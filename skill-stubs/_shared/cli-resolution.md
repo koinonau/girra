@@ -1,18 +1,6 @@
----
-name: orca-emulator-android
-description: >-
-  Android device and emulator control from inside Orca over adb, with the live
-  device view in Orca's emulator pane. Use when driving an adb-connected emulator
-  or phone on Windows, Linux, or macOS: booting AVDs, taps, swipes, typing,
-  hardware buttons, rotation, app install and launch, runtime permissions, the
-  accessibility tree, and logcat. For an iOS simulator use the iOS emulator
-  skill; build the APK with Gradle first.
-license: Apache-2.0
----
+<!-- Single-authored blocks shared by every skill stub. -->
 
-# Orca Emulator (Android)
-
-This discovery stub loads the version-matched guide from the Orca executable used for this session.
+<!-- block: resolver -->
 
 ## Resolve the CLI for this session
 
@@ -33,11 +21,7 @@ same way in POSIX shells, PowerShell, and cmd.exe.
 If the selected executable cannot run, report its exact error and stop. Do not fall through
 to another executable, which could silently target a different Orca build.
 
-## Load the version-matched guide before running Orca commands
-
-```text
-ORCA skills get orca-emulator-android
-```
+<!-- block: no-guessing -->
 
 Prefer `--json`. Use the selected executable's `--help` for commands or flags the guide does
 not cover. If a command reports that Orca is not running, start it with `ORCA open --json`
