@@ -8,8 +8,8 @@ As of 2026-09-13: planning is complete and the repository exists. No Orca code h
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
-- `shanedolley/girra` is private on GitHub. Its `main` holds Orca's code at the surveyed commit, with history older than 2026-08-29 squashed.
-- The planning and handover files reached `main` through [#1](https://github.com/shanedolley/girra/pull/1), merged 2026-09-13.
+- `koinonau/girra` is private on GitHub, moved from `shanedolley/girra` on 2026-09-13; GitHub redirects the old URL. Its `main` holds Orca's code at the surveyed commit, with history older than 2026-08-29 squashed.
+- The planning and handover files reached `main` through [#1](https://github.com/koinonau/girra/pull/1), merged 2026-09-13.
 - Phase 0, the baseline, has not run.
 
 ## Files
@@ -31,11 +31,11 @@ Until a tracker exists, the phases in the build plan are the backlog.
 
 ## Repository
 
-`~/Development/koinonau/girra`, pushed to `shanedolley/girra` (private).
+`~/Development/koinonau/girra`, pushed to `koinonau/girra` (private).
 
 | Remote | Points to |
 |---|---|
-| `origin` | `shanedolley/girra` |
+| `origin` | `koinonau/girra` |
 | `upstream` | `stablyai/orca`. Push URL set to `DISABLED` |
 
 - Show the head with `git log -1 --format='%h %ad %s' --date=short main`. On 2026-09-13 it matched Orca `403b62a8d`, upstream/main from 2026-09-12, v1.4.197, apart from the five planning files at the root (`git diff --stat orca-full-history main`).
@@ -43,7 +43,8 @@ Until a tracker exists, the phases in the build plan are the backlog.
 - **`main` shares no ancestry with upstream** (`git merge-base main upstream/main` finds none). Take upstream fixes with `git cherry-pick` after `git fetch upstream`. `git merge upstream/main` fails as unrelated histories.
 - **`orca-full-history`** is a local-only branch at Orca `403b62a8d` holding all 10,733 commits. It exists in this clone alone and is the only place `git blame` reaches past 2026-08-29. Measure upstream drift against it: `git fetch upstream && git rev-list --count orca-full-history..upstream/main` gave 137 (2026-09-13).
 - No Git LFS; largest blob 8.2 MB (`docs/assets/readme-feature-showcase.gif`). Orca's release tags exist locally and point into the unsquashed history; none were pushed.
-- **GitHub Actions is disabled** on the repository (`gh api repos/shanedolley/girra/actions/permissions` returns `"enabled":false`, 2026-09-13). Orca ships 65 workflows, including an hourly macOS build.
+- **GitHub Actions is disabled** on the repository (`gh api repos/koinonau/girra/actions/permissions` returns `"enabled":false`, 2026-09-13). Orca ships 65 workflows, including an hourly macOS build.
+- Branch protection and rulesets are unavailable: the rulesets API returns 403 and asks for a paid plan on this private repository (2026-09-13).
 - Licence: MIT.
 - The survey clone at `~/Development/github_clones/orca` still exists at the same commit. Its `origin` is `shanedolley/orca`, a month-stale standalone copy (`isFork: false`) holding 61 commits from earlier work. Girra no longer depends on either.
 
@@ -94,6 +95,7 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-12: reset the survey clone to `upstream/main`, discarding a half-finished merge of 221 commits and 3,392 staged files.
 - Fork and delete rather than rebuild.
 - Fork from `403b62a8d`, the commit every measurement used. Pull newer upstream commits later as a sync.
+- Move the repository to the `koinonau` organisation; it already sat at `~/Development/koinonau/girra` locally, beside the other Koinon repositories.
 - This directory is the repository, and `upstream` stays fetchable so upstream patches remain pullable by cherry-pick.
 - Squash history older than 14 days, keeping 1,307 commits, and replace the already-pushed full history with `git push --force-with-lease`.
 - Disable GitHub Actions until the workflows are pruned.
