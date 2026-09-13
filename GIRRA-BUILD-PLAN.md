@@ -1,0 +1,123 @@
+# Girra Build Plan
+
+Fork Orca and delete what you rejected. Do not rebuild.
+
+You kept 432 of 535 features, 81%. At that ratio a rebuild re-derives code you already decided to keep, and the 103 rejections are mostly whole directories. The work is subtraction.
+
+The 535 counts real decisions. An earlier draft said 575, which double-counted 37 entries scraped from Orca's docs site and three features listed twice under different names. Removing them changed no decision and no line of code.
+
+Source: Orca `403b62a8d8` (upstream/main, 2026-09-12), v1.4.197, MIT licensed. Selections in `GIRRA-FEATURE-TREE.md`.
+
+## What comes out
+
+197,983 lines across 26 modules. Ordered by inbound coupling, which is what actually sets the difficulty:
+
+| Module | LoC | Inbound refs | Difficulty |
+|---|---|---|---|
+| `mobile/` | 137,454 | 0 from `src/` | Free |
+| `src/main/star-nag` | 817 | 3 | Trivial |
+| `src/main/speech` | 2,971 | 10 | Easy |
+| `src/main/updater` | 2,465 | 13 | Easy |
+| `src/main/orca-profiles` | 4,836 | 27 | Moderate |
+| `src/main/crash-reporting` | 4,185 | 39 | Moderate |
+| `src/main/telemetry` | 1,030 | 45 | Wide but mechanical |
+| Artifacts + skill sharing | 3,467 | Self-contained | Easy |
+| 13 minor agent CLIs | 5,525 | 1 choke point | Easy |
+| `src/main/codex*` | 35,233 | **125** | Hard |
+
+Mobile is 70% of the deletion and costs nothing. Codex is 18% and costs the most.
+
+## Phases
+
+### Phase 0. Baseline
+
+Fork to a girra repo. Run `pnpm install`, `pnpm typecheck`, `pnpm test`, `pnpm lint` and record the results before changing a line. Every later phase verifies against this baseline, so a red test here must be fixed or documented first.
+
+### Phase 1. Mobile
+
+Remove `mobile/`, its CI workflows, and the mobile pairing code in `src/main/host` and `src/renderer/src/web`. Nothing in `src/` imports the mobile tree, so this is one commit and the largest single win.
+
+Relocate `Clipboard copy of terminal selection` out of `src/renderer/src/web/` first. You kept it; its current home does not survive.
+
+### Phase 2. Cheap strips
+
+Take star-nag, then speech, then updater, in that order. Each is the same loop: delete the directory, fix the named call sites, run typecheck and tests. Ascending coupling means you learn the loop on the 3-reference case, not the 45.
+
+### Phase 3. Instrumented strips
+
+orca-profiles, then crash-reporting, then telemetry. Telemetry has 45 call sites because it is instrumented through the app rather than concentrated. Expect wide, shallow edits. Decide once whether call sites become no-ops or disappear, then apply that consistently.
+
+Keep `src/main/observability`. It writes local logs and traces, phones nothing home, and you kept it.
+
+### Phase 4. Minor agent CLIs
+
+`src/main/agent-hooks/managed-agent-hook-registry.ts` imports every provider's hook service. Cut the 13 imports there, then delete the directories: amp, antigravity, copilot, cursor, devin, droid, gemini, grok, grok-accounts, kimi, mimo, openclaude, command-code, hermes.
+
+### Phase 5. Codex
+
+Last, when you know the codebase. 125 files reference it, `src/shared` carries Codex-shaped types, and the rate-limit and AI Vault code branch on provider. Budget more time here than for phases 1 to 4 combined.
+
+### Phase 6. Relocation
+
+Move `Unified usage dashboard` out of `components/feature-wall/`. You cut the marketing directory but kept the dashboard, and it is the only real feature in there.
+
+### Phase 7. Strip the Orca identity
+
+Split the work by who sees it. Internal identifiers stay; anything a person reads changes.
+
+**Displayed text.** 4,559 Orca mentions across six locale files: `en` 895, `fr` 826, `ko` 723, `zh` 713, `es` 705, `ja` 697. This is the bulk of the job and it is mechanical, because the renderer routes almost everything through i18n. Only two hardcoded strings escaped into TSX. CLI help text is the other half: 86 non-test files under `src/cli` carry `summary`, `usage` and `notes` strings that print on `--help`.
+
+**Identity and packaging.** `package.json` name, description, homepage and author. In `config/electron-builder.config.cjs`: `appId` (`com.stablyai.orca`), `productName`, and the `protocols` entry registering the `orca` scheme. Replace the icons in `resources/build`.
+
+**Deep links.** The `orca://` scheme has 136 references and `orca-preview://` another 5. Changing the scheme breaks any saved link, which for a solo build means nothing.
+
+**Paths you will see every day.** Girra writes `.orca/` into every repo it touches, 239 references. Agent hooks read 20-odd `ORCA_*` environment variables, including `ORCA_PANE_KEY`, `ORCA_USER_DATA_PATH` and `ORCA_AGENT_HOOK_TOKEN`. You see these whenever you write a hook or debug one, so decide deliberately rather than by default.
+
+**Live Orca services inside features you kept.** One survives:
+
+| Endpoint | Feature | Action |
+|---|---|---|
+| `www.onorca.dev/docs/*` | Sidebar help menu | 17 links into docs that will not describe girra. Remove the menu or repoint it. |
+
+Fifteen files reference `onorca.dev`. Fourteen belong to features you dropped: `login.onorca.dev` with orca-profiles, `push` and `relay` with mobile, the nudge and changelog feeds with the updater, `plugins/kill-list.json` with the kill-list, `share.onorca.dev` with artifacts and skill sharing, `v1/feedback` with the feedback form. Confirm each one leaves rather than assuming it did.
+
+**Leave alone.** The 359 `orca*` TypeScript identifiers and the module paths under `src/main`. Renaming them touches nearly every file, breaks any upstream patch you later want to pull, and changes nothing visible.
+
+**Verify.** No Orca string should survive in a place a person reads:
+
+```
+grep -ri orca src/renderer/src/i18n/locales/
+grep -ri orca src/cli/specs src/cli/handlers | grep -v '\.test\.'
+grep -rn 'onorca\.dev' src | grep -v '\.test\.'
+```
+
+Test fixtures are noise here. Roughly half the Orca mentions under `src/` live in `.test.` files, along with invented URLs like `github.com/acme/orca`. Filter them out or the count never reaches zero.
+
+### Phase 8. Gates
+
+Orca's CI enforces a max-lines ratchet, a reliability-gates file, and ts-nocheck limits. Deleting a fifth of the codebase invalidates all three baselines. Regenerate them rather than suppressing them, or the first real change fails for unrelated reasons.
+
+## Verification
+
+Run after every phase, not at the end:
+
+```
+pnpm typecheck
+pnpm test
+pnpm lint
+pnpm build
+```
+
+A phase is finished when all four match the Phase 0 baseline. Deleting code that something still imports fails typecheck immediately, which is why the order above matters more than the speed.
+
+## Start here
+
+Phase 0 then Phase 1. Mobile is 137k lines, zero inbound references, and one commit. It proves the loop works before you touch anything coupled.
+
+## Open decisions
+
+Three, all in Phase 7:
+
+- **In-app help links.** 17 links point at Orca's docs site. Remove the help menu, or repoint it.
+- **`.orca/` and `ORCA_*`.** Rename them and every existing worktree and hook script stops resolving. Keep them and you read Orca's name every time you debug a hook.
+- **The `orca` CLI binary.** Rename it if you will run both side by side.
