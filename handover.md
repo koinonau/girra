@@ -9,7 +9,7 @@ As of 2026-09-13: planning is complete and the repository exists. No Orca code h
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
 - `shanedolley/girra` is private on GitHub. Its `main` holds Orca's code at the surveyed commit, with history older than 2026-08-29 squashed.
-- The planning and handover files arrive through a pull request: `gh pr list --repo shanedolley/girra`.
+- The planning and handover files reached `main` through [#1](https://github.com/shanedolley/girra/pull/1), merged 2026-09-13.
 - Phase 0, the baseline, has not run.
 
 ## Files
@@ -38,8 +38,8 @@ Until a tracker exists, the phases in the build plan are the backlog.
 | `origin` | `shanedolley/girra` |
 | `upstream` | `stablyai/orca`. Push URL set to `DISABLED` |
 
-- Show the head with `git log -1 --format='%h %ad %s' --date=short main`. On 2026-09-13 its tree was identical to Orca `403b62a8d`, upstream/main from 2026-09-12, v1.4.197 (`git diff --quiet orca-full-history main`).
-- **History is squashed.** `main` has 1,308 commits: one root commit holding Orca's tree at `51ed7d4f6` (2026-08-29) in place of 9,426 older commits, then the 1,307 later Orca commits with their original authors (`git rev-list --count main`, 2026-09-13). Estimated at 89 MiB of objects, down from 219 MiB.
+- Show the head with `git log -1 --format='%h %ad %s' --date=short main`. On 2026-09-13 it matched Orca `403b62a8d`, upstream/main from 2026-09-12, v1.4.197, apart from the five planning files at the root (`git diff --stat orca-full-history main`).
+- **History is squashed.** The first 1,308 commits of `main` are Orca's: one root commit holding Orca's tree at `51ed7d4f6` (2026-08-29) in place of 9,426 older commits, then the 1,307 later Orca commits with their original authors. Girra's own commits follow. Estimated at 89 MiB of objects, down from 219 MiB (2026-09-13).
 - **`main` shares no ancestry with upstream** (`git merge-base main upstream/main` finds none). Take upstream fixes with `git cherry-pick` after `git fetch upstream`. `git merge upstream/main` fails as unrelated histories.
 - **`orca-full-history`** is a local-only branch at Orca `403b62a8d` holding all 10,733 commits. It exists in this clone alone and is the only place `git blame` reaches past 2026-08-29. Measure upstream drift against it: `git fetch upstream && git rev-list --count orca-full-history..upstream/main` gave 137 (2026-09-13).
 - No Git LFS; largest blob 8.2 MB (`docs/assets/readme-feature-showcase.gif`). Orca's release tags exist locally and point into the unsquashed history; none were pushed.
