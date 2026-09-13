@@ -28,7 +28,7 @@ When a tracker exists, record its project, ready status, and transition IDs here
 
 ## Commits
 
-One pull request per story. Cut the branch from `origin/main`, stage files by name, push, and open the pull request against `main` on `shanedolley/girra`.
+One pull request per story. Cut the branch from `origin/main`, stage files by name, push, and open the pull request against `main` on `koinonau/girra`.
 
 Actions is disabled, so no CI runs. The local checks in the loop stand in for CI until workflows are pruned and Actions is re-enabled.
 
@@ -44,7 +44,7 @@ Raise a decision with the question, each option with its cost and what it buys, 
 
 Ask the user first:
 
-- Re-enabling GitHub Actions on `shanedolley/girra`.
+- Re-enabling GitHub Actions on `koinonau/girra`.
 - Merging a pull request, pushing to `main`, or force-pushing any branch.
 - Pushing tags, or anything against `stablyai/orca`. Its push URL is `DISABLED`; keep it so. Orca's tags point into unsquashed history.
 - Cherry-picking upstream commits into `main`. A merge from upstream fails; `main` shares no ancestry with it.
