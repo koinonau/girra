@@ -10,11 +10,12 @@ Source: Orca `403b62a8d8` (upstream/main, 2026-09-12), v1.4.197, MIT licensed. S
 
 ## What comes out
 
-197,983 lines across 26 modules. Ordered by inbound coupling, which is what actually sets the difficulty:
+226,348 lines across 27 modules. Ordered by inbound coupling, which is what actually sets the difficulty:
 
 | Module | LoC | Inbound refs | Difficulty |
 |---|---|---|---|
 | `mobile/` | 137,454 | 0 from `src/` | Free |
+| `cloud/` | 28,365 | 0 from `src/` | Free |
 | `src/main/star-nag` | 817 | 3 | Trivial |
 | `src/main/speech` | 2,971 | 10 | Easy |
 | `src/main/updater` | 2,465 | 13 | Easy |
@@ -25,7 +26,9 @@ Source: Orca `403b62a8d8` (upstream/main, 2026-09-12), v1.4.197, MIT licensed. S
 | 13 minor agent CLIs | 5,525 | 1 choke point | Easy |
 | `src/main/codex*` | 35,233 | **125** | Hard |
 
-Mobile is 70% of the deletion and costs nothing. Codex is 18% and costs the most.
+Mobile and `cloud/` are 73% of the deletion and cost nothing. Codex is 16% and costs the most.
+
+`cloud/` holds Orca's server-side push and relay apps, which serve the mobile companion and Orca cloud. The first survey missed it; the Phase 0 test run found it.
 
 ## Phases
 
@@ -33,9 +36,11 @@ Mobile is 70% of the deletion and costs nothing. Codex is 18% and costs the most
 
 Fork to a girra repo. Run `pnpm install`, `pnpm typecheck`, `pnpm test`, `pnpm lint` and record the results before changing a line. Every later phase verifies against this baseline, so a red test here must be fixed or documented first.
 
-### Phase 1. Mobile
+Done 2026-09-14. The baseline, with its ten known test failures, lives in `handover.md`.
 
-Remove `mobile/`, its CI workflows, and the mobile pairing code in `src/main/host` and `src/renderer/src/web`. Nothing in `src/` imports the mobile tree, so this is one commit and the largest single win.
+### Phase 1. Mobile and cloud
+
+Remove `mobile/`, `cloud/`, their CI workflows, and the mobile pairing code in `src/main/host` and `src/renderer/src/web`. Nothing in `src/` imports either tree, so this is one commit and the largest single win.
 
 Relocate `Clipboard copy of terminal selection` out of `src/renderer/src/web/` first. You kept it; its current home does not survive.
 
