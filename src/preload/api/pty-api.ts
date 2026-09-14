@@ -11,7 +11,8 @@ import type {
   PtyRendererDeliveryHealthReply,
   PtyRendererDeliveryStateReport
 } from '../../shared/pty-renderer-delivery-health'
-import type { AgentKind, LaunchSource, RequestKind } from '../../shared/telemetry-events'
+import type { AgentKind } from '../../shared/agent-kind'
+import type { LaunchSource, RequestKind } from '../../shared/worktree/launch-types'
 import type { TerminalSideEffectBatch } from '../../shared/terminal-side-effect-facts'
 import type { TerminalViewAttributes } from '../../shared/terminal-view-attributes'
 import type { TuiAgent } from '../../shared/tui-agent'

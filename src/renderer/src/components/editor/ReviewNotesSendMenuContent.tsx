@@ -31,7 +31,7 @@ import type { DashboardAgentRow as DashboardAgentRowData } from '@/components/da
 import { lastEnteredDoneAt } from '@/components/dashboard/agent-finished-timestamp'
 import { selectLivePtyIdsForWorktree } from '@/components/sidebar/worktree-card-status-inputs'
 import { useWorktreeAgentRows } from '@/components/sidebar/useWorktreeAgentRows'
-import type { LaunchSource } from '../../../../shared/telemetry-events'
+import type { LaunchSource } from '../../../../shared/worktree/launch-types'
 import { agentRowDotState } from '@/lib/agent-row-dot-state'
 import { translate } from '@/i18n/i18n'
 

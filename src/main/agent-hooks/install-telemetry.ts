@@ -1,4 +1,4 @@
-import type { HookInstallAgent } from '../../shared/telemetry-events'
+import type { AgentHookTarget as HookInstallAgent } from '../../shared/agent-hook-types'
 import { track } from '../telemetry/client'
 
 const ERROR_MESSAGE_MAX_LEN = 200

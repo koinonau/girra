@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto'
 
-import type { AgentKind } from '../../../shared/telemetry-events'
+import type { AgentKind } from '../../../shared/agent-kind'
 import type { AgentHookEventPayload } from '../../../shared/agent-hook-listener/listener-event'
 import {
   getAgentResumeArgv,

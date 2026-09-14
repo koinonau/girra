@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { agentKindToTuiAgent, tuiAgentToAgentKind } from './agent-kind'
-import { AGENT_KIND_VALUES, agentKindSchema } from './telemetry-events'
+import {
+  AGENT_KIND_VALUES,
+  agentKindSchema,
+  agentKindToTuiAgent,
+  tuiAgentToAgentKind
+} from './agent-kind'
 import { TUI_AGENT_CONFIG } from './tui-agent-config'
 import type { TuiAgent } from './tui-agent'
 

@@ -14,7 +14,8 @@ import type {
 } from '../../shared/pty-renderer-delivery-health'
 import type { TerminalViewAttributes } from '../../shared/terminal-view-attributes'
 import type { PtyMainDeliveryDiagnostics } from '../../shared/pty-delivery-diagnostics'
-import type { AgentKind, LaunchSource, RequestKind } from '../../shared/telemetry-events'
+import type { AgentKind } from '../../shared/agent-kind'
+import type { LaunchSource, RequestKind } from '../../shared/worktree/launch-types'
 import type { PreloadApi } from '../api-types'
 
 export const ptySessionControlApi = {

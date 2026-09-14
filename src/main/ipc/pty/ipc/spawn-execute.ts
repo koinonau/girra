@@ -7,7 +7,7 @@ import {
 import { classifyError } from '../../../telemetry/classify-error'
 import { track } from '../../../telemetry/client'
 import { getCohortAtEmit } from '../../../telemetry/cohort-classifier'
-import { agentKindSchema } from '../../../../shared/telemetry-events'
+import { agentKindSchema } from '../../../../shared/agent-kind'
 import { normalizeNodePtySpawnError } from '../provider/liveness'
 import { resolveStablePaneOwner, spawnForStablePane } from '../pane/stable-owner'
 import { assertSpawnReplyWasLive } from '../pane/agent-session-owners'

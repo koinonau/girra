@@ -1,4 +1,4 @@
-import { AGENT_KIND_VALUES, type AgentKind } from '../../../shared/telemetry-events'
+import { AGENT_KIND_VALUES, type AgentKind } from '../../../shared/agent-kind'
 
 // Why: co-located with the endpoint file in userData/agent-hooks/ so hook-server cross-restart artifacts stay together.
 export const LAST_STATUS_FILE_NAME = 'last-status.json'

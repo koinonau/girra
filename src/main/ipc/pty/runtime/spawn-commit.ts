@@ -18,11 +18,8 @@ import {
 import { seedTerminalRestoreRecordsFromSpawnResult } from '../pane/agent-session-owners'
 import { track } from '../../../telemetry/client'
 import { getCohortAtEmit } from '../../../telemetry/cohort-classifier'
-import {
-  agentKindSchema,
-  launchSourceSchema,
-  requestKindSchema
-} from '../../../../shared/telemetry-events'
+import { agentKindSchema } from '../../../../shared/agent-kind'
+import { launchSourceSchema, requestKindSchema } from '../../../../shared/telemetry-events'
 import { persistAdmittedStablePaneBinding } from '../pane/stable-owner'
 import { claimSshPaneLease } from '../pane/ssh-pane-lease-claim'
 import {
