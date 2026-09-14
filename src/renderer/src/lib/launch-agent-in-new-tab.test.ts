@@ -12,7 +12,6 @@ const mockPasteDraftWhenAgentReady = vi.fn()
 const mockSeedNativeChatLaunchPrompt = vi.fn()
 const mockSeedNativeChatLaunchDraft = vi.fn()
 const mockMarkNativeChatLaunchPromptFailed = vi.fn()
-const mockTrack = vi.fn()
 const mockToastMessage = vi.fn()
 const mockWaitForAgentReady = vi.fn()
 
@@ -118,11 +117,6 @@ vi.mock('@/lib/agent-paste-draft', () => ({
 
 vi.mock('@/lib/agent-ready-wait', () => ({
   waitForAgentReady: mockWaitForAgentReady
-}))
-
-vi.mock('@/lib/telemetry', () => ({
-  track: mockTrack,
-  tuiAgentToAgentKind: (agent: string) => agent
 }))
 
 const mockCreateWebRuntimeSessionTerminal = vi.fn()
@@ -597,30 +591,6 @@ describe('launchAgentInNewTab', () => {
     )
   })
 
-  it('does not track prompt-sent for argv prompt launches', async () => {
-    const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
-
-    launchAgentInNewTab({
-      agent: 'codex',
-      worktreeId: 'wt-1',
-      prompt: 'fix the spinner',
-      launchSource: 'onboarding'
-    })
-  })
-
-  it('does not track prompt-sent for draft launches', async () => {
-    const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
-
-    launchAgentInNewTab({
-      agent: 'claude',
-      worktreeId: 'wt-1',
-      prompt: 'review this before sending',
-      promptDelivery: 'draft'
-    })
-
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
-  })
-
   it('falls back to post-ready draft paste when a Windows inline draft would be too large', async () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
     const prompt = 'x'.repeat(25_000)
@@ -729,7 +699,6 @@ describe('launchAgentInNewTab', () => {
       undefined,
       { connectionId: 'ssh-a' }
     )
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
   })
 
   it('does not recreate SSH status when clear arrives before disconnect state', async () => {
@@ -766,7 +735,7 @@ describe('launchAgentInNewTab', () => {
     expect(mockSetAgentStatus).not.toHaveBeenCalled()
   })
 
-  it('does not track prompt-sent when submit-after-ready delivery fails', async () => {
+  it('reports failed submit-after-ready delivery', async () => {
     mockPasteDraftWhenAgentReady.mockResolvedValue(false)
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
@@ -781,8 +750,6 @@ describe('launchAgentInNewTab', () => {
       failureNotified: false
     })
     await Promise.resolve()
-
-    expect(mockTrack).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
   })
 
   it('marks failed submit-after-ready delivery as notified after readiness timeout toast', async () => {

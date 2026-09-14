@@ -1,4 +1,3 @@
-import { track } from '../../telemetry/client'
 import { normalizeAgentStatusPayload } from '../../../shared/agent-status-types'
 import { normalizeAgentProviderSession } from '../../../shared/agent-session-resume'
 import { isAgentHookSource, restoreShedStatusFields } from '../../../shared/agent-hook-relay'
@@ -65,7 +64,6 @@ export abstract class AgentHookServerIngestRemote extends AgentHookServerIngestS
     const paneKey = this.resolvePaneKeyAlias(physicalPaneKey)
     const parsedPaneKey = parsePaneKey(paneKey)
     if (paneKey.length === 0) {
-      track('agent_hook_unattributed', { reason: 'empty_pane_key' })
       return
     }
     if (paneKey.length > MAX_PANE_KEY_LEN || !parsedPaneKey) {

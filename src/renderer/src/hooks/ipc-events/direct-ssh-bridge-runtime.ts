@@ -1,4 +1,3 @@
-import { createDirectSshReconnectProductTelemetryAdapter } from '@/lib/direct-ssh-reconnect-product-telemetry'
 import { acquireDirectSshDetectedWorktreeRefresh } from '@/store/slices/worktrees'
 import { toSshExecutionHostId } from '../../../../shared/execution-host'
 import type { DirectSshAuthority } from '../../../../shared/ssh-types'
@@ -124,8 +123,7 @@ export function createDirectSshBridgeRuntime(): DirectSshBridgeRuntime {
       terminalActions().retryDirectSshTargetPanes?.(authority) ?? 0,
     correctUnboundTerminalPanes: (authority) =>
       terminalActions().retryDirectSshTargetPanes?.(authority) ?? 0,
-    syncRemoteWorkspaceAfterConnect: (token) => remoteWorkspaceTargetSync?.syncAfterConnect(token),
-    onTelemetry: createDirectSshReconnectProductTelemetryAdapter()
+    syncRemoteWorkspaceAfterConnect: (token) => remoteWorkspaceTargetSync?.syncAfterConnect(token)
   })
   const remoteWorkspaceApi = window.api.remoteWorkspace
   if (remoteWorkspaceApi) {

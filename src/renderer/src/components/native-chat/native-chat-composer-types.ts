@@ -26,7 +26,6 @@ export type NativeChatStructuredComposerTransport = {
   sessionCommands?: readonly AgentSessionSlashCommand[]
   worktreeId?: string
   onError: (message: string | null) => void
-  runtime: 'local' | 'remote'
   /** The session behind this composer; a real user send relinquishes orchestration ownership. */
   sessionId: string
   /** Owning runtime for that report; null is the local runtime. */

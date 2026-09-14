@@ -11,7 +11,6 @@ import { createUIStore, makePersistedUI } from './ui-slice-test-harness'
 
 const mocks = vi.hoisted(() => ({
   sendNotesToActiveAgentSession: vi.fn(),
-  track: vi.fn(),
   toastMessage: vi.fn(),
   toastSuccess: vi.fn(),
   toastError: vi.fn()
@@ -23,10 +22,6 @@ vi.mock('@/lib/active-agent-note-send', () => ({
     options: { explicitTarget?: boolean } = {}
   ) => (options.explicitTarget ? `selected:${status}` : status),
   sendNotesToActiveAgentSession: mocks.sendNotesToActiveAgentSession
-}))
-
-vi.mock('@/lib/telemetry', () => ({
-  track: mocks.track
 }))
 
 vi.mock('sonner', () => ({
@@ -45,7 +40,6 @@ afterEach(() => {
 beforeEach(() => {
   mocks.sendNotesToActiveAgentSession.mockReset()
   mocks.sendNotesToActiveAgentSession.mockResolvedValue({ status: 'sent' })
-  mocks.track.mockReset()
   mocks.toastMessage.mockReset()
   mocks.toastSuccess.mockReset()
   mocks.toastError.mockReset()

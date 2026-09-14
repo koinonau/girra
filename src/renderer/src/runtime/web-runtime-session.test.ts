@@ -29,7 +29,6 @@ const mocks = vi.hoisted(() => ({
   acceptReplayedWebSessionTabsSnapshot: vi.fn(),
   getWebSessionTabsTrackingGeneration: vi.fn(() => 0),
   resolveHostSessionTabIdForWebSessionTab: vi.fn(),
-  trackTerminalPaneSplit: vi.fn(),
   deliverLaunchPromptToAgentTab: vi.fn(),
   seedNativeChatLaunchDraftForAgentTab: vi.fn(),
   getRuntimeEnvironmentIdForWorktree: vi.fn(),
@@ -62,10 +61,6 @@ vi.mock('./web-session-tabs-sync', () => ({
 
 vi.mock('./web-session-terminal-orphan-recovery', () => ({
   recoverWebSessionTerminalOrphansBeforeApply: mocks.recoverWebSessionTerminalOrphansBeforeApply
-}))
-
-vi.mock('@/lib/feature-education-telemetry', () => ({
-  trackTerminalPaneSplit: mocks.trackTerminalPaneSplit
 }))
 
 vi.mock('@/lib/worktree-runtime-owner', () => ({

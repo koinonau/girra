@@ -66,7 +66,6 @@
     "../src/main/codex/codex-trust-identity.ts",
     "../src/main/codex/codex-trust-config-rollback.ts",
     "../src/main/codex/codex-trust-config-mutation-queue.ts",
-    "../src/main/codex/codex-trust-grant-telemetry.ts",
     "../src/main/codex/codex-trust-grant-host.ts",
     "../src/main/codex/codex-trust-grant-ledger.ts",
     "../src/main/codex/codex-user-hook-trust-rebase-client.ts",

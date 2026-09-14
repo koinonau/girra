@@ -41,7 +41,6 @@ import { createRuntimeEnvironmentsApi } from './preload-api/web-runtime-environm
 import { webRuntimeState } from './preload-api/web-runtime-session'
 import { createWebSettingsApi } from './preload-api/web-settings-api'
 import { createShellApi } from './preload-api/web-shell-api'
-import { createWebTelemetryApi } from './preload-api/web-telemetry-api'
 import { createPtyApi, createSshApi } from './preload-api/web-terminal-api'
 import { createWebUiApi } from './preload-api/web-ui-api'
 import { createWebWorkspacePortsApi } from './preload-api/web-workspace-ports-api'
@@ -127,7 +126,6 @@ function createWebPreloadApi(): Partial<PreloadApi> {
       isAvailable: () => callRuntimeResult<boolean>('host.gitBash.isAvailable').catch(() => false)
     },
     ...createWebAgentStatusApi(),
-    ...createWebMobileApi(),
-    ...createWebTelemetryApi()
+    ...createWebMobileApi()
   }
 }

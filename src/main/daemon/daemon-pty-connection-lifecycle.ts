@@ -137,7 +137,6 @@ export abstract class DaemonPtyConnectionLifecycle extends DaemonPtyEventSubscri
 
   protected publishAuditObservation(observation: DaemonAuditObservation): void {
     this.lastAuditObservation = observation
-    this.trackAuditEligibility(observation)
     notifyDaemonAuditListeners(this.auditObservationListeners, observation)
   }
 

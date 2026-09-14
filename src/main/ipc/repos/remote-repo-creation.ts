@@ -8,7 +8,6 @@ import {
 import { getSshGitProvider } from '../../providers/ssh-git-dispatch'
 import { getSshFilesystemProvider } from '../../providers/ssh-filesystem-dispatch'
 import { joinRemotePath } from '../../ssh/ssh-remote-platform'
-import { emitRepoAdded } from './repo-added-telemetry'
 import { addRemoteRepoFromPath } from './remote-repo-registration'
 import { resolveRemoteHomePath } from './remote-home-path'
 
@@ -58,7 +57,6 @@ export async function createRemoteRepo(
     )
   })
   if (existing) {
-    emitRepoAdded('folder_picker', true)
     return { repo: existing }
   }
 
@@ -134,7 +132,6 @@ export async function createRemoteRepo(
     )
   })
   if (raceWinner) {
-    emitRepoAdded('folder_picker', true)
     return { repo: raceWinner }
   }
 
@@ -147,6 +144,5 @@ export async function createRemoteRepo(
   if ('error' in result) {
     return result
   }
-  emitRepoAdded('folder_picker', result.alreadyExisted)
   return { repo: result.repo }
 }

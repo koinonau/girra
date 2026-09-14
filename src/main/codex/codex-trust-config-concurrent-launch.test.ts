@@ -25,7 +25,6 @@ const { CodexAppServerUnsupportedError } = await import('./codex-app-server-clie
 const { codexAppServerCapabilityCache } = await import('./codex-app-server-capability-cache')
 const { _internals, grantManagedCodexHookTrust } = await import('./codex-hook-trust-grant')
 const { markCodexProjectTrusted } = await import('../agent-trust-presets')
-const { setCodexTrustGrantTelemetry } = await import('./codex-trust-grant-telemetry')
 const {
   computeTrustKey,
   computeTrustedHash,
@@ -51,7 +50,6 @@ beforeEach(() => {
 
 afterEach(() => {
   _internals.setGrantSessionRunner(null)
-  setCodexTrustGrantTelemetry(() => {})
   codexAppServerCapabilityCache.clear()
   if (testState.previousUserDataPath === undefined) {
     delete process.env.ORCA_USER_DATA_PATH
@@ -86,7 +84,6 @@ function buildPlan(
     managedCommand: MANAGED_COMMAND,
     managedEntries: entries,
     host: { kind: 'native' },
-    telemetryLane: 'real-home',
     ...overrides
   }
 }
@@ -122,11 +119,7 @@ function writingSessionRunner(args: {
       await args.gate
     }
     if (args.outcome === 'verify-failed') {
-      return {
-        outcome: 'verify-failed',
-        reason: 'listed hash mismatch',
-        reasonClass: 'post-grant-mismatch'
-      }
+      return { outcome: 'verify-failed', reason: 'listed hash mismatch' }
     }
     return { outcome: 'granted', wroteTrust: true, entries: granted }
   }

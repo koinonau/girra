@@ -75,11 +75,6 @@ vi.mock('@/components/tab-bar/reconcile-order', () => ({
 
 vi.mock('@/lib/agent-paste-draft', () => ({ pasteDraftWhenAgentReady: vi.fn() }))
 
-vi.mock('@/lib/telemetry', () => ({
-  track: vi.fn(),
-  tuiAgentToAgentKind: (agent: string) => agent
-}))
-
 vi.mock('@/runtime/web-runtime-session', () => ({
   createWebRuntimeSessionTerminal: vi.fn(),
   isWebRuntimeSessionActive: vi.fn(() => false),

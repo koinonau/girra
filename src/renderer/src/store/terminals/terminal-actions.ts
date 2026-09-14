@@ -11,7 +11,7 @@ import type {
 import type { DirectSshAuthority } from '../../../../shared/ssh-types'
 import type { StartupCommandDelivery } from '../../../../shared/codex-startup-delivery'
 import type { SessionOptionValue } from '../../../../shared/native-chat-session-options'
-import type { AgentStartedTelemetry } from '../../lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '../../lib/worktree-startup-payload'
 import type { AiVaultSessionTitle } from '../../../../shared/ai-vault-session-title'
 import type {
   GeneratedTabTitleUpdate,
@@ -215,7 +215,7 @@ export type TerminalActions = {
         prompt: string
       }
       showSessionRestoredBanner?: boolean
-      telemetry?: AgentStartedTelemetry
+      telemetry?: AgentLaunchMetadata
     }
   ) => void
   queueTabInitialCwd: (tabId: string, cwd: string) => void
@@ -241,7 +241,7 @@ export type TerminalActions = {
       prompt: string
     }
     showSessionRestoredBanner?: boolean
-    telemetry?: AgentStartedTelemetry
+    telemetry?: AgentLaunchMetadata
   } | null
   queueTabSetupSplit: (
     tabId: string,

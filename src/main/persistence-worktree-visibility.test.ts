@@ -17,11 +17,6 @@ vi.mock('./ssh/ssh-config-parser', () => ({
   loadUserSshConfig: loadUserSshConfigMock,
   sshConfigHostsToTargets: sshConfigHostsToTargetsMock
 }))
-const { trackMock, getCohortAtEmitMock } = vi.hoisted(() => ({
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn()
-}))
-
 vi.mock('electron', () => ({
   app: {
     getPath: () => testState.dir
@@ -39,20 +34,9 @@ vi.mock('electron', () => ({
   }
 }))
 
-vi.mock('./telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('./telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
-
 describe('Store', () => {
   beforeEach(() => {
     testState.dir = mkdtempSync(join(tmpdir(), 'orca-test-'))
-    trackMock.mockReset()
-    getCohortAtEmitMock.mockReset()
-    getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
   })
 
   afterEach(() => {

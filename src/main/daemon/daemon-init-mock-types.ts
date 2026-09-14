@@ -143,9 +143,6 @@ export type DaemonInitMockState = {
   setLocalPtyProviderMock: Mock<(...args: unknown[]) => void>
   unbindLocalProviderListenersMock: Mock<(...args: unknown[]) => void>
   rebindLocalProviderListenersMock: Mock<(...args: unknown[]) => void>
-  trackDaemonReplacedMock: Mock<(...args: unknown[]) => void>
-  trackDaemonRetiredMock: Mock<(...args: unknown[]) => void>
-  trackDaemonAdoptedMock: Mock<(...args: unknown[]) => void>
 }
 
 /** net.connect stubs the suites install in beforeEach. */

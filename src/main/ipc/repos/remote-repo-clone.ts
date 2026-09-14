@@ -13,7 +13,6 @@ import { getSshGitProvider } from '../../providers/ssh-git-dispatch'
 import { getSshFilesystemProvider } from '../../providers/ssh-filesystem-dispatch'
 import { joinRemotePath } from '../../ssh/ssh-remote-platform'
 import { getActiveMultiplexer } from '../ssh'
-import { emitRepoAdded } from './repo-added-telemetry'
 import { addRemoteRepoFromPath } from './remote-repo-registration'
 import { resolveRemoteHomePath } from './remote-home-path'
 
@@ -64,7 +63,6 @@ export async function cloneRemoteRepo(
     )
   })
   if (existing && !isFolderRepo(existing)) {
-    emitRepoAdded('clone_url', true)
     return existing
   }
 
@@ -118,7 +116,6 @@ export async function cloneRemoteRepo(
       projectHostSetupMethod: 'cloned'
     })
     if (updated) {
-      emitRepoAdded('clone_url', false)
       getActiveMultiplexer(args.connectionId)?.notify('session.registerRoot', {
         rootPath: clonePath
       })
@@ -134,7 +131,6 @@ export async function cloneRemoteRepo(
   if ('error' in result) {
     throw new Error(result.error)
   }
-  emitRepoAdded('clone_url', result.alreadyExisted)
   return result.repo
 }
 

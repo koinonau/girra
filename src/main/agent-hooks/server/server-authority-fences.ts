@@ -41,7 +41,6 @@ export abstract class AgentHookServerAuthorityFences extends AgentHookServerAuth
       this.activeHookTurnCompletedAtByPaneKey.delete(key)
       this.runtimeObservedStatusPaneKeys.delete(key)
       this.currentAuthorityObservations.delete(key)
-      this.promptSentDedupeByPaneKey.delete(key)
       this.observations.forget(key)
     }
     if (aliasChanged) {
@@ -139,7 +138,6 @@ export abstract class AgentHookServerAuthorityFences extends AgentHookServerAuth
       clearPaneCacheState(this.state, legacyPaneKey)
       this.activeHookTurnCompletedAtByPaneKey.delete(legacyPaneKey)
       this.currentAuthorityObservations.delete(legacyPaneKey)
-      this.promptSentDedupeByPaneKey.delete(legacyPaneKey)
       if (shouldClearStablePaneKey && this.state.lastStatusByPaneKey.has(entry.stablePaneKey)) {
         statusChanged = true
         clearedStatusPaneKeys.add(entry.stablePaneKey)
@@ -154,7 +152,6 @@ export abstract class AgentHookServerAuthorityFences extends AgentHookServerAuth
         this.activeHookTurnCompletedAtByPaneKey.delete(entry.stablePaneKey)
         this.runtimeObservedStatusPaneKeys.delete(entry.stablePaneKey)
         this.currentAuthorityObservations.delete(entry.stablePaneKey)
-        this.promptSentDedupeByPaneKey.delete(entry.stablePaneKey)
       }
       aliasChanged = true
     }

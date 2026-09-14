@@ -12,7 +12,6 @@ import { HOOK_REQUEST_SLOWLORIS_MS } from '../../../shared/agent-hook-listener/l
 import { isHookRequestTruncatedError } from '../../../shared/agent-hook-transport-interference'
 import { drainAgentHookSpool, type SpoolRecord } from '../../../shared/agent-hook-spool'
 import { clearAllListenerCaches } from '../../../shared/agent-hook-listener/listener-state'
-import { trackEmptyPaneKeyHook } from './server-transport-rules'
 import { AgentHookServerRuntimeEnv } from './server-runtime-env'
 
 export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv {
@@ -92,7 +91,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
         }
         // Why: merge transport headers before normalization so relay-compatible fields have one canonical path.
         const hookBody = mergeAgentHookRequestHeaders(body, req.headers)
-        trackEmptyPaneKeyHook(hookBody)
         const aliasedBody = this.normalizeHookBodyPaneKeyAlias(hookBody)
         const normalized = this.normalizeLocalHookPayload(source, aliasedBody)
         const statusDisposition = normalized.event
@@ -199,7 +197,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
     this.persistedAuthorityCommitmentsByPaneKey.clear()
     this.revokedHydratedAuthorityCommitments = new WeakSet()
     this.currentAuthorityObservations.clear()
-    this.promptSentDedupeByPaneKey.clear()
     this.closedAgentStatusTabIds.clear()
     this.closedAgentStatusPaneKeys.clear()
     this.restartedStatusLaunchTokenHashByPaneKey.clear()

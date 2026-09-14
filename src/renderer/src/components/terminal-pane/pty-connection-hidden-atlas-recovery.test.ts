@@ -498,7 +498,7 @@ describe('connectPanePty', () => {
     expect(pane.terminal.write).toHaveBeenCalledWith('backgrounded document output\r\n')
   })
 
-  it('keeps hidden Codex telemetry startup output parsing briefly', async () => {
+  it('keeps hidden Codex startup output parsing briefly when launch attribution names the agent', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -541,7 +541,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps hidden Grok telemetry startup output parsing briefly', async () => {
+  it('keeps hidden Grok startup output parsing briefly when launch attribution names the agent', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }

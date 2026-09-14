@@ -1,5 +1,4 @@
 import { useCallback, useLayoutEffect, useRef } from 'react'
-import { emitNativeChatMessageSent } from '@/lib/native-chat-telemetry'
 import { reportStructuredSessionUserInput } from '@/lib/worker-terminal-takeover-report'
 import { isStructuredAgentSessionComposerCommand } from '../../../../shared/structured-agent-session-composer'
 import type { AgentType } from '../../../../shared/agent-status-types'
@@ -56,7 +55,6 @@ export function useNativeChatStructuredComposerSend({
           if (!accepted) {
             return
           }
-          emitNativeChatMessageSent({ agent, runtime: structuredTransport.runtime })
           // A real user send is a takeover, exactly as typing into a worker's pane is. Only past
           // `accepted`, and only from this hook: the outbox dispatcher retries and would re-fire,
           // and orchestration's own pointer nudges never reach the composer at all.

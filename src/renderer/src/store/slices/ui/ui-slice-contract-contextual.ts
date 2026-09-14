@@ -63,8 +63,6 @@ export type UISliceContextual = {
   activeContextualTourStepIndex: number
   activeContextualTourSource: string | null
   activeContextualTourSourceDetached: boolean
-  activeContextualTourWasFeaturePreviouslyInteracted: boolean
-  contextualTourNavigationInteractionSnapshot: Partial<Record<ContextualTourId, boolean>>
   activeContextualTourSuppressed: boolean
   contextualTourShownThisSession: boolean
   contextualToursOnboardingVisible: boolean

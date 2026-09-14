@@ -33,19 +33,6 @@ export type DirectSshWorktreeRefreshOutcome = {
   status: DirectSshWorktreeRefreshTerminalStatus
   providerRequestId?: ProviderRequestId
   providerResult?: HostQualifiedDetectedWorktreeResult
-  metrics?: DirectSshWorktreeRefreshMetrics
-}
-
-export type DirectSshWorktreeRefreshMetrics = {
-  queueWaitDurationsMs: readonly number[]
-  providerExecutionDurationsMs: readonly number[]
-  timeoutRetryCount: number
-  locallySettledWaiterCount: number
-  cancelDebtCount: number
-  replacementAdmissionDelayedCount: number
-  overlappingJoinCount: number
-  peakLocallyUnsettled: number
-  estimatedLateWorkAllowanceCount: number
 }
 
 export type DirectSshWorktreeRefreshReleaseReason = 'superseded' | 'invalidated' | 'stopped'
@@ -68,7 +55,6 @@ export type DirectSshWorktreeRefreshSchedulerDeps = {
   startAttempt: (key: DirectSshWorktreeRefreshKey) => DirectSshWorktreeRefreshAttempt
   createWaiterLeaseId?: () => WaiterLeaseId
   onUnexpectedError?: (error: unknown) => void
-  now?: () => number
 }
 
 export type DirectSshWorktreeRefreshSchedulerSnapshot = {
@@ -101,9 +87,6 @@ export type DirectSshWorktreeRefreshLogicalTask = {
   attemptCount: number
   attempt: DirectSshWorktreeRefreshAttempt | null
   attemptCanceled: boolean
-  attemptStartedAt: number | null
-  queuedAt: number
-  metrics: DirectSshWorktreeRefreshMetrics
   waiters: Map<WaiterLeaseId, DirectSshWorktreeRefreshWaiter>
 }
 

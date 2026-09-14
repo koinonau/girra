@@ -1,15 +1,7 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react'
 import type { AgentType } from '../../../../shared/agent-status-types'
-import {
-  emitNativeChatMessageSent,
-  emitNativeChatPickerItemAccepted,
-  emitNativeChatSendClassified
-} from '@/lib/native-chat-telemetry'
 import { sendNativeChatMessage, sendNativeChatTypedCommand } from './native-chat-runtime-send'
-import {
-  nativeChatComposerTargetIsRemote,
-  type NativeChatResolvedTarget
-} from './native-chat-composer-target'
+import type { NativeChatResolvedTarget } from './native-chat-composer-target'
 import {
   pushHistory,
   type HistoryState,
@@ -62,17 +54,11 @@ export function useNativeChatPickerCommandDispatch(args: {
           ? sendNativeChatTypedCommand(target.settings, target.ptyId, text)
           : sendNativeChatMessage(target.settings, target.ptyId, text)
       )
-      emitNativeChatPickerItemAccepted({ agent, itemKind: 'command' })
       // Why: picker dispatch is a catalog-verified command send; it must leave
-      // the same telemetry and composer state as the typed path — including
-      // disarming attachments, or a stale image rides the next prompt.
-      emitNativeChatSendClassified({ agent, outcome: 'command' })
+      // the same composer state as the typed path, including disarming
+      // attachments, or a stale image rides the next prompt.
       onSlashCommand?.(text)
       sessionOptionsSurface?.recordOutgoingCommand(text)
-      emitNativeChatMessageSent({
-        agent,
-        runtime: nativeChatComposerTargetIsRemote(target.ptyId) ? 'remote' : 'local'
-      })
       setHistory((previous) => pushHistory(previous, text))
       setDraft('')
       setCaret(0)

@@ -4,11 +4,6 @@ import { applyBackgroundActivationPolicy } from '../window/foreground-activation
 import { applyElectronProxySettings } from '../network/proxy-settings'
 import { installElectronProxyRequestGuard } from '../network/electron-proxy-request-guard'
 import { handleElectronProxyLogin } from '../network/electron-proxy-credentials'
-import { installMainThreadHangWatchdog } from '../hang-watchdog/main-thread-hang-watchdog'
-import {
-  consumeHangDetectionMarker,
-  hangDetectionMarkerPath
-} from '../hang-watchdog/hang-detection-marker'
 import { browserCertificateTrustController } from '../browser/browser-manager'
 import { ensureActiveOrcaProfile } from '../orca-profiles/profile-index-store'
 import { Store, getCanonicalUserDataPath } from '../persistence'
@@ -65,8 +60,6 @@ export async function initializeReadyFoundation(): Promise<void> {
     )
   })
   const canonicalUserDataPath = getCanonicalUserDataPath()
-  installMainThreadHangWatchdog({ userDataPath: canonicalUserDataPath })
-  state.hangDetection = consumeHangDetectionMarker(hangDetectionMarkerPath(canonicalUserDataPath))
   // Why: install certificate decisions before any webview or headless window issues its first TLS request.
   app.on(
     'certificate-error',

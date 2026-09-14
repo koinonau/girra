@@ -1309,19 +1309,11 @@ jobs:
           echo "identity=$identity" >>"$GITHUB_OUTPUT"
           echo "Classified $TAG as $identity"
 
-      # Why ORCA_POSTHOG_WRITE_KEY here: this is the only build that
-      # produces a published binary, so this is the only place the secret
-      # needs to be in scope. The key is a PostHog *project* API key, not
-      # a server secret — it ships in every official binary's app.asar
-      # and is therefore extractable from any release. We still keep it
-      # in GitHub Actions secrets so the literal stays out of the repo
-      # (and out of fork CI runs / log scrapers / casual greps).
       # Why ORCA_BUILD_IDENTITY here (not in env at the job level): the
       # value comes from the per-tag classification above and electron-vite
       # reads it from `process.env` during `pnpm build:release` only.
       # Why ORCA_DIAGNOSTICS_TOKEN_URL here: official builds pin crash
-      # diagnostic uploads to Orca's endpoint at compile time, matching the
-      # telemetry gate's "official binary only" behavior.
+      # diagnostic uploads to Orca's endpoint at compile time.
       - name: Build app
         run: pnpm build:release
         env:
@@ -1330,7 +1322,6 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
           ORCA_BUILD_IDENTITY: ${{ steps.tag-classify.outputs.identity }}
           ORCA_DIAGNOSTICS_TOKEN_URL: https://www.onorca.dev/diagnostics/token
-          ORCA_POSTHOG_WRITE_KEY: ${{ secrets.ORCA_POSTHOG_WRITE_KEY }}
 
       - name: Gate runtime file-watcher process isolation
         if: runner.os == 'Linux'
@@ -2164,22 +2155,6 @@ jobs:
             exit 1
           fi
 
-      # Why post-publish for Linux: electron-builder packs and uploads in a
-      # single `--publish always` invocation, so there is no cheap insertion
-      # point between pack and upload without splitting those steps. Running
-      # verify last still blocks the bad release: the binary is uploaded to the
-      # draft, but a failed matrix job blocks `publish-release` from flipping
-      # the release from draft → published, so users never see it. A human then
-      # deletes the draft and re-cuts.
-      #
-      # Why this guards against: a misconfigured CI run where
-      # `ORCA_POSTHOG_WRITE_KEY` is unset or the tag fails to classify
-      # would otherwise produce a binary with `BUILD_IDENTITY = null` and
-      # `WRITE_KEY = null`, which silently disables transport
-      # (`IS_OFFICIAL_BUILD === false`) — the exact failure mode flagged
-      # in PR #1385's deferred follow-up.
-      - name: Verify telemetry constants present in app.asar
-        run: node config/scripts/verify-telemetry-constants.mjs
 
   build-mac:
     needs:

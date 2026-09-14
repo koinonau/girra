@@ -1,7 +1,7 @@
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { AgentStartupShell } from '../../../../shared/tui-agent-startup-shell'
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { WorktreeCreationRequest } from '@/lib/pending-worktree-creation'
 import type { AgentStartupPlan } from '@/lib/tui-agent-startup'
 import { buildAgentDraftLaunchPlan, buildAgentStartupPlan } from '@/lib/tui-agent-startup'
@@ -11,7 +11,7 @@ import {
 } from '../../../../shared/tui-agent-launch-defaults'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
 import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
-import { tuiAgentToAgentKind } from '@/lib/telemetry'
+import { tuiAgentToAgentKind } from '../../../../shared/agent-kind'
 
 export type QuickComposerStartupInput = {
   agent: TuiAgent | null
@@ -28,7 +28,7 @@ export type QuickComposerStartupInput = {
 export type QuickComposerStartup = {
   startupPlan: AgentStartupPlan | null
   backendStartup: WorktreeCreationRequest['startup']
-  telemetry: AgentStartedTelemetry | null
+  telemetry: AgentLaunchMetadata | null
 }
 
 export function buildQuickComposerStartup(input: QuickComposerStartupInput): QuickComposerStartup {
@@ -97,7 +97,7 @@ export function buildQuickComposerStartup(input: QuickComposerStartupInput): Qui
       startupPlan.draftPrompt = draftPrompt
     }
   }
-  const telemetry: AgentStartedTelemetry | null =
+  const telemetry: AgentLaunchMetadata | null =
     agent === null
       ? null
       : {

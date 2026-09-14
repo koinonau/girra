@@ -198,7 +198,7 @@ describe('attachRestoredTabConflictScan', () => {
     try {
       await vi.advanceTimersByTimeAsync(10)
       // Why: in-session drift is the live watcher's job; re-reading here would
-      // turn the scan into a poller and skew the 'restore' telemetry origin.
+      // turn the scan into a poller.
       expect(mocks.readRuntimeFileContent).not.toHaveBeenCalled()
     } finally {
       detach()

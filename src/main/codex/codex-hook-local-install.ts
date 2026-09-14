@@ -150,8 +150,7 @@ export async function installCodexHooksExclusively(
       tomlPath,
       managedCommand: command,
       managedEntries: managedTrustEntries,
-      host: { kind: 'native' },
-      telemetryLane: 'managed'
+      host: { kind: 'native' }
     })
     if (grant.lane === 'rpc') {
       recentGrantEntries = grant.entries

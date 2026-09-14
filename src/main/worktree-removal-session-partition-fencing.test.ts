@@ -27,9 +27,6 @@ vi.mock('electron', () => ({
   }
 }))
 
-vi.mock('./telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('./telemetry/cohort-classifier', () => ({ getCohortAtEmit: vi.fn().mockReturnValue({}) }))
-
 async function createStore() {
   vi.resetModules()
   const { Store, initDataPath } = await import('./persistence')

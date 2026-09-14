@@ -1,11 +1,11 @@
 import { toast } from 'sonner'
-import { track, tuiAgentToAgentKind } from '@/lib/telemetry'
+import { tuiAgentToAgentKind } from '../../../shared/agent-kind'
 import {
   buildAgentDraftLaunchPlan,
   buildAgentStartupPlan,
   type AgentStartupPlan
 } from '@/lib/tui-agent-startup'
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { SleepingAgentLaunchConfig } from '../../../shared/agent-session-resume'
 import type { LaunchSource } from '../../../shared/worktree/launch-types'
 import type { StartupCommandDelivery } from '../../../shared/codex-startup-delivery'
@@ -133,13 +133,13 @@ export function buildDirectWorkItemStartupOpts(
     launchDraftText?: string
     sessionOptions?: AgentStartupPlan['sessionOptions']
     startupCommandDelivery?: StartupCommandDelivery
-    telemetry?: AgentStartedTelemetry
+    telemetry?: AgentLaunchMetadata
   }
 } {
   if (!plan) {
     return {}
   }
-  const telemetry: AgentStartedTelemetry | null =
+  const telemetry: AgentLaunchMetadata | null =
     agent === null
       ? null
       : { agent_kind: tuiAgentToAgentKind(agent), launch_source: launchSource, request_kind: 'new' }
@@ -161,7 +161,7 @@ export function buildDirectWorkItemStartupOpts(
 }
 
 /** Timeout notice for the post-launch paste; the workspace itself is ready. */
-export function notifyDirectWorkItemAgentStartTimeout(agent: TuiAgent, submit: boolean): void {
+export function notifyDirectWorkItemAgentStartTimeout(submit: boolean): void {
   toast.message(
     translate(
       'auto.lib.launch.work.item.direct.agent.ceeeb509b5',
@@ -169,7 +169,4 @@ export function notifyDirectWorkItemAgentStartTimeout(agent: TuiAgent, submit: b
       { value0: submit ? 'prompt' : 'work item context' }
     )
   )
-  // Why: process-startup timeout has no v1 enum slot; the `unknown` slice
-  // on the dashboard is the trigger to add one.
-  track('agent_error', { error_class: 'unknown', agent_kind: tuiAgentToAgentKind(agent) })
 }

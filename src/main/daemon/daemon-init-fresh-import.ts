@@ -39,10 +39,7 @@ export async function importFreshDaemonInit(state: DaemonInitMockState) {
     localFallbackProvider,
     setLocalPtyProviderMock,
     unbindLocalProviderListenersMock,
-    rebindLocalProviderListenersMock,
-    trackDaemonReplacedMock,
-    trackDaemonRetiredMock,
-    trackDaemonAdoptedMock
+    rebindLocalProviderListenersMock
   } = state
 
   vi.resetModules()
@@ -63,9 +60,6 @@ export async function importFreshDaemonInit(state: DaemonInitMockState) {
   setLocalPtyProviderMock.mockClear()
   unbindLocalProviderListenersMock.mockClear()
   rebindLocalProviderListenersMock.mockClear()
-  trackDaemonReplacedMock.mockClear()
-  trackDaemonRetiredMock.mockClear()
-  trackDaemonAdoptedMock.mockClear()
   checkDaemonHealthMock.mockClear()
   checkDaemonHealthMock.mockResolvedValue('healthy')
   healthCheckDaemonMock.mockClear()
@@ -78,7 +72,7 @@ export async function importFreshDaemonInit(state: DaemonInitMockState) {
   isDaemonStaleForCurrentBundleMock.mockReset()
   isDaemonStaleForCurrentBundleMock.mockReturnValue(false)
   // mockReset (not mockClear) also drops an unconsumed *Once queue, so a test that bails early
-  // can't leak a queued false into the next test's confirmedReplacement gate.
+  // can't leak a queued outcome into the next test.
   killStaleDaemonMock.mockReset()
   killStaleDaemonMock.mockResolvedValue({
     killed: true,

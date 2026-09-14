@@ -11,7 +11,7 @@ import type {
   WorkspaceStatus
 } from '../../../shared/worktree/types'
 import type { AgentStartupPlan } from '@/lib/tui-agent-startup'
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { TaskSourceContext, WorkspaceRunContext } from '../../../shared/task-source-context'
 import type { AgentLaunchRoute } from '@/lib/agent-launch-routing'
 
@@ -111,7 +111,7 @@ export type WorktreeCreationRequest = {
   /** How a structured launch delivers `launchDraftPrompt ?? quickPrompt`; decided once by the
    *  composer beside `agentLaunchRoute`, never re-derived from the prompt fields. */
   promptDelivery?: 'draft' | 'auto-submit'
-  quickTelemetry: AgentStartedTelemetry | null
+  quickTelemetry: AgentLaunchMetadata | null
   /** When the composer stays open for sequential creates, completion must not
    *  steal focus from the next workspace name field. */
   suppressTerminalFocusOnCompletion?: boolean

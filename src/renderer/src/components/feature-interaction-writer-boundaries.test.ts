@@ -64,7 +64,7 @@ describe('feature interaction writer boundaries', () => {
 
   it('records GitHub provider-depth for inline item mutation success paths', () => {
     const githubWriter = "recordFeatureInteraction('github-tasks')"
-    // Why: table cells route success telemetry through the optimistic mutation
+    // Why: table cells route success recording through the optimistic mutation
     // hook so provider-depth recording stays on one confirm path.
     const hookSource = readFileSync(
       join(COMPONENT_ROOT, '../hooks/useTaskPageGitHubWorkItemMutation.ts'),
@@ -105,7 +105,7 @@ describe('feature interaction writer boundaries', () => {
     ).toHaveLength(4)
   })
 
-  it('suppresses Tasks surface telemetry for in-page provider switches and detail opens', () => {
+  it('suppresses Tasks surface interaction recording for in-page provider switches and detail opens', () => {
     const suppression = 'recordTasksInteraction: false'
     const githubDetailSection = sourceBetween(
       componentSource('use-task-page-github-detail.ts'),

@@ -31,9 +31,8 @@ export type QuickLaunchAgentMenuItemsProps = {
   prompt?: string
   /** Use non-default modes for generated context that must not become shell syntax. */
   promptDelivery?: 'auto-submit' | 'draft' | 'submit-after-ready'
-  /** Telemetry surface for `agent_started.launch_source`. Defaults to
-   *  `'tab_bar_quick_launch'` so the existing tab-bar `+` callsite is
-   *  unchanged. */
+  /** Launch attribution for the startup payload. Defaults to
+   *  `'tab_bar_quick_launch'` for the tab-bar `+` callsite. */
   launchSource?: LaunchSource
   /** Called after a prompt is queued into the agent, or immediately for argv prompt launches. */
   onPromptDelivered?: () => void

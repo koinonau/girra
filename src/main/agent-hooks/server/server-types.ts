@@ -5,7 +5,6 @@ import type {
   AgentStatusState
 } from '../../../shared/agent-status-types'
 import type { AgentStatusObservation } from '../../../shared/agent-status-observation'
-import type { AgentKind } from '../../../shared/agent-kind'
 import type { LegacyPaneKeyAliasEntry } from '../../../shared/persisted-state-types'
 
 // Why: server-side enrichment — receivedAt = latest event arrival, stateStartedAt = when the current state first appeared; extra fields ride the shared map untouched (it only writes/clears).
@@ -120,12 +119,6 @@ export type LastStatusFile = {
   version: number
   entries: Record<string, PersistedAgentHookEventPayload>
   authorityCommitments?: Record<string, PersistedAgentHookAuthorityCommitment>
-}
-
-export type AgentPromptSentDedupeEntry = {
-  agentKind: AgentKind
-  promptHash: string
-  promptInteractionKey?: string
 }
 
 export type NormalizedLocalHook = {

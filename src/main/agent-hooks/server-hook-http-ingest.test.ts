@@ -4,24 +4,8 @@ import { AGENT_STATUS_MAX_FIELD_LENGTH } from '../../shared/agent-status-types'
 import { makePaneKey } from '../../shared/stable-pane-id'
 import { buildBody, PANE, LEAF_2, LEAF_3 } from './server.test-fixtures'
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
-
-vi.mock('../telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
-
 beforeEach(() => {
   _internals.resetCachesForTests()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {
@@ -326,9 +310,6 @@ describe('AgentHookServer listener replay', () => {
 
       expect(response.status).toBe(204)
       expect(listener).not.toHaveBeenCalled()
-      expect(trackMock).toHaveBeenCalledWith('agent_hook_unattributed', {
-        reason: 'empty_pane_key'
-      })
     } finally {
       server.stop()
     }

@@ -61,8 +61,6 @@ export type GitHubIpcMocks = {
   client: MockedModule<typeof CLIENT_EXPORTS>
   workItemDetails: MockedModule<typeof WORK_ITEM_DETAILS_EXPORTS>
   prRefresh: MockedModule<typeof PR_REFRESH_EXPORTS>
-  telemetry: { track: Mock }
-  cohort: { getCohortAtEmit: Mock }
   ui: { sendToTrustedUIRenderer: Mock }
 }
 
@@ -75,8 +73,6 @@ export function createGitHubIpcMocks(): GitHubIpcMocks {
     client: mockedModule(CLIENT_EXPORTS),
     workItemDetails: mockedModule(WORK_ITEM_DETAILS_EXPORTS),
     prRefresh: mockedModule(PR_REFRESH_EXPORTS),
-    telemetry: { track: vi.fn() },
-    cohort: { getCohortAtEmit: vi.fn() },
     ui: { sendToTrustedUIRenderer: vi.fn() }
   }
 }
@@ -88,8 +84,6 @@ export function listGitHubIpcMockFns(mocks: GitHubIpcMocks): Mock[] {
     ...Object.values<Mock>(mocks.client),
     ...Object.values<Mock>(mocks.workItemDetails),
     ...Object.values<Mock>(mocks.prRefresh),
-    mocks.telemetry.track,
-    mocks.cohort.getCohortAtEmit,
     mocks.ui.sendToTrustedUIRenderer
   ]
 }

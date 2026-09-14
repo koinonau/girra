@@ -3,11 +3,13 @@ import type { SessionRestoredBannerReason } from './session-restored-banner-pane
 import type { ReplayingPanesRef } from './replay-guard'
 import type { RestoredViewportBlankingPanesRef } from './terminal-restored-viewport'
 import type { AgentCompletionStatusSnapshot } from './agent-completion-coordinator-types'
-import type { EventProps } from '../../../../shared/telemetry-events'
 import type { TerminalColorSchemeMode } from '../../../../shared/terminal-color-scheme-protocol'
 import type { StartupCommandDelivery } from '../../../../shared/codex-startup-delivery'
 import type { TuiAgent } from '../../../../shared/tui-agent'
-import type { SetupSplitDirection } from '../../../../shared/worktree/launch-types'
+import type {
+  SetupSplitDirection,
+  WorktreeStartupLaunch
+} from '../../../../shared/worktree/launch-types'
 import type {
   AgentProviderSessionMetadata,
   SleepingAgentLaunchConfig
@@ -34,9 +36,8 @@ export type PtyPaneStartup = {
   agentArgsOverride?: string | null
   draftPrompt?: string
   sessionOptions?: Record<string, SessionOptionValue>
-  /** Telemetry payload for `agent_started`. Forwarded to `pty:spawn`
-   *  so main fires the event only after the spawn succeeds. */
-  telemetry?: EventProps<'agent_started'>
+  /** Launch attribution forwarded to `pty:spawn`; main uses it to answer terminal color queries. */
+  telemetry?: WorktreeStartupLaunch['telemetry']
   /** Initial prompt-start status for agents that lack native prompt hooks. */
   initialAgentStatus?: { agent: TuiAgent; prompt: string }
   /** Show the restored-session banner when this startup command mounts. */

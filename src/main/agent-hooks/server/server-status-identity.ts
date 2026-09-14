@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto'
 
-import type { AgentKind } from '../../../shared/agent-kind'
 import type { AgentHookEventPayload } from '../../../shared/agent-hook-listener/listener-event'
 import {
   getAgentResumeArgv,
@@ -9,21 +8,8 @@ import {
 import { parseLegacyNumericPaneKey, parsePaneKey } from '../../../shared/stable-pane-id'
 import type { AgentStatusIpcPayload, AgentType } from '../../../shared/agent-status-types'
 import type { EnrichedAgentHookEventPayload } from './server-types'
-import { AGENT_PROMPT_SENT_AGENT_KINDS, TOOL_PROGRESS_HOOK_EVENTS } from './server-constants'
+import { TOOL_PROGRESS_HOOK_EVENTS } from './server-constants'
 import { MAX_PANE_KEY_LEN } from '../../../shared/agent-hook-listener/listener-limits'
-
-export function agentTypeToPromptSentAgentKind(agentType: AgentType | undefined): AgentKind {
-  const normalized = agentType?.trim().toLowerCase()
-  if (!normalized || normalized === 'unknown') {
-    return 'other'
-  }
-  if (normalized === 'claude') {
-    return 'claude-code'
-  }
-  return AGENT_PROMPT_SENT_AGENT_KINDS.has(normalized as AgentKind)
-    ? (normalized as AgentKind)
-    : 'other'
-}
 
 export function equivalentInterruptAgentType(
   actual: AgentType | undefined,

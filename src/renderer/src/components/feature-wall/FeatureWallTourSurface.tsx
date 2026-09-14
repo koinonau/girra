@@ -10,9 +10,6 @@ import {
 import { getAgentsSteps, type AgentsStepId } from '../../../../shared/agents-orchestration-steps'
 import { getWorkbenchSteps, type WorkbenchStepId } from '../../../../shared/workbench-steps'
 import { getReviewSteps, type ReviewStepId } from '../../../../shared/review-steps'
-import type { FeatureWallOpenSourceTelemetry } from '../../../../shared/telemetry-events'
-import type { FeatureWallTourDepthSummary } from '../../../../shared/feature-wall-tour-depth'
-import { track } from '@/lib/telemetry'
 import { useAppStore } from '@/store'
 import { ORCA_CLI_SKILL_NAME, ORCHESTRATION_SKILL_NAME } from '@/lib/agent-feature-install-commands'
 import {
@@ -20,11 +17,10 @@ import {
   useInstalledAgentSkill
 } from '@/hooks/useInstalledAgentSkills'
 import { useActiveProjectSkillRuntime } from '@/hooks/useActiveProjectSkillRuntime'
-import { usePrefersReducedMotion } from './feature-wall-modal-helpers'
+import { usePrefersReducedMotion, type FeatureWallOpenSource } from './feature-wall-modal-helpers'
 import { toFeatureWallAssetUrl, useFeatureWallAssetBaseUrl } from './feature-wall-assets'
 import { useFeatureWallTaskSourcePresentation } from './use-feature-wall-task-source-presentation'
 import { useFeatureWallCompletion } from './use-feature-wall-completion'
-import { useFeatureWallTourTelemetry } from './use-feature-wall-tour-telemetry'
 import { FeatureWallContinueButton } from './FeatureWallContinueButton'
 import { FeatureWallTourPanel } from './FeatureWallTourPanel'
 import { getFeatureWallActiveStepCopy } from './feature-wall-active-step-copy'
@@ -34,8 +30,8 @@ import { useFeatureWallTourRailKeydown } from './use-feature-wall-tour-rail-keyd
 
 type FeatureWallTourSurfaceProps = {
   isOpen: boolean
-  source: FeatureWallOpenSourceTelemetry
-  onDone: (markSuccessfulExit?: () => void) => boolean | void | Promise<boolean | void>
+  source: FeatureWallOpenSource
+  onDone: () => void
   className?: string
   panelClassName?: string
   doneLabel?: string
@@ -44,7 +40,6 @@ type FeatureWallTourSurfaceProps = {
   compactRail?: boolean
   detachedFooter?: boolean
   leadingFooterContent?: ReactNode
-  onTourDepthSummaryChange?: (summary: FeatureWallTourDepthSummary) => void
 }
 
 export function FeatureWallTourSurface({
@@ -58,8 +53,7 @@ export function FeatureWallTourSurface({
   enableKeyboardShortcut = true,
   compactRail = false,
   detachedFooter = false,
-  leadingFooterContent,
-  onTourDepthSummaryChange
+  leadingFooterContent
 }: FeatureWallTourSurfaceProps): JSX.Element | null {
   const settings = useAppStore((s) => s.settings)
   const updateSettings = useAppStore((s) => s.updateSettings)
@@ -124,14 +118,8 @@ export function FeatureWallTourSurface({
     taskSourcePresentation.hasConnectedTaskSource,
     taskSourcePresentation.isCheckingTaskSources,
     orchestrationSkill.installed,
-    browserUseSkill.installed,
-    { onTourDepthSummaryChange }
+    browserUseSkill.installed
   )
-  const { markExitAction } = useFeatureWallTourTelemetry({
-    isOpen,
-    source,
-    getDepthSummary: completion.getTourDepthSummary
-  })
   const {
     markWorkflowVisited,
     markAgentStepVisited,
@@ -165,23 +153,8 @@ export function FeatureWallTourSurface({
   useEffect(() => {
     if (isOpen) {
       markWorkflowVisitedRef.current(DEFAULT_FEATURE_WALL_WORKFLOW_ID)
-      track('feature_wall_group_selected', {
-        group_id: DEFAULT_FEATURE_WALL_WORKFLOW_ID,
-        source
-      })
-      const defaultTile = getFeatureWallMediaTile(FEATURE_WALL_WORKFLOWS[0].primaryTileId)
-      if (defaultTile) {
-        track('feature_wall_feature_selected', {
-          group_id: DEFAULT_FEATURE_WALL_WORKFLOW_ID,
-          tile_id: defaultTile.id,
-          source
-        })
-        // Keep the legacy hover/focus event firing too for analytics
-        // continuity until dashboards are migrated to feature_selected.
-        track('feature_wall_tile_focused', { tile_id: defaultTile.id })
-      }
     }
-  }, [isOpen, source])
+  }, [isOpen])
 
   const handleSelect = useCallback(
     (workflow: FeatureWallWorkflow): void => {
@@ -203,16 +176,6 @@ export function FeatureWallTourSurface({
         markReviewStepVisited(nextStepId)
         setReviewStepId(nextStepId)
       }
-      track('feature_wall_group_selected', { group_id: workflow.id, source })
-      const tile = getFeatureWallMediaTile(workflow.primaryTileId)
-      if (tile) {
-        track('feature_wall_feature_selected', {
-          group_id: workflow.id,
-          tile_id: tile.id,
-          source
-        })
-        track('feature_wall_tile_focused', { tile_id: tile.id })
-      }
     },
     [
       agentsSteps,
@@ -222,7 +185,6 @@ export function FeatureWallTourSurface({
       markWorkflowVisited,
       reviewSteps,
       selectedId,
-      source,
       workbenchSteps
     ]
   )
@@ -307,21 +269,7 @@ export function FeatureWallTourSurface({
       }
     }
     if (isLastWorkflow) {
-      const exitAction = source === 'onboarding' ? 'onboarding_continue' : 'done'
-      let markedSuccessfulExit = false
-      const markSuccessfulExit = (): void => {
-        if (markedSuccessfulExit) {
-          return
-        }
-        markedSuccessfulExit = true
-        markExitAction(exitAction)
-      }
-      const doneResult = onDone(markSuccessfulExit)
-      if (doneResult instanceof Promise) {
-        void doneResult.then((result) => result !== false && markSuccessfulExit())
-      } else if (doneResult !== false) {
-        markSuccessfulExit()
-      }
+      onDone()
       return
     }
     const nextWorkflow = FEATURE_WALL_WORKFLOWS[selectedIndex + 1]
@@ -336,7 +284,6 @@ export function FeatureWallTourSurface({
     handleSelect,
     isLastWorkflow,
     markAgentStepVisited,
-    markExitAction,
     markReviewStepVisited,
     markWorkbenchStepVisited,
     markWorkflowVisited,
@@ -346,7 +293,6 @@ export function FeatureWallTourSurface({
     reviewSteps,
     selected.id,
     selectedIndex,
-    source,
     workbenchStepId,
     workbenchStepIndex,
     workbenchSteps

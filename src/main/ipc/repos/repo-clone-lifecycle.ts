@@ -21,7 +21,6 @@ import { LOCAL_EXECUTION_HOST_ID } from '../../../shared/execution-host'
 import { detectRepoIconAndUpstream } from '../../repo-icon-autodetect'
 import { prepareLocalWorktreeRootForRepo } from '../../worktree-root-preparation'
 import { invalidateAuthorizedRootsCache } from '../registered-worktree-roots-cache'
-import { emitRepoAdded } from './repo-added-telemetry'
 import { notifyReposChanged } from './repos-changed-notification'
 import { runWithClonePathLock } from './clone-path-lock'
 import { abortActiveRemoteClone, cloneRemoteRepo } from './remote-repo-clone'
@@ -125,8 +124,6 @@ export function registerRepoCloneHandlers(mainWindow: BrowserWindow, store: Stor
           .getRepos()
           .find((r) => getClonePathComparisonKey(r.path) === clonePathKey)
         if (existingAfterPendingClone && !isFolderRepo(existingAfterPendingClone)) {
-          // Why: clone_url always produces a git repo.
-          emitRepoAdded('clone_url', true, true)
           return existingAfterPendingClone
         }
         // Why: gitSpawn cwd is args.destination, so it must exist before spawn (fresh installs may lack the defaulted parent).
@@ -249,12 +246,9 @@ export function registerRepoCloneHandlers(mainWindow: BrowserWindow, store: Stor
                 await prepareLocalWorktreeRootForRepo(store, updated)
                 invalidateAuthorizedRootsCache()
                 notifyReposChanged(mainWindow)
-                // Why: folder→git upgrade is a real new git repo provisioning event.
-                emitRepoAdded('clone_url', false, true)
                 return updated
               }
             }
-            emitRepoAdded('clone_url', true, true)
             return existing
           }
 
@@ -279,7 +273,6 @@ export function registerRepoCloneHandlers(mainWindow: BrowserWindow, store: Stor
           await prepareLocalWorktreeRootForRepo(store, repo)
           invalidateAuthorizedRootsCache()
           notifyReposChanged(mainWindow)
-          emitRepoAdded('clone_url', false, true)
           return repo
         } finally {
           const metadata = cloneMetadataRef.current

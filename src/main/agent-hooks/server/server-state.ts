@@ -1,5 +1,4 @@
 import type { createServer } from 'node:http'
-import { randomBytes } from 'node:crypto'
 
 import {
   createHookListenerState,
@@ -26,7 +25,6 @@ import type {
   AgentHookProviderSessionIdentity,
   AgentHookStatusChangeEntry,
   AgentHookStatusFreshnessObservation,
-  AgentPromptSentDedupeEntry,
   EnrichedAgentHookEventPayload,
   NormalizedLocalHook,
   PaneKeyAliasEntry,
@@ -100,9 +98,7 @@ export abstract class AgentHookServerState {
   // Why: trailing-edge debounce timer, per-instance so test servers in one process don't share state.
   protected statusPersistTimer: ReturnType<typeof setTimeout> | null = null
   protected assistantMessageRetryTimers = new Map<string, ReturnType<typeof setTimeout>>()
-  protected promptSentDedupeByPaneKey = new Map<string, AgentPromptSentDedupeEntry>()
   protected activeHookTurnCompletedAtByPaneKey = new Map<string, number>()
-  protected promptSentHashSalt = randomBytes(16).toString('hex')
   protected closedAgentStatusTabIds = new Set<string>()
   protected closedAgentStatusPaneKeys = new Set<string>()
   protected restartedStatusLaunchTokenHashByPaneKey = new Map<string, string>()
@@ -153,11 +149,6 @@ export abstract class AgentHookServerState {
     now?: number,
     observedAt?: number
   ): EnrichedAgentHookEventPayload
-  protected abstract hashPromptForTelemetryDedupe(prompt: string): string
-  protected abstract maybeTrackAgentPromptSent(
-    payload: AgentHookEventPayload,
-    previousStatus: EnrichedAgentHookEventPayload | undefined
-  ): void
   protected abstract stampObservation(
     payload: AgentHookEventPayload,
     origin: AgentStatusObservationOrigin,
@@ -235,6 +226,5 @@ export abstract class AgentHookServerState {
   protected abstract runStatusPersist(): void
 
   abstract _getStateForTests(): HookListenerState
-  abstract _resetPromptSentDedupeForTests(): void
   abstract _resetConnectionTimestampWatermarksForTests(): void
 }

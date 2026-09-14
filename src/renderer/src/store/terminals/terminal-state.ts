@@ -9,7 +9,7 @@ import type {
 import type { ExecutionHostId } from '../../../../shared/execution-host'
 import type { StartupCommandDelivery } from '../../../../shared/codex-startup-delivery'
 import type { SessionOptionValue } from '../../../../shared/native-chat-session-options'
-import type { AgentStartedTelemetry } from '../../lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '../../lib/worktree-startup-payload'
 import type {
   DirectSshLivePtyBinding,
   DirectSshPaneRetryAttempt,
@@ -68,7 +68,7 @@ export type TerminalState = {
         prompt: string
       }
       showSessionRestoredBanner?: boolean
-      telemetry?: AgentStartedTelemetry
+      telemetry?: AgentLaunchMetadata
     }
   >
   pendingInitialCwdByTabId: Record<string, string>

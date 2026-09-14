@@ -1,7 +1,3 @@
-import { createHash } from 'node:crypto'
-
-import { getCohortAtEmit } from '../../telemetry/cohort-classifier'
-import { track } from '../../telemetry/client'
 import { isCommandCodeNewTurnWhileWorking } from '../../../shared/command-code-turn-boundary'
 import { isNewTurnEvent } from '../../../shared/agent-hook-listener/provider-event-routing'
 import type { AgentHookEventPayload } from '../../../shared/agent-hook-listener/listener-event'
@@ -10,7 +6,6 @@ import type {
   AgentStatusObservationOrigin
 } from '../../../shared/agent-status-observation'
 import type { EnrichedAgentHookEventPayload } from './server-types'
-import { agentTypeToPromptSentAgentKind } from './server-status-identity'
 import { AgentHookServerStatusDisposition } from './server-status-disposition'
 
 /** Bounds the retained observation clock; eviction only degrades a replay to `now`. */
@@ -77,75 +72,6 @@ export abstract class AgentHookServerStatusApplication extends AgentHookServerSt
       this.evidenceObservedAtByPaneKey.delete(oldest)
     }
     return observedAt
-  }
-
-  protected hashPromptForTelemetryDedupe(prompt: string): string {
-    return createHash('sha256')
-      .update(this.promptSentHashSalt)
-      .update('\0')
-      .update(prompt)
-      .digest('hex')
-  }
-
-  protected maybeTrackAgentPromptSent(
-    payload: AgentHookEventPayload,
-    previousStatus: EnrichedAgentHookEventPayload | undefined
-  ): void {
-    if (payload.isReplay === true || payload.hasExplicitPrompt !== true) {
-      return
-    }
-    const prompt = payload.payload.prompt?.trim() ?? ''
-    if (prompt.length === 0) {
-      return
-    }
-    const agentKind = agentTypeToPromptSentAgentKind(payload.payload.agentType)
-    const promptHash = this.hashPromptForTelemetryDedupe(prompt)
-    const promptInteractionKey =
-      typeof payload.promptInteractionKey === 'string' &&
-      payload.promptInteractionKey.trim().length > 0
-        ? payload.promptInteractionKey.trim()
-        : undefined
-    const previousDedupe = this.promptSentDedupeByPaneKey.get(payload.paneKey)
-    const isCompletedTurnBoundary =
-      previousStatus?.payload.state === 'done' && payload.payload.state === 'working'
-    if (
-      previousDedupe?.agentKind === agentKind &&
-      previousDedupe.promptInteractionKey !== undefined &&
-      previousDedupe.promptInteractionKey === promptInteractionKey &&
-      (agentKind === 'opencode' || previousDedupe.promptHash === promptHash)
-    ) {
-      return
-    }
-    if (
-      previousDedupe?.agentKind === agentKind &&
-      previousDedupe.promptHash === promptHash &&
-      !(
-        previousStatus?.payload.state === 'done' &&
-        payload.payload.state === 'done' &&
-        previousDedupe.promptInteractionKey !== undefined &&
-        promptInteractionKey !== undefined &&
-        previousDedupe.promptInteractionKey !== promptInteractionKey
-      ) &&
-      !isCompletedTurnBoundary
-    ) {
-      return
-    }
-    this.promptSentDedupeByPaneKey.set(payload.paneKey, {
-      agentKind,
-      promptHash,
-      promptInteractionKey
-    })
-    try {
-      // Why: hooks prove a turn was submitted but not which UI launched the terminal; keep attribution low-cardinality.
-      track('agent_prompt_sent', {
-        agent_kind: agentKind,
-        launch_source: 'unknown',
-        request_kind: 'followup',
-        ...getCohortAtEmit()
-      })
-    } catch (err) {
-      console.error('[agent-hooks] prompt-sent telemetry failed', err)
-    }
   }
 
   /** Stamp who observed this event, in what order, on main's clock. Nothing reads it yet

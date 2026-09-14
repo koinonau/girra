@@ -30,16 +30,14 @@ import {
   normalizeShowDotfilesByWorktree,
   normalizeSortBy
 } from './ui-selection-normalization'
-import { stripMainOwnedTelemetryMarkerFromUI } from './ui-interaction-merge'
 
 export function getPersistedUI(
   state: PersistedState,
   activeView: PersistedState['ui']['activeView']
 ): PersistedState['ui'] {
-  const uiState = stripMainOwnedTelemetryMarkerFromUI(state.ui)
   return {
     ...getDefaultUIState(),
-    ...uiState,
+    ...state.ui,
     groupBy: normalizeGroupBy(state.ui?.groupBy),
     sortBy: normalizeSortBy(state.ui?.sortBy),
     projectOrderBy: normalizeProjectOrderBy(state.ui?.projectOrderBy),

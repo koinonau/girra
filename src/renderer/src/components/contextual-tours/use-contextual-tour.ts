@@ -125,8 +125,8 @@ export function useContextualTour(
   ])
 
   useEffect(() => {
-    // Why: source disable should end through the overlay so a shown tour gets
-    // a cancellation outcome; the store flag also lets pre-render attempts retry.
+    // Why: source disable ends through the overlay's cancel path; the store
+    // flag also lets pre-render attempts retry.
     if (
       !enabled &&
       activeContextualTourId === id &&

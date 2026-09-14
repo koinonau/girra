@@ -1,13 +1,6 @@
 import { useCallback, useRef, useState, type Dispatch, type SetStateAction } from 'react'
-import { track } from '@/lib/telemetry'
 import { markOnboardingProjectAdded } from '@/lib/onboarding-project-checklist'
 import { isGitRepoKind } from '../../../../shared/repo-kind'
-import {
-  buildNestedRepoScanTelemetry,
-  createNestedRepoTelemetryAttemptId,
-  type NestedRepoTelemetryRuntimeKind
-} from '../../../../shared/nested-repo-telemetry'
-import type { AddRepoExistingWorkspaceSource } from '../../../../shared/telemetry-events'
 import type { NestedRepoScanResult } from '../../../../shared/project-group-types'
 import type { Repo } from '../../../../shared/repo-types'
 import type { WorktreeFetchOptions } from '@/store/slices/worktree-helpers'
@@ -19,8 +12,6 @@ type ShowNestedRepoReview = (args: {
   scan: NestedRepoScanResult
   selectedPath: string
   connectionId: string | null
-  attemptId: string
-  runtimeKind: NestedRepoTelemetryRuntimeKind
   inProgress: boolean
   scanId: string | null
   runtimeEnvironmentId?: string | null
@@ -31,7 +22,6 @@ export function useAddRepoServerPathFlow({
   activeRuntimeEnvironmentId,
   closeModal,
   fetchWorktrees,
-  getNestedRepoRuntimeKind,
   scanNestedRepos,
   setActiveNestedScanId,
   setNestedScanInProgress,
@@ -47,7 +37,6 @@ export function useAddRepoServerPathFlow({
   activeRuntimeEnvironmentId: string | null
   closeModal: () => void
   fetchWorktrees: (repoId: string, options?: WorktreeFetchOptions) => Promise<unknown>
-  getNestedRepoRuntimeKind: (connectionId: string | null) => NestedRepoTelemetryRuntimeKind
   scanNestedRepos: (
     path: string,
     connectionId?: string,
@@ -60,11 +49,7 @@ export function useAddRepoServerPathFlow({
   setActiveNestedScanId: (scanId: string | null, runtimeEnvironmentId?: string | null) => void
   setNestedScanInProgress: (inProgress: boolean) => void
   showNestedRepoReview: ShowNestedRepoReview
-  onGitRepoReady: (
-    repoId: string,
-    source: AddRepoExistingWorkspaceSource,
-    executionHostId?: ExecutionHostId
-  ) => Promise<void>
+  onGitRepoReady: (repoId: string, executionHostId?: ExecutionHostId) => Promise<void>
   setAddProjectBusyLabel: (label: string | null) => void
 }): {
   serverPath: string
@@ -94,9 +79,8 @@ export function useAddRepoServerPathFlow({
       setAddProjectBusyLabel(kind === 'git' ? 'Scanning for repositories...' : 'Opening folder...')
       try {
         if (kind === 'git') {
-          const attemptId = createNestedRepoTelemetryAttemptId()
-          const runtimeKind = getNestedRepoRuntimeKind(null)
-          const supportsStreamingScan = runtimeKind !== 'runtime'
+          // Why: runtime servers cannot stream or cancel nested scans.
+          const supportsStreamingScan = !activeRuntimeEnvironmentId?.trim()
           const scanId = supportsStreamingScan ? createNestedRepoScanId() : null
           if (scanId) {
             setActiveNestedScanId(scanId, activeRuntimeEnvironmentId)
@@ -119,8 +103,6 @@ export function useAddRepoServerPathFlow({
                       scan: progressScan,
                       selectedPath: path,
                       connectionId: null,
-                      attemptId,
-                      runtimeKind,
                       inProgress: true,
                       scanId,
                       runtimeEnvironmentId: activeRuntimeEnvironmentId
@@ -134,22 +116,11 @@ export function useAddRepoServerPathFlow({
           }
           setNestedScanInProgress(false)
           setActiveNestedScanId(null)
-          track(
-            'add_repo_nested_scan_result',
-            buildNestedRepoScanTelemetry({
-              attemptId,
-              surface: 'sidebar',
-              runtimeKind,
-              scan
-            })
-          )
           if (scan?.selectedPathKind === 'non_git_folder' && scan.repos.length > 0) {
             showNestedRepoReview({
               scan,
               selectedPath: path,
               connectionId: null,
-              attemptId,
-              runtimeKind,
               inProgress: false,
               scanId,
               runtimeEnvironmentId: activeRuntimeEnvironmentId
@@ -172,7 +143,7 @@ export function useAddRepoServerPathFlow({
           if (gen !== serverAddGenRef.current) {
             return
           }
-          await onGitRepoReady(repo.id, 'runtime_server_path', ownerOptions.executionHostId)
+          await onGitRepoReady(repo.id, ownerOptions.executionHostId)
         } else if (repo) {
           // Why: folder repos skip the Git default-checkout handoff; their synthetic
           // root workspace is opened by the folder add flow.
@@ -193,7 +164,6 @@ export function useAddRepoServerPathFlow({
       activeRuntimeEnvironmentId,
       closeModal,
       fetchWorktrees,
-      getNestedRepoRuntimeKind,
       onGitRepoReady,
       scanNestedRepos,
       serverPath,

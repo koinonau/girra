@@ -740,9 +740,6 @@ jobs:
       - name: Smoke packaged CLI
         run: node config/scripts/smoke-packaged-cli.mjs --app-dir=dist/linux-unpacked
 
-      - name: Smoke packaged hang watchdog worker
-        run: xvfb-run --auto-servernum node config/scripts/smoke-packaged-hang-watchdog-worker.mjs --app-dir=dist/linux-unpacked
-
   package_windows:
     name: package (windows)
     needs: [code_paths]

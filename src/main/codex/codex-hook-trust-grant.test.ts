@@ -15,7 +15,6 @@ import {
   grantManagedCodexHookTrust,
   type CodexManagedTrustGrantPlan
 } from './codex-hook-trust-grant'
-import { setCodexTrustGrantTelemetry } from './codex-trust-grant-telemetry'
 import { readCodexTrustGrantLedgerHome } from './codex-trust-grant-ledger'
 import {
   computeTrustKey,
@@ -46,7 +45,6 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers()
   _internals.setGrantSessionRunner(null)
-  setCodexTrustGrantTelemetry(() => {})
   codexAppServerCapabilityCache.clear()
   if (previousUserDataPath === undefined) {
     delete process.env.ORCA_USER_DATA_PATH
@@ -76,8 +74,7 @@ function buildPlan(entries: CodexTrustEntry[]): CodexManagedTrustGrantPlan {
     tomlPath: join(runtimeHomeDir, 'config.toml'),
     managedCommand: MANAGED_COMMAND,
     managedEntries: entries,
-    host: { kind: 'native' },
-    telemetryLane: 'real-home'
+    host: { kind: 'native' }
   }
 }
 
@@ -274,8 +271,7 @@ describe('grantManagedCodexHookTrust', () => {
     const entries = [managedEntry('session_start')]
     const runner = vi.fn(async () => ({
       outcome: 'verify-failed' as const,
-      reason: 'missing entries',
-      reasonClass: 'list-mismatch' as const
+      reason: 'missing entries'
     }))
     _internals.setGrantSessionRunner(runner)
 
@@ -297,21 +293,6 @@ describe('grantManagedCodexHookTrust', () => {
       reason: 'verify-failed'
     })
     expect(readCodexTrustGrantLedgerHome(runtimeHomeDir)).toBeNull()
-  })
-
-  it('keeps grant and fallback outcomes stable when telemetry throws', async () => {
-    const entries = [managedEntry('session_start')]
-    setCodexTrustGrantTelemetry(() => {
-      throw new Error('telemetry unavailable')
-    })
-    _internals.setGrantSessionRunner(async () => grantedSessionResult(entries))
-
-    expect(await grantManagedCodexHookTrust(buildPlan(entries))).toMatchObject({ lane: 'rpc' })
-    process.env.ORCA_DISABLE_CODEX_TRUST_RPC = '1'
-    expect(await grantManagedCodexHookTrust(buildPlan(entries))).toMatchObject({
-      lane: 'fallback',
-      reason: 'disabled'
-    })
   })
 
   it('restores exact config bytes before fallback after a mutating RPC error', async () => {
@@ -340,8 +321,7 @@ describe('grantManagedCodexHookTrust', () => {
       writeFileSync(plan.tomlPath, '[hooks.state."rpc-partial"]\ntrusted_hash = "changed"\n')
       return {
         outcome: 'verify-failed',
-        reason: 'post-write listing failed',
-        reasonClass: 'post-grant-mismatch'
+        reason: 'post-write listing failed'
       }
     })
 
@@ -464,95 +444,5 @@ describe('grantManagedCodexHookTrust', () => {
     expect(request.invocation.args.slice(0, 2)).toEqual(['-d', 'Ubuntu'])
     expect(request.invocation.args.join(' ')).toContain('app-server')
     expect(request.hooksListCwd).toBe('/home/alice/.codex-runtime')
-  })
-})
-
-describe('trust-grant telemetry detail', () => {
-  type CapturedEvent = Record<string, unknown>
-
-  function captureTelemetry(): CapturedEvent[] {
-    const events: CapturedEvent[] = []
-    setCodexTrustGrantTelemetry((event) => {
-      events.push(event)
-    })
-    return events
-  }
-
-  it('attributes the plan lane on granted events', async () => {
-    const events = captureTelemetry()
-    const entries = [managedEntry('session_start')]
-    _internals.setGrantSessionRunner(async () => grantedSessionResult(entries))
-
-    expect(await grantManagedCodexHookTrust(buildPlan(entries))).toMatchObject({ lane: 'rpc' })
-    expect(events).toEqual([{ outcome: 'granted', hostKind: 'native', lane: 'real-home' }])
-  })
-
-  it('reports the managed lane independently of host kind', async () => {
-    const events = captureTelemetry()
-    const entries = [managedEntry('session_start')]
-    _internals.setGrantSessionRunner(async () => grantedSessionResult(entries))
-
-    await grantManagedCodexHookTrust({ ...buildPlan(entries), telemetryLane: 'managed' })
-    expect(events).toEqual([{ outcome: 'granted', hostKind: 'native', lane: 'managed' }])
-  })
-
-  it('classifies error fallbacks on the wire', async () => {
-    const events = captureTelemetry()
-    const entries = [managedEntry('session_start')]
-    _internals.setGrantSessionRunner(async () => {
-      throw new Error('spawn codex ENOENT')
-    })
-
-    expect(await grantManagedCodexHookTrust(buildPlan(entries))).toMatchObject({
-      lane: 'fallback',
-      reason: 'error'
-    })
-    expect(events).toEqual([
-      {
-        outcome: 'fallback',
-        hostKind: 'native',
-        lane: 'real-home',
-        reason: 'error',
-        errorClass: 'binary-missing'
-      }
-    ])
-  })
-
-  it('carries the session verify class through the fallback event', async () => {
-    const events = captureTelemetry()
-    const entries = [managedEntry('session_start')]
-    _internals.setGrantSessionRunner(async () => ({
-      outcome: 'verify-failed' as const,
-      reason: 'post-grant verify left 1 entries untrusted',
-      reasonClass: 'post-grant-untrusted' as const
-    }))
-
-    await grantManagedCodexHookTrust(buildPlan(entries))
-    expect(events).toEqual([
-      {
-        outcome: 'verify_failed',
-        hostKind: 'native',
-        lane: 'real-home',
-        reason: 'verify-failed',
-        verifyClass: 'post-grant-untrusted'
-      }
-    ])
-  })
-
-  it('classifies module-detected verify failures', async () => {
-    const events = captureTelemetry()
-    const entries = [managedEntry('session_start'), managedEntry('stop')]
-    _internals.setGrantSessionRunner(async () => grantedSessionResult([entries[0]!, entries[0]!]))
-
-    await grantManagedCodexHookTrust(buildPlan(entries))
-    expect(events).toEqual([
-      {
-        outcome: 'verify_failed',
-        hostKind: 'native',
-        lane: 'real-home',
-        reason: 'verify-failed',
-        verifyClass: 'duplicate-key'
-      }
-    ])
   })
 })

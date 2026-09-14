@@ -1,5 +1,4 @@
 import type {
-  DirectSshPreparationMetrics,
   DirectSshPreparationOutcome,
   DirectSshReconnectOutcome,
   DirectSshRepoOutcomeCounts
@@ -14,21 +13,6 @@ export function createEmptyDirectSshRepoOutcomeCounts(): DirectSshRepoOutcomeCou
     canceled: 0,
     stale: 0,
     rejected: 0
-  }
-}
-
-export function createEmptyDirectSshPreparationMetrics(): DirectSshPreparationMetrics {
-  return {
-    queueWaitDurationsMs: [],
-    providerExecutionDurationsMs: [],
-    timeoutRetryCount: 0,
-    locallySettledWaiterCount: 0,
-    cancelDebtCount: 0,
-    replacementAdmissionDelayedCount: 0,
-    schedulerOverlappingJoinCount: 0,
-    peakLocallyUnsettled: 0,
-    estimatedLateWorkAllowanceCount: 0,
-    lineageDurationMs: 0
   }
 }
 
@@ -57,7 +41,6 @@ export function createTerminalOnlyDirectSshReconnectOutcome(
     token: null,
     repoOutcomes: createEmptyDirectSshRepoOutcomeCounts(),
     lineageOutcome: 'not-started',
-    metrics: createEmptyDirectSshPreparationMetrics(),
     staleBindingsCleared,
     retriedTerminals,
     correctedTerminals: 0,

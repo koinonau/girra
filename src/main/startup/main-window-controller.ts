@@ -1,8 +1,6 @@
 import { app, type BrowserWindow } from 'electron'
 import { createMainWindow, loadMainWindow } from '../window/createMainWindow'
 import { shouldRecoverRendererAfterProcessGone } from '../crash-reporting/process-gone-classification'
-import { resolveConsent } from '../telemetry/consent'
-import { trackAppOpenedOnce } from '../telemetry/client'
 import { ensureWindowsUserDataAclGrant } from './windows-user-data-acl'
 import { probeWindowsInstallDirAcl } from './windows-install-dir-acl-probe'
 import {
@@ -132,10 +130,6 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
     // Why cleared here: a reload drops the old ui:openMarkdownFiles listener, and the fresh
     // renderer re-attaches by pulling. Pushing into the gap between would be silently lost.
     state.markdownFileOpenListenerReady = false
-    const currentStore = state.store
-    if (currentStore && resolveConsent(currentStore.getSettings()).effective === 'enabled') {
-      trackAppOpenedOnce()
-    }
   }
   window.webContents.on('did-finish-load', onFirstWindowLoad)
   attachMainWindowCoreServices(window, { markExpectedRendererReload })

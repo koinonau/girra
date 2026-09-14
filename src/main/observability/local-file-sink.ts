@@ -150,7 +150,7 @@ export function createLocalFileSink(opts: LocalFileSinkOptions): LocalFileSink {
         writeSync(fd, chunk)
         currentBytes += chunkBytes
       } catch {
-        // Reopen + retry once; if that also fails, drop the chunk — telemetry must never crash main.
+        // Reopen + retry once; if that also fails, drop the chunk. Logging must never crash main.
         try {
           // Best-effort close of the prior fd to prevent fd-leak on transient errors.
           try {
@@ -162,7 +162,7 @@ export function createLocalFileSink(opts: LocalFileSinkOptions): LocalFileSink {
           writeSync(fd, chunk)
           currentBytes = safeFstatSize(fd)
         } catch {
-          /* swallow — telemetry must never crash main */
+          /* swallow: logging must never crash main */
         }
       }
     }

@@ -17,21 +17,8 @@
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { makePaneKey } from '../../shared/stable-pane-id'
-
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
-
-vi.mock('../telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
 
 import { AgentHookServer } from './server'
 
@@ -52,7 +39,6 @@ describe('OpenCode MessagePart flood benchmark', () => {
   let listenerEvents: number
 
   beforeEach(async () => {
-    getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
     tempDir = mkdtempSync(join(tmpdir(), 'orca-hook-bench-'))
     server = new AgentHookServer()
     listenerEvents = 0

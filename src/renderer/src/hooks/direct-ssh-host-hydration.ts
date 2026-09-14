@@ -12,7 +12,6 @@ import type {
   DirectSshPreparationInput,
   DirectSshPreparationReason
 } from './direct-ssh-reconnect-coordinator'
-import { directSshHostHydrationTelemetry } from './direct-ssh-host-hydration-telemetry'
 import { directSshHostHydrationScope } from './direct-ssh-host-hydration-scope'
 import { directSshAuthoritiesEqual } from './direct-ssh-reconnect-tokens'
 
@@ -215,9 +214,7 @@ export function createDirectSshHostHydration(
     reason: DirectSshPreparationReason,
     snapshotRevision?: number
   ): Promise<DirectSshPreparationInput | null> => {
-    const catalogStartedAt = Date.now()
     const catalogOutcome = await refreshCatalog(authority)
-    const catalogDurationMs = Math.max(0, Date.now() - catalogStartedAt)
     if (catalogOutcome === 'stale' || stopped || !deps.isCurrentAuthority(authority)) {
       return null
     }
@@ -229,8 +226,7 @@ export function createDirectSshHostHydration(
       repoRefs: scope.gitRepos,
       authorityRequirement: 'required',
       ...(snapshotRevision === undefined ? {} : { snapshotRevision }),
-      reason,
-      telemetry: directSshHostHydrationTelemetry(scope, catalogOutcome, catalogDurationMs)
+      reason
     }
   }
 

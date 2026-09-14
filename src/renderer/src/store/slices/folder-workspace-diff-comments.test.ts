@@ -554,7 +554,7 @@ describe('folder workspace diff comment rollback convergence', () => {
     }))
     store.setState({
       recordFeatureInteraction: () => {
-        throw new Error('telemetry down')
+        throw new Error('interaction record down')
       }
     } as never)
 

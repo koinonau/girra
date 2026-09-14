@@ -191,7 +191,7 @@ describe('ensureWorktreeHasInitialTerminal', () => {
     }
   )
 
-  it('forwards telemetry on the queued startup so main can fire agent_started', () => {
+  it('forwards launch metadata on the queued startup', () => {
     const store = createMockStore()
 
     ensureWorktreeHasInitialTerminal(
@@ -223,7 +223,7 @@ describe('ensureWorktreeHasInitialTerminal', () => {
     })
   })
 
-  it('stamps the tab agent from startup launchAgent without telemetry', () => {
+  it('stamps the tab agent from startup launchAgent without launch metadata', () => {
     const store = createMockStore()
 
     ensureWorktreeHasInitialTerminal(

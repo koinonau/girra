@@ -209,11 +209,6 @@ export function updateSettings(
   if (historyWithPreviousLayout) {
     sanitizedUpdates.workspaceDirHistory = historyWithPreviousLayout
   }
-  // Why deep-merge telemetry: a partial update (e.g. flipping only `optedIn`) must not clobber siblings like `installId`.
-  const mergedTelemetry =
-    sanitizedUpdates.telemetry !== undefined
-      ? { ...operations.state.settings.telemetry, ...sanitizedUpdates.telemetry }
-      : operations.state.settings.telemetry
   if ('sourceControlAi' in sanitizedUpdates) {
     sanitizedUpdates.sourceControlAi = retireLegacyInstructionsForClearedTextActionRecipes(
       sanitizedUpdates.sourceControlAi,
@@ -241,8 +236,7 @@ export function updateSettings(
     notifications: normalizeNotificationSettings({
       ...operations.state.settings.notifications,
       ...sanitizedUpdates.notifications
-    }),
-    ...(mergedTelemetry !== undefined ? { telemetry: mergedTelemetry } : {})
+    })
   }
   if (
     !Object.is(

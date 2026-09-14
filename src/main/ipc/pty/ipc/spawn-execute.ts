@@ -4,10 +4,6 @@ import {
   isSshPtyAbsentFromRelayError,
   isSshPtyIdentityMismatchError
 } from '../../../providers/ssh-pty-errors'
-import { classifyError } from '../../../telemetry/classify-error'
-import { track } from '../../../telemetry/client'
-import { getCohortAtEmit } from '../../../telemetry/cohort-classifier'
-import { agentKindSchema } from '../../../../shared/agent-kind'
 import { normalizeNodePtySpawnError } from '../provider/liveness'
 import { resolveStablePaneOwner, spawnForStablePane } from '../pane/stable-owner'
 import { assertSpawnReplyWasLive } from '../pane/agent-session-owners'
@@ -188,24 +184,6 @@ export async function executePtyIpcSpawn(ctx: PtyIpcSpawnState): Promise<void> {
     // Why: provider state buildPtyHostEnv materialized for this minted id leaks if spawn failed.
     if (ctx.isMintedSessionId && ctx.effectiveSessionId !== undefined) {
       clearProviderPtyState(ctx.effectiveSessionId)
-    }
-    // Why: telemetry-plan.md§agent_error — attribute the error to the renderer-threaded agent_kind, else sniff the command for `claude`; raw messages are dropped at the validator boundary.
-    const rendererAgentKindParse =
-      args.telemetry?.agent_kind !== undefined
-        ? agentKindSchema.safeParse(args.telemetry.agent_kind)
-        : null
-    const errorAgentKind = rendererAgentKindParse?.success
-      ? rendererAgentKindParse.data
-      : ctx.isClaudeLaunch
-        ? ('claude-code' as const)
-        : null
-    if (errorAgentKind) {
-      const classified = classifyError(spawnError)
-      track('agent_error', {
-        agent_kind: errorAgentKind,
-        error_class: classified.error_class,
-        ...getCohortAtEmit()
-      })
     }
     throw spawnError
   } finally {

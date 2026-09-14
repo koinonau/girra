@@ -6,10 +6,6 @@ import {
   getFeatureTipsAppOpenDecision,
   isCliFeatureTipCompleted
 } from '../components/feature-tips/feature-tip-startup-gate'
-import {
-  trackCmdJPaletteFeatureTipShown,
-  trackOrcaCliFeatureTipShown
-} from '../components/feature-tips/feature-tip-telemetry'
 import { useAppStore } from '../store'
 import type { OnboardingState } from '../../../shared/onboarding-state-types'
 
@@ -112,11 +108,6 @@ export function useOnboardingAndFeatureTips() {
     }
 
     promptedThisSessionRef.current = true
-    if (featureTipsDecision.tipId === 'orca-cli') {
-      trackOrcaCliFeatureTipShown('app_open')
-    } else if (featureTipsDecision.tipId === 'cmd-j-palette') {
-      trackCmdJPaletteFeatureTipShown('app_open')
-    }
     // Why: mark seen on show so a quit/crash before dismiss doesn't reappear it next launch.
     actions.markFeatureTipsSeen([featureTipsDecision.tipId])
     actions.openModal('feature-tips', { source: 'app_open', tipId: featureTipsDecision.tipId })

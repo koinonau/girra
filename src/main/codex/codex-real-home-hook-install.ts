@@ -194,7 +194,6 @@ async function installRealHomeCodexHook(userDataPath: string): Promise<RealHomeC
     managedCommand: material.command,
     managedEntries,
     host: { kind: 'native' },
-    telemetryLane: 'real-home',
     useDefaultCodexHome: true
   })
   if (grant.lane === 'rpc') {

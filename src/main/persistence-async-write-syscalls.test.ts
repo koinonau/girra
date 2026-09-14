@@ -109,12 +109,6 @@ vi.mock('./ssh/ssh-config-parser', () => ({
   sshConfigHostsToTargets: vi.fn()
 }))
 
-vi.mock('./telemetry/client', () => ({ track: vi.fn() }))
-
-vi.mock('./telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: vi.fn().mockReturnValue({ nth_repo_added: 2 })
-}))
-
 // Deterministic cipher so two stores driven through identical mutations produce identical bytes.
 vi.mock('electron', () => ({
   app: { getPath: () => testState.dir },

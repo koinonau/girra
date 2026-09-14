@@ -56,7 +56,7 @@ function deliverySnapshotMatches(
 // Why: a frozen shared sentinel avoids selector re-renders and mutation.
 const EMPTY_COMMENTS: readonly DiffComment[] = Object.freeze([])
 
-// Why: best-effort telemetry runs only after the note is on disk, so a throw here must not report a failed save.
+// Why: the interaction record runs only after the note is on disk, so a throw here must not report a failed save.
 function recordReviewNoteInteraction(get: () => AppState): void {
   try {
     get().recordFeatureInteraction?.('review-notes')

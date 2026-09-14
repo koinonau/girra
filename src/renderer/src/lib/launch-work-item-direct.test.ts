@@ -93,11 +93,6 @@ vi.mock('@/lib/new-workspace', () => ({
   isGitLabIssueUrl: vi.fn(() => false)
 }))
 
-vi.mock('@/lib/telemetry', () => ({
-  track: vi.fn(),
-  tuiAgentToAgentKind: (agent: string) => agent
-}))
-
 vi.mock('@/lib/tui-agent-startup', async () => {
   const actual = await vi.importActual<typeof TuiAgentStartupModule>('@/lib/tui-agent-startup')
   return {

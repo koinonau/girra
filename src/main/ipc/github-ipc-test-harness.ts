@@ -79,7 +79,6 @@ export function createGitHubIpcHarness(mocks: GitHubIpcMocks): GitHubIpcHarness 
       for (const fn of listGitHubIpcMockFns(mocks)) {
         fn.mockReset()
       }
-      mocks.cohort.getCohortAtEmit.mockReturnValue({ nth_repo_added: undefined })
       mocks.electron.webContents.getAllWebContents.mockReturnValue([])
       clearPRRefreshValidationBackoffForTests()
       for (const key of Object.keys(handlers)) {

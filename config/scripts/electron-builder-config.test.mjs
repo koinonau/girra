@@ -257,12 +257,6 @@ describe('electron-builder config', () => {
     expect(viteConfig).toMatch(new RegExp(`'${entryFilename.replace(/\.js$/, '')}':\\s*resolve\\(`))
   })
 
-  it('keeps the worker-thread hang watchdog inside app.asar', () => {
-    expect(electronBuilderConfig.asarUnpack).not.toContain(
-      'out/main/main-thread-hang-watchdog-entry.js'
-    )
-  })
-
   it('uses the multi-size icon source for Linux packages', () => {
     expect(electronBuilderConfig.linux.icon).toBe('resources/build/icon.icns')
   })

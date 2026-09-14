@@ -4,8 +4,6 @@ import type { Worktree } from '../../../shared/worktree/types'
 import type { AgentStatusState, AgentType } from '../../../shared/agent-status-types'
 import { tabHasLivePty } from './tab-has-live-pty'
 import type { WorktreeStatus } from './worktree-status'
-import { tuiAgentToAgentKind } from '../../../shared/agent-kind'
-import type { AgentKind } from '../../../shared/agent-kind'
 
 // Re-export from shared so existing renderer imports work; main process now shares the detection logic.
 export {
@@ -142,12 +140,6 @@ export function agentTypeToIconAgent(agentType: AgentType | null | undefined): T
     return null
   }
   return Object.hasOwn(ICONABLE_AGENT_TYPES, agentType) ? (agentType as TuiAgent) : null
-}
-
-// Why: shared resolver so all send paths stamp identical agent_kind on agent_prompt_sent telemetry.
-export function agentKindForAgentType(agentType: AgentType | null | undefined): AgentKind {
-  const tuiAgent = agentTypeToIconAgent(agentType)
-  return tuiAgent ? tuiAgentToAgentKind(tuiAgent) : 'other'
 }
 
 // Re-export: freshness gate moved into pane-agent-evidence; keeps existing importers unchanged.

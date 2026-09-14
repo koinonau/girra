@@ -1,4 +1,4 @@
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { WorktreeCreationRequest } from '@/lib/pending-worktree-creation'
 import type { AgentStartupPlan } from '@/lib/tui-agent-startup'
 import type { LinkedWorkItemSummary } from '@/lib/new-workspace'
@@ -48,7 +48,7 @@ export type QuickCreationRequestInput = {
   quickPrompt: string
   launchDraftPrompt: string | null | undefined
   promptDelivery: 'draft' | 'auto-submit'
-  quickTelemetry: AgentStartedTelemetry | null
+  quickTelemetry: AgentLaunchMetadata | null
   suppressTerminalFocusOnCompletion: boolean
 }
 

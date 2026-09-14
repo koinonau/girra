@@ -52,7 +52,7 @@ import type { RuntimeApi } from './api/runtime-api'
 import type { KeybindingsApi, SettingsApi } from './api/settings-api'
 import type { ShellApi } from './api/shell-api'
 import type { SshApi } from './api/ssh-api'
-import type { DiagnosticsApi, MemoryApi, StatsApi, TelemetryApi } from './api/telemetry-api'
+import type { DiagnosticsApi, MemoryApi, StatsApi } from './api/stats-memory-diagnostics-api'
 import type { UiCommandEventApi } from './api/ui-command-event-api'
 import type { UiWindowApi } from './api/ui-window-api'
 import type { WorkspaceCleanupApi, WorkspaceSpaceApi } from './api/workspace-cleanup-api'
@@ -85,11 +85,7 @@ export type PreloadApi = {
   bitbucket: BitbucketApi
   linear: LinearApi
   jira: JiraApi
-  telemetryTrack: TelemetryApi['telemetryTrack']
-  telemetrySetOptIn: TelemetryApi['telemetrySetOptIn']
   diagnostics: DiagnosticsApi
-  telemetryGetConsentState: TelemetryApi['telemetryGetConsentState']
-  telemetryAcknowledgeBanner: TelemetryApi['telemetryAcknowledgeBanner']
   settings: SettingsApi
   agentAwake: AgentAwakeApi
   localhostWorktreeLabels: LocalhostWorktreeLabelsApi
@@ -191,7 +187,7 @@ export type {
   DiagnosticsStatusPayload,
   MemoryApi,
   StatsApi
-} from './api/telemetry-api'
+} from './api/stats-memory-diagnostics-api'
 
 declare global {
   // oxlint-disable-next-line typescript-eslint/consistent-type-definitions -- declaration merging requires interface

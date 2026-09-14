@@ -90,12 +90,6 @@ vi.mock('./claude-model-switch-confirmation', () => ({
   createClaudeModelSwitchConfirmationObserver: (...args: unknown[]) =>
     mocks.createClaudeModelSwitchConfirmationObserver(...args)
 }))
-vi.mock('@/lib/native-chat-telemetry', () => ({
-  emitNativeChatMessageSent: vi.fn(),
-  emitNativeChatPickerItemAccepted: vi.fn(),
-  emitNativeChatPickerOpened: vi.fn(),
-  emitNativeChatSendClassified: vi.fn()
-}))
 vi.mock('./use-native-chat-draft', () => ({
   useNativeChatDraft: (scopeKey: string) => {
     mocks.draftScopeKeys.push(scopeKey)
@@ -288,7 +282,6 @@ describe('NativeChatComposer', () => {
           optionsSurface,
           optionSnapshot,
           onError: vi.fn(),
-          runtime: 'local',
           sessionId: 'session-test',
           runtimeEnvironmentId: null
         }}
@@ -332,7 +325,6 @@ describe('NativeChatComposer', () => {
           },
           optionSnapshot: [],
           onError: vi.fn(),
-          runtime: 'local',
           sessionId: 'session-test',
           runtimeEnvironmentId: null
         }}
@@ -372,7 +364,6 @@ describe('NativeChatComposer', () => {
           optionSnapshot: [],
           worktreeId: 'wt-1',
           onError: vi.fn(),
-          runtime: 'local',
           sessionId: 'session-test',
           runtimeEnvironmentId: null
         }}

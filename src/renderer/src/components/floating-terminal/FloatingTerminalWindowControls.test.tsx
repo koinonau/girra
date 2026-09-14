@@ -56,10 +56,6 @@ vi.mock('@/lib/new-workspace', () => ({
   CLIENT_PLATFORM: 'darwin'
 }))
 
-vi.mock('@/lib/telemetry', () => ({
-  tuiAgentToAgentKind: () => 'claude'
-}))
-
 vi.mock('../../../../shared/tui-agent-selection', () => ({
   isTuiAgentEnabled: () => true
 }))

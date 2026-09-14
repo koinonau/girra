@@ -290,7 +290,7 @@ export async function sendRuntimePtyInputVerified(
     if (!accepted) {
       window.api.pty.write(ptyId, data)
       // Why: SSH/local fallback writes are fire-and-forget. Callers use this
-      // boolean to continue UX flow, while hook telemetry confirms real turns.
+      // boolean to continue UX flow, while hook status confirms real turns.
       recordRuntimeTerminalInputForPtyId(ptyId)
       return true
     }

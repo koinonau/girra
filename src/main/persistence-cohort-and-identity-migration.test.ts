@@ -26,11 +26,6 @@ vi.mock('./ssh/ssh-config-parser', () => ({
   loadUserSshConfig: loadUserSshConfigMock,
   sshConfigHostsToTargets: sshConfigHostsToTargetsMock
 }))
-const { trackMock, getCohortAtEmitMock } = vi.hoisted(() => ({
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn()
-}))
-
 vi.mock('electron', () => ({
   app: {
     getPath: () => testState.dir
@@ -47,103 +42,6 @@ vi.mock('electron', () => ({
     }
   }
 }))
-
-vi.mock('./telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('./telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
-
-describe('Store', () => {
-  beforeEach(() => {
-    testState.dir = mkdtempSync(join(tmpdir(), 'orca-test-'))
-    trackMock.mockReset()
-    getCohortAtEmitMock.mockReset()
-    getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
-  })
-
-  afterEach(() => {
-    rmSync(testState.dir, { recursive: true, force: true })
-  })
-  // ── Telemetry cohort migration ─────────────────────────────────────
-  // Why: keys on `existsSync(dataFile)`, not the new `telemetry` field, so pre-telemetry installs aren't misclassified as fresh and flipped default-on.
-
-  it('classifies a truly fresh install as new-user cohort (file absent → optedIn=true)', async () => {
-    // No data file written — truly fresh install of the telemetry release.
-    const store = await createStore()
-    const t = store.getSettings().telemetry
-    expect(t).toBeDefined()
-    expect(t!.existedBeforeTelemetryRelease).toBe(false)
-    expect(t!.optedIn).toBe(true)
-    expect(t!.installId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-    )
-  })
-
-  it('classifies a pre-existing install as existing-user cohort (file present → optedIn=null)', async () => {
-    // A pre-telemetry data file exists on disk with no telemetry block.
-    writeDataFile({
-      schemaVersion: 1,
-      repos: [makeRepo()],
-      worktreeMeta: {},
-      settings: { theme: 'dark' },
-      ui: {},
-      githubCache: { pr: {}, issue: {} },
-      workspaceSession: {}
-    })
-    const store = await createStore()
-    const t = store.getSettings().telemetry
-    expect(t).toBeDefined()
-    expect(t!.existedBeforeTelemetryRelease).toBe(true)
-    expect(t!.optedIn).toBeNull()
-    expect(t!.installId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-    )
-    // Sibling migrations still run alongside the telemetry migration.
-    expect(store.getSettings().theme).toBe('dark')
-  })
-
-  it('still classifies as existing-user cohort when the data file is corrupt', async () => {
-    // Load-bearing: the corrupt-file catch path keeps `fileExistedOnLoad` true so a corrupted install isn't silently opted in as fresh.
-    mkdirSync(testState.dir, { recursive: true })
-    writeFileSync(dataFile(), '{{{corrupt json', 'utf-8')
-    const store = await createStore()
-    const t = store.getSettings().telemetry
-    expect(t).toBeDefined()
-    expect(t!.existedBeforeTelemetryRelease).toBe(true)
-    expect(t!.optedIn).toBeNull()
-    expect(t!.installId).toMatch(
-      /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/
-    )
-    expect(store.getSettings().experimentalNewWorktreeCardStyle).toBe(false)
-  })
-
-  it('preserves an already-migrated telemetry block on subsequent launches', async () => {
-    writeDataFile({
-      schemaVersion: 1,
-      repos: [],
-      worktreeMeta: {},
-      settings: {
-        telemetry: {
-          optedIn: true,
-          installId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-          existedBeforeTelemetryRelease: false
-        }
-      },
-      ui: {},
-      githubCache: { pr: {}, issue: {} },
-      workspaceSession: {}
-    })
-    const store = await createStore()
-    expect(store.getSettings().telemetry).toEqual({
-      optedIn: true,
-      installId: 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
-      existedBeforeTelemetryRelease: false
-    })
-  })
-})
 
 describe('Store.migrateTabSwitchKeybindings', () => {
   // Freezes the tab-switch cohort on first load, keying on `fileExistedOnLoad` (not field presence) so the verdict survives later launches.
