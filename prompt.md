@@ -4,9 +4,9 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phases 0 to 2, Phase 3a (Orca cloud), the ADRs and the harness deletion are done or in review.
+Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phases 0 to 2, Phases 3a (Orca cloud) and 3b (crash reporting), the ADRs and the harness deletion are done or in review.
 
-1. **Phase 3b, instrumented strips.** Crash reporting, then telemetry, deleting telemetry call sites outright. Keep `src/main/observability`. Unblocked once Phase 3a is merged.
+1. **Phase 3c, telemetry.** Delete telemetry call sites outright; keep `src/main/observability`. Map every call site with a read-only subagent first: about 140 production files and 200 test files reach it. Several "telemetry" fields drive real behaviour: terminal colour-query replies, the Windows focus guard, the nested-repo import guard. Move the general types out of `shared/telemetry-*` first. Unblocked once Phase 3b is merged.
 2. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 3. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
 4. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
