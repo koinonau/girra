@@ -5,7 +5,6 @@ import {
   join,
   makePaneKey,
   markCodexProjectTrustedMock,
-  markCursorWorkspaceTrustedMock,
   mkdtemp,
   setPlatform,
   setTerminalViewAttributes,
@@ -421,7 +420,6 @@ describe('OrcaRuntimeService', () => {
     expect(spawnCall?.command).toBe("cursor-agent '--force'")
     expect(spawnCall?.launchAgent).toBe('cursor')
     expect(spawnCall?.env).toMatchObject({ CURSOR_PROFILE: 'captured' })
-    expect(markCursorWorkspaceTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
   })
 
   it('resolves a startupAgent to the CLI binary on Windows, where `cursor` is the IDE', async () => {

@@ -77,13 +77,8 @@ const WINDOWS_LANE_RUNNER = 'windows-2022'
  * list. Shrink-only: registering one means deleting its line here. Never add.
  */
 const UNREGISTERED_ON_MAIN = [
-  // Suite gated with `describe.skipIf(platform !== 'win32')`; the cross-platform
-  // half of the file still runs on ubuntu, the Windows half runs nowhere.
-  'src/main/antigravity/windows-hook-payload-delivery.test.ts',
   // `.win32.test.ts` by name yet in neither list -- the plainest instance of the class.
   'src/main/daemon/node-pty-windows-input-error.win32.test.ts',
-  // Same shape as the antigravity file: a win32-only sibling suite that never runs.
-  'src/main/grok/windows-grok-hook-script.test.ts',
   // Whole file is `describe.runIf(platform === 'win32')`; runs on no machine.
   'src/main/ipc/preflight-windows-path-refresh.repro.test.ts',
   // Nested `describe.skipIf(!isWindows)` real-shell block; never exercised in CI.

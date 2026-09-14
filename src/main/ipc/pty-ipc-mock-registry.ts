@@ -23,7 +23,6 @@ export const getPathMock: Mock = vi.fn()
 export const loginPreflightExecFileMock: Mock = vi.fn()
 export const spawnMock: Mock = vi.fn()
 export const openCodeBuildPtyEnvMock: Mock = vi.fn()
-export const mimoCodeBuildPtyEnvMock: Mock = vi.fn()
 export const isPwshAvailableMock: Mock = vi.fn()
 export const wslUncDirectoryExistsAsyncMock: Mock = vi.fn()
 export const openCodeClearPtyMock: Mock = vi.fn()
@@ -106,12 +105,6 @@ export const openCodeHookServiceModuleMock = () => ({
   openCodeHookService: {
     buildPtyEnv: openCodeBuildPtyEnvMock,
     clearPty: openCodeClearPtyMock
-  }
-})
-
-export const mimoHookServiceModuleMock = () => ({
-  mimoCodeHookService: {
-    buildPtyEnv: mimoCodeBuildPtyEnvMock
   }
 })
 

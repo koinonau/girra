@@ -43,7 +43,7 @@ export function normalizeClaudeEvent(
   if (eventName === 'SessionStart') {
     // Why: SessionStart is the only signal a resumed session emits before its first prompt
     // (STA-3386). Land it as a session-boundary 'done' row: 'working' would show a phantom
-    // spinner on an idle TUI (why Devin/Pi/Grok drop the event), and the sessionBoundary
+    // spinner on an idle TUI (why Pi drops the event), and the sessionBoundary
     // flag keeps completion-reactive consumers (notifications, automation runs) out of it.
     const sessionStartSource = hookPayload['source']
     if (
@@ -88,7 +88,7 @@ export function normalizeClaudeEvent(
   }
 
   // Why: Claude normally emits PreToolUse while AskUserQuestion is blocked; newer builds can also report it as PermissionRequest.
-  // Treat the PreToolUse as waiting so the sidebar shows amber attention, not a spinner that decays to grey. Mirrors normalizeKimiEvent.
+  // Treat the PreToolUse as waiting so the sidebar shows amber attention, not a spinner that decays to grey.
   const eventToolName = readString(hookPayload, 'tool_name')
   const isAskUserQuestionWait =
     (eventName === 'PreToolUse' || eventName === 'PermissionRequest') &&

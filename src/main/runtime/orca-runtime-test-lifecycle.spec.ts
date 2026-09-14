@@ -37,7 +37,7 @@ const {
   listWorktreesSharedStrict
 } = mocks
 const { listWorktreesStrict, loadHooks, markCodexProjectTrustedMock } = mocks
-const { markCopilotFolderTrustedMock, markCursorWorkspaceTrustedMock, mergeGitHubPRMock } = mocks
+const { markCopilotFolderTrustedMock, mergeGitHubPRMock } = mocks
 const { mergeGitLabMRMock, muxRequestMock, parseOrcaYaml, prepareLocalWorktreeRootForRepoMock } =
   mocks
 const { registerSshGitProviderMock, removeGitHubPRReviewersMock, removeWorktree } = mocks
@@ -271,7 +271,6 @@ function resetRuntimeTestMocks(): void {
   detectRemoteAgentsMock.mockResolvedValue([])
   markCodexProjectTrustedMock.mockReset()
   markCopilotFolderTrustedMock.mockReset()
-  markCursorWorkspaceTrustedMock.mockReset()
   listGitLabMergeRequestsMock.mockReset()
   listGitLabMergeRequestsMock.mockResolvedValue({ items: [] })
   listGitLabWorkItemsMock.mockReset()

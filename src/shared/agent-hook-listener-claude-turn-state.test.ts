@@ -1,10 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   createHookListenerState,
   type HookListenerState
 } from './agent-hook-listener/listener-state'
 import { normalizeHookPayload } from './agent-hook-listener'
-import { clearGrokSessionPathLookupCacheForTests } from './grok-session-paths'
 import {
   CLAUDE_PREVIOUS_PROMPT_ID,
   CLAUDE_PROMPT_ID,
@@ -17,11 +16,6 @@ describe('shared agent-hook-listener', () => {
 
   beforeEach(() => {
     state = createHookListenerState()
-  })
-
-  afterEach(() => {
-    clearGrokSessionPathLookupCacheForTests()
-    vi.unstubAllEnvs()
   })
 
   it('normalizes a Claude-compatible StopFailure to done without copying provider error text', () => {
@@ -298,25 +292,6 @@ describe('shared agent-hook-listener', () => {
     expect(event!.hasExplicitPrompt).toBe(true)
   })
 
-  it('treats a Grok user_query prompt as an explicit user turn', () => {
-    const event = normalizeHookPayload(
-      state,
-      'grok',
-      {
-        paneKey: PANE_KEY,
-        payload: {
-          hookEventName: 'user_prompt_submit',
-          prompt: '<user_query>fix the bug</user_query>'
-        }
-      },
-      'production'
-    )
-    expect(event).not.toBeNull()
-    // Grok wraps the real typed prompt; the envelope is stripped but it stays explicit.
-    expect(event!.payload.prompt).toBe('fix the bug')
-    expect(event!.hasExplicitPrompt).toBe(true)
-  })
-
   it('isolates caches between listener instances', () => {
     const a = createHookListenerState()
     const b = createHookListenerState()
@@ -343,60 +318,5 @@ describe('shared agent-hook-listener', () => {
     )
     expect(event).not.toBeNull()
     expect(event!.payload.prompt).toBe('')
-  })
-
-  it('bounds Amp thread-scoped caches for a long-lived pane', () => {
-    let latestPrompt = ''
-    for (let i = 0; i < 40; i++) {
-      const threadId = `thread-${i}`
-      const started = normalizeHookPayload(
-        state,
-        'amp',
-        {
-          paneKey: PANE_KEY,
-          payload: {
-            hookEventName: 'agent.start',
-            threadId,
-            message: `prompt ${i}`
-          }
-        },
-        'production'
-      )
-      expect(started?.payload.state).toBe('working')
-
-      const ended = normalizeHookPayload(
-        state,
-        'amp',
-        {
-          paneKey: PANE_KEY,
-          payload: {
-            hookEventName: 'agent.end',
-            threadId,
-            status: 'completed'
-          }
-        },
-        'production'
-      )
-      expect(ended?.payload.state).toBe('done')
-      latestPrompt = ended?.payload.prompt ?? ''
-    }
-
-    const scopedPrefix = `${PANE_KEY}\0amp:`
-    const promptKeys = [...state.lastPromptByPaneKey.keys()].filter((key) =>
-      key.startsWith(scopedPrefix)
-    )
-    const toolKeys = [...state.lastToolByPaneKey.keys()].filter((key) =>
-      key.startsWith(scopedPrefix)
-    )
-    const completedKeys = [...state.ampCompletedCacheKeys].filter((key) =>
-      key.startsWith(scopedPrefix)
-    )
-
-    expect(promptKeys.length).toBeLessThanOrEqual(32)
-    expect(toolKeys.length).toBeLessThanOrEqual(32)
-    expect(completedKeys.length).toBeLessThanOrEqual(32)
-    expect(state.lastPromptByPaneKey.has(`${scopedPrefix}thread-0`)).toBe(false)
-    expect(state.lastPromptByPaneKey.get(`${scopedPrefix}thread-39`)).toBe('prompt 39')
-    expect(latestPrompt).toBe('prompt 39')
   })
 })

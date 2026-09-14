@@ -37,22 +37,19 @@ describe('managed-hook local filesystem', () => {
   it('supports cold and warm aggregate installs without SFTP or temp-file residue', async () => {
     const home = await createTempHome()
     const filesystem = createManagedHookLocalFilesystem()
-    const options = {
-      grokHomeDir: join(home, '.grok'),
-      agents: REMOTE_MANAGED_HOOK_INSTALLER_AGENTS
-    }
+    const options = { agents: REMOTE_MANAGED_HOOK_INSTALLER_AGENTS }
 
     const cold = await installRemoteManagedAgentHooks(filesystem, home, options)
     const warm = await installRemoteManagedAgentHooks(filesystem, home, options)
 
-    expect(cold).toHaveLength(14)
+    expect(cold).toHaveLength(2)
     expect(cold.filter((result) => result.state === 'error')).toEqual([])
-    expect(warm).toHaveLength(14)
+    expect(warm).toHaveLength(2)
     expect(warm.filter((result) => result.state === 'error')).toEqual([])
     const files = await listFiles(home)
     expect(files.filter((path) => path.endsWith('.tmp'))).toEqual([])
     const scripts = files.filter((path) => path.includes(join('.orca', 'agent-hooks')))
-    expect(scripts.length).toBeGreaterThanOrEqual(10)
+    expect(scripts.length).toBeGreaterThanOrEqual(2)
     if (process.platform !== 'win32') {
       for (const script of scripts) {
         expect((await stat(script)).mode & 0o777).toBe(0o755)
@@ -67,14 +64,12 @@ describe('managed-hook local filesystem', () => {
     await writeFile(claudeConfig, '{"hooks": }', 'utf8')
 
     const results = await installRemoteManagedAgentHooks(createManagedHookLocalFilesystem(), home, {
-      grokHomeDir: join(home, '.grok'),
       agents: REMOTE_MANAGED_HOOK_INSTALLER_AGENTS
     })
 
-    expect(results).toHaveLength(14)
+    expect(results).toHaveLength(2)
     expect(results.find((result) => result.agent === 'claude')?.state).toBe('error')
-    expect(results.find((result) => result.agent === 'openclaude')?.state).toBe('installed')
-    expect(results.find((result) => result.agent === 'kimi')?.state).toBe('installed')
+    expect(results.find((result) => result.agent === 'codex')?.state).toBe('installed')
     expect(await readFile(claudeConfig, 'utf8')).toBe('{"hooks": }')
   })
 })

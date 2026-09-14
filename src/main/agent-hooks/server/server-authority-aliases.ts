@@ -208,7 +208,6 @@ export abstract class AgentHookServerAuthorityAliases extends AgentHookServerAut
         Object.freeze({ ...authorityObservation, paneKey: toPaneKey, tabId: owner?.tabId })
       )
     }
-    this.clearAssistantMessageRetry(previousOwnerPaneKey)
     this.clearCodexSubagentPoll(previousOwnerPaneKey)
     // Why: the live process keeps posting the physical source key after detach; persist a chain-safe mapping to the current owner.
     this.legacyPaneKeyAliases.set(physicalPaneKey, {

@@ -1,8 +1,4 @@
 import {
-  getCommandTokenPathBasename,
-  getFirstCommandToken
-} from '../../../../shared/command-token-scanner'
-import {
   PRIMARY_AGENT_DIR_ENV_BY_KIND,
   SOURCE_AGENT_DIR_ENV_BY_KIND,
   type PiAgentKind
@@ -160,26 +156,6 @@ export function restoreOrStripOverlayEnv(
   }
   delete baseEnv[keys.overlay]
   delete baseEnv[keys.source]
-}
-
-export function isMimoLaunchCommand(launchCommand: string | undefined): boolean {
-  const binary = getCommandTokenPathBasename(getFirstCommandToken(launchCommand ?? ''))
-    .toLowerCase()
-    .replace(/\.(?:cmd|exe|sh)$/, '')
-  return binary === 'mimo'
-}
-
-export function resolveMimocodeSourceHome(baseEnv: Record<string, string>): string | undefined {
-  const sourceHome = baseEnv.ORCA_MIMOCODE_SOURCE_HOME ?? process.env.ORCA_MIMOCODE_SOURCE_HOME
-  if (sourceHome) {
-    return sourceHome
-  }
-  const configHome = baseEnv.MIMOCODE_HOME ?? process.env.MIMOCODE_HOME
-  const orcaHome = baseEnv.ORCA_MIMOCODE_HOME ?? process.env.ORCA_MIMOCODE_HOME
-  if (configHome && orcaHome && configHome === orcaHome) {
-    return undefined
-  }
-  return configHome
 }
 
 export function resolveOpenCodeSourceConfigDir(

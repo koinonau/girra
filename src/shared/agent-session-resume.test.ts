@@ -31,38 +31,17 @@ describe('agent session resume metadata', () => {
   it.each([
     ['claude', { session_id: 'claude-session' }, { key: 'session_id', id: 'claude-session' }],
     ['codex', { session_id: 'codex-session' }, { key: 'session_id', id: 'codex-session' }],
-    ['gemini', { session_id: 'gemini-session' }, { key: 'session_id', id: 'gemini-session' }],
-    [
-      'antigravity',
-      { conversationId: 'agy-conversation' },
-      { key: 'conversation_id', id: 'agy-conversation' }
-    ],
     ['opencode', { sessionID: 'opencode-session' }, { key: 'session_id', id: 'opencode-session' }],
     [
       'pi',
       { session_id: 'pi-session', session_file: '/tmp/pi-session.jsonl' },
       { key: 'session_id', id: 'pi-session', transcriptPath: '/tmp/pi-session.jsonl' }
     ],
-    ['mimo-code', { sessionID: 'mimo-session' }, { key: 'session_id', id: 'mimo-session' }],
-    ['droid', { session_id: 'droid-session' }, { key: 'session_id', id: 'droid-session' }],
-    ['grok', { sessionId: 'grok-session' }, { key: 'session_id', id: 'grok-session' }],
-    ['devin', { session_id: 'devin-session' }, { key: 'session_id', id: 'devin-session' }],
     ['omp', { session_id: 'omp-session' }, { key: 'session_id', id: 'omp-session' }],
     [
       'prime-agent',
       { session_id: 'prime-session', session_file: '/tmp/prime-session.jsonl' },
       { key: 'session_id', id: 'prime-session', transcriptPath: '/tmp/prime-session.jsonl' }
-    ],
-    [
-      'copilot',
-      { session_id: '940237d9-c712-48e8-bca1-fd75fc4a8d4b' },
-      { key: 'session_id', id: '940237d9-c712-48e8-bca1-fd75fc4a8d4b' }
-    ],
-    ['copilot', { sessionId: 'copilot-camel' }, { key: 'session_id', id: 'copilot-camel' }],
-    [
-      'kimi',
-      { session_id: 'session_431324d7-2165-42f0-9ecd-9f93437b3201' },
-      { key: 'session_id', id: 'session_431324d7-2165-42f0-9ecd-9f93437b3201' }
     ]
   ] as const)('extracts %s provider session ids', (source, payload, expected) => {
     expect(extractAgentProviderSession(source, payload)).toEqual(expected)
@@ -99,8 +78,7 @@ describe('agent session resume metadata', () => {
     expect(getAgentResumeArgv(agent, providerSession)).toEqual(expected)
   })
 
-  it('rejects unsupported sources and unsafe ids', () => {
-    expect(extractAgentProviderSession('cursor', { session_id: 'cursor-session' })).toBeNull()
+  it('rejects unsafe ids', () => {
     expect(normalizeAgentProviderSession({ key: 'session_id', id: 'bad\nid' })).toBeNull()
     expect(normalizeAgentProviderSession({ key: 'session_id', id: '--last' })).toBeNull()
     expect(extractAgentProviderSession('codex', { session_id: '--last' })).toBeNull()
@@ -150,8 +128,8 @@ describe('agent session resume metadata', () => {
 
   it('does not attach transcript_path for non-native-chat agents', () => {
     expect(
-      extractAgentProviderSession('gemini', { session_id: 'gs', transcript_path: '/x/r.jsonl' })
-    ).toEqual({ key: 'session_id', id: 'gs' })
+      extractAgentProviderSession('opencode', { sessionID: 'os', transcript_path: '/x/r.jsonl' })
+    ).toEqual({ key: 'session_id', id: 'os' })
   })
 
   it('round-trips transcriptPath through normalizeAgentProviderSession', () => {

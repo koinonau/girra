@@ -141,10 +141,6 @@ describe('managed hook script refresh', () => {
   it('covers every shared launcher script with a refresher', async () => {
     const home = mkdtempSync(join(tmpdir(), 'orca-hook-refresh-coverage-'))
     homedirMock.mockReturnValue(home)
-    const previousGrokHome = process.env.GROK_HOME
-    const previousKimiHome = process.env.KIMI_CODE_HOME
-    delete process.env.GROK_HOME
-    delete process.env.KIMI_CODE_HOME
     try {
       await withPlatform('win32', () => {
         for (const [, install] of MANAGED_AGENT_HOOK_INSTALLERS) {
@@ -173,16 +169,6 @@ describe('managed hook script refresh', () => {
       }
     } finally {
       homedirMock.mockImplementation(() => process.env.HOME ?? tmpdir())
-      if (previousGrokHome === undefined) {
-        delete process.env.GROK_HOME
-      } else {
-        process.env.GROK_HOME = previousGrokHome
-      }
-      if (previousKimiHome === undefined) {
-        delete process.env.KIMI_CODE_HOME
-      } else {
-        process.env.KIMI_CODE_HOME = previousKimiHome
-      }
       rmSync(home, { recursive: true, force: true })
     }
   })

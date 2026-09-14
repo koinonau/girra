@@ -22,24 +22,6 @@ export type ExtractedPromptText = {
     | null
 }
 
-// Joins text of an Anthropic-style content-block array; returns '' when nothing textual so callers fall through to the next prompt source.
-export function contentBlockArrayText(value: unknown[]): string {
-  const parts: string[] = []
-  for (const item of value) {
-    if (typeof item === 'string') {
-      parts.push(item)
-      continue
-    }
-    if (item && typeof item === 'object') {
-      const text = (item as Record<string, unknown>).text
-      if (typeof text === 'string') {
-        parts.push(text)
-      }
-    }
-  }
-  return parts.join(' ').replace(/\s+/g, ' ').trim()
-}
-
 export function extractPromptText(hookPayload: Record<string, unknown>): ExtractedPromptText {
   const candidateKeys = [
     'prompt',
@@ -56,13 +38,6 @@ export function extractPromptText(hookPayload: Record<string, unknown>): Extract
       // Why: trim so prompts match readStringField output — whitespace would otherwise leak into UI and caches.
       return { text: value.trim(), source: key as Exclude<ExtractedPromptText['source'], null> }
     }
-    // Why: Kimi sends `prompt` as a content-block array, not a string; extract it for real prompt keys but skip `message` (ambiguous status field).
-    if (key !== 'message' && Array.isArray(value)) {
-      const text = contentBlockArrayText(value)
-      if (text.length > 0) {
-        return { text, source: key as Exclude<ExtractedPromptText['source'], null> }
-      }
-    }
   }
   // Why: OpenCode sends MessagePart { role, text } with no UserPromptSubmit; when role === 'user' the text is the prompt.
   if (hookPayload.role === 'user' && typeof hookPayload.text === 'string') {
@@ -72,18 +47,6 @@ export function extractPromptText(hookPayload: Record<string, unknown>): Extract
     }
   }
   return { text: '', source: null }
-}
-
-export function stripGrokUserQueryWrapper(promptText: string): string {
-  const opener = '<user_query>'
-  if (!promptText.startsWith(opener)) {
-    return promptText
-  }
-  const closer = '</user_query>'
-  const wrappedText = promptText.slice(opener.length)
-  const text = wrappedText.endsWith(closer) ? wrappedText.slice(0, -closer.length) : wrappedText
-  // Why: Grok wraps the submitted prompt in a `<user_query>` envelope; the status cache should hold the plain user text.
-  return text.trim()
 }
 
 // Why: the post-compact continuation prompt has no matching Stop and would resurrect working.

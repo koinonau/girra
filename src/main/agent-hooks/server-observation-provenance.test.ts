@@ -130,15 +130,13 @@ describe('agent status observation provenance', () => {
   })
 
   // Why: this is the whole point of stamping boundary from the listener's own classifier.
-  // `before_agent_start`, `BeforeAgent` and `agent.start` are NOT the two raw literals the
+  // `before_agent_start` is NOT one of the two raw literals the
   // retired-pane gate matches, so a second hand-written list here would report them as
   // non-boundaries — exactly the defect PR #14626 fixed one instance of.
   it.each([
     { source: 'claude', hookEventName: 'UserPromptSubmit', agentType: 'claude' },
     { source: 'pi', hookEventName: 'before_agent_start', agentType: 'pi' },
-    { source: 'gemini', hookEventName: 'BeforeAgent', agentType: 'gemini' },
-    { source: 'amp', hookEventName: 'agent.start', agentType: 'amp' },
-    { source: 'cursor', hookEventName: 'beforeSubmitPrompt', agentType: 'cursor' }
+    { source: 'omp', hookEventName: 'before_agent_start', agentType: 'omp' }
   ])(
     'stamps boundary for $source $hookEventName even though it is not a gate literal',
     ({ source, hookEventName, agentType }) => {
@@ -168,9 +166,9 @@ describe('agent status observation provenance', () => {
       {
         paneKey: PANE,
         tabId: 'tab-1',
-        source: 'gemini',
+        source: 'claude',
         hookEventName: 'PostToolUse',
-        payload: { state: 'working', prompt: 'mid turn', agentType: 'gemini' }
+        payload: { state: 'working', prompt: 'mid turn', agentType: 'claude' }
       },
       CONNECTION
     )

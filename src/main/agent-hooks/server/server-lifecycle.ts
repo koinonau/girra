@@ -114,7 +114,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
           }
           this.recordCurrentAuthorityObservation(event)
           const enriched = this.applyNormalizedStatus(event, normalized.onAccepted)
-          this.scheduleAssistantMessageRetry(source, aliasedBody, enriched)
           this.scheduleCodexSubagentPoll(source, aliasedBody, enriched)
         }
         res.writeHead(204)
@@ -180,10 +179,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
     this.onPaneStatusCleared = null
     this.onTransportInterference = null
     this.transportInterference.reset()
-    for (const timer of this.assistantMessageRetryTimers.values()) {
-      clearTimeout(timer)
-    }
-    this.assistantMessageRetryTimers.clear()
     this.clearAllCodexSubagentPolls()
     this.endpointDir = null
     this.endpointFilePathCache = null

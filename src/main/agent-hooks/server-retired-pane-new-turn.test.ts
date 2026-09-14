@@ -8,28 +8,14 @@ beforeEach(() => {
 })
 afterEach(() => vi.restoreAllMocks())
 
-/** Each source's own new-turn boundary, as `isNewTurnEvent` classifies it. `null` means the
- *  classifier names no boundary for that source. That is not the same as "can never revive":
- *  mimo-code's boundary is an explicit-prompt MessagePart, which the gate handles separately. */
-const NEW_TURN_EVENT: Record<AgentHookSource, string | null> = {
+/** Each source's own new-turn boundary, as `isNewTurnEvent` classifies it. */
+const NEW_TURN_EVENT: Record<AgentHookSource, string> = {
   claude: 'SessionStart',
-  kimi: 'UserPromptSubmit',
   codex: 'SessionStart',
-  gemini: 'BeforeAgent',
-  antigravity: 'PreInvocation',
-  amp: 'agent.start',
-  cursor: 'beforeSubmitPrompt',
   pi: 'before_agent_start',
   omp: 'before_agent_start',
   'prime-agent': 'before_agent_start',
-  droid: 'UserPromptSubmit',
-  grok: 'user_prompt_submit',
-  copilot: 'sessionStart',
-  hermes: 'pre_llm_call',
-  devin: 'UserPromptSubmit',
-  opencode: 'SessionStart',
-  'mimo-code': null,
-  'command-code': null
+  opencode: 'SessionStart'
 }
 
 function reviveRetiredPane(source: unknown, hookEventName: string): boolean {
@@ -55,18 +41,11 @@ function reviveRetiredPane(source: unknown, hookEventName: string): boolean {
 }
 
 describe("retired pane un-retires on each provider's own new-turn event", () => {
-  // Why: the gate matched two raw literals, so only the 5 sources that happen to name their
-  // boundary UserPromptSubmit/SessionStart could ever revive — the rest stayed rowless forever.
-  // Why: keys of a Record<AgentHookSource, …> — a new source fails typecheck here rather than
-  // silently skipping coverage, which is the same guarantee the runtime list would give.
-  const revivable = (Object.keys(NEW_TURN_EVENT) as AgentHookSource[]).filter(
-    (source) => NEW_TURN_EVENT[source] !== null
-  )
-
-  it.each(revivable)('%s', (source) => {
-    const hookEventName = NEW_TURN_EVENT[source]
-    expect(hookEventName).not.toBeNull()
-    expect(reviveRetiredPane(source, hookEventName as string)).toBe(true)
+  // Why: the gate matched two raw literals, so sources whose boundary had another name could
+  // never revive. Keys of a Record<AgentHookSource, …>: a new source fails typecheck here
+  // rather than silently skipping coverage.
+  it.each(Object.keys(NEW_TURN_EVENT) as AgentHookSource[])('%s', (source) => {
+    expect(reviveRetiredPane(source, NEW_TURN_EVENT[source])).toBe(true)
   })
 
   // Why these two: every case above passes `source`, so the source-less compatibility path —
@@ -99,16 +78,8 @@ describe("retired pane un-retires on each provider's own new-turn event", () => 
     }
   )
 
-  it('leaves the pane retired for a source with no turn boundary', () => {
-    // Why mimo-code and command-code: neither names a boundary through `isNewTurnEvent`, so
-    // SessionStart must not open the gate for them. Mimo-code still revives on its own
-    // explicit-prompt MessagePart — that path is covered in server-opencode-lifecycle.test.ts.
-    expect(reviveRetiredPane('mimo-code', 'SessionStart')).toBe(false)
-    expect(reviveRetiredPane('command-code', 'SessionStart')).toBe(false)
-  })
-
   it('leaves the pane retired for a non-boundary event on a revivable source', () => {
     // Why: guards the inverse — the gate must not open on any event that merely mentions a session.
-    expect(reviveRetiredPane('gemini', 'AfterAgent')).toBe(false)
+    expect(reviveRetiredPane('codex', 'Stop')).toBe(false)
   })
 })

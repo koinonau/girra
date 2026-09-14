@@ -24,7 +24,6 @@ export type Body = {
 }
 
 export type AgentHookServerCacheInternals = {
-  assistantMessageRetryTimers: Map<string, number | ReturnType<typeof globalThis.setTimeout>>
   runtimeObservedStatusPaneKeys: Set<string>
   scheduleStatusPersist: () => void
 }

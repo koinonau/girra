@@ -191,20 +191,7 @@ export function extractAgentProviderSession(
       const id = readSessionId(payload, ['session_id'])
       return id ? withTranscriptPath({ key: 'session_id', id }, payload) : null
     }
-    case 'gemini':
-    case 'droid':
-    // Why: Kimi Code posts a Claude-shaped `session_id` (e.g. session_<uuid>).
-    // falls through
-    case 'kimi': {
-      const id = readSessionId(payload, ['session_id'])
-      return id ? { key: 'session_id', id } : null
-    }
-    case 'antigravity': {
-      const id = readSessionId(payload, ['conversationId'])
-      return id ? { key: 'conversation_id', id } : null
-    }
-    case 'opencode':
-    case 'mimo-code': {
+    case 'opencode': {
       const id = readSessionId(payload, ['sessionID'])
       return id ? { key: 'session_id', id } : null
     }
@@ -216,30 +203,11 @@ export function extractAgentProviderSession(
         : null
       return providerSession?.transcriptPath ? providerSession : null
     }
-    case 'grok': {
-      const id = readSessionId(payload, ['sessionId', 'session_id'])
-      return id ? { key: 'session_id', id } : null
-    }
-    case 'devin': {
-      const id = readSessionId(payload, ['session_id', 'sessionId'])
-      return id ? { key: 'session_id', id } : null
-    }
     // Why: OMP's managed extension reports the authoritative CLI resume id.
     case 'omp': {
       const id = readSessionId(payload, ['session_id'])
       return id ? { key: 'session_id', id } : null
     }
-    // Why: Copilot's hook `session_id` is also its `~/.copilot/session-state/<id>/`
-    // directory name, so the same id is the CLI's resume locator.
-    case 'copilot': {
-      const id = readSessionId(payload, ['session_id', 'sessionId'])
-      return id ? { key: 'session_id', id } : null
-    }
-    case 'amp':
-    case 'cursor':
-    case 'command-code':
-    case 'hermes':
-      return null
   }
 }
 

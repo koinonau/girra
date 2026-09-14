@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   clearClaudeAnsweredQuestionWait,
   markClaudeLeadTurnInterrupted,
@@ -10,7 +10,6 @@ import {
   type HookListenerState
 } from './agent-hook-listener/listener-state'
 import { normalizeHookPayload } from './agent-hook-listener'
-import { clearGrokSessionPathLookupCacheForTests } from './grok-session-paths'
 import { AGENT_STATUS_MAX_SUBAGENTS } from './agent-status-types'
 import { makePaneKey } from './stable-pane-id'
 import { PANE_KEY } from './agent-hook-listener-test-harness'
@@ -20,11 +19,6 @@ describe('shared agent-hook-listener', () => {
 
   beforeEach(() => {
     state = createHookListenerState()
-  })
-
-  afterEach(() => {
-    clearGrokSessionPathLookupCacheForTests()
-    vi.unstubAllEnvs()
   })
 
   describe('claude subagent tracking', () => {

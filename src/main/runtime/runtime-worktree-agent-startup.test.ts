@@ -4,15 +4,13 @@ import type { Repo } from '../../shared/repo-types'
 const mocks = vi.hoisted(() => ({
   markCodexProjectTrusted: vi.fn(),
   markCopilotFolderTrusted: vi.fn(),
-  markCursorWorkspaceTrusted: vi.fn(),
   detectRemoteAgents: vi.fn(),
   detectInstalledAgentsWithShellPathHydration: vi.fn()
 }))
 
 vi.mock('../agent-trust-presets', () => ({
   markCodexProjectTrusted: mocks.markCodexProjectTrusted,
-  markCopilotFolderTrusted: mocks.markCopilotFolderTrusted,
-  markCursorWorkspaceTrusted: mocks.markCursorWorkspaceTrusted
+  markCopilotFolderTrusted: mocks.markCopilotFolderTrusted
 }))
 
 vi.mock('../preflight/agent-detection', () => ({

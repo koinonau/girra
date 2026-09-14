@@ -35,7 +35,6 @@ export abstract class AgentHookServerAuthorityFences extends AgentHookServerAuth
     for (const key of paneKeys) {
       this.markPaneClosedForAgentStatus(key)
       this.restartedStatusLaunchTokenHashByPaneKey.delete(key)
-      this.clearAssistantMessageRetry(key)
       this.clearCodexSubagentPoll(key)
       clearPaneCacheState(this.state, key)
       this.activeHookTurnCompletedAtByPaneKey.delete(key)

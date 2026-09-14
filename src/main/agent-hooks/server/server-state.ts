@@ -97,7 +97,6 @@ export abstract class AgentHookServerState {
   protected lastStatusFilePath: string | null = null
   // Why: trailing-edge debounce timer, per-instance so test servers in one process don't share state.
   protected statusPersistTimer: ReturnType<typeof setTimeout> | null = null
-  protected assistantMessageRetryTimers = new Map<string, ReturnType<typeof setTimeout>>()
   protected activeHookTurnCompletedAtByPaneKey = new Map<string, number>()
   protected closedAgentStatusTabIds = new Set<string>()
   protected closedAgentStatusPaneKeys = new Set<string>()
@@ -162,27 +161,12 @@ export abstract class AgentHookServerState {
     mutationBefore?: EnrichedAgentHookEventPayload
   ): EnrichedAgentHookEventPayload
   protected abstract emitEnrichedStatus(enriched: EnrichedAgentHookEventPayload): void
-  protected abstract clearAssistantMessageRetry(paneKey: string): void
   protected abstract clearCodexSubagentPoll(paneKey: string): void
   protected abstract clearAllCodexSubagentPolls(): void
   protected abstract scheduleCodexSubagentPoll(
     source: AgentHookSource,
     body: unknown,
     original: EnrichedAgentHookEventPayload
-  ): void
-  protected abstract scheduleAssistantMessageRetry(
-    source: AgentHookSource,
-    body: unknown,
-    original: EnrichedAgentHookEventPayload,
-    attempt?: number,
-    discoveryReady?: boolean
-  ): void
-  protected abstract applyAssistantMessageRetry(
-    source: AgentHookSource,
-    body: unknown,
-    original: EnrichedAgentHookEventPayload,
-    nextAttempt: number,
-    requireExactOriginal: boolean
   ): void
   protected abstract getPersistedPaneKeyAliases(): LegacyPaneKeyAliasEntry[]
   protected abstract notifyPaneKeyAliasPersistenceListener(): void

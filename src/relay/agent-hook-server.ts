@@ -225,7 +225,6 @@ export class RelayAgentHookServer {
 
   /** Drop a paneKey's cached entries on PTY exit so a terminated pane can't resurface as a ghost event on reconnect. */
   clearPaneState(paneKey: string): void {
-    this.retryScheduler.clearAssistantMessageRetry(paneKey)
     this.retryScheduler.clearCodexSubagentPoll(paneKey)
     clearPaneCacheState(this.state, paneKey)
     this.lastEnvelopeMetaByPaneKey.delete(paneKey)
@@ -284,7 +283,6 @@ export class RelayAgentHookServer {
         const env = hookBodyEnv(hookBody)
         const version = hookBodyVersion(hookBody)
         this.applyEvent(event, source, env, version)
-        this.retryScheduler.scheduleAssistantMessageRetry(source, hookBody, event, env, version)
         this.retryScheduler.scheduleCodexSubagentPoll(source, hookBody, event, env, version)
       }
       res.writeHead(204)
@@ -318,9 +316,6 @@ export class RelayAgentHookServer {
     if (this.isPaneSurfaceRetired(event.paneKey)) {
       this.clearPaneState(event.paneKey)
       return
-    }
-    if (event.payload.state !== 'done' || event.payload.lastAssistantMessage) {
-      this.retryScheduler.clearAssistantMessageRetry(event.paneKey)
     }
     // Why: keep PostCompact identity in the replay cache so the client can re-run ownership when
     // it reconnects. Stripping it would let a cold relay replay a completion as an ordinary `done`

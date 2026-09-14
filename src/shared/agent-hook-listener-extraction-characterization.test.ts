@@ -16,22 +16,10 @@ const MOVED_PANE = makePaneKey('tab-hooks', '22222222-2222-4222-8222-22222222222
 const ROUTES = {
   '/hook/claude': 'claude',
   '/hook/codex': 'codex',
-  '/hook/gemini': 'gemini',
-  '/hook/antigravity': 'antigravity',
-  '/hook/amp': 'amp',
   '/hook/opencode': 'opencode',
-  '/hook/mimo-code': 'mimo-code',
-  '/hook/cursor': 'cursor',
   '/hook/pi': 'pi',
   '/hook/omp': 'omp',
-  '/hook/prime-agent': 'prime-agent',
-  '/hook/droid': 'droid',
-  '/hook/command-code': 'command-code',
-  '/hook/grok': 'grok',
-  '/hook/copilot': 'copilot',
-  '/hook/hermes': 'hermes',
-  '/hook/devin': 'devin',
-  '/hook/kimi': 'kimi'
+  '/hook/prime-agent': 'prime-agent'
 } as const
 function normalizeProviderState(
   source: (typeof ROUTES)[keyof typeof ROUTES],
@@ -60,17 +48,10 @@ describe('agent hook extraction boundaries', () => {
 
   it('preserves thin provider lifecycle branches and source attribution', () => {
     const cases = [
-      ['devin', 'UserPromptSubmit', 'working'],
-      ['devin', 'PermissionRequest', 'waiting'],
-      ['devin', 'Stop', 'done'],
-      ['mimo-code', 'MessagePart', 'working'],
-      ['mimo-code', 'AskUserQuestion', 'waiting'],
+      ['opencode', 'MessagePart', 'working'],
+      ['opencode', 'AskUserQuestion', 'waiting'],
       ['prime-agent', 'before_agent_start', 'working'],
-      ['prime-agent', 'agent_end', 'done'],
-      ['kimi', 'PermissionRequest', 'waiting'],
-      ['kimi', 'StopFailure', 'done'],
-      ['hermes', 'on_session_finalize', 'done'],
-      ['hermes', 'on_session_reset', 'done']
+      ['prime-agent', 'agent_end', 'done']
     ] as const
 
     for (const [source, eventName, expectedState] of cases) {
@@ -79,7 +60,7 @@ describe('agent hook extraction boundaries', () => {
         agentType: source
       })
     }
-    for (const source of ['devin', 'mimo-code', 'prime-agent', 'kimi', 'hermes'] as const) {
+    for (const source of ['opencode', 'prime-agent'] as const) {
       expect(normalizeProviderState(source, 'UnknownEvent')).toBeNull()
     }
   })
@@ -89,7 +70,7 @@ describe('agent hook extraction boundaries', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const rejected = normalizeHookPayload(
       orderState,
-      'devin',
+      'codex',
       {
         paneKey: PANE,
         tabId: 'wrong-tab',
@@ -123,7 +104,6 @@ describe('agent hook extraction boundaries', () => {
       state.lastPromptByPaneKey,
       state.lastToolByPaneKey,
       state.lastStatusByPaneKey,
-      state.antigravityCompletedTranscriptByPaneKey,
       state.claudeSubagentRosterByPaneKey,
       state.claudeLeadStateByPaneKey,
       state.codexSubagentRosterByPaneKey,
@@ -137,7 +117,6 @@ describe('agent hook extraction boundaries', () => {
       cache.set(sibling, 'sibling')
     }
     const paneSets = [
-      state.ampCompletedCacheKeys,
       state.claudeUnconfirmedRestoredStatusPaneKeys,
       state.claudeRunningNonAgentTaskPaneKeys,
       state.claudeActiveSessionCronPaneKeys
@@ -172,21 +151,13 @@ describe('agent hook extraction boundaries', () => {
     const state = createHookListenerState()
     const scoped = `${PANE}\0thread`
     const sibling = `${PANE}-sibling`
-    const paneMaps = [
-      state.lastPromptByPaneKey,
-      state.lastToolByPaneKey,
-      state.lastStatusByPaneKey,
-      state.antigravityCompletedTranscriptByPaneKey
-    ]
+    const paneMaps = [state.lastPromptByPaneKey, state.lastToolByPaneKey, state.lastStatusByPaneKey]
     for (const map of paneMaps) {
       const cache = map as Map<string, unknown>
       cache.set(PANE, 'exact')
       cache.set(scoped, 'scoped')
       cache.set(sibling, 'sibling')
     }
-    state.ampCompletedCacheKeys.add(PANE)
-    state.ampCompletedCacheKeys.add(scoped)
-    state.ampCompletedCacheKeys.add(sibling)
     state.claudeLeadStateByPaneKey.set(PANE, { state: 'working' })
     state.codexLeadStateByPaneKey.set(PANE, { state: 'working' })
 
@@ -198,8 +169,6 @@ describe('agent hook extraction boundaries', () => {
       expect(cache.has(scoped)).toBe(false)
       expect(cache.get(sibling)).toBe('sibling')
     }
-    expect(state.ampCompletedCacheKeys.has(scoped)).toBe(false)
-    expect(state.ampCompletedCacheKeys.has(sibling)).toBe(true)
     expect(state.claudeLeadStateByPaneKey.has(PANE)).toBe(false)
     expect(state.codexLeadStateByPaneKey.has(PANE)).toBe(false)
   })
@@ -212,8 +181,8 @@ describe('agent hook extraction boundaries', () => {
 
     const event = normalizeHookPayload(
       state,
-      'droid',
-      { paneKey: PANE, payload: { hook_event_name: 'SessionStart' } },
+      'prime-agent',
+      { paneKey: PANE, payload: { hook_event_name: 'session_start' } },
       'production'
     )
 

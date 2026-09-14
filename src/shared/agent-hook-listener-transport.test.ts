@@ -18,7 +18,6 @@ import { mergeAgentHookRequestHeaders } from './agent-hook-listener/hook-envelop
 import { createHookListenerState } from './agent-hook-listener/listener-state'
 import { resolveHookSource } from './agent-hook-listener/source-routing'
 import { normalizeHookPayload } from './agent-hook-listener'
-import { clearGrokSessionPathLookupCacheForTests } from './grok-session-paths'
 
 type FakeIncomingMessage = EventEmitter & {
   headers: IncomingHttpHeaders
@@ -44,11 +43,6 @@ describe('shared agent-hook-listener', () => {
   const paneKey = 'tab-1:11111111-1111-4111-8111-111111111111'
   const b64 = (value: string): string => Buffer.from(value, 'utf8').toString('base64')
   const packedMetadata = (...values: string[]): string => b64(values.join('\x1f'))
-
-  afterEach(() => {
-    clearGrokSessionPathLookupCacheForTests()
-    vi.unstubAllEnvs()
-  })
 
   it('parses form-encoded bodies', () => {
     const decoded = parseFormEncodedBody('paneKey=tab-1%3A0&worktreeId=foo')
@@ -208,15 +202,11 @@ describe('shared agent-hook-listener', () => {
 
   it('routes pathnames to a known source or null', () => {
     expect(resolveHookSource('/hook/claude')).toBe('claude')
-    expect(resolveHookSource('/hook/cursor')).toBe('cursor')
-    expect(resolveHookSource('/hook/antigravity')).toBe('antigravity')
-    expect(resolveHookSource('/hook/grok')).toBe('grok')
-    expect(resolveHookSource('/hook/hermes')).toBe('hermes')
     expect(resolveHookSource('/hook/pi')).toBe('pi')
     expect(resolveHookSource('/hook/omp')).toBe('omp')
     expect(resolveHookSource('/hook/prime-agent')).toBe('prime-agent')
-    expect(resolveHookSource('/hook/command-code')).toBe('command-code')
-    expect(resolveHookSource('/hook/mimo-code')).toBe('mimo-code')
+    // Installed scripts for removed integrations still post here; they must drop.
+    expect(resolveHookSource('/hook/grok')).toBeNull()
     expect(resolveHookSource('/hook/unknown')).toBeNull()
     expect(resolveHookSource('/')).toBeNull()
   })

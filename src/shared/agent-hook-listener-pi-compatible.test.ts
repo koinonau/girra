@@ -1,10 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   createHookListenerState,
   type HookListenerState
 } from './agent-hook-listener/listener-state'
 import { normalizeHookPayload } from './agent-hook-listener'
-import { clearGrokSessionPathLookupCacheForTests } from './grok-session-paths'
 import { PANE_KEY } from './agent-hook-listener-test-harness'
 
 describe('shared agent-hook-listener', () => {
@@ -12,11 +11,6 @@ describe('shared agent-hook-listener', () => {
 
   beforeEach(() => {
     state = createHookListenerState()
-  })
-
-  afterEach(() => {
-    clearGrokSessionPathLookupCacheForTests()
-    vi.unstubAllEnvs()
   })
 
   it('maps Pi tool_call ask_user_question to blocked with interactivePrompt', () => {

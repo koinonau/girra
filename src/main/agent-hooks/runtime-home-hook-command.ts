@@ -18,7 +18,7 @@ export function wrapRuntimeHomeHookCommand(
   if (!MANAGED_SCRIPT_BASE_NAME.test(scriptBaseName)) {
     throw new Error(`Invalid managed script base name: ${scriptBaseName}`)
   }
-  // Why: default-form every var — a static hook precheck (Grok) rejects the whole command on a bare
+  // Why: default-form every var, since a static hook precheck rejects the whole command on a bare
   // reference it cannot resolve, even in a branch that platform never takes.
   const windowsScript = `"\${HOME-}/.orca/agent-hooks/${scriptBaseName}.cmd"`
   const posixScript = `"\${HOME-}/.orca/agent-hooks/${scriptBaseName}.sh"`
@@ -39,7 +39,8 @@ export function wrapRuntimeHomeHookCommand(
   const missingScriptFallback = `case "\${OSTYPE-}" in msys*|cygwin*|win32*) ${windowsMissingScriptFallback} ;; *) ${posixMissingScriptFallback} ;; esac`
   const powershell = '"${SYSTEMROOT-}/System32/WindowsPowerShell/v1.0/powershell.exe"'
   const powershellFallback = options.neutralJsonWhenMissing ? "; Write-Output '{}'" : ''
-  // Why the order: answer first, then the shared env guard, then own stdin — see wrapWindowsHookCommand.
+  // Why the order: answer first (a gate event reads silence as deny, #2426), then the env guard,
+  // and only then own stdin, which an abandoned pipe would strand (#11549).
   const powershellCommand = `$homePath = $env:HOME -replace '^/([A-Za-z])/', '$1:/'; $scriptPath = Join-Path $homePath '.orca\\agent-hooks\\${scriptBaseName}.cmd'; if (Test-Path -LiteralPath $scriptPath -PathType Leaf) { & $scriptPath; exit $LASTEXITCODE }${powershellFallback}; ${WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD}; [Console]::In.ReadToEnd() | Out-Null; exit 0`
   const encodedCommand = encodeWindowsPowerShellHookCommand(powershellCommand)
   // Why: the Git Bash and native Windows launchers must spell the same switches — window suppression (#14815) and an AV verdict on the shape (#16003) both hit either path.

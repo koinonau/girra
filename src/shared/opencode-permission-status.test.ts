@@ -16,18 +16,15 @@ const PANE_KEY = makePaneKey('tab-1', '11111111-1111-4111-8111-111111111111')
  * inside it come from each tool. The payloads below were captured from a live opencode
  * 1.18.18 rather than invented, because the first version of this suite guessed a shape
  * (`metadata: {}`) that OpenCode never emits and so never exercised the real `edit` path.
- *
- * `normalizeOpenCodeFamilyEvent` serves opencode and mimo-code from one path, so every
- * case here runs for both.
  */
-describe('OpenCode-family permission request status', () => {
+describe('OpenCode permission request status', () => {
   let state: ReturnType<typeof createHookListenerState>
 
   beforeEach(() => {
     state = createHookListenerState()
   })
 
-  const SOURCES = ['opencode', 'mimo-code'] as const
+  const SOURCES = ['opencode'] as const
 
   function permissionEvent(
     source: (typeof SOURCES)[number],

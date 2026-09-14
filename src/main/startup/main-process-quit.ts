@@ -7,7 +7,6 @@ import { disconnectDaemon, shutdownDaemon } from '../daemon/daemon-init'
 import { beginSshShutdown } from '../ipc/ssh-shutdown-drain'
 import { agentHookServer } from '../agent-hooks/server'
 import { wslHookRelayManager } from '../agent-hooks/wsl-hook-relay-manager'
-import { removeManagedAgentHooksAsync } from '../agent-hooks/managed-agent-hook-controls'
 import { stopStructuredAgentSessionRuntime } from '../runtime/structured-agent-session-runtime'
 import { awaitRuntimeFileWatcherUnsubscribes } from '../runtime/orca-runtime-files'
 import { clearRuntimeMetadataIfOwned } from '../runtime/runtime-metadata'
@@ -30,8 +29,6 @@ import { getCanonicalUserDataPath } from '../persistence'
 // Why: will-quit fires twice — first pass preventDefaults and runs teardown; second pass exits.
 let daemonDisconnectDone = false
 let watcherShutdownPromise: Promise<void> | null = null
-// Why 2s: a config delete is best-effort, not durable state.
-const GROK_HOOK_CLEANUP_DEADLINE_MS = 2_000
 // Why 2s: long enough for a `pack-refs` child to take SIGTERM and unlink its lock.
 const REF_MAINTENANCE_QUIT_DEADLINE_MS = 2_000
 
@@ -126,31 +123,6 @@ function installWillQuitHandler(): void {
     ).then(() => {})
     state.uninstallRepoMaintenanceIdleGate = null
     agentHookServer.stop()
-    // Why Windows only: POSIX hooks short-circuit on ORCA_PANE_KEY, while Windows must register a
-    // bare script path that cannot express the guard and would otherwise keep spawning after quit.
-    // Why bounded here: every other teardown member carries its own ceiling, and this one reaches
-    // $GROK_HOME -- which can be a stalled network mount, where the fs calls never settle and the
-    // shared 20s deadline becomes the only thing ending the quit.
-    const grokHookCleanup =
-      process.platform === 'win32'
-        ? settleWithinMs(
-            removeManagedAgentHooksAsync({ agents: ['grok'] }),
-            GROK_HOOK_CLEANUP_DEADLINE_MS
-          ).then((settled) => {
-            if (settled.outcome === 'timed-out') {
-              console.warn('[agent-hooks] Grok hook cleanup on quit timed out')
-              return
-            }
-            if (settled.outcome === 'failed') {
-              console.warn('[agent-hooks] Grok hook cleanup on quit failed:', settled.error)
-              return
-            }
-            // Why: removers report failures as statuses, so inspect details even after fulfillment.
-            for (const status of settled.value.filter((entry) => entry.detail)) {
-              console.warn(`[agent-hooks] ${status.agent} hook cleanup on quit: ${status.detail}`)
-            }
-          })
-        : Promise.resolve()
     // Why: cancels relay restart/reinstall timers and kills wsl.exe children deterministically, not via stdio-pipe teardown.
     wslHookRelayManager.disposeAll()
     const statsFlush = state.stats?.flushAsync() ?? Promise.resolve()
@@ -219,7 +191,6 @@ function installWillQuitHandler(): void {
       { name: 'ssh', promise: sshShutdown },
       { name: 'plugin-hosts', promise: pluginHostShutdown },
       { name: 'skill-uploads', promise: skillUploadShutdown },
-      { name: 'grok-hooks', promise: grokHookCleanup },
       { name: 'ref-maintenance', promise: refMaintenanceShutdown },
       { name: 'codex-backfill-recovery', promise: codexBackfillRecoveryShutdown },
       { name: 'structured-agent-session', promise: structuredAgentSessionShutdown },

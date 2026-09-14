@@ -165,7 +165,6 @@ const {
   detectRemoteAgentsMock,
   markCodexProjectTrustedMock,
   markCopilotFolderTrustedMock,
-  markCursorWorkspaceTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,
   listGitLabIssuesMock,
@@ -276,7 +275,6 @@ const {
     detectRemoteAgentsMock: vi.fn() as TestMock,
     markCodexProjectTrustedMock: vi.fn() as TestMock,
     markCopilotFolderTrustedMock: vi.fn() as TestMock,
-    markCursorWorkspaceTrustedMock: vi.fn() as TestMock,
     listGitLabMergeRequestsMock: vi.fn() as TestMock,
     listGitLabWorkItemsMock: vi.fn() as TestMock,
     listGitLabIssuesMock: vi.fn() as TestMock,
@@ -359,8 +357,7 @@ vi.mock('../../agent-hooks/managed-agent-hook-controls', () => ({
 
 vi.mock('../../agent-trust-presets', () => ({
   markCodexProjectTrusted: markCodexProjectTrustedMock,
-  markCopilotFolderTrusted: markCopilotFolderTrustedMock,
-  markCursorWorkspaceTrusted: markCursorWorkspaceTrustedMock
+  markCopilotFolderTrusted: markCopilotFolderTrustedMock
 }))
 
 vi.mock('../../hooks', () => ({
@@ -634,7 +631,6 @@ export {
   detectRemoteAgentsMock,
   markCodexProjectTrustedMock,
   markCopilotFolderTrustedMock,
-  markCursorWorkspaceTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,
   listGitLabIssuesMock,

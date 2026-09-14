@@ -32,16 +32,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
         paneKeysToClear.add(key.split('\0', 1)[0] ?? key)
       }
     }
-    for (const key of this.state.antigravityCompletedTranscriptByPaneKey.keys()) {
-      if (paneCacheKeyMatchesTab(key, tabId)) {
-        paneKeysToClear.add(key.split('\0', 1)[0] ?? key)
-      }
-    }
-    for (const key of this.state.ampCompletedCacheKeys) {
-      if (paneCacheKeyMatchesTab(key, tabId)) {
-        paneKeysToClear.add(key.split('\0', 1)[0] ?? key)
-      }
-    }
     for (const paneKey of this.runtimeObservedStatusPaneKeys) {
       if (paneCacheKeyMatchesTab(paneKey, tabId)) {
         paneKeysToClear.add(paneKey)
@@ -69,7 +59,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
       if (this.state.lastStatusByPaneKey.has(paneKey)) {
         statusChanged = true
       }
-      this.clearAssistantMessageRetry(paneKey)
       this.clearCodexSubagentPoll(paneKey)
       clearPaneCacheState(this.state, paneKey)
       this.activeHookTurnCompletedAtByPaneKey.delete(paneKey)
@@ -102,7 +91,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
       | EnrichedAgentHookEventPayload
       | undefined
     const hadStatus = previousStatus !== undefined
-    this.clearAssistantMessageRetry(resolvedPaneKey)
     this.clearCodexSubagentPoll(resolvedPaneKey)
     clearPaneCacheState(this.state, resolvedPaneKey)
     this.activeHookTurnCompletedAtByPaneKey.delete(resolvedPaneKey)

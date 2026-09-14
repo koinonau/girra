@@ -7,7 +7,6 @@ import { resolvePrompt, resolveToolState } from '../prompt-fields'
 import { extractToolFields, isNewTurnEvent } from '../provider-event-routing'
 
 export function normalizeOpenCodeFamilyEvent(
-  source: 'opencode' | 'mimo-code',
   state: HookListenerState,
   eventName: unknown,
   promptText: string,
@@ -15,18 +14,16 @@ export function normalizeOpenCodeFamilyEvent(
   hookPayload: Record<string, unknown>
 ): ParsedAgentStatusPayload | null {
   const resetsTurn =
-    isNewTurnEvent(source, eventName) ||
+    isNewTurnEvent('opencode', eventName) ||
     (eventName === 'MessagePart' && hookPayload.role === 'user')
   const stateName =
     eventName === 'SessionBusy' || eventName === 'MessagePart'
       ? 'working'
-      : eventName === 'SessionIdle'
+      : eventName === 'SessionIdle' || eventName === 'SessionStart'
         ? 'done'
-        : source === 'opencode' && eventName === 'SessionStart'
-          ? 'done'
-          : eventName === 'PermissionRequest' || eventName === 'AskUserQuestion'
-            ? 'waiting'
-            : null
+        : eventName === 'PermissionRequest' || eventName === 'AskUserQuestion'
+          ? 'waiting'
+          : null
 
   if (!stateName) {
     return null
@@ -35,7 +32,7 @@ export function normalizeOpenCodeFamilyEvent(
   const snapshot = resolveToolState(
     state,
     paneKey,
-    extractToolFields(source, eventName, hookPayload),
+    extractToolFields('opencode', eventName, hookPayload),
     {
       resetOnNewTurn: resetsTurn
     }
@@ -46,12 +43,12 @@ export function normalizeOpenCodeFamilyEvent(
     prompt: resolvePrompt(state, paneKey, promptText, {
       resetOnNewTurn: resetsTurn
     }),
-    agentType: source,
+    agentType: 'opencode',
     toolName: snapshot.toolName,
     toolInput: snapshot.toolInput,
     interactivePrompt: snapshot.interactivePrompt,
     lastAssistantMessage: snapshot.lastAssistantMessage,
     lastAssistantMessageIsToolOutput: snapshot.lastAssistantMessageIsToolOutput,
-    sessionBoundary: source === 'opencode' && eventName === 'SessionStart' ? true : undefined
+    sessionBoundary: eventName === 'SessionStart' ? true : undefined
   })
 }

@@ -146,11 +146,7 @@ import {
 import { createSequencedSetupAgentCommands } from '../../shared/setup-agent-sequencing'
 import { shouldWaitForSetupBeforeAgentStartup } from '../../shared/setup-agent-startup-policy'
 import { createWorktreeCreateTimingRecorder } from '../worktree-create-timing'
-import {
-  markCodexProjectTrusted,
-  markCopilotFolderTrusted,
-  markCursorWorkspaceTrusted
-} from '../agent-trust-presets'
+import { markCodexProjectTrusted, markCopilotFolderTrusted } from '../agent-trust-presets'
 import {
   getLocalProjectGitExecOptions,
   getLocalProjectWorktreeGitOptions,
@@ -432,9 +428,7 @@ async function spawnLocalStartupAndSetupTerminals(args: {
     if (isTuiAgent(createdWithAgent)) {
       const preset = TUI_AGENT_CONFIG[createdWithAgent].preflightTrust
       try {
-        if (preset === 'cursor') {
-          markCursorWorkspaceTrusted(worktree.path)
-        } else if (preset === 'copilot') {
+        if (preset === 'copilot') {
           markCopilotFolderTrusted(worktree.path)
         } else if (preset === 'codex') {
           markCodexProjectTrusted(worktree.path)

@@ -2,7 +2,6 @@ import {
   existsSync,
   mkdirSync,
   mkdtempSync,
-  readdirSync,
   readFileSync,
   realpathSync,
   rmSync,
@@ -38,8 +37,7 @@ vi.mock('node:os', async () => {
   }
 })
 
-const { markCodexProjectTrusted, markCopilotFolderTrusted, markCursorWorkspaceTrusted } =
-  await import('./agent-trust-presets')
+const { markCodexProjectTrusted, markCopilotFolderTrusted } = await import('./agent-trust-presets')
 const { runExclusivelyForCodexTrustConfig } =
   await import('./codex/codex-trust-config-mutation-queue')
 
@@ -61,41 +59,6 @@ afterEach(() => {
   testState.fakeHomeDir = ''
   testState.userDataDir = ''
   testState.previousUserDataPath = undefined
-})
-
-describe('markCursorWorkspaceTrusted', () => {
-  it('writes ~/.cursor/projects/<slug>/.workspace-trusted with the cwd payload', () => {
-    const workspace = mkdtempSync(join(tmpdir(), 'orca-cursor-ws-'))
-    try {
-      markCursorWorkspaceTrusted(workspace)
-      const projectsDir = join(testState.fakeHomeDir, '.cursor', 'projects')
-      const slugDirs = readdirSync(projectsDir)
-      expect(slugDirs.length).toBe(1)
-      const trustFile = join(projectsDir, slugDirs[0], '.workspace-trusted')
-      expect(existsSync(trustFile)).toBe(true)
-      const payload = JSON.parse(readFileSync(trustFile, 'utf-8'))
-      expect(payload.workspacePath).toBeTruthy()
-      expect(typeof payload.trustedAt).toBe('string')
-    } finally {
-      rmSync(workspace, { recursive: true, force: true })
-    }
-  })
-
-  it('is idempotent — re-marking the same workspace does not overwrite trustedAt', () => {
-    const workspace = mkdtempSync(join(tmpdir(), 'orca-cursor-ws-'))
-    try {
-      markCursorWorkspaceTrusted(workspace)
-      const projectsDir = join(testState.fakeHomeDir, '.cursor', 'projects')
-      const slugDirs = readdirSync(projectsDir)
-      const trustFile = join(projectsDir, slugDirs[0], '.workspace-trusted')
-      const firstPayload = readFileSync(trustFile, 'utf-8')
-      markCursorWorkspaceTrusted(workspace)
-      const secondPayload = readFileSync(trustFile, 'utf-8')
-      expect(secondPayload).toBe(firstPayload)
-    } finally {
-      rmSync(workspace, { recursive: true, force: true })
-    }
-  })
 })
 
 describe('markCopilotFolderTrusted', () => {

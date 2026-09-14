@@ -121,7 +121,6 @@ describe('agent hook listener relay dependency boundary', () => {
     expect([...seeded].map((file) => file.slice(sharedRoot.length + 1)).sort()).toEqual([
       'agent-hook-listener.ts',
       'agent-hook-listener/endpoint-publication.ts',
-      'agent-hook-listener/grok-result-discovery.ts',
       'agent-hook-listener/hook-envelope.ts',
       'agent-hook-listener/listener-limits.ts',
       'agent-hook-listener/listener-state.ts',

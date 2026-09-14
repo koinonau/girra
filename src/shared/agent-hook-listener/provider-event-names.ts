@@ -10,7 +10,3 @@ export function normalizeHookEventName(value: unknown): string {
     .replace(/[-\s]+/g, '_')
     .toLowerCase()
 }
-
-export function isGrokEvent(eventName: unknown, ...expected: readonly string[]): boolean {
-  return expected.includes(normalizeHookEventName(eventName))
-}

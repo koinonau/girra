@@ -1,10 +1,9 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   createHookListenerState,
   type HookListenerState
 } from './agent-hook-listener/listener-state'
 import { normalizeHookPayload } from './agent-hook-listener'
-import { clearGrokSessionPathLookupCacheForTests } from './grok-session-paths'
 import { PANE_KEY } from './agent-hook-listener-test-harness'
 
 describe('shared agent-hook-listener', () => {
@@ -12,11 +11,6 @@ describe('shared agent-hook-listener', () => {
 
   beforeEach(() => {
     state = createHookListenerState()
-  })
-
-  afterEach(() => {
-    clearGrokSessionPathLookupCacheForTests()
-    vi.unstubAllEnvs()
   })
 
   it('normalizes a Claude UserPromptSubmit body to a working state', () => {
@@ -41,64 +35,43 @@ describe('shared agent-hook-listener', () => {
     expect(event!.payload.agentType).toBe('claude')
   })
 
-  it('normalizes a BOM-prefixed Cursor hook payload to a working state', () => {
+  it('normalizes a BOM-prefixed hook payload to a working state', () => {
     const event = normalizeHookPayload(
       state,
-      'cursor',
+      'claude',
       {
         paneKey: PANE_KEY,
-        payload: '\uFEFF{"hook_event_name":"beforeSubmitPrompt","prompt":"Synthetic Cursor prompt"}'
+        payload: '\uFEFF{"hook_event_name":"UserPromptSubmit","prompt":"Synthetic prompt"}'
       },
       'production'
     )
 
     expect(event?.payload).toMatchObject({
-      agentType: 'cursor',
+      agentType: 'claude',
       state: 'working',
-      prompt: 'Synthetic Cursor prompt'
+      prompt: 'Synthetic prompt'
     })
-    expect(event?.hookEventName).toBe('beforeSubmitPrompt')
+    expect(event?.hookEventName).toBe('UserPromptSubmit')
   })
 
   // Why: pins the allowance to exactly one leading U+FEFF, so nobody widens it into a trim.
   it('still rejects a hook payload that is malformed once the BOM is removed', () => {
     const bom = '\uFEFF'
-    const body = '{"hook_event_name":"beforeSubmitPrompt"}'
+    const body = '{"hook_event_name":"UserPromptSubmit","prompt":"p"}'
     for (const payload of [
       `${bom}${bom}${body}`,
       `${bom}not json`,
       ` ${bom}${body}`,
-      `{"hook_event_name"${bom}:"beforeSubmitPrompt"}`
+      `{"hook_event_name"${bom}:"UserPromptSubmit","prompt":"p"}`
     ]) {
       const event = normalizeHookPayload(
         state,
-        'cursor',
+        'claude',
         { paneKey: PANE_KEY, payload },
         'production'
       )
       expect(event).toBeNull()
     }
-  })
-
-  it('normalizes Gemini BeforeTool to working with tool fields', () => {
-    const event = normalizeHookPayload(
-      state,
-      'gemini',
-      {
-        paneKey: PANE_KEY,
-        payload: {
-          hook_event_name: 'BeforeTool',
-          tool_name: 'read_file',
-          args: { file_path: 'src/index.ts' }
-        }
-      },
-      'production'
-    )
-
-    expect(event?.payload.state).toBe('working')
-    expect(event?.payload.agentType).toBe('gemini')
-    expect(event?.payload.toolName).toBe('read_file')
-    expect(event?.payload.toolInput).toBe('src/index.ts')
   })
 
   it('captures the full AskUserQuestion tool input as interactivePrompt (untruncated)', () => {

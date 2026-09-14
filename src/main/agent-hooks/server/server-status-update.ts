@@ -62,7 +62,6 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
         ...this.attachStatusTiming(terminalOwnedPayload, now),
         observation: this.stampObservation(terminalOwnedPayload, origin, now)
       }
-      this.clearAssistantMessageRetry(enriched.paneKey)
       this.runtimeObservedStatusPaneKeys.delete(enriched.paneKey)
       this.state.lastStatusByPaneKey.set(enriched.paneKey, enriched)
       this.commitStatusRowMutation(rowBefore, enriched)
@@ -184,12 +183,6 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
       }
       this.commitStatusRowMutation(rowBefore, previous)
       return previous
-    }
-    if (
-      effectivePayload.payload.state !== 'done' ||
-      effectivePayload.payload.lastAssistantMessage
-    ) {
-      this.clearAssistantMessageRetry(effectivePayload.paneKey)
     }
     onAccepted?.()
     // Why carried forward only within one host: main's OSC parse resolves the handle, so a later

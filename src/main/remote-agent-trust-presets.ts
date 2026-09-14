@@ -22,8 +22,6 @@ export async function markRemoteAgentWorkspaceTrusted(args: {
   const workspacePath = await canonicalizeRemoteWorkspacePath(fsProvider, args.workspacePath)
   if (args.preset === 'codex') {
     await markRemoteCodexProjectTrusted(fsProvider, home, workspacePath)
-  } else if (args.preset === 'cursor') {
-    await markRemoteCursorWorkspaceTrusted(fsProvider, home, workspacePath)
   } else if (args.preset === 'copilot') {
     await markRemoteCopilotFolderTrusted(fsProvider, home, workspacePath)
   }
@@ -93,30 +91,6 @@ async function markRemoteCodexProjectTrusted(
   }
   await fsProvider.createDir(codexDir)
   await fsProvider.writeFile(configPath, updated)
-}
-
-async function markRemoteCursorWorkspaceTrusted(
-  fsProvider: IFilesystemProvider,
-  remoteHome: string,
-  workspacePath: string
-): Promise<void> {
-  const slug = workspacePath.replace(/^[\\/]+/, '').replace(/[\\/:*?"<>|]+/g, '-')
-  if (!slug) {
-    return
-  }
-  const trustDir = `${remoteHome}/.cursor/projects/${slug}`
-  const trustFile = `${trustDir}/.workspace-trusted`
-  try {
-    await fsProvider.stat(trustFile)
-    return
-  } catch {
-    // Missing marker: write the same shape the local trust preset writes.
-  }
-  await fsProvider.createDir(trustDir)
-  await fsProvider.writeFile(
-    trustFile,
-    `${JSON.stringify({ trustedAt: new Date().toISOString(), workspacePath }, null, 2)}\n`
-  )
 }
 
 async function markRemoteCopilotFolderTrusted(

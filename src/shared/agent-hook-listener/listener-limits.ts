@@ -19,10 +19,6 @@ export function capOpenCodeHookText(text: string): string {
 
 /** Bound paneKey size (real keys are well under 200); caps per-pane caches against pathological input. Exported so non-HTTP ingest (`ingestRemote`) applies the same cap as defense-in-depth. */
 export const MAX_PANE_KEY_LEN = 200
-export const AMP_THREAD_ID_MAX_LENGTH = 256
-export const AMP_MAX_SCOPED_THREAD_CACHE_KEYS = 32
-export const GROK_SESSION_CWD_MAX_LENGTH = 4096
-export const GROK_HOME_ENVELOPE_MAX_LENGTH = 4096
 const CLAUDE_PROMPT_ID_RE = /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i
 
 export function normalizeClaudePromptId(value: unknown): string | undefined {

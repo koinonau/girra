@@ -39,16 +39,8 @@ export abstract class AgentHookServerStatusInference extends AgentHookServerRowO
     }
     const payload = existing.payload
     const agentType: AgentType | undefined = payload.agentType
-    // Why: Droid's Ctrl+C exits the CLI (handled by PTY lifecycle) rather than interrupting the current turn.
-    if (agentType === 'droid' && request.intent === 'ctrl-c') {
-      return false
-    }
-    // Why: these agents use the first Escape as a TUI cancel that can leave the turn running; only a double Escape infers an interrupt.
-    if (
-      (agentType === 'opencode' || agentType === 'copilot') &&
-      request.intent === 'plain-escape' &&
-      request.inputCount !== 2
-    ) {
+    // Why: OpenCode uses the first Escape as a TUI cancel that can leave the turn running; only a double Escape infers an interrupt.
+    if (agentType === 'opencode' && request.intent === 'plain-escape' && request.inputCount !== 2) {
       return false
     }
     const dismissesClaudeQuestion =

@@ -20,8 +20,7 @@ describe('AgentHookServer OpenCode lifecycle', () => {
     post: (
       payload: Record<string, unknown>,
       launchToken: string,
-      paneKey?: string,
-      source?: 'opencode' | 'mimo-code'
+      paneKey?: string
     ) => Promise<Response>
   }> {
     const server = new AgentHookServer()
@@ -30,8 +29,8 @@ describe('AgentHookServer OpenCode lifecycle', () => {
     const env = server.buildPtyEnv()
     return {
       server,
-      post: (payload, launchToken, paneKey = PANE, source = 'opencode') =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/${source}`, {
+      post: (payload, launchToken, paneKey = PANE) =>
+        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/opencode`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -234,13 +233,12 @@ describe('AgentHookServer OpenCode lifecycle', () => {
     ])
   })
 
-  it('restarts a retired mimo-code pane on an explicit user prompt', async () => {
+  it('restarts a retired pane on an explicit user prompt', async () => {
     const { server, post } = await setup()
-    await post({ hook_event_name: 'SessionBusy', sessionID: 'old' }, 'old-token', PANE, 'mimo-code')
+    await post({ hook_event_name: 'SessionBusy', sessionID: 'old' }, 'old-token')
     server.retirePaneAuthority(PANE)
 
-    // Why: mimo-code emits no SessionStart, so the explicit prompt is its only restart
-    // boundary — excluding it would strand every retired mimo-code pane.
+    // Why: a mid-session prompt carries no SessionStart, so the explicit prompt is the restart boundary.
     await post(
       {
         hook_event_name: 'MessagePart',
@@ -249,9 +247,7 @@ describe('AgentHookServer OpenCode lifecycle', () => {
         messageID: 'message-resumed',
         sessionID: 'resumed'
       },
-      'resume-token',
-      PANE,
-      'mimo-code'
+      'resume-token'
     )
 
     expect(server.getStatusSnapshot()).toEqual([

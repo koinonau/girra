@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 2, Phases 3a and 3b, the ADRs and the cross-version harness deletion are merged. Phase 3c (telemetry), the last of Phase 3, is in its pull request.
+As of 2026-09-15: Phases 0 to 3, the ADRs and the cross-version harness deletion are merged. Phase 4 is split: 4a (agent hook integrations) is in its pull request, and 4b (Gemini, Grok and Kimi usage) follows.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -16,7 +16,8 @@ As of 2026-09-15: Phases 0 to 2, Phases 3a and 3b, the ADRs and the cross-versio
 - Phase 2 merged in [#8](https://github.com/koinonau/girra/pull/8): star-nag, voice input and the updater. 245 files deleted, 45,450 lines removed.
 - Phase 3a merged in [#9](https://github.com/koinonau/girra/pull/9): artifacts, skill sharing, the cloud relay, push, mobile pairing, and Orca profiles and accounts. 486 files deleted, 77,388 lines removed.
 - Phase 3b merged in [#10](https://github.com/koinonau/girra/pull/10): crash reporting. 108 files deleted, 23,966 lines removed.
-- Phase 3c deletes telemetry and the hang watchdog that only fed it: 135 files deleted, 23,837 lines removed and 989 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 3c merged in [#11](https://github.com/koinonau/girra/pull/11): telemetry and the hang watchdog that only fed it. 135 files deleted, 23,837 lines removed.
+- Phase 4a deletes the managed hook integrations for 14 agent CLIs and Cursor's trust bypass: 94 files deleted, 20,455 lines removed and 534 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -131,6 +132,15 @@ After Phase 3c, on 2026-09-15:
 | `pnpm lint` | 0 | 43 s | 114 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 16 s | Main 5,422 modules, renderer 12,165 |
 
+After Phase 4a, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 6 s | No errors |
+| `pnpm test` | 1 | 668 s | Files: 7 failed, 8,100 passed, 61 skipped of 8,168. Tests: 9 failed, 75,656 passed, 355 skipped of 76,020. Two files were the child-process ratchets, fixed before merge (both pass alone, 8 tests); the other five are the known failures below |
+| `pnpm lint` | 0 | 46 s | 114 reliability gates; ratchets unchanged |
+| `pnpm build` | 0 | 18 s | Main 5,361 modules, renderer 12,165 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -171,7 +181,7 @@ Taken at Orca `403b62a8d` by a Python walk over non-test `.ts` and `.tsx` files.
 - **Deletion scope:** 197,983 lines across 27 directories (2026-09-13). `mobile/` holds 137,454; the four `codex*` directories hold 35,233. With `cloud/`, 226,348 lines: 12% of the 1,905,345 non-test source lines in `src/`, `mobile/` and `cloud/` (2026-09-14).
 - **Runtime behind the CLI:** 265,344 lines across `src/main/runtime`, `src/relay`, `src/main/daemon` and `src/main/orcad` (2026-09-14).
 - **`cloud/`:** 28,365 lines in 132 files, Orca's server-side `push`, `relay`, `relay-fence-broker` and `relay-ops` apps. Added to the deletion table and deleted in Phase 1 (2026-09-14).
-- **Reliability gates:** 118 after Phase 1, which removed three gates whose tests all lived in the deleted trees and trimmed four more (2026-09-14). Still 118 after Phase 2, which trimmed `runtime.headless-desktop-promotion-continuity` and moved an AppImage startup check from `updater-setup-done` to `first-window-startup-services-ready`. 115 after Phase 3a, which removed `desktop-relay.assignment-backpressure`, `mobile-relay.endpoint-recovery` and `mobile-push.headless-startup-and-policy`. 114 after Phase 3b, which removed `terminal-observability.lifecycle-breadcrumbs`. Still 114 after Phase 3c, which trimmed the telemetry tests from `git-worktree.refresh-event-semantics` (2026-09-15).
+- **Reliability gates:** 118 after Phase 1, which removed three gates whose tests all lived in the deleted trees and trimmed four more (2026-09-14). Still 118 after Phase 2, which trimmed `runtime.headless-desktop-promotion-continuity` and moved an AppImage startup check from `updater-setup-done` to `first-window-startup-services-ready`. 115 after Phase 3a, which removed `desktop-relay.assignment-backpressure`, `mobile-relay.endpoint-recovery` and `mobile-push.headless-startup-and-policy`. 114 after Phase 3b, which removed `terminal-observability.lifecycle-breadcrumbs`. Still 114 after Phase 3c, which trimmed the telemetry tests from `git-worktree.refresh-event-semantics`, and after Phase 4a, which trimmed a deleted listener test from `agent-status.manual-compact-identity` (2026-09-15).
 - **Orca profiles reach:** 141 files outside `src/main/orca-profiles` name them, 38 in `src/main/browser`, which imports only `getOrcaProfileBrowserSessionPartition` (`git grep -l`, 2026-09-14).
 - **Inbound references from outside each module:** star-nag 3, speech 10, updater 13, orca-profiles 27, crash-reporting 39, telemetry 45, codex 125 (2026-09-13).
 - **Orca in locale files:** 4,559 case-insensitive matches across six files in `src/renderer/src/i18n/locales/` (2026-09-13).
@@ -200,6 +210,10 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: keep the startup payload field named `telemetry` (`agent_kind`, `launch_source`, `request_kind`). Terminal colour-query replies, tab launch agents and the Windows focus guard read it. Renaming it is Phase 7 work at most.
 - 2026-09-15: remove telemetry-only RPC params (`telemetrySource` on `terminal.split` and `worktree.create`). Neither schema is strict, so older clients that still send the field have it stripped; a test for each proves it.
 - 2026-09-15: the Privacy settings section now holds only local diagnostics. Its copy still says diagnostics go to support, and observability still honours `ORCA_TELEMETRY_DISABLED`; both wait for Phase 7.
+- 2026-09-15: Phase 4a deletes only hook integrations. The 14 agents stay launchable, with title-based status, until the launch roster decision below. AI Vault session resume for them still works; it never used hooks.
+- 2026-09-15: drop Cursor's workspace trust bypass as the feature tree says, and keep Copilot's trust preset and Claude's `DEVIN_PROJECT_DIR` guard while those agents stay launchable.
+- 2026-09-15: leave the PowerShell execution-policy bypass in `windows-powershell-hook-launcher.ts`. Only Copilot's removed `.ps1` hook needed it, but it is part of an antivirus-scored payload documented in `docs/reference/windows-edr-posture.md`.
+- 2026-09-15: the Grok stats pane goes with Grok usage fetching in Phase 4b. The tree keeps "Usage stats panes (Claude/Codex/OpenCode/Grok)" but unticks the Grok fetch, and the pane reads nothing else.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -209,6 +223,7 @@ All 2026-09-13 unless dated otherwise.
 ## Open Decisions
 
 - **Web renderer and pairing.** The feature tree keeps "Web UI served over the network", "Headless serve mode", "Cross-device session tab sync" and "Paired-runtime remote browser host", but drops "Web/mobile companion renderer" (`src/renderer/src/web`) and the mobile pairing items: end-to-end encryption, device tokens, QR pairing. The code does not split that way. Serve mode serves the web client built from `src/renderer/src/web`, and `src/main/runtime/runtime-rpc/` imports `device-registry.ts` and `e2ee-keypair.ts` for every remote client. Keep both, and drop only mobile-specific surfaces; or drop the web UI and remote serving with them. Phase 3a already removed the mobile pairing page, QR pairing, push and the cloud relay. Still in place: `orca serve --mobile-pairing`, the mobile session tab runtime, the mobile RPC allowlist and mobile-scope devices in the registry.
+- **Launch roster.** The tree unticks only the hook integrations for Amp, Antigravity, Command Code, Cursor, Devin, Droid, Gemini, Copilot, Grok, Hermes, Kimi, MiMo and OpenClaude, but the selection summary reads "drop 13 minor agent CLIs". Keep them launchable without live status: no more work. Or remove them from the roster: a read-only map estimated about 140 more files deleted and 450 to 530 edited, across catalogs, icons, session options, AI Vault scanners, session resume, native chat decoders and locales (2026-09-15). Sixteen other launchable agents (aider, goose, cline and more) never had hooks.
 - **Remote skill install.** Since skill sharing left, nothing calls the host-side skill install RPC (`skills.install`, uploads) or the SSH relay skill handler. Delete them, or add a local package source that uses them.
 - **Workflows.** Which of the 36 to keep before Actions is re-enabled. Until then, no change has CI.
 - **Help menu.** Seventeen links point at Orca's docs. Remove the menu or repoint it.

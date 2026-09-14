@@ -64,6 +64,8 @@ Split into pull requests, since orca-profiles reaches far wider than its 27 dire
 
 `src/main/agent-hooks/managed-agent-hook-registry.ts` imports every provider's hook service. Cut the 13 imports there, then delete the directories: amp, antigravity, copilot, cursor, devin, droid, gemini, grok, grok-accounts, kimi, mimo, openclaude, command-code, hermes.
 
+Split into pull requests. Phase 4a took the hook integrations (94 files, 20,455 lines). `remote-managed-hook-installers.ts`, the shared hook listener parsers, the relay retry scheduler and MiMo's PTY env overlay also imported them. `grok-accounts` and `kimi/kimi-runtime-home.ts` are not hook code: they serve Grok and Kimi usage, which Phase 4b removes with the Gemini fetcher and the Grok stats pane. The agents stay launchable pending the roster decision.
+
 ### Phase 5. Codex
 
 Last, when you know the codebase. 125 files reference it, `src/shared` carries Codex-shaped types, and the rate-limit and AI Vault code branch on provider. Budget more time here than for phases 1 to 4 combined.

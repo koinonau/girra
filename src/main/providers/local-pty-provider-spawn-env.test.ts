@@ -517,23 +517,6 @@ describe('LocalPtyProvider', () => {
       expect(env.CONDA_DEFAULT_ENV).toBeUndefined()
     })
 
-    it('uses shell wrapper when MiMo home must survive shell startup', async () => {
-      provider.configure({
-        buildSpawnEnv: (_id, env) => {
-          env.MIMOCODE_HOME = '/tmp/orca-mimocode-overlay'
-          env.ORCA_MIMOCODE_HOME = '/tmp/orca-mimocode-overlay'
-          return env
-        }
-      })
-
-      await provider.spawn({ cols: 80, rows: 24 })
-
-      const spawnCall = spawnMock.mock.calls.at(-1)!
-      expect(spawnCall[1]).toEqual(['-l'])
-      expect(spawnCall[2].env.ZDOTDIR).toMatch(/shell-ready[\\/]zsh/)
-      expect(spawnCall[2].env.ORCA_SHELL_FEATURES).not.toContain('ready')
-    })
-
     it('promotes the agent-teams shim onto the Windows `Path` spelling', async () => {
       Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
       provider.configure({

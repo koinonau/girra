@@ -42,21 +42,15 @@ export type HooksConfig = {
   [key: string]: unknown
 }
 
-// Why: host-level backstop timeout for status hooks, independent of the curl --max-time and Copilot's timeoutSec (#4633).
+// Why: host-level backstop timeout for status hooks, independent of the curl --max-time (#4633).
 export const MANAGED_HOOK_TIMEOUT_SECONDS = 10
-export const MANAGED_HOOK_TIMEOUT_MILLISECONDS = MANAGED_HOOK_TIMEOUT_SECONDS * 1000
 
-// Nested command hook for the Claude-shaped `hooks: [...]` schema (Claude, Codex, Gemini, Droid, Grok, Command Code, Devin).
+// Nested command hook for the Claude-shaped `hooks: [...]` schema (Claude, Codex).
 export function buildManagedCommandHook(
   command: string,
   timeout = MANAGED_HOOK_TIMEOUT_SECONDS
 ): HookCommandConfig {
   return { type: 'command', command, timeout }
-}
-
-// Direct command definition for schemas that put `command` on the definition itself (Cursor's top-level shape).
-export function buildManagedCommandDefinition(command: string): HookDefinition {
-  return { command, timeout: MANAGED_HOOK_TIMEOUT_SECONDS }
 }
 
 export {
@@ -117,59 +111,20 @@ export {
   WINDOWS_POWERSHELL_HOOK_SWITCHES
 } from './windows-powershell-hook-launcher'
 
-export function wrapWindowsHookCommand(
-  scriptPath: string,
-  env: Record<string, string> = {},
-  // Why: POSIX wrap already answers missing-script with stdout; Windows must match so gate events cannot drift (#15462).
-  options: { fallbackStdout?: string } = {}
-): string {
+export function wrapWindowsHookCommand(scriptPath: string): string {
   // Why: the encoded launcher protects paths across Windows shells and drains stdin when the config points at a missing script.
   const quoted = quotePowerShellString(scriptPath)
-  const envPrefix = Object.entries(env)
-    .map(([key, value]) => `$env:${key} = ${quotePowerShellString(value)}; `)
-    .join('')
-  const fallback =
-    options.fallbackStdout === undefined
-      ? ''
-      : `Write-Output ${quotePowerShellString(options.fallbackStdout)}; `
-  // Why the order: answer first (a gate event reads silence as deny), then the shared
-  // env guard, and only then own stdin — outside an Orca pane the caller may abandon the
-  // pipe, and ReadToEnd would strand the launcher there forever (#11549).
-  const command = `${envPrefix}if (Test-Path -LiteralPath ${quoted} -PathType Leaf) { & ${quoted}; exit $LASTEXITCODE }; ${fallback}${WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD}; [Console]::In.ReadToEnd() | Out-Null; exit 0`
+  // Why the guard before ReadToEnd: outside an Orca pane the caller may abandon the pipe,
+  // and ReadToEnd would strand the launcher there forever (#11549).
+  const command = `if (Test-Path -LiteralPath ${quoted} -PathType Leaf) { & ${quoted}; exit $LASTEXITCODE }; ${WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD}; [Console]::In.ReadToEnd() | Out-Null; exit 0`
   return wrapWindowsPowerShellEncodedCommand(command)
 }
 
 export const WINDOWS_CMD_SAFE_PATH = /^[A-Za-z0-9_.:\\~-]+$/
 
 export function wrapWindowsCmdHookCommand(scriptPath: string): string {
-  // Why: Codex/Antigravity/Devin spawn the hook as argv[0], not via cmd.exe, so it must be one spawnable token; a cmd `if exist` launcher isn't (#8430).
+  // Why: Codex spawns the hook as argv[0], not via cmd.exe, so it must be one spawnable token; a cmd `if exist` launcher isn't (#8430).
   return WINDOWS_CMD_SAFE_PATH.test(scriptPath) ? scriptPath : wrapWindowsHookCommand(scriptPath)
-}
-
-/**
- * Extra form lines inserted before the final `payload@-` line (each should end with ` ^`).
- * Used by Grok to attach `grokHome` without fragile string replace on the shared template.
- */
-export function buildWindowsAgentHookPostCommand(
-  source: AgentHookSource,
-  extraFormLines: readonly string[] = []
-): string {
-  // Why: PowerShell startup makes inline per-turn Codex hooks visibly slow, so mirror the POSIX curl path.
-  // Why: fully-qualify curl so a repo-local curl.exe can't hijack hook payloads.
-  return [
-    `"%SystemRoot%\\System32\\curl.exe" -sS -X POST "http://127.0.0.1:%ORCA_AGENT_HOOK_PORT%/hook/${source}" ^`,
-    '  --connect-timeout 0.5 --max-time 1.5 ^',
-    '  -H "Content-Type: application/x-www-form-urlencoded" ^',
-    '  -H "X-Orca-Agent-Hook-Token: %ORCA_AGENT_HOOK_TOKEN%" ^',
-    '  --data-urlencode "paneKey=%ORCA_PANE_KEY%" ^',
-    '  --data-urlencode "tabId=%ORCA_TAB_ID%" ^',
-    '  --data-urlencode "launchToken=%ORCA_AGENT_LAUNCH_TOKEN%" ^',
-    '  --data-urlencode "worktreeId=%ORCA_WORKTREE_ID%" ^',
-    '  --data-urlencode "env=%ORCA_AGENT_HOOK_ENV%" ^',
-    '  --data-urlencode "version=%ORCA_AGENT_HOOK_VERSION%" ^',
-    ...extraFormLines,
-    '  --data-urlencode "payload@-" >nul 2>nul'
-  ].join('\r\n')
 }
 
 // Why: PowerShell per-post costs ~300ms startup and mangles UTF-8 via code-page translation; curl.exe (Win10 1803+) avoids both.
@@ -310,9 +265,7 @@ function writeScriptWithAclRetry(scriptPath: string, content: string): void {
 export function writeHooksJson(
   configPath: string,
   config: HooksConfig,
-  // Why: `serialized` lets a JSONC config (Devin) supply text edited in place, so the
-  // atomic write + rolling backup below stay shared instead of being reimplemented.
-  options?: { preserveMode?: boolean; serialized?: string }
+  options?: { preserveMode?: boolean }
 ): void {
   const writePath = resolveHooksJsonWritePath(configPath)
   const dir = dirname(writePath)
@@ -321,7 +274,7 @@ export function writeHooksJson(
   // Why: temp+rename leaves the original untouched on a crash/disk-full mid-write.
   // Why randomUUID: avoids tmp-path collisions when two install() calls fire in the same millisecond.
   const tmpPath = join(dir, `.${Date.now()}-${randomUUID()}.tmp`)
-  const serialized = options?.serialized ?? `${JSON.stringify(config, null, 2)}\n`
+  const serialized = `${JSON.stringify(config, null, 2)}\n`
   const existingMode =
     options?.preserveMode === true && existsSync(writePath) ? statSync(writePath).mode : undefined
 
