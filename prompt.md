@@ -4,11 +4,12 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phase 0 and the ADRs are merged; the cross-version harness deletion awaits the user's merge.
+Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phases 0 and 1, the ADRs and the harness deletion are done.
 
-1. **Phase 1, mobile and cloud.** Delete `mobile/` (137,454 lines) and `cloud/` (28,365 lines), which nothing in `src/` imports, and remove them from the workspace, lint scripts, CI workflows, gate manifest and docs. 97 tracked files outside the two trees mention them, many as comments or parity tests (`git grep -lE "(^|[^A-Za-z-])(mobile|cloud)/"`). Leave `src/renderer/src/web` and the pairing code alone until "Web renderer and pairing" in `handover.md` is decided. Unblocked; stack it on the harness branch, or branch from `origin/main` once that merges.
+1. **Phase 2, cheap strips.** Delete star-nag, then speech, then updater, each through the loop. Star-nag reaches about 20 files: startup, the preload bridge and its web twin, `AppRootSurfaces.tsx`, `Landing.tsx`, `GeneralSupportSection.tsx`, persisted UI-state fields, telemetry schemas and locale keys. Unblocked.
 2. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
-3. **Workflows.** Choose which of Orca's 65 workflows survive before GitHub Actions is re-enabled. Needs the user.
+3. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
+4. **Phase 3, instrumented strips.** orca-profiles, crash-reporting, then telemetry, deleting telemetry call sites outright. Unblocked once Phase 2 is merged.
 
 ## Backlog
 
@@ -21,8 +22,8 @@ When a tracker exists, record its project, ready status, and transition IDs here
 1. Read the phase in the build plan and every file it names.
 2. Find every caller of anything you will delete: `grep -rl` over `src`, excluding `.test.` files.
 3. Delete, then fix the callers.
-4. Run `pnpm tc`, `pnpm test`, `pnpm lint` and `pnpm build` through `mise exec --`, with `ORCA_BACKGROUND_LAUNCH=1` for tests, as `handover.md` lists them. Read the pass and fail counts from the output, not the exit code of a pipeline. Rerun any newly failing test file alone before calling it a regression.
-5. Compare against the baseline in `handover.md`. A phase is done when typecheck, lint and build pass and only the baseline's known tests fail. Deleting a feature may remove known failures; record the new baseline when it does.
+4. While fixing, run `pnpm tc`, `pnpm lint`, and only the tests that touch what changed: the callers found in step 2, plus `config/scripts` when workflows or lint config change. The full suite takes 13 to 22 minutes, so run it once, when the phase is otherwise done. Run everything through `mise exec --`, with `ORCA_BACKGROUND_LAUNCH=1` for tests, as `handover.md` lists. Read the pass and fail counts from the output, not the exit code of a pipeline. Rerun any newly failing test file alone before calling it a regression.
+5. Run the full `pnpm tc`, `pnpm test`, `pnpm lint` and `pnpm build`, and compare against the baseline in `handover.md`. A phase is done when typecheck, lint and build pass and only the baseline's known tests fail. Deleting a feature may remove known failures; record the new baseline when it does.
 6. Update `handover.md` and this file's "Start Here" in the same commit.
 
 ## Commits
@@ -32,6 +33,8 @@ One pull request per story. Cut the branch from `origin/main`, stage files by na
 When a story must build on an unmerged one, stack it: branch from the earlier story's branch and target that branch. After the earlier pull request merges, retarget the stacked one to `main` with `gh pr edit --base main` before deleting the merged branch. Deleting it first closes the stacked pull request.
 
 Actions is disabled, so no CI runs. The local checks in the loop stand in for CI until workflows are pruned and Actions is re-enabled.
+
+Standing permission from the user, 2026-09-14: work through the phases without waiting for approval, and merge each pull request and clean up its branch once step 5 passes. Merge with a merge commit so `git branch -d` recognises the branch, then run the cleanup from the global instructions.
 
 ## Orca's Agent Instructions
 
@@ -46,7 +49,7 @@ Raise a decision with the question, each option with its cost and what it buys, 
 Ask the user first:
 
 - Re-enabling GitHub Actions on `koinonau/girra`.
-- Merging a pull request, pushing to `main`, or force-pushing any branch.
+- Pushing to `main` directly, or force-pushing any branch. Merging a pull request through GitHub is permitted; see "Commits".
 - Pushing tags, or anything against `stablyai/orca`. Its push URL is `DISABLED`; keep it so. Orca's tags point into unsquashed history.
 - Cherry-picking upstream commits into `main`. A merge from upstream fails; `main` shares no ancestry with it.
 - Deleting the local `orca-full-history` branch. It is the only copy of Orca's full history in this clone.

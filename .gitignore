@@ -155,7 +155,6 @@ playwright-report/
 
 # Generated Clawpatch state includes machine-local paths and review records.
 /.clawpatch/
-/mobile/.clawpatch/
 
 # Agent hook runtime endpoints (machine-local secrets)
 /agent-hooks/
@@ -171,7 +170,3 @@ src/renderer/src/i18n/locales/.fr-catalog-cache.json
 # Bench result JSONs are working artifacts
 tests/tools/benchmarks/results/terminal-pipeline-*.json
 
-# Bundler's install path for the mobile release toolchain (mobile/Gemfile.lock
-# IS committed). Also keeps oxfmt/oxlint, which honor this file, from walking
-# vendored gems.
-/mobile/vendor/

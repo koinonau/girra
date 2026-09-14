@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createHmac } from 'node:crypto'
-import vector from '../../../../cloud/packages/push-contract/src/push-host-proof-vector.json'
+import vector from './push-host-proof-vector.json'
 import { answerPushHostChallenge } from './push-host-proof'
 
 // Why: the gateway builds the challenge and this file answers it, in two

@@ -14,8 +14,6 @@
 // Invariant: when two independently identified clients change DISJOINT workspace-view
 // fields concurrently or across stale-mirror windows, both changes survive and all
 // mirrors converge; no client may restore a stale sibling field.
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { StrictMode, act, createElement } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -96,11 +94,7 @@ type MobileViewState = {
   collapsedGroups: string[]
 }
 
-function mobileHasPatchOnlyBuilder(): boolean {
-  return readMobileViewSettingsSource().includes('export function buildWorkspaceViewSettingsUpdate')
-}
-
-/** Mirrors buildWorkspaceViewSettingsUpdate (candidate) — only touched fields. */
+/** Mirrors the removed mobile app's buildWorkspaceViewSettingsUpdate: only touched fields. */
 function patchOnlyUpdate(
   patch: Partial<MobileViewState>,
   next: MobileViewState
@@ -125,18 +119,6 @@ function patchOnlyUpdate(
     update.collapsedGroups = next.collapsedGroups
   }
   return update
-}
-
-/** Mirrors the pre-fix persistViewSettings payload — the full snapshot on every tap. */
-function legacyWholeSnapshotUpdate(next: MobileViewState): Partial<PersistedUIState> {
-  return {
-    groupBy: next.groupMode === 'workspaceStatus' ? 'workspace-status' : 'repo',
-    sortBy: next.sortMode,
-    hideSleepingWorkspaces: next.hideSleeping,
-    hideDefaultBranchWorkspace: next.hideDefaultBranch,
-    filterRepoIds: next.filterRepoIds,
-    collapsedGroups: next.collapsedGroups
-  }
 }
 
 /** Model of the mobile host screen's view-settings client (persistViewSettings et al.). */
@@ -171,26 +153,10 @@ function createMobileClient(authority: Authority) {
     /** A user tap: apply locally, then push through the shipping payload shape. */
     tap(patch: Partial<MobileViewState>) {
       view = { ...view, ...patch }
-      const payload = mobileHasPatchOnlyBuilder()
-        ? patchOnlyUpdate(patch, view)
-        : legacyWholeSnapshotUpdate(view)
+      const payload = patchOnlyUpdate(patch, view)
       authority.set(omitPairingLocalUiFields(payload) as Partial<PersistedUIState>)
     }
   }
-}
-
-function readMobileViewSettingsHookSource(): string {
-  return readFileSync(
-    join(__dirname, '../../../../mobile/src/host-screen/use-host-view-settings.ts'),
-    'utf-8'
-  )
-}
-
-function readMobileViewSettingsSource(): string {
-  return readFileSync(
-    join(__dirname, '../../../../mobile/src/worktree/workspace-view-settings.ts'),
-    'utf-8'
-  )
 }
 
 describe('workspace view preferences: cross-client persistence (STA-5781)', () => {
@@ -709,36 +675,5 @@ describe('workspace view preferences: cross-client persistence (STA-5781)', () =
     await flushDesktopDebounce()
     expect(authority.get().hideDefaultBranchWorkspace).toBe(false)
     expect(store.getState().hideDefaultBranchWorkspace).toBe(false)
-  })
-
-  it('pins the modeled mobile ui.set payload to the shipping source', async () => {
-    const source = readMobileViewSettingsHookSource()
-    if (mobileHasPatchOnlyBuilder()) {
-      // Candidate: the persistence hook must push through the patch-only builder this model uses.
-      expect(source).toContain('buildWorkspaceViewSettingsUpdate(patch, next)')
-      const builderSource = readMobileViewSettingsSource()
-      for (const guard of [
-        "if ('groupMode' in patch)",
-        "if ('sortMode' in patch)",
-        "if ('hideSleeping' in patch)",
-        "if ('hideDefaultBranch' in patch)",
-        "if ('filterRepoIds' in patch)",
-        "if ('collapsedGroups' in patch)"
-      ]) {
-        expect(builderSource).toContain(guard)
-      }
-    } else {
-      // Baseline: persistViewSettings pushes exactly this whole-snapshot payload.
-      for (const key of [
-        'groupBy: groupModeToDesktop(next.groupMode)',
-        'sortBy: next.sortMode',
-        'hideSleepingWorkspaces: next.hideSleeping',
-        'hideDefaultBranchWorkspace: next.hideDefaultBranch',
-        'filterRepoIds: next.filterRepoIds',
-        'collapsedGroups: next.collapsedGroups'
-      ]) {
-        expect(source).toContain(key)
-      }
-    }
   })
 })
