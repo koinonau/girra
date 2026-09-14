@@ -40,9 +40,7 @@ const IGNORED_DIRECTORIES = new Set([
   'build',
   '.git',
   '__fixtures__',
-  'coverage',
-  // Full snapshots of older releases; their bind sites are not this tree's to fix.
-  '.cross-version-checkouts'
+  'coverage'
 ])
 const SCANNED_EXTENSIONS = /\.(?:ts|tsx|mts|cts)$/
 const SCANNED_ROOTS = ['src', 'mobile', 'config', 'tests']

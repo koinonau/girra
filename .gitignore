@@ -171,9 +171,6 @@ src/renderer/src/i18n/locales/.fr-catalog-cache.json
 # Bench result JSONs are working artifacts
 tests/tools/benchmarks/results/terminal-pipeline-*.json
 
-# Old release trees the cross-version wire harness extracts on demand
-tests/e2e/.cross-version-checkouts/
-
 # Bundler's install path for the mobile release toolchain (mobile/Gemfile.lock
 # IS committed). Also keeps oxfmt/oxlint, which honor this file, from walking
 # vendored gems.

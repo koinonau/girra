@@ -24,7 +24,6 @@ export const PR_CHECK_JOBS = [
   'shell_contracts',
   'test',
   'orcad_browser',
-  'cross-version-wire',
   'managed_hook_node18',
   'package',
   'package_windows'
@@ -102,29 +101,6 @@ const ORCAD_BROWSER_PREFIXES = [
   'src/main/orcad/orcad-browser-provider',
   'src/main/orcad/orcad-agent-browser-binary',
   'src/main/orcad/electron-serve-browser-process'
-]
-
-const CROSS_VERSION_WIRE_PREFIXES = [
-  'tests/e2e/cross-version-wire/',
-  'src/shared/protocol-version',
-  'src/shared/terminal-stream-protocol',
-  'src/shared/browser-client-host-protocol',
-  'src/shared/browser-network-tunnel-protocol',
-  'src/shared/browser-client-host-placement',
-  'src/shared/agent-session-wire',
-  'src/shared/agent-session-mutation-envelope',
-  'src/shared/agent-session-journal-',
-  'src/main/ai-vault/structured-session-ownership.ts',
-  'src/main/native-chat/agent-session-journal/',
-  'src/main/native-chat/agent-session-wire/',
-  'src/main/runtime/agent-session-record-store',
-  'src/main/runtime/rpc/dispatcher',
-  'src/main/runtime/rpc/methods/ai-vault.ts',
-  'src/main/runtime/rpc/methods/browser-tab-create-schema',
-  'src/main/runtime/rpc/methods/session-tabs.ts',
-  'src/main/runtime/rpc/methods/structured-agent-session',
-  'src/main/runtime/rpc/methods/terminal',
-  'src/renderer/src/runtime/remote-runtime-terminal-multiplexer'
 ]
 
 const MANAGED_HOOK_PREFIXES = [
@@ -316,8 +292,6 @@ function jobDetector(job) {
       return (files) => files.some((file) => matchesPrefix(file, SHELL_PREFIXES))
     case 'orcad_browser':
       return (files) => files.some((file) => matchesPrefix(file, ORCAD_BROWSER_PREFIXES))
-    case 'cross-version-wire':
-      return (files) => files.some((file) => matchesPrefix(file, CROSS_VERSION_WIRE_PREFIXES))
     case 'managed_hook_node18':
       return (files) => files.some((file) => matchesPrefix(file, MANAGED_HOOK_PREFIXES))
     case 'package':

@@ -40,9 +40,9 @@ Done 2026-09-14. The baseline, with its ten known test failures, lives in `hando
 
 ### Phase 1. Mobile and cloud
 
-Remove `mobile/`, `cloud/`, their CI workflows, and the mobile pairing code in `src/main/host` and `src/renderer/src/web`. Nothing in `src/` imports either tree, so this is one commit and the largest single win.
+Remove `mobile/`, `cloud/`, and everything that names them: CI workflows, lint scripts, the gate manifest, and docs. Nothing in `src/` imports either tree, so this is one change and the largest single win.
 
-Relocate `Clipboard copy of terminal selection` out of `src/renderer/src/web/` first. You kept it; its current home does not survive.
+Leave `src/renderer/src/web` and the pairing code. An earlier draft deleted them as mobile-only, but serve mode serves the web client built from `src/renderer/src/web`, and the runtime RPC layer uses the device registry and end-to-end encryption for every remote client. "Web renderer and pairing" in `handover.md` holds the decision.
 
 ### Phase 2. Cheap strips
 
@@ -101,6 +101,8 @@ Test fixtures are noise here. Roughly half the Orca mentions under `src/` live i
 ### Phase 8. Gates
 
 Orca's CI enforces a max-lines ratchet, a reliability-gates file, and ts-nocheck limits. Deleting 12% of the source lines invalidates all three baselines. Regenerate them rather than suppressing them, or the first real change fails for unrelated reasons.
+
+The reliability-gates file cannot wait for this phase. `pnpm lint` fails when a gate lists a test file that no longer exists, so every deletion phase edits `config/reliability-gates.jsonc` as it goes.
 
 ## Verification
 

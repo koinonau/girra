@@ -185,7 +185,6 @@
     "**/dist",
     "**/out",
     "cloud/**",
-    ".github/actions/cloud-sql-rollout-lease/**",
-    "tests/e2e/.cross-version-checkouts"
+    ".github/actions/cloud-sql-rollout-lease/**"
   ]
 }

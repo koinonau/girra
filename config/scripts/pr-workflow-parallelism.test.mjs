@@ -464,7 +464,6 @@ describe('PR workflow parallelism', () => {
       'shell_contracts',
       'test',
       'orcad_browser',
-      'cross-version-wire',
       'managed_hook_node18',
       'package',
       'package_windows'
@@ -478,7 +477,5 @@ describe('PR workflow parallelism', () => {
     // ORCA_BROWSER_EXECUTABLE, so it only guards anything if verify actually reads it.
     expect(verifyStep.env.ORCAD_BROWSER).toBe('${{ needs.orcad_browser.result }}')
     expect(verifyStep.run).toContain('"$ORCAD_BROWSER"')
-    expect(verifyStep.env.CROSS_VERSION_WIRE).toBe('${{ needs.cross-version-wire.result }}')
-    expect(verifyStep.run).toContain('"$CROSS_VERSION_WIRE"')
   })
 })
