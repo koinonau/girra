@@ -38,12 +38,12 @@ describe('settings navigation metadata', () => {
       'accounts',
       'orchestration',
       'computer-use',
-      'voice',
       'orca-account',
       'setup-guide',
       'general',
       'integrations',
-      'mobile'
+      'mobile',
+      'automations'
     ])
   })
 

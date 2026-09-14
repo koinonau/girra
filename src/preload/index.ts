@@ -59,7 +59,6 @@ import { ephemeralVmApi } from './api/ephemeral-vm-bridge'
 import { cacheApi } from './api/cache-bridge'
 import { sessionApi } from './api/session-bridge'
 import { remoteWorkspaceApi } from './api/remote-workspace-bridge'
-import { updaterApi } from './api/updater-bridge'
 import { docPreviewApi } from './api/doc-preview-bridge'
 import { notebookApi } from './api/notebook-bridge'
 import { fsApi } from './api/fs-bridge'
@@ -155,7 +154,6 @@ const api = {
   cache: cacheApi,
   session: sessionApi,
   remoteWorkspace: remoteWorkspaceApi,
-  updater: updaterApi,
   docPreview: docPreviewApi,
   notebook: notebookApi,
   fs: fsApi,

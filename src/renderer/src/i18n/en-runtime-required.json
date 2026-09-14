@@ -1362,14 +1362,8 @@
           "7784912ed6": "repo",
           "f91b649324": "Saved Commands"
         },
-        "ReleaseChannelSection": {
-          "adhocWarning": "Adhoc builds come from a branch that has not landed, and the Windows ones are unsigned. Whoever cut one may abandon it — keep a stable build handy.",
-          "dailyWarning": "Daily builds ship straight from main with no test gate, and the Windows ones are unsigned. Keep a stable build handy.",
-          "hourlyWarning": "Hourly builds ship straight from main with no test gate, and the Windows ones are unsigned. Keep a stable build handy."
-        },
         "RemoteServerUpdateDialog": {
           "checkAgain": "Check for Server Updates",
-          "restartWarning": "Updating restarts these servers. {{value0}} live tabs and {{value1}} terminal panes may briefly disconnect.",
           "updateOne": "Update server",
           "updating": "Updating servers…"
         },

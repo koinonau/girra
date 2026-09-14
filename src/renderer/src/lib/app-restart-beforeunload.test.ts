@@ -1,15 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   isIntentionalAppRestartInProgress,
-  isUpdaterQuitAndInstallInProgress,
-  registerUpdaterBeforeUnloadBypass
-} from './updater-beforeunload'
+  registerAppRestartBeforeUnloadBypass
+} from './app-restart-beforeunload'
 import {
   ORCA_APP_RESTART_ABORTED_EVENT,
-  ORCA_APP_RESTART_STARTED_EVENT,
-  ORCA_UPDATER_QUIT_AND_INSTALL_ABORTED_EVENT,
-  ORCA_UPDATER_QUIT_AND_INSTALL_STARTED_EVENT
-} from '../../../shared/updater-renderer-events'
+  ORCA_APP_RESTART_STARTED_EVENT
+} from '../../../shared/app-restart-events'
 import { ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT } from '../../../shared/renderer-shutdown-events'
 
 type WindowEventStub = Pick<Window, 'addEventListener' | 'removeEventListener' | 'dispatchEvent'>
@@ -27,29 +24,13 @@ afterEach(() => {
   vi.unstubAllGlobals()
 })
 
-describe('registerUpdaterBeforeUnloadBypass', () => {
-  it('tracks updater quit-and-install lifecycle events', () => {
-    const cleanup = registerUpdaterBeforeUnloadBypass()
-    expect(isUpdaterQuitAndInstallInProgress()).toBe(false)
-
-    window.dispatchEvent(new Event(ORCA_UPDATER_QUIT_AND_INSTALL_STARTED_EVENT))
-    expect(isUpdaterQuitAndInstallInProgress()).toBe(true)
-    expect(isIntentionalAppRestartInProgress()).toBe(true)
-
-    window.dispatchEvent(new Event(ORCA_UPDATER_QUIT_AND_INSTALL_ABORTED_EVENT))
-    expect(isUpdaterQuitAndInstallInProgress()).toBe(false)
-    expect(isIntentionalAppRestartInProgress()).toBe(false)
-
-    cleanup()
-  })
-
+describe('registerAppRestartBeforeUnloadBypass', () => {
   it('tracks app restart lifecycle events', () => {
-    const cleanup = registerUpdaterBeforeUnloadBypass()
+    const cleanup = registerAppRestartBeforeUnloadBypass()
     expect(isIntentionalAppRestartInProgress()).toBe(false)
 
     window.dispatchEvent(new Event(ORCA_APP_RESTART_STARTED_EVENT))
     expect(isIntentionalAppRestartInProgress()).toBe(true)
-    expect(isUpdaterQuitAndInstallInProgress()).toBe(true)
 
     window.dispatchEvent(new Event(ORCA_APP_RESTART_ABORTED_EVENT))
     expect(isIntentionalAppRestartInProgress()).toBe(false)
@@ -58,7 +39,7 @@ describe('registerUpdaterBeforeUnloadBypass', () => {
   })
 
   it('ends restart progress when the shutdown checkpoint aborts preparation', () => {
-    const cleanup = registerUpdaterBeforeUnloadBypass()
+    const cleanup = registerAppRestartBeforeUnloadBypass()
 
     window.dispatchEvent(new Event(ORCA_APP_RESTART_STARTED_EVENT))
     window.dispatchEvent(new Event(ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT))
@@ -68,12 +49,12 @@ describe('registerUpdaterBeforeUnloadBypass', () => {
   })
 
   it('resets the bypass flag during cleanup', () => {
-    const cleanup = registerUpdaterBeforeUnloadBypass()
+    const cleanup = registerAppRestartBeforeUnloadBypass()
 
-    window.dispatchEvent(new Event(ORCA_UPDATER_QUIT_AND_INSTALL_STARTED_EVENT))
-    expect(isUpdaterQuitAndInstallInProgress()).toBe(true)
+    window.dispatchEvent(new Event(ORCA_APP_RESTART_STARTED_EVENT))
+    expect(isIntentionalAppRestartInProgress()).toBe(true)
 
     cleanup()
-    expect(isUpdaterQuitAndInstallInProgress()).toBe(false)
+    expect(isIntentionalAppRestartInProgress()).toBe(false)
   })
 })

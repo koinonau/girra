@@ -30,7 +30,7 @@ beforeEach(() => {
     configurable: true,
     value: {
       ui: { set: persist },
-      updater: { getVersion: vi.fn().mockResolvedValue('1.4.197') }
+      app: { getVersion: vi.fn().mockResolvedValue('1.4.197') }
     }
   })
   useAppStore.setState(useAppStore.getInitialState(), true)

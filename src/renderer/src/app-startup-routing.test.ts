@@ -273,10 +273,8 @@ describe('renderer startup runtime routing', () => {
   it('does not eagerly import idle optional overlay surfaces on startup', () => {
     const source = readSource(ROOT_SURFACES_PATH)
 
-    expect(source).toContain("import('../components/UpdateCard').then")
     expect(source).toContain("import('../components/contextual-tours/ContextualTourOverlay').then")
     expect(source).toContain("import('../components/setup-guide/SetupGuideTelemetryObserver').then")
-    expect(source).not.toContain("from '../components/UpdateCard'")
     expect(source).not.toContain("from '../components/contextual-tours/ContextualTourOverlay'")
     expect(source).not.toContain("from '../components/setup-guide/SetupGuideTelemetryObserver'")
     expect(source).toContain('const shouldMountSetupGuideTelemetryObserver = persistedUIReady')

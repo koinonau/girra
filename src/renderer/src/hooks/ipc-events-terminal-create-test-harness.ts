@@ -44,7 +44,6 @@ export async function setupTerminalCreateSurfacing(
   const focusRuntimeTerminalSurface = vi.fn(() => false)
   const focusTerminalTabSurface = vi.fn()
   const storeState: TerminalCreateSurfacingStore = {
-    setUpdateStatus: vi.fn(),
     createTab,
     setActiveView,
     setActiveWorktree,

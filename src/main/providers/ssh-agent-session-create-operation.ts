@@ -9,9 +9,10 @@ import {
   parsePtySourceReceivingActivation,
   type PtySourceReceivingActivation
 } from '../../shared/pty-source-receiving-activation'
-import { validateClaimedSshSpawn } from './ssh-agent-session-claim-validation'
-
-export const SSH_AGENT_SESSION_CAPABILITY_PROBE_TIMEOUT_MS = 5_000
+import {
+  SSH_AGENT_SESSION_CAPABILITY_PROBE_TIMEOUT_MS,
+  validateClaimedSshSpawn
+} from './ssh-agent-session-claim-validation'
 
 export function assertSshAgentSessionCreateResult(
   result: unknown

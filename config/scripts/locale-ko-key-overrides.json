@@ -500,12 +500,6 @@
   "auto.components.Terminal.e57db40c11": {
     "ko": "{{value0}} 실행 명령을 만들 수 없습니다."
   },
-  "auto.components.UpdateCard.ccd8b0a793": {
-    "ko": "마지막 업데이트 이후 추가됨"
-  },
-  "auto.components.UpdateCard.f58b5c57a6": {
-    "ko": "새 소식:"
-  },
   "auto.components.WorktreeJumpPalette.1628fd7dfa": {
     "ko": "활성 워크트리, 설정, 작업 또는 열린 탭이 없습니다."
   },

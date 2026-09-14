@@ -2266,32 +2266,6 @@ html.native-shell .app-layout {
   white-space: nowrap !important;
 }
 
-/* ── Update card animations ───────────────────────────────────────── */
-
-@keyframes update-card-enter {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-@keyframes update-card-exit {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-.animate-update-card-enter {
-  animation: update-card-enter 200ms ease-out both;
-}
-
 /* Why: `skills update` reports no parseable progress, so the skill-update bar is
    deliberately indeterminate rather than a faked percentage. */
 @keyframes skill-update-slide {
@@ -2301,28 +2275,6 @@ html.native-shell .app-layout {
   to {
     transform: translateX(365%);
   }
-}
-
-.animate-update-card-exit {
-  animation: update-card-exit 150ms ease-in both;
-}
-
-/* Waveform bars in the FeatureTipsModal voice tip — purely decorative. */
-@keyframes waveform {
-  0%,
-  100% {
-    transform: scaleY(0.4);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scaleY(1);
-    opacity: 1;
-  }
-}
-
-.animate-waveform {
-  animation: waveform 1.4s ease-in-out infinite;
-  transform-origin: center;
 }
 
 /* CLI feature tip — terminal cursor inside the agent-control command. */

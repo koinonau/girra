@@ -14,6 +14,7 @@ import type { PreloadApi } from '../api-types'
 
 export const appApi = {
   getIdentity: (): Promise<AppIdentity> => ipcRenderer.invoke('app:getIdentity'),
+  getVersion: (): Promise<string> => ipcRenderer.invoke('app:getVersion'),
   getFeatureWallAssetBaseUrl: (): Promise<string> =>
     ipcRenderer.invoke('app:getFeatureWallAssetBaseUrl'),
   relaunch: (): Promise<void> =>
