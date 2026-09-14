@@ -84,7 +84,6 @@ describe('feature interactions', () => {
       'terminal-tabs',
       'tab-splits',
       'usage-tracking',
-      'voice-dictation',
       'workspace-cleanup'
     ]
 
@@ -102,14 +101,12 @@ describe('feature interactions', () => {
         browser: { firstInteractedAt: Number.NaN },
         automations: { firstInteractedAt: 200, interactionCount: 3 },
         'browser-grab': { firstInteractedAt: 250, interactionCount: 0 },
-        unknown: { firstInteractedAt: 200 },
-        'voice-dictation': { firstInteractedAt: 300 }
+        unknown: { firstInteractedAt: 200 }
       })
     ).toEqual({
       tasks: { firstInteractedAt: 100, interactionCount: 1 },
       automations: { firstInteractedAt: 200, interactionCount: 3 },
-      'browser-grab': { firstInteractedAt: 250, interactionCount: 1 },
-      'voice-dictation': { firstInteractedAt: 300, interactionCount: 1 }
+      'browser-grab': { firstInteractedAt: 250, interactionCount: 1 }
     })
   })
 
@@ -168,7 +165,6 @@ describe('feature interactions', () => {
       'terminal',
       'collaboration',
       'resource_management',
-      'voice',
       'source_control'
     ])
     expect(Object.keys(FEATURE_INTERACTION_CATEGORY_BY_ID).sort()).toEqual(
@@ -180,7 +176,6 @@ describe('feature interactions', () => {
     expect(FEATURE_INTERACTION_CATEGORY_BY_ID['markdown-file-created']).toBe('notes')
     expect(FEATURE_INTERACTION_CATEGORY_BY_ID['agent-browser-setup']).toBe('setup')
     expect(FEATURE_INTERACTION_CATEGORY_BY_ID['terminal-tabs']).toBe('terminal')
-    expect(FEATURE_INTERACTION_CATEGORY_BY_ID['voice-dictation']).toBe('voice')
     expect(FEATURE_INTERACTION_CATEGORY_BY_ID['ai-commit-generation']).toBe('source_control')
     expect(FEATURE_INTERACTION_CATEGORY_BY_ID['resource-manager']).toBe('resource_management')
   })
@@ -192,7 +187,7 @@ describe('feature interactions', () => {
         browser: 'count_1000_plus',
         automations: 'count_4',
         unknown: 'count_1',
-        'voice-dictation': null
+        'workspace-cleanup': null
       })
     ).toEqual({
       tasks: 'count_1',

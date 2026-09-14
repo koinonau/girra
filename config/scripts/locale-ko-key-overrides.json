@@ -2360,9 +2360,6 @@
   "auto.components.settings.NotificationsPane.b6fc369244": {
     "ko": "백그라운드 terminal이 벨 문자를 내보냅니다."
   },
-  "auto.components.settings.OpenAiTranscriptionKeyDialog.07b26f2742": {
-    "ko": "키 지우기"
-  },
   "auto.components.settings.PrivacyPane.79a0f3c16c": {
     "ko": "텔레메트리는 다음에 의해 비활성화됩니다."
   },
@@ -2848,27 +2845,6 @@
   },
   "auto.components.settings.TerminalWindowSection.e56e7d6ea0": {
     "ko": "밝은 마젠타"
-  },
-  "auto.components.settings.VoicePane.118b3c2dee": {
-    "ko": "토글"
-  },
-  "auto.components.settings.VoicePane.174da92062": {
-    "ko": "길게 누르기"
-  },
-  "auto.components.settings.VoicePane.295d84b849": {
-    "ko": "한 번 누르면 시작, 다시 누르면 중지. 길게 누르기: 누르고 있는 동안 받아쓰기"
-  },
-  "auto.components.settings.VoicePane.366e1b4f36": {
-    "ko": "포커스된 창에 텍스트를 받아쓰기합니다."
-  },
-  "auto.components.settings.VoicePane.4465596675": {
-    "ko": "누르기"
-  },
-  "auto.components.settings.VoicePane.61a16c8141": {
-    "ko": "추출 중..."
-  },
-  "auto.components.settings.VoicePane.7cf715f891": {
-    "ko": "누르고 있는 동안"
   },
   "auto.components.settings.VoicePane.901985625d": {
     "ko": "토글"

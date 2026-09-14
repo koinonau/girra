@@ -1,6 +1,5 @@
 import type { NativeChatComposerInput } from './native-chat-composer-input'
 import { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
-import { useAppStore } from '../../store'
 import { sendRuntimePtyInput } from '@/runtime/runtime-terminal-inspection'
 import { getSettingsForAgentTabRuntimeOwner } from '@/lib/agent-paste-draft'
 import {
@@ -19,7 +18,6 @@ import { useNativeChatComposerKeyDown } from './use-native-chat-composer-keydown
 import { useNativeChatSendLifecycle } from './use-native-chat-send-lifecycle'
 import { useNativeChatSessionOptions } from './use-native-chat-session-options'
 import { useNativeChatFileAttachmentActions } from './use-native-chat-file-attachment-actions'
-import { useNativeChatDictationActions } from './use-native-chat-dictation-actions'
 import { useNativeChatSessionOptionCommand } from './use-native-chat-session-option-command'
 import { useNativeChatComposerCatalog } from './use-native-chat-composer-catalog'
 import { useNativeChatPickerState } from './use-native-chat-picker-state'
@@ -92,7 +90,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
     const [history, setHistory] = useState<HistoryState>(EMPTY_HISTORY)
     const [activeSuggestion, setActiveSuggestion] = useState(0)
     const [notice, setNotice] = useState<string | null>(null)
-    const [dictationPressed, setDictationPressed] = useState(false)
     const imeEnterGesture = useImeEnterGestureOwnership()
     const { textareaRef } = useNativeChatComposerAppMenuSelection(imeEnterGesture.isComposing)
     const { cancelPendingSends, trackPendingSend } = useNativeChatSendLifecycle(
@@ -100,15 +97,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
       targetPtyId,
       onOptimisticSendCanceled
     )
-    const dictationState = useAppStore((store) => store.dictationState)
-    const voiceSettings = useAppStore((store) => store.settings?.voice)
-    const dictationDisabled = voiceSettings?.enabled !== true || !voiceSettings.sttModel
-    const isDictating =
-      dictationPressed ||
-      dictationState === 'starting' ||
-      dictationState === 'listening' ||
-      dictationState === 'stopping'
-
     const { agentCommands, sessionSkillNames } = useNativeChatComposerCatalog(
       agent,
       structuredTransport
@@ -219,8 +207,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
     )
 
     const { pickAttachment } = useNativeChatFileAttachmentActions(paneKey, attachExternalPaths)
-    const { toggleDictation, startHoldDictation, stopHoldDictation } =
-      useNativeChatDictationActions({ textareaRef, setDictationPressed })
     const { dispatch: dispatchSessionOptionCommand, isDispatching: isDispatchingSessionOption } =
       useNativeChatSessionOptionCommand({
         agent,
@@ -379,9 +365,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         sendButtonDisabled={sendButtonDisabled}
         isWorking={isWorking}
         attachDisabled={disabled}
-        dictationDisabled={dictationDisabled}
-        isDictating={isDictating}
-        isDictationHoldMode={voiceSettings?.dictationMode === 'hold'}
         imeEnterGesture={imeEnterGesture}
         onDraftChange={handleDraftChange}
         onTextareaSelect={(element) => {
@@ -413,9 +396,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
         }}
         onRemoveImageAttachment={(id) => removeImageAttachment(id)}
         onAttach={pickAttachment}
-        onDictationToggle={toggleDictation}
-        onDictationHoldStart={startHoldDictation}
-        onDictationHoldEnd={stopHoldDictation}
         onSend={send}
         onStop={interrupt}
         sessionOptionsSurface={sessionOptionsSurface}

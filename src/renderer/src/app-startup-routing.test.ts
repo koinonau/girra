@@ -318,16 +318,6 @@ describe('renderer startup runtime routing', () => {
     )
   })
 
-  it('loads dictation only when voice is enabled or a session is active', () => {
-    const source = readSource(ROOT_SURFACES_PATH)
-
-    expect(source).toContain("import('../components/dictation/DictationController').then")
-    expect(source).not.toContain("from '../components/dictation/DictationController'")
-    expect(source).toContain('useAppStore(selectAppRootSurfaceVoiceEnabled)')
-    expect(source).toContain("voiceEnabled || dictationState !== 'idle'")
-    expect(source).toContain('shouldMountDictationController ?')
-  })
-
   it('loads the SSH passphrase dialog only when a credential request is queued', () => {
     const source = readSource(ROOT_SURFACES_PATH)
 

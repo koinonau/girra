@@ -1441,6 +1441,7 @@
           "9abb9be3bc": "Set Up",
           "dd72ed437a": "Choose which task providers appear in the Tasks page and sidebar.",
           "e1578cd4bc": "Workflows",
+          "eb1176a14e": "Local speech-to-text dictation with on-device models.",
           "mobile_group": "Mobile"
         },
         "SettingsFormControls": {
@@ -1775,6 +1776,31 @@
           "imported_other": "Imported {{value0}} themes",
           "over_limit_one": "Importing these themes would exceed the {{value0}} custom terminal theme limit. Deselect 1 new theme and try again.",
           "over_limit_other": "Importing these themes would exceed the {{value0}} custom terminal theme limit. Deselect {{value1}} new themes and try again."
+        },
+        "voice": {
+          "pane": {
+            "search": {
+              "04c25a6fb0": "openai",
+              "064a9bd94a": "hold",
+              "080202facb": "model",
+              "089d31a45b": "dictation",
+              "10d45a9fce": "stt",
+              "2d206de105": "api key",
+              "322d457a0d": "transcription",
+              "3d8b853963": "speech",
+              "6fa48bcd41": "toggle",
+              "7640ed9848": "voice",
+              "931b1a9e53": "push to talk",
+              "b9dee49cd7": "download",
+              "d86f5600da": "mode",
+              "e360027a65": "microphone",
+              "f6e0dfa61c": "cloud",
+              "micAirpods": "airpods",
+              "micDefault": "system default",
+              "micDevice": "device",
+              "micInput": "input"
+            }
+          }
         }
       },
       "shared": {
@@ -2532,7 +2558,8 @@
         "f6300deb8b": "New Browser Tab"
       },
       "useSettingsNavigationMetadata": {
-        "5235c215ca": "Choose which task providers appear in the Tasks page and sidebar."
+        "5235c215ca": "Choose which task providers appear in the Tasks page and sidebar.",
+        "8ac3de82f5": "Local speech-to-text dictation with on-device models."
       }
     },
     "lib": {

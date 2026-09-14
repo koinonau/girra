@@ -1,6 +1,5 @@
 import type { Store } from '../persistence'
 import type { GlobalSettings } from '../../shared/global-settings-types'
-import type { VoiceSettings } from '../../shared/speech-types'
 
 export type RuntimeStore = {
   getRepos: Store['getRepos']
@@ -108,7 +107,6 @@ export type RuntimeStore = {
     mobileAutoRestoreFitMs?: number | null
     mobileEmulatorEnabled?: boolean
     mobileEmulatorDefaultDeviceUdid?: string | null
-    voice?: VoiceSettings
     claudeAgentTeamsMode?: GlobalSettings['claudeAgentTeamsMode']
     // Why: Phase-5 query responder kill switches — read per chunk in
     // onPtyData to capture reply ownership at ingestion.

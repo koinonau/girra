@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState, type JSX } from 'react'
 import { toast } from 'sonner'
-import { getDefaultVoiceSettings } from '../../../../shared/constants'
 import {
   ORCHESTRATION_ENABLED_STORAGE_KEY,
   ORCHESTRATION_SETUP_DISMISSED_STORAGE_KEY,
@@ -30,7 +29,6 @@ import {
 } from './feature-tip-telemetry'
 import { useMountedRef } from '@/hooks/useMountedRef'
 import { translate } from '@/i18n/i18n'
-import { VoiceDictationTipDialog } from './VoiceDictationTipDialog'
 
 function WorktreePromptTerm({ children }: { children: string }): JSX.Element {
   return (
@@ -45,8 +43,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
   const closeModal = useAppStore((s) => s.closeModal)
   const openSettingsPage = useAppStore((s) => s.openSettingsPage)
   const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
-  const settings = useAppStore((s) => s.settings)
-  const updateSettings = useAppStore((s) => s.updateSettings)
   const seenTipIds = useAppStore((s) => s.featureTipsSeenIds)
   const featureInteractions = useAppStore((s) => s.featureInteractions)
   const markFeatureTipsSeen = useAppStore((s) => s.markFeatureTipsSeen)
@@ -61,8 +57,7 @@ export default function FeatureTipsModal(): JSX.Element | null {
     cliInstalled: true,
     modalData,
     seenTipIds,
-    featureInteractions,
-    settings
+    featureInteractions
   })
 
   useEffect(() => {
@@ -108,13 +103,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
     openSettingsPage()
   }
 
-  const openVoiceSettings = (): void => {
-    markCurrentTipSeen()
-    closeModal()
-    openSettingsTarget({ pane: 'voice', repoId: null })
-    openSettingsPage()
-  }
-
   const enableOrchestrationSkillSetup = (): void => {
     localStorage.setItem(ORCHESTRATION_ENABLED_STORAGE_KEY, '1')
     localStorage.removeItem(ORCHESTRATION_SETUP_DISMISSED_STORAGE_KEY)
@@ -135,19 +123,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
           getOrcaCliFeatureTipTelemetrySource(modalData.source)
         )
         closeModal()
-        break
-      }
-      case 'enable-voice': {
-        const voice = settings?.voice ?? getDefaultVoiceSettings()
-        void updateSettings({
-          voice: {
-            ...voice,
-            enabled: true
-          }
-        })
-        closeModal()
-        openSettingsTarget({ pane: 'voice', repoId: null })
-        openSettingsPage()
         break
       }
       case 'setup-cli': {
@@ -365,20 +340,6 @@ export default function FeatureTipsModal(): JSX.Element | null {
     )
   }
 
-  if (currentTip.action !== 'enable-voice') {
-    currentTip.action satisfies never
-    return null
-  }
-
-  return (
-    <VoiceDictationTipDialog
-      open={isOpen}
-      tip={currentTip}
-      primaryBusy={primaryBusy}
-      onOpenChange={handleOpenChange}
-      onPrimaryAction={() => void handlePrimaryAction()}
-      onSkip={handleSkip}
-      onVoiceSettingsClick={openVoiceSettings}
-    />
-  )
+  currentTip.action satisfies never
+  return null
 }

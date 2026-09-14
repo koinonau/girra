@@ -57,7 +57,6 @@ const {
   registerDashboardPopoutHandlersMock,
   isDashboardPopoutRendererMock,
   registerTerminalPreviewHandlersMock,
-  registerSpeechHandlersMock,
   registerSkillsHandlersMock,
   registerSkillDeleteIpcHandlersMock,
   registerWorkspaceSpaceHandlersMock,
@@ -123,7 +122,6 @@ const {
   registerDashboardPopoutHandlersMock: vi.fn(),
   isDashboardPopoutRendererMock: vi.fn(),
   registerTerminalPreviewHandlersMock: vi.fn(),
-  registerSpeechHandlersMock: vi.fn(),
   registerSkillsHandlersMock: vi.fn(),
   registerSkillDeleteIpcHandlersMock: vi.fn(),
   registerWorkspaceSpaceHandlersMock: vi.fn(),
@@ -166,10 +164,6 @@ vi.mock('../../window/dashboard-popout-window', () => ({
 
 vi.mock('../terminal-preview', () => ({
   registerTerminalPreviewHandlers: registerTerminalPreviewHandlersMock
-}))
-
-vi.mock('../speech', () => ({
-  registerSpeechHandlers: registerSpeechHandlersMock
 }))
 
 vi.mock('../cli', () => ({
@@ -445,7 +439,6 @@ describe('registerCoreHandlers', () => {
     registerExportHandlersMock.mockReset()
     registerDashboardPopoutHandlersMock.mockReset()
     registerTerminalPreviewHandlersMock.mockReset()
-    registerSpeechHandlersMock.mockReset()
     registerSkillsHandlersMock.mockReset()
     registerSkillDeleteIpcHandlersMock.mockReset()
     registerWorkspaceSpaceHandlersMock.mockReset()
@@ -571,7 +564,6 @@ describe('registerCoreHandlers', () => {
     expect(setTrustedUIRendererWebContentsIdMock).toHaveBeenCalledWith(null)
     expect(registerBrowserHandlersMock).toHaveBeenCalled()
     expect(registerFilesystemWatcherHandlersMock).toHaveBeenCalled()
-    expect(registerSpeechHandlersMock).toHaveBeenCalledWith(store)
 
     await expect(
       aiVaultOptions.scanRuntimeAiVaultSessions(

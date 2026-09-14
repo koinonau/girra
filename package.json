@@ -182,7 +182,6 @@
     "qrcode": "^1.5.4",
     "react-i18next": "17.0.13",
     "serve-sim": "^0.1.40",
-    "sherpa-onnx": "1.12.37",
     "ssh2": "^1.17.0",
     "tweetnacl": "^1.0.3",
     "ws": "^8.21.3",
@@ -297,11 +296,6 @@
   },
   "optionalDependencies": {
     "@vscode/windows-process-tree": "0.8.0",
-    "sherpa-onnx-darwin-arm64": "1.12.37",
-    "sherpa-onnx-darwin-x64": "1.12.37",
-    "sherpa-onnx-linux-arm64": "1.12.37",
-    "sherpa-onnx-linux-x64": "1.12.37",
-    "sherpa-onnx-win-x64": "1.12.37",
     "windows-native-registry": "3.2.2"
   },
   "lint-staged": {

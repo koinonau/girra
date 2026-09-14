@@ -98,7 +98,6 @@ export function useOnboardingAndFeatureTips() {
       onboarding,
       persistedUIReady,
       promptedThisSession: promptedThisSessionRef.current,
-      settings,
       suppressedByOnboardingThisSession: suppressedByOnboardingThisSessionRef.current
     })
 

@@ -409,7 +409,6 @@ describe('OrcaRuntimeRpcServer', () => {
       getStartedAt: () => 1,
       getStatus: () => ({ graphStatus: 'unavailable' }),
       cleanupSubscriptionsForConnection: () => {},
-      cancelMobileDictationForConnection: () => {},
       onClientDisconnected: () => {}
     } as unknown as OrcaRuntimeService
     expect(
