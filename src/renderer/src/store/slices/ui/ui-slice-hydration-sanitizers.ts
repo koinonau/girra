@@ -232,6 +232,10 @@ export function migrateStatusBarItems(items: readonly string[] | undefined): Sta
   const out: string[] = []
   for (const id of source) {
     const mapped = id === 'memory' || id === 'sessions' ? 'resource-usage' : id
+    // Why: drops ids of removed providers (gemini, grok, ...) still stored in older profiles.
+    if (!DEFAULT_STATUS_BAR_ITEMS.includes(mapped as StatusBarItem)) {
+      continue
+    }
     if (!out.includes(mapped)) {
       out.push(mapped)
     }

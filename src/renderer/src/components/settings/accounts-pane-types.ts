@@ -69,7 +69,6 @@ export type AccountsPaneSectionModel = {
   wslDistros: string[]
   wslCapabilitiesLoading: boolean
   localAccountRuntime: LocalAccountRuntime
-  localAccountRuntimeSentenceLabel: string
   isRemoteAccountScope: boolean
   remoteServerName: string | null
   remoteAccountScopeNotice: ReactNode

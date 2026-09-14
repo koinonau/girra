@@ -9,31 +9,23 @@ import {
   type InactiveCodexAccountInfo,
   type InternalRateLimitState,
   type CodexHomePathResolver,
-  type KimiHomeResolver,
   type ClaudeAuthPreparationResolver,
   type OpenCodeGoRateLimitConfig,
   type MiniMaxRateLimitConfig,
-  type GeminiCliOAuthEnabledResolver,
   type NormalizedCodexAccountSelectionTarget,
   type NormalizedClaudeAccountSelectionTarget,
   type InactiveClaudeAccountInfo,
   type NetworkProxySettings,
   DEFAULT_POLL_MS
 } from './service-types'
-import { readGrokAuthSession } from '../grok-auth'
 
 export abstract class RateLimitServiceState {
   protected state: InternalRateLimitState = {
     claude: null,
     codex: null,
-    gemini: null,
     opencodeGo: null,
-    kimi: null,
-    antigravity: null,
-    minimax: null,
-    grok: null
+    minimax: null
   }
-  protected grokAuthConfigured = readGrokAuthSession().status === 'ok'
   protected pollInterval: number = DEFAULT_POLL_MS
   protected timer: ReturnType<typeof setInterval> | null = null
   protected deferredStartupRefreshTimer: ReturnType<typeof setTimeout> | null = null
@@ -41,23 +33,15 @@ export abstract class RateLimitServiceState {
   protected lastActiveFailureRetryAtByProvider: Record<ActiveRateLimitProvider, number> = {
     claude: 0,
     codex: 0,
-    gemini: 0,
     'opencode-go': 0,
-    kimi: 0,
-    minimax: 0,
-    grok: 0,
-    antigravity: 0
+    minimax: 0
   }
   // Why: consecutive failures drive exponential backoff of the fast activation-retry lane; reset on any success/unavailable result.
   protected activeFailureStreakByProvider: Record<ActiveRateLimitProvider, number> = {
     claude: 0,
     codex: 0,
-    gemini: 0,
     'opencode-go': 0,
-    kimi: 0,
-    minimax: 0,
-    grok: 0,
-    antigravity: 0
+    minimax: 0
   }
   protected mainWindow: BrowserWindow | null = null
   protected detachWindowListeners: (() => void) | null = null
@@ -65,7 +49,6 @@ export abstract class RateLimitServiceState {
   protected fullFetchQueued = false
   protected codexOnlyFetchQueued = false
   protected claudeOnlyFetchQueued = false
-  protected grokOnlyFetchQueued = false
   protected activeFetchAbortControllers = new Set<AbortController>()
   protected fetchIdleResolvers: (() => void)[] = []
   protected codexFetchGeneration = 0
@@ -81,8 +64,6 @@ export abstract class RateLimitServiceState {
     runtime: 'host',
     wslDistro: null
   }
-  // Why: resolved per cycle — the local-account runtime policy can flip between fetches.
-  protected kimiHomeResolver: KimiHomeResolver | null = null
   protected claudeAuthPreparationResolver: ClaudeAuthPreparationResolver | null = null
   protected claudeFetchTarget: NormalizedClaudeAccountSelectionTarget = {
     runtime: 'host',
@@ -90,7 +71,6 @@ export abstract class RateLimitServiceState {
   }
   protected openCodeGoConfigResolver: (() => OpenCodeGoRateLimitConfig) | null = null
   protected miniMaxConfigResolver: (() => MiniMaxRateLimitConfig) | null = null
-  protected geminiCliOAuthEnabledResolver: GeminiCliOAuthEnabledResolver | null = null
   protected inactiveClaudeAccountsResolver: (() => InactiveClaudeAccountInfo[]) | null = null
   protected inactiveCodexAccountsResolver: (() => InactiveCodexAccountInfo[]) | null = null
   protected networkProxySettingsResolver: (() => NetworkProxySettings) | null = null

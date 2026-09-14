@@ -47,15 +47,6 @@ export abstract class RateLimitServiceFetchQueue extends RateLimitServiceProvide
             break
           }
         }
-        if (this.grokOnlyFetchQueued) {
-          this.grokOnlyFetchQueued = false
-          const grokSignal = await this.runWithFetchAbortSignal((fetchSignal) =>
-            this.runFetchGrokOnlyCycle(fetchSignal)
-          )
-          if (grokSignal.aborted) {
-            break
-          }
-        }
       }
     } finally {
       this.isFetching = false
@@ -103,15 +94,6 @@ export abstract class RateLimitServiceFetchQueue extends RateLimitServiceProvide
             this.runFetchClaudeOnlyCycle(fetchSignal, { force: true })
           )
           if (claudeSignal.aborted) {
-            break
-          }
-        }
-        if (this.grokOnlyFetchQueued) {
-          this.grokOnlyFetchQueued = false
-          const grokSignal = await this.runWithFetchAbortSignal((fetchSignal) =>
-            this.runFetchGrokOnlyCycle(fetchSignal)
-          )
-          if (grokSignal.aborted) {
             break
           }
         }
@@ -165,74 +147,6 @@ export abstract class RateLimitServiceFetchQueue extends RateLimitServiceProvide
             this.runFetchCodexOnlyCycle(fetchSignal)
           )
           if (codexSignal.aborted) {
-            break
-          }
-        }
-        if (this.grokOnlyFetchQueued) {
-          this.grokOnlyFetchQueued = false
-          const grokSignal = await this.runWithFetchAbortSignal((fetchSignal) =>
-            this.runFetchGrokOnlyCycle(fetchSignal)
-          )
-          if (grokSignal.aborted) {
-            break
-          }
-        }
-      }
-    } finally {
-      this.isFetching = false
-      this.resolveFetchIdleWaiters()
-    }
-  }
-
-  protected async fetchGrokOnly(options?: { force?: boolean }): Promise<void> {
-    if (this.isFetching) {
-      if (options?.force) {
-        this.grokOnlyFetchQueued = true
-        return this.waitForFetchIdle()
-      }
-      return
-    }
-    this.isFetching = true
-
-    try {
-      let shouldContinue = true
-      while (shouldContinue) {
-        const signal = await this.runWithFetchAbortSignal((fetchSignal) =>
-          this.runFetchGrokOnlyCycle(fetchSignal)
-        )
-        shouldContinue = false
-        if (signal.aborted) {
-          break
-        }
-        if (this.fullFetchQueued) {
-          this.fullFetchQueued = false
-          const fullSignal = await this.runWithFetchAbortSignal((fetchSignal) =>
-            this.runFetchAllCycle(fetchSignal, { force: true })
-          )
-          if (fullSignal.aborted) {
-            break
-          }
-          continue
-        }
-        if (this.grokOnlyFetchQueued) {
-          this.grokOnlyFetchQueued = false
-          shouldContinue = true
-        }
-        if (this.codexOnlyFetchQueued) {
-          this.codexOnlyFetchQueued = false
-          const codexSignal = await this.runWithFetchAbortSignal((fetchSignal) =>
-            this.runFetchCodexOnlyCycle(fetchSignal)
-          )
-          if (codexSignal.aborted) {
-            break
-          }
-        }
-        if (this.claudeOnlyFetchQueued) {
-          this.claudeOnlyFetchQueued = false
-          const claudeSignal = await this.runWithFetchAbortSignal((fetchSignal) =>
-            this.runFetchClaudeOnlyCycle(fetchSignal, { force: true })
-          )
-          if (claudeSignal.aborted) {
             break
           }
         }

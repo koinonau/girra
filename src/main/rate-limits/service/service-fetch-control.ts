@@ -6,8 +6,7 @@ export abstract class RateLimitServiceFetchControl extends RateLimitServiceState
       !this.isFetching &&
       !this.fullFetchQueued &&
       !this.codexOnlyFetchQueued &&
-      !this.claudeOnlyFetchQueued &&
-      !this.grokOnlyFetchQueued
+      !this.claudeOnlyFetchQueued
     ) {
       return Promise.resolve()
     }
@@ -22,8 +21,7 @@ export abstract class RateLimitServiceFetchControl extends RateLimitServiceState
       this.isFetching ||
       this.fullFetchQueued ||
       this.codexOnlyFetchQueued ||
-      this.claudeOnlyFetchQueued ||
-      this.grokOnlyFetchQueued
+      this.claudeOnlyFetchQueued
     ) {
       return
     }
@@ -67,7 +65,6 @@ export abstract class RateLimitServiceFetchControl extends RateLimitServiceState
     this.fullFetchQueued = false
     this.codexOnlyFetchQueued = false
     this.claudeOnlyFetchQueued = false
-    this.grokOnlyFetchQueued = false
   }
 
   protected resolveAndClearFetchIdleWaiters(): void {

@@ -30,10 +30,10 @@ function windowOf(
   return { usedPercent, windowMinutes, resetsAt, resetDescription: null }
 }
 
-// Grok unified-billing accounts surface a monthly window and nothing else.
-function grokMonthlyLimits(status: ProviderRateLimits['status']): ProviderRateLimits {
+// A monthly-only OpenCode Go snapshot surfaces one window and nothing else.
+function monthlyOnlyLimits(status: ProviderRateLimits['status']): ProviderRateLimits {
   return {
-    provider: 'grok',
+    provider: 'opencode-go',
     session: null,
     weekly: null,
     monthly: windowOf(25, 43200),
@@ -48,7 +48,7 @@ describe('ProviderSegment monthly window', () => {
     const { ProviderSegment } = await import('./StatusBar')
 
     const markup = renderToStaticMarkup(
-      <ProviderSegment p={grokMonthlyLimits('ok')} compact={false} display="used" mode="compact" />
+      <ProviderSegment p={monthlyOnlyLimits('ok')} compact={false} display="used" mode="compact" />
     )
 
     expect(markup).toContain('25% used 30d')
@@ -59,7 +59,7 @@ describe('ProviderSegment monthly window', () => {
 
     const markup = renderToStaticMarkup(
       <ProviderSegment
-        p={grokMonthlyLimits('fetching')}
+        p={monthlyOnlyLimits('fetching')}
         compact={false}
         display="used"
         mode="compact"
@@ -89,29 +89,6 @@ describe('ProviderSegment monthly window', () => {
     expect(markup).toContain('30% used 30d')
     expect(markup).not.toContain('10% used')
     expect(markup).not.toContain('20% used')
-  })
-
-  it('selects a named bucket as the tightest provider window', async () => {
-    const { ProviderSegment } = await import('./StatusBar')
-    const limits: ProviderRateLimits = {
-      provider: 'gemini',
-      session: null,
-      weekly: null,
-      buckets: [
-        { ...windowOf(25, 300), name: 'Flash' },
-        { ...windowOf(80, 300), name: 'Pro' }
-      ],
-      updatedAt: Date.now(),
-      error: null,
-      status: 'ok'
-    }
-
-    const markup = renderToStaticMarkup(
-      <ProviderSegment p={limits} compact={false} display="used" mode="compact" />
-    )
-
-    expect(markup).toContain('80% used Pro')
-    expect(markup).not.toContain('25% used')
   })
 
   // Why: #8378 — status-bar chip showed fixed window size ("5h") while the
@@ -147,7 +124,7 @@ describe('ProviderSegment monthly window', () => {
 
   it('shows the footer bar only in verbose mode', async () => {
     const { ProviderSegment } = await import('./StatusBar')
-    const limits = grokMonthlyLimits('ok')
+    const limits = monthlyOnlyLimits('ok')
 
     const verbose = renderToStaticMarkup(
       <ProviderSegment p={limits} compact={false} display="used" mode="verbose" />

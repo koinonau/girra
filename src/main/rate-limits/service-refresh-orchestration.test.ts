@@ -3,17 +3,11 @@ import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { RateLimitService } from './service'
 import { fetchClaudeRateLimits } from './claude-fetcher'
 import { fetchCodexRateLimits } from './codex-fetcher'
-import { fetchGeminiRateLimits } from './gemini-usage-fetcher'
-import { fetchKimiRateLimits } from './kimi-fetcher'
 import { fetchMiniMaxRateLimits } from './minimax/minimax-fetcher'
-import { fetchGrokRateLimits } from './grok-fetcher'
-import { readGrokAuthSession } from './grok-auth'
 import { fetchOpenCodeGoRateLimits } from './opencode-go-usage-fetcher'
 import {
   deferred,
   errorProvider,
-  flushMicrotasks,
-  mockFreshBackgroundProviderFetches,
   okProvider,
   resetRateLimitProviderMocks
 } from './rate-limit-service-test-harness'
@@ -28,28 +22,12 @@ vi.mock('./codex-fetcher', () => ({
   fetchCodexRateLimits: vi.fn()
 }))
 
-vi.mock('./gemini-usage-fetcher', () => ({
-  fetchGeminiRateLimits: vi.fn()
-}))
-
-vi.mock('./kimi-fetcher', () => ({
-  fetchKimiRateLimits: vi.fn()
-}))
-
 vi.mock('./opencode-go-usage-fetcher', () => ({
   fetchOpenCodeGoRateLimits: vi.fn()
 }))
 
 vi.mock('./minimax/minimax-fetcher', () => ({
   fetchMiniMaxRateLimits: vi.fn()
-}))
-
-vi.mock('./grok-fetcher', () => ({
-  fetchGrokRateLimits: vi.fn()
-}))
-
-vi.mock('./grok-auth', () => ({
-  readGrokAuthSession: vi.fn(() => ({ status: 'missing' }))
 }))
 
 vi.mock('../minimax/minimax-cookie-store', () => ({
@@ -63,60 +41,6 @@ function serviceInternals(service: RateLimitService): { fetchAll: () => Promise<
 describe('RateLimitService', () => {
   beforeEach(() => {
     resetRateLimitProviderMocks()
-  })
-
-  it('does not reread Grok auth when callers read state snapshots', () => {
-    vi.mocked(readGrokAuthSession).mockReturnValue({
-      status: 'ok',
-      session: {
-        accessToken: 'token',
-        userId: null,
-        email: null,
-        teamId: null,
-        expiresAtMs: null,
-        oidcClientId: null
-      }
-    })
-    const service = new RateLimitService()
-    vi.mocked(readGrokAuthSession).mockClear()
-
-    expect(service.getState().grokAuthConfigured).toBe(true)
-    service.getState()
-
-    expect(readGrokAuthSession).not.toHaveBeenCalled()
-  })
-
-  it('refreshes Grok without refreshing other providers', async () => {
-    const authReadResult = {
-      status: 'ok' as const,
-      session: {
-        accessToken: 'token',
-        userId: null,
-        email: 'dev@example.com',
-        teamId: null,
-        expiresAtMs: null,
-        oidcClientId: null
-      }
-    }
-    vi.mocked(readGrokAuthSession).mockReturnValue(authReadResult)
-    vi.mocked(fetchGrokRateLimits).mockResolvedValueOnce(okProvider('grok', 42))
-    const service = new RateLimitService()
-
-    await service.refreshGrok()
-
-    expect(fetchGrokRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchGrokRateLimits).toHaveBeenCalledWith({
-      authReadResult,
-      signal: expect.any(AbortSignal)
-    })
-    expect(fetchClaudeRateLimits).not.toHaveBeenCalled()
-    expect(fetchCodexRateLimits).not.toHaveBeenCalled()
-    expect(fetchGeminiRateLimits).not.toHaveBeenCalled()
-    expect(fetchOpenCodeGoRateLimits).not.toHaveBeenCalled()
-    expect(fetchKimiRateLimits).not.toHaveBeenCalled()
-    expect(fetchMiniMaxRateLimits).not.toHaveBeenCalled()
-    expect(service.getState().grokAuthConfigured).toBe(true)
-    expect(service.getState().grok?.status).toBe('ok')
   })
 
   it('does not refetch Claude when a Codex account switch is queued during fetchAll', async () => {
@@ -264,47 +188,9 @@ describe('RateLimitService', () => {
     expect(fetchCodexRateLimits).toHaveBeenCalledTimes(2)
   })
 
-  it('publishes non-Grok provider results before a slow Grok fetch completes', async () => {
-    const service = new RateLimitService()
-    const grok = deferred<ProviderRateLimits>()
-    let refreshResolved = false
-
-    vi.mocked(fetchClaudeRateLimits).mockResolvedValueOnce(okProvider('claude', 10, Date.now()))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
-    vi.mocked(fetchGeminiRateLimits).mockResolvedValueOnce(okProvider('gemini', 30, Date.now()))
-    vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValueOnce(
-      okProvider('opencode-go', 40, Date.now())
-    )
-    vi.mocked(fetchKimiRateLimits).mockResolvedValueOnce(okProvider('kimi', 50, Date.now()))
-    vi.mocked(fetchMiniMaxRateLimits).mockResolvedValueOnce(okProvider('minimax', 60, Date.now()))
-    vi.mocked(fetchGrokRateLimits).mockReturnValueOnce(grok.promise)
-
-    const refresh = service.refresh().then(() => {
-      refreshResolved = true
-    })
-    await flushMicrotasks()
-
-    const pendingGrokState = service.getState()
-    expect(pendingGrokState.claude?.status).toBe('ok')
-    expect(pendingGrokState.codex?.status).toBe('ok')
-    expect(pendingGrokState.gemini?.status).toBe('ok')
-    expect(pendingGrokState.opencodeGo?.status).toBe('ok')
-    expect(pendingGrokState.kimi?.status).toBe('ok')
-    expect(pendingGrokState.minimax?.status).toBe('ok')
-    expect(pendingGrokState.grok?.status).toBe('fetching')
-    expect(refreshResolved).toBe(false)
-
-    grok.resolve(okProvider('grok', 70, Date.now()))
-    await refresh
-
-    const completedState = service.getState()
-    expect(completedState.grok?.status).toBe('ok')
-    expect(refreshResolved).toBe(true)
-  })
-
   it('aborts the active fetch cycle and clears queued refreshes on stop', async () => {
     const service = new RateLimitService()
-    const capturedSignals: { claude?: AbortSignal; codex?: AbortSignal; grok?: AbortSignal } = {}
+    const capturedSignals: { claude?: AbortSignal; codex?: AbortSignal } = {}
 
     vi.mocked(fetchClaudeRateLimits).mockImplementation(
       (options) =>
@@ -328,17 +214,6 @@ describe('RateLimitService', () => {
           )
         })
     )
-    vi.mocked(fetchGrokRateLimits).mockImplementation(
-      (options) =>
-        new Promise((resolve) => {
-          capturedSignals.grok = options?.signal
-          options?.signal?.addEventListener(
-            'abort',
-            () => resolve(errorProvider('grok', 'aborted')),
-            { once: true }
-          )
-        })
-    )
 
     const activeFetch = serviceInternals(service).fetchAll()
     await Promise.resolve()
@@ -351,17 +226,15 @@ describe('RateLimitService', () => {
 
     expect(capturedSignals.claude?.aborted).toBe(true)
     expect(capturedSignals.codex?.aborted).toBe(true)
-    expect(capturedSignals.grok?.aborted).toBe(true)
 
     await queuedRefresh
     await activeFetch
 
     expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
     expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchGrokRateLimits).toHaveBeenCalledTimes(1)
   })
 
-  it('fetches Gemini and OpenCode Go alongside Claude and Codex', async () => {
+  it('fetches OpenCode Go alongside Claude and Codex', async () => {
     const service = new RateLimitService()
     service.setOpenCodeGoConfigResolver(() => ({
       sessionCookie: 'session=abc123',
@@ -372,11 +245,9 @@ describe('RateLimitService', () => {
       httpProxyBypassRules: 'localhost'
     }
     service.setNetworkProxySettingsResolver(() => networkProxySettings)
-    service.setGeminiCliOAuthEnabledResolver(() => true)
 
     vi.mocked(fetchClaudeRateLimits).mockResolvedValueOnce(okProvider('claude', 10, Date.now()))
     vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
-    vi.mocked(fetchGeminiRateLimits).mockResolvedValueOnce(okProvider('gemini', 30, Date.now()))
     vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValueOnce(
       okProvider('opencode-go', 40, Date.now())
     )
@@ -393,103 +264,20 @@ describe('RateLimitService', () => {
       })
     )
     expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchGeminiRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchGeminiRateLimits).toHaveBeenCalledWith(true)
     expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
     expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledWith(
       'session=abc123',
       undefined,
       networkProxySettings
     )
-    expect(fetchGrokRateLimits).toHaveBeenCalledWith({
-      signal: expect.any(AbortSignal),
-      authReadResult: { status: 'missing' }
-    })
 
     const state = service.getState()
     expect(state.claude?.status).toBe('ok')
     expect(state.claude?.session?.usedPercent).toBe(10)
     expect(state.codex?.status).toBe('ok')
     expect(state.codex?.session?.usedPercent).toBe(20)
-    expect(state.gemini?.status).toBe('ok')
-    expect(state.gemini?.session?.usedPercent).toBe(30)
     expect(state.opencodeGo?.status).toBe('ok')
     expect(state.opencodeGo?.session?.usedPercent).toBe(40)
-  })
-
-  it('passes the resolved Kimi home into each fetch cycle', async () => {
-    const service = new RateLimitService()
-    const home = {
-      runtime: 'wsl' as const,
-      wslDistro: 'Ubuntu',
-      path: '\\\\wsl.localhost\\Ubuntu\\home\\neil\\.kimi-code'
-    }
-    const resolver = vi.fn(async () => home)
-    service.setKimiHomeResolver(resolver)
-    mockFreshBackgroundProviderFetches()
-    vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 10))
-
-    await service.refresh()
-    await service.refresh()
-
-    // Resolved per cycle so a runtime-policy change takes effect without a restart.
-    expect(resolver).toHaveBeenCalledTimes(2)
-    expect(fetchKimiRateLimits).toHaveBeenCalledWith({ home })
-  })
-
-  it('reads the host Kimi home when no resolver is wired', async () => {
-    const service = new RateLimitService()
-    mockFreshBackgroundProviderFetches()
-    vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 10))
-
-    await service.refresh()
-
-    expect(fetchKimiRateLimits).toHaveBeenCalledWith({ home: undefined })
-  })
-
-  it('preserves Gemini buckets through getState after fetch', async () => {
-    const service = new RateLimitService()
-
-    const geminiWithBuckets: ProviderRateLimits = {
-      provider: 'gemini',
-      session: { usedPercent: 80, windowMinutes: 300, resetsAt: null, resetDescription: null },
-      weekly: null,
-      buckets: [
-        {
-          name: 'Pro',
-          usedPercent: 30,
-          windowMinutes: 300,
-          resetsAt: null,
-          resetDescription: null
-        },
-        {
-          name: 'Flash',
-          usedPercent: 80,
-          windowMinutes: 300,
-          resetsAt: null,
-          resetDescription: null
-        }
-      ],
-      updatedAt: Date.now(),
-      error: null,
-      status: 'ok'
-    }
-
-    vi.mocked(fetchClaudeRateLimits).mockResolvedValueOnce(okProvider('claude', 10, Date.now()))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
-    vi.mocked(fetchGeminiRateLimits).mockResolvedValueOnce(geminiWithBuckets)
-    vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValueOnce(
-      okProvider('opencode-go', 0, Date.now())
-    )
-
-    await service.refresh()
-
-    const state = service.getState()
-    expect(state.gemini?.buckets).toHaveLength(2)
-    expect(state.gemini?.buckets![0].name).toBe('Pro')
-    expect(state.gemini?.buckets![1].name).toBe('Flash')
-    // Why: session summary is derived from bucket data and must match the most constrained bucket.
-    expect(state.gemini?.session?.usedPercent).toBe(80)
   })
 
   it('isolates provider failures so one error does not block others', async () => {
@@ -501,7 +289,7 @@ describe('RateLimitService', () => {
 
     vi.mocked(fetchClaudeRateLimits).mockRejectedValueOnce(new Error('claude down'))
     vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
-    vi.mocked(fetchGeminiRateLimits).mockRejectedValueOnce(new Error('gemini down'))
+    vi.mocked(fetchMiniMaxRateLimits).mockRejectedValueOnce(new Error('minimax down'))
     vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValueOnce(
       okProvider('opencode-go', 40, Date.now())
     )
@@ -512,8 +300,8 @@ describe('RateLimitService', () => {
     expect(state.claude?.status).toBe('error')
     expect(state.claude?.error).toBe('claude down')
     expect(state.codex?.status).toBe('ok')
-    expect(state.gemini?.status).toBe('error')
-    expect(state.gemini?.error).toBe('gemini down')
+    expect(state.minimax?.status).toBe('error')
+    expect(state.minimax?.error).toBe('minimax down')
     expect(state.opencodeGo?.status).toBe('ok')
   })
 
@@ -528,7 +316,6 @@ describe('RateLimitService', () => {
     // 1. Success fetch
     vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 10, Date.now()))
     vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 20, Date.now()))
-    vi.mocked(fetchGeminiRateLimits).mockResolvedValue(okProvider('gemini', 30, Date.now()))
     vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(
       okProvider('opencode-go', 40, Date.now())
     )

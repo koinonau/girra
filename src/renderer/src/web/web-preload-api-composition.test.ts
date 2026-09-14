@@ -51,7 +51,6 @@ describe('web preload API composition', () => {
       'notifications',
       'rateLimits',
       'minimaxCredentials',
-      'grokAccounts',
       'codexAccounts',
       'claudeAccounts',
       'cli',

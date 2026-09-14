@@ -29,5 +29,4 @@ export function registerRateLimitHandlers(
     rateLimits.fetchInactiveCodexAccountsOnOpen()
   )
   ipcMain.handle('rateLimits:refreshMiniMax', () => rateLimits.refresh())
-  ipcMain.handle('rateLimits:refreshGrok', () => rateLimits.refreshGrok())
 }

@@ -55,7 +55,7 @@ function WindowLabel({
 // the roster trigger and ProviderDetailsMenu so the dot's has-data condition
 // and markup can't drift between the two.
 export function ProviderLetterBadge({ p }: { p: ProviderRateLimits }): React.JSX.Element {
-  const hasData = Boolean(p.session || p.weekly || p.fableWeekly || p.monthly || p.buckets?.length)
+  const hasData = Boolean(p.session || p.weekly || p.fableWeekly || p.monthly)
   return (
     <span className="inline-flex items-center gap-1 text-muted-foreground">
       <span
@@ -70,18 +70,10 @@ function getProviderLetter(provider: ProviderRateLimits['provider']): string {
   switch (provider) {
     case 'claude':
       return 'C'
-    case 'gemini':
-      return 'G'
     case 'opencode-go':
       return 'O'
-    case 'kimi':
-      return 'K'
-    case 'antigravity':
-      return 'A'
     case 'minimax':
       return 'M'
-    case 'grok':
-      return 'R'
     case 'codex':
       return 'X'
   }
@@ -91,9 +83,6 @@ function getProviderLetter(provider: ProviderRateLimits['provider']): string {
 // Provider segment
 // ---------------------------------------------------------------------------
 
-// Why: Gemini exposes extra experimental buckets that made the pre-existing verbose footer noisy.
-const STATUS_BAR_BUCKET_NAMES = new Set(['Flash', 'Pro', '1.5 Pro'])
-
 function VerboseProviderUsage({
   p,
   display
@@ -101,29 +90,6 @@ function VerboseProviderUsage({
   p: ProviderRateLimits
   display: UsagePercentageDisplay
 }): React.JSX.Element {
-  if (p.buckets && p.buckets.length > 0) {
-    const visibleBuckets = p.buckets.filter((bucket) => STATUS_BAR_BUCKET_NAMES.has(bucket.name))
-    return (
-      <>
-        {visibleBuckets.map((bucket, index) => (
-          <React.Fragment key={bucket.name}>
-            {index > 0 ? <span className="text-muted-foreground">·</span> : null}
-            <span className="tabular-nums">
-              {bucket.name} {formatUsagePercentageLabel(bucket.usedPercent, display)}
-            </span>
-          </React.Fragment>
-        ))}
-        {visibleBuckets.length === 0 && p.session ? (
-          <WindowLabel
-            w={p.session}
-            label={formatRateLimitWindowChipLabel(p.session)}
-            display={display}
-          />
-        ) : null}
-      </>
-    )
-  }
-
   const visibleWindows = [
     p.session
       ? {

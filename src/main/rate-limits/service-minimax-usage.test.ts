@@ -21,28 +21,12 @@ vi.mock('./codex-fetcher', () => ({
   fetchCodexRateLimits: vi.fn()
 }))
 
-vi.mock('./gemini-usage-fetcher', () => ({
-  fetchGeminiRateLimits: vi.fn()
-}))
-
-vi.mock('./kimi-fetcher', () => ({
-  fetchKimiRateLimits: vi.fn()
-}))
-
 vi.mock('./opencode-go-usage-fetcher', () => ({
   fetchOpenCodeGoRateLimits: vi.fn()
 }))
 
 vi.mock('./minimax/minimax-fetcher', () => ({
   fetchMiniMaxRateLimits: vi.fn()
-}))
-
-vi.mock('./grok-fetcher', () => ({
-  fetchGrokRateLimits: vi.fn()
-}))
-
-vi.mock('./grok-auth', () => ({
-  readGrokAuthSession: vi.fn(() => ({ status: 'missing' }))
 }))
 
 vi.mock('../minimax/minimax-cookie-store', () => ({

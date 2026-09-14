@@ -1199,10 +1199,6 @@
         "GitPane": {
           "f35007e6e8": "git-username"
         },
-        "GrokAccountsSection": {
-          "c3d4e5f6a7": "Signed in. Orca only reads that file on disk — run grok login again if usage fails.",
-          "d4e5f6a7b8": "Session expired — run grok login in a terminal to refresh."
-        },
         "IntegrationsPane": {
           "01f6c7582e": "Learn more",
           "027440e1cb": "Merge requests, issues, todos, and pipelines via the",
@@ -2224,18 +2220,12 @@
           "StatusBar": {
             "06741a2f3d": "Open MiniMax usage details",
             "2483c60695": "···",
-            "3d79122c3f": "kimi",
             "4dff061aab": "·",
             "629251f4b6": "Open OpenCode Go usage details",
-            "68efc0345c": "gemini",
             "76b06d4da5": "claude",
             "a28a5dd9b1": "error",
-            "antigravityUsageDetails": "Open Antigravity usage details",
-            "d2375976eb": "Open Gemini usage details",
             "d79c3362c4": "5h",
-            "d7a0668acc": "opencode-go",
-            "fda8146810": "Open Kimi usage details",
-            "grokUsageAria": "Open Grok usage details"
+            "d7a0668acc": "opencode-go"
           },
           "WorkspaceSpaceCompactPanel": {
             "2837dc7c72": "cancelling",

@@ -16,13 +16,8 @@ import { repairTranslatedValue } from './locale-translation-policy.mjs'
 const STATUS_BAR_PROVIDERS = [
   ['auto.components.status.bar.StatusBar.3885eb74d8', 'Claude'],
   ['auto.components.status.bar.StatusBar.c0909c686e', 'Codex'],
-  ['auto.components.status.bar.StatusBar.c1df0d67ec', 'Gemini'],
-  ['auto.components.status.bar.StatusBar.antigravityUsage', 'Antigravity'],
   ['auto.components.status.bar.StatusBar.8c86cd77b0', 'OpenCode Go'],
-  ['auto.components.status.bar.StatusBar.5e59007df4', 'Kimi'],
-  ['auto.components.status.bar.StatusBar.3bbf140864', 'MiniMax'],
-  ['auto.components.status.bar.StatusBar.grokUsageMenu', 'Grok'],
-  ['auto.components.settings.accounts.search.f4a8c2e1b7', 'Grok (xAI)']
+  ['auto.components.status.bar.StatusBar.3bbf140864', 'MiniMax']
 ]
 
 describe('locale-translation-policy zh status bar usage labels', () => {
@@ -38,25 +33,6 @@ describe('locale-translation-policy zh status bar usage labels', () => {
         brand
       ).toBe(`${brand} 使用情况`)
     }
-  })
-
-  it('reverts the Kimi transliteration in labels and search keywords', () => {
-    expect(
-      repairTranslatedValue({
-        key: 'auto.components.settings.appearance.search.3a6c028ea8',
-        enValue: 'Kimi Usage',
-        localeValue: '基米用法',
-        locale: 'zh'
-      })
-    ).toBe('Kimi 使用情况')
-    expect(
-      repairTranslatedValue({
-        key: 'auto.components.settings.appearance.search.40e5c3c285',
-        enValue: 'kimi',
-        localeValue: '基米',
-        locale: 'zh'
-      })
-    ).toBe('kimi')
   })
 
   // Why: NEVER_TRANSLATE_VALUES is cross-locale. Moving the moonshot repair there would rewrite

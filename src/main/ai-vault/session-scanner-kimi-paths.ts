@@ -13,7 +13,7 @@ import {
 export { KIMI_WORK_DIR_CACHE_MAX_INDEX_PATHS, KIMI_WORK_DIR_CACHE_TTL_MS }
 
 // Why: Kimi Code stores sessions under <KIMI_CODE_HOME>/sessions/, mirroring the
-// CLI's own `KIMI_CODE_HOME ?? ~/.kimi-code` resolution (see kimi-fetcher.ts).
+// CLI's own `KIMI_CODE_HOME ?? ~/.kimi-code` resolution.
 export function resolveKimiSessionsDir(override?: string): string {
   if (override?.trim()) {
     return override.trim()

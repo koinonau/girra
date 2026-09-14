@@ -54,7 +54,7 @@ export function UsagePercentageDisplayChangeNotice({
 }: {
   children: ReactNode
   // Why: StatusBar owns which meter children actually render (status-bar items,
-  // CLI detection, MiniMax/Grok durability). Don't re-derive empty-state here.
+  // CLI detection, MiniMax durability). Don't re-derive empty-state here.
   hasVisibleUsageMeters: boolean
 }): React.JSX.Element {
   const persistedUIReady = useAppStore((s) => s.persistedUIReady)

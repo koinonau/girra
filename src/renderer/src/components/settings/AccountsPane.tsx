@@ -17,8 +17,6 @@ import {
 import {
   getAccountsClaudeSearchEntries,
   getAccountsCodexSearchEntries,
-  getAccountsGeminiSearchEntries,
-  getAccountsGrokSearchEntries,
   getAccountsLocationSearchEntries,
   getAccountsMiniMaxSearchEntries,
   getAccountsOpencodeSearchEntries,
@@ -35,7 +33,6 @@ import {
   providerAccountMatchesView
 } from './provider-account-visibility'
 import { Separator } from '../ui/separator'
-import { GrokAccountsSection } from './GrokAccountsSection'
 import type {
   AccountsPaneProps,
   AccountsPaneSectionModel,
@@ -53,10 +50,7 @@ import { createMiniMaxCredentialActions } from './accounts-pane-minimax-actions'
 import { renderAccountsLocationSection } from './accounts-pane-location-section'
 import { renderClaudeAccountsSection } from './accounts-pane-claude-section'
 import { renderCodexAccountsSection } from './accounts-pane-codex-section'
-import {
-  renderGeminiAccountsSection,
-  renderOpenCodeAccountsSection
-} from './accounts-pane-provider-setting-sections'
+import { renderOpenCodeAccountsSection } from './accounts-pane-provider-setting-sections'
 import { renderMiniMaxAccountsSection } from './accounts-pane-minimax-section'
 import { renderAccountsRemovalDialogs } from './accounts-pane-removal-dialogs'
 
@@ -115,10 +109,6 @@ export function AccountsPane({
     !navigator.userAgent.includes('Windows')
       ? `${accountRuntime.label.charAt(0).toLocaleLowerCase()}${accountRuntime.label.slice(1)}`
       : accountRuntime.label
-  const localAccountRuntimeSentenceLabel =
-    localAccountRuntime.runtime === 'host' && !navigator.userAgent.includes('Windows')
-      ? `${localAccountRuntime.label.charAt(0).toLocaleLowerCase()}${localAccountRuntime.label.slice(1)}`
-      : localAccountRuntime.label
   // Why: users read the remote-scoped list as their desktop accounts being
   // deleted (#8186); say they are intact and link the default-runtime control.
   // The web client has no desktop-owned accounts and cannot select Local
@@ -311,7 +301,6 @@ export function AccountsPane({
     wslDistros,
     wslCapabilitiesLoading,
     localAccountRuntime,
-    localAccountRuntimeSentenceLabel,
     isRemoteAccountScope,
     remoteServerName,
     remoteAccountScopeNotice,
@@ -366,18 +355,12 @@ export function AccountsPane({
     matchesSettingsSearch(searchQuery, getAccountsCodexSearchEntries())
       ? renderCodexAccountsSection(model)
       : null,
-    matchesSettingsSearch(searchQuery, getAccountsGeminiSearchEntries())
-      ? renderGeminiAccountsSection(model)
-      : null,
     matchesSettingsSearch(searchQuery, getAccountsOpencodeSearchEntries())
       ? renderOpenCodeAccountsSection(model)
       : null,
     matchesSettingsSearch(searchQuery, getAccountsMiniMaxSearchEntries())
       ? renderMiniMaxAccountsSection(model)
-      : null,
-    matchesSettingsSearch(searchQuery, getAccountsGrokSearchEntries()) ? (
-      <GrokAccountsSection key="grok" />
-    ) : null
+      : null
   ].filter(Boolean)
 
   return (

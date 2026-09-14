@@ -1,7 +1,6 @@
 import type { ProviderRateLimits } from '../../../shared/rate-limit-types'
 import type { ClaudeRuntimeAuthPreparation } from '../../claude-accounts/runtime-auth-service'
 import type { ClaudeAccountSelectionTarget } from '../../claude-accounts/runtime-selection'
-import type { KimiHomeResolution } from '../../kimi/kimi-runtime-home'
 import type { CodexAccountSelectionTarget } from '../../codex-accounts/runtime-selection'
 import type { CodexRateLimitHomeResolution } from '../../codex-accounts/runtime-home-service'
 
@@ -36,7 +35,6 @@ export type InactiveCodexAccountInfo = {
 export type CodexHomePathResolver = (
   target?: CodexAccountSelectionTarget
 ) => CodexRateLimitHomeResolution
-export type KimiHomeResolver = () => Promise<KimiHomeResolution>
 export type ClaudeAuthPreparationResolver = (
   target?: ClaudeAccountSelectionTarget
 ) => Promise<ClaudeRuntimeAuthPreparation>
@@ -59,7 +57,6 @@ export type MiniMaxResolvedConfig = {
   error: string | null
 }
 
-export type GeminiCliOAuthEnabledResolver = () => boolean
 export type ActiveRateLimitProvider = ProviderRateLimits['provider']
 export type ActiveProviderState = {
   provider: ActiveRateLimitProvider
@@ -82,8 +79,7 @@ export const MAX_ACTIVE_FAILURE_STREAK = 8
 // Why: these providers have a dedicated fetch cycle, so an activation retry refreshes just the failing one; others force a full fetchAll.
 export const INDIVIDUALLY_REFRESHABLE_PROVIDERS: ReadonlySet<ActiveRateLimitProvider> = new Set([
   'claude',
-  'codex',
-  'grok'
+  'codex'
 ])
 export const STALE_THRESHOLD_MS = 30 * 60 * 1000 // 30 minutes — after this, stale data is dropped
 // Why: usage-endpoint 429 windows can outlast the generic threshold (Retry-After ~1h); quota is informational, so a stale snapshot beats a bare "Limited".
@@ -101,12 +97,8 @@ export const DEFERRED_STARTUP_ACTIVE_REFRESH_MS = 1000
 export type InternalRateLimitState = {
   claude: ProviderRateLimits | null
   codex: ProviderRateLimits | null
-  gemini: ProviderRateLimits | null
   opencodeGo: ProviderRateLimits | null
-  kimi: ProviderRateLimits | null
-  antigravity: ProviderRateLimits | null
   minimax: ProviderRateLimits | null
-  grok: ProviderRateLimits | null
 }
 
 export function normalizePollingInterval(ms: number): number {

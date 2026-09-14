@@ -34,7 +34,6 @@ const {
   registerAgentTrustHandlersMock,
   registerClaudeAccountHandlersMock,
   registerMiniMaxCredentialsHandlersMock,
-  registerGrokAccountHandlersMock,
   registerClipboardHandlersMock,
   setTrustedClipboardRendererWebContentsIdMock,
   registerRateLimitHandlersMock,
@@ -96,7 +95,6 @@ const {
   registerAgentTrustHandlersMock: vi.fn(),
   registerClaudeAccountHandlersMock: vi.fn(),
   registerMiniMaxCredentialsHandlersMock: vi.fn(),
-  registerGrokAccountHandlersMock: vi.fn(),
   registerClipboardHandlersMock: vi.fn(),
   setTrustedClipboardRendererWebContentsIdMock: vi.fn(),
   registerRateLimitHandlersMock: vi.fn(),
@@ -313,10 +311,6 @@ vi.mock('../minimax-credentials', () => ({
   registerMiniMaxCredentialsHandlers: registerMiniMaxCredentialsHandlersMock
 }))
 
-vi.mock('../grok-accounts', () => ({
-  registerGrokAccountHandlers: registerGrokAccountHandlersMock
-}))
-
 vi.mock('../../window/clipboard-ipc-handlers', () => ({
   registerClipboardHandlers: registerClipboardHandlersMock,
   setTrustedClipboardRendererWebContentsId: setTrustedClipboardRendererWebContentsIdMock
@@ -487,7 +481,6 @@ describe('registerCoreHandlers', () => {
     expect(registerPetHandlersMock).toHaveBeenCalled()
     expect(registerClaudeAccountHandlersMock).toHaveBeenCalledWith(claudeAccounts)
     expect(registerMiniMaxCredentialsHandlersMock).toHaveBeenCalledWith(rateLimits)
-    expect(registerGrokAccountHandlersMock).toHaveBeenCalled()
     expect(registerRateLimitHandlersMock).toHaveBeenCalledWith(rateLimits, codexAccounts)
     expect(registerGitHubHandlersMock).toHaveBeenCalledWith(store, stats)
     expect(registerLinearHandlersMock).toHaveBeenCalled()

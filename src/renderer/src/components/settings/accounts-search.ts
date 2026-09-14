@@ -96,37 +96,6 @@ export const getAccountsCodexSearchEntries = createLocalizedCatalog(() => [
   }
 ])
 
-export const getAccountsGeminiSearchEntries = createLocalizedCatalog(() => [
-  {
-    title: translate(
-      'auto.components.settings.accounts.search.d819755b02',
-      'Use Gemini CLI credentials'
-    ),
-    description: translate(
-      'auto.components.settings.accounts.search.bada4a3218',
-      'Extracts OAuth credentials from your local Gemini CLI installation to authenticate with Google.'
-    ),
-    keywords: [
-      ...translateSearchKeyword('auto.components.settings.accounts.search.e8e1ff3887', 'gemini'),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.8630464352', 'cli'),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.933deaf732', 'oauth'),
-      ...translateSearchKeyword(
-        'auto.components.settings.accounts.search.7118d2f908',
-        'credentials'
-      ),
-      ...translateSearchKeyword(
-        'auto.components.settings.accounts.search.b7c2cee442',
-        'experimental'
-      ),
-      ...translateSearchKeyword(
-        'auto.components.settings.accounts.search.e949b08ffb',
-        'rate limit'
-      ),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.86edc96bc9', 'status bar')
-    ]
-  }
-])
-
 export const getAccountsOpencodeSearchEntries = createLocalizedCatalog(() => [
   {
     title: translate(
@@ -195,33 +164,10 @@ export const getAccountsMiniMaxSearchEntries = createLocalizedCatalog(() => [
   }
 ])
 
-export const getAccountsGrokSearchEntries = createLocalizedCatalog(() => [
-  {
-    title: translate('auto.components.settings.accounts.search.f4a8c2e1b7', 'Grok (xAI) Usage'),
-    description: translate(
-      'auto.components.settings.accounts.search.e3b7d1f9a2',
-      'OAuth sign-in via Grok CLI (grok login) for weekly credit usage.'
-    ),
-    keywords: [
-      ...translateSearchKeyword('auto.components.settings.accounts.search.d2c6a0e8f1', 'grok'),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.c1b5f9d7e0', 'xai'),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.b0a4e8c6d9', 'oauth'),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.a9f3d7b5c8', 'login'),
-      ...translateSearchKeyword(
-        'auto.components.settings.accounts.search.e949b08ffb',
-        'rate limit'
-      ),
-      ...translateSearchKeyword('auto.components.settings.accounts.search.86edc96bc9', 'status bar')
-    ]
-  }
-])
-
 export const getAccountsPaneSearchEntries = createLocalizedCatalog((): SettingsSearchEntry[] => [
   ...getAccountsLocationSearchEntries(),
   ...getAccountsClaudeSearchEntries(),
   ...getAccountsCodexSearchEntries(),
-  ...getAccountsGeminiSearchEntries(),
   ...getAccountsOpencodeSearchEntries(),
-  ...getAccountsMiniMaxSearchEntries(),
-  ...getAccountsGrokSearchEntries()
+  ...getAccountsMiniMaxSearchEntries()
 ])

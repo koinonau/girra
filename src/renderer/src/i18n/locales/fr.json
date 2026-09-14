@@ -53,15 +53,11 @@
       "statusBar": {
         "claudeToggleDescription": "Afficher l'utilisation des tokens et des coûts de Claude pour l'espace de travail actif.",
         "codexToggleDescription": "Afficher l'utilisation des tokens et des coûts de Codex pour l'espace de travail actif.",
-        "geminiToggleDescription": "Afficher l'utilisation des tokens et des coûts de Gemini pour l'espace de travail actif.",
         "opencodeGoToggleDescription": "Afficher l'utilisation des tokens et des coûts d'OpenCode Go pour l'espace de travail actif.",
-        "kimiToggleDescription": "Afficher l'utilisation de l'abonnement Kimi pour l'espace de travail actif.",
         "minimaxToggleDescription": "Afficher l'utilisation de l'abonnement MiniMax pour l'espace de travail actif.",
         "sshToggleDescription": "Afficher les hôtes SSH et les hôtes Orca distants configurés lorsqu'ils sont disponibles.",
         "resourceUsageToggleDescription": "Afficher le gestionnaire de ressources. Cliquez dessus pour le CPU, la mémoire, les sessions, les contrôles des daemons et les analyses disque des espaces de travail.",
-        "portsToggleDescription": "Afficher les ports actifs de l'espace de travail. Cliquez dessus pour les ports par espace de travail et les écouteurs externes.",
-        "antigravityToggleDescription": "Afficher l'utilisation de l'abonnement Antigravity pour l'espace de travail actif.",
-        "grokToggleDescription": "Afficher l'utilisation des crédits de l'abonnement Grok lorsque vous êtes connecté via Grok CLI."
+        "portsToggleDescription": "Afficher les ports actifs de l'espace de travail. Cliquez dessus pour les ports par espace de travail et les écouteurs externes."
       },
       "menuBarIcon": {
         "title": "Afficher l'icône dans la barre de menus",
@@ -858,7 +854,7 @@
         "94a5afe910": "Hôtes SSH",
         "40d80bad8a": "Beta",
         "de0c2907a1": "Serveurs Orca distants",
-        "b351014180": "Statistiques Orca, plus analyses de tokens Claude, Codex, OpenCode et utilisation d'abonnement Grok.",
+        "b351014180": "Statistiques Orca, plus analyses de tokens Claude, Codex et OpenCode.",
         "d72a58b5b9": "Statistiques & usage",
         "dcd0d9b74f": "Raccourcis clavier pour les actions courantes.",
         "94295ebfb3": "Raccourcis",
@@ -898,7 +894,7 @@
         "cd50cec5d7": "Coordonnez plusieurs agents de codage via Orca.",
         "58a868e8e4": "Orchestration",
         "7c79d3b7bf": "Facultatif",
-        "b1c2f8b0ac": "Configuration facultative de changement de compte et d'utilisation pour Claude, Codex, Gemini, OpenCode Go, MiniMax et Grok.",
+        "b1c2f8b0ac": "Configuration facultative de changement de compte et d'utilisation pour Claude, Codex, OpenCode Go et MiniMax.",
         "f70ac54d38": "Comptes de fournisseurs d'IA",
         "4121f7a0a2": "Gérez les agents IA, définissez-en un par défaut et personnalisez les commandes.",
         "b49abbd2f7": "Agents",
@@ -3346,9 +3342,7 @@
             "9659e38343": "Ports",
             "d1e1a7a6bf": "Gestionnaire de ressources",
             "24ac89df1a": "Hôtes distants",
-            "5e59007df4": "Utilisation Kimi",
             "8c86cd77b0": "Utilisation OpenCode Go",
-            "c1df0d67ec": "Utilisation Gemini",
             "c0909c686e": "Utilisation Codex",
             "3885eb74d8": "Utilisation Claude",
             "c8857b40f7": "Actualiser les données d'utilisation",
@@ -3374,12 +3368,8 @@
             "59c6e7b4e0": "Les sessions visibles redémarrent maintenant. Les autres redémarrent quand leur worktree devient actif.",
             "c676918adc": "Valeur par défaut du système",
             "3325d996cb": "Actualiser les limites de débit",
-            "fda8146810": "Ouvrir les détails d'utilisation Kimi",
             "629251f4b6": "Ouvrir les détails d'utilisation OpenCode Go",
-            "d2375976eb": "Ouvrir les détails d'utilisation Gemini",
-            "3d79122c3f": "kimi",
             "d7a0668acc": "opencode-go",
-            "68efc0345c": "gemini",
             "76b06d4da5": "claude",
             "a28a5dd9b1": "error",
             "cd9d7b40ff": "Redémarrer {{value0}} sessions",
@@ -3397,10 +3387,6 @@
             "06741a2f3d": "Ouvrir les détails d'utilisation MiniMax",
             "3bbf140864": "Utilisation MiniMax",
             "remoteServerLabel": "Serveur distant",
-            "antigravityUsage": "Utilisation Antigravity",
-            "antigravityUsageDetails": "Ouvrir les détails d'utilisation Antigravity",
-            "grokUsageAria": "Ouvrir les détails d'utilisation Grok",
-            "grokUsageMenu": "Utilisation Grok",
             "floatingTerminalNewActivity": "{{label}}, nouvelle activité",
             "codexSignInSuccess": "Connecté à Codex",
             "codexSignInError": "Échec de la connexion à Codex. Veuillez réessayer."
@@ -3568,11 +3554,7 @@
             "42fdd4da1d": "La connexion Claude est en cours d'actualisation. Des sessions d'agent sont peut-être encore connectées.",
             "c06c1d215d": "L'utilisation de Claude n'a pas pu être actualisée car la requête réseau a échoué.",
             "cabdc2a9e0": "Les identifiants de connexion Claude n'ont pas pu être lus.",
-            "a7517cccb6": "L'utilisation de Claude est indisponible pour le moment.",
-            "e2c6a4f917": "Exécutez Grok pour actualiser",
-            "d1b7f509ac": "Exécutez grok dans un terminal sur l'ordinateur qui fait tourner Orca et attendez son démarrage. Si demandé, terminez la connexion, puis réessayez l'utilisation. Inutile d'envoyer un message.",
-            "f90b3d7a16": "Exécutez Kimi pour actualiser",
-            "a37e8c15d4": "Exécutez kimi dans un terminal sur l'ordinateur qui fait tourner Orca et attendez son démarrage, puis réessayez l'utilisation."
+            "a7517cccb6": "L'utilisation de Claude est indisponible pour le moment."
           },
           "SshTargetStatusRow": {
             "sshHost": "Hôte SSH"
@@ -3819,7 +3801,6 @@
           "908c470587": "codex",
           "eb6a066185": "claude",
           "eee19cfade": "vue d'ensemble",
-          "grokUsageTab": "Grok",
           "trackingSince": "Suivi depuis {{value0}}"
         },
         "UsageOverviewPane": {
@@ -3871,13 +3852,8 @@
             "0bba8ca244": "statistiques",
             "0e2a0b6431": "utilisation",
             "372debfac0": "stats",
-            "26bb901fcd": "Statistiques Orca, plus analyses de tokens Claude, Codex, OpenCode et utilisation d'abonnement Grok.",
-            "cb2430ae6a": "Statistiques & usage",
-            "f8a1b2c3d4": "grok",
-            "e7f0a1b2c3": "abonnement",
-            "d6e9f0a1b2": "crédits",
-            "a3b6c7d8e9": "utilisation grok",
-            "9f2a3b4c5d": "xai"
+            "26bb901fcd": "Statistiques Orca, plus analyses de tokens Claude, Codex et OpenCode.",
+            "cb2430ae6a": "Statistiques & usage"
           }
         },
         "usage": {
@@ -3933,17 +3909,6 @@
           "faf3444859": "Entrée",
           "a8b7487ff7": "Sortie",
           "cfe2282ffa": "Inconnu"
-        },
-        "GrokUsagePane": {
-          "g8h9i0j1k2": "Utilisation Grok",
-          "b2d3e4f5c6": "Crédits hebdomadaires de l'abonnement via OAuth du Grok CLI (~/.grok/auth.json). Même source que la barre d'état.",
-          "c3e4f5a6b7": "Configurer dans Comptes",
-          "h9i0j1k2l3": " • {{value0}}",
-          "i0j1k2l3m4": "Actualiser l'utilisation Grok",
-          "d4f5a6b7c8": "Actualiser",
-          "e5a6b7c8d9": "Crédits hebdomadaires utilisés",
-          "f6b7c8d9e0": "Réinitialisation de la période de facturation",
-          "a7b8c9d0e1": "Paramètres du compte Grok"
         }
       },
       "sparse": {
@@ -5757,12 +5722,6 @@
           "36223200ac": "Cookie de session OpenCode Go",
           "ea631977b5": "Configurer les paramètres du fournisseur OpenCode Go.",
           "4ac10b4d08": "OpenCode Go",
-          "c2aee76420": "Extrait les identifiants OAuth de votre installation locale de Gemini CLI pour vous authentifier auprès de Google pour {{value0}}. Utilise les identifiants émis pour l'app Gemini CLI, pas pour Orca. Peut cesser de fonctionner si Google met à jour la CLI. À utiliser à vos risques et périls.",
-          "96f3649526": "Utiliser les identifiants Gemini CLI (expérimental)",
-          "d676c41fc6": "Extrait les identifiants OAuth de votre installation locale de Gemini CLI pour vous authentifier auprès de Google. Utilise les identifiants émis pour l'app Gemini CLI, pas pour Orca. Peut cesser de fonctionner si Google met à jour la CLI. À utiliser à vos risques et périls.",
-          "0c7f915b01": "Utiliser les identifiants Gemini CLI",
-          "973741a871": "Configurer les paramètres du fournisseur Gemini.",
-          "0c64dc2a64": "Gemini",
           "db209ee572": "Supprimer",
           "8a0f870153": "Réauthentifier",
           "3d245ef7d9": "Codex signale que cette connexion est périmée",
@@ -7403,7 +7362,7 @@
           "b5ee17826b": "Appairez des runtimes Orca distants pour des sessions persistantes, un état distant plus riche et un transfert web ou mobile.",
           "7686cb5c36": "Connectez ce navigateur à un serveur Orca enregistré.",
           "bd0181eeca": "Serveurs Orca distants",
-          "8acf3f22e0": "Statistiques Orca, plus analyses de tokens Claude, Codex, OpenCode et utilisation d'abonnement Grok.",
+          "8acf3f22e0": "Statistiques Orca, plus analyses de tokens Claude, Codex et OpenCode.",
           "954a8f5aef": "Statistiques & usage",
           "a737a4bb22": "Raccourcis clavier pour les actions courantes.",
           "23bf7a1ad4": "Raccourcis",
@@ -8040,13 +7999,6 @@
             "61f7d1fcbe": "cookie",
             "d1d2ae383c": "Collez votre cookie de session opencode.ai pour récupérer les rate limits.",
             "6ed1401020": "Cookie de session OpenCode Go",
-            "b7c2cee442": "expérimental",
-            "7118d2f908": "identifiants",
-            "933deaf732": "oauth",
-            "8630464352": "cli",
-            "e8e1ff3887": "gemini",
-            "bada4a3218": "Extrait les identifiants OAuth de votre installation locale de Gemini CLI pour l'authentification auprès de Google.",
-            "d819755b02": "Utiliser les identifiants Gemini CLI",
             "35b461d817": "connexion",
             "f2d666a886": "facultatif",
             "8b06729e0f": "actif",
@@ -8073,13 +8025,7 @@
             "b84a5b0c8a": "Choisissez si les comptes des fournisseurs sont inspectés et ajoutés sur cet appareil ou dans WSL.",
             "d09fb5ca92": "Emplacement des comptes",
             "733f9e2a93": "Utilisation MiniMax",
-            "f8374c3151": "Collez votre cookie de session platform.minimax.io pour récupérer localement les limites de débit.",
-            "f4a8c2e1b7": "Utilisation Grok (xAI)",
-            "e3b7d1f9a2": "Connexion OAuth via Grok CLI (grok login) pour l'utilisation hebdomadaire des crédits.",
-            "d2c6a0e8f1": "grok",
-            "c1b5f9d7e0": "xai",
-            "b0a4e8c6d9": "oauth",
-            "a9f3d7b5c8": "connexion"
+            "f8374c3151": "Collez votre cookie de session platform.minimax.io pour récupérer localement les limites de débit."
           }
         },
         "advanced": {
@@ -8240,12 +8186,8 @@
             "6ecad74eb3": "ssh",
             "f17d66d0d2": "Afficher l'état de connexion à l'hôte distant dans la barre d'état.",
             "57fb424c56": "Hôtes distants",
-            "35565867cb": "moonshot",
             "de586def95": "abonnement",
             "00a028f25f": "utilisation",
-            "40e5c3c285": "kimi",
-            "c927a155d5": "Afficher l'utilisation de l'abonnement Kimi dans la barre d'état.",
-            "3a6c028ea8": "Utilisation Kimi",
             "25e51b62ee": "limite de débit",
             "d9e7cef86f": "cookie",
             "d16378a88f": "minimax",
@@ -8257,10 +8199,6 @@
             "a9d56852eb": "opencode",
             "7f72de7cbe": "Afficher l'utilisation des tokens et des coûts d'OpenCode Go dans la barre d'état.",
             "bc046e7899": "Utilisation OpenCode Go",
-            "51b0ccd6a2": "google",
-            "2804a920ad": "gemini",
-            "9660c5b2f1": "Afficher l'utilisation des tokens et des coûts de Gemini dans la barre d'état.",
-            "5bfb874d05": "Utilisation Gemini",
             "97957e374e": "openai",
             "8dfd676c28": "codex",
             "e9e4412545": "Afficher l'utilisation des tokens et des coûts de Codex dans la barre d'état.",
@@ -8293,13 +8231,6 @@
               "title": "Afficher aussi les worktrees épinglés dans leurs listes d'origine",
               "description": "Les worktrees épinglés restent dans Épinglés et apparaissent aussi dans Tous, Projet, Statut et PR."
             },
-            "antigravityUsageTitle": "Utilisation Antigravity",
-            "antigravityUsageDescription": "Afficher l'utilisation de l'abonnement Antigravity dans la barre d'état.",
-            "antigravityKeyword": "antigravity",
-            "f8e2a1c4b6": "Utilisation Grok",
-            "e7d1b0f3a5": "Afficher l'utilisation hebdomadaire des crédits Grok issue de l'OAuth de Grok CLI.",
-            "d6c0a9e2f4": "grok",
-            "c5b9f8d1e3": "xai",
             "usagePercentageDisplayTitle": "Pourcentages d'utilisation",
             "usagePercentageDisplayDescription": "Choisissez si les limites des fournisseurs affichent le pourcentage utilisé ou restant."
           }
@@ -10005,25 +9936,6 @@
               }
             }
           }
-        },
-        "GrokAccountsSection": {
-          "a1b2c3d4e5": "Grok (xAI)",
-          "f6e5d4c3b2": "Affiche l'utilisation hebdomadaire de crédits issue de votre connexion Grok CLI (fichier de session ~/.grok/auth.json).",
-          "0d8e77bc40": "Documentation Grok CLI",
-          "ad47a33f72": "Chargement…",
-          "b2c3d4e5f6": "Connecté",
-          "c3d4e5f6a7": "Connecté. Orca lit uniquement ce fichier sur disque — relancez grok login si l'affichage de l'utilisation échoue.",
-          "d4e5f6a7b8": "Session expirée — exécutez grok login dans un terminal pour l'actualiser.",
-          "e5f6a7b8c9": "Non connecté à Grok CLI",
-          "f6a7b8c9d0": "Dans un terminal, exécutez grok login, puis cliquez ici sur Actualiser l'utilisation.",
-          "3325d996cb": "Actualiser l'utilisation",
-          "a8f3e2c1b4": "Crédits hebdomadaires",
-          "b7e2d9f0a3": "Même % de crédits hebdomadaires que l'écran grok /usage dans le terminal.",
-          "c6d1a8f4e2": "Réinitialisation {{when}}",
-          "e6dadc1e2b": "Utilisation mensuelle",
-          "75e396bf42": "Utilisation mensuelle incluse pour les comptes Grok à facturation unifiée.",
-          "b36fa2c908": "Connecté. Orca lit la session Grok CLI stockée sur disque.",
-          "f08c41de73": "Session expirée — lancez grok sur l'ordinateur qui exécute Orca et attendez son démarrage. Complétez la connexion si une invite apparaît, puis cliquez sur Actualiser l'utilisation. Aucun message dans le chat n'est nécessaire."
         },
         "AppearanceWindowSidebarSection": {
           "usagePercentageDisplayUsed": "Utilisé",

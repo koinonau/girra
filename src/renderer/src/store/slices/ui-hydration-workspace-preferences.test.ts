@@ -130,27 +130,37 @@ describe('createUISlice hydratePersistedUI', () => {
       'claude',
       'resource-usage',
       'ports',
-      'kimi',
-      'minimax',
-      'antigravity',
-      'grok'
+      'minimax'
     ])
     expect(setUI).toHaveBeenCalledWith({
-      statusBarItems: [
-        'claude',
-        'resource-usage',
-        'ports',
-        'kimi',
-        'minimax',
-        'antigravity',
-        'grok'
-      ],
+      statusBarItems: ['claude', 'resource-usage', 'ports', 'minimax'],
       _portsStatusBarDefaultAdded: true,
-      _kimiStatusBarDefaultAdded: true,
-      _minimaxStatusBarDefaultAdded: true,
-      _antigravityStatusBarDefaultAdded: true,
-      _grokStatusBarDefaultAdded: true
+      _minimaxStatusBarDefaultAdded: true
     })
+  })
+
+  it('drops status items of removed usage providers from older persisted UI', () => {
+    const setUI = vi.fn().mockResolvedValue(undefined)
+    vi.stubGlobal('window', { api: { ui: { set: setUI } } })
+    const store = createUIStore()
+
+    store.getState().hydratePersistedUI(
+      makePersistedUI({
+        statusBarItems: [
+          'claude',
+          'gemini',
+          'kimi',
+          'grok',
+          'antigravity',
+          'ports'
+        ] as unknown as PersistedUIState['statusBarItems'],
+        _portsStatusBarDefaultAdded: true,
+        _minimaxStatusBarDefaultAdded: true
+      })
+    )
+
+    expect(store.getState().statusBarItems).toEqual(['claude', 'ports'])
+    expect(setUI).not.toHaveBeenCalled()
   })
 
   it('preserves user-hidden default-on status items after one-shot migrations ran', () => {
@@ -162,10 +172,7 @@ describe('createUISlice hydratePersistedUI', () => {
       makePersistedUI({
         statusBarItems: ['claude', 'resource-usage'],
         _portsStatusBarDefaultAdded: true,
-        _kimiStatusBarDefaultAdded: true,
-        _minimaxStatusBarDefaultAdded: true,
-        _antigravityStatusBarDefaultAdded: true,
-        _grokStatusBarDefaultAdded: true
+        _minimaxStatusBarDefaultAdded: true
       })
     )
 

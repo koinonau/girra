@@ -109,13 +109,13 @@ export type PersistedUIState = {
   _workspaceStatusesDefaultVisualsMigrated?: boolean
   /** One-shot migration flag for adding the default-on Ports status item. */
   _portsStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Kimi status item. */
+  /** @deprecated Kimi usage was removed; kept so older clients' strict ui.set payloads still validate. */
   _kimiStatusBarDefaultAdded?: boolean
   /** One-shot migration flag for adding the default-on MiniMax status item. */
   _minimaxStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Antigravity status item. */
+  /** @deprecated Antigravity usage was removed; kept so older clients' strict ui.set payloads still validate. */
   _antigravityStatusBarDefaultAdded?: boolean
-  /** One-shot migration flag for adding the default-on Grok status item. */
+  /** @deprecated Grok usage was removed; kept so older clients' strict ui.set payloads still validate. */
   _grokStatusBarDefaultAdded?: boolean
   statusBarItems: StatusBarItem[]
   statusBarVisible: boolean

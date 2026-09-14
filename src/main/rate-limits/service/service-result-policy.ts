@@ -30,11 +30,7 @@ export abstract class RateLimitServiceResultPolicy extends RateLimitServiceFetch
     }
 
     const previousHasData = Boolean(
-      previous?.session ||
-      previous?.weekly ||
-      previous?.fableWeekly ||
-      previous?.monthly ||
-      (previous?.buckets && previous.buckets.length > 0)
+      previous?.session || previous?.weekly || previous?.fableWeekly || previous?.monthly
     )
 
     // No previous data to fall back on
@@ -83,15 +79,7 @@ export abstract class RateLimitServiceResultPolicy extends RateLimitServiceFetch
 
   protected withFetchingStatus(
     current: ProviderRateLimits | null,
-    provider:
-      | 'claude'
-      | 'codex'
-      | 'gemini'
-      | 'opencode-go'
-      | 'kimi'
-      | 'minimax'
-      | 'grok'
-      | 'antigravity'
+    provider: ActiveRateLimitProvider
   ): ProviderRateLimits {
     if (!current) {
       return {
