@@ -1,6 +1,5 @@
 import { RateLimitServiceResultPolicy } from './service-result-policy'
 import { fetchCodexRateLimits } from '../codex-fetcher'
-import { fetchKimiRateLimits } from '../kimi-fetcher'
 import {
   isSystemDefaultClaudeAuth,
   type ClaudeRuntimeAuthPreparation,
@@ -25,15 +24,6 @@ export abstract class RateLimitServiceFetchTargets extends RateLimitServiceResul
     return resolution.kind === 'skip'
       ? { skip: true, homePath: null }
       : { skip: false, homePath: resolution.codexHomePath }
-  }
-
-  // Why: resolving a WSL home probes wsl.exe, so it must not run before the other
-  // providers' fetches are started; chaining keeps the no-resolver path immediate.
-  protected fetchKimiWithResolvedHome(): Promise<ProviderRateLimits> {
-    const pendingHome = this.kimiHomeResolver?.()
-    return pendingHome
-      ? pendingHome.then((home) => fetchKimiRateLimits({ home }))
-      : fetchKimiRateLimits({ home: undefined })
   }
 
   protected isSameCodexTarget(

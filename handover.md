@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 3, the ADRs and the cross-version harness deletion are merged. Phase 4 is split: 4a (agent hook integrations) is in its pull request, and 4b (Gemini, Grok and Kimi usage) follows.
+As of 2026-09-15: Phases 0 to 3, the ADRs and the cross-version harness deletion are merged. Phase 4a (agent hook integrations) is merged, and 4b (Gemini, Grok, Kimi and Antigravity usage) is in its pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -17,7 +17,8 @@ As of 2026-09-15: Phases 0 to 3, the ADRs and the cross-version harness deletion
 - Phase 3a merged in [#9](https://github.com/koinonau/girra/pull/9): artifacts, skill sharing, the cloud relay, push, mobile pairing, and Orca profiles and accounts. 486 files deleted, 77,388 lines removed.
 - Phase 3b merged in [#10](https://github.com/koinonau/girra/pull/10): crash reporting. 108 files deleted, 23,966 lines removed.
 - Phase 3c merged in [#11](https://github.com/koinonau/girra/pull/11): telemetry and the hang watchdog that only fed it. 135 files deleted, 23,837 lines removed.
-- Phase 4a deletes the managed hook integrations for 14 agent CLIs and Cursor's trust bypass: 94 files deleted, 20,455 lines removed and 534 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 4a merged in [#12](https://github.com/koinonau/girra/pull/12): the managed hook integrations for 14 agent CLIs and Cursor's trust bypass. 94 files deleted, 20,455 lines removed.
+- Phase 4b deletes Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane: 30 files deleted, 6,923 lines removed and 246 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -141,6 +142,15 @@ After Phase 4a, on 2026-09-15:
 | `pnpm lint` | 0 | 46 s | 114 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 18 s | Main 5,361 modules, renderer 12,165 |
 
+After Phase 4b, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 3 s | No errors |
+| `pnpm test` | 1 | 678 s | Files: 5 failed, 8,089 passed, 61 skipped of 8,155. Tests: 6 failed, 75,542 passed, 355 skipped of 75,903. Only the known files below; `claude-structured-real-cli` failed a second, load-flaky case |
+| `pnpm lint` | 0 | 50 s | 114 reliability gates; ratchets unchanged |
+| `pnpm build` | 0 | 18 s | Main 5,350 modules, renderer 12,161 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -214,6 +224,9 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: drop Cursor's workspace trust bypass as the feature tree says, and keep Copilot's trust preset and Claude's `DEVIN_PROJECT_DIR` guard while those agents stay launchable.
 - 2026-09-15: leave the PowerShell execution-policy bypass in `windows-powershell-hook-launcher.ts`. Only Copilot's removed `.ps1` hook needed it, but it is part of an antivirus-scored payload documented in `docs/reference/windows-edr-posture.md`.
 - 2026-09-15: the Grok stats pane goes with Grok usage fetching in Phase 4b. The tree keeps "Usage stats panes (Claude/Codex/OpenCode/Grok)" but unticks the Grok fetch, and the pane reads nothing else.
+- 2026-09-15: delete the Antigravity usage mirror with the Gemini fetcher. It only republished the Gemini quota read; the tree has no separate entry for it.
+- 2026-09-15: keep MiniMax usage fetching for now, although the tree unticks it, because the selection keeps MiniMax credentials and they serve only that fetch. See the open decision.
+- 2026-09-15: the `ui.set` schema keeps the removed status bar ids (`gemini`, `antigravity`, `kimi`, `grok`) and the three `_*StatusBarDefaultAdded` flags as deprecated, because the schema is strict and would reject an older client's whole update. The TypeScript types are narrowed, and hydration drops the stale ids.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -224,6 +237,7 @@ All 2026-09-13 unless dated otherwise.
 
 - **Web renderer and pairing.** The feature tree keeps "Web UI served over the network", "Headless serve mode", "Cross-device session tab sync" and "Paired-runtime remote browser host", but drops "Web/mobile companion renderer" (`src/renderer/src/web`) and the mobile pairing items: end-to-end encryption, device tokens, QR pairing. The code does not split that way. Serve mode serves the web client built from `src/renderer/src/web`, and `src/main/runtime/runtime-rpc/` imports `device-registry.ts` and `e2ee-keypair.ts` for every remote client. Keep both, and drop only mobile-specific surfaces; or drop the web UI and remote serving with them. Phase 3a already removed the mobile pairing page, QR pairing, push and the cloud relay. Still in place: `orca serve --mobile-pairing`, the mobile session tab runtime, the mobile RPC allowlist and mobile-scope devices in the registry.
 - **Launch roster.** The tree unticks only the hook integrations for Amp, Antigravity, Command Code, Cursor, Devin, Droid, Gemini, Copilot, Grok, Hermes, Kimi, MiMo and OpenClaude, but the selection summary reads "drop 13 minor agent CLIs". Keep them launchable without live status: no more work. Or remove them from the roster: a read-only map estimated about 140 more files deleted and 450 to 530 edited, across catalogs, icons, session options, AI Vault scanners, session resume, native chat decoders and locales (2026-09-15). Sixteen other launchable agents (aider, goose, cline and more) never had hooks.
+- **MiniMax usage.** The tree unticks "MiniMax usage fetch" but ticks "MiniMax credential storage", and the credentials exist only to feed that fetch (`src/main/rate-limits/minimax`, `src/main/minimax`). Keep both, or delete both with the MiniMax account section and status bar item.
 - **Remote skill install.** Since skill sharing left, nothing calls the host-side skill install RPC (`skills.install`, uploads) or the SSH relay skill handler. Delete them, or add a local package source that uses them.
 - **Workflows.** Which of the 36 to keep before Actions is re-enabled. Until then, no change has CI.
 - **Help menu.** Seventeen links point at Orca's docs. Remove the menu or repoint it.

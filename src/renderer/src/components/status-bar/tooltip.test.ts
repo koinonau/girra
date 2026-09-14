@@ -1,16 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { createElement } from 'react'
-import type * as ReactModule from 'react'
 import type { ProviderRateLimits } from '../../../../shared/rate-limit-types'
-
-vi.mock('@/lib/agent-catalog', async () => {
-  const ReactActual = await vi.importActual<typeof ReactModule>('react')
-  return {
-    AgentIcon: ({ agent }: { agent: string }) =>
-      ReactActual.createElement('span', { 'data-agent-icon': agent })
-  }
-})
 
 vi.mock('@/i18n/i18n', () => ({
   translate: (_key: string, fallback: string, values?: Record<string, string>) => {
@@ -46,16 +37,7 @@ function provider(overrides: Partial<ProviderRateLimits> = {}): ProviderRateLimi
   }
 }
 
-const PROVIDER_IDS: ProviderRateLimits['provider'][] = [
-  'claude',
-  'codex',
-  'gemini',
-  'antigravity',
-  'opencode-go',
-  'kimi',
-  'minimax',
-  'grok'
-]
+const PROVIDER_IDS: ProviderRateLimits['provider'][] = ['claude', 'codex', 'opencode-go', 'minimax']
 
 afterEach(() => {
   vi.useRealTimers()
@@ -104,68 +86,35 @@ describe('provider usage error copy', () => {
       error:
         'Your access token could not be refreshed because your refresh token was already used. Please log out and sign in again.'
     })
-    const gemini = provider({
-      provider: 'gemini',
-      error: 'Gemini CLI credentials not found'
+    const minimax = provider({
+      provider: 'minimax',
+      error: 'MiniMax credentials not found'
     })
 
     expect(getProviderUsageStatusLabel(codex)).toBe('Refresh failed')
     expect(getProviderUsageErrorMessage(codex)).toBe(
       'Codex usage could not be refreshed. Agent sessions may still be signed in.'
     )
-    expect(getProviderUsageErrorMessage(gemini)).toBe(
-      'Gemini usage could not be refreshed. Agent sessions may still be signed in.'
+    expect(getProviderUsageErrorMessage(minimax)).toBe(
+      'MiniMax usage could not be refreshed. Agent sessions may still be signed in.'
     )
   })
 
   it('frames credential-file and login failures as auth-shaped usage failures', () => {
-    const kimi = provider({
-      provider: 'kimi',
-      error: 'Kimi credentials-file is invalid'
+    const codex = provider({
+      provider: 'codex',
+      error: 'Codex credentials-file is invalid'
     })
     const opencodeGo = provider({
       provider: 'opencode-go',
       error: 'Please log in before refreshing usage.'
     })
 
-    expect(getProviderUsageErrorMessage(kimi)).toBe(
-      'Kimi usage could not be refreshed. Agent sessions may still be signed in.'
+    expect(getProviderUsageErrorMessage(codex)).toBe(
+      'Codex usage could not be refreshed. Agent sessions may still be signed in.'
     )
     expect(getProviderUsageErrorMessage(opencodeGo)).toBe(
       'OpenCode Go usage could not be refreshed. Agent sessions may still be signed in.'
-    )
-  })
-
-  it('shows the exact Grok CLI recovery flow for an expired refreshable session (#8497)', () => {
-    const grok = provider({
-      provider: 'grok',
-      error:
-        'Grok sign-in expired — run grok on the computer running Orca; sign in if prompted. No chat message is needed.',
-      usageMetadata: {
-        failureKind: 'delegated-refresh-required',
-        source: 'oauth'
-      }
-    })
-
-    expect(getProviderUsageStatusLabel(grok)).toBe('Run Grok to refresh')
-    expect(getProviderUsageErrorMessage(grok)).toBe(
-      'Run grok in a terminal on the computer running Orca and wait for it to start. If prompted, complete sign-in, then retry usage. You do not need to send a chat message.'
-    )
-  })
-
-  it('shows the exact Kimi CLI recovery flow for an expired read-only session', () => {
-    const kimi = provider({
-      provider: 'kimi',
-      error: 'Kimi session expired — run kimi on the computer running Orca, then retry usage.',
-      usageMetadata: {
-        failureKind: 'delegated-refresh-required',
-        source: 'oauth'
-      }
-    })
-
-    expect(getProviderUsageStatusLabel(kimi)).toBe('Run Kimi to refresh')
-    expect(getProviderUsageErrorMessage(kimi)).toBe(
-      'Run kimi in a terminal on the computer running Orca and wait for it to start, then retry usage.'
     )
   })
 
@@ -294,40 +243,7 @@ describe('provider usage error copy', () => {
 })
 
 describe('getWindowSections', () => {
-  it('returns buckets as sections when present', () => {
-    const p: ProviderRateLimits = {
-      provider: 'gemini',
-      session: { usedPercent: 80, windowMinutes: 300, resetsAt: null, resetDescription: null },
-      weekly: null,
-      buckets: [
-        {
-          name: 'Pro',
-          usedPercent: 30,
-          windowMinutes: 300,
-          resetsAt: null,
-          resetDescription: null
-        },
-        {
-          name: 'Flash',
-          usedPercent: 80,
-          windowMinutes: 300,
-          resetsAt: null,
-          resetDescription: null
-        }
-      ],
-      updatedAt: Date.now(),
-      error: null,
-      status: 'ok'
-    }
-    const sections = getWindowSections(p)
-    expect(sections).toEqual([
-      { label: 'Pro', window: p.buckets![0] },
-      { label: 'Flash', window: p.buckets![1] },
-      { label: 'Weekly', window: null }
-    ])
-  })
-
-  it('returns session and weekly when buckets are absent', () => {
+  it('returns session and weekly sections', () => {
     const p: ProviderRateLimits = {
       provider: 'claude',
       session: { usedPercent: 40, windowMinutes: 300, resetsAt: null, resetDescription: null },
@@ -364,87 +280,6 @@ describe('getWindowSections', () => {
       { label: 'Weekly', window: p.weekly },
       { label: 'Fable', window: p.fableWeekly }
     ])
-  })
-
-  it('returns session and weekly for empty buckets array', () => {
-    const p: ProviderRateLimits = {
-      provider: 'gemini',
-      session: { usedPercent: 50, windowMinutes: 300, resetsAt: null, resetDescription: null },
-      weekly: null,
-      buckets: [],
-      updatedAt: Date.now(),
-      error: null,
-      status: 'ok'
-    }
-    const sections = getWindowSections(p)
-    expect(sections).toEqual([
-      { label: 'Session', window: p.session },
-      { label: 'Weekly', window: null }
-    ])
-  })
-
-  it('does not expose bucket names via session window in compact rendering path', () => {
-    // Why: ProviderSegment (compact mode) reads only p.session — never p.buckets.
-    // This test locks the contract: getWindowSections returns buckets for detail
-    // views, while the plain session value remains independently available for
-    // compact rendering without bucket names bleeding through.
-    const p: ProviderRateLimits = {
-      provider: 'gemini',
-      session: { usedPercent: 80, windowMinutes: 300, resetsAt: null, resetDescription: null },
-      weekly: null,
-      buckets: [
-        {
-          name: 'Pro',
-          usedPercent: 30,
-          windowMinutes: 300,
-          resetsAt: null,
-          resetDescription: null
-        },
-        {
-          name: 'Flash',
-          usedPercent: 80,
-          windowMinutes: 300,
-          resetsAt: null,
-          resetDescription: null
-        }
-      ],
-      updatedAt: Date.now(),
-      error: null,
-      status: 'ok'
-    }
-    // Compact path uses p.session directly — independent of getWindowSections.
-    expect(p.session?.usedPercent).toBe(80)
-    // getWindowSections (detail path) returns bucket rows, not session label.
-    const sections = getWindowSections(p)
-    const labels = sections.map((s) => s.label)
-    expect(labels).toContain('Pro')
-    expect(labels).toContain('Flash')
-    expect(labels).not.toContain('Session')
-  })
-
-  it('preserves reset metadata inside bucket windows', () => {
-    const p: ProviderRateLimits = {
-      provider: 'gemini',
-      session: null,
-      weekly: null,
-      buckets: [
-        {
-          name: 'Pro',
-          usedPercent: 45,
-          windowMinutes: 300,
-          resetsAt: 18000000,
-          resetDescription: '5:00 PM'
-        }
-      ],
-      updatedAt: Date.now(),
-      error: null,
-      status: 'ok'
-    }
-    const sections = getWindowSections(p)
-    expect(sections).toHaveLength(2)
-    expect(sections[0].label).toBe('Pro')
-    expect(sections[0].window!.resetsAt).toBe(18000000)
-    expect(sections[0].window!.resetDescription).toBe('5:00 PM')
   })
 })
 
@@ -580,11 +415,6 @@ describe('barColor', () => {
 })
 
 describe('ProviderIcon', () => {
-  it('renders the Antigravity agent icon for the antigravity provider', () => {
-    const markup = renderToStaticMarkup(ProviderIcon({ provider: 'antigravity' }))
-    expect(markup).toContain('data-agent-icon="antigravity"')
-  })
-
   it('renders the official MiniMax icon asset for the minimax provider', () => {
     // Why: the icon must travel to the status bar / tooltip unchanged so the
     // user recognises the brand. We pin it to an <img> with a non-empty

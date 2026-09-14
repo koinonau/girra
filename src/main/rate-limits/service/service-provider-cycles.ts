@@ -1,8 +1,6 @@
 import { RateLimitServiceFullCycleApplication } from './service-full-cycle-application'
 import { fetchClaudeRateLimits } from '../claude-fetcher'
 import { fetchCodexRateLimits } from '../codex-fetcher'
-import { fetchGrokRateLimits } from '../grok-fetcher'
-import { readGrokAuthSession } from '../grok-auth'
 import type { ProviderRateLimits } from './service-types'
 
 export abstract class RateLimitServiceProviderCycles extends RateLimitServiceFullCycleApplication {
@@ -142,42 +140,6 @@ export abstract class RateLimitServiceProviderCycles extends RateLimitServiceFul
       claude: shouldApplyClaude
         ? this.resolveClaudeFetchApply(claude, previousState.claude)
         : this.state.claude
-    })
-  }
-
-  protected async runFetchGrokOnlyCycle(signal: AbortSignal): Promise<void> {
-    if (signal.aborted) {
-      return
-    }
-    const previousState = this.state
-    const grokAuthReadResult = readGrokAuthSession()
-    this.grokAuthConfigured = grokAuthReadResult.status === 'ok'
-
-    this.updateState({
-      ...previousState,
-      grok: this.withFetchingStatus(previousState.grok, 'grok')
-    })
-
-    const grok = await fetchGrokRateLimits({
-      signal,
-      authReadResult: grokAuthReadResult
-    }).catch((err): ProviderRateLimits => ({
-      provider: 'grok',
-      session: null,
-      weekly: null,
-      updatedAt: Date.now(),
-      error: err instanceof Error ? err.message : 'Unknown error',
-      status: 'error'
-    }))
-
-    if (signal.aborted) {
-      return
-    }
-
-    this.trackActiveFailureStreak('grok', grok)
-    this.updateState({
-      ...this.state,
-      grok: this.applyStalePolicy(grok, previousState.grok)
     })
   }
 }

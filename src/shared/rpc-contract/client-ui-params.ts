@@ -58,6 +58,8 @@ export const RightSidebarTabParam = z.custom<StaticRightSidebarTab | `plugin:${s
 
 export const AgentActivityDisplayMode = z.enum(['compact', 'full'])
 
+// Why wider than the StatusBarItem type: older clients still send the removed
+// gemini/antigravity/kimi/grok ids, and an unknown id drops their whole list.
 export const StatusBarItem = z.enum([
   'claude',
   'codex',

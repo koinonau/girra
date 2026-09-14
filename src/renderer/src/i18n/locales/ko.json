@@ -26,15 +26,11 @@
       "statusBar": {
         "claudeToggleDescription": "활성 워크스페이스에 대한 Claude 토큰 및 비용 사용량을 표시합니다.",
         "codexToggleDescription": "활성 워크스페이스에 대한 Codex 토큰 및 비용 사용량을 표시합니다.",
-        "geminiToggleDescription": "활성 워크스페이스에 대한 Gemini 토큰 및 비용 사용량을 표시합니다.",
         "opencodeGoToggleDescription": "활성 워크스페이스에 대한 OpenCode Go 토큰 및 비용 사용량을 표시합니다.",
-        "kimiToggleDescription": "활성 워크스페이스의 Kimi 구독 사용량을 표시합니다.",
         "minimaxToggleDescription": "활성 워크스페이스의 MiniMax 구독 사용량을 표시합니다.",
         "sshToggleDescription": "사용 가능한 SSH 및 원격 Orca 호스트가 있으면 표시합니다.",
         "resourceUsageToggleDescription": "리소스 관리자를 표시합니다. 클릭하면 CPU, 메모리, 세션, 데몬 제어, 워크스페이스 디스크 스캔을 볼 수 있습니다.",
-        "portsToggleDescription": "라이브 워크스페이스 포트를 표시합니다. 워크스페이스 범위 포트 및 외부 수신기를 보려면 클릭하세요.",
-        "antigravityToggleDescription": "활성 워크스페이스에 대한 Antigravity 구독 사용량을 표시합니다.",
-        "grokToggleDescription": "Grok CLI로 로그인한 경우 Grok 구독 크레딧 사용량을 표시합니다."
+        "portsToggleDescription": "라이브 워크스페이스 포트를 표시합니다. 워크스페이스 범위 포트 및 외부 수신기를 보려면 클릭하세요."
       },
       "menuBarIcon": {
         "title": "메뉴 바 아이콘 표시",
@@ -739,7 +735,7 @@
         "94a5afe910": "SSH 호스트",
         "40d80bad8a": "베타",
         "de0c2907a1": "원격 Orca 서버",
-        "b351014180": "Orca 통계와 Claude, Codex, OpenCode 토큰 분석 및 Grok 구독 사용량.",
+        "b351014180": "Orca 통계와 Claude, Codex, OpenCode 토큰 분석.",
         "d72a58b5b9": "통계 및 사용량",
         "dcd0d9b74f": "일반 작업에 대한 키보드 단축키입니다.",
         "94295ebfb3": "단축키",
@@ -779,7 +775,7 @@
         "cd50cec5d7": "Orca를 통해 여러 코딩 agents를 조정합니다.",
         "58a868e8e4": "오케스트레이션",
         "7c79d3b7bf": "선택 사항",
-        "b1c2f8b0ac": "Claude, Codex, Gemini, OpenCode Go, MiniMax, Grok의 선택적 계정 전환 및 사용량 설정.",
+        "b1c2f8b0ac": "Claude, Codex, OpenCode Go, MiniMax의 선택적 계정 전환 및 사용량 설정.",
         "f70ac54d38": "AI 제공자 계정",
         "4121f7a0a2": "AI agents를 관리하고, 기본값을 설정하고, 명령을 사용자 정의하세요.",
         "b49abbd2f7": "에이전트",
@@ -3145,9 +3141,7 @@
             "9659e38343": "포트",
             "d1e1a7a6bf": "리소스 관리자",
             "24ac89df1a": "원격 호스트",
-            "5e59007df4": "Kimi 사용량",
             "8c86cd77b0": "OpenCode Go 사용량",
-            "c1df0d67ec": "Gemini 사용량",
             "c0909c686e": "Codex 사용량",
             "3885eb74d8": "Claude 사용량",
             "c8857b40f7": "사용량 데이터 새로 고침",
@@ -3173,12 +3167,8 @@
             "59c6e7b4e0": "보이는 세션은 지금 다시 시작됩니다. 나머지는 해당 작업 트리가 활성화될 때 다시 시작됩니다.",
             "c676918adc": "시스템 기본값",
             "3325d996cb": "rate-limit 새로고침",
-            "fda8146810": "Kimi 사용 세부정보 열기",
             "629251f4b6": "OpenCode Go 사용 세부정보 열기",
-            "d2375976eb": "Gemini 사용 세부정보 열기",
-            "3d79122c3f": "kimi",
             "d7a0668acc": "opencode-go",
-            "68efc0345c": "gemini",
             "76b06d4da5": "claude",
             "a28a5dd9b1": "오류",
             "cd9d7b40ff": "{{value0}} 세션 다시 시작",
@@ -3196,10 +3186,6 @@
             "06741a2f3d": "MiniMax 사용량 세부 정보 열기",
             "3bbf140864": "MiniMax 사용량",
             "remoteServerLabel": "원격 서버",
-            "antigravityUsage": "Antigravity 사용량",
-            "antigravityUsageDetails": "Antigravity 사용량 세부 정보 열기",
-            "grokUsageAria": "Grok 사용량 세부 정보 열기",
-            "grokUsageMenu": "Grok 사용량",
             "floatingTerminalNewActivity": "{{label}}, 새 활동",
             "codexSignInSuccess": "Codex에 로그인했습니다",
             "codexSignInError": "Codex 로그인에 실패했습니다. 다시 시도해 주세요."
@@ -3351,11 +3337,7 @@
             "42fdd4da1d": "Claude 로그인을 새로 고치는 중입니다. 에이전트 세션은 여전히 로그인되어 있을 수 있습니다.",
             "c06c1d215d": "네트워크 요청 실패로 Claude 사용량을 새로 고칠 수 없습니다.",
             "cabdc2a9e0": "Claude 로그인 자격 증명을 읽을 수 없습니다.",
-            "a7517cccb6": "현재 Claude 사용량을 사용할 수 없습니다.",
-            "e2c6a4f917": "Run Grok to refresh",
-            "d1b7f509ac": "Run grok in a terminal on the computer running Orca and wait for it to start. If prompted, complete sign-in, then retry usage. You do not need to send a chat message.",
-            "f90b3d7a16": "Run Kimi to refresh",
-            "a37e8c15d4": "Run kimi in a terminal on the computer running Orca and wait for it to start, then retry usage."
+            "a7517cccb6": "현재 Claude 사용량을 사용할 수 없습니다."
           },
           "SshTargetStatusRow": {
             "sshHost": "SSH 호스트"
@@ -3610,8 +3592,7 @@
           "b2cf4310ce": "개요",
           "908c470587": "codex",
           "eb6a066185": "claude",
-          "eee19cfade": "개요",
-          "grokUsageTab": "Grok"
+          "eee19cfade": "개요"
         },
         "UsageOverviewPane": {
           "22ed1b7669": "세션",
@@ -3662,13 +3643,8 @@
             "0bba8ca244": "통계",
             "0e2a0b6431": "사용량",
             "372debfac0": "통계",
-            "26bb901fcd": "Orca 통계와 Claude, Codex, OpenCode 토큰 분석 및 Grok 구독 사용량.",
-            "cb2430ae6a": "통계 및 사용량",
-            "f8a1b2c3d4": "grok",
-            "e7f0a1b2c3": "구독",
-            "d6e9f0a1b2": "크레딧",
-            "a3b6c7d8e9": "grok 사용량",
-            "9f2a3b4c5d": "xai"
+            "26bb901fcd": "Orca 통계와 Claude, Codex, OpenCode 토큰 분석.",
+            "cb2430ae6a": "통계 및 사용량"
           }
         },
         "usage": {
@@ -3718,17 +3694,6 @@
           "faf3444859": "입력",
           "a8b7487ff7": "출력",
           "cfe2282ffa": "알 수 없음"
-        },
-        "GrokUsagePane": {
-          "g8h9i0j1k2": "Grok 사용량",
-          "b2d3e4f5c6": "Grok CLI OAuth(~/.grok/auth.json)의 주간 구독 크레딧입니다. 상태 표시줄과 같은 출처입니다.",
-          "c3e4f5a6b7": "계정에서 설정",
-          "h9i0j1k2l3": " • {{value0}}",
-          "i0j1k2l3m4": "Grok 사용량 새로 고침",
-          "d4f5a6b7c8": "새로 고침",
-          "e5a6b7c8d9": "사용한 주간 크레딧",
-          "f6b7c8d9e0": "결제 기간 재설정",
-          "a7b8c9d0e1": "Grok 계정 설정"
         }
       },
       "sparse": {
@@ -5210,12 +5175,6 @@
           "36223200ac": "OpenCode Go 세션 쿠키",
           "ea631977b5": "OpenCode Go 공급자 설정을 구성합니다.",
           "4ac10b4d08": "OpenCode Go",
-          "c2aee76420": "{{value0}}에서 Google에 인증하기 위해 로컬 Gemini CLI 설치에서 OAuth 자격 증명을 추출합니다. 이는 Orca가 아닌 Gemini CLI 앱에 발급된 자격 증명을 사용합니다. Google이 CLI를 업데이트하면 중단될 수 있습니다. 자신의 책임하에 사용하십시오.",
-          "96f3649526": "Gemini CLI 자격 증명 사용(실험적)",
-          "d676c41fc6": "Google 인증을 위해 로컬 Gemini CLI 설치에서 OAuth 자격 증명을 추출합니다. 이는 Orca가 아닌 Gemini CLI 앱에 발급된 자격 증명을 사용합니다. Google이 CLI를 업데이트하면 중단될 수 있습니다. 자신의 책임하에 사용하십시오.",
-          "0c7f915b01": "Gemini CLI 자격 증명 사용",
-          "973741a871": "Gemini 공급자 설정을 구성합니다.",
-          "0c64dc2a64": "Gemini",
           "db209ee572": "제거",
           "8a0f870153": "재인증",
           "3d245ef7d9": "Codex에서 이 로그인이 오래되었다고 보고했습니다.",
@@ -6763,7 +6722,7 @@
           "b5ee17826b": "지속 세션, 더 풍부한 원격 상태, 웹 또는 모바일 핸드오프를 위해 원격 Orca 런타임을 페어링합니다.",
           "7686cb5c36": "이 브라우저를 저장된 Orca 서버에 연결하세요.",
           "bd0181eeca": "원격 Orca 서버",
-          "8acf3f22e0": "Orca 통계와 Claude, Codex, OpenCode 토큰 분석 및 Grok 구독 사용량.",
+          "8acf3f22e0": "Orca 통계와 Claude, Codex, OpenCode 토큰 분석.",
           "954a8f5aef": "통계 및 사용량",
           "a737a4bb22": "일반 작업에 대한 키보드 단축키입니다.",
           "23bf7a1ad4": "단축키",
@@ -7396,13 +7355,6 @@
             "61f7d1fcbe": "쿠키",
             "d1d2ae383c": "속도 제한을 가져오려면 opencode.ai 세션 쿠키를 붙여넣으세요.",
             "6ed1401020": "OpenCode Go 세션 쿠키",
-            "b7c2cee442": "실험적",
-            "7118d2f908": "자격 증명",
-            "933deaf732": "OAuth",
-            "8630464352": "CLI",
-            "e8e1ff3887": "gemini",
-            "bada4a3218": "Google 인증을 위해 로컬 Gemini CLI 설치에서 OAuth 자격 증명을 추출합니다.",
-            "d819755b02": "Gemini CLI 자격 증명 사용",
             "35b461d817": "로그인",
             "f2d666a886": "선택 사항",
             "8b06729e0f": "활성",
@@ -7429,13 +7381,7 @@
             "b84a5b0c8a": "이 장치 또는 WSL에서 공급자 계정을 검사하고 추가할지 선택합니다.",
             "d09fb5ca92": "계정 위치",
             "733f9e2a93": "MiniMax 사용량",
-            "f8374c3151": "로컬 rate-limit 가져오기에 사용할 platform.minimax.io 세션 Cookie를 붙여넣으세요.",
-            "f4a8c2e1b7": "Grok(xAI) 사용량",
-            "e3b7d1f9a2": "주간 크레딧 사용량을 위한 Grok CLI(grok login) OAuth 로그인.",
-            "d2c6a0e8f1": "grok",
-            "c1b5f9d7e0": "xai",
-            "b0a4e8c6d9": "OAuth",
-            "a9f3d7b5c8": "로그인"
+            "f8374c3151": "로컬 rate-limit 가져오기에 사용할 platform.minimax.io 세션 Cookie를 붙여넣으세요."
           }
         },
         "advanced": {
@@ -7594,12 +7540,8 @@
             "6ecad74eb3": "SSH",
             "f17d66d0d2": "상태 표시줄에 원격 호스트 연결 상태를 표시합니다.",
             "57fb424c56": "원격 호스트",
-            "35565867cb": "Moonshot",
             "de586def95": "구독",
             "00a028f25f": "사용량",
-            "40e5c3c285": "kimi",
-            "c927a155d5": "상태 표시줄에 Kimi 구독 사용량을 표시합니다.",
-            "3a6c028ea8": "Kimi 사용량",
             "25e51b62ee": "사용 한도",
             "d9e7cef86f": "쿠키",
             "d16378a88f": "minimax",
@@ -7611,10 +7553,6 @@
             "a9d56852eb": "opencode",
             "7f72de7cbe": "상태 표시줄에 OpenCode Go 토큰 및 비용 사용량을 표시합니다.",
             "bc046e7899": "OpenCode Go 사용량",
-            "51b0ccd6a2": "Google",
-            "2804a920ad": "gemini",
-            "9660c5b2f1": "상태 표시줄에 Gemini 토큰과 비용 사용량을 표시합니다.",
-            "5bfb874d05": "Gemini 사용량",
             "97957e374e": "OpenAI",
             "8dfd676c28": "codex",
             "e9e4412545": "상태 표시줄에 Codex 토큰 및 비용 사용량을 표시합니다.",
@@ -7649,13 +7587,6 @@
               "title": "고정된 워크트리를 원래 목록에도 표시",
               "description": "고정된 워크트리는 Pinned에 유지하면서 전체, 프로젝트, 상태 및 PR에도 표시합니다."
             },
-            "antigravityUsageTitle": "Antigravity 사용량",
-            "antigravityUsageDescription": "상태 표시줄에 Antigravity 구독 사용량을 표시합니다.",
-            "antigravityKeyword": "antigravity",
-            "f8e2a1c4b6": "Grok 사용량",
-            "e7d1b0f3a5": "Grok CLI OAuth에서 Grok 주간 크레딧 사용량을 표시합니다.",
-            "d6c0a9e2f4": "grok",
-            "c5b9f8d1e3": "xai",
             "usagePercentageDisplayTitle": "사용량 백분율",
             "usagePercentageDisplayDescription": "공급자 한도를 사용한 비율 또는 남은 비율로 표시할지 선택합니다."
           }
@@ -9385,25 +9316,6 @@
               }
             }
           }
-        },
-        "GrokAccountsSection": {
-          "a1b2c3d4e5": "Grok (xAI)",
-          "f6e5d4c3b2": "Grok CLI 로그인에서 주간 크레딧 사용량을 표시합니다(세션 파일 ~/.grok/auth.json).",
-          "0d8e77bc40": "Grok CLI 문서",
-          "ad47a33f72": "로드 중…",
-          "b2c3d4e5f6": "로그인됨",
-          "c3d4e5f6a7": "로그인되었습니다. Orca는 디스크의 해당 파일만 읽습니다. 사용량 조회가 실패하면 grok login을 다시 실행하세요.",
-          "d4e5f6a7b8": "세션이 만료되었습니다. 터미널에서 grok login을 실행해 갱신하세요.",
-          "e5f6a7b8c9": "Grok CLI에 로그인되어 있지 않음",
-          "f6a7b8c9d0": "터미널에서 grok login을 실행한 다음 여기에서 사용량 새로 고침을 클릭하세요.",
-          "3325d996cb": "사용량 새로 고침",
-          "a8f3e2c1b4": "주간 크레딧",
-          "b7e2d9f0a3": "터미널의 grok /usage 화면과 같은 주간 크레딧 비율입니다.",
-          "c6d1a8f4e2": "{{when}}에 재설정",
-          "e6dadc1e2b": "Monthly usage",
-          "75e396bf42": "Grok 통합 결제 계정에 포함된 월간 사용량입니다.",
-          "b36fa2c908": "Signed in. Orca reads the Grok CLI session stored on disk.",
-          "f08c41de73": "Session expired — run grok on the computer running Orca and wait for it to start. If prompted, complete sign-in, then click Refresh usage. No chat message is needed."
         },
         "AppearanceWindowSidebarSection": {
           "usagePercentageDisplayUsed": "사용",

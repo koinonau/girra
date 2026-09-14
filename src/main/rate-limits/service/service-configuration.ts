@@ -5,12 +5,10 @@ import { RateLimitServiceAccountRefresh } from './service-account-refresh'
 import {
   type CodexAccountSelectionTarget,
   type CodexHomePathResolver,
-  type KimiHomeResolver,
   type ClaudeAccountSelectionTarget,
   type ClaudeAuthPreparationResolver,
   type OpenCodeGoRateLimitConfig,
   type MiniMaxRateLimitConfig,
-  type GeminiCliOAuthEnabledResolver,
   type InactiveCodexAccountInfo,
   type InactiveClaudeAccountInfo,
   type RateLimitState,
@@ -28,10 +26,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
     this.codexFetchTarget = normalizeCodexAccountSelectionTarget(target)
   }
 
-  setKimiHomeResolver(resolver: KimiHomeResolver): void {
-    this.kimiHomeResolver = resolver
-  }
-
   setClaudeAuthPreparationResolver(resolver: ClaudeAuthPreparationResolver): void {
     this.claudeAuthPreparationResolver = resolver
   }
@@ -46,10 +40,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
 
   setMiniMaxConfigResolver(resolver: () => MiniMaxRateLimitConfig): void {
     this.miniMaxConfigResolver = resolver
-  }
-
-  setGeminiCliOAuthEnabledResolver(resolver: GeminiCliOAuthEnabledResolver): void {
-    this.geminiCliOAuthEnabledResolver = resolver
   }
 
   setNetworkProxySettingsResolver(resolver: () => NetworkProxySettings): void {
@@ -125,7 +115,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
       // Why: the cookie lives on the filesystem, not GlobalSettings; surface its presence so the renderer keeps the MiniMax bar across reloads.
       minimaxCookieConfigured: hasMiniMaxSessionCookie(),
       minimaxApiKeyConfigured: hasMiniMaxApiKey(),
-      grokAuthConfigured: this.grokAuthConfigured,
       claudeTarget: this.claudeFetchTarget,
       codexTarget: this.codexFetchTarget,
       inactiveClaudeAccounts: this.buildInactiveArray(

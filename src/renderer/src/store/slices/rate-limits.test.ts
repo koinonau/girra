@@ -11,9 +11,9 @@ function createRateLimitStore(): StoreApi<AppState> {
 }
 
 describe('createRateLimitSlice', () => {
-  it('initializes Antigravity usage with a stable pending key', () => {
+  it('initializes MiniMax usage with a stable pending key', () => {
     const store = createRateLimitStore()
 
-    expect(store.getState().rateLimits.antigravity).toBeNull()
+    expect(store.getState().rateLimits.minimax).toBeNull()
   })
 })

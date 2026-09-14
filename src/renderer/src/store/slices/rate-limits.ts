@@ -7,7 +7,6 @@ export type RateLimitSlice = {
   rateLimits: RateLimitState
   fetchRateLimits: () => Promise<void>
   refreshRateLimits: () => Promise<void>
-  refreshGrokRateLimits: () => Promise<void>
   refreshClaudeRateLimitsForTarget: (target: RateLimitRuntimeTarget) => Promise<void>
   refreshCodexRateLimitsForTarget: (target: RateLimitRuntimeTarget) => Promise<void>
   consumeCodexRateLimitResetCredit: () => Promise<void>
@@ -34,15 +33,6 @@ export const createRateLimitSlice: StateCreator<AppState, [], [], RateLimitSlice
       set({ rateLimits: state })
     } catch (error) {
       console.error('Failed to refresh rate limits:', error)
-    }
-  },
-
-  refreshGrokRateLimits: async () => {
-    try {
-      const state = await window.api.rateLimits.refreshGrok()
-      set({ rateLimits: state })
-    } catch (error) {
-      console.error('Failed to refresh Grok usage:', error)
     }
   },
 

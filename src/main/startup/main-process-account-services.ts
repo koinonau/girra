@@ -12,7 +12,6 @@ import { startCodexStateDbBackfillRecoveryInBackground } from '../codex/codex-st
 import { getOrcaManagedCodexHomePath } from '../codex/codex-home-paths'
 import { getInitialCodexRateLimitTarget } from '../rate-limits/codex-rate-limit-target'
 import { getInitialClaudeRateLimitTarget } from '../rate-limits/claude-rate-limit-target'
-import { getKimiRuntimeTarget, resolveKimiHome } from '../kimi/kimi-runtime-home'
 import { readMiniMaxSessionCookie } from '../minimax/minimax-cookie-store'
 import { readMiniMaxApiKey } from '../minimax/minimax-api-key-store'
 import { createAccountRuntimeTargetSettingsSync } from '../rate-limits/account-runtime-target-sync'
@@ -71,11 +70,6 @@ export function initializeMainProcessAccountServices(): void {
     state.codexRuntimeHome!.prepareForRateLimitFetch(target)
   )
   state.rateLimits.setCodexFetchTarget(getInitialCodexRateLimitTarget(store.getSettings()))
-  // Why: Kimi's CLI refreshes its OAuth token in whichever runtime it runs in, so the
-  // usage fetch must read the WSL-side credentials when that's the configured runtime (#12370).
-  state.rateLimits.setKimiHomeResolver(() =>
-    resolveKimiHome(getKimiRuntimeTarget(store.getSettings()))
-  )
   state.rateLimits.setClaudeFetchTarget(getInitialClaudeRateLimitTarget(store.getSettings()))
   const syncAccountRuntimeTargets = createAccountRuntimeTargetSettingsSync(
     state.rateLimits,
@@ -127,7 +121,6 @@ export function initializeMainProcessAccountServices(): void {
       apiKey
     }
   })
-  state.rateLimits.setGeminiCliOAuthEnabledResolver(() => store.getSettings().geminiCliOAuthEnabled)
   state.rateLimits.setNetworkProxySettingsResolver(() => store.getSettings())
   state.keybindings = new KeybindingService({
     homePath: app.getPath('home'),

@@ -4,10 +4,10 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 3 and the ADRs are merged; Phase 4a is in review.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 3, Phase 4a and the ADRs are merged; Phase 4b is in review.
 
-1. **Phase 4b, usage fetchers.** Delete Gemini CLI, Grok and Kimi usage fetching, the Grok account check and the Grok stats pane, which the tree unticks. Unblocked once 4a merges. Keep Claude, Codex, OpenCode and MiniMax usage.
-2. **Launch roster.** Whether the 14 agents whose hooks 4a removed also leave the roster. Needs the user; see `handover.md`.
+1. **Phase 5, Codex.** Unblocked once 4b merges. The largest phase: map it with read-only subagents and split it into pull requests, as Phases 3 and 4 were. Codex also appears in the launch roster, trust presets, hook targets, rate limits (`codex-*`, reset credits) and AI Vault.
+2. **Launch roster** and **MiniMax usage.** Need the user; see `handover.md`.
 3. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 4. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
 5. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.

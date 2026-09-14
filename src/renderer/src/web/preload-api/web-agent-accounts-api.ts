@@ -14,19 +14,6 @@ export function createMiniMaxCredentialsApi(): NonNullable<
   }
 }
 
-export function createGrokAccountsApi(): NonNullable<Partial<PreloadApi>['grokAccounts']> {
-  const unsigned = {
-    signedIn: false,
-    email: null,
-    teamId: null,
-    tokenFresh: false,
-    error: null
-  }
-  return {
-    getStatus: () => Promise.resolve(unsigned)
-  }
-}
-
 export function createAccountsApi(): never {
   const empty = {
     accounts: [],

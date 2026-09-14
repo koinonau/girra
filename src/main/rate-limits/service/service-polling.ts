@@ -73,12 +73,8 @@ export abstract class RateLimitServicePolling extends RateLimitServiceFetchQueue
     const byProvider: Record<ActiveRateLimitProvider, ProviderRateLimits | null> = {
       claude: this.state.claude,
       codex: this.state.codex,
-      gemini: this.state.gemini,
       'opencode-go': this.state.opencodeGo,
-      kimi: this.state.kimi,
-      minimax: this.state.minimax,
-      grok: this.state.grok,
-      antigravity: this.state.antigravity
+      minimax: this.state.minimax
     }
     return Object.entries(byProvider).map(([provider, limits]) => ({
       provider: provider as ActiveRateLimitProvider,
@@ -167,9 +163,6 @@ export abstract class RateLimitServicePolling extends RateLimitServiceFetchQueue
     }
     if (plan.providers.includes('codex')) {
       await this.fetchCodexOnly()
-    }
-    if (plan.providers.includes('grok')) {
-      await this.fetchGrokOnly()
     }
   }
 

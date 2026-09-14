@@ -1,5 +1,4 @@
 import { RateLimitServiceFullCyclePreparation } from './service-full-cycle-preparation'
-import { deriveAntigravityRateLimits } from '../antigravity-usage-mirror'
 import type { ProviderRateLimits } from './service-types'
 
 export abstract class RateLimitServiceFullCycleApplication extends RateLimitServiceFullCyclePreparation {
@@ -26,15 +25,7 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
       miniMaxConfigChanged,
       miniMaxGeneration,
       claudeFetchGated,
-      results: [
-        claudeResult,
-        codexResult,
-        geminiResult,
-        opencodeGoResult,
-        kimiResult,
-        miniMaxResult
-      ],
-      grokResultPromise
+      results: [claudeResult, codexResult, opencodeGoResult, miniMaxResult]
     } = prepared
     if (signal.aborted) {
       return
@@ -66,22 +57,6 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
             status: 'error'
           } satisfies ProviderRateLimits)
 
-    const gemini =
-      geminiResult.status === 'fulfilled'
-        ? geminiResult.value
-        : ({
-            provider: 'gemini',
-            session: null,
-            weekly: null,
-            updatedAt: Date.now(),
-            error:
-              geminiResult.reason instanceof Error ? geminiResult.reason.message : 'Unknown error',
-            status: 'error'
-          } satisfies ProviderRateLimits)
-
-    // Why: Antigravity can only borrow a *successful* Gemini read; a Gemini failure is not an Antigravity failure.
-    const antigravity = deriveAntigravityRateLimits(gemini)
-
     const opencodeGo =
       opencodeGoResult.status === 'fulfilled'
         ? opencodeGoResult.value
@@ -95,18 +70,6 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
               opencodeGoResult.reason instanceof Error
                 ? opencodeGoResult.reason.message
                 : 'Unknown error',
-            status: 'error'
-          } satisfies ProviderRateLimits)
-
-    const kimi =
-      kimiResult.status === 'fulfilled'
-        ? kimiResult.value
-        : ({
-            provider: 'kimi',
-            session: null,
-            weekly: null,
-            updatedAt: Date.now(),
-            error: kimiResult.reason instanceof Error ? kimiResult.reason.message : 'Unknown error',
             status: 'error'
           } satisfies ProviderRateLimits)
 
@@ -155,12 +118,9 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
     if (shouldApplyCodex) {
       this.trackActiveFailureStreak('codex', codex)
     }
-    this.trackActiveFailureStreak('gemini', gemini)
-    this.trackActiveFailureStreak('antigravity', antigravity)
     if (shouldApplyOpencode) {
       this.trackActiveFailureStreak('opencode-go', opencodeGo)
     }
-    this.trackActiveFailureStreak('kimi', kimi)
     if (shouldApplyMiniMax) {
       this.trackActiveFailureStreak('minimax', miniMax)
     }
@@ -176,40 +136,16 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
         : codexBecameUnavailable
           ? codexStateBeforeFetch
           : this.state.codex,
-      gemini: this.applyStalePolicy(gemini, previousState.gemini),
       opencodeGo: shouldApplyOpencode
         ? opencodeConfigChanged
           ? opencodeGo
           : this.applyStalePolicy(opencodeGo, previousState.opencodeGo)
         : this.state.opencodeGo,
-      kimi: this.applyStalePolicy(kimi, previousState.kimi),
-      antigravity: this.applyStalePolicy(antigravity, previousState.antigravity),
       minimax: shouldApplyMiniMax
         ? miniMaxConfigChanged
           ? miniMax
           : this.applyStalePolicy(miniMax, previousState.minimax)
         : this.state.minimax
-    })
-
-    const grokResult = await grokResultPromise
-    if (signal.aborted) {
-      return
-    }
-    const grok =
-      grokResult.status === 'fulfilled'
-        ? grokResult.value
-        : ({
-            provider: 'grok',
-            session: null,
-            weekly: null,
-            updatedAt: Date.now(),
-            error: grokResult.reason instanceof Error ? grokResult.reason.message : 'Unknown error',
-            status: 'error'
-          } satisfies ProviderRateLimits)
-    this.trackActiveFailureStreak('grok', grok)
-    this.updateState({
-      ...this.state,
-      grok: this.applyStalePolicy(grok, previousState.grok)
     })
   }
 }

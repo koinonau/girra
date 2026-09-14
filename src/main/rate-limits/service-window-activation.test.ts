@@ -3,10 +3,7 @@ import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { RateLimitService } from './service'
 import { fetchClaudeRateLimits } from './claude-fetcher'
 import { fetchCodexRateLimits } from './codex-fetcher'
-import { fetchGeminiRateLimits } from './gemini-usage-fetcher'
-import { fetchKimiRateLimits } from './kimi-fetcher'
 import { fetchMiniMaxRateLimits } from './minimax/minimax-fetcher'
-import { fetchGrokRateLimits } from './grok-fetcher'
 import { fetchOpenCodeGoRateLimits } from './opencode-go-usage-fetcher'
 import {
   asRateLimitWindow,
@@ -29,28 +26,12 @@ vi.mock('./codex-fetcher', () => ({
   fetchCodexRateLimits: vi.fn()
 }))
 
-vi.mock('./gemini-usage-fetcher', () => ({
-  fetchGeminiRateLimits: vi.fn()
-}))
-
-vi.mock('./kimi-fetcher', () => ({
-  fetchKimiRateLimits: vi.fn()
-}))
-
 vi.mock('./opencode-go-usage-fetcher', () => ({
   fetchOpenCodeGoRateLimits: vi.fn()
 }))
 
 vi.mock('./minimax/minimax-fetcher', () => ({
   fetchMiniMaxRateLimits: vi.fn()
-}))
-
-vi.mock('./grok-fetcher', () => ({
-  fetchGrokRateLimits: vi.fn()
-}))
-
-vi.mock('./grok-auth', () => ({
-  readGrokAuthSession: vi.fn(() => ({ status: 'missing' }))
 }))
 
 vi.mock('../minimax/minimax-cookie-store', () => ({
@@ -187,11 +168,8 @@ describe('RateLimitService', () => {
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchGeminiRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchMiniMaxRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchGrokRateLimits).toHaveBeenCalledTimes(1)
       expect(service.getState().claude?.status).toBe('ok')
 
       service.stop()
@@ -498,12 +476,14 @@ describe('RateLimitService', () => {
   it('keeps a full-fetch retry on the 5-minute cadence for a provider without a dedicated fetch cycle', async () => {
     vi.useFakeTimers()
     try {
-      // Kimi has no individual fetch cycle, so recovering it re-runs fetchAll
-      // (which hits Claude's tight-budget endpoint). A durable Kimi error must
+      // OpenCode Go has no individual fetch cycle, so recovering it re-runs fetchAll
+      // (which hits Claude's tight-budget endpoint). A durable OpenCode Go error must
       // not drive that full fetch every 30s — it stays on the 5-minute cadence.
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 12))
       vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
-      vi.mocked(fetchKimiRateLimits).mockResolvedValue(errorProvider('kimi', 'token expired'))
+      vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(
+        errorProvider('opencode-go', 'session expired')
+      )
 
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()
@@ -511,13 +491,13 @@ describe('RateLimitService', () => {
       service.start({ fetchImmediately: false })
 
       await vi.advanceTimersByTimeAsync(1000)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(1)
-      expect(service.getState().kimi?.status).toBe('error')
+      expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
+      expect(service.getState().opencodeGo?.status).toBe('error')
 
       // First activation recovers immediately (retry timestamps start at 0).
       window.emit('focus')
       await vi.advanceTimersByTimeAsync(0)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(2)
+      expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
 
       // Well past the 30s failure throttle but inside the 5-minute window: the
@@ -525,14 +505,14 @@ describe('RateLimitService', () => {
       await vi.advanceTimersByTimeAsync(2 * 60 * 1000)
       window.emit('show')
       await vi.advanceTimersByTimeAsync(0)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(2)
+      expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
 
       // After the full 5-minute window the retry fires again.
       await vi.advanceTimersByTimeAsync(4 * 60 * 1000)
       window.emit('restore')
       await vi.advanceTimersByTimeAsync(0)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(3)
+      expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(3)
 
       service.stop()
     } finally {
@@ -545,9 +525,8 @@ describe('RateLimitService', () => {
     try {
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(unavailableProvider('claude'))
       vi.mocked(fetchCodexRateLimits).mockResolvedValue(unavailableProvider('codex'))
-      vi.mocked(fetchGeminiRateLimits).mockResolvedValue(unavailableProvider('gemini'))
       vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(unavailableProvider('opencode-go'))
-      vi.mocked(fetchKimiRateLimits).mockResolvedValue(unavailableProvider('kimi'))
+      vi.mocked(fetchMiniMaxRateLimits).mockResolvedValue(unavailableProvider('minimax'))
 
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()
@@ -562,9 +541,8 @@ describe('RateLimitService', () => {
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchGeminiRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(1)
+      expect(fetchMiniMaxRateLimits).toHaveBeenCalledTimes(1)
 
       await vi.advanceTimersByTimeAsync(5 * 60 * 1000)
       window.emit('show')
@@ -572,9 +550,8 @@ describe('RateLimitService', () => {
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchCodexRateLimits).toHaveBeenCalledTimes(2)
-      expect(fetchGeminiRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(2)
-      expect(fetchKimiRateLimits).toHaveBeenCalledTimes(2)
+      expect(fetchMiniMaxRateLimits).toHaveBeenCalledTimes(2)
 
       service.stop()
     } finally {
