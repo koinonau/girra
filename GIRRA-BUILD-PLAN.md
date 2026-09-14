@@ -100,7 +100,7 @@ Test fixtures are noise here. Roughly half the Orca mentions under `src/` live i
 
 ### Phase 8. Gates
 
-Orca's CI enforces a max-lines ratchet, a reliability-gates file, and ts-nocheck limits. Deleting a fifth of the codebase invalidates all three baselines. Regenerate them rather than suppressing them, or the first real change fails for unrelated reasons.
+Orca's CI enforces a max-lines ratchet, a reliability-gates file, and ts-nocheck limits. Deleting 12% of the source lines invalidates all three baselines. Regenerate them rather than suppressing them, or the first real change fails for unrelated reasons.
 
 ## Verification
 
@@ -115,14 +115,6 @@ pnpm build
 
 A phase is finished when all four match the Phase 0 baseline. Deleting code that something still imports fails typecheck immediately, which is why the order above matters more than the speed.
 
-## Start here
+## Progress
 
-Phase 0 then Phase 1. Mobile is 137k lines, zero inbound references, and one commit. It proves the loop works before you touch anything coupled.
-
-## Open decisions
-
-Three, all in Phase 7:
-
-- **In-app help links.** 17 links point at Orca's docs site. Remove the help menu, or repoint it.
-- **`.orca/` and `ORCA_*`.** Rename them and every existing worktree and hook script stops resolving. Keep them and you read Orca's name every time you debug a hook.
-- **The `orca` CLI binary.** Rename it if you will run both side by side.
+The next stories are in `prompt.md` under "Start Here". Open decisions and the baseline are in `handover.md`.

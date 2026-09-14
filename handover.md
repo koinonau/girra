@@ -9,7 +9,8 @@ As of 2026-09-14: Phase 0 is done and its baseline is recorded below. No Orca co
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
 - `koinonau/girra` is private on GitHub, moved from `shanedolley/girra` on 2026-09-13; GitHub redirects the old URL. Its `main` holds Orca's code at the surveyed commit, with history older than 2026-08-29 squashed.
-- Phase 0 travels in one pull request with `mise.toml`, this baseline, and `cloud/` added to the deletion table: `gh pr list --repo koinonau/girra`.
+- Phase 0 travels in one pull request with `mise.toml`, this baseline, and `cloud/` added to the deletion table. The ADR pull request is stacked on it and merges second: `gh pr list --repo koinonau/girra`.
+- ADRs [0001](docs/adr/0001-fork-orca-and-delete.md) and [0002](docs/adr/0002-keep-internal-orca-identifiers.md) record fork-and-delete and keeping internal `orca*` identifiers (2026-09-14).
 
 ## Files
 
@@ -21,6 +22,7 @@ At the repository root, beside Orca's code.
 | [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md) | The selection, nested by module. Authoritative |
 | [ORCA-FEATURE-INVENTORY.md](ORCA-FEATURE-INVENTORY.md) | The flat survey the tree came from. Superseded; kept for history |
 | `mise.toml` | Pins Node 24 for this repository |
+| `docs/adr/` | Architecture decision records |
 | `prompt.md` | How to work, and "Start here" |
 
 ## Board
@@ -111,7 +113,8 @@ No command reaches an external database.
 
 Taken at Orca `403b62a8d` by a Python walk over non-test `.ts` and `.tsx` files.
 
-- **Deletion scope:** 197,983 lines across 27 directories (2026-09-13). `mobile/` holds 137,454; the four `codex*` directories hold 35,233.
+- **Deletion scope:** 197,983 lines across 27 directories (2026-09-13). `mobile/` holds 137,454; the four `codex*` directories hold 35,233. With `cloud/`, 226,348 lines: 12% of the 1,905,345 non-test source lines in `src/`, `mobile/` and `cloud/` (2026-09-14).
+- **Runtime behind the CLI:** 265,344 lines across `src/main/runtime`, `src/relay`, `src/main/daemon` and `src/main/orcad` (2026-09-14).
 - **`cloud/`:** 28,365 lines in 132 files, with no imports from `src/`. It holds Orca's server-side `push`, `relay`, `relay-fence-broker` and `relay-ops` apps, which serve features girra drops. Four test or source files outside it reference `cloud/apps` (2026-09-14). Added to the deletion table on 2026-09-14.
 - **Inbound references from outside each module:** star-nag 3, speech 10, updater 13, orca-profiles 27, crash-reporting 39, telemetry 45, codex 125 (2026-09-13).
 - **Orca in locale files:** 4,559 case-insensitive matches across six files in `src/renderer/src/i18n/locales/` (2026-09-13).
@@ -165,3 +168,6 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-14 | Homebrew's pnpm 10.33 cannot switch to the pinned 12.0.0, and the pre-commit hook calls bare `pnpm` | Would block every commit | Run pnpm and `git commit` through `mise exec --` |
 | 2026-09-14 | `pnpm build` runs `install-dev-cli.mjs`, which tries to symlink `/usr/local/bin/orca-dev`; permission is denied and the build continues | None | Leave it denied. Never rerun it with `sudo` |
 | 2026-09-14 | The full test suite loads the machine enough to fail `daemon-reattach-checkpoint-isolation` | One false failure in the baseline | Rerun a failing file alone before treating it as a regression |
+| 2026-09-14 | The cross-version tests write 404 MB of Orca release checkouts into `tests/e2e/.cross-version-checkouts/`, which git ignores | Disk space only | Expect it after every full test run |
+| 2026-09-14 | Orca's `.gitignore` ignores `docs/**` apart from an allow-list, so a new file under `docs/` is silently untracked. `docs/adr/` is now allow-listed | One `git add` that staged nothing | Add a new docs path to the allow-list in `.gitignore`; never `git add -f` |
+| 2026-09-14 | Feature share and line share differ: 103 of 535 features is 19%, but their code is 12% of source lines | "A fifth of the codebase" in the plan and an ADR draft | Measure lines before quoting a code proportion |

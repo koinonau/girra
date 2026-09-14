@@ -4,12 +4,11 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phase 0 is done; its pull request must merge before the stories below branch from `origin/main`, because they need `mise.toml` and the baseline.
+Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phase 0 and the ADRs are done, in two stacked pull requests awaiting the user's merge: Phase 0 first, then the ADRs.
 
-1. **ADRs.** Write two records to `docs/adr/` with the `architecture-decisions` skill before Phase 1: fork-and-delete over rebuild, and keeping internal `orca*` identifiers. Both are hard to reverse, surprising without context, and chosen over real alternatives. Unblocked once Phase 0 merges.
-2. **Phase 1, mobile and cloud.** Relocate `Clipboard copy of terminal selection` out of `src/renderer/src/web/` first, then delete `mobile/` (137,454 lines) and `cloud/` (28,365 lines). Neither is imported from `src/`. Removing `cloud/` also removes `tests/e2e/relay-region-correction.unit.test.ts` from the baseline failures. Unblocked once Phase 0 merges.
-3. **Cross-version wire tests.** Decide whether to fetch Orca's release tags locally or delete `tests/e2e/cross-version-wire/`. Needs the user.
-4. **Workflows.** Choose which of Orca's 65 workflows survive before GitHub Actions is re-enabled. Needs the user.
+1. **Phase 1, mobile and cloud.** Relocate `Clipboard copy of terminal selection` out of `src/renderer/src/web/` first, then delete `mobile/` (137,454 lines) and `cloud/` (28,365 lines). Neither is imported from `src/`. Removing `cloud/` also removes `tests/e2e/relay-region-correction.unit.test.ts` from the baseline failures. Blocked until the Phase 0 pull request merges: it needs `mise.toml` and the baseline, and the user has not yet reviewed adding `cloud/`.
+2. **Cross-version wire tests.** Decide whether to fetch Orca's release tags locally or delete `tests/e2e/cross-version-wire/`. Needs the user.
+3. **Workflows.** Choose which of Orca's 65 workflows survive before GitHub Actions is re-enabled. Needs the user.
 
 ## Backlog
 
@@ -57,5 +56,5 @@ Ask the user first:
 
 - `writing-clearly-and-concisely` before writing any file, commit message or pull request.
 - `verification-before-completion` before calling a phase done.
-- `architecture-decisions` for the ADRs in "Start Here".
+- `architecture-decisions` before carrying a hard-to-reverse, surprising trade-off into code. Records live in `docs/adr/`.
 - `autonomous` for handover upkeep and commits.
