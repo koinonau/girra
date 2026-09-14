@@ -2,11 +2,6 @@ import { createConnection } from 'node:net'
 import { DispatcherClientWriter } from './dispatcher-client-writer'
 import { pickRemoteCliEnv } from './remote-cli-env'
 import { shouldReadRemoteCliStdin } from './remote-cli-stdin'
-import { prepareRemoteArtifactCliInput } from './remote-artifact-cli-input'
-import {
-  assertRemoteArtifactCliForwardingFits,
-  type RemoteArtifactCliForwardingParams
-} from './remote-artifact-cli-forwarding'
 import {
   FrameDecoder,
   MessageType,
@@ -25,33 +20,12 @@ export async function runRelayOrcaCliChannel(
   endpointCredential?: string
 ): Promise<void> {
   const myVersion = readLaunchVersion()
-  let preparedArtifact: Awaited<ReturnType<typeof prepareRemoteArtifactCliInput>>
-  try {
-    preparedArtifact = await prepareRemoteArtifactCliInput(argv, process.cwd())
-  } catch (error) {
-    process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
-    process.exitCode = 1
-    return
-  }
-  const stdin =
-    preparedArtifact.stdin ??
-    (shouldReadRemoteCliStdin(argv) ? await readOrcaCliStdin() : undefined)
-  const env = pickRemoteCliEnv(process.env)
-  const requestParams: RemoteArtifactCliForwardingParams = {
+  const stdin = shouldReadRemoteCliStdin(argv) ? await readOrcaCliStdin() : undefined
+  const requestParams = {
     argv,
     cwd: process.cwd(),
-    env,
-    ...(stdin !== undefined ? { stdin } : {}),
-    ...(preparedArtifact.artifactInput ? { artifactInput: preparedArtifact.artifactInput } : {})
-  }
-  if (preparedArtifact.artifactInput) {
-    try {
-      assertRemoteArtifactCliForwardingFits(requestParams)
-    } catch (error) {
-      process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
-      process.exitCode = 1
-      return
-    }
+    env: pickRemoteCliEnv(process.env),
+    ...(stdin !== undefined ? { stdin } : {})
   }
   const sock = createConnection({ path: sockPath })
   const stdoutWriter = new DispatcherClientWriter(

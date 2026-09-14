@@ -6,7 +6,6 @@ import { replaceConversationInSnapshot } from './structured-conversation-tab-rep
 import type { RuntimeStore } from './runtime-store-contract'
 import type { RuntimeClientSettingsController } from './runtime-client-settings'
 import type { RuntimeAutomationController } from './runtime-automation-controller'
-import { RuntimeArtifactController } from './runtime-artifact-controller'
 import type { OrchestrationEnvironmentTransport } from './orchestration/environment-transport'
 import type { RuntimeOrchestrationFederation } from './runtime-orchestration-federation'
 import type {
@@ -63,8 +62,6 @@ export class OrcaRuntimeWithRuntimeId {
   protected readonly clientSettings: RuntimeClientSettingsController
 
   protected readonly automation: RuntimeAutomationController
-
-  protected readonly artifacts = new RuntimeArtifactController()
 
   protected readonly orchestrationEnvironmentTransport: OrchestrationEnvironmentTransport | null
 

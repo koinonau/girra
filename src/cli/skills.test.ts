@@ -216,7 +216,7 @@ describe('orca skills CLI', () => {
       'Usage: orca skills get <topic> [--full | --reference <name>] [--json]'
     )
     expect(String(logSpy.mock.calls[1]?.[0])).toContain(
-      'Commands:\n  installed          List installed skill selectors'
+      'Commands:\n  list               List version-matched skill guides'
     )
     expect(String(logSpy.mock.calls[1]?.[0])).toContain(
       'get                Print a version-matched skill guide'

@@ -83,7 +83,6 @@ import {
   SSH_RELAY_CONFIGURE_GRACE_TIME_METHOD,
   sshRemotePtyLeaseAllowsReattach
 } from '../../shared/ssh-types'
-import { normalizeRemoteArtifactInput } from '../../shared/artifact-cli-bridge'
 import type { Store } from '../persistence'
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import {
@@ -1452,7 +1451,6 @@ export class SshRelaySession {
             )
           : {}
       const stdin = typeof params.stdin === 'string' ? params.stdin : undefined
-      const artifactInput = normalizeRemoteArtifactInput(params.artifactInput)
       const runtimeAuthority = this.runtime.registerOrchestrationCompatibilitySshAttachment(
         this.targetId,
         connectionIncarnation
@@ -1464,7 +1462,6 @@ export class SshRelaySession {
           cwd,
           env,
           ...(stdin !== undefined ? { stdin } : {}),
-          ...(artifactInput ? { artifactInput } : {}),
           runtimeAuthority
         })
       } finally {

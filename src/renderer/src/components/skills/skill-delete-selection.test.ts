@@ -26,14 +26,13 @@ function skill(overrides: Partial<DiscoveredSkill> & { id: string }): Discovered
 
 describe('delete selection', () => {
   it('keeps two rows sharing a name independently selectable', () => {
-    // Share collapses duplicate names because two skills cannot publish under
-    // one name. Delete has no such constraint — these are two distinct files.
+    // Two distinct files, even though they share a name.
     const skills = [
       skill({ id: 'a', rootPath: '/home/.agents/skills' }),
       skill({ id: 'b', rootPath: '/repo/.claude/skills' })
     ]
     expect(eligibleDeleteSkillCount(skills)).toBe(2)
-    expect([...addDeletableSkillResults(new Set(), skills, skills)]).toEqual(['a', 'b'])
+    expect([...addDeletableSkillResults(new Set(), skills)]).toEqual(['a', 'b'])
   })
 
   it('excludes bundled and plugin rows from select-all', () => {
@@ -44,7 +43,7 @@ describe('delete selection', () => {
       skill({ id: 'd', sourceKind: 'repo' })
     ]
     expect(eligibleDeleteSkillCount(skills)).toBe(2)
-    expect([...addDeletableSkillResults(new Set(), skills, skills)]).toEqual(['a', 'd'])
+    expect([...addDeletableSkillResults(new Set(), skills)]).toEqual(['a', 'd'])
   })
 
   it('drops a selection whose row no longer exists after a rescan', () => {

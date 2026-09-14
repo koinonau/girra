@@ -232,18 +232,10 @@ export type GlobalSettings = {
   showTasksButton: boolean
   /** Only toggles the sidebar shortcut; Automations stay reachable from Settings/View menu. */
   showAutomationsButton?: boolean
-  /** Deprecated: Artifacts are always available. Use showArtifactsButton for sidebar visibility. */
-  artifactsEnabled?: boolean
-  /** Capability gate for agent-driven publishing; off until granted, enforced in main, not just the UI. */
-  artifactSharingEnabled?: boolean
-  /** Capability gate for agent/CLI skill publishing; manual reviewed publishing remains available. */
-  agentSkillSharingEnabled?: boolean
   /** How deep dispatched workers may nest. 1 = workers cannot dispatch sub-workers.
    *  Renderer-writable only: omitted from the SettingsUpdate RPC schema so a worker
    *  cannot raise its own cap via `orca settings update`. */
   nestedWorkerMaxDepth?: number
-  /** Only toggles the sidebar shortcut; Artifacts stay reachable from Settings. */
-  showArtifactsButton?: boolean
   /** Only toggles the sidebar shortcut; Skills stay reachable from Settings. */
   showSkillsButton?: boolean
   /** Only toggles the sidebar shortcut; Orca Mobile stays reachable from Settings. */
@@ -340,8 +332,6 @@ export type GlobalSettings = {
   skipCloseTerminalWithRunningProcessConfirm: boolean
   /** Why: deleting an automation also deletes its run history; keep this skip separate from worktree deletion. */
   skipDeleteAutomationConfirm: boolean
-  /** Why: deleting an artifact breaks a public link others may already hold; keep this skip separate from local deletions. */
-  skipDeleteArtifactConfirm: boolean
   /** Why: a Codex rate-limit reset spends a scarce credit on the live account; keep this skip separate from local confirmations. */
   skipCodexRateLimitResetConfirm: boolean
   /** Default preset in the new-workspace GitHub task view. */

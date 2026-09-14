@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { ORCA_BROWSER_BLANK_URL } from '../../../../../shared/constants'
 import {
+  browserFileUrlToAbsolutePath,
   getBrowserDisplayTitle,
   getBrowserPageRuntimeEnvironmentId,
   getNotebookPathFromBrowserUrl,
@@ -12,6 +13,17 @@ import {
 import type { BrowserPage as BrowserPageState } from '../../../../../shared/browser-workspace-types'
 
 describe('browser page URL display', () => {
+  it('converts file URLs to absolute paths across path flavors', () => {
+    expect(browserFileUrlToAbsolutePath('file:///tmp/Design%20Review.html')).toBe(
+      '/tmp/Design Review.html'
+    )
+    expect(browserFileUrlToAbsolutePath('file:///C:/repo/report.HTM')).toBe('C:\\repo\\report.HTM')
+    expect(browserFileUrlToAbsolutePath('file://server/share/report.html')).toBe(
+      '\\\\server\\share\\report.html'
+    )
+    expect(browserFileUrlToAbsolutePath('https://example.com/report.html')).toBeNull()
+  })
+
   it('maps the blank-tab sentinel to about:blank and redacts Kagi session tokens', () => {
     expect(toDisplayUrl(ORCA_BROWSER_BLANK_URL)).toBe('about:blank')
     expect(toDisplayUrl('https://kagi.com/search?q=a&token=secret')).not.toContain('secret')

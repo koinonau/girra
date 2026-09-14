@@ -3810,8 +3810,6 @@
           "08a321a984": "Ninguna skill coincide con la búsqueda y los filtros actuales.",
           "cd7893fbc1": "Analizando skills",
           "35b9a724a0": "Disponible",
-          "c13b82793c": "Gestionar instalaciones",
-          "aee7b99cc6": "Instalar desde un enlace",
           "filterProvider": "Filtrar por agente",
           "filterSource": "Filtrar por origen",
           "allSources": "Todo",
@@ -3819,16 +3817,9 @@
           "closeSkills": "Cerrar skills",
           "closeTooltip": "Cerrar · Esc",
           "moreActions": "Más acciones",
-          "sharedLinks": "Enlaces compartidos",
           "emptyCopy": "Las carpetas de skills analizadas están vacías. Instala un paquete compartido o actualiza después de añadir una skill.",
           "retry": "Reintentar",
-          "remoteShareNotice": "Estas skills están en {{host}}. Abre Skills en esa máquina para compartirlas.",
-          "viewSwitch": "Mostrar",
-          "searchLinks": "Buscar enlaces",
           "deleteSkills": "Eliminar skills…"
-        },
-        "SkillShareSelectionControls": {
-          "01c5a15e02": "Compartir skills"
         },
         "SkillRow": {
           "updatedUnknown": "Sin fecha",
@@ -3861,15 +3852,9 @@
           "skillOther": "{{count}} skills",
           "sourceOne": "{{count}} origen",
           "sourceOther": "{{count}} orígenes",
-          "fileOne": "{{count}} archivo",
-          "fileOther": "{{count}} archivos",
           "resultOne": "{{count}} resultado",
           "resultOther": "{{count}} resultados",
-          "selected": "{{count}} seleccionadas",
-          "shareOne": "Compartir {{count}} skill",
-          "shareOther": "Compartir {{count}} skills",
-          "linkOne": "{{count}} enlace",
-          "linkOther": "{{count}} enlaces"
+          "selected": "{{count}} seleccionadas"
         },
         "filter": {
           "allAgents": "Todos los agentes",
@@ -3878,7 +3863,6 @@
         "SkillsSelectionHeader": {
           "exit": "Salir de la selección",
           "exitTooltip": "Salir de la selección · Esc",
-          "title": "Seleccionar skills para compartir",
           "selectAll": "Seleccionar las {{count}} aptas",
           "clear": "Borrar",
           "deleteTitle": "Seleccionar skills para eliminar"
@@ -14271,13 +14255,6 @@
         "pendingChip": "{{value0}} pendiente",
         "needsActionChip": "{{value0}} requiere acción",
         "unresolvedChip": "{{value0}} sin resolver"
-      },
-      "artifacts": {
-        "ArtifactsPage": {
-          "deleteTitle": "¿Eliminar el artefacto?",
-          "deleteDescription": "“{{name}}” ya no estará disponible en su enlace público.",
-          "delete": "Eliminar"
-        }
       },
       "ComposerParentWorktreePicker": {
         "label": "Worktree padre",

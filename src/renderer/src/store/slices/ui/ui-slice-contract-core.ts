@@ -111,7 +111,6 @@ export type UiViewHistory =
   | 'automations'
   | 'space'
   | 'skills'
-  | 'artifacts'
   | 'mobile'
 
 export type UISliceCore = {
@@ -147,7 +146,6 @@ export type UISliceCore = {
   previousViewBeforeSpace: Exclude<UiViewHistory, 'space'>
   previousViewBeforeSkills: Exclude<UiViewHistory, 'skills'>
   previousViewBeforeMobile: Exclude<UiViewHistory, 'mobile'>
-  previousViewBeforeArtifacts: Exclude<UiViewHistory, 'artifacts'>
   setActiveView: (view: UISliceCore['activeView']) => void
   taskPageData: TaskPageData
   taskResumeState: TaskResumeState | undefined
@@ -180,15 +178,6 @@ export type UISliceCore = {
   closeSpacePage: () => void
   openSkillsPage: () => void
   closeSkillsPage: () => void
-  pendingSkillShareId: string | null
-  openSkillShare: (shareId: string) => void
-  clearPendingSkillShare: () => void
-  /** Set when another surface links straight to the page's shared-links view. */
-  pendingSkillsSharedView: boolean
-  openSkillsSharedLinks: () => void
-  clearPendingSkillsSharedView: () => void
-  openArtifactsPage: () => void
-  closeArtifactsPage: () => void
   openMobilePage: () => void
   closeMobilePage: () => void
   setNewWorkspaceDraft: (draft: NonNullable<UISliceCore['newWorkspaceDraft']>) => void

@@ -9,11 +9,8 @@ import {
   type SkillSelectionPolicy
 } from './skill-selection'
 
-/** No collision key: two rows named `foo` from different roots are two distinct
- *  skills, and both must be independently selectable and reportable. */
 const DELETE_SELECTION_POLICY: SkillSelectionPolicy = {
   isEligible: (skill) => skillDeletionEligibility(skill).deletable,
-  collisionKey: () => null,
   maxSelection: MAX_SKILL_DELETE_BATCH
 }
 
@@ -34,10 +31,9 @@ export function eligibleDeleteSkillCount(results: readonly DiscoveredSkill[]): n
 
 export function addDeletableSkillResults(
   current: ReadonlySet<string>,
-  skills: readonly DiscoveredSkill[],
   results: readonly DiscoveredSkill[]
 ): Set<string> {
-  return addSelectableSkillResults(current, skills, results, DELETE_SELECTION_POLICY)
+  return addSelectableSkillResults(current, results, DELETE_SELECTION_POLICY)
 }
 
 export function retainedDeletableSkillSelection(
