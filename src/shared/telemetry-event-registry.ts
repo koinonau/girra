@@ -6,7 +6,6 @@ import {
   appStarredOrcaSchema,
   featureInteractionUsageBucketReachedSchema,
   repoAddedSchema,
-  starNagOutcomeEventSchema,
   workspaceCreatedSchema
 } from './telemetry-app-event-schemas'
 import {
@@ -99,7 +98,6 @@ import {
 export const eventSchemas = {
   app_opened: appOpenedSchema,
   app_starred_orca: appStarredOrcaSchema,
-  star_nag_outcome: starNagOutcomeEventSchema,
   feature_interaction_usage_bucket_reached: featureInteractionUsageBucketReachedSchema,
 
   repo_added: repoAddedSchema,
