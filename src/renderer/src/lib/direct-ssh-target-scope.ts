@@ -34,6 +34,10 @@ function newHostEvidence(): HostEvidence {
   return { hosts: new Set(), ambiguous: false, contradictory: false }
 }
 
+function isUnambiguouslyOwnedBy(evidence: HostEvidence, host: ExecutionHostId): boolean {
+  return !evidence.ambiguous && !evidence.contradictory && evidence.hosts.has(host)
+}
+
 function addHostEvidence(evidence: HostEvidence, rawHostId: string | null | undefined): void {
   if (!rawHostId?.trim()) {
     return
@@ -235,26 +239,13 @@ export function resolveDirectSshTargetScope(
   const expectedHost = toSshExecutionHostId(input.targetId)
   const repoRowsById = indexDirectSshOwnerRows(input.repos)
   const gitRepos: DirectSshGitRepoRef[] = []
-  let ambiguousOwnerCount = 0
-  let contradictoryOwnerCount = 0
 
   for (const [repoId, rows] of repoRowsById) {
-    const matchingRows = rows.filter((repo) => {
-      const evidence = resolveRepoEvidence(repo)
-      if (evidence.contradictory) {
-        contradictoryOwnerCount++
-        return false
-      }
-      if (evidence.ambiguous) {
-        ambiguousOwnerCount++
-        return false
-      }
-      return evidence.hosts.has(expectedHost)
-    })
+    const matchingRows = rows.filter((repo) =>
+      isUnambiguouslyOwnedBy(resolveRepoEvidence(repo), expectedHost)
+    )
     if (matchingRows.length === 1) {
       gitRepos.push({ repoId, executionHostId: expectedHost })
-    } else if (matchingRows.length > 1) {
-      ambiguousOwnerCount++
     }
   }
 
@@ -263,11 +254,7 @@ export function resolveDirectSshTargetScope(
   const lineageWorkspaceKeys = new Set<ReturnType<typeof worktreeWorkspaceKey>>()
   for (const [worktreeId, rows] of collectWorktreeRows(input)) {
     const evidence = resolveWorktreeEvidence(input, rows, repoRowsById)
-    if (evidence.contradictory) {
-      contradictoryOwnerCount++
-    } else if (evidence.ambiguous || evidence.hosts.size === 0) {
-      ambiguousOwnerCount++
-    } else if (evidence.hosts.has(expectedHost)) {
+    if (isUnambiguouslyOwnedBy(evidence, expectedHost)) {
       gitWorktreeIds.add(worktreeId)
       terminalWorkspaceKeys.add(worktreeId)
       lineageWorkspaceKeys.add(worktreeWorkspaceKey(worktreeId))
@@ -277,21 +264,12 @@ export function resolveDirectSshTargetScope(
   const folderRowsById = indexDirectSshOwnerRows(input.folderWorkspaces ?? [])
   const groupRowsById = indexDirectSshOwnerRows(input.projectGroups ?? [])
   for (const [folderId, rows] of folderRowsById) {
-    if (rows.length !== 1) {
-      ambiguousOwnerCount++
-      continue
-    }
     const groupRows = groupRowsById.get(rows[0].projectGroupId) ?? []
-    if (groupRows.length > 1) {
-      ambiguousOwnerCount++
+    if (rows.length !== 1 || groupRows.length > 1) {
       continue
     }
     const evidence = resolveFolderEvidence(input, rows[0], groupRows[0])
-    if (evidence.contradictory) {
-      contradictoryOwnerCount++
-    } else if (evidence.ambiguous || evidence.hosts.size === 0) {
-      ambiguousOwnerCount++
-    } else if (evidence.hosts.has(expectedHost)) {
+    if (isUnambiguouslyOwnedBy(evidence, expectedHost)) {
       const workspaceKey = folderWorkspaceKey(folderId)
       terminalWorkspaceKeys.add(workspaceKey)
       lineageWorkspaceKeys.add(workspaceKey)
@@ -303,8 +281,6 @@ export function resolveDirectSshTargetScope(
     gitRepos,
     gitWorktreeIds,
     terminalWorkspaceKeys,
-    lineageWorkspaceKeys,
-    ambiguousOwnerCount,
-    contradictoryOwnerCount
+    lineageWorkspaceKeys
   }
 }

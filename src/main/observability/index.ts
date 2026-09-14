@@ -199,9 +199,7 @@ export function getDiagnosticsStatus(): DiagnosticsStatus {
 
 /** Collect a bundle from the live trace folder. The `appVersion` /
  *  `platform` / `arch` / `osRelease` / `orcaChannel` inputs come from main
- *  and are baked into the bundle header. NEVER pass `install_id` here —
- *  the bundle's identity is the per-bundle submission ID, not the
- *  PostHog-lane install_id (Issue 8 in the security review). */
+ *  and are baked into the bundle header. */
 export function collectDiagnosticBundle(
   meta: Pick<
     CollectBundleOptions,

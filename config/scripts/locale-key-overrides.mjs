@@ -83,11 +83,6 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     zh: '入门清单',
     ja: 'オンボーディングチェックリスト'
   },
-  'auto.hooks.useSettingsNavigationMetadata.3618579df6': {
-    ko: '개인정보 및 텔레메트리',
-    zh: '隐私与遥测',
-    ja: 'プライバシーとテレメトリ'
-  },
   'auto.hooks.useSettingsNavigationMetadata.65b19f5bde': {
     ko: '플로팅 워크스페이스',
     zh: '浮动工作区',
@@ -127,16 +122,6 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     ko: '단축키 입력 대기 중',
     zh: '正在录制快捷键',
     ja: 'ショートカットを記録中'
-  },
-  'auto.components.FirstLaunchBanner.fc5cc29955': {
-    ko: '거부',
-    zh: '退出',
-    ja: 'オプトアウト'
-  },
-  'auto.components.FirstLaunchBanner.94cc673726': {
-    ko: '확인',
-    zh: '知道了',
-    ja: '了解'
   },
   'auto.components.GitHubItemDialog.55962099bc': {
     ko: '이 이슈를 열었습니다',

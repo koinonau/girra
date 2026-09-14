@@ -19,7 +19,6 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
     contextualTourShownThisSession: false,
     contextualToursOnboardingVisible: false,
     contextualToursBlockingSurfaceVisible: false,
-    lastCompletedContextualTourId: null,
     setContextualToursAutoEligible: (eligible) =>
       set((s) => {
         if (s.contextualToursAutoEligible === eligible) {
@@ -42,7 +41,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           ? s
           : { contextualToursBlockingSurfaceVisible: visible }
       ),
-    requestContextualTour: (id, source, _wasFeaturePreviouslyInteracted, options) =>
+    requestContextualTour: (id, source, options) =>
       set((s) => {
         const tour = getContextualTour(id)
         const decision = getContextualTourRequestDecision({
@@ -66,8 +65,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourSource: source,
           activeContextualTourSourceDetached: false,
           activeContextualTourSuppressed: false,
-          contextualTourShownThisSession: true,
-          lastCompletedContextualTourId: null
+          contextualTourShownThisSession: true
         }
       }),
     suppressContextualTour: (id, source) =>
@@ -146,8 +144,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourStepIndex: 0,
           activeContextualTourSource: null,
           activeContextualTourSourceDetached: false,
-          activeContextualTourSuppressed: false,
-          lastCompletedContextualTourId: null
+          activeContextualTourSuppressed: false
         }
       })
     },
@@ -169,8 +166,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourStepIndex: 0,
           activeContextualTourSource: null,
           activeContextualTourSourceDetached: false,
-          activeContextualTourSuppressed: false,
-          lastCompletedContextualTourId: tourId ?? null
+          activeContextualTourSuppressed: false
         }
       })
     },
@@ -188,7 +184,6 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourSource: null,
           activeContextualTourSourceDetached: false,
           activeContextualTourSuppressed: false,
-          lastCompletedContextualTourId: null,
           contextualTourShownThisSession: alreadyShown ? s.contextualTourShownThisSession : false
         }
       }),

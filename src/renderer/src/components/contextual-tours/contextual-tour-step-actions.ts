@@ -10,7 +10,7 @@ export function performContextualTourStepAction(args: {
   detachContextualTourSource: () => void
   setSidebarOpen: (open: boolean) => void
   openTaskPage: () => void
-  openModal: (modal: 'setup-guide', data?: Record<string, unknown>) => void
+  openModal: (modal: 'setup-guide') => void
   openClientHostedBrowserSettings: () => void
   openWorkspaceComposer: () => void
   dispatchTerminalPaneSplit: (detail: RequestActiveTerminalPaneSplitDetail) => void
@@ -58,7 +58,7 @@ export function performContextualTourStepAction(args: {
     case 'open-getting-started':
       args.finishTour()
       args.schedule(() => {
-        args.openModal('setup-guide', { telemetrySource: 'contextual_tour' })
+        args.openModal('setup-guide')
       })
       return
     case 'open-client-hosted-browser-settings':

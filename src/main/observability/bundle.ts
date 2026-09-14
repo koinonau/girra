@@ -1,10 +1,5 @@
-// Diagnostic bundle collection + upload (Mode 3, telemetry-error-tracking.md): the one
-// user-initiated network path from the error-tracking lane to Orca infra. The per-bundle
-// submission ID NEVER carries install_id (security-review Issue 8), and main retains the
-// uploadable payload so a compromised renderer can't substitute bytes after preview.
-// Server endpoint contract lives in telemetry-error-tracking.md §Endpoint contract; we
-// ship only the client, with the hardening invariants it controls (content-type pinning,
-// upload body-size cap, token-handling discipline).
+// Local diagnostic bundle collection. Main retains the payload so a compromised renderer
+// can't substitute bytes after preview.
 
 import { randomBytes } from 'node:crypto'
 import { readFileSync, statSync } from 'node:fs'
@@ -29,7 +24,7 @@ export type CollectBundleOptions = {
 }
 
 export type CollectedBundle = {
-  /** 128-bit unguessable base64url ID. NOT the install_id — bundles are join-incompatible with the PostHog lane. */
+  /** 128-bit unguessable base64url ID. Never an install id. */
   readonly bundleSubmissionId: string
   /** UTF-8 NDJSON payload — header line + N redacted span lines. */
   readonly payload: string

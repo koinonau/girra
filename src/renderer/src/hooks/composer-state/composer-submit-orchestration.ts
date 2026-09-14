@@ -42,8 +42,7 @@ export function useComposerSubmitOrchestration(
     setCreateError: target.asyncComposerState.setCreateError,
     setCreating: target.asyncComposerState.setCreating,
     settings: target.composerTargetStore.settings,
-    taskSourceContext: target.sourceContextState.taskSourceContext,
-    telemetrySource: target.composerTargetStore.telemetrySource
+    taskSourceContext: target.sourceContextState.taskSourceContext
   })
   const fullSubmitSourcePreparation = useFullSubmitSourcePreparation({
     agentPrompt: target.sourceContextState.agentPrompt,
@@ -84,7 +83,6 @@ export function useComposerSubmitOrchestration(
     selectedRepoStartupShell: target.runtimeTargetSelection.selectedRepoStartupShell,
     settings: target.composerTargetStore.settings,
     smartNameMode: target.workspaceIdentityState.smartNameMode,
-    telemetrySource: target.composerTargetStore.telemetrySource,
     tuiAgent: target.workspaceIdentityState.tuiAgent
   })
   const fullCreationExecution = useFullCreationExecution({
@@ -108,7 +106,6 @@ export function useComposerSubmitOrchestration(
     setSidebarOpen: target.composerTargetStore.setSidebarOpen,
     sparseEnabled: target.asyncComposerState.sparseEnabled,
     taskSourceContext: target.sourceContextState.taskSourceContext,
-    telemetrySource: target.composerTargetStore.telemetrySource,
     tuiAgent: target.workspaceIdentityState.tuiAgent
   })
   const fullSubmitOrchestration = useFullSubmitOrchestration({
@@ -215,8 +212,7 @@ export function useComposerSubmitOrchestration(
     selectedWorkspaceTarget: target.runtimeTargetSelection.selectedWorkspaceTarget,
     settings: target.composerTargetStore.settings,
     sparseEnabled: target.asyncComposerState.sparseEnabled,
-    taskSourceContext: target.sourceContextState.taskSourceContext,
-    telemetrySource: target.composerTargetStore.telemetrySource
+    taskSourceContext: target.sourceContextState.taskSourceContext
   })
   const quickSubmitAction = useQuickSubmitAction({
     effectiveLinkedPR: target.derivedComposerState.effectiveLinkedPR,

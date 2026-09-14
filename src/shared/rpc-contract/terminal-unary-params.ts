@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { OptionalFiniteNumber, OptionalString, requiredString } from './rpc-param-primitives'
 import { isTuiAgent } from '../tui-agent-config'
-import { TERMINAL_PANE_SPLIT_SOURCES } from '../feature-education-telemetry'
 
 export const TerminalHandle = z.object({
   terminal: requiredString('Missing terminal handle'),
@@ -190,8 +189,7 @@ export const TerminalSplit = TerminalHandle.extend({
     .pipe(z.union([z.enum(['vertical', 'horizontal']), z.undefined()]))
     .optional(),
   command: OptionalString,
-  env: z.record(z.string(), z.string()).optional(),
-  telemetrySource: z.enum(TERMINAL_PANE_SPLIT_SOURCES).optional()
+  env: z.record(z.string(), z.string()).optional()
 })
 
 export const TerminalStop = z.object({

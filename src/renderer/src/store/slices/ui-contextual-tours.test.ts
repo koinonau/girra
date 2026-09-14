@@ -199,7 +199,7 @@ describe('createUISlice contextual tours', () => {
 
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -221,7 +221,7 @@ describe('createUISlice contextual tours', () => {
 
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -299,7 +299,7 @@ describe('createUISlice contextual tours', () => {
     setMock.mockClear()
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -329,7 +329,7 @@ describe('createUISlice contextual tours', () => {
     store.getState().hydratePersistedUI(makeAutoTourEligibleUI())
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -339,7 +339,6 @@ describe('createUISlice contextual tours', () => {
     expect(store.getState().activeContextualTourId).toBe('workspace-agent-sessions')
     expect(store.getState().activeContextualTourStepIndex).toBe(1)
     expect(store.getState().contextualToursSeenIds).toEqual([])
-    expect(store.getState().lastCompletedContextualTourId).toBeNull()
   })
 
   it('marks the active contextual tour suppressed when its owning source disables', () => {
@@ -400,7 +399,6 @@ describe('createUISlice contextual tours', () => {
 
     expect(store.getState().activeContextualTourId).toBeNull()
     expect(store.getState().contextualTourShownThisSession).toBe(false)
-    expect(store.getState().lastCompletedContextualTourId).toBeNull()
     expect(store.getState().contextualToursSeenIds).toEqual([])
     expect(setMock).not.toHaveBeenCalled()
   })
@@ -452,7 +450,6 @@ describe('createUISlice contextual tours', () => {
 
     expect(store.getState().activeContextualTourId).toBeNull()
     expect(store.getState().contextualToursSeenIds).toEqual<ContextualTourId[]>(['automations'])
-    expect(store.getState().lastCompletedContextualTourId).toBeNull()
     expect(setMock).toHaveBeenCalledWith({ contextualToursSeenIds: ['automations'] })
   })
 

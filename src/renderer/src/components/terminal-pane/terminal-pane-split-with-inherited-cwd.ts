@@ -1,4 +1,3 @@
-import type { TerminalPaneSplitSource } from '../../../../shared/feature-education-telemetry'
 import type { ManagedPane, PaneManager } from '@/lib/pane-manager/pane-manager'
 import { splitWebRuntimeTerminal } from '@/runtime/web-runtime-session'
 import type { PtyTransport } from './pty-transport'
@@ -15,11 +14,10 @@ export function splitTerminalPaneWithInheritedCwd(args: {
   fallbackCwd: string
   pane: ManagedPane
   direction: 'vertical' | 'horizontal'
-  source: TerminalPaneSplitSource
 }): void {
   const ptyId = args.paneTransports.get(args.pane.id)?.getPtyId() ?? null
   if (
-    splitWebRuntimeTerminal(ptyId, args.direction, args.source, {
+    splitWebRuntimeTerminal(ptyId, args.direction, {
       worktreeId: args.worktreeId,
       tabId: args.tabId,
       leafId: args.pane.leafId
@@ -33,11 +31,9 @@ export function splitTerminalPaneWithInheritedCwd(args: {
   }
   const cached = args.paneCwdMap.get(args.pane.id)
   if (cached?.confirmed && cached.cwd) {
-    const createdPane = manager.splitPane(args.pane.id, args.direction, { cwd: cached.cwd })
-    recordCreatedTerminalPaneSplit(createdPane, {
-      source: args.source,
-      direction: args.direction
-    })
+    recordCreatedTerminalPaneSplit(
+      manager.splitPane(args.pane.id, args.direction, { cwd: cached.cwd })
+    )
     return
   }
   const paneId = args.pane.id
@@ -49,9 +45,5 @@ export function splitTerminalPaneWithInheritedCwd(args: {
       sourcePtyId: ptyId,
       fallbackCwd: args.fallbackCwd
     })
-  const createdPane = manager.splitPane(paneId, args.direction, { cwdPromise })
-  recordCreatedTerminalPaneSplit(createdPane, {
-    source: args.source,
-    direction: args.direction
-  })
+  recordCreatedTerminalPaneSplit(manager.splitPane(paneId, args.direction, { cwdPromise }))
 }

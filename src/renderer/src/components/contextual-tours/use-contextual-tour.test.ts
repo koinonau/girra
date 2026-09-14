@@ -51,13 +51,11 @@ describe('createContextualTourInteractionSnapshot', () => {
 
     const snapshot = createContextualTourInteractionSnapshot({
       id: 'tasks',
-      featureInteractions: {},
       recordFeatureInteraction,
       recordFeatureInteractionForTour: true
     })
 
     expect(recordFeatureInteraction).toHaveBeenCalledWith('tasks')
-    expect(snapshot.wasPreviouslyInteracted).toBe(false)
     await expect(snapshot.persisted).resolves.toBeUndefined()
   })
 
@@ -67,54 +65,12 @@ describe('createContextualTourInteractionSnapshot', () => {
 
     const snapshot = createContextualTourInteractionSnapshot({
       id: 'floating-workspace',
-      featureInteractions: {
-        'floating-workspace': {
-          firstInteractedAt: 1,
-          interactionCount: 1
-        }
-      },
       recordFeatureInteraction,
       recordFeatureInteractionForTour: false,
-      featureInteractionPersisted: persisted,
-      wasFeaturePreviouslyInteracted: false
+      featureInteractionPersisted: persisted
     })
 
     expect(recordFeatureInteraction).not.toHaveBeenCalled()
-    expect(snapshot.wasPreviouslyInteracted).toBe(false)
-    expect(snapshot.persisted).toBe(persisted)
-  })
-
-  it('marks existing floating workspace users from the explicit pre-open snapshot', () => {
-    const snapshot = createContextualTourInteractionSnapshot({
-      id: 'floating-workspace',
-      featureInteractions: {},
-      recordFeatureInteraction: vi.fn(() => Promise.resolve()),
-      recordFeatureInteractionForTour: false,
-      wasFeaturePreviouslyInteracted: true
-    })
-
-    expect(snapshot.wasPreviouslyInteracted).toBe(true)
-  })
-
-  it('can record after hydration while preserving an explicit pre-open snapshot', () => {
-    const persisted = Promise.resolve()
-    const recordFeatureInteraction = vi.fn(() => persisted)
-
-    const snapshot = createContextualTourInteractionSnapshot({
-      id: 'floating-workspace',
-      featureInteractions: {
-        'floating-workspace': {
-          firstInteractedAt: 1,
-          interactionCount: 1
-        }
-      },
-      recordFeatureInteraction,
-      recordFeatureInteractionForTour: true,
-      wasFeaturePreviouslyInteracted: false
-    })
-
-    expect(recordFeatureInteraction).toHaveBeenCalledWith('floating-workspace')
-    expect(snapshot.wasPreviouslyInteracted).toBe(false)
     expect(snapshot.persisted).toBe(persisted)
   })
 })

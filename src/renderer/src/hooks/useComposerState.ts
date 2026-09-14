@@ -7,7 +7,6 @@ import {
 import type { GitHubWorkItem } from '../../../shared/github/work-item-types'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import type { TaskSourceContext } from '../../../shared/task-source-context'
-import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../shared/workspace-source'
 import type { WorkspaceStatus } from '../../../shared/worktree/types'
 import { normalizeExecutionHostId, type ExecutionHostId } from '../../../shared/execution-host'
 import { isWorkItemLookupText } from '@/lib/work-item-lookup-text'
@@ -45,7 +44,6 @@ export type UseComposerStateOptions = {
   isSubmissionCancelled?: () => boolean
   repoIdOverride?: string
   onRepoIdOverrideChange?: (value: string) => void
-  telemetrySource?: WorkspaceCreateTelemetrySource
   enableIssueAutomation?: boolean
   createGateMode?: 'full' | 'quick'
 }

@@ -94,9 +94,7 @@ describe('createDetectedAgentsSlice WSL context', () => {
     refreshAgents.mockReset().mockResolvedValue({
       agents: ['codex'],
       addedPathSegments: [],
-      shellHydrationOk: true,
-      pathSource: 'shell_hydrate',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     })
     detectRemoteAgents.mockReset().mockResolvedValue([])
     runtimeEnvironmentCall.mockReset().mockResolvedValue({
@@ -484,9 +482,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
     refreshAgents.mockReset().mockResolvedValue({
       agents: ['codex'],
       addedPathSegments: [],
-      shellHydrationOk: true,
-      pathSource: 'shell_hydrate',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     })
     detectRemoteAgents.mockReset().mockResolvedValue([])
     runtimeEnvironmentCall.mockReset().mockImplementation(({ method }: { method: string }) => {
@@ -681,9 +677,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
         result = {
           agents: ['claude', 'gemini'],
           addedPathSegments: [],
-          shellHydrationOk: true,
-          pathSource: 'shell_hydrate',
-          pathFailureReason: 'none'
+          shellHydrationOk: true
         }
       } else {
         result = ['codex']
@@ -768,9 +762,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
       result: {
         agents: ['kilo'],
         addedPathSegments: [],
-        shellHydrationOk: true,
-        pathSource: 'shell_hydrate',
-        pathFailureReason: 'none'
+        shellHydrationOk: true
       },
       _meta: { runtimeId: 'remote-runtime' }
     })

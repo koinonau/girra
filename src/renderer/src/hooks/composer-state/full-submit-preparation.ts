@@ -19,7 +19,6 @@ type FullSubmitPreparationInput = Pick<
   | 'selectedRepoStartupShell'
   | 'settings'
   | 'smartNameMode'
-  | 'telemetrySource'
   | 'tuiAgent'
 >
 
@@ -59,7 +58,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
     selectedRepoStartupShell,
     settings,
     smartNameMode,
-    telemetrySource,
     tuiAgent
   } = input
 
@@ -208,7 +206,7 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
       // Why: backend startup is safe only for self-contained launch commands; agents needing post-ready paste stay on the renderer path.
       const composerTelemetry: AgentLaunchMetadata = {
         agent_kind: tuiAgentToAgentKind(tuiAgent),
-        launch_source: telemetrySource === 'onboarding' ? 'onboarding' : 'new_workspace_composer',
+        launch_source: 'new_workspace_composer',
         request_kind: 'new'
       }
 
@@ -259,7 +257,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
       selectedRepoStartupShell,
       settings,
       smartNameMode,
-      telemetrySource,
       tuiAgent,
       branchAutoNameRef
     ]

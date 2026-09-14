@@ -13,7 +13,6 @@ import type {
   AgentProviderSessionMetadata,
   SleepingAgentLaunchConfig
 } from '../../shared/agent-session-resume'
-import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
 import type {
   RuntimeMobileSessionTabMove,
   RuntimeTerminalCreateRequestPayload,
@@ -157,7 +156,6 @@ export type UiCommandEventApi = {
       leafId?: string
       splitFromLeafId?: string
       splitDirection?: 'horizontal' | 'vertical'
-      splitTelemetrySource?: TerminalPaneSplitSource
     }) => void
   ) => () => void
   onRequestTerminalCreate: (
@@ -175,7 +173,6 @@ export type UiCommandEventApi = {
       command?: string
       worktreeId?: string
       sourceLeafId?: string
-      telemetrySource?: TerminalPaneSplitSource
       newLeafId?: string
     }) => void
   ) => () => void

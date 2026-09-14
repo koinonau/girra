@@ -29,31 +29,23 @@ export function mergeWebUIState(
   base: PersistedUIState,
   updates: Partial<PersistedUIState>
 ): PersistedUIState {
-  const { featureInteractionTelemetryBuckets: _reserved, ...safeUpdates } =
-    updates as Partial<PersistedUIState> & {
-      featureInteractionTelemetryBuckets?: unknown
-    }
-  void _reserved
   return {
     ...base,
-    ...safeUpdates,
-    workspaceCleanup: mergeWorkspaceCleanupUIState(
-      base.workspaceCleanup,
-      safeUpdates.workspaceCleanup
-    ),
+    ...updates,
+    workspaceCleanup: mergeWorkspaceCleanupUIState(base.workspaceCleanup, updates.workspaceCleanup),
     worktreeCardProperties: normalizeWorktreeCardProperties(
-      safeUpdates.worktreeCardProperties ?? base.worktreeCardProperties
+      updates.worktreeCardProperties ?? base.worktreeCardProperties
     ),
     _worktreeCardModeDefaulted:
-      safeUpdates._worktreeCardModeDefaulted ?? base._worktreeCardModeDefaulted,
+      updates._worktreeCardModeDefaulted ?? base._worktreeCardModeDefaulted,
     agentActivityDisplayMode: normalizeAgentActivityDisplayMode(
-      safeUpdates.agentActivityDisplayMode ?? base.agentActivityDisplayMode
+      updates.agentActivityDisplayMode ?? base.agentActivityDisplayMode
     ),
     usagePercentageDisplay: normalizeUsagePercentageDisplay(
-      safeUpdates.usagePercentageDisplay ?? base.usagePercentageDisplay
+      updates.usagePercentageDisplay ?? base.usagePercentageDisplay
     ),
     statusBarUsageMode: normalizeStatusBarUsageMode(
-      safeUpdates.statusBarUsageMode ?? base.statusBarUsageMode
+      updates.statusBarUsageMode ?? base.statusBarUsageMode
     )
   }
 }

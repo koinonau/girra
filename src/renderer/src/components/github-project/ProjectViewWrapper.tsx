@@ -109,7 +109,6 @@ function ProjectViewBody({
             item,
             repoId: dialogItem.workItem.repoId,
             launchSource: 'task_page',
-            telemetrySource: 'sidebar',
             openModalFallback: () => {
               if (item.url) {
                 void window.api.shell.openUrl(item.url)

@@ -1,9 +1,5 @@
 import { useEffect, useRef } from 'react'
 import type { ContextualTourId } from '../../../../shared/contextual-tours'
-import {
-  hasFeatureInteraction,
-  type FeatureInteractionState
-} from '../../../../shared/feature-interactions'
 import { useAppStore } from '@/store'
 
 const TOUR_SOURCES = {
@@ -20,21 +16,15 @@ const TOUR_SOURCES = {
 export type UseContextualTourOptions = {
   recordFeatureInteraction?: boolean | undefined
   featureInteractionPersisted?: Promise<void> | undefined
-  wasFeaturePreviouslyInteracted?: boolean | undefined
 }
 
 export function createContextualTourInteractionSnapshot(args: {
   id: ContextualTourId
-  featureInteractions: FeatureInteractionState
   recordFeatureInteraction: (id: ContextualTourId) => Promise<void>
   recordFeatureInteractionForTour: boolean
   featureInteractionPersisted?: Promise<void> | undefined
-  wasFeaturePreviouslyInteracted?: boolean | undefined
-}): { persisted: Promise<void>; wasPreviouslyInteracted: boolean } {
-  const wasPreviouslyInteracted =
-    args.wasFeaturePreviouslyInteracted ?? hasFeatureInteraction(args.featureInteractions, args.id)
+}): { persisted: Promise<void> } {
   return {
-    wasPreviouslyInteracted,
     persisted: args.recordFeatureInteractionForTour
       ? args.recordFeatureInteraction(args.id)
       : (args.featureInteractionPersisted ?? Promise.resolve())
@@ -59,8 +49,7 @@ export function useContextualTour(
 ): void {
   const {
     recordFeatureInteraction: shouldRecordFeatureInteraction = true,
-    featureInteractionPersisted,
-    wasFeaturePreviouslyInteracted
+    featureInteractionPersisted
   } = options
   const requestContextualTour = useAppStore((s) => s.requestContextualTour)
   const suppressContextualTour = useAppStore((s) => s.suppressContextualTour)
@@ -82,7 +71,6 @@ export function useContextualTour(
   const enabledInteractionSnapshotRef = useRef<{
     id: ContextualTourId
     source: string
-    wasPreviouslyInteracted: boolean
     persisted: Promise<void>
   } | null>(null)
 
@@ -99,20 +87,13 @@ export function useContextualTour(
     }
     const snapshot = createContextualTourInteractionSnapshot({
       id,
-      featureInteractions: useAppStore.getState().featureInteractions,
       recordFeatureInteraction,
       recordFeatureInteractionForTour: shouldRecordFeatureInteraction,
-      featureInteractionPersisted,
-      wasFeaturePreviouslyInteracted
+      featureInteractionPersisted
     })
-    enabledInteractionSnapshotRef.current = {
-      id,
-      source,
-      // Why: recording writes featureInteractions; subscribing here would
-      // retrigger this effect and repeatedly persist the same enabled source.
-      wasPreviouslyInteracted: snapshot.wasPreviouslyInteracted,
-      persisted: snapshot.persisted
-    }
+    // Why: recording writes featureInteractions; subscribing here would
+    // retrigger this effect and repeatedly persist the same enabled source.
+    enabledInteractionSnapshotRef.current = { id, source, persisted: snapshot.persisted }
   }, [
     enabled,
     featureInteractionPersisted,
@@ -120,8 +101,7 @@ export function useContextualTour(
     persistedUIReady,
     recordFeatureInteraction,
     shouldRecordFeatureInteraction,
-    source,
-    wasFeaturePreviouslyInteracted
+    source
   ])
 
   useEffect(() => {
@@ -201,17 +181,10 @@ export function useContextualTour(
         attempts += 1
         frame = window.requestAnimationFrame(() => {
           frame = null
-          const latestSnapshot = enabledInteractionSnapshotRef.current
           if (useAppStore.getState().contextualToursSeenIds.includes(id)) {
             return
           }
-          requestContextualTour(
-            id,
-            source,
-            latestSnapshot?.id === id && latestSnapshot.source === source
-              ? latestSnapshot.wasPreviouslyInteracted
-              : hasFeatureInteraction(useAppStore.getState().featureInteractions, id)
-          )
+          requestContextualTour(id, source)
         })
       })
     }

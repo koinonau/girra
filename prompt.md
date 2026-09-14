@@ -4,13 +4,12 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phases 0 to 2, Phases 3a (Orca cloud) and 3b (crash reporting), the ADRs and the harness deletion are done or in review.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 3, the ADRs and the harness deletion are done or in review.
 
-1. **Phase 3c, telemetry.** Delete telemetry call sites outright; keep `src/main/observability`. Map every call site with a read-only subagent first: about 140 production files and 200 test files reach it. Several "telemetry" fields drive real behaviour: terminal colour-query replies, the Windows focus guard, the nested-repo import guard. Move the general types out of `shared/telemetry-*` first. Unblocked once Phase 3b is merged.
+1. **Phase 4, minor agent CLIs.** Unblocked once Phase 3c is merged. Start at `managed-agent-hook-registry.ts`, but the agents also live in `TuiAgent`, `TUI_AGENT_CONFIG`, `AGENT_KIND_VALUES` in `shared/agent-kind.ts`, `AGENT_HOOK_TARGETS`, locale keys and reliability gates. Map them with a read-only subagent first.
 2. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 3. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
 4. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
-5. **Phase 4, minor agent CLIs.** Unblocked once Phase 3 is merged.
 
 ## Backlog
 
@@ -26,6 +25,8 @@ When a tracker exists, record its project, ready status, and transition IDs here
 4. While fixing, run `pnpm tc`, `pnpm lint`, `pnpm build` when a deleted module was a build entry, and only the tests that touch what changed: the callers found in step 2, plus `config/scripts` when workflows or lint config change. The full suite takes 13 to 22 minutes, so run it once, when the phase is otherwise done. Run everything through `mise exec --`, with `ORCA_BACKGROUND_LAUNCH=1` for tests, as `handover.md` lists. Read the pass and fail counts from the output, not the exit code of a pipeline. Rerun any newly failing test file alone before calling it a regression.
 5. Run the full `pnpm tc`, `pnpm test`, `pnpm lint` and `pnpm build`, and compare against the baseline in `handover.md`. A phase is done when typecheck, lint and build pass and only the baseline's known tests fail. Deleting a feature may remove known failures; record the new baseline when it does.
 6. Update `handover.md` and this file's "Start Here" in the same commit.
+
+When you split a phase across subagents, give each one disjoint file ownership, tell it to send its report to `main` with SendMessage, and tell it to format only the files it changed. Rerun `pnpm tc` yourself before committing its work.
 
 ## Commits
 

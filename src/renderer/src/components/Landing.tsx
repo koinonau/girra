@@ -68,7 +68,7 @@ function GitHubStarButton({
       return
     }
     setState('starred') // optimistic
-    const ok = await window.api.gh.starOrca('landing')
+    const ok = await window.api.gh.starOrca()
     if (!ok && mountedRef.current) {
       setState('web-fallback')
     }
@@ -284,7 +284,7 @@ export default function Landing(): React.JSX.Element {
 
             <button
               className="inline-flex items-center gap-1.5 bg-secondary/70 border border-border/80 text-foreground font-medium text-sm px-4 py-2 rounded-md cursor-pointer hover:bg-accent transition-colors"
-              onClick={() => openModal('new-workspace-composer', { telemetrySource: 'unknown' })}
+              onClick={() => openModal('new-workspace-composer')}
             >
               <GitBranchPlus className="size-3.5" />
               {translate('auto.components.Landing.76a95f7f47', 'Create')}{' '}

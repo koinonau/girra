@@ -161,10 +161,7 @@ export class DaemonTerminalAdmission {
       ...(result.launchAgent ? { launchAgent: result.launchAgent } : {}),
       wslDistro: result.wslDistro,
       ...(result.historySeeded !== undefined ? { historySeeded: result.historySeeded } : {}),
-      ...(result.agentSessionEnsure ? { agentSessionEnsure: result.agentSessionEnsure } : {}),
-      ...(result.cwdReadableByDaemon !== undefined
-        ? { cwdReadableByDaemon: result.cwdReadableByDaemon }
-        : {})
+      ...(result.agentSessionEnsure ? { agentSessionEnsure: result.agentSessionEnsure } : {})
     }
   }
 

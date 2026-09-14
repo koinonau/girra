@@ -1,16 +1,6 @@
 import { useAppStore } from '@/store'
-import type { TerminalPaneSplitSource } from '../../../../shared/feature-education-telemetry'
 
-export type TerminalPaneSplitCompletion = {
-  source: TerminalPaneSplitSource
-  direction: 'vertical' | 'horizontal'
-  telemetrySuppressed?: boolean
-}
-
-export function recordCreatedTerminalPaneSplit(
-  createdPane: unknown,
-  _completion: TerminalPaneSplitCompletion
-): boolean {
+export function recordCreatedTerminalPaneSplit(createdPane: unknown): boolean {
   if (!createdPane) {
     return false
   }

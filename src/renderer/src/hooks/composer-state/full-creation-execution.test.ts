@@ -84,7 +84,6 @@ describe('useFullCreationExecution cancellation', () => {
       setSidebarOpen: vi.fn<FullCreationExecutionInput['setSidebarOpen']>(),
       sparseEnabled: false,
       taskSourceContext: null,
-      telemetrySource: undefined,
       tuiAgent: 'claude'
     } satisfies FullCreationExecutionInput
     const hook = renderHook(() => useFullCreationExecution(state))

@@ -11,8 +11,7 @@
 
 // Why: for OSC-title detection only. Intentionally narrower than the full set
 // of launchable agents because short names like "amp" would classify ordinary
-// shell titles like "timestamp ready" as agent activity. Product telemetry uses
-// the explicit launch/session facts Orca owns, not this inference path.
+// shell titles like "timestamp ready" as agent activity.
 export const AGENT_NAMES = [
   'claude',
   'openclaude',

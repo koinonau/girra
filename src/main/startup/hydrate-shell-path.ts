@@ -1,6 +1,5 @@
 import { spawn } from 'node:child_process'
 import { delimiter, win32 as pathWin32 } from 'node:path'
-import type { ShellHydrationFailureReason } from '../../shared/shell-path-hydration-types'
 import { resolveWindowsShellStartupFamily } from '../../shared/windows-terminal-shell'
 import { WindowsShellPathOwnership, windowsPathSegmentKey } from './windows-shell-path-ownership'
 
@@ -34,7 +33,7 @@ export type HydrationResult =
   | {
       ok: false
       segments: []
-      failureReason: Exclude<ShellHydrationFailureReason, 'none'>
+      failureReason: 'no_shell' | 'timeout' | 'spawn_error' | 'empty_path'
     }
 
 let cached: Promise<HydrationResult> | null = null

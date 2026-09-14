@@ -1,5 +1,4 @@
 import type { TuiAgent } from '../../../shared/tui-agent'
-import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../shared/workspace-source'
 import type {
   CreateSparseCheckoutRequest,
   SetupDecision
@@ -72,7 +71,6 @@ export type WorktreeCreationRequest = {
   compareBaseRef?: string
   setupDecision: SetupDecision
   sparseCheckout?: CreateSparseCheckoutRequest
-  telemetrySource?: WorkspaceCreateTelemetrySource
   linkedIssue?: number
   linkedPR?: number
   pushTarget?: GitPushTarget

@@ -18,7 +18,6 @@ import type { FolderWorkspace } from '../../../../shared/folder-workspace-types'
 import type { ExecutionHostId } from '../../../../shared/execution-host'
 import type { TaskSourceContext } from '../../../../shared/task-source-context'
 import type { TuiAgent } from '../../../../shared/tui-agent'
-import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../../shared/workspace-source'
 
 export type ComposerStoreActions = {
   setNewWorkspaceDraft: (draft: NonNullable<UISlice['newWorkspaceDraft']>) => void
@@ -29,7 +28,6 @@ export type ComposerStoreActions = {
     baseBranch?: string,
     setupDecision?: SetupDecision,
     sparseCheckout?: CreateSparseCheckoutRequest,
-    telemetrySource?: WorkspaceCreateTelemetrySource,
     displayName?: string,
     linkedIssue?: number,
     linkedPR?: number,

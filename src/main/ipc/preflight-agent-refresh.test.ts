@@ -159,16 +159,12 @@ describe('preflight', () => {
       agents: string[]
       addedPathSegments: string[]
       shellHydrationOk: boolean
-      pathSource: string
-      pathFailureReason: string
     }
 
     expect(result).toEqual({
       agents: ['claude'],
       addedPathSegments: [],
-      shellHydrationOk: true,
-      pathSource: 'sync_seed_only',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     })
     expect(hydrateShellPathMock).not.toHaveBeenCalled()
     expect(mergePathSegmentsMock).not.toHaveBeenCalled()
@@ -206,16 +202,12 @@ describe('preflight', () => {
       agents: string[]
       addedPathSegments: string[]
       shellHydrationOk: boolean
-      pathSource: string
-      pathFailureReason: string
     }
 
     expect(result).toEqual({
       agents: ['opencode'],
       addedPathSegments: ['/Users/test/.opencode/bin'],
-      shellHydrationOk: true,
-      pathSource: 'shell_hydrate',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     })
     expect(hydrateShellPathMock).toHaveBeenCalledWith({ force: true })
   })
@@ -248,38 +240,13 @@ describe('preflight', () => {
       agents: string[]
       addedPathSegments: string[]
       shellHydrationOk: boolean
-      pathSource: string
-      pathFailureReason: string
     }
 
     expect(result.shellHydrationOk).toBe(false)
     expect(result.addedPathSegments).toEqual([])
     expect(result.agents).toEqual(['claude'])
-    // Why: drives the agent_picks `on_path:false` triage in dashboard 1562016.
-    // Without these fields we cannot distinguish "hydration failed" from
-    // "user genuinely doesn't have the binary."
-    expect(result.pathSource).toBe('sync_seed_only')
-    expect(result.pathFailureReason).toBe('timeout')
     // Why: when hydration fails, we must not call merge — nothing to merge —
     // otherwise we'd log a no-op "added 0 segments" event on every refresh.
     expect(mergePathSegmentsMock).not.toHaveBeenCalled()
   })
-
-  it.each(['no_shell', 'spawn_error', 'empty_path'] as const)(
-    'classifies pathFailureReason=%s when hydration reports it',
-    async (failureReason) => {
-      hydrateShellPathMock.mockResolvedValueOnce({ segments: [], ok: false, failureReason })
-      execFileAsyncMock.mockRejectedValue(new Error('not found'))
-
-      registerPreflightHandlers()
-
-      const result = (await handlers['preflight:refreshAgents']()) as {
-        pathSource: string
-        pathFailureReason: string
-      }
-
-      expect(result.pathSource).toBe('sync_seed_only')
-      expect(result.pathFailureReason).toBe(failureReason)
-    }
-  )
 })

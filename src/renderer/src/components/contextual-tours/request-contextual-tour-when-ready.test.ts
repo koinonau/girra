@@ -40,7 +40,6 @@ describe('requestContextualTourWhenReady', () => {
     expect(requestContextualTour).toHaveBeenLastCalledWith(
       'workspace-agent-sessions',
       'setup_guide_parallel_work',
-      undefined,
       { force: true }
     )
   })
@@ -104,7 +103,6 @@ describe('requestContextualTourWhenReady', () => {
     expect(requestContextualTour).toHaveBeenLastCalledWith(
       'workspace-creation',
       'workspace_creation_modal',
-      undefined,
       { force: true }
     )
   })

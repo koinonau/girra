@@ -29,7 +29,6 @@ type QuickCreationExecutionInput = Pick<
   | 'settings'
   | 'sparseEnabled'
   | 'taskSourceContext'
-  | 'telemetrySource'
 >
 
 import { useCallback } from 'react'
@@ -76,8 +75,7 @@ export function useQuickCreationExecution(input: QuickCreationExecutionInput) {
     selectedWorkspaceTarget,
     settings,
     sparseEnabled,
-    taskSourceContext,
-    telemetrySource
+    taskSourceContext
   } = input
 
   const executeQuickCreation = useCallback(
@@ -138,8 +136,7 @@ export function useQuickCreationExecution(input: QuickCreationExecutionInput) {
         repoConnectionId: selectedRepo.connectionId,
         platform: selectedRepoAgentLaunchPlatform,
         shell: selectedRepoStartupShell,
-        isRemote: selectedRepoIsRemote,
-        telemetrySource
+        isRemote: selectedRepoIsRemote
       })
 
       const startupPolicySettlement = await settleComposerSubmit(
@@ -232,7 +229,6 @@ export function useQuickCreationExecution(input: QuickCreationExecutionInput) {
         setupDecision: effectiveSetupDecision,
         sparseDirectories: selectedRepoIsGit && sparseEnabled ? normalizedSparseDirectories : null,
         sparsePresetId: effectivePresetId,
-        telemetrySource,
         linkedIssue: submitLinkedIssueNumber,
         linkedPR: submitLinkedPR,
         pushTarget: submitPushTarget,
@@ -302,8 +298,7 @@ export function useQuickCreationExecution(input: QuickCreationExecutionInput) {
       selectedWorkspaceTarget,
       settings,
       sparseEnabled,
-      taskSourceContext,
-      telemetrySource
+      taskSourceContext
     ]
   )
 

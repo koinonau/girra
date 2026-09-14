@@ -1,6 +1,5 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { OrcaRuntimeWithStopExplicitlyClosedTabPtys } from './orca-runtime-stop-explicitly-closed-tab-ptys'
-import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
 import type { RuntimeTerminalSplit } from '../../shared/runtime-types'
 import { randomUUID } from 'node:crypto'
 
@@ -16,7 +15,6 @@ export class OrcaRuntimeWithSplitTerminal extends OrcaRuntimeWithStopExplicitlyC
       // Why: same split as createTerminal — adopt the pane without revealing its
       // workspace, for splits the user never asked to see.
       surfaceOwner?: false
-      telemetrySource?: TerminalPaneSplitSource
     } = {}
   ): Promise<RuntimeTerminalSplit> {
     const livePty = this.getLivePtyForHandle(handle)
@@ -34,7 +32,6 @@ export class OrcaRuntimeWithSplitTerminal extends OrcaRuntimeWithStopExplicitlyC
       command: opts.command,
       worktreeId: leaf.worktreeId,
       sourceLeafId: leaf.leafId,
-      telemetrySource: opts.telemetrySource,
       newLeafId
     })
 

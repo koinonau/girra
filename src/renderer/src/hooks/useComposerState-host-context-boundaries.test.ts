@@ -245,9 +245,7 @@ describe('useComposerState host-context boundaries', () => {
 
     const submitSection = COMPOSER_SOURCE.folderSubmit
     expect(submitSection).toContain('isRemote: folderTargetIsRemote')
-    expect(submitSection).toContain(
-      "launchSource: telemetrySource === 'onboarding' ? 'onboarding' : 'new_workspace_composer'"
-    )
+    expect(submitSection).toContain("launchSource: 'new_workspace_composer'")
     expect(submitSection).toContain('runtimeEnvironmentId: folderTargetRuntimeEnvironmentId')
   })
 

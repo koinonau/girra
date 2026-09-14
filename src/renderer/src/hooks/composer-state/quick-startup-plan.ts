@@ -22,7 +22,6 @@ export type QuickComposerStartupInput = {
   platform: NodeJS.Platform
   shell: AgentStartupShell | null | undefined
   isRemote: boolean
-  telemetrySource: WorktreeCreationRequest['telemetrySource']
 }
 
 export type QuickComposerStartup = {
@@ -102,8 +101,7 @@ export function buildQuickComposerStartup(input: QuickComposerStartupInput): Qui
       ? null
       : {
           agent_kind: tuiAgentToAgentKind(agent),
-          launch_source:
-            input.telemetrySource === 'onboarding' ? 'onboarding' : 'new_workspace_composer',
+          launch_source: 'new_workspace_composer',
           request_kind: 'new'
         }
   const backendStartup =

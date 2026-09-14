@@ -122,13 +122,7 @@ function ensureFixture(fixtureDir) {
         externalWorktreeVisibility: 'show'
       }
     ],
-    settings: {
-      telemetry: {
-        installId: 'main-thread-jank-bench',
-        optedIn: false,
-        existedBeforeTelemetryRelease: true
-      }
-    },
+    settings: {},
     ui: {
       lastActiveRepoId: repoId,
       lastActiveWorktreeId: worktreeId,

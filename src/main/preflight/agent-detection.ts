@@ -5,10 +5,6 @@
  * dragging `ipcMain` into its module graph. The Electron handler registration
  * stays in `ipc/preflight.ts` and imports from here.
  */
-import type {
-  PathSource,
-  ShellHydrationFailureReason
-} from '../../shared/shell-path-hydration-types'
 import { hydrateShellPath, mergePathSegments } from '../startup/hydrate-shell-path'
 import { getAzureDevOpsAuthStatus } from '../azure-devops/client'
 import { getBitbucketAuthStatus } from '../bitbucket/client'
@@ -190,14 +186,6 @@ export type RefreshAgentsResult = {
   addedPathSegments: string[]
   /** True when the shell spawn succeeded. False = relied on existing PATH. */
   shellHydrationOk: boolean
-  /** Whether `detectInstalledAgents` ran against shell-hydrated PATH or only
-   *  the seed list from `patchPackagedProcessPath`. Drives the on_path:false
-   *  triage in tile A on dashboard 1562016. */
-  pathSource: PathSource
-  /** Why hydration failed (or `'none'` on success). Typed against the shared
-   *  alias so the IPC boundary stays in lockstep with the renderer-visible
-   *  enum on `onboardingAgentPickedSchema`. */
-  pathFailureReason: ShellHydrationFailureReason
 }
 
 /**
@@ -220,9 +208,7 @@ export async function refreshShellPathAndDetectAgents(
     return {
       agents,
       addedPathSegments: [],
-      shellHydrationOk: true,
-      pathSource: 'sync_seed_only',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     }
   }
 
@@ -232,9 +218,7 @@ export async function refreshShellPathAndDetectAgents(
   return {
     agents,
     addedPathSegments: added,
-    shellHydrationOk: hydration.ok,
-    pathSource: hydration.ok ? 'shell_hydrate' : 'sync_seed_only',
-    pathFailureReason: hydration.failureReason
+    shellHydrationOk: hydration.ok
   }
 }
 

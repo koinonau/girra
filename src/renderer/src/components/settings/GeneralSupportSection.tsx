@@ -69,7 +69,7 @@ export function GeneralSupportSection({
       return
     }
     setStarState('starring')
-    const ok = await window.api.gh.starOrca('settings')
+    const ok = await window.api.gh.starOrca()
     if (!ok) {
       if (mountedRef.current) {
         setStarState('web-fallback')

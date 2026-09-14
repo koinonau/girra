@@ -64,7 +64,6 @@ export const NEVER_TRANSLATE_VALUES = new Set([
   'OpenCode Go',
   'Orca',
   'Pi',
-  'PostHog',
   'Qwen Code',
   'Rovo Dev',
   'Markdown',

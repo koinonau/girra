@@ -204,9 +204,7 @@ export const createLocalDetectedAgentState: LocalDetectedAgentStateCreator = (se
               ...(exposeToLegacy
                 ? {
                     detectedAgentIds: typed,
-                    isRefreshingAgents: false,
-                    pathSource: result.pathSource,
-                    pathFailureReason: result.pathFailureReason
+                    isRefreshingAgents: false
                   }
                 : {}),
               localDetectedAgentIdsByContext: {

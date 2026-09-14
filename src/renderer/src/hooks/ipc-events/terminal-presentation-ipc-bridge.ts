@@ -42,8 +42,7 @@ export function registerTerminalPresentationIpcBridge(unsubs: (() => void)[]): v
         tabId,
         leafId,
         splitFromLeafId,
-        splitDirection,
-        splitTelemetrySource
+        splitDirection
       }) => {
         try {
           const store = useAppStore.getState()
@@ -155,7 +154,6 @@ export function registerTerminalPresentationIpcBridge(unsubs: (() => void)[]): v
               // Why: runtime split PTYs already carry the parent tab's paneKey, so reuse the tab instead of minting a collision tab.
               store.updateTabPtyId(tab.id, ptyId)
               const existingLayout = store.terminalLayoutsByTabId?.[tab.id]
-              const sourcePtyId = existingLayout?.ptyIdsByLeafId?.[splitFromLeafId]
               store.setTabLayout(
                 tab.id,
                 addSplitLeafToLayout(
@@ -176,8 +174,6 @@ export function registerTerminalPresentationIpcBridge(unsubs: (() => void)[]): v
                     paneRuntimeId: -1,
                     direction: splitDirection ?? 'horizontal',
                     sourceLeafId: splitFromLeafId,
-                    sourcePtyId,
-                    telemetrySource: splitTelemetrySource,
                     newLeafId: leafId,
                     ptyId
                   }

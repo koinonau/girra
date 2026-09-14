@@ -8,7 +8,6 @@ import type {
   Worktree
 } from '../../shared/worktree/types'
 import type { TuiAgent } from '../../shared/tui-agent'
-import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../shared/workspace-source'
 import type { WorktreeStartupLaunch } from '../../shared/worktree/launch-types'
 import type { TaskSourceContext } from '../../shared/task-source-context'
 import type { WorktreeStartupDraftPaste } from './runtime-worktree-agent-startup'
@@ -37,7 +36,6 @@ export type RuntimeManagedWorktreeCreateArgs = {
   comment?: string
   displayName?: string
   displayNameKind?: CreateWorktreeArgs['displayNameKind']
-  telemetrySource?: WorkspaceCreateTelemetrySource
   workspaceStatus?: string
   manualOrder?: number
   sparseCheckout?: { directories: string[]; presetId?: string }

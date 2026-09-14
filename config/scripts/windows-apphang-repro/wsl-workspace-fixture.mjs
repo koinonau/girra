@@ -93,16 +93,7 @@ export function removeWslFixture(fixture) {
 export function createCompletedOnboardingProfile(userDataDir) {
   mkdirSync(userDataDir, { recursive: true })
   const profile = {
-    settings: {
-      telemetry: {
-        // Why: synthetic harness/benchmark activity must not send telemetry.
-        // Explicit false with existedBeforeTelemetryRelease=false also keeps
-        // the first-launch consent surface from blocking automation.
-        optedIn: false,
-        installId: '00000000-0000-4000-8000-000000000000',
-        existedBeforeTelemetryRelease: false
-      }
-    },
+    settings: {},
     onboarding: {
       flowVersion: 4,
       closedAt: 1,

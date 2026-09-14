@@ -47,8 +47,6 @@ describe('resolveDirectSshTargetScope', () => {
     expect(scope.gitWorktreeIds).toEqual(new Set(['shared::remote']))
     expect(scope.terminalWorkspaceKeys).toEqual(new Set(['shared::remote']))
     expect(scope.lineageWorkspaceKeys).toEqual(new Set([worktreeWorkspaceKey('shared::remote')]))
-    expect(scope.ambiguousOwnerCount).toBe(0)
-    expect(scope.contradictoryOwnerCount).toBe(0)
   })
 
   it('keeps duplicate same-host repo owners ambiguous', () => {
@@ -76,7 +74,6 @@ describe('resolveDirectSshTargetScope', () => {
     expect(scope.gitRepos).toEqual([])
     expect(scope.gitWorktreeIds.size).toBe(0)
     expect(scope.terminalWorkspaceKeys.size).toBe(0)
-    expect(scope.ambiguousOwnerCount).toBe(2)
   })
 
   it('gives folder workspaces the same exact target isolation as Git worktrees', () => {
@@ -153,7 +150,6 @@ describe('resolveDirectSshTargetScope', () => {
 
     expect(scope.gitWorktreeIds.size).toBe(0)
     expect(scope.terminalWorkspaceKeys.size).toBe(0)
-    expect(scope.contradictoryOwnerCount).toBe(1)
   })
 
   it('rejects explicit worktree and exact repo ownership contradictions', () => {
@@ -175,7 +171,6 @@ describe('resolveDirectSshTargetScope', () => {
 
     expect(scope.gitRepos).toEqual([{ repoId: 'repo', executionHostId: 'ssh:target-a' }])
     expect(scope.gitWorktreeIds.size).toBe(0)
-    expect(scope.contradictoryOwnerCount).toBe(1)
   })
 
   it('excludes ambiguous legacy and duplicate same-host folder owners', () => {
@@ -218,8 +213,6 @@ describe('resolveDirectSshTargetScope', () => {
 
     expect(scope.gitWorktreeIds.size).toBe(0)
     expect(scope.terminalWorkspaceKeys.size).toBe(0)
-    expect(scope.ambiguousOwnerCount).toBe(3)
-    expect(scope.contradictoryOwnerCount).toBe(0)
   })
 
   it('rejects conflicting folder workspace, group, repo, and restored provenance', () => {
@@ -256,7 +249,6 @@ describe('resolveDirectSshTargetScope', () => {
     })
 
     expect(scope.terminalWorkspaceKeys.size).toBe(0)
-    expect(scope.contradictoryOwnerCount).toBe(1)
   })
 
   it('does not infer an effective folder connection from an SSH host stamp alone', () => {
@@ -282,6 +274,5 @@ describe('resolveDirectSshTargetScope', () => {
     })
 
     expect(scope.terminalWorkspaceKeys.size).toBe(0)
-    expect(scope.ambiguousOwnerCount).toBe(1)
   })
 })

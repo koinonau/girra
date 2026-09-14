@@ -46,7 +46,6 @@ describe('TaskPage workspace creation source boundaries', () => {
     expect(section).toContain('initialRepoId: item.repoId')
     expect(section).toContain('initialGitHubWorkItem: item')
     expect(section).toContain("enableIssueAutomation: item.type === 'issue'")
-    expect(section).toContain("telemetrySource: 'sidebar'")
   })
 
   it('forwards PR start-point data and issue automation through quick submit', () => {
@@ -95,7 +94,6 @@ describe('TaskPage workspace creation source boundaries', () => {
     expect(composerSection).toContain("openModal('new-workspace-composer', {")
     expect(composerSection).toContain('taskSourceContext: linearTaskSourceContext')
     expect(composerSection).toContain('prefilledName: getLinearIssueWorkspaceName(issue)')
-    expect(composerSection).toContain("telemetrySource: 'sidebar'")
     expect(handlerSection).toContain("recordFeatureInteraction('linear-tasks')")
     expect(handlerSection).toContain('openComposerForLinearItem(issue)')
   })

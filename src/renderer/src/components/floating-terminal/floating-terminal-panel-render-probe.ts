@@ -110,7 +110,6 @@ export async function renderPanel(
   open: boolean,
   onOpenChange: (open: boolean) => void = vi.fn(),
   tourInteractionSnapshot?: {
-    wasPreviouslyInteracted: boolean
     persisted?: Promise<void>
     recordFeatureInteractionForTour: boolean
   } | null

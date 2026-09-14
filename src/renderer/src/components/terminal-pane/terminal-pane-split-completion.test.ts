@@ -19,26 +19,13 @@ describe('recordCreatedTerminalPaneSplit', () => {
   })
 
   it('does not record durable split completion when no pane was created', () => {
-    expect(
-      recordCreatedTerminalPaneSplit(null, {
-        source: 'keyboard',
-        direction: 'vertical'
-      })
-    ).toBe(false)
+    expect(recordCreatedTerminalPaneSplit(null)).toBe(false)
 
     expect(mocks.recordFeatureInteraction).not.toHaveBeenCalled()
   })
 
   it('records durable split completion after a pane is created', () => {
-    expect(
-      recordCreatedTerminalPaneSplit(
-        { id: 2 },
-        {
-          source: 'context_menu',
-          direction: 'horizontal'
-        }
-      )
-    ).toBe(true)
+    expect(recordCreatedTerminalPaneSplit({ id: 2 })).toBe(true)
 
     expect(mocks.recordFeatureInteraction).toHaveBeenCalledWith('terminal-pane-split')
   })

@@ -39,9 +39,7 @@ export function createPreflightApi(): NonNullable<Partial<PreloadApi>['preflight
   const fallbackRefreshAgents: RefreshAgentsResult = {
     agents: [],
     addedPathSegments: [],
-    shellHydrationOk: false,
-    pathSource: 'sync_seed_only',
-    pathFailureReason: 'spawn_error'
+    shellHydrationOk: false
   }
   type WindowsTerminalCapabilityBridgeResult = {
     wslAvailable: boolean

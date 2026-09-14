@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  closeWebRuntimeTerminal,
-  consumePendingWebRuntimeSplitMirrorTelemetry,
-  splitWebRuntimeTerminal
-} from './web-runtime-session'
+import { closeWebRuntimeTerminal, splitWebRuntimeTerminal } from './web-runtime-session'
 import { resetWebSessionCloseIntentForTests } from './web-session-close-intent'
 import {
   peekWebSessionFocusIntent,
@@ -144,7 +140,7 @@ describe('splitWebRuntimeTerminal', () => {
     vi.clearAllMocks()
   })
 
-  it('passes telemetry source to the host split while allowing the mirrored split event to be suppressed', async () => {
+  it('sends the split to the host terminal', async () => {
     const runtimeCall = vi.fn().mockResolvedValue({
       id: 'split',
       ok: true,
@@ -165,18 +161,7 @@ describe('splitWebRuntimeTerminal', () => {
     })
 
     expect(
-      splitWebRuntimeTerminal(
-        'remote:web-env-1@@terminal-1',
-        'horizontal',
-        'keyboard',
-        SPLIT_SOURCE
-      )
-    ).toBe(true)
-    expect(
-      consumePendingWebRuntimeSplitMirrorTelemetry('remote:web-env-1@@terminal-other', 'horizontal')
-    ).toBe(false)
-    expect(
-      consumePendingWebRuntimeSplitMirrorTelemetry('remote:web-env-1@@terminal-1', 'horizontal')
+      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'horizontal', SPLIT_SOURCE)
     ).toBe(true)
 
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledTimes(1))
@@ -186,8 +171,7 @@ describe('splitWebRuntimeTerminal', () => {
       method: 'terminal.split',
       params: {
         terminal: 'terminal-1',
-        direction: 'horizontal',
-        telemetrySource: 'keyboard'
+        direction: 'horizontal'
       },
       timeoutMs: 15_000
     })
@@ -208,14 +192,9 @@ describe('splitWebRuntimeTerminal', () => {
       }
     })
 
-    expect(
-      splitWebRuntimeTerminal(
-        'remote:web-env-1@@terminal-1',
-        'vertical',
-        'context_menu',
-        SPLIT_SOURCE
-      )
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
 
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledTimes(1))
     await vi.waitFor(() => expect(warnSpy).toHaveBeenCalledTimes(1))
@@ -241,17 +220,10 @@ describe('splitWebRuntimeTerminal', () => {
       }
     })
 
-    expect(splitWebRuntimeTerminal('pty-local-1', 'horizontal', 'keyboard', SPLIT_SOURCE)).toBe(
-      false
-    )
+    expect(splitWebRuntimeTerminal('pty-local-1', 'horizontal', SPLIT_SOURCE)).toBe(false)
     vi.stubGlobal('__ORCA_WEB_CLIENT__', false)
     expect(
-      splitWebRuntimeTerminal(
-        'remote:web-env-1@@terminal-1',
-        'horizontal',
-        'keyboard',
-        SPLIT_SOURCE
-      )
+      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'horizontal', SPLIT_SOURCE)
     ).toBe(true)
 
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledTimes(1))
@@ -292,9 +264,9 @@ describe('splitWebRuntimeTerminal', () => {
     )
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
 
     await vi.waitFor(() =>
       expect(
@@ -390,7 +362,7 @@ describe('splitWebRuntimeTerminal', () => {
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
     expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', {
+      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', {
         worktreeId: SPLIT_WORKTREE_ID,
         tabId: sourceTabId,
         leafId: 'leaf-source'
@@ -421,12 +393,8 @@ describe('splitWebRuntimeTerminal', () => {
       leafId: 'leaf-1'
     }
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', source)
-    ).toBe(true)
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', source)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', source)).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', source)).toBe(true)
     await vi.waitFor(() => expect(splitResolvers).toHaveLength(2))
 
     splitResolvers[1]?.(makeSplitResult('leaf-b'))
@@ -476,7 +444,7 @@ describe('splitWebRuntimeTerminal', () => {
     const runtimeCall = vi.fn(() => new Promise((resolve) => splitResolvers.push(resolve)))
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
     const split = (): boolean =>
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
+      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)
     expect(split()).toBe(true)
     await vi.waitFor(() => expect(splitResolvers).toHaveLength(1))
     const staleSource = {
@@ -485,12 +453,7 @@ describe('splitWebRuntimeTerminal', () => {
       leafId: 'leaf-missing'
     }
     expect(
-      splitWebRuntimeTerminal(
-        'remote:web-env-1@@terminal-missing',
-        'vertical',
-        'keyboard',
-        staleSource
-      )
+      splitWebRuntimeTerminal('remote:web-env-1@@terminal-missing', 'vertical', staleSource)
     ).toBe(true)
     await vi.waitFor(() => expect(splitResolvers).toHaveLength(2))
     splitResolvers[0]?.(makeSplitResult('leaf-a'))
@@ -517,9 +480,9 @@ describe('splitWebRuntimeTerminal', () => {
     })
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
     await vi.waitFor(() => expect(splitResolvers).toHaveLength(1))
     splitResolvers[0]?.({
       id: 'split-a',
@@ -534,9 +497,9 @@ describe('splitWebRuntimeTerminal', () => {
       ).toMatchObject({ leafId: 'leaf-a' })
     )
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
     await vi.waitFor(() => expect(splitResolvers).toHaveLength(2))
     splitResolvers[1]?.({
       id: 'split-b',
@@ -587,9 +550,9 @@ describe('splitWebRuntimeTerminal', () => {
     })
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
 
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledOnce())
     expect(peekWebSessionFocusIntent({ environmentId: 'web-env-1' }, SPLIT_WORKTREE_ID)).toBeNull()
@@ -630,14 +593,9 @@ describe('splitWebRuntimeTerminal', () => {
     )
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal(
-        'remote:web-env-1@@terminal-1',
-        'vertical',
-        'context_menu',
-        SPLIT_SOURCE
-      )
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
 
     await vi.waitFor(() =>
       expect(mocks.activateTabAndFocusPane).toHaveBeenCalledWith(
@@ -665,9 +623,9 @@ describe('splitWebRuntimeTerminal', () => {
     )
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledOnce())
     mocks.getState.mockReturnValue(makeSplitSourceState('tab-2'))
     resolveSplit({
@@ -701,9 +659,9 @@ describe('splitWebRuntimeTerminal', () => {
     )
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledOnce())
     replaceRuntimeEnvironmentRevisions([{ id: 'web-env-1', createdAt: 9 }])
     resolveSplit({
@@ -753,9 +711,9 @@ describe('splitWebRuntimeTerminal', () => {
     )
     vi.stubGlobal('window', { api: { runtimeEnvironments: { call: runtimeCall } } })
 
-    expect(
-      splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', 'keyboard', SPLIT_SOURCE)
-    ).toBe(true)
+    expect(splitWebRuntimeTerminal('remote:web-env-1@@terminal-1', 'vertical', SPLIT_SOURCE)).toBe(
+      true
+    )
     await vi.waitFor(() => expect(runtimeCall).toHaveBeenCalledTimes(2))
     replaceRuntimeEnvironmentRevisions([{ id: 'web-env-1', createdAt: 9 }])
     resolveList({

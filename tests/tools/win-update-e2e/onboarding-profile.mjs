@@ -49,17 +49,11 @@ export function createSeededRepo(dir) {
   }
 }
 
-/** The persisted profile object: onboarding dismissed + telemetry opted in +
- *  an optional seeded repo. */
+/** The persisted profile object: onboarding dismissed + an optional seeded repo. */
 export function buildFreshProfile({ repo = null } = {}) {
   return {
     settings: {
-      defaultTuiAgent: 'blank',
-      telemetry: {
-        optedIn: true,
-        installId: '00000000-0000-4000-8000-000000000000',
-        existedBeforeTelemetryRelease: false
-      }
+      defaultTuiAgent: 'blank'
     },
     onboarding: {
       flowVersion: ONBOARDING_FLOW_VERSION,

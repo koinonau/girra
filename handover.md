@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-14: Phases 0 to 2, the ADRs and the cross-version harness deletion are merged. Phase 3 is split into pull requests: 3a (Orca cloud) is merged, 3b (crash reporting) is in its pull request, and 3c (telemetry) follows.
+As of 2026-09-15: Phases 0 to 2, Phases 3a and 3b, the ADRs and the cross-version harness deletion are merged. Phase 3c (telemetry), the last of Phase 3, is in its pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -15,7 +15,8 @@ As of 2026-09-14: Phases 0 to 2, the ADRs and the cross-version harness deletion
 - Phase 1 merged in [#7](https://github.com/koinonau/girra/pull/7): 2,222 files deleted and 380,483 lines removed, measured with `git diff --shortstat` across its merge commit.
 - Phase 2 merged in [#8](https://github.com/koinonau/girra/pull/8): star-nag, voice input and the updater. 245 files deleted, 45,450 lines removed.
 - Phase 3a merged in [#9](https://github.com/koinonau/girra/pull/9): artifacts, skill sharing, the cloud relay, push, mobile pairing, and Orca profiles and accounts. 486 files deleted, 77,388 lines removed.
-- Phase 3b deletes crash reporting: 108 files deleted, 23,966 lines removed and 541 added, measured with `git diff --shortstat origin/main`. Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 3b merged in [#10](https://github.com/koinonau/girra/pull/10): crash reporting. 108 files deleted, 23,966 lines removed.
+- Phase 3c deletes telemetry and the hang watchdog that only fed it: 135 files deleted, 23,837 lines removed and 989 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -121,6 +122,15 @@ After Phase 3b, on 2026-09-14:
 | `pnpm lint` | 0 | 53 s | 114 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 20 s | Main 5,467 modules, renderer 12,195 |
 
+After Phase 3c, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 21 s | No errors |
+| `pnpm test` | 1 | 631 s | Files: 5 failed, 8,131 passed, 61 skipped of 8,197. Tests: 5 failed, 76,016 passed, 385 skipped of 76,406. Only the known failures below |
+| `pnpm lint` | 0 | 43 s | 114 reliability gates; ratchets unchanged |
+| `pnpm build` | 0 | 16 s | Main 5,422 modules, renderer 12,165 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -161,7 +171,7 @@ Taken at Orca `403b62a8d` by a Python walk over non-test `.ts` and `.tsx` files.
 - **Deletion scope:** 197,983 lines across 27 directories (2026-09-13). `mobile/` holds 137,454; the four `codex*` directories hold 35,233. With `cloud/`, 226,348 lines: 12% of the 1,905,345 non-test source lines in `src/`, `mobile/` and `cloud/` (2026-09-14).
 - **Runtime behind the CLI:** 265,344 lines across `src/main/runtime`, `src/relay`, `src/main/daemon` and `src/main/orcad` (2026-09-14).
 - **`cloud/`:** 28,365 lines in 132 files, Orca's server-side `push`, `relay`, `relay-fence-broker` and `relay-ops` apps. Added to the deletion table and deleted in Phase 1 (2026-09-14).
-- **Reliability gates:** 118 after Phase 1, which removed three gates whose tests all lived in the deleted trees and trimmed four more (2026-09-14). Still 118 after Phase 2, which trimmed `runtime.headless-desktop-promotion-continuity` and moved an AppImage startup check from `updater-setup-done` to `first-window-startup-services-ready`. 115 after Phase 3a, which removed `desktop-relay.assignment-backpressure`, `mobile-relay.endpoint-recovery` and `mobile-push.headless-startup-and-policy`. 114 after Phase 3b, which removed `terminal-observability.lifecycle-breadcrumbs`.
+- **Reliability gates:** 118 after Phase 1, which removed three gates whose tests all lived in the deleted trees and trimmed four more (2026-09-14). Still 118 after Phase 2, which trimmed `runtime.headless-desktop-promotion-continuity` and moved an AppImage startup check from `updater-setup-done` to `first-window-startup-services-ready`. 115 after Phase 3a, which removed `desktop-relay.assignment-backpressure`, `mobile-relay.endpoint-recovery` and `mobile-push.headless-startup-and-policy`. 114 after Phase 3b, which removed `terminal-observability.lifecycle-breadcrumbs`. Still 114 after Phase 3c, which trimmed the telemetry tests from `git-worktree.refresh-event-semantics` (2026-09-15).
 - **Orca profiles reach:** 141 files outside `src/main/orca-profiles` name them, 38 in `src/main/browser`, which imports only `getOrcaProfileBrowserSessionPartition` (`git grep -l`, 2026-09-14).
 - **Inbound references from outside each module:** star-nag 3, speech 10, updater 13, orca-profiles 27, crash-reporting 39, telemetry 45, codex 125 (2026-09-13).
 - **Orca in locale files:** 4,559 case-insensitive matches across six files in `src/renderer/src/i18n/locales/` (2026-09-13).
@@ -186,6 +196,10 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-14: delete the mobile companion pairing page, its settings pane, the Orca Mobile sidebar button and QR generation with the cloud relay. The feature tree drops them, and both options of the web renderer decision remove them.
 - 2026-09-14: delete remote server updates and the macOS serve update handoff with the updater, since only the updater used them. The CLI keeps foreground signal forwarding. The app version moves to `window.api.app.getVersion`.
 - 2026-09-14: delete the cross-version wire harness, its CI job, its change-scope category, and the gate evidence citing it. It compared girra against Orca releases girra does not ship.
+- 2026-09-15: delete the main-thread hang watchdog with telemetry. Its worker only wrote a marker that the telemetry event read.
+- 2026-09-15: keep the startup payload field named `telemetry` (`agent_kind`, `launch_source`, `request_kind`). Terminal colour-query replies, tab launch agents and the Windows focus guard read it. Renaming it is Phase 7 work at most.
+- 2026-09-15: remove telemetry-only RPC params (`telemetrySource` on `terminal.split` and `worktree.create`). Neither schema is strict, so older clients that still send the field have it stripped; a test for each proves it.
+- 2026-09-15: the Privacy settings section now holds only local diagnostics. Its copy still says diagnostics go to support, and observability still honours `ORCA_TELEMETRY_DISABLED`; both wait for Phase 7.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -205,7 +219,7 @@ All 2026-09-13 unless dated otherwise.
 
 | Date | Trap | Cost | Avoid it |
 |---|---|---|---|
-| 2026-09-12 | Named subagents are mailbox-only. Their final text is lost | One round of messages to recover six surveys | Tell each agent to write its result to a file |
+| 2026-09-12 | Named subagents are mailbox-only. Their final text is lost | One round of messages to recover six surveys; bit again 2026-09-15, caught by a hook | Tell each named agent to send its report to `main` with SendMessage; now in `prompt.md` |
 | 2026-09-12 | The shell's `ls` alias prints nothing in tool output | Two empty directory listings | Use `/bin/ls` |
 | 2026-09-13 | Transitive import closure reaches 11,213 of about 13,000 files | One analysis pass with 191 false dependencies | Measure direct imports only |
 | 2026-09-13 | Directory-level paths in the inventory match unrelated features | A first duplicate pass whose labels were mostly wrong | Test path containment, and read both entries |
@@ -240,4 +254,5 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-14 | Words in file names mislead: most files named `artifact` are build, terminal or test artifacts, not the published artifacts feature | None; a subagent traced imports first | Decide from imports, never from names |
 | 2026-09-14 | Editors and shell prompts poll git, so a commit or `git rm` can hit `.git/index.lock` | Two failed commits | Retry once; the lock clears within a second |
 | 2026-09-14 | A subagent reported `pnpm tc` clean while one test file still failed to compile | One typecheck error found at verification | Rerun `pnpm tc` yourself before committing a subagent's work |
+| 2026-09-15 | A subagent ran `pnpm format` across the repository and reformatted files other agents and the lead were editing | Eight format-only files restored; mixed edits left to re-read | Tell subagents to format only the files they changed |
 | 2026-09-14 | Feature share and line share differ: 103 of 535 features is 19%, but their code is 12% of source lines | "A fifth of the codebase" in the plan and an ADR draft | Measure lines before quoting a code proportion |

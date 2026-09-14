@@ -43,9 +43,7 @@ describe('local detected agent context lifecycle', () => {
   beforeEach(() => {
     detectAgents.mockReset().mockResolvedValue(['claude'])
     refreshAgents.mockReset().mockResolvedValue({
-      agents: ['codex'],
-      pathSource: 'process_env',
-      pathFailureReason: 'none'
+      agents: ['codex']
     })
   })
 
@@ -169,11 +167,7 @@ describe('local detected agent context lifecycle', () => {
   })
 
   it('joins an authoritative refresh instead of starting a later detect', async () => {
-    let resolveRefresh: (result: {
-      agents: string[]
-      pathSource: string
-      pathFailureReason: string
-    }) => void = () => {}
+    let resolveRefresh: (result: { agents: string[] }) => void = () => {}
     refreshAgents.mockReturnValueOnce(
       new Promise((resolve) => {
         resolveRefresh = resolve
@@ -187,9 +181,7 @@ describe('local detected agent context lifecycle', () => {
     expect(detectAgents).not.toHaveBeenCalled()
 
     resolveRefresh({
-      agents: ['codex'],
-      pathSource: 'process_env',
-      pathFailureReason: 'none'
+      agents: ['codex']
     })
     await expect(Promise.all([refresh, ensure])).resolves.toEqual([['codex'], ['codex']])
     expect(store.getState().detectedAgentIds).toEqual(['codex'])

@@ -99,8 +99,8 @@ export function AgentMapProjectContextMenu({
               openModal(
                 'new-workspace-composer',
                 target.kind === 'repo'
-                  ? { initialRepoId: target.repo.id, telemetrySource: 'sidebar' }
-                  : { initialProjectGroupId: target.group.id, telemetrySource: 'sidebar' }
+                  ? { initialRepoId: target.repo.id }
+                  : { initialProjectGroupId: target.group.id }
               )
             }}
           >

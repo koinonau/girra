@@ -31,8 +31,7 @@ export function useFloatingTerminalPanelController({
 
   useContextualTour('floating-workspace', open, 'floating_workspace_visible', {
     recordFeatureInteraction: tourInteractionSnapshot?.recordFeatureInteractionForTour ?? false,
-    featureInteractionPersisted: tourInteractionSnapshot?.persisted,
-    wasFeaturePreviouslyInteracted: tourInteractionSnapshot?.wasPreviouslyInteracted
+    featureInteractionPersisted: tourInteractionSnapshot?.persisted
   })
 
   const editorCloseQueue = useFloatingTerminalEditorCloseQueue({ ...storeState, ...localState })

@@ -20,7 +20,6 @@ import type { PublicKnownRuntimeEnvironment } from '../../../../shared/runtime-e
 import type { RuntimeEnvironmentStatus } from '../../store/slices/runtime-status'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { WorkspaceHostScope } from '../../../../shared/ui-chrome-types'
-import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../../shared/workspace-source'
 
 export type ComposerTargetStoreModel = {
   initialRepoId: string | undefined
@@ -37,7 +36,6 @@ export type ComposerTargetStoreModel = {
   isSubmissionCancelled: () => boolean
   repoIdOverride: string | undefined
   onRepoIdOverrideChange: ((value: string) => void) | undefined
-  telemetrySource: WorkspaceCreateTelemetrySource | undefined
   enableIssueAutomation: boolean
   createGateMode: 'full' | 'quick'
   initialProjectGroupId: string | undefined
