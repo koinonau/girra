@@ -5,15 +5,11 @@ import type { BrowserPage } from '../../../../shared/browser-workspace-types'
 
 const mocks = vi.hoisted(() => ({
   attach: vi.fn(),
-  detach: vi.fn(),
-  recordBreadcrumb: vi.fn()
+  detach: vi.fn()
 }))
 
 vi.mock('./browser-client-page-renderer-installation', () => ({
   attachBrowserClientPageToViewport: mocks.attach
-}))
-vi.mock('@/lib/crash-breadcrumb-recorder', () => ({
-  recordRendererCrashBreadcrumb: mocks.recordBreadcrumb
 }))
 vi.mock('sonner', () => ({
   toast: { error: vi.fn(), success: vi.fn(), loading: vi.fn(), message: vi.fn() }
@@ -112,7 +108,6 @@ let webview: ReturnType<typeof createGuest>
 beforeEach(() => {
   mocks.attach.mockReset()
   mocks.detach.mockReset()
-  mocks.recordBreadcrumb.mockReset()
   installClientHostedPaneApi()
   webview = createGuest()
 })
@@ -131,17 +126,6 @@ describe('client-hosted browser pane over a dead guest', () => {
     expect(() => render(paneElement(true))).not.toThrow()
     expect(screen.getByText('Client-hosted browser unavailable')).toBeTruthy()
     expect(mocks.detach).toHaveBeenCalled()
-    expect(mocks.recordBreadcrumb).toHaveBeenCalledWith('browser_client_page_guest_unavailable', {
-      browserPageId: 'page-a',
-      pageHostGeneration: PLACEMENT.pageHostGeneration,
-      reason: 'unreadable',
-      tagConnected: false
-    })
-    // Why: the catch is total, so the swallowed error must stay visible to diagnostics.
-    expect(mocks.recordBreadcrumb).toHaveBeenCalledWith('browser_client_page_guest_read_failed', {
-      errorName: 'Error',
-      errorMessage: 'Invalid guestInstanceId: 7'
-    })
   })
 
   it('stops the spinner it inherited from a page that died mid-load', () => {
@@ -170,12 +154,6 @@ describe('client-hosted browser pane over a dead guest', () => {
     expect(screen.getByText('Client-hosted browser unavailable')).toBeTruthy()
     expect(mocks.detach).toHaveBeenCalled()
     expect(onUpdatePageState).toHaveBeenCalledWith('page-a', { loading: false })
-    expect(mocks.recordBreadcrumb).toHaveBeenCalledWith('browser_client_page_guest_unavailable', {
-      browserPageId: 'page-a',
-      pageHostGeneration: PLACEMENT.pageHostGeneration,
-      reason: 'render-process-gone',
-      tagConnected: false
-    })
   })
 
   it('flips to the unavailable notice when main destroys the guest after attach', () => {
@@ -186,10 +164,6 @@ describe('client-hosted browser pane over a dead guest', () => {
     })
 
     expect(screen.getByText('Client-hosted browser unavailable')).toBeTruthy()
-    expect(mocks.recordBreadcrumb).toHaveBeenCalledWith(
-      'browser_client_page_guest_unavailable',
-      expect.objectContaining({ reason: 'destroyed' })
-    )
     // The chrome must not keep driving the dead tag: Reload routes to the notice, not a throw.
     webview.reload.mockImplementation(() => {
       throw invalidGuestInstanceId()
@@ -286,12 +260,10 @@ describe('client-hosted browser pane over a dead guest', () => {
     const view = render(paneElement(true, { onUpdatePageState }))
     view.unmount()
     onUpdatePageState.mockClear()
-    mocks.recordBreadcrumb.mockClear()
 
     webview.dispatchEvent(new Event('destroyed'))
 
     expect(onUpdatePageState).not.toHaveBeenCalled()
-    expect(mocks.recordBreadcrumb).not.toHaveBeenCalled()
   })
 
   it('survives activation focus after the retained tag left the DOM', () => {

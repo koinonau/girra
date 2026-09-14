@@ -195,7 +195,6 @@ export function createIpcPtyTransport(opts: IpcPtyTransportOptions = {}): PtyTra
 
     detach(options) {
       advancePtyLifecycle()
-      outputProcessor.disposePendingSideEffectGauge()
       handlers.clearAccumulatedState()
       preconnectInputBuffer?.clear()
       if (ptyId) {
@@ -270,11 +269,7 @@ export function createIpcPtyTransport(opts: IpcPtyTransportOptions = {}): PtyTra
 
     destroy() {
       destroyed = true
-      try {
-        this.disconnect()
-      } finally {
-        outputProcessor.disposePendingSideEffectGauge()
-      }
+      this.disconnect()
     }
   }
 }

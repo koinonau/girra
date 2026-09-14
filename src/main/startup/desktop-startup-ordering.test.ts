@@ -309,7 +309,7 @@ describe('startup ordering', () => {
     expect(startIndex).toBeGreaterThan(attachIndex)
   })
 
-  it('wires bounded teardown state to reporting but not recovery or close behavior', () => {
+  it('wires expected teardown state into renderer recovery', () => {
     const lifecycleSource = readFileSync(
       join(process.cwd(), 'src/main/startup/main-window-lifecycle-flags.ts'),
       'utf8'
@@ -321,13 +321,9 @@ describe('startup ordering', () => {
 
     expect(lifecycleSource).toContain('export function getExpectedTeardownScope(')
     expect(lifecycleSource).toContain('resolveExpectedTeardownScope({')
-    expect(lifecycleSource).toContain('includeSystemSessionEnd')
     expect(windowSource).toContain('const window = createMainWindow(store, {')
     expect(windowSource).toContain('getIsQuitting: () => state.isQuitting')
-    expect(windowSource).toContain(
-      'expectedTeardown: getExpectedTeardownScope(webContentsId, false)'
-    )
-    expect(lifecycleSource).toContain('expectedTeardown: getExpectedTeardownScope(webContentsId)')
+    expect(windowSource).toContain('expectedTeardown: getExpectedTeardownScope(webContentsId)')
   })
 
   it('attaches renderer services before starting the TCC prompt watcher', () => {
@@ -346,7 +342,7 @@ describe('startup ordering', () => {
     const attachIndex = coreSource.indexOf('attachMainWindowServices(')
     const tccNoticeIndex = coreSource.indexOf('initTccPromptNotice(window', attachIndex)
     const quitAbortStart = windowSource.indexOf('onQuitAborted:')
-    const quitAbortEnd = windowSource.indexOf('onRendererProcessGone:', quitAbortStart)
+    const quitAbortEnd = windowSource.indexOf('shouldRecoverRenderer:', quitAbortStart)
 
     expect(attachIndex).toBeGreaterThanOrEqual(0)
     expect(tccNoticeIndex).toBeGreaterThan(attachIndex)

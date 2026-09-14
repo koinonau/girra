@@ -46,10 +46,6 @@ vi.mock('@/store', () => ({
   }
 }))
 
-vi.mock('@/lib/crash-breadcrumb-recorder', () => ({
-  recordRendererCrashBreadcrumb: vi.fn()
-}))
-
 beforeEach(() => {
   _resetTerminalPaneRecoveryForTests()
   mocks.remountTerminalTabForRecovery.mockClear()

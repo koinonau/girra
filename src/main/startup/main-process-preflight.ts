@@ -61,12 +61,6 @@ import { initClaudeUsagePath } from '../claude-usage/store'
 import { initCodexUsagePath } from '../codex-usage/store'
 import { initOpenCodeUsagePath } from '../opencode-usage/store'
 import { registerDocPreviewSchemePrivileges } from '../browser/doc-preview-protocol'
-import { startCrashpadCapture } from '../crash-reporting/crashpad-capture'
-import { CrashReportStore } from '../crash-reporting/crash-report-store'
-import { recordCrashBreadcrumb } from '../crash-reporting/crash-breadcrumb-store'
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
-import { GpuCrashDiagnosticsRecorder } from '../crash-reporting/gpu-crash-diagnostics'
-import { getMainProcessLifecycleIdentity } from '../crash-reporting/main-process-lifecycle-identity'
 import {
   ensureVirtualDisplayForHeadlessServe,
   hasUsableLinuxDisplay,
@@ -255,25 +249,6 @@ export function runMainProcessPreflight(options: MainProcessPreflightOptions): b
   // Why: Electron freezes the privileged scheme table at ready, so the doc-preview
   // scheme must be declared here or its webview loses fetch/secure-origin privileges.
   registerDocPreviewSchemePrivileges()
-  // Why: must precede app.whenReady() so Crashpad is installed before the
-  // first renderer spawns; a CHECK before this point is still exit-code-only.
-  startCrashpadCapture()
-  state.crashReports = CrashReportStore.fromUserData()
-  state.gpuCrashDiagnostics =
-    process.platform === 'win32'
-      ? new GpuCrashDiagnosticsRecorder({
-          provider: {
-            getGPUInfo: (infoType) => app.getGPUInfo(infoType),
-            getGPUFeatureStatus: () => app.getGPUFeatureStatus()
-          },
-          recordBreadcrumb: (data) => recordDurableCrashBreadcrumb('gpu_crash_hardware', data)
-        })
-      : null
-  recordCrashBreadcrumb('app_started', {
-    packaged: app.isPackaged,
-    platform: process.platform,
-    ...getMainProcessLifecycleIdentity()
-  })
   disableUnsupportedChromiumFeatures()
   // Why: unconditional — a GPU-fallback launch skips enableMainProcessGpuFeatures() below.
   optOutOfHiddenPageWakeUpThrottling()

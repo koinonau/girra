@@ -1,10 +1,8 @@
 // @vitest-environment happy-dom
 
-// Reproduces the production path behind all 9 lazy-chunk crash reports on
-// 1.4.171–1.4.175: guard 'not-attempted' -> reload requested -> the reload never
-// lands -> recovery gives up. 16/16 `lazy_chunk_reload_vetoed` breadcrumbs across
-// the shipped bundles carry outcome=never-landed and no bundle contains a
-// LazyChunkLoadError, so the boundary receives the raw SyntaxError and files a crash.
+// Reproduces the production lazy-chunk failure on 1.4.171–1.4.175: guard 'not-attempted'
+// -> reload requested -> the reload never lands -> recovery gives up. Without a
+// LazyChunkLoadError the boundary receives the raw SyntaxError instead of containing it.
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -21,27 +19,12 @@ const RELOAD_SETTLE_GRACE_MS = 10_000
 // The dominant crash-time message across the shipped bundles (7/9 reports).
 const CORRUPT_CHUNK_ERROR = (): SyntaxError => new SyntaxError("Unexpected token '}'")
 
-type Breadcrumb = { name: string; data: Record<string, unknown> }
-
-function installBreadcrumbSink(): Breadcrumb[] {
-  const breadcrumbs: Breadcrumb[] = []
-  ;(window as unknown as { api: unknown }).api = {
-    crashReports: {
-      recordBreadcrumb: (crumb: Breadcrumb) => {
-        breadcrumbs.push(crumb)
-      }
-    }
-  }
-  return breadcrumbs
-}
-
 describe('loadLazyWithRetry when the recovery reload never lands', () => {
   beforeEach(() => {
     vi.useFakeTimers()
     window.sessionStorage.clear()
     resetLazyChunkReloadRequestsForTest()
-    // Production truth: location.reload() produced zero navigations in all 10
-    // bundles — no renderer_bootstrap_started follows any lazy_chunk_reload.
+    // Production truth: location.reload() produced zero navigations.
     vi.spyOn(window.location, 'reload').mockImplementation(() => undefined)
   })
 
@@ -50,11 +33,9 @@ describe('loadLazyWithRetry when the recovery reload never lands', () => {
     vi.restoreAllMocks()
     window.sessionStorage.clear()
     resetLazyChunkReloadRequestsForTest()
-    delete (window as unknown as { api?: unknown }).api
   })
 
   it('surfaces a recognizable LazyChunkLoadError so the boundary can contain it', async () => {
-    const breadcrumbs = installBreadcrumbSink()
     const settled = loadLazyWithRetry(() => Promise.reject(CORRUPT_CHUNK_ERROR()), {
       retries: 0,
       reloadKey: 'right-sidebar'
@@ -70,15 +51,11 @@ describe('loadLazyWithRetry when the recovery reload never lands', () => {
     const result = await settled
     expect(result.ok).toBe(false)
 
-    const vetoed = breadcrumbs.find((crumb) => crumb.name === 'lazy_chunk_reload_vetoed')
-    expect(vetoed?.data.outcome).toBe('never-landed')
-
-    // The boundary only suppresses LazyChunkLoadError; a raw SyntaxError files a crash report.
+    // The boundary treats LazyChunkLoadError as a contained chunk failure.
     expect(isLazyChunkLoadError((result as { error: unknown }).error)).toBe(true)
   })
 
   it('does not strand a sibling lazy import that fails while a reload is pending', async () => {
-    installBreadcrumbSink()
     const first = loadLazyWithRetry(() => Promise.reject(CORRUPT_CHUNK_ERROR()), {
       retries: 0,
       reloadKey: 'app.root'
@@ -87,8 +64,7 @@ describe('loadLazyWithRetry when the recovery reload never lands', () => {
     await vi.advanceTimersByTimeAsync(0)
 
     // A second surface resolves its lazy chunk while the first reload is still in
-    // flight — the shape of 131d2ed2 and a7bc7be0, which filed raw crash reports
-    // 250 ms / 95 ms after the reload request with no explanatory breadcrumb.
+    // flight — observed 250 ms / 95 ms after the reload request in the field.
     const sibling = loadLazyWithRetry(() => Promise.reject(CORRUPT_CHUNK_ERROR()), {
       retries: 0,
       reloadKey: 'app.root.sibling'
@@ -100,8 +76,7 @@ describe('loadLazyWithRetry when the recovery reload never lands', () => {
     expect(isLazyChunkLoadError(await sibling)).toBe(true)
   })
 
-  it('contains an unload-vetoed reload and records it as a distinct outcome', async () => {
-    const breadcrumbs = installBreadcrumbSink()
+  it('contains an unload-vetoed reload', async () => {
     vi.spyOn(window.location, 'reload').mockImplementation(() => {
       window.dispatchEvent(new Event(ORCA_RENDERER_UNLOAD_PREVENTED_EVENT))
     })
@@ -111,14 +86,11 @@ describe('loadLazyWithRetry when the recovery reload never lands', () => {
     }).catch((error: unknown) => error)
     await vi.advanceTimersByTimeAsync(0)
 
-    const vetoed = breadcrumbs.find((crumb) => crumb.name === 'lazy_chunk_reload_vetoed')
-    expect(vetoed?.data.outcome).toBe('unload-vetoed')
     // A veto is still an attempted-and-failed recovery, so it is contained too.
     expect(isLazyChunkLoadError(await settled)).toBe(true)
   })
 
   it('leaves no guard behind that would block a later document from recovering', async () => {
-    installBreadcrumbSink()
     const settled = loadLazyWithRetry(() => Promise.reject(CORRUPT_CHUNK_ERROR()), {
       retries: 0
     }).catch((error: unknown) => error)

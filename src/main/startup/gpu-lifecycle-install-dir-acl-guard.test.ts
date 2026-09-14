@@ -66,14 +66,12 @@ function recoveryOptions(userDataPath?: string): {
   installDir: string
   appVersion: string
   userDataPath: string
-  recordBreadcrumb: () => void
 } {
   return {
     platform: 'win32',
     installDir: INSTALL_DIR,
     appVersion: '1.4.184',
-    userDataPath: userDataPath ?? mkdtempSync(join(tmpdir(), 'orca-acl-gpu-guard-')),
-    recordBreadcrumb: () => undefined
+    userDataPath: userDataPath ?? mkdtempSync(join(tmpdir(), 'orca-acl-gpu-guard-'))
   }
 }
 

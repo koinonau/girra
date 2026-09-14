@@ -1,9 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import {
   TERMINAL_TAB_PARK_FLIP_BURST_LIMIT,
   TERMINAL_TAB_PARK_FLIP_BURST_WINDOW_MS,
   TERMINAL_TAB_PARK_FLIP_COMMIT_COST,
-  TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT,
   TERMINAL_TAB_PARK_FLIP_WINDOW_MS,
   getParkVerdictUnparkPinUntilMs,
   recordParkVerdictFlips,
@@ -11,14 +10,10 @@ import {
   type ParkVerdictFlipRecord
 } from './terminal-park-verdict-flip-telemetry'
 
-const recordBreadcrumb = vi.fn()
-vi.mock('@/lib/crash-breadcrumb-recorder', () => ({
-  recordRendererCrashBreadcrumb: (name: string, data?: unknown) => recordBreadcrumb(name, data)
-}))
-
 const TAB = 'tab-1'
-/** Slower than the burst window, so only the notice limit can fire. */
+/** Slower than the burst window, so the burst counter never reaches its limit. */
 const SLOW_CHURN_STEP_MS = TERMINAL_TAB_PARK_FLIP_BURST_WINDOW_MS * 4
+const SLOW_CHURN_FLIPS = 13
 
 function observe(args: {
   records: Map<string, ParkVerdictFlipRecord>
@@ -34,81 +29,34 @@ function observe(args: {
   })
 }
 
-beforeEach(() => {
-  recordBreadcrumb.mockClear()
-})
-
-// Why asserted: the whole point of the burst trigger is that it is derived from
-// React's 50-commit bail, not copied from the breadcrumb notice limit. If the
-// two ever converge again the damping stops firing before React throws #185.
+// Why asserted: the burst trigger is derived from React's 50-commit bail; if it
+// drifts above it the damping stops firing before React throws #185.
 describe('burst damping threshold', () => {
   it('stays under React NESTED_UPDATE_LIMIT at the assumed commits-per-flip cost', () => {
     expect(TERMINAL_TAB_PARK_FLIP_BURST_LIMIT * TERMINAL_TAB_PARK_FLIP_COMMIT_COST).toBeLessThan(50)
-    expect(TERMINAL_TAB_PARK_FLIP_BURST_LIMIT).toBeLessThan(TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT)
   })
 })
 
 describe('recordParkVerdictFlips', () => {
-  it('stays silent for a stable verdict', () => {
+  it('counts no flips for a stable verdict', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     for (let i = 0; i < 100; i += 1) {
       observe({ records, parked: true, nowMs: 1_000 + i * 1_000 })
     }
 
-    expect(recordBreadcrumb).not.toHaveBeenCalled()
     expect(records.get(TAB)?.flips).toBe(0)
+    expect(records.get(TAB)?.pinnedUntilMs ?? null).toBeNull()
   })
 
-  it('emits one burst breadcrumb once the verdict churns at render cadence', () => {
+  it('pins once the verdict churns at render cadence', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     for (let i = 0; i < 40; i += 1) {
       observe({ records, parked: i % 2 === 0, nowMs: 1_000 + i * 10 })
     }
 
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
-    expect(recordBreadcrumb).toHaveBeenCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({
-        tabId: TAB,
-        trigger: 'burst',
-        flips: TERMINAL_TAB_PARK_FLIP_BURST_LIMIT,
-        pinnedForMs: TERMINAL_TAB_PARK_FLIP_WINDOW_MS
-      })
-    )
-  })
-
-  // Why: the two triggers answer different questions — 'burst' means damping
-  // engaged before React could bail, 'window' means churn too slow to loop.
-  it('separates a damped burst from slow churn', () => {
-    const tightRecords = new Map<string, ParkVerdictFlipRecord>()
-    for (let i = 0; i < 40; i += 1) {
-      observe({ records: tightRecords, parked: i % 2 === 0, nowMs: 1_000 + i })
-    }
-    expect(recordBreadcrumb).toHaveBeenCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({
-        trigger: 'burst',
-        flips: TERMINAL_TAB_PARK_FLIP_BURST_LIMIT,
-        elapsedMs: TERMINAL_TAB_PARK_FLIP_BURST_LIMIT,
-        windowMs: TERMINAL_TAB_PARK_FLIP_BURST_WINDOW_MS
-      })
-    )
-
-    recordBreadcrumb.mockClear()
-
-    const slowRecords = new Map<string, ParkVerdictFlipRecord>()
-    for (let i = 0; i < TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT + 1; i += 1) {
-      observe({ records: slowRecords, parked: i % 2 === 0, nowMs: 1_000 + i * SLOW_CHURN_STEP_MS })
-    }
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
-    expect(recordBreadcrumb).toHaveBeenCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({
-        trigger: 'window',
-        flips: TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT,
-        elapsedMs: TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT * SLOW_CHURN_STEP_MS,
-        windowMs: TERMINAL_TAB_PARK_FLIP_WINDOW_MS
-      })
+    // The first observation only seeds the record, so flip N lands one step later.
+    expect(records.get(TAB)?.pinnedUntilMs).toBe(
+      1_000 + TERMINAL_TAB_PARK_FLIP_BURST_LIMIT * 10 + TERMINAL_TAB_PARK_FLIP_WINDOW_MS
     )
   })
 
@@ -116,7 +64,7 @@ describe('recordParkVerdictFlips', () => {
   // a mounted pane's memory for a verdict that was never near React's bail.
   it('does not pin churn spread past the burst window', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
-    for (let i = 0; i < TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT + 1; i += 1) {
+    for (let i = 0; i < SLOW_CHURN_FLIPS; i += 1) {
       observe({ records, parked: i % 2 === 0, nowMs: 1_000 + i * SLOW_CHURN_STEP_MS })
     }
 
@@ -128,18 +76,16 @@ describe('recordParkVerdictFlips', () => {
     for (let i = 0; i < 40; i += 1) {
       observe({ records, parked: i % 2 === 0, nowMs: 1_000 + i * 10 })
     }
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
+    const firstPinUntilMs = records.get(TAB)?.pinnedUntilMs ?? 0
 
     const laterMs = 1_000 + TERMINAL_TAB_PARK_FLIP_WINDOW_MS * 2
     for (let i = 0; i < 40; i += 1) {
       observe({ records, parked: i % 2 === 0, nowMs: laterMs + i * 10 })
     }
 
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(2)
+    expect(records.get(TAB)?.pinnedUntilMs).toBeGreaterThan(firstPinUntilMs)
   })
 
-  // Why: an unclamped backwards jump would freeze the window and suppress the
-  // very signal this module exists to capture.
   it('treats a backwards clock jump as a fresh window', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     observe({ records, parked: true, nowMs: 10_000_000 })
@@ -149,8 +95,7 @@ describe('recordParkVerdictFlips', () => {
     expect(records.get(TAB)?.flips).toBe(1)
   })
 
-  // Why: >= is the boundary operator; a > regression would silently stretch the
-  // window and delay every notice by one full period.
+  // Why: >= is the boundary operator; a > regression would silently stretch the window.
   it('treats an exactly-elapsed window as expired', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     observe({ records, parked: true, nowMs: 1_000 })
@@ -160,31 +105,35 @@ describe('recordParkVerdictFlips', () => {
     expect(records.get(TAB)?.flips).toBe(1)
   })
 
-  it('honours the window, notice, burst-window and burst-limit overrides', () => {
-    const records = new Map<string, ParkVerdictFlipRecord>()
+  it('honours the window, burst-window and burst-limit overrides', () => {
+    const overrides = { flipWindowMs: 5_000, burstWindowMs: 10, burstLimit: 2 }
+    const slowRecords = new Map<string, ParkVerdictFlipRecord>()
     for (let i = 0; i < 10; i += 1) {
       recordParkVerdictFlips({
-        records,
+        records: slowRecords,
         liveTabIds: new Set([TAB]),
         nextParkedTabIds: i % 2 === 0 ? new Set([TAB]) : new Set(),
         nowMs: 1_000 + i * 100,
-        flipWindowMs: 5_000,
-        noticeLimit: 3,
-        burstWindowMs: 10,
-        burstLimit: 2
+        ...overrides
       })
     }
+    // Why no pin: the 100ms step outruns the 10ms burst window, so the burst counter resets every flip.
+    expect(slowRecords.get(TAB)?.pinnedUntilMs ?? null).toBeNull()
 
-    // Why 'window': the 100ms step outruns the 10ms burst window, so the burst
-    // counter resets on every flip and only the notice limit can fire.
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
-    expect(recordBreadcrumb).toHaveBeenCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({ trigger: 'window', flips: 3, windowMs: 5_000 })
-    )
+    const tightRecords = new Map<string, ParkVerdictFlipRecord>()
+    for (let i = 0; i < 3; i += 1) {
+      recordParkVerdictFlips({
+        records: tightRecords,
+        liveTabIds: new Set([TAB]),
+        nextParkedTabIds: i % 2 === 0 ? new Set([TAB]) : new Set(),
+        nowMs: 1_000 + i,
+        ...overrides
+      })
+    }
+    expect(tightRecords.get(TAB)?.pinnedUntilMs).toBe(1_002 + 5_000)
   })
 
-  it('keeps per-tab windows and notices independent', () => {
+  it('keeps per-tab windows and pins independent', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     const other = 'tab-2'
     for (let i = 0; i < 40; i += 1) {
@@ -197,11 +146,8 @@ describe('recordParkVerdictFlips', () => {
       })
     }
 
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
-    expect(recordBreadcrumb).toHaveBeenCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({ tabId: TAB })
-    )
+    expect(records.get(TAB)?.pinnedUntilMs).not.toBeNull()
+    expect(records.get(other)?.pinnedUntilMs ?? null).toBeNull()
     expect(records.get(other)?.flips).toBe(0)
   })
 
@@ -252,9 +198,7 @@ describe('getParkVerdictUnparkPinUntilMs', () => {
     expect(records.get(TAB)?.flips).toBe(0)
     expect(records.get(TAB)?.burstFlips).toBe(0)
 
-    recordBreadcrumb.mockClear()
     churnToBurst(records, pinUntilMs)
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
     expect(getParkVerdictUnparkPinUntilMs({ records, tabId: TAB, nowMs: pinUntilMs + 1 })).not.toBe(
       null
     )
@@ -268,16 +212,16 @@ describe('getParkVerdictUnparkPinUntilMs', () => {
     expect(getParkVerdictUnparkPinUntilMs({ records, tabId: TAB, nowMs: 5 })).toBeNull()
   })
 
-  // Why: the notice window starts at the first flip and the pin starts one
-  // burst later, so the notice window always lapses first. Resetting it must
+  // Why: the flip window starts at the first flip and the pin starts one
+  // burst later, so the flip window always lapses first. Resetting it must
   // not hand the pane back to the parking policy mid-damping.
-  it('survives a notice-window expiry that lands mid-pin', () => {
+  it('survives a flip-window expiry that lands mid-pin', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     const pinnedAtMs = churnToBurst(records)
     const pinUntilMs = pinnedAtMs + TERMINAL_TAB_PARK_FLIP_WINDOW_MS
     const windowLapseMs = 1_000 + TERMINAL_TAB_PARK_FLIP_WINDOW_MS
 
-    // An exogenous flip (visibility change, tab removal) after the notice
+    // An exogenous flip (visibility change, tab removal) after the flip
     // window lapsed but before the pin deadline.
     expect(windowLapseMs).toBeLessThan(pinUntilMs)
     observe({ records, parked: true, nowMs: windowLapseMs })
@@ -291,18 +235,14 @@ describe('getParkVerdictUnparkPinUntilMs', () => {
 
 // Why liveness and not presence: a pinned tab can stop being cold-park eligible
 // before its deadline, and nothing consults getParkVerdictUnparkPinUntilMs for
-// it again. A stale deadline must not silence churn telemetry forever.
-describe('expired pins stop gating breadcrumbs', () => {
-  it('re-arms damping and notices without a getParkVerdictUnparkPinUntilMs call', () => {
+// it again. A stale deadline must not stop damping forever.
+describe('expired pins', () => {
+  it('re-arms damping without a getParkVerdictUnparkPinUntilMs call', () => {
     const records = new Map<string, ParkVerdictFlipRecord>()
     for (let i = 0; i < 40; i += 1) {
       observe({ records, parked: i % 2 === 0, nowMs: 1_000 + i * 10 })
     }
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(1)
-    expect(recordBreadcrumb).toHaveBeenLastCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({ trigger: 'burst' })
-    )
+    expect(records.get(TAB)?.pinnedUntilMs).not.toBeNull()
 
     // Churn resumes past the pin deadline; the pin was never read back.
     const afterPinMs = 1_000 + TERMINAL_TAB_PARK_FLIP_WINDOW_MS * 2
@@ -310,32 +250,7 @@ describe('expired pins stop gating breadcrumbs', () => {
       observe({ records, parked: i % 2 === 0, nowMs: afterPinMs + i * 10 })
     }
 
-    expect(recordBreadcrumb).toHaveBeenCalledTimes(2)
-    expect(recordBreadcrumb).toHaveBeenLastCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({ trigger: 'burst' })
-    )
     expect(records.get(TAB)?.pinnedUntilMs).toBeGreaterThan(afterPinMs)
-  })
-
-  it('still reports slow churn after a pin lapses', () => {
-    const records = new Map<string, ParkVerdictFlipRecord>()
-    for (let i = 0; i < 40; i += 1) {
-      observe({ records, parked: i % 2 === 0, nowMs: 1_000 + i * 10 })
-    }
-    recordBreadcrumb.mockClear()
-
-    // Slow churn only: each step outruns the burst window, so the notice limit
-    // is the only trigger left. It must not stay gated by the lapsed pin.
-    const afterPinMs = 1_000 + TERMINAL_TAB_PARK_FLIP_WINDOW_MS * 2
-    for (let i = 0; i <= TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT; i += 1) {
-      observe({ records, parked: i % 2 === 0, nowMs: afterPinMs + i * SLOW_CHURN_STEP_MS })
-    }
-
-    expect(recordBreadcrumb).toHaveBeenCalledWith(
-      'terminal_park_verdict_churn',
-      expect.objectContaining({ trigger: 'window' })
-    )
   })
 
   // Why: the pin is set from flips on the rendered verdict, so it has to be

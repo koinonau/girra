@@ -28,7 +28,6 @@ export type GpuFallbackRecoveredLaunchHandlers = {
   confirmSafeGraphics: () => void
   clearSafeGraphics: () => void
   onPromptFailed: (error: unknown) => void
-  onSafeGraphicsKept: () => void
   restartWithHardware: () => void
 }
 
@@ -52,5 +51,4 @@ export async function handleGpuFallbackRecoveredLaunch(
     return
   }
   handlers.confirmSafeGraphics()
-  handlers.onSafeGraphicsKept()
 }

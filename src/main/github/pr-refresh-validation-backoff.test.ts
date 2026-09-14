@@ -1,13 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-
-const { recordCoalescedCrashBreadcrumbMock } = vi.hoisted(() => ({
-  recordCoalescedCrashBreadcrumbMock: vi.fn()
-}))
-
-vi.mock('../crash-reporting/crash-breadcrumb-store', () => ({
-  recordCoalescedCrashBreadcrumb: recordCoalescedCrashBreadcrumbMock
-}))
-
+import { beforeEach, describe, expect, it } from 'vitest'
 import {
   clearPRRefreshValidationBackoffForTests,
   getPRRefreshValidationBackoffCountForTests,
@@ -17,7 +8,6 @@ import {
 describe('PR refresh validation backoff', () => {
   beforeEach(() => {
     clearPRRefreshValidationBackoffForTests()
-    recordCoalescedCrashBreadcrumbMock.mockReset()
   })
 
   it('backs off repeated automatic validation denials until the TTL expires', () => {
@@ -45,29 +35,5 @@ describe('PR refresh validation backoff', () => {
     }
 
     expect(getPRRefreshValidationBackoffCountForTests()).toBe(256)
-  })
-
-  it('records path-safe diagnostic breadcrumbs', () => {
-    notePRRefreshValidationDenial(
-      {
-        repoId: 'repo-1',
-        repoPath: '/Users/alice/private/project',
-        reason: 'repo-path-mismatch'
-      },
-      0
-    )
-
-    expect(recordCoalescedCrashBreadcrumbMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: 'pr_refresh_validation_skip',
-        data: expect.objectContaining({
-          reason: 'repo-path-mismatch',
-          result: 'recorded',
-          token: expect.any(String)
-        })
-      })
-    )
-    const payload = recordCoalescedCrashBreadcrumbMock.mock.calls[0]?.[0]
-    expect(JSON.stringify(payload)).not.toContain('/Users/alice/private/project')
   })
 })

@@ -1,15 +1,13 @@
 import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import type { ProcessResult, ProcessSpec } from '../../shared/child-process/run-process'
-import type { CrashReportBreadcrumbData } from '../../shared/crash-reporting'
 import {
   buildInstallDirAclRepairCommands,
   isInstallDirAclPoisonVerdict,
   repairWindowsInstallDirPackageAcl,
   resetWindowsInstallDirAclRepairForTest,
-  WINDOWS_INSTALL_DIR_ACL_REPAIR_BREADCRUMB,
   WINDOWS_INSTALL_DIR_ACL_REPAIR_MARKER_FILE,
   WINDOWS_INSTALL_DIR_ACL_REPAIR_SCHEME_VERSION,
   type WindowsInstallDirAclRepairResult
@@ -57,13 +55,9 @@ function repair(
     isServeMode?: boolean
     run?: Runner
   } = {}
-): Promise<{
-  result: WindowsInstallDirAclRepairResult
-  data: CrashReportBreadcrumbData
-}> {
+): Promise<{ result: WindowsInstallDirAclRepairResult }> {
   const { run, ...rest } = overrides
   return new Promise((resolve, reject) => {
-    let data: CrashReportBreadcrumbData = {}
     repairWindowsInstallDirPackageAcl({
       platform: 'win32',
       installDir: INSTALL_DIR,
@@ -71,12 +65,7 @@ function repair(
       ...rest,
       userDataPath: rest.userDataPath ?? userDataDir(),
       runProcessFn: (run ?? fakeRunner().run) as never,
-      recordBreadcrumb: (name, breadcrumb) => {
-        expect(name).toBe(WINDOWS_INSTALL_DIR_ACL_REPAIR_BREADCRUMB)
-        data = breadcrumb ?? {}
-        return undefined
-      },
-      onDone: (result) => resolve({ result, data })
+      onDone: (result) => resolve({ result })
     })
     setTimeout(() => reject(new Error('repair never settled')), 2_000).unref?.()
   })
@@ -118,11 +107,9 @@ describe('repairWindowsInstallDirPackageAcl', () => {
     }
   })
 
-  it('reports the repair and records an ok breadcrumb', async () => {
-    const { result, data } = await repair()
+  it('reports the repair', async () => {
+    const { result } = await repair()
     expect(result).toEqual({ mode: 'repaired' })
-    expect(data.status).toBe('ok')
-    expect(data.failedFileCount).toBe(0)
   })
 
   it('runs once and then never spawns again for the same install and version', async () => {
@@ -133,10 +120,9 @@ describe('repairWindowsInstallDirPackageAcl', () => {
 
     resetWindowsInstallDirAclRepairForTest()
     const second = fakeRunner()
-    const { result, data } = await repair({ userDataPath, run: second.run })
+    const { result } = await repair({ userDataPath, run: second.run })
     expect(second.specs).toHaveLength(0)
     expect(result).toEqual({ mode: 'marker-hit', alreadyRepaired: true })
-    expect(data.reason).toBe('marker-hit')
   })
 
   it('re-runs after an update and after a reinstall to another directory', async () => {
@@ -186,7 +172,7 @@ describe('repairWindowsInstallDirPackageAcl', () => {
     expect(corrupt.specs).toHaveLength(2)
   })
 
-  it('records the failed-file count when a standard user cannot write the ACL', async () => {
+  it('reports the failed-file count when a standard user cannot write the ACL', async () => {
     // Program Files: /C keeps going, icacls reports the losses and exits non-zero.
     const { run, specs } = fakeRunner((spec) =>
       spec.args?.includes('/T')
@@ -197,11 +183,9 @@ describe('repairWindowsInstallDirPackageAcl', () => {
           }
         : { code: 5, stdout: '', stderr: 'Access is denied.' }
     )
-    const { result, data } = await repair({ run })
+    const { result } = await repair({ run })
 
-    expect(result.mode).toBe('failed')
-    expect(data.status).toBe('failed')
-    expect(data.failedFileCount).toBe(81)
+    expect(result).toMatchObject({ mode: 'failed', failedFileCount: 81 })
     // No retry loop: exactly the two passes, then it gives up for this version.
     expect(specs).toHaveLength(2)
   })
@@ -215,12 +199,11 @@ describe('repairWindowsInstallDirPackageAcl', () => {
     expect(result.mode).toBe('failed')
   })
 
-  it('does not throw when the runner rejects, and still records a breadcrumb', async () => {
+  it('does not throw when the runner rejects', async () => {
     const run: Runner = () => Promise.reject(new Error('spawn EPERM'))
-    const { result, data } = await repair({ run })
+    const { result } = await repair({ run })
     expect(result.mode).toBe('failed')
-    expect(data.status).toBe('failed')
-    expect(String(data.reason)).toContain('spawn EPERM')
+    expect(result.mode === 'failed' ? result.reason : '').toContain('spawn EPERM')
   })
 
   it('marks the attempt so a hopeless install does not re-spawn icacls every launch', async () => {
@@ -277,12 +260,10 @@ describe('repairWindowsInstallDirPackageAcl', () => {
       appVersion: APP_VERSION,
       userDataPath: userDataDir(),
       runProcessFn: off.run as never,
-      recordBreadcrumb: vi.fn(),
       onDone: () => expect.unreachable('no-op must not settle')
     })
     resetWindowsInstallDirAclRepairForTest()
     const serve = fakeRunner()
-    const recordServe = vi.fn()
     repairWindowsInstallDirPackageAcl({
       platform: 'win32',
       isServeMode: true,
@@ -290,13 +271,11 @@ describe('repairWindowsInstallDirPackageAcl', () => {
       appVersion: APP_VERSION,
       userDataPath: userDataDir(),
       runProcessFn: serve.run as never,
-      recordBreadcrumb: recordServe,
       onDone: () => expect.unreachable('no-op must not settle')
     })
     await new Promise((resolve) => setTimeout(resolve, 20))
     expect(off.specs).toHaveLength(0)
     expect(serve.specs).toHaveLength(0)
-    expect(recordServe).not.toHaveBeenCalled()
   })
 
   it('offers commands that match what the repair itself runs', () => {

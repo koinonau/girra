@@ -7,7 +7,6 @@ import {
   GpuCrashFallbackTracker,
   isGpuFallbackCrashCandidate
 } from './gpu-crash-fallback-decision'
-import { shouldRecordProcessGoneCrash } from './process-gone-classification'
 
 /**
  * Replays the win32 GPU-child deaths from the 1.4.190 'crashed' renderer cluster
@@ -58,26 +57,8 @@ function newTracker(): GpuCrashFallbackTracker {
   })
 }
 
-const FIELD_GPU_EVENT = {
-  source: 'child',
-  processType: 'GPU',
-  serviceName: 'GPU',
-  reason: 'crashed',
-  expectedTeardown: 'none'
-} as const
-
 describe('1.4.190 win32 GPU-child crash cluster', () => {
-  it('does not let process_gone_suppressed gate the fallback candidate check', () => {
-    // The GPU death is suppressed as recoverable churn (no user-facing report)...
-    expect(
-      shouldRecordProcessGoneCrash({
-        ...FIELD_GPU_EVENT,
-        platform: 'win32',
-        exitCode: -2147483645
-      })
-    ).toBe(false)
-    // ...but the fallback path reads the raw child-process-gone event, so the
-    // suppression cannot hide a broken driver from recovery.
+  it('does not gate the fallback candidate check behind other conditions', () => {
     expect(
       isGpuFallbackCrashCandidate({
         platform: 'win32',
@@ -85,17 +66,14 @@ describe('1.4.190 win32 GPU-child crash cluster', () => {
         reason: 'crashed'
       })
     ).toBe(true)
-    // Both assertions above still pass if the candidate check is moved behind the
-    // suppressed-report path, so pin that nothing branches ahead of it in index.ts.
+    // Pin that nothing branches ahead of the candidate check in the listener.
     const listener = readChildProcessGoneListener()
     const guardStart = listener.indexOf('isGpuFallbackCrashCandidate(')
     expect(guardStart).toBeGreaterThan(0)
     expect(listener.slice(0, guardStart).match(/\bif\s*\(/g) ?? []).toHaveLength(1)
-    expect(listener).toMatch(
-      /isGpuFallbackCrashCandidate\([\s\S]*?state\.gpuCrashDiagnostics\?\.record\(\)[\s\S]*?handleGpuChildCrash\(/
-    )
+    expect(listener).toMatch(/isGpuFallbackCrashCandidate\([\s\S]*?handleGpuChildCrash\(/)
     // The `if (` count alone still allows `recorded && isGpuFallbackCrashCandidate(...)`, which
-    // re-couples recovery to the suppression decision, so pin the guard to that check alone.
+    // couples recovery to another decision, so pin the guard to that check alone.
     const recoveryGuard = listener.slice(
       listener.lastIndexOf('if (', guardStart),
       listener.indexOf('handleGpuChildCrash(')

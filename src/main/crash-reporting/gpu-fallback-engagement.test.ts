@@ -32,8 +32,6 @@ function createHandlers(overrides: Partial<GpuFallbackEngagementHandlers> = {}):
       return 'restart' as GpuFallbackRestartDecision
     }),
     onPromptFailed: vi.fn(),
-    onEngaged: vi.fn(),
-    onRestartDeferred: vi.fn(() => order.push('restartDeferred')),
     restartIntoSafeGraphics: vi.fn(() => order.push('restart')),
     ...overrides
   }
@@ -80,7 +78,7 @@ describe('engageGpuFallbackAfterCrashBurst', () => {
       promptForRestart: vi.fn(async () => 'continue' as GpuFallbackRestartDecision)
     })
     await engageGpuFallbackAfterCrashBurst(ENGAGEMENT, handlers)
-    expect(order).toEqual(['persistMarker', 'clearMarker', 'restartDeferred'])
+    expect(order).toEqual(['persistMarker', 'clearMarker'])
     expect(handlers.restartIntoSafeGraphics).not.toHaveBeenCalled()
   })
 

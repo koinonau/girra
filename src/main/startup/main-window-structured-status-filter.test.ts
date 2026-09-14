@@ -66,8 +66,7 @@ beforeEach(() => {
   } as unknown as typeof mainProcessState.mainWindow
   installMainWindowAgentStatusListeners({
     window: mainProcessState.mainWindow!,
-    maybeAutoRenameBranchOnFirstWork: vi.fn(),
-    onRecordAgentState: vi.fn()
+    maybeAutoRenameBranchOnFirstWork: vi.fn()
   })
 })
 

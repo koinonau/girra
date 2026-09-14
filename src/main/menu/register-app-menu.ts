@@ -25,7 +25,6 @@ type RegisterAppMenuOptions = {
   onOpenSettings: () => void
   onOpenSetupGuide: (window?: Electron.BaseWindow | null) => void
   onOpenFeatureTour: (window?: Electron.BaseWindow | null) => void
-  onOpenCrashReport: (window?: Electron.BaseWindow | null) => void
   onBeforeReload?: (options: { ignoreCache: boolean; webContentsId: number }) => void
   onZoomIn: () => void
   onZoomOut: () => void
@@ -45,7 +44,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
     onOpenSettings,
     onOpenSetupGuide,
     onOpenFeatureTour,
-    onOpenCrashReport,
     onBeforeReload,
     onZoomIn,
     onZoomOut,
@@ -97,11 +95,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   const setupGuideItem: Electron.MenuItemConstructorOptions = {
     label: translateMain('menu.gettingStarted', 'Getting Started with Orca'),
     click: (_menuItem, window) => onOpenSetupGuide(window)
-  }
-
-  const crashReportItem: Electron.MenuItemConstructorOptions = {
-    label: translateMain('menu.reportCrash', 'Report Crash...'),
-    click: (_menuItem, window) => onOpenCrashReport(window)
   }
 
   // Why: the macOS app-menu (named after the app) is mandatory on darwin and
@@ -282,8 +275,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   const helpMenu: Electron.MenuItemConstructorOptions = {
     label: translateMain('menu.help', 'Help'),
     submenu: [
-      crashReportItem,
-      { type: 'separator' },
       featureTourItem,
       setupGuideItem,
       ...(isMac

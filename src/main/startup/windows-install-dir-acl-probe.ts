@@ -5,7 +5,6 @@ import {
   sanitizeCrashReportString,
   type CrashReportBreadcrumbData
 } from '../../shared/crash-reporting'
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
 import { getIcaclsExePath } from '../win32-utils'
 
 /**
@@ -15,19 +14,17 @@ import { getIcaclsExePath } from '../win32-utils'
  * with 0x80000003 and nothing to distinguish them from any other CHECK. An install
  * tree carrying an orphan S-1-15-2-* package ACE with no S-1-15-2-1/-2 to satisfy
  * it reproduces exactly that signature (10/10 launches), and an additive grant of
- * S-1-15-2-2 clears it — see electron/electron#51761. This records whether a
- * machine is in that state so the next crash report answers the question itself.
+ * S-1-15-2-2 clears it — see electron/electron#51761. This reports whether a
+ * machine is in that state so the ACL repair can act on it.
  *
  * The verdict deliberately accepts EITHER well-known grant: a tree carrying the
  * orphan plus S-1-15-2-1 only (the Program Files default) launched clean on
  * win32 10.0.26200 / Electron 43.4.1, so it is not the reproduced state and must
- * not be treated as one. `hasRestrictedPackageGrant` is still reported, so a
- * report can tell the two shapes apart if that ever stops holding.
+ * not be treated as one. `hasRestrictedPackageGrant` is still reported, so the
+ * two shapes stay distinguishable if that ever stops holding.
  *
- * Diagnostic only: it never writes an ACL and never changes behavior.
+ * Read-only: it never writes an ACL.
  */
-
-export const WINDOWS_INSTALL_DIR_ACL_BREADCRUMB = 'windows_install_dir_acl'
 
 // Why a shortlist rather than a readdir: the reproduced failure is a per-file
 // content read, so the directory's own DACL is not sufficient evidence — but any
@@ -61,7 +58,6 @@ export type WindowsInstallDirAclProbeOptions = {
   /** Test seams. */
   spawnFn?: typeof spawn
   fileExists?: (path: string) => boolean
-  recordBreadcrumb?: typeof recordDurableCrashBreadcrumb
   onDone?: (data: CrashReportBreadcrumbData) => void
 }
 
@@ -151,7 +147,6 @@ function resolveTargets(installDir: string, fileExists: (path: string) => boolea
 }
 
 async function runProbe(options: WindowsInstallDirAclProbeOptions): Promise<void> {
-  const record = options.recordBreadcrumb ?? recordDurableCrashBreadcrumb
   let data: CrashReportBreadcrumbData
   try {
     const installDir = options.installDir ?? dirname(process.execPath)
@@ -180,8 +175,6 @@ async function runProbe(options: WindowsInstallDirAclProbeOptions): Promise<void
           status: 'ok',
           probedTargetCount: targets.length,
           orphanPackageSidCount: orphans.length,
-          // Capped: correlating the same orphan across reports is what would
-          // identify the tool that left it, which is the point of recording it.
           orphanPackageSids: sanitizeCrashReportString(orphans.slice(0, 3).join(','), 200),
           // The verdict rides on this one: either well-known grant satisfies the orphan.
           hasWellKnownPackageGrant,
@@ -195,7 +188,6 @@ async function runProbe(options: WindowsInstallDirAclProbeOptions): Promise<void
   } catch (error) {
     data = { status: 'failed', reason: sanitizeCrashReportString(`probe: ${String(error)}`, 200) }
   }
-  record(WINDOWS_INSTALL_DIR_ACL_BREADCRUMB, data)
   options.onDone?.(data)
 }
 
@@ -209,8 +201,7 @@ export function resetWindowsInstallDirAclProbeForTest(): void {
 
 /**
  * Fire-and-forget; returns before any spawn. win32 only — no spawn and no fs I/O
- * anywhere else. Called from openMainWindow, which runs after initObservability,
- * so the durable record also emits a span into the diagnostics bundle.
+ * anywhere else. Called from openMainWindow.
  *
  * Returns whether THIS call dispatched the probe: openMainWindow re-runs on every
  * reopen, and only a dispatch will ever produce an `onDone`.

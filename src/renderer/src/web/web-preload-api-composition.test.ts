@@ -26,7 +26,6 @@ describe('web preload API composition', () => {
       'agentAwake',
       'keybindings',
       'ui',
-      'crashReports',
       'diagnostics',
       'session',
       'onboarding',

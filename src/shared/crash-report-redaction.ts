@@ -1,13 +1,4 @@
-import type {
-  CrashReportBreadcrumb,
-  CrashReportBreadcrumbInput,
-  CrashReportDetailValue
-} from './crash-reporting'
-
 const MAX_STRING_DETAIL_LENGTH = 240
-const MAX_STACK_DETAIL_LENGTH = 4_000
-const MAX_BREADCRUMB_NAME_LENGTH = 80
-const MAX_BREADCRUMBS = 30
 
 const SECRET_PATTERNS = [
   /\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g,
@@ -50,60 +41,4 @@ export function sanitizeCrashReportString(
     sanitized = sanitized.replace(pattern, '[redacted-secret]')
   }
   return sanitized.length > maxLength ? `${sanitized.slice(0, maxLength)}...` : sanitized
-}
-
-export function sanitizeCrashReportDetails(
-  details: Record<string, unknown>
-): Record<string, CrashReportDetailValue> {
-  const sanitized: Record<string, CrashReportDetailValue> = {}
-  for (const [key, value] of Object.entries(details)) {
-    if (typeof value === 'string') {
-      const normalizedKey = key.replace(/([a-z0-9])([A-Z])/g, '$1_$2')
-      if (/(?:^|_)path$/i.test(normalizedKey)) {
-        sanitized[key] = '[redacted-path]'
-      } else {
-        const maxLength =
-          /(?:^|_)(?:stack|component_stack|error_stack|minidump_check_message)$/i.test(
-            normalizedKey
-          )
-            ? MAX_STACK_DETAIL_LENGTH
-            : MAX_STRING_DETAIL_LENGTH
-        sanitized[key] = sanitizeCrashReportString(value, maxLength)
-      }
-    } else if (typeof value === 'number' && Number.isFinite(value)) {
-      sanitized[key] = value
-    } else if (typeof value === 'boolean' || value === null) {
-      sanitized[key] = value
-    }
-  }
-  return sanitized
-}
-
-export function sanitizeCrashReportBreadcrumbs(
-  breadcrumbs: CrashReportBreadcrumbInput[] | undefined
-): CrashReportBreadcrumb[] | undefined {
-  if (!breadcrumbs || breadcrumbs.length === 0) {
-    return undefined
-  }
-
-  const sanitized = breadcrumbs
-    .slice(-MAX_BREADCRUMBS)
-    .map((breadcrumb): CrashReportBreadcrumb | null => {
-      if (!breadcrumb.name.trim() || !breadcrumb.createdAt.trim()) {
-        return null
-      }
-      const data = breadcrumb.data ? sanitizeCrashReportDetails(breadcrumb.data) : {}
-      const origin = breadcrumb.origin
-        ? sanitizeCrashReportString(breadcrumb.origin).slice(0, 80)
-        : ''
-      return {
-        createdAt: sanitizeCrashReportString(breadcrumb.createdAt),
-        name: sanitizeCrashReportString(breadcrumb.name).slice(0, MAX_BREADCRUMB_NAME_LENGTH),
-        ...(Object.keys(data).length > 0 ? { data } : {}),
-        ...(origin ? { origin } : {})
-      }
-    })
-    .filter((breadcrumb): breadcrumb is CrashReportBreadcrumb => breadcrumb !== null)
-
-  return sanitized.length > 0 ? sanitized : undefined
 }

@@ -761,20 +761,8 @@
   "auto.components.contextual.tours.contextual.tour.overlay.measurement.automations.results.title": {
     "ko": "결과 확인"
   },
-  "auto.components.crash.report.CrashReportDialog.88fea8e84e": {
-    "ko": "보내지 않음"
-  },
-  "auto.components.crash.report.CrashReportDialog.b082f27490": {
-    "ko": "최근 진단 로그 첨부"
-  },
   "auto.components.crash.report.CrashReportDialog.b2e36f53a1": {
     "ko": "크래시 보고서를 보내지 못했습니다. 진단 티켓 {{value0}}이 업로드되었지만 연결되지 않았습니다."
-  },
-  "auto.components.crash.report.CrashReportDialog.e59f0b9427": {
-    "ko": "보고서와 함께 크기가 제한되고 민감 정보가 제거된 로그 묶음을 보냅니다."
-  },
-  "auto.components.crash.report.CrashReportDialog.ead6fc0510": {
-    "ko": "자동 크래시 보고서가 캡처되지 않았습니다. 그래도 세부 정보를 보내고, 가능한 경우 최근 진단 로그를 포함할 수 있습니다."
   },
   "auto.components.dashboard.DashboardAgentRowMessage.0a01046763": {
     "ko": "중단됨"

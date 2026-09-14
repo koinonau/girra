@@ -5,7 +5,6 @@ import {
   sanitizeCrashReportString,
   type CrashReportBreadcrumbData
 } from '../../shared/crash-reporting'
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
 import { getIcaclsExePath } from '../win32-utils'
 
 /**
@@ -31,7 +30,6 @@ import { getIcaclsExePath } from '../win32-utils'
  * survive, and so must the orphan (removing an ACE is not ours to do).
  */
 
-export const WINDOWS_INSTALL_DIR_ACL_REPAIR_BREADCRUMB = 'windows_install_dir_acl_repair'
 export const WINDOWS_INSTALL_DIR_ACL_REPAIR_MARKER_FILE = 'windows-install-dir-acl-repair.json'
 export const WINDOWS_INSTALL_DIR_ACL_REPAIR_SCHEME_VERSION = 1
 
@@ -73,7 +71,6 @@ export type WindowsInstallDirAclRepairOptions = {
   poisonEvidenceOutstanding?: boolean
   /** Test seams. */
   runProcessFn?: typeof runProcess
-  recordBreadcrumb?: typeof recordDurableCrashBreadcrumb
   onDone?: (result: WindowsInstallDirAclRepairResult) => void
 }
 
@@ -212,16 +209,13 @@ async function runGrant(
 }
 
 async function runRepair(args: WindowsInstallDirAclRepairArgs): Promise<void> {
-  const record = args.recordBreadcrumb ?? recordDurableCrashBreadcrumb
   const installDir = args.installDir ?? dirname(process.execPath)
   const resolved: WindowsInstallDirAclRepairArgs = { ...args, installDir }
   let result: WindowsInstallDirAclRepairResult
-  let data: CrashReportBreadcrumbData
   try {
     const markerHit = markerHitFor(resolved)
     if (markerHit) {
       result = { mode: 'marker-hit', alreadyRepaired: markerHit.alreadyRepaired }
-      data = { status: 'skipped', reason: 'marker-hit', alreadyRepaired: markerHit.alreadyRepaired }
     } else {
       const runner = args.runProcessFn ?? runProcess
       const root = await runGrant(
@@ -243,7 +237,6 @@ async function runRepair(args: WindowsInstallDirAclRepairArgs): Promise<void> {
       const failedFileCount = tree.failedFileCount ?? root.failedFileCount
       if (root.ok && tree.ok) {
         result = { mode: 'repaired' }
-        data = { status: 'ok', failedFileCount: failedFileCount ?? -1 }
       } else {
         const reason = [
           root.reason && `root: ${root.reason}`,
@@ -252,30 +245,16 @@ async function runRepair(args: WindowsInstallDirAclRepairArgs): Promise<void> {
           .filter(Boolean)
           .join('; ')
         result = { mode: 'failed', reason, failedFileCount }
-        data = {
-          status: 'failed',
-          reason: sanitizeCrashReportString(reason, 200),
-          // -1 means icacls printed no parsable summary (a localized Windows).
-          failedFileCount: failedFileCount ?? -1
-        }
       }
       try {
         writeMarker(resolved, result.mode)
-      } catch (error) {
-        data = {
-          ...data,
-          markerWriteFailed: sanitizeCrashReportString(String(error), 200)
-        }
+      } catch {
+        // Why: an unwritable marker only costs a retry next launch; it must not flip the result.
       }
     }
   } catch (error) {
     result = { mode: 'failed', reason: String(error), failedFileCount: null }
-    data = {
-      status: 'failed',
-      reason: sanitizeCrashReportString(`repair: ${String(error)}`, 200)
-    }
   }
-  record(WINDOWS_INSTALL_DIR_ACL_REPAIR_BREADCRUMB, data)
   args.onDone?.(result)
 }
 

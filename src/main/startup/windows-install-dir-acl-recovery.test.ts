@@ -69,15 +69,13 @@ function probeThenRecover(
       installDir: INSTALL_DIR,
       fileExists: (path) => path.endsWith('ffmpeg.dll'),
       spawnFn: fakeIcaclsSpawn(dacl).spawnFn,
-      recordBreadcrumb: () => undefined,
       onDone: (data) => {
         startWindowsInstallDirAclRepairIfPoisoned(data, {
           platform: 'win32',
           installDir: INSTALL_DIR,
           appVersion: APP_VERSION,
           userDataPath: mkdtempSync(join(tmpdir(), 'orca-acl-recovery-')),
-          runProcessFn: runProcessFn as never,
-          recordBreadcrumb: () => undefined
+          runProcessFn: runProcessFn as never
         })
         // Longer than the repair's own setImmediate hop, so a repair that was
         // started has always spawned by the time this resolves.
@@ -139,7 +137,6 @@ describe('startWindowsInstallDirAclRepairIfPoisoned', () => {
         installDir: INSTALL_DIR,
         fileExists: () => false,
         spawnFn: fakeIcaclsSpawn(() => null).spawnFn,
-        recordBreadcrumb: () => undefined,
         onDone: (data) => {
           startWindowsInstallDirAclRepairIfPoisoned(data, {
             platform: 'win32',
@@ -149,8 +146,7 @@ describe('startWindowsInstallDirAclRepairIfPoisoned', () => {
             runProcessFn: (async (spec: ProcessSpec) => {
               collected.push(spec)
               throw new Error('unreachable')
-            }) as never,
-            recordBreadcrumb: () => undefined
+            }) as never
           })
           setTimeout(() => resolve(collected), 25)
         }
@@ -196,8 +192,7 @@ describe('describeInstallDirAclPoison', () => {
         installDir: INSTALL_DIR,
         appVersion: APP_VERSION,
         userDataPath: mkdtempSync(join(tmpdir(), 'orca-acl-recovery-')),
-        runProcessFn: (() => new Promise<never>(() => undefined)) as never,
-        recordBreadcrumb: () => undefined
+        runProcessFn: (() => new Promise<never>(() => undefined)) as never
       }
     )
     expect(describeInstallDirAclPoison()?.detail).toContain('repairing the permissions now')
@@ -217,8 +212,25 @@ function recoveryOptions(userDataPath: string, run: Runner): WindowsInstallDirAc
     installDir: INSTALL_DIR,
     appVersion: APP_VERSION,
     userDataPath,
-    runProcessFn: run as never,
-    recordBreadcrumb: () => undefined
+    runProcessFn: run as never
+  }
+}
+
+/** Resolves a macrotask after the repair's tree grant returns, by which point its onDone has run. */
+function trackRepairSettled(run: Runner): { run: Runner; settled: Promise<void> } {
+  let settle: () => void = () => undefined
+  const settled = new Promise<void>((resolve) => (settle = resolve))
+  return {
+    run: async (spec) => {
+      try {
+        return await run(spec)
+      } finally {
+        if (spec.args?.includes('/T')) {
+          setTimeout(settle, 0)
+        }
+      }
+    },
+    settled
   }
 }
 
@@ -249,16 +261,12 @@ describe('install-dir ACL repair vs the GPU safe-graphics marker', () => {
     )
     expect(readActiveGpuFallbackMarker(userDataPath, GPU_ENV)).not.toBeNull()
 
-    await new Promise<void>((resolve) => {
-      startWindowsInstallDirAclRepairIfPoisoned(POISON_VERDICT, {
-        ...recoveryOptions(userDataPath, okRun),
-        // Settles after the repair's own setImmediate hop and its two icacls passes.
-        recordBreadcrumb: () => {
-          setTimeout(resolve, 0)
-          return undefined
-        }
-      })
-    })
+    const repair = trackRepairSettled(okRun)
+    startWindowsInstallDirAclRepairIfPoisoned(
+      POISON_VERDICT,
+      recoveryOptions(userDataPath, repair.run)
+    )
+    await repair.settled
 
     expect(describeInstallDirAclPoison()?.detail).toContain('repaired the permissions')
     // The GPU child deaths were never a driver fault, so safe graphics — and the
@@ -276,15 +284,12 @@ describe('install-dir ACL repair vs the GPU safe-graphics marker', () => {
       GPU_ENV
     )
 
-    await new Promise<void>((resolve) => {
-      startWindowsInstallDirAclRepairIfPoisoned(POISON_VERDICT, {
-        ...recoveryOptions(userDataPath, okRun),
-        recordBreadcrumb: () => {
-          setTimeout(resolve, 0)
-          return undefined
-        }
-      })
-    })
+    const repair = trackRepairSettled(okRun)
+    startWindowsInstallDirAclRepairIfPoisoned(
+      POISON_VERDICT,
+      recoveryOptions(userDataPath, repair.run)
+    )
+    await repair.settled
 
     expect(describeInstallDirAclPoison()?.detail).toContain('repaired the permissions')
     expect(readActiveGpuFallbackMarker(userDataPath, GPU_ENV)?.userConfirmed).toBe(true)
@@ -496,20 +501,14 @@ describe('repairKnownPoisonedInstallDirBeforeWindow', () => {
     const stalled = new Promise<void>((resolve) => {
       releaseIcacls = resolve
     })
-    let repairReported: () => void = () => undefined
-    const reported = new Promise<void>((resolve) => {
-      repairReported = resolve
+    const stalledRepair = trackRepairSettled(async (spec) => {
+      await stalled
+      return okRun(spec)
     })
+    const reported = stalledRepair.settled
 
     const mode = await repairKnownPoisonedInstallDirBeforeWindow({
-      ...recoveryOptions(userDataPath, async (spec) => {
-        await stalled
-        return okRun(spec)
-      }),
-      recordBreadcrumb: () => {
-        setTimeout(repairReported, 0)
-        return undefined
-      },
+      ...recoveryOptions(userDataPath, stalledRepair.run),
       timeoutMs: 20
     })
     expect(mode).toBe('timeout')
@@ -543,20 +542,14 @@ describe('repairKnownPoisonedInstallDirBeforeWindow', () => {
     const stalled = new Promise<void>((resolve) => {
       releaseIcacls = resolve
     })
-    let repairReported: () => void = () => undefined
-    const reported = new Promise<void>((resolve) => {
-      repairReported = resolve
+    const stalledRepair = trackRepairSettled(async (spec) => {
+      await stalled
+      return okRun(spec)
     })
+    const reported = stalledRepair.settled
 
     const mode = await repairKnownPoisonedInstallDirBeforeWindow({
-      ...recoveryOptions(userDataPath, async (spec) => {
-        await stalled
-        return okRun(spec)
-      }),
-      recordBreadcrumb: () => {
-        setTimeout(repairReported, 0)
-        return undefined
-      },
+      ...recoveryOptions(userDataPath, stalledRepair.run),
       timeoutMs: 20
     })
     expect(mode).toBe('timeout')
@@ -754,15 +747,12 @@ describe('a repair marker recording a completed repair', () => {
       spent.push(spec)
       return { code: 5, signal: null, stdout: '', stderr: 'Access is denied.', timedOut: false }
     }
-    await new Promise<void>((resolve) => {
-      startWindowsInstallDirAclRepairIfPoisoned(POISON_VERDICT, {
-        ...recoveryOptions(userDataPath, failing),
-        recordBreadcrumb: () => {
-          setTimeout(resolve, 0)
-          return undefined
-        }
-      })
-    })
+    const repair = trackRepairSettled(failing)
+    startWindowsInstallDirAclRepairIfPoisoned(
+      POISON_VERDICT,
+      recoveryOptions(userDataPath, repair.run)
+    )
+    await repair.settled
 
     expect(spent.map((spec) => spec.args?.[2])).toEqual([
       '*S-1-15-2-2:(OI)(CI)(RX)',
@@ -793,15 +783,9 @@ describe('a repair marker recording a completed repair', () => {
       spent.push(spec)
       return okRun(spec)
     }
-    await new Promise<void>((resolve) => {
-      startWindowsInstallDirAclRepairIfPoisoned(POISON_VERDICT, {
-        ...recoveryOptions(userDataPath, run),
-        recordBreadcrumb: () => {
-          setTimeout(resolve, 0)
-          return undefined
-        }
-      })
-    })
+    startWindowsInstallDirAclRepairIfPoisoned(POISON_VERDICT, recoveryOptions(userDataPath, run))
+    // A spent budget runs no icacls, so the repair settles inside its own setImmediate hop.
+    await new Promise((resolve) => setTimeout(resolve, 25))
 
     expect(spent).toHaveLength(0)
     // Nothing was repaired, so the user still gets the commands and the gate stays armed.
@@ -864,19 +848,16 @@ describe('a clean probe verdict', () => {
       stderr: 'Access is denied.',
       timedOut: false
     })
-    let repairSettled = false
-    startWindowsInstallDirAclRepairIfPoisoned(POISON_VERDICT, {
-      ...recoveryOptions(userDataPath, failing),
-      recordBreadcrumb: () => {
-        repairSettled = true
-        return undefined
-      }
-    })
+    const repair = trackRepairSettled(failing)
+    startWindowsInstallDirAclRepairIfPoisoned(
+      POISON_VERDICT,
+      recoveryOptions(userDataPath, repair.run)
+    )
     startWindowsInstallDirAclRepairIfPoisoned(
       { status: 'ok', matchesPoisonSignature: false },
       recoveryOptions(userDataPath, okRun)
     )
-    await vi.waitFor(() => expect(repairSettled).toBe(true))
+    await repair.settled
     expect(isInstallDirAclSuspect()).toBe(false)
     expect(describeInstallDirAclPoison()).toBeNull()
   })
@@ -897,8 +878,7 @@ describe('the probe-pending grace window', () => {
       platform: 'win32' as const,
       installDir: INSTALL_DIR,
       fileExists: () => false,
-      spawnFn: fakeIcaclsSpawn((target) => icaclsDacl(target, [RESTRICTED_PACKAGES_ACE])).spawnFn,
-      recordBreadcrumb: () => undefined
+      spawnFn: fakeIcaclsSpawn((target) => icaclsDacl(target, [RESTRICTED_PACKAGES_ACE])).spawnFn
     }
     let settleVerdict: () => void = () => undefined
     const verdict = new Promise<void>((resolve) => (settleVerdict = resolve))

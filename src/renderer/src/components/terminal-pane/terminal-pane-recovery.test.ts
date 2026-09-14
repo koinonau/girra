@@ -20,11 +20,6 @@ vi.mock('@/store', async () => {
   return { useAppStore: { getState: () => store.recoveryLedgerStoreState() } }
 })
 
-vi.mock('@/lib/crash-breadcrumb-recorder', async () => {
-  const store = await import('./terminal-recovery-ledger-test-store')
-  return { recordRendererCrashBreadcrumb: store.recoveryLedgerMocks.recordRendererCrashBreadcrumb }
-})
-
 beforeEach(() => {
   _resetTerminalPaneRecoveryForTests()
   resetRecoveryLedgerStore()
@@ -42,7 +37,7 @@ afterEach(() => {
 })
 
 describe('requestTerminalPaneRecovery', () => {
-  it('remounts the tab and records a breadcrumb for a certified-dead pipeline', async () => {
+  it('remounts the tab for a certified-dead pipeline', async () => {
     const result = await requestTerminalPaneRecovery({
       tabId: 'tab-1',
       ptyId: 'pty-1',
@@ -51,10 +46,6 @@ describe('requestTerminalPaneRecovery', () => {
 
     expect(result).toBe(true)
     expect(mocks.remountTerminalTabForRecovery).toHaveBeenCalledWith('tab-1')
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_pane_recovery_remount',
-      { tabId: 'tab-1', reason: 'write-stalled' }
-    )
     // Pipeline-death reasons are already probe-certified — no liveness gate.
     expect(mocks.hasPty).not.toHaveBeenCalled()
   })
@@ -72,7 +63,7 @@ describe('requestTerminalPaneRecovery', () => {
     expect(isTerminalInputQuarantined('tab-ssh')).toBe(false)
   })
 
-  it('records a breadcrumb when the tab cannot be remounted, without consuming budget', async () => {
+  it('declines when the tab cannot be remounted, without consuming budget', async () => {
     const result = await requestTerminalPaneRecovery({
       tabId: 'tab-gone',
       ptyId: 'pty-1',
@@ -80,10 +71,6 @@ describe('requestTerminalPaneRecovery', () => {
     })
 
     expect(result).toBe(false)
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_pane_recovery_remount_unavailable',
-      { tabId: 'tab-gone', reason: 'restore-blocked' }
-    )
     // Budget untouched: a later request for the same tab may still remount.
     setTerminalTabs([...terminalTabs(), { id: 'tab-gone' }])
     expect(
@@ -236,10 +223,6 @@ describe('requestTerminalPaneRecovery', () => {
       })
     }
     expect(mocks.remountTerminalTabForRecovery).toHaveBeenCalledTimes(3)
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_pane_recovery_window_cap',
-      { tabId: 'tab-1', reason: 'write-stalled' }
-    )
   })
 
   it('drops the budget with the row the tab closure removes', async () => {
@@ -516,10 +499,6 @@ describe('requestTerminalPaneRecovery', () => {
 
     expect(mocks.hasPty).toHaveBeenCalledWith('pty-not-live')
     expect(mocks.remountTerminalTabForRecovery).toHaveBeenCalledTimes(2)
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenLastCalledWith(
-      'terminal_pane_recovery_remount',
-      { tabId: 'tab-1', reason: 'write-stalled' }
-    )
     livenessSplit.unregister()
     certifiedSplit.unregister()
   })
@@ -686,12 +665,6 @@ describe('requestTerminalPaneRecovery', () => {
     await expect(
       requestTerminalPaneRecovery({ tabId: 'tab-1', ptyId: 'pty-1', reason: 'write-stalled' })
     ).resolves.toBe(false)
-    // The failure must leave a trace — it is the only forensic signal for a
-    // production remount-failure loop (budget unconsumed → cooldown retries).
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_pane_recovery_failed',
-      { tabId: 'tab-1', reason: 'write-stalled' }
-    )
   })
 
   it('does not consume budget when the tab no longer exists', async () => {
@@ -702,12 +675,6 @@ describe('requestTerminalPaneRecovery', () => {
     })
 
     expect(result).toBe(false)
-    // Not silent anymore: the missing-tab outcome is breadcrumbed (see the
-    // dedicated test above), but no remount breadcrumb may fire.
-    expect(mocks.recordRendererCrashBreadcrumb).not.toHaveBeenCalledWith(
-      'terminal_pane_recovery_remount',
-      expect.anything()
-    )
   })
 
   // Why: quarantine suppresses real keystrokes, so arming it on a recovery that

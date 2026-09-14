@@ -69,13 +69,11 @@ export function enqueuePRRefresh(
   const skippedReason = validateCandidate(candidate)
   if (skippedReason) {
     queue.removeInvalidAlias(key, alias)
-    events.record('skipped', reason, skippedReason)
     events.broadcast({ aliases: [alias], reason, status: 'skipped', skippedReason })
     return
   }
 
   const enqueued = queue.enqueue(candidate, reason, priority, windowId)
-  events.record(enqueued.coalesced ? 'coalesced' : 'enqueued', reason)
   if (shouldBroadcastQueued(reason, enqueued.dueAt)) {
     events.broadcast({ aliases: [enqueued.alias], reason, status: 'queued' })
   }

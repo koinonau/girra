@@ -1,21 +1,9 @@
 import type { ILink, ILinkProvider, Terminal } from '@xterm/xterm'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import {
   guardLinkProvider,
   installGuardedLinkProviderRegistration
 } from './terminal-link-provider-guard'
-
-const mocks = vi.hoisted(() => ({
-  recordRendererCrashBreadcrumb: vi.fn()
-}))
-
-vi.mock('@/lib/crash-diagnostics', () => ({
-  recordRendererCrashBreadcrumb: mocks.recordRendererCrashBreadcrumb
-}))
-
-beforeEach(() => {
-  mocks.recordRendererCrashBreadcrumb.mockClear()
-})
 
 function collectLinks(provider: ILinkProvider, bufferLineNumber = 1): ILink[] | undefined {
   let result: ILink[] | undefined
@@ -37,19 +25,10 @@ describe('guardLinkProvider', () => {
         throw new RangeError('Invalid array length')
       }
     }
-    const guarded = guardLinkProvider(provider, 'web-links')
+    const guarded = guardLinkProvider(provider)
 
     expect(() => collectLinks(guarded)).not.toThrow()
     expect(collectLinks(guarded)).toBeUndefined()
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_link_provider_error',
-      {
-        provider: 'web-links',
-        bufferLineNumber: 1,
-        errorName: 'RangeError',
-        errorMessage: 'Invalid array length'
-      }
-    )
   })
 
   it('passes provided links through unchanged when the provider succeeds', () => {
@@ -57,10 +36,9 @@ describe('guardLinkProvider', () => {
     const provider: ILinkProvider = {
       provideLinks: (_lineNumber, callback) => callback(links)
     }
-    const guarded = guardLinkProvider(provider, 'orca-handle')
+    const guarded = guardLinkProvider(provider)
 
     expect(collectLinks(guarded)).toBe(links)
-    expect(mocks.recordRendererCrashBreadcrumb).not.toHaveBeenCalled()
   })
 
   it('does not double-invoke the callback when the provider throws after resolving', () => {
@@ -71,13 +49,12 @@ describe('guardLinkProvider', () => {
         throw new RangeError('Invalid array length')
       }
     }
-    const guarded = guardLinkProvider(provider, 'orca-file')
+    const guarded = guardLinkProvider(provider)
 
     const callback = vi.fn()
     expect(() => guarded.provideLinks(1, callback)).not.toThrow()
     expect(callback).toHaveBeenCalledTimes(1)
     expect(callback).toHaveBeenCalledWith(links)
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledOnce()
   })
 })
 
@@ -103,9 +80,5 @@ describe('installGuardedLinkProviderRegistration', () => {
     expect(registered).toHaveLength(1)
     expect(() => collectLinks(registered[0])).not.toThrow()
     expect(collectLinks(registered[0])).toBeUndefined()
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_link_provider_error',
-      expect.objectContaining({ provider: 'provider-1', errorName: 'RangeError' })
-    )
   })
 })

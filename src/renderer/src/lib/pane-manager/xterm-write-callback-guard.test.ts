@@ -5,21 +5,12 @@ import {
 } from './xterm-write-callback-guard'
 import { writeForegroundTerminalChunk } from './pane-terminal-foreground-render-settle'
 
-const mocks = vi.hoisted(() => ({
-  recordRendererCrashBreadcrumb: vi.fn()
-}))
-
-vi.mock('@/lib/crash-breadcrumb-recorder', () => ({
-  recordRendererCrashBreadcrumb: mocks.recordRendererCrashBreadcrumb
-}))
-
 beforeEach(() => {
-  mocks.recordRendererCrashBreadcrumb.mockClear()
   _resetWriteCompletionReportsForTests()
 })
 
 describe('runGuardedWriteCompletionStep', () => {
-  it('contains a synchronous throw and reports a breadcrumb', () => {
+  it('contains a synchronous throw and reports it', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     try {
       expect(() =>
@@ -27,20 +18,16 @@ describe('runGuardedWriteCompletionStep', () => {
           throw new RangeError('synthetic settle failure')
         })
       ).not.toThrow()
-      expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-        'terminal_write_completion_error',
-        expect.objectContaining({
-          context: 'test-step',
-          errorName: 'RangeError',
-          errorMessage: 'synthetic settle failure'
-        })
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[terminal] write-completion step "test-step" threw',
+        expect.objectContaining({ name: 'RangeError', message: 'synthetic settle failure' })
       )
     } finally {
       errorSpy.mockRestore()
     }
   })
 
-  it('caps repeated reports per context so a throw-per-write loop cannot spam breadcrumbs', () => {
+  it('caps repeated reports per context so a throw-per-write loop cannot spam the log', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     try {
       for (let i = 0; i < 20; i++) {
@@ -48,7 +35,7 @@ describe('runGuardedWriteCompletionStep', () => {
           throw new Error('always fails')
         })
       }
-      expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledTimes(5)
+      expect(errorSpy).toHaveBeenCalledTimes(5)
     } finally {
       errorSpy.mockRestore()
     }
@@ -58,7 +45,6 @@ describe('runGuardedWriteCompletionStep', () => {
     const step = vi.fn()
     runGuardedWriteCompletionStep('ok-step', step)
     expect(step).toHaveBeenCalledTimes(1)
-    expect(mocks.recordRendererCrashBreadcrumb).not.toHaveBeenCalled()
   })
 })
 
@@ -119,9 +105,9 @@ describe('writeForegroundTerminalChunk completion guarding', () => {
       // replay-guard release) must still run.
       expect(() => pendingCallbacks.forEach((cb) => cb())).not.toThrow()
       expect(onParsed).toHaveBeenCalledTimes(1)
-      expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-        'terminal_write_completion_error',
-        expect.objectContaining({ context: 'foreground-render-settle' })
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[terminal] write-completion step "foreground-render-settle" threw',
+        expect.any(Error)
       )
     } finally {
       errorSpy.mockRestore()

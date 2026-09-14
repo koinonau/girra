@@ -5,16 +5,7 @@ import {
   guardParserHandler
 } from './terminal-parser-handler-guard'
 
-const mocks = vi.hoisted(() => ({
-  recordRendererCrashBreadcrumb: vi.fn()
-}))
-
-vi.mock('@/lib/crash-breadcrumb-recorder', () => ({
-  recordRendererCrashBreadcrumb: mocks.recordRendererCrashBreadcrumb
-}))
-
 beforeEach(() => {
-  mocks.recordRendererCrashBreadcrumb.mockClear()
   _resetParserHandlerReportsForTests()
 })
 
@@ -29,23 +20,18 @@ describe('guardParserHandler', () => {
     expect(guarded('handled')).toBe(true)
     expect(guarded('other')).toBe(false)
     expect(handler).toHaveBeenCalledTimes(2)
-    expect(mocks.recordRendererCrashBreadcrumb).not.toHaveBeenCalled()
   })
 
-  it('degrades a throwing handler to "not handled" and reports a breadcrumb', () => {
+  it('degrades a throwing handler to "not handled" and reports it', () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     try {
       const guarded = guardParserHandler('exploding-handler', () => {
         throw new TypeError('synthetic handler failure')
       })
       expect(guarded()).toBe(false)
-      expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-        'terminal_parser_handler_error',
-        expect.objectContaining({
-          handler: 'exploding-handler',
-          errorName: 'TypeError',
-          errorMessage: 'synthetic handler failure'
-        })
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[terminal] parser handler "exploding-handler" threw',
+        expect.objectContaining({ name: 'TypeError', message: 'synthetic handler failure' })
       )
     } finally {
       errorSpy.mockRestore()
@@ -61,7 +47,7 @@ describe('guardParserHandler', () => {
       for (let i = 0; i < 20; i++) {
         guarded()
       }
-      expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledTimes(5)
+      expect(errorSpy).toHaveBeenCalledTimes(5)
     } finally {
       errorSpy.mockRestore()
     }
@@ -97,9 +83,9 @@ describe('guardParserHandler', () => {
       })
       vi.runAllTimers()
       expect(completed).toEqual(['poisoned', 'after', 'later'])
-      expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-        'terminal_parser_handler_error',
-        expect.objectContaining({ handler: 'poisoned-csi' })
+      expect(errorSpy).toHaveBeenCalledWith(
+        '[terminal] parser handler "poisoned-csi" threw',
+        expect.any(Error)
       )
     } finally {
       errorSpy.mockRestore()

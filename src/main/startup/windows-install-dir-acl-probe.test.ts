@@ -3,7 +3,6 @@ import { describe, expect, it, beforeEach, vi } from 'vitest'
 import {
   probeWindowsInstallDirAcl,
   resetWindowsInstallDirAclProbeForTest,
-  WINDOWS_INSTALL_DIR_ACL_BREADCRUMB,
   type WindowsInstallDirAclProbeOptions
 } from './windows-install-dir-acl-probe'
 import {
@@ -34,10 +33,7 @@ function probe(options: WindowsInstallDirAclProbeOptions): Promise<Record<string
       installDir: INSTALL_DIR,
       fileExists: (path) => path.endsWith('ffmpeg.dll'),
       ...options,
-      recordBreadcrumb: (name, data) => {
-        resolve({ ...(data as Record<string, unknown>), name })
-        return undefined
-      }
+      onDone: (data) => resolve(data as Record<string, unknown>)
     })
   })
 }
@@ -56,7 +52,6 @@ describe('probeWindowsInstallDirAcl', () => {
     const data = await probe({
       spawnFn: fakeSpawn((target) => icaclsDacl(target, [], ENGLISH_BASELINE_ACES)).spawnFn
     })
-    expect(data.name).toBe(WINDOWS_INSTALL_DIR_ACL_BREADCRUMB)
     expect(data.status).toBe('ok')
     expect(data.orphanPackageSidCount).toBe(0)
     expect(data.matchesPoisonSignature).toBe(false)
@@ -131,10 +126,7 @@ describe('probeWindowsInstallDirAcl', () => {
         spawnFn: fakeSpawn((target) =>
           icaclsDacl(target, [ORPHAN, FRENCH_RESTRICTED_PACKAGES_ACE], FRENCH_BASELINE_ACES)
         ).spawnFn,
-        recordBreadcrumb: (_name, d) => {
-          resolve(d as Record<string, unknown>)
-          return undefined
-        }
+        onDone: (d) => resolve(d as Record<string, unknown>)
       })
     })
     expect(localized.matchesPoisonSignature).toBe(true)
@@ -181,19 +173,19 @@ describe('probeWindowsInstallDirAcl', () => {
     ['serve mode', { platform: 'win32' as NodeJS.Platform, isServeMode: true }]
   ])('does no work on %s', async (_label, options) => {
     const fake = fakeSpawn((target) => dacl(target, ORPHAN))
-    const record = vi.fn()
+    const onDone = vi.fn()
     const fileExists = vi.fn(() => true)
     probeWindowsInstallDirAcl({
       installDir: INSTALL_DIR,
       spawnFn: fake.spawnFn,
       fileExists,
-      recordBreadcrumb: record,
+      onDone,
       ...options
     })
     await new Promise((resolve) => setImmediate(resolve))
     expect(fake.calls).toHaveLength(0)
     expect(fileExists).not.toHaveBeenCalled()
-    expect(record).not.toHaveBeenCalled()
+    expect(onDone).not.toHaveBeenCalled()
   })
 
   it('runs once per process', async () => {

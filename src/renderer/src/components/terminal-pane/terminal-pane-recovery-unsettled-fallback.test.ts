@@ -30,11 +30,6 @@ vi.mock('@/store', async () => {
   return { useAppStore: { getState: () => store.recoveryLedgerStoreState() } }
 })
 
-vi.mock('@/lib/crash-breadcrumb-recorder', async () => {
-  const store = await import('./terminal-recovery-ledger-test-store')
-  return { recordRendererCrashBreadcrumb: store.recoveryLedgerMocks.recordRendererCrashBreadcrumb }
-})
-
 /** The one reason with no `success` settle path, and the one this bound exists for. */
 const NEVER_SETTLES = {
   tabId: 'tab-1',
@@ -59,7 +54,7 @@ afterEach(() => {
 })
 
 describe('a pane that never reports an outcome', () => {
-  it('bounds a never-settling tab at three remounts per window and says so', async () => {
+  it('bounds a never-settling tab at three remounts per window', async () => {
     // t=0 admits: no ledger yet.
     expect(await requestTerminalPaneRecovery(NEVER_SETTLES)).toBe(true)
 
@@ -77,16 +72,12 @@ describe('a pane that never reports an outcome', () => {
     expect(await requestTerminalPaneRecovery(NEVER_SETTLES)).toBe(true)
     expect(mocks.remountTerminalTabForRecovery).toHaveBeenCalledTimes(3)
 
-    // The backstop. Every further ask inside the window is refused, loudly.
+    // The backstop. Every further ask inside the window is refused.
     for (const now of [93_000, 124_000, 200_000, 299_000]) {
       vi.setSystemTime(now)
       expect(await requestTerminalPaneRecovery(NEVER_SETTLES)).toBe(false)
     }
     expect(mocks.remountTerminalTabForRecovery).toHaveBeenCalledTimes(3)
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_pane_recovery_window_cap',
-      { tabId: 'tab-1', reason: 'spawn-left-pane-unbound' }
-    )
 
     // And it is a rolling window, not a permanent stop: once the first attempt
     // ages out of it the tab may heal again.

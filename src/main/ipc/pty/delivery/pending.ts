@@ -5,7 +5,6 @@ import {
   type Mode2031ReplyScanState
 } from '../../../../shared/terminal-color-scheme-protocol'
 import { redactPtyIdForDiagnostics } from '../../../../shared/pty-delivery-diagnostics'
-import { recordCrashBreadcrumb } from '../../../crash-reporting/crash-breadcrumb-store'
 import { terminalOutputBacklogCapChars } from '../../../../shared/terminal-scrollback-policy'
 import { isHiddenPtyDeliveryGateEnabled } from '../../pty-hidden-delivery-gate'
 import {
@@ -100,11 +99,6 @@ export function dropOversizedPendingPtyData(
     console.error(
       `[pty] dropped ${pending.data.length} buffered chars for ${redactPtyIdForDiagnostics(id)}: renderer not receiving and per-PTY pending cap exceeded; pane will restore from the main-owned snapshot`
     )
-    // Why: field visibility for cap tuning (issue #2836 / #7017); no pty id since session ids can embed workspace paths.
-    recordCrashBreadcrumb('terminal_pending_output_dropped', {
-      droppedChars: pending.data.length,
-      capChars
-    })
   }
   if (
     isHiddenPtyDeliveryGateEnabled(session.getSettings?.()) &&

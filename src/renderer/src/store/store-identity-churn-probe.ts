@@ -8,8 +8,7 @@
  * answer it. A field that churns re-renders every component selecting it, with
  * no data change to show for it.
  *
- * Cost when disarmed: one boolean field load per write, matching
- * react-commit-cascade-write-probe. Comparison work only happens while armed.
+ * Cost when disarmed: one boolean field load per write. Comparison work only happens while armed.
  * Nothing in the app arms it, so store/index.ts installs it only in dev and
  * store-exposing builds; a shipped build never runs the wrapper at all.
  *
@@ -169,9 +168,8 @@ function recordWrite(
 }
 
 /**
- * Wraps the state creator rather than patching setState, for the same reason as
- * react-commit-cascade-write-probe: slices capture the `set` closure built before
- * `api` exists, and slice-internal writes are the ones that churn.
+ * Wraps the state creator rather than patching setState: slices capture the `set`
+ * closure built before `api` exists, and slice-internal writes are the ones that churn.
  */
 export function withStoreIdentityChurnProbe<TState>(
   createState: StateCreator<TState, [], []>

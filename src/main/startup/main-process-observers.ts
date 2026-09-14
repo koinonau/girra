@@ -8,7 +8,6 @@ import { installHookStatusSessionTabsRepublish } from '../agent-hooks/hook-statu
 import { initTelemetry, track } from '../telemetry/client'
 import { setCodexTrustGrantTelemetry } from '../codex/codex-trust-grant-telemetry'
 import { initObservability } from '../observability'
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
 import { recoverPendingSkillTransactions } from '../skills/skill-transaction-startup-recovery'
 import { initCohortClassifier } from '../telemetry/cohort-classifier'
 import { initOnboardingCohortClassifier } from '../telemetry/onboarding-cohort-classifier'
@@ -56,10 +55,7 @@ export function initializeMainProcessObservers(): void {
   }
   // Why: telemetry must init before any IPC handler/renderer can call track(); it's a no-op in dev and while TELEMETRY_ENABLED is false, so it's safe early.
   initTelemetry(store)
-  // Why: the breadcrumb alone never leaves the machine — it rides crash reports, and a hang is not
-  // a crash (the app is force-quit, so no report is ever generated). Without this the incidence
-  // number the watchdog exists to produce would sit unread on the user's disk. Must run after
-  // initTelemetry: track() drops silently until the client and store are wired.
+  // Why after initTelemetry: track() drops silently until the client and store are wired.
   if (state.hangDetection) {
     track('main_thread_hang_detected', {
       unresponsive_ms: Math.round(state.hangDetection.unresponsiveMs),
@@ -86,10 +82,6 @@ export function initializeMainProcessObservers(): void {
   // Honors DO_NOT_TRACK / ORCA_TELEMETRY_DISABLED / ORCA_DIAGNOSTICS_DISABLED
   // / CI internally; those gates do not need to be re-checked here.
   initObservability()
-  recordDurableCrashBreadcrumb('main_process_lifecycle_started', {
-    packaged: app.isPackaged,
-    platform: process.platform
-  })
   state.skillTransactionRecovery = recoverPendingSkillTransactions(
     join(app.getPath('userData'), 'skill-installs')
   )

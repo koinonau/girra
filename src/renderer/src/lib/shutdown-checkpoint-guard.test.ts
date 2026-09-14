@@ -53,9 +53,7 @@ describe('createShutdownCheckpointGuard', () => {
     expect(persist).toHaveBeenCalledTimes(2)
   })
 
-  it('publishes the failure cause and records a crash breadcrumb (STA-5505)', () => {
-    const recordBreadcrumb = vi.fn()
-    ;(window as unknown as { api: unknown }).api = { crashReports: { recordBreadcrumb } }
+  it('publishes the failure cause (STA-5505)', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const guard = createShutdownCheckpointGuard(() => {
       throw new Error('sendSync payload rejected')
@@ -64,10 +62,6 @@ describe('createShutdownCheckpointGuard', () => {
     expect(guard.persistOnce()).toBe(false)
 
     expect(consumeShutdownCheckpointFailureReason()).toBe('sendSync payload rejected')
-    expect(recordBreadcrumb).toHaveBeenCalledWith({
-      name: 'renderer_shutdown_checkpoint_failed',
-      data: { message: 'sendSync payload rejected' }
-    })
   })
 
   it('clears a stale failure cause once a later checkpoint succeeds (STA-5505)', () => {

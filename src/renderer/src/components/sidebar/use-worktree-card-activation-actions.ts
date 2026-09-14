@@ -1,7 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react'
 
 import { getRepoExecutionHostId } from '../../../../shared/execution-host'
-import { recordRendererCrashBreadcrumb } from '@/lib/crash-diagnostics'
 import { activateWorktreeFromSidebar } from '@/lib/sidebar-worktree-activation'
 import { isEventTargetInsideCurrentTarget } from './worktree-card-dom-events'
 import type { WorktreeCardProps } from './worktree-card-model'
@@ -16,12 +15,10 @@ export function useWorktreeCardActivationActions({
   repo,
   affiliateListMode,
   onSelectionGesture,
-  isActive,
   activationRowKey,
   onActivate,
   onImmediateActivate,
   isDeleting,
-  isSshDisconnected,
   updateWorktreeMeta,
   openModal
 }: Pick<
@@ -30,12 +27,11 @@ export function useWorktreeCardActivationActions({
   | 'repo'
   | 'affiliateListMode'
   | 'onSelectionGesture'
-  | 'isActive'
   | 'activationRowKey'
   | 'onActivate'
   | 'onImmediateActivate'
 > &
-  Pick<Foundation, 'isSshDisconnected' | 'updateWorktreeMeta' | 'openModal'> &
+  Pick<Foundation, 'updateWorktreeMeta' | 'openModal'> &
   Pick<LinkedDetails, 'isDeleting'>) {
   const worktreeRef = useRef(worktree)
   useLayoutEffect(() => {
@@ -74,12 +70,6 @@ export function useWorktreeCardActivationActions({
         return
       }
       // Why: route sidebar clicks through the shared activation path so the back/forward stack stays complete.
-      recordRendererCrashBreadcrumb('sidebar_worktree_activate', {
-        worktreeId: worktree.id,
-        repoId: worktree.repoId,
-        wasActive: isActive,
-        sshDisconnected: isSshDisconnected
-      })
       onImmediateActivate?.(worktree.id, activationRowKey)
       void activateWorktreeFromSidebar(
         worktree.id,
@@ -90,13 +80,10 @@ export function useWorktreeCardActivationActions({
     [
       affiliateListMode,
       worktree.id,
-      worktree.repoId,
       worktree.hostId,
       repo,
-      isActive,
       isDeleting,
       activationRowKey,
-      isSshDisconnected,
       onActivate,
       onImmediateActivate,
       onSelectionGesture

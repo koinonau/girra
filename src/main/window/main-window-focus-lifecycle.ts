@@ -222,10 +222,6 @@ export function installMainWindowFocusLifecycle(args: {
     resetShortcutRecorderFocus()
     // Why: macOS reports BrowserWindow teardown as renderer killed/SIGKILL after close — window noise, not a crash.
     if (!isWindowClosing()) {
-      // Why: the recorder owns crash classification; filtering here made expected-teardown evidence unreachable.
-      opts?.onRendererProcessGone?.(details, rendererWebContentsId)
-    }
-    if (!isWindowClosing()) {
       console.error('[window] Renderer process gone; close confirmation will be bypassed', details)
     }
     scheduleRendererRecovery(details)

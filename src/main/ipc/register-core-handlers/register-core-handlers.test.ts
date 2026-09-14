@@ -464,7 +464,6 @@ describe('registerCoreHandlers', () => {
       undefined,
       agentAwakeService as never,
       undefined,
-      undefined,
       { getAdditionalAiVaultCodexHomePaths, onBeforeRelaunch }
     )
 

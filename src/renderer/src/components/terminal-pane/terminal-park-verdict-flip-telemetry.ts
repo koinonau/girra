@@ -1,21 +1,15 @@
 /**
- * Cold-park verdict telemetry and a safe-side circuit breaker.
- * Field breadcrumbs prove render-cadence flips, but not which eligibility input
- * oscillates; burst damping keeps the pane mounted before React reaches #185.
+ * Cold-park verdict flip tracking and a safe-side circuit breaker.
+ * Burst damping keeps the pane mounted before React reaches #185.
  *
  * Scope: flips are counted on the rendered verdict and the pin subtracts from
  * that same verdict (selectParkVerdictPinnedTabIds), so churn driven by any
  * parked input — worktree-level park, portal ownership, deferred activation
- * mounts — is damped, not only the cold-park candidate set. A repeating `burst`
- * crumb for one tab therefore means the driver keeps re-proposing the park once
- * each pin lapses, not that damping never reached it.
+ * mounts — is damped, not only the cold-park candidate set.
  */
-import { recordRendererCrashBreadcrumb } from '@/lib/crash-breadcrumb-recorder'
 import { REACT_NESTED_UPDATE_LIMIT } from '../../../../shared/react-update-depth-attribution'
 
 export const TERMINAL_TAB_PARK_FLIP_WINDOW_MS = 60_000
-/** Flips per window that no sane park policy should reach. Breadcrumb only. */
-export const TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT = 12
 
 /** Measured upper bound after the passive-effect pin engages. */
 const PARK_PIN_SETTLE_COMMITS = 6
@@ -35,26 +29,24 @@ export type ParkVerdictFlipRecord = {
   parked: boolean
   windowStartMs: number
   flips: number
-  notified: boolean
   burstStartMs: number
   burstFlips: number
   /** Set when a flip burst engaged damping; the verdict stays unparked until then. */
   pinnedUntilMs?: number | null
 }
 
-// Why it leaves pinnedUntilMs alone: the notice window is 60s from the first
+// Why it leaves pinnedUntilMs alone: the flip window is 60s from the first
 // flip, so it lapses mid-pin; clearing here would release damping early.
 function resetFlipWindows(record: ParkVerdictFlipRecord, nowMs: number): void {
   record.windowStartMs = nowMs
   record.flips = 0
-  record.notified = false
   record.burstStartMs = nowMs
   record.burstFlips = 0
 }
 
 // Why liveness and not presence: a tab pinned while cold-park-eligible can stop
 // being a candidate before its deadline, and nothing would consult it again. An
-// expired pin must stop damping and stop gating breadcrumbs on its own.
+// expired pin must stop damping on its own.
 function isParkVerdictPinLive(record: ParkVerdictFlipRecord, nowMs: number): boolean {
   return record.pinnedUntilMs != null && nowMs < record.pinnedUntilMs
 }
@@ -77,14 +69,13 @@ export function getParkVerdictUnparkPinUntilMs(args: {
   return record.pinnedUntilMs
 }
 
-/** Records park-verdict churn per tab; damps bursts and breadcrumbs the rest. */
+/** Records park-verdict churn per tab and damps bursts. */
 export function recordParkVerdictFlips(args: {
   records: Map<string, ParkVerdictFlipRecord>
   liveTabIds: ReadonlySet<string>
   nextParkedTabIds: ReadonlySet<string>
   nowMs: number
   flipWindowMs?: number
-  noticeLimit?: number
   burstWindowMs?: number
   burstLimit?: number
 }): void {
@@ -94,7 +85,6 @@ export function recordParkVerdictFlips(args: {
     nextParkedTabIds,
     nowMs,
     flipWindowMs = TERMINAL_TAB_PARK_FLIP_WINDOW_MS,
-    noticeLimit = TERMINAL_TAB_PARK_FLIP_NOTICE_LIMIT,
     burstWindowMs = TERMINAL_TAB_PARK_FLIP_BURST_WINDOW_MS,
     burstLimit = TERMINAL_TAB_PARK_FLIP_BURST_LIMIT
   } = args
@@ -114,7 +104,6 @@ export function recordParkVerdictFlips(args: {
         parked,
         windowStartMs: nowMs,
         flips: 0,
-        notified: false,
         burstStartMs: nowMs,
         burstFlips: 0,
         pinnedUntilMs: null
@@ -143,30 +132,6 @@ export function recordParkVerdictFlips(args: {
 
     if (!isParkVerdictPinLive(record, nowMs) && record.burstFlips >= burstLimit) {
       record.pinnedUntilMs = nowMs + flipWindowMs
-      recordRendererCrashBreadcrumb('terminal_park_verdict_churn', {
-        tabId,
-        trigger: 'burst',
-        flips: record.burstFlips,
-        elapsedMs: nowMs - record.burstStartMs,
-        windowMs: burstWindowMs,
-        pinnedForMs: flipWindowMs
-      })
-      continue
-    }
-    // Why a live pin gates this: the burst crumb already reported the same
-    // window, so a second crumb would only double the volume the notice limit
-    // exists to keep down.
-    if (!isParkVerdictPinLive(record, nowMs) && !record.notified && record.flips >= noticeLimit) {
-      record.notified = true
-      // Why: flips is always exactly noticeLimit here, so elapsedMs is the only
-      // field that separates slow churn from a burst the damping already caught.
-      recordRendererCrashBreadcrumb('terminal_park_verdict_churn', {
-        tabId,
-        trigger: 'window',
-        flips: record.flips,
-        elapsedMs: nowMs - record.windowStartMs,
-        windowMs: flipWindowMs
-      })
     }
   }
 }
@@ -184,7 +149,7 @@ export type ParkVerdictPinSelection = {
  * the rendered verdict, so the oscillating input can be one the cold-park
  * selector never sees (worktree-level park, activation-deferred mounts). A pin
  * consulted only through the cold set then damps nothing and never lapses —
- * it just silences its own breadcrumb for the window and re-arms forever.
+ * it just re-arms forever.
  */
 export function selectParkVerdictPinnedTabIds(args: {
   records: Map<string, ParkVerdictFlipRecord>

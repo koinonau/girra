@@ -10,18 +10,9 @@ vi.mock('@/lib/e2e-config', () => ({
   e2eConfig: { exposeStore: true }
 }))
 
-const mocks = vi.hoisted(() => ({
-  recordRendererCrashBreadcrumb: vi.fn()
-}))
-
-vi.mock('@/lib/crash-breadcrumb-recorder', () => ({
-  recordRendererCrashBreadcrumb: mocks.recordRendererCrashBreadcrumb
-}))
-
 describe('pane terminal output scheduler', () => {
   beforeEach(() => {
     vi.stubGlobal('window', globalThis)
-    mocks.recordRendererCrashBreadcrumb.mockClear()
   })
 
   afterEach(() => {
@@ -70,26 +61,6 @@ describe('pane terminal output scheduler', () => {
     expect(output).toContain('Orca skipped a burst of terminal output')
     expect(output).toContain('after-cap')
     expect(output).not.toContain('x'.repeat(1024))
-  })
-
-  it('records a drop breadcrumb with sizes when the cap replaces a backlog', async () => {
-    vi.useFakeTimers()
-    const { writeTerminalOutput } = await loadScheduler()
-    const terminal = createTerminal()
-    const chunk = 'x'.repeat(512 * 1024)
-
-    for (let i = 0; i < 5; i++) {
-      writeTerminalOutput(terminal, chunk, { foreground: false })
-    }
-
-    expect(mocks.recordRendererCrashBreadcrumb).toHaveBeenCalledWith(
-      'terminal_output_backlog_dropped',
-      expect.objectContaining({
-        foreground: false,
-        droppedChars: expect.any(Number),
-        capChars: 2 * 1024 * 1024
-      })
-    )
   })
 
   it('scales the backlog cap with the scrollback setting', async () => {

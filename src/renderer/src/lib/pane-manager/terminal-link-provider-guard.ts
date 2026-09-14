@@ -1,5 +1,4 @@
 import type { ILinkProvider, Terminal } from '@xterm/xterm'
-import { recordRendererCrashBreadcrumb } from '@/lib/crash-diagnostics'
 
 /**
  * Wrap a link provider so a synchronous throw inside `provideLinks` is reported
@@ -12,7 +11,7 @@ import { recordRendererCrashBreadcrumb } from '@/lib/crash-diagnostics'
  * which Chromium then kills (`killed` exit 1). Degrading to "no link this hover"
  * keeps the renderer alive; the user can retry by moving the mouse.
  */
-export function guardLinkProvider(provider: ILinkProvider, label: string): ILinkProvider {
+export function guardLinkProvider(provider: ILinkProvider): ILinkProvider {
   return {
     provideLinks(bufferLineNumber, callback) {
       let callbackInvoked = false
@@ -22,13 +21,7 @@ export function guardLinkProvider(provider: ILinkProvider, label: string): ILink
       }
       try {
         provider.provideLinks(bufferLineNumber, trackedCallback)
-      } catch (error: unknown) {
-        recordRendererCrashBreadcrumb('terminal_link_provider_error', {
-          provider: label,
-          bufferLineNumber,
-          errorName: error instanceof Error ? error.name : typeof error,
-          errorMessage: error instanceof Error ? error.message : String(error)
-        })
+      } catch {
         // Why: only resolve the link request if the provider threw before it
         // already delivered links, so we never double-invoke the callback.
         if (!callbackInvoked) {
@@ -52,9 +45,5 @@ export function installGuardedLinkProviderRegistration(terminal: Terminal): void
     return
   }
   const register = terminal.registerLinkProvider.bind(terminal)
-  let providerCount = 0
-  terminal.registerLinkProvider = (provider: ILinkProvider) => {
-    providerCount += 1
-    return register(guardLinkProvider(provider, `provider-${providerCount}`))
-  }
+  terminal.registerLinkProvider = (provider: ILinkProvider) => register(guardLinkProvider(provider))
 }

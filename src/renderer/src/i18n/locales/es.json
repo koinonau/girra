@@ -46,7 +46,6 @@
     "settings": "Ajustes",
     "exploreOrca": "Explorar Orca",
     "gettingStarted": "Primeros pasos con Orca",
-    "reportCrash": "Informar fallo...",
     "file": "Archivo",
     "exit": "Salir",
     "edit": "Editar",
@@ -92,8 +91,6 @@
     "App": {
       "221a95ba38": "Vuelve a intentar la configuración inicial o ciérrala y continúa en la aplicación.",
       "f02d37278a": "La configuración inicial tuvo un error.",
-      "acd66311dc": "Si todavía necesitas diagnóstico después de reintentarlo, usa el menú Ayuda.",
-      "722d03aa62": "La ventana de informe de fallos tuvo un error.",
       "8a023cea1f": "Vuelve a intentarlo para recargar los controles de la barra de estado.",
       "2e8ff36f94": "La barra de estado tuvo un error.",
       "7cbfbf622f": "Vuelve a intentarlo, o cierra y vuelve a abrir el espacio de trabajo flotante.",
@@ -175,7 +172,6 @@
             "10898045f3": "Se ignoró el atajo para \"{{value0}}\": usa un array de strings.",
             "36761d9604": "Se ignoró la acción de atajo desconocida \"{{value0}}\".",
             "d2e43e426a": "{{value0}} debe ser un objeto.",
-            "fb290366b2": "No está disponible en la web.",
             "76122208ca": "Se ignoró el atajo para \"{{value0}}\": {{value1}}"
           }
         },
@@ -6335,24 +6331,14 @@
         "PrivacyDiagnosticBundleControls": {
           "dc8404a930": "Crear archivo de diagnóstico",
           "a5acaffdb6": "Desechar",
-          "aca2c8a367": "Enviar a soporte",
           "798b6f0be5": "Abrir archivo de revisión",
-          "2ae9a6b63e": "Hecho",
-          "7f14a1733c": "Eliminar archivo enviado",
-          "2801d4ce22": "Copiar ID de referencia",
-          "d8be621237": "Abre primero el archivo de revisión.",
-          "61676df223": "Diagnósticos enviados. Comparte este ID de referencia con soporte: {{value0}}.",
           "fd7b3891af": "Abriste el archivo de revisión ({{value0}}). Envía ese archivo a soporte o descártalo.",
           "62340d4439": "Tu archivo de revisión está listo ({{value0}}). Ábrelo para ver qué se enviaría y luego elige si quieres enviarlo a soporte.",
           "19ec5e29b3": "Recopila actividad reciente y errores de la app en un archivo depurado que puedes revisar antes de enviarlo. Nada se sube hasta que elijas enviarlo."
         },
         "PrivacyDiagnosticsSection": {
           "af2fc82cde": "Enviar diagnósticos de la app a soporte",
-          "c18cbe45df": "Se eliminaron los diagnósticos enviados",
-          "7a4944595b": "No se pudo copiar el ID de referencia",
-          "13eb2c65a1": "ID de referencia copiado",
           "860bca9ec9": "Archivo de revisión descartado",
-          "49fc6c80e8": "Diagnósticos enviados",
           "db3228e01a": "Archivo de revisión abierto",
           "a2b3505c77": "Archivo de revisión creado"
         },
@@ -12856,35 +12842,9 @@
       "crash": {
         "report": {
           "CrashReportDialog": {
-            "b4951cd27c": "Enviar informe",
-            "88fea8e84e": "No enviar",
-            "50b00dc327": "Copiar detalles",
-            "6d3ebe216a": "Texto de diagnóstico",
-            "835037edc9": "· Orca",
             "56a3dfa283": "No se pudo enviar el informe de fallas.",
-            "8e24fe4f75": "Informe de fallo enviado.",
-            "8b8473c544": "Se copió el informe de fallos.",
             "b175e90213": "No hay ningún informe de fallo disponible.",
-            "765591798d": "Comprobando informes de fallos...",
-            "b2e36f53a1": "No se pudo enviar el informe de fallo. Se subió el ticket de diagnóstico {{value0}}, pero no se vinculó.",
-            "ead6fc0510": "No se capturó ningún informe de fallo automático. Aun así puedes enviar detalles e incluir logs de diagnóstico recientes cuando estén disponibles.",
-            "b082f27490": "Adjuntar logs de diagnóstico recientes",
-            "e59f0b9427": "Envía un paquete limitado de logs redactados junto con el informe."
-          },
-          "submit": {
-            "notice": {
-              "unknownError": "The crash report request failed before it returned a reason.",
-              "ticketUploaded": "Diagnostic ticket {{value0}} was uploaded but not linked.",
-              "uncheckDiagnostics": "Uncheck \"Attach recent diagnostic logs\" and try again, or copy the details.",
-              "checkConnection": "Check your connection and try again, or copy the details.",
-              "notSent": "Crash report wasn't sent",
-              "copyDetails": "Copy Details",
-              "sentWithoutDiagnostics": "Crash report sent without diagnostic logs",
-              "diagnosticsReason": "Diagnostic logs were not attached: {{value0}}"
-            }
-          },
-          "copy": {
-            "copyFailed": "No se pudieron copiar los detalles del informe de fallo."
+            "b2e36f53a1": "No se pudo enviar el informe de fallo. Se subió el ticket de diagnóstico {{value0}}, pero no se vinculó."
           }
         }
       },

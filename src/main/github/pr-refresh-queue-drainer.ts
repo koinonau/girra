@@ -141,7 +141,6 @@ export class PRRefreshQueueDrainer {
         const aliases = Array.from(next.aliases.values())
         const skippedReason = validateCandidate(next.candidate)
         if (skippedReason) {
-          this.events.record('skipped', next.reason, skippedReason)
           this.events.broadcast({ aliases, reason: next.reason, status: 'skipped', skippedReason })
           continue
         }
@@ -230,13 +229,6 @@ export class PRRefreshQueueDrainer {
         reason: entry.reason,
         status: 'queued'
       })
-    }
-    if (
-      entry.bypassBackgroundBudget !== true &&
-      (entry.reason === 'visible' || entry.reason === 'swr') &&
-      this.pacing.nextBudgetDelay() > 0
-    ) {
-      this.events.record('background-pause', entry.reason)
     }
   }
 }

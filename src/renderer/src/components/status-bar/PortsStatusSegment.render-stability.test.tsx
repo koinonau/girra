@@ -25,10 +25,6 @@ vi.mock('./ports-status-popover-rows', () => ({
   WorkspaceGroupRows: () => <div />
 }))
 
-vi.mock('@/lib/react-error-boundary-reporting', () => ({
-  reportReactErrorBoundaryCrash: vi.fn()
-}))
-
 vi.mock('@/i18n/i18n', () => ({
   translate: (_key: string, fallback: string, options?: Record<string, unknown>) =>
     options
@@ -64,9 +60,7 @@ describe('PortsStatusSegment render stability', () => {
       root.render(
         <RecoverableRenderErrorBoundary
           boundaryId="oracle.status-bar"
-          surface="overlay"
           compact
-          reportAsCrash={false}
           title="The status bar hit an error."
           description="Retry the status bar to remount its controls."
         >

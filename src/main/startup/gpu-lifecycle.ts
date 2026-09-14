@@ -14,8 +14,6 @@ import {
 } from '../crash-reporting/gpu-fallback-recovered-launch'
 import { promptForGpuFallbackRestart } from '../crash-reporting/gpu-fallback-restart-prompt'
 import { engageGpuFallbackAfterCrashBurst } from '../crash-reporting/gpu-fallback-engagement'
-import { recordCrashBreadcrumb } from '../crash-reporting/crash-breadcrumb-store'
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
 import {
   isInstallDirAclRepairExhausted,
   isInstallDirAclRepairPending,
@@ -71,14 +69,8 @@ export function maybeApplyGpuFallbackForThisLaunch(): void {
   }
   state.activeGpuFallbackMarker = marker
   app.disableHardwareAcceleration()
-  const appliedSwitches = applyGpuFallbackCommandLineSwitches(app.commandLine, process.platform)
+  applyGpuFallbackCommandLineSwitches(app.commandLine, process.platform)
   state.gpuFallbackActiveThisLaunch = true
-  // Why: with no GPU child left, child-process-gone can't report a GPU fault, so
-  // name the applied switches in the trail any later crash report carries.
-  recordCrashBreadcrumb('gpu_fallback_applied', {
-    crashesInWindow: marker.crashesInWindow,
-    switches: appliedSwitches.join(',')
-  })
 }
 
 export async function presentGpuFallbackRecoveredLaunchPrompt(
@@ -116,16 +108,9 @@ export async function presentGpuFallbackRecoveredLaunchPrompt(
     clearSafeGraphics: () => clearGpuFallbackMarker(userDataPath),
     onPromptFailed: (error) =>
       console.warn('[gpu-fallback] failed to show recovered-launch prompt:', error),
-    onSafeGraphicsKept: () =>
-      recordDurableCrashBreadcrumb('gpu_fallback_safe_graphics_kept', {
-        crashesInWindow: marker.crashesInWindow
-      }),
     restartWithHardware: () => {
       state.isQuitting = true
-      relaunchApp('gpu-fallback', {
-        mode: 'hardware-retry',
-        crashesInWindow: marker.crashesInWindow
-      })
+      relaunchApp('gpu-fallback')
       destroySystemTray()
       app.exit(0)
     }
@@ -185,10 +170,6 @@ async function installDirAclClearsGpuFallback(
   // consumed that one report, so without this a later burst — including one after the repair
   // succeeds and the tree is no longer the suspect — could never engage safe graphics again.
   state.gpuCrashFallbackTracker.disengage()
-  recordDurableCrashBreadcrumb('gpu_fallback_withheld_install_dir_acl', {
-    crashesInWindow,
-    markerHeldForPendingRepair: repairPending
-  })
   return false
 }
 
@@ -209,7 +190,6 @@ export async function handleGpuChildCrash(
   if (!result.shouldEngageFallback) {
     return
   }
-  const fallbackData = { processReason: reason, exitCode, crashesInWindow: result.crashesInWindow }
   const userDataPath = app.getPath('userData')
   if (!(await installDirAclClearsGpuFallback(userDataPath, result.crashesInWindow))) {
     return
@@ -223,12 +203,6 @@ export async function handleGpuChildCrash(
     { reason, exitCode, crashesInWindow: result.crashesInWindow, engagedAt: Date.now() },
     {
       isQuitting: () => state.isQuitting,
-      onEngaged: (engagement) =>
-        recordCrashBreadcrumb('gpu_fallback_engaged', {
-          reason: engagement.reason,
-          exitCode: engagement.exitCode,
-          crashesInWindow: engagement.crashesInWindow
-        }),
       persistMarker: (engagement) =>
         persistGpuFallbackMarker(userDataPath, {
           engagedAt: engagement.engagedAt,
@@ -249,11 +223,9 @@ export async function handleGpuChildCrash(
         ),
       onPromptFailed: (error) =>
         console.warn('[gpu-fallback] failed to show restart prompt:', error),
-      onRestartDeferred: () =>
-        recordDurableCrashBreadcrumb('gpu_fallback_restart_deferred', fallbackData),
       restartIntoSafeGraphics: () => {
         state.isQuitting = true
-        relaunchApp('gpu-fallback', fallbackData)
+        relaunchApp('gpu-fallback')
         destroySystemTray()
         app.exit(0)
       }
@@ -264,7 +236,6 @@ export async function handleGpuChildCrash(
 export function registerGpuLifecycleHandlers(): void {
   app.on('gpu-info-update', () => {
     state.gpuFeatureStatus = app.getGPUFeatureStatus()
-    state.gpuCrashDiagnostics?.warm()
     if (app.isReady()) {
       updateGpuAccelerationAboutPanel()
     }

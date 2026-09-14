@@ -8,8 +8,6 @@ import { resolveRegisteredWorktreePath } from '../registered-worktree-roots-cach
 import { resolveAuthorizedPath } from '../filesystem-auth'
 import { isENOENT } from '../filesystem-path-containment'
 import { listMarkdownDocuments, markdownDocumentsFromRelativePaths } from '../markdown-documents'
-import { recordCrashBreadcrumb } from '../../crash-reporting/crash-breadcrumb-store'
-import { buildReadDirErrorBreadcrumb, type ReadDirThrowSite } from '../readdir-error-diagnostics'
 import type { FilesystemHandlerContext } from './filesystem-handler-context'
 import {
   BINARY_PROBE_BYTES,
@@ -28,36 +26,19 @@ export function registerFilesystemReadHandlers(context: FilesystemHandlerContext
   ipcMain.handle(
     'fs:readDir',
     async (_event, args: { dirPath: string; connectionId?: string }): Promise<DirEntry[]> => {
-      // Why: fs:readDir throws surface as opaque IPC errors; record the throw site + redacted path shape to keep them diagnosable.
-      let throwSite: ReadDirThrowSite = 'authorize'
-      try {
-        if (args.connectionId) {
-          throwSite = 'ssh-provider'
-          const provider = requireSshFilesystemProvider(args.connectionId)
-          // Why: re-sort locally — the remote relay may be an older build with lexicographic ordering.
-          return sortDirEntries(await provider.readDir(args.dirPath))
-        }
-        const dirPath = await resolveAuthorizedPath(args.dirPath, store)
-        throwSite = 'readdir'
-        const entries = await readdir(dirPath, { withFileTypes: true })
-        const mapped = entries.map((entry) => ({
-          name: entry.name,
-          isDirectory: isDirectoryEntry(entry),
-          isSymlink: entry.isSymbolicLink()
-        }))
-        return sortDirEntries(mapped)
-      } catch (error: unknown) {
-        recordCrashBreadcrumb(
-          'fs_readdir_error',
-          buildReadDirErrorBreadcrumb({
-            dirPath: args.dirPath,
-            connectionId: args.connectionId,
-            throwSite,
-            error
-          })
-        )
-        throw error
+      if (args.connectionId) {
+        const provider = requireSshFilesystemProvider(args.connectionId)
+        // Why: re-sort locally — the remote relay may be an older build with lexicographic ordering.
+        return sortDirEntries(await provider.readDir(args.dirPath))
       }
+      const dirPath = await resolveAuthorizedPath(args.dirPath, store)
+      const entries = await readdir(dirPath, { withFileTypes: true })
+      const mapped = entries.map((entry) => ({
+        name: entry.name,
+        isDirectory: isDirectoryEntry(entry),
+        isSymlink: entry.isSymbolicLink()
+      }))
+      return sortDirEntries(mapped)
     }
   )
 

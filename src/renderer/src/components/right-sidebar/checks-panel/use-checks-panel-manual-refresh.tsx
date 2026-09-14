@@ -10,7 +10,6 @@ import {
 } from '../checks-panel-git-status-snapshot'
 
 import { checksPanelAsyncResultKey } from '../checks-panel-async-result-key'
-import { recordChecksPanelPRRefreshBreadcrumb } from '../checks-panel-pr-refresh-breadcrumb'
 import type { PRInfo } from '../../../../../shared/github/pull-request-types'
 import type { ChecksPanelManualRefreshInput } from './manual-refresh-dependencies'
 
@@ -78,22 +77,7 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
     const refreshRequestKey = `${activeWorktreeId ?? ''}::${prCacheKey}::${branch}::${Date.now()}::${Math.random()}`
     refreshRequestKeyRef.current = refreshRequestKey
     const isCurrentRequest = (): boolean => refreshRequestKeyRef.current === refreshRequestKey
-    const refreshStartedAt = Date.now()
-    const refreshProvider = isGitLabReviewContext ? 'gitlab' : 'github'
-    let refreshOutcome = 'started'
     setIsRefreshing(true)
-    recordChecksPanelPRRefreshBreadcrumb({
-      event: 'start',
-      provider: refreshProvider,
-      repoId: repo.id,
-      worktreeId: activeWorktreeId,
-      branch,
-      prCacheKey,
-      prNumber: activeGitLabReview?.number ?? prNumber,
-      prState: activeGitLabReview?.state ?? pr?.state,
-      prChecksStatus: pr?.checksStatus,
-      refreshState: prCacheKey ? useAppStore.getState().prRefreshStates[prCacheKey] : null
-    })
     try {
       if (activeWorktreeId && activeWorktreePath && !isFolder) {
         const snapshotIdentity = readChecksPanelRefreshGitIdentitySnapshot({
@@ -107,7 +91,6 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
             branch: snapshotIdentity.branch
           })
           // Why: this click discovered a terminal branch switch; let branch-keyed render/effects restart instead of refreshing old PR data.
-          refreshOutcome = 'branch-changed'
           return
         }
         try {
@@ -133,7 +116,6 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
             })
           ) {
             // Why: this click discovered a terminal branch switch; let branch-keyed render/effects restart instead of refreshing old PR data.
-            refreshOutcome = 'branch-changed'
             return
           }
           let freshRemoteStatus = status.upstreamStatus
@@ -193,11 +175,9 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
             headShaOverride: refreshedGitLabReview.headSha,
             commitAsCurrent: true
           })
-          refreshOutcome = 'review'
         } else {
           setChecks([])
           setComments([])
-          refreshOutcome = 'no-review'
         }
         return
       }
@@ -242,7 +222,6 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
         return
       }
       if (refreshedPR) {
-        refreshOutcome = 'pr'
         const prRequestKey = checksPanelAsyncResultKey(
           prCacheKey,
           branch,
@@ -321,27 +300,8 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
       } else if (isCurrentRequest()) {
         setChecks([])
         setComments([])
-        refreshOutcome = 'no-pr'
       }
-    } catch (error) {
-      refreshOutcome = 'error'
-      throw error
     } finally {
-      recordChecksPanelPRRefreshBreadcrumb({
-        event: 'done',
-        provider: refreshProvider,
-        repoId: repo.id,
-        worktreeId: activeWorktreeId,
-        branch,
-        prCacheKey,
-        prNumber: activeGitLabReview?.number ?? prNumber,
-        prState: activeGitLabReview?.state ?? pr?.state,
-        prChecksStatus: pr?.checksStatus,
-        refreshState: prCacheKey ? useAppStore.getState().prRefreshStates[prCacheKey] : null,
-        outcome: refreshOutcome,
-        durationMs: Date.now() - refreshStartedAt,
-        currentRequest: isCurrentRequest()
-      })
       if (isCurrentRequest()) {
         refreshInFlightRef.current = false
         setIsRefreshing(false)
@@ -358,10 +318,8 @@ export function useChecksPanelManualRefresh(model: ChecksPanelManualRefreshInput
     activeWorktreePushTarget,
     activeGitLabReview,
     prNumber,
-    pr?.checksStatus,
     pr?.headSha,
     pr?.prRepo,
-    pr?.state,
     prCacheKey,
     linkedPR,
     fallbackGitHubPRNumber,
