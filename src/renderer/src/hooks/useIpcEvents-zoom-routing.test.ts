@@ -142,7 +142,6 @@ describe('useIpcEvents zoom routing', () => {
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
           settings: { terminalFontSize: 13 },
-          setUpdateStatus: vi.fn(),
           fetchRepos: vi.fn(),
           fetchWorktrees: vi.fn(),
           setActiveView: vi.fn(),
@@ -200,11 +199,6 @@ describe('useIpcEvents zoom routing', () => {
         worktrees: makeEvents(),
         keybindings: makeEvents(),
         settings: makeEvents(),
-        updater: {
-          getStatus: () => Promise.resolve({ state: 'idle' }),
-          onStatus: () => () => {},
-          onClearDismissal: () => () => {}
-        },
         browser: makeEvents(),
         rateLimits: {
           get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),
@@ -288,7 +282,6 @@ describe('useIpcEvents zoom routing', () => {
           editorFontZoomLevel: 0,
           setEditorFontZoomLevel: vi.fn(),
           settings: { terminalFontSize: 13 },
-          setUpdateStatus: vi.fn(),
           fetchRepos: vi.fn(),
           fetchWorktrees: vi.fn(),
           setActiveView: vi.fn(),
@@ -346,11 +339,6 @@ describe('useIpcEvents zoom routing', () => {
         worktrees: makeEvents(),
         keybindings: makeEvents(),
         settings: makeEvents(),
-        updater: {
-          getStatus: () => Promise.resolve({ state: 'idle' }),
-          onStatus: () => () => {},
-          onClearDismissal: () => () => {}
-        },
         browser: makeEvents(),
         rateLimits: {
           get: () => Promise.resolve({ limits: {}, lastUpdatedAt: Date.now() }),

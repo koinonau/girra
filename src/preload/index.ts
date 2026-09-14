@@ -31,7 +31,6 @@ import { glApiBridge } from './api/gl-bridge'
 import { bitbucketApi } from './api/bitbucket-bridge'
 import { linearApi } from './api/linear-bridge'
 import { jiraApi } from './api/jira-bridge'
-import { starNagApi } from './api/star-nag-bridge'
 import { diagnosticsApi } from './api/diagnostics-bridge'
 import { settingsApi } from './api/settings-bridge'
 import { agentAwakeApi } from './api/agent-awake-bridge'
@@ -60,7 +59,6 @@ import { ephemeralVmApi } from './api/ephemeral-vm-bridge'
 import { cacheApi } from './api/cache-bridge'
 import { sessionApi } from './api/session-bridge'
 import { remoteWorkspaceApi } from './api/remote-workspace-bridge'
-import { updaterApi } from './api/updater-bridge'
 import { docPreviewApi } from './api/doc-preview-bridge'
 import { notebookApi } from './api/notebook-bridge'
 import { fsApi } from './api/fs-bridge'
@@ -83,7 +81,6 @@ import { automationsApi } from './api/automations-bridge'
 import { e2eApi } from './api/e2e-bridge'
 import { mobileApi } from './api/mobile-bridge'
 import { agentStatusApi } from './api/agent-status-bridge'
-import { speechApi } from './api/speech-bridge'
 
 installNativeFileDropHandlers()
 installBrowserFindListener()
@@ -125,7 +122,6 @@ const api = {
   bitbucket: bitbucketApi,
   linear: linearApi,
   jira: jiraApi,
-  starNag: starNagApi,
   telemetryTrack: telemetryTrackApi,
   telemetrySetOptIn: telemetrySetOptInApi,
   telemetryAcknowledgeBanner: telemetryAcknowledgeBannerApi,
@@ -158,7 +154,6 @@ const api = {
   cache: cacheApi,
   session: sessionApi,
   remoteWorkspace: remoteWorkspaceApi,
-  updater: updaterApi,
   docPreview: docPreviewApi,
   notebook: notebookApi,
   fs: fsApi,
@@ -180,8 +175,7 @@ const api = {
   automations: automationsApi,
   e2e: e2eApi,
   mobile: mobileApi,
-  agentStatus: agentStatusApi,
-  speech: speechApi
+  agentStatus: agentStatusApi
 } satisfies PreloadApi
 
 if (process.contextIsolated) {

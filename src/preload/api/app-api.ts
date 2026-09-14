@@ -16,6 +16,7 @@ import type { KeyboardLayoutChangeEvent } from '../../shared/keyboard-layout-eve
 export type AppApi = {
   /** Returns the app identity currently exposed to native chrome and the titlebar. */
   getIdentity: () => Promise<AppIdentity>
+  getVersion: () => Promise<string>
   /** Returns a URL base for feature-wall assets. In dev this is Vite /@fs;
    *  in packaged builds this is file:// resources. Renderer appends filenames. */
   getFeatureWallAssetBaseUrl: () => Promise<string>

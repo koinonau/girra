@@ -4,7 +4,7 @@ import { useAppStore } from '../../store'
 import { keybindingMatchesAction } from '../../../../shared/keybindings'
 import { resolveAppearanceAccordionDeepLink } from './appearance-usage-percentage-search'
 import { registerWindowCloseGuard } from '../window-close-request-coordinator'
-import { isIntentionalAppRestartInProgress } from '@/lib/updater-beforeunload'
+import { isIntentionalAppRestartInProgress } from '@/lib/app-restart-beforeunload'
 import { getShortcutPlatform } from '@/lib/shortcut-platform'
 import { hasVisibleOverlay } from '@/lib/visible-overlay'
 import { translate } from '@/i18n/i18n'
@@ -30,7 +30,6 @@ export function useSettingsPageEffects(
     fetchKeybindings,
     fetchSettings,
     keybindings,
-    refreshModelStates,
     repoIdToHostSelection,
     repoIdToRepresentative,
     setHighlightedSettingsTargetId,
@@ -40,11 +39,9 @@ export function useSettingsPageEffects(
     setSettingsProjectHostSelection,
     setSshHostAddIntentSignal,
     setPendingNavRequestTick,
-    setVoiceModelStatesLoading,
     settings,
     settingsNavigationTarget,
-    settingsProjectList,
-    showDesktopOnlySettings
+    settingsProjectList
   } = model
   const {
     closeSettingsPageWithPromptGuard,
@@ -60,24 +57,6 @@ export function useSettingsPageEffects(
     fetchSettings()
     fetchKeybindings()
   }, [fetchKeybindings, fetchSettings])
-
-  useEffect(() => {
-    if (!showDesktopOnlySettings) {
-      setVoiceModelStatesLoading(false)
-      return
-    }
-    let canceled = false
-    // Why: modelStates starts empty, so Voice shouldn't look missing before the first speech-model scan reports state.
-    setVoiceModelStatesLoading(true)
-    void refreshModelStates().finally(() => {
-      if (!canceled) {
-        setVoiceModelStatesLoading(false)
-      }
-    })
-    return () => {
-      canceled = true
-    }
-  }, [refreshModelStates, setVoiceModelStatesLoading, showDesktopOnlySettings])
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent): void => {

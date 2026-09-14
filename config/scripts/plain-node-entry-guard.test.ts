@@ -136,13 +136,13 @@ describe('guarded entry names', () => {
   it('rejects a guarded name that is no longer a rollup input', () => {
     const plugin = createPlainNodeEntryGuardPlugin()
     const input = Object.fromEntries(
-      GUARDED_ENTRY_NAMES.filter((name) => name !== 'stt-worker').map((name) => [
+      GUARDED_ENTRY_NAMES.filter((name) => name !== 'warp-theme-parser-worker').map((name) => [
         name,
         `${name}.ts`
       ])
     )
 
-    expect(() => runBuildStart(plugin, input)).toThrow('"stt-worker"')
+    expect(() => runBuildStart(plugin, input)).toThrow('"warp-theme-parser-worker"')
   })
 
   it('passes when every guarded name is a rollup input', () => {
@@ -198,7 +198,7 @@ describe('worker thread entry guard', () => {
   it('names the worker-thread runtime so the failure is actionable', () => {
     const plugin = createPlainNodeEntryGuardPlugin()
     const bundle = {
-      'stt-worker.js': workerChunk('stt-worker', 'require("electron")')
+      'warp-theme-parser-worker.js': workerChunk('warp-theme-parser-worker', 'require("electron")')
     } as Rollup.OutputBundle
 
     expect(() => runWorkerWriteBundle(plugin, bundle)).toThrow('runs as a worker thread')

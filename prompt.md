@@ -4,12 +4,12 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phases 0 and 1, the ADRs and the harness deletion are done.
+Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phases 0 to 2, the ADRs and the harness deletion are done.
 
-1. **Phase 2, cheap strips.** Delete star-nag, then speech, then updater, each through the loop. Star-nag reaches about 20 files: startup, the preload bridge and its web twin, `AppRootSurfaces.tsx`, `Landing.tsx`, `GeneralSupportSection.tsx`, persisted UI-state fields, telemetry schemas and locale keys. Unblocked.
+1. **Phase 3, instrumented strips.** orca-profiles, crash-reporting, then telemetry, deleting telemetry call sites outright. Profiles reach 141 files; local profiles are dropped too, so collapse to the default profile. The kept "Orca profile sign-out confirmation" signs out of a cloud account, so it goes with sign-in. Unblocked once Phase 2 is merged.
 2. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 3. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
-4. **Phase 3, instrumented strips.** orca-profiles, crash-reporting, then telemetry, deleting telemetry call sites outright. Unblocked once Phase 2 is merged.
+4. **Phase 4, minor agent CLIs.** Unblocked once Phase 3 is merged.
 
 ## Backlog
 
@@ -22,7 +22,7 @@ When a tracker exists, record its project, ready status, and transition IDs here
 1. Read the phase in the build plan and every file it names.
 2. Find every caller of anything you will delete: `grep -rl` over `src`, excluding `.test.` files.
 3. Delete, then fix the callers.
-4. While fixing, run `pnpm tc`, `pnpm lint`, and only the tests that touch what changed: the callers found in step 2, plus `config/scripts` when workflows or lint config change. The full suite takes 13 to 22 minutes, so run it once, when the phase is otherwise done. Run everything through `mise exec --`, with `ORCA_BACKGROUND_LAUNCH=1` for tests, as `handover.md` lists. Read the pass and fail counts from the output, not the exit code of a pipeline. Rerun any newly failing test file alone before calling it a regression.
+4. While fixing, run `pnpm tc`, `pnpm lint`, `pnpm build` when a deleted module was a build entry, and only the tests that touch what changed: the callers found in step 2, plus `config/scripts` when workflows or lint config change. The full suite takes 13 to 22 minutes, so run it once, when the phase is otherwise done. Run everything through `mise exec --`, with `ORCA_BACKGROUND_LAUNCH=1` for tests, as `handover.md` lists. Read the pass and fail counts from the output, not the exit code of a pipeline. Rerun any newly failing test file alone before calling it a regression.
 5. Run the full `pnpm tc`, `pnpm test`, `pnpm lint` and `pnpm build`, and compare against the baseline in `handover.md`. A phase is done when typecheck, lint and build pass and only the baseline's known tests fail. Deleting a feature may remove known failures; record the new baseline when it does.
 6. Update `handover.md` and this file's "Start Here" in the same commit.
 

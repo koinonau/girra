@@ -30,7 +30,6 @@ import type { DiffCommentsSlice } from './slices/diffComments'
 import type { DetectedAgentsSlice } from './slices/detected-agents'
 import type { RuntimeDetectedAgentsSlice } from './slices/runtime-detected-agents'
 import type { WorktreeNavHistorySlice } from './slices/worktree-nav-history'
-import type { DictationSlice } from './slices/dictation'
 import type { WorkspaceCleanupSlice } from './slices/workspace-cleanup'
 import type { WorkspaceCleanupBrowseSlice } from './slices/workspace-cleanup-browse'
 import type { RuntimeStatusSlice } from './slices/runtime-status'
@@ -41,7 +40,6 @@ import type { RecentlyClosedTabsSlice } from './slices/recently-closed-tabs'
 import type { OrcaProfilesSlice } from './slices/orca-profiles'
 import type { NewIssueDraftSlice } from './slices/new-issue-draft'
 import type { TaskCreationDraftsSlice } from './slices/task-creation-drafts'
-import type { RemoteServerUpdatesSlice } from './slices/remote-server-updates'
 import type { TerminalQuickCommandHostsSlice } from './slices/terminal-quick-command-hosts'
 
 export type AppState = RepoSlice &
@@ -74,7 +72,6 @@ export type AppState = RepoSlice &
   DetectedAgentsSlice &
   RuntimeDetectedAgentsSlice &
   WorktreeNavHistorySlice &
-  DictationSlice &
   WorkspaceCleanupSlice &
   WorkspaceCleanupBrowseSlice &
   RuntimeStatusSlice &
@@ -85,5 +82,4 @@ export type AppState = RepoSlice &
   OrcaProfilesSlice &
   NewIssueDraftSlice &
   TaskCreationDraftsSlice &
-  RemoteServerUpdatesSlice &
   TerminalQuickCommandHostsSlice

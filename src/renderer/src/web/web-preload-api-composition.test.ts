@@ -19,7 +19,6 @@ describe('web preload API composition', () => {
 
     expect(Object.keys(globals.window.api)).toEqual([
       'app',
-      'starNag',
       'platform',
       'workspacePorts',
       'orcaProfiles',
@@ -62,7 +61,6 @@ describe('web preload API composition', () => {
       'codexConfigSync',
       'developerPermissions',
       'computerUsePermissions',
-      'updater',
       'shell',
       'skills',
       'pty',

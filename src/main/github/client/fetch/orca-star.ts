@@ -2,7 +2,7 @@ import { ghExecFileAsync, acquire, release } from '../../gh-utils'
 export const ORCA_REPO = 'stablyai/orca'
 
 /**
- * Deadline for the two star-nag gh calls.
+ * Deadline for the two star gh calls.
  *
  * Why bounded at all: these are the only gh call sites that used the raw
  * `execFileAsync`, so a `gh` that never exits blocked forever, never released

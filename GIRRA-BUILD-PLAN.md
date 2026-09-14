@@ -44,11 +44,13 @@ Remove `mobile/`, `cloud/`, and everything that names them: CI workflows, lint s
 
 Leave `src/renderer/src/web` and the pairing code. An earlier draft deleted them as mobile-only, but serve mode serves the web client built from `src/renderer/src/web`, and the runtime RPC layer uses the device registry and end-to-end encryption for every remote client. "Web renderer and pairing" in `handover.md` holds the decision.
 
-Done 2026-09-14: 2,223 files deleted, 380,499 lines removed.
+Done 2026-09-14: 2,222 files deleted, 380,483 lines removed.
 
 ### Phase 2. Cheap strips
 
 Take star-nag, then speech, then updater, in that order. Each is the same loop: delete the directory, fix the named call sites, run typecheck and tests. Ascending coupling means you learn the loop on the 3-reference case, not the 45.
+
+Done 2026-09-14: 245 files deleted, 45,450 lines removed. The updater took remote server updates and the macOS serve update handoff with it, since nothing else used them.
 
 ### Phase 3. Instrumented strips
 

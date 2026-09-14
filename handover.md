@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-14: Phase 0, the ADRs and the cross-version harness deletion are merged. Phase 1, deleting `mobile/` and `cloud/`, is in its pull request. Phase 2 is next.
+As of 2026-09-14: Phases 0 and 1, the ADRs and the cross-version harness deletion are merged. Phase 2, the cheap strips, is in its pull request. Phase 3 is next.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -12,7 +12,8 @@ As of 2026-09-14: Phase 0, the ADRs and the cross-version harness deletion are m
 - Phase 0 merged in [#4](https://github.com/koinonau/girra/pull/4): `mise.toml`, the baseline, and `cloud/` added to the deletion table.
 - ADRs [0001](docs/adr/0001-fork-orca-and-delete.md) and [0002](docs/adr/0002-keep-internal-orca-identifiers.md) merged in [#5](https://github.com/koinonau/girra/pull/5).
 - The cross-version wire harness deletion merged in [#6](https://github.com/koinonau/girra/pull/6).
-- Phase 1 deletes `mobile/` and `cloud/`: 2,223 files deleted and 380,499 lines removed, measured with `git diff --shortstat origin/main`. Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 1 merged in [#7](https://github.com/koinonau/girra/pull/7): 2,222 files deleted and 380,483 lines removed, measured with `git diff --shortstat` across its merge commit.
+- Phase 2 deletes star-nag, voice input and the updater: 245 files deleted, 45,450 lines removed and 339 added, measured with `git diff --shortstat origin/main`. Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -91,6 +92,15 @@ After Phase 1, on 2026-09-14, with `out/` left by an earlier build:
 | `pnpm lint` | 0 | 59 s | 118 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 22 s | Desktop and native |
 
+After Phase 2, on 2026-09-14:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 2 s | No errors |
+| `pnpm test` | 1 | 730 s | Files: 5 failed, 8,412 passed, 61 skipped of 8,478. Tests: 5 failed, 78,421 passed, 388 skipped of 78,814 |
+| `pnpm lint` | 0 | 47 s | 118 reliability gates; ratchets unchanged; 1,562 English locale entries not statically referenced |
+| `pnpm build` | 0 | Untimed | Main 5,633 modules, renderer 12,388. It failed until the speech worker's build entry was removed |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -131,7 +141,8 @@ Taken at Orca `403b62a8d` by a Python walk over non-test `.ts` and `.tsx` files.
 - **Deletion scope:** 197,983 lines across 27 directories (2026-09-13). `mobile/` holds 137,454; the four `codex*` directories hold 35,233. With `cloud/`, 226,348 lines: 12% of the 1,905,345 non-test source lines in `src/`, `mobile/` and `cloud/` (2026-09-14).
 - **Runtime behind the CLI:** 265,344 lines across `src/main/runtime`, `src/relay`, `src/main/daemon` and `src/main/orcad` (2026-09-14).
 - **`cloud/`:** 28,365 lines in 132 files, Orca's server-side `push`, `relay`, `relay-fence-broker` and `relay-ops` apps. Added to the deletion table and deleted in Phase 1 (2026-09-14).
-- **Reliability gates:** 118 after Phase 1, which removed three gates whose tests all lived in the deleted trees and trimmed four more (2026-09-14).
+- **Reliability gates:** 118 after Phase 1, which removed three gates whose tests all lived in the deleted trees and trimmed four more (2026-09-14). Still 118 after Phase 2, which trimmed `runtime.headless-desktop-promotion-continuity` and moved an AppImage startup check from `updater-setup-done` to `first-window-startup-services-ready`.
+- **Orca profiles reach:** 141 files outside `src/main/orca-profiles` name them, 38 in `src/main/browser`, which imports only `getOrcaProfileBrowserSessionPartition` (`git grep -l`, 2026-09-14).
 - **Inbound references from outside each module:** star-nag 3, speech 10, updater 13, orca-profiles 27, crash-reporting 39, telemetry 45, codex 125 (2026-09-13).
 - **Orca in locale files:** 4,559 case-insensitive matches across six files in `src/renderer/src/i18n/locales/` (2026-09-13).
 - **`onorca.dev` references:** 15 non-test files. Fourteen belong to dropped features; the sidebar help menu is the one kept (2026-09-13).
@@ -149,6 +160,7 @@ All 2026-09-13 unless dated otherwise.
 - Disable GitHub Actions until the workflows are pruned.
 - 2026-09-14: pin Node through a committed `mise.toml` and get pnpm 12 from corepack, leaving the global Node untouched.
 - 2026-09-14: Phase 3 deletes telemetry call sites outright rather than replacing them with no-ops.
+- 2026-09-14: delete remote server updates and the macOS serve update handoff with the updater, since only the updater used them. The CLI keeps foreground signal forwarding. The app version moves to `window.api.app.getVersion`.
 - 2026-09-14: delete the cross-version wire harness, its CI job, its change-scope category, and the gate evidence citing it. It compared girra against Orca releases girra does not ship.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
@@ -194,4 +206,8 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-14 | zsh's `noclobber` refuses `>` onto an existing file, so a redirected command does not run and the old log is read instead | One stale lint result | Redirect with `>|`, or give each run a new log name |
 | 2026-09-14 | zsh does not word-split an unquoted `$VAR`, so a list of test paths reaches Vitest as one filter and it finds no tests | One empty test run | Put multi-file commands in a `sh` script |
 | 2026-09-14 | The plan's inbound-reference counts miss preload bridges, persisted UI-state fields, telemetry schemas and locale keys: star-nag's "3" is about 20 files | A Phase 2 estimate that reads cheaper than it is | Grep the module's identifiers, not only its import path |
+| 2026-09-14 | With `noImplicitAny` off, tsc resolved `useAppStore` to `any` once the updater slice left its import cycle, and reported 900 errors about `unknown` store fields | Most of an hour on a cascade with no root error | When errors say store fields are `unknown`, look for an inferred type in a cycle. `useAppStore` is now annotated |
+| 2026-09-14 | The locale prune matched keys only when `translate(` and the key shared a line, so multi-line calls kept dead keys | About 21 dead keys left by the voice deletion | Match any quoted `auto.`, `menu.` or `tray.` key in removed code |
+| 2026-09-14 | A deleted worker stays a build input in `electron.vite.config.ts` and the entry guard, and only `pnpm build` notices | One failed full-suite build | Grep the build config for a deleted module's path before the full run |
+| 2026-09-14 | Feature-named files hold generic code: `updater-renderer-events.ts` held app restart events and `serve-update-supervisor.ts` held CLI signal forwarding | A restart and a serve regression, caught by typecheck | Read a file's exports before deleting it, and move what other features use |
 | 2026-09-14 | Feature share and line share differ: 103 of 535 features is 19%, but their code is 12% of source lines | "A fifth of the codebase" in the plan and an ADR draft | Measure lines before quoting a code proportion |

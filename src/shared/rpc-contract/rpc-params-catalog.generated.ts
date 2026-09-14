@@ -445,13 +445,6 @@ import {
   SkillsDiscoverParams,
   SkillsGetInstallProgressParams
 } from './skills-params'
-import {
-  DictationChunk,
-  DictationHandle,
-  DictationSetup,
-  DictationStart,
-  SpeechModelAction
-} from './speech-params'
 import { SshTarget } from './ssh-params'
 import {
   AttachParams,
@@ -504,7 +497,6 @@ import {
   TerminalUnsubscribe,
   TerminalUpdateViewport
 } from './terminal-viewport-schemas-params'
-import { UpdaterCheckParams } from './updater-params'
 import { WorkspacePortKillParams, WorkspacePortScanParams } from './workspace-ports-params'
 import { WorktreeCreate, WorktreePrefetchCreateBase } from './worktree-create-params'
 import {
@@ -1070,14 +1062,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'skills.removeInstall': SkillRemoveRequestSchema,
   'skills.share': AgentSkillShareRequestSchema,
   'skills.uploadChunk': SkillUploadChunkRequestSchema,
-  'speech.dictation.cancel': DictationHandle,
-  'speech.dictation.chunk': DictationChunk,
-  'speech.dictation.finish': DictationHandle,
-  'speech.dictation.setup': DictationSetup,
-  'speech.dictation.start': DictationStart,
-  'speech.models.delete': SpeechModelAction,
-  'speech.models.download': SpeechModelAction,
-  'speech.models.list': null,
   'ssh.connect': SshTarget,
   'ssh.getState': SshTarget,
   'ssh.listRemovedTargetLabels': null,
@@ -1124,10 +1108,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'ui.get': null,
   'ui.recordFeatureInteraction': FeatureInteractionIdParam,
   'ui.set': UiUpdate,
-  'updater.check': UpdaterCheckParams,
-  'updater.download': null,
-  'updater.getStatus': null,
-  'updater.install': null,
   'workspacePorts.kill': WorkspacePortKillParams,
   'workspacePorts.scan': WorkspacePortScanParams,
   'worktree.activate': WorktreeActivate,

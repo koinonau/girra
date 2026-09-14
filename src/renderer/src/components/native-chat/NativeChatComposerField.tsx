@@ -33,9 +33,6 @@ export type NativeChatComposerFieldProps = {
   sendButtonDisabled: boolean
   isWorking: boolean
   attachDisabled: boolean
-  dictationDisabled: boolean
-  isDictating: boolean
-  isDictationHoldMode: boolean
   imeEnterGesture: ReturnType<typeof useImeEnterGestureOwnership>
   onDraftChange: (value: string, element: NativeChatComposerInput) => void
   onTextareaSelect: (element: NativeChatComposerInput) => void
@@ -48,9 +45,6 @@ export type NativeChatComposerFieldProps = {
   onAcceptMention: () => void
   onRemoveImageAttachment: (id: string) => void
   onAttach: () => void
-  onDictationToggle: () => void
-  onDictationHoldStart: () => void
-  onDictationHoldEnd: () => void
   onSend: () => void
   onStop?: () => void
   sessionOptionsSurface: SessionOptionsSurface | null
@@ -105,9 +99,6 @@ export function NativeChatComposerField({
   sendButtonDisabled,
   isWorking,
   attachDisabled,
-  dictationDisabled,
-  isDictating,
-  isDictationHoldMode,
   imeEnterGesture,
   onDraftChange,
   onTextareaSelect,
@@ -120,9 +111,6 @@ export function NativeChatComposerField({
   onAcceptMention,
   onRemoveImageAttachment,
   onAttach,
-  onDictationToggle,
-  onDictationHoldStart,
-  onDictationHoldEnd,
   onSend,
   onStop,
   sessionOptionsSurface,
@@ -261,15 +249,9 @@ export function NativeChatComposerField({
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
               <NativeChatComposerActions
                 attachDisabled={attachDisabled}
-                dictationDisabled={dictationDisabled}
                 sendDisabled={sendButtonDisabled}
                 isWorking={isWorking}
-                isDictating={isDictating}
-                isDictationHoldMode={isDictationHoldMode}
                 onAttach={onAttach}
-                onDictationToggle={onDictationToggle}
-                onDictationHoldStart={onDictationHoldStart}
-                onDictationHoldEnd={onDictationHoldEnd}
                 onSend={onSend}
                 onStop={onStop}
                 sessionOptionsSurface={sessionOptionsSurface}

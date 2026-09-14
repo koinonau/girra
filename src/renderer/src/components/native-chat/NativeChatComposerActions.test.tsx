@@ -36,19 +36,13 @@ import { NativeChatComposerActions } from './NativeChatComposerActions'
 afterEach(() => cleanup())
 
 describe('NativeChatComposerActions', () => {
-  it('places session option pickers immediately beside dictation', () => {
+  it('places session option pickers immediately beside send', () => {
     render(
       <NativeChatComposerActions
         attachDisabled={false}
-        dictationDisabled={false}
         sendDisabled={false}
         isWorking={false}
-        isDictating={false}
-        isDictationHoldMode={false}
         onAttach={vi.fn()}
-        onDictationToggle={vi.fn()}
-        onDictationHoldStart={vi.fn()}
-        onDictationHoldEnd={vi.fn()}
         onSend={vi.fn()}
         sessionOptionsSurface={null}
         sessionOptionsSnapshot={[]}
@@ -56,23 +50,17 @@ describe('NativeChatComposerActions', () => {
     )
 
     const pickers = screen.getByTestId('session-option-pickers')
-    const dictation = screen.getByRole('button', { name: 'Start dictation' })
-    expect(pickers.nextElementSibling).toBe(dictation)
+    const send = screen.getByRole('button', { name: 'Send' })
+    expect(pickers.nextElementSibling).toBe(send)
   })
 
   it('marks the streaming Stop control as the critical hit target', () => {
     render(
       <NativeChatComposerActions
         attachDisabled={false}
-        dictationDisabled={false}
         sendDisabled={false}
         isWorking
-        isDictating={false}
-        isDictationHoldMode={false}
         onAttach={vi.fn()}
-        onDictationToggle={vi.fn()}
-        onDictationHoldStart={vi.fn()}
-        onDictationHoldEnd={vi.fn()}
         onSend={vi.fn()}
         onStop={vi.fn()}
         sessionOptionsSurface={null}
@@ -93,15 +81,9 @@ describe('NativeChatComposerActions', () => {
     render(
       <NativeChatComposerActions
         attachDisabled={false}
-        dictationDisabled={false}
         sendDisabled={false}
         isWorking
-        isDictating={false}
-        isDictationHoldMode={false}
         onAttach={vi.fn()}
-        onDictationToggle={vi.fn()}
-        onDictationHoldStart={vi.fn()}
-        onDictationHoldEnd={vi.fn()}
         onSend={onSend}
         onStop={onStop}
         sessionOptionsSurface={null}

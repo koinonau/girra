@@ -55,12 +55,12 @@ describe('createUISlice feature tips', () => {
     })
     const store = createUIStore()
 
-    store.getState().markFeatureTipsSeen(['voice-dictation'])
-    store.getState().markFeatureTipsSeen(['voice-dictation'])
+    store.getState().markFeatureTipsSeen(['orca-cli'])
+    store.getState().markFeatureTipsSeen(['orca-cli'])
 
-    expect(store.getState().featureTipsSeenIds).toEqual(['voice-dictation'])
+    expect(store.getState().featureTipsSeenIds).toEqual(['orca-cli'])
     expect(setMock).toHaveBeenCalledTimes(1)
-    expect(setMock).toHaveBeenCalledWith({ featureTipsSeenIds: ['voice-dictation'] })
+    expect(setMock).toHaveBeenCalledWith({ featureTipsSeenIds: ['orca-cli'] })
   })
 
   it('normalizes persisted feature tip ids during hydration', () => {
@@ -68,11 +68,11 @@ describe('createUISlice feature tips', () => {
 
     store.getState().hydratePersistedUI(
       makePersistedUI({
-        featureTipsSeenIds: ['voice-dictation', 'unknown', 'voice-dictation'] as never
+        featureTipsSeenIds: ['orca-cli', 'unknown', 'orca-cli'] as never
       })
     )
 
-    expect(store.getState().featureTipsSeenIds).toEqual(['voice-dictation'])
+    expect(store.getState().featureTipsSeenIds).toEqual(['orca-cli'])
   })
 })
 

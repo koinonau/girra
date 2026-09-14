@@ -8,7 +8,6 @@ import type { AgentActivityDisplayMode } from './ui-chrome-types'
 import type { WorkspaceSessionState } from './workspace-session-state-types'
 import { EMPTY_CODEX_RESET_CREDIT_ATTEMPT_LEDGER } from './codex-reset-credit-attempt-ledger'
 import { DEFAULT_STATUS_BAR_ITEMS } from './status-bar-defaults'
-import type { VoiceSettings } from './speech-types'
 import { cloneDefaultWorkspaceStatuses } from './workspace-statuses'
 import { DEFAULT_WORKTREE_CARD_PROPERTIES } from './worktree/card-properties'
 import { DEFAULT_AGENTS_GROUP_BY, DEFAULT_AGENTS_READ_FILTER } from './agents-view-thread-filters'
@@ -96,9 +95,6 @@ export const DEFAULT_EDITOR_AUTO_SAVE_DELAY_MS = 1000
 export const MIN_EDITOR_AUTO_SAVE_DELAY_MS = 250
 export const MAX_EDITOR_AUTO_SAVE_DELAY_MS = 10_000
 
-// Why: first-time seed only — doubles on each dismissal without starring; later thresholds live in starNagNextThreshold.
-export const STAR_NAG_INITIAL_THRESHOLD = 35
-
 /** Synthetic worktree id for PTYs not tied to any worktree; shared so main and renderer agree on the sentinel. */
 export const ORPHAN_WORKTREE_ID = '__orphan__'
 
@@ -172,24 +168,8 @@ export function getDefaultSettings(homedir: string): GlobalSettings {
     terminalFontFamily: defaultTerminalFontFamily(),
     terminalInactivePaneOpacity: DEFAULT_TERMINAL_INACTIVE_PANE_OPACITY,
     terminalRightClickToPaste: getDefaultTerminalRightClickToPaste(),
-    notifications: getDefaultNotificationSettings(),
-    voice: getDefaultVoiceSettings()
+    notifications: getDefaultNotificationSettings()
   })
-}
-
-export function getDefaultVoiceSettings(): VoiceSettings {
-  return {
-    enabled: false,
-    sttModel: '',
-    modelsDir: '',
-    language: 'en',
-    dictationMode: 'toggle' as const,
-    terminalConfirmBeforeInsert: false,
-    userModels: [],
-    openAiApiKeyConfigured: false,
-    microphoneDeviceId: null,
-    microphoneDeviceLabel: null
-  }
 }
 
 export function getDefaultRepoHookSettings(): RepoHookSettings {
@@ -295,9 +275,7 @@ export function getDefaultUIState(): PersistedUIState {
     statusBarVisible: true,
     usagePercentageDisplay: DEFAULT_USAGE_PERCENTAGE_DISPLAY,
     statusBarUsageMode: DEFAULT_STATUS_BAR_USAGE_MODE,
-    dismissedUpdateVersion: null,
     dismissedUnexpectedSignoutVersion: null,
-    lastUpdateCheckAt: null,
     trustedOrcaHooks: {},
     setupScriptPromptDismissedRepoIds: [],
     acknowledgedAgentsByPaneKey: {},

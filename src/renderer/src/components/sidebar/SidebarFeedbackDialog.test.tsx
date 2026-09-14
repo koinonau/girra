@@ -80,7 +80,7 @@ beforeEach(() => {
       platform: {
         get: mocks.getPlatform
       },
-      updater: { getVersion: mocks.getVersion }
+      app: { getVersion: mocks.getVersion }
     }
   })
 })
