@@ -23,7 +23,6 @@ export type MainWindowAgentStatusOptions = {
     payload: { state: string; prompt?: string; lastAssistantMessage?: string }
     isReplay: boolean | undefined
   }) => void
-  onRecordAgentState: (agentType: string, status: string) => void
 }
 
 export function installMainWindowAgentStatusListeners(options: MainWindowAgentStatusOptions): void {
@@ -108,7 +107,6 @@ export function installMainWindowAgentStatusListeners(options: MainWindowAgentSt
       if (!suppressSyntheticCodexAutoApprovalTitle || isAskUserQuestionTool(payload.toolName)) {
         getDashboardPopoutWindow()?.webContents.send('agentStatus:set', statusEvent)
       }
-      options.onRecordAgentState(payload.agentType ?? 'unknown', payload.state)
       // Why: native OSC titles miss some idle/permission frames, so inject hook-derived ones to keep the renderer title tracker in sync.
       const profile = getSyntheticAgentTitleProfile(payload.agentType)
       if (

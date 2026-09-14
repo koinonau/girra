@@ -107,20 +107,20 @@ describe('locale-translation-policy', () => {
     ).toBe('自动')
     expect(
       repairTranslatedValue({
-        key: 'menu.reportCrash',
-        enValue: 'Report Crash...',
-        localeValue: '충돌 신고...',
+        key: 'menu.toggleLeftSidebar',
+        enValue: 'Toggle Left Sidebar',
+        localeValue: '왼쪽 사이드바 전환',
         locale: 'ko'
       })
-    ).toBe('크래시 신고...')
+    ).toBe('왼쪽 사이드바 표시/숨기기')
     expect(
       repairTranslatedValue({
-        key: 'auto.App.722d03aa62',
-        enValue: 'The crash report dialog hit an error.',
-        localeValue: '충돌 보고서 대화 상자에 오류가 발생했습니다.',
+        key: 'auto.components.status.bar.SshStatusSegment.workspaceConflict',
+        enValue: 'Workspace conflict',
+        localeValue: '워크스페이스 갈등',
         locale: 'ko'
       })
-    ).toBe('크래시 보고서 대화 상자에 오류가 발생했습니다.')
+    ).toBe('워크스페이스 충돌')
     expect(
       repairTranslatedValue({
         key: 'auto.components.dashboard.DashboardAgentRow.912e136cd9',

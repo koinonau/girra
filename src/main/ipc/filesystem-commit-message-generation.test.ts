@@ -22,10 +22,6 @@ vi.mock(
   async () => (await import('./filesystem-test-harness')).wslUncDeleteMock
 )
 vi.mock(
-  '../crash-reporting/crash-breadcrumb-store',
-  async () => (await import('./filesystem-test-harness')).crashBreadcrumbMock
-)
-vi.mock(
   '../local-downloaded-folder-promotion',
   async () => (await import('./filesystem-test-harness')).folderPromotionMock
 )

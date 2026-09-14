@@ -40,7 +40,6 @@ function buildMenuOptions() {
     onOpenSettings: vi.fn(),
     onOpenSetupGuide: vi.fn(),
     onOpenFeatureTour: vi.fn(),
-    onOpenCrashReport: vi.fn(),
     onBeforeReload: vi.fn(),
     onZoomIn: vi.fn(),
     onZoomOut: vi.fn(),
@@ -322,7 +321,7 @@ describe('registerAppMenu', () => {
 
     const helpLabels = getSubmenu(template, 'Help').map((item) => item.label)
     expect(helpLabels).toEqual(
-      expect.arrayContaining(['Report Crash...', 'Getting Started with Orca', 'Explore Orca'])
+      expect.arrayContaining(['Getting Started with Orca', 'Explore Orca'])
     )
   })
 
@@ -337,12 +336,7 @@ describe('registerAppMenu', () => {
     // the system app menu. Without global Export, there is no File item left.
     expect(template.find((item) => item.label === 'File')).toBeUndefined()
     const helpLabels = getSubmenu(template, 'Help').map((item) => item.label)
-    expect(helpLabels).toEqual([
-      'Report Crash...',
-      undefined,
-      'Explore Orca',
-      'Getting Started with Orca'
-    ])
+    expect(helpLabels).toEqual(['Explore Orca', 'Getting Started with Orca'])
   })
 
   it('routes Getting Started with Orca through its callback', () => {
@@ -375,21 +369,6 @@ describe('registerAppMenu', () => {
 
     expect(options.onOpenFeatureTour).toHaveBeenCalledTimes(1)
     expect(options.onOpenFeatureTour).toHaveBeenCalledWith(targetWindow)
-  })
-
-  it('routes Report Crash through its callback', () => {
-    const options = buildMenuOptions()
-    registerAppMenu(options)
-
-    const crashReportItem = getSubmenu(getTemplate(), 'Help').find(
-      (entry) => entry.label === 'Report Crash...'
-    )
-
-    const targetWindow = {} as Electron.BaseWindow
-    crashReportItem?.click?.({} as never, targetWindow, {} as Electron.KeyboardEvent)
-
-    expect(options.onOpenCrashReport).toHaveBeenCalledTimes(1)
-    expect(options.onOpenCrashReport).toHaveBeenCalledWith(targetWindow)
   })
 
   it('exposes an Appearance submenu under View with checkbox items reflecting state', () => {

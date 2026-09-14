@@ -6,11 +6,9 @@ import {
   getNextDefaultOnAppearanceSettingValue
 } from '../menu/register-app-menu'
 import { zoomDashboardPopoutIfFocused } from '../window/dashboard-popout-window'
-import { recordCrashBreadcrumb } from '../crash-reporting/crash-breadcrumb-store'
 import { mainProcessState as state } from './main-process-state'
 import {
   openSettingsFromSystemMenu,
-  sendOpenCrashReport,
   sendOpenFeatureTour,
   sendOpenSetupGuide
 } from './main-window-actions'
@@ -26,23 +24,16 @@ export async function initializeMainProcessI18nAndMenu(): Promise<void> {
   logStartupMilestone('i18n-ready')
   registerAppMenu({
     appMenuLabel: state.devInstanceIdentity?.name ?? app.name,
-    onBeforeReload: ({ ignoreCache, webContentsId }) => {
+    onBeforeReload: ({ webContentsId }) => {
       if (state.mainWindow?.webContents.id === webContentsId) {
         state.expectedRendererReload.mark(webContentsId)
       }
-      recordCrashBreadcrumb('manual_reload_requested', { ignoreCache })
     },
     onOpenSettings: openSettingsFromSystemMenu,
     onOpenSetupGuide: (targetWindow) => {
-      recordCrashBreadcrumb('setup_guide_opened')
       sendOpenSetupGuide(targetWindow instanceof BrowserWindow ? targetWindow : null)
     },
-    onOpenCrashReport: (targetWindow) => {
-      recordCrashBreadcrumb('crash_report_opened')
-      sendOpenCrashReport(targetWindow instanceof BrowserWindow ? targetWindow : null)
-    },
     onOpenFeatureTour: (targetWindow) => {
-      recordCrashBreadcrumb('feature_tour_opened')
       // Why: use the invoking BrowserWindow so hidden/E2E and multi-window flows route to the right renderer, not global focus.
       sendOpenFeatureTour(targetWindow instanceof BrowserWindow ? targetWindow : null)
     },

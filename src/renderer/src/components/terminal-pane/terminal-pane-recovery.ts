@@ -1,5 +1,4 @@
 import { useAppStore } from '@/store'
-import { recordRendererCrashBreadcrumb } from '@/lib/crash-breadcrumb-recorder'
 import { locateTerminalTab } from '@/store/terminals/terminal-tab-location'
 import {
   admitTerminalRecoveryRemount,
@@ -189,14 +188,6 @@ function cancelPendingRecoveryRetry(tabId: string): void {
 }
 
 function handleDeclinedRecovery(request: RecoveryRequest, decline: TerminalRecoveryDecline): false {
-  if (decline.declinedBy === 'window-cap') {
-    // The backstop firing means the outcome gate let a loop through. That is a
-    // bug in the gate, so leave a trace rather than only declining quietly.
-    recordRendererCrashBreadcrumb('terminal_pane_recovery_window_cap', {
-      tabId: request.tabId,
-      reason: request.reason
-    })
-  }
   if (shouldScheduleRecoveryRetry(request, decline)) {
     scheduleRecoveryRetry(request, decline.retryInMs)
   }
@@ -281,24 +272,11 @@ export async function requestTerminalPaneRecovery(request: RecoveryRequest): Pro
     // Why: recovery fires from timer and write-callback contexts (stall watch,
     // replay guard, onData) — it is best-effort by contract and must never
     // surface a throw there (partial store surfaces in tests, teardown races).
-    // The breadcrumb is the only trace of a production failure loop here: the
-    // budget was not consumed, so the detector will retry each cooldown.
-    // recordRendererCrashBreadcrumb is itself guarded and cannot throw.
-    recordRendererCrashBreadcrumb('terminal_pane_recovery_failed', {
-      tabId: request.tabId,
-      reason: request.reason
-    })
     return false
   }
   if (!result.remounted) {
     if (result.declinedBy === 'tab-missing') {
-      // Why: this was the one silent outcome — the tab is gone from the store
-      // (closed/orphaned), so retrying is pointless, but the trace must show
-      // that a certified-dead pane asked for recovery and none happened.
-      recordRendererCrashBreadcrumb('terminal_pane_recovery_remount_unavailable', {
-        tabId: request.tabId,
-        reason: request.reason
-      })
+      // Why: the tab is gone from the store (closed/orphaned), so retrying is pointless.
       return false
     }
     return result.declinedBy === 'stale-generation'
@@ -313,16 +291,11 @@ export async function requestTerminalPaneRecovery(request: RecoveryRequest): Pro
     // would suppress input on a pane that never recovered.
     armTerminalInputQuarantine(request.tabId)
   }
-  // warn, not error: this is the recovery succeeding, and the breadcrumb below is
-  // what diagnostics actually read. STA-2373 made this path routine (every daemon
-  // death remounts each live pane), so error level just floods the logs.
+  // warn, not error: this is the recovery succeeding. STA-2373 made this path routine
+  // (every daemon death remounts each live pane), so error level just floods the logs.
   console.warn(
     `[terminal] recovering pane tab ${request.tabId} — ${request.reason} with a live PTY (${request.ptyId ?? 'unbound'}); remounting to rebuild the renderer`
   )
-  recordRendererCrashBreadcrumb('terminal_pane_recovery_remount', {
-    tabId: request.tabId,
-    reason: request.reason
-  })
   return true
 }
 

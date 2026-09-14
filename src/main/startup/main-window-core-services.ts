@@ -19,7 +19,6 @@ export function attachMainWindowCoreServices(
   window: BrowserWindow,
   deps: {
     markExpectedRendererReload: (webContentsId: number) => void
-    recordRendererReload: (ignoreCache: boolean) => void
   }
 ): void {
   const store = state.store
@@ -69,7 +68,6 @@ export function attachMainWindowCoreServices(
       prepareForClaudeLaunch: (target) => claudeRuntimeAuth.prepareForClaudeLaunch(target)
     },
     state.agentAwakeService ?? undefined,
-    state.crashReports ?? undefined,
     keybindings,
     {
       getAdditionalAiVaultCodexHomePaths: () =>
@@ -105,11 +103,10 @@ export function attachMainWindowCoreServices(
       prepareCodexSessionResume: prepareCodexSessionResumeForLaunch,
       awaitLocalPtyStartup: () => state.localPtyStartupReady,
       awaitLocalPtyProviderStartup: () => state.localPtyProviderStartupReady,
-      onBeforeRendererReload: ({ ignoreCache, webContentsId }) => {
+      onBeforeRendererReload: ({ webContentsId }) => {
         if (window.webContents.id === webContentsId) {
           deps.markExpectedRendererReload(webContentsId)
         }
-        deps.recordRendererReload(ignoreCache)
       },
       // Why: let the PTY layer skip its orphan sweep on the recovery reload that re-fires did-finish-load, so live local sessions survive (#5787).
       isRecoveryReloadInFlight,

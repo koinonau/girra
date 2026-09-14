@@ -71,12 +71,10 @@ export function useWorktreeCardController(props: ResolvedWorktreeCardProps) {
     repo,
     affiliateListMode: props.affiliateListMode,
     onSelectionGesture: props.onSelectionGesture,
-    isActive: props.isActive,
     activationRowKey: props.activationRowKey,
     onActivate: props.onActivate,
     onImmediateActivate: props.onImmediateActivate,
     isDeleting: linked.isDeleting,
-    isSshDisconnected: foundation.isSshDisconnected,
     updateWorktreeMeta: foundation.updateWorktreeMeta,
     openModal: foundation.openModal
   })

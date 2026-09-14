@@ -3,7 +3,6 @@ import { lazyWithRetry as lazy } from '@/lib/lazy-with-retry'
 import { translate } from '@/i18n/i18n'
 import { RecoverableRenderErrorBoundary } from '../components/error-boundaries/RecoverableRenderErrorBoundary'
 import NewWorkspaceComposerModal from '../components/NewWorkspaceComposerModal'
-import { CrashReportDialog } from '../components/crash-report/CrashReportDialog'
 import { MarkdownTemplatePicker } from '../components/editor/MarkdownTemplatePicker'
 import RecentTabSwitcher from '../components/tab-bar/RecentTabSwitcher'
 import { SkillFreshnessUpdateDialog } from '../components/skills/SkillFreshnessUpdateDialog'
@@ -75,7 +74,7 @@ type BoundaryProps = {
 
 function ModalBoundary({ children, ...props }: BoundaryProps): React.JSX.Element {
   return (
-    <RecoverableRenderErrorBoundary surface="modal" compact {...props}>
+    <RecoverableRenderErrorBoundary compact {...props}>
       {children}
     </RecoverableRenderErrorBoundary>
   )
@@ -83,7 +82,7 @@ function ModalBoundary({ children, ...props }: BoundaryProps): React.JSX.Element
 
 function OverlayBoundary({ children, ...props }: BoundaryProps): React.JSX.Element {
   return (
-    <RecoverableRenderErrorBoundary surface="overlay" compact {...props}>
+    <RecoverableRenderErrorBoundary compact {...props}>
       {children}
     </RecoverableRenderErrorBoundary>
   )
@@ -271,25 +270,10 @@ export function AppRootSurfaces(props: {
       <ModalBoundary boundaryId="modal.markdown-template-picker" resetKey={activeModal}>
         <MarkdownTemplatePicker />
       </ModalBoundary>
-      <RecoverableRenderErrorBoundary
-        boundaryId="modal.crash-report"
-        surface="modal"
-        reportAsCrash={false}
-        resetKey={activeModal}
-        compact
-        title={translate('auto.App.722d03aa62', 'The crash report dialog hit an error.')}
-        description={translate(
-          'auto.App.acd66311dc',
-          'Use the Help menu after retrying if you still need diagnostics.'
-        )}
-      >
-        <CrashReportDialog />
-      </RecoverableRenderErrorBoundary>
       {onboardingGate.onboarding && onboardingGate.shouldRender ? (
         <Suspense fallback={null}>
           <RecoverableRenderErrorBoundary
             boundaryId="modal.onboarding"
-            surface="modal"
             title={translate('auto.App.f02d37278a', 'Onboarding hit an error.')}
             description={translate(
               'auto.App.221a95ba38',

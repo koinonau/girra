@@ -189,7 +189,6 @@
     "settings": "Settings",
     "exploreOrca": "Explore Orca",
     "gettingStarted": "Getting Started with Orca",
-    "reportCrash": "Report Crash...",
     "file": "File",
     "exit": "Exit",
     "edit": "Edit",
@@ -276,8 +275,6 @@
     "App": {
       "221a95ba38": "Retry onboarding or close it and continue in the app.",
       "f02d37278a": "Onboarding hit an error.",
-      "acd66311dc": "Use the Help menu after retrying if you still need diagnostics.",
-      "722d03aa62": "The crash report dialog hit an error.",
       "8a023cea1f": "Retry the status bar to remount its controls.",
       "2e8ff36f94": "The status bar hit an error.",
       "7cbfbf622f": "Retry the floating workspace or close and reopen it.",
@@ -360,7 +357,6 @@
             "10898045f3": "Shortcut for \"{{value0}}\" was ignored: Use a string array.",
             "36761d9604": "Unknown keybinding action \"{{value0}}\" was ignored.",
             "d2e43e426a": "{{value0}} must be an object.",
-            "fb290366b2": "Unavailable on web.",
             "76122208ca": "Shortcut for \"{{value0}}\" was ignored: {{value1}}"
           }
         },
@@ -7236,24 +7232,14 @@
         "PrivacyDiagnosticBundleControls": {
           "dc8404a930": "Create diagnostic file",
           "a5acaffdb6": "Discard",
-          "aca2c8a367": "Send to support",
           "798b6f0be5": "Open review file",
-          "2ae9a6b63e": "Done",
-          "7f14a1733c": "Delete sent file",
-          "2801d4ce22": "Copy reference ID",
-          "d8be621237": "Open the review file first.",
-          "61676df223": "Diagnostics sent. Share this reference ID with support: {{value0}}.",
           "fd7b3891af": "You opened the review file ({{value0}}). Send that file to support, or discard it.",
           "62340d4439": "Your review file is ready ({{value0}}). Open it to see what would be sent, then choose whether to send it to support.",
           "19ec5e29b3": "Collects recent app activity and errors into a redacted file you can review before sending. Nothing is uploaded until you choose to send it."
         },
         "PrivacyDiagnosticsSection": {
           "af2fc82cde": "Send app diagnostics to support",
-          "c18cbe45df": "Sent diagnostics deleted",
-          "7a4944595b": "Could not copy reference ID",
-          "13eb2c65a1": "Reference ID copied",
           "860bca9ec9": "Review file discarded",
-          "49fc6c80e8": "Diagnostics sent",
           "db3228e01a": "Review file opened",
           "a2b3505c77": "Review file created"
         },
@@ -14306,35 +14292,9 @@
       "crash": {
         "report": {
           "CrashReportDialog": {
-            "b4951cd27c": "Send Report",
-            "88fea8e84e": "Don't Send",
-            "50b00dc327": "Copy Details",
-            "6d3ebe216a": "Diagnostic text",
-            "835037edc9": "· Orca",
             "56a3dfa283": "Failed to send crash report.",
-            "8e24fe4f75": "Crash report sent.",
-            "8b8473c544": "Crash report copied.",
             "b175e90213": "No crash report is available.",
-            "765591798d": "Checking for crash reports...",
-            "b2e36f53a1": "Failed to send crash report. Diagnostic ticket {{value0}} was uploaded but not linked.",
-            "ead6fc0510": "No automatic crash report was captured. You can still send details and include recent diagnostic logs when available.",
-            "b082f27490": "Attach recent diagnostic logs",
-            "e59f0b9427": "Sends a capped redacted log bundle with the report."
-          },
-          "submit": {
-            "notice": {
-              "unknownError": "The crash report request failed before it returned a reason.",
-              "ticketUploaded": "Diagnostic ticket {{value0}} was uploaded but not linked.",
-              "uncheckDiagnostics": "Uncheck \"Attach recent diagnostic logs\" and try again, or copy the details.",
-              "checkConnection": "Check your connection and try again, or copy the details.",
-              "notSent": "Crash report wasn't sent",
-              "copyDetails": "Copy Details",
-              "sentWithoutDiagnostics": "Crash report sent without diagnostic logs",
-              "diagnosticsReason": "Diagnostic logs were not attached: {{value0}}"
-            }
-          },
-          "copy": {
-            "copyFailed": "Crash report details could not be copied."
+            "b2e36f53a1": "Failed to send crash report. Diagnostic ticket {{value0}} was uploaded but not linked."
           }
         }
       },

@@ -17,14 +17,9 @@ vi.mock('../browser/browser-manager', async () =>
 import { createMainWindow } from './createMainWindow'
 import { ipcMain } from 'electron'
 import {
-  resetExpectedTeardownStateForTest,
-  resolveExpectedTeardownScope,
-  WINDOWS_SESSION_END_CRASH_SUPPRESSION_WINDOW_MS
+  isSystemSessionEnding,
+  resetExpectedTeardownStateForTest
 } from '../crash-reporting/expected-teardown-state'
-import {
-  clearCrashBreadcrumbsForTest,
-  getCrashBreadcrumbSnapshot
-} from '../crash-reporting/crash-breadcrumb-store'
 import {
   browserWindowMock,
   notificationMock,
@@ -36,7 +31,6 @@ describe('createMainWindow', () => {
   beforeEach(() => {
     resetMainWindowMocks()
     resetExpectedTeardownStateForTest()
-    clearCrashBreadcrumbsForTest()
     vi.useRealTimers()
   })
 
@@ -100,43 +94,16 @@ describe('createMainWindow', () => {
 
     afterEach(() => {
       setPlatform(originalPlatform)
-      clearCrashBreadcrumbsForTest()
     })
 
     it('marks production teardown state on irrevocable Windows session end', () => {
       setPlatform('win32')
-      resetExpectedTeardownStateForTest(() => 1_000)
       const { windowHandlers } = setupCloseWindow()
 
       createMainWindow(null)
       windowHandlers['session-end']?.({} as never)
 
-      expect(
-        resolveExpectedTeardownScope({
-          isQuitting: false,
-          isExpectedRendererReload: false
-        })
-      ).toBe('app-shutdown')
-    })
-
-    it('durably records the session-end reasons so bundles can identify OS shutdown', () => {
-      setPlatform('win32')
-      const { windowHandlers } = setupCloseWindow()
-
-      createMainWindow(null)
-      windowHandlers['session-end']?.({ reasons: ['shutdown', 'critical'] } as never)
-      windowHandlers['session-end']?.({} as never)
-
-      expect(getCrashBreadcrumbSnapshot()).toEqual([
-        expect.objectContaining({
-          name: 'system_session_end',
-          data: expect.objectContaining({ reasons: 'shutdown,critical' })
-        }),
-        expect.objectContaining({
-          name: 'system_session_end',
-          data: expect.objectContaining({ reasons: '' })
-        })
-      ])
+      expect(isSystemSessionEnding()).toBe(true)
     })
 
     it.each(['darwin', 'linux'] as const)(
@@ -148,25 +115,17 @@ describe('createMainWindow', () => {
         createMainWindow(null)
 
         expect(windowHandlers['session-end']).toBeUndefined()
-        expect(
-          resolveExpectedTeardownScope({
-            isQuitting: false,
-            isExpectedRendererReload: false
-          })
-        ).toBe('none')
+        expect(isSystemSessionEnding()).toBe(false)
       }
     )
 
-    it('still minimizes to tray after the session-end reporting window expires', () => {
+    it('still minimizes to tray after session end', () => {
       setPlatform('win32')
-      let now = 1_000
-      resetExpectedTeardownStateForTest(() => now)
       const { windowHandlers, webContents, instance } = setupCloseWindow()
       const store = makeStore(true, true)
 
       createMainWindow(store as never)
       windowHandlers['session-end']?.({} as never)
-      now += WINDOWS_SESSION_END_CRASH_SUPPRESSION_WINDOW_MS
       const preventDefault = vi.fn()
       windowHandlers.close({ preventDefault } as never)
 

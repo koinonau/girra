@@ -56,7 +56,6 @@ export const loadPullRequestLinkedIssueMock: IpcMock = vi.fn()
 export const getSshFilesystemProviderMock: IpcMock = vi.fn()
 export const getSshGitProviderMock: IpcMock = vi.fn()
 export const tryDeleteWslUncPathMock: IpcMock = vi.fn()
-export const recordCrashBreadcrumbMock: IpcMock = vi.fn()
 export const promoteLocalDownloadedFolderMock: IpcMock = vi.fn()
 
 export const electronMock = {
@@ -79,8 +78,6 @@ export const fsPromisesMock = {
 }
 
 export const wslUncDeleteMock = { tryDeleteWslUncPath: tryDeleteWslUncPathMock }
-
-export const crashBreadcrumbMock = { recordCrashBreadcrumb: recordCrashBreadcrumbMock }
 
 export const folderPromotionMock = {
   promoteLocalDownloadedFolder: promoteLocalDownloadedFolderMock
@@ -220,7 +217,6 @@ const ALL_MOCKS = [
   electronMock,
   fsPromisesMock,
   wslUncDeleteMock,
-  crashBreadcrumbMock,
   folderPromotionMock,
   gitStatusModuleMock,
   gitIgnoredPathsMock,

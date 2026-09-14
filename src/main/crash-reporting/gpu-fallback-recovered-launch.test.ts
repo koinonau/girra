@@ -35,7 +35,6 @@ function createHandlers(
     confirmSafeGraphics: vi.fn(() => order.push('confirm')),
     clearSafeGraphics: vi.fn(() => order.push('clear')),
     onPromptFailed: vi.fn(),
-    onSafeGraphicsKept: vi.fn(() => order.push('kept')),
     restartWithHardware: vi.fn(() => order.push('restart')),
     ...overrides
   }
@@ -72,7 +71,7 @@ describe('handleGpuFallbackRecoveredLaunch', () => {
   it('confirms safe graphics so later launches do not prompt again', async () => {
     const { handlers, order } = createHandlers()
     await handleGpuFallbackRecoveredLaunch(handlers)
-    expect(order).toEqual(['prompt', 'confirm', 'kept'])
+    expect(order).toEqual(['prompt', 'confirm'])
     expect(handlers.clearSafeGraphics).not.toHaveBeenCalled()
     expect(handlers.restartWithHardware).not.toHaveBeenCalled()
   })

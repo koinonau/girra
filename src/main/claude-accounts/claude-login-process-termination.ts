@@ -1,6 +1,5 @@
 import { spawnProcess, type ChildProcessHandle } from '../../shared/child-process/run-process'
 import type { WindowsHostInteractiveLoginSpawn } from '../../shared/windows-interactive-login-spawn'
-import { recordSelfInitiatedTreeKill } from '../crash-reporting/self-initiated-tree-kill-log'
 import { admitSelfInitiatedTreeKill } from '../own-chromium-tree-kill-guard'
 
 const WINDOWS_TASKKILL_TIMEOUT_MS = 5_000
@@ -76,11 +75,6 @@ export function terminateClaudeProcess(
       // The direct child remains the only safe fallback when group lookup fails.
     }
     if (signaledGroup) {
-      recordSelfInitiatedTreeKill({
-        pid: child.pid,
-        site: 'claude-account-login-teardown',
-        scope: 'posix-process-group'
-      })
       afterKill()
       return
     }

@@ -1,4 +1,3 @@
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
 import { removeBootstrapFatalExitGuard } from './bootstrap-fatal-exit-guard'
 
 type FatalMainProcessErrorKind = 'main_uncaught_exception' | 'main_unhandled_rejection'
@@ -53,43 +52,29 @@ function fatalMainProcessErrorDetails(error: unknown): FatalMainProcessErrorDeta
   }
 }
 
-// Why: one broken resource can reject hundreds of concurrent restore chains; each record does a
-// synchronous trace flush, so an uncapped storm stalls main and churns the trace-file rotation.
+// Why: one broken resource can reject hundreds of concurrent restore chains; an uncapped storm floods the log.
 const RECORD_WINDOW_MS = 60_000
 const RECORD_WINDOW_MAX = 20
 let recordWindowStartedAt = 0
 let recordWindowCount = 0
-let recordsSuppressed = 0
 
-/** Durably record a main-process fatal/near-fatal error before default handling runs. Exported for tests. */
+/** Log a main-process fatal/near-fatal error before default handling runs. Exported for tests. */
 export function recordFatalMainProcessError(kind: FatalMainProcessErrorKind, error: unknown): void {
   // Why: only rejections can storm; the one uncaught-exception record before the fatal re-throw
   // must never be lost to a window a storm already exhausted.
   if (kind === 'main_unhandled_rejection') {
     const now = Date.now()
-    // Why: a backward clock jump (sleep/resume, NTP) would otherwise trap an exhausted window and suppress every breadcrumb until wall time catches up.
+    // Why: a backward clock jump (sleep/resume, NTP) would otherwise trap an exhausted window and suppress every record until wall time catches up.
     if (now < recordWindowStartedAt || now - recordWindowStartedAt >= RECORD_WINDOW_MS) {
       recordWindowStartedAt = now
       recordWindowCount = 0
     }
     if (recordWindowCount >= RECORD_WINDOW_MAX) {
-      recordsSuppressed += 1
       return
     }
     recordWindowCount += 1
   }
-  const suppressedSinceLast = recordsSuppressed
-  recordsSuppressed = 0
   const details = fatalMainProcessErrorDetails(error)
-  try {
-    recordDurableCrashBreadcrumb(
-      kind,
-      suppressedSinceLast > 0 ? { ...details, suppressedSinceLast } : details,
-      kind
-    )
-  } catch {
-    // Why: diagnostics must never turn a fatal-error report into a second fault.
-  }
   try {
     console.error(
       `[${kind}] ${details.errorStack || `${details.errorName}: ${details.errorMessage}`}`
@@ -106,7 +91,7 @@ export function installUncaughtPipeErrorGuard(): void {
       return
     }
 
-    // Why (issue #9441): the re-throw below exits with a clean code and no macOS crash report; record durably first or the death is undiagnosable in the field.
+    // Why (issue #9441): the re-throw below exits with a clean code and no macOS crash report; log first or the death is undiagnosable.
     recordFatalMainProcessError('main_uncaught_exception', error)
     process.off('uncaughtException', onUncaughtException)
     // Why: throwing inside an uncaughtException handler exits with status 7 and hides the fault; re-throw next tick for the real stack.
@@ -123,7 +108,7 @@ export function installUncaughtPipeErrorGuard(): void {
  *
  * Node's default kills the process on an unhandled rejection. Large-profile startup restore runs
  * hundreds of concurrent async chains (worktree scans, terminal reconnects) in main; a single
- * rejection in any of them exited the app with no crash report (issue #9441). Log it durably and
+ * rejection in any of them exited the app with no crash report (issue #9441). Log it and
  * stay alive — dying cannot be less disruptive than continuing with one failed background task.
  */
 export function installUnhandledRejectionLogging(): void {

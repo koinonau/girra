@@ -58,7 +58,7 @@ orca-profiles, then crash-reporting, then telemetry. Telemetry has 45 call sites
 
 Keep `src/main/observability`. It writes local logs and traces, phones nothing home, and you kept it.
 
-Split into pull requests, since orca-profiles reaches far wider than its 27 direct references. Phase 3a took everything that talks to Orca cloud: artifacts, skill sharing, the cloud relay, push, mobile pairing, and profiles and accounts, keeping the profile storage layout per ADR 0003. 486 files deleted, 77,388 lines removed. Crash reporting and telemetry follow as Phase 3b.
+Split into pull requests, since orca-profiles reaches far wider than its 27 direct references. Phase 3a took everything that talks to Orca cloud: artifacts, skill sharing, the cloud relay, push, mobile pairing, and profiles and accounts, keeping the profile storage layout per ADR 0003. 486 files deleted, 77,388 lines removed. Phase 3b took crash reporting (108 files, 23,966 lines), keeping GPU fallback and renderer crash recovery. Telemetry follows as Phase 3c.
 
 ### Phase 4. Minor agent CLIs
 

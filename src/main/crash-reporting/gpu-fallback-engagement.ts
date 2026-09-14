@@ -18,8 +18,6 @@ export type GpuFallbackEngagementHandlers = {
   clearMarker: () => void
   promptForRestart: () => Promise<GpuFallbackRestartDecision>
   onPromptFailed: (error: unknown) => void
-  onEngaged: (engagement: GpuFallbackEngagement) => void
-  onRestartDeferred: (engagement: GpuFallbackEngagement) => void
   restartIntoSafeGraphics: (engagement: GpuFallbackEngagement) => void
 }
 
@@ -38,7 +36,6 @@ export async function engageGpuFallbackAfterCrashBurst(
   engagement: GpuFallbackEngagement,
   handlers: GpuFallbackEngagementHandlers
 ): Promise<void> {
-  handlers.onEngaged(engagement)
   const persisted = handlers.persistMarker(engagement)
   let decision: GpuFallbackRestartDecision
   try {
@@ -55,7 +52,6 @@ export async function engageGpuFallbackAfterCrashBurst(
     if (persisted) {
       handlers.clearMarker()
     }
-    handlers.onRestartDeferred(engagement)
     return
   }
   if (!persisted) {

@@ -77,7 +77,6 @@ describeOnWindows('install-dir package ACL repair against the real icacls', () =
     return new Promise((resolve) => {
       probeWindowsInstallDirAcl({
         installDir,
-        recordBreadcrumb: () => undefined,
         onDone: (data) => resolve(data as Record<string, unknown>)
       })
     })
@@ -104,8 +103,7 @@ describeOnWindows('install-dir package ACL repair against the real icacls', () =
     const mode = await repairKnownPoisonedInstallDirBeforeWindow({
       installDir,
       userDataPath,
-      appVersion: '1.4.196',
-      recordBreadcrumb: () => undefined
+      appVersion: '1.4.196'
     })
     console.log(`[live-acl] blocking repair ${mode} in ${Date.now() - startedAt}ms`)
     expect(mode).toBe('repaired')

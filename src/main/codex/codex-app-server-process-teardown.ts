@@ -3,7 +3,6 @@ import { captureDescendantSnapshot, type DescendantSnapshot } from '../pty-desce
 import { terminateDescendantSnapshotAndWait } from '../pty-descendant-exit-verification'
 import { terminateWindowsProcessTree } from '../windows-process-tree-kill'
 import { findAgentSessionSpawnTokenProcesses } from '../runtime/agent-session-spawn-token-process-scan'
-import { recordSelfInitiatedTreeKill } from '../crash-reporting/self-initiated-tree-kill-log'
 
 const TOKEN_PROCESS_EXIT_TIMEOUT_MS = 3_500
 const TOKEN_PROCESS_POLL_MS = 25
@@ -38,12 +37,6 @@ function terminateDedicatedPosixGroup(
   } catch (error) {
     return (error as NodeJS.ErrnoException).code === 'ESRCH'
   }
-  // Outside the try: that catch is the ESRCH contract, not a breadcrumb handler.
-  recordSelfInitiatedTreeKill({
-    pid: rootPid,
-    site: 'codex-app-server-teardown',
-    scope: 'posix-process-group'
-  })
   return true
 }
 
@@ -129,22 +122,10 @@ async function terminatePosixTree(
     const signalGroup =
       deps.signalProcessGroup ??
       ((pgid: number, signal: NodeJS.Signals) => process.kill(-pgid, signal))
-    let groupSignalled = false
     try {
       signalGroup(snapshot.rootPgid, 'SIGKILL')
-      groupSignalled = true
     } catch {
-      // Already-gone is still the desired outcome, but nothing here killed it,
-      // and a crumb for a kill we never landed is a false render-process-gone suspect.
-    }
-    if (groupSignalled) {
-      // Outside the try, as in terminateDedicatedPosixGroup: that catch is the
-      // already-gone contract, not a breadcrumb handler.
-      recordSelfInitiatedTreeKill({
-        pid: snapshot.rootPgid,
-        site: 'codex-app-server-teardown',
-        scope: 'posix-process-group'
-      })
+      // Already-gone is still the desired outcome.
     }
   }
   if (!descendantsExited) {

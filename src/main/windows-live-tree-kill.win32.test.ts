@@ -8,10 +8,6 @@ import { setAppEnvironment, type AppEnvironment } from '../shared/app-environmen
 import { setProcessTreeKillGate } from '../shared/child-process/process-tree-kill-gate'
 import { signalProcessTree } from '../shared/child-process/process-tree-termination'
 import { removeTreeSync } from '../shared/windows-transient-lock-removal'
-import {
-  findSelfInitiatedTreeKills,
-  resetSelfInitiatedTreeKillLogForTest
-} from './crash-reporting/self-initiated-tree-kill-log'
 import { installMainProcessTreeKillGate } from './own-chromium-tree-kill-guard'
 import { terminateWindowsProcessTree } from './windows-process-tree-kill'
 
@@ -111,7 +107,6 @@ async function spawnLiveTree(): Promise<{
 describeOnWindows('own-Chromium gate against real Windows process trees', () => {
   beforeEach(() => {
     markerDirectory ||= mkdtempSync(join(tmpdir(), 'orca-live-tree-kill-'))
-    resetSelfInitiatedTreeKillLogForTest()
     orcaChromiumPids = []
     setAppEnvironment(appEnvironment())
     installMainProcessTreeKillGate()
@@ -137,21 +132,16 @@ describeOnWindows('own-Chromium gate against real Windows process trees', () => 
     }
   })
 
-  it('admitted: taskkill reaps the root and its detached grandchild, and the kill is recorded', async () => {
+  it('admitted: taskkill reaps the root and its detached grandchild', async () => {
     const { rootPid, leafPid } = await spawnLiveTree()
 
     await terminateWindowsProcessTree(rootPid, { site: 'live-tree-kill-admit' })
 
     expect(await waitFor(() => !isAlive(rootPid))).toBe(true)
     expect(await waitFor(() => !isAlive(leafPid))).toBe(true)
-    expect(
-      findSelfInitiatedTreeKills(Date.now()).some(
-        (kill) => kill.pid === rootPid && kill.site === 'live-tree-kill-admit'
-      )
-    ).toBe(true)
   })
 
-  it('refused: the tree survives, nothing is recorded, and the handle kill still reaps the root', async () => {
+  it('refused: the tree survives, and the handle kill still reaps the root', async () => {
     const { child, rootPid, leafPid } = await spawnLiveTree()
     orcaChromiumPids = [rootPid]
 
@@ -160,7 +150,6 @@ describeOnWindows('own-Chromium gate against real Windows process trees', () => 
     await sleep(1_000)
     expect(isAlive(rootPid)).toBe(true)
     expect(isAlive(leafPid)).toBe(true)
-    expect(findSelfInitiatedTreeKills(Date.now())).toEqual([])
 
     // The fallback every gated site runs after a refusal.
     child.kill('SIGKILL')

@@ -1,10 +1,5 @@
 import { app, type BrowserWindow } from 'electron'
 import { createMainWindow, loadMainWindow } from '../window/createMainWindow'
-import {
-  recordCrashBreadcrumb,
-  recordCoalescedCrashBreadcrumb
-} from '../crash-reporting/crash-breadcrumb-store'
-import { recordDurableCrashBreadcrumb } from '../crash-reporting/durable-crash-breadcrumb'
 import { shouldRecoverRendererAfterProcessGone } from '../crash-reporting/process-gone-classification'
 import { resolveConsent } from '../telemetry/consent'
 import { trackAppOpenedOnce } from '../telemetry/client'
@@ -34,8 +29,7 @@ import {
   clearExpectedRendererReload,
   markExpectedRendererReload,
   markRecoveryReloadInFlight,
-  getExpectedTeardownScope,
-  recordProcessGoneCrash
+  getExpectedTeardownScope
 } from './main-window-lifecycle-flags'
 import { presentGpuFallbackRecoveredLaunchPrompt } from './gpu-lifecycle'
 import { maybeAutoRenameBranchOnFirstWorkFromHook } from './branch-rename-hook'
@@ -46,7 +40,6 @@ import {
 import { requireMainWindowServices } from './main-window-service-readiness'
 
 const TRAY_CREATE_FALLBACK_MS = 12_000
-const AGENT_STATE_CRASH_BREADCRUMB_MIN_INTERVAL_MS = 30_000
 
 export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}): BrowserWindow {
   logStartupMilestone('open-main-window-start')
@@ -99,57 +92,27 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
       state.isQuitting = false
       clearExpectedRendererReload()
     },
-    onRendererProcessGone: (details, webContentsId) =>
-      recordProcessGoneCrash(
-        'renderer',
-        'renderer',
-        details.reason,
-        details.exitCode ?? null,
-        { processType: 'renderer' },
-        webContentsId
-      ),
     shouldRecoverRenderer: (details, webContentsId) =>
       shouldRecoverRendererAfterProcessGone({
         reason: details.reason,
-        expectedTeardown: getExpectedTeardownScope(webContentsId, false)
+        expectedTeardown: getExpectedTeardownScope(webContentsId)
       }),
-    onRendererRecoveryExhausted: ({ details, recentRecoveryCount, cause, retry }) => {
-      // Why two names: a stalled reload never opened the breaker, and a bundle that says it did misreads the failure.
-      recordDurableCrashBreadcrumb(
-        cause === 'reload-stalled'
-          ? 'renderer_recovery_reload_exhausted'
-          : 'renderer_recovery_circuit_breaker_open',
-        {
-          reason: details.reason,
-          exitCode: details.exitCode ?? null,
-          recentRecoveryCount
-        }
-      )
+    onRendererRecoveryExhausted: ({ recentRecoveryCount, cause, retry }) => {
       void showRendererRecoveryPrompt(recentRecoveryCount, cause, retry)
     },
     deferLoad: true,
     ...(options.revealOnDidFinishLoad === true ? { revealOnDidFinishLoad: true } : {}),
     title: state.devInstanceIdentity?.name ?? app.name,
     getKeybindings: () => keybindings.getOverrides(),
-    onBeforeReload: ({ ignoreCache, webContentsId }) => {
+    onBeforeReload: ({ webContentsId }) => {
       if (state.mainWindow?.webContents.id === webContentsId) {
         markExpectedRendererReload(webContentsId)
       }
-      recordCrashBreadcrumb('manual_reload_requested', { ignoreCache })
     },
-    // Manual retries also preserve PTYs, but have their own intent breadcrumb.
-    onBeforeRecoveryReload: (webContentsId, trigger) => {
+    onBeforeRecoveryReload: (webContentsId) => {
       markRecoveryReloadInFlight(webContentsId)
-      if (trigger === 'automatic') {
-        recordDurableCrashBreadcrumb('renderer_recovery_reload')
-      }
-    },
-    // Pair the intent breadcrumb with its path-free outcome.
-    onRecoveryReloadOutcome: ({ status, ...outcome }) => {
-      recordDurableCrashBreadcrumb(`renderer_recovery_reload_${status}`, outcome)
     }
   })
-  recordCrashBreadcrumb('main_window_created')
   logStartupMilestone('window-created')
   const createTray = createSystemTrayDeferred(window, () => logStartupMilestone('tray-created'))
   window.once('ready-to-show', () => {
@@ -165,7 +128,6 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
   const rendererWebContentsId = window.webContents.id
   const onFirstWindowLoad = (): void => {
     clearExpectedRendererReload(rendererWebContentsId)
-    recordCrashBreadcrumb('main_window_loaded')
     logStartupMilestone('did-finish-load')
     // Why cleared here: a reload drops the old ui:openMarkdownFiles listener, and the fresh
     // renderer re-attaches by pulling. Pushing into the gap between would be silently lost.
@@ -176,11 +138,7 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
     }
   }
   window.webContents.on('did-finish-load', onFirstWindowLoad)
-  attachMainWindowCoreServices(window, {
-    markExpectedRendererReload,
-    recordRendererReload: (ignoreCache) =>
-      recordCrashBreadcrumb('renderer_reload_requested', { ignoreCache })
-  })
+  attachMainWindowCoreServices(window, { markExpectedRendererReload })
   state.mainWindow = window
   window.on('show', resumeSyntheticTitleSpinnerTimer)
   window.on('restore', resumeSyntheticTitleSpinnerTimer)
@@ -192,14 +150,7 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
   window.on('restore', () => setTrayAttention(false))
   installMainWindowAgentStatusListeners({
     window,
-    maybeAutoRenameBranchOnFirstWork: maybeAutoRenameBranchOnFirstWorkFromHook,
-    onRecordAgentState: (agentType, status) =>
-      recordCoalescedCrashBreadcrumb({
-        name: 'agent_state_changed',
-        data: { agentType, state: status },
-        coalesceKey: `agent:${agentType}:${status}`,
-        minIntervalMs: AGENT_STATE_CRASH_BREADCRUMB_MIN_INTERVAL_MS
-      })
+    maybeAutoRenameBranchOnFirstWork: maybeAutoRenameBranchOnFirstWorkFromHook
   })
   window.on('closed', () => {
     if (state.mainWindow === window) {

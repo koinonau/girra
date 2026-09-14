@@ -13,7 +13,6 @@ import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import type { RateLimitService } from '../rate-limits/service'
 import type { OrcaRuntimeRpcServer } from '../runtime/runtime-rpc'
 import type { AgentAwakeService } from '../agent-awake-service'
-import type { CrashReportStore } from '../crash-reporting/crash-report-store'
 import type { AutomationService } from '../automations/service'
 import type { PluginService } from '../plugins/plugin-service'
 import type { PluginKillListService } from '../plugins/plugin-kill-list-service'
@@ -36,7 +35,6 @@ import {
   DEFAULT_GPU_CRASH_FALLBACK_WINDOW_MS,
   GpuCrashFallbackTracker
 } from '../crash-reporting/gpu-crash-fallback-decision'
-import type { GpuCrashDiagnosticsRecorder } from '../crash-reporting/gpu-crash-diagnostics'
 import { createWebContentsTimedFlag } from './web-contents-timed-flag'
 
 /** Mutable composition-root state shared by startup, window, serve, and quit phases. */
@@ -63,7 +61,6 @@ export const mainProcessState = {
   agentAwakeService: null as AgentAwakeService | null,
   uninstallRepoMaintenanceIdleGate: null as (() => Promise<void>) | null,
   repoMaintenanceShutdown: Promise.resolve() as Promise<void>,
-  crashReports: null as CrashReportStore | null,
   unsubscribeAgentAwakeStatusChanges: null as (() => void) | null,
   unsubscribeSystemResumeBroadcast: null as (() => void) | null,
   watcherShutdownPromise: null as Promise<void> | null,
@@ -104,7 +101,6 @@ export const mainProcessState = {
   activeGpuFallbackMarker: null as GpuFallbackMarker | null,
   gpuFallbackActiveThisLaunch: false,
   gpuFeatureStatus: null as Electron.GPUFeatureStatus | null,
-  gpuCrashDiagnostics: null as GpuCrashDiagnosticsRecorder | null,
   localPtyStartupReady: Promise.resolve(),
   localPtyProviderStartupReady: Promise.resolve(),
   isServeMode: false,

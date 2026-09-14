@@ -73,7 +73,6 @@
     "settings": "Paramètres",
     "exploreOrca": "Découvrir Orca",
     "gettingStarted": "Premiers pas avec Orca",
-    "reportCrash": "Signaler un plantage...",
     "file": "Fichier",
     "exit": "Quitter",
     "edit": "Édition",
@@ -159,8 +158,6 @@
     "App": {
       "221a95ba38": "Relancez l'onboarding, ou fermez-le et continuez dans l'app.",
       "f02d37278a": "Une erreur est survenue dans l'onboarding.",
-      "acd66311dc": "Utilisez le menu Aide après avoir réessayé si vous avez toujours besoin d'un diagnostic.",
-      "722d03aa62": "La boîte de dialogue de rapport de plantage a rencontré une erreur.",
       "8a023cea1f": "Réessayez la barre d'état pour remonter ses contrôles.",
       "2e8ff36f94": "La barre d'état a rencontré une erreur.",
       "7cbfbf622f": "Réessayez l'espace de travail flottant, ou fermez-le et rouvrez-le.",
@@ -243,7 +240,6 @@
             "10898045f3": "Raccourci pour « {{value0}} » ignoré : utilisez un tableau de chaînes.",
             "36761d9604": "Action de raccourci inconnue « {{value0}} » ignorée.",
             "d2e43e426a": "{{value0}} doit être un objet.",
-            "fb290366b2": "Indisponible sur le web.",
             "76122208ca": "Raccourci pour « {{value0}} » ignoré : {{value1}}"
           }
         },
@@ -6951,24 +6947,14 @@
         "PrivacyDiagnosticBundleControls": {
           "dc8404a930": "Créer le fichier de diagnostic",
           "a5acaffdb6": "Abandonner",
-          "aca2c8a367": "Envoyer au support",
           "798b6f0be5": "Ouvrir le fichier de révision",
-          "2ae9a6b63e": "Terminé",
-          "7f14a1733c": "Supprimer le fichier envoyé",
-          "2801d4ce22": "Copier l'ID de référence",
-          "d8be621237": "Ouvrez d'abord le fichier de révision.",
-          "61676df223": "Diagnostics envoyés. Communiquez cet ID de référence au support : {{value0}}.",
           "fd7b3891af": "Vous avez ouvert le fichier de révision ({{value0}}). Envoyez ce fichier au support, ou abandonnez-le.",
           "62340d4439": "Votre fichier de révision est prêt ({{value0}}). Ouvrez-le pour voir ce qui serait envoyé, puis choisissez de l'envoyer ou non au support.",
           "19ec5e29b3": "Collecte l'activité récente de l'app et les erreurs dans un fichier expurgé que vous pouvez consulter avant l'envoi. Rien n'est téléversé tant que vous n'avez pas choisi de l'envoyer."
         },
         "PrivacyDiagnosticsSection": {
           "af2fc82cde": "Envoyer les diagnostics de l'app au support",
-          "c18cbe45df": "Diagnostics envoyés supprimés",
-          "7a4944595b": "Impossible de copier l'ID de référence",
-          "13eb2c65a1": "ID de référence copié",
           "860bca9ec9": "Fichier de révision abandonné",
-          "49fc6c80e8": "Diagnostics envoyés",
           "db3228e01a": "Fichier de révision ouvert",
           "a2b3505c77": "Fichier de révision créé"
         },
@@ -13747,35 +13733,9 @@
       "crash": {
         "report": {
           "CrashReportDialog": {
-            "b4951cd27c": "Envoyer le rapport",
-            "88fea8e84e": "Ne pas envoyer",
-            "50b00dc327": "Copier les détails",
-            "6d3ebe216a": "Texte de diagnostic",
-            "835037edc9": "· Orca",
             "56a3dfa283": "Échec de l'envoi du rapport de plantage.",
-            "8e24fe4f75": "Rapport de plantage envoyé.",
-            "8b8473c544": "Rapport de plantage copié.",
             "b175e90213": "Aucun rapport de plantage disponible.",
-            "765591798d": "Recherche de rapports de plantage...",
-            "b2e36f53a1": "Échec de l'envoi du rapport de plantage. Le ticket de diagnostic {{value0}} a été téléversé, mais pas associé.",
-            "ead6fc0510": "Aucun rapport de plantage automatique n'a été capturé. Vous pouvez toujours envoyer des détails et inclure les journaux de diagnostic récents lorsqu'ils sont disponibles.",
-            "b082f27490": "Joindre les journaux de diagnostic récents",
-            "e59f0b9427": "Envoie avec le rapport un lot de journaux anonymisés et de taille limitée."
-          },
-          "submit": {
-            "notice": {
-              "unknownError": "La demande de rapport de plantage a échoué avant de renvoyer une raison.",
-              "ticketUploaded": "Le ticket de diagnostic {{value0}} a été téléversé, mais pas associé.",
-              "uncheckDiagnostics": "Décochez « Joindre les journaux de diagnostic récents » et réessayez, ou copiez les détails.",
-              "checkConnection": "Vérifiez votre connexion et réessayez, ou copiez les détails.",
-              "notSent": "Le rapport de plantage n'a pas été envoyé",
-              "copyDetails": "Copier les détails",
-              "sentWithoutDiagnostics": "Rapport de plantage envoyé sans journaux de diagnostic",
-              "diagnosticsReason": "Journaux de diagnostic non joints : {{value0}}"
-            }
-          },
-          "copy": {
-            "copyFailed": "Impossible de copier les détails du rapport de plantage."
+            "b2e36f53a1": "Échec de l'envoi du rapport de plantage. Le ticket de diagnostic {{value0}} a été téléversé, mais pas associé."
           }
         }
       },
