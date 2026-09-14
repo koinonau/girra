@@ -29,7 +29,6 @@ export {
   resolvePaneLinkCwd,
   resolvePaneSeedCwd,
   resolveQueuedInitialCwd,
-  recordRuntimeCreatedTerminalPaneSplit,
   shouldDetachPaneTransportOnUnmount,
   terminalSelectionExceedsPrimaryLimit,
   splitPaneWithOneShotStartup

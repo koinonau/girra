@@ -12,7 +12,6 @@ import {
   normalizeShowDotfilesByWorktree,
   normalizeSortBy
 } from '../applying-settings/ui-selection-normalization'
-import { stripMainOwnedTelemetryMarkerFromUI } from '../applying-settings/ui-interaction-merge'
 import {
   readDeprecatedExperimentFlag,
   resolveSetupGuideSidebarDismissedOnLoad
@@ -170,7 +169,8 @@ export function normalizeLoadedUiState(
     worktreeCardProperties: getWorktreeCardModeProperties(
       loadedCompactWorktreeCards ? 'Compact' : 'Default'
     ),
-    ...stripMainOwnedTelemetryMarkerFromUI(parsed.ui),
+    // Why: persisted JSON may omit fields the type marks required.
+    ...(parsed.ui as Partial<PersistedState['ui']> | undefined),
     // Why: migrate once from the retired Appearance setting only when no explicit chrome preference exists yet.
     rightSidebarOpen,
     rightSidebarTab: normalizeRightSidebarTab(parsed.ui?.rightSidebarTab),

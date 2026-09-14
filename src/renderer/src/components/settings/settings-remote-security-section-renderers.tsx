@@ -1,5 +1,5 @@
 import { DeveloperPermissionsPane } from './DeveloperPermissionsPane'
-import { PrivacyPane } from './PrivacyPane'
+import { PrivacyDiagnosticsSection } from './PrivacyDiagnosticsSection'
 import { RuntimeEnvironmentsPane } from './RuntimeEnvironmentsPane'
 import { SshPane } from './SshPane'
 import { SettingsSection } from './SettingsSection'
@@ -80,18 +80,18 @@ export function renderDeveloperPermissionsSettingsSection(
 }
 
 export function renderPrivacySettingsSection(context: SettingsRenderContext): React.JSX.Element {
-  const { model, navigation, view } = context
+  const { navigation, view } = context
   return (
     <SettingsSection
       id="privacy"
-      title={translate('auto.components.settings.Settings.d7e3f62d70', 'Privacy & Telemetry')}
+      title={translate('auto.components.settings.Settings.72cbb0eb1d', 'Privacy')}
       description={translate(
-        'auto.components.settings.Settings.c1b43dc4e2',
-        'Anonymous usage data and telemetry controls.'
+        'auto.components.settings.Settings.2d11e205cd',
+        'Create and review local diagnostic files.'
       )}
       searchEntries={navigation.getSectionSearchEntries('privacy')}
     >
-      {view.isSectionMounted('privacy') ? <PrivacyPane settings={model.settings} /> : null}
+      {view.isSectionMounted('privacy') ? <PrivacyDiagnosticsSection /> : null}
     </SettingsSection>
   )
 }

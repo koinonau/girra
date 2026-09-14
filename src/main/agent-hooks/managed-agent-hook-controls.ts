@@ -26,7 +26,6 @@ type InstallOptions = {
   /** Set only for an explicit user action, never for startup reconciliation. */
   userInitiated?: boolean
   shouldHydrateShellPath?: boolean
-  onInstallError?: (agent: AgentHookTarget, error: unknown) => void
   shouldContinue?: (agent: AgentHookTarget) => boolean
   agents?: readonly AgentHookTarget[]
 }
@@ -111,7 +110,6 @@ function selectedInstallers(options: InstallOptions): readonly ManagedAgentHookI
 
 async function runInstaller(
   entry: ManagedAgentHookInstaller,
-  onInstallError: InstallOptions['onInstallError'],
   userInitiated?: boolean
 ): Promise<AgentHookInstallStatus> {
   const [agent, install] = entry
@@ -119,11 +117,6 @@ async function runInstaller(
     return await install({ userInitiated })
   } catch (error) {
     console.error(`[agent-hooks] Failed to install ${agent} managed hooks:`, error)
-    try {
-      onInstallError?.(agent, error)
-    } catch (telemetryError) {
-      console.error('[agent-hooks] Failed to record install-failure telemetry:', telemetryError)
-    }
     return errorStatus(agent, error)
   }
 }
@@ -200,7 +193,7 @@ export async function installManagedAgentHooks(
       )
       continue
     }
-    results.push(await runInstaller(entry, options.onInstallError, options.userInitiated))
+    results.push(await runInstaller(entry, options.userInitiated))
   }
   return results
 }

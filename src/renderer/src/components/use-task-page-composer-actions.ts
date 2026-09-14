@@ -64,8 +64,7 @@ export function useTaskPageComposerActions(model: TaskPageJiraListEffectsModel) 
       openModal('new-workspace-composer', {
         linkedWorkItem,
         taskSourceContext: linearTaskSourceContext,
-        prefilledName: getLinearIssueWorkspaceName(issue),
-        telemetrySource: 'sidebar'
+        prefilledName: getLinearIssueWorkspaceName(issue)
       })
     },
     [linearTaskSourceContext, openModal]
@@ -215,8 +214,7 @@ export function useTaskPageComposerActions(model: TaskPageJiraListEffectsModel) 
       openModal('new-workspace-composer', {
         linkedWorkItem,
         taskSourceContext,
-        prefilledName: getJiraIssueWorkspaceSeed(issue),
-        telemetrySource: 'sidebar'
+        prefilledName: getJiraIssueWorkspaceSeed(issue)
       })
     },
     [jiraSites, jiraTaskSourceContext, openModal]

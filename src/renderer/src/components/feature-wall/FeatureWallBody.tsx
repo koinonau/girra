@@ -1,6 +1,6 @@
 import type { JSX } from 'react'
 import type { FeatureWallWorkflow } from '../../../../shared/feature-wall-workflows'
-import type { FeatureWallOpenSourceTelemetry } from '../../../../shared/telemetry-events'
+import type { FeatureWallOpenSource } from './feature-wall-modal-helpers'
 import type { AgentsStep } from '../../../../shared/agents-orchestration-steps'
 import type { WorkbenchStep } from '../../../../shared/workbench-steps'
 import type { ReviewStep } from '../../../../shared/review-steps'
@@ -29,7 +29,7 @@ export function FeatureWallBody(props: {
   gifUrl: string | null
   showGif: boolean
   prefersReducedMotion: boolean
-  source: FeatureWallOpenSourceTelemetry
+  source: FeatureWallOpenSource
   agentsActiveStep: AgentsStep | null
   workbenchActiveStep: WorkbenchStep | null
   reviewActiveStep: ReviewStep | null
@@ -252,9 +252,7 @@ export function FeatureWallBody(props: {
           previewVisualNode
         ) : (
           <aside className="flex flex-col gap-5">
-            {selected.relatedTileIds.length > 0 ? (
-              <RelatedFeatures workflow={selected} source={source} />
-            ) : null}
+            {selected.relatedTileIds.length > 0 ? <RelatedFeatures workflow={selected} /> : null}
           </aside>
         )}
       </div>

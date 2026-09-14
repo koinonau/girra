@@ -302,7 +302,7 @@ export function registerAppHandlers(store: Store, options: RegisterAppHandlersOp
   })
 
   ipcMain.handle('app:restart', async () => {
-    // Why: use the normal quit pipeline so daemon checkpoints and telemetry flush before exit.
+    // Why: use the normal quit pipeline so daemon checkpoints and state flush before exit.
     await runBeforeRelaunchCleanup(options.onBeforeRelaunch)
     setTimeout(() => {
       relaunchApp('admin-restart')

@@ -17,21 +17,13 @@ import {
   getDaemonRuntimeDir as getRuntimeDir,
   resolvePackagedDarwinAppVersion
 } from './daemon-launch-paths'
-import {
-  attributeNextDaemonReplacement,
-  createOutOfProcessLauncher
-} from './daemon-out-of-process-launcher'
+import { createOutOfProcessLauncher } from './daemon-out-of-process-launcher'
 import type { DaemonProvider } from './daemon-provider-routing'
 import { installDaemonProvider } from './daemon-provider-state'
 import { DegradedDaemonPtyProvider } from './degraded-daemon-pty-provider'
-import { trackDaemonAdopted } from './daemon-adoption-telemetry-event'
-import { readDaemonPidRecord } from './daemon-endpoint-incarnation'
-import { trackDaemonRetired } from './daemon-lifecycle-event'
-import { getMacDaemonTccAttributionHealth } from './daemon-tcc-attribution'
 import { DaemonPtyAdapter } from './daemon-pty-adapter'
 import type { DaemonRespawnReason } from './daemon-pty-runtime-state'
 import { DaemonPtyRouter } from './daemon-pty-router'
-import { isDaemonRestartInFlight } from './daemon-restart-state'
 import { DaemonSpawner, getDaemonPidPath } from './daemon-spawner'
 
 // Why: daemon init runs concurrent with window load, so an in-process t timestamp (not harness stderr timing) measures cold-start.
@@ -91,20 +83,8 @@ export async function initDaemonPtyProvider(
     historyPath: getHistoryDir(),
     // Why: on daemon death, ensureConnected() detects the dead socket and calls this to fork a replacement before retrying.
     respawn: async (reason: DaemonRespawnReason) => {
-      // Why: attribute rather than emit — the launcher below is the one that completes the
-      // replacement, and emitting here would fire before the outcome is known.
-      // Caveat: a wedged-but-alive daemon (#8689) can still report died_respawn here and
-      // failed_health_check from the launcher — the app cannot tell wedged from dead at this point.
       if (reason === 'daemon_died') {
         console.warn('[daemon] Daemon process died — respawning')
-        // Why: a manual restart tears the daemon down under a still-live adapter, so a pane
-        // respawning on its synthetic exit would bill a user action to the crash bucket.
-        if (!isDaemonRestartInFlight()) {
-          trackDaemonRetired('died_respawn')
-        }
-      } else {
-        // Must reach the launcher below without an await in between; see the consume site.
-        attributeNextDaemonReplacement(reason)
       }
       newSpawner.resetHandle()
       await newSpawner.ensureRunning()
@@ -159,35 +139,7 @@ export async function initDaemonPtyProvider(
   logDaemonMilestone('daemon-init-done', {
     legacyAdapters: legacyAdapters.length
   })
-  if (process.platform === 'darwin' && newSpawner.getHandle()?.adopted) {
-    void reportDaemonAdoption(runtimeDir, info.socketPath, info.tokenPath, newAdapter)
-  }
   await reconcileSeededClaudeLivePtys(routedAdapter)
-}
-
-// Why off the init path: this is measurement of an adopted daemon (#17696), and neither its probes nor their failure may delay or fail startup.
-async function reportDaemonAdoption(
-  runtimeDir: string,
-  socketPath: string,
-  tokenPath: string,
-  adapter: DaemonPtyAdapter
-): Promise<void> {
-  try {
-    const [tccAttribution, liveSessionCount] = await Promise.all([
-      getMacDaemonTccAttributionHealth(runtimeDir, socketPath, tokenPath),
-      adapter.listSessions().then(
-        (sessions) => sessions.length,
-        () => null
-      )
-    ])
-    trackDaemonAdopted(
-      readDaemonPidRecord(getDaemonPidPath(runtimeDir)),
-      tccAttribution,
-      liveSessionCount
-    )
-  } catch {
-    // Best-effort measurement only.
-  }
 }
 
 // Why: release gate ids only for daemon-confirmed-dead sessions; keep seeds on listing failure since releasing early can rotate a live CLI's refresh token.

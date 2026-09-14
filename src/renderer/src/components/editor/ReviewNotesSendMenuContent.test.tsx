@@ -25,7 +25,6 @@ const hookRuntime = vi.hoisted(() => ({
 const harness = vi.hoisted(() => ({
   storeState: {} as Record<string, unknown>,
   sendNotesToActiveAgentSession: vi.fn(),
-  track: vi.fn(),
   toastMessage: vi.fn(),
   worktreeAgentRows: [] as DashboardAgentRowData[],
   noteTargets: [] as {
@@ -96,10 +95,6 @@ vi.mock('@/lib/active-agent-note-send', () => ({
 
 vi.mock('@/lib/notes-send-agent-targets', () => ({
   deriveNotesSendAgentTargets: () => harness.noteTargets
-}))
-
-vi.mock('@/lib/telemetry', () => ({
-  track: harness.track
 }))
 
 vi.mock('@/hooks/use-now', () => ({
@@ -342,7 +337,6 @@ describe('ReviewNotesSendMenuContent', () => {
     hookRuntime.cleanups = []
     harness.sendNotesToActiveAgentSession.mockReset()
     harness.sendNotesToActiveAgentSession.mockResolvedValue({ status: 'sent' })
-    harness.track.mockReset()
     harness.toastMessage.mockReset()
     harness.worktreeAgentRows = []
     harness.noteTargets = []
@@ -595,7 +589,7 @@ describe('ReviewNotesSendMenuContent', () => {
     expect(collectText(tree)).not.toContain('Active agent session')
   })
 
-  it('sends notes to the chosen agent and tracks the send once it succeeds', async () => {
+  it('sends notes to the chosen agent and reports delivery once it succeeds', async () => {
     const statusPaneKey = makePaneKey(TAB_A, LEAF_A)
     const onPromptDelivered = vi.fn()
     setStore({
@@ -623,11 +617,6 @@ describe('ReviewNotesSendMenuContent', () => {
       noteTarget: { tabId: TAB_A, leafId: LEAF_A }
     })
     expect(onPromptDelivered).toHaveBeenCalledTimes(1)
-    expect(harness.track).toHaveBeenCalledWith('agent_prompt_sent', {
-      agent_kind: 'claude-code',
-      launch_source: 'notes_send',
-      request_kind: 'followup'
-    })
   })
 
   it('keeps selected-target note failures undelivered and uses selected wording', async () => {
@@ -654,7 +643,6 @@ describe('ReviewNotesSendMenuContent', () => {
     await flushMicrotasks()
 
     expect(onPromptDelivered).not.toHaveBeenCalled()
-    expect(harness.track).not.toHaveBeenCalled()
     expect(harness.toastMessage).toHaveBeenCalledWith('selected:not-ready')
   })
 
@@ -682,7 +670,6 @@ describe('ReviewNotesSendMenuContent', () => {
     await flushMicrotasks()
 
     expect(onPromptDelivered).not.toHaveBeenCalled()
-    expect(harness.track).not.toHaveBeenCalled()
   })
 
   it('revalidates the chosen target at click time and refuses stale rows', async () => {

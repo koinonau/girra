@@ -5,8 +5,7 @@
 //   diagnostics:openBundlePreview    — open the retained payload in the OS.
 //   diagnostics:discardBundlePreview — delete a retained payload.
 //
-// Same threat model as the product-telemetry IPC (`ipc/telemetry.ts`):
-// renderer can pass anything over the wire, type-narrow here. Everything
+// The renderer can pass anything over the wire, so type-narrow here. Everything
 // that touches the filesystem stays in main — the renderer only sees the
 // resulting status / preview.
 

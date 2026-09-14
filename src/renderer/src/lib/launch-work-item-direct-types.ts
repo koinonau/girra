@@ -1,8 +1,7 @@
 import type { LinkedWorkItemContext } from '@/lib/linked-work-item-context'
 import type { TaskProvider } from '../../../shared/task-providers'
 import type { TuiAgent } from '../../../shared/tui-agent'
-import type { WorkspaceSource as WorkspaceCreateTelemetrySource } from '../../../shared/workspace-source'
-import type { LaunchSource } from '../../../shared/telemetry-events'
+import type { LaunchSource } from '../../../shared/worktree/launch-types'
 
 export type LaunchableWorkItem = {
   provider?: TaskProvider
@@ -27,7 +26,6 @@ export type LaunchWorkItemDirectArgs = {
   openModalFallback: () => void
   baseBranch?: string
   launchSource: LaunchSource
-  telemetrySource?: WorkspaceCreateTelemetrySource
   agentOverride?: TuiAgent
   agentArgs?: string | null
   promptDelivery?: 'draft' | 'submit-after-ready'

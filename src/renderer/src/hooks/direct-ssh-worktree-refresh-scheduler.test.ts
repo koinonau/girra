@@ -94,7 +94,7 @@ function completeResult(
   }
 }
 
-function createHarness(cancelOutcome?: 'cancel-failed', now?: () => number) {
+function createHarness(cancelOutcome?: 'cancel-failed') {
   const attempts: ControlledAttempt[] = []
   const onUnexpectedError = vi.fn()
   const startAttempt = vi.fn((attemptKey: DirectSshWorktreeRefreshKey) => {
@@ -121,8 +121,7 @@ function createHarness(cancelOutcome?: 'cancel-failed', now?: () => number) {
   })
   const scheduler = createDirectSshWorktreeRefreshScheduler({
     startAttempt,
-    onUnexpectedError,
-    now
+    onUnexpectedError
   })
   return { scheduler, attempts, startAttempt, onUnexpectedError }
 }
@@ -397,39 +396,5 @@ describe('createDirectSshWorktreeRefreshScheduler', () => {
 
     await expect(metadata.result).resolves.toMatchObject({ status: 'non-authoritative' })
     await expect(rejected.result).resolves.toMatchObject({ status: 'rejected' })
-  })
-
-  it('reports queue wait, provider execution, retry, joins, and scoped peak metrics', async () => {
-    let now = 0
-    const { scheduler, attempts } = createHarness(undefined, () => now)
-    const leases = Array.from({ length: 6 }, (_, index) =>
-      scheduler.request(key('target-a', `repo-${index}`))
-    )
-    scheduler.request(key('target-a', 'repo-5'))
-
-    now = 25
-    attempts[0].deferred.resolve(completeResult(attempts[0]))
-    await leases[0].result
-    await flushAttempt()
-    expect(attempts).toHaveLength(6)
-
-    now = 100
-    attempts[5].deferred.resolve(terminalResult(attempts[5], 'timed-out'))
-    await flushAttempt()
-    now = 140
-    attempts[6].deferred.resolve(completeResult(attempts[6]))
-
-    await expect(leases[5].result).resolves.toMatchObject({
-      status: 'complete',
-      metrics: {
-        queueWaitDurationsMs: [25, 0],
-        providerExecutionDurationsMs: [75, 40],
-        timeoutRetryCount: 1,
-        cancelDebtCount: 1,
-        overlappingJoinCount: 1,
-        peakLocallyUnsettled: 5
-      }
-    })
-    scheduler.stop()
   })
 })

@@ -4,7 +4,6 @@ import { useAppStore } from '@/store'
 type RequestContextualTourWhenReadyArgs = {
   id: ContextualTourId
   source: string
-  wasFeaturePreviouslyInteracted?: boolean
   maxAttempts?: number
   retryDelayMs?: number
   waitForActiveTourToClear?: boolean
@@ -40,9 +39,7 @@ export function requestContextualTourWhenReady(
       return
     }
 
-    before.requestContextualTour(args.id, args.source, args.wasFeaturePreviouslyInteracted, {
-      force: true
-    })
+    before.requestContextualTour(args.id, args.source, { force: true })
 
     const after = useAppStore.getState()
     if (after.activeContextualTourId === args.id || attempts >= maxAttempts) {

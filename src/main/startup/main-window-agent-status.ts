@@ -54,7 +54,7 @@ export function installMainWindowAgentStatusListeners(options: MainWindowAgentSt
         return
       }
       if (providerSessionOnly) {
-        // Why: session_start just refreshes durable resume identity while Pi is idle; forward it without titles, telemetry, or status UI.
+        // Why: session_start just refreshes durable resume identity while Pi is idle; forward it without titles or status UI.
         state.mainWindow?.webContents.send('agentStatus:set', {
           ...payload,
           paneKey,

@@ -14,12 +14,6 @@ export type DaemonCreateOrAttachResult = {
   wslDistro?: string | null
   agentSessionEnsure?: AgentSessionClaimedSpawnResult
   incarnationId?: PtyIncarnationId
-  /**
-   * Whether the daemon process itself could read the requested cwd at spawn. Only the daemon's own
-   * verdict counts: macOS TCC scopes folder access per process tree, so the app's view of the same
-   * path proves nothing about the daemon's (#17696). Omitted by daemons predating this field.
-   */
-  cwdReadableByDaemon?: boolean
 }
 
 export function getDaemonSessionResultMetadata(session: {

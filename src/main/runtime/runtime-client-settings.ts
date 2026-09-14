@@ -13,7 +13,6 @@ import type { NativeChatSessionOptionSettingsMutation } from '../../shared/nativ
 import { getHostDisplayLabelOverrides } from '../../shared/host-setting-overrides'
 import type { ExecutionHostId } from '../../shared/execution-host'
 import type { TerminalQuickCommand } from '../../shared/terminal-quick-command-types'
-import { recordManagedHookInstallFailure } from '../agent-hooks/install-telemetry'
 import { applyAgentStatusHooksEnabled } from '../agent-hooks/managed-agent-hook-controls'
 import type { RuntimeStore } from './runtime-store-contract'
 
@@ -202,7 +201,6 @@ export class RuntimeClientSettingsController {
       }
       await applyAgentStatusHooksEnabled(settings.agentStatusHooksEnabled !== false, settings, {
         shouldHydrateShellPath: getAppEnvironment().isPackaged(),
-        onInstallError: recordManagedHookInstallFailure,
         shouldContinue: (agent) => {
           const current = this.store?.getSettings()
           return (

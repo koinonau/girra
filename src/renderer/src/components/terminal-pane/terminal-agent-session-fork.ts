@@ -205,7 +205,6 @@ export async function startAgentSessionFork(fork: PreparedAgentSessionFork): Pro
       sourceBranch,
       'inherit',
       undefined,
-      'terminal_context_menu',
       `Fork of ${sourceWorktree.displayName || forkName}`,
       undefined,
       undefined,

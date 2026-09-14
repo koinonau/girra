@@ -37,9 +37,7 @@ globalThis.window = {
       refreshAgents: vi.fn().mockResolvedValue({
         agents: [],
         addedPathSegments: [],
-        shellHydrationOk: false,
-        pathSource: 'sync_seed_only',
-        pathFailureReason: 'spawn_error'
+        shellHydrationOk: false
       }),
       detectRemoteAgents: vi.fn().mockResolvedValue([])
     },

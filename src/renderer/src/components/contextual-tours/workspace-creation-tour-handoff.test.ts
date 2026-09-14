@@ -32,9 +32,7 @@ describe('openWorkspaceCreationComposerWithTourHandoff', () => {
 
     openWorkspaceCreationComposerWithTourHandoff()
 
-    expect(openModal).toHaveBeenCalledWith('new-workspace-composer', {
-      telemetrySource: 'sidebar'
-    })
+    expect(openModal).toHaveBeenCalledWith('new-workspace-composer', {})
     expect(detachContextualTourSource).not.toHaveBeenCalled()
     expect(requestContextualTourWhenReady).not.toHaveBeenCalled()
   })
@@ -67,13 +65,11 @@ describe('openWorkspaceCreationComposerWithTourHandoff', () => {
     )
     expect(completeContextualTour).toHaveBeenCalledWith('workspace-agent-sessions')
     expect(openModal).toHaveBeenCalledWith('new-workspace-composer', {
-      telemetrySource: 'sidebar',
       contextualTourSource: 'workspace_creation_modal'
     })
     expect(requestContextualTourWhenReady).toHaveBeenCalledWith({
       id: 'workspace-creation',
       source: 'workspace_creation_modal',
-      wasFeaturePreviouslyInteracted: false,
       waitForActiveTourToClear: true,
       shouldContinue: expect.any(Function)
     })
@@ -112,7 +108,6 @@ describe('openWorkspaceCreationComposerWithTourHandoff', () => {
     )
     expect(completeContextualTour).toHaveBeenCalledWith('workspace-agent-sessions')
     expect(openModal).toHaveBeenCalledWith('new-workspace-composer', {
-      telemetrySource: 'sidebar',
       contextualTourSource: 'workspace_creation_modal'
     })
     expect(requestContextualTourWhenReady).not.toHaveBeenCalled()
@@ -138,9 +133,7 @@ describe('openWorkspaceCreationComposerWithTourHandoff', () => {
     openWorkspaceCreationComposerWithTourHandoff()
 
     expect(detachContextualTourSource).not.toHaveBeenCalled()
-    expect(openModal).toHaveBeenCalledWith('new-workspace-composer', {
-      telemetrySource: 'sidebar'
-    })
+    expect(openModal).toHaveBeenCalledWith('new-workspace-composer', {})
     expect(requestContextualTourWhenReady).not.toHaveBeenCalled()
   })
 })

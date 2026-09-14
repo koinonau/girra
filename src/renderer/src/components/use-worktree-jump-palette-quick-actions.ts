@@ -73,9 +73,7 @@ export function useWorktreeJumpPaletteQuickActions({
   }, [])
   const openCreateWorkspaceAction = useCallback(() => {
     prefetchCreateWorkspaceBaseForComposer()
-    queueMicrotask(() =>
-      openModal('new-workspace-composer', { telemetrySource: 'command_palette' })
-    )
+    queueMicrotask(() => openModal('new-workspace-composer'))
   }, [openModal, prefetchCreateWorkspaceBaseForComposer])
   const deleteActiveWorkspaceAction = useCallback(() => {
     const {

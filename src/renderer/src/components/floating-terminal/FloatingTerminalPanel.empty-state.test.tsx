@@ -186,7 +186,6 @@ describe('FloatingTerminalPanel close behavior', () => {
     const persisted = Promise.resolve()
 
     await renderPanel(false, vi.fn(), {
-      wasPreviouslyInteracted: false,
       persisted,
       recordFeatureInteractionForTour: false
     })
@@ -197,13 +196,11 @@ describe('FloatingTerminalPanel close behavior', () => {
       'floating_workspace_visible',
       {
         recordFeatureInteraction: false,
-        featureInteractionPersisted: persisted,
-        wasFeaturePreviouslyInteracted: false
+        featureInteractionPersisted: persisted
       }
     )
 
     await renderPanel(true, vi.fn(), {
-      wasPreviouslyInteracted: true,
       persisted,
       recordFeatureInteractionForTour: false
     })
@@ -214,15 +211,13 @@ describe('FloatingTerminalPanel close behavior', () => {
       'floating_workspace_visible',
       {
         recordFeatureInteraction: false,
-        featureInteractionPersisted: persisted,
-        wasFeaturePreviouslyInteracted: true
+        featureInteractionPersisted: persisted
       }
     )
   })
 
   it('records the floating workspace tour interaction when the open snapshot deferred persistence', async () => {
     await renderPanel(true, vi.fn(), {
-      wasPreviouslyInteracted: false,
       recordFeatureInteractionForTour: true
     })
 
@@ -232,8 +227,7 @@ describe('FloatingTerminalPanel close behavior', () => {
       'floating_workspace_visible',
       {
         recordFeatureInteraction: true,
-        featureInteractionPersisted: undefined,
-        wasFeaturePreviouslyInteracted: false
+        featureInteractionPersisted: undefined
       }
     )
   })

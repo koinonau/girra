@@ -1,9 +1,8 @@
 import { EventEmitter } from 'node:events'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { showMessageBoxMock, trackMock } = vi.hoisted(() => ({
-  showMessageBoxMock: vi.fn(),
-  trackMock: vi.fn()
+const { showMessageBoxMock } = vi.hoisted(() => ({
+  showMessageBoxMock: vi.fn()
 }))
 
 vi.mock('electron', () => ({
@@ -26,13 +25,8 @@ vi.mock('../i18n/main-i18n', () => ({
     )
 }))
 
-vi.mock('../telemetry/client', () => ({
-  track: trackMock
-}))
-
 import {
   classifyRuntimeRpcStartFailure,
-  recordRuntimeRpcStartFailure,
   showRuntimeRpcStartupFailureDialog
 } from './runtime-rpc-startup-failure'
 
@@ -72,7 +66,6 @@ function flushMicrotasks(): Promise<void> {
 describe('runtime RPC startup failure reporting', () => {
   beforeEach(() => {
     showMessageBoxMock.mockReset().mockResolvedValue({ response: 0 })
-    trackMock.mockReset()
   })
 
   it.each([
@@ -113,34 +106,6 @@ describe('runtime RPC startup failure reporting', () => {
     error.cause = error
 
     expect(classifyRuntimeRpcStartFailure(error)).toBe('unknown')
-  })
-
-  it('records a privacy-safe telemetry event', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const error = Object.assign(new Error('/Users/private/orca-runtime.json'), { code: 'EACCES' })
-
-    recordRuntimeRpcStartFailure(error)
-
-    expect(trackMock).toHaveBeenCalledWith('runtime_rpc_start_failed', {
-      error_class: 'permission_denied'
-    })
-    expect(JSON.stringify(trackMock.mock.calls)).not.toContain('/Users/private')
-    consoleError.mockRestore()
-  })
-
-  it('does not let telemetry failure escape the startup failure handler', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
-    const telemetryError = new Error('telemetry unavailable')
-    trackMock.mockImplementationOnce(() => {
-      throw telemetryError
-    })
-
-    expect(() => recordRuntimeRpcStartFailure(new Error('RPC failed'))).not.toThrow()
-    expect(consoleError).toHaveBeenCalledWith(
-      '[runtime] Failed to record RPC startup failure telemetry:',
-      telemetryError
-    )
-    consoleError.mockRestore()
   })
 
   it('shows the CLI impact and local cause', async () => {

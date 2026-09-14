@@ -178,7 +178,6 @@ export function NativeChatStructuredSession(
       sessionCommands: controller.sessionCommands,
       worktreeId: fileLinkContext?.worktreeId,
       onError: setComposerError,
-      runtime: (props.target.kind === 'local' ? 'local' : 'remote') as 'local' | 'remote',
       sessionId: props.sessionId,
       runtimeEnvironmentId:
         props.target.kind === 'local' ? null : (props.target.environmentId ?? null)

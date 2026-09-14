@@ -22,7 +22,6 @@ export type FullCreationExecutionInput = Pick<
   | 'setSidebarOpen'
   | 'sparseEnabled'
   | 'taskSourceContext'
-  | 'telemetrySource'
   | 'tuiAgent'
 >
 
@@ -65,7 +64,6 @@ export function useFullCreationExecution(input: FullCreationExecutionInput) {
     setSidebarOpen,
     sparseEnabled,
     taskSourceContext,
-    telemetrySource,
     tuiAgent
   } = input
 
@@ -154,7 +152,6 @@ export function useFullCreationExecution(input: FullCreationExecutionInput) {
               ...(effectivePresetId ? { presetId: effectivePresetId } : {})
             }
           : undefined,
-        telemetrySource,
         createDisplayName,
         submitLinkedIssueNumber ?? undefined,
         submitLinkedPR ?? undefined,
@@ -300,7 +297,6 @@ export function useFullCreationExecution(input: FullCreationExecutionInput) {
       setSidebarOpen,
       sparseEnabled,
       taskSourceContext,
-      telemetrySource,
       tuiAgent
     ]
   )

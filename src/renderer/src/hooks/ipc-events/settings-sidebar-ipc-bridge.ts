@@ -32,7 +32,7 @@ export function registerSettingsAndSidebarIpcBridge(unsubs: (() => void)[]): voi
 
   unsubs.push(
     window.api.ui.onOpenSetupGuide?.(() => {
-      useAppStore.getState().openModal('setup-guide', { telemetrySource: 'help_menu' })
+      useAppStore.getState().openModal('setup-guide')
     }) ?? (() => {})
   )
 

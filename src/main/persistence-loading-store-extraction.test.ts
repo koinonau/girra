@@ -14,9 +14,7 @@ import {
   writeDataFile
 } from './persistence-test-harness'
 
-const { trackMock, getCohortAtEmitMock, logStartupDiagnosticMock } = vi.hoisted(() => ({
-  trackMock: vi.fn(),
-  getCohortAtEmitMock: vi.fn(() => ({ nth_repo_added: 2 })),
+const { logStartupDiagnosticMock } = vi.hoisted(() => ({
   logStartupDiagnosticMock: vi.fn()
 }))
 
@@ -35,8 +33,6 @@ vi.mock('electron', () => ({
   }
 }))
 
-vi.mock('./telemetry/client', () => ({ track: trackMock }))
-vi.mock('./telemetry/cohort-classifier', () => ({ getCohortAtEmit: getCohortAtEmitMock }))
 vi.mock('./ssh/ssh-config-parser', () => ({
   loadUserSshConfig: vi.fn(() => ({ hosts: [] })),
   sshConfigHostsToTargets: vi.fn(() => [])

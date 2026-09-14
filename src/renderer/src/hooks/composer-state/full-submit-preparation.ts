@@ -19,7 +19,6 @@ type FullSubmitPreparationInput = Pick<
   | 'selectedRepoStartupShell'
   | 'settings'
   | 'smartNameMode'
-  | 'telemetrySource'
   | 'tuiAgent'
 >
 
@@ -36,8 +35,8 @@ import {
 } from '../../../../shared/tui-agent-launch-defaults'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
 import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
-import { tuiAgentToAgentKind } from '@/lib/telemetry'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
+import { tuiAgentToAgentKind } from '../../../../shared/agent-kind'
 import type { PendingSmartGitHubSubmitResolution } from './source-selection-decisions'
 
 export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
@@ -59,7 +58,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
     selectedRepoStartupShell,
     settings,
     smartNameMode,
-    telemetrySource,
     tuiAgent
   } = input
 
@@ -206,9 +204,9 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
         tuiAgent === 'command-code' && submitStartupPrompt.trim().length > 0
 
       // Why: backend startup is safe only for self-contained launch commands; agents needing post-ready paste stay on the renderer path.
-      const composerTelemetry: AgentStartedTelemetry = {
+      const composerTelemetry: AgentLaunchMetadata = {
         agent_kind: tuiAgentToAgentKind(tuiAgent),
-        launch_source: telemetrySource === 'onboarding' ? 'onboarding' : 'new_workspace_composer',
+        launch_source: 'new_workspace_composer',
         request_kind: 'new'
       }
 
@@ -259,7 +257,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
       selectedRepoStartupShell,
       settings,
       smartNameMode,
-      telemetrySource,
       tuiAgent,
       branchAutoNameRef
     ]

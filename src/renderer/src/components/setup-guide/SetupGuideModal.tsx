@@ -19,7 +19,6 @@ import { useAppStore } from '@/store'
 import { FeatureWallSetupChecklist } from '../feature-wall/FeatureWallSetupChecklist'
 import { SetupGuideProgressRing } from './SetupGuideProgressRing'
 import { useSetupGuideProgress } from './use-setup-guide-progress'
-import { useSetupGuideOpenCloseTelemetry } from './use-setup-guide-telemetry'
 import { translate } from '@/i18n/i18n'
 
 const SETUP_GUIDE_CLOSE_LINGER_MS = 300
@@ -70,20 +69,7 @@ function SetupGuideModalContent({
   const requestedStepId = isFeatureWallSetupStepId(modalData.setupStepId)
     ? modalData.setupStepId
     : null
-  const telemetrySource =
-    typeof modalData.setupGuideSource === 'string'
-      ? modalData.setupGuideSource
-      : typeof modalData.telemetrySource === 'string'
-        ? modalData.telemetrySource
-        : 'unknown'
   const activeStep = setupSteps.find((step) => step.id === activeStepId) ?? setupSteps[0] ?? null
-
-  useSetupGuideOpenCloseTelemetry({
-    isOpen: open,
-    source: telemetrySource,
-    progress,
-    activeStepId: activeStep?.id ?? null
-  })
 
   useEffect(() => {
     if (!open) {

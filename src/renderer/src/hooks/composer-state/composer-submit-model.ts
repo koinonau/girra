@@ -4,7 +4,7 @@ import type { SetupDecision } from '../../../../shared/worktree/create-types'
 import type { Repo } from '../../../../shared/repo-types'
 import type { WorkspaceIntentName } from '../../../../shared/workspace-name'
 import type { AgentStartupPlan } from '../../../../shared/tui-agent-startup'
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { LinkedWorkItemSummary } from '@/lib/new-workspace'
 import type { WorktreeCreationRequest } from '@/lib/pending-worktree-creation'
 import type { PendingSmartGitHubSubmitResolution } from './source-selection-decisions'
@@ -44,7 +44,7 @@ export type PreparedFullSubmit = FullSubmitSource & {
   pendingFirstAgentMessageRename: boolean
   startupPlan: AgentStartupPlan | null
   shouldSeedInitialAgentStatus: boolean
-  composerTelemetry: AgentStartedTelemetry
+  composerTelemetry: AgentLaunchMetadata
   backendStartup: WorktreeCreationRequest['startup']
 }
 

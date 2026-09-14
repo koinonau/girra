@@ -93,11 +93,6 @@ vi.mock('@/lib/new-workspace', () => ({
   isGitLabIssueUrl: vi.fn(() => false)
 }))
 
-vi.mock('@/lib/telemetry', () => ({
-  track: vi.fn(),
-  tuiAgentToAgentKind: (agent: string) => agent
-}))
-
 vi.mock('@/lib/tui-agent-startup', async () => {
   const actual = await vi.importActual<typeof TuiAgentStartupModule>('@/lib/tui-agent-startup')
   return {
@@ -246,7 +241,6 @@ describe('launchWorkItemDirect', () => {
     await launchWorkItemDirect({
       repoId: 'repo-1',
       launchSource: 'task_page',
-      telemetrySource: 'sidebar',
       openModalFallback: vi.fn(),
       item: {
         type: 'pr',
@@ -272,7 +266,6 @@ describe('launchWorkItemDirect', () => {
       'abc123',
       'inherit',
       undefined,
-      'sidebar',
       'Review PR 6934',
       undefined,
       6934,
@@ -303,7 +296,6 @@ describe('launchWorkItemDirect', () => {
       launchWorkItemDirect({
         repoId: 'repo-1',
         launchSource: 'task_page',
-        telemetrySource: 'sidebar',
         openModalFallback,
         item: {
           type: 'pr',
@@ -322,12 +314,12 @@ describe('launchWorkItemDirect', () => {
     const createArgs = mocks.createWorktree.mock.calls[0]
     expect(createArgs?.[1]).toBe('issue-6933')
     expect(createArgs?.[2]).toBeUndefined()
-    expect(createArgs?.[6]).toBe('Issue 6933')
-    expect(createArgs?.[7]).toBe(6933)
+    expect(createArgs?.[5]).toBe('Issue 6933')
+    expect(createArgs?.[6]).toBe(6933)
+    expect(createArgs?.[7]).toBeUndefined()
     expect(createArgs?.[8]).toBeUndefined()
-    expect(createArgs?.[9]).toBeUndefined()
-    expect(createArgs?.[12]).toBeUndefined()
-    expect(createArgs?.[24]).toBeUndefined()
+    expect(createArgs?.[11]).toBeUndefined()
+    expect(createArgs?.[23]).toBeUndefined()
   })
 
   it('uses the Linear identifier in direct-launch workspace names', async () => {
@@ -336,7 +328,6 @@ describe('launchWorkItemDirect', () => {
     await launchWorkItemDirect({
       repoId: 'repo-1',
       launchSource: 'task_page',
-      telemetrySource: 'sidebar',
       openModalFallback: vi.fn(),
       item: {
         type: 'issue',
@@ -353,7 +344,6 @@ describe('launchWorkItemDirect', () => {
       undefined,
       'inherit',
       undefined,
-      'sidebar',
       'Ship Linear parity',
       undefined,
       undefined,
@@ -624,7 +614,6 @@ describe('launchWorkItemDirect', () => {
     await launchWorkItemDirect({
       repoId: 'repo-ssh',
       launchSource: 'task_page',
-      telemetrySource: 'sidebar',
       openModalFallback: vi.fn(),
       item: {
         type: 'issue',

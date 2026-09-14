@@ -1,6 +1,4 @@
 import { app } from 'electron'
-import { classifyError } from '../telemetry/classify-error'
-import { track } from '../telemetry/client'
 import { getPtyIdForPaneKey } from '../ipc/pty'
 import {
   getDaemonProvider,
@@ -167,12 +165,6 @@ export function startTerminalRuntimeStartupServices(): WindowsDesktopStartupServ
         return
       }
       logStartupMilestone('startup-service-start', { service: 'agent-hook-server' })
-      // Why (#11217): the hook listener fails open on every request error, so an IDS resetting
-      // loopback POSTs mid-body stops agent status for every runtime with no symptom but staleness.
-      // Log + telemetry (the daemon_start_failed pattern) so it is diagnosable without a packet capture.
-      agentHookServer.setTransportInterferenceListener((report) => {
-        track('agent_hook_transport_blocked', { count: report.count })
-      })
       await agentHookServer.start({
         env: app.isPackaged ? 'production' : 'development',
         // Why: hooks source this endpoint file at invocation time so old PTY env reaches the current process after restart; dev namespaces it (worktrees share `orca-dev`).
@@ -182,12 +174,11 @@ export function startTerminalRuntimeStartupServices(): WindowsDesktopStartupServ
       logStartupMilestone('startup-service-done', { service: 'agent-hook-server' })
     },
     onDaemonError: (error) => {
-      // Why: daemon failure silently falls back to non-persistent local PTYs; log + telemetry so a fleet-wide outage is observable (was invisible in v1.4.129-rc.1).
+      // Why: daemon failure silently falls back to non-persistent local PTYs, so log it loudly.
       const reason = error instanceof Error ? error.message : String(error)
       console.error(
         `[daemon] STARTUP FAILED — falling back to local PTYs; terminals will not persist across quit. Reason: ${reason}`
       )
-      track('daemon_start_failed', classifyError(error))
     },
     onAgentHookServerError: (error) => {
       // Why: hook callbacks are sidebar enrichment only; Orca must still boot if the loopback receiver fails.

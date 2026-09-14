@@ -2,7 +2,6 @@ import type { FloatingWorkspacePanelOwnedAction } from '@/lib/floating-workspace
 import type { KeybindingActionId, PhysicalModifierToken } from '../../../../shared/keybindings'
 
 export type FloatingWorkspaceTourInteractionSnapshot = {
-  wasPreviouslyInteracted?: boolean
   persisted?: Promise<void>
   recordFeatureInteractionForTour: boolean
 }

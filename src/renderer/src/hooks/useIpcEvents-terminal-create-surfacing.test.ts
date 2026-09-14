@@ -739,7 +739,6 @@ describe('useIpcEvents updater integration', () => {
       leafId: 'leaf-split',
       splitFromLeafId: 'leaf-source',
       splitDirection: 'vertical',
-      splitTelemetrySource: 'contextual_tour',
       presentation: 'focused'
     })
 
@@ -769,8 +768,6 @@ describe('useIpcEvents updater integration', () => {
           paneRuntimeId: -1,
           direction: 'vertical',
           sourceLeafId: 'leaf-source',
-          sourcePtyId: 'pty-bg',
-          telemetrySource: 'contextual_tour',
           newLeafId: 'leaf-split',
           ptyId: 'pty-split'
         }

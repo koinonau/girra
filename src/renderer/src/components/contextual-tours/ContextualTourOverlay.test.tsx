@@ -5,7 +5,6 @@ import { createRoot, type Root } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ContextualTourId } from '../../../../shared/contextual-tours'
-import { getContextualTourCleanupOutcome } from './ContextualTourOverlay'
 import {
   ContextualTourOverlaySurface,
   handleContextualTourGlobalKeyDown,
@@ -117,13 +116,6 @@ describe('ContextualTourOverlaySurface', () => {
     expect(markup).toContain('Switch between connected providers')
     expect(markup).toContain('aria-label="Skip tour"')
     expect(markup).toContain('Next')
-  })
-
-  it('treats externally completed tours as completed during cleanup', () => {
-    useAppStore.setState({ lastCompletedContextualTourId: 'workspace-agent-sessions' })
-
-    expect(getContextualTourCleanupOutcome('workspace-agent-sessions')).toBe('completed')
-    expect(getContextualTourCleanupOutcome('tasks')).toBe('cancelled')
   })
 
   it('renders later progress and Done on the final visible step', () => {
@@ -261,7 +253,7 @@ describe('ContextualTourOverlaySurface', () => {
     expect(click).toHaveBeenCalledTimes(1)
   })
 
-  it('handles global Escape through the panel button so telemetry callbacks run', () => {
+  it('handles global Escape through the panel button so the skip handler runs', () => {
     const click = vi.fn()
     const dismissContextualTour = vi.fn()
     const preventDefault = vi.fn()

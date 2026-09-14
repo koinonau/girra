@@ -11,24 +11,8 @@ import {
   type AgentHookServerCacheInternals
 } from './server.test-fixtures'
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
-
-vi.mock('../telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
-
 beforeEach(() => {
   _internals.resetCachesForTests()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {
@@ -85,8 +69,6 @@ describe('AgentHookServer listener replay', () => {
       state.lastPromptByPaneKey.set(siblingPrefixPane, 'sibling prompt')
       internals.assistantMessageRetryTimers.set(PANE, setTimeout(sameTabRetry, 1_000))
       internals.assistantMessageRetryTimers.set(siblingPrefixPane, setTimeout(siblingRetry, 1_000))
-      internals.promptSentDedupeByPaneKey.set(PANE, { promptHash: 'same-tab' })
-      internals.promptSentDedupeByPaneKey.set(siblingPrefixPane, { promptHash: 'sibling' })
       const scheduleStatusPersist = vi.spyOn(internals, 'scheduleStatusPersist')
       statusListener.mockClear()
       aliasPersist.mockClear()
@@ -104,10 +86,6 @@ describe('AgentHookServer listener replay', () => {
       expect(state.lastPromptByPaneKey.get(siblingPrefixPane)).toBe('sibling prompt')
       expect(internals.assistantMessageRetryTimers.has(PANE)).toBe(false)
       expect(internals.assistantMessageRetryTimers.has(siblingPrefixPane)).toBe(true)
-      expect(internals.promptSentDedupeByPaneKey.has(PANE)).toBe(false)
-      expect(internals.promptSentDedupeByPaneKey.get(siblingPrefixPane)).toEqual({
-        promptHash: 'sibling'
-      })
       expect(internals.runtimeObservedStatusPaneKeys.has(PANE)).toBe(false)
       expect(internals.runtimeObservedStatusPaneKeys.has(sameTabPane)).toBe(false)
       expect(internals.runtimeObservedStatusPaneKeys.has(siblingPrefixPane)).toBe(true)

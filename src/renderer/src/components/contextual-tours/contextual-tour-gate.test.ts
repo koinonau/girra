@@ -3,7 +3,6 @@ import { getContextualTour } from '../../../../shared/contextual-tours'
 import {
   getContextualTourRequestDecision,
   getContextualTourStepProgress,
-  getContextualTourOutcomeStepTotal,
   getMeasurableContextualTourTarget,
   getNextVisibleContextualTourStepIndex,
   getPreviousVisibleContextualTourStepIndex,
@@ -333,8 +332,6 @@ describe('contextual tour gate', () => {
       current: 2,
       total: 2
     })
-    expect(getContextualTourOutcomeStepTotal(visibleStepIndexes)).toBe(2)
-    expect(getContextualTourOutcomeStepTotal([])).toBe(1)
   })
 
   it('advances the workspace-agent-sessions tour from split to the create-worktree step', () => {

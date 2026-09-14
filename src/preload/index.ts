@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import type { PreloadApi } from './api-types'
 import {
@@ -84,15 +84,6 @@ installNativeFileDropHandlers()
 installBrowserFindListener()
 
 // Custom APIs for renderer. Each domain bridge owns its IPC contract.
-const telemetryTrackApi: PreloadApi['telemetryTrack'] = (name, props) =>
-  ipcRenderer.invoke('telemetry:track', name, props)
-const telemetrySetOptInApi: PreloadApi['telemetrySetOptIn'] = (optedIn) =>
-  ipcRenderer.invoke('telemetry:setOptIn', optedIn)
-const telemetryAcknowledgeBannerApi: PreloadApi['telemetryAcknowledgeBanner'] = () =>
-  ipcRenderer.invoke('telemetry:acknowledgeBanner')
-const telemetryGetConsentStateApi: PreloadApi['telemetryGetConsentState'] = () =>
-  ipcRenderer.invoke('telemetry:getConsentState')
-
 const api = {
   app: appApi,
   platform: platformApi,
@@ -118,10 +109,6 @@ const api = {
   bitbucket: bitbucketApi,
   linear: linearApi,
   jira: jiraApi,
-  telemetryTrack: telemetryTrackApi,
-  telemetrySetOptIn: telemetrySetOptInApi,
-  telemetryAcknowledgeBanner: telemetryAcknowledgeBannerApi,
-  telemetryGetConsentState: telemetryGetConsentStateApi,
   diagnostics: diagnosticsApi,
   settings: settingsApi,
   agentAwake: agentAwakeApi,

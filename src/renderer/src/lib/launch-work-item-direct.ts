@@ -54,16 +54,8 @@ import {
  * has a usable workspace and can paste the work item context themselves.
  */
 export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Promise<boolean> {
-  const {
-    item,
-    repoId,
-    openModalFallback,
-    baseBranch,
-    telemetrySource,
-    launchSource,
-    agentOverride,
-    agentArgs
-  } = args
+  const { item, repoId, openModalFallback, baseBranch, launchSource, agentOverride, agentArgs } =
+    args
   const store = useAppStore.getState()
   const repo = store.repos.find((r) => r.id === repoId)
   if (!repo) {
@@ -174,7 +166,6 @@ export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Prom
       resolvedBaseBranch,
       finalSetupDecision,
       undefined,
-      telemetrySource,
       workspaceIntentName?.displayName ?? item.title,
       itemType === 'issue' && itemNumber ? itemNumber : undefined,
       itemType === 'pr' && itemNumber ? itemNumber : undefined,
@@ -304,7 +295,7 @@ export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Prom
       content: draftContent,
       submit,
       forcePaste: submit,
-      onTimeout: () => notifyDirectWorkItemAgentStartTimeout(agent, submit)
+      onTimeout: () => notifyDirectWorkItemAgentStartTimeout(submit)
     })
   }
   return true

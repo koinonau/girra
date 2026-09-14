@@ -1,6 +1,5 @@
 import { spawn } from 'node:child_process'
 import { delimiter, win32 as pathWin32 } from 'node:path'
-import type { ShellHydrationFailureReason } from '../../shared/shell-path-hydration-types'
 import { resolveWindowsShellStartupFamily } from '../../shared/windows-terminal-shell'
 import { WindowsShellPathOwnership, windowsPathSegmentKey } from './windows-shell-path-ownership'
 
@@ -28,16 +27,13 @@ const SPAWN_TIMEOUT_MS = 10_000
 // files print banners or set colored prompts. Strip them before parsing.
 const ANSI_RE = /\x1b\[[0-9;?]*[A-Za-z]/g // eslint-disable-line no-control-regex
 
-// Why: the discriminator lets telemetry classify *why* hydration failed, not
-// just whether it did. Five resolve sites in this file each tag the result
-// with the right reason. The shared alias keeps the enum in lockstep with the
-// telemetry schema (compile-time guard in telemetry-events.ts).
+// Why: the discriminator records *why* hydration failed, not just whether it did.
 export type HydrationResult =
   | { ok: true; segments: string[]; failureReason: 'none' }
   | {
       ok: false
       segments: []
-      failureReason: Exclude<ShellHydrationFailureReason, 'none'>
+      failureReason: 'no_shell' | 'timeout' | 'spawn_error' | 'empty_path'
     }
 
 let cached: Promise<HydrationResult> | null = null
@@ -361,7 +357,7 @@ function uniquePathSegments(segments: string[], pathKey: (segment: string) => st
 /**
  * Promote shell-discovered PATH segments to the front of process.env.PATH,
  * preserving shell ordering and avoiding duplicates. Returns the segments that
- * were newly added so callers can log/telemetry on nontrivial hydrations.
+ * were newly added so callers can log nontrivial hydrations.
  */
 export function mergePathSegments(segments: string[]): string[] {
   if (segments.length === 0) {

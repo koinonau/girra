@@ -44,7 +44,7 @@ export type StaleDaemonKillTestHooks = {
 }
 
 export type StaleDaemonKillOutcome = {
-  /** A daemon was positively confirmed gone. Drives replacement telemetry. */
+  /** A daemon was positively confirmed gone. */
   killed: boolean
   /**
    * We could not prove the recorded daemon is gone. Its PID record and endpoint are left

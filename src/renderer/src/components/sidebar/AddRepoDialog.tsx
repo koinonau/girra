@@ -63,26 +63,21 @@ export default React.memo(function AddRepoDialog({
     setNestedSelectedPaths,
     setNestedGroupName,
     setNestedScanInProgress,
-    getNestedRepoRuntimeKind,
     showNestedRepoReview,
     setActiveNestedScanId,
     handleStopNestedScan,
     resetNestedRepoReviewState,
     showRemoteNestedRepoReview,
-    trackRemoteNestedScanResult,
     handleImportNestedRepos,
     handleOpenNestedRootFolder,
-    resetNestedImportFlow,
-    trackNestedBackAction
+    resetNestedImportFlow
   } = useAddRepoNestedReviewController({
-    reviewRuntimeEnvironmentId: selectedRuntimeEnvironmentId,
     cancelNestedRepoScan,
     closeModal: closeForFolderHandoff,
     fetchWorktrees,
     importNestedRepos,
     onGitRepoReady: completeGitRepoAdd,
     setIsAdding,
-    activeRuntimeEnvironmentId: selectedRuntimeEnvironmentId,
     setStep
   })
   const {
@@ -105,10 +100,9 @@ export default React.memo(function AddRepoDialog({
     setStep,
     // Why: useRemoteRepo closes only for the non-git → confirm-dialog handoff.
     closeForFolderHandoff,
-    (repoId, executionHostId) => completeGitRepoAdd(repoId, 'ssh_remote_path', executionHostId),
+    completeGitRepoAdd,
     scanNestedRepos,
-    showRemoteNestedRepoReview,
-    trackRemoteNestedScanResult
+    showRemoteNestedRepoReview
   )
   const {
     createName,
@@ -121,16 +115,11 @@ export default React.memo(function AddRepoDialog({
     resetCreateState,
     handlePickParent,
     handleCreate
-  } = useCreateRepo(
-    fetchWorktrees,
-    closeForFolderHandoff,
-    (repoId, executionHostId) => completeGitRepoAdd(repoId, 'create_project', executionHostId),
-    {
-      hostId: hostSelection.selectedHostId,
-      runtimeEnvironmentId: selectedRuntimeEnvironmentId,
-      sshTargetId: hostSelection.selectedSshTargetId
-    }
-  )
+  } = useCreateRepo(fetchWorktrees, closeForFolderHandoff, completeGitRepoAdd, {
+    hostId: hostSelection.selectedHostId,
+    runtimeEnvironmentId: selectedRuntimeEnvironmentId,
+    sshTargetId: hostSelection.selectedSshTargetId
+  })
 
   const {
     createDefaultParent,
@@ -198,7 +187,6 @@ export default React.memo(function AddRepoDialog({
     // Why: closes only after a folder add, which activates the folder workspace.
     closeModal: closeForFolderHandoff,
     fetchWorktrees,
-    getNestedRepoRuntimeKind,
     scanNestedRepos,
     setActiveNestedScanId,
     setNestedScanInProgress,
@@ -258,24 +246,14 @@ export default React.memo(function AddRepoDialog({
     onResetHostScopedState: resetHostScopedState
   })
 
-  const handleBack = useCallback(() => {
-    if (step === 'nested') {
-      trackNestedBackAction()
-    }
-    resetState()
-  }, [resetState, step, trackNestedBackAction])
-
   const handleOpenChange = useCallback(
     (open: boolean) => {
       if (!open) {
-        if (step === 'nested' && !isAdding) {
-          trackNestedBackAction()
-        }
         closeModal()
         resetState()
       }
     },
-    [closeModal, isAdding, resetState, step, trackNestedBackAction]
+    [closeModal, resetState]
   )
 
   return (
@@ -283,7 +261,7 @@ export default React.memo(function AddRepoDialog({
       isOpen={isOpen}
       step={step}
       isAdding={isAdding}
-      onBack={handleBack}
+      onBack={resetState}
       onCloseAutoFocus={hosted?.onCloseAutoFocus}
       onOpenChange={handleOpenChange}
     >

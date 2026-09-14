@@ -63,10 +63,6 @@ vi.mock('@/store', () => {
   return { useAppStore }
 })
 
-vi.mock('../../../../shared/nested-repo-telemetry', () => ({
-  createNestedRepoTelemetryAttemptId: () => 'attempt-1'
-}))
-
 vi.mock('sonner', () => ({
   toast: {
     error: vi.fn(),

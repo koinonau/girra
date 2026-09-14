@@ -73,9 +73,7 @@ beforeEach(() => {
   refreshLocalAgents.mockReset().mockResolvedValue({
     agents: [],
     addedPathSegments: [],
-    shellHydrationOk: true,
-    pathSource: 'process_env',
-    pathFailureReason: 'none'
+    shellHydrationOk: true
   })
   runtimeEnvironmentCall.mockReset().mockImplementation(({ method }: { method: string }) => {
     const result =
@@ -177,9 +175,7 @@ describe('Floating Workspace authority', () => {
     refreshLocalAgents.mockResolvedValueOnce({
       agents: ['codex'],
       addedPathSegments: [],
-      shellHydrationOk: true,
-      pathSource: 'process_env',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     })
     await act(async () => {
       await floatingResult.current?.refresh()
@@ -308,9 +304,7 @@ describe('useDetectedAgents (runtime call site)', () => {
         result = {
           agents: [],
           addedPathSegments: [],
-          shellHydrationOk: true,
-          pathSource: 'shell_hydrate',
-          pathFailureReason: 'none'
+          shellHydrationOk: true
         }
       } else {
         detectCalls += 1

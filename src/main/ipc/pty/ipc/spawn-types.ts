@@ -50,7 +50,7 @@ export type PtySpawnIpcArgs = {
   // Why: closes the SIGKILL race (INVESTIGATION.md) by letting main sync-flush the binding before pty:spawn returns; only the Ctrl+T daemon-host path threads these.
   tabId?: string
   leafId?: string
-  // Why: renderer-threaded launch telemetry (telemetry-plan.md§Agent launch semantics); loosely typed because the main-side schema validator is the single enforcement point.
+  // Why: renderer-threaded launch identity; loosely typed because each reader validates it with agentKindSchema.
   telemetry?: {
     agent_kind?: unknown
     launch_source?: unknown

@@ -3,13 +3,6 @@
 // exposes a single init/shutdown pair the main process calls from
 // `src/main/index.ts`.
 //
-// Architectural rule (load-bearing): nothing in `src/main/telemetry/`
-// imports from this directory and vice versa — the two lanes never share a
-// code path. Cross-contamination is the failure mode this entire lane is
-// counter-designed against. An import-restricted-paths lint rule will
-// enforce this; even before the rule lands, the rule is a code-review
-// invariant.
-//
 // Consent boundaries (telemetry-error-tracking.md §Consent boundaries):
 //
 //   DO_NOT_TRACK=1            → disable bundle button. KEEP local file.
@@ -20,13 +13,6 @@
 //                                hatch for users on devices where even local
 //                                debug logs are policy-forbidden.
 //   CI detection              → disable everything in this lane.
-//
-// The CI gate matches the same env-var list the product-telemetry consent
-// resolver uses (CI / GITHUB_ACTIONS / GITLAB_CI / CIRCLECI / TRAVIS /
-// BUILDKITE / JENKINS_URL / TEAMCITY_VERSION). Duplicating the list — rather
-// than importing it from `src/main/telemetry/consent.ts` — preserves the
-// import isolation rule above. The cost of one duplicated array vs.
-// punching a hole in the architecture is trivially worth it.
 
 import {
   createLocalFileSink,
@@ -213,9 +199,7 @@ export function getDiagnosticsStatus(): DiagnosticsStatus {
 
 /** Collect a bundle from the live trace folder. The `appVersion` /
  *  `platform` / `arch` / `osRelease` / `orcaChannel` inputs come from main
- *  and are baked into the bundle header. NEVER pass `install_id` here —
- *  the bundle's identity is the per-bundle submission ID, not the
- *  PostHog-lane install_id (Issue 8 in the security review). */
+ *  and are baked into the bundle header. */
 export function collectDiagnosticBundle(
   meta: Pick<
     CollectBundleOptions,

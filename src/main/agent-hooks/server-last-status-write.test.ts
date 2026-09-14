@@ -6,24 +6,8 @@ import { join } from 'node:path'
 import { AgentHookServer, _internals } from './server'
 import { buildBody, postHookEvent, recentTs, PANE, RUNNING_SHELL } from './server.test-fixtures'
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
-
-vi.mock('../telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
-
 beforeEach(() => {
   _internals.resetCachesForTests()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {
@@ -227,7 +211,7 @@ describe('Last-status persistence', () => {
     }
   })
 
-  it('persists and hydrates Pi session identity without creating status telemetry', async () => {
+  it('persists and hydrates Pi session identity without a status change', async () => {
     const firstServer = new AgentHookServer()
     const firstRendererListener = vi.fn()
     const statusChangeListener = vi.fn()
@@ -257,7 +241,6 @@ describe('Last-status persistence', () => {
         })
       )
       expect(statusChangeListener).toHaveBeenCalledWith([])
-      expect(trackMock).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
 
       firstServer.flushStatusPersistSync()
       const file = JSON.parse(readFileSync(lastStatusPath(), 'utf8'))

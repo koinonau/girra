@@ -229,7 +229,6 @@ export async function fixBrokenGitHubChecks({
       repoId: targetRepoId,
       basePrompt,
       launchSource: 'task_page',
-      telemetrySource: 'sidebar',
       openModalFallback: () => {
         toast.error(
           translate(

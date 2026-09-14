@@ -5,7 +5,6 @@ import { createUIStore, makePersistedUI } from './ui-slice-test-harness'
 
 const mocks = vi.hoisted(() => ({
   sendNotesToActiveAgentSession: vi.fn(),
-  track: vi.fn(),
   toastMessage: vi.fn(),
   toastSuccess: vi.fn(),
   toastError: vi.fn()
@@ -17,10 +16,6 @@ vi.mock('@/lib/active-agent-note-send', () => ({
     options: { explicitTarget?: boolean } = {}
   ) => (options.explicitTarget ? `selected:${status}` : status),
   sendNotesToActiveAgentSession: mocks.sendNotesToActiveAgentSession
-}))
-
-vi.mock('@/lib/telemetry', () => ({
-  track: mocks.track
 }))
 
 vi.mock('sonner', () => ({
@@ -39,7 +34,6 @@ afterEach(() => {
 beforeEach(() => {
   mocks.sendNotesToActiveAgentSession.mockReset()
   mocks.sendNotesToActiveAgentSession.mockResolvedValue({ status: 'sent' })
-  mocks.track.mockReset()
   mocks.toastMessage.mockReset()
   mocks.toastSuccess.mockReset()
   mocks.toastError.mockReset()
@@ -156,58 +150,6 @@ describe('createUISlice contextual tours', () => {
     expect(store.getState().contextualToursSeenIds).toEqual([])
   })
 
-  it('stores whether the feature was interacted with before the tour request', () => {
-    const store = createUIStore()
-    const tasksFirstSelector = '[data-contextual-tour-target="tasks-source-filters"]'
-    stubContextualTourTargets([tasksFirstSelector])
-    store.getState().hydratePersistedUI(makeAutoTourEligibleUI())
-
-    store.getState().recordFeatureInteraction('tasks')
-    store.getState().requestContextualTour('tasks', 'tasks_open')
-
-    expect(store.getState().activeContextualTourWasFeaturePreviouslyInteracted).toBe(true)
-  })
-
-  it('lets the caller preserve the pre-enable interaction snapshot for telemetry', () => {
-    const store = createUIStore()
-    const tasksFirstSelector = '[data-contextual-tour-target="tasks-source-filters"]'
-    stubContextualTourTargets([tasksFirstSelector])
-    store.getState().hydratePersistedUI(makeAutoTourEligibleUI())
-
-    store.getState().recordFeatureInteraction('tasks')
-    store.getState().requestContextualTour('tasks', 'tasks_open', false)
-
-    expect(store.getState().activeContextualTourWasFeaturePreviouslyInteracted).toBe(false)
-  })
-
-  it('does not bias first-visit contextual tour telemetry from navigation actions', () => {
-    stubContextualTourTargets([
-      '[data-contextual-tour-target="tasks-source-filters"]',
-      '[data-contextual-tour-target="automations-create"]',
-      '[data-contextual-tour-target="workspace-creation-project"]'
-    ])
-
-    const tasksStore = createUIStore()
-    tasksStore.getState().hydratePersistedUI(makeAutoTourEligibleUI())
-    tasksStore.getState().openTaskPage()
-    tasksStore.getState().requestContextualTour('tasks', 'tasks_open')
-    expect(tasksStore.getState().activeContextualTourWasFeaturePreviouslyInteracted).toBe(false)
-
-    const automationsStore = createUIStore()
-    automationsStore.getState().hydratePersistedUI(makeAutoTourEligibleUI())
-    automationsStore.getState().openAutomationsPage()
-    automationsStore.getState().requestContextualTour('automations', 'automations_open')
-    expect(automationsStore.getState().activeContextualTourWasFeaturePreviouslyInteracted).toBe(
-      false
-    )
-
-    const composerStore = createUIStore()
-    composerStore.getState().hydratePersistedUI(makeAutoTourEligibleUI())
-    composerStore.getState().openModal('new-workspace-composer')
-    composerStore.getState().requestContextualTour('workspace-creation', 'workspace_creation_modal')
-    expect(composerStore.getState().activeContextualTourWasFeaturePreviouslyInteracted).toBe(false)
-  })
-
   it('does not mark seen when the required first target is absent', () => {
     const store = createUIStore()
     stubContextualTourTargets([])
@@ -257,13 +199,12 @@ describe('createUISlice contextual tours', () => {
 
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
     expect(store.getState().activeContextualTourId).toBe('workspace-agent-sessions')
     expect(store.getState().activeContextualTourSource).toBe('setup_guide_parallel_work')
-    expect(store.getState().activeContextualTourWasFeaturePreviouslyInteracted).toBe(false)
   })
 
   it('preserves the bounded setup-guide parallel-work source on forced tour requests', () => {
@@ -280,7 +221,7 @@ describe('createUISlice contextual tours', () => {
 
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -358,7 +299,7 @@ describe('createUISlice contextual tours', () => {
     setMock.mockClear()
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -388,7 +329,7 @@ describe('createUISlice contextual tours', () => {
     store.getState().hydratePersistedUI(makeAutoTourEligibleUI())
     store
       .getState()
-      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', false, {
+      .requestContextualTour('workspace-agent-sessions', 'setup_guide_parallel_work', {
         force: true
       })
 
@@ -398,7 +339,6 @@ describe('createUISlice contextual tours', () => {
     expect(store.getState().activeContextualTourId).toBe('workspace-agent-sessions')
     expect(store.getState().activeContextualTourStepIndex).toBe(1)
     expect(store.getState().contextualToursSeenIds).toEqual([])
-    expect(store.getState().lastCompletedContextualTourId).toBeNull()
   })
 
   it('marks the active contextual tour suppressed when its owning source disables', () => {
@@ -407,7 +347,6 @@ describe('createUISlice contextual tours', () => {
       activeContextualTourId: 'browser',
       activeContextualTourStepIndex: 0,
       activeContextualTourSource: 'browser_visible',
-      activeContextualTourWasFeaturePreviouslyInteracted: false,
       contextualTourShownThisSession: true
     })
 
@@ -424,7 +363,6 @@ describe('createUISlice contextual tours', () => {
       activeContextualTourId: 'workspace-agent-sessions',
       activeContextualTourStepIndex: 3,
       activeContextualTourSource: 'workspace_agent_sessions_visible',
-      activeContextualTourWasFeaturePreviouslyInteracted: false,
       contextualTourShownThisSession: true
     })
 
@@ -461,7 +399,6 @@ describe('createUISlice contextual tours', () => {
 
     expect(store.getState().activeContextualTourId).toBeNull()
     expect(store.getState().contextualTourShownThisSession).toBe(false)
-    expect(store.getState().lastCompletedContextualTourId).toBeNull()
     expect(store.getState().contextualToursSeenIds).toEqual([])
     expect(setMock).not.toHaveBeenCalled()
   })
@@ -513,7 +450,6 @@ describe('createUISlice contextual tours', () => {
 
     expect(store.getState().activeContextualTourId).toBeNull()
     expect(store.getState().contextualToursSeenIds).toEqual<ContextualTourId[]>(['automations'])
-    expect(store.getState().lastCompletedContextualTourId).toBeNull()
     expect(setMock).toHaveBeenCalledWith({ contextualToursSeenIds: ['automations'] })
   })
 

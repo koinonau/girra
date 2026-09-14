@@ -220,8 +220,7 @@ export function useTerminalPaneMobileActions(controller: TerminalPaneContextCont
         paneCwdMap: paneCwdRef.current,
         fallbackCwd: cwd ?? '',
         pane,
-        direction,
-        source: 'context_menu'
+        direction
       })
     },
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.

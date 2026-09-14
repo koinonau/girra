@@ -1,8 +1,13 @@
 import { dialog, type BrowserWindow, type MessageBoxOptions } from 'electron'
 
-import type { RuntimeRpcStartErrorClass } from '../../shared/telemetry-events'
 import { translateMain } from '../i18n/main-i18n'
-import { track } from '../telemetry/client'
+
+export type RuntimeRpcStartErrorClass =
+  | 'permission_denied'
+  | 'address_in_use'
+  | 'storage_unavailable'
+  | 'invalid_path'
+  | 'unknown'
 
 const MAX_VISIBLE_CAUSE_LENGTH = 500
 
@@ -115,13 +120,6 @@ function createRuntimeRpcStartupFailureDialogOptions(error: unknown): MessageBox
 
 export function recordRuntimeRpcStartFailure(error: unknown): void {
   console.error('[runtime] Failed to start local RPC transport:', error)
-  try {
-    track('runtime_rpc_start_failed', {
-      error_class: classifyRuntimeRpcStartFailure(error)
-    })
-  } catch (telemetryError) {
-    console.error('[runtime] Failed to record RPC startup failure telemetry:', telemetryError)
-  }
 }
 
 function waitForWindowToShow(parentWindow: BrowserWindow): Promise<boolean> {

@@ -100,13 +100,7 @@ export function writePersistedStateFixture(
       schemaVersion: 1,
       ...(sshTargets.length > 0 ? { sshTargets } : {}),
       repos: githubRepoEntries,
-      settings: {
-        telemetry: {
-          installId: 'startup-bench',
-          optedIn: false,
-          existedBeforeTelemetryRelease: true
-        }
-      }
+      settings: {}
     }
     const json = JSON.stringify(state, null, 2)
     writeFileSync(dataPath, json, 'utf-8')
@@ -153,13 +147,7 @@ export function writePersistedStateFixture(
       },
       ...githubRepoEntries
     ],
-    settings: {
-      telemetry: {
-        installId: 'startup-bench',
-        optedIn: false,
-        existedBeforeTelemetryRelease: true
-      }
-    },
+    settings: {},
     ui: {
       lastActiveRepoId: repoId,
       lastActiveWorktreeId: worktreeId

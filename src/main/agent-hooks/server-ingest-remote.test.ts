@@ -6,24 +6,8 @@ import {
 } from '../../shared/agent-status-types'
 import { PANE } from './server.test-fixtures'
 
-const { getCohortAtEmitMock, trackMock } = vi.hoisted(() => ({
-  getCohortAtEmitMock: vi.fn(),
-  trackMock: vi.fn()
-}))
-
-vi.mock('../telemetry/client', () => ({
-  track: trackMock
-}))
-
-vi.mock('../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: getCohortAtEmitMock
-}))
-
 beforeEach(() => {
   _internals.resetCachesForTests()
-  trackMock.mockReset()
-  getCohortAtEmitMock.mockReset()
-  getCohortAtEmitMock.mockReturnValue({ nth_repo_added: 2 })
 })
 
 afterEach(() => {
@@ -78,7 +62,6 @@ describe('AgentHookServer ingestRemote', () => {
           providerSession: expect.objectContaining({ transcriptPath: '/tmp/pi-session-1.jsonl' })
         })
       ])
-      expect(trackMock).not.toHaveBeenCalledWith('agent_prompt_sent', expect.anything())
 
       const replayListener = vi.fn()
       server.setListener(replayListener)
@@ -248,7 +231,6 @@ describe('AgentHookServer ingestRemote', () => {
           })
         })
       )
-      expect(trackMock).toHaveBeenCalledTimes(1)
     } finally {
       vi.useRealTimers()
     }
@@ -314,7 +296,6 @@ describe('AgentHookServer ingestRemote', () => {
           })
         })
       )
-      expect(trackMock).toHaveBeenCalledTimes(1)
     } finally {
       vi.useRealTimers()
     }
@@ -621,9 +602,6 @@ describe('AgentHookServer ingestRemote', () => {
     server.setListener(listener)
     server.ingestRemote({ paneKey: '   ', tabId: 'tab-1', worktreeId: 'wt-1', payload }, 'conn-1')
     expect(listener).not.toHaveBeenCalled()
-    expect(trackMock).toHaveBeenCalledWith('agent_hook_unattributed', {
-      reason: 'empty_pane_key'
-    })
   })
 
   it('normalizes inner payload via normalizeAgentStatusPayload — clamps oversized prompt', () => {

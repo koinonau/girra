@@ -329,10 +329,7 @@ describe('Agent Map workspace context menu', () => {
     await act(async () => focusRestored)
 
     expect(useAppStore.getState().activeModal).toBe('new-workspace-composer')
-    expect(useAppStore.getState().modalData).toEqual({
-      initialRepoId: repo.id,
-      telemetrySource: 'sidebar'
-    })
+    expect(useAppStore.getState().modalData).toEqual({ initialRepoId: repo.id })
   })
 
   it('opens the folder-workspace composer from a synthetic project ring', async () => {
@@ -362,8 +359,7 @@ describe('Agent Map workspace context menu', () => {
     )
 
     expect(useAppStore.getState().modalData).toEqual({
-      initialProjectGroupId: folderProjectGroup.id,
-      telemetrySource: 'sidebar'
+      initialProjectGroupId: folderProjectGroup.id
     })
   })
 

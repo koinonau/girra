@@ -1,8 +1,4 @@
 import type { AppState } from '../types'
-import type {
-  PathSource,
-  ShellHydrationFailureReason
-} from '../../../../shared/shell-path-hydration-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 
 export type LocalDetectedAgentState = {
@@ -12,8 +8,6 @@ export type LocalDetectedAgentState = {
   localDetectedAgentIdsByContext: Record<string, TuiAgent[] | null>
   isDetectingLocalAgentsByContext: Record<string, boolean>
   isRefreshingLocalAgentsByContext: Record<string, boolean>
-  pathSource: PathSource | null
-  pathFailureReason: ShellHydrationFailureReason | null
   ensureDetectedAgents: (worktreeId?: string | null) => Promise<TuiAgent[]>
   refreshDetectedAgents: (worktreeId?: string | null) => Promise<TuiAgent[]>
   clearLocalDetectedAgentContextsForProjects: (projectIds: readonly string[]) => void
@@ -28,8 +22,6 @@ export function createEmptyLocalDetectedAgentState(): Pick<
   | 'localDetectedAgentIdsByContext'
   | 'isDetectingLocalAgentsByContext'
   | 'isRefreshingLocalAgentsByContext'
-  | 'pathSource'
-  | 'pathFailureReason'
 > {
   return {
     detectedAgentIds: null,
@@ -37,8 +29,6 @@ export function createEmptyLocalDetectedAgentState(): Pick<
     isRefreshingAgents: false,
     localDetectedAgentIdsByContext: {},
     isDetectingLocalAgentsByContext: {},
-    isRefreshingLocalAgentsByContext: {},
-    pathSource: null,
-    pathFailureReason: null
+    isRefreshingLocalAgentsByContext: {}
   }
 }

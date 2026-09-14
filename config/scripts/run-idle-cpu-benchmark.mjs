@@ -169,13 +169,7 @@ function buildAppIfNeeded(root, skipBuild) {
 
 function makeCompletedOnboardingProfile() {
   return {
-    settings: {
-      telemetry: {
-        optedIn: true,
-        installId: '00000000-0000-4000-8000-000000000000',
-        existedBeforeTelemetryRelease: false
-      }
-    },
+    settings: {},
     onboarding: {
       flowVersion: ONBOARDING_FLOW_VERSION,
       closedAt: 1,

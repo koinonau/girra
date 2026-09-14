@@ -1,5 +1,4 @@
 import type { SleepingAgentLaunchConfig } from '../../shared/agent-session-resume'
-import type { TerminalPaneSplitSource } from '../../shared/feature-education-telemetry'
 import type { TerminalRevealIdentity } from '../../shared/terminal-reveal-identity'
 import type { TuiAgent } from '../../shared/tui-agent'
 import type { ClientHostedBrowserRowsEvent } from '../../shared/client-hosted-browser-rows'
@@ -63,7 +62,6 @@ export type RuntimeNotifier = {
       leafId?: string
       splitFromLeafId?: string
       splitDirection?: 'horizontal' | 'vertical'
-      splitTelemetrySource?: TerminalPaneSplitSource
       focus?: boolean
       expectedProcessIdentity?: {
         terminalHandle: string
@@ -88,7 +86,6 @@ export type RuntimeNotifier = {
       command?: string
       worktreeId?: string
       sourceLeafId?: string
-      telemetrySource?: TerminalPaneSplitSource
       newLeafId?: string
     }
   ): void

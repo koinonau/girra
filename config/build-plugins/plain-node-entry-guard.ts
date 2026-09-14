@@ -38,7 +38,6 @@ const WORKER_THREAD_ENTRY_NAMES = [
   'warp-theme-parser-worker',
   'session-scanner-opencode-sqlite-worker-entry',
   'session-scanner-worker-entry',
-  'main-thread-hang-watchdog-entry',
   'port-scan-command-worker-entry'
 ] as const
 

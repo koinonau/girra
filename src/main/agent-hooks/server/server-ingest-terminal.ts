@@ -1,4 +1,3 @@
-import { track } from '../../telemetry/client'
 import { MAX_PANE_KEY_LEN } from '../../../shared/agent-hook-listener/listener-limits'
 import { parseLegacyNumericPaneKey, parsePaneKey } from '../../../shared/stable-pane-id'
 import { terminalStatusPayloadMatchesHook } from '../../../shared/agent-terminal-status-equivalence'
@@ -21,7 +20,6 @@ export abstract class AgentHookServerIngestTerminal extends AgentHookServerInges
     const parsedPaneKey = parsePaneKey(paneKey)
     const legacyPaneKey = parseLegacyNumericPaneKey(paneKey)
     if (paneKey.length === 0) {
-      track('agent_hook_unattributed', { reason: 'empty_pane_key' })
       return
     }
     const reportedTabId =
@@ -130,7 +128,6 @@ export abstract class AgentHookServerIngestTerminal extends AgentHookServerInges
       (previous.payload.state !== 'done' || event.payload.state === 'done')
         ? previous.providerSession
         : undefined
-    // Why: OSC status is a runtime observation, not a prompt boundary; keep prompt-sent telemetry tied to native hooks.
     this.applyNormalizedStatus(
       {
         paneKey,

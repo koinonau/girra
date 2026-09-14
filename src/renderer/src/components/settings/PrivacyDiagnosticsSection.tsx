@@ -6,7 +6,6 @@ import type {
   DiagnosticsStatusPayload
 } from '../../../../preload/api-types'
 import { Label } from '../ui/label'
-import { Separator } from '../ui/separator'
 import {
   getDiagnosticBundleDescription,
   PrivacyDiagnosticBundleControls
@@ -137,11 +136,10 @@ export function PrivacyDiagnosticsSection(): React.JSX.Element {
   }, [bundle])
 
   return (
-    <>
+    <div className="space-y-4">
       {status?.disabledReason ? (
         <DiagnosticsDisabledStateNote reason={status.disabledReason} />
       ) : null}
-      <Separator />
       <PrivacyDiagnosticsRow
         icon={<FileText className="size-4" />}
         title={translate(
@@ -161,7 +159,7 @@ export function PrivacyDiagnosticsSection(): React.JSX.Element {
           onDiscard={handleDiscardBundle}
         />
       </PrivacyDiagnosticsRow>
-    </>
+    </div>
   )
 }
 

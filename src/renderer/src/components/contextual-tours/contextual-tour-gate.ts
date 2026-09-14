@@ -179,13 +179,6 @@ export function getContextualTourStepProgress(args: {
   return { current: visibleIndex + 1, total: args.visibleStepIndexes.length }
 }
 
-export function getContextualTourOutcomeStepTotal(
-  visibleStepIndexes: readonly number[],
-  fallback = 1
-): number {
-  return visibleStepIndexes.length > 0 ? visibleStepIndexes.length : fallback
-}
-
 export function getContextualTourStepCopy(step: ContextualTourStep): string {
   return step.body || step.fallbackCopy || ''
 }

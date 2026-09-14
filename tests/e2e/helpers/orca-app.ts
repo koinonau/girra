@@ -193,9 +193,7 @@ export const test = base.extend<OrcaTestFixtures, OrcaWorkerFixtures>({
     if (dismissOnboarding) {
       // Why: onboarding renders a fullscreen `fixed inset-0 z-[100]` overlay
       // when persisted `closedAt` is null, which intercepts pointer events for
-      // every other test. Seed a completed-onboarding fresh-install profile:
-      // an empty file would make persistence treat the profile as an
-      // existing-user upgrade cohort and mount the telemetry notice overlay.
+      // every other test. Seed a completed-onboarding profile.
       writeFileSync(
         path.join(userDataDir, 'orca-data.json'),
         `${JSON.stringify(getE2ECompletedOnboardingProfile(), null, 2)}\n`

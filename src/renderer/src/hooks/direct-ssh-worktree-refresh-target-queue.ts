@@ -4,9 +4,8 @@ export class DirectSshWorktreeRefreshTargetQueue {
   private readonly queuedByTarget = new Map<string, DirectSshWorktreeRefreshLogicalTask[]>()
   private readonly targetOrder: string[] = []
 
-  enqueue(task: DirectSshWorktreeRefreshLogicalTask, retrying: boolean, now: number): void {
+  enqueue(task: DirectSshWorktreeRefreshLogicalTask, retrying: boolean): void {
     task.state = retrying ? 'retrying' : 'queued'
-    task.queuedAt = now
     const lane = this.queuedByTarget.get(task.key.targetId)
     if (lane) {
       lane.push(task)

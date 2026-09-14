@@ -48,10 +48,7 @@ export function createDaemonInitModuleFactories(state: DaemonInitMockState) {
     getLocalPtyProviderMock,
     setLocalPtyProviderMock,
     unbindLocalProviderListenersMock,
-    rebindLocalProviderListenersMock,
-    trackDaemonReplacedMock,
-    trackDaemonRetiredMock,
-    trackDaemonAdoptedMock
+    rebindLocalProviderListenersMock
   } = state
 
   // Why: both fakes are annotated with constructor types so the exported factories widen to
@@ -198,13 +195,6 @@ export function createDaemonInitModuleFactories(state: DaemonInitMockState) {
     }),
     client: () => ({
       DaemonClient: daemonClientMock
-    }),
-    daemonLifecycleEvent: () => ({
-      trackDaemonReplaced: trackDaemonReplacedMock,
-      trackDaemonRetired: trackDaemonRetiredMock
-    }),
-    daemonAdoptionTelemetryEvent: () => ({
-      trackDaemonAdopted: trackDaemonAdoptedMock
     }),
     daemonSpawner: () => ({
       DaemonSpawner: MockDaemonSpawner,

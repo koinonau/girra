@@ -118,16 +118,10 @@ export async function createValidationLayout(options = {}) {
 }
 
 async function seedCompletedProfile(layout) {
-  // Why: the validation is about account routing, so first-run education and
-  // telemetry overlays must not obscure the account controls under test.
+  // Why: the validation is about account routing, so first-run education
+  // overlays must not obscure the account controls under test.
   const profile = {
-    settings: {
-      telemetry: {
-        optedIn: true,
-        installId: '00000000-0000-4000-8000-000000000000',
-        existedBeforeTelemetryRelease: false
-      }
-    },
+    settings: {},
     onboarding: { flowVersion: 2, closedAt: 1, outcome: 'completed', lastCompletedStep: 3 },
     ui: { contextualToursAutoEligible: false, projectOrderManualDefaultNoticeDismissed: true }
   }

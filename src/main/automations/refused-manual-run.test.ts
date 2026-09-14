@@ -29,8 +29,6 @@ vi.mock('electron', () => ({
   },
   safeStorage: { isEncryptionAvailable: () => false }
 }))
-vi.mock('../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../telemetry/cohort-classifier', () => ({ getCohortAtEmit: vi.fn() }))
 
 function automation(overrides: Partial<Automation>): Automation {
   return {

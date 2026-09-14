@@ -1,11 +1,11 @@
 import { buildAgentStartupPlan } from '@/lib/tui-agent-startup'
-import { tuiAgentToAgentKind } from '@/lib/telemetry'
+import { tuiAgentToAgentKind } from '../../../shared/agent-kind'
 import { isTuiAgentEnabled } from '../../../shared/tui-agent-selection'
 import {
   resolveTuiAgentLaunchArgs,
   resolveTuiAgentLaunchEnv
 } from '../../../shared/tui-agent-launch-defaults'
-import type { AgentStartedTelemetry } from '@/lib/worktree-startup-payload'
+import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { StartupCommandDelivery } from '../../../shared/codex-startup-delivery'
 import type { SleepingAgentLaunchConfig } from '../../../shared/agent-session-resume'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
@@ -21,7 +21,7 @@ export type OnboardingFolderAgentStartup = {
   launchAgent?: TuiAgent
   startupCommandDelivery?: StartupCommandDelivery
   sessionOptions?: Record<string, SessionOptionValue>
-  telemetry: AgentStartedTelemetry
+  telemetry: AgentLaunchMetadata
 }
 
 function getClientPlatform(): NodeJS.Platform {

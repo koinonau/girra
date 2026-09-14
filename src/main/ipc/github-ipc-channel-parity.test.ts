@@ -10,8 +10,6 @@ vi.mock('electron', () => mocks.electron)
 vi.mock('../github/client', () => mocks.client)
 vi.mock('../github/work-item-details', () => mocks.workItemDetails)
 vi.mock('../github/pr-refresh-coordinator', () => mocks.prRefresh)
-vi.mock('../telemetry/client', () => mocks.telemetry)
-vi.mock('../telemetry/cohort-classifier', () => mocks.cohort)
 vi.mock('./ui', () => mocks.ui)
 
 import * as github from './github'

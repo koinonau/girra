@@ -1,5 +1,5 @@
 import { buildBoundedSessionTranscript } from '@/lib/agent-session-fork-context'
-import type { LaunchSource } from '../../../shared/telemetry-events'
+import type { LaunchSource } from '../../../shared/worktree/launch-types'
 import type { TuiAgent } from '../../../shared/tui-agent'
 
 export type AgentSessionContinuationContextMode = 'focused' | 'full'

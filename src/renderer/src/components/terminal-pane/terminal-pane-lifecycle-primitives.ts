@@ -4,10 +4,8 @@ import type { PtyTransport } from './pty-transport'
 import type { PaneCwdMap } from './resolve-split-cwd'
 import { writeTerminalOutput } from '@/lib/pane-manager/pane-terminal-output-scheduler'
 import { RESET_KITTY_KEYBOARD_PROTOCOL } from '../../../../shared/terminal-mode-reset-profiles'
-import type { TerminalPaneSplitSource } from '../../../../shared/feature-education-telemetry'
 import type { HttpLinkSourceOwner } from '@/lib/http-link-routing'
 import { resolveLocalhostHttpLinkDisplayUrl } from '@/lib/http-link-routing'
-import { recordCreatedTerminalPaneSplit } from './terminal-pane-split-completion'
 import { PRIMARY_SELECTION_MAX_LENGTH } from '@/lib/primary-selection'
 
 /** Writes a transport-agnostic interrupt reset without running xterm work inline. */
@@ -16,17 +14,6 @@ export function resetTerminalKeyboardProtocolAfterInterrupt(terminal: Terminal):
     foreground: true,
     latencySensitive: false
   })
-}
-
-export function recordRuntimeCreatedTerminalPaneSplit(
-  createdPane: unknown,
-  args: {
-    source: TerminalPaneSplitSource
-    direction: 'vertical' | 'horizontal'
-    telemetrySuppressed?: boolean
-  }
-): boolean {
-  return recordCreatedTerminalPaneSplit(createdPane, args)
 }
 
 export type TerminalScrollbackPaneManager = {

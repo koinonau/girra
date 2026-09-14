@@ -54,6 +54,4 @@ export type CreateOrAttachResult = {
   attachToken: symbol
   incarnationId: PtyIncarnationId
   agentSessionEnsure?: AgentSessionClaimedSpawnResult
-  /** Daemon-process verdict on the spawn cwd; only set on a fresh spawn that was given a cwd. */
-  cwdReadableByDaemon?: boolean
 }

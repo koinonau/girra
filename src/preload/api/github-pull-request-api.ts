@@ -1,4 +1,3 @@
-import type { AppStarSource } from '../../shared/gh-star-source'
 import type { GhAuthDiagnostic } from '../../shared/github/auth-types'
 import type { TaskSourceContext } from '../../shared/task-source-context'
 import type { PRCheckDetail, PRCheckRunDetails } from '../../shared/github/check-types'
@@ -196,7 +195,7 @@ export type GithubPullRequestApi = {
     }
   ) => Promise<GitHubCommentResult>
   checkOrcaStarred: () => Promise<boolean | null>
-  starOrca: (source: AppStarSource) => Promise<boolean>
+  starOrca: () => Promise<boolean>
   /**
    * GitHub API rate-limit snapshot. Does NOT consume quota (the
    * `rate_limit` endpoint is exempt). Cached 30s server-side — pass

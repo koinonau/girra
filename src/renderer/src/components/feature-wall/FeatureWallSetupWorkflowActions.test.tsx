@@ -121,7 +121,6 @@ describe('setup guide workflow actions', () => {
     expect(useAppStore.getState().activeModal).toBe('new-workspace-composer')
     expect(useAppStore.getState().modalData).toMatchObject({
       initialRepoId: 'repo-1',
-      telemetrySource: 'unknown',
       contextualTourSource: 'setup_guide_parallel_work'
     })
 
@@ -132,7 +131,6 @@ describe('setup guide workflow actions', () => {
     expect(requestContextualTour).toHaveBeenCalledWith(
       'workspace-creation',
       'setup_guide_parallel_work',
-      false,
       { force: true }
     )
   })

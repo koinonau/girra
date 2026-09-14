@@ -20,7 +20,6 @@ vi.mock('@/lib/worker-terminal-takeover-report', () => ({
   reportStructuredSessionUserInput,
   reportWorkerTerminalUserInput: vi.fn()
 }))
-vi.mock('@/lib/native-chat-telemetry', () => ({ emitNativeChatMessageSent: vi.fn() }))
 vi.mock('./native-chat-structured-composer-dispatch', () => ({
   dispatchNativeChatStructuredComposerText: dispatchStructuredComposerText
 }))
@@ -40,7 +39,6 @@ function transport(): NativeChatStructuredComposerTransport {
     },
     optionSnapshot: [],
     onError: vi.fn(),
-    runtime: 'local',
     sessionId: 'session-1',
     runtimeEnvironmentId: null
   }

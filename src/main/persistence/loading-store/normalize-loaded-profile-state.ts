@@ -1,6 +1,5 @@
 import { normalizePersistedMobileClientTabSelections } from '../../runtime/client-session-tab-selection-persistence'
 import type { SshRemotePtyLease } from '../../../shared/ssh-types'
-import { normalizeFeatureInteractionTelemetryBuckets } from '../../../shared/feature-interactions'
 import { normalizeFolderWorkspaceDiffComments } from '../../folder-workspace-diff-comments'
 import { normalizeFolderWorkspaces } from '../../../shared/folder-workspaces'
 import { normalizeWorkspaceLineageByChildKey } from '../applying-settings/ui-interaction-merge'
@@ -42,9 +41,6 @@ export function normalizeLoadedProfileState(
   return {
     ...defaults,
     ...parsed,
-    featureInteractionTelemetryBuckets: normalizeFeatureInteractionTelemetryBuckets(
-      parsed.featureInteractionTelemetryBuckets
-    ),
     projectGroups: normalizedProjectGroups,
     repos: migratedExternalVisibility.repos,
     // Why: persisted catalog rows are untrusted JSON; consumers call string methods on fields the type says are strings.

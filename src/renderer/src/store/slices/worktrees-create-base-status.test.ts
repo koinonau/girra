@@ -107,7 +107,6 @@ describe('createWorktree base status merge', () => {
         undefined,
         undefined,
         undefined,
-        undefined,
         { nameWasGenerated: true }
       )
     expect(mockApi.worktrees.create.mock.calls[0][0]).toMatchObject({ nameWasGenerated: true })
@@ -136,7 +135,6 @@ describe('createWorktree base status merge', () => {
         'origin/main',
         'inherit',
         undefined,
-        'sidebar',
         'Feature Title',
         123,
         456,
@@ -193,7 +191,6 @@ describe('createWorktree base status merge', () => {
         undefined,
         'inherit',
         undefined,
-        'sidebar',
         undefined,
         undefined,
         undefined,
@@ -630,7 +627,6 @@ describe('createWorktree base status merge', () => {
         undefined,
         undefined,
         undefined,
-        undefined,
         'feature/something'
       )
 
@@ -665,7 +661,6 @@ describe('createWorktree base status merge', () => {
         'feature/something',
         'origin/main',
         'inherit',
-        undefined,
         undefined,
         undefined,
         undefined,

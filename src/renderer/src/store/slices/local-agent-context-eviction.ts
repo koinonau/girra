@@ -8,8 +8,6 @@ type LocalAgentContextState = Pick<
   | 'localDetectedAgentIdsByContext'
   | 'isDetectingLocalAgentsByContext'
   | 'isRefreshingLocalAgentsByContext'
-  | 'pathSource'
-  | 'pathFailureReason'
 >
 
 export type LocalAgentContextEviction = {
@@ -95,9 +93,7 @@ export function getLocalAgentContextEviction(args: {
       ...(clearDetected
         ? {
             detectedAgentIds: null,
-            isDetectingAgents: false,
-            pathSource: null,
-            pathFailureReason: null
+            isDetectingAgents: false
           }
         : {}),
       ...(clearRefreshing ? { isRefreshingAgents: false } : {}),

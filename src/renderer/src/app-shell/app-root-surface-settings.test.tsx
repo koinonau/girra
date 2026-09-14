@@ -5,10 +5,7 @@ import { useStore } from 'zustand'
 import { createStore } from 'zustand/vanilla'
 import { describe, expect, it } from 'vitest'
 import { getDefaultSettings } from '../../../shared/constants'
-import {
-  selectAppRootSurfacePetEnabled,
-  selectAppRootSurfaceTelemetryOptedIn
-} from './app-root-surface-settings'
+import { selectAppRootSurfacePetEnabled } from './app-root-surface-settings'
 
 type SurfaceState = Parameters<typeof selectAppRootSurfacePetEnabled>[0]
 
@@ -18,10 +15,7 @@ describe('app root surface settings selectors', () => {
     let renderCount = 0
     const view = renderHook(() => {
       renderCount += 1
-      return {
-        petEnabled: useStore(store, selectAppRootSurfacePetEnabled),
-        telemetryOptedIn: useStore(store, selectAppRootSurfaceTelemetryOptedIn)
-      }
+      return useStore(store, selectAppRootSurfacePetEnabled)
     })
 
     expect(renderCount).toBe(1)
@@ -31,8 +25,7 @@ describe('app root surface settings selectors', () => {
     })
 
     expect(renderCount).toBe(1)
-    expect(view.result.current.petEnabled).toBe(false)
-    expect(view.result.current.telemetryOptedIn).toBe('unknown')
+    expect(view.result.current).toBe(false)
     view.unmount()
   })
 

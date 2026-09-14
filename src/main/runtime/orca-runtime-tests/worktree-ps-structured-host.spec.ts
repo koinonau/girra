@@ -3,11 +3,6 @@ import { OrcaRuntimeService } from '../orca-runtime-test-mocks.spec'
 import { TEST_WORKTREE_ID, store } from '../orca-runtime-test-fixtures.spec'
 import { AgentHookServer, _internals } from '../../agent-hooks/server'
 
-vi.mock('../../telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('../../telemetry/cohort-classifier', () => ({
-  getCohortAtEmit: vi.fn(() => ({ nth_repo_added: 2 }))
-}))
-
 /**
  * The production read, not the projection. The structured-row suites feed
  * `attachRuntimeWorktreeAgentRows` a snapshot they built themselves; this executes `getWorktreePs`

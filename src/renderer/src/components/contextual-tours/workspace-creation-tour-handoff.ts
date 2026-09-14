@@ -18,12 +18,10 @@ export function openWorkspaceCreationComposerWithTourHandoff(): void {
     state.completeContextualTour('workspace-agent-sessions')
   }
 
-  state.openModal('new-workspace-composer', {
-    telemetrySource: 'sidebar',
-    ...(shouldHandoffFromAgentSessionsTour
-      ? { contextualTourSource: 'workspace_creation_modal' }
-      : {})
-  })
+  state.openModal(
+    'new-workspace-composer',
+    shouldHandoffFromAgentSessionsTour ? { contextualTourSource: 'workspace_creation_modal' } : {}
+  )
 
   if (!shouldHandoffFromAgentSessionsTour) {
     return
@@ -36,7 +34,6 @@ export function openWorkspaceCreationComposerWithTourHandoff(): void {
   requestContextualTourWhenReady({
     id: 'workspace-creation',
     source: 'workspace_creation_modal',
-    wasFeaturePreviouslyInteracted: false,
     waitForActiveTourToClear: true,
     shouldContinue: () => useAppStore.getState().activeModal === 'new-workspace-composer'
   })

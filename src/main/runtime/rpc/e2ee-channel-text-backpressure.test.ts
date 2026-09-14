@@ -5,10 +5,6 @@ import { deriveSharedKey, decrypt, encrypt, generateKeyPair } from './e2ee-crypt
 import { createMobileE2EEOutboundMemoryBudget } from './mobile-e2ee-outbound-memory-budget'
 import { REMOTE_RUNTIME_MAX_OUTBOUND_JSON_BYTES } from '../../../shared/remote-runtime-memory-limits'
 
-const trackMock = vi.hoisted(() => vi.fn())
-
-vi.mock('../../telemetry/client', () => ({ track: trackMock }))
-
 // Repro for gap (a): the streaming JSON reply path (encryptedReply) had no
 // bufferedAmount gate, so a fast producer over a slow link (legacy
 // terminal.subscribe, which has NO seq/resync) ballooned ws.bufferedAmount
@@ -69,7 +65,6 @@ function emitReply(ctx: ReturnType<typeof setup>, payload: string): void {
 describe('E2EE text reply backpressure', () => {
   beforeEach(() => {
     vi.useFakeTimers()
-    trackMock.mockReset()
   })
   afterEach(() => {
     vi.useRealTimers()
@@ -106,16 +101,10 @@ describe('E2EE text reply backpressure', () => {
     expect(decrypt(ctx.ws.sent[baseline]!, ctx.sharedKey)).toBe('{"ok":true}')
   })
 
-  it('still closes an oversized reply when telemetry throws', () => {
+  it('closes the session on an oversized reply', () => {
     const ctx = setup()
-    trackMock.mockImplementationOnce(() => {
-      throw new Error('telemetry unavailable')
-    })
 
-    expect(() =>
-      emitReply(ctx, 'x'.repeat(REMOTE_RUNTIME_MAX_OUTBOUND_JSON_BYTES + 1))
-    ).not.toThrow()
-    expect(trackMock).toHaveBeenCalledWith('remote_outbound_budget_close', { emitter: 'size' })
+    emitReply(ctx, 'x'.repeat(REMOTE_RUNTIME_MAX_OUTBOUND_JSON_BYTES + 1))
     expect(ctx.onError).toHaveBeenCalledWith(1013, 'Outbound reply buffer overflow')
   })
 
@@ -135,10 +124,6 @@ describe('E2EE text reply backpressure', () => {
 
     expect(first.onError).not.toHaveBeenCalled()
     expect(second.onError).toHaveBeenCalledWith(1013, 'Outbound reply buffer overflow')
-    // Why: this close kills the whole remote session, so it has to be countable.
-    expect(trackMock).toHaveBeenCalledWith('remote_outbound_budget_close', {
-      emitter: 'queue'
-    })
     first.channel.destroy()
     expect(outboundMemoryBudget.evidence().queuedBytes).toBe(0)
   })

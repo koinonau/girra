@@ -81,12 +81,7 @@ export function SetupGuideSidebarEntry(): React.JSX.Element | null {
         <button
           type="button"
           data-contextual-tour-target="setup-guide-entry"
-          onClick={() =>
-            openModal('setup-guide', {
-              setupStepId: firstUnfinishedSetupStepId,
-              telemetrySource: 'sidebar'
-            })
-          }
+          onClick={() => openModal('setup-guide', { setupStepId: firstUnfinishedSetupStepId })}
           aria-current={setupActive ? 'page' : undefined}
           className={cn(
             'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left text-[13px] font-medium tracking-tight transition-colors',

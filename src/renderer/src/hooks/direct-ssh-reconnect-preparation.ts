@@ -12,11 +12,7 @@ import type {
   DirectSshPreparationToken,
   DirectSshRepoOutcomeCounts
 } from './direct-ssh-reconnect-coordinator-types'
-import {
-  createEmptyDirectSshPreparationMetrics,
-  createEmptyDirectSshRepoOutcomeCounts
-} from './direct-ssh-reconnect-coordinator-outcomes'
-import { aggregateDirectSshPreparationMetrics } from './direct-ssh-reconnect-preparation-metrics'
+import { createEmptyDirectSshRepoOutcomeCounts } from './direct-ssh-reconnect-coordinator-outcomes'
 import {
   directSshAuthoritiesEqual,
   directSshPreparationOperationKey,
@@ -28,7 +24,6 @@ type PreparationOperation = {
   key: string
   input: DirectSshPreparationInput
   leases: DirectSshWorktreeRefreshLease[]
-  joinCount: number
   invalidatedAs: 'stale' | 'stopped' | null
   settleInvalidation: (reason: 'stale' | 'stopped') => void
   invalidation: Promise<'stale' | 'stopped'>
@@ -36,10 +31,7 @@ type PreparationOperation = {
 }
 
 export type DirectSshPreparationCoordinator = {
-  acquire: (input: DirectSshPreparationInput) => {
-    promise: Promise<DirectSshPreparationOutcome>
-    joined: boolean
-  }
+  acquire: (input: DirectSshPreparationInput) => Promise<DirectSshPreparationOutcome>
   invalidateAuthority: (authority: DirectSshAuthority) => void
   invalidateTarget: (targetId: string) => void
   stop: () => void
@@ -49,7 +41,6 @@ type PreparationCoordinatorDeps = {
   scheduler: DirectSshWorktreeRefreshScheduler
   isCurrentAuthority: (authority: DirectSshAuthority) => boolean
   readLineage: (input: DirectSshPreparationInput) => Promise<DirectSshLineageOutcome>
-  now?: () => number
 }
 
 const TERMINAL_STATUSES: readonly DirectSshWorktreeRefreshTerminalStatus[] = [
@@ -104,15 +95,13 @@ function awaitRepoLeases(
 
 function terminalPreparationOutcome(
   status: 'canceled' | 'stale' | 'stopped',
-  repoOutcomes: DirectSshRepoOutcomeCounts,
-  metrics = createEmptyDirectSshPreparationMetrics()
+  repoOutcomes: DirectSshRepoOutcomeCounts
 ): DirectSshPreparationOutcome {
   return {
     status,
     token: null,
     repoOutcomes,
-    lineageOutcome: 'not-started',
-    metrics
+    lineageOutcome: 'not-started'
   }
 }
 
@@ -144,7 +133,6 @@ function hasOutcome(
 export function createDirectSshPreparationCoordinator(
   deps: PreparationCoordinatorDeps
 ): DirectSshPreparationCoordinator {
-  const now = deps.now ?? Date.now
   const operations = new Map<string, PreparationOperation>()
   let stopped = false
 
@@ -163,34 +151,31 @@ export function createDirectSshPreparationCoordinator(
     )
     const outcomes = await awaitRepoLeases(operation.leases)
     const repoOutcomes = countRepoOutcomes(outcomes)
-    const metrics = aggregateDirectSshPreparationMetrics(outcomes, operation.joinCount)
     if (operation.invalidatedAs) {
-      return terminalPreparationOutcome(operation.invalidatedAs, repoOutcomes, metrics)
+      return terminalPreparationOutcome(operation.invalidatedAs, repoOutcomes)
     }
     if (!deps.isCurrentAuthority(input)) {
-      return terminalPreparationOutcome('stale', repoOutcomes, metrics)
+      return terminalPreparationOutcome('stale', repoOutcomes)
     }
     if (hasOutcome(repoOutcomes, ['canceled', 'stale'])) {
       const status = repoOutcomes.stale > 0 ? 'stale' : 'canceled'
-      return terminalPreparationOutcome(status, repoOutcomes, metrics)
+      return terminalPreparationOutcome(status, repoOutcomes)
     }
 
     let lineageOutcome: DirectSshLineageOutcome
-    const lineageStartedAt = now()
     try {
       lineageOutcome = await deps.readLineage(input)
     } catch {
       lineageOutcome = 'degraded'
     }
-    metrics.lineageDurationMs = Math.max(0, now() - lineageStartedAt)
     if (operation.invalidatedAs) {
-      return terminalPreparationOutcome(operation.invalidatedAs, repoOutcomes, metrics)
+      return terminalPreparationOutcome(operation.invalidatedAs, repoOutcomes)
     }
     if (!deps.isCurrentAuthority(input) || lineageOutcome === 'stale') {
-      return terminalPreparationOutcome('stale', repoOutcomes, metrics)
+      return terminalPreparationOutcome('stale', repoOutcomes)
     }
     if (lineageOutcome === 'canceled') {
-      return terminalPreparationOutcome('canceled', repoOutcomes, metrics)
+      return terminalPreparationOutcome('canceled', repoOutcomes)
     }
     const degraded =
       lineageOutcome === 'degraded' ||
@@ -200,34 +185,26 @@ export function createDirectSshPreparationCoordinator(
       status,
       token: buildPreparationToken(input, status),
       repoOutcomes,
-      lineageOutcome,
-      metrics
+      lineageOutcome
     }
   }
 
-  const acquire = (
-    rawInput: DirectSshPreparationInput
-  ): { promise: Promise<DirectSshPreparationOutcome>; joined: boolean } => {
+  const acquire = (rawInput: DirectSshPreparationInput): Promise<DirectSshPreparationOutcome> => {
     const input = normalizeDirectSshPreparationInput(rawInput)
     const key = directSshPreparationOperationKey(input)
     const current = operations.get(key)
     if (current) {
-      current.joinCount++
-      return { promise: current.promise, joined: true }
+      return current.promise
     }
     if (stopped) {
-      return {
-        promise: Promise.resolve(
-          terminalPreparationOutcome('stopped', createEmptyDirectSshRepoOutcomeCounts())
-        ),
-        joined: false
-      }
+      return Promise.resolve(
+        terminalPreparationOutcome('stopped', createEmptyDirectSshRepoOutcomeCounts())
+      )
     }
     const operation: PreparationOperation = {
       key,
       input,
       leases: [],
-      joinCount: 0,
       invalidatedAs: null,
       settleInvalidation: () => {},
       invalidation: Promise.resolve('stopped'),
@@ -249,7 +226,7 @@ export function createDirectSshPreparationCoordinator(
         operations.delete(key)
       }
     })
-    return { promise: operation.promise, joined: false }
+    return operation.promise
   }
 
   const invalidateMatching = (

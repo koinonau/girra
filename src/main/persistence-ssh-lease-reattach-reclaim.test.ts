@@ -10,9 +10,6 @@ vi.mock('electron', () => ({
   safeStorage: { isEncryptionAvailable: () => false }
 }))
 
-vi.mock('./telemetry/client', () => ({ track: vi.fn() }))
-vi.mock('./telemetry/cohort-classifier', () => ({ getCohortAtEmit: () => ({}) }))
-
 /**
  * `expired` records that the CLIENT lost its route, so a reattach that named the pty and succeeded
  * is the only evidence that can settle which of "orphan" or "corpse" it was. Without the edge back

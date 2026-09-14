@@ -11,11 +11,6 @@ vi.mock('./native-chat-runtime-send', () => ({
   sendNativeChatMessage: (...args: unknown[]) => sendNativeChatMessage(...args),
   sendNativeChatTypedCommand: (...args: unknown[]) => sendNativeChatTypedCommand(...args)
 }))
-vi.mock('@/lib/native-chat-telemetry', () => ({
-  emitNativeChatMessageSent: vi.fn(),
-  emitNativeChatPickerItemAccepted: vi.fn(),
-  emitNativeChatSendClassified: vi.fn()
-}))
 
 import { useNativeChatPickerCommandDispatch } from './use-native-chat-picker-command-dispatch'
 

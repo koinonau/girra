@@ -94,7 +94,6 @@ describe('worktree RPC methods', () => {
         compareBaseRef: undefined,
         setupDecision: 'skip',
         displayName: 'Feature title',
-        telemetrySource: 'sidebar',
         workspaceStatus: 'in-review',
         manualOrder: 123_456,
         linkedIssue: 123,
@@ -124,7 +123,6 @@ describe('worktree RPC methods', () => {
       linkedGiteaPR: undefined,
       comment: undefined,
       displayName: 'Feature title',
-      telemetrySource: 'sidebar',
       workspaceStatus: 'in-review',
       manualOrder: 123_456,
       sparseCheckout: { directories: ['src'], presetId: 'preset-1' },
@@ -635,7 +633,7 @@ describe('worktree RPC methods', () => {
     })
   })
 
-  it('maps unknown telemetry sources to the runtime default instead of rejecting create', async () => {
+  it('ignores the retired telemetrySource field older clients still send', async () => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',
       dedupeWorktreeCreate: passthroughDedupe,
@@ -653,13 +651,9 @@ describe('worktree RPC methods', () => {
     )
 
     expect(response).toMatchObject({ ok: true })
-    expect(runtime.createManagedWorktree).toHaveBeenCalledWith(
-      expect.objectContaining({
-        repoSelector: 'repo-1',
-        name: 'feature',
-        telemetrySource: undefined
-      })
-    )
+    const [args] = vi.mocked(runtime.createManagedWorktree).mock.calls[0]
+    expect(args).toMatchObject({ repoSelector: 'repo-1', name: 'feature' })
+    expect(args).not.toHaveProperty('telemetrySource')
   })
 
   it('rejects worktree.create when both parent and no-parent are supplied', async () => {

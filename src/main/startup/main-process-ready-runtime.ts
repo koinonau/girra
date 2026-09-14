@@ -18,7 +18,6 @@ import {
   shouldInstallStartupManagedAgentHook
 } from '../agent-hooks/managed-agent-hook-controls'
 import { shouldInstallManagedHooks } from './configure-process'
-import { recordManagedHookInstallFailure } from '../agent-hooks/install-telemetry'
 import { mainProcessState as state } from './main-process-state'
 import { initializeMainProcessObservers } from './main-process-observers'
 import { initializeMainProcessAccountServices } from './main-process-account-services'
@@ -111,7 +110,6 @@ export async function initializeReadyRuntimeServices(): Promise<void> {
       .then(() =>
         installManagedAgentHooks(managedHookStore.getSettings(), {
           shouldHydrateShellPath: app.isPackaged,
-          onInstallError: recordManagedHookInstallFailure,
           shouldContinue: (agent) =>
             shouldContinueManagedHookStartup(
               state.isQuitting,

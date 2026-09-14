@@ -110,7 +110,7 @@ export function hasExplicitUserPrompt(
   if (extractedPrompt.text.length === 0) {
     return false
   }
-  // Why: harness-injected turns aren't a user submit (no prompt-sent telemetry or permission stickiness); match only KNOWN tags so a real `<my-element>` prompt still counts and survives interrupt recovery.
+  // Why: harness-injected turns aren't a user submit (no permission stickiness); match only KNOWN tags so a real `<my-element>` prompt still counts and survives interrupt recovery.
   if (isKnownHarnessInjectedUserTurnText(extractedPrompt.text)) {
     return false
   }

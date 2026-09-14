@@ -1,9 +1,28 @@
 import type { StartupCommandDelivery } from '../codex-startup-delivery'
-import type { AgentKind, LaunchSource, RequestKind } from '../telemetry-events'
+import type { AgentKind } from '../agent-kind'
 import type { SleepingAgentLaunchConfig } from '../agent-session-resume'
 import type { SetupRunnerShell } from '../setup-runner-command'
 import type { OrcaDefaultTabTemplate } from '../orca-yaml-hook-types'
 import type { TuiAgent } from '../tui-agent'
+
+export type LaunchSource =
+  | 'command_palette'
+  | 'sidebar'
+  | 'quick_command'
+  | 'tab_bar_quick_launch'
+  | 'task_page'
+  | 'new_workspace_composer'
+  | 'workspace_jump_palette'
+  | 'shortcut'
+  | 'onboarding'
+  | 'diff_notes_send'
+  | 'notes_send'
+  | 'conflict_resolution'
+  | 'source_control_recovery'
+  | 'terminal_context_menu'
+  | 'unknown'
+
+export type RequestKind = 'new' | 'resume' | 'followup'
 
 export type WorktreeSetupLaunch = {
   runnerScriptPath: string

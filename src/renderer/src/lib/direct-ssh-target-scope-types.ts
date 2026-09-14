@@ -14,8 +14,6 @@ export type DirectSshTargetScope = {
   gitWorktreeIds: Set<string>
   terminalWorkspaceKeys: Set<string>
   lineageWorkspaceKeys: Set<WorkspaceKey>
-  ambiguousOwnerCount: number
-  contradictoryOwnerCount: number
 }
 
 export type DirectSshRepoOwner = Pick<

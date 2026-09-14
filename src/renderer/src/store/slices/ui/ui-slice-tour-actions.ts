@@ -6,7 +6,6 @@ import {
   getNextVisibleContextualTourStepIndex,
   getPreviousVisibleContextualTourStepIndex
 } from '../../../components/contextual-tours/contextual-tour-gate'
-import { hasFeatureInteraction } from '../../../../../shared/feature-interactions'
 
 export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<UISlice> {
   return {
@@ -16,13 +15,10 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
     activeContextualTourStepIndex: 0,
     activeContextualTourSource: null,
     activeContextualTourSourceDetached: false,
-    activeContextualTourWasFeaturePreviouslyInteracted: false,
-    contextualTourNavigationInteractionSnapshot: {},
     activeContextualTourSuppressed: false,
     contextualTourShownThisSession: false,
     contextualToursOnboardingVisible: false,
     contextualToursBlockingSurfaceVisible: false,
-    lastCompletedContextualTourId: null,
     setContextualToursAutoEligible: (eligible) =>
       set((s) => {
         if (s.contextualToursAutoEligible === eligible) {
@@ -45,7 +41,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           ? s
           : { contextualToursBlockingSurfaceVisible: visible }
       ),
-    requestContextualTour: (id, source, wasFeaturePreviouslyInteracted, options) =>
+    requestContextualTour: (id, source, options) =>
       set((s) => {
         const tour = getContextualTour(id)
         const decision = getContextualTourRequestDecision({
@@ -61,31 +57,15 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           targetExists: hasContextualTourTarget
         })
         if (decision.kind !== 'start') {
-          if (s.contextualTourNavigationInteractionSnapshot[id] === undefined) {
-            return s
-          }
-          const { [id]: _consumed, ...remainingNavigationSnapshot } =
-            s.contextualTourNavigationInteractionSnapshot
-          void _consumed
-          return { contextualTourNavigationInteractionSnapshot: remainingNavigationSnapshot }
+          return s
         }
-        const navigationSnapshot = s.contextualTourNavigationInteractionSnapshot[id]
-        const { [id]: _consumed, ...remainingNavigationSnapshot } =
-          s.contextualTourNavigationInteractionSnapshot
-        void _consumed
         return {
           activeContextualTourId: id,
           activeContextualTourStepIndex: decision.stepIndex,
           activeContextualTourSource: source,
           activeContextualTourSourceDetached: false,
-          activeContextualTourWasFeaturePreviouslyInteracted:
-            wasFeaturePreviouslyInteracted ??
-            navigationSnapshot ??
-            hasFeatureInteraction(s.featureInteractions, id),
-          contextualTourNavigationInteractionSnapshot: remainingNavigationSnapshot,
           activeContextualTourSuppressed: false,
-          contextualTourShownThisSession: true,
-          lastCompletedContextualTourId: null
+          contextualTourShownThisSession: true
         }
       }),
     suppressContextualTour: (id, source) =>
@@ -164,9 +144,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourStepIndex: 0,
           activeContextualTourSource: null,
           activeContextualTourSourceDetached: false,
-          activeContextualTourWasFeaturePreviouslyInteracted: false,
-          activeContextualTourSuppressed: false,
-          lastCompletedContextualTourId: null
+          activeContextualTourSuppressed: false
         }
       })
     },
@@ -188,9 +166,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourStepIndex: 0,
           activeContextualTourSource: null,
           activeContextualTourSourceDetached: false,
-          activeContextualTourWasFeaturePreviouslyInteracted: false,
-          activeContextualTourSuppressed: false,
-          lastCompletedContextualTourId: tourId ?? null
+          activeContextualTourSuppressed: false
         }
       })
     },
@@ -207,9 +183,7 @@ export function createUiTourActions(set: UISliceSet, get: UISliceGet): Partial<U
           activeContextualTourStepIndex: 0,
           activeContextualTourSource: null,
           activeContextualTourSourceDetached: false,
-          activeContextualTourWasFeaturePreviouslyInteracted: false,
           activeContextualTourSuppressed: false,
-          lastCompletedContextualTourId: null,
           contextualTourShownThisSession: alreadyShown ? s.contextualTourShownThisSession : false
         }
       }),

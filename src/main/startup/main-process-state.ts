@@ -27,7 +27,6 @@ import type { getDevInstanceIdentity } from './dev-instance-identity'
 import type { createServeDesktopActivationGate } from './serve-desktop-activation'
 import type { createWindowsShellPathHydration } from './windows-shell-path-hydration'
 import type { ServeOptions } from './main-process-serve'
-import type { HangDetectionMarker } from '../hang-watchdog/hang-detection-marker'
 import { ServeReadinessPublisher } from '../server/serve-readiness'
 import { OsOpenedMarkdownFileState } from './os-opened-markdown-files'
 import {
@@ -110,7 +109,6 @@ export const mainProcessState = {
   desktopActivationGate: null as ReturnType<typeof createServeDesktopActivationGate> | null,
   windowsShellPathHydration: null as ReturnType<typeof createWindowsShellPathHydration> | null,
   shellPathReady: Promise.resolve(),
-  hangDetection: null as HangDetectionMarker | null,
   skillTransactionRecovery: Promise.resolve() as Promise<unknown>,
   serveOptions: null as ServeOptions | null,
   desktopWindow: null as BrowserWindow | null,

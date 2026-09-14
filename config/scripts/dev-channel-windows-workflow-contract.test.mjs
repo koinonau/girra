@@ -166,9 +166,8 @@ describe('dev-channel Windows build workflow', () => {
     expect(stepNamed(winSteps(), 'Vet the requested inputs').run).toContain('--contains')
   })
 
-  // Telemetry's transport gate accepts only 'stable' or 'rc'; leaving the build
-  // identity unset is what keeps unvetted artifacts silent.
-  it('never stamps an official telemetry build identity', () => {
+  // Why: diagnostics report only 'stable' or 'rc' as official; unvetted artifacts leave it unset.
+  it('never stamps an official build identity', () => {
     const build = stepNamed(winSteps(), 'Build app')
 
     expect(Object.keys(build.env ?? {})).not.toContain('ORCA_BUILD_IDENTITY')

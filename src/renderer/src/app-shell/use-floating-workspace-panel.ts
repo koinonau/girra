@@ -24,7 +24,6 @@ export function useFloatingWorkspacePanel() {
     () => readPersistedFloatingTerminalPanelViewState()?.open === true
   )
   const tourInteractionSnapshotRef = useRef<{
-    wasPreviouslyInteracted?: boolean
     persisted?: Promise<void>
     recordFeatureInteractionForTour: boolean
   } | null>(null)

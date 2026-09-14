@@ -79,7 +79,7 @@ export class LoadedStateParsingOperations {
   ) {}
 
   load(allowBackupRecovery = true): PersistedState {
-    // Capture "has run Orca before?" for telemetry cohort; the telemetry field is new, so field inference misclassifies old users as fresh.
+    // Capture "has run Orca before?" for the tab-switch keybinding migration; field inference misclassifies old users as fresh.
     const dataFile = this.runtime.dataFile
     const fileExistedOnLoad = existsSync(dataFile)
     logPersistenceStartupMilestone('persistence-load-start', {
@@ -267,10 +267,7 @@ export class LoadedStateParsingOperations {
       this.runtime.loadNeedsSave = true
     }
 
-    const migrated = this.cohorts.migrateTabSwitchKeybindings(
-      this.cohorts.migrateTelemetry(result, fileExistedOnLoad),
-      fileExistedOnLoad
-    )
+    const migrated = this.cohorts.migrateTabSwitchKeybindings(result, fileExistedOnLoad)
 
     // githubCache is a sidecar file now (see getGithubCacheFile); legacy in-file caches seed the session, then get stripped.
     const legacyCache = migrated.githubCache

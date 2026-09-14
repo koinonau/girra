@@ -53,9 +53,7 @@ describe('preflight RPC methods', () => {
     refreshShellPathAndDetectAgentsMock.mockResolvedValueOnce({
       agents: ['codex', 'claude'],
       addedPathSegments: ['/opt/bin'],
-      shellHydrationOk: true,
-      pathSource: 'shell_hydrate',
-      pathFailureReason: 'none'
+      shellHydrationOk: true
     })
     const runtime = { getRuntimeId: () => 'test-runtime' } as unknown as OrcaRuntimeService
     const dispatcher = new RpcDispatcher({ runtime, methods: PREFLIGHT_METHODS })

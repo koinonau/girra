@@ -17,7 +17,6 @@ import { getProjectHostSetupForRepo } from '../../../shared/project-host-setup-l
 import { parseExecutionHostId } from '../../../shared/execution-host'
 import { prepareLocalWorktreeRootForRepo } from '../../worktree-root-preparation'
 import { invalidateAuthorizedRootsCache } from '../registered-worktree-roots-cache'
-import { emitRepoAdded } from './repo-added-telemetry'
 import { notifyReposChanged } from './repos-changed-notification'
 import {
   ProjectHostSetupCreateIpcArgs,
@@ -184,7 +183,6 @@ export function registerProjectHostSetupHandlers(mainWindow: BrowserWindow, stor
       }
       invalidateAuthorizedRootsCache()
       notifyReposChanged(mainWindow)
-      emitRepoAdded('folder_picker', result.alreadyExisted)
       if (result.alreadyExisted) {
         await prepareLocalWorktreeRootForRepo(store, aligned.repo)
       }

@@ -4,7 +4,7 @@ import { planLaunchAgentStartupPrompt } from '@/lib/launch-agent-startup-prompt-
 import { CLIENT_PLATFORM } from '@/lib/new-workspace'
 import { getAgentLaunchPlatformForRepo } from '@/lib/agent-launch-platform'
 import { persistAgentLaunchTabOrder } from '@/lib/launch-agent-tab-order'
-import { tuiAgentToAgentKind } from '@/lib/telemetry'
+import { tuiAgentToAgentKind } from '../../../shared/agent-kind'
 import { createPasteReadinessTimeoutNotice } from '@/lib/launch-agent-paste-timeout-notice'
 import {
   deliverLaunchPromptToAgentTab,
@@ -24,7 +24,7 @@ import { resolveLocalWindowsAgentStartupShell } from '../../../shared/windows-te
 import { TUI_AGENT_CONFIG } from '../../../shared/tui-agent-config'
 import { seedCommandCodeSubmittedPromptStatus } from '@/lib/command-code-prompt-status-seed'
 import type { TuiAgent } from '../../../shared/tui-agent'
-import type { LaunchSource } from '../../../shared/telemetry-events'
+import type { LaunchSource } from '../../../shared/worktree/launch-types'
 import { getConnectionIdFromState } from '@/lib/connection-context'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
 import { seedNativeChatAppliedSessionOptions } from '@/components/native-chat/native-chat-session-option-cache'
@@ -45,7 +45,7 @@ export type LaunchAgentInNewTabArgs = {
   initialCwd?: string | null
   /** How to deliver the prompt: `draft` leaves it editable, `submit-after-ready` sends it once the TUI is ready. */
   promptDelivery?: 'auto-submit' | 'draft' | 'submit-after-ready'
-  /** Telemetry surface that initiated this launch. Defaults to the tab-bar quick-launch entry point. */
+  /** Surface that initiated this launch. Defaults to the tab-bar quick-launch entry point. */
   launchSource?: LaunchSource
   /** User-authored Quick Command label for local tabs created from the tab bar. */
   quickCommandLabel?: string | null
@@ -267,7 +267,6 @@ function launchAgentInNewTabInternal(
     const timeoutNotice = createPasteReadinessTimeoutNotice({
       worktreeId,
       tabId: tab.id,
-      agent,
       submitted: submitPastedPrompt
     })
     const deliveryPromise = deliverLaunchPromptToAgentTab({

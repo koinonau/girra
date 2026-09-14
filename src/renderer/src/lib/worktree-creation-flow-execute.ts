@@ -57,7 +57,6 @@ export async function executeWorktreeCreation(
         preparedRequest.baseBranch,
         preparedRequest.setupDecision,
         preparedRequest.sparseCheckout,
-        preparedRequest.telemetrySource,
         preparedRequest.displayName,
         preparedRequest.linkedIssue,
         preparedRequest.linkedPR,

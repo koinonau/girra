@@ -56,7 +56,7 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
       this.connectionTimestampWatermarkById.set(terminalOwnedPayload.connectionId, now)
     }
     if (terminalOwnedPayload.providerSessionOnly) {
-      // Why: identity-only rows survive replay but must not emit prompt telemetry or a fabricated status.
+      // Why: identity-only rows survive replay but must not fabricate a status.
       onAccepted?.()
       const enriched = {
         ...this.attachStatusTiming(terminalOwnedPayload, now),
@@ -192,9 +192,6 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
       this.clearAssistantMessageRetry(effectivePayload.paneKey)
     }
     onAccepted?.()
-    if (!identity.inheritedFromActivePane) {
-      this.maybeTrackAgentPromptSent(effectivePayload, previous)
-    }
     // Why carried forward only within one host: main's OSC parse resolves the handle, so a later
     // hook must not erase its terminal join; a connection change must not inherit another host's.
     const enriched = {

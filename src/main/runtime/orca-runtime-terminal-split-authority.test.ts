@@ -240,7 +240,6 @@ describe('remote runtime terminal split authority', () => {
       command: undefined,
       worktreeId: WORKTREE_ID,
       sourceLeafId: SOURCE_LEAF_ID,
-      telemetrySource: undefined,
       newLeafId
     })
     harness.runtime.syncWindowGraph(1, {

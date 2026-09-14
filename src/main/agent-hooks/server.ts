@@ -43,7 +43,6 @@ export const _internals = {
   resetCachesForTests: (): void => {
     clearAllListenerCaches(agentHookServer._getStateForTests())
     agentHookServer._resetRowOwnershipForTests()
-    agentHookServer._resetPromptSentDedupeForTests()
     agentHookServer._resetConnectionTimestampWatermarksForTests()
   }
 }

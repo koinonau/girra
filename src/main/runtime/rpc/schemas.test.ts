@@ -68,11 +68,8 @@ describe('RPC optional pipe schemas', () => {
 
   it('accepts omitted terminal and worktree optional fields while required fields are present', () => {
     expectParses(methodParams(TERMINAL_METHODS, 'terminal.split'), { terminal: 'terminal-1' })
+    // Older clients still send telemetrySource; the non-strict schema must strip it.
     expectParses(methodParams(TERMINAL_METHODS, 'terminal.split'), {
-      terminal: 'terminal-1',
-      telemetrySource: 'contextual_tour'
-    })
-    expectRejects(methodParams(TERMINAL_METHODS, 'terminal.split'), {
       terminal: 'terminal-1',
       telemetrySource: 'raw-source'
     })

@@ -57,7 +57,6 @@ export const LOCALE_PHRASE_FIXES = {
     { pattern: /일반적인/g, replacement: '일반', whenEnIncludes: 'General' },
     { pattern: /모습/g, replacement: '외관', whenEnIncludes: 'Appearance' },
     { pattern: /목소리/g, replacement: '음성', whenEnIncludes: 'Voice' },
-    { pattern: /원격 측정/g, replacement: '텔레메트리', whenEnIncludes: 'Telemetry' },
     { pattern: /충돌 신고/g, replacement: '크래시 신고', whenEnIncludes: 'Crash' },
     { pattern: /충돌 보고서/g, replacement: '크래시 보고서', whenEnIncludes: 'crash report' },
     { pattern: /충돌 세부/g, replacement: '크래시 세부', whenEnIncludes: 'crash' },

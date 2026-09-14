@@ -42,13 +42,6 @@ export type CodexGrantedHookTrust = {
   trustedHash: string
 }
 
-/** Closed verify-failure taxonomy, so telemetry never has to parse the
- *  free-form `reason` diagnostics string. */
-export type CodexTrustGrantSessionVerifyClass =
-  | 'list-mismatch'
-  | 'post-grant-untrusted'
-  | 'post-grant-mismatch'
-
 export type CodexHookTrustGrantSessionResult =
   | {
       outcome: 'granted'
@@ -56,7 +49,7 @@ export type CodexHookTrustGrantSessionResult =
       /** False when every expected entry was already trusted (no write). */
       wroteTrust: boolean
     }
-  | { outcome: 'verify-failed'; reason: string; reasonClass: CodexTrustGrantSessionVerifyClass }
+  | { outcome: 'verify-failed'; reason: string }
 
 type CodexHookListing = {
   key: string
@@ -130,8 +123,7 @@ export async function runCodexHookTrustGrantSession(
       ) {
         return {
           outcome: 'verify-failed',
-          reason: `hooks/list reported ${managedListings.length} entries covering ${managedKeyCoverage.size} of ${expectedKeys.size} expected managed entries`,
-          reasonClass: 'list-mismatch'
+          reason: `hooks/list reported ${managedListings.length} entries covering ${managedKeyCoverage.size} of ${expectedKeys.size} expected managed entries`
         }
       }
 
@@ -161,13 +153,11 @@ export async function runCodexHookTrustGrantSession(
         return untrusted.length > 0
           ? {
               outcome: 'verify-failed',
-              reason: `post-grant verify left ${untrusted.length} entries ${untrusted[0].trustStatus}`,
-              reasonClass: 'post-grant-untrusted'
+              reason: `post-grant verify left ${untrusted.length} entries ${untrusted[0].trustStatus}`
             }
           : {
               outcome: 'verify-failed',
-              reason: `post-grant verify reported ${verifiedListings.length} entries covering ${verifiedKeyCoverage.size} of ${expectedKeys.size} expected entries`,
-              reasonClass: 'post-grant-mismatch'
+              reason: `post-grant verify reported ${verifiedListings.length} entries covering ${verifiedKeyCoverage.size} of ${expectedKeys.size} expected entries`
             }
       }
       return {

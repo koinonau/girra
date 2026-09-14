@@ -1,6 +1,5 @@
 import { randomUUID } from 'node:crypto'
 import { getAppEnvironment } from '../../shared/app-environment'
-import type { DaemonReplaceReason } from '../../shared/daemon-lifecycle-telemetry'
 import { DaemonClient } from './client'
 import {
   DaemonEndpointOwnershipError,
@@ -24,16 +23,6 @@ import {
 } from './daemon-spawner'
 import { PROTOCOL_VERSION } from './types'
 import { prepareDaemonReplacement } from './daemon-replacement-preflight'
-
-// Why: the adapter decides a runtime resolver replacement, but the launcher completes it — and by
-// then the daemon has usually self-retired (dropping its last authenticated client is enough), so
-// there is nothing left to kill and the launcher's own confirmed-kill gate would report nothing.
-// The adapter hands the reason across so the launch it triggers reports what actually drove it.
-let attributedReplaceReason: DaemonReplaceReason | null = null
-
-export function attributeNextDaemonReplacement(reason: DaemonReplaceReason): void {
-  attributedReplaceReason = reason
-}
 
 function createPreservedDaemonHandle(
   runtimeDir: string,
@@ -63,11 +52,6 @@ export function createOutOfProcessLauncher(
     const recoveryDeadlineMs = Date.now() + DAEMON_RECOVERY_BUDGET_MS
     const pidPath = suppliedPidPath ?? getDaemonPidPath(runtimeDir)
     const launchNonce = suppliedLaunchNonce ?? randomUUID()
-    // One-shot: whichever launch consumes it owns the attribution, so a later unrelated launch can't
-    // reuse it. The write in the respawn closure reaches here without an intervening await, which is
-    // what makes a bare module-scoped slot safe — keep it that way or a concurrent launch can steal it.
-    const attributedReason = attributedReplaceReason
-    attributedReplaceReason = null
     let adoptionClient: DaemonClient | null = new DaemonClient({
       socketPath,
       tokenPath
@@ -107,7 +91,6 @@ export function createOutOfProcessLauncher(
         tokenPath,
         entryPath,
         recoveryDeadlineMs,
-        attributedReason,
         releaseAdoptionClient,
         preserveDaemon
       })
