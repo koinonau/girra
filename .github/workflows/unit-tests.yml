@@ -67,7 +67,6 @@ jobs:
             --exclude=src/shared/pty-reply-echo-shapes.node-pty.test.ts \
             --exclude=src/shared/startup-shell-portability.live-shell.test.ts \
             --exclude=src/shared/posix-command-path-lookup.test.ts \
-            --exclude=tests/e2e/cross-version-wire/** \
             --shard=${{ matrix.shard }}/${{ matrix.shard_total }}
 
       - name: Upload unit shard assignment

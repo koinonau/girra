@@ -4,13 +4,14 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-14: Phase 0 is done and its baseline is recorded below. No Orca code has changed.
+As of 2026-09-14: Phase 0 and the ADRs are merged, and the cross-version wire harness is deleted in an open pull request. No Orca feature code has changed.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
 - `koinonau/girra` is private on GitHub, moved from `shanedolley/girra` on 2026-09-13; GitHub redirects the old URL. Its `main` holds Orca's code at the surveyed commit, with history older than 2026-08-29 squashed.
-- Phase 0 travels in one pull request with `mise.toml`, this baseline, and `cloud/` added to the deletion table. The ADR pull request is stacked on it and merges second: `gh pr list --repo koinonau/girra`.
-- ADRs [0001](docs/adr/0001-fork-orca-and-delete.md) and [0002](docs/adr/0002-keep-internal-orca-identifiers.md) record fork-and-delete and keeping internal `orca*` identifiers (2026-09-14).
+- Phase 0 merged in [#4](https://github.com/koinonau/girra/pull/4): `mise.toml`, the baseline, and `cloud/` added to the deletion table.
+- ADRs [0001](docs/adr/0001-fork-orca-and-delete.md) and [0002](docs/adr/0002-keep-internal-orca-identifiers.md) merged in [#5](https://github.com/koinonau/girra/pull/5).
+- The cross-version wire harness deletion is open: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -44,7 +45,7 @@ Until a tracker exists, the phases in the build plan are the backlog.
 - **History is squashed.** The first 1,308 commits of `main` are Orca's: one root commit holding Orca's tree at `51ed7d4f6` (2026-08-29) in place of 9,426 older commits, then the 1,307 later Orca commits with their original authors. Girra's own commits follow. Estimated at 89 MiB of objects, down from 219 MiB (2026-09-13).
 - **`main` shares no ancestry with upstream** (`git merge-base main upstream/main` finds none). Take upstream fixes with `git cherry-pick` after `git fetch upstream`. `git merge upstream/main` fails as unrelated histories.
 - **`orca-full-history`** is a local-only branch at Orca `403b62a8d` holding all 10,733 commits. It exists in this clone alone and is the only place `git blame` reaches past 2026-08-29. Measure upstream drift against it: `git fetch upstream && git rev-list --count orca-full-history..upstream/main` gave 189 (2026-09-14).
-- **Release tags are incomplete.** The clone holds 860 of Orca's tags (`git tag | wc -l`), only those reachable when history was fetched. `v1.4.190`, which the cross-version tests need, is absent; the survey clone at `~/Development/github_clones/orca` has it (2026-09-14). None were pushed.
+- **Release tags are incomplete.** The clone holds 860 of Orca's tags (`git tag | wc -l`), only those reachable when history was fetched; `v1.4.190` is absent, and the survey clone at `~/Development/github_clones/orca` has it (2026-09-14). Nothing needs them since the cross-version harness went. None were pushed.
 - No Git LFS; largest blob 8.2 MB (`docs/assets/readme-feature-showcase.gif`).
 - **GitHub Actions is disabled** on the repository (`gh api repos/koinonau/girra/actions/permissions` returns `"enabled":false`, 2026-09-14). Orca ships 65 workflows, including an hourly macOS build.
 - Branch protection and rulesets are unavailable: the rulesets API returns 403 and asks for a paid plan on this private repository (2026-09-13).
@@ -78,19 +79,29 @@ Phase 0, run on 2026-09-14 against `main` at Orca `403b62a8d` plus the planning 
 | `pnpm lint` | 0 | 52 s | No oxlint findings. 122 reliability gates, 7 grandfathered max-lines suppressions, 171 ts-nocheck files, 14,262 English locale keys |
 | `pnpm build` | 0 | 41 s | Main 5,721 modules, renderer 12,447. Native Swift helpers built |
 
-Rerunning the nine failing files alone gave 10 failed, 31 passed, 13 skipped, 1 error. A phase matches the baseline when these, and only these, fail:
+Six of those 11 failures were `release-checkout` tests, and two cross-version files errored, all for want of tag `v1.4.190`. The harness deletion removed them.
+
+After deleting the cross-version harness, on 2026-09-14, with `out/` left by an earlier build:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 5 s | No errors. Incremental: `config/*.tsbuildinfo` caches earlier runs |
+| `pnpm test` | 1 | 1,292 s | Files: 6 failed, 8,506 passed, 61 skipped of 8,573. Tests: 5 failed, 79,349 passed, 388 skipped of 79,742 |
+| `pnpm lint` | 0 | 85 s | 121 reliability gates; ratchets unchanged |
+| `pnpm build` | 0 | 30 s | As above |
+
+A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
 |---|---|---|
-| `tests/e2e/cross-version-wire/release-checkout.unit.test.ts` | 6 | Tag `v1.4.190` is absent |
-| `tests/e2e/cross-version-wire/cross-version-{browser-placement,terminal-wire}.unit.test.ts` | Files error, 13 tests skip | Same missing tag |
-| `tests/e2e/relay-region-correction.unit.test.ts` | File errors | Imports `pg` through `cloud/apps/relay`, which is not installed |
+| `tests/e2e/relay-region-correction.unit.test.ts` | File errors | Imports `pg` through `cloud/apps/relay`, which is not installed. Phase 1 deletes it |
+| `src/main/runtime/orchestration-cli-subprocess.test.ts` | 1 | Runs only when `out/cli/index.js` exists (`describeIfBuilt`), so Phase 0, which tested before building, skipped it. The spawned CLI exits 1. Not yet root-caused |
 | `config/scripts/skill-recipe-shell.test.mjs` | 1 | macOS `/bin/bash` is 3.2 and rejects an empty `"${array[@]}"` under `set -u` |
 | `src/main/claude/claude-structured-real-cli.test.ts` | 1 | Runs the real `claude` binary; this machine's commands do not match the fixture |
 | `src/main/claude/claude-tui-resume-real-binary.integration.test.ts` | 1 | Runs the real `claude` binary |
-| `src/main/daemon/repro-13767-shell-ready-marker-lost-to-exec.test.ts` | 1, plus 1 unhandled error | Times out waiting for a real bash profile prompt |
+| `src/main/daemon/repro-13767-shell-ready-marker-lost-to-exec.test.ts` | 1 | Times out waiting for a real bash profile prompt. Phase 0 also counted it as an unhandled error; the next run did not |
 
-`src/main/daemon/daemon-reattach-checkpoint-isolation.test.ts` failed under the full suite with `ENOTEMPTY` in teardown and passed alone. Treat it as load-flaky.
+`src/main/daemon/daemon-reattach-checkpoint-isolation.test.ts` failed under the Phase 0 suite with `ENOTEMPTY` in teardown, passed alone, and passed in the next full run. Treat it as load-flaky.
 
 ## Environment
 
@@ -132,6 +143,7 @@ All 2026-09-13 unless dated otherwise.
 - Squash history older than 14 days, keeping 1,307 commits, and replace the already-pushed full history with `git push --force-with-lease`.
 - Disable GitHub Actions until the workflows are pruned.
 - 2026-09-14: pin Node through a committed `mise.toml` and get pnpm 12 from corepack, leaving the global Node untouched.
+- 2026-09-14: delete the cross-version wire harness, its CI job, its change-scope category, and the gate evidence citing it. It compared girra against Orca releases girra does not ship.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -140,7 +152,7 @@ All 2026-09-13 unless dated otherwise.
 
 ## Open Decisions
 
-- **Cross-version wire tests.** 15 files in `tests/e2e/cross-version-wire/` compare wire compatibility against Orca releases. Fetch the release tags locally so they pass, or delete the harness, since girra will diverge from Orca's releases.
+- **Web renderer and pairing.** The feature tree keeps "Web UI served over the network", "Headless serve mode", "Cross-device session tab sync" and "Paired-runtime remote browser host", but drops "Web/mobile companion renderer" (`src/renderer/src/web`) and the mobile pairing items: end-to-end encryption, device tokens, QR pairing. The code does not split that way. Serve mode serves the web client built from `src/renderer/src/web`, and `src/main/runtime/runtime-rpc/` imports `device-registry.ts` and `e2ee-keypair.ts` for every remote client. Keep both, and drop only mobile-specific surfaces such as the pairing page and push; or drop the web UI and remote serving with them. Until decided, Phase 1 deletes only `mobile/` and `cloud/`.
 - **Workflows.** Which of the 65 to keep before Actions is re-enabled. Until then, no change has CI.
 - **Help menu.** Seventeen links point at Orca's docs. Remove the menu or repoint it.
 - **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug.
@@ -170,4 +182,8 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-14 | The full test suite loads the machine enough to fail `daemon-reattach-checkpoint-isolation` | One false failure in the baseline | Rerun a failing file alone before treating it as a regression |
 | 2026-09-14 | The cross-version tests write 404 MB of Orca release checkouts into `tests/e2e/.cross-version-checkouts/`, which git ignores | Disk space only | Expect it after every full test run |
 | 2026-09-14 | Orca's `.gitignore` ignores `docs/**` apart from an allow-list, so a new file under `docs/` is silently untracked. `docs/adr/` is now allow-listed | One `git add` that staged nothing | Add a new docs path to the allow-list in `.gitignore`; never `git add -f` |
+| 2026-09-14 | Deleting a merged pull request's head branch closed the pull request stacked on it instead of retargeting it | Pushing the branch back, reopening, retargeting to `main`, then deleting it again | Retarget a stacked pull request to `main` before deleting its base branch |
+| 2026-09-14 | `pnpm lint` checks that every test file a reliability gate lists exists, so each deletion must edit `config/reliability-gates.jsonc` in the same change, not in Phase 8 | Three gates edited for the harness | Grep the manifest for deleted paths; edit it with `jsonc-parser`'s `modify` so comments survive |
+| 2026-09-14 | Some tests skip until `pnpm build` has written `out/`, so a baseline taken before building undercounts failures | One failure mistaken for new | Build before taking a baseline |
+| 2026-09-14 | The survey labelled shared remote-runtime code as mobile-only, so the feature tree drops code that kept features import | A Phase 1 plan that would have broken the web UI and remote servers | Trace imports before deleting anything a feature entry names |
 | 2026-09-14 | Feature share and line share differ: 103 of 535 features is 19%, but their code is 12% of source lines | "A fifth of the codebase" in the plan and an ADR draft | Measure lines before quoting a code proportion |

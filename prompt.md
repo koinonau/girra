@@ -4,10 +4,10 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phase 0 and the ADRs are done, in two stacked pull requests awaiting the user's merge: Phase 0 first, then the ADRs.
+Measured 2026-09-14. No tracker exists, so these come from the build plan's phases. Phase 0 and the ADRs are merged; the cross-version harness deletion awaits the user's merge.
 
-1. **Phase 1, mobile and cloud.** Relocate `Clipboard copy of terminal selection` out of `src/renderer/src/web/` first, then delete `mobile/` (137,454 lines) and `cloud/` (28,365 lines). Neither is imported from `src/`. Removing `cloud/` also removes `tests/e2e/relay-region-correction.unit.test.ts` from the baseline failures. Blocked until the Phase 0 pull request merges: it needs `mise.toml` and the baseline, and the user has not yet reviewed adding `cloud/`.
-2. **Cross-version wire tests.** Decide whether to fetch Orca's release tags locally or delete `tests/e2e/cross-version-wire/`. Needs the user.
+1. **Phase 1, mobile and cloud.** Delete `mobile/` (137,454 lines) and `cloud/` (28,365 lines), which nothing in `src/` imports, and remove them from the workspace, lint scripts, CI workflows, gate manifest and docs. 97 tracked files outside the two trees mention them, many as comments or parity tests (`git grep -lE "(^|[^A-Za-z-])(mobile|cloud)/"`). Leave `src/renderer/src/web` and the pairing code alone until "Web renderer and pairing" in `handover.md` is decided. Unblocked; stack it on the harness branch, or branch from `origin/main` once that merges.
+2. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 3. **Workflows.** Choose which of Orca's 65 workflows survive before GitHub Actions is re-enabled. Needs the user.
 
 ## Backlog
@@ -28,6 +28,8 @@ When a tracker exists, record its project, ready status, and transition IDs here
 ## Commits
 
 One pull request per story. Cut the branch from `origin/main`, stage files by name, push, and open the pull request against `main` on `koinonau/girra`.
+
+When a story must build on an unmerged one, stack it: branch from the earlier story's branch and target that branch. After the earlier pull request merges, retarget the stacked one to `main` with `gh pr edit --base main` before deleting the merged branch. Deleting it first closes the stacked pull request.
 
 Actions is disabled, so no CI runs. The local checks in the loop stand in for CI until workflows are pruned and Actions is re-enabled.
 

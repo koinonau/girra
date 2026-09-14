@@ -14,7 +14,6 @@
     "../src/renderer/src/env.d.ts",
     "../src/types/**/*"
   ],
-  "exclude": ["../tests/e2e/.cross-version-checkouts/**"],
   "compilerOptions": {
     // Why: specs run browser code inside page.evaluate, so the DOM lib has to be visible here
     // even though the harness itself is Node.

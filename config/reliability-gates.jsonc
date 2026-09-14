@@ -6345,7 +6345,6 @@
         "pnpm exec playwright test tests/e2e/paired-client-hosted-browser.spec.ts --config tests/playwright.config.ts --project electron-headless --workers=1",
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/runtime/web-runtime-session-browser-client-placement.test.ts src/renderer/src/runtime/web-runtime-session-browser-create-failure.test.ts src/main/runtime/orca-runtime-browser-client-hosted.test.ts src/main/runtime/runtime-browser-client-page-creation.test.ts src/main/runtime/browser-host-page-reconciliation-orchestration.test.ts src/main/runtime/browser-host-command-ledger.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/shared/browser-client-host-protocol.test.ts src/shared/remote-runtime-client.test.ts src/main/runtime/browser-host-capability-selection.test.ts src/main/runtime/rpc/methods/browser-tab-create-schema.test.ts src/main/ipc/runtime-environment-browser-client-host-handler.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/cross-version-wire/cross-version-browser-placement.unit.test.ts",
         "SKIP_BUILD=1 ORCA_CROSS_VERSION_PACKAGED_EXECUTABLE=/Applications/Orca.app/Contents/MacOS/Orca pnpm exec playwright test tests/e2e/packaged-mixed-version-browser-placement.spec.ts --config tests/playwright.config.ts --project electron-headless --workers=1",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/browser-network-tunnel-paired-runtime.integration.test.ts src/main/browser/paired-runtime-browser-network-route.test.ts src/main/browser/browser-network-execution-route.test.ts src/main/browser/wsl-browser-network-execution-route.test.ts src/main/browser/wsl-browser-network-relay-launch.test.ts src/main/runtime/runtime-browser-network-execution-host.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/browser/browser-screencast-lifecycle.test.ts src/main/browser/browser-screencast-stream.test.ts src/main/runtime/orca-runtime-browser-screencast-fanout.test.ts",
@@ -6366,7 +6365,6 @@
         "src/main/runtime/browser-host-capability-selection.test.ts",
         "src/main/runtime/rpc/methods/browser-tab-create-schema.test.ts",
         "src/main/ipc/runtime-environment-browser-client-host-handler.test.ts",
-        "tests/e2e/cross-version-wire/cross-version-browser-placement.unit.test.ts",
         "tests/e2e/packaged-mixed-version-browser-placement.spec.ts",
         "src/main/runtime/browser-network-tunnel-paired-runtime.integration.test.ts",
         "src/main/browser/paired-runtime-browser-network-route.test.ts",
@@ -6394,14 +6392,6 @@
             "eligible desktops prepare exact client placement while legacy and explicit-server requests omit placement",
             "client preparation failure surfaces without server fallback",
             "acknowledged client pages wait for exact renderer-store materialization"
-          ]
-        },
-        {
-          "file": "tests/e2e/cross-version-wire/cross-version-browser-placement.unit.test.ts",
-          "assertions": [
-            "a real stable release has no client-host or browser-tunnel capability constants",
-            "the old server schema strips additive placement without changing legacy fields",
-            "the current schema accepts the old request with placement omitted"
           ]
         },
         {
@@ -6442,15 +6432,6 @@
           "result": "passed",
           "durationSeconds": 48.8,
           "summary": "Two fresh-build production journeys passed against isolated headed Electron and real headless orca serve hosts, including client ownership, visible retained content, automation, no screencast, new-page-only kill switch, and server fallback without duplicate execution."
-        },
-        {
-          "date": "2026-08-16",
-          "runner": "local",
-          "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/cross-version-wire/cross-version-browser-placement.unit.test.ts",
-          "result": "passed",
-          "durationSeconds": 0.23,
-          "summary": "Three assertions passed against published v1.4.182 and the current tree: the release lacks the negotiated capabilities, strips additive placement without changing legacy fields, and the current server preserves an old request with omitted placement."
         },
         {
           "date": "2026-08-16",
@@ -6904,7 +6885,6 @@
       "oracle": "Run one fixed child-TUI journey for normal exit and cleanup-free SIGKILL. Assert renderer and host normal-buffer/non-mouse state, host snapshot terminalOwner metadata, exact PTY writes with no post-exit mouse report, unrelated-pane survival, post-boundary prompt output preserved (normal exit), ordered proof invalidation, bounded settlement and bail-out flush, one inspection per unclean episode with zero scans for ordinary output, split-escape safety at every chunk boundary, and old/new client-host fallback parity.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/main/daemon/terminal-shell-lifecycle-scanner.test.ts src/main/daemon/terminal-shell-recovery-barrier.test.ts src/main/daemon/session-shell-recovery.test.ts src/main/daemon/session.test.ts src/main/daemon/terminal-host-concurrent-create.test.ts src/main/daemon/daemon-pty-adapter.test.ts src/main/daemon/daemon-restore-scrollback-depth.test.ts src/main/daemon/terminal-checkpoint-serializer.test.ts src/main/providers/agent-foreground-process.test.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/mobile-subscribe-integration.test.ts src/main/runtime/rpc/terminal-multiplex-escape-tail.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-codex-queries.test.ts src/renderer/src/components/terminal-pane/pty-connection-reattach-mode-reset.test.ts src/renderer/src/components/terminal-pane/pty-connection-daemon-snapshot-replay.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-snapshot-escape-tail.test.ts src/shared/terminal-partial-escape-tail.test.ts src/shared/terminal-partial-escape-tail.fuzz.test.ts --reporter=dot",
-        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/cross-version-wire/cross-version-terminal-wire.unit.test.ts --reporter=dot",
         "pnpm exec electron-vite build --mode e2e",
         "SKIP_BUILD=1 pnpm exec playwright test tests/e2e/terminal-hidden-child-tui-kill-mode-reset.spec.ts --config tests/playwright.config.ts --project electron-headless --workers=1"
       ],
@@ -6927,7 +6907,6 @@
         "src/renderer/src/components/terminal-pane/remote-runtime-pty-snapshot-escape-tail.test.ts",
         "src/shared/terminal-partial-escape-tail.test.ts",
         "src/shared/terminal-partial-escape-tail.fuzz.test.ts",
-        "tests/e2e/cross-version-wire/cross-version-terminal-wire.unit.test.ts",
         "tests/e2e/terminal-hidden-child-tui-kill-mode-reset.spec.ts"
       ],
       "assertionRefs": [
@@ -18082,102 +18061,6 @@
         "The live topology uses an SSH Git worktree; folder-workspace behavior is covered by target-scoped renderer reconciliation rather than a second headed topology."
       ],
       "demotionRule": "Keep experimental or demote if same-authority snapshots can overwrite newer pushes, reconnect silently loses persisted intent, one forward operation disturbs unrelated forwards, live HTTP diverges from renderer/main inventory, or either transport topology flakes without an identified product or harness fault."
-    },
-    {
-      "id": "remote-wire.cross-version-terminal-journey",
-      "title": "A released client and a current server still complete one terminal journey in both skew directions",
-      "maturity": "experimental",
-      "protection": "partial",
-      "owner": "remote-runtime",
-      "layer": "cross-version-protocol-integration",
-      "surfaces": [
-        "terminal binary stream framing",
-        "terminal multiplex subscribe handshake and capability negotiation",
-        "host-published snapshot and output projection",
-        "remote terminal reconnect"
-      ],
-      "platforms": ["macos", "linux", "windows"],
-      "providers": ["paired-runtime"],
-      "coveredPlatforms": ["macos"],
-      "coveredProviders": ["paired-runtime"],
-      "coverageNotes": "Loads the real host RPC methods, real RpcDispatcher, real renderer terminal multiplexer, and codecs from the current working tree, exact pre-fix main, newest release tag, and the pinned reported 1.4.192-client/1.4.191-host commits. In-process transport reproduces production frame routing, including decoder-rejected opcodes. Covers the terminal stream only; session tabs, agent publications, file/Git RPCs, mobile E2EE framing, and relay transport are uncovered.",
-      "motivatingLinks": [
-        "https://github.com/stablyai/orca/pull/12641",
-        "https://github.com/stablyai/orca/pull/12655"
-      ],
-      "invariant": "A client and a server built from different releases must complete subscribe, input delivery to the process, hide/reveal buffer snapshot, transport drop, and resubscribe with no frame refused by the receiving build's decoder, the same negotiated capabilities, and the same published snapshot content — so a new optional field stays safe, a new opcode is only sent after negotiation, and a change in what the host publishes is visible before release.",
-      "oracle": "Run one fixed journey per general pairing (old client/new server, new client/old server, and current/current) plus the pinned reported pair, exact pre-fix main control, and candidate controls. Assert exact frames, subscriptions, input, rendered snapshot/live content, and zero decoder rejects or missing host methods. The reported and pre-fix-main clients must render blank after discarding the nonempty lossy initial image; candidate pairings must paint it once, recover the first post-snapshot sequence gap, and resume contiguous live output once.",
-      "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/cross-version-wire/cross-version-terminal-wire.unit.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/cross-version-wire/reported-lossy-initial-snapshot.unit.test.ts"
-      ],
-      "testFiles": [
-        "tests/e2e/cross-version-wire/cross-version-terminal-wire.unit.test.ts",
-        "tests/e2e/cross-version-wire/reported-lossy-initial-snapshot.unit.test.ts"
-      ],
-      "assertionRefs": [
-        {
-          "file": "tests/e2e/cross-version-wire/cross-version-terminal-wire.unit.test.ts",
-          "assertions": [
-            "expect(record.completed).toEqual([...JOURNEY_STEPS])",
-            "expect(record.frameSequence).toEqual(EXPECTED_JOURNEY_FRAMES)",
-            "expect(record.rejected).toEqual([])",
-            "expect(record.inputAtProcess).toEqual([JOURNEY_INPUTS.first, JOURNEY_INPUTS.second])",
-            "expect(event.capabilities).toEqual({ outputPause: 1 })"
-          ]
-        },
-        {
-          "file": "tests/e2e/cross-version-wire/reported-lossy-initial-snapshot.unit.test.ts",
-          "assertions": [
-            "the reported 1.4.192 client discards the reported 1.4.191 host's nonempty lossy snapshot",
-            "the exact pre-fix main client reproduces the same blank rendered terminal",
-            "the candidate client paints that old-host image exactly once and resumes live output",
-            "the candidate client paints the candidate-host image exactly once and resumes live output",
-            "both candidate pairings report zero decoder rejects and missing runtime methods"
-          ]
-        }
-      ],
-      "evidenceRuns": [
-        {
-          "date": "2026-08-05",
-          "runner": "local",
-          "platform": "macos",
-          "result": "passed",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/cross-version-wire/cross-version-terminal-wire.unit.test.ts",
-          "durationSeconds": 6,
-          "summary": "v1.4.169 against working tree c4d5a535f2; all three pairings produced the identical 16-frame journey with zero rejected frames."
-        }
-      ],
-      "runtimeBudget": {
-        "p95Seconds": 180,
-        "scope": "four historical checkout extractions plus seven in-process pairings"
-      },
-      "flakeHistory": {
-        "status": "not-started",
-        "evidence": "New gate; no soak history yet. The journey uses observed-state barriers only, with no sleeps or elapsed-time oracles."
-      },
-      "redGreenEvidence": {
-        "status": "complete",
-        "evidence": "Red proven separately for each rule by injecting the violation into the working tree and reverting it. Rule 2: adding opcode 17 and sending it ungated from the client turned new-client/old-server red with rejected rawOpcode 17 in the client-to-host direction, while old-client/new-server stayed green. Rule 3: making the host stop publishing the snapshot `source` field turned both new-server pairings red and left the old-server pairing green; trimming the published initial buffer removed the SnapshotChunk frame and failed the frame-sequence oracle. Rule 1: adding an optional `hiddenOutputReason` field to the snapshot frame kept all pairings green, and making the client require that field turned only new-client/old-server red."
-      },
-      "performanceBudget": {
-        "required": true,
-        "evidence": "Product reconciliation adds one existing-target comparison per completed snapshot and no timer, polling, subscription, provider call, scan, or subprocess. The test-only host hook adds one environment read per initial subscribe. Extracted trees are cached by commit."
-      },
-      "promotionCriteria": [
-        "Extend the matrix beyond the newest stable release and pinned reported pair.",
-        "Cover a second wire surface, starting with the session-tab sync channel that PR #12641 changed.",
-        "Collect 100 consecutive CI passes on the dedicated cross-version-wire job.",
-        "Run the job on Linux and Windows runners, not only macOS locally."
-      ],
-      "knownGaps": [
-        "Only the terminal stream is covered; session tabs, agent sessions, file/Git RPCs, mobile E2EE framing, and the relay transport are not.",
-        "The newest stable release and pinned reported pair do not expose every intermediate regression.",
-        "The host runtime is a stub around a fake PTY, so real PTY, daemon, and SSH provider behavior is out of scope.",
-        "The baseline is the newest release tag by default, so the compared pair changes when a new release is cut unless ORCA_CROSS_VERSION_BASELINE_REF pins it.",
-        "tests/ is outside every tsconfig include, so the harness is linted and executed but not typechecked."
-      ],
-      "demotionRule": "Demote if the baseline checkout cannot be materialized in CI, if a pairing has to be skipped to keep the lane green, or if the journey stops asserting the full step list and frame sequence."
     },
     {
       "id": "codex.state-db-backfill-recovery-bounds",
