@@ -1,23 +1,11 @@
-import type { UISlice, UISliceGet, UISliceSet } from './ui-slice-contract'
+import type { UISlice, UISliceSet } from './ui-slice-contract'
 import {
   DEFAULT_BROWSER_PAGE_ZOOM_LEVEL,
   normalizeBrowserPageZoomLevel
 } from '../../../../../shared/browser-page-zoom'
 import { normalizeKagiSessionLink } from '../../../../../shared/browser-url'
-export function createUiUpdateActions(set: UISliceSet, get: UISliceGet): Partial<UISlice> {
+export function createUiUpdateActions(set: UISliceSet): Partial<UISlice> {
   return {
-    dismissedUnexpectedSignoutVersion: null,
-    unexpectedSignoutDismissedVersions: [],
-    dismissUnexpectedSignoutCard: (version) => {
-      if (get().unexpectedSignoutDismissedVersions.includes(version)) {
-        return
-      }
-      set({
-        dismissedUnexpectedSignoutVersion: version,
-        unexpectedSignoutDismissedVersions: [...get().unexpectedSignoutDismissedVersions, version]
-      })
-      void window.api.ui.set({ dismissedUnexpectedSignoutVersion: version }).catch(console.error)
-    },
     osc52ClipboardDefaultOnNoticePending: false,
     clearOsc52ClipboardDefaultOnNotice: () => {
       // Why clear locally first: a failed persist must not re-toast this session. It will

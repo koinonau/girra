@@ -6,19 +6,13 @@ import {
   renameSync,
   writeFileSync
 } from 'node:fs'
-import { randomUUID } from 'node:crypto'
 import { dirname } from 'node:path'
 import { bestEffortFsyncDirectorySync, fsyncFileSync } from '../../shared/secure-file'
-import type { GlobalSettings } from '../../shared/global-settings-types'
 import {
   createDefaultLocalOrcaProfile,
   DEFAULT_LOCAL_ORCA_PROFILE_ID,
-  DEFAULT_LOCAL_ORCA_PROFILE_NAME,
   ORCA_PROFILE_INDEX_SCHEMA_VERSION,
-  type CreateLocalOrcaProfileArgs,
-  type CreateLocalOrcaProfileResult,
   type OrcaProfileIndex,
-  type OrcaProfileListState,
   type OrcaProfileSummary
 } from '../../shared/orca-profiles'
 import {
@@ -34,14 +28,7 @@ import {
   profileBackupPath
 } from './profile-storage-paths'
 
-export {
-  getOrcaProfileBrowserSessionMetaFile,
-  getOrcaProfileDataFile,
-  getOrcaProfileDirectory,
-  getOrcaProfileIndexPath,
-  getOrcaProfilesDirectory,
-  initOrcaProfilePaths
-} from './profile-storage-paths'
+export { getOrcaProfileIndexPath, initOrcaProfilePaths } from './profile-storage-paths'
 
 export type ActiveOrcaProfileState = {
   index: OrcaProfileIndex
@@ -97,11 +84,6 @@ function normalizeProfileIndex(raw: unknown): OrcaProfileIndex | null {
     activeProfileId,
     profiles
   }
-}
-
-function sanitizeProfileName(value: unknown): string {
-  const trimmed = typeof value === 'string' ? value.trim() : ''
-  return trimmed.length > 0 ? trimmed.slice(0, 80) : 'New Profile'
 }
 
 function readProfileIndexFile(indexPath: string): OrcaProfileIndex | null {
@@ -160,28 +142,6 @@ function copyLegacyStateToProfile(userDataPath: string, profileId: string): void
   }
 }
 
-// Why: a brand-new profile has no data file, which the telemetry cohort
-// migration reads as a fresh install and defaults to opted-in. Copying the
-// active profile's consent block keeps an opted-out user opted out (and keeps
-// one installId per install) when they create additional profiles.
-export function seedNewOrcaProfileTelemetryConsent(
-  profileId: string,
-  telemetry: GlobalSettings['telemetry'],
-  userDataPath = getProfileUserDataPath()
-): void {
-  if (!telemetry) {
-    return
-  }
-  const dataFile = getOrcaProfileDataFile(profileId, userDataPath)
-  if (existsSync(dataFile)) {
-    return
-  }
-  mkdirSync(dirname(dataFile), { recursive: true })
-  const tmpPath = `${dataFile}.tmp`
-  writeFileSync(tmpPath, JSON.stringify({ settings: { telemetry } }, null, 2), 'utf-8')
-  renameSync(tmpPath, dataFile)
-}
-
 function createInitialProfileIndex(now = Date.now()): OrcaProfileIndex {
   const profile = createDefaultLocalOrcaProfile(now)
   return {
@@ -189,17 +149,6 @@ function createInitialProfileIndex(now = Date.now()): OrcaProfileIndex {
     activeProfileId: profile.id,
     profiles: [profile]
   }
-}
-
-export function loadOrCreateProfileIndex(userDataPath: string): OrcaProfileIndex {
-  const indexPath = getOrcaProfileIndexPath(userDataPath)
-  const index = existsSync(indexPath) ? readProfileIndex(indexPath) : null
-  if (index) {
-    return index
-  }
-  const nextIndex = createInitialProfileIndex()
-  writeProfileIndex(indexPath, nextIndex)
-  return nextIndex
 }
 
 function getActiveProfile(index: OrcaProfileIndex): OrcaProfileSummary {
@@ -243,88 +192,5 @@ export function ensureActiveOrcaProfile(
     profile: activeProfile,
     dataFile: getOrcaProfileDataFile(activeProfile.id, userDataPath),
     profileDirectory
-  }
-}
-
-export function isDefaultLocalOrcaProfileId(profileId: string): boolean {
-  return profileId === DEFAULT_LOCAL_ORCA_PROFILE_ID
-}
-
-export function getOrcaProfileListState(
-  userDataPath = getProfileUserDataPath()
-): OrcaProfileListState {
-  const { index } = ensureActiveOrcaProfile(userDataPath)
-  return {
-    activeProfileId: index.activeProfileId,
-    profiles: index.profiles
-  }
-}
-
-export function createLocalOrcaProfile(
-  args: CreateLocalOrcaProfileArgs = {},
-  userDataPath = getProfileUserDataPath()
-): CreateLocalOrcaProfileResult {
-  const index = loadOrCreateProfileIndex(userDataPath)
-  const now = Date.now()
-  const name = sanitizeProfileName(args.name)
-  const profile: OrcaProfileSummary = {
-    id: `local-${randomUUID()}`,
-    name,
-    avatar: {
-      kind: 'initials',
-      initials: (
-        name.match(/[A-Za-z0-9]/)?.[0] ?? DEFAULT_LOCAL_ORCA_PROFILE_NAME[0]
-      ).toUpperCase(),
-      color: 'neutral'
-    },
-    kind: 'local',
-    createdAt: now,
-    updatedAt: now,
-    lastOpenedAt: now
-  }
-  const nextIndex: OrcaProfileIndex = {
-    ...index,
-    profiles: [...index.profiles, profile]
-  }
-  mkdirSync(getOrcaProfileDirectory(profile.id, userDataPath), { recursive: true })
-  writeProfileIndex(getOrcaProfileIndexPath(userDataPath), nextIndex)
-  return {
-    activeProfileId: nextIndex.activeProfileId,
-    profiles: nextIndex.profiles,
-    profile
-  }
-}
-
-export function setActiveOrcaProfile(
-  profileId: string,
-  userDataPath = getProfileUserDataPath()
-): OrcaProfileListState {
-  const index = loadOrCreateProfileIndex(userDataPath)
-  const now = Date.now()
-  let found = false
-  const profiles = index.profiles.map((profile) => {
-    if (profile.id !== profileId) {
-      return profile
-    }
-    found = true
-    return {
-      ...profile,
-      updatedAt: now,
-      lastOpenedAt: now
-    }
-  })
-  if (!found) {
-    throw new Error('unknown_orca_profile')
-  }
-  const nextIndex: OrcaProfileIndex = {
-    ...index,
-    activeProfileId: profileId,
-    profiles
-  }
-  mkdirSync(getOrcaProfileDirectory(profileId, userDataPath), { recursive: true })
-  writeProfileIndex(getOrcaProfileIndexPath(userDataPath), nextIndex)
-  return {
-    activeProfileId: nextIndex.activeProfileId,
-    profiles: nextIndex.profiles
   }
 }

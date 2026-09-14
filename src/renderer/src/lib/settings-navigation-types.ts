@@ -39,7 +39,6 @@ const SETTINGS_NAV_TARGETS = [
   'agents',
   'orchestration',
   'automations',
-  'orca-account',
   'linear',
   'setup-guide',
   'servers',

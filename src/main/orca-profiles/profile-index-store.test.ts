@@ -118,46 +118,6 @@ describe('profile index store', () => {
     expect(readJson(activeProfile.dataFile)).toEqual(profileData)
   })
 
-  it('creates an empty local profile without copying legacy state into it', async () => {
-    writeFileSync(
-      join(testState.dir, 'orca-data.json'),
-      JSON.stringify({ schemaVersion: 1, repos: [{ id: 'legacy-repo' }] }),
-      'utf-8'
-    )
-
-    const { createLocalOrcaProfile, getOrcaProfileDataFile, getOrcaProfileListState } =
-      await loadProfileIndexStore()
-    const created = createLocalOrcaProfile({ name: ' Work ' })
-
-    expect(created.profile.name).toBe('Work')
-    expect(created.profile.id).toMatch(/^local-/)
-    expect(created.activeProfileId).toBe(DEFAULT_LOCAL_ORCA_PROFILE_ID)
-    expect(created.profiles.map((profile) => profile.id)).toContain(created.profile.id)
-    expect(existsSync(getOrcaProfileDataFile(created.profile.id))).toBe(false)
-    expect(getOrcaProfileListState().profiles.map((profile) => profile.id)).toContain(
-      created.profile.id
-    )
-  })
-
-  it('switches the active profile and updates last-opened metadata', async () => {
-    const { createLocalOrcaProfile, setActiveOrcaProfile } = await loadProfileIndexStore()
-    const created = createLocalOrcaProfile({ name: 'Work' })
-
-    const switched = setActiveOrcaProfile(created.profile.id)
-
-    expect(switched.activeProfileId).toBe(created.profile.id)
-    expect(switched.profiles.find((profile) => profile.id === created.profile.id)).toMatchObject({
-      id: created.profile.id,
-      lastOpenedAt: expect.any(Number)
-    })
-  })
-
-  it('rejects switching to an unknown profile', async () => {
-    const { setActiveOrcaProfile } = await loadProfileIndexStore()
-
-    expect(() => setActiveOrcaProfile('missing-profile')).toThrow('unknown_orca_profile')
-  })
-
   const posixIt = process.platform === 'win32' ? it.skip : it
   posixIt('writes a fresh profile index when umask removes owner-write permission', async () => {
     const store = await loadProfileIndexStore()
@@ -181,18 +141,23 @@ describe('profile index store', () => {
 
   it('recovers a corrupted profile index from the backup copy', async () => {
     const store = await loadProfileIndexStore()
-    store.ensureActiveOrcaProfile()
-    const created = store.createLocalOrcaProfile({ name: 'Work' })
-    // Trigger one more write so the backup captures the two-profile index.
-    store.setActiveOrcaProfile(created.profile.id)
-
     const indexPath = store.getOrcaProfileIndexPath()
+    const profile = createDefaultLocalOrcaProfile(1)
+    const index: OrcaProfileIndex = {
+      schemaVersion: ORCA_PROFILE_INDEX_SCHEMA_VERSION,
+      activeProfileId: profile.id,
+      profiles: [profile, { ...profile, id: 'work', name: 'Work' }]
+    }
+    store.writeProfileIndex(indexPath, index)
+    // Why a second write: only a write over a parseable index refreshes the backup.
+    store.writeProfileIndex(indexPath, index)
     expect(existsSync(`${indexPath}.bak`)).toBe(true)
     writeFileSync(indexPath, '{ not json', 'utf-8')
 
-    const recovered = store.getOrcaProfileListState()
-    expect(recovered.profiles.map((profile) => profile.id)).toContain(created.profile.id)
-    expect(recovered.profiles.length).toBeGreaterThanOrEqual(2)
+    expect(store.readProfileIndex(indexPath)?.profiles.map((entry) => entry.id)).toEqual([
+      profile.id,
+      'work'
+    ])
   })
 
   it('rejects profile ids that are not safe path segments', async () => {

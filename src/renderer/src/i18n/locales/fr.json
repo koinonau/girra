@@ -362,8 +362,6 @@
           "6d3318e813": "Échec de l'import des dépôts",
           "3be0f7df04": "Impossible d'ouvrir le dossier sur le runtime sélectionné",
           "15cf5319ec": "{{path}} a été vérifié sur {{hostName}}, mais cet hôte n'a pas signalé de dossier exploitable.",
-          "2dcd706774": "Le projet existe aussi dans un autre profil",
-          "presenceProfileOverflow": "{{names}} +{{count}} autres",
           "removeProjectFailed": "Échec de la suppression du projet"
         },
         "settings": {
@@ -379,24 +377,6 @@
         },
         "linear": {
           "37d36984d0": "La connexion Linear a été remplacée par une requête plus récente."
-        },
-        "orca": {
-          "profiles": {
-            "612f7f6861": "Échec de la création du profil",
-            "319d7cf39b": "Profil cloud créé",
-            "d6e764e7db": "Reconnecter ce profil",
-            "f0c9e11a6d": "Échec de la création du profil cloud",
-            "8b8fa73174": "La connexion à Orca Cloud n'est pas configurée",
-            "33290e88ed": "Échec de la connexion du profil",
-            "9fcb07a796": "Profil connecté",
-            "2f6c78a039": "Échec de l'actualisation de l'authentification du profil",
-            "a37b5e6d37": "Déconnecté du profil",
-            "83600521e7": "Échec de la déconnexion",
-            "76deec8f58": "Échec du changement d'organisation",
-            "7d4bc516ee": "Échec du changement de profil",
-            "f518e89aa5": "Le projet existe déjà dans ce profil",
-            "f03ae7f27b": "Échec du transfert du projet"
-          }
         },
         "runtime": {
           "status": {
@@ -9978,14 +9958,7 @@
           "behindBaseRefToastDescription": "Invite persistante avec un lien Paramètres intégré et une action en pied de page.",
           "notificationPlayground": "Terrain d'essai des notifications",
           "notificationPlaygroundDescription": "Déclencheurs réservés au développement pour vérifier la disposition des toasts, les actions de récupération et le retour à la ligne des textes longs.",
-          "devOnly": "Réservé au développement",
-          "orcaCloud": "Orca Cloud",
-          "orcaCloudDescription": "Aperçu réservé au développement de la connexion au cloud officiel. Masqué en production ; en dev, il apparaît aussi dans le sélecteur de comptes de la barre latérale dès que ORCA_CLOUD_API_URL et ORCA_CLOUD_CLIENT_ID sont définis.",
-          "orcaCloudStatus": "Statut",
-          "orcaCloudSignOut": "Se déconnecter",
-          "orcaCloudConnect": "Connecter le profil",
-          "orcaCloudRefresh": "Actualiser le statut",
-          "orcaCloudNotConfigured": "Définissez ORCA_CLOUD_API_URL et ORCA_CLOUD_CLIENT_ID pour prévisualiser la connexion à Orca Cloud dans ce build de développement."
+          "devOnly": "Réservé au développement"
         },
         "EphemeralVmRecipeRow": {
           "useInWorkspace": "Utiliser dans l'espace de travail"
@@ -10555,28 +10528,6 @@
           "connected": "Connecté",
           "signInRequired": "La connexion est requise pour téléverser et gérer les artifacts.",
           "openArtifactsDescription": "Consultez et supprimez les liens partagés via votre compte."
-        },
-        "orcaAccount": {
-          "connected": "Connecté",
-          "reconnectRequired": "Votre session a expiré. Reconnectez-vous pour utiliser les fonctions cloud.",
-          "unavailable": "La connexion Orca n'est pas disponible dans ce build.",
-          "signedOut": "Connectez-vous pour étendre Orca avec des fonctions cloud, dont Artifacts et Orca Relay.",
-          "checking": "Vérification de l'état du compte…",
-          "account": "Compte Orca",
-          "signOut": "Se déconnecter",
-          "signingIn": "Connexion…",
-          "signInAgain": "Se reconnecter",
-          "signIn": "Se connecter à Orca",
-          "title": "Compte Orca",
-          "description": "Partagez instantanément votre travail et accédez à votre poste depuis Orca Mobile, où que vous soyez.",
-          "searchDescription": "Connectez-vous ou déconnectez-vous du compte utilisé par Artifacts et Orca Relay.",
-          "benefitsTitle": "Inclus avec votre compte",
-          "artifactsTitle": "Partage d'artifacts",
-          "artifactsDescription": "Publiez des fichiers HTML et Markdown, puis gérez chaque lien partagé depuis Orca.",
-          "relayTitle": "Orca Relay",
-          "relayDescription": "Connectez Orca Mobile à ce poste via réseau mobile ou n'importe quel Wi-Fi.",
-          "skillsTitle": "Partage de skills",
-          "skillsDescription": "Partagez une skill ou tout un ensemble derrière un lien non répertorié, et installez-les sur toutes les machines que vous utilisez."
         },
         "automations": {
           "showButton": "Afficher le bouton Automatisations",
@@ -14788,18 +14739,6 @@
       "nativeChat": {
         "contextMenu": {
           "copy": "Copier"
-        }
-      },
-      "orca": {
-        "profiles": {
-          "signout": {
-            "confirm": {
-              "title": "Se déconnecter d'Orca ?",
-              "description": "Les artifacts et Orca Relay seront indisponibles jusqu'à votre reconnexion. Vos projets et worktrees locaux ne seront pas affectés.",
-              "cancel": "Annuler",
-              "action": "Se déconnecter"
-            }
-          }
         }
       },
       "linear-issue-attribute-filter-dropdowns": {

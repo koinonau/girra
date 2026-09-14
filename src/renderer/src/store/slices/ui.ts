@@ -39,5 +39,5 @@ export const createUISlice: StateCreator<AppState, [], [], UISlice> = (set, get)
     ...createUiSurfaceActions(set, get),
     ...createUiPersistenceActions(set, get),
     ...createUiHydrationActions(set, get),
-    ...createUiUpdateActions(set, get)
+    ...createUiUpdateActions(set)
   }) as UISlice

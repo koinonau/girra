@@ -33,12 +33,11 @@ function ids(
 
 describe('settings navigation metadata', () => {
   it('puts AI capability panes at the top on desktop', () => {
-    expect(ids().slice(0, 9)).toEqual([
+    expect(ids().slice(0, 8)).toEqual([
       'agents',
       'accounts',
       'orchestration',
       'computer-use',
-      'orca-account',
       'setup-guide',
       'general',
       'integrations',
@@ -81,20 +80,6 @@ describe('settings navigation metadata', () => {
 
   it('keeps the Linear capability section available on web clients when connected', () => {
     expect(ids({ isWebClient: true, isLinearConnected: true })).toContain('linear')
-  })
-
-  it('places the Orca account in Set Up on desktop only', () => {
-    const desktopSections = buildSettingsNavigationMetadata({
-      isMac: false,
-      isWindows: false,
-      isWebClient: false,
-      repos: [repo]
-    })
-    const account = desktopSections.find((section) => section.id === 'orca-account')
-
-    expect(account?.group).toBe('setup')
-    expect(account?.searchEntries[0]?.title).toBe('Orca account')
-    expect(ids({ isWebClient: true })).not.toContain('orca-account')
   })
 
   it('puts web-safe AI capability panes at the top while hiding desktop-only panes', () => {

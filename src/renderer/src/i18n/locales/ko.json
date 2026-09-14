@@ -280,9 +280,7 @@
           "a8e4b3af5b": "프로젝트가 이미 추가되었습니다.",
           "6d3318e813": "repos를 가져오지 못했습니다.",
           "3be0f7df04": "선택한 런타임에서 폴더를 열 수 없습니다.",
-          "15cf5319ec": "{{path}}이(가) {{hostName}}에서 확인되었지만 해당 호스트가 사용 가능한 폴더를 보고하지 않았습니다.",
-          "2dcd706774": "프로젝트가 다른 프로필에도 있습니다",
-          "presenceProfileOverflow": "{{names}} 외 {{count}}개"
+          "15cf5319ec": "{{path}}이(가) {{hostName}}에서 확인되었지만 해당 호스트가 사용 가능한 폴더를 보고하지 않았습니다."
         },
         "settings": {
           "e12dab333b": "서버를 전환하지 못했습니다.",
@@ -297,24 +295,6 @@
         },
         "linear": {
           "37d36984d0": "더 새로운 요청이 있어 Linear 연결 요청을 건너뛰었습니다."
-        },
-        "orca": {
-          "profiles": {
-            "612f7f6861": "프로필을 생성하지 못했습니다",
-            "319d7cf39b": "클라우드 프로필이 생성되었습니다",
-            "d6e764e7db": "이 프로필을 다시 연결하세요",
-            "f0c9e11a6d": "클라우드 프로필을 생성하지 못했습니다",
-            "8b8fa73174": "Orca Cloud 로그인이 구성되어 있지 않습니다",
-            "33290e88ed": "프로필을 연결하지 못했습니다",
-            "9fcb07a796": "프로필이 연결되었습니다",
-            "2f6c78a039": "프로필 인증을 새로 고치지 못했습니다",
-            "a37b5e6d37": "프로필에서 로그아웃했습니다",
-            "83600521e7": "로그아웃하지 못했습니다",
-            "76deec8f58": "조직을 전환하지 못했습니다",
-            "7d4bc516ee": "프로필을 전환하지 못했습니다",
-            "f518e89aa5": "프로젝트가 해당 프로필에 이미 있습니다",
-            "f03ae7f27b": "프로젝트를 전송하지 못했습니다"
-          }
         }
       }
     },
@@ -9362,14 +9342,7 @@
           "behindBaseRefToastDescription": "인라인 설정 링크와 바닥글 작업이 있는 영구 프롬프트입니다.",
           "notificationPlayground": "Notification playground",
           "notificationPlaygroundDescription": "토스트 레이아웃, 복구 액션, 긴 텍스트 줄바꿈을 확인하기 위한 개발 전용 트리거입니다.",
-          "devOnly": "Dev only",
-          "orcaCloud": "Orca Cloud",
-          "orcaCloudDescription": "자사 클라우드 로그인의 개발자 전용 미리보기. 프로덕션에서는 숨겨집니다. 개발 환경에서는 ORCA_CLOUD_API_URL과 ORCA_CLOUD_CLIENT_ID가 설정되면 사이드바 계정 전환기에도 표시됩니다.",
-          "orcaCloudStatus": "상태",
-          "orcaCloudSignOut": "로그아웃",
-          "orcaCloudConnect": "프로필 연결",
-          "orcaCloudRefresh": "상태 새로고침",
-          "orcaCloudNotConfigured": "ORCA_CLOUD_API_URL과 ORCA_CLOUD_CLIENT_ID를 설정하여 이 개발 빌드에서 Orca Cloud 로그인을 미리보세요."
+          "devOnly": "Dev only"
         },
         "EphemeralVmRecipeRow": {
           "useInWorkspace": "워크스페이스에서 사용"
@@ -9921,28 +9894,6 @@
           "saveFailed": "가시성 기본값을 저장할 수 없습니다.",
           "updateServer": "소스 기본값을 구성하려면 이 서버를 업데이트하세요.",
           "updateServerDefaults": "표시 기본값을 구성하려면 이 서버를 업데이트하세요."
-        },
-        "orcaAccount": {
-          "connected": "연결됨",
-          "reconnectRequired": "세션이 만료되었습니다. 클라우드 기능을 사용하려면 다시 로그인하세요.",
-          "unavailable": "이 빌드에서는 Orca 로그인을 사용할 수 없습니다.",
-          "signedOut": "로그인하여 아티팩트 및 Orca Relay를 비롯한 클라우드 기능으로 Orca를 확장하세요.",
-          "checking": "계정 상태 확인 중…",
-          "account": "Orca 계정",
-          "signOut": "로그아웃",
-          "signingIn": "로그인 중…",
-          "signInAgain": "다시 로그인",
-          "signIn": "Orca 로그인",
-          "title": "Orca 계정",
-          "description": "작업을 즉시 공유하고 어디서나 Orca Mobile로 데스크톱에 연결하세요.",
-          "searchDescription": "아티팩트 및 Orca Relay에서 사용하는 계정에 로그인하거나 로그아웃합니다.",
-          "benefitsTitle": "계정에 포함된 기능",
-          "artifactsTitle": "아티팩트 공유",
-          "artifactsDescription": "HTML 및 Markdown 파일을 게시하고 Orca에서 모든 공유 링크를 관리합니다.",
-          "relayTitle": "Orca Relay",
-          "relayDescription": "셀룰러 또는 모든 Wi-Fi 네트워크를 통해 Orca Mobile을 이 데스크톱에 연결합니다.",
-          "skillsTitle": "스킬 공유",
-          "skillsDescription": "단일 스킬 또는 전체 세트를 비공개 링크로 공유하고 사용하는 모든 기기에 설치하세요."
         },
         "automations": {
           "title": "자동화",
@@ -13929,18 +13880,6 @@
       "nativeChat": {
         "contextMenu": {
           "copy": "복사"
-        }
-      },
-      "orca": {
-        "profiles": {
-          "signout": {
-            "confirm": {
-              "title": "Orca에서 로그아웃할까요?",
-              "description": "이 기기의 Orca에서 로그아웃됩니다. 로컬 프로젝트와 워크트리에는 영향을 주지 않습니다.",
-              "cancel": "취소",
-              "action": "로그아웃"
-            }
-          }
         }
       },
       "linear-issue-attribute-filter-dropdowns": {

@@ -589,9 +589,6 @@ describe('Electron runtime package contract', () => {
       '@windows-fresh-startup-golden'
     )
     expect(packageScripts['test:e2e:posix-profile-index-golden']).toContain(
-      'golden-posix-profile-index-fsync.spec.ts'
-    )
-    expect(packageScripts['test:e2e:posix-profile-index-golden']).toContain(
       'golden-posix-fresh-startup.spec.ts'
     )
     expect(packageScripts['test:e2e:posix-profile-index-golden']).toContain(

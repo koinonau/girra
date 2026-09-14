@@ -4,15 +4,12 @@ import { CLIENT_HOSTED_BROWSER_PAGE_RECORD_VERSION } from '../../shared/client-h
 import type { PersistedClientHostedBrowserPage } from '../../shared/client-hosted-browser-page-record'
 import type { WorkspaceSessionState } from '../../shared/workspace-session-state-types'
 import {
-  SESSION_FIELDS_COPIED_BY_OWNER_KEY,
   SESSION_FIELDS_PRUNED_BY_OWNER_KEY,
   WORKSPACE_SESSION_FIELD_DISPOSITION
 } from './profile-project-session-field-disposition'
 import { removeRepoFromWorkspaceSession } from './profile-project-session-state'
-import { extractSessionForTransfer } from './profile-project-session-transfer'
 
 const REMOVED_REPO_ID = 'repo-1'
-const TRANSFER_TARGET_REPO_ID = 'repo-3'
 const REMOVED_WORKTREE_ID = 'repo-1::/tmp/worktree-a'
 const RETAINED_WORKTREE_ID = 'repo-2::/tmp/worktree-b'
 
@@ -43,7 +40,7 @@ function sessionWithClientHostedRows(): WorkspaceSessionState {
   }
 }
 
-describe('client-hosted rows in the repo-removal and transfer paths', () => {
+describe('client-hosted rows in the repo-removal path', () => {
   it('drops a removed repo client-hosted rows and keeps another repo', () => {
     const result = removeRepoFromWorkspaceSession(sessionWithClientHostedRows(), REMOVED_REPO_ID)
 
@@ -52,27 +49,6 @@ describe('client-hosted rows in the repo-removal and transfer paths', () => {
     })
     // The sibling map is the control: whatever removal does to it, it must do here too.
     expect(result.activeTabTypeByWorktree).toEqual({ [RETAINED_WORKTREE_ID]: 'browser' })
-  })
-
-  it('leaves client-hosted rows behind on transfer while a sibling map is rekeyed', () => {
-    const result = extractSessionForTransfer(
-      sessionWithClientHostedRows(),
-      REMOVED_REPO_ID,
-      TRANSFER_TARGET_REPO_ID
-    )
-
-    expect(result.activeTabTypeByWorktree).toEqual({ 'repo-3::/tmp/worktree-a': 'browser' })
-    // Not an omission: the rows name a paired device and browser profile the payload cannot carry.
-    expect(result.clientHostedBrowserPagesByWorktree).toBeUndefined()
-  })
-
-  it('removes the transferred repo rows from the source it left', () => {
-    const source = removeRepoFromWorkspaceSession(
-      sessionWithClientHostedRows(),
-      REMOVED_REPO_ID
-    ).clientHostedBrowserPagesByWorktree
-
-    expect(source?.[REMOVED_WORKTREE_ID]).toBeUndefined()
   })
 })
 
@@ -100,36 +76,6 @@ describe('workspace session field disposition census', () => {
     }
   )
 
-  it.each(SESSION_FIELDS_COPIED_BY_OWNER_KEY)(
-    'rekeys %s onto the target repo and carries nothing else',
-    (field) => {
-      const result = extractSessionForTransfer(
-        ownerKeyedSeed(field),
-        REMOVED_REPO_ID,
-        TRANSFER_TARGET_REPO_ID
-      ) as Record<string, unknown>
-
-      expect(result[field]).toEqual({ 'repo-3::/tmp/worktree-a': 'removed-value' })
-    }
-  )
-
-  const notTransferredFields = (
-    Object.keys(WORKSPACE_SESSION_FIELD_DISPOSITION) as (keyof WorkspaceSessionState)[]
-  ).filter((field) => WORKSPACE_SESSION_FIELD_DISPOSITION[field].onTransfer === 'notTransferred')
-
-  it.each(notTransferredFields)('leaves %s behind on transfer', (field) => {
-    const session = { ...getDefaultWorkspaceSession() } as Record<string, unknown>
-    session[field] = { [REMOVED_WORKTREE_ID]: 'source-only-value' }
-
-    const result = extractSessionForTransfer(
-      session as WorkspaceSessionState,
-      REMOVED_REPO_ID,
-      TRANSFER_TARGET_REPO_ID
-    ) as Record<string, unknown>
-
-    expect(result[field]).toEqual((getDefaultWorkspaceSession() as Record<string, unknown>)[field])
-  })
-
   // Why spelled out rather than derived: every other test here iterates these lists, so a field
   // quietly reclassified loses its pruning and its test case together and the suite stays green.
   // Reclassifying now means editing this array, which is a reviewed change.
@@ -143,20 +89,6 @@ describe('workspace session field disposition census', () => {
       'activeTabIdByWorktree',
       'unifiedTabs',
       'tabGroups',
-      'tabGroupLayouts',
-      'activeGroupIdByWorktree',
-      'lastVisitedAtByWorktreeId',
-      'defaultTerminalTabsAppliedByWorktreeId',
-      'terminalTopologyRevisionByRepoId'
-    ])
-  })
-
-  it('copies exactly these fields by owner key on transfer', () => {
-    expect(SESSION_FIELDS_COPIED_BY_OWNER_KEY).toEqual([
-      'activeFileIdByWorktree',
-      'activeBrowserTabIdByWorktree',
-      'activeTabTypeByWorktree',
-      'activeTabIdByWorktree',
       'tabGroupLayouts',
       'activeGroupIdByWorktree',
       'lastVisitedAtByWorktreeId',

@@ -21,7 +21,6 @@ describe('web preload API composition', () => {
       'app',
       'platform',
       'workspacePorts',
-      'orcaProfiles',
       'e2e',
       'settings',
       'agentAwake',

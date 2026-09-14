@@ -1,11 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { getDefaultWorkspaceSession } from '../../shared/constants'
-import type { WorkspaceSessionState } from '../../shared/workspace-session-state-types'
 import {
   mergeWorkspaceSessions,
   removeRepoFromWorkspaceSession
 } from './profile-project-session-state'
-import { extractSessionForTransfer } from './profile-project-session-transfer'
 
 const REMOVED_WORKTREE_ID = 'repo-a::/removed'
 const RETAINED_WORKTREE_ID = 'repo-b::/retained'
@@ -37,102 +35,6 @@ describe('profile project session state', () => {
     expect(result.terminalPtyIncarnationsByPaneKey).toEqual({
       'base-tab:leaf': 'base-incarnation',
       'incoming-tab:leaf': 'incoming-incarnation'
-    })
-  })
-
-  it('rekeys terminal membership authority during project transfer', () => {
-    const session = {
-      ...getDefaultWorkspaceSession(),
-      tabsByWorktree: {
-        [REMOVED_WORKTREE_ID]: [
-          {
-            id: 'transferred-tab',
-            worktreeId: REMOVED_WORKTREE_ID,
-            title: 'Transferred',
-            customTitle: null,
-            color: null,
-            sortOrder: 0,
-            createdAt: 1,
-            ptyId: 'transferred-pty'
-          }
-        ]
-      },
-      terminalTopologyRevisionByRepoId: { [REMOVED_REPO_ID]: 6 },
-      terminalPtyIncarnationsByPaneKey: {
-        'transferred-tab:leaf': 'transferred-incarnation'
-      },
-      terminalSurfaceTombstonesByPaneKey: {
-        'retired-tab:leaf': {
-          worktreeId: REMOVED_WORKTREE_ID,
-          parentTabId: 'retired-tab',
-          leafId: 'leaf',
-          ptyId: 'retired-pty',
-          incarnationId: 'retired-incarnation',
-          retiredAt: 1
-        }
-      }
-    }
-
-    const result = extractSessionForTransfer(session, 'repo-a', 'repo-c')
-    const transferredWorktreeId = 'repo-c::/removed'
-
-    expect(result.terminalTopologyRevisionByRepoId).toEqual({ 'repo-c': 6 })
-    expect(result.terminalPtyIncarnationsByPaneKey).toEqual({
-      'transferred-tab:leaf': 'transferred-incarnation'
-    })
-    expect(result.terminalSurfaceTombstonesByPaneKey?.['retired-tab:leaf']?.worktreeId).toBe(
-      transferredWorktreeId
-    )
-  })
-
-  it('rekeys document-preview ownership during project transfer', () => {
-    const session = {
-      ...getDefaultWorkspaceSession(),
-      browserTabsByWorktree: {
-        [REMOVED_WORKTREE_ID]: [
-          {
-            id: 'browser-1',
-            worktreeId: REMOVED_WORKTREE_ID,
-            docLocation: {
-              kind: 'workspace-doc',
-              worktreeId: REMOVED_WORKTREE_ID,
-              filePath: '/removed/docs/report.html'
-            }
-          }
-        ]
-      },
-      browserPagesByWorkspace: {
-        'browser-1': [
-          {
-            id: 'page-1',
-            workspaceId: 'browser-1',
-            worktreeId: REMOVED_WORKTREE_ID,
-            docLocation: {
-              kind: 'workspace-doc',
-              worktreeId: REMOVED_WORKTREE_ID,
-              filePath: '/removed/docs/report.html'
-            }
-          }
-        ]
-      }
-    }
-
-    const result = extractSessionForTransfer(
-      session as unknown as WorkspaceSessionState,
-      REMOVED_REPO_ID,
-      'repo-c'
-    )
-    const transferredWorktreeId = 'repo-c::/removed'
-
-    expect(result.browserTabsByWorktree?.[transferredWorktreeId]?.[0]?.docLocation).toEqual({
-      kind: 'workspace-doc',
-      worktreeId: transferredWorktreeId,
-      filePath: '/removed/docs/report.html'
-    })
-    expect(result.browserPagesByWorkspace?.['browser-1']?.[0]?.docLocation).toEqual({
-      kind: 'workspace-doc',
-      worktreeId: transferredWorktreeId,
-      filePath: '/removed/docs/report.html'
     })
   })
 
