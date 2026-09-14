@@ -264,8 +264,7 @@ export class E2EEChannel {
     }
 
     // Why: transport-bound identity checks must complete before the peer sees
-    // authentication success; relay sockets additionally bind this context to
-    // their immutable relayDeviceId in the resolver.
+    // authentication success.
     this.onReady(this, authenticatedDevice)
     this.sendEncryptedControl(
       this.v2Session

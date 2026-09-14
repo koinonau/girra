@@ -59,16 +59,6 @@ export function createUiViewActions(set: UISliceSet, get: UISliceGet): Partial<U
         activeView: state.previousViewBeforeSkills,
         worktreeNavHistoryIndex: rewindHistoryIndexPastView(state, 'skills')
       })),
-    openMobilePage: () =>
-      set((state) => ({
-        activeView: 'mobile',
-        previousViewBeforeMobile:
-          state.activeView === 'mobile' ? state.previousViewBeforeMobile : state.activeView
-      })),
-    closeMobilePage: () =>
-      set((state) => ({
-        activeView: state.previousViewBeforeMobile
-      })),
     setNewWorkspaceDraft: (draft) => set({ newWorkspaceDraft: draft }),
     clearNewWorkspaceDraft: () => set({ newWorkspaceDraft: null })
   }

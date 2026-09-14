@@ -22,12 +22,6 @@ const AUDITED_GLOBAL_FETCH_LINES = new Map<string, number>([
   ['main/orca-profiles/profile-cloud-client.ts', 1],
   ['main/orca-profiles/profile-cloud-org-members-client.ts', 1],
   ['main/rate-limits/codex-fetcher.ts', 3],
-  ['main/runtime/push/push-gateway-client.ts', 1],
-  ['main/runtime/relay/relay-http-client.ts', 2],
-  ['main/runtime/relay/relay-region-catalog-fetch.ts', 1],
-  // Measurement reuses the audited catalog/probe consumers, which consume or cancel every body.
-  ['main/runtime/relay/relay-region-preference.ts', 3],
-  ['main/runtime/relay/relay-region-probe.ts', 1],
   ['main/source-control/hosted-review-api-request.ts', 1],
   // Main HTTP port: one type declaration plus the Node fallback call. The fallback
   // returns the Response to its caller without inspecting it, so the consume/cancel

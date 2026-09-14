@@ -200,36 +200,6 @@ describeOnWindows('a secure store that exists but cannot be read', () => {
     expect(readFileSync(filePath, 'utf8')).toBe(original)
   })
 
-  it('does not drop pending relay revocations', async () => {
-    const { RelayRevokeOutbox } = await import('./relay/relay-revoke-outbox')
-    const dir = join(root, 'relay')
-    mkdirSync(dir, { recursive: true })
-    const filePath = join(dir, 'mobile-relay-revoke-outbox.json')
-    const original = JSON.stringify([
-      {
-        relayHostId: 'host-1',
-        relayDeviceId: 'device-1',
-        ownerIdentityKey: 'owner-1',
-        reqId: 'req-1',
-        createdAt: 1
-      }
-    ])
-    writeFileSync(filePath, original)
-    makeUnreadable(filePath)
-
-    const outbox = new RelayRevokeOutbox(dir)
-    expect(() =>
-      outbox.enqueue({
-        relayHostId: 'host-2',
-        relayDeviceId: 'device-2',
-        ownerIdentityKey: 'owner-2'
-      })
-    ).toThrow(/Refusing to (regenerate|overwrite)/)
-
-    icacls(filePath, '/reset', '/q')
-    expect(readFileSync(filePath, 'utf8')).toBe(original)
-  })
-
   /**
    * The one site that *deletes* rather than overwrites: a refresh failure plus an unreadable
    * session used to fall past the `status === 'found'` guard into `clearOrcaCloudSession`.

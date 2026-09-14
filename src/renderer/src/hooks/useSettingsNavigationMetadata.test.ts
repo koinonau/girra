@@ -33,7 +33,7 @@ function ids(
 
 describe('settings navigation metadata', () => {
   it('puts AI capability panes at the top on desktop', () => {
-    expect(ids().slice(0, 10)).toEqual([
+    expect(ids().slice(0, 9)).toEqual([
       'agents',
       'accounts',
       'orchestration',
@@ -42,7 +42,6 @@ describe('settings navigation metadata', () => {
       'setup-guide',
       'general',
       'integrations',
-      'mobile',
       'automations'
     ])
   })
@@ -84,17 +83,6 @@ describe('settings navigation metadata', () => {
     expect(ids({ isWebClient: true, isLinearConnected: true })).toContain('linear')
   })
 
-  it('places Mobile under Set Up instead of its own sidebar group', () => {
-    const sections = buildSettingsNavigationMetadata({
-      isMac: false,
-      isWindows: false,
-      isWebClient: false,
-      repos: [repo]
-    })
-
-    expect(sections.find((section) => section.id === 'mobile')?.group).toBe('setup')
-  })
-
   it('places the Orca account in Set Up on desktop only', () => {
     const desktopSections = buildSettingsNavigationMetadata({
       isMac: false,
@@ -131,7 +119,6 @@ describe('settings navigation metadata', () => {
 
     expect(webIds).not.toContain('browser')
     expect(webIds).not.toContain('ssh')
-    expect(webIds).not.toContain('mobile')
     expect(webIds).not.toContain('computer-use')
     expect(webIds).not.toContain('voice')
     expect(webIds).not.toContain('advanced')

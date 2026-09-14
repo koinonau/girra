@@ -1686,13 +1686,6 @@
             }
           }
         },
-        "mobile": {
-          "settings": {
-            "search": {
-              "b730ff7049": "experimental"
-            }
-          }
-        },
         "providerAccountScope": {
           "localMac": "Local Mac"
         },

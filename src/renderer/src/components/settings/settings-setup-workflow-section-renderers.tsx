@@ -1,7 +1,6 @@
 import { AutomationsSettingsPane } from './AutomationsSettingsPane'
 import { GeneralPane } from './GeneralPane'
 import { IntegrationsPane } from './IntegrationsPane'
-import { MobileSettingsPane } from './MobileSettingsPane'
 import { OrcaAccountSettingsPane } from './OrcaAccountSettingsPane'
 import { SettingsSetupGuidePane } from './SettingsSetupGuidePane'
 import { SettingsSection } from './SettingsSection'
@@ -92,26 +91,6 @@ export function renderIntegrationsSettingsSection(
       {view.isSectionMounted('integrations') ? <IntegrationsPane /> : null}
     </SettingsSection>
   )
-}
-
-export function renderMobileSettingsSection(
-  context: SettingsRenderContext
-): React.JSX.Element | null {
-  const { model, navigation, view } = context
-  return model.showDesktopOnlySettings ? (
-    <SettingsSection
-      id="mobile"
-      title={translate('auto.components.settings.Settings.c40dadaac8', 'Mobile')}
-      badge="Beta"
-      description={translate(
-        'auto.components.settings.Settings.c6c01ac209',
-        'Control terminals and agents from your phone.'
-      )}
-      searchEntries={navigation.getSectionSearchEntries('mobile')}
-    >
-      {view.isSectionMounted('mobile') ? <MobileSettingsPane /> : null}
-    </SettingsSection>
-  ) : null
 }
 
 export function renderAutomationsSettingsSection(

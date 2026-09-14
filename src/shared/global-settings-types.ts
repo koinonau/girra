@@ -238,8 +238,6 @@ export type GlobalSettings = {
   nestedWorkerMaxDepth?: number
   /** Only toggles the sidebar shortcut; Skills stay reachable from Settings. */
   showSkillsButton?: boolean
-  /** Only toggles the sidebar shortcut; Orca Mobile stays reachable from Settings. */
-  showMobileButton?: boolean
   /** Pinned workspaces show in one sidebar location by default; opt in to also show them in their natural groups. */
   showPinnedWorktreesInGroups?: boolean
   /** How Ctrl+Tab picks the next visible tab; optional (older profiles), readers default to MRU. */
@@ -409,9 +407,6 @@ export type GlobalSettings = {
    *  `null` (default) holds phone size indefinitely; a finite value schedules restore.
    *  Clamped on read to [5_000ms, 60min]. See docs/mobile-fit-hold.md. */
   mobileAutoRestoreFitMs: number | null
-  /** Preferred mobile pairing path for new QR codes. Missing/'automatic' = Anywhere (Relay + local);
-   *  explicit 'local-only' = same-network only. */
-  mobilePairingConnectionMode?: 'automatic' | 'local-only'
   /** Explicit custom address restored when generating future mobile pairing codes. */
   mobilePairingCustomAddress?: string | null
   /** Saved custom addresses available in both mobile pairing pickers. */

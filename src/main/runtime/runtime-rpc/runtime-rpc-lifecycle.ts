@@ -196,10 +196,8 @@ export class RuntimeRpcLifecycle extends RuntimeRpcWebSocketDispatch {
     }
   }
 
-  // Why: one MobileSocketWiring per server session. Direct WS and cloud relay both attach to it, and
-  // DesktopRelayService captures it once at construction, so a loopback→wide pairing rebind must swap the
-  // transport under the SAME wiring — replacing the wiring would strand relay sockets (lost connection IDs,
-  // binary handling, and revocation targeting) on a dead object.
+  // Why: one MobileSocketWiring per server session, so a loopback→wide pairing rebind swaps the transport
+  // under the SAME wiring instead of dropping its connection IDs and revocation targeting.
   protected ensureMobileSocketWiring(
     deviceRegistry: DeviceRegistry,
     e2eeKeypair: E2EEKeypair
@@ -227,13 +225,11 @@ export class RuntimeRpcLifecycle extends RuntimeRpcWebSocketDispatch {
       },
       onBinary: (socket, bytes) => this.handleWebSocketBinaryMessage(bytes, socket.ws),
       onReady: () => {
-        // Why: first authenticated mobile/remote client (direct WS and
-        // cloud relay both attach here) starts path-candidate tracking.
+        // Why: first authenticated mobile/remote client starts path-candidate tracking.
         // Activation is a local-host concern: candidate buffers live on the
         // buffer-owning host's runtime, so a remote runtime proxy may
         // legitimately lack this method (its own server activates it).
         this.runtime.activateRecentPtyPathCandidateTracking?.()
-        this.mobileRelayPairingProvider?.onDemandStateChanged?.()
       },
       onClose: (socket, hasOtherConnections) => {
         if (!socket) {
@@ -247,12 +243,7 @@ export class RuntimeRpcLifecycle extends RuntimeRpcWebSocketDispatch {
           this.runtime.onClientDisconnected(socket.device.deviceToken)
         }
       },
-      // Why: relay attempts are authorized upstream; only direct failures should prompt local re-pairing.
-      onUnpairedDeviceAuthFailure: (metadata) => {
-        if (metadata.transport === 'direct') {
-          this.unpairedDeviceAuthThrottle?.recordFailure()
-        }
-      }
+      onUnpairedDeviceAuthFailure: () => this.unpairedDeviceAuthThrottle?.recordFailure()
     })
     this.mobileSocketWiring = mobileSocketWiring
     return mobileSocketWiring

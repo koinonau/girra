@@ -1,12 +1,6 @@
 import type { DeviceEntry, DeviceRegistry, DeviceScope } from '../device-registry'
 import type { E2EEKeypair } from '../e2ee-keypair'
 import type { MobileSocketWiring } from '../rpc/mobile-socket-wiring'
-import type {
-  RelayDeviceBinding,
-  RelayRevokeOutbox,
-  RelayRevokeOutboxItem
-} from '../relay/relay-revoke-outbox'
-import type { PushUnregisterOutbox } from '../push/push-unregister-outbox'
 import { encodePairingOffer, PAIRING_OFFER_VERSION } from '../../../shared/pairing'
 import type { RuntimePairingReach } from '../../../shared/runtime-pairing-reach'
 import { resolveAdvertisedPairingEndpoint } from '../pairing-endpoint'
@@ -16,13 +10,10 @@ import {
   DEVICE_REGISTRY_UNAVAILABLE_GUIDANCE,
   E2EE_KEY_UNAVAILABLE_GUIDANCE,
   pairingUnavailable,
-  type MobileRelayPairingProvider,
   type PairingOfferUnavailable
 } from './runtime-rpc-pairing-types'
 
 export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
-  private onPushUnregisterQueued?: () => void
-
   getDeviceRegistry(): DeviceRegistry | null {
     return this.deviceRegistry
   }
@@ -43,68 +34,9 @@ export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
     return this.mobileSocketWiring
   }
 
-  getRelayRevokeOutbox(): RelayRevokeOutbox {
-    return this.relayRevokeOutbox
-  }
-
-  getPushUnregisterOutbox(): PushUnregisterOutbox {
-    return this.pushUnregisterOutbox
-  }
-
-  setMobileRelayBinding(deviceId: string, binding: RelayDeviceBinding): boolean {
-    const current = this.deviceRegistry?.getDevice(deviceId)
-    if (
-      current?.scope !== 'mobile' ||
-      this.deviceRegistry?.getMobilePairingConnectionMode(deviceId) === 'local-only'
-    ) {
-      return false
-    }
-    if (
-      current.relayBinding &&
-      (current.relayBinding.relayHostId !== binding.relayHostId ||
-        current.relayBinding.ownerIdentityKey !== binding.ownerIdentityKey)
-    ) {
-      // Why: switching the owning account/host must not strand the old cloud credential family, even if that account is offline.
-      if (!this.queueRelayDeviceRevoke(current.relayBinding)) {
-        return false
-      }
-    }
-    const updated = this.deviceRegistry?.setRelayBinding(deviceId, binding) ?? false
-    if (updated) {
-      this.mobileRelayPairingProvider?.onDemandStateChanged?.()
-    }
-    return updated
-  }
-
   // Why: only the desktop shell can surface UI; headless serve leaves this unset.
   setOnUnpairedDeviceAuthFailure(callback: (() => void) | null): void {
     this.onUnpairedDeviceAuthFailure = callback
-  }
-
-  setMobileRelayPairingProvider(provider: MobileRelayPairingProvider | null): void {
-    this.mobileRelayPairingProvider = provider
-  }
-
-  async revokeMobileDevice(deviceId: string): Promise<boolean> {
-    const device = this.deviceRegistry?.getDevice(deviceId)
-    if (device?.scope !== 'mobile') {
-      return false
-    }
-    if (device.relayBinding) {
-      if (!this.queueRelayDeviceRevoke(device.relayBinding)) {
-        return false
-      }
-    }
-    // Why: unpairing must delete the phone's push token at the gateway too, and the
-    // registration id is only readable while the device row still exists.
-    this.queuePushUnregister(deviceId, device.pushRegistration?.registrationId)
-    if (!this.deviceRegistry?.removeDevice(deviceId)) {
-      return false
-    }
-    this.mobileRelayPairingProvider?.onDemandStateChanged?.()
-    this.runtime.forgetClientNavigationState(deviceId)
-    this.mobileSocketWiring?.terminateDeviceConnections(device.token)
-    return true
   }
 
   revokeRuntimeAccess(deviceId: string): boolean {
@@ -190,49 +122,5 @@ export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
       webClientUrl:
         this.webClientRoot && scope === 'runtime' ? createWebClientUrl(endpoint, pairingUrl) : null
     }
-  }
-
-  /** Best-effort: a failed enqueue must never block the revoke the user asked for. */
-  protected queuePushUnregister(deviceId: string, registrationId: string | undefined): void {
-    if (!registrationId) {
-      return
-    }
-    try {
-      this.pushUnregisterOutbox.enqueue({ registrationId, deviceId })
-      this.onPushUnregisterQueued?.()
-    } catch (error) {
-      console.error('[runtime] Failed to persist a push token cleanup:', error)
-    }
-  }
-
-  setOnPushUnregisterQueued(callback: (() => void) | null): void {
-    this.onPushUnregisterQueued = callback ?? undefined
-  }
-
-  protected queueOrRetainRelayDeviceRevoke(deviceId: string, binding: RelayDeviceBinding): void {
-    if (this.queueRelayDeviceRevoke(binding)) {
-      return
-    }
-    try {
-      this.deviceRegistry?.setRelayBinding(deviceId, binding)
-    } catch (error) {
-      console.error('[runtime] Failed to retain an unrevoked Relay binding:', error)
-    }
-  }
-
-  protected queueRelayDeviceRevoke(binding: RelayDeviceBinding): boolean {
-    let item: RelayRevokeOutboxItem
-    try {
-      item = this.relayRevokeOutbox.enqueue(binding)
-    } catch (error) {
-      console.error('[runtime] Failed to persist Relay device cleanup:', error)
-      return false
-    }
-    try {
-      this.mobileRelayPairingProvider?.onDeviceRevokeQueued(item)
-    } catch (error) {
-      console.warn('[runtime] Failed to notify Relay cleanup worker:', error)
-    }
-    return true
   }
 }

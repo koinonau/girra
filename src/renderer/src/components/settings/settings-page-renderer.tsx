@@ -15,7 +15,6 @@ import {
   renderAutomationsSettingsSection,
   renderGeneralSettingsSection,
   renderIntegrationsSettingsSection,
-  renderMobileSettingsSection,
   renderOrcaAccountSettingsSection,
   renderSetupGuideSettingsSection
 } from './settings-setup-workflow-section-renderers'
@@ -121,7 +120,6 @@ export function renderSettingsPage(context: SettingsRenderContext): React.JSX.El
                 {renderSetupGuideSettingsSection(context)}
                 {renderGeneralSettingsSection(context)}
                 {renderIntegrationsSettingsSection(context)}
-                {renderMobileSettingsSection(context)}
                 {renderAutomationsSettingsSection(context)}
                 {renderGitSettingsSection(context)}
                 {renderTasksSettingsSection(context)}

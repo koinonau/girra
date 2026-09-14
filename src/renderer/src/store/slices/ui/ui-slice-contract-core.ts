@@ -111,7 +111,6 @@ export type UiViewHistory =
   | 'automations'
   | 'space'
   | 'skills'
-  | 'mobile'
 
 export type UISliceCore = {
   sidebarOpen: boolean
@@ -145,7 +144,6 @@ export type UISliceCore = {
   previousViewBeforeAutomations: Exclude<UiViewHistory, 'automations'>
   previousViewBeforeSpace: Exclude<UiViewHistory, 'space'>
   previousViewBeforeSkills: Exclude<UiViewHistory, 'skills'>
-  previousViewBeforeMobile: Exclude<UiViewHistory, 'mobile'>
   setActiveView: (view: UISliceCore['activeView']) => void
   taskPageData: TaskPageData
   taskResumeState: TaskResumeState | undefined
@@ -178,8 +176,6 @@ export type UISliceCore = {
   closeSpacePage: () => void
   openSkillsPage: () => void
   closeSkillsPage: () => void
-  openMobilePage: () => void
-  closeMobilePage: () => void
   setNewWorkspaceDraft: (draft: NonNullable<UISliceCore['newWorkspaceDraft']>) => void
   clearNewWorkspaceDraft: () => void
   pendingRevealWorktree: PendingSidebarWorktreeReveal | null

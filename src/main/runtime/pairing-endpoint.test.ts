@@ -3,7 +3,7 @@ import {
   resolveAdvertisedPairingEndpoint,
   resolveAdvertisedPairingHostname
 } from './pairing-endpoint'
-import { PAIRING_OFFER_VERSION, PairingOfferSchema } from '../../shared/mobile-relay-pairing-offer'
+import { PAIRING_OFFER_VERSION, PairingOfferSchema } from '../../shared/pairing'
 import { PAIRING_ENDPOINT_MAX_CHARACTERS } from '../../shared/mobile-pairing-protocol-limits'
 import { parseManualNetworkAddress } from '../../shared/network/manual-address'
 

@@ -12,8 +12,6 @@ import type { ClaudeRuntimeAuthService } from '../claude-accounts/runtime-auth-s
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import type { RateLimitService } from '../rate-limits/service'
 import type { OrcaRuntimeRpcServer } from '../runtime/runtime-rpc'
-import type { DesktopRelayService } from '../runtime/relay/desktop-relay-service'
-import type { DesktopPushService } from '../runtime/push/desktop-push-service'
 import type { AgentAwakeService } from '../agent-awake-service'
 import type { CrashReportStore } from '../crash-reporting/crash-report-store'
 import type { AutomationService } from '../automations/service'
@@ -22,7 +20,6 @@ import type { PluginKillListService } from '../plugins/plugin-kill-list-service'
 import type { PluginMarketplaceService } from '../plugins/plugin-marketplace-service'
 import type { PluginMarketplaceInstaller } from '../plugins/plugin-marketplace-installer'
 import type { KeybindingService } from '../keybindings/keybinding-service'
-import type { RelayBrokerStatus } from '../runtime/relay/relay-session-broker'
 import type { AgentBrowserBridge } from '../browser/agent-browser-bridge'
 import type { EmulatorBridge } from '../emulator/emulator-bridge'
 import type { GpuFallbackMarker, GpuFallbackEnvironment } from './gpu-fallback-marker'
@@ -62,11 +59,6 @@ export const mainProcessState = {
   rateLimits: null as RateLimitService | null,
   runtimeRpc: null as OrcaRuntimeRpcServer | null,
   serveReadinessPublisher: new ServeReadinessPublisher(),
-  desktopRelayService: null as DesktopRelayService | null,
-  desktopPushService: null as DesktopPushService | null,
-  desktopRelayStatus: 'offline' as RelayBrokerStatus,
-  desktopRelayCellUrl: undefined as string | undefined,
-  pendingUnpairedDeviceAuthFailure: false,
   // Why: gates whether headless serve installs the offscreen browser backend (and advertises browser pane support).
   headlessBrowserDisplayAvailable: false,
   agentAwakeService: null as AgentAwakeService | null,
