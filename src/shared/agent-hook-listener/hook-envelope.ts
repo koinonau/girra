@@ -1,7 +1,6 @@
 import { Buffer } from 'node:buffer'
 import type { IncomingHttpHeaders } from 'node:http'
 
-import type { AgentHookSource } from '../agent-hook-relay'
 import { parsePaneKey } from '../stable-pane-id'
 import { MAX_PANE_KEY_LEN, warnOnHookEnvOrVersionMismatch } from './listener-limits'
 import type { HookListenerState } from './listener-state'
@@ -107,7 +106,6 @@ export type ParsedHookEnvelope = {
 /** Validates the transport envelope while preserving warning-before-tab-rejection order. */
 export function parseHookEnvelope(
   state: HookListenerState,
-  source: AgentHookSource,
   body: unknown,
   expectedEnv: string
 ): ParsedHookEnvelope | null {
@@ -118,13 +116,8 @@ export function parseHookEnvelope(
   const paneKey = typeof record.paneKey === 'string' ? record.paneKey.trim() : ''
   const parsedPaneKey = parsePaneKey(paneKey)
   const rawPayload = record.payload
-  // Antigravity may carry a transition with absent stdin; every other provider requires payload.
-  const antigravityPayloadAbsent =
-    source === 'antigravity' &&
-    (rawPayload === undefined || (typeof rawPayload === 'string' && rawPayload.trim() === ''))
-  const hookPayload = antigravityPayloadAbsent
-    ? {}
-    : typeof rawPayload === 'string'
+  const hookPayload =
+    typeof rawPayload === 'string'
       ? (() => {
           try {
             return parseAgentHookJson(rawPayload)

@@ -11,8 +11,6 @@ export type HookListenerState = {
   lastPromptByPaneKey: Map<string, string>
   lastToolByPaneKey: Map<string, ToolSnapshot>
   lastStatusByPaneKey: Map<string, AgentHookEventPayload>
-  antigravityCompletedTranscriptByPaneKey: Map<string, string>
-  ampCompletedCacheKeys: Set<string>
   /** Live subagents/teammates per Claude pane; survives turn boundaries since background children outlive the lead turn. */
   claudeSubagentRosterByPaneKey: Map<string, ClaudeSubagentRoster>
   /** Last state from the LEAD session's own events (subagent events carry agent_id, excluded), so a SubagentStop can re-emit pane status; `interrupted` persists so the eventual done still carries it. */
@@ -62,8 +60,6 @@ export function createHookListenerState(): HookListenerState {
     lastPromptByPaneKey: new Map(),
     lastToolByPaneKey: new Map(),
     lastStatusByPaneKey: new Map(),
-    antigravityCompletedTranscriptByPaneKey: new Map(),
-    ampCompletedCacheKeys: new Set(),
     claudeSubagentRosterByPaneKey: new Map(),
     claudeLeadStateByPaneKey: new Map(),
     claudeUnconfirmedRestoredStatusPaneKeys: new Set(),
@@ -81,8 +77,6 @@ export function clearPaneCacheState(state: HookListenerState, paneKey: string): 
   deletePaneScopedCacheEntry(state.lastPromptByPaneKey, paneKey)
   deletePaneScopedCacheEntry(state.lastToolByPaneKey, paneKey)
   deletePaneScopedCacheEntry(state.lastStatusByPaneKey, paneKey)
-  deletePaneScopedCacheEntry(state.antigravityCompletedTranscriptByPaneKey, paneKey)
-  deletePaneScopedSetEntry(state.ampCompletedCacheKeys, paneKey)
   deletePaneScopedCacheEntry(state.claudeConsumedCompactPromptIdByPaneKey, paneKey)
   state.claudeSubagentRosterByPaneKey.delete(paneKey)
   state.claudeLeadStateByPaneKey.delete(paneKey)
@@ -154,8 +148,6 @@ export function movePaneCacheState(
   movePaneScopedMapEntries(state.lastPromptByPaneKey, fromPaneKey, toPaneKey)
   movePaneScopedMapEntries(state.lastToolByPaneKey, fromPaneKey, toPaneKey)
   movePaneScopedMapEntries(state.lastStatusByPaneKey, fromPaneKey, toPaneKey)
-  movePaneScopedMapEntries(state.antigravityCompletedTranscriptByPaneKey, fromPaneKey, toPaneKey)
-  movePaneScopedSetEntries(state.ampCompletedCacheKeys, fromPaneKey, toPaneKey)
   movePaneScopedMapEntries(state.claudeConsumedCompactPromptIdByPaneKey, fromPaneKey, toPaneKey)
   movePaneScopedMapEntries(state.claudeSubagentRosterByPaneKey, fromPaneKey, toPaneKey)
   movePaneScopedMapEntries(state.claudeLeadStateByPaneKey, fromPaneKey, toPaneKey)
@@ -171,8 +163,6 @@ export function movePaneCacheState(
 export function clearPaneTurnCacheState(state: HookListenerState, paneKey: string): void {
   state.lastPromptByPaneKey.delete(paneKey)
   state.lastToolByPaneKey.delete(paneKey)
-  state.antigravityCompletedTranscriptByPaneKey.delete(paneKey)
-  state.ampCompletedCacheKeys.delete(paneKey)
 }
 
 export function deletePaneScopedCacheEntry(map: Map<string, unknown>, paneKey: string): void {
@@ -185,22 +175,10 @@ export function deletePaneScopedCacheEntry(map: Map<string, unknown>, paneKey: s
   }
 }
 
-export function deletePaneScopedSetEntry(set: Set<string>, paneKey: string): void {
-  set.delete(paneKey)
-  const scopedPrefix = `${paneKey}\0`
-  for (const key of set) {
-    if (key.startsWith(scopedPrefix)) {
-      set.delete(key)
-    }
-  }
-}
-
 export function clearAllListenerCaches(state: HookListenerState): void {
   state.lastPromptByPaneKey.clear()
   state.lastToolByPaneKey.clear()
   state.lastStatusByPaneKey.clear()
-  state.antigravityCompletedTranscriptByPaneKey.clear()
-  state.ampCompletedCacheKeys.clear()
   state.claudeConsumedCompactPromptIdByPaneKey.clear()
   state.warnedVersions.clear()
   state.warnedEnvs.clear()

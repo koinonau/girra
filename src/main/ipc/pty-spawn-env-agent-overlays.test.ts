@@ -3,7 +3,6 @@ import {
   readFileSyncMock,
   spawnMock,
   openCodeBuildPtyEnvMock,
-  mimoCodeBuildPtyEnvMock,
   piBuildPtyEnvMock
 } from './pty-ipc-mock-registry'
 import { posixOnlyIt } from './pty-ipc-test-constants'
@@ -19,9 +18,6 @@ vi.mock('node:child_process', async (importOriginal) =>
 )
 vi.mock('../opencode/hook-service', () =>
   import('./pty-ipc-mock-registry').then((m) => m.openCodeHookServiceModuleMock())
-)
-vi.mock('../mimo/hook-service', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.mimoHookServiceModuleMock())
 )
 vi.mock('../agent-hooks/server', () =>
   import('./pty-ipc-mock-registry').then((m) => m.agentHookServerModuleMock())
@@ -147,60 +143,6 @@ describe('registerPtyHandlers', () => {
       expect(env.OPENCODE_CONFIG_DIR).toBeUndefined()
       expect(env.ORCA_OPENCODE_CONFIG_DIR).toBeUndefined()
       expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
-    })
-    it('injects MiMo overlay env only when launch command is mimo', async () => {
-      const env = await spawnAndGetEnv(undefined, undefined, undefined, undefined, 'mimo')
-
-      expect(mimoCodeBuildPtyEnvMock).toHaveBeenCalledTimes(1)
-      expect(env.MIMOCODE_HOME).toBe('/tmp/orca-mimocode-shared')
-      expect(env.ORCA_MIMOCODE_HOME).toBe('/tmp/orca-mimocode-shared')
-      expect(env.ORCA_MIMOCODE_SOURCE_HOME).toBeUndefined()
-    })
-    it.each(['/usr/local/bin/mimo --prompt hi', '"C:\\Program Files\\MiMo\\mimo.cmd" --prompt hi'])(
-      'injects MiMo overlay env for path-qualified launch command %s',
-      async (launchCommand) => {
-        const env = await spawnAndGetEnv(undefined, undefined, undefined, undefined, launchCommand)
-
-        expect(mimoCodeBuildPtyEnvMock).toHaveBeenCalledTimes(1)
-        expect(env.MIMOCODE_HOME).toBe('/tmp/orca-mimocode-shared')
-        expect(env.ORCA_MIMOCODE_HOME).toBe('/tmp/orca-mimocode-shared')
-      }
-    )
-    it('uses sequenced startup env as the MiMo launch hint when command is a wrapper', async () => {
-      const env = await spawnAndGetEnv(
-        { [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'mimo --prompt hi' },
-        undefined,
-        undefined,
-        undefined,
-        'bash -lc wait-wrapper'
-      )
-
-      expect(mimoCodeBuildPtyEnvMock).toHaveBeenCalledTimes(1)
-      expect(env.MIMOCODE_HOME).toBe('/tmp/orca-mimocode-shared')
-      expect(env.ORCA_MIMOCODE_HOME).toBe('/tmp/orca-mimocode-shared')
-    })
-    it('does not inject MiMo overlay for non-mimo launches', async () => {
-      await spawnAndGetEnv()
-
-      expect(mimoCodeBuildPtyEnvMock).not.toHaveBeenCalled()
-    })
-    it('restores user MiMo home when agent status hooks are disabled in a nested Orca shell', async () => {
-      const env = await spawnAndGetEnv(
-        {
-          MIMOCODE_HOME: '/tmp/parent-orca-mimocode-overlay',
-          ORCA_MIMOCODE_HOME: '/tmp/parent-orca-mimocode-overlay',
-          ORCA_MIMOCODE_SOURCE_HOME: '/tmp/user-mimocode-home'
-        },
-        undefined,
-        undefined,
-        () => ({ agentStatusHooksEnabled: false }),
-        'mimo'
-      )
-
-      expect(mimoCodeBuildPtyEnvMock).not.toHaveBeenCalled()
-      expect(env.MIMOCODE_HOME).toBe('/tmp/user-mimocode-home')
-      expect(env.ORCA_MIMOCODE_HOME).toBeUndefined()
-      expect(env.ORCA_MIMOCODE_SOURCE_HOME).toBeUndefined()
     })
     posixOnlyIt(
       'reproduces issue #1534: GUI-launched Orca mirrors zshrc-only OpenCode config',

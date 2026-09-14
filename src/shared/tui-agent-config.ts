@@ -37,7 +37,7 @@ export type TuiAgentConfig = {
   /** Startup env var that seeds the input without submitting, for agents with no `--prefill`-style flag (e.g. pi); avoids the paste-after-ready race. */
   draftPromptEnvVar?: string
   /** Pre-write a trust artifact so the agent's first-launch "trust this folder?" menu doesn't consume the bracketed paste (see agent-trust-presets.ts). */
-  preflightTrust?: 'cursor' | 'copilot' | 'codex'
+  preflightTrust?: 'copilot' | 'codex'
   /** Agent-specific signal that the composer is ready for paste, stronger than the default quiet-render window. */
   draftPasteReadySignal?: DraftPasteReadySignal
   /** Hard deadline for the agent's composer readiness signal. */
@@ -221,9 +221,7 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
   },
   cursor: {
     detectCmd: 'cursor-agent',
-    promptInjectionMode: 'argv',
-    // Why: first-launch trust menu swallows the bracketed paste; pre-write the .workspace-trusted marker so it skips (agent-trust-presets.ts).
-    preflightTrust: 'cursor'
+    promptInjectionMode: 'argv'
   },
   droid: {
     detectCmd: 'droid',

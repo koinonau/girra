@@ -14,7 +14,6 @@ import type { HookListenerState } from './agent-hook-listener/listener-state'
 import { extractPromptText } from './agent-hook-listener/prompt-fields'
 import { normalizeProviderEvent } from './agent-hook-listener/provider-dispatch'
 import { hasExplicitUserPrompt } from './agent-hook-listener/provider-event-routing'
-import { hasExplicitAmpPrompt } from './agent-hook-listener/providers/amp-events'
 import { readString } from './agent-hook-listener/tool-input-preview'
 /** Canonical transport-agnostic normalization entry shared by main and relay listeners. */
 export function normalizeHookPayload(
@@ -24,7 +23,7 @@ export function normalizeHookPayload(
   expectedEnv: string,
   options: { deferCompactOwnershipToClient?: boolean } = {}
 ): AgentHookEventPayload | null {
-  const envelope = parseHookEnvelope(state, source, body, expectedEnv)
+  const envelope = parseHookEnvelope(state, body, expectedEnv)
   if (!envelope) {
     return null
   }
@@ -108,7 +107,6 @@ export function normalizeHookPayload(
     promptText,
     paneKey,
     hookPayload: hookPayloadRecord,
-    envelope: record,
     extractedPrompt
   })
   const providerSessionOnly =
@@ -136,18 +134,7 @@ export function normalizeHookPayload(
     // Normalization is transport-agnostic; only ingestRemote knows the mux identity to stamp.
     connectionId: null,
     ...(restoredUnconfirmed ? { restoredUnconfirmed: true } : {}),
-    hasExplicitPrompt:
-      source === 'amp'
-        ? hasExplicitAmpPrompt(eventName, promptText, hookPayloadRecord)
-          ? true
-          : undefined
-        : hasExplicitUserPrompt(
-            source,
-            eventName,
-            extractedPrompt,
-            dispatched.resolvedPromptText,
-            dispatched.hasTranscriptPromptEvidence
-          ),
+    hasExplicitPrompt: hasExplicitUserPrompt(source, eventName, extractedPrompt),
     promptInteractionKey: dispatched.promptInteractionKey,
     hookEventName: typeof eventName === 'string' ? eventName : undefined,
     providerPromptId,

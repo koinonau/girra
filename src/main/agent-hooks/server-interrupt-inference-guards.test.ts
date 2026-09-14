@@ -509,93 +509,7 @@ describe('AgentHookServer listener replay', () => {
     }
   })
 
-  it.each(['opencode', 'copilot'] as const)(
-    'rejects single plain Escape inference for %s',
-    (agentType) => {
-      vi.useFakeTimers()
-      vi.setSystemTime(1_000)
-      try {
-        const server = new AgentHookServer()
-        server.ingestRemote(
-          {
-            paneKey: PANE,
-            tabId: 'tab-1',
-            worktreeId: 'wt-1',
-            payload: { state: 'working', prompt: 'long task', agentType }
-          },
-          'conn-1'
-        )
-        const baseline = server.getStatusSnapshot()[0]
-
-        vi.setSystemTime(1_500)
-        const applied = server.inferInterrupt({
-          paneKey: PANE,
-          baselineUpdatedAt: baseline.receivedAt,
-          baselineStateStartedAt: baseline.stateStartedAt,
-          baselinePrompt: 'long task',
-          baselineAgentType: agentType,
-          intent: 'plain-escape'
-        })
-
-        expect(applied).toBe(false)
-        expect(server.getStatusSnapshot()).toEqual([
-          expect.objectContaining({
-            state: 'working',
-            prompt: 'long task',
-            agentType
-          })
-        ])
-      } finally {
-        vi.useRealTimers()
-      }
-    }
-  )
-
-  it.each(['opencode', 'copilot'] as const)(
-    'accepts double plain Escape inference for %s',
-    (agentType) => {
-      vi.useFakeTimers()
-      vi.setSystemTime(1_000)
-      try {
-        const server = new AgentHookServer()
-        server.ingestRemote(
-          {
-            paneKey: PANE,
-            tabId: 'tab-1',
-            worktreeId: 'wt-1',
-            payload: { state: 'working', prompt: 'long task', agentType }
-          },
-          'conn-1'
-        )
-        const baseline = server.getStatusSnapshot()[0]
-
-        vi.setSystemTime(1_500)
-        const applied = server.inferInterrupt({
-          paneKey: PANE,
-          baselineUpdatedAt: baseline.receivedAt,
-          baselineStateStartedAt: baseline.stateStartedAt,
-          baselinePrompt: 'long task',
-          baselineAgentType: agentType,
-          intent: 'plain-escape',
-          inputCount: 2
-        })
-
-        expect(applied).toBe(true)
-        expect(server.getStatusSnapshot()).toEqual([
-          expect.objectContaining({
-            state: 'done',
-            prompt: 'long task',
-            agentType,
-            interrupted: true
-          })
-        ])
-      } finally {
-        vi.useRealTimers()
-      }
-    }
-  )
-
-  it('rejects Ctrl+C inference for Droid', () => {
+  it.each(['opencode'] as const)('rejects single plain Escape inference for %s', (agentType) => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)
     try {
@@ -605,7 +519,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'long task', agentType: 'droid' }
+          payload: { state: 'working', prompt: 'long task', agentType }
         },
         'conn-1'
       )
@@ -617,8 +531,8 @@ describe('AgentHookServer listener replay', () => {
         baselineUpdatedAt: baseline.receivedAt,
         baselineStateStartedAt: baseline.stateStartedAt,
         baselinePrompt: 'long task',
-        baselineAgentType: 'droid',
-        intent: 'ctrl-c'
+        baselineAgentType: agentType,
+        intent: 'plain-escape'
       })
 
       expect(applied).toBe(false)
@@ -626,7 +540,48 @@ describe('AgentHookServer listener replay', () => {
         expect.objectContaining({
           state: 'working',
           prompt: 'long task',
-          agentType: 'droid'
+          agentType
+        })
+      ])
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it.each(['opencode'] as const)('accepts double plain Escape inference for %s', (agentType) => {
+    vi.useFakeTimers()
+    vi.setSystemTime(1_000)
+    try {
+      const server = new AgentHookServer()
+      server.ingestRemote(
+        {
+          paneKey: PANE,
+          tabId: 'tab-1',
+          worktreeId: 'wt-1',
+          payload: { state: 'working', prompt: 'long task', agentType }
+        },
+        'conn-1'
+      )
+      const baseline = server.getStatusSnapshot()[0]
+
+      vi.setSystemTime(1_500)
+      const applied = server.inferInterrupt({
+        paneKey: PANE,
+        baselineUpdatedAt: baseline.receivedAt,
+        baselineStateStartedAt: baseline.stateStartedAt,
+        baselinePrompt: 'long task',
+        baselineAgentType: agentType,
+        intent: 'plain-escape',
+        inputCount: 2
+      })
+
+      expect(applied).toBe(true)
+      expect(server.getStatusSnapshot()).toEqual([
+        expect.objectContaining({
+          state: 'done',
+          prompt: 'long task',
+          agentType,
+          interrupted: true
         })
       ])
     } finally {

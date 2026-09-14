@@ -94,11 +94,10 @@ export abstract class AgentHookServerStatusDisposition extends AgentHookServerSt
               // cannot revive a provider whose boundary event is named anything else.
               event?.hookEventName === 'UserPromptSubmit' || event?.hookEventName === 'SessionStart'
             : false
-    // Why in addition to the classifier: the OpenCode family carries its mid-session boundary in
-    // an explicit-prompt MessagePart, which isNewTurnEvent cannot name — and mimo-code has no
-    // SessionStart at all, so without this its retired panes never come back.
+    // Why in addition to the classifier: OpenCode carries its mid-session boundary in an
+    // explicit-prompt MessagePart, which isNewTurnEvent cannot name.
     const freshOpenCodeFamilyPrompt =
-      (event?.source === 'opencode' || event?.source === 'mimo-code') &&
+      event?.source === 'opencode' &&
       event.hookEventName === 'MessagePart' &&
       event.hasExplicitPrompt === true
     // Why the token is minted here: a revive proves a live lifecycle, and fencing follow-up

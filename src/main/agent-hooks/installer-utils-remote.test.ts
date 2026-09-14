@@ -153,9 +153,9 @@ describe('installer-utils-remote', () => {
 
   it('parses settings.json with one leading BOM', async () => {
     const { sftp, fs } = createFakeSftp()
-    fs.files.set('/home/u/.cursor/hooks.json', '\uFEFF{"version":1,"hooks":{}}')
+    fs.files.set('/home/u/.codex/hooks.json', '\uFEFF{"version":1,"hooks":{}}')
 
-    const result = await readHooksJsonRemote(sftp, '/home/u/.cursor/hooks.json')
+    const result = await readHooksJsonRemote(sftp, '/home/u/.codex/hooks.json')
 
     expect(result).toEqual({ version: 1, hooks: {} })
   })

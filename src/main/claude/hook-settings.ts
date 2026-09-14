@@ -18,8 +18,8 @@ import { wrapWindowsDirectCmdHookCommand } from '../agent-hooks/windows-direct-c
 import { isGitBashAvailable } from '../git-bash'
 
 export type ClaudeCompatibleHookSettings = {
-  configDirName: '.claude' | '.openclaude'
-  scriptBaseName: 'claude-hook' | 'openclaude-hook'
+  configDirName: '.claude'
+  scriptBaseName: 'claude-hook'
   usesWindowsCompatLauncher: boolean
 }
 
@@ -27,12 +27,6 @@ export const CLAUDE_HOOK_SETTINGS: ClaudeCompatibleHookSettings = {
   configDirName: '.claude',
   scriptBaseName: 'claude-hook',
   usesWindowsCompatLauncher: true
-}
-
-export const OPENCLAUDE_HOOK_SETTINGS: ClaudeCompatibleHookSettings = {
-  configDirName: '.openclaude',
-  scriptBaseName: 'openclaude-hook',
-  usesWindowsCompatLauncher: false
 }
 
 export const CLAUDE_EVENTS = [
@@ -50,8 +44,8 @@ export const CLAUDE_EVENTS = [
     eventName: 'Stop',
     definition: { hooks: [{ type: 'command', command: '' }] }
   },
-  // Why: OpenClaude skips normal Stop hooks after API/model errors and emits
-  // StopFailure instead; without this hook Orca leaves the turn spinning.
+  // Why: API/model errors emit StopFailure instead of Stop; without this hook Orca
+  // leaves the turn spinning.
   {
     eventName: 'StopFailure',
     definition: { hooks: [{ type: 'command', command: '' }] }

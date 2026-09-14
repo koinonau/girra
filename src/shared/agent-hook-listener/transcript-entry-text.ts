@@ -11,23 +11,6 @@ export function extractAssistantTextFromLine(line: string): string | undefined {
     return undefined
   }
   const record = entry as Record<string, unknown>
-  if (record.type === 'assistant.message') {
-    const data = record.data
-    if (typeof data === 'object' && data !== null) {
-      const text = extractAssistantContentText((data as Record<string, unknown>).content)
-      if (text) {
-        return text
-      }
-    }
-  }
-  if (
-    record.source === 'MODEL' &&
-    record.type === 'PLANNER_RESPONSE' &&
-    typeof record.content === 'string' &&
-    record.content.trim().length > 0
-  ) {
-    return record.content
-  }
   const nestedMessage = record.message as Record<string, unknown> | undefined
   const role =
     record.role ?? nestedMessage?.role ?? (record.type === 'assistant' ? 'assistant' : undefined)
@@ -38,7 +21,7 @@ export function extractAssistantTextFromLine(line: string): string | undefined {
   return extractAssistantContentText(content)
 }
 
-export function extractAssistantContentText(content: unknown): string | undefined {
+function extractAssistantContentText(content: unknown): string | undefined {
   if (typeof content === 'string' && content.trim().length > 0) {
     return content
   }

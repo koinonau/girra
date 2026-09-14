@@ -6,8 +6,6 @@ const mocks = vi.hoisted(() => ({
   installCodex: vi.fn(),
   removeClaude: vi.fn(),
   removeCodex: vi.fn(),
-  removeClaudeAsync: vi.fn(),
-  removeCodexAsync: vi.fn(),
   statusClaude: vi.fn(),
   statusCodex: vi.fn(),
   refreshClaude: vi.fn(),
@@ -27,10 +25,6 @@ vi.mock('./managed-agent-hook-registry', () => ({
     ['claude', mocks.removeClaude],
     ['codex', mocks.removeCodex]
   ],
-  MANAGED_AGENT_HOOK_ASYNC_REMOVERS: [
-    ['claude', mocks.removeClaudeAsync],
-    ['codex', mocks.removeCodexAsync]
-  ],
   MANAGED_AGENT_HOOK_STATUS_READERS: [
     ['claude', mocks.statusClaude],
     ['codex', mocks.statusCodex]
@@ -44,7 +38,6 @@ vi.mock('./managed-agent-hook-registry', () => ({
 import {
   applyAgentStatusHooksEnabled,
   installManagedAgentHooks,
-  removeManagedAgentHooksAsync,
   resolveStartupManagedHookAction,
   shouldInstallStartupManagedAgentHook,
   shouldContinueManagedHookStartup
@@ -67,8 +60,6 @@ describe('managed agent hook controls', () => {
     mocks.installCodex.mockReturnValue(status('codex', 'installed'))
     mocks.removeClaude.mockReturnValue(status('claude', 'not_installed'))
     mocks.removeCodex.mockReturnValue(status('codex', 'not_installed'))
-    mocks.removeClaudeAsync.mockResolvedValue(status('claude', 'not_installed'))
-    mocks.removeCodexAsync.mockResolvedValue(status('codex', 'not_installed'))
     mocks.refreshClaude.mockResolvedValue(undefined)
     mocks.refreshCodex.mockResolvedValue(undefined)
   })
@@ -266,14 +257,6 @@ describe('managed agent hook controls', () => {
     expect(mocks.removeClaude).toHaveBeenCalledTimes(1)
     expect(mocks.removeCodex).toHaveBeenCalledTimes(1)
   })
-
-  it('awaits only the selected asynchronous removers during quit', async () => {
-    const results = await removeManagedAgentHooksAsync({ agents: ['codex'] })
-
-    expect(mocks.removeClaudeAsync).not.toHaveBeenCalled()
-    expect(mocks.removeCodexAsync).toHaveBeenCalledTimes(1)
-    expect(results).toEqual([expect.objectContaining({ agent: 'codex', state: 'not_installed' })])
-  })
 })
 
 describe('startup managed hook reconciliation (STA-5679)', () => {
@@ -283,7 +266,7 @@ describe('startup managed hook reconciliation (STA-5679)', () => {
 
   it('skips instead of removing when this profile has the off switch set', () => {
     // Why this matters: the hook files are user-global. Startup removal here deleted the hooks that
-    // every other Orca instance depends on, and Cursor then reads as idle with no status at all.
+    // every other Orca instance depends on.
     expect(resolveStartupManagedHookAction({ agentStatusHooksEnabled: false })).toBe('skip')
   })
 

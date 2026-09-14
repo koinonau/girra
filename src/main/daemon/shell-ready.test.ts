@@ -581,8 +581,6 @@ describePosix('daemon shell-ready launch config', () => {
     const bashRc = readFileSync(join(getShellReadyWrapperRoot(), 'bash', 'rcfile'), 'utf8')
     const restoreLine =
       '[[ -n "${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${ORCA_OPENCODE_CONFIG_DIR}"'
-    const mimoRestoreLine =
-      '[[ -n "${ORCA_MIMOCODE_HOME:-}" ]] && export MIMOCODE_HOME="${ORCA_MIMOCODE_HOME}"'
     const codexRestoreLine =
       '[[ -n "${ORCA_CODEX_HOME:-}" ]] && export CODEX_HOME="${ORCA_CODEX_HOME}"'
     const agentTeamsPathRestoreLine = '[[ -n "${ORCA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0'
@@ -590,9 +588,6 @@ describePosix('daemon shell-ready launch config', () => {
     expect(zshrc).toContain(restoreLine)
     expect(zlogin).toContain(restoreLine)
     expect(bashRc).toContain(restoreLine)
-    expect(zshrc).toContain(mimoRestoreLine)
-    expect(zlogin).toContain(mimoRestoreLine)
-    expect(bashRc).toContain(mimoRestoreLine)
     expect(zshrc).not.toContain('ORCA_PI_CODING_AGENT_DIR')
     expect(zlogin).not.toContain('ORCA_PI_CODING_AGENT_DIR')
     expect(bashRc).not.toContain('ORCA_PI_CODING_AGENT_DIR')

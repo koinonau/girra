@@ -48,20 +48,9 @@ vi.mock('os', async (importOriginal) => {
   }
 })
 
-import { AntigravityHookService } from '../antigravity/hook-service'
 import { ClaudeHookService } from '../claude/hook-service'
 import { getRemoteManagedCommand } from '../claude/hook-settings'
 import { CodexHookService } from '../codex/hook-service'
-import { CommandCodeHookService } from '../command-code/hook-service'
-import { CopilotHookService } from '../copilot/hook-service'
-import { CursorHookService } from '../cursor/hook-service'
-import { DevinHookService } from '../devin/hook-service'
-import { DroidHookService } from '../droid/hook-service'
-import { GeminiHookService } from '../gemini/hook-service'
-import { GrokHookService } from '../grok/hook-service'
-import { KimiHookService } from '../kimi/hook-service'
-
-import { openClaudeHookService } from '../openclaude/hook-service'
 import { wrapPosixHookCommand, wrapWindowsHookCommand } from './installer-utils'
 import {
   POSIX_HOOK_STDIN_READER,
@@ -96,68 +85,18 @@ function seedCmdAutoRunTarget(profileDir: string): void {
 }
 const REMOTE_INSTALLERS = [
   {
-    agent: 'antigravity',
-    install: (sftp: SFTPWrapper) => new AntigravityHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
     agent: 'claude',
     install: (sftp: SFTPWrapper) => new ClaudeHookService().installRemote(sftp, REMOTE_HOME)
   },
   {
-    agent: 'openclaude',
-    install: (sftp: SFTPWrapper) => openClaudeHookService.installRemote(sftp, REMOTE_HOME)
-  },
-  {
     agent: 'codex',
     install: (sftp: SFTPWrapper) => new CodexHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'command-code',
-    install: (sftp: SFTPWrapper) => new CommandCodeHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'copilot',
-    install: (sftp: SFTPWrapper) => new CopilotHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'cursor',
-    install: (sftp: SFTPWrapper) => new CursorHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'devin',
-    install: (sftp: SFTPWrapper) => new DevinHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'droid',
-    install: (sftp: SFTPWrapper) => new DroidHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'gemini',
-    install: (sftp: SFTPWrapper) => new GeminiHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'grok',
-    install: (sftp: SFTPWrapper) => new GrokHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'kimi',
-    install: (sftp: SFTPWrapper) => new KimiHookService().installRemote(sftp, REMOTE_HOME)
   }
 ] as const
 
 const LOCAL_INSTALLERS = [
-  { agent: 'antigravity', install: () => new AntigravityHookService().install() },
   { agent: 'claude', install: () => new ClaudeHookService().install() },
-  { agent: 'openclaude', install: () => openClaudeHookService.install() },
-  { agent: 'codex', install: () => new CodexHookService().install() },
-  { agent: 'command-code', install: () => new CommandCodeHookService().install() },
-  { agent: 'copilot', install: () => new CopilotHookService().install() },
-  { agent: 'cursor', install: () => new CursorHookService().install() },
-  { agent: 'devin', install: () => new DevinHookService().install() },
-  { agent: 'droid', install: () => new DroidHookService().install() },
-  { agent: 'gemini', install: () => new GeminiHookService().install() },
-  { agent: 'grok', install: () => new GrokHookService().install() },
-  { agent: 'kimi', install: () => new KimiHookService().install() }
+  { agent: 'codex', install: () => new CodexHookService().install() }
 ] as const
 
 type HookRun = {
@@ -260,10 +199,6 @@ describe('Windows managed hook stdin structure', () => {
     const home = mkdtempSync(join(tmpdir(), 'orca-hook-stdin-windows-'))
     homedirMock.mockReturnValue(home)
     seedCmdAutoRunTarget(home)
-    const previousGrokHome = process.env.GROK_HOME
-    const previousKimiHome = process.env.KIMI_CODE_HOME
-    delete process.env.GROK_HOME
-    delete process.env.KIMI_CODE_HOME
     try {
       await withPlatform('win32', async () => {
         for (const entry of LOCAL_INSTALLERS) {
@@ -271,12 +206,8 @@ describe('Windows managed hook stdin structure', () => {
         }
       })
       const hooksDir = join(home, '.orca', 'agent-hooks')
-      const fileNames = readdirSync(hooksDir)
-      const mainBatchScripts = fileNames.filter(
-        (name) => name.endsWith('-hook.cmd') && !name.startsWith('antigravity-')
-      )
-      mainBatchScripts.push('antigravity-hook.cmd')
-      expect(mainBatchScripts).toHaveLength(10)
+      const mainBatchScripts = readdirSync(hooksDir).filter((name) => name.endsWith('-hook.cmd'))
+      expect(mainBatchScripts).toHaveLength(2)
       for (const fileName of mainBatchScripts) {
         const script = readFileSync(join(hooksDir, fileName), 'utf8')
         // Why: missing-env path must not touch more.com — hang class from #11549.
@@ -316,22 +247,10 @@ describe('Windows managed hook stdin structure', () => {
         claude.indexOf('if not "%DEVIN_PROJECT_DIR%"=="" goto :orca_agent_hook_drain_stdin')
       )
 
-      // Why (#11549 class): every Windows-local hook now guards before owning stdin —
-      // the caller may abandon the pipe, and the payload is discarded on this path anyway.
-      const copilot = readFileSync(join(hooksDir, 'copilot-hook.ps1'), 'utf8')
-      expect(copilot.indexOf('if (-not $env:ORCA_AGENT_HOOK_PORT')).toBeGreaterThan(-1)
-      expect(copilot.indexOf('if (-not $env:ORCA_AGENT_HOOK_PORT')).toBeLessThan(
-        copilot.indexOf('[Console]::In.ReadToEnd()')
-      )
       // Why: the two encoded-PowerShell launchers own stdin themselves when the managed
-      // script is missing, so the same guard has to precede their ReadToEnd — and the
-      // fallback answer has to precede the guard, or a gate event outside a pane is
-      // answered with silence, which reads as deny (#2426/#15462).
+      // script is missing, so the same guard has to precede their ReadToEnd.
       for (const [name, command] of [
-        [
-          'wrapWindowsHookCommand',
-          wrapWindowsHookCommand('C:\\missing\\orca-hook.cmd', {}, { fallbackStdout: '{}' })
-        ],
+        ['wrapWindowsHookCommand', wrapWindowsHookCommand('C:\\missing\\orca-hook.cmd')],
         [
           'wrapRuntimeHomeHookCommand',
           wrapRuntimeHomeHookCommand('missing-orca-hook', { neutralJsonWhenMissing: true })
@@ -339,32 +258,22 @@ describe('Windows managed hook stdin structure', () => {
       ] as const) {
         const decoded = decodeEncodedPowerShellCommand(command)
         expect(decoded, `${name} decoded`).toContain(WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD)
-        expect(decoded.indexOf("Write-Output '{}'"), `${name} answers first`).toBeLessThan(
-          decoded.indexOf(WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD)
-        )
         expect(
           decoded.indexOf(WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD),
           `${name} guards before owning stdin`
         ).toBeLessThan(decoded.indexOf('[Console]::In.ReadToEnd()'))
       }
-
-      const kimi = readFileSync(join(hooksDir, 'kimi-hook.sh'), 'utf8')
-      expect(kimi.indexOf('if [ -z "$ORCA_AGENT_HOOK_PORT" ]')).toBeGreaterThan(-1)
-      expect(kimi.indexOf('if [ -z "$ORCA_AGENT_HOOK_PORT" ]')).toBeLessThan(
-        kimi.indexOf(`payload=$(${POSIX_HOOK_STDIN_READER})`)
+      // Why: the fallback answer has to precede the guard, or a gate event outside a pane is
+      // answered with silence, which reads as deny (#2426/#15462).
+      const runtimeHome = decodeEncodedPowerShellCommand(
+        wrapRuntimeHomeHookCommand('missing-orca-hook', { neutralJsonWhenMissing: true })
+      )
+      expect(runtimeHome.indexOf("Write-Output '{}'")).toBeGreaterThan(-1)
+      expect(runtimeHome.indexOf("Write-Output '{}'")).toBeLessThan(
+        runtimeHome.indexOf(WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD)
       )
     } finally {
       homedirMock.mockImplementation(() => process.env.HOME ?? tmpdir())
-      if (previousGrokHome === undefined) {
-        delete process.env.GROK_HOME
-      } else {
-        process.env.GROK_HOME = previousGrokHome
-      }
-      if (previousKimiHome === undefined) {
-        delete process.env.KIMI_CODE_HOME
-      } else {
-        process.env.KIMI_CODE_HOME = previousKimiHome
-      }
       rmSync(home, { recursive: true, force: true })
     }
   })
@@ -381,33 +290,15 @@ describe('Windows managed hook stdin structure', () => {
           expect((await entry.install()).state, `${entry.agent} install status`).toBe('installed')
         }
         const hooksDir = join(home, '.orca', 'agent-hooks')
-        const mainScripts = readdirSync(hooksDir).filter(
-          (name) =>
-            name === 'antigravity-hook.cmd' ||
-            name.endsWith('-hook.ps1') ||
-            name.endsWith('-hook.sh') ||
-            (name.endsWith('-hook.cmd') && !name.startsWith('antigravity-'))
-        )
-        expect(mainScripts).toHaveLength(12)
+        const mainScripts = readdirSync(hooksDir).filter((name) => name.endsWith('-hook.cmd'))
+        expect(mainScripts).toHaveLength(2)
         for (const fileName of mainScripts) {
           const scriptPath = join(hooksDir, fileName)
-          const executable = fileName.endsWith('.cmd')
-            ? 'cmd.exe'
-            : fileName.endsWith('.ps1')
-              ? join(
-                  process.env.SystemRoot ?? 'C:\\Windows',
-                  'System32',
-                  'WindowsPowerShell',
-                  'v1.0',
-                  'powershell.exe'
-                )
-              : gitBash
-          const args = fileName.endsWith('.cmd')
-            ? ['/d', '/c', scriptPath]
-            : fileName.endsWith('.ps1')
-              ? ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', scriptPath]
-              : [scriptPath]
-          const result = await runHookProcess(executable, args, hookEnvironment())
+          const result = await runHookProcess(
+            'cmd.exe',
+            ['/d', '/c', scriptPath],
+            hookEnvironment()
+          )
           expect(result.exitCode, `${fileName} exit code`).toBe(0)
           // Why (#11549 class): every Windows-local hook exits before owning stdin when the
           // Orca env is missing, so the writer may break. hookEnvironment() strips every
@@ -420,7 +311,7 @@ describe('Windows managed hook stdin structure', () => {
 
         const missingScript = 'C:\\missing\\orca-hook.cmd'
         // Why: the cmd fast path is intentionally a bare, directly-spawnable .cmd
-        // path (Codex/Antigravity/Devin launch it as argv[0], not via cmd.exe), so
+        // path (Codex launches it as argv[0], not via cmd.exe), so
         // it cannot own stdin for a missing script — a cmd-builtin drain would make
         // argv[0] unspawnable and fail every hook (#8430 regression). Only launchers
         // that already require a real interpreter (encoded PowerShell, Git Bash)
@@ -571,14 +462,7 @@ describe.skipIf(process.platform === 'win32')('managed hook stdin lifecycle', ()
   it('accepts a large payload without Orca environment or a broken writer', async () => {
     const scripts = await generatePosixScripts()
     for (const [agent, script] of scripts) {
-      const extraEnv = agent.startsWith('command-code')
-        ? {
-            ORCA_AGENT_HOOK_PORT: '1',
-            ORCA_AGENT_HOOK_TOKEN: 'test-token',
-            ORCA_PANE_KEY: 'test-pane'
-          }
-        : {}
-      const result = await runPosixHook(script, extraEnv)
+      const result = await runPosixHook(script)
       expect(result.exitCode, `${agent} exit code`).toBe(0)
       expect(result.stdinErrors, `${agent} stdin errors`).toHaveLength(0)
     }

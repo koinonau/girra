@@ -4,12 +4,13 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 3, the ADRs and the harness deletion are done or in review.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 3 and the ADRs are merged; Phase 4a is in review.
 
-1. **Phase 4, minor agent CLIs.** Unblocked once Phase 3c is merged. Start at `managed-agent-hook-registry.ts`, but the agents also live in `TuiAgent`, `TUI_AGENT_CONFIG`, `AGENT_KIND_VALUES` in `shared/agent-kind.ts`, `AGENT_HOOK_TARGETS`, locale keys and reliability gates. Map them with a read-only subagent first.
-2. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
-3. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
-4. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
+1. **Phase 4b, usage fetchers.** Delete Gemini CLI, Grok and Kimi usage fetching, the Grok account check and the Grok stats pane, which the tree unticks. Unblocked once 4a merges. Keep Claude, Codex, OpenCode and MiniMax usage.
+2. **Launch roster.** Whether the 14 agents whose hooks 4a removed also leave the roster. Needs the user; see `handover.md`.
+3. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
+4. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
+5. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
 
 ## Backlog
 
@@ -27,6 +28,8 @@ When a tracker exists, record its project, ready status, and transition IDs here
 6. Update `handover.md` and this file's "Start Here" in the same commit.
 
 When you split a phase across subagents, give each one disjoint file ownership, tell it to send its report to `main` with SendMessage, and tell it to format only the files it changed. Rerun `pnpm tc` yourself before committing its work.
+
+Deleting a file that spawns processes trips the ratchets in `src/shared/child-process/`: remove it from both `__fixtures__` allowlists and lower `DIRECT_IMPORTER_PIN` or `UNHIDDEN_SPAWNER_PIN` to the count the test prints.
 
 ## Commits
 

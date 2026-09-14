@@ -7,7 +7,6 @@ import type { AgentHookResultRetryScheduler } from './agent-hook-result-retry-sc
 import { endpointDirForRelaySocket } from './agent-hook-endpoint-coordinates'
 import type { AgentHookRelayEnvelope } from '../shared/agent-hook-relay'
 import { makePaneKey } from '../shared/stable-pane-id'
-import * as agentHookListener from '../shared/agent-hook-listener/grok-result-discovery'
 import { HOOK_REQUEST_MAX_BYTES } from '../shared/agent-hook-listener/request-body'
 
 const LEAF_ID = '11111111-1111-4111-8111-111111111111'
@@ -167,14 +166,7 @@ describe('RelayAgentHookServer', () => {
     // Characterization deliberately observes the server-owned scheduler without widening production API.
     internals = server as unknown as RelayServerInternals
     const retryScheduler = internals.retryScheduler
-    const originalAssistantRetry = retryScheduler.scheduleAssistantMessageRetry.bind(retryScheduler)
     const originalCodexRetry = retryScheduler.scheduleCodexSubagentPoll.bind(retryScheduler)
-    const assistantRetry = vi
-      .spyOn(retryScheduler, 'scheduleAssistantMessageRetry')
-      .mockImplementation((...args) => {
-        order.push('assistant-retry')
-        originalAssistantRetry(...args)
-      })
     const codexRetry = vi
       .spyOn(retryScheduler, 'scheduleCodexSubagentPoll')
       .mockImplementation((...args) => {
@@ -198,10 +190,9 @@ describe('RelayAgentHookServer', () => {
       })
       order.push('response')
       expect(res.status).toBe(204)
-      expect(order).toEqual(['forward', 'assistant-retry', 'codex-retry', 'response'])
+      expect(order).toEqual(['forward', 'codex-retry', 'response'])
     } finally {
       server.stop()
-      assistantRetry.mockRestore()
       codexRetry.mockRestore()
     }
   })
@@ -216,7 +207,6 @@ describe('RelayAgentHookServer', () => {
     // Characterization deliberately observes cache/scheduler order without widening production API.
     const internals = server as unknown as RelayServerInternals
     const retryScheduler = internals.retryScheduler
-    const assistantRetry = vi.spyOn(retryScheduler, 'scheduleAssistantMessageRetry')
     const codexRetry = vi.spyOn(retryScheduler, 'scheduleCodexSubagentPoll')
     await server.start()
     try {
@@ -235,11 +225,9 @@ describe('RelayAgentHookServer', () => {
       })
       expect(res.status).toBe(204)
       expect(internals.state.lastStatusByPaneKey.has(PANE_KEY)).toBe(true)
-      expect(assistantRetry).not.toHaveBeenCalled()
       expect(codexRetry).not.toHaveBeenCalled()
     } finally {
       server.stop()
-      assistantRetry.mockRestore()
       codexRetry.mockRestore()
     }
   })
@@ -531,121 +519,6 @@ describe('RelayAgentHookServer', () => {
     }
   })
 
-  it('keeps Copilot transcript retry alive across a following SessionEnd event', async () => {
-    const forward = vi.fn<(envelope: AgentHookRelayEnvelope) => void>()
-    const server = new RelayAgentHookServer({ endpointDir: dir, forward })
-    const transcriptPath = join(dir, 'events.jsonl')
-    writeFileSync(transcriptPath, '')
-    await server.start()
-    try {
-      const { port, token } = server.getCoordinates()
-      await fetch(`http://127.0.0.1:${port}/hook/copilot`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': token
-        },
-        body: JSON.stringify({
-          paneKey: PANE_KEY,
-          tabId: 'tab-1',
-          env: 'remote',
-          version: '1',
-          payload: { hook_event_name: 'Stop', transcriptPath }
-        })
-      })
-      await fetch(`http://127.0.0.1:${port}/hook/copilot`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': token
-        },
-        body: JSON.stringify({
-          paneKey: PANE_KEY,
-          tabId: 'tab-1',
-          env: 'remote',
-          version: '1',
-          payload: { hook_event_name: 'SessionEnd', reason: 'complete' }
-        })
-      })
-      expect(forward.mock.calls.at(-1)?.[0].payload.lastAssistantMessage).toBeUndefined()
-
-      // Let the first 50ms retry miss so continuation across SessionEnd is proven.
-      await new Promise((resolve) => setTimeout(resolve, 70))
-      writeFileSync(
-        transcriptPath,
-        `${JSON.stringify({
-          type: 'assistant.message',
-          data: { content: 'Relay transcript completed.' }
-        })}\n`
-      )
-      await new Promise((resolve) => setTimeout(resolve, 120))
-
-      expect(forward.mock.calls.at(-1)?.[0].payload.lastAssistantMessage).toBe(
-        'Relay transcript completed.'
-      )
-    } finally {
-      server.stop()
-    }
-  })
-
-  it('retries Grok chat history on the relay without blocking the hook POST', async () => {
-    const forward = vi.fn<(envelope: AgentHookRelayEnvelope) => void>()
-    const server = new RelayAgentHookServer({ endpointDir: dir, forward })
-    const sessionId = '019e37f4-5135-7b63-a4ab-6d13aa6bf528'
-    const cwd = join(dir, 'workspace')
-    const sessionDir = join(dir, '.grok', 'sessions', encodeURIComponent(cwd), sessionId)
-    mkdirSync(sessionDir, { recursive: true })
-    writeFileSync(join(sessionDir, 'chat_history.jsonl'), '')
-    vi.stubEnv('HOME', dir)
-    vi.stubEnv('USERPROFILE', dir)
-    await server.start()
-    try {
-      const { port, token } = server.getCoordinates()
-      await fetch(`http://127.0.0.1:${port}/hook/grok`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': token
-        },
-        body: JSON.stringify({
-          paneKey: PANE_KEY,
-          tabId: 'tab-1',
-          env: 'remote',
-          version: '1',
-          payload: { hookEventName: 'user_prompt_submit', prompt: 'hihi' }
-        })
-      })
-      const response = await fetch(`http://127.0.0.1:${port}/hook/grok`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': token
-        },
-        body: JSON.stringify({
-          paneKey: PANE_KEY,
-          tabId: 'tab-1',
-          env: 'remote',
-          version: '1',
-          payload: { hookEventName: 'Stop', sessionId, cwd }
-        })
-      })
-
-      expect(response.status).toBe(204)
-      expect(forward.mock.calls.at(-1)?.[0].payload.lastAssistantMessage).toBeUndefined()
-
-      writeFileSync(
-        join(sessionDir, 'chat_history.jsonl'),
-        `${JSON.stringify({ type: 'assistant', content: 'Relay Grok reply.' })}\n`
-      )
-      await new Promise((resolve) => setTimeout(resolve, 120))
-
-      expect(forward.mock.calls.at(-1)?.[0].payload.lastAssistantMessage).toBe('Relay Grok reply.')
-    } finally {
-      server.stop()
-      vi.unstubAllEnvs()
-    }
-  })
-
   it('caps the replay cache at 256 panes, evicting the least-recently-updated', async () => {
     // Mirrors the server's private MAX_CACHED_PANES. The WSL relay never gets a
     // per-pane teardown signal, so the cache is recency-capped instead.
@@ -692,111 +565,4 @@ describe('RelayAgentHookServer', () => {
       server.stop()
     }
   }, 30_000)
-
-  it('forwards a Grok result when discovery finishes after the old retry window', async () => {
-    let releaseDiscovery!: () => void
-    const discovery = new Promise<void>((resolve) => {
-      releaseDiscovery = resolve
-    })
-    vi.spyOn(agentHookListener, 'preparePendingGrokResultDiscovery').mockReturnValue(discovery)
-    const forward = vi.fn<(envelope: AgentHookRelayEnvelope) => void>()
-    const server = new RelayAgentHookServer({ endpointDir: dir, forward })
-    const sessionId = '019e37f4-5135-7b63-a4ab-6d13aa6bf534'
-    const cwd = join(dir, 'workspace')
-    const sessionDir = join(dir, '.grok', 'sessions', encodeURIComponent(cwd), sessionId)
-    mkdirSync(sessionDir, { recursive: true })
-    const history = join(sessionDir, 'chat_history.jsonl')
-    writeFileSync(history, '')
-    vi.stubEnv('HOME', dir)
-    vi.stubEnv('USERPROFILE', dir)
-    await server.start()
-    try {
-      const { port, token } = server.getCoordinates()
-      const post = (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${port}/hook/grok`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': token
-          },
-          body: JSON.stringify({
-            paneKey: PANE_KEY,
-            tabId: 'tab-1',
-            env: 'remote',
-            version: '1',
-            payload
-          })
-        })
-
-      await post({ hookEventName: 'UserPromptSubmit', prompt: 'delayed relay result' })
-      await post({ hookEventName: 'Stop', sessionId, cwd })
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      expect(forward.mock.calls.at(-1)?.[0].payload.lastAssistantMessage).toBeUndefined()
-
-      writeFileSync(
-        history,
-        `${JSON.stringify({ type: 'assistant', content: 'Relay found after discovery.' })}\n`
-      )
-      releaseDiscovery()
-
-      await vi.waitFor(() => {
-        expect(forward.mock.calls.at(-1)?.[0].payload.lastAssistantMessage).toBe(
-          'Relay found after discovery.'
-        )
-      })
-    } finally {
-      server.stop()
-      vi.unstubAllEnvs()
-    }
-  })
-
-  it('does not forward an old result over a newer same-text Grok turn', async () => {
-    let releaseDiscovery!: () => void
-    const discovery = new Promise<void>((resolve) => {
-      releaseDiscovery = resolve
-    })
-    vi.spyOn(agentHookListener, 'preparePendingGrokResultDiscovery').mockReturnValue(discovery)
-    const forward = vi.fn<(envelope: AgentHookRelayEnvelope) => void>()
-    const server = new RelayAgentHookServer({ endpointDir: dir, forward })
-    await server.start()
-    try {
-      const { port, token } = server.getCoordinates()
-      const post = (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${port}/hook/grok`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': token
-          },
-          body: JSON.stringify({
-            paneKey: PANE_KEY,
-            tabId: 'tab-1',
-            env: 'remote',
-            version: '1',
-            payload
-          })
-        })
-
-      await post({ hookEventName: 'UserPromptSubmit', prompt: 'repeat me' })
-      await post({
-        hookEventName: 'Stop',
-        sessionId: '019e37f4-5135-7b63-a4ab-6d13aa6bf535',
-        cwd: join(dir, 'workspace')
-      })
-      await post({ hookEventName: 'UserPromptSubmit', prompt: 'repeat me' })
-      const forwardsBeforeDiscovery = forward.mock.calls.length
-
-      releaseDiscovery()
-      await new Promise((resolve) => setTimeout(resolve, 80))
-
-      expect(forward).toHaveBeenCalledTimes(forwardsBeforeDiscovery)
-      expect(forward.mock.calls.at(-1)?.[0].payload).toMatchObject({
-        state: 'working',
-        prompt: 'repeat me',
-        agentType: 'grok'
-      })
-    } finally {
-      server.stop()
-    }
-  })
 })

@@ -10,7 +10,6 @@ import {
   readFileSync,
   rmSync,
   statSync,
-  symlinkSync,
   writeFileSync
 } from 'node:fs'
 import { createServer } from 'node:http'
@@ -18,21 +17,9 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 const MANAGED_SCRIPTS = [
-  ['antigravity-hook.sh', 'antigravity'],
   ['claude-hook.sh', 'claude'],
-  ['codex-hook.sh', 'codex'],
-  ['command-code-hook.sh', 'command-code'],
-  ['copilot-hook.sh', 'copilot'],
-  ['cursor-hook.sh', 'cursor'],
-  ['devin-hook.sh', 'devin'],
-  ['droid-hook.sh', 'droid'],
-  ['gemini-hook.sh', 'gemini'],
-  ['grok-hook.sh', 'grok'],
-  ['kimi-hook.sh', 'kimi'],
-  ['openclaude-hook.sh', 'claude']
+  ['codex-hook.sh', 'codex']
 ]
-
-const REQUIRED_JSON_STDOUT = new Set(['antigravity-hook.sh', 'copilot-hook.sh', 'gemini-hook.sh'])
 
 function parseArgs(argv) {
   const result = { home: process.env.HOME ?? '', minMtime: 0 }
@@ -111,18 +98,6 @@ function assertSuccessfulWrite(result, label) {
   }
 }
 
-function assertProtocolStdout(fileName, stdout) {
-  if (!REQUIRED_JSON_STDOUT.has(fileName)) {
-    return
-  }
-  const firstLine = stdout.trim().split(/\r?\n/, 1)[0]
-  try {
-    JSON.parse(firstLine)
-  } catch {
-    throw new Error([fileName, ' did not emit protocol JSON: ', stdout.slice(0, 200)].join(''))
-  }
-}
-
 function readGeneratedScripts(home, minMtime) {
   const hooksDir = join(home, '.orca', 'agent-hooks')
   return MANAGED_SCRIPTS.map(([fileName, source]) => {
@@ -193,28 +168,17 @@ function nextRequest(server) {
 }
 
 async function verifyNoOpWrites(scripts, home, payload) {
-  const commandCodeBin = mkdtempSync(join(tmpdir(), 'orca-hook-command-code-bin-'))
-  symlinkSync('/bin/cat', join(commandCodeBin, 'cat'))
-  try {
-    for (const script of scripts) {
-      const path =
-        script.fileName === 'command-code-hook.sh'
-          ? commandCodeBin
-          : (process.env.PATH ?? '/usr/bin:/bin')
-      const result = await runShell(
-        ['/bin/sh ', JSON.stringify(script.path)].join(''),
-        payload,
-        withoutOrcaEnvironment({
-          HOME: home,
-          PATH: path,
-          ORCA_AGENT_HOOK_ENDPOINT: ''
-        })
-      )
-      assertSuccessfulWrite(result, [script.fileName, ' no-op'].join(''))
-      assertProtocolStdout(script.fileName, result.stdout)
-    }
-  } finally {
-    rmSync(commandCodeBin, { recursive: true, force: true })
+  for (const script of scripts) {
+    const result = await runShell(
+      ['/bin/sh ', JSON.stringify(script.path)].join(''),
+      payload,
+      withoutOrcaEnvironment({
+        HOME: home,
+        PATH: process.env.PATH ?? '/usr/bin:/bin',
+        ORCA_AGENT_HOOK_ENDPOINT: ''
+      })
+    )
+    assertSuccessfulWrite(result, [script.fileName, ' no-op'].join(''))
   }
 }
 
@@ -287,7 +251,6 @@ async function verifyForwarding(scripts, home, payload) {
         })
       )
       assertSuccessfulWrite(result, [script.fileName, ' forwarding'].join(''))
-      assertProtocolStdout(script.fileName, result.stdout)
       const request = await requestPromise
       const form = new URLSearchParams(request.body)
       if (request.url !== ['/hook/', script.source].join('')) {

@@ -5,7 +5,6 @@ import {
 } from '../../../../shared/pi-agent-kind'
 import { applyTerminalGitCredentialPromptGuard } from '../../terminal-git-credential-guard'
 import { openCodeHookService } from '../../../opencode/hook-service'
-import { mimoCodeHookService } from '../../../mimo/hook-service'
 import { agentHookServer } from '../../../agent-hooks/server'
 import { wslHookRelayManager } from '../../../agent-hooks/wsl-hook-relay-manager'
 import { piTitlebarExtensionService } from '../../../pi/titlebar-extension-service'
@@ -19,8 +18,6 @@ import { stripInheritedOrcaCodexHomeOverride } from './codex-home'
 import {
   clearPiAgentShadowEnv,
   exposePiManagedExtensionEnv,
-  isMimoLaunchCommand,
-  resolveMimocodeSourceHome,
   resolveOpenCodeSourceConfigDir,
   resolvePiAgentSourceDir,
   resolveScopedPiAgentSourceDir,
@@ -86,28 +83,11 @@ export function buildPtyHostEnv(
         delete baseEnv.ORCA_OPENCODE_SOURCE_CONFIG_DIR
       }
     }
-    if (isMimoLaunchCommand(launchCommandHint)) {
-      const preexistingMimocodeHome = resolveMimocodeSourceHome(baseEnv)
-      Object.assign(baseEnv, mimoCodeHookService.buildPtyEnv(id, preexistingMimocodeHome))
-      if (baseEnv.MIMOCODE_HOME) {
-        baseEnv.ORCA_MIMOCODE_HOME = baseEnv.MIMOCODE_HOME
-        if (preexistingMimocodeHome) {
-          baseEnv.ORCA_MIMOCODE_SOURCE_HOME = preexistingMimocodeHome
-        } else {
-          delete baseEnv.ORCA_MIMOCODE_SOURCE_HOME
-        }
-      }
-    }
   } else {
     restoreOrStripOverlayEnv(baseEnv, {
       primary: 'OPENCODE_CONFIG_DIR',
       overlay: 'ORCA_OPENCODE_CONFIG_DIR',
       source: 'ORCA_OPENCODE_SOURCE_CONFIG_DIR'
-    })
-    restoreOrStripOverlayEnv(baseEnv, {
-      primary: 'MIMOCODE_HOME',
-      overlay: 'ORCA_MIMOCODE_HOME',
-      source: 'ORCA_MIMOCODE_SOURCE_HOME'
     })
   }
 

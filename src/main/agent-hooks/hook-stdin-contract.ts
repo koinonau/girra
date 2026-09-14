@@ -22,27 +22,17 @@ export function buildPosixHookPayloadCapture(
   ]
 }
 
-/** Shell-side durable fallback shared by every POSIX managed hook.
- *  `eventNameVar` is for providers that send the event name out-of-band rather than in the
- *  payload JSON; without it both the progress filter and replay would miss the event name. */
-export function buildPosixHookSpoolLines(source: string, eventNameVar?: string): string[] {
-  // Why: the event name must be a printf ARG, not inlined in the single-quoted format,
-  // where a command substitution would be emitted literally.
-  const eventFormat = eventNameVar ? '"hookEventName":"%s",' : ''
-  const eventArg = eventNameVar ? ` "$(spool_json_escape "\${${eventNameVar}:-}")"` : ''
+/** Shell-side durable fallback shared by every POSIX managed hook. */
+export function buildPosixHookSpoolLines(source: string): string[] {
   const spoolRecordLine = "  { printf '\\n{".concat(
-    eventFormat,
     '"paneKey":"%s","tabId":"%s","worktreeId":"%s","env":"%s","version":"%s","launchToken":"%s","source":"%s","receivedAt":%s,"payload":%s}\\n\'',
-    eventArg,
     ' "$(spool_json_escape "${ORCA_PANE_KEY:-}")" "$(spool_json_escape "${ORCA_TAB_ID:-}")" "$(spool_json_escape "${ORCA_WORKTREE_ID:-}")" "$(spool_json_escape "${ORCA_AGENT_HOOK_ENV:-}")" "$(spool_json_escape "${ORCA_AGENT_HOOK_VERSION:-}")" "$(spool_json_escape "${ORCA_AGENT_LAUNCH_TOKEN:-}")" "$(spool_json_escape "',
     source,
     '")" "$spool_now" "$payload"; } >> "$spool_file" 2>/dev/null || :'
   )
   return [
     'spool_hook_event() {',
-    eventNameVar
-      ? `  case "\${${eventNameVar}:-}" in PreToolUse|PostToolUse|PostToolUseFailure) return 0 ;; esac`
-      : '  case "$payload" in *\'"PreToolUse"\'*|*\'"PostToolUse"\'*|*\'"PostToolUseFailure"\'*) return 0 ;; esac',
+    '  case "$payload" in *\'"PreToolUse"\'*|*\'"PostToolUse"\'*|*\'"PostToolUseFailure"\'*) return 0 ;; esac',
     '  [ -n "${ORCA_AGENT_HOOK_ENDPOINT:-}" ] || return 0',
     // Why: an endpoint can linger in a parent shell after leaving Orca; without a pane key
     // the record is un-attributable and would accumulate as pane-unknown.jsonl.
@@ -72,7 +62,7 @@ export const WINDOWS_HOOK_STDIN_DRAIN_LABEL = 'orca_agent_hook_drain_stdin'
 // Why: qualify the stdin reader because Windows searches the worktree for
 // executables before PATH and hook payloads must not reach repo-local code.
 export const WINDOWS_HOOK_STDIN_READER = '"%SystemRoot%\\System32\\more.com"'
-export const WINDOWS_HOOK_STDIN_DRAIN_COMMAND = `${WINDOWS_HOOK_STDIN_READER} >nul 2>nul`
+const WINDOWS_HOOK_STDIN_DRAIN_COMMAND = `${WINDOWS_HOOK_STDIN_READER} >nul 2>nul`
 
 // The Orca context a hook needs before it may own stdin; see the rule below.
 const WINDOWS_HOOK_ENVIRONMENT_VARS = [
@@ -85,16 +75,16 @@ const WINDOWS_HOOK_ENVIRONMENT_VARS = [
 // may abandon stdin rather than close it — a read-to-EOF then blocks forever and strands a
 // visible window per hook event. The Windows rule: a hook must check the Orca env before it
 // owns stdin, and exit without reading when the env is missing — the payload is discarded on
-// that path anyway. This applies to .cmd, the copilot .ps1, and the Git Bash kimi .sh alike,
-// and to the launchers that own stdin themselves when the managed script is missing.
+// that path anyway. This applies to .cmd hooks and to the launchers that own stdin themselves
+// when the managed script is missing.
 // POSIX hooks keep capture-first: their callers close stdin, and exiting mid-write there
 // surfaces as EPIPE the agent can see (#8110).
 export function buildWindowsHookEnvironmentGuardLines(): string[] {
   return WINDOWS_HOOK_ENVIRONMENT_VARS.map((name) => `if "%${name}%"=="" exit /b 0`)
 }
 
-/** The same guard in sh, for the Git Bash hooks and launchers that run on Windows.
- *  Default-formed because a static hook precheck (Grok) rejects a bare reference it
+/** The same guard in sh, for the Git Bash launchers that run on Windows.
+ *  Default-formed because a static hook precheck rejects a bare reference it
  *  cannot resolve. POSIX hosts keep capture-first — this is the Windows rule only. */
 export const WINDOWS_GIT_BASH_HOOK_ENVIRONMENT_GUARD = `if ${WINDOWS_HOOK_ENVIRONMENT_VARS.map(
   (name) => `[ -z "\${${name}-}" ]`

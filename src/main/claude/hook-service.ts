@@ -221,7 +221,7 @@ export class ClaudeHookService {
       scriptPath,
       getManagedScript('local', { skipWhenDevinImportsClaude: this.options.agent === 'claude' })
     )
-    // Why: the statusline usage feed is Claude-only — OpenClaude data would be misattributed to the Claude provider.
+    // Why: the statusline usage feed is Claude-only.
     if (this.options.agent === 'claude') {
       nextConfig = this.installManagedStatusLine(nextConfig)
     }

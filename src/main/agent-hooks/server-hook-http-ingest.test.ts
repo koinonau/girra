@@ -65,17 +65,9 @@ describe('AgentHookServer listener replay', () => {
     await server.start({ env: 'production' })
     const order: string[] = []
     const internal = server as unknown as {
-      scheduleAssistantMessageRetry: (...args: unknown[]) => void
       scheduleCodexSubagentPoll: (...args: unknown[]) => void
     }
-    const originalAssistantRetry = internal.scheduleAssistantMessageRetry.bind(server)
     const originalCodexRetry = internal.scheduleCodexSubagentPoll.bind(server)
-    const assistantRetry = vi
-      .spyOn(internal, 'scheduleAssistantMessageRetry')
-      .mockImplementation((...args) => {
-        order.push('assistant-retry')
-        originalAssistantRetry(...args)
-      })
     const codexRetry = vi
       .spyOn(internal, 'scheduleCodexSubagentPoll')
       .mockImplementation((...args) => {
@@ -99,14 +91,12 @@ describe('AgentHookServer listener replay', () => {
         'status-change',
         'main-listener',
         'plugin-listener',
-        'assistant-retry',
         'codex-retry',
         'response'
       ])
     } finally {
       unsubscribeStatus()
       unsubscribePlugin()
-      assistantRetry.mockRestore()
       codexRetry.mockRestore()
       server.stop()
     }
@@ -116,10 +106,8 @@ describe('AgentHookServer listener replay', () => {
     const server = new AgentHookServer()
     await server.start({ env: 'production' })
     const internal = server as unknown as {
-      scheduleAssistantMessageRetry: (...args: unknown[]) => void
       scheduleCodexSubagentPoll: (...args: unknown[]) => void
     }
-    const assistantRetry = vi.spyOn(internal, 'scheduleAssistantMessageRetry')
     const codexRetry = vi.spyOn(internal, 'scheduleCodexSubagentPoll')
     server.setListener(() => {
       throw new Error('listener failed')
@@ -131,10 +119,8 @@ describe('AgentHookServer listener replay', () => {
       })
       expect(response.status).toBe(204)
       expect(server.getStatusSnapshotForPane(PANE)).toHaveLength(1)
-      expect(assistantRetry).not.toHaveBeenCalled()
       expect(codexRetry).not.toHaveBeenCalled()
     } finally {
-      assistantRetry.mockRestore()
       codexRetry.mockRestore()
       server.stop()
     }
@@ -572,88 +558,6 @@ describe('AgentHookServer listener replay', () => {
             agentType: 'codex',
             prompt: 'ship codex hook status',
             lastAssistantMessage: 'done'
-          })
-        })
-      )
-    } finally {
-      server.stop()
-    }
-  })
-
-  it('accepts Hermes plugin hook posts on /hook/hermes', async () => {
-    const server = new AgentHookServer()
-    await server.start({ env: 'production' })
-    try {
-      const env = server.buildPtyEnv()
-      const response = await fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/hermes`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
-        },
-        body: JSON.stringify(
-          buildBody({
-            hook_event_name: 'pre_llm_call',
-            user_message: 'verify Hermes route'
-          })
-        )
-      })
-      expect(response.status).toBe(204)
-
-      const listener = vi.fn()
-      server.setListener(listener)
-
-      expect(listener).toHaveBeenCalledWith(
-        expect.objectContaining({
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          connectionId: null,
-          payload: expect.objectContaining({
-            state: 'working',
-            prompt: 'verify Hermes route',
-            agentType: 'hermes'
-          })
-        })
-      )
-    } finally {
-      server.stop()
-    }
-  })
-
-  it('accepts Amp plugin hook posts on /hook/amp', async () => {
-    const server = new AgentHookServer()
-    await server.start({ env: 'production' })
-    try {
-      const env = server.buildPtyEnv()
-      const listener = vi.fn()
-      server.setListener(listener)
-
-      const response = await fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/amp`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
-        },
-        body: JSON.stringify(
-          buildBody({
-            hook_event_name: 'agent.start',
-            message: 'verify Amp route'
-          })
-        )
-      })
-      expect(response.status).toBe(204)
-
-      expect(listener).toHaveBeenCalledWith(
-        expect.objectContaining({
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          connectionId: null,
-          payload: expect.objectContaining({
-            state: 'working',
-            prompt: 'verify Amp route',
-            agentType: 'amp'
           })
         })
       )
