@@ -111,9 +111,7 @@ export const TopLevelViewSchema = z.enum([
   'activity',
   'automations',
   'space',
-  'skills',
-  'artifacts',
-  'mobile'
+  'skills'
 ])
 
 export const UiUpdateFields = z
@@ -183,7 +181,6 @@ export const UiUpdateFields = z
     statusBarVisible: z.boolean().optional(),
     usagePercentageDisplay: z.enum(['used', 'remaining']).optional(),
     statusBarUsageMode: z.enum(['verbose', 'compact']).optional(),
-    dismissedUnexpectedSignoutVersion: NullableString.optional(),
     notificationPermissionRequested: z.boolean().optional(),
     osc52ClipboardDefaultOnNoticePending: z.boolean().optional(),
     acknowledgedAgentsByPaneKey: z.record(z.string(), z.number().finite()).optional(),

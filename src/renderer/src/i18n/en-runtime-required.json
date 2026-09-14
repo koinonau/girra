@@ -195,9 +195,7 @@
       },
       "artifacts": {
         "ArtifactsPage": {
-          "openArtifact": "Open artifact",
-          "signInCopy": "Sign in to view and manage artifacts shared through your account.",
-          "signInHeading": "Sign in to Orca"
+          "openArtifact": "Open artifact"
         },
         "artifact-publish-flow": {
           "5cb4f5ec36": "Copy link"
@@ -1688,13 +1686,6 @@
             }
           }
         },
-        "mobile": {
-          "settings": {
-            "search": {
-              "b730ff7049": "experimental"
-            }
-          }
-        },
         "providerAccountScope": {
           "localMac": "Local Mac"
         },
@@ -1721,8 +1712,7 @@
           "terminalQuickCommands": "Commands are saved on this client, then scoped globally or to a project setup so they run from the selected terminal context."
         },
         "shareSkills": {
-          "refreshLinks": "Refresh",
-          "showButton": "Show Skills button"
+          "refreshLinks": "Refresh"
         },
         "ssh": {
           "search": {
@@ -2047,11 +2037,8 @@
           "1c9e7f420a": "Installed bundle skills",
           "2ae587d39c": "Retry incomplete coverage",
           "34c2ef9e71": "Install {{count}} skills",
-          "3677ae58e7": "Update, roll back, or safely remove versions installed by Orca.",
-          "44d118a8f7": "Manage installed skills",
           "470d8d2476": "Confirm remove",
           "561e49ccd1": "Install selected version",
-          "64c71cf7b9": "No Orca-managed skill installs were found on this machine.",
           "74b70892ea": "Local files were modified",
           "86ed219b55": "Choose a version",
           "9c04bd0120": "Installed version",
@@ -2134,6 +2121,7 @@
           "ab5b777350": "Checked home, repository, bundled, and plugin skill folders.",
           "b088e0785d": "Beta",
           "e46e162e2e": "from",
+          "emptyCopy": "The scanned skill folders are empty. Install a shared bundle, or refresh after adding a skill.",
           "fb6bf60b52": "Claude"
         },
         "SkillsSharedLinksHeader": {
@@ -2148,8 +2136,6 @@
           "agentsNoneChosen": "No extra agents",
           "agentsSummary": "Also: {{value0}}",
           "bundleDestinationSummary": "{{value0}} new · {{value1}} already installed · {{value2}} need a decision",
-          "deselectAll": "Deselect optional",
-          "reviewSupportingFiles": "Includes supporting files",
           "trustNote": "Skills are instructions and code from their author. Install what you trust."
         },
         "managedInstall": {

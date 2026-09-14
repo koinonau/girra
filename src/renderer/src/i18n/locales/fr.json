@@ -83,7 +83,6 @@
     "showStatusBar": "Afficher la barre d'état",
     "showTasksButton": "Afficher le bouton Tâches",
     "showAutomationsButton": "Afficher le bouton Automatisations",
-    "showMobileButton": "Afficher le bouton Orca Mobile",
     "showTitlebarAppName": "Afficher le nom de l'app dans la barre de titre",
     "view": "Affichage",
     "reload": "Recharger",
@@ -363,8 +362,6 @@
           "6d3318e813": "Échec de l'import des dépôts",
           "3be0f7df04": "Impossible d'ouvrir le dossier sur le runtime sélectionné",
           "15cf5319ec": "{{path}} a été vérifié sur {{hostName}}, mais cet hôte n'a pas signalé de dossier exploitable.",
-          "2dcd706774": "Le projet existe aussi dans un autre profil",
-          "presenceProfileOverflow": "{{names}} +{{count}} autres",
           "removeProjectFailed": "Échec de la suppression du projet"
         },
         "settings": {
@@ -380,24 +377,6 @@
         },
         "linear": {
           "37d36984d0": "La connexion Linear a été remplacée par une requête plus récente."
-        },
-        "orca": {
-          "profiles": {
-            "612f7f6861": "Échec de la création du profil",
-            "319d7cf39b": "Profil cloud créé",
-            "d6e764e7db": "Reconnecter ce profil",
-            "f0c9e11a6d": "Échec de la création du profil cloud",
-            "8b8fa73174": "La connexion à Orca Cloud n'est pas configurée",
-            "33290e88ed": "Échec de la connexion du profil",
-            "9fcb07a796": "Profil connecté",
-            "2f6c78a039": "Échec de l'actualisation de l'authentification du profil",
-            "a37b5e6d37": "Déconnecté du profil",
-            "83600521e7": "Échec de la déconnexion",
-            "76deec8f58": "Échec du changement d'organisation",
-            "7d4bc516ee": "Échec du changement de profil",
-            "f518e89aa5": "Le projet existe déjà dans ce profil",
-            "f03ae7f27b": "Échec du transfert du projet"
-          }
         },
         "runtime": {
           "status": {
@@ -870,9 +849,6 @@
         "2ec42e1c52": "Pas encore de espace de travail distant",
         "88214a785b": "La synchronisation de l'espace de travail a attendu l'hydratation de la session locale et a expiré",
         "4f78ba5885": "Espace de travail synchronisé",
-        "ef223fbb6b": "Un appareil a tenté de se connecter mais n'est pas jumelé",
-        "11992d0337": "S'il s'agissait de votre téléphone ou d'un autre client Orca, réappairez-le depuis Paramètres → Mobile.",
-        "6573cfe955": "Ouvrir les paramètres mobiles",
         "unresolvedTerminalWorktreeOwner": "La création de terminal est indisponible car le propriétaire du worktree n'a pas pu être déterminé"
       },
       "useSettingsNavigationMetadata": {
@@ -884,8 +860,6 @@
         "3618579df6": "Confidentialité & télémétrie",
         "65ec7d1968": "Accès de confidentialité macOS pour les outils de développement lancés depuis le terminal.",
         "d91ae31fbd": "Autorisations macOS",
-        "95a1886d94": "Contrôlez les terminaux et les agents depuis votre téléphone.",
-        "1cd25673df": "Mobile",
         "31e57d1c70": "Utilisez des machines existantes via SSH pour les fichiers, les terminaux, Git et les espaces de travail.",
         "94a5afe910": "Hôtes SSH",
         "40d80bad8a": "Beta",
@@ -950,12 +924,8 @@
         "pluginsTitle": "Plugins",
         "pluginsDescription": "Installez et gérez les plugins Orca expérimentaux.",
         "tasksDescription": "Connectez des fournisseurs, installez le skill Linear et choisissez ce qui apparaît dans Tâches.",
-        "artifactsTitle": "Artefacts",
-        "artifactsDescription": "Partagez des fichiers HTML et Markdown avec votre équipe et gérez leurs liens publics.",
         "automationsTitle": "Automatisations",
         "automationsDescription": "Planifiez le travail des agents et choisissez si Automatisations apparaît dans la barre latérale.",
-        "shareSkillsTitle": "Partage de skills",
-        "shareSkillsDescription": "Partagez vos skills avec un lien non répertorié. Toute personne qui l'a peut les installer.",
         "floatingWorkspaceWebDescription": "Onglets globaux de terminal et de markdown."
       },
       "useAppMenuPaste": {
@@ -4048,8 +4018,6 @@
           "cd7893fbc1": "Analyse des skills",
           "35b9a724a0": "Disponibles",
           "0c74e7ff34": "Installés",
-          "c13b82793c": "Gérer les installations",
-          "aee7b99cc6": "Installer depuis un lien",
           "filterProvider": "Filtrer par agent",
           "filterSource": "Filtrer par source",
           "allSources": "Tous",
@@ -4057,12 +4025,8 @@
           "closeSkills": "Fermer les skills",
           "closeTooltip": "Fermer · Esc",
           "moreActions": "Plus d'actions",
-          "sharedLinks": "Liens partagés",
           "emptyCopy": "Les dossiers de skills analysés sont vides. Installez un bundle partagé, ou actualisez après avoir ajouté un skill.",
           "retry": "Réessayer",
-          "remoteShareNotice": "Ces skills se trouvent sur {{host}}. Ouvrez Skills sur cette machine pour les partager.",
-          "viewSwitch": "Afficher",
-          "searchLinks": "Rechercher des liens",
           "deleteSkills": "Supprimer des skills…"
         },
         "SkillFreshnessNudge": {
@@ -4165,31 +4129,14 @@
           "checkFailed": "Échec de la vérification"
         },
         "SkillShareDialog": {
-          "reconnect": "Reconnectez votre compte Orca avant de partager.",
-          "unconfigured": "Connectez un compte Orca Cloud avant de partager.",
-          "prepareFailed": "Impossible de préparer ce skill au partage.",
           "peopleRequired": "Sélectionnez au moins un membre de l'équipe.",
-          "publishCancelled": "Téléversement annulé. La copie préparée reste disponible pour une nouvelle tentative.",
-          "publishFailed": "Impossible de publier ce skill. La copie préparée reste disponible pour une nouvelle tentative.",
-          "copied": "Lien de partage copié",
-          "preparing": "Préparation de l'aperçu…",
-          "ready": "Lien du skill prêt",
-          "title": "Partager le skill",
           "readyDescription": "Les destinataires s'authentifient auprès d'Orca avant de pouvoir l'inspecter ou l'installer.",
           "newVersionDescription": "Vérifiez les fichiers exacts, puis publiez une version immuable dans le package Cloud existant.",
           "description": "Vérifiez les fichiers exacts, choisissez qui peut y accéder, puis publiez une version immuable.",
-          "0f07fa2a79": "Publier le skill",
-          "7aa4ba0dba": "Publier une nouvelle version",
-          "3a51d0f34f": "Annuler le téléversement",
-          "e9d652ae3d": "Annulation…",
-          "30985d4fc0": "Annuler",
-          "3af85f6add": "Terminé",
           "readyDescriptionV2": "Toute personne disposant de ce lien non répertorié peut inspecter et installer les skills.",
-          "descriptionV2": "Vérifiez les fichiers exacts, puis publiez une version immuable protégée par un lien non répertorié.",
-          "publishBundle": "Publier le bundle"
+          "descriptionV2": "Vérifiez les fichiers exacts, puis publiez une version immuable protégée par un lien non répertorié."
         },
         "SkillCard": {
-          "d25a1b8ae6": "Partager le skill",
           "01c5a16e01": "Sélectionner {{value0}}"
         },
         "SkillCloudManagementActions": {
@@ -4213,18 +4160,9 @@
           "copyLink": "Copier le lien"
         },
         "SkillInstallDialog": {
-          "39acb9e8f4": "Installer le skill",
-          "59c3b76cdd": "Réessayer l'installation",
-          "241e72f9d6": "Installation…",
-          "05588076a9": "Annuler l'installation",
-          "d198ec91e5": "Fermer",
-          "4a00d133c5": "Orca vérifie l'accès et l'identité du package avant de modifier la machine sélectionnée.",
-          "fcbec627cc": "Installer le skill partagé",
-          "01c5a14e01": "Installer les skills partagés",
-          "opening": "Ouverture de ce lien…"
+          "4a00d133c5": "Orca vérifie l'accès et l'identité du package avant de modifier la machine sélectionnée."
         },
         "SkillInstallManagementDialog": {
-          "8095927ff3": "Fermer",
           "e91af0079f": "Supprimer",
           "470d8d2476": "Confirmer la suppression",
           "c1d03ee50d": "Annuler l'installation",
@@ -4236,71 +4174,24 @@
           "74b70892ea": "Fichiers locaux modifiés",
           "86ed219b55": "Choisir une version",
           "9c04bd0120": "Version installée",
-          "64c71cf7b9": "Aucune installation de skill gérée par Orca n'a été trouvée sur cette machine.",
-          "0900db719a": "— déconnecté",
-          "176fef9516": "· SSH",
-          "6cb1fbe039": "Cet ordinateur",
-          "3677ae58e7": "Mettez à jour, revenez en arrière ou supprimez sans risque les versions installées par Orca.",
-          "44d118a8f7": "Gérer les skills installés",
           "1c9e7f420a": "Skills de bundle installés",
           "34c2ef9e71": "Installer {{count}} skills",
           "a0cab67c2f": "Supprimer {{count}} skills",
           "f970d8088d": "Confirmer la suppression de {{count}} skills",
-          "dab29e4b54": "{{installed}} installés · {{updated}} mis à jour · {{keptLocal}} conservés en local",
           "installAnotherMachine": "Installer sur une autre machine"
         },
         "SkillInstallReviewContent": {
-          "89e2601162": "Abandonner et remplacer",
-          "a5675fb371": "de contenu et l'a laissée intacte. Conservez-la, ou abandonnez explicitement et remplacez-la par cette version.",
-          "37d990b94c": "modifié",
-          "2a31912f14": "Orca a détecté",
-          "651b7d8a57": "La copie locale nécessite une décision",
           "98ed90e523": "Un skill contient des instructions et peut inclure des scripts. Considérez-le comme du code provenant de son auteur.",
           "f72ee4022a": "SHA-256",
           "3d8421ca2f": "exécutable",
           "87137bcb8d": "scripts",
           "fab8fce842": "fichiers",
           "8f9833d509": "Version immuable",
-          "66270286ac": "· Vous pouvez réessayer sans risque.",
-          "1b6ad2ca5c": "vérifié(s).",
-          "3fc62a61eb": "emplacement",
-          "157de228b4": "Inspecter le skill",
-          "69236de8d6": "Vérification…",
-          "27672470d9": "Ouvrir le lien n'installe rien. Examinez d'abord la version immuable.",
-          "66cff7a804": "https://app.orca.dev/skills/share/…",
-          "93eb0fe8c7": "Lien de skill Orca",
-          "releaseNotes": "Notes de version :",
-          "targetHeader": "Cible d'installation"
-        },
-        "SkillInstallTargetFields": {
-          "8e6a972229": "Aucun espace de travail connu sur cette machine.",
-          "7a366323e7": "Dossier",
-          "d628c416a2": "Worktree Git",
-          "5845cfe543": "Choisir un worktree ou un dossier",
-          "0e5b43a9e3": "Espace de travail",
-          "0c10a406fb": "WSL ·",
-          "e5b0d15e64": "Système d'exploitation hôte",
-          "cb47652227": "Environnement d'exécution",
-          "a4dfd33095": "Un seul espace de travail",
-          "c779621aa0": "Skills globaux",
-          "63cc9e31fe": "Destination",
-          "85d85880df": "· SSH",
-          "71eefd7660": "— déconnecté",
-          "0785d0a503": "— mise à jour requise",
-          "8562dd1e6e": "Cet ordinateur",
-          "b8a0b706ad": "Machine"
-        },
-        "SkillInstallWorkspaceCombobox": {
-          "search": "Rechercher des espaces de travail...",
-          "empty": "Aucun espace de travail trouvé."
+          "27672470d9": "Ouvrir le lien n'installe rien. Examinez d'abord la version immuable."
         },
         "SkillShareReviewContent": {
           "e3caf6baeb": "La révocation de ce lien bloque les accès futurs. Elle ne retire pas les copies déjà installées sur les machines des destinataires.",
-          "6d6233a3a4": "Copier le lien",
-          "0142581727": "Téléversement…",
           "ad940367a5": "Validation et publication…",
-          "bf02d6ed9e": "Quoi de neuf dans cette version ?",
-          "f0c0411549": "Notes de version",
           "4895d3e0ee": "Aucun membre de l'équipe disponible.",
           "8188f5d765": "peuvent accéder au lien.",
           "fe204e06f0": "l'organisation",
@@ -4308,44 +4199,25 @@
           "f25429e266": "Personnes sélectionnées",
           "0a49d901ab": "Organisation",
           "6817a7f6f8": "Accès aux skills",
-          "c15d90c10b": "Un compte Orca Cloud connecté est requis.",
           "266527d295": "Publication en tant que {{value0}}{{value1}}.",
           "78d863235c": "Accès",
-          "b3b1d4b911": "SHA-256",
           "77f636eac3": "exécutable",
           "8edd32622f": "scripts",
           "3121f44358": "fichiers",
-          "2dca0b720b": "Publier une nouvelle version du skill",
           "01c5a17e01": "{{value0}} skills",
           "01c5a17e02": "Examiner les skills inclus",
           "01c5a17e03": "{{value0}} fichiers · {{value1}}",
           "unlistedLinkTitle": "Lien non répertorié",
           "unlistedPublishingAs": "Publication en tant que {{value0}}. Toute personne disposant du lien peut inspecter et installer ces skills.",
-          "unlistedLinkDetails": "Le lien n'est ni recherchable ni listé publiquement. Révoquez-le pour bloquer les accès futurs ; les copies installées restent en place.",
-          "bundleReady": "Lien du bundle de skills prêt",
-          "publishBundleVersion": "Publier une nouvelle version du bundle de skills",
-          "shareBundle": "Partager le bundle de skills",
-          "publishingLink": "Publication du lien…",
-          "verifyingPackage": "Vérification du package…"
+          "unlistedLinkDetails": "Le lien n'est ni recherchable ni listé publiquement. Révoquez-le pour bloquer les accès futurs ; les copies installées restent en place."
         },
         "SkillBundleInstallFlow": {
-          "01c5a13e01": "Fermer",
-          "01c5a13e02": "Annuler l'installation",
-          "01c5a13e03": "Installation…",
           "01c5a13e04": "Réessayer {{value0}} skills",
           "01c5a13e05": "Installer {{value0}} skills"
         },
         "SkillBundleInstallOutcome": {
-          "01c5a12e01": "Installés",
-          "01c5a12e02": "Mis à jour",
-          "01c5a12e03": "Inchangé",
-          "01c5a12e04": "Conservé en local",
           "01c5a12e05": "Échec",
-          "01c5a12e06": "Annulé",
-          "01c5a12e07": "L'installation du bundle nécessite votre attention.",
-          "01c5a12e08": "Skills installés et vérifiés.",
-          "01c5a12e09": "{{value0}} skills sélectionnés vérifiés.",
-          "01c5a12e10": "Réessai nécessaire"
+          "01c5a12e06": "Annulé"
         },
         "SkillBundleInstallReview": {
           "01c5a11e01": "Version immuable",
@@ -4354,17 +4226,12 @@
           "01c5a11e04": "{{value0}} scripts",
           "01c5a11e05": "{{value0}} exécutable",
           "01c5a11e06": "SHA-256",
-          "01c5a11e09": "Notes de version :",
           "01c5a11e0a": "Les skills contiennent des instructions et peuvent inclure des scripts. Considérez-les comme du code provenant de leur auteur.",
           "01c5a11e0b": "Skills à installer",
           "01c5a11e0c": "Choisissez n'importe quel sous-ensemble de ce bundle.",
-          "01c5a11e0d": "Tout sélectionner",
           "01c5a11e0e": "Aucune description",
           "01c5a11e0f": "{{value0}} fichiers · {{value1}} scripts",
           "01c5a11e10": "{{value0}} exécutable",
-          "01c5a11e11": "Les copies locales nécessitent une décision",
-          "01c5a11e12": "Par défaut, Orca conserve ces copies locales. Sélectionnez uniquement celles que vous voulez abandonner et remplacer.",
-          "01c5a11e13": "Remplacer {{value0}} ({{value1}})",
           "01c5a11e14": "{{value0}} nouveaux",
           "01c5a11e15": "{{value0}} inchangés",
           "01c5a11e16": "{{value0}} mises à jour",
@@ -4373,25 +4240,16 @@
         "SkillShareSelectionControls": {
           "01c5a15e05": "Partager {{value0}} skills",
           "01c5a15e01": "Annuler le partage",
-          "01c5a15e02": "Partager des skills",
           "01c5a15e03": "{{value0}} sélectionnés",
-          "01c5a15e04": "Sélectionner tous les résultats",
-          "01c5a15e06": "Ouvrez ce skill sur la machine qui l'héberge pour le partager.",
-          "01c5a15e07": "Installez ce skill avant de le partager.",
-          "01c5a15e08": "Seuls les skills home et espace de travail peuvent être partagés.",
-          "01c5a15e09": "Un skill portant ce nom est déjà sélectionné depuis une autre source."
+          "01c5a15e04": "Sélectionner tous les résultats"
         },
         "SkillManagedInstallList": {
           "86c76cb262": "{{count}} bundle de skills"
-        },
-        "skill-install-progress-state": {
-          "currentSkill": "Installation de {{value0}} sur {{value1}} : {{value2}}…"
         },
         "SkillRow": {
           "updatedUnknown": "Aucune date",
           "pathCopied": "Chemin copié",
           "copyPath": "Copier le chemin",
-          "notShareable": "Non partageable",
           "detailPath": "Chemin",
           "detailSource": "Source",
           "detailContents": "Contenu",
@@ -4426,19 +4284,9 @@
           "skillOther": "{{count}} skills",
           "sourceOne": "{{count}} source",
           "sourceOther": "{{count}} sources",
-          "fileOne": "{{count}} fichier",
-          "fileOther": "{{count}} fichiers",
           "resultOne": "{{count}} résultat",
           "resultOther": "{{count}} résultats",
           "selected": "{{count}} sélectionnés",
-          "shareOne": "Partager {{count}} skill",
-          "shareOther": "Partager {{count}} skills",
-          "installOne": "Installer {{count}} skill",
-          "installOther": "Installer {{count}} skills",
-          "retryOne": "Réessayer {{count}} skill",
-          "retryOther": "Réessayer {{count}} skills",
-          "linkOne": "{{count}} lien",
-          "linkOther": "{{count}} liens",
           "deleteOne": "Supprimer {{count}} skill",
           "deleteOther": "Supprimer {{count}} skills",
           "deletedOne": "{{count}} skill supprimé",
@@ -4453,66 +4301,20 @@
           "remote": "Runtime connecté"
         },
         "share": {
-          "fileExecutable": "exécutable",
-          "fileScript": "script",
-          "reviewFiles": "Examiner les fichiers exécutables",
-          "reviewSkills": "Examiner les skills inclus",
-          "releaseNotesVersion": "Notes de version",
-          "releaseNotesOptional": "Ajouter des notes de version (facultatif)",
-          "releaseNotesFirst": "Décrivez cette version",
           "readyDescription": "Copiez le lien pour le partager.",
           "newVersionDescription": "Publie une version immuable dans le package existant.",
           "description": "Publie une version immuable protégée par un lien non répertorié.",
           "accessSummary": "Toute personne disposant du lien peut l'installer. Il n'est listé nulle part, et le révoquer bloque les nouvelles installations — pas les copies déjà installées. Publication en tant que {{value0}}.",
-          "manageLinks": "Gérer ou révoquer ce lien dans les Paramètres",
-          "scriptOne": "{{count}} script",
-          "scriptOther": "{{count}} scripts",
-          "executableOne": "{{count}} exécutable",
-          "executableOther": "{{count}} exécutables",
-          "noExecutableContent": "Aucun script ni exécutable",
-          "newVersionDescriptionPlain": "Ajoute une nouvelle version au lien existant.",
-          "accessSummaryShort": "Lien non répertorié — toute personne qui le possède peut l'installer. Publication en tant que {{value0}}.",
-          "accessSummaryPlain": "Lien non répertorié — toute personne qui le possède peut l'installer."
-        },
-        "description": {
-          "showLess": "Afficher moins",
-          "showMore": "Afficher plus"
+          "accessSummaryShort": "Lien non répertorié — toute personne qui le possède peut l'installer. Publication en tant que {{value0}}."
         },
         "install": {
-          "agentsLabel": "Agents",
           "agentsCanonical": "Toujours installé pour {{value0}}, qui lisent {{value1}}.",
           "agentsNoneChosen": "Aucun agent supplémentaire",
           "agentsSummary": "Également : {{value0}}",
-          "agentNotInstalled": "Non installé",
           "bundleDestinationSummary": "{{value0}} nouveaux · {{value1}} déjà installés · {{value2}} nécessitent une décision",
           "trustNote": "Les skills sont des instructions et du code provenant de leur auteur. N'installez que ce en quoi vous avez confiance.",
-          "agentsNone": "Aucun agent sélectionné",
-          "agentsSelected": "Installation pour : {{value0}}",
           "agentAlways": "Toujours",
-          "agentsCanonicalNote": "{{value0}} lisent {{value1}}, que chaque installation écrit.",
-          "linkHint": "Ouvrir un lien n'installe jamais rien — vous l'examinez d'abord.",
-          "rowNeedsDecision": "Nécessite une décision",
-          "rowInstalled": "Déjà installé",
-          "rowUpdate": "Mettre à jour",
-          "rowNew": "Nouveau",
-          "chooseSkills": "Choisissez ce que vous voulez installer depuis ce lien.",
-          "singleRunnableWarning": "Ce skill inclut des scripts ou des fichiers binaires.",
-          "runnableWarning": "{{affectedCount}} des {{selectedCount}} skills sélectionnés incluent des scripts ou des fichiers binaires : {{affected}}.",
-          "reviewRunnableFiles": "Inclut des scripts ou des fichiers binaires",
-          "reviewSupportingFiles": "Inclut des fichiers annexes",
-          "reviewInstructions": "À propos de ce skill",
-          "supportingFileWarning": "Les skills sélectionnés incluent {{fileCount}} fichiers en plus de SKILL.md.",
-          "agentAccessWarning": "Les skills contiennent des instructions que votre agent pourrait suivre. Ne continuez que si vous faites confiance à la source de ce lien de partage.",
-          "fileBinary": "binaire",
-          "fileRunnable": "exécutable",
-          "agentsCountBadge": "{{count}} sélectionnés",
-          "agentsCountLabel": "{{count}} {{label}}",
-          "targetAgentsHeader": "Agents ciblés",
-          "deselectAll": "Désélectionner les facultatifs",
-          "selectAll": "Tout sélectionner",
-          "canonicalHeader": "Agents standard (toujours inclus)",
-          "canonicalExplanation": "Ces agents lisent nativement {{root}}, où Orca installe par défaut :",
-          "additionalAgentsHeader": "Répertoires d'agents supplémentaires"
+          "agentsCanonicalNote": "{{value0}} lisent {{value1}}, que chaque installation écrit."
         },
         "filter": {
           "allAgents": "Tous les agents",
@@ -4521,7 +4323,6 @@
         "SkillsSelectionHeader": {
           "exit": "Quitter la sélection",
           "exitTooltip": "Quitter la sélection · Esc",
-          "title": "Sélectionner les skills à partager",
           "selectAll": "Sélectionner les {{count}} éligibles",
           "clear": "Effacer",
           "deleteTitle": "Sélectionner les skills à supprimer"
@@ -4531,53 +4332,13 @@
           "updated": "Mis à jour",
           "copy": "Copier"
         },
-        "SkillSharedLinkRow": {
-          "contentsUnavailable": "Impossible de charger le contenu de ce lien.",
-          "loading": "Chargement du contenu…",
-          "deleteFailed": "Orca n'a pas pu supprimer cet élément du Cloud.",
-          "deleted": "Supprimé du Cloud",
-          "confirmDelete": "Confirmer la suppression",
-          "moreActions": "Autres actions pour {{name}}",
-          "deletePackage": "Supprimer du Cloud"
-        },
-        "SkillSharedLinksView": {
-          "loading": "Chargement des liens partagés…",
-          "noMatches": "Aucun lien ne correspond à cette recherche."
-        },
         "SkillsSharedLinksHeader": {
           "back": "Retour aux skills",
           "backTooltip": "Retour aux skills · Esc",
           "unlisted": "Non répertorié — seules les personnes disposant d'un lien peuvent l'ouvrir."
         },
         "managedInstall": {
-          "versionLabel": "Version",
-          "editedWarning": "Vos modifications sont conservées, sauf si vous choisissez de les abandonner.",
-          "finishInstall": "Terminer l'installation",
-          "useVersion": "Utiliser cette version",
-          "reinstall": "Réinstaller",
-          "cancel": "Annuler",
-          "sendToMachine": "Envoyer vers une autre machine",
-          "confirmRemove": "Confirmer la suppression",
-          "remove": "Supprimer",
-          "discardEditsRemove": "Abandonner mes modifications et supprimer",
-          "discardEdits": "Abandonner mes modifications et réinstaller",
-          "titleMore": "{{name}} +{{count}}",
-          "scopeWorkspace": "Cet espace de travail",
-          "scopeGlobal": "Partout",
-          "installedOn": "Installé le {{date}}",
-          "stateEdited": "Modifié après l'installation",
-          "stateMissing": "Des fichiers sont manquants",
-          "skillEdited": "Modifié",
-          "skillMissing": "Manquant",
-          "versionCurrent": "{{date}} (installé)",
-          "installElsewhere": "Installer ailleurs…"
-        },
-        "skillWarningPreview": {
-          "bundleDescription": "Un bundle d'aperçu couvrant tous les niveaux d'avertissement.",
-          "instructionsOnlyDescription": "Instructions entièrement contenues dans SKILL.md.",
-          "supportingFilesDescription": "Inclut des fichiers de référence lisibles en plus des instructions principales.",
-          "runnableFilesDescription": "Inclut des scripts qu'un agent peut exécuter avec vos accès.",
-          "binaryFilesDescription": "Inclut des ressources opaques et un binaire exécutable."
+          "sendToMachine": "Envoyer vers une autre machine"
         },
         "SkillDelete": {
           "dismissResults": "Fermer",
@@ -4966,8 +4727,6 @@
         "SidebarNav": {
           "80611a8b10": "Recherche",
           "0c3395fd32": "Rechercher parmi les worktrees et les onglets du navigateur",
-          "c86d83b5c3": "Nouveau",
-          "1b5c41caee": "Orca Mobile",
           "9c95e1ce91": "Agents",
           "f323383e9a": "Automatisations",
           "e7ad3c540d": "Ouvrir les tâches Jira",
@@ -4976,7 +4735,6 @@
           "0ccba862b8": "Ouvrir les tâches GitHub",
           "fee535205b": "Tâches",
           "d599269755": "Masquer de la barre latérale",
-          "artifacts": "Artefacts",
           "skills": "Skills"
         },
         "SidebarRepositoryFilterSection": {
@@ -6227,8 +5985,6 @@
           "b707773a0d": "Quand activé, fermer la fenêtre laisse Orca tourner dans la zone de notification au lieu de quitter.",
           "0cd9b8228f": "Choisissez l'icône d'app affichée dans le Dock et le sélecteur de fenêtres.",
           "ca1590d42f": "Icône de l'app",
-          "61d842eca0": "Afficher le raccourci Orca Mobile dans la barre latérale. Il reste accessible depuis la Toolbox.",
-          "9da1020447": "Afficher le bouton Orca Mobile",
           "5db6ba961f": "Afficher le bouton Orca Mobile en haut de la barre latérale gauche.",
           "fa882a3e6b": "Afficher le bouton Automatisations en haut de la barre latérale gauche.",
           "511f270ebb": "Afficher le bouton Automatisations",
@@ -6788,9 +6544,6 @@
           "0e9fc0eadc": "Dossier des espaces de travail",
           "e2955d9ccb": "Configure où sont créés les nouveaux espaces de travail.",
           "7511097c5d": "Espace de travail",
-          "31e300af1c": "Confirmer avant de supprimer les artefacts",
-          "fb29a73a17": "Afficher une boîte de dialogue de confirmation avant de supprimer un artefact partagé et de rompre son lien public.",
-          "bf46474e33": "Demander confirmation avant de supprimer un artefact partagé. Quiconque détient son lien public perd l'accès.",
           "externalWorktrees": "Worktrees externes",
           "externalWorktreesDescription": "Choisissez si les worktrees créés en dehors d'Orca apparaissent par défaut.",
           "show": "Afficher",
@@ -7100,54 +6853,18 @@
           "9fc5d203ff": "Orca Mobile se connecte directement à cet ordinateur. Pour l'utiliser loin du même réseau local, placez votre ordinateur et votre téléphone sur le même réseau privé superposé (overlay), puis générez le QR code avec cette adresse réseau sélectionnée.",
           "39fad211d9": "Se connecter hors de votre Wi-Fi grâce à un tailnet",
           "a9db5d771d": "Actualiser les interfaces réseau",
-          "b2c384cfd6": "Aucune interface trouvée",
           "d536b5e20d": "Choisissez l'adresse réseau à annoncer dans le QR code. Utilisez votre adresse LAN pour un appairage sur le même réseau, ou une adresse de réseau superposé (Tailscale, ZeroTier) pour un accès entre réseaux distincts.",
           "406a35121c": "Interface réseau",
           "c541f67790": "Générer le QR code",
           "1e64659126": "Régénérer"
         },
         "MobilePane": {
-          "dd3cd78d04": "Scanner avec Orca Mobile",
-          "35100bca5d": "Pendant que vous utilisez un terminal sur votre téléphone, Orca le réduit pour tenir sur l'écran du téléphone. À la fermeture de l'app ou quand vous passez à autre chose, ce réglage détermine s'il garde la taille téléphone (pour que les outils CLI interactifs ne se reforment pas) ou reprend sa taille bureau. Vous pouvez toujours utiliser Restaurer ce terminal ou Restaurer tous les terminaux sur la bannière pour redimensionner manuellement.",
-          "ee56f1c7e4": "Quand vous quittez l'app mobile",
-          "3939fd062c": "La révocation d'un appareil le déconnecte immédiatement.",
-          "254a6d09e4": "Appairé",
-          "d7ce676270": "Appareils appairés",
-          "e778ecb209": "Ou collez ce code dans l'app mobile :",
-          "310924ad2c": "Scannez ce code avec l'app mobile Orca. Chaque code crée un jeton d'appareil unique.",
-          "870e1b5ca5": "Échec de la révocation de l'appareil",
-          "2e3dd0bc29": "Appareil révoqué",
-          "711231348f": "Échec de la copie du code d'appairage",
-          "e3c427e020": "Échec de la génération du QR code",
-          "cb9067c1c1": "Le transport WebSocket n'est pas actif",
-          "d714614dbf": "Échec de l'actualisation des interfaces réseau",
-          "ff865419dc": "Après 30 minutes",
-          "d4ba07d914": "Après 5 minutes",
-          "c474aa09d8": "Après 1 minute",
-          "aa1263e881": "Conserver à la taille téléphone (par défaut)",
-          "6436e56546": "QR code pour l'appairage mobile",
-          "1b1b70279a": "Aucun appareil appairé pour le moment.",
-          "1592afcc7a": "Aucun appareil appairé pour le moment. Scannez le QR code avec l'app mobile Orca.",
-          "relayDegradedNotice": "Le relais est injoignable — ce code ne fonctionne que sur votre LAN ou via Tailscale. Régénérez-le pour réessayer.",
-          "pairingQrError": "Ce code d'appairage n'a pas pu être rendu sous forme de QR code. Copiez-le plutôt dans Orca Mobile.",
-          "pairingCodeReady": "Code d'appairage prêt",
-          "copyPairingCode": "Copier le code d'appairage",
-          "diagnosticsCopied": "Diagnostics copiés",
-          "diagnosticsCopyFailed": "Échec de la copie des diagnostics"
+          "relayDegradedNotice": "Le relais est injoignable — ce code ne fonctionne que sur votre LAN ou via Tailscale. Régénérez-le pour réessayer."
         },
         "MobileSettingsPane": {
           "9a3c280e49": "GitHub Releases",
           "b0088412a1": "ou l'APK Android depuis",
-          "b5a2ed83ff": "App Store",
-          "installIntro": "Installez Orca Mobile depuis",
-          "installOutro": ", puis appairez ci-dessous.",
-          "androidApkLabel": "APK Android",
-          "c8491c17ef": "Contrôlez Orca depuis votre téléphone en scannant un QR code. Bêta / avant-première — attendez-vous à des bugs et à des changements incompatibles. Obtenez l'app iOS depuis",
-          "e7a3ae8c4e": "Mobile",
-          "174f4a3c6d": "Contrôlez les terminaux et les agents depuis votre téléphone.",
-          "1de96ec8a6": "Afficher le bouton Orca Mobile",
-          "682293cadf": "Afficher le bouton Orca Mobile en haut de la barre latérale gauche.",
-          "d4f2b65f30": "Afficher le raccourci Orca Mobile dans la barre latérale."
+          "c8491c17ef": "Contrôlez Orca depuis votre téléphone en scannant un QR code. Bêta / avant-première — attendez-vous à des bugs et à des changements incompatibles. Obtenez l'app iOS depuis"
         },
         "NotificationsPane": {
           "906b4afebf": "Envoyer une notification de test",
@@ -7714,8 +7431,6 @@
           "d7e3f62d70": "Confidentialité & télémétrie",
           "9b83cc62c2": "Accès de confidentialité macOS pour les outils de développement lancés depuis le terminal.",
           "65660d4548": "Autorisations macOS",
-          "c6c01ac209": "Contrôlez les terminaux et les agents depuis votre téléphone.",
-          "c40dadaac8": "Mobile",
           "c2ee313198": "Utilisez des machines existantes via SSH pour les fichiers, les terminaux, Git et les espaces de travail.",
           "9b02492d1f": "Hôtes SSH",
           "b5ee17826b": "Appairez des runtimes Orca distants pour des sessions persistantes, un état distant plus riche et un transfert web ou mobile.",
@@ -8492,15 +8207,10 @@
             "2cfb3420c0": "icône de l'app",
             "e80c2af428": "Choisissez l'icône d'app affichée dans le Dock et le sélecteur de fenêtres.",
             "2b313598c6": "Icône de l'app",
-            "839fb1e3ed": "boîte à outils",
             "ac79fe4a04": "afficher",
             "648eeada79": "masquer",
             "6cf5f54ce1": "bouton",
             "5bff6a2ef0": "barre latérale",
-            "5e5b8878bf": "téléphone",
-            "74618577c7": "mobile",
-            "682293cadf": "Afficher le bouton Orca Mobile en haut de la barre latérale gauche.",
-            "1de96ec8a6": "Afficher le bouton Orca Mobile",
             "4c920ab2d1": "planification",
             "58f4e22fa2": "automatisation",
             "b186f3cefb": "automatisations",
@@ -9282,69 +8992,6 @@
               "25159de808": "émulateur mobile",
               "9595354cff": "Configurez la prise en charge des émulateurs mobiles pour Orca et les agents de codage.",
               "cdd3c31918": "Émulateur mobile"
-            }
-          },
-          "pane": {
-            "search": {
-              "dbccde3a60": "clôturer",
-              "9e16be01d6": "arrière-plan",
-              "3a5e31e84b": "laisser",
-              "8015fd9523": "conserver",
-              "aa3f736042": "redimensionner",
-              "356c31d6dc": "largeur",
-              "fadcbfdd99": "ajuster",
-              "ad08035c5f": "téléphone",
-              "6cd2bfdb0e": "restaurer",
-              "b34ad5b3a7": "terminal",
-              "6db86f445f": "mobile",
-              "707fc78052": "Choisissez ce qu'il advient des terminaux consultés sur mobile après la fermeture de l'app ou un changement de contexte.",
-              "1e711aca11": "Quand vous quittez l'app mobile",
-              "126afc5dbd": "distant",
-              "70f505f3c3": "lan",
-              "1802188b5d": "Wi-Fi",
-              "dd6e671aa9": "adresse",
-              "1f70d63998": "IP",
-              "d0c89bc4a9": "superposition",
-              "87711f4b8f": "vpn",
-              "16bff559a0": "tailnet",
-              "c690e3ee38": "tailscale",
-              "a023683767": "interface",
-              "7b37c2e557": "réseau",
-              "3190ef67a4": "Choisissez l'adresse réseau à utiliser pour l'appairage mobile.",
-              "d96c315227": "Interface réseau",
-              "7d01f93ec0": "connecté",
-              "5e8fda4d7f": "appairé",
-              "905c65a308": "révoquer",
-              "82783d9b71": "appareils",
-              "13419718b3": "Gérez les appareils mobiles appairés.",
-              "9d3a9397ba": "Appareils connectés",
-              "2128a21096": "scanner",
-              "e518cbd61c": "appairer",
-              "4a0c826f3d": "code",
-              "3c1807a81a": "QR",
-              "7fb728fb2b": "Appairez un appareil mobile en scannant un code QR.",
-              "d49925710a": "Appairage mobile"
-            }
-          },
-          "settings": {
-            "search": {
-              "b730ff7049": "expérimental",
-              "8d4ba0ef09": "bêta",
-              "6bfa001752": "APK",
-              "a7eececc1d": "android",
-              "7e801801ac": "distant",
-              "0b7e585cb9": "scanner",
-              "59b1d75fd1": "code",
-              "87816d1c59": "QR",
-              "cf2c93b479": "appairer",
-              "f4ed142753": "téléphone",
-              "f213400800": "mobile",
-              "671eb4173c": "Contrôlez les terminaux et les agents depuis votre téléphone.",
-              "ffd52a96e4": "Mobile",
-              "1de96ec8a6": "Afficher le bouton Orca Mobile",
-              "682293cadf": "Afficher le bouton Orca Mobile en haut de la barre latérale gauche.",
-              "e4f4daea0e": "relais",
-              "5d5af8e041": "iPhone"
             }
           }
         },
@@ -10311,14 +9958,7 @@
           "behindBaseRefToastDescription": "Invite persistante avec un lien Paramètres intégré et une action en pied de page.",
           "notificationPlayground": "Terrain d'essai des notifications",
           "notificationPlaygroundDescription": "Déclencheurs réservés au développement pour vérifier la disposition des toasts, les actions de récupération et le retour à la ligne des textes longs.",
-          "devOnly": "Réservé au développement",
-          "orcaCloud": "Orca Cloud",
-          "orcaCloudDescription": "Aperçu réservé au développement de la connexion au cloud officiel. Masqué en production ; en dev, il apparaît aussi dans le sélecteur de comptes de la barre latérale dès que ORCA_CLOUD_API_URL et ORCA_CLOUD_CLIENT_ID sont définis.",
-          "orcaCloudStatus": "Statut",
-          "orcaCloudSignOut": "Se déconnecter",
-          "orcaCloudConnect": "Connecter le profil",
-          "orcaCloudRefresh": "Actualiser le statut",
-          "orcaCloudNotConfigured": "Définissez ORCA_CLOUD_API_URL et ORCA_CLOUD_CLIENT_ID pour prévisualiser la connexion à Orca Cloud dans ce build de développement."
+          "devOnly": "Réservé au développement"
         },
         "EphemeralVmRecipeRow": {
           "useInWorkspace": "Utiliser dans l'espace de travail"
@@ -10464,35 +10104,6 @@
           "unavailable": "Indisponible",
           "standby": "Veille — aucun appareil via Relay"
         },
-        "MobilePairingConnectionOptions": {
-          "ready": "Prêt",
-          "connecting": "Connexion",
-          "available": "Disponibles",
-          "reconnecting": "Reconnexion",
-          "unavailable": "Indisponible",
-          "pathGroup": "Comment le téléphone joint cet ordinateur",
-          "anywhereTitle": "Orca Relay",
-          "anywhereDescription": "Le téléphone peut être en données mobiles ou sur n'importe quel Wi‑Fi. Connexion requise uniquement pour Relay.",
-          "signInRequired": "Relay uniquement — le LAN n'a pas besoin de compte.",
-          "relayUnavailable": "Orca Relay n'est pas disponible dans ce build. Utilisez le LAN.",
-          "signIn": "Se connecter pour Relay",
-          "signInAgain": "Se reconnecter pour Relay",
-          "localTitle": "LAN",
-          "localDescription": "Le téléphone doit être sur ce Wi‑Fi ou connecté via Tailscale. Aucun compte requis.",
-          "retrying": "Nouvelle tentative"
-        },
-        "MobilePairingSetupSection": {
-          "title": "Jumeler un téléphone",
-          "overview": "Générez un QR code, puis scannez-le dans Orca Mobile sous Jumeler le bureau.",
-          "step1Title": "Connexion",
-          "step2Title": "Adresse de cet ordinateur",
-          "step2LocalDescription": "Le téléphone doit pouvoir joindre cette adresse via Tailscale ou le Wi‑Fi.",
-          "regenerate": "Régénérer le QR code",
-          "generate": "Générer le QR code",
-          "refresh": "Actualiser les interfaces réseau",
-          "step2RelayDescription": "Facultatif. Choisissez l'adresse Wi‑Fi ou Tailscale que votre téléphone utilisera à proximité — généralement plus rapide que Relay. Relay reste fonctionnel quand vous êtes loin.",
-          "step2RelayDisclosure": "Utiliser aussi un chemin local plus rapide"
-        },
         "MobileRelayBetaAvailability": {
           "about": "À propos de la bêta d'Orca Relay",
           "beta": "Beta",
@@ -10517,9 +10128,6 @@
           "terminalAriaLabel": "Terminal d'installation de la skill Linear",
           "manageConnectionHint": "Consultez les espaces de travail Linear connectés et les clés d'API dans",
           "manageConnectionLink": "Intégrations"
-        },
-        "MobileRelayBetaNotice": {
-          "notice": "Orca Relay est en bêta."
         },
         "EditorFontFamilySetting": {
           "title": "Police de l'éditeur",
@@ -10919,56 +10527,7 @@
           "account": "Compte Orca",
           "connected": "Connecté",
           "signInRequired": "La connexion est requise pour téléverser et gérer les artifacts.",
-          "signingIn": "Connexion…",
-          "signIn": "Se connecter à Orca",
-          "title": "Artefacts",
-          "description": "Partagez des fichiers HTML et Markdown avec votre équipe et gérez leurs liens publics.",
-          "howToTitle": "Comment utiliser Artifacts",
-          "howToDescription": "Publiez des fichiers HTML ou Markdown sous forme de liens publics, puis partagez-les avec votre équipe.",
-          "shareStepTitle": "Choisir un fichier à partager",
-          "shareStepDescription": "Ouvrez un fichier HTML ou Markdown et sélectionnez Partager comme artifact, ou demandez à un agent de le partager.",
-          "linkStepTitle": "Copier le lien public",
-          "linkStepDescription": "Après publication, copiez le lien et envoyez-le à votre équipe.",
-          "manageStepTitle": "Gérer dans Orca",
-          "manageStepDescription": "Ouvrez Artifacts depuis la barre latérale pour prévisualiser ou supprimer des liens.",
-          "openArtifacts": "Ouvrir Artifacts",
-          "openArtifactsDescription": "Consultez et supprimez les liens partagés via votre compte.",
-          "showButton": "Afficher le bouton Artifacts",
-          "showButtonDescription": "Afficher le raccourci Artifacts dans la barre latérale.",
-          "openArtifactsDescriptionV2": "Prévisualisez, copiez et gérez les liens partagés via votre compte.",
-          "signInTitle": "Se connecter pour partager des artifacts",
-          "signInDescription": "Utilisez votre compte Orca pour téléverser des artifacts et gérer leurs liens publics.",
-          "signInAgain": "Se reconnecter",
-          "enableStepTitle": "Activer le partage d'artifacts",
-          "enableStepWebDescription": "Ouvrez Paramètres → Artifacts dans l'app Orca de bureau sur l'appareil hôte et activez la publication.",
-          "enableStepDescription": "Activez « Autoriser la publication de liens d'artifacts publics » ci-dessus.",
-          "allowPublishing": "Autoriser la publication de liens d'artifacts publics",
-          "allowPublishingWebDescription": "Bureau uniquement. Ouvrez Paramètres → Artifacts sur l'appareil hôte pour modifier ce paramètre.",
-          "allowPublishingDescription": "Publiez des fichiers HTML et Markdown sous forme de liens ouvrables par quiconque possède l'URL. Les liens existants demeurent jusqu'à leur suppression dans Artifacts.",
-          "howToDescriptionDisabled": "Activez le partage d'artifacts ci-dessus pour publier des fichiers HTML ou Markdown sous forme de liens publics.",
-          "allowPublishingSearchDescription": "Autoriser Orca à publier des fichiers HTML et Markdown sous forme de liens publics."
-        },
-        "orcaAccount": {
-          "connected": "Connecté",
-          "reconnectRequired": "Votre session a expiré. Reconnectez-vous pour utiliser les fonctions cloud.",
-          "unavailable": "La connexion Orca n'est pas disponible dans ce build.",
-          "signedOut": "Connectez-vous pour étendre Orca avec des fonctions cloud, dont Artifacts et Orca Relay.",
-          "checking": "Vérification de l'état du compte…",
-          "account": "Compte Orca",
-          "signOut": "Se déconnecter",
-          "signingIn": "Connexion…",
-          "signInAgain": "Se reconnecter",
-          "signIn": "Se connecter à Orca",
-          "title": "Compte Orca",
-          "description": "Partagez instantanément votre travail et accédez à votre poste depuis Orca Mobile, où que vous soyez.",
-          "searchDescription": "Connectez-vous ou déconnectez-vous du compte utilisé par Artifacts et Orca Relay.",
-          "benefitsTitle": "Inclus avec votre compte",
-          "artifactsTitle": "Partage d'artifacts",
-          "artifactsDescription": "Publiez des fichiers HTML et Markdown, puis gérez chaque lien partagé depuis Orca.",
-          "relayTitle": "Orca Relay",
-          "relayDescription": "Connectez Orca Mobile à ce poste via réseau mobile ou n'importe quel Wi-Fi.",
-          "skillsTitle": "Partage de skills",
-          "skillsDescription": "Partagez une skill ou tout un ensemble derrière un lien non répertorié, et installez-les sur toutes les machines que vous utilisez."
+          "openArtifactsDescription": "Consultez et supprimez les liens partagés via votre compte."
         },
         "automations": {
           "showButton": "Afficher le bouton Automatisations",
@@ -10992,47 +10551,7 @@
           "off": "Désactivé"
         },
         "shareSkills": {
-          "title": "Partage de skills",
-          "description": "Partagez vos skills avec un lien non répertorié. Toute personne qui l'a peut les installer.",
-          "allowAgentPublishing": "Autoriser les agents et la CLI Orca à publier des liens de skills",
-          "allowAgentPublishingDescription": "Permet aux commandes de publier des skills installées nommées explicitement. Les dossiers de skills peuvent contenir des scripts, de la configuration ou des secrets, c'est donc désactivé par défaut.",
-          "allowAgentPublishingWebDescription": "Bureau uniquement. Ouvrez Paramètres → Partage de skills sur l'appareil hôte pour modifier ce paramètre.",
-          "selectTitle": "Sélectionnez une ou plusieurs skills",
-          "selectDescription": "Ouvrez Skills, choisissez Partager des skills, puis sélectionnez les skills à regrouper derrière un seul lien.",
-          "reviewTitle": "Vérifier et publier",
-          "reviewDescription": "Vérifiez les fichiers, scripts et exécutables inclus avant de téléverser le bundle immuable.",
-          "copyTitle": "Copier le lien non répertorié",
-          "copyDescription": "Quiconque possède le lien peut inspecter et installer toutes les skills ou celles sélectionnées, sans se connecter.",
-          "manageTitle": "Gérer ou révoquer les liens",
-          "manageDescription": "La révocation bloque tout accès futur. Les skills déjà installées sur une autre machine y restent.",
-          "linkTitle": "Liens de skills non répertoriés",
-          "linkDescription": "Les bundles partagés ne sont ni recherchables ni listés dans Orca. Le lien tient lieu d'identifiant : envoyez-le uniquement à des personnes de confiance.",
-          "signInTitle": "Se connecter pour partager des skills",
-          "signInWebDescription": "La publication et la gestion des liens sont disponibles dans l'app Orca de bureau.",
-          "signInDescription": "Utilisez votre compte Orca pour publier des bundles et gérer leurs liens. Les destinataires n'ont pas besoin de compte.",
-          "signingIn": "Connexion…",
-          "signInAgain": "Se reconnecter",
-          "signIn": "Se connecter à Orca",
-          "howToTitle": "Comment partager des skills",
-          "howToDescription": "Publiez une seule skill ou un bundle, par exemple une collection de 30 skills, derrière un seul lien.",
-          "openSkills": "Ouvrir Skills",
-          "openSkillsDescription": "Publiez un bundle, installez depuis un lien ou gérez les skills installées et partagées.",
-          "searchDescription": "Partagez vos skills avec un lien non répertorié. Toute personne qui l'a peut les installer.",
-          "linksReconnect": "Reconnectez-vous pour gérer les liens partagés.",
-          "linksUnavailable": "Les liens partagés sont indisponibles pour le moment.",
-          "linkCopied": "Lien de partage copié",
-          "linkRevoked": "Lien révoqué",
-          "revokeFailed": "Orca n'a pas pu révoquer ce lien.",
-          "activeLinks": "Liens partagés actifs",
-          "activeLinksDescription": "Seules les personnes disposant du lien peuvent l'ouvrir. Annulez le partage d'un lien pour bloquer toute inspection et installation futures.",
-          "refreshLinks": "Actualiser",
-          "noActiveLinks": "Aucun lien actif. Publiez un bundle de skills depuis Skills pour en créer un.",
-          "copyLink": "Copier le lien",
-          "confirmUnshare": "Confirmer l'arrêt du partage",
-          "unshare": "Ne plus partager",
-          "showButton": "Afficher le bouton Skills",
-          "showButtonDescription": "Afficher le raccourci Skills dans la barre latérale.",
-          "manageInSkills": "Gérer dans Skills"
+          "refreshLinks": "Actualiser"
         },
         "bitbucket": {
           "credentials": {
@@ -12889,227 +12408,32 @@
       },
       "mobile": {
         "MobileHero": {
-          "a8fb43cf1c": "Continuer",
-          "3f90dbd274": "Terminé",
-          "b622eba64d": "Retour",
-          "65b3f2e8bc": "Génération…",
-          "27735e5f4e": "QR d'appairage",
           "bb0074ce11": "Code QR d'appairage",
-          "010dddcf27": "Copier le code d'appairage",
-          "4c1df4eba7": "Impossible de scanner ?",
-          "85067b9e06": "Actualiser les interfaces réseau",
           "ca85e595a7": "Aucune interface trouvée",
           "79d2f480da": "Interface réseau à annoncer",
-          "dfd2aa9d5d": "Réseau",
-          "2f077ef4eb": ", puis scannez le code.",
-          "3aa7bb2d8b": "Appairer l'ordinateur",
-          "d1495e5e64": "Ouvrez Orca Mobile, touchez",
-          "3960f5c339": "Étape 2 sur 2",
-          "3241f3c26a": "QR d'installation",
           "7af266b80d": "Code QR d'installation",
-          "aa97420ba4": "Copier le lien d'installation",
-          "ac1eb64952": "Android",
-          "711e6f4b47": "iOS",
-          "e75647ace0": "Scannez le code QR avec votre téléphone ou ouvrez le lien d'installation pour récupérer Orca Mobile.",
-          "0d9b33299e": "Récupérez l'app.",
-          "92ddfdfa1f": "Étape 1 sur 2",
-          "ff48d9d520": "Appairer un autre appareil",
-          "f9cbf4bb53": "Révoquer l'appareil",
-          "34f878d04f": "Révoquer {{value0}}",
-          "94829abdb1": "Appairé",
-          "266c18c105": "Ouvrez Orca Mobile pour reprendre là où vous en étiez, ou appairez un autre appareil.",
-          "5410d55d79": "Orca Mobile",
-          "10d27b4cba": "Commencer",
-          "da1d5e5ed0": "Disponible sur",
-          "ec0607bf66": "Plateformes mobiles prises en charge",
-          "b4ccce5cb7": "Pilotez Orca depuis votre téléphone. Suivez les agents, examinez les changements et lancez des tâches même loin de votre bureau.",
-          "cd4e5e816f": "Vos espaces de travail, dans votre poche.",
-          "a6cffbbb0b": "Générer le code",
-          "e59a252eca": "Régénérer le code",
-          "d0b52871ce": "Vos téléphones sont appairés.",
-          "051978a785": "Votre téléphone est appairé.",
-          "channel": {
-            "group": "Canal de release",
-            "preview": "Aperçu",
-            "stable": "Stable"
-          },
-          "relayDegradedNotice": "Relay injoignable — ce code ne fonctionne que sur votre LAN ou Tailscale.",
-          "pairingQrError": "Ce code d'appairage n'a pas pu être rendu sous forme de QR code. Copiez-le plutôt dans Orca Mobile.",
-          "noRelayCode": "Aucun code d'appairage disponible",
-          "noPairingCode": "Aucun code d'appairage disponible",
-          "qrSignInRequired": "Connectez-vous pour créer un code d'appairage Relay",
-          "qrRenderFailed": "Impossible d'afficher le code QR — copiez le code ci-dessous",
-          "qrGeneratePrompt": "Générez un code d'appairage pour continuer",
-          "pairingCodeReady": "Code d'appairage prêt",
-          "pairThisMac": "Appairez ce Mac.",
-          "pairThisPc": "Appairez ce PC.",
-          "pairThisComputer": "Appairez cet ordinateur.",
-          "directAddressDisclosure": "Utiliser aussi un chemin local plus rapide",
-          "directAddressHint": "Facultatif. Choisissez l'adresse Wi‑Fi ou Tailscale que votre téléphone utilisera à proximité — généralement plus rapide que Relay. Relay reste fonctionnel quand vous êtes loin.",
-          "androidHelp": {
-            "guide": "Guide d'installation"
-          }
+          "relayDegradedNotice": "Relay injoignable — ce code ne fonctionne que sur votre LAN ou Tailscale."
         },
         "MobilePage": {
-          "e17393c6a3": "Aperçu du téléphone",
-          "baea63c445": "Échec de la copie du lien",
-          "fad833de8d": "Lien d'installation copié",
-          "6a66e38943": "Échec de la copie du code d'appairage",
-          "3c1f7168bb": "Code d'appairage copié",
-          "4c8bd11c1a": "Échec de la génération du code d'appairage",
-          "b353e18de1": "Le transport WebSocket n'est pas actif",
-          "4e1eb5d55c": "Échec de la révocation de l'appareil",
-          "255372e6e8": "Appareil révoqué",
           "1b4509a8a1": "appairé",
-          "c5909374cf": "intro",
-          "diagnosticsCopied": "Diagnostics copiés",
-          "diagnosticsCopyFailed": "Échec de la copie des diagnostics"
+          "c5909374cf": "intro"
         },
         "MobilePageToolbar": {
-          "ad2284a9e2": "Fermer · Esc",
-          "9883b58693": "Fermer Orca Mobile",
-          "fb5f28330e": "Afficher dans la barre latérale",
-          "c669abcf8f": "Masquer de la barre latérale",
-          "e1c7b4a92d": "À configurer dans Réglages > Mobile.",
           "a4f8c2d91e": "Masquer de la barre latérale",
-          "b7e3d1c84a": "Afficher dans la barre latérale",
-          "f3d8e5b71a": "Remet le raccourci dans la barre latérale."
-        },
-        "PhoneCarousel": {
-          "96d651cb87": "Session de terminal",
-          "93217b41c1": "Liste des worktrees",
-          "89c7713645": "Écran d'accueil d'Orca Mobile"
+          "b7e3d1c84a": "Afficher dans la barre latérale"
         },
         "mobile": {
           "platform": {
             "copy": {
               "2a532d6fd7": "Scannez avec l'appareil photo de votre Android pour télécharger le dernier APK depuis GitHub Releases.",
-              "432db52b73": "Scannez avec l'appareil photo de votre iPhone pour ouvrir l'App Store.",
-              "preview": {
-                "tagline": "Fonctionnalités les plus récentes, mises à jour chaque jour."
-              },
-              "stable": {
-                "tagline": "La version publique, mise à jour chaque semaine."
-              }
+              "432db52b73": "Scannez avec l'appareil photo de votre iPhone pour ouvrir l'App Store."
             }
           }
         },
         "slides": {
-          "HomeSlide": {
-            "a7d9e2c44d": "7 j",
-            "a3d5476811": "5 h",
-            "8a350a4784": "Utilisation du compte",
-            "e27fdaee51": "Nouvel espace de travail",
-            "4405f3c440": "Appairer l'ordinateur",
-            "0b00c98506": "Actions rapides",
-            "0bad5b07c8": "GitHub et Linear",
-            "d047197480": "GitHub · Linear",
-            "a4c3f7b7aa": "Tâches",
-            "d33d7a9c29": "orca  ·  feat/mobile-page",
-            "25d6e8a491": "feat/mobile-page",
-            "c791677f2f": "Reprendre",
-            "cf3f98fa3f": "Déconnecté",
-            "091355da3d": "M1 Mini · home",
-            "0bc1881bc4": "Connecté · 40 worktrees · 5 actifs",
-            "19c212e25e": "MacBook Pro",
-            "2f1a1d10c4": "Ordinateurs",
-            "156db8a68a": "PRs créées",
-            "4a40af029b": "Temps agent",
-            "00a6903322": "Agents lancés",
-            "c0e2e9dcd9": "Bon retour",
-            "af761a0c0d": "Paramètres",
-            "5d94e8ddcc": "Orca"
-          },
-          "TerminalSlide": {
-            "0bb39f8fe6": "Envoyer",
-            "69334b4b10": "Dictée vocale",
-            "29f2d13839": "Saisissez une commande…",
-            "817090af40": "Ctrl+C",
-            "53ff909568": "Tab",
-            "4930eaaae7": "Esc",
-            "fa22927f13": "Coller",
-            "985373052e": "Basculer en mode téléphone",
-            "58a9ee6003": "avec mise en forme des tool calls. Je vous ajoute le diff ensuite ?",
-            "aa64b519c6": "écran de terminal. Palette Tokyonight, police Menlo, véritable claude",
-            "e75112c834": "J'ai remplacé la diapositive pair-scan par un",
-            "3ce3e8c892": "14 réussis, 1 ignoré (1,8 s)",
-            "4b3666f9a9": "src/cache/worktree-cache.test.ts",
-            "1d448b69f7": "PASS",
-            "d39445686a": "src/transport/host-store.test.ts",
-            "a6e7cdc688": "pnpm test --filter mobile",
-            "21b67dfc92": "Bash",
-            "d6d1041a1c": "⎿ Diapositive pair-scan remplacée par une session de terminal",
-            "336c0e070e": "mobile/orca-mobile-sidebar-mock-v3.html",
-            "6d4ebd5833": "Édition",
-            "fc83e0d5ef": "⎿ Lecture de 2103 lignes",
-            "80cc356591": "Lecture",
-            "2c10d43745": "claude",
-            "e0f98be657": "orca/feat-mobile-page",
-            "2defc05141": "dev@mac",
-            "da121ba48d": "PLAN.md",
-            "e4befee569": "shell",
-            "606aa93192": "Fichiers",
-            "94febb0976": "Contrôle de code source",
-            "8d6516312d": "2 terminaux · claude actif",
-            "8432787c4e": "feat/mobile-page",
-            "8fd998acd3": "Retour"
-          },
           "WorktreeListSlide": {
-            "357a519567": "Actif",
-            "79a24ff530": "Épinglés",
-            "22971156df": "Dépôt",
-            "17f9e0d226": "Récents",
-            "0e3e809a4b": "Filtre",
-            "b4271864bd": "MacBook Pro",
-            "cefd048225": "Retour",
             "c5ad56786d": "spinner"
           }
-        },
-        "CustomNetworkAddressDialog": {
-          "title": "Adresse réseau personnalisée",
-          "description": "Annoncez une adresse que votre téléphone peut joindre — par exemple un nom d'hôte Tailscale, une adresse IP ou une URL de reverse proxy.",
-          "label": "Adresse",
-          "placeholder": "home.example.com:8443 or https://example.com/orca",
-          "hint": "Saisissez une adresse IPv4/IPv6, un nom d'hôte ou une URL HTTP(S)/WebSocket complète. Les ports sont facultatifs.",
-          "cancel": "Annuler",
-          "use": "Utiliser l'adresse",
-          "confirmationError": "Cette adresse n'a pas permis de générer un code d'appairage scannable. Vérifiez l'adresse et réessayez."
-        },
-        "NetworkInterfacePicker": {
-          "no-address-selected": "Aucune adresse sélectionnée",
-          "trigger-label": "Adresse réseau à annoncer",
-          "custom-option": "{{address}} (personnalisée)",
-          "add-custom": "Ajouter une adresse personnalisée…",
-          "custom-section": "Personnalisé",
-          "remove-custom": "Supprimer {{address}}"
-        },
-        "WindowsFirewallNotice": {
-          "repair-success": "Le Pare-feu Windows autorise désormais Orca Mobile sur les réseaux privés",
-          "repair-failed": "Impossible de mettre à jour les règles du Pare-feu Windows",
-          "public-title": "Windows marque ce réseau comme public",
-          "missing-title": "Autoriser les connexions des téléphones via le Pare-feu Windows",
-          "public-description": "Définissez ce réseau Wi-Fi approuvé comme Privé avant d'autoriser les connexions Orca Mobile.",
-          "missing-description": "Windows peut bloquer le serveur d'appairage. Ajoutez une règle pour cette application Orca et le port TCP {{port}} sur les réseaux privés.",
-          "open-settings": "Ouvrir les paramètres réseau",
-          "waiting": "Attente de Windows…",
-          "allow": "Autoriser les connexions des téléphones",
-          "repair-unverified": "Impossible de vérifier l'accès au Pare-feu Windows",
-          "blocked-title": "Windows bloque peut-être Orca Mobile",
-          "blocked-description": "Une règle entrante de blocage existante peut prendre le pas sur l'exception d'appairage. La réparation supprime les règles TCP conflictuelles de cette application Orca, puis autorise le port {{port}} sur les réseaux privés.",
-          "repair": "Réparer l'accès pare-feu",
-          "relay-note": "L'appairage fonctionne toujours via Orca Relay — cette autorisation ajoute seulement la connexion locale, plus rapide."
-        },
-        "MobileRelayMintFailureNotice": {
-          "retryingTitle": "Nouvelle tentative via Orca Relay…",
-          "unavailableTitle": "Orca Relay n'est pas disponible sur ce poste de bureau.",
-          "title": "Impossible de créer un code d'appairage Relay.",
-          "retryingBody": "Création d'un nouveau code d'appairage. Cela peut prendre un moment via une connexion distante.",
-          "unavailableBody": "Utilisez le LAN pour appairer via Tailscale ou le même Wi-Fi.",
-          "body": "Réessayez, ou utilisez le LAN pour appairer via Tailscale ou le même Wi-Fi.",
-          "useLan": "Utiliser le LAN",
-          "retrying": "Nouvelle tentative…",
-          "retry": "Réessayer Relay",
-          "copyDiagnostics": "Copier les diagnostics"
         }
       },
       "gitlab": {
@@ -15417,18 +14741,6 @@
           "copy": "Copier"
         }
       },
-      "orca": {
-        "profiles": {
-          "signout": {
-            "confirm": {
-              "title": "Se déconnecter d'Orca ?",
-              "description": "Les artifacts et Orca Relay seront indisponibles jusqu'à votre reconnexion. Vos projets et worktrees locaux ne seront pas affectés.",
-              "cancel": "Annuler",
-              "action": "Se déconnecter"
-            }
-          }
-        }
-      },
       "linear-issue-attribute-filter-dropdowns": {
         "removeFilter": "Retirer le filtre {{value0}}",
         "teamRequired": "Sélectionnez une équipe pour charger les statuts, responsables et étiquettes de cet espace de travail.",
@@ -15524,119 +14836,11 @@
       },
       "artifacts": {
         "ArtifactsPage": {
-          "signInAgain": "Reconnectez-vous à Orca pour charger les artifacts.",
-          "loadFailed": "Impossible de charger les artifacts.",
-          "deleteTitle": "Supprimer l'artifact ?",
-          "deleteDescription": "« {{name}} » ne sera plus disponible via son lien public.",
-          "delete": "Supprimer",
-          "deleteFailed": "Impossible de supprimer l'artifact.",
-          "title": "Artefacts",
-          "refresh": "Actualiser",
-          "signInHeading": "Se connecter à Orca",
-          "signInCopy": "Connectez-vous pour voir et gérer les artifacts partagés via votre compte.",
-          "signingIn": "Connexion…",
-          "signIn": "Se connecter à Orca",
-          "empty": "Aucun artifact partagé",
-          "emptyCopy": "Ouvrez un fichier HTML ou Markdown et choisissez Partager comme artifact, ou demandez à votre agent de le partager.",
-          "openArtifact": "Ouvrir l'artifact",
-          "deleteArtifact": "Supprimer l'artifact",
-          "moreAvailable": "Davantage d'artifacts sont disponibles",
-          "moreAvailableCopy": "Chargez la page suivante pour continuer.",
-          "loadMoreFailed": "Impossible de charger davantage d'artifacts.",
-          "publishingOff": "La publication est désactivée",
-          "publishingOffCopy": "Rien sur cet appareil ne peut encore créer de lien d'artifact public. Autorisez la publication dans Paramètres → Artifacts, puis partagez depuis un fichier HTML ou Markdown ouvert, ou demandez à votre agent.",
-          "openArtifactsSettings": "Ouvrir Paramètres → Artifacts",
-          "retry": "Réessayer",
-          "reconnectHeading": "Se reconnecter à Orca",
-          "reconnectCopy": "Reconnectez-vous pour voir et gérer les artifacts partagés via votre compte.",
-          "signInAgainAction": "Se reconnecter",
-          "unconfiguredCopy": "La connexion au compte Orca n'est pas encore configurée sur cette machine.",
-          "openAccountSettings": "Ouvrir les paramètres du compte"
-        },
-        "copySuccess": "Lien de l'artifact copié",
-        "copyFailed": "Impossible de copier le lien de l'artifact",
-        "copyLink": "Copier le lien",
-        "openInBrowser": "Ouvrir dans le navigateur",
-        "preview": "Aperçu de l'artifact",
-        "previewUnavailable": "Aperçu indisponible",
-        "previewUnavailableDescription": "Ouvrez cet artifact dans votre navigateur pour le consulter.",
-        "actions": "Actions de l'artifact",
-        "ArtifactActions": {
-          "more": "Plus d'actions sur l'artifact"
-        },
-        "ArtifactCollection": {
-          "loadMore": "Charger plus",
-          "noMatches": "Aucun résultat"
-        },
-        "ArtifactDetailHeader": {
-          "publicLink": "Toute personne disposant de ce lien peut le consulter",
-          "close": "Fermer"
-        },
-        "updatedAt": "Mis à jour {{when}}",
-        "updatedRecently": "récemment",
-        "expiryUnknown": "Expiration inconnue",
-        "expired": "Lien expiré",
-        "expires": "Le lien expire {{when}}",
-        "ArtifactPublishButton": {
-          "a4a49da6af": "Partager comme artifact",
-          "confirmTitle": "Partager comme artifact",
-          "confirmDescription": "Ceci publie le fichier actuel à un lien consultable par toute personne disposant de l'URL.",
-          "accountTitle": "Compte Orca",
-          "accountDescription": "Connectez-vous pour créer et gérer ce lien.",
-          "signingIn": "Connexion…",
-          "signInAgain": "Se reconnecter",
-          "signIn": "Se connecter",
-          "publishingOffTitle": "Le partage d'artifacts est désactivé",
-          "publishingOffDescription": "Découvrez les liens publics et activez le partage dans les paramètres.",
-          "openSettings": "Ouvrir les paramètres Artifacts",
-          "sharing": "Partage…",
-          "sharePublicLink": "Partager le lien public",
-          "publishedDescription": "Toute personne disposant de ce lien peut consulter le fichier partagé.",
-          "checkingLink": "Recherche d'un lien existant…",
-          "checkFailed": "Impossible de rechercher un lien existant.",
-          "tryAgain": "Réessayer"
+          "openArtifact": "Ouvrir l'artifact"
         },
         "artifact-publish-flow": {
-          "9a078a0c65": "Le partage d'artifacts est indisponible",
-          "bba20daa6d": "Connectez-vous à Orca puis réessayez.",
-          "54b1805328": "Impossible de partager l'artifact",
-          "430019efd0": "Artifact partagé",
-          "2fc727c831": "Artifact mis à jour",
-          "5cb4f5ec36": "Copier le lien",
-          "fbb5018602": "Ce fichier est vide.",
-          "6112db5a1c": "Les artifacts partagés depuis Orca doivent peser moins de 800 Ko.",
-          "e2ed5acd8c": "Orca n'a pas pu lire ce fichier. Ouvrez-le depuis un espace de travail et réessayez.",
-          "6d475e9b25": "Seuls les fichiers HTML et Markdown locaux peuvent être partagés comme artifacts.",
-          "29a406be09": "Les artifacts doivent contenir du texte."
-        },
-        "ArtifactPublishedLinkPanel": {
-          "copyLink": "Copier le lien",
-          "openLink": "Ouvrir le lien",
-          "updating": "Mise à jour…",
-          "update": "Mettre à jour le contenu partagé"
-        },
-        "ArtifactDetailDrawer": {
-          "description": "Prévisualisez et gérez cet artifact partagé."
-        },
-        "ArtifactListSearchField": {
-          "label": "Rechercher des artifacts",
-          "placeholder": "Rechercher...",
-          "clear": "Effacer la recherche"
-        },
-        "ArtifactListTableHeader": {
-          "name": "Nom",
-          "type": "Tapez",
-          "size": "Taille",
-          "updated": "Mis à jour",
-          "expires": "Expiration",
-          "actions": "Actions"
-        },
-        "ArtifactsPageSkeleton": {
-          "loading": "Chargement des artifacts"
-        },
-        "expiredCompact": "Expiré",
-        "typeMarkdown": "Markdown",
-        "typeHtml": "HTML"
+          "5cb4f5ec36": "Copier le lien"
+        }
       }
     },
     "i18n": {

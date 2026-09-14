@@ -349,8 +349,7 @@ describe('OrcaRuntimeRpcServer', () => {
     if (!offer.available) {
       throw new Error('WebSocket pairing unavailable')
     }
-    // Full direct E2EE authentication drives MobileSocketWiring.onReady (the
-    // relay transport attaches through the same wiring), which must backfill
+    // Full direct E2EE authentication drives MobileSocketWiring.onReady, which must backfill
     // candidates from the raw window without any direct activation call.
     const phone = await authenticateMobileWsSession(offer.pairingUrl)
     const phoneResponses = createEncryptedWsResponseReader(phone)
@@ -404,7 +403,6 @@ describe('OrcaRuntimeRpcServer', () => {
     // activation is a local-host concern, so the proxy legitimately lacks
     // activateRecentPtyPathCandidateTracking and onReady must not throw.
     const runtimeProxy = {
-      configureNotificationDismissalStore: () => {},
       getRuntimeId: () => 'proxy-runtime-test',
       getStartedAt: () => 1,
       getStatus: () => ({ graphStatus: 'unavailable' }),

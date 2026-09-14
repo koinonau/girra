@@ -114,6 +114,19 @@ function buttonStartingWith(prefix: string): HTMLButtonElement {
   return button
 }
 
+async function startDeleteSelection(): Promise<void> {
+  await act(async () => {
+    fireEvent.pointerDown(buttonNamed('More actions'), { button: 0, ctrlKey: false })
+  })
+  const item = [...document.querySelectorAll('[role="menuitem"]')].find(
+    (candidate) => candidate.textContent?.trim() === 'Delete skills…'
+  )
+  if (!(item instanceof HTMLElement)) {
+    throw new Error('Missing Delete skills menu item')
+  }
+  await act(async () => fireEvent.click(item))
+}
+
 function skillRow(name: string): HTMLElement {
   const row = [...(container?.querySelectorAll('[role="option"]') ?? [])].find(
     (candidate) => candidate.querySelector('[data-skill-name]')?.textContent === name
@@ -290,7 +303,7 @@ describe('SkillsPage', () => {
 
     await renderPage()
     await flushMicrotasks()
-    await act(async () => fireEvent.click(buttonNamed('Share skills')))
+    await startDeleteSelection()
     await act(async () => fireEvent.click(selectionCheckbox('alpha')))
 
     const search = container?.querySelector('input[placeholder="Search skills"]')
@@ -307,7 +320,7 @@ describe('SkillsPage', () => {
     expect(selectionCheckbox('beta').getAttribute('data-state')).toBe('checked')
   })
 
-  it('shows why skills are disabled and selects only one duplicate name', async () => {
+  it('shows why skills are not deletable and keeps duplicate names selectable', async () => {
     const discover = vi.fn().mockResolvedValue({
       skills: [
         skill('same-name', { id: 'home:same-name' }),
@@ -324,19 +337,16 @@ describe('SkillsPage', () => {
 
     await renderPage()
     await flushMicrotasks()
-    await act(async () => fireEvent.click(buttonNamed('Share skills')))
-    expect(container?.textContent).toContain('Only home and workspace skills can be shared.')
+    await startDeleteSelection()
+    expect(container?.textContent).toContain('Not deletable')
 
     await act(async () => fireEvent.click(buttonStartingWith('Select all')))
-    expect(container?.textContent).toContain('1 selected')
-    expect(container?.textContent).toContain(
-      'A skill with this name is already selected from another source.'
-    )
+    expect(container?.textContent).toContain('2 selected')
   })
 
   // Why: Escape used to leave the page outright, discarding a selection that can
   // hold dozens of skills chosen one by one.
-  it('backs out of share selection on Escape before leaving the page', async () => {
+  it('backs out of delete selection on Escape before leaving the page', async () => {
     const closeSkillsPage = vi.fn()
     const discover = vi.fn().mockResolvedValue(discoveryResult(['alpha']))
     useAppStore.setState({ closeSkillsPage })
@@ -347,7 +357,7 @@ describe('SkillsPage', () => {
 
     await renderPage()
     await flushMicrotasks()
-    await act(async () => fireEvent.click(buttonNamed('Share skills')))
+    await startDeleteSelection()
     expect(container?.querySelector('[aria-label="Select alpha"]')).not.toBeNull()
 
     await act(async () => {
@@ -364,7 +374,7 @@ describe('SkillsPage', () => {
 
   // Why: bundles run to ~30 skills; ticking each box one at a time is the flow
   // this page exists for.
-  it('extends the share selection to a shift-clicked row', async () => {
+  it('extends the delete selection to a shift-clicked row', async () => {
     const discover = vi.fn().mockResolvedValue(discoveryResult(['alpha', 'beta', 'gamma']))
     Object.defineProperty(window, 'api', {
       configurable: true,
@@ -373,7 +383,7 @@ describe('SkillsPage', () => {
 
     await renderPage()
     await flushMicrotasks()
-    await act(async () => fireEvent.click(buttonNamed('Share skills')))
+    await startDeleteSelection()
     await act(async () => fireEvent.click(skillRow('alpha')))
     expect(container?.textContent).toContain('1 selected')
 
@@ -404,32 +414,6 @@ describe('SkillsPage', () => {
     expect(container?.textContent).toContain('1 result')
   })
 
-  // Why: the reason is per-row state, but on a remote runtime it applies to every
-  // row at once — 114 copies of the same sentence is not an explanation.
-  it('explains remote-only skills once instead of on every row', async () => {
-    const call = vi.fn(
-      async (args: { method: string; selector?: string }) =>
-        createCompatibleRuntimeStatusResponseIfNeeded(args) ?? {
-          id: 'skills',
-          ok: true,
-          result: discoveryResult(['remote-one', 'remote-two'])
-        }
-    )
-    Object.defineProperty(window, 'api', {
-      configurable: true,
-      value: { skills: skillsApi(vi.fn()), runtimeEnvironments: { call } }
-    })
-    setRuntimeOwner('env-1')
-
-    await renderPage()
-    await flushMicrotasks()
-    await act(async () => fireEvent.click(buttonNamed('Share skills')))
-
-    const notices = (container?.textContent ?? '').split('Open Skills on that machine').length - 1
-    expect(notices).toBe(1)
-    expect(container?.textContent).not.toContain('Open this skill on its owning machine')
-  })
-
   it('drops stale selections when a refreshed scan no longer contains the skill', async () => {
     const discover = vi
       .fn()
@@ -442,7 +426,7 @@ describe('SkillsPage', () => {
 
     await renderPage()
     await flushMicrotasks()
-    await act(async () => fireEvent.click(buttonNamed('Share skills')))
+    await startDeleteSelection()
     await act(async () => fireEvent.click(selectionCheckbox('alpha')))
     expect(container?.textContent).toContain('1 selected')
 

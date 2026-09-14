@@ -3,12 +3,7 @@ import type { CrashReportBreadcrumbData } from '../shared/crash-reporting'
 import { recordDurableCrashBreadcrumb } from './crash-reporting/durable-crash-breadcrumb'
 import { runWithLaunchPath } from './startup/hydrate-shell-path'
 
-export type AppRelaunchReason =
-  | 'admin-restart'
-  | 'gpu-fallback'
-  | 'profile-switch'
-  | 'profile-transfer'
-  | 'renderer-request'
+export type AppRelaunchReason = 'admin-restart' | 'gpu-fallback' | 'renderer-request'
 
 export function relaunchApp(reason: AppRelaunchReason, data?: CrashReportBreadcrumbData): void {
   // Why: the current process can exit immediately after app.relaunch(), so

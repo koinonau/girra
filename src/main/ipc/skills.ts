@@ -20,7 +20,6 @@ import {
   discoverSkillsOnTarget,
   resolveSkillDiscoveryTarget
 } from '../skills/skill-discovery-target'
-import { registerSkillCloudIpcHandlers } from './skill-cloud-ipc-handlers'
 import { handleMainWindowSkillIpc } from './skill-ipc-main-window'
 
 export function registerSkillsHandlers(store: Store, runtime?: OrcaRuntimeService): void {
@@ -68,10 +67,6 @@ export function registerSkillsHandlers(store: Store, runtime?: OrcaRuntimeServic
     'skills:discover',
     async (_event, target?: SkillDiscoveryTarget): Promise<SkillDiscoveryResult> => discover(target)
   )
-
-  if (runtime) {
-    registerSkillCloudIpcHandlers(runtime, discover)
-  }
 
   handleMainWindowSkillIpc(
     'skills:freshnessInventory',

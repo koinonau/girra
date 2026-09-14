@@ -1,6 +1,4 @@
 import { getAppEnvironment } from '../../shared/app-environment'
-import { isArtifactSharingEnabled } from '../../shared/artifact-sharing-gate'
-import { isAgentSkillSharingEnabled } from '../../shared/agent-skill-sharing-gate'
 import { applyPRBotAuthorOverride } from '../../shared/pr-bot-author-overrides'
 import { TASK_PROVIDERS } from '../../shared/task-providers'
 import {
@@ -42,9 +40,7 @@ export type RuntimeClientSettings = Pick<
   | 'minimaxUsageModels'
   | 'minimaxEndpoint'
   | 'prBotAuthorOverrides'
-  | 'artifactSharingEnabled'
   | 'worktreeVisibilityDefaults'
-  | 'agentSkillSharingEnabled'
 > & {
   hostSettingOverrides: RuntimeHostDisplayLabelOverrides
 }
@@ -114,9 +110,7 @@ export class RuntimeClientSettingsController {
       minimaxUsageModels: settings.minimaxUsageModels ?? 'general',
       minimaxEndpoint: settings.minimaxEndpoint ?? 'overseas',
       prBotAuthorOverrides: settings.prBotAuthorOverrides ?? [],
-      artifactSharingEnabled: isArtifactSharingEnabled(settings),
       worktreeVisibilityDefaults: settings.worktreeVisibilityDefaults ?? { external: 'hide' },
-      agentSkillSharingEnabled: isAgentSkillSharingEnabled(settings),
       hostSettingOverrides: Object.fromEntries(
         [
           ...getHostDisplayLabelOverrides({ hostSettingOverrides: settings.hostSettingOverrides })

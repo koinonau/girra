@@ -24,7 +24,6 @@ describe('RuntimeSkillInstallQueries', () => {
       getRuntimeId: () => 'runtime-1',
       getUserDataPath: () => '/tmp/orca-runtime-skill-test',
       isPackaged: () => true,
-      getSettings: () => ({}),
       listRepos: () => [
         { id: 'repo-1', path: '/local/app' },
         { id: 'repo-1', path: '/remote/app', connectionId: 'ssh-1' }
@@ -57,7 +56,6 @@ describe('RuntimeSkillInstallQueries', () => {
       getRuntimeId: () => 'runtime-1',
       getUserDataPath: () => '/tmp/orca-runtime-skill-test',
       isPackaged: () => true,
-      getSettings: () => ({}),
       listRepos: () => [{ id: 'repo-1', path: '/remote/app', connectionId: 'ssh-1' }],
       listFolderWorkspaces: () => [],
       listResolvedWorktrees: async () => [{ id: worktreeId, path: '/remote/app' }],
@@ -83,7 +81,6 @@ describe('RuntimeSkillInstallQueries', () => {
       getRuntimeId: () => 'runtime-1',
       getUserDataPath: () => '/tmp/orca-runtime-skill-test',
       isPackaged: () => true,
-      getSettings: () => ({}),
       listRepos: () => [
         { id: 'repo-1', path: '/local/app' },
         { id: 'repo-1', path: '/remote/app', connectionId: 'ssh-1' }
@@ -109,7 +106,6 @@ describe('RuntimeSkillInstallQueries', () => {
       getRuntimeId: () => 'runtime-1',
       getUserDataPath: () => '/tmp/orca-runtime-skill-test',
       isPackaged: () => true,
-      getSettings: () => ({}),
       listRepos: () => [],
       listFolderWorkspaces: () => [],
       listResolvedWorktrees: async () => [],

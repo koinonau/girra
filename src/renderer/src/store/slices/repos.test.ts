@@ -3,11 +3,9 @@ import { createTestStore, makeWorktree } from './store-test-helpers'
 import { workItemsCacheKey } from '../github/cache-identity'
 import type { Project, ProjectHostSetup } from '../../../../shared/project-types'
 import type { Repo } from '../../../../shared/repo-types'
-import { toast } from 'sonner'
 import {
   installReposRuntimeRoutingHarness,
   localRepo,
-  orcaProfileFindProjectProfiles,
   projectGroupsMoveProject,
   projectsSetupExistingFolder,
   ptyKill,
@@ -215,39 +213,6 @@ describe('repo slice runtime routing', () => {
     })
     expect(reposAdd).not.toHaveBeenCalled()
     expect(reposPickFolder).not.toHaveBeenCalled()
-    expect(orcaProfileFindProjectProfiles).not.toHaveBeenCalled()
-  })
-
-  it('warns when a local project is already present in another profile', async () => {
-    reposAdd.mockResolvedValue({ repo: localRepo })
-    orcaProfileFindProjectProfiles.mockResolvedValue({
-      projects: [
-        {
-          profileId: 'work',
-          profileName: 'Work',
-          profileKind: 'local',
-          repoId: 'work-repo',
-          repoName: 'Local'
-        }
-      ]
-    })
-    const store = createTestStore()
-    store.setState({ activeOrcaProfileId: 'local-default' })
-
-    await expect(store.getState().addRepoPath('/local')).resolves.toEqual({
-      ...localRepo,
-      executionHostId: 'local'
-    })
-
-    expect(orcaProfileFindProjectProfiles).toHaveBeenCalledWith({
-      path: '/local',
-      connectionId: null,
-      executionHostId: 'local',
-      excludeProfileId: 'local-default'
-    })
-    expect(toast.warning).toHaveBeenCalledWith('Project also exists in another profile', {
-      description: 'Work'
-    })
   })
 
   it('sets up a project on a local host through the project setup API', async () => {

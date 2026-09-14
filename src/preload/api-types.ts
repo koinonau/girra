@@ -37,7 +37,6 @@ import type { LinearApi } from './api/linear-api'
 import type { MobileApi } from './api/mobile-api'
 import type { NativeChatApi } from './api/native-chat-api'
 import type { OnboardingApi } from './api/onboarding-api'
-import type { OrcaProfileApi } from './api/orca-profile-api'
 import type {
   ComputerUsePermissionsApi,
   DeveloperPermissionsApi,
@@ -66,7 +65,6 @@ type Merged<T> = { [K in keyof T]: T[K] }
 
 export type PreloadApi = {
   app: AppApi
-  orcaProfiles: OrcaProfileApi
   platform: PlatformApi
   e2e: E2EApi
   repos: RepositoryApi

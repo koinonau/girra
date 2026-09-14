@@ -18,7 +18,6 @@ function createHost(): RuntimeSkillCommandHost {
     getRuntimeId: () => 'runtime-1',
     getUserDataPath: () => '/tmp/orca-runtime-skill-test',
     isPackaged: () => true,
-    getSettings: () => ({}),
     listRepos: () => [],
     listFolderWorkspaces: () => [],
     listResolvedWorktrees: async () => [],

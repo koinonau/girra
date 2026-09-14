@@ -55,7 +55,6 @@ export function BrowserChromeToolbar({
   importControl,
   elementTools,
   markup,
-  shareControl,
   viewSource,
   openExternal,
   overflowMenu,
@@ -69,7 +68,6 @@ export function BrowserChromeToolbar({
   importControl?: React.ReactNode
   elementTools: BrowserChromeElementTools | null
   markup: BrowserChromeMarkupTool
-  shareControl?: React.ReactNode
   viewSource: BrowserChromeToolAction | null
   openExternal: BrowserChromeToolAction | null
   overflowMenu?: React.ReactNode
@@ -169,8 +167,6 @@ export function BrowserChromeToolbar({
         active={markup.active}
         surfaceActive={markup.canShowDiscoveryHint}
       />
-
-      {shareControl}
 
       {viewSource ? (
         <Button

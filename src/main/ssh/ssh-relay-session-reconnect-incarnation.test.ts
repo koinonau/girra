@@ -382,15 +382,10 @@ describe('SshRelaySession reconnect incarnation ordering', () => {
     const winningCliHandler = muxInstances[2]?.requestHandlers.get('orca.cli')
     expect(winningCliHandler).toBeDefined()
     await winningCliHandler?.({
-      argv: ['artifacts', 'share', 'report.html'],
+      argv: ['status'],
       cwd: '/srv/repo',
       env: {},
-      stdin: '<h1>Remote</h1>',
-      artifactInput: {
-        sourceKey: '/srv/repo/report.html',
-        fileName: 'report.html',
-        contentType: 'text/html'
-      }
+      stdin: '<h1>Remote</h1>'
     })
 
     expect(runtime.registerOrchestrationCompatibilitySshAttachment).toHaveBeenCalledWith(
@@ -400,12 +395,7 @@ describe('SshRelaySession reconnect incarnation ordering', () => {
     expect(vi.mocked(runRemoteOrcaCli)).toHaveBeenCalledWith(
       runtime,
       expect.objectContaining({
-        stdin: '<h1>Remote</h1>',
-        artifactInput: {
-          sourceKey: '/srv/repo/report.html',
-          fileName: 'report.html',
-          contentType: 'text/html'
-        }
+        stdin: '<h1>Remote</h1>'
       })
     )
     expect(randomUUID).toHaveBeenCalledTimes(3)

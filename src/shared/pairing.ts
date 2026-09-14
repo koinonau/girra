@@ -1,15 +1,24 @@
-import {
-  PAIRING_OFFER_VERSION,
-  PairingOfferSchema,
-  type PairingOffer
-} from './mobile-relay-pairing-offer'
+import { z } from 'zod'
 import {
   PAIRING_CODE_MAX_CHARACTERS,
-  PAIRING_INPUT_MAX_CHARACTERS
+  PAIRING_DEVICE_TOKEN_MAX_CHARACTERS,
+  PAIRING_ENDPOINT_MAX_CHARACTERS,
+  PAIRING_INPUT_MAX_CHARACTERS,
+  PAIRING_PUBLIC_KEY_MAX_CHARACTERS
 } from './mobile-pairing-protocol-limits'
 
-export { PAIRING_OFFER_VERSION, PairingOfferSchema }
-export type { PairingOffer }
+export const PAIRING_OFFER_VERSION = 2
+
+// Why not strict: offers minted by older desktops carry a `relay` block, which parses away.
+export const PairingOfferSchema = z.object({
+  v: z.literal(PAIRING_OFFER_VERSION),
+  endpoint: z.string().min(1).max(PAIRING_ENDPOINT_MAX_CHARACTERS),
+  deviceToken: z.string().min(1).max(PAIRING_DEVICE_TOKEN_MAX_CHARACTERS),
+  publicKeyB64: z.string().min(1).max(PAIRING_PUBLIC_KEY_MAX_CHARACTERS),
+  pairedDeviceId: z.string().min(1).max(128).optional(),
+  scope: z.enum(['mobile', 'runtime']).optional()
+})
+export type PairingOffer = z.infer<typeof PairingOfferSchema>
 
 export function encodePairingOffer(offer: PairingOffer): string {
   const json = JSON.stringify(PairingOfferSchema.parse(offer))

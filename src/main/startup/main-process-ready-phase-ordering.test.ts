@@ -103,23 +103,6 @@ describe('initial proxy application ordering', () => {
     expect(foundation).not.toMatch(/await\s+(?:state\.)?initialProxyApplication/)
   })
 
-  it('awaits the proxy after the window opens and before the desktop relay starts', () => {
-    const launch = readStartupSource('main-process-runtime-launch.ts')
-    const desktopStart = launch.indexOf('async function launchDesktopMode(')
-    const desktopEnd = launch.indexOf('\nexport async function initializeMainProcessRuntimeLaunch')
-    expect(desktopStart).toBeGreaterThanOrEqual(0)
-    expect(desktopEnd).toBeGreaterThan(desktopStart)
-    const desktop = launch.slice(desktopStart, desktopEnd)
-
-    const windowIndex = desktop.indexOf('openMainWindow()')
-    const proxyIndex = desktop.indexOf('await state.initialProxyApplicationReady')
-    const relayIndex = desktop.indexOf('new DesktopRelayService(')
-
-    expect(windowIndex).toBeGreaterThanOrEqual(0)
-    expect(proxyIndex).toBeGreaterThan(windowIndex)
-    expect(relayIndex).toBeGreaterThan(proxyIndex)
-  })
-
   it('waits for i18n before the only launch-phase dialog that reads a translated string', () => {
     const ready = readStartupSource('main-process-ready.ts')
     const launch = readStartupSource('main-process-runtime-launch.ts')

@@ -19,7 +19,6 @@ const EXPECTED_DIRECT_CALLBACK_METHODS = [
   'emulator.onPaneFocus',
   'gh.onPRRefreshEvent',
   'keybindings.onChanged',
-  'orcaProfiles.onAuthStatusChanged',
   'pty.onExit',
   'rateLimits.onUpdate',
   'remoteWorkspace.onChanged',
@@ -62,7 +61,6 @@ const EXPECTED_DIRECT_CALLBACK_METHODS = [
   'ui.onOpenQuickOpen',
   'ui.onOpenSettings',
   'ui.onOpenSetupGuide',
-  'ui.onOpenSkillShare',
   'ui.onOpenTasks',
   'ui.onOpenWorkspaceBoard',
   'ui.onRenameTerminal',
@@ -113,9 +111,7 @@ const EXPECTED_CALLBACK_REGISTRATION_SEQUENCE = [
   'worktrees.onCreateProgress',
   'gh.onPRRefreshEvent',
   'ui.onOpenSettings',
-  'ui.onOpenSkillShare',
   'ui.onOpenSetupGuide',
-  'mobile.onUnpairedDeviceAuthFailure',
   'ui.onOpenFeatureTour',
   'settings.onChanged',
   'ui.onStateChanged',
@@ -125,7 +121,6 @@ const EXPECTED_CALLBACK_REGISTRATION_SEQUENCE = [
   'ui.onToggleWorktreePalette',
   'ui.onToggleFloatingTerminal',
   'ui.onTerminalShortcutCaptured',
-  'orcaProfiles.onAuthStatusChanged',
   'ui.onOpenQuickOpen',
   'ui.onToggleQuickCommandsMenu',
   'ui.onOpenNewWorkspace',
@@ -356,10 +351,7 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
     await Promise.resolve()
     await Promise.resolve()
     const directCallbackMethods = [...listeners.keys()]
-      .filter(
-        (method) =>
-          method !== 'mobile.onUnpairedDeviceAuthFailure' && method !== 'ui.onMobileMarkdownRequest'
-      )
+      .filter((method) => method !== 'ui.onMobileMarkdownRequest')
       .sort()
     expect(directCallbackMethods).toEqual(EXPECTED_DIRECT_CALLBACK_METHODS)
     expect([...listeners.keys()].sort()).toEqual(
@@ -382,18 +374,9 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
     ])
     const groupOrder = (names: readonly string[]): string[] =>
       registrationOrder.filter((entry) => names.includes(entry))
-    expect(
-      groupOrder([
-        'ui.onOpenSettings',
-        'ui.onOpenSkillShare',
-        'ui.consumePendingOpenSettings',
-        'ui.consumePendingSkillShare'
-      ])
-    ).toEqual([
+    expect(groupOrder(['ui.onOpenSettings', 'ui.consumePendingOpenSettings'])).toEqual([
       'ui.onOpenSettings',
-      'ui.onOpenSkillShare',
-      'ui.consumePendingOpenSettings',
-      'ui.consumePendingSkillShare'
+      'ui.consumePendingOpenSettings'
     ])
     expect(groupOrder(['rateLimits.onUpdate', 'rateLimits.get'])).toEqual([
       'rateLimits.onUpdate',

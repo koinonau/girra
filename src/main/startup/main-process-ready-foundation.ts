@@ -130,7 +130,6 @@ export async function initializeReadyFoundation(): Promise<void> {
     state.managedWslCliReconciliationReady
   )
   const profile = ensureActiveOrcaProfile()
-  state.activeOrcaProfile = profile
   // Why this early: the first window stamps the hosting id into its renderer's argv, so the durable
   // read has to have happened by then or the renderer and the browser-host lease disagree.
   initializeBrowserClientHostId(profile.profileDirectory)

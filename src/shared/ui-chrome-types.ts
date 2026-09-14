@@ -118,5 +118,3 @@ export type TopLevelView =
   | 'automations'
   | 'space'
   | 'skills'
-  | 'artifacts'
-  | 'mobile'

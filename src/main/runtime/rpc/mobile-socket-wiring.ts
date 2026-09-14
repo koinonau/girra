@@ -8,16 +8,6 @@ import type { RuntimeCapability } from '../../../shared/protocol-version'
 
 type MobileSocketPayload = string | Uint8Array<ArrayBufferLike>
 
-export type MobileSocketTransportMetadata =
-  | { transport: 'direct' }
-  | {
-      transport: 'relay'
-      relayHostId: string
-      relayDeviceId: string
-      basisConnId: string
-      credentialKind: 'invite' | 'resume'
-    }
-
 export type MobileSocketTransport = {
   onMessage(
     handler: (
@@ -38,7 +28,6 @@ export type AuthenticatedMobileSocket = {
   connectionId: string
   device: E2EEAuthenticatedDevice
   clientCapabilities: readonly RuntimeCapability[]
-  transport: MobileSocketTransportMetadata
 }
 
 type MobileSocketWiringOptions = {
@@ -54,7 +43,7 @@ type MobileSocketWiringOptions = {
   onClose: (socket: AuthenticatedMobileSocket | null, hasOtherConnections: boolean) => void
   onReady?: (socket: AuthenticatedMobileSocket) => void
   // Why: stale keys and missing registry entries both fail before RPC can explain the re-pair action.
-  onUnpairedDeviceAuthFailure?: (metadata: MobileSocketTransportMetadata) => void
+  onUnpairedDeviceAuthFailure?: () => void
 }
 
 function toAuthenticatedDevice(device: DeviceEntry): E2EEAuthenticatedDevice {
@@ -89,15 +78,10 @@ export class MobileSocketWiring {
     this.onUnpairedDeviceAuthFailure = options.onUnpairedDeviceAuthFailure
   }
 
-  attachTransport(
-    transport: MobileSocketTransport,
-    getMetadata: (ws: WebSocket) => MobileSocketTransportMetadata = () => ({
-      transport: 'direct'
-    })
-  ): () => void {
+  attachTransport(transport: MobileSocketTransport): () => void {
     this.transports.add(transport)
     transport.onMessage((message, _reply, ws) => {
-      this.handleRawMessage(transport, ws, message, getMetadata(ws))
+      this.handleRawMessage(transport, ws, message)
     })
     transport.onConnectionClose((_clientId, ws) => this.handleClose(ws))
     let attached = true
@@ -133,8 +117,7 @@ export class MobileSocketWiring {
   private handleRawMessage(
     transport: MobileSocketTransport,
     ws: WebSocket,
-    message: MobileSocketPayload,
-    metadata: MobileSocketTransportMetadata
+    message: MobileSocketPayload
   ): void {
     let channel = this.channels.get(ws)
     if (!channel) {
@@ -142,23 +125,10 @@ export class MobileSocketWiring {
       this.connectionIds.set(ws, connectionId)
       channel = new E2EEChannel(ws, {
         serverSecretKey: this.e2eeKeypair.secretKey,
-        transportContext:
-          metadata.transport === 'relay'
-            ? { transport: 'relay', relayHostId: metadata.relayHostId }
-            : { transport: 'direct' },
-        requireV2: metadata.transport === 'relay',
         outboundMemoryBudget: this.outboundMemoryBudget,
         resolveAuthenticatedDevice: (token) => {
           const device = this.deviceRegistry.validateToken(token)
-          if (!device) {
-            return null
-          }
-          // Why: outer relay authorization cannot choose the local Orca
-          // identity; E2EE must resolve the same device before readiness.
-          if (metadata.transport === 'relay' && metadata.relayDeviceId !== device.deviceId) {
-            return null
-          }
-          return toAuthenticatedDevice(device)
+          return device ? toAuthenticatedDevice(device) : null
         },
         onReady: (channel, device) => {
           const socket = {
@@ -174,8 +144,7 @@ export class MobileSocketWiring {
             },
             set clientCapabilities(next: readonly RuntimeCapability[]) {
               channel.clientCapabilities = next
-            },
-            transport: metadata
+            }
           }
           this.authenticatedSockets.set(ws, socket)
           transport.setClientId(ws, device.deviceToken)
@@ -190,7 +159,7 @@ export class MobileSocketWiring {
           ws.close(code, reason)
           if (reportUnpairedDevice) {
             try {
-              this.onUnpairedDeviceAuthFailure?.(metadata)
+              this.onUnpairedDeviceAuthFailure?.()
             } catch (error) {
               // Why: renderer teardown can make UI delivery throw; auth cleanup must remain authoritative.
               console.error('[mobile] Failed to report unpaired-device auth failure:', error)
