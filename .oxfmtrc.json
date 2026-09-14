@@ -3,6 +3,5 @@
   "singleQuote": true,
   "semi": false,
   "printWidth": 100,
-  "trailingComma": "none",
-  "ignorePatterns": ["cloud/**", ".github/actions/cloud-sql-rollout-lease/**"]
+  "trailingComma": "none"
 }

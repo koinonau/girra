@@ -44,13 +44,15 @@ Remove `mobile/`, `cloud/`, and everything that names them: CI workflows, lint s
 
 Leave `src/renderer/src/web` and the pairing code. An earlier draft deleted them as mobile-only, but serve mode serves the web client built from `src/renderer/src/web`, and the runtime RPC layer uses the device registry and end-to-end encryption for every remote client. "Web renderer and pairing" in `handover.md` holds the decision.
 
+Done 2026-09-14: 2,223 files deleted, 380,499 lines removed.
+
 ### Phase 2. Cheap strips
 
 Take star-nag, then speech, then updater, in that order. Each is the same loop: delete the directory, fix the named call sites, run typecheck and tests. Ascending coupling means you learn the loop on the 3-reference case, not the 45.
 
 ### Phase 3. Instrumented strips
 
-orca-profiles, then crash-reporting, then telemetry. Telemetry has 45 call sites because it is instrumented through the app rather than concentrated. Expect wide, shallow edits. Decide once whether call sites become no-ops or disappear, then apply that consistently.
+orca-profiles, then crash-reporting, then telemetry. Telemetry has 45 call sites because it is instrumented through the app rather than concentrated. Expect wide, shallow edits. Delete each call site outright; do not leave no-op stubs (decided 2026-09-14).
 
 Keep `src/main/observability`. It writes local logs and traces, phones nothing home, and you kept it.
 
