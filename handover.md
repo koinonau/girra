@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phase 5b is merged, and Phase 5c (roster leaves: OMP and Prime Agent out of Pi, dropped agents' terminal special cases) is in its pull request.
+As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phases 5b and 5c are merged, and Phase 5d (Codex and dropped agents out of structured sessions, native chat, AI Vault and resume, with `src/main/codex` deleted) is in its pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -22,7 +22,8 @@ As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version ha
 - Phase 6 merged in [#14](https://github.com/koinonau/girra/pull/14): the feature wall, contextual tours and first-run onboarding. 189 files deleted, 27,662 lines removed.
 - Phase 5a merged in [#15](https://github.com/koinonau/girra/pull/15): Codex accounts, managed homes, reset credits, rate limits, usage, the CLI lock, the per-pane account registry and stale-pane restart. 254 files deleted, 58,851 lines removed.
 - Phase 5b merged in [#19](https://github.com/koinonau/girra/pull/19): Codex out of the PTY and shell environment, hooks, trust, startup, the agent-hooks CLI and RPC, and renderer terminal special cases. 179 files deleted, 41,801 lines removed.
-- Phase 5c removes OMP and Prime Agent from Pi's hooks, extensions, host environment, relay and shell wrappers, and the dropped agents' title detection, keyboard, readiness and output-scraping special cases (Command Code, Cursor, Gemini, Grok, Droid, Hermes startup query): 73 files deleted, 19,596 lines removed and 1,775 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 5c merged in [#20](https://github.com/koinonau/girra/pull/20): OMP and Prime Agent out of Pi, and the dropped agents' title, keyboard, readiness and output-scraping special cases. 73 files deleted, 19,596 lines removed.
+- Phase 5d removes Codex and the dropped agents from structured sessions, main and renderer native chat, AI Vault scanning and search, and session resume, and deletes what remained of `src/main/codex`: 252 files deleted, 55,947 lines removed and 4,675 added, measured with `git diff --shortstat origin/main` (2026-09-16). Its pull request: `gh pr list --repo koinonau/girra`.
 - Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
 
 ## Files
@@ -201,6 +202,15 @@ After Phase 5c, on 2026-09-15:
 | `pnpm lint` | 0 | 42 s | 113 reliability gates |
 | `pnpm build` | 0 | 16 s | Main 5,138 modules, renderer 12,001 |
 
+After Phase 5d, on 2026-09-16:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 5 s | No errors |
+| `pnpm test` | 1 | 1,128 s | Files: 7 failed, 7,742 passed, 56 skipped of 7,805. Tests: 7 failed, 71,096 passed, 321 skipped of 71,424. The five known failures, the load-sensitive `browser-history-match.performance.test.ts` (passes alone), and `tests/e2e/completed-worker-retirement-resume.unit.test.ts`, which recorded a Codex worker; retargeted to Claude and passing |
+| `pnpm lint` | 1, then 0 | 19 s | Six type-aware `restrict-template-expressions` warnings where narrowed provider types became `never` in runtime guards; fixed with `String(...)`. Then clean, 113 reliability gates, `DIRECT_IMPORTER_PIN` 143 |
+| `pnpm build` | 0 | 26 s | Main 5,004 modules, renderer 11,992 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -287,6 +297,8 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: remove the plugin kill-list's remote fetch, though the tree ticks it with a `[STRIP]` PHONE-HOME tag, because the selection drops phone-home. The plugin system and marketplace stay; nothing blocks a plugin now.
 - 2026-09-15: delete `src/main/codex` files as soon as kept code stops reaching them, measured by an import walk from non-test files outside the directory, rather than waiting for the phase that owns the directory. A pull request must typecheck, and those files broke once hook types narrowed.
 - 2026-09-15: the SSH relay's hook installer ignores agents it does not know instead of failing the whole install, so an older desktop asking for Codex hooks still gets Claude's.
+- 2026-09-16: Phase 5d keeps `AiVaultSession.codexHome: null` on the wire and the strict `ui.set` `codex` ids, but removes the Phase 5a Codex slots from `AccountsSnapshot` and `RateLimitState`, since girra does not pair with Orca. `aiVault.prepareSessionResume` and the Kimi and OMP resume capabilities are gone; creating or attaching a Codex structured session is rejected. The AI Vault search index and parse cache bump their schema versions and rebuild.
+- 2026-09-16: known gaps after 5d. Copying an AI Vault resume command no longer refuses a session a structured chat owns (the terminal-send guards still block the paste). The deleted Codex rewind and integration tests covered concurrent rewind refusal, outcome-unknown rewind blocking sends, provider-exit reacquire and capability-less host refusal; no Claude test covers those yet.
 - 2026-09-15: dropping OMP and title special cases changes hand-started CLIs: OMP started by hand in a Pi pane reports as Pi, and dropped CLIs started by hand get no title-based status. The renderer GPU gate now follows only the user setting, WebGL capability and context loss, since the Gemini fallback went.
 - 2026-09-15 (user): keep remote serving, pairing and the web UI (option A); remove only the mobile leftovers (`--mobile-pairing`, mobile session tabs, the mobile RPC allowlist, mobile-scope devices).
 - 2026-09-15 (user): workflows keep `pr.yml` and `unit-tests.yml` trimmed of Orca jobs and `e2e.yml` on demand, add one macOS build that signs and notarizes with the user's Apple developer account, and delete the rest; then re-enable Actions once the secrets exist (`MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`).

@@ -79,7 +79,7 @@ Measured 2026-09-15: 1,086 production and 1,465 test files mention Codex. `src/m
 
 Measured 2026-09-15 (read-only maps): the rest of Codex is about 350 files and 80,000 lines; the 31 other agents add about 140 files deleted and 630 edited.
 
-Phase 5a done 2026-09-15: 254 files deleted, 58,851 lines removed. Phase 5b: 179 files deleted, 41,801 lines removed. Phase 5c: 73 files deleted, 19,596 lines removed.
+Phase 5a done 2026-09-15: 254 files deleted, 58,851 lines removed. Phase 5b: 179 files deleted, 41,801 lines removed. Phase 5c: 73 files deleted, 19,596 lines removed. Phase 5d: 252 files deleted, 55,947 lines removed.
 
 ### Phase 6. Relocation
 

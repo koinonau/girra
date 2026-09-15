@@ -120,7 +120,7 @@ export function admitAttachOrRefuse(
       ok: false,
       refusal: {
         code: 'agent_session_operation_invalid',
-        message: `A ${params.provider} session requires a ${params.provider} provider handle.`
+        message: `A ${String(params.provider)} session requires a ${String(params.provider)} provider handle.`
       }
     }
   }
