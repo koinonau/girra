@@ -4,14 +4,13 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6, 7a and the ADRs are merged. Every item below waits on the user.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6, 7a and the ADRs are merged.
 
-1. **Phase 5b to 5d, remaining Codex integrations.** Blocked on the launch roster decision, which sets whether Codex stays launchable and so how much of hooks, trust, the shell-launch preflight, backfill, the app-server runtime, native chat and AI Vault goes. See the build plan's Phase 5 for the order.
-2. **Phase 7b, Orca identity strip.** Waits on the product name, CLI binary and "Orca CLI" prose decisions in `handover.md`, because much of the text is only correct once they land. The build plan's Phase 7 records the measured scope and the traps.
-3. **Launch roster** and **MiniMax usage.** Need the user; see `handover.md`.
-4. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
-5. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
-6. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
+1. **Phase 5b onward, the rest of Codex and the launch roster.** Unblocked: the user dropped Codex and every agent except Claude Code, OpenCode and Pi (2026-09-15). Map both with read-only subagents, then split into pull requests.
+2. **Phase 7b, Girra identity.** Unblocked once the roster removal lands: rename the app to Girra and the CLI binary to `girra`, then sweep displayed text. `.orca/`, `ORCA_*`, `orca://`, the Help menu, Support section and share card stay. The build plan's Phase 7 records the measured scope and the traps.
+3. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
+4. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
+5. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
 
 ## Backlog
 
