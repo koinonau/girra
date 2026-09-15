@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, Phase 5a, Phase 6, the ADRs and the cross-version harness deletion are merged. Phase 7a (the last calls to Orca's servers) is in its pull request. Every remaining story waits on a user decision below.
+As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Every remaining story waits on a user decision below.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -21,7 +21,7 @@ As of 2026-09-15: Phases 0 to 4, Phase 5a, Phase 6, the ADRs and the cross-versi
 - Phase 4b merged in [#13](https://github.com/koinonau/girra/pull/13): Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane. 30 files deleted, 6,923 lines removed.
 - Phase 6 merged in [#14](https://github.com/koinonau/girra/pull/14): the feature wall, contextual tours and first-run onboarding. 189 files deleted, 27,662 lines removed.
 - Phase 5a merged in [#15](https://github.com/koinonau/girra/pull/15): Codex accounts, managed homes, reset credits, rate limits, usage, the CLI lock, the per-pane account registry and stale-pane restart. 254 files deleted, 58,851 lines removed.
-- Phase 7a deletes the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links: 22 files deleted, 4,552 lines removed and 156 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
 
 ## Files
 
