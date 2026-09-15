@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, unlinkSync } from 'node:fs'
 import { join } from 'node:path'
-import { writeFileAtomically } from '../codex-accounts/fs-utils'
+import { writeFileAtomically } from '../fs-utils'
 import {
   buildManagedCommandHook,
   removeManagedCommands,

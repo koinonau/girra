@@ -148,34 +148,13 @@ export function createTerminalPtyBindingActions(
           s.disownedPtyIds,
           replacementPtyId ? [ptyId, replacementPtyId] : [ptyId]
         )
-        const hasReplacementPendingRestart = replacementPtyId
-          ? replacementPtyId in s.pendingCodexPaneRestartIds
-          : false
-        const hasReplacementRestartNotice = replacementPtyId
-          ? replacementPtyId in s.codexRestartNoticeByPtyId
-          : false
         const hasReplacementMigrationUnsupported = replacementPtyId
           ? replacementPtyId in s.migrationUnsupportedByPtyId
           : false
-        const nextPendingCodexPaneRestartIds = hasReplacementPendingRestart
-          ? { ...s.pendingCodexPaneRestartIds }
-          : s.pendingCodexPaneRestartIds
-        const nextCodexRestartNoticeByPtyId = hasReplacementRestartNotice
-          ? { ...s.codexRestartNoticeByPtyId }
-          : s.codexRestartNoticeByPtyId
         const nextMigrationUnsupportedByPtyId = hasReplacementMigrationUnsupported
           ? { ...s.migrationUnsupportedByPtyId }
           : s.migrationUnsupportedByPtyId
         if (replacementPtyId) {
-          if (hasReplacementPendingRestart) {
-            nextPendingCodexPaneRestartIds[ptyId] = true
-            delete nextPendingCodexPaneRestartIds[replacementPtyId]
-          }
-          if (hasReplacementRestartNotice) {
-            const replacedNotice = nextCodexRestartNoticeByPtyId[replacementPtyId]
-            nextCodexRestartNoticeByPtyId[ptyId] ??= replacedNotice
-            delete nextCodexRestartNoticeByPtyId[replacementPtyId]
-          }
           if (hasReplacementMigrationUnsupported) {
             const replacedMigrationUnsupported = nextMigrationUnsupportedByPtyId[replacementPtyId]
             nextMigrationUnsupportedByPtyId[ptyId] ??= {
@@ -265,8 +244,6 @@ export function createTerminalPtyBindingActions(
             ? { disownedPtyIds: nextDisownedPtyIds }
             : {}),
           suppressedPtyExitIds: nextSuppressedPtyExitIds,
-          pendingCodexPaneRestartIds: nextPendingCodexPaneRestartIds,
-          codexRestartNoticeByPtyId: nextCodexRestartNoticeByPtyId,
           migrationUnsupportedByPtyId: nextMigrationUnsupportedByPtyId,
           directSshPaneRetryByTabId: nextDirectSshPaneRetryByTabId,
           directSshLivePtyBindingByTabId: nextDirectSshLivePtyBindingByTabId,

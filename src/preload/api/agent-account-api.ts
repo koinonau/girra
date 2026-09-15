@@ -1,41 +1,4 @@
-import type {
-  ClaudeRateLimitAccountsState,
-  CodexRateLimitAccountsState
-} from '../../shared/managed-account-types'
-import type { CodexConfigSyncStatus } from '../../shared/codex-config-sync-types'
-
-export type CodexAccountsApi = {
-  list: () => Promise<CodexRateLimitAccountsState>
-  add: (args?: {
-    runtime?: 'host' | 'wsl'
-    wslDistro?: string | null
-  }) => Promise<CodexRateLimitAccountsState>
-  reauthenticate: (args: {
-    accountId: string
-    /** Local-only: activate the re-authed account when its runtime lane had no selection. */
-    activateIfSelectionWasEmpty?: boolean
-  }) => Promise<CodexRateLimitAccountsState>
-  remove: (args: { accountId: string }) => Promise<CodexRateLimitAccountsState>
-  select: (args: {
-    accountId: string | null
-    runtime?: 'host' | 'wsl'
-    wslDistro?: string | null
-  }) => Promise<CodexRateLimitAccountsState>
-  /** Live PTYs whose baked CODEX_HOME still points at a deselected account. */
-  listStalePanes: (args: { ptyIds: string[] }) => Promise<
-    {
-      ptyId: string
-      launchAccountId: string | null
-      activeAccountId: string | null
-      /** Optional for compatibility with a pre-reason main process. */
-      reason?: 'account-change' | 'home-route-change'
-    }[]
-  >
-  /** The selection lane each PTY launched from, keyed by pty id; unrecorded panes are absent. */
-  listRecordedPaneLanes: (args: { ptyIds: string[] }) => Promise<Record<string, string>>
-  /** Drops launch records so a dismissed prompt stays dismissed across restarts. */
-  forgetStalePanes: (args: { ptyIds: string[] }) => Promise<void>
-}
+import type { ClaudeRateLimitAccountsState } from '../../shared/managed-account-types'
 
 export type ClaudeAccountsApi = {
   list: () => Promise<ClaudeRateLimitAccountsState>
@@ -66,8 +29,4 @@ export type MinimaxCredentialsApi = {
   clearCookie: () => Promise<{ cookieConfigured: boolean }>
   saveApiKey: (key: string) => Promise<{ apiKeyConfigured: boolean }>
   clearApiKey: () => Promise<{ apiKeyConfigured: boolean }>
-}
-
-export type CodexConfigSyncApi = {
-  status: () => Promise<CodexConfigSyncStatus>
 }

@@ -27,7 +27,7 @@ The Orca mobile companion is an iOS/Android app that pairs with your desktop Orc
 - Long-press a session tab for bulk close actions (**Close Other Tabs**, **Close Tabs to the Left**, **Close Tabs to the Right**). Unsaved markdown tabs and pinned tabs are skipped.
 - Open a browser session in **Web** or **Mobile** view when you need to check a responsive page from your phone.
 - Open Source Control for a worktree to review changed files, stage or unstage, and commit from your phone.
-- Switch your active agent account and see usage / rate-limit state on the go. When Codex has earned reset credits, spend one from the accounts screen.
+- Switch your active agent account and see usage / rate-limit state on the go.
 - Create a workspace from mobile with the same Smart source modes as desktop: Smart, GitHub, Linear, GitLab, Branch, and Name. With **multiple connected desktops**, **New Workspace** asks which host should create it first (one connected host skips the picker).
 - Open a host card's **⋯** menu for **Edit**, **Connect**, **Remove**, and related actions (long-press still works as a shortcut).
 - Edit a saved host's display name or connection address without re-pairing (for example when the desktop moves between home LAN and Tailscale).
@@ -73,7 +73,7 @@ Long-press a tab in the session strip for tab actions, including **Close**, **Cl
 
 The mobile app exposes the same account switcher as the desktop status bar, including inline usage for inactive accounts. The accounts screen shows reset countdowns when a provider reports reset timestamps for its session or weekly window. Switching here switches on the paired desktop.
 
-When the active Codex account has earned **rate-limit reset** credits, the accounts screen shows how many are available (and when the next one expires) and a **Use reset** action. Confirming spends one credit for the current Codex target (host or WSL distro) and refreshes eligible rate-limit windows. The phone journals the attempt so a retry after a flaky connection does not double-spend. Outcomes include success, nothing eligible to reset, no credit left, or that a reset was already applied. See also [Usage & rate-limit tracking](/docs/agents/usage-tracking).
+See also [Usage & rate-limit tracking](/docs/agents/usage-tracking).
 
 ## Create a workspace
 

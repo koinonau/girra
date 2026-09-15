@@ -15,7 +15,6 @@ import { repairTranslatedValue } from './locale-translation-policy.mjs'
 // Real catalog keys, so a future zh key override shadowing one of these is caught here.
 const STATUS_BAR_PROVIDERS = [
   ['auto.components.status.bar.StatusBar.3885eb74d8', 'Claude'],
-  ['auto.components.status.bar.StatusBar.c0909c686e', 'Codex'],
   ['auto.components.status.bar.StatusBar.8c86cd77b0', 'OpenCode Go'],
   ['auto.components.status.bar.StatusBar.3bbf140864', 'MiniMax']
 ]

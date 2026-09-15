@@ -133,19 +133,12 @@ function clearSshTargetTabPtyState(
   state: AppState,
   targetId: string,
   targetTabIds: Set<string>
-): Pick<
-  AppState,
-  | 'tabsByWorktree'
-  | 'ptyIdsByTabId'
-  | 'lastKnownRelayPtyIdByTabId'
-  | 'pendingCodexPaneRestartIds'
-  | 'codexRestartNoticeByPtyId'
-> & { changed: boolean } {
+): Pick<AppState, 'tabsByWorktree' | 'ptyIdsByTabId' | 'lastKnownRelayPtyIdByTabId'> & {
+  changed: boolean
+} {
   let nextTabsByWorktree = state.tabsByWorktree
   const nextPtyIdsByTabId = { ...state.ptyIdsByTabId }
   const nextLastKnownRelayPtyIdByTabId = { ...state.lastKnownRelayPtyIdByTabId }
-  const nextPendingCodexPaneRestartIds = { ...state.pendingCodexPaneRestartIds }
-  const nextCodexRestartNoticeByPtyId = { ...state.codexRestartNoticeByPtyId }
   let changed = false
 
   for (const [worktreeId, tabs] of Object.entries(state.tabsByWorktree)) {
@@ -176,10 +169,6 @@ function clearSshTargetTabPtyState(
       nextTabs[index] = { ...tabWithoutActivationSpawn, ptyId: null }
       nextPtyIdsByTabId[tab.id] = []
       delete nextLastKnownRelayPtyIdByTabId[tab.id]
-      for (const ptyId of ptyIds) {
-        delete nextPendingCodexPaneRestartIds[ptyId]
-        delete nextCodexRestartNoticeByPtyId[ptyId]
-      }
     }
     if (nextTabs !== tabs) {
       nextTabsByWorktree = { ...nextTabsByWorktree, [worktreeId]: nextTabs }
@@ -190,9 +179,7 @@ function clearSshTargetTabPtyState(
     changed,
     tabsByWorktree: nextTabsByWorktree,
     ptyIdsByTabId: nextPtyIdsByTabId,
-    lastKnownRelayPtyIdByTabId: nextLastKnownRelayPtyIdByTabId,
-    pendingCodexPaneRestartIds: nextPendingCodexPaneRestartIds,
-    codexRestartNoticeByPtyId: nextCodexRestartNoticeByPtyId
+    lastKnownRelayPtyIdByTabId: nextLastKnownRelayPtyIdByTabId
   }
 }
 
@@ -290,9 +277,7 @@ export function buildRemovedSshTargetCleanupPatch(
       ? {
           tabsByWorktree: tabPtyState.tabsByWorktree,
           ptyIdsByTabId: tabPtyState.ptyIdsByTabId,
-          lastKnownRelayPtyIdByTabId: tabPtyState.lastKnownRelayPtyIdByTabId,
-          pendingCodexPaneRestartIds: tabPtyState.pendingCodexPaneRestartIds,
-          codexRestartNoticeByPtyId: tabPtyState.codexRestartNoticeByPtyId
+          lastKnownRelayPtyIdByTabId: tabPtyState.lastKnownRelayPtyIdByTabId
         }
       : {}),
     ...(removedCredentialRequest ? { sshCredentialQueue: nextCredentialQueue } : {}),

@@ -1,7 +1,6 @@
 import { advertisedUrlWatcher } from '../../../ports/advertised-url-watcher'
 import { unregisterPty } from '../../../memory/pty-registry'
 import { markClaudePtyExited } from '../../../claude-accounts/live-pty-gate'
-import { forgetCodexPaneAccount } from '../../../codex/codex-pane-account-registry'
 import { openCodeHookService } from '../../../opencode/hook-service'
 import { piTitlebarExtensionService } from '../../../pi/titlebar-extension-service'
 import { agentHookServer } from '../../../agent-hooks/server'
@@ -41,10 +40,6 @@ export function clearProviderPtyState(
 ): void {
   if (!opts.preserveAgentSessionOwners) {
     agentSessionOwners.release(id)
-    // Why: the launch-account record outlives the app, so only a real teardown
-    // may drop it — a disconnect that can reconnect is not a death, and a reused
-    // id must never inherit a dead pane's Codex account.
-    forgetCodexPaneAccount(id)
   }
   // Why: OpenCode and Pi both allocate PTY-scoped runtime state outside the
   // node-pty process table. Centralizing provider cleanup avoids drift where a

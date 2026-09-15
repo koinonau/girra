@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { RateLimitService } from './service'
 import { fetchClaudeRateLimits } from './claude-fetcher'
-import { fetchCodexRateLimits } from './codex-fetcher'
 import { fetchMiniMaxRateLimits } from './minimax/minimax-fetcher'
 import { fetchOpenCodeGoRateLimits } from './opencode-go-usage-fetcher'
 import {
@@ -15,11 +14,6 @@ import {
 vi.mock('./claude-fetcher', () => ({
   fetchClaudeRateLimits: vi.fn(),
   fetchManagedAccountUsage: vi.fn()
-}))
-
-vi.mock('./codex-fetcher', () => ({
-  consumeCodexRateLimitResetCredit: vi.fn(),
-  fetchCodexRateLimits: vi.fn()
 }))
 
 vi.mock('./opencode-go-usage-fetcher', () => ({
@@ -43,30 +37,30 @@ describe('RateLimitService', () => {
     resetRateLimitProviderMocks()
   })
 
-  it('does not refetch Claude when a Codex account switch is queued during fetchAll', async () => {
+  it('does not refetch OpenCode Go when a Claude account switch is queued during fetchAll', async () => {
     const service = new RateLimitService()
     const firstClaude = deferred<ProviderRateLimits>()
-    const firstCodex = deferred<ProviderRateLimits>()
+    const firstOpenCode = deferred<ProviderRateLimits>()
 
-    vi.mocked(fetchClaudeRateLimits).mockImplementationOnce(() => firstClaude.promise)
-    vi.mocked(fetchCodexRateLimits)
-      .mockImplementationOnce(() => firstCodex.promise)
-      .mockResolvedValueOnce(okProvider('codex', 42))
+    vi.mocked(fetchClaudeRateLimits)
+      .mockImplementationOnce(() => firstClaude.promise)
+      .mockResolvedValueOnce(okProvider('claude', 42))
+    vi.mocked(fetchOpenCodeGoRateLimits).mockImplementationOnce(() => firstOpenCode.promise)
 
     const fullRefresh = service.refresh()
     await Promise.resolve()
 
-    const switchRefresh = service.refreshForCodexAccountChange()
+    const switchRefresh = service.refreshForClaudeAccountChange()
     await Promise.resolve()
 
     firstClaude.resolve(okProvider('claude', 18))
-    firstCodex.resolve(okProvider('codex', 24))
+    firstOpenCode.resolve(okProvider('opencode-go', 24))
 
     await fullRefresh
     await switchRefresh
 
-    expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchCodexRateLimits).toHaveBeenCalledTimes(2)
+    expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
+    expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
   })
 
   it('keeps recent stale data across repeated failures', async () => {
@@ -77,11 +71,6 @@ describe('RateLimitService', () => {
       .mockResolvedValueOnce(okProvider('claude', 33, Date.now()))
       .mockResolvedValueOnce(errorProvider('claude', 'temporary failure'))
       .mockResolvedValueOnce(errorProvider('claude', 'still failing'))
-
-    vi.mocked(fetchCodexRateLimits)
-      .mockResolvedValueOnce(okProvider('codex', 44, Date.now()))
-      .mockResolvedValueOnce(okProvider('codex', 44, Date.now()))
-      .mockResolvedValueOnce(okProvider('codex', 44, Date.now()))
 
     await internal.fetchAll()
     await internal.fetchAll()
@@ -105,63 +94,63 @@ describe('RateLimitService', () => {
       .mockResolvedValueOnce(okProvider('claude', 10, Date.now()))
       .mockResolvedValueOnce(okProvider('claude', 11, Date.now()))
 
-    vi.mocked(fetchCodexRateLimits)
-      .mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
-      .mockResolvedValueOnce(okProvider('codex', 21, Date.now()))
+    vi.mocked(fetchOpenCodeGoRateLimits)
+      .mockResolvedValueOnce(okProvider('opencode-go', 20, Date.now()))
+      .mockResolvedValueOnce(okProvider('opencode-go', 21, Date.now()))
 
     await service.refresh()
     await service.refresh()
 
     expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
-    expect(fetchCodexRateLimits).toHaveBeenCalledTimes(2)
+    expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(2)
   })
 
   it('does not refetch fresh provider data for replayed mobile subscriptions', async () => {
     const service = new RateLimitService()
     vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 10))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 20))
+    vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(okProvider('opencode-go', 20))
 
     await service.refreshIfStale()
     await service.refreshIfStale()
     await service.refreshIfStale()
 
     expect(fetchClaudeRateLimits).toHaveBeenCalledOnce()
-    expect(fetchCodexRateLimits).toHaveBeenCalledOnce()
+    expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledOnce()
   })
 
   it('does not queue a follow-up fetch when a mobile subscription replays mid-fetch', async () => {
     const service = new RateLimitService()
     const claude = deferred<ProviderRateLimits>()
-    const codex = deferred<ProviderRateLimits>()
+    const openCode = deferred<ProviderRateLimits>()
     vi.mocked(fetchClaudeRateLimits).mockReturnValue(claude.promise)
-    vi.mocked(fetchCodexRateLimits).mockReturnValue(codex.promise)
+    vi.mocked(fetchOpenCodeGoRateLimits).mockReturnValue(openCode.promise)
 
     const firstRefresh = service.refreshIfStale()
     await Promise.resolve()
     const replayedRefresh = service.refreshIfStale()
 
     claude.resolve(okProvider('claude', 10))
-    codex.resolve(okProvider('codex', 20))
+    openCode.resolve(okProvider('opencode-go', 20))
     await firstRefresh
     await replayedRefresh
 
     expect(fetchClaudeRateLimits).toHaveBeenCalledOnce()
-    expect(fetchCodexRateLimits).toHaveBeenCalledOnce()
+    expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledOnce()
   })
 
   it('waits for a queued explicit refresh when another fetch is already in flight', async () => {
     const service = new RateLimitService()
     const firstClaude = deferred<ProviderRateLimits>()
-    const firstCodex = deferred<ProviderRateLimits>()
+    const firstOpenCode = deferred<ProviderRateLimits>()
     const secondClaude = deferred<ProviderRateLimits>()
-    const secondCodex = deferred<ProviderRateLimits>()
+    const secondOpenCode = deferred<ProviderRateLimits>()
 
     vi.mocked(fetchClaudeRateLimits)
       .mockImplementationOnce(() => firstClaude.promise)
       .mockImplementationOnce(() => secondClaude.promise)
-    vi.mocked(fetchCodexRateLimits)
-      .mockImplementationOnce(() => firstCodex.promise)
-      .mockImplementationOnce(() => secondCodex.promise)
+    vi.mocked(fetchOpenCodeGoRateLimits)
+      .mockImplementationOnce(() => firstOpenCode.promise)
+      .mockImplementationOnce(() => secondOpenCode.promise)
 
     const backgroundFetch = serviceInternals(service).fetchAll()
     await Promise.resolve()
@@ -173,24 +162,24 @@ describe('RateLimitService', () => {
     await Promise.resolve()
 
     firstClaude.resolve(okProvider('claude', 10, Date.now()))
-    firstCodex.resolve(okProvider('codex', 20, Date.now()))
+    firstOpenCode.resolve(okProvider('opencode-go', 20, Date.now()))
     await Promise.resolve()
 
     expect(refreshResolved).toBe(false)
 
     secondClaude.resolve(okProvider('claude', 11, Date.now()))
-    secondCodex.resolve(okProvider('codex', 21, Date.now()))
+    secondOpenCode.resolve(okProvider('opencode-go', 21, Date.now()))
     await backgroundFetch
     await manualRefresh
 
     expect(refreshResolved).toBe(true)
     expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
-    expect(fetchCodexRateLimits).toHaveBeenCalledTimes(2)
+    expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(2)
   })
 
   it('aborts the active fetch cycle and clears queued refreshes on stop', async () => {
     const service = new RateLimitService()
-    const capturedSignals: { claude?: AbortSignal; codex?: AbortSignal } = {}
+    const capturedSignals: { claude?: AbortSignal } = {}
 
     vi.mocked(fetchClaudeRateLimits).mockImplementation(
       (options) =>
@@ -199,17 +188,6 @@ describe('RateLimitService', () => {
           options?.signal?.addEventListener(
             'abort',
             () => resolve(errorProvider('claude', 'aborted')),
-            { once: true }
-          )
-        })
-    )
-    vi.mocked(fetchCodexRateLimits).mockImplementation(
-      (options) =>
-        new Promise((resolve) => {
-          capturedSignals.codex = options?.signal
-          options?.signal?.addEventListener(
-            'abort',
-            () => resolve(errorProvider('codex', 'aborted')),
             { once: true }
           )
         })
@@ -225,16 +203,14 @@ describe('RateLimitService', () => {
     service.stop()
 
     expect(capturedSignals.claude?.aborted).toBe(true)
-    expect(capturedSignals.codex?.aborted).toBe(true)
 
     await queuedRefresh
     await activeFetch
 
     expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
   })
 
-  it('fetches OpenCode Go alongside Claude and Codex', async () => {
+  it('fetches OpenCode Go alongside Claude', async () => {
     const service = new RateLimitService()
     service.setOpenCodeGoConfigResolver(() => ({
       sessionCookie: 'session=abc123',
@@ -247,7 +223,6 @@ describe('RateLimitService', () => {
     service.setNetworkProxySettingsResolver(() => networkProxySettings)
 
     vi.mocked(fetchClaudeRateLimits).mockResolvedValueOnce(okProvider('claude', 10, Date.now()))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
     vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValueOnce(
       okProvider('opencode-go', 40, Date.now())
     )
@@ -263,7 +238,6 @@ describe('RateLimitService', () => {
         signal: expect.any(AbortSignal)
       })
     )
-    expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
     expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
     expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledWith(
       'session=abc123',
@@ -274,8 +248,6 @@ describe('RateLimitService', () => {
     const state = service.getState()
     expect(state.claude?.status).toBe('ok')
     expect(state.claude?.session?.usedPercent).toBe(10)
-    expect(state.codex?.status).toBe('ok')
-    expect(state.codex?.session?.usedPercent).toBe(20)
     expect(state.opencodeGo?.status).toBe('ok')
     expect(state.opencodeGo?.session?.usedPercent).toBe(40)
   })
@@ -288,7 +260,6 @@ describe('RateLimitService', () => {
     }))
 
     vi.mocked(fetchClaudeRateLimits).mockRejectedValueOnce(new Error('claude down'))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValueOnce(okProvider('codex', 20, Date.now()))
     vi.mocked(fetchMiniMaxRateLimits).mockRejectedValueOnce(new Error('minimax down'))
     vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValueOnce(
       okProvider('opencode-go', 40, Date.now())
@@ -299,7 +270,6 @@ describe('RateLimitService', () => {
     const state = service.getState()
     expect(state.claude?.status).toBe('error')
     expect(state.claude?.error).toBe('claude down')
-    expect(state.codex?.status).toBe('ok')
     expect(state.minimax?.status).toBe('error')
     expect(state.minimax?.error).toBe('minimax down')
     expect(state.opencodeGo?.status).toBe('ok')
@@ -315,7 +285,6 @@ describe('RateLimitService', () => {
 
     // 1. Success fetch
     vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 10, Date.now()))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 20, Date.now()))
     vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(
       okProvider('opencode-go', 40, Date.now())
     )

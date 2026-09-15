@@ -26,8 +26,8 @@ describe('useIpcEvents rate-limit hydration', () => {
         error: null,
         status: 'ok'
       },
-      codex: {
-        provider: 'codex',
+      opencodeGo: {
+        provider: 'opencode-go',
         session: {
           usedPercent: 24,
           windowMinutes: 300,

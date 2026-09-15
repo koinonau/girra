@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect } from 'react'
+import { useCallback, useLayoutEffect } from 'react'
 import { useAppStore } from '../../store'
-import { CODEX_ACCOUNT_RESTART_STARTUP } from '@/lib/codex-session-restart'
 import { makePaneKey } from '../../../../shared/stable-pane-id'
 import { connectPanePty } from './pty-connection'
 import { bindPanePtyId } from '@/lib/pane-manager/mobile-fit-overrides'
@@ -12,14 +11,12 @@ import type { TerminalPaneCloseController } from './use-terminal-pane-close-acti
 /** Owns the restart/close actions for panes whose PTY process has exited. */
 export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseController) {
   const {
-    clearCodexRestartNotice,
     clearExitedPanePtyLayoutBinding,
     clearRuntimePaneTitle,
     clearTabPtyId,
     clearTerminalPaneUnread,
     clearTerminalTabUnread,
     clearWorktreeUnread,
-    consumePendingCodexPaneRestart,
     cwd,
     dispatchNotification,
     executeClosePane,
@@ -40,7 +37,6 @@ export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseC
     paneMode2031Ref,
     panePtyBindingsRef,
     paneTransportsRef,
-    pendingCodexPaneRestartIds,
     replayingPanesRef,
     savedLayout,
     setCacheTimerStartedAt,
@@ -57,11 +53,8 @@ export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseC
     worktreeId
   } = controller
 
-  const handleRestartCodexPane = useCallback(
-    (
-      paneId: number,
-      restartStartup: PtyConnectionDeps['startup'] = CODEX_ACCOUNT_RESTART_STARTUP
-    ) => {
+  const restartPane = useCallback(
+    (paneId: number, restartStartup: PtyConnectionDeps['startup']) => {
       const manager = managerRef.current
       const pane = manager?.getPanes().find((candidate) => candidate.id === paneId)
       if (!manager || !pane) {
@@ -72,7 +65,6 @@ export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseC
       const existingPtyId = transport?.getPtyId()
       if (existingPtyId) {
         suppressPtyExit(existingPtyId)
-        clearCodexRestartNotice(existingPtyId)
         clearTabPtyId(tabId, existingPtyId)
       }
       panePtyBinding?.dispose()
@@ -126,7 +118,6 @@ export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseC
     },
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
     [
-      clearCodexRestartNotice,
       clearExitedPanePtyLayoutBinding,
       clearRuntimePaneTitle,
       clearTabPtyId,
@@ -183,12 +174,9 @@ export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseC
   const handleRestartExitedPane = useCallback(
     (processExit: PaneProcessExit) => {
       clearPaneProcessExit(processExit.paneId)
-      handleRestartCodexPane(
-        processExit.paneId,
-        resolveTerminalProcessExitRestartStartup(processExit)
-      )
+      restartPane(processExit.paneId, resolveTerminalProcessExitRestartStartup(processExit))
     },
-    [clearPaneProcessExit, handleRestartCodexPane]
+    [clearPaneProcessExit, restartPane]
   )
 
   const handleCloseExitedPane = useCallback(
@@ -225,28 +213,6 @@ export function useTerminalPaneProcessExitActions(controller: TerminalPaneCloseC
       pane.container.dataset.ptyId = expectedPtyId
     }
   }, [managerRef, panePtyLayoutBindings, paneTransportsRef, tabId])
-
-  useEffect(() => {
-    const manager = managerRef.current
-    if (!manager) {
-      return
-    }
-    for (const pane of manager.getPanes()) {
-      const ptyId = paneTransportsRef.current.get(pane.id)?.getPtyId()
-      if (!ptyId || !pendingCodexPaneRestartIds[ptyId]) {
-        continue
-      }
-      if (consumePendingCodexPaneRestart(ptyId)) {
-        handleRestartCodexPane(pane.id)
-      }
-    }
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
-  }, [
-    consumePendingCodexPaneRestart,
-    handleRestartCodexPane,
-    panePtyLayoutBindings,
-    pendingCodexPaneRestartIds
-  ])
 
   return { handleRestartExitedPane, handleCloseExitedPane }
 }

@@ -14,8 +14,6 @@ import { browserManager } from '../browser/browser-manager'
 import { getServeOptions, getBundledWebClientRoot, printServeReady } from './main-process-serve'
 import {
   bindTerminalRuntimeStartupServices,
-  handleCodexHomePtySpawned,
-  handlePtyExit,
   startTerminalRuntimeStartupServices
 } from './main-process-pty-startup'
 import { prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
@@ -114,8 +112,7 @@ async function launchServeMode(
     () => state.store!.getSettings(),
     (target) => state.claudeRuntimeAuth!.prepareForClaudeLaunch(target),
     state.store!,
-    prepareCodexSessionResumeForLaunch,
-    { onCodexHomePtySpawned: handleCodexHomePtySpawned, onPtyExit: handlePtyExit }
+    prepareCodexSessionResumeForLaunch
   )
   await runtime.refreshRestoredOrchestrationAuthority()
   await runtime.reconcileLegacyWorkerTerminals()

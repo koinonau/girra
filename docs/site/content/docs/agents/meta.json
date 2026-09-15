@@ -7,7 +7,6 @@
     "glm-agent",
     "codex",
     "cursor-cli",
-    "codex-hot-swap",
     "native-chat",
     "session-history",
     "hibernation",

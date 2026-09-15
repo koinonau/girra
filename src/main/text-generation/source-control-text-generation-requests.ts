@@ -23,7 +23,7 @@ import type { ResolvedSourceControlAiGenerationParams } from '../../shared/sourc
 import { formatLinkedIssueTemplateValue } from '../../shared/source-control-ai-action-variables'
 import { renderSourceControlActionCommandTemplate } from '../../shared/source-control-ai-actions'
 import { captureAgentGenerationFailureOutput } from './agent-failure-output'
-import { runLocalPlanForAgent } from './source-control-local-generation'
+import { runLocalSourceControlPlan } from './source-control-local-process'
 import { runRemoteSourceControlPlan } from './source-control-remote-generation'
 import type {
   CommitMessageGenerationTarget,
@@ -63,12 +63,13 @@ async function executeGenerationPlan(input: {
         emptyResultName: input.emptyResultName,
         operation: input.operation
       })
-    : runLocalPlanForAgent({
-        agentId: input.params.agentId,
+    : runLocalSourceControlPlan({
         plan: input.plan,
-        target: input.target,
+        cwd: input.target.cwd,
+        env: input.target.env,
         emptyResultName: input.emptyResultName,
         operation: input.operation,
+        wslDistro: input.target.wslDistro,
         spawnAgent: input.spawnAgent
       })
 }

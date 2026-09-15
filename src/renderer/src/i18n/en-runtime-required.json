@@ -24,9 +24,6 @@
       "d54e66004c": "terminal"
     },
     "components": {
-      "CodexRestartChip": {
-        "9263e75f49": "Codex is using the previous account"
-      },
       "GitHubItemDialog": {
         "04539beb48": "issue",
         "307c98e8e3": "Show {{value0}} more lines above",
@@ -946,7 +943,6 @@
           "b10cb4f696": "adding",
           "b11078a9c2": "wsl",
           "b43e761fe5": "MiniMax cookie update failed.",
-          "b8c2905c2b": "Could not load Codex accounts.",
           "f5d8d2a6a1": "Open platform.minimax.io/console/usage in your browser and sign in."
         },
         "AdvancedNetworkSettingsSection": {
@@ -2050,19 +2046,12 @@
           "02a046792e": "sessions •",
           "32176e1d44": "turns"
         },
-        "CodexUsagePane": {
-          "247c93ca92": "• inferred pricing",
-          "79a69522a5": "events",
-          "ae255c3dba": "n/a",
-          "bf1bf2f674": "sessions •"
-        },
         "OpenCodeUsagePane": {
           "1e5d410df0": "events",
           "8095a63426": "n/a",
           "bc0cb89901": "sessions •"
         },
         "StatsPane": {
-          "908c470587": "codex",
           "eb6a066185": "claude",
           "eee19cfade": "overview"
         },

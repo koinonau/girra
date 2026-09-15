@@ -61,13 +61,6 @@ const POPULAR_SEARCHES: {
     url: '/docs/model/worktrees'
   },
   {
-    breadcrumb: ['Working with Agents', 'Hot-swap Codex accounts'],
-    title: 'Hot-swap Codex accounts',
-    description:
-      'Switch between multiple Codex or Claude accounts in one click to maximize tokens — no re-login, no config editing.',
-    url: '/docs/agents/codex-hot-swap'
-  },
-  {
     breadcrumb: ['Browser & Design Mode', 'Design Mode'],
     title: 'Design Mode',
     description:

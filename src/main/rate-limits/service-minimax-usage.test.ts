@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { RateLimitService } from './service'
 import { fetchClaudeRateLimits } from './claude-fetcher'
-import { fetchCodexRateLimits } from './codex-fetcher'
 import { fetchMiniMaxRateLimits } from './minimax/minimax-fetcher'
 import { hasMiniMaxSessionCookie } from '../minimax/minimax-cookie-store'
 import {
@@ -14,11 +13,6 @@ import {
 vi.mock('./claude-fetcher', () => ({
   fetchClaudeRateLimits: vi.fn(),
   fetchManagedAccountUsage: vi.fn()
-}))
-
-vi.mock('./codex-fetcher', () => ({
-  consumeCodexRateLimitResetCredit: vi.fn(),
-  fetchCodexRateLimits: vi.fn()
 }))
 
 vi.mock('./opencode-go-usage-fetcher', () => ({
@@ -41,10 +35,9 @@ describe('RateLimitService', () => {
   beforeEach(() => {
     resetRateLimitProviderMocks()
     // Why: these cases only stub MiniMax, so the surrounding fetch cycle still
-    // needs healthy Claude/Codex results — previously inherited implicitly from
+    // needs healthy Claude results — previously inherited implicitly from
     // earlier tests' persistent mocks (clearAllMocks keeps implementations).
     vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 7))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 20))
   })
 
   it('fetches MiniMax alongside other providers when a config resolver is set', async () => {

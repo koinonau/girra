@@ -72,14 +72,8 @@ export type GenerateBranchNameResult =
       failureOutput?: AgentGenerationFailureOutput
     }
 
-export type LocalProcessExecution<T> = {
-  result: Promise<T>
-  processClosed: Promise<void>
-}
-
 export type SpawnedSourceControlAgentProcess = ReturnType<typeof spawnProcess>
 
-export type LocalGenerationTarget = Extract<CommitMessageGenerationTarget, { kind: 'local' }>
 export type RemoteGenerationTarget = Extract<CommitMessageGenerationTarget, { kind: 'remote' }>
 
 export type SpawnSourceControlAgent = (input: {

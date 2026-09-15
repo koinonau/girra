@@ -16,7 +16,6 @@ describe('runtime extraction regressions', () => {
     const getRuntimeConfigDir = vi.fn(() => '/accounts/claude/managed')
     runtime.setAccountServices({
       claudeAccounts: { getRuntimeConfigDir },
-      codexAccounts: {},
       rateLimits: {}
     } as never)
 

@@ -80,7 +80,7 @@ export function buildInterfaceSettingsSections({
       title: translate('auto.hooks.useSettingsNavigationMetadata.d72a58b5b9', 'Stats & Usage'),
       description: translate(
         'auto.hooks.useSettingsNavigationMetadata.b351014180',
-        'Orca stats plus Claude, Codex and OpenCode token analytics.'
+        'Orca stats plus Claude and OpenCode token analytics.'
       ),
       icon: BarChart3,
       searchEntries: getStatsPaneSearchEntries(),

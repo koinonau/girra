@@ -41,9 +41,8 @@ export function createChildTerminationExpectation(
       })
     }
     // Every platform kills the root by its own handle. On win32 that is not a
-    // duplicate of the tree walk: it is what keeps a refused walk from resolving
-    // having killed nothing while the caller releases the managed-home lock. It
-    // runs after the walk there, so it can be a tick behind the caller.
+    // duplicate of the tree walk: it is what kills the root when the walk is
+    // refused. It runs after the walk there, so it can be a tick behind the caller.
     await vi.waitFor(() => expect(child.kill).toHaveBeenCalledWith('SIGKILL'))
   }
 }

@@ -19,15 +19,13 @@ describe('usage provider IPC handlers', () => {
       getRecentSessions: vi.fn()
     })
     const claudeUsage = createUsage()
-    const codexUsage = createUsage()
     const openCodeUsage = createUsage()
     registerUsageProviderHandlers({
       claudeUsage: claudeUsage as never,
-      codexUsage: codexUsage as never,
       openCodeUsage: openCodeUsage as never
     })
 
-    const prefixes = ['claudeUsage', 'codexUsage', 'openCodeUsage']
+    const prefixes = ['claudeUsage', 'openCodeUsage']
     const suffixes = Object.keys(claudeUsage)
     expect(handle.mock.calls.map(([channel]) => channel)).toEqual(
       prefixes.flatMap((prefix) => suffixes.map((suffix) => `${prefix}:${suffix}`))
@@ -40,7 +38,6 @@ describe('usage provider IPC handlers', () => {
       return handler?.({}, args)
     }
     call('claudeUsage', 'getScanState')
-    call('codexUsage', 'getScanState')
     call('openCodeUsage', 'getScanState')
     call('claudeUsage', 'setEnabled', { enabled: true })
     call('claudeUsage', 'refresh')
@@ -52,7 +49,6 @@ describe('usage provider IPC handlers', () => {
     call('claudeUsage', 'getRecentSessions', { scope: 'orca', range: '30d', limit: 4 })
 
     expect(claudeUsage.getScanState).toHaveBeenCalledWith()
-    expect(codexUsage.getScanState).toHaveBeenCalledWith()
     expect(openCodeUsage.getScanState).toHaveBeenCalledWith()
     expect(claudeUsage.setEnabled).toHaveBeenCalledWith(true)
     expect(claudeUsage.refresh.mock.calls).toEqual([[false], [true]])

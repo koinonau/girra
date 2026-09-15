@@ -92,7 +92,7 @@ export function parseMiniMaxModels(models: MiniMaxModelList): string[] {
 // Why: MiniMax's API returns `end_time - start_time` that can drift below the
 // 5-hour bucket (e.g. 4h or 295 min). The UI labels must reflect the contracted
 // session — a fixed 5-hour window — so the status bar reads "5h" regardless of
-// what the API reports. Mirrors how Codex always reports 300/10080 minutes.
+// what the API reports.
 const MINIMAX_SESSION_WINDOW_MINUTES = 300
 // Why: 7-day window. The API doesn't expose a `weekly_end_time` analog of the
 // session's end_time, so we label the chip via windowMinutes + a relative

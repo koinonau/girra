@@ -99,7 +99,7 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
     return null
   }
 
-  const { claude, codex, opencodeGo, minimax } = rateLimits
+  const { claude, opencodeGo, minimax } = rateLimits
 
   // Why: a bar is earned by a live snapshot or durable Settings setup; detection-gating hides per-CLI bars when the agent isn't on PATH.
   // Why: thread non-GlobalSettings durability flags so bars stay visible across reloads and snapshot refreshes.
@@ -109,16 +109,11 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
     minimaxApiKeyConfigured: rateLimits.minimaxApiKeyConfigured
   }
   const visibleClaude = getVisibleUsageProvider('claude', claude, usageSettings)
-  const visibleCodex = getVisibleUsageProvider('codex', codex, usageSettings)
   const visibleMiniMax = getVisibleUsageProvider('minimax', minimax, usageSettings)
   const showClaude =
     visibleClaude !== null &&
     statusBarItems.includes('claude') &&
     isStatusBarItemAvailable('claude', detectedAgentIds)
-  const showCodex =
-    visibleCodex !== null &&
-    statusBarItems.includes('codex') &&
-    isStatusBarItemAvailable('codex', detectedAgentIds)
   // Why: MiniMax is cookie-auth, not a CLI on PATH, so detection-gating doesn't apply.
   const showMiniMax = visibleMiniMax !== null && statusBarItems.includes('minimax')
   // Why: OpenCode Go is web/cookie-auth, not a CLI on PATH, so detection-gating doesn't apply.
@@ -130,15 +125,14 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
   const showFloatingTerminalToggle =
     floatingTerminalEnabled && floatingTerminalTriggerLocation === 'status-bar'
   // Why: meter-only children (excludes resource-usage) so the % display callout anchors to a real meter cluster.
-  const hasVisibleUsageMeters = showClaude || showCodex || showOpencodeGo || showMiniMax
+  const hasVisibleUsageMeters = showClaude || showOpencodeGo || showMiniMax
   const anyVisible = hasVisibleUsageMeters || showResourceUsage
   // Why: include Settings so durable managed accounts count — a configured user isn't shown the empty state while snapshots hydrate.
-  const isEmptyUsageState = isUsageEmptyState({ claude, codex, opencodeGo, minimax }, usageSettings)
+  const isEmptyUsageState = isUsageEmptyState({ claude, opencodeGo, minimax }, usageSettings)
   // Why: one-time nudge — once dismissed, stays hidden even if providers reconnect later.
   const showEmptyUsageCta = isEmptyUsageState && !usageEmptyStateDismissed
   const anyFetching =
     claude?.status === 'fetching' ||
-    codex?.status === 'fetching' ||
     opencodeGo?.status === 'fetching' ||
     minimax?.status === 'fetching'
 
@@ -153,7 +147,6 @@ export function useStatusBarController(floatingTerminalOpen: boolean) {
   // otherwise an empty trigger would bypass those visibility controls.
   const rosterProviders = [
     showClaude ? visibleClaude : null,
-    showCodex ? visibleCodex : null,
     showOpencodeGo ? visibleOpencodeGo : null,
     showMiniMax ? visibleMiniMax : null
   ].filter((p): p is ProviderRateLimits => p !== null)

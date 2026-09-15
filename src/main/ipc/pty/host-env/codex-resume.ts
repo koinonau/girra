@@ -5,7 +5,7 @@ import {
 } from '../../../../shared/agent-session-resume'
 import { SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV } from '../../../../shared/setup-agent-sequencing'
 import { dropAgentResumeArgvFromCommand } from '../../../../shared/agent-resume-argv-drop'
-import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
+import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import { dropUnverifiedCodexResumeArgv } from '../../../codex/codex-unverified-resume-launch'
 import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
 import { CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE, codexHomePathsEqual } from './codex-home'
@@ -28,7 +28,7 @@ export type PrepareCodexResumeHomeArgs = {
   connectionId?: string | null
   launchAgent?: TuiAgent
   providerSession?: AgentProviderSessionMetadata
-  target: CodexAccountSelectionTarget
+  target: AccountSelectionTarget
   launchEnv?: NodeJS.ProcessEnv
   workspacePath?: string
 }

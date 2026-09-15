@@ -9,7 +9,6 @@ import {
   type AutomationRun
 } from '../../shared/automations-types'
 import type { ClaudeUsageStore } from '../claude-usage/store'
-import type { CodexUsageStore } from '../codex-usage/store'
 import { runAutomationPrecheck } from './precheck-runner'
 import { resolveAutomationRunTarget, type AutomationRunTargetResult } from './run-target-resolution'
 import { collectAutomationRunUsage } from './run-usage-collection'
@@ -41,7 +40,6 @@ export class AutomationService {
   private rendererReady = false
   private evaluating = false
   private readonly claudeUsage: ClaudeUsageStore | null
-  private readonly codexUsage: CodexUsageStore | null
   private readonly allowRemoteHostScheduling: boolean
   private readonly headlessDispatcher: HeadlessAutomationDispatcher | null
   private readonly publish: PublishAutomationsChanged | null
@@ -57,7 +55,6 @@ export class AutomationService {
     opts: {
       tickMs?: number
       claudeUsage?: ClaudeUsageStore
-      codexUsage?: CodexUsageStore
       allowRemoteHostScheduling?: boolean
       headlessDispatcher?: HeadlessAutomationDispatcher
       terminalObserver?: AutomationRunTerminalObserver
@@ -67,7 +64,6 @@ export class AutomationService {
     this.store = store
     this.tickMs = opts.tickMs ?? DEFAULT_TICK_MS
     this.claudeUsage = opts.claudeUsage ?? null
-    this.codexUsage = opts.codexUsage ?? null
     this.allowRemoteHostScheduling = opts.allowRemoteHostScheduling ?? false
     this.headlessDispatcher = opts.headlessDispatcher ?? null
     this.publish = opts.onAutomationsChanged ?? null
@@ -207,8 +203,7 @@ export class AutomationService {
     const usage = await collectAutomationRunUsage({
       automation: this.store.listAutomations().find((entry) => entry.id === run.automationId),
       run,
-      claudeUsage: this.claudeUsage,
-      codexUsage: this.codexUsage
+      claudeUsage: this.claudeUsage
     })
     // Why: the run is final during the await above, so a concurrent create-time
     // retention prune may have evicted it — the usage write must not throw then.

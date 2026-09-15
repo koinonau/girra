@@ -13,7 +13,7 @@ import {
 } from '../../../../shared/usage-percentage-display'
 import { barColor, formatResetCountdown, getWindowSections, ProviderIcon } from './tooltip'
 import { getProviderDisplayName } from './usage-error-copy'
-import { formatPlanLabel, usageTextColorClass } from './usage-roster-formatting'
+import { usageTextColorClass } from './usage-roster-formatting'
 import { getUsageRosterRowState, type UsageRosterRowState } from './usage-roster-row-state'
 import type { StatusBarUsageMode } from '../../../../shared/status-bar-usage-mode'
 
@@ -124,7 +124,6 @@ export function UsageRow({
   const sections = usedSections(p)
   const hasUsage = sections.length > 0
   const name = getProviderDisplayName(p.provider)
-  const plan = formatPlanLabel(p.planType)
   const reset = hasUsage ? soonestResetLabel(sections, now) : null
   const tightest = mode === 'compact' ? getTightestUsageSection(p) : null
 
@@ -136,7 +135,6 @@ export function UsageRow({
         </span>
         <span className="min-w-0 shrink truncate text-[13px] font-medium text-foreground">
           {name}
-          {plan ? <span className="font-normal text-muted-foreground"> · {plan}</span> : null}
         </span>
         {!hasUsage ? (
           <>
@@ -209,7 +207,7 @@ export function UsageRosterPanel({
   onManageAccounts: () => void
   onUsageDetails: () => void
   // Lets the host wrap a provider's row in a richer control (e.g. the
-  // Claude/Codex account-switch drill-in submenu); return null to use the
+  // Claude account-switch drill-in submenu); return null to use the
   // default clickable row.
   renderRow?: (p: ProviderRateLimits, row: React.ReactNode) => React.ReactNode
 }): React.JSX.Element {

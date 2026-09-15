@@ -2,12 +2,12 @@ import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { StatusBarItem } from '../../../../shared/ui-chrome-types'
 
 // Why: CLI-backed usage bars are surface noise when the underlying
-// CLI isn't installed (e.g. a fresh Ubuntu install showing "Codex Usage"
-// when no Codex CLI is on PATH). We hide both the bar and its toggle when
+// CLI isn't installed (e.g. a fresh Ubuntu install showing "Claude Usage"
+// when no Claude CLI is on PATH). We hide both the bar and its toggle when
 // PATH detection reports the agent as missing. Pre-detection (null) keeps
 // the legacy behavior so the bar/toggle don't flicker on cold start, and
 // re-show automatically once the agent appears on PATH.
-const CLI_GATED_ITEMS: ReadonlySet<StatusBarItem> = new Set(['claude', 'codex'])
+const CLI_GATED_ITEMS: ReadonlySet<StatusBarItem> = new Set(['claude'])
 
 export function isStatusBarItemAvailable(
   id: StatusBarItem,

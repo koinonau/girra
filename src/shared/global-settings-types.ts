@@ -15,9 +15,7 @@ import type { CommitMessageAiSettings } from './commit-message-ai-types'
 import type { HostSettingOverrides } from './host-setting-overrides'
 import type {
   ClaudeManagedAccount,
-  ClaudeManagedAccountRuntimeSelection,
-  CodexManagedAccount,
-  CodexManagedAccountRuntimeSelection
+  ClaudeManagedAccountRuntimeSelection
 } from './managed-account-types'
 import type { NotificationSettings } from './notification-settings-types'
 import type { CtrlTabOrderMode } from './tab-types'
@@ -277,10 +275,6 @@ export type GlobalSettings = {
   promptCacheTimerEnabled: boolean
   /** Prompt-cache TTL (ms); only 300000 (5 min standard) or 3600000 (1 hr, extended-TTL plans). */
   promptCacheTtlMs: number
-  /** Why: durable main-owned pref so Orca can prepare shared ~/.codex before the renderer hydrates. */
-  codexManagedAccounts: CodexManagedAccount[]
-  activeCodexManagedAccountId: string | null
-  activeCodexManagedAccountIdsByRuntime?: CodexManagedAccountRuntimeSelection
   /** Why: persist only per-account auth (not a CLAUDE_CONFIG_DIR swap) so switching accounts doesn't fork Claude's shared chat/session context. */
   claudeManagedAccounts: ClaudeManagedAccount[]
   activeClaudeManagedAccountId: string | null
@@ -330,8 +324,6 @@ export type GlobalSettings = {
   skipCloseTerminalWithRunningProcessConfirm: boolean
   /** Why: deleting an automation also deletes its run history; keep this skip separate from worktree deletion. */
   skipDeleteAutomationConfirm: boolean
-  /** Why: a Codex rate-limit reset spends a scarce credit on the live account; keep this skip separate from local confirmations. */
-  skipCodexRateLimitResetConfirm: boolean
   /** Default preset in the new-workspace GitHub task view. */
   defaultTaskViewPreset: TaskViewPresetId
   /** Persisted last-used task source so Tasks reopens to the same provider instead of defaulting to GitHub. */

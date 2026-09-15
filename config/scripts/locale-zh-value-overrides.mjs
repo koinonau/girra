@@ -147,9 +147,6 @@ export const ZH_VALUE_OVERRIDES = {
   'Support Orca': '支持 Orca',
   'Restarting Orca…': '正在重启 Orca…',
   'Show Orca Mobile Button': '显示 Orca Mobile 按钮',
-  'Codex Accounts': 'Codex 账户',
-  'Codex Account': 'Codex 账户',
-  'Active Codex Account': '活跃 Codex 账户',
   'Claude Accounts': 'Claude 账户',
   'Remove Claude Account?': '删除 Claude 账户？',
   'Claude account updated.': 'Claude 账户已更新。',
@@ -159,8 +156,6 @@ export const ZH_VALUE_OVERRIDES = {
   'Claude account added.': '已添加 Claude 账户。',
   'Claude Code session started': 'Claude Code 会话已开始',
   'Codex session started': 'Codex 会话已开始',
-  'Enable Codex': '启用 Codex',
-  'Most recent local Codex sessions in this scope.': '此范围内最近的本地 Codex 会话。',
   'Hosted-review creation defaults': '托管评审创建默认值',
   'Defaults used when the hosted-review composer opens.': '打开托管评审编辑器时使用的默认值。',
   'Run hosted-review detail generation once when the composer opens.':

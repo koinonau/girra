@@ -5,9 +5,6 @@ export function getProviderDisplayName(provider: ProviderRateLimits['provider'])
   if (provider === 'claude') {
     return 'Claude'
   }
-  if (provider === 'codex') {
-    return 'Codex'
-  }
   if (provider === 'opencode-go') {
     return 'OpenCode Go'
   }
@@ -18,9 +15,8 @@ export function getProviderDisplayName(provider: ProviderRateLimits['provider'])
 }
 
 function isUsageRateLimitError(message: string | null): boolean {
-  // Why: Codex app-server's "chatgpt authentication required to read rate
-  // limits" mentions rate limits only as the thing it could not read; treat
-  // authentication-required failures as auth, never as the user being limited.
+  // Why: "authentication required to read rate limits" names rate limits only as
+  // the thing it could not read; treat it as auth, never as the user being limited.
   if (!message || /\bauthentication required\b/i.test(message)) {
     return false
   }

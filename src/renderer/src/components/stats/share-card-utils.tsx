@@ -2,19 +2,12 @@ import type {
   ClaudeUsageDailyPoint,
   ClaudeUsageSummary
 } from '../../../../shared/claude-usage-types'
-import type { CodexUsageDailyPoint, CodexUsageSummary } from '../../../../shared/codex-usage-types'
 import { translate } from '@/i18n/i18n'
 
 export type ClaudeShareData = {
   provider: 'claude'
   summary: ClaudeUsageSummary
   daily: ClaudeUsageDailyPoint[]
-}
-
-export type CodexShareData = {
-  provider: 'codex'
-  summary: CodexUsageSummary
-  daily: CodexUsageDailyPoint[]
 }
 
 export function formatTokens(value: number): string {
@@ -56,57 +49,24 @@ export const RANGE_LABELS: Record<string, string> = {
   all: 'All time'
 }
 
-export function getDailyTotal(entry: ClaudeUsageDailyPoint | CodexUsageDailyPoint): number {
-  if ('cacheReadTokens' in entry) {
-    return entry.inputTokens + entry.outputTokens + entry.cacheReadTokens + entry.cacheWriteTokens
-  }
-  return entry.totalTokens
+export function getDailyTotal(entry: ClaudeUsageDailyPoint): number {
+  return entry.inputTokens + entry.outputTokens + entry.cacheReadTokens + entry.cacheWriteTokens
 }
 
 export type DailySegment = { key: string; value: number; color: string }
 
-export function getDailySegments(
-  entry: ClaudeUsageDailyPoint | CodexUsageDailyPoint
-): DailySegment[] {
+export function getDailySegments(entry: ClaudeUsageDailyPoint): DailySegment[] {
   // Why: segment order matches the original charts exactly (top-to-bottom).
   // Segments render as stacked block divs in a table cell with vertical-align: bottom.
-  if ('cacheReadTokens' in entry) {
-    return [
-      { key: 'cache-write', value: entry.cacheWriteTokens, color: 'rgba(217, 70, 239, 0.7)' },
-      { key: 'cache-read', value: entry.cacheReadTokens, color: 'rgba(251, 191, 36, 0.7)' },
-      { key: 'output', value: entry.outputTokens, color: 'rgba(52, 211, 153, 0.8)' },
-      { key: 'input', value: entry.inputTokens, color: 'rgba(56, 189, 248, 0.8)' }
-    ]
-  }
   return [
-    { key: 'input', value: entry.inputTokens, color: 'rgba(56, 189, 248, 0.8)' },
+    { key: 'cache-write', value: entry.cacheWriteTokens, color: 'rgba(217, 70, 239, 0.7)' },
+    { key: 'cache-read', value: entry.cacheReadTokens, color: 'rgba(251, 191, 36, 0.7)' },
     { key: 'output', value: entry.outputTokens, color: 'rgba(52, 211, 153, 0.8)' },
-    { key: 'cached', value: entry.cachedInputTokens, color: 'rgba(251, 191, 36, 0.7)' },
-    { key: 'reasoning', value: entry.reasoningOutputTokens, color: 'rgba(217, 70, 239, 0.7)' }
+    { key: 'input', value: entry.inputTokens, color: 'rgba(56, 189, 248, 0.8)' }
   ]
 }
 
-export function getLegendItems(provider: 'claude' | 'codex') {
-  if (provider === 'claude') {
-    return [
-      {
-        label: translate('auto.components.stats.share.card.utils.c2d7b23d57', 'Input'),
-        color: 'rgba(56, 189, 248, 0.8)'
-      },
-      {
-        label: translate('auto.components.stats.share.card.utils.33d38e2177', 'Output'),
-        color: 'rgba(52, 211, 153, 0.8)'
-      },
-      {
-        label: translate('auto.components.stats.share.card.utils.cc28cb965e', 'Cache read'),
-        color: 'rgba(251, 191, 36, 0.7)'
-      },
-      {
-        label: translate('auto.components.stats.share.card.utils.9d166247ee', 'Cache write'),
-        color: 'rgba(217, 70, 239, 0.7)'
-      }
-    ]
-  }
+export function getLegendItems() {
   return [
     {
       label: translate('auto.components.stats.share.card.utils.c2d7b23d57', 'Input'),
@@ -117,11 +77,11 @@ export function getLegendItems(provider: 'claude' | 'codex') {
       color: 'rgba(52, 211, 153, 0.8)'
     },
     {
-      label: translate('auto.components.stats.share.card.utils.4ee864629a', 'Cached input'),
+      label: translate('auto.components.stats.share.card.utils.cc28cb965e', 'Cache read'),
       color: 'rgba(251, 191, 36, 0.7)'
     },
     {
-      label: translate('auto.components.stats.share.card.utils.7080aeaebb', 'Reasoning'),
+      label: translate('auto.components.stats.share.card.utils.9d166247ee', 'Cache write'),
       color: 'rgba(217, 70, 239, 0.7)'
     }
   ]

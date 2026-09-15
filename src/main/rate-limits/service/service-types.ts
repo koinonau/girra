@@ -1,11 +1,8 @@
 import type { ProviderRateLimits } from '../../../shared/rate-limit-types'
 import type { ClaudeRuntimeAuthPreparation } from '../../claude-accounts/runtime-auth-service'
 import type { ClaudeAccountSelectionTarget } from '../../claude-accounts/runtime-selection'
-import type { CodexAccountSelectionTarget } from '../../codex-accounts/runtime-selection'
-import type { CodexRateLimitHomeResolution } from '../../codex-accounts/runtime-home-service'
 
 export type {
-  CodexRateLimitResetResult,
   RateLimitState,
   ProviderRateLimits,
   InactiveAccountUsage,
@@ -20,21 +17,7 @@ export type {
   NormalizedClaudeAccountSelectionTarget
 } from '../../claude-accounts/runtime-selection'
 export { normalizeClaudeAccountSelectionTarget } from '../../claude-accounts/runtime-selection'
-export type {
-  CodexAccountSelectionTarget,
-  NormalizedCodexAccountSelectionTarget
-} from '../../codex-accounts/runtime-selection'
-export { normalizeCodexAccountSelectionTarget } from '../../codex-accounts/runtime-selection'
-export type { CodexRateLimitHomeResolution } from '../../codex-accounts/runtime-home-service'
 
-export type InactiveCodexAccountInfo = {
-  id: string
-  resolveHome: () => { kind: 'ready'; managedHomePath: string } | { kind: 'skip' }
-}
-
-export type CodexHomePathResolver = (
-  target?: CodexAccountSelectionTarget
-) => CodexRateLimitHomeResolution
 export type ClaudeAuthPreparationResolver = (
   target?: ClaudeAccountSelectionTarget
 ) => Promise<ClaudeRuntimeAuthPreparation>
@@ -78,8 +61,7 @@ export const MAX_ACTIVE_FAILURE_REFETCH_MS = DEFAULT_POLL_MS
 export const MAX_ACTIVE_FAILURE_STREAK = 8
 // Why: these providers have a dedicated fetch cycle, so an activation retry refreshes just the failing one; others force a full fetchAll.
 export const INDIVIDUALLY_REFRESHABLE_PROVIDERS: ReadonlySet<ActiveRateLimitProvider> = new Set([
-  'claude',
-  'codex'
+  'claude'
 ])
 export const STALE_THRESHOLD_MS = 30 * 60 * 1000 // 30 minutes — after this, stale data is dropped
 // Why: usage-endpoint 429 windows can outlast the generic threshold (Retry-After ~1h); quota is informational, so a stale snapshot beats a bare "Limited".
@@ -87,16 +69,11 @@ export const RATE_LIMITED_STALE_THRESHOLD_MS = 24 * 60 * 60 * 1000
 // Why: statusline posts arrive on every turn; skip renderer pushes for identical windows so streaming sessions don't spam state updates.
 export const LIVE_CLAUDE_INGEST_DEDUPE_MS = 30 * 1000
 export const INACTIVE_FETCH_DEBOUNCE_MS = 60 * 1000 // 60 seconds — debounce fetch-on-open
-// Why: each inactive Codex probe spawns a real codex process inside that
-// account's live credential home; pace them out instead of bursting every
-// account the moment the switcher opens.
-export const INACTIVE_CODEX_PROBE_STAGGER_MS = 2_000
 export const DEFERRED_STARTUP_ACTIVE_REFRESH_MS = 1000
 
 // Why: inactive account arrays are derived from provider caches on demand in getState()/pushToRenderer().
 export type InternalRateLimitState = {
   claude: ProviderRateLimits | null
-  codex: ProviderRateLimits | null
   opencodeGo: ProviderRateLimits | null
   minimax: ProviderRateLimits | null
 }
@@ -127,23 +104,6 @@ export function normalizeClaudeConfigDir(dir: string | null | undefined): string
   // Why: normalize mixed Windows separators for path attribution; preserve Linux case sensitivity.
   const trimmed = dir?.trim().replace(/\\/g, '/').replace(/\/+$/, '')
   return trimmed || null
-}
-
-export function delayUnlessAborted(ms: number, signal: AbortSignal): Promise<void> {
-  if (signal.aborted) {
-    return Promise.resolve()
-  }
-  return new Promise((resolve) => {
-    const onAbort = (): void => {
-      clearTimeout(timer)
-      resolve()
-    }
-    const timer = setTimeout(() => {
-      signal.removeEventListener('abort', onAbort)
-      resolve()
-    }, ms)
-    signal.addEventListener('abort', onAbort, { once: true })
-  })
 }
 
 export function isSameUsageWindow(

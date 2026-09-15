@@ -1,6 +1,5 @@
 import type { Automation, AutomationRun, AutomationRunUsage } from '../../shared/automations-types'
 import type { ClaudeUsageStore } from '../claude-usage/store'
-import type { CodexUsageStore } from '../codex-usage/store'
 
 function createUnavailableAutomationUsage(
   collectedAt: number,
@@ -31,9 +30,6 @@ function createUnavailableAutomationUsage(
 function getAutomationUsageProvider(
   automation: Automation | undefined
 ): AutomationRunUsage['provider'] {
-  if (automation?.agentId === 'codex') {
-    return 'codex'
-  }
   if (automation?.agentId === 'claude') {
     return 'claude'
   }
@@ -43,13 +39,11 @@ function getAutomationUsageProvider(
 export async function collectAutomationRunUsage({
   automation,
   run,
-  claudeUsage,
-  codexUsage
+  claudeUsage
 }: {
   automation: Automation | undefined
   run: AutomationRun
   claudeUsage: ClaudeUsageStore | null
-  codexUsage: CodexUsageStore | null
 }): Promise<AutomationRunUsage> {
   const collectedAt = Date.now()
   const unavailable = (
@@ -78,17 +72,6 @@ export async function collectAutomationRunUsage({
       return unavailable('claude', 'scan_failed', 'Claude usage store is unavailable.')
     }
     return claudeUsage.getAutomationRunUsage({
-      worktreeId: run.workspaceId,
-      terminalSessionId: run.terminalSessionId,
-      startedAt: run.startedAt,
-      completedAt: collectedAt
-    })
-  }
-  if (automation.agentId === 'codex') {
-    if (!codexUsage) {
-      return unavailable('codex', 'scan_failed', 'Codex usage store is unavailable.')
-    }
-    return codexUsage.getAutomationRunUsage({
       worktreeId: run.workspaceId,
       terminalSessionId: run.terminalSessionId,
       startedAt: run.startedAt,

@@ -6,7 +6,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
-import { ClaudeIcon, MiniMaxIcon, OpenAIIcon, OpenCodeGoIcon } from './icons'
+import { ClaudeIcon, MiniMaxIcon, OpenCodeGoIcon } from './icons'
 import { translate } from '@/i18n/i18n'
 import { isStatusBarItemAvailable } from './status-bar-agent-gating'
 import type { StatusBarController } from './use-status-bar-controller'
@@ -47,18 +47,6 @@ export function StatusBarVisibilityMenu({
           >
             <ClaudeIcon size={14} />
             {translate('auto.components.status.bar.StatusBar.3885eb74d8', 'Claude Usage')}
-          </DropdownMenuCheckboxItem>
-        )}
-        {isStatusBarItemAvailable('codex', detectedAgentIds) && (
-          <DropdownMenuCheckboxItem
-            checked={statusBarItems.includes('codex')}
-            onCheckedChange={() => {
-              recordFeatureInteraction('usage-tracking')
-              toggleStatusBarItem('codex')
-            }}
-          >
-            <OpenAIIcon size={14} />
-            {translate('auto.components.status.bar.StatusBar.c0909c686e', 'Codex Usage')}
           </DropdownMenuCheckboxItem>
         )}
         <DropdownMenuCheckboxItem

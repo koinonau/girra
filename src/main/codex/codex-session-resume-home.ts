@@ -6,7 +6,6 @@ import {
   relativePathInsideRoot
 } from '../../shared/cross-platform-path'
 import { listCodexSessionRolloutFilesIncrementally } from './codex-session-file-listing'
-import { ManagedCodexHomeTemporarilyUnavailableError } from '../codex-accounts/host-codex-managed-home-ownership'
 
 // Why: only Codex's dated rollout layout may establish account-home provenance; nested/misplaced JSONL must not select credentials.
 const CLAIMED_CODEX_ROLLOUT_TAIL = String.raw`\d{4}/\d{2}/\d{2}/rollout-[^/]+\.jsonl(?:\.zst)?`
@@ -217,43 +216,13 @@ function rankTrustedCodexHomesForRescan(
     .map((entry) => entry.homePath)
 }
 
-function isSelectedAccountHome(selectedAccountHome: string | null, homePath: string): boolean {
-  return (
-    selectedAccountHome !== null &&
-    normalizeRuntimePathForComparison(selectedAccountHome) ===
-      normalizeRuntimePathForComparison(homePath)
-  )
-}
-
-/**
- * Why: `existsSync` reports false for *any* stat error, so a briefly locked
- * sessions tree (antivirus, backup, indexer) reads as "this rollout is not
- * bridged here" and the scan moves on to the next ranked home. For the selected
- * account that silently resumes the session under a DIFFERENT account's
- * credentials while the UI still shows the selected one, so only a definitive
- * absence may skip it (STA-4607).
- */
-function sessionsTreeIsPresent(sessionsRoot: string, isSelectedAccount: boolean): boolean {
+function sessionsTreeIsPresent(sessionsRoot: string): boolean {
   try {
     statSync(sessionsRoot)
     return true
-  } catch (error) {
-    const code = (error as NodeJS.ErrnoException | null)?.code
-    if (code === 'ENOENT' || code === 'ENOTDIR') {
-      return false
-    }
-    if (isSelectedAccount) {
-      throw new ManagedCodexHomeTemporarilyUnavailableError(undefined, { cause: error })
-    }
-    // Why: an unreadable home that is NOT the selected account cannot cause a
-    // wrong-account resume; skipping it only forgoes a candidate.
+  } catch {
     return false
   }
-}
-
-function isDefinitiveSessionTreeAbsence(error: unknown): boolean {
-  const code = (error as NodeJS.ErrnoException | null)?.code
-  return code === 'ENOENT' || code === 'ENOTDIR'
 }
 
 export async function findTrustedCodexSessionResume(args: {
@@ -279,24 +248,10 @@ export async function findTrustedCodexSessionResume(args: {
   }
 
   const selectedAccountHome = args.getSelectedAccountCodexHome()
-  const selectedSessionsRoot = selectedAccountHome
-    ? normalizeRuntimePathForComparison(join(selectedAccountHome, 'sessions'))
-    : null
   const listSessionFiles =
     args.listSessionFiles ??
     ((sessionsRoot: string) =>
-      listCodexSessionRolloutFilesIncrementally(
-        sessionsRoot,
-        { batchSize: 64, yieldMs: 0 },
-        (_directoryPath, error) => {
-          if (
-            selectedSessionsRoot === normalizeRuntimePathForComparison(sessionsRoot) &&
-            !isDefinitiveSessionTreeAbsence(error)
-          ) {
-            throw new ManagedCodexHomeTemporarilyUnavailableError(undefined, { cause: error })
-          }
-        }
-      ))
+      listCodexSessionRolloutFilesIncrementally(sessionsRoot, { batchSize: 64, yieldMs: 0 }))
   const expectedSuffix = `-${args.sessionId}.jsonl`.toLowerCase()
   const seenHomes = new Set<string>()
   for (const homePath of rankTrustedCodexHomesForRescan(args, selectedAccountHome)) {
@@ -306,10 +261,7 @@ export async function findTrustedCodexSessionResume(args: {
     }
     seenHomes.add(comparisonHome)
     const sessionsRoot = join(homePath, 'sessions')
-    if (
-      !args.listSessionFiles &&
-      !sessionsTreeIsPresent(sessionsRoot, isSelectedAccountHome(selectedAccountHome, homePath))
-    ) {
+    if (!args.listSessionFiles && !sessionsTreeIsPresent(sessionsRoot)) {
       continue
     }
     for await (const filePath of listSessionFiles(sessionsRoot)) {

@@ -1,6 +1,5 @@
 import type { IPtyProvider, PtySpawnOptions, PtySpawnResult } from '../../../providers/types'
-import type { CodexPaneHomeRoute } from '../../../codex/codex-pane-account-registry'
-import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
+import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
 import type { StablePaneOwner } from '../pane/stable-owner'
 import type { PaneSpawnReservation } from '../pane/spawn-reservation'
@@ -19,10 +18,7 @@ import { localProvider } from '../provider/registry'
 export type RuntimePtySpawnState = {
   deps: PtyRuntimeControllerDeps
   args: RuntimePtySpawnArgs
-  codexHomeLaunchStartedAt: Date | undefined
-  codexHomeLaunchStartedSequence: number | undefined
   preAdoptedStablePane: AdoptStablePaneResult | null
-  reattachedCodexHomeRoutes: Map<string, CodexPaneHomeRoute | null>
   cwd: string | undefined
   provider: IPtyProvider
   isClaudeLaunch: boolean
@@ -36,7 +32,7 @@ export type RuntimePtySpawnState = {
   effectiveSessionAppId: string | undefined
   isNewDaemonSession: boolean
   expectedWslDistro: string | null
-  codexSelectionTarget: CodexAccountSelectionTarget
+  codexSelectionTarget: AccountSelectionTarget
   launchCommand: string | undefined
   claudeAuth: ClaudeRuntimeAuthPreparation | null
   shouldPersistHostSessionBinding: boolean
@@ -133,10 +129,7 @@ export function createRuntimePtySpawnState(
   return {
     deps,
     args,
-    codexHomeLaunchStartedAt: undefined,
-    codexHomeLaunchStartedSequence: undefined,
     preAdoptedStablePane: null,
-    reattachedCodexHomeRoutes: new Map(),
     cwd: undefined,
     provider: localProvider,
     isClaudeLaunch: false,

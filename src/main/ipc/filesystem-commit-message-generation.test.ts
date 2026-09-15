@@ -139,7 +139,7 @@ describe('registerFilesystemHandlers', () => {
     )
   })
 
-  it('prepares the selected Codex account home before local generation', async () => {
+  it('strips a nested-Orca CODEX_HOME override before local Codex generation', async () => {
     const context = {
       branch: 'feature/ai',
       stagedSummary: 'M\tREADME.md',
@@ -152,57 +152,37 @@ describe('registerFilesystemHandlers', () => {
       success: true,
       message: 'Update README'
     })
+    const previousCodexHome = process.env.CODEX_HOME
+    const previousOrcaCodexHome = process.env.ORCA_CODEX_HOME
+    process.env.CODEX_HOME = '/nested-orca/codex-home'
+    process.env.ORCA_CODEX_HOME = '/nested-orca/codex-home'
 
-    registerFilesystemHandlers(store as never, {
-      prepareForCodexLaunch: () => '/managed/codex-home'
-    })
+    try {
+      registerFilesystemHandlers(store as never, {})
 
-    await handlers.get('git:generateCommitMessage')!(null, {
-      worktreePath: WORKTREE_FEATURE_PATH
-    })
-
-    expect(generateCommitMessageFromContextMock).toHaveBeenCalledWith(
-      context,
-      params,
-      expect.objectContaining({
-        kind: 'local',
-        cwd: WORKTREE_FEATURE_PATH,
-        env: expect.objectContaining({ CODEX_HOME: '/managed/codex-home' })
+      await handlers.get('git:generateCommitMessage')!(null, {
+        worktreePath: WORKTREE_FEATURE_PATH
       })
-    )
-  })
 
-  it('prepares the Orca-managed Codex home for the default system selection', async () => {
-    const context = {
-      branch: 'feature/ai',
-      stagedSummary: 'M\tREADME.md',
-      stagedPatch: '+hello'
+      const target = generateCommitMessageFromContextMock.mock.calls[0]?.[2] as
+        | { kind: string; cwd: string; env?: NodeJS.ProcessEnv }
+        | undefined
+      expect(target).toMatchObject({ kind: 'local', cwd: WORKTREE_FEATURE_PATH })
+      expect(target?.env).toBeDefined()
+      expect(target?.env?.CODEX_HOME).toBeUndefined()
+      expect(target?.env?.ORCA_CODEX_HOME).toBeUndefined()
+    } finally {
+      for (const [key, value] of [
+        ['CODEX_HOME', previousCodexHome],
+        ['ORCA_CODEX_HOME', previousOrcaCodexHome]
+      ] as const) {
+        if (value === undefined) {
+          delete process.env[key]
+        } else {
+          process.env[key] = value
+        }
+      }
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
-    resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
-    getStagedCommitContextMock.mockResolvedValue(context)
-    generateCommitMessageFromContextMock.mockResolvedValue({
-      success: true,
-      message: 'Update README'
-    })
-
-    registerFilesystemHandlers(store as never, {
-      prepareForCodexLaunch: () => '/orca-managed/codex-home'
-    })
-
-    await handlers.get('git:generateCommitMessage')!(null, {
-      worktreePath: WORKTREE_FEATURE_PATH
-    })
-
-    expect(generateCommitMessageFromContextMock).toHaveBeenCalledWith(
-      context,
-      params,
-      expect.objectContaining({
-        kind: 'local',
-        cwd: WORKTREE_FEATURE_PATH,
-        env: expect.objectContaining({ CODEX_HOME: '/orca-managed/codex-home' })
-      })
-    )
   })
 
   it('routes local WSL project commit-message generation through the project runtime target', async () => {
@@ -213,7 +193,6 @@ describe('registerFilesystemHandlers', () => {
         stagedPatch: '+hello'
       }
       const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
-      const prepareForCodexLaunch = vi.fn(() => '\\\\wsl.localhost\\Ubuntu\\home\\tester\\.codex')
       resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
       getStagedCommitContextMock.mockResolvedValue(context)
       generateCommitMessageFromContextMock.mockResolvedValue({
@@ -244,7 +223,7 @@ describe('registerFilesystemHandlers', () => {
         })
       }
 
-      registerFilesystemHandlers(wslStore as never, { prepareForCodexLaunch })
+      registerFilesystemHandlers(wslStore as never, {})
 
       await handlers.get('git:generateCommitMessage')!(null, {
         worktreePath: WORKTREE_FEATURE_PATH
@@ -254,18 +233,13 @@ describe('registerFilesystemHandlers', () => {
         admissionTier: 'interactive',
         wslDistro: 'Ubuntu'
       })
-      expect(prepareForCodexLaunch).toHaveBeenCalledWith({
-        runtime: 'wsl',
-        wslDistro: 'Ubuntu'
-      })
       expect(generateCommitMessageFromContextMock).toHaveBeenCalledWith(
         context,
         params,
         expect.objectContaining({
           kind: 'local',
           cwd: WORKTREE_FEATURE_PATH,
-          wslDistro: 'Ubuntu',
-          env: expect.objectContaining({ CODEX_HOME: '/home/tester/.codex' })
+          wslDistro: 'Ubuntu'
         })
       )
     })
@@ -399,13 +373,13 @@ describe('registerFilesystemHandlers', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
+    const params = { agentId: 'claude', model: 'haiku' }
     resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
     getStagedCommitContextMock.mockResolvedValue(context)
 
     registerFilesystemHandlers(store as never, {
-      prepareForCodexLaunch: () => {
-        throw new Error('failed to read /Users/alice/.codex/auth.json')
+      prepareForClaudeLaunch: async () => {
+        throw new Error('failed to read /Users/alice/.claude/.credentials.json')
       }
     })
 
@@ -476,7 +450,6 @@ describe('registerFilesystemHandlers', () => {
     }
     const params = { agentId: 'custom', model: '', customAgentCommand: 'agent' }
     const executeCommitMessagePlan = vi.fn()
-    const prepareForCodexLaunch = vi.fn(() => '/managed/codex-home')
     const prepareForClaudeLaunch = vi.fn()
     resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
     getSshGitProviderMock.mockReturnValue({
@@ -488,10 +461,7 @@ describe('registerFilesystemHandlers', () => {
       message: 'Add remote file'
     })
 
-    registerFilesystemHandlers(store as never, {
-      prepareForCodexLaunch,
-      prepareForClaudeLaunch
-    })
+    registerFilesystemHandlers(store as never, { prepareForClaudeLaunch })
 
     await expect(
       handlers.get('git:generateCommitMessage')!(null, {
@@ -522,7 +492,6 @@ describe('registerFilesystemHandlers', () => {
       1,
       'commit-message'
     )
-    expect(prepareForCodexLaunch).not.toHaveBeenCalled()
     expect(prepareForClaudeLaunch).not.toHaveBeenCalled()
   })
 

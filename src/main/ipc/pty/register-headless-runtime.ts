@@ -3,7 +3,6 @@ import type { OrcaRuntimeService } from '../../runtime/orca-runtime'
 import type { Store } from '../../persistence'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
 import type {
-  CodexHomePtySpawnedLifecycleArgs,
   GetSelectedCodexHomePath,
   PrepareClaudeAuth,
   PrepareCodexSessionResume
@@ -17,11 +16,7 @@ export function registerHeadlessPtyRuntime(
   getSettings?: () => GlobalSettings,
   prepareClaudeAuth?: PrepareClaudeAuth,
   store?: Store,
-  prepareCodexSessionResume?: PrepareCodexSessionResume,
-  lifecycle?: {
-    onCodexHomePtySpawned?: (args: CodexHomePtySpawnedLifecycleArgs) => void
-    onPtyExit?: (id: string, exitSequence: number) => void
-  }
+  prepareCodexSessionResume?: PrepareCodexSessionResume
 ): Promise<void> {
   // Why: headless `orca serve` has no renderer window but still needs the same PTY handlers so remote clients can drive terminals.
   // Why a fake rather than null: `registerPtyHandlers` takes a non-null BrowserWindow. `isDestroyed: () => true`
@@ -43,7 +38,7 @@ export function registerHeadlessPtyRuntime(
     getSettings,
     prepareClaudeAuth,
     store,
-    { prepareCodexSessionResume, ...lifecycle }
+    { prepareCodexSessionResume }
   )
   return store ? hydrateLocalPtyRegistryAtBoot(store) : Promise.resolve()
 }

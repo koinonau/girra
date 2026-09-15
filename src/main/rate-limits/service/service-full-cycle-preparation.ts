@@ -1,5 +1,4 @@
 import { fetchClaudeRateLimits } from '../claude-fetcher'
-import { fetchCodexRateLimits } from '../codex-fetcher'
 import { fetchMiniMaxRateLimits } from '../minimax/minimax-fetcher'
 import { fetchOpenCodeGoRateLimits } from '../opencode-go-usage-fetcher'
 import { RateLimitServiceFetchPolicy } from './service-fetch-policy'
@@ -7,7 +6,6 @@ import type {
   ClaudeRuntimeAuthPreparation,
   InternalRateLimitState,
   NormalizedClaudeAccountSelectionTarget,
-  NormalizedCodexAccountSelectionTarget,
   ProviderRateLimits
 } from './service-types'
 
@@ -16,19 +14,13 @@ export type FetchAllCyclePrepared = {
   claudeGeneration: number
   claudeAuthPreparation: ClaudeRuntimeAuthPreparation | undefined
   claudeProvenance: string
-  codexTarget: NormalizedCodexAccountSelectionTarget
   previousState: InternalRateLimitState
-  codexFetchGated: boolean
-  codexStateBeforeFetch: ProviderRateLimits | null
-  codexProvenance: string | null
-  codexGeneration: number
   opencodeConfigChanged: boolean
   opencodeGeneration: number
   miniMaxConfigChanged: boolean
   miniMaxGeneration: number
   claudeFetchGated: boolean
   results: [
-    PromiseSettledResult<ProviderRateLimits>,
     PromiseSettledResult<ProviderRateLimits>,
     PromiseSettledResult<ProviderRateLimits>,
     PromiseSettledResult<ProviderRateLimits>
@@ -52,19 +44,7 @@ export abstract class RateLimitServiceFullCyclePreparation extends RateLimitServ
     }
     this.rememberClaudeAuthSnapshot(claudeAuthPreparation, claudeGeneration, claudeTarget)
     const claudeProvenance = claudeAuthPreparation?.provenance ?? 'system'
-    const codexTarget = this.codexFetchTarget
     const previousState = this.state
-    // Why: a skipped Codex poll must not stop the other providers' cycle, so gate
-    // only the Codex slot instead of returning early (#STA-4422).
-    const codexHome = this.resolveCodexHome(codexTarget)
-    const codexFetchGated = codexHome.skip
-    const codexHomePath = codexHome.homePath
-    const codexStateBeforeFetch =
-      previousState.codex?.status === 'fetching' ? null : previousState.codex
-    const codexProvenance = codexFetchGated
-      ? null
-      : this.getCodexProvenance(codexTarget, codexHomePath)
-    const codexGeneration = this.codexFetchGeneration
     const openCodeGoConfig = this.openCodeGoConfigResolver?.()
     const cookie = openCodeGoConfig?.sessionCookie ?? ''
     const workspaceIdOverride = openCodeGoConfig?.workspaceIdOverride ?? ''
@@ -92,14 +72,10 @@ export abstract class RateLimitServiceFullCyclePreparation extends RateLimitServ
     }
     const miniMaxGeneration = this.minimaxFetchGeneration
 
-    // Mark all providers fetching while keeping previous data visible (Codex is cleared separately on account change).
+    // Mark all providers fetching while keeping previous data visible.
     this.updateState({
       ...previousState,
       claude: this.withFetchingStatus(previousState.claude, 'claude'),
-      // Why: a gated Codex cycle makes no attempt; a "fetching" chip would never settle.
-      codex: codexFetchGated
-        ? codexStateBeforeFetch
-        : this.withFetchingStatus(previousState.codex, 'codex'),
       opencodeGo: opencodeConfigChanged
         ? this.withFetchingStatus(null, 'opencode-go')
         : this.withFetchingStatus(previousState.opencodeGo, 'opencode-go'),
@@ -108,14 +84,11 @@ export abstract class RateLimitServiceFullCyclePreparation extends RateLimitServ
         : this.withFetchingStatus(previousState.minimax, 'minimax')
     })
 
-    const missingWslCodexHome =
-      codexFetchGated || codexHomePath ? null : this.getMissingWslCodexHomeResult(codexTarget)
-
     // Why: skip automated Claude fetches while a Retry-After window is open or a live session feed is fresher than the OAuth poll would be.
     const claudeFetchGated =
       !options?.force && this.shouldSkipAutomatedClaudeFetch(previousState.claude)
 
-    const [claudeResult, codexResult, opencodeGoResult, miniMaxResult] = await Promise.allSettled([
+    const [claudeResult, opencodeGoResult, miniMaxResult] = await Promise.allSettled([
       claudeFetchGated
         ? Promise.resolve(previousState.claude as ProviderRateLimits)
         : fetchClaudeRateLimits({
@@ -125,14 +98,6 @@ export abstract class RateLimitServiceFullCyclePreparation extends RateLimitServ
             networkProxySettings: this.networkProxySettingsResolver?.(),
             signal
           }),
-      codexFetchGated
-        ? Promise.resolve(previousState.codex as ProviderRateLimits)
-        : (missingWslCodexHome ??
-          fetchCodexRateLimits({
-            codexHomePath,
-            allowPtyFallback: this.shouldAllowCodexPtyFallback(),
-            signal
-          })),
       fetchOpenCodeGoRateLimits(
         cookie,
         workspaceIdOverride || undefined,
@@ -157,18 +122,13 @@ export abstract class RateLimitServiceFullCyclePreparation extends RateLimitServ
       claudeGeneration,
       claudeAuthPreparation,
       claudeProvenance,
-      codexTarget,
       previousState,
-      codexFetchGated,
-      codexStateBeforeFetch,
-      codexProvenance,
-      codexGeneration,
       opencodeConfigChanged,
       opencodeGeneration,
       miniMaxConfigChanged,
       miniMaxGeneration,
       claudeFetchGated,
-      results: [claudeResult, codexResult, opencodeGoResult, miniMaxResult]
+      results: [claudeResult, opencodeGoResult, miniMaxResult]
     }
   }
 }

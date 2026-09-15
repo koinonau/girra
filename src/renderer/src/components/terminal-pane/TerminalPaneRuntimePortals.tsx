@@ -1,5 +1,4 @@
 import { createPortal } from 'react-dom'
-import CodexRestartChip from '../CodexRestartChip'
 import { TerminalSshReconnectOverlay } from './TerminalSshReconnectOverlay'
 import { TerminalRemoteRuntimeReconnectBanner } from './TerminalRemoteRuntimeReconnectBanner'
 import { TerminalProcessExitOverlay } from './TerminalProcessExitOverlay'
@@ -9,37 +8,6 @@ import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
 import { shouldShowMobileDriverOverlay } from './mobile-driver-overlay-visibility'
 import { shouldChatTakeOverMobileSurface } from '../native-chat/native-chat-send-eligibility'
 import type { TerminalPaneController } from './use-terminal-pane-controller'
-
-export function TerminalPaneCodexRestartPortals({
-  controller
-}: {
-  controller: TerminalPaneController
-}): React.JSX.Element {
-  const { activePane, isActive, isVisible, managedPanes, paneTransportsRef, savedLayout } =
-    controller
-  return (
-    <>
-      {managedPanes.map((pane) => {
-        const ptyId =
-          paneTransportsRef.current.get(pane.id)?.getPtyId() ??
-          savedLayout.ptyIdsByLeafId?.[pane.leafId]
-        if (!ptyId) {
-          return null
-        }
-        return createPortal(
-          <CodexRestartChip
-            key={`codex-restart-${pane.id}-${ptyId}`}
-            isVisible={isVisible}
-            ptyId={ptyId}
-            shouldFocus={isActive && isVisible && activePane?.id === pane.id}
-          />,
-          pane.container,
-          `codex-restart-${pane.id}`
-        )
-      })}
-    </>
-  )
-}
 
 export function TerminalPaneProcessExitPortals({
   controller

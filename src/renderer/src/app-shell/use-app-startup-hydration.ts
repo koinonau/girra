@@ -1,11 +1,9 @@
 import { useEffect } from 'react'
 import { syncZoomCSSVar } from '@/lib/ui-zoom'
-import { installCodexDetachedPaneRestartExecutor } from '@/components/terminal-pane/codex-detached-pane-restart-scheduler'
 import { useAppStore } from '../store'
 import { reconcileHydratedWorkspaceTabModels } from './reconcile-hydrated-workspace-tab-models'
 import { useStartupActions } from './use-app-startup-actions'
 import { WORKTREE_REFRESH_CONCURRENCY } from '../store/slices/worktrees'
-import { sweepRestoredCodexPanesForStaleAccounts } from '../lib/codex-stale-pane-sweep'
 import { fetchWorkspaceSessionWithRuntimeHostOwners } from '../lib/workspace-session-host-hydration'
 import {
   collectFolderWorkspaceKeysFromSession,
@@ -54,8 +52,6 @@ async function listRuntimeSessionHostIdsForStartup(): Promise<ExecutionHostId[]>
  */
 export function useAppStartupHydration(): void {
   const actions = useStartupActions()
-
-  useEffect(() => installCodexDetachedPaneRestartExecutor(), [])
 
   // Fetch initial data + hydrate GitHub cache from disk
   useEffect(() => {
@@ -263,9 +259,6 @@ export function useAppStartupHydration(): void {
           if (cancelled) {
             return
           }
-          // Why here: reconnect just published restored PTY ids; sweeping them now
-          // re-offers stale Codex panes whose tabs never mount this session.
-          sweepRestoredCodexPanesForStaleAccounts(useAppStore.getState())
           syncZoomCSSVar()
           // Why (issue #1158): unlock the session writer only after hydration and all dependent steps succeeded, so a mid-startup throw can't serialize partially-mutated state to disk.
           actions.setHydrationSucceeded(true)

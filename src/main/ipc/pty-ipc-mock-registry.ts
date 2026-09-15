@@ -37,9 +37,6 @@ export const setMigrationUnsupportedPtyMock: Mock = vi.fn()
 export const clearMigrationUnsupportedPtyMock: Mock = vi.fn()
 export const clearMigrationUnsupportedPtysForPaneKeyMock: Mock = vi.fn()
 export const clearPaneKeyAliasesForPtyMock: Mock = vi.fn()
-export const recordCodexPaneAccountMock: Mock = vi.fn()
-export const forgetCodexPaneAccountMock: Mock = vi.fn()
-export const getCodexPaneAccountMock: Mock = vi.fn()
 export const ensureCodexBackfillRecoveryMock: Mock<() => Promise<void>> = vi.fn(() =>
   Promise.resolve()
 )
@@ -147,12 +144,6 @@ export const migrationUnsupportedPtyModuleMock = () => ({
   setMigrationUnsupportedPty: setMigrationUnsupportedPtyMock,
   clearMigrationUnsupportedPty: clearMigrationUnsupportedPtyMock,
   clearMigrationUnsupportedPtysForPaneKey: clearMigrationUnsupportedPtysForPaneKeyMock
-})
-
-export const codexPaneAccountRegistryModuleMock = () => ({
-  recordCodexPaneAccount: recordCodexPaneAccountMock,
-  forgetCodexPaneAccount: forgetCodexPaneAccountMock,
-  getCodexPaneAccount: getCodexPaneAccountMock
 })
 
 export const codexBackfillRecoveryModuleMock = () => ({

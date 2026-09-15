@@ -2,7 +2,7 @@
 title: Usage & rate-limit tracking
 ---
 
-Orca reads local usage state for Claude Code, Codex, OpenCode, and MiniMax and surfaces it in the status bar, so you know how close you are to a rate limit before an agent stalls.
+Orca reads local usage state for Claude Code, OpenCode, and MiniMax and surfaces it in the status bar, so you know how close you are to a rate limit before an agent stalls.
 
 ## What's shown
 
@@ -12,7 +12,7 @@ Orca reads local usage state for Claude Code, Codex, OpenCode, and MiniMax and s
 
 ## How it works
 
-Orca reads the local usage state each agent maintains on disk (under `~/.claude`, `~/.codex`, and the OpenCode equivalent). No API calls, no extra auth. This means the readout is only as fresh as the agent's own bookkeeping: numbers update when the agent writes, not in real time.
+Orca reads the local usage state each agent maintains on disk (under `~/.claude` and the OpenCode equivalent). No API calls, no extra auth. This means the readout is only as fresh as the agent's own bookkeeping: numbers update when the agent writes, not in real time.
 
 ## Multi-account accounting
 
@@ -27,12 +27,12 @@ Click the usage segment in the status bar to open the **Usage** popover. It list
 
 Under [Settings → Appearance](/docs/settings), choose **% used** vs **% remaining** for how those numbers read.
 
-Rows without live numbers show a short status instead: **Loading usage…**, **not signed in**, **Usage unavailable**, **No usage data**, or a provider-specific error. Claude and Codex rows can drill into account switching; **Manage accounts** opens Settings.
+Rows without live numbers show a short status instead: **Loading usage…**, **not signed in**, **Usage unavailable**, **No usage data**, or a provider-specific error. Claude rows can drill into account switching; **Manage accounts** opens Settings.
 
 ### Mobile
 
-On the companion app, open the host **Accounts** screen for the same switcher/usage readout. When Codex has earned **rate-limit reset** credits, spend one from that screen (see [Mobile companion](/docs/mobile)).
+On the companion app, open the host **Accounts** screen for the same switcher/usage readout (see [Mobile companion](/docs/mobile)).
 
 ## Estimated cost (Stats)
 
-The Stats breakdown may show **estimated cost** for known model families (including Claude 5-class and Codex GPT-5.6 rows). Rows marked **• inferred pricing** use Orca’s local price table, not a live bill from the provider. Prefer the provider console for authoritative spend.
+The Stats breakdown may show **estimated cost** for known model families (including Claude 5-class rows). Rows marked **• inferred pricing** use Orca’s local price table, not a live bill from the provider. Prefer the provider console for authoritative spend.

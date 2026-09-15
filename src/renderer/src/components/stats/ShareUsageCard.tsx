@@ -1,6 +1,4 @@
 import { forwardRef } from 'react'
-import type { ClaudeUsageSummary } from '../../../../shared/claude-usage-types'
-import type { CodexUsageSummary } from '../../../../shared/codex-usage-types'
 import {
   BackgroundGlows,
   CardFooter,
@@ -13,10 +11,10 @@ import {
   OrcaLogo,
   RANGE_LABELS
 } from './share-card-utils'
-import type { ClaudeShareData, CodexShareData } from './share-card-utils'
+import type { ClaudeShareData } from './share-card-utils'
 import { translate } from '@/i18n/i18n'
 
-export type ShareUsageCardProps = (ClaudeShareData | CodexShareData) & {
+export type ShareUsageCardProps = ClaudeShareData & {
   range: string
 }
 
@@ -24,36 +22,17 @@ export type ShareUsageCardProps = (ClaudeShareData | CodexShareData) & {
 // but inline styles are kept for portability and to avoid Tailwind class stripping.
 export const ShareUsageCard = forwardRef<HTMLDivElement, ShareUsageCardProps>(
   function ShareUsageCard(props, ref) {
-    const { provider, summary, daily, range } = props
+    const { summary, daily, range } = props
     const slicedDaily = daily.slice(-10)
 
-    const totalTokens =
-      provider === 'claude'
-        ? summary.inputTokens + summary.outputTokens
-        : (summary as CodexUsageSummary).totalTokens
-
-    const topModel =
-      provider === 'claude'
-        ? ((summary as ClaudeUsageSummary).topModel ?? 'n/a')
-        : ((summary as CodexUsageSummary).topModel ?? 'n/a')
-
-    const sessions =
-      provider === 'claude'
-        ? (summary as ClaudeUsageSummary).sessions
-        : (summary as CodexUsageSummary).sessions
-
-    const turnsOrEvents =
-      provider === 'claude'
-        ? {
-            label: translate('auto.components.stats.ShareUsageCard.6adac63cfe', 'turns'),
-            count: (summary as ClaudeUsageSummary).turns
-          }
-        : {
-            label: translate('auto.components.stats.ShareUsageCard.960324e9b8', 'events'),
-            count: (summary as CodexUsageSummary).events
-          }
-
-    const providerLabel = provider === 'claude' ? 'Claude' : 'Codex'
+    const totalTokens = summary.inputTokens + summary.outputTokens
+    const topModel = summary.topModel ?? 'n/a'
+    const sessions = summary.sessions
+    const turnsOrEvents = {
+      label: translate('auto.components.stats.ShareUsageCard.6adac63cfe', 'turns'),
+      count: summary.turns
+    }
+    const providerLabel = 'Claude'
 
     return (
       <div
@@ -86,7 +65,7 @@ export const ShareUsageCard = forwardRef<HTMLDivElement, ShareUsageCardProps>(
           <ChartHeader sessions={sessions} turnsOrEvents={turnsOrEvents} />
           <DailyChart slicedDaily={slicedDaily} />
           <DayLabels slicedDaily={slicedDaily} />
-          <Legend provider={provider} />
+          <Legend />
         </div>
 
         <CardFooter summary={summary} />
@@ -336,10 +315,10 @@ function DayLabels(props: { slicedDaily: { day: string }[] }): React.JSX.Element
   )
 }
 
-function Legend(props: { provider: 'claude' | 'codex' }): React.JSX.Element {
+function Legend(): React.JSX.Element {
   return (
     <div style={{ marginTop: 10 }}>
-      {getLegendItems(props.provider).map((item, i) => (
+      {getLegendItems().map((item, i) => (
         <span
           key={item.label}
           style={{

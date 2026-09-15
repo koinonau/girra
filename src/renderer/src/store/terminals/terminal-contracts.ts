@@ -12,20 +12,6 @@ export type AutomaticAgentResumeClaim = {
   providerSession: AgentProviderSessionMetadata
 }
 
-export type CodexRestartNotice = {
-  previousAccountLabel: string
-  nextAccountLabel: string
-  /** Labels are display-only; account ids disambiguate equal labels and A→B→A collapse. */
-  previousAccountId?: string | null
-  nextAccountId?: string | null
-  /** Persists a home-route mismatch after ephemeral launch-account memory has expired. */
-  homeRouteChanged?: true
-  /** Accepted restart remains tracked so a failed execution can reopen instead of input-blocking invisibly. */
-  restartRequested?: true
-  /** Dismissal outlives the prompt while explicitly preventing that notice from blocking pane input. */
-  dismissed?: true
-}
-
 /** Scoped direct-SSH hydration replaces only named workspace keys and authority. */
 export type HydrateWorkspaceSessionOptions = {
   directSshAuthority?: DirectSshAuthority

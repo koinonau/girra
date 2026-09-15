@@ -488,7 +488,7 @@ describe('client UI RPC methods', () => {
       ...getDefaultUIState(),
       worktreeCardProperties: ['status', 'branch', 'automation', 'inline-agents'],
       _worktreeCardModeDefaulted: true,
-      statusBarItems: ['codex', 'minimax', 'ports'],
+      statusBarItems: ['claude', 'minimax', 'ports'],
       _portsStatusBarDefaultAdded: true,
       _minimaxStatusBarDefaultAdded: true,
       taskResumeState: {

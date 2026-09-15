@@ -4,7 +4,6 @@ import type * as NodeOs from 'node:os'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { syncSystemConfigIntoManagedCodexHome } from './codex-config-mirror'
-import { listStaleCodexPanes } from './codex-stale-pane-accounts'
 import type { CodexTrustEntry } from './config-toml-trust'
 
 // STA-4823: six shared Codex state files were rebuilt, erased or reported as
@@ -149,7 +148,6 @@ const { MAX_AGENT_STATE_FILE_BYTES } = await import('../agent-state-file-reader'
 const { observeCodexSettingsBaseline } = await import('./config-settings-baseline')
 const { snapshotCodexRuntimeSettingsBaseline } = await import('./config-settings-promotion')
 const { getCodexConfigSyncStatus } = await import('./config-sync-stall')
-const paneRegistry = await import('./codex-pane-account-registry')
 
 let fakeHomeDir: string
 let userDataDir: string
@@ -175,12 +173,10 @@ beforeEach(() => {
   })
   realFs.mkdirSync(runtimeHomePath, { recursive: true })
   realFs.mkdirSync(systemHome(), { recursive: true })
-  paneRegistry._internals.resetCache()
 })
 
 afterEach(() => {
   denials.reset()
-  paneRegistry._internals.resetCache()
   realFs.rmSync(fakeHomeDir, { recursive: true, force: true })
   realFs.rmSync(userDataDir, { recursive: true, force: true })
   if (previousUserDataPath === undefined) {
@@ -434,73 +430,5 @@ describe('STA-4823 D15 — the sync status must not report synced while the mirr
     expect(
       getCodexConfigSyncStatus({ runtimeHomePath, systemHomePath: systemHome() })
     ).toMatchObject({ state: 'synced', reason: null })
-  })
-})
-
-describe('STA-4823 D31 — an unreadable pane registry must not erase every attribution', () => {
-  const PANE = 'pty-1'
-  const OTHER_PANE = 'pty-2'
-  const registryPath = (): string => join(userDataDir, 'codex-pane-accounts.json')
-
-  function seedTwoAttributedPanes(): void {
-    paneRegistry.recordCodexPaneAccount(PANE, {
-      selectionKey: 'host',
-      accountId: 'account-1',
-      homeRoute: 'account-home'
-    } as never)
-    paneRegistry.recordCodexPaneAccount(OTHER_PANE, {
-      selectionKey: 'host',
-      accountId: 'account-2',
-      homeRoute: 'account-home'
-    } as never)
-    paneRegistry._internals.resetCache()
-  }
-
-  it('preserves existing records and retries the one-shot spawn mutation', () => {
-    seedTwoAttributedPanes()
-    const before = realFs.readFileSync(registryPath(), 'utf-8')
-    denials.denyReads(registryPath())
-
-    paneRegistry.recordCodexPaneAccount('pty-3', {
-      selectionKey: 'host',
-      accountId: 'account-3',
-      homeRoute: 'account-home'
-    } as never)
-
-    // Before the fix the read degraded to an empty registry and this write
-    // persisted it, dropping every other pane's account attribution on disk.
-    expect(realFs.readFileSync(registryPath(), 'utf-8')).toBe(before)
-
-    denials.release(registryPath())
-    expect(paneRegistry.getCodexPaneAccount('pty-3')).toMatchObject({ accountId: 'account-3' })
-    paneRegistry._internals.resetCache()
-    expect(paneRegistry.getCodexPaneAccount(PANE)).toMatchObject({ accountId: 'account-1' })
-    expect(paneRegistry.getCodexPaneAccount('pty-3')).toMatchObject({ accountId: 'account-3' })
-  })
-
-  it('does not cache the erasure, so attribution returns when the file does', () => {
-    seedTwoAttributedPanes()
-    denials.denyReads(registryPath())
-
-    expect(paneRegistry.getCodexPaneAccount(PANE)).toBeNull()
-    expect(() =>
-      listStaleCodexPanes({
-        ptyIds: [PANE],
-        settings: { activeCodexManagedAccountId: 'account-2' } as never
-      })
-    ).toThrow('registry could not be read')
-
-    denials.release(registryPath())
-
-    // THE CACHE is the second half of this defect: one unreadable read used to
-    // pin the empty registry in memory for the rest of the process, so the
-    // attribution never came back even after the file did.
-    expect(paneRegistry.getCodexPaneAccount(PANE)).toMatchObject({ accountId: 'account-1' })
-  })
-
-  it('still reports no attribution when the registry genuinely does not exist', () => {
-    // Why: a fresh install has no registry, and that really is "no panes are
-    // attributed". Refusing here would make every first launch look degraded.
-    expect(paneRegistry.getCodexPaneAccount(PANE)).toBeNull()
   })
 })

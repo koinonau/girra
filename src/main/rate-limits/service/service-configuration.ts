@@ -3,29 +3,17 @@ import { hasMiniMaxSessionCookie } from '../../minimax/minimax-cookie-store'
 import { hasMiniMaxApiKey } from '../../minimax/minimax-api-key-store'
 import { RateLimitServiceAccountRefresh } from './service-account-refresh'
 import {
-  type CodexAccountSelectionTarget,
-  type CodexHomePathResolver,
   type ClaudeAccountSelectionTarget,
   type ClaudeAuthPreparationResolver,
   type OpenCodeGoRateLimitConfig,
   type MiniMaxRateLimitConfig,
-  type InactiveCodexAccountInfo,
   type InactiveClaudeAccountInfo,
   type RateLimitState,
-  normalizeCodexAccountSelectionTarget,
   normalizeClaudeAccountSelectionTarget,
   type NetworkProxySettings
 } from './service-types'
 
 export abstract class RateLimitServiceConfiguration extends RateLimitServiceAccountRefresh {
-  setCodexHomePathResolver(resolver: CodexHomePathResolver): void {
-    this.codexHomePathResolver = resolver
-  }
-
-  setCodexFetchTarget(target?: CodexAccountSelectionTarget): void {
-    this.codexFetchTarget = normalizeCodexAccountSelectionTarget(target)
-  }
-
   setClaudeAuthPreparationResolver(resolver: ClaudeAuthPreparationResolver): void {
     this.claudeAuthPreparationResolver = resolver
   }
@@ -51,11 +39,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
     this.inactiveClaudeAccountsGeneration += 1
   }
 
-  setInactiveCodexAccountsResolver(resolver: () => InactiveCodexAccountInfo[]): void {
-    this.inactiveCodexAccountsResolver = resolver
-    this.inactiveCodexAccountsGeneration += 1
-    this.pruneInactiveCodexState()
-  }
   attach(mainWindow: BrowserWindow): void {
     this.detachWindowListeners?.()
     this.mainWindow = mainWindow
@@ -98,7 +81,6 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
     this.abortActiveFetchCycle()
     this.clearQueuedFetches()
     this.inactiveClaudeFetching.clear()
-    this.inactiveCodexFetching.clear()
     this.resolveAndClearFetchIdleWaiters()
     this.stopTimer()
     this.clearDeferredStartupRefresh()
@@ -109,22 +91,20 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
 
   getState(): RateLimitState {
     this.pruneInactiveClaudeState()
-    this.pruneInactiveCodexState()
     return {
       ...this.state,
+      codex: null,
       // Why: the cookie lives on the filesystem, not GlobalSettings; surface its presence so the renderer keeps the MiniMax bar across reloads.
       minimaxCookieConfigured: hasMiniMaxSessionCookie(),
       minimaxApiKeyConfigured: hasMiniMaxApiKey(),
       claudeTarget: this.claudeFetchTarget,
-      codexTarget: this.codexFetchTarget,
+      // Why: retired Codex fields stay on the wire for older paired clients.
+      codexTarget: { runtime: 'host', wslDistro: null },
       inactiveClaudeAccounts: this.buildInactiveArray(
         this.inactiveClaudeCache,
         this.inactiveClaudeFetching
       ),
-      inactiveCodexAccounts: this.buildInactiveArray(
-        this.inactiveCodexCache,
-        this.inactiveCodexFetching
-      )
+      inactiveCodexAccounts: []
     }
   }
 }

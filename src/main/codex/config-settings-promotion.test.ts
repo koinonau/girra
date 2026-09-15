@@ -15,7 +15,7 @@ import {
 import { homedir, tmpdir } from 'node:os'
 import type * as Os from 'node:os'
 import { join } from 'node:path'
-import type * as CodexFsUtils from '../codex-accounts/fs-utils'
+import type * as CodexFsUtils from '../fs-utils'
 
 const { homedirMock, promotionTestState } = vi.hoisted(() => ({
   homedirMock: vi.fn<() => string>(),
@@ -30,7 +30,7 @@ vi.mock('node:os', async (importOriginal) => {
   }
 })
 
-vi.mock('../codex-accounts/fs-utils', async (importOriginal) => {
+vi.mock('../fs-utils', async (importOriginal) => {
   const actual = await importOriginal<typeof CodexFsUtils>()
   return {
     ...actual,

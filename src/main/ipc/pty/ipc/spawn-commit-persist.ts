@@ -2,7 +2,6 @@ import { toSshExecutionHostId } from '../../../../shared/execution-host'
 import { markNativeWindowsConptyPty } from '../../../runtime/terminal-model-query-authority'
 import { closeStartupQueryAuthorityForPty, getRelayPtyId } from '../provider/registry'
 import { createTerminalSessionStateSaveFailureMessage } from '../../../../shared/terminal-session-state-save-failure'
-import { recordCodexPaneAccountForSpawn } from '../host-env/codex-home'
 import { persistAdmittedStablePaneBinding } from '../pane/stable-owner'
 import {
   pendingByPaneKey,
@@ -42,16 +41,6 @@ export async function persistPtyIpcSpawnCommit(ctx: PtyIpcSpawnState): Promise<{
   ctx.spawnTiming.log(ctx.result.id, {
     daemon: ctx.isDaemonHostSpawn,
     reattach: ctx.result.isReattach ?? false
-  })
-  recordCodexPaneAccountForSpawn({
-    ptyId: ctx.result.id,
-    isDaemonHostSpawn: ctx.isDaemonHostSpawn,
-    isReattach: ctx.result.isReattach === true,
-    pinnedByResume: ctx.codexResumeHomeSelected,
-    launchCodexHomePath: ctx.selectedCodexHomePath,
-    launchEnv: ctx.baseEnv,
-    target: ctx.codexSelectionTarget,
-    settings: ctx.deps.getSettings?.()
   })
   ptyOwnership.set(ctx.result.id, args.connectionId ?? null)
   if (ctx.result.incarnationId) {

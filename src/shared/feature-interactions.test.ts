@@ -17,6 +17,8 @@ const REPO_ROOT = join(__dirname, '..', '..')
 const SOURCE_ROOTS = ['src/main', 'src/renderer/src', 'src/preload']
 const PRODUCTION_FILE_PATTERN = /\.(ts|tsx)$/
 const TEST_FILE_PATTERN = /(?:^|\.)(test|spec)\.(ts|tsx)$/
+// Why: retired ids stay in the catalog only so ui.set accepts older stored interactions.
+const RETIRED_IDS: ReadonlySet<FeatureInteractionId> = new Set(['codex-account-switching'])
 
 describe('feature interactions', () => {
   it('defines local interaction semantics for product education features', () => {
@@ -122,6 +124,9 @@ describe('feature interactions', () => {
   it('keeps every catalog id wired to a production writer', () => {
     const productionText = collectProductionSourceText()
     const missingWriters = FEATURE_INTERACTIONS.map((feature) => feature.id).filter((id) => {
+      if (RETIRED_IDS.has(id)) {
+        return false
+      }
       const escaped = escapeRegex(id)
       const directRecord = new RegExp(
         `recordFeatureInteraction(?:\\?\\.)?\\(\\s*['"]${escaped}['"]`

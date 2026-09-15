@@ -34,8 +34,6 @@ export const createTerminalSlice: StateCreator<AppState, [], [], TerminalSlice> 
   unreadAgentCompletionPanes: {},
   suppressedPtyExitIds: {},
   pendingPtyShutdownIds: {},
-  pendingCodexPaneRestartIds: {},
-  codexRestartNoticeByPtyId: {},
   directSshPaneRetryByTabId: {},
   directSshLivePtyBindingByTabId: {},
   directSshPaneRetryHistoryByTabId: {},

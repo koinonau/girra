@@ -56,14 +56,6 @@ describe('createSshSlice', () => {
         'tab-stale-last-known': staleLastKnownPtyId,
         'tab-other': otherPtyId
       },
-      pendingCodexPaneRestartIds: {
-        [removedPtyId]: true,
-        [otherPtyId]: true
-      },
-      codexRestartNoticeByPtyId: {
-        [removedPtyId]: { previousAccountLabel: 'Old', nextAccountLabel: 'New' },
-        [otherPtyId]: { previousAccountLabel: 'Other old', nextAccountLabel: 'Other new' }
-      },
       sshConnectionStates: new Map([
         [targetId, { targetId, status: 'disconnected', error: null, reconnectAttempt: 0 }],
         [
@@ -198,8 +190,6 @@ describe('createSshSlice', () => {
     expect(state.ptyIdsByTabId['tab-ssh']).toEqual([])
     expect(state.lastKnownRelayPtyIdByTabId['tab-ssh']).toBeUndefined()
     expect(state.lastKnownRelayPtyIdByTabId['tab-stale-last-known']).toBeUndefined()
-    expect(state.pendingCodexPaneRestartIds[removedPtyId]).toBeUndefined()
-    expect(state.codexRestartNoticeByPtyId[removedPtyId]).toBeUndefined()
 
     expect(state.sshConnectionStates.get(otherTargetId)?.status).toBe('connected')
     expect(state.sshTargetLabels.get(otherTargetId)).toBe('Other target')
@@ -210,11 +200,6 @@ describe('createSshSlice', () => {
     expect(state.tabsByWorktree[otherWorktreeId][0]?.ptyId).toBe(otherPtyId)
     expect(state.ptyIdsByTabId['tab-other']).toEqual([otherPtyId])
     expect(state.lastKnownRelayPtyIdByTabId['tab-other']).toBe(otherPtyId)
-    expect(state.pendingCodexPaneRestartIds[otherPtyId]).toBe(true)
-    expect(state.codexRestartNoticeByPtyId[otherPtyId]).toEqual({
-      previousAccountLabel: 'Other old',
-      nextAccountLabel: 'Other new'
-    })
   })
 
   it("preserves another SSH target's terminal ledgers when repo ids collide", () => {

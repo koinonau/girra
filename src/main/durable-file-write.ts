@@ -6,7 +6,7 @@
 import { closeSync, fsyncSync, openSync, rmSync, writeFileSync } from 'node:fs'
 import { copyFile, open, readdir, rename, rm, stat } from 'node:fs/promises'
 import { basename, dirname, join } from 'node:path'
-import { renameFileWithWindowsRetry } from './codex-accounts/fs-utils'
+import { renameFileWithWindowsRetry } from './fs-utils'
 
 /**
  * fsync a directory so a rename within it is durable. Best-effort by design: Windows cannot open a

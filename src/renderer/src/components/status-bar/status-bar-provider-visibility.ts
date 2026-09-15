@@ -3,7 +3,7 @@ import type { GlobalSettings } from '../../../../shared/global-settings-types'
 
 export type UsageProviderSettings = Pick<
   GlobalSettings,
-  'codexManagedAccounts' | 'claudeManagedAccounts' | 'opencodeSessionCookie'
+  'claudeManagedAccounts' | 'opencodeSessionCookie'
 > & {
   // Why: MiniMax sign-in lives on disk, not in settings; main sets these each poll.
   minimaxCookieConfigured: boolean
@@ -12,7 +12,6 @@ export type UsageProviderSettings = Pick<
 
 type UsageProviderSnapshots = {
   claude: ProviderRateLimits | null | undefined
-  codex: ProviderRateLimits | null | undefined
   opencodeGo: ProviderRateLimits | null | undefined
   minimax: ProviderRateLimits | null | undefined
 }
@@ -51,7 +50,6 @@ export function hasUsageProviderSettings(
   settings: Partial<UsageProviderSettings> | null | undefined
 ): boolean {
   return Boolean(
-    (settings?.codexManagedAccounts?.length ?? 0) > 0 ||
     (settings?.claudeManagedAccounts?.length ?? 0) > 0 ||
     Boolean(settings?.opencodeSessionCookie?.trim()) ||
     settings?.minimaxCookieConfigured === true ||
@@ -68,9 +66,6 @@ export function hasUsageProviderSettingsForProvider(
   }
   if (providerId === 'claude') {
     return (settings.claudeManagedAccounts?.length ?? 0) > 0
-  }
-  if (providerId === 'codex') {
-    return (settings.codexManagedAccounts?.length ?? 0) > 0
   }
   if (providerId === 'opencode-go') {
     return Boolean(settings.opencodeSessionCookie?.trim())
@@ -116,12 +111,11 @@ export function isUsageEmptyState(
   if (!settings) {
     return false
   }
-  // Why: system-default Claude/Codex accounts have no persisted account row;
+  // Why: system-default Claude accounts have no persisted account row;
   // their first durable signal is the usage snapshot, so wait for snapshots to
   // settle before teaching the user to connect an account.
   if (
     isProviderSnapshotPending(providers.claude) ||
-    isProviderSnapshotPending(providers.codex) ||
     isProviderSnapshotPending(providers.opencodeGo) ||
     isProviderSnapshotPending(providers.minimax)
   ) {
@@ -130,7 +124,6 @@ export function isUsageEmptyState(
   return (
     !hasUsageProviderSettings(settings) &&
     !isProviderConfigured(providers.claude) &&
-    !isProviderConfigured(providers.codex) &&
     !isProviderConfigured(providers.opencodeGo) &&
     !isProviderConfigured(providers.minimax)
   )

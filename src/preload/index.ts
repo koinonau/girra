@@ -34,10 +34,8 @@ import { settingsApi } from './api/settings-bridge'
 import { agentAwakeApi } from './api/agent-awake-bridge'
 import { localhostWorktreeLabelsApi } from './api/localhost-worktree-labels-bridge'
 import { keybindingsApi } from './api/keybindings-bridge'
-import { codexAccountsApi } from './api/codex-accounts-bridge'
 import { claudeAccountsApi } from './api/claude-accounts-bridge'
 import { cliApi } from './api/cli-bridge'
-import { codexConfigSyncApi } from './api/codex-config-sync-bridge'
 import { agentTrustApi } from './api/agent-trust-bridge'
 import { preflightApi } from './api/preflight-bridge'
 import { notificationsApi } from './api/notifications-bridge'
@@ -64,7 +62,6 @@ import { uiApi } from './api/ui-bridge'
 import { statsApi } from './api/stats-bridge'
 import { memoryApi } from './api/memory-bridge'
 import { claudeUsageApi } from './api/claude-usage-bridge'
-import { codexUsageApi } from './api/codex-usage-bridge'
 import { openCodeUsageApi } from './api/open-code-usage-bridge'
 import { aiVaultApi } from './api/ai-vault-bridge'
 import { nativeChatApi } from './api/native-chat-bridge'
@@ -112,10 +109,8 @@ const api = {
   agentAwake: agentAwakeApi,
   localhostWorktreeLabels: localhostWorktreeLabelsApi,
   keybindings: keybindingsApi,
-  codexAccounts: codexAccountsApi,
   claudeAccounts: claudeAccountsApi,
   cli: cliApi,
-  codexConfigSync: codexConfigSyncApi,
   agentTrust: agentTrustApi,
   preflight: preflightApi,
   notifications: notificationsApi,
@@ -142,7 +137,6 @@ const api = {
   stats: statsApi,
   memory: memoryApi,
   claudeUsage: claudeUsageApi,
-  codexUsage: codexUsageApi,
   openCodeUsage: openCodeUsageApi,
   aiVault: aiVaultApi,
   nativeChat: nativeChatApi,

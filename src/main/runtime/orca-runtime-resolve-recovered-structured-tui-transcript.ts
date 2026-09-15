@@ -209,7 +209,6 @@ export class OrcaRuntimeWithResolveRecoveredStructuredTuiTranscript extends Orca
     const adoption = input.resumeFrom
       ? await resolveStructuredAgentSessionAdoptionForCreate({
           host,
-          settings,
           agent: input.agent,
           providerSessionId: input.resumeFrom.providerSessionId,
           selfSessionId: input.envelope.sessionId,

@@ -10,7 +10,7 @@ import { createMobileRpcSurfaceRuntime } from './runtime-rpc-mobile-method-allow
 describe('OrcaRuntimeRpcServer', () => {
   it('limits mobile-scoped WebSocket tokens to the mobile RPC surface', async () => {
     const userDataPath = mkdtempSync(join(tmpdir(), 'orca-runtime-rpc-'))
-    const { runtime, mocks, expectedCodexResetScope } = createMobileRpcSurfaceRuntime()
+    const { runtime, mocks } = createMobileRpcSurfaceRuntime()
     const server = new OrcaRuntimeRpcServer({ runtime, userDataPath, enableWebSocket: false })
     server['deviceRegistry'] = new DeviceRegistry(userDataPath)
     const mobile = server['deviceRegistry']!.addDevice('phone', 'mobile')
@@ -407,21 +407,6 @@ describe('OrcaRuntimeRpcServer', () => {
       params: { accountId: 'claude-account' }
     })
     await dispatch({
-      id: 'req_select_codex',
-      method: 'accounts.selectCodex',
-      deviceToken: mobile.token,
-      params: { accountId: null }
-    })
-    await dispatch({
-      id: 'req_consume_codex_reset',
-      method: 'accounts.consumeCodexResetCredit',
-      deviceToken: mobile.token,
-      params: {
-        idempotencyKey: '11111111-1111-4111-8111-111111111111',
-        expectedScope: expectedCodexResetScope
-      }
-    })
-    await dispatch({
       id: 'req_remove_claude',
       method: 'accounts.removeClaude',
       deviceToken: mobile.token,
@@ -588,10 +573,6 @@ describe('OrcaRuntimeRpcServer', () => {
       expect.objectContaining({ id: 'req_git_bulk_unstage', ok: true })
     )
     expect(replies).toContainEqual(expect.objectContaining({ id: 'req_select_claude', ok: true }))
-    expect(replies).toContainEqual(expect.objectContaining({ id: 'req_select_codex', ok: true }))
-    expect(replies).toContainEqual(
-      expect.objectContaining({ id: 'req_consume_codex_reset', ok: true })
-    )
     expect(replies).toContainEqual(expect.objectContaining({ id: 'req_terminal_read', ok: true }))
     expect(replies).toContainEqual(expect.objectContaining({ id: 'req_files_open_diff', ok: true }))
     expect(replies).toContainEqual(expect.objectContaining({ id: 'req_git_diff', ok: true }))
@@ -622,11 +603,6 @@ describe('OrcaRuntimeRpcServer', () => {
       })
     )
     expect(mocks.selectClaudeAccount).toHaveBeenCalledWith('claude-account')
-    expect(mocks.selectCodexAccount).toHaveBeenCalledWith(null)
-    expect(mocks.consumeCodexRateLimitResetCredit).toHaveBeenCalledWith(
-      '11111111-1111-4111-8111-111111111111',
-      expectedCodexResetScope
-    )
     expect(mocks.readTerminal).toHaveBeenCalledWith('term-1', { cursor: undefined })
     expect(mocks.getRuntimeGitStatus).toHaveBeenCalledWith('id:wt-1', { admissionTier: 'status' })
     expect(mocks.pushRuntimeGit).toHaveBeenCalledWith('id:wt-1', true, undefined, undefined)

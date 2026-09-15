@@ -5,7 +5,7 @@ import { agentHookServer } from '../agent-hooks/server'
 import { browserManager } from '../browser/browser-manager'
 import { loadAgentSessionClaimSigner } from '../runtime/agent-session-claim-identity'
 import { getProfileUserDataPath } from '../orca-profiles/profile-storage-paths'
-import { prepareCodexAiVaultSessionResume } from '../codex/codex-ai-vault-session-resume'
+import { prepareLegacySharedCodexSessionResume } from '../codex/codex-legacy-session-resume'
 import { resolveHostCodexSessionSourceHome } from '../codex/codex-session-source-home'
 import { isAgentStatusHooksEnabled } from '../agent-hooks/managed-agent-hook-controls'
 import { getDaemonProvider } from '../daemon/daemon-init'
@@ -16,7 +16,7 @@ import { getPreferredPairingOffer } from '../../shared/runtime-environments'
 import { fingerprintOrchestrationPeer } from '../runtime/orchestration/environment-transport'
 import { callRuntimeEnvironment } from '../ipc/runtime-environment-transport-routing'
 import { mainProcessState as state } from './main-process-state'
-import { prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
+import { isHostCodexRealHome, prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
 import type { RuntimeDesktopWindowStatus } from '../../shared/runtime-types'
 import {
   AgentStatusObservedPaneIdentities,
@@ -110,12 +110,14 @@ export function initializeMainProcessRuntime(): OrcaRuntimeService {
     // constructed with this runtime and does not exist yet at this point.
     getPairedDeviceName: (pairedDeviceId) =>
       state.runtimeRpc?.getDeviceRegistry()?.getDevice(pairedDeviceId)?.name ?? null,
-    // Why: source codex-home here (runs in window AND serve) so aiVault.listSessions includes managed-Codex sessions; registerCoreHandlers is window-only.
-    getAdditionalAiVaultCodexHomePaths: () =>
-      state.codexRuntimeHome?.getHostCodexHomePathsForSessionDiscovery() ?? [],
+    // Why: source codex-home here (runs in window AND serve) so aiVault.listSessions includes a custom history home; registerCoreHandlers is window-only.
+    getAdditionalAiVaultCodexHomePaths: () => {
+      const sourceHome = resolveHostCodexSessionSourceHome(store.getSettings())
+      return sourceHome ? [sourceHome] : []
+    },
     prepareAiVaultSessionResume: (args) =>
-      prepareCodexAiVaultSessionResume(args, {
-        runtimeHome: state.codexRuntimeHome,
+      prepareLegacySharedCodexSessionResume(args, {
+        isHostSystemDefaultRealHome: () => isHostCodexRealHome(),
         systemCodexHomePath: resolveHostCodexSessionSourceHome(store.getSettings())
       }),
     prepareCodexStructuredLaunch: ({ workspacePath, launchEnv }) =>
@@ -144,15 +146,12 @@ export function initializeMainProcessRuntime(): OrcaRuntimeService {
 export function configureRuntimeServices(runtime: OrcaRuntimeService): void {
   const store = state.store
   const claudeAccounts = state.claudeAccounts
-  const codexAccounts = state.codexAccounts
   const rateLimits = state.rateLimits
-  if (!store || !claudeAccounts || !codexAccounts || !rateLimits) {
+  if (!store || !claudeAccounts || !rateLimits) {
     throw new Error('Account services must be initialized before runtime wiring')
   }
-  runtime.setAccountServices({ claudeAccounts, codexAccounts, rateLimits })
+  runtime.setAccountServices({ claudeAccounts, rateLimits })
   runtime.setCommitMessageAgentEnvironmentResolvers({
-    // Why: Codex hooks/auth live in Orca's managed runtime home even for the default path, so every launch must resolve CODEX_HOME via runtime-home.
-    prepareForCodexLaunch: prepareCodexRuntimeHomeForLaunch,
     prepareForClaudeLaunch: (target) => state.claudeRuntimeAuth!.prepareForClaudeLaunch(target)
   })
 }

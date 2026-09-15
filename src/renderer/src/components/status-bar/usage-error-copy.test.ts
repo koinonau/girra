@@ -13,7 +13,6 @@ describe('getProviderDisplayName', () => {
 
   it('returns the existing provider brand names', () => {
     expect(getProviderDisplayName('claude')).toBe('Claude')
-    expect(getProviderDisplayName('codex')).toBe('Codex')
     expect(getProviderDisplayName('opencode-go')).toBe('OpenCode Go')
   })
 

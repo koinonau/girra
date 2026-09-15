@@ -38,7 +38,7 @@ export function renderAccountsLocationSection(
               )
             : translate(
                 'auto.components.settings.AccountsPane.0b4591ff93',
-                'Choose which local environment to inspect and where new managed Claude and Codex accounts are added.'
+                'Choose which local environment to inspect and where new managed Claude accounts are added.'
               )
         }
         control={

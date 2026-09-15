@@ -10,7 +10,6 @@ import { recoverPendingSkillTransactions } from '../skills/skill-transaction-sta
 import { StatsCollector } from '../stats/collector'
 import { AgentSessionTransitionRecorder } from '../stats/agent-session-transition-recorder'
 import { ClaudeUsageStore } from '../claude-usage/store'
-import { CodexUsageStore } from '../codex-usage/store'
 import { OpenCodeUsageStore } from '../opencode-usage/store'
 import { installRepoMaintenanceIdleGate } from '../repo-maintenance-idle-gate'
 import { mainProcessState as state } from './main-process-state'
@@ -81,6 +80,5 @@ export function initializeMainProcessObservers(): void {
   agentHookServer.subscribeEnrichedStatus((enriched) => agentSessionRecorder.onStatus(enriched))
   agentHookServer.subscribePaneStatusClear((clear) => agentSessionRecorder.onCleared(clear))
   state.claudeUsage = new ClaudeUsageStore(store)
-  state.codexUsage = new CodexUsageStore(store)
   state.openCodeUsage = new OpenCodeUsageStore(store)
 }

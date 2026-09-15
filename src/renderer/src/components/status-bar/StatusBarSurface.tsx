@@ -22,7 +22,6 @@ import { CaffeinateStatusSegment } from './CaffeinateStatusSegment'
 import { TOGGLE_FLOATING_TERMINAL_EVENT } from '@/lib/floating-terminal'
 import { FloatingTerminalIconContextMenu } from '@/components/floating-terminal/FloatingTerminalIconContextMenu'
 import { ClaudeSwitcherMenu } from './ClaudeSwitcherMenu'
-import { CodexSwitcherMenu } from './CodexSwitcherMenu'
 import { ProviderDetailsMenu, CLOSE_ALL_CONTEXT_MENUS_EVENT } from './ProviderDetailsMenu'
 import { ProviderLetterBadge, ProviderSegment } from './StatusBarProviderSegment'
 import { useStatusBarController } from './use-status-bar-controller'
@@ -170,23 +169,12 @@ export function StatusBarSurface({
                   onUsageDetails={handleUsageDetails}
                   renderRow={(p, rowNode) => {
                     // Every provider drills into its detail panel (parity with the
-                    // per-provider dropdowns on main); Claude/Codex additionally get
-                    // the account switcher + runtime toggle + Codex reset credits.
+                    // per-provider dropdowns on main); Claude additionally gets
+                    // the account switcher + runtime toggle.
                     if (p.provider === 'claude') {
                       return (
                         <ClaudeSwitcherMenu
                           claude={p}
-                          compact={compact}
-                          iconOnly={false}
-                          asSubmenu
-                          triggerContent={rowNode}
-                        />
-                      )
-                    }
-                    if (p.provider === 'codex') {
-                      return (
-                        <CodexSwitcherMenu
-                          codex={p}
                           compact={compact}
                           iconOnly={false}
                           asSubmenu

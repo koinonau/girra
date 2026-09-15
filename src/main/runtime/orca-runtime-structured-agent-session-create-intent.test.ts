@@ -133,7 +133,6 @@ describe('structured agent-session create intent', () => {
     )
     runtime.setAccountServices({
       claudeAccounts: { getRuntimeConfigDir } as never,
-      codexAccounts: {} as never,
       rateLimits: {} as never
     })
     vi.spyOn(runtime, 'getStructuredAgentSessionCreateSupport').mockResolvedValue({

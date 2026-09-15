@@ -74,8 +74,6 @@ function getProviderLetter(provider: ProviderRateLimits['provider']): string {
       return 'O'
     case 'minimax':
       return 'M'
-    case 'codex':
-      return 'X'
   }
 }
 

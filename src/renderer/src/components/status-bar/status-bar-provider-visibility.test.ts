@@ -68,7 +68,6 @@ describe('isProviderConfigured', () => {
 
 function usageSettings(overrides: Partial<UsageProviderSettings> = {}): UsageProviderSettings {
   return {
-    codexManagedAccounts: [],
     claudeManagedAccounts: [],
     opencodeSessionCookie: '',
     minimaxCookieConfigured: false,
@@ -79,23 +78,6 @@ function usageSettings(overrides: Partial<UsageProviderSettings> = {}): UsagePro
 
 describe('hasUsageProviderSettings', () => {
   it('treats persisted managed accounts as configured usage providers', () => {
-    expect(
-      hasUsageProviderSettings(
-        usageSettings({
-          codexManagedAccounts: [
-            {
-              id: 'codex-account-1',
-              email: 'dev@example.com',
-              managedHomePath: '/tmp/codex-account-1',
-              createdAt: 1,
-              updatedAt: 1,
-              lastAuthenticatedAt: 1
-            }
-          ]
-        })
-      )
-    ).toBe(true)
-
     expect(
       hasUsageProviderSettings(
         usageSettings({
@@ -133,13 +115,14 @@ describe('hasUsageProviderSettingsForProvider', () => {
   it('checks durable configuration for a single provider', () => {
     expect(
       hasUsageProviderSettingsForProvider(
-        'codex',
+        'claude',
         usageSettings({
-          codexManagedAccounts: [
+          claudeManagedAccounts: [
             {
-              id: 'codex-account-1',
+              id: 'claude-account-1',
               email: 'dev@example.com',
-              managedHomePath: '/tmp/codex-account-1',
+              managedAuthPath: '/tmp/claude-account-1',
+              authMethod: 'subscription-oauth',
               createdAt: 1,
               updatedAt: 1,
               lastAuthenticatedAt: 1
@@ -185,14 +168,15 @@ describe('hasUsageProviderSettingsForProvider', () => {
 describe('getVisibleUsageProvider', () => {
   it('keeps configured managed-account providers visible while snapshots are pending', () => {
     const visible = getVisibleUsageProvider(
-      'codex',
+      'claude',
       null,
       usageSettings({
-        codexManagedAccounts: [
+        claudeManagedAccounts: [
           {
-            id: 'codex-account-1',
+            id: 'claude-account-1',
             email: 'dev@example.com',
-            managedHomePath: '/tmp/codex-account-1',
+            managedAuthPath: '/tmp/claude-account-1',
+            authMethod: 'subscription-oauth',
             createdAt: 1,
             updatedAt: 1,
             lastAuthenticatedAt: 1
@@ -202,7 +186,7 @@ describe('getVisibleUsageProvider', () => {
     )
 
     expect(visible).toMatchObject({
-      provider: 'codex',
+      provider: 'claude',
       status: 'fetching',
       session: null,
       weekly: null
@@ -237,7 +221,7 @@ describe('getVisibleUsageProvider', () => {
   })
 
   it('hides providers with no live data or durable configuration', () => {
-    expect(getVisibleUsageProvider('codex', null, usageSettings())).toBe(null)
+    expect(getVisibleUsageProvider('claude', null, usageSettings())).toBe(null)
     expect(getVisibleUsageProvider('minimax', undefined, usageSettings())).toBe(null)
     expect(getVisibleUsageProvider('opencode-go', provider('fetching'), usageSettings())).toBe(null)
   })
@@ -302,7 +286,6 @@ describe('isUsageEmptyState', () => {
       isUsageEmptyState(
         {
           claude: provider('unavailable', { provider: 'claude' }),
-          codex: provider('unavailable', { provider: 'codex' }),
           opencodeGo: provider('unavailable', { provider: 'opencode-go' }),
           minimax: undefined
         },
@@ -316,7 +299,6 @@ describe('isUsageEmptyState', () => {
       isUsageEmptyState(
         {
           claude: provider('fetching', { provider: 'claude' }),
-          codex: provider('fetching', { provider: 'codex' }),
           opencodeGo: provider('unavailable', { provider: 'opencode-go' }),
           minimax: provider('unavailable', { provider: 'minimax' })
         },
@@ -330,16 +312,16 @@ describe('isUsageEmptyState', () => {
       isUsageEmptyState(
         {
           claude: provider('unavailable', { provider: 'claude' }),
-          codex: provider('unavailable', { provider: 'codex' }),
           opencodeGo: provider('unavailable', { provider: 'opencode-go' }),
           minimax: provider('unavailable', { provider: 'minimax' })
         },
         usageSettings({
-          codexManagedAccounts: [
+          claudeManagedAccounts: [
             {
-              id: 'codex-account-1',
+              id: 'claude-account-1',
               email: 'dev@example.com',
-              managedHomePath: '/tmp/codex-account-1',
+              managedAuthPath: '/tmp/claude-account-1',
+              authMethod: 'subscription-oauth',
               createdAt: 1,
               updatedAt: 1,
               lastAuthenticatedAt: 1
@@ -359,7 +341,6 @@ describe('isUsageEmptyState', () => {
       isUsageEmptyState(
         {
           claude: provider('unavailable', { provider: 'claude' }),
-          codex: provider('unavailable', { provider: 'codex' }),
           opencodeGo: provider('unavailable', { provider: 'opencode-go' }),
           minimax: provider('unavailable', { provider: 'minimax' })
         },

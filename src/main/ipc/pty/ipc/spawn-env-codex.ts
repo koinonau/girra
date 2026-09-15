@@ -7,9 +7,9 @@ import { stampWslOrchestrationCompatibilityHost } from '../../../pty/wsl-orca-en
 import { ensureCodexStateDbBackfillRecoveryStarted } from '../../../codex/codex-state-db-backfill-recovery'
 import { buildPtyHostEnv } from '../host-env/assembly'
 import {
+  CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE,
   getCompatibleSelectedCodexHomePath,
   getCodexSelectionTargetForPty,
-  resolveCodexHomeAfterManagedAuthReadiness,
   shouldSkipCodexHomeEnvForWindowsShell,
   shouldStripInheritedOrcaCodexHome,
   isCodexStatusHooksEnabled,
@@ -74,31 +74,15 @@ export async function assemblePtyIpcSpawnCodexEnv(ctx: PtyIpcSpawnState): Promis
             : await selectLaunchCodexHome()
         )
       : null
-  if (!ctx.preAdoptedStablePane && args.launchAgent === 'codex' && args.sessionId === undefined) {
-    const resolution = resolveCodexHomeAfterManagedAuthReadiness({
-      selectedCodexHomePath: ctx.selectedCodexHomePath,
-      getSettings: () => ctx.deps.getSettings?.(),
-      requiredCodexHomePath: codexResumeHome?.codexHomePath,
-      target: ctx.codexSelectionTarget,
-      resolveCurrent: async () =>
-        getCompatibleSelectedCodexHomePath(
-          ctx.codexSelectionTarget,
-          (await ctx.deps.getSelectedCodexHomePath?.(ctx.codexSelectionTarget, ctx.baseEnv, {
-            workspacePath: ctx.cwd,
-            launchAgent: 'codex'
-          })) ?? null
-        ),
-      resolveAfterUnavailable: async (unavailableManagedHomePath) =>
-        getCompatibleSelectedCodexHomePath(
-          ctx.codexSelectionTarget,
-          (await ctx.deps.getSelectedCodexHomePath?.(ctx.codexSelectionTarget, ctx.baseEnv, {
-            workspacePath: ctx.cwd,
-            launchAgent: 'codex',
-            unavailableManagedHomePath
-          })) ?? null
-        )
-    })
-    ctx.selectedCodexHomePath = resolution instanceof Promise ? await resolution : resolution
+  if (
+    !ctx.preAdoptedStablePane &&
+    args.launchAgent === 'codex' &&
+    args.sessionId === undefined &&
+    codexResumeHome &&
+    !codexHomePathsEqual(ctx.selectedCodexHomePath, codexResumeHome.codexHomePath)
+  ) {
+    // Why: a resume must never run under a home other than the one that owns its rollout.
+    throw new Error(CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE)
   }
   if (args.launchAgent === 'codex' && ctx.selectedCodexHomePath) {
     await ensureCodexStateDbBackfillRecoveryStarted(ctx.selectedCodexHomePath)

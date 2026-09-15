@@ -5,11 +5,6 @@ import type {
   ClaudeUsageSnapshot
 } from '../../../../shared/claude-usage-types'
 import type {
-  CodexUsageRange,
-  CodexUsageScope,
-  CodexUsageSnapshot
-} from '../../../../shared/codex-usage-types'
-import type {
   OpenCodeUsageRange,
   OpenCodeUsageScope,
   OpenCodeUsageSnapshot
@@ -256,11 +251,9 @@ function createUsageProviderSlice<
 }
 
 type ClaudeUsageShape = UsageShape<ClaudeUsageScope, ClaudeUsageRange, ClaudeUsageSnapshot>
-type CodexUsageShape = UsageShape<CodexUsageScope, CodexUsageRange, CodexUsageSnapshot>
 type OpenCodeUsageShape = UsageShape<OpenCodeUsageScope, OpenCodeUsageRange, OpenCodeUsageSnapshot>
 
 export type ClaudeUsageSlice = ProviderUsageSlice<'claude', 'Claude', ClaudeUsageShape>
-export type CodexUsageSlice = ProviderUsageSlice<'codex', 'Codex', CodexUsageShape>
 export type OpenCodeUsageSlice = ProviderUsageSlice<'openCode', 'OpenCode', OpenCodeUsageShape>
 
 export const createClaudeUsageSlice = createUsageProviderSlice<
@@ -274,15 +267,6 @@ export const createClaudeUsageSlice = createUsageProviderSlice<
   initialRange: '30d',
   getApi: () => window.api.claudeUsage,
   hasCachedData: (state) => state.hasAnyClaudeData
-})
-
-export const createCodexUsageSlice = createUsageProviderSlice<'codex', 'Codex', CodexUsageShape>({
-  prefix: 'codex',
-  name: 'Codex',
-  initialScope: 'orca',
-  initialRange: '30d',
-  getApi: () => window.api.codexUsage,
-  hasCachedData: (state) => state.hasAnyCodexData
 })
 
 export const createOpenCodeUsageSlice = createUsageProviderSlice<

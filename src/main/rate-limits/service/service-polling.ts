@@ -72,7 +72,6 @@ export abstract class RateLimitServicePolling extends RateLimitServiceFetchQueue
     // Why: key by provider so a new provider is compile-forced an entry — a missing one silently never recovers from a startup error.
     const byProvider: Record<ActiveRateLimitProvider, ProviderRateLimits | null> = {
       claude: this.state.claude,
-      codex: this.state.codex,
       'opencode-go': this.state.opencodeGo,
       minimax: this.state.minimax
     }
@@ -160,9 +159,6 @@ export abstract class RateLimitServicePolling extends RateLimitServiceFetchQueue
     // Why: recover partial failures of dedicated-fetch providers without re-reading healthy providers still inside their debounce.
     if (plan.providers.includes('claude')) {
       await this.fetchClaudeOnly()
-    }
-    if (plan.providers.includes('codex')) {
-      await this.fetchCodexOnly()
     }
   }
 

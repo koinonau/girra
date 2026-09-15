@@ -28,13 +28,6 @@ describe('account RPC methods', () => {
         wslDistro: null,
         previousLegacyCredentialsSha256: 'a'.repeat(64)
       }
-    },
-    {
-      methodName: 'accounts.addCodexFromHome',
-      params: { sourceHome: join(tmpdir(), 'codex-login') },
-      runtimeMethod: 'addCodexAccountFromHome',
-      expectedSource: join(tmpdir(), 'codex-login'),
-      expectedOptions: { runtime: undefined, wslDistro: null }
     }
   ])('allows local-socket $methodName calls', async (testCase) => {
     const add = vi.fn().mockResolvedValue({ accounts: [] })
@@ -49,27 +42,25 @@ describe('account RPC methods', () => {
     expect(add).toHaveBeenCalledWith(testCase.expectedSource, testCase.expectedOptions)
   })
 
-  it.each([
-    ['accounts.addClaudeFromConfigDir', { configDir: join(tmpdir(), 'claude-login') }],
-    ['accounts.addCodexFromHome', { sourceHome: join(tmpdir(), 'codex-login') }]
-  ])('rejects paired-device calls to %s', async (methodName, params) => {
-    const runtime = {
-      addClaudeAccountFromConfigDir: vi.fn(),
-      addCodexAccountFromHome: vi.fn()
-    } as unknown as OrcaRuntimeService
-    const addMethod = method(methodName)
-    if (isStreamingMethod(addMethod)) {
-      throw new Error(`${methodName} must be a request method`)
-    }
+  it.each([['accounts.addClaudeFromConfigDir', { configDir: join(tmpdir(), 'claude-login') }]])(
+    'rejects paired-device calls to %s',
+    async (methodName, params) => {
+      const runtime = {
+        addClaudeAccountFromConfigDir: vi.fn()
+      } as unknown as OrcaRuntimeService
+      const addMethod = method(methodName)
+      if (isStreamingMethod(addMethod)) {
+        throw new Error(`${methodName} must be a request method`)
+      }
 
-    for (const clientKind of ['mobile', 'runtime'] as const) {
-      await expect(addMethod.handler(params, { runtime, clientKind })).rejects.toThrow(
-        /only available on the Orca host runtime/
-      )
+      for (const clientKind of ['mobile', 'runtime'] as const) {
+        await expect(addMethod.handler(params, { runtime, clientKind })).rejects.toThrow(
+          /only available on the Orca host runtime/
+        )
+      }
+      expect(runtime.addClaudeAccountFromConfigDir).not.toHaveBeenCalled()
     }
-    expect(runtime.addClaudeAccountFromConfigDir).not.toHaveBeenCalled()
-    expect(runtime.addCodexAccountFromHome).not.toHaveBeenCalled()
-  })
+  )
 
   it('keeps explicit account-list refreshes on the forced refresh lane', async () => {
     const snapshot = { claude: null, codex: null }
@@ -102,96 +93,6 @@ describe('account RPC methods', () => {
       list.handler(list.params?.parse({ refreshUsage: false }), { runtime })
     ).resolves.toBe(snapshot)
     expect(runtime.refreshAccountsForMobile).not.toHaveBeenCalled()
-  })
-
-  it('forwards a client idempotency key when consuming a Codex reset credit', async () => {
-    const idempotencyKey = '11111111-1111-4111-8111-111111111111'
-    const expectedScope = {
-      target: { runtime: 'host' as const, wslDistro: null },
-      accountId: 'codex-account',
-      accountRevision: 42,
-      offerRevision: 'v1:offer'
-    }
-    const result = {
-      outcome: 'reset',
-      scope: expectedScope,
-      snapshot: { claude: null, codex: null }
-    }
-    const consumeCodexRateLimitResetCredit = vi.fn().mockResolvedValue(result)
-    const runtime = { consumeCodexRateLimitResetCredit } as unknown as OrcaRuntimeService
-    const reset = method('accounts.consumeCodexResetCredit')
-    if (isStreamingMethod(reset)) {
-      throw new Error('accounts.consumeCodexResetCredit must be a request method')
-    }
-
-    expect(reset.params?.parse({ idempotencyKey, expectedScope })).toEqual({
-      idempotencyKey,
-      expectedScope
-    })
-    expect(() => reset.params?.parse({ idempotencyKey: 'not-a-uuid', expectedScope })).toThrow()
-    expect(() =>
-      reset.params?.parse({
-        idempotencyKey,
-        expectedScope: {
-          ...expectedScope,
-          target: { runtime: 'host', wslDistro: 'Ubuntu' }
-        }
-      })
-    ).toThrow()
-    expect(() =>
-      reset.params?.parse({
-        idempotencyKey,
-        expectedScope: {
-          ...expectedScope,
-          target: { runtime: 'wsl', wslDistro: null }
-        }
-      })
-    ).toThrow()
-    expect(() => reset.params?.parse({ idempotencyKey, expectedScope, extra: true })).toThrow()
-    await expect(reset.handler({ idempotencyKey, expectedScope }, { runtime })).resolves.toBe(
-      result
-    )
-    expect(consumeCodexRateLimitResetCredit).toHaveBeenCalledWith(idempotencyKey, expectedScope)
-  })
-
-  it('forwards the exact WSL target when selecting a Codex account', async () => {
-    const selectCodexAccountForTarget = vi
-      .fn()
-      .mockResolvedValue({ accounts: [], activeAccountId: null })
-    const runtime = { selectCodexAccountForTarget } as unknown as OrcaRuntimeService
-    const select = method('accounts.selectCodexForTarget')
-    if (isStreamingMethod(select)) {
-      throw new Error('accounts.selectCodexForTarget must be a request method')
-    }
-    const params = {
-      accountId: null,
-      target: { runtime: 'wsl' as const, wslDistro: 'Ubuntu' }
-    }
-
-    expect(select.params?.parse(params)).toEqual(params)
-    expect(
-      select.params?.parse({
-        accountId: null,
-        target: { runtime: 'wsl', wslDistro: null }
-      })
-    ).toEqual({ accountId: null, target: { runtime: 'wsl', wslDistro: null } })
-    expect(() =>
-      select.params?.parse({
-        accountId: null,
-        target: { runtime: 'host', wslDistro: 'Ubuntu' }
-      })
-    ).toThrow()
-    expect(() =>
-      select.params?.parse({
-        accountId: null,
-        target: { runtime: 'wsl', wslDistro: '   ' }
-      })
-    ).toThrow()
-    await expect(select.handler(params, { runtime })).resolves.toEqual({
-      accounts: [],
-      activeAccountId: null
-    })
-    expect(selectCodexAccountForTarget).toHaveBeenCalledWith(null, params.target)
   })
 
   it('uses a stale-aware refresh when a connection replays the subscription', async () => {

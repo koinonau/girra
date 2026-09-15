@@ -65,16 +65,6 @@ const SURFACE_ROWS: readonly SurfaceRow[] = [
     marker: 'sendFollowupPromptWhenAgentReady'
   },
   {
-    row: 41,
-    path: 'src/renderer/src/lib/codex-session-restart.ts',
-    marker: 'markLiveCodexSessionsForRestart'
-  },
-  {
-    row: 41,
-    path: 'src/renderer/src/lib/codex-pane-restart-eligibility.ts',
-    marker: 'isCodexForegroundProcess'
-  },
-  {
     row: 42,
     path: 'src/renderer/src/components/native-chat/native-chat-availability.ts',
     marker: 'canToggleNativeChat'

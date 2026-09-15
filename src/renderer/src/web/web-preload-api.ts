@@ -97,14 +97,9 @@ function createWebPreloadApi(): Partial<PreloadApi> {
     notifications: createNotificationsApi(),
     rateLimits: createRateLimitsApi(),
     minimaxCredentials: createMiniMaxCredentialsApi(),
-    codexAccounts: createAccountsApi(),
     claudeAccounts: createAccountsApi(),
     cli: createCliApi(),
     macosTccPrompts: createMacosTccPromptsApi(),
-    codexConfigSync: {
-      status: () =>
-        Promise.resolve({ state: 'synced', reason: null, systemConfigPath: '' } as const)
-    },
     developerPermissions: createDeveloperPermissionsApi(),
     computerUsePermissions: createComputerUsePermissionsApi(),
     shell: createShellApi(),

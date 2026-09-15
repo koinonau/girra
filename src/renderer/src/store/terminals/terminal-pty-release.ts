@@ -78,17 +78,6 @@ export function createTerminalPtyReleaseActions(
           // Why: repo purge can retire the owning tab before its async exit arrives; don't resurrect an orphan PTY index.
           delete nextPtyIdsByTabId[tabId]
         }
-        const nextPendingCodexPaneRestartIds = { ...s.pendingCodexPaneRestartIds }
-        const nextCodexRestartNoticeByPtyId = { ...s.codexRestartNoticeByPtyId }
-        if (ptyId) {
-          delete nextPendingCodexPaneRestartIds[ptyId]
-          delete nextCodexRestartNoticeByPtyId[ptyId]
-        } else {
-          for (const currentPtyId of s.ptyIdsByTabId[tabId] ?? []) {
-            delete nextPendingCodexPaneRestartIds[currentPtyId]
-            delete nextCodexRestartNoticeByPtyId[currentPtyId]
-          }
-        }
         // Why: an explicit exit drops the dead relay ID; bulk clears retain it for relay grace.
         const nextLastKnownRelay = { ...s.lastKnownRelayPtyIdByTabId }
         if (ptyId && nextLastKnownRelay[tabId] === ptyId) {
@@ -140,8 +129,6 @@ export function createTerminalPtyReleaseActions(
             : {}),
           ptyIdsByTabId: nextPtyIdsByTabId,
           lastKnownRelayPtyIdByTabId: nextLastKnownRelay,
-          pendingCodexPaneRestartIds: nextPendingCodexPaneRestartIds,
-          codexRestartNoticeByPtyId: nextCodexRestartNoticeByPtyId,
           directSshPaneRetryByTabId: nextDirectSshPaneRetryByTabId,
           directSshLivePtyBindingByTabId: nextDirectSshLivePtyBindingByTabId
         }

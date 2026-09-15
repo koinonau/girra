@@ -204,8 +204,8 @@ const BASHISM =
  *
  * Why per-call and not per-file: a file-wide `shell: 'bash'` check passes as
  * soon as ANY call in the file pins bash, so an unpinned dash payload added
- * beside a pinned one is invisible -- planted in `codex-accounts/service.ts`
- * and the guard stayed green. That is the #14292 signature shipping again.
+ * beside a pinned one is invisible -- planted in a file that pinned bash
+ * elsewhere, the guard stayed green. That is the #14292 signature shipping again.
  *
  * Braces are matched on string-blanked source so a `}` inside a script literal
  * cannot close the object early; offsets survive blanking, so the slice is
@@ -312,9 +312,8 @@ describe('bash-only payloads declare their interpreter', () => {
     // bash, and if a bashism survives anywhere in the file while a
     // script-carrying call is not bash-pinned, flag it.
     //
-    // Stripping the bash-pinned calls is what keeps codex-accounts/service.ts
-    // clean -- it pins bash on four inline payloads and on a `bash -lc`
-    // execFileSync, and correctly leaves its printf/mkdir calls unpinned.
+    // Stripping the bash-pinned calls is what keeps a file that pins bash on
+    // its inline payloads clean while its printf/mkdir calls stay unpinned.
     // Masked by POSITION, not by String.replace: replace() with a string
     // pattern removes only the first match, so two identically-written pinned
     // calls would leave one behind, and a body that also occurs earlier as a

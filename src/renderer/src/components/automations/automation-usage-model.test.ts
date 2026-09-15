@@ -37,8 +37,8 @@ describe('automation usage model', () => {
       makeRun({
         usage: {
           status: 'known',
-          provider: 'codex',
-          model: 'gpt-5.4',
+          provider: 'claude',
+          model: 'claude-sonnet-4-5',
           inputTokens: 1000,
           outputTokens: 300,
           cacheReadTokens: 400,

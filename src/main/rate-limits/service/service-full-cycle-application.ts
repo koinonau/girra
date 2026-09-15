@@ -14,18 +14,13 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
       claudeTarget,
       claudeGeneration,
       claudeProvenance,
-      codexTarget,
       previousState,
-      codexFetchGated,
-      codexStateBeforeFetch,
-      codexProvenance,
-      codexGeneration,
       opencodeConfigChanged,
       opencodeGeneration,
       miniMaxConfigChanged,
       miniMaxGeneration,
       claudeFetchGated,
-      results: [claudeResult, codexResult, opencodeGoResult, miniMaxResult]
+      results: [claudeResult, opencodeGoResult, miniMaxResult]
     } = prepared
     if (signal.aborted) {
       return
@@ -41,19 +36,6 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
             updatedAt: Date.now(),
             error:
               claudeResult.reason instanceof Error ? claudeResult.reason.message : 'Unknown error',
-            status: 'error'
-          } satisfies ProviderRateLimits)
-
-    const codex =
-      codexResult.status === 'fulfilled'
-        ? codexResult.value
-        : ({
-            provider: 'codex',
-            session: null,
-            weekly: null,
-            updatedAt: Date.now(),
-            error:
-              codexResult.reason instanceof Error ? codexResult.reason.message : 'Unknown error',
             status: 'error'
           } satisfies ProviderRateLimits)
 
@@ -88,21 +70,11 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
             status: 'error'
           } satisfies ProviderRateLimits)
 
-    const latestCodexHome = this.resolveCodexHome(codexTarget)
     const latestClaudeAuthPreparation = await this.claudeAuthPreparationResolver?.(claudeTarget)
     if (signal.aborted) {
       return
     }
     const latestClaudeProvenance = latestClaudeAuthPreparation?.provenance ?? 'system'
-    // Why: a finishing skip has no provenance, so an in-flight result must never be
-    // applied as though the target had become the system default (#STA-4422).
-    const shouldApplyCodex =
-      !codexFetchGated &&
-      !latestCodexHome.skip &&
-      codexGeneration === this.codexFetchGeneration &&
-      codexProvenance === this.getCodexProvenance(codexTarget, latestCodexHome.homePath)
-    const codexBecameUnavailable =
-      !codexFetchGated && latestCodexHome.skip && codexGeneration === this.codexFetchGeneration
     // Why: a gated cycle made no Claude attempt; applying its passthrough result would grow the failure streak and reset stale-policy clocks for free.
     const shouldApplyClaude =
       !claudeFetchGated &&
@@ -115,9 +87,6 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
     if (shouldApplyClaude) {
       this.trackActiveFailureStreak('claude', claude)
     }
-    if (shouldApplyCodex) {
-      this.trackActiveFailureStreak('codex', codex)
-    }
     if (shouldApplyOpencode) {
       this.trackActiveFailureStreak('opencode-go', opencodeGo)
     }
@@ -125,17 +94,12 @@ export abstract class RateLimitServiceFullCycleApplication extends RateLimitServ
       this.trackActiveFailureStreak('minimax', miniMax)
     }
 
-    // Why: apply a Codex result only when provenance and generation still match, else a raced in-flight fetch overwrites the new account.
+    // Why: apply a Claude result only when provenance and generation still match, else a raced in-flight fetch overwrites the new account.
     this.updateState({
       ...this.state,
       claude: shouldApplyClaude
         ? this.resolveClaudeFetchApply(claude, previousState.claude)
         : this.state.claude,
-      codex: shouldApplyCodex
-        ? this.applyStalePolicy(codex, previousState.codex)
-        : codexBecameUnavailable
-          ? codexStateBeforeFetch
-          : this.state.codex,
       opencodeGo: shouldApplyOpencode
         ? opencodeConfigChanged
           ? opencodeGo

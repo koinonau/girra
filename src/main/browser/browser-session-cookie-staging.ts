@@ -8,7 +8,7 @@ import {
   type PendingBrowserCookieImport
 } from './browser-session-meta-store'
 import { isValidPersistedBrowserSessionProfile } from './browser-session-persisted-profile-validation'
-import { renameFileWithWindowsRetry } from '../codex-accounts/fs-utils'
+import { renameFileWithWindowsRetry } from '../fs-utils'
 import {
   applyScopedStagedCookieImport,
   isScopedStagedCookieImport,

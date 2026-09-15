@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { app } from 'electron'
-import { writeFileAtomically } from '../../codex-accounts/fs-utils'
+import { writeFileAtomically } from '../../fs-utils'
 import { ClaudeRuntimeAuthState } from './runtime-auth-state'
 
 export class ClaudeRuntimeAuthFileStorage extends ClaudeRuntimeAuthState {

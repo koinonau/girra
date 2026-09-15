@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { RateLimitService } from './service'
 import { fetchClaudeRateLimits } from './claude-fetcher'
-import { fetchCodexRateLimits } from './codex-fetcher'
+import { fetchOpenCodeGoRateLimits } from './opencode-go-usage-fetcher'
 import {
   asRateLimitWindow,
   deferred,
@@ -17,11 +17,6 @@ import {
 vi.mock('./claude-fetcher', () => ({
   fetchClaudeRateLimits: vi.fn(),
   fetchManagedAccountUsage: vi.fn()
-}))
-
-vi.mock('./codex-fetcher', () => ({
-  consumeCodexRateLimitResetCredit: vi.fn(),
-  fetchCodexRateLimits: vi.fn()
 }))
 
 vi.mock('./opencode-go-usage-fetcher', () => ({
@@ -75,10 +70,10 @@ describe('RateLimitService', () => {
       expect(claude?.usageMetadata?.source).toBe('live-session')
 
       // The 15-minute poll cycle lands inside the live-feed freshness window: other providers refresh, Claude's OAuth fetch is skipped.
-      const codexCallsBeforePoll = vi.mocked(fetchCodexRateLimits).mock.calls.length
+      const openCodeCallsBeforePoll = vi.mocked(fetchOpenCodeGoRateLimits).mock.calls.length
       await vi.advanceTimersByTimeAsync(3 * 60 * 1000)
-      expect(vi.mocked(fetchCodexRateLimits).mock.calls.length).toBeGreaterThan(
-        codexCallsBeforePoll
+      expect(vi.mocked(fetchOpenCodeGoRateLimits).mock.calls.length).toBeGreaterThan(
+        openCodeCallsBeforePoll
       )
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
 

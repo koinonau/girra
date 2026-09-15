@@ -8,7 +8,7 @@ import {
   addOrcaWslInteropEnv,
   stampWslOrchestrationCompatibilityHost
 } from '../../../pty/wsl-orca-env'
-import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
+import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import { markClaudePtyExited } from '../../../claude-accounts/live-pty-gate'
 import { buildPtyHostEnv } from '../host-env/assembly'
 import {
@@ -39,7 +39,7 @@ export function configureLocalPtyProvider(args: {
       getSettings ? (getSettings()?.terminalWindowsPowerShellImplementation ?? 'auto') : undefined,
     pwshAvailable: () => isPwshAvailableAsync(),
     buildSpawnEnv: async (id, baseEnv, ctx) => {
-      const codexSelectionTarget: CodexAccountSelectionTarget =
+      const codexSelectionTarget: AccountSelectionTarget =
         ctx?.isWsl === true
           ? { runtime: 'wsl', wslDistro: ctx.wslDistro ?? null }
           : { runtime: 'host' }

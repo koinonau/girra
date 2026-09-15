@@ -3,8 +3,7 @@ import type { AgentProviderSessionMetadata } from '../../../../shared/agent-sess
 import type { NetworkProxySettings } from '../../../../shared/network-proxy'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
 import type { ClaudeAccountSelectionTarget } from '../../../claude-accounts/runtime-selection'
-import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
-import type { CodexPaneHomeRoute } from '../../../codex/codex-pane-account-registry'
+import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
 
 export type BuildPtyHostEnvOptions = {
@@ -38,40 +37,23 @@ export type BuildPtyHostEnvOptions = {
 export type CodexHomeLaunchContext = {
   workspacePath?: string
   launchAgent?: TuiAgent
-  unavailableManagedHomePath?: string
 }
 
 // Why (#16441): Codex launch prep grants hook trust through a codex app-server
 // session. It resolves asynchronously so the Electron main thread stays
 // responsive; every consumer already runs inside an async spawn path.
 export type GetSelectedCodexHomePath = (
-  target?: CodexAccountSelectionTarget,
+  target?: AccountSelectionTarget,
   launchEnv?: NodeJS.ProcessEnv,
   launchContext?: CodexHomeLaunchContext
 ) => string | null | Promise<string | null>
 
 export type PrepareCodexSessionResume = (args: {
   providerSession: AgentProviderSessionMetadata
-  target: CodexAccountSelectionTarget
+  target: AccountSelectionTarget
   launchEnv?: NodeJS.ProcessEnv
   workspacePath?: string
 }) => Promise<CodexSessionResumePreparation | null>
-
-export type CodexHomePtySpawnedLifecycleArgs = {
-  id: string
-  codexHomePath: string | null
-  reattached?: boolean
-  reattachedHomeRoute?: CodexPaneHomeRoute | null
-  launchEnv?: NodeJS.ProcessEnv
-  startedAt?: Date
-  startedSequence?: number
-}
-
-let ptyLifecycleSequence = 0
-
-export function allocatePtyLifecycleSequence(): number {
-  return ++ptyLifecycleSequence
-}
 
 export type PrepareClaudeAuth = (
   target?: ClaudeAccountSelectionTarget

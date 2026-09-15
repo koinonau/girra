@@ -62,8 +62,6 @@ export function commitTerminalShutdownState({
     }
     const suppressedPtyExitIds = copyOnWriteRecord(state.suppressedPtyExitIds)
     const pendingPtyShutdownIds = copyOnWriteRecord(state.pendingPtyShutdownIds)
-    const pendingCodexPaneRestartIds = copyOnWriteRecord(state.pendingCodexPaneRestartIds)
-    const codexRestartNoticeByPtyId = copyOnWriteRecord(state.codexRestartNoticeByPtyId)
     for (const ptyId of exitGuardPtyIds) {
       if (state.suppressedPtyExitIds[ptyId] !== true) {
         suppressedPtyExitIds.set(ptyId, true)
@@ -77,11 +75,6 @@ export function commitTerminalShutdownState({
           pendingPtyShutdownIds.delete(ptyId)
         }
       }
-      // Sleeping terminals retain restart intent, but a wake can receive a different live PTY id.
-      if (!keepIdentifiers) {
-        pendingCodexPaneRestartIds.delete(ptyId)
-      }
-      codexRestartNoticeByPtyId.delete(ptyId)
     }
 
     const runtimePaneTitlesByTabId = copyOnWriteRecord(state.runtimePaneTitlesByTabId)
@@ -133,8 +126,6 @@ export function commitTerminalShutdownState({
       runtimePaneTitlesByTabId: runtimePaneTitlesByTabId.read(),
       suppressedPtyExitIds: suppressedPtyExitIds.read(),
       pendingPtyShutdownIds: pendingPtyShutdownIds.read(),
-      pendingCodexPaneRestartIds: pendingCodexPaneRestartIds.read(),
-      codexRestartNoticeByPtyId: codexRestartNoticeByPtyId.read(),
       pendingSetupSplitByTabId: pendingSetupSplitByTabId.read(),
       pendingIssueCommandSplitByTabId: pendingIssueCommandSplitByTabId.read(),
       terminalLayoutsByTabId: terminalLayoutsByTabId.read(),

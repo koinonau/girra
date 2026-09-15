@@ -2,12 +2,9 @@ import { defineMethod, defineStreamingMethod } from '../core'
 import {
   AccountsUnsubscribeParams,
   AddClaudeFromConfigDirParams,
-  AddCodexFromHomeParams,
-  ConsumeCodexResetCreditParams,
   ListAccountsParams,
   RemoveAccountParams,
-  SelectAccountParams,
-  SelectCodexAccountForTargetParams
+  SelectAccountParams
 } from '../../../../shared/rpc-contract/accounts-params'
 
 // Why: monotonically increasing per-process counter avoids the Date.now()
@@ -16,12 +13,12 @@ import {
 // registerSubscriptionCleanup's existing-key eviction path.
 let accountsSubscriptionSeq = 0
 
-// Why: bridges the desktop ClaudeAccountService / CodexAccountService /
-// RateLimitService into the WebSocket / local-socket RPC. Read + switch +
-// remove for all clients; interactive add/re-auth flows spawn `claude login`
-// / `codex login` PTYs that need a desktop browser, so they intentionally
-// remain desktop-only. `accounts.addClaudeFromConfigDir` is the exception: it
-// captures an already-authenticated CLAUDE_CONFIG_DIR (no PTY) so the local
+// Why: bridges the desktop ClaudeAccountService / RateLimitService into the
+// WebSocket / local-socket RPC. Read + switch + remove for all clients;
+// interactive add/re-auth flows spawn `claude login` PTYs that need a desktop
+// browser, so they intentionally remain desktop-only.
+// `accounts.addClaudeFromConfigDir` is the exception: it captures an
+// already-authenticated CLAUDE_CONFIG_DIR (no PTY) so the local
 // `orca account add` CLI can register accounts on a headless host; it is gated
 // to the local runtime connection, never a mobile device token. See #1438.
 export const ACCOUNT_METHODS = [
@@ -45,33 +42,9 @@ export const ACCOUNT_METHODS = [
     handler: async (params, { runtime }) => runtime.selectClaudeAccount(params.accountId)
   }),
   defineMethod({
-    name: 'accounts.selectCodex',
-    params: SelectAccountParams,
-    handler: async (params, { runtime }) => runtime.selectCodexAccount(params.accountId)
-  }),
-  defineMethod({
-    // Why: old hosts silently strip unknown target fields from selectCodex.
-    // A distinct RPC makes version skew fail before it can clear the host slot.
-    name: 'accounts.selectCodexForTarget',
-    params: SelectCodexAccountForTargetParams,
-    handler: async (params, { runtime }) =>
-      runtime.selectCodexAccountForTarget(params.accountId, params.target)
-  }),
-  defineMethod({
-    name: 'accounts.consumeCodexResetCredit',
-    params: ConsumeCodexResetCreditParams,
-    handler: async (params, { runtime }) =>
-      runtime.consumeCodexRateLimitResetCredit(params.idempotencyKey, params.expectedScope)
-  }),
-  defineMethod({
     name: 'accounts.removeClaude',
     params: RemoveAccountParams,
     handler: async (params, { runtime }) => runtime.removeClaudeAccount(params.accountId)
-  }),
-  defineMethod({
-    name: 'accounts.removeCodex',
-    params: RemoveAccountParams,
-    handler: async (params, { runtime }) => runtime.removeCodexAccount(params.accountId)
   }),
   defineMethod({
     name: 'accounts.addClaudeFromConfigDir',
@@ -86,19 +59,6 @@ export const ACCOUNT_METHODS = [
         runtime: params.runtime,
         wslDistro: params.wslDistro ?? null,
         previousLegacyCredentialsSha256: params.previousLegacyCredentialsSha256
-      })
-    }
-  }),
-  defineMethod({
-    name: 'accounts.addCodexFromHome',
-    params: AddCodexFromHomeParams,
-    handler: async (params, { runtime, clientKind }) => {
-      if (clientKind !== undefined) {
-        throw new Error('Adding Codex accounts is only available on the Orca host runtime.')
-      }
-      return runtime.addCodexAccountFromHome(params.sourceHome, {
-        runtime: params.runtime,
-        wslDistro: params.wslDistro ?? null
       })
     }
   }),

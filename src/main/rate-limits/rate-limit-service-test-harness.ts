@@ -2,7 +2,6 @@ import { EventEmitter } from 'node:events'
 import { vi, type Mock } from 'vitest'
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import type { RateLimitService } from './service'
-import { fetchCodexRateLimits } from './codex-fetcher'
 import { fetchMiniMaxRateLimits } from './minimax/minimax-fetcher'
 import { fetchOpenCodeGoRateLimits } from './opencode-go-usage-fetcher'
 import { hasMiniMaxSessionCookie } from '../minimax/minimax-cookie-store'
@@ -79,7 +78,6 @@ export function unavailableProvider(
 // activation degrades to a full fetch. Backoff tests that reason about the
 // individual retry lane need healthy providers minted fresh at fetch time.
 export function mockFreshBackgroundProviderFetches(): void {
-  vi.mocked(fetchCodexRateLimits).mockImplementation(async () => okProvider('codex', 24))
   vi.mocked(fetchOpenCodeGoRateLimits).mockImplementation(async () => okProvider('opencode-go', 0))
   vi.mocked(fetchMiniMaxRateLimits).mockImplementation(async () => okProvider('minimax', 0))
 }

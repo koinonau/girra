@@ -26,10 +26,7 @@ import {
 import { stdioForWindowsInteractiveChild } from '../../shared/windows-console-input'
 import { ACCOUNT_IMPORT_RUNTIME_CAPABILITY } from '../../shared/protocol-version'
 import type { RuntimeStatus } from '../../shared/runtime-types'
-import type {
-  ClaudeRateLimitAccountsState,
-  CodexRateLimitAccountsState
-} from '../../shared/managed-account-types'
+import type { ClaudeRateLimitAccountsState } from '../../shared/managed-account-types'
 import {
   type InteractiveLoginSession,
   withInteractiveLoginCleanup
@@ -38,11 +35,8 @@ import {
 // Why: add returns just that provider's state; list returns the full snapshot.
 type AccountsListSnapshot = {
   claude: ClaudeRateLimitAccountsState
-  codex: CodexRateLimitAccountsState
 }
 
-// Why: Claude and Codex managed-account summaries both carry id+email+active id,
-// so one formatter renders either provider's block.
 type AccountsBlock = {
   accounts: readonly { id: string; email: string }[]
   activeAccountId: string | null
@@ -238,38 +232,6 @@ async function addClaudeAccount({ client, json }: HandlerContext): Promise<void>
   printResult(result, json, (state) => formatAccountsBlock('Claude', state))
 }
 
-/** Logs into a Codex account in a temp CODEX_HOME, then registers it with the local runtime. */
-async function addCodexAccount({ client, json }: HandlerContext): Promise<void> {
-  const codexHome = mkdtempSync(join(tmpdir(), 'orca-account-add-codex-'))
-  const session: InteractiveLoginSession = {
-    child: null,
-    registering: false,
-    terminationPromise: null
-  }
-  const result = await withInteractiveLoginCleanup(
-    session,
-    async () => {
-      rmSync(codexHome, { recursive: true, force: true })
-    },
-    async () => {
-      // Why: plain OAuth binds a loopback callback the user's browser cannot reach
-      // on a headless/SSH host; device auth is explicitly designed for this flow.
-      await runAgentLoginInTerminal(
-        'codex',
-        ['login', '--device-auth'],
-        { CODEX_HOME: codexHome },
-        json,
-        session
-      )
-      session.registering = true
-      return client.call<CodexRateLimitAccountsState>('accounts.addCodexFromHome', {
-        sourceHome: codexHome
-      })
-    }
-  )
-  printResult(result, json, (state) => formatAccountsBlock('Codex', state))
-}
-
 /**
  * Rejects the runtime-selector flags instead of ignoring them. shouldIgnoreRemoteSelection
  * pins account commands to the local runtime, so honoring `--environment homelab`
@@ -294,7 +256,7 @@ async function assertAccountImportSupported({ client }: HandlerContext): Promise
   }
 }
 
-/** CLI handlers for `orca account add [--agent claude|codex]` and `orca account list`. */
+/** CLI handlers for `orca account add [--agent claude]` and `orca account list`. */
 export const ACCOUNT_HANDLERS: Record<string, CommandHandler> = {
   'account add': async (ctx) => {
     const agentFlag = ctx.flags.get('agent')
@@ -303,21 +265,21 @@ export const ACCOUNT_HANDLERS: Record<string, CommandHandler> = {
     if (agentFlag !== undefined && typeof agentFlag !== 'string') {
       throw new RuntimeClientError(
         'invalid_argument',
-        'Missing a value for --agent. Use `--agent claude` or `--agent codex`.'
+        'Missing a value for --agent. Use `--agent claude`.'
       )
     }
     const agent = agentFlag ?? 'claude'
-    if (agent !== 'claude' && agent !== 'codex') {
+    if (agent !== 'claude') {
       throw new RuntimeClientError(
         'invalid_argument',
-        `Unsupported --agent "${agent}". Use "claude" or "codex".`
+        `Unsupported --agent "${agent}". Use "claude".`
       )
     }
     rejectAccountRemoteSelectionFlags(ctx, 'orca account add')
     // Why: fail on runtime version skew before burning a full OAuth round trip.
     await assertAccountImportSupported(ctx)
     await ctx.client.call('accounts.list', { refreshUsage: false })
-    await (agent === 'claude' ? addClaudeAccount(ctx) : addCodexAccount(ctx))
+    await addClaudeAccount(ctx)
   },
   'account list': async (ctx) => {
     rejectAccountRemoteSelectionFlags(ctx, 'orca account list')
@@ -327,11 +289,6 @@ export const ACCOUNT_HANDLERS: Record<string, CommandHandler> = {
     const result = await client.call<AccountsListSnapshot>('accounts.list', {
       refreshUsage: false
     })
-    printResult(
-      result,
-      json,
-      (snapshot) =>
-        `${formatAccountsBlock('Claude', snapshot.claude)}\n\n${formatAccountsBlock('Codex', snapshot.codex)}`
-    )
+    printResult(result, json, (snapshot) => formatAccountsBlock('Claude', snapshot.claude))
   }
 }

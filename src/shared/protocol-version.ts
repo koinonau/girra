@@ -113,7 +113,6 @@ export const TERMINAL_QUICK_COMMANDS_RUNTIME_CAPABILITY = 'terminal.quick-comman
 // status.worktreeCreateIdempotency carries the optional host retention policy.
 export const WORKTREE_CREATE_IDEMPOTENCY_RUNTIME_CAPABILITY =
   'worktree.create-idempotency.v1' as const
-export const CODEX_RESET_CREDIT_RUNTIME_CAPABILITY = 'accounts.codex-reset-credit.v1' as const
 export const ACCOUNT_IMPORT_RUNTIME_CAPABILITY = 'accounts.import-host-credentials.v1' as const
 // Why: older hosts cannot reconcile terminal.create's mutation after losing the reply, so clients may only retry unknown outcomes when advertised.
 export const TERMINAL_CREATE_IDEMPOTENCY_RUNTIME_CAPABILITY =
@@ -297,7 +296,6 @@ export const RUNTIME_CAPABILITIES = [
   WORKTREE_VISIBILITY_DEFAULTS_RUNTIME_CAPABILITY,
   WORKTREE_VISIBILITY_SOURCE_DEFAULTS_RUNTIME_CAPABILITY,
   ACCOUNT_IMPORT_RUNTIME_CAPABILITY,
-  CODEX_RESET_CREDIT_RUNTIME_CAPABILITY,
   SKILL_INSTALL_CAPABILITY,
   SKILL_BUNDLE_INSTALL_CAPABILITY,
   SKILL_INSTALL_CANCEL_CAPABILITY,

@@ -11,7 +11,7 @@ import {
 } from './browser-cookie-import-policy'
 import { createChromiumCookieSnapshot } from './chromium-cookie-snapshot'
 import { resolveChromiumCookiesPath } from './chromium-cookie-path'
-import { copyFileWithWindowsRetry } from '../codex-accounts/fs-utils'
+import { copyFileWithWindowsRetry } from '../fs-utils'
 import { planImportWrites } from './browser-cookie-import-write'
 import { readChromiumRowPartition } from './browser-cookie-source-partition'
 import { diag } from './browser-cookie-import-diagnostics'

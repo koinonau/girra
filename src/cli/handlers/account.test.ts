@@ -130,7 +130,7 @@ describe('account CLI handlers', () => {
         result:
           method === 'status.get'
             ? { capabilities: [ACCOUNT_IMPORT_RUNTIME_CAPABILITY] }
-            : accountState(method.includes('Claude') ? 'claude@example.com' : 'codex@example.com'),
+            : accountState('claude@example.com'),
         _meta: { runtimeId: 'test-runtime' }
       })
     )
@@ -153,23 +153,31 @@ describe('account CLI handlers', () => {
     }
   })
 
-  it('uses Codex device auth and keeps JSON stdout clean', async () => {
-    await ACCOUNT_HANDLERS['account add'](context('codex', true))
+  it('runs Claude login and keeps JSON stdout clean', async () => {
+    await ACCOUNT_HANDLERS['account add'](context('claude', true))
 
     expect(spawnMock).toHaveBeenCalledWith(
-      'codex',
-      ['login', '--device-auth'],
+      'claude',
+      ['auth', 'login', '--claudeai'],
       expect.objectContaining({
         stdio: ['inherit', process.stderr, 'inherit'],
-        env: expect.objectContaining({ CODEX_HOME: expect.any(String) })
+        env: expect.objectContaining({ CLAUDE_CONFIG_DIR: expect.any(String) })
       })
     )
     const spawnOptions = spawnMock.mock.calls[0]?.[2]
     expect(spawnOptions.env.ELECTRON_RUN_AS_NODE).toBeUndefined()
-    expect(existsSync(spawnOptions.env.CODEX_HOME)).toBe(false)
-    expect(callMock).toHaveBeenCalledWith('accounts.addCodexFromHome', {
-      sourceHome: spawnOptions.env.CODEX_HOME
-    })
+    expect(existsSync(spawnOptions.env.CLAUDE_CONFIG_DIR)).toBe(false)
+    expect(callMock).toHaveBeenCalledWith(
+      'accounts.addClaudeFromConfigDir',
+      expect.objectContaining({ configDir: spawnOptions.env.CLAUDE_CONFIG_DIR })
+    )
+  })
+
+  it('rejects the retired Codex provider before any login', async () => {
+    await expect(ACCOUNT_HANDLERS['account add'](context('codex'))).rejects.toThrow(
+      'Unsupported --agent "codex"'
+    )
+    expect(spawnMock).not.toHaveBeenCalled()
   })
 
   it('passes Windows console device handles to the login child instead of inheriting Electron stdio', async () => {
@@ -180,11 +188,11 @@ describe('account CLI handlers', () => {
       dispose
     })
 
-    await ACCOUNT_HANDLERS['account add'](context('codex'))
+    await ACCOUNT_HANDLERS['account add'](context('claude'))
 
     expect(spawnMock).toHaveBeenCalledWith(
-      'codex',
-      ['login', '--device-auth'],
+      'claude',
+      ['auth', 'login', '--claudeai'],
       expect.objectContaining({ stdio: [11, 'inherit', 'inherit'] })
     )
     expect(dispose).toHaveBeenCalledTimes(1)
@@ -201,7 +209,9 @@ describe('account CLI handlers', () => {
       throw new Error('invalid stdio')
     })
 
-    await expect(ACCOUNT_HANDLERS['account add'](context('codex'))).rejects.toThrow('invalid stdio')
+    await expect(ACCOUNT_HANDLERS['account add'](context('claude'))).rejects.toThrow(
+      'invalid stdio'
+    )
 
     expect(dispose).toHaveBeenCalledOnce()
   })
@@ -213,54 +223,54 @@ describe('account CLI handlers', () => {
       dispose: vi.fn()
     })
 
-    await ACCOUNT_HANDLERS['account add'](context('codex', true))
+    await ACCOUNT_HANDLERS['account add'](context('claude', true))
 
     expect(spawnMock).toHaveBeenCalledWith(
-      'codex',
-      ['login', '--device-auth'],
+      'claude',
+      ['auth', 'login', '--claudeai'],
       expect.objectContaining({ stdio: [11, process.stderr, 'inherit'] })
     )
   })
 
   it('routes Windows package-manager shims through the safe cmd launcher', async () => {
     Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
-    resolveCliCommandMock.mockReturnValue('C:\\tools\\codex.cmd')
+    resolveCliCommandMock.mockReturnValue('C:\\tools\\claude.cmd')
 
-    await ACCOUNT_HANDLERS['account add'](context('codex'))
+    await ACCOUNT_HANDLERS['account add'](context('claude'))
 
     expect(spawnMock).toHaveBeenCalledWith(
       getCmdExePath(),
-      ['/d', '/c', 'C:\\tools\\codex.cmd', 'login', '--device-auth'],
+      ['/d', '/c', 'C:\\tools\\claude.cmd', 'auth', 'login', '--claudeai'],
       expect.objectContaining({ stdio: ['inherit', 'inherit', 'inherit'] })
     )
   })
 
   it('launches a Windows shim installed under Program Files (x86)', async () => {
     Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
-    const shim = 'C:\\Program Files (x86)\\nodejs\\codex.cmd'
+    const shim = 'C:\\Program Files (x86)\\nodejs\\claude.cmd'
     resolveCliCommandMock.mockReturnValue(shim)
 
-    await ACCOUNT_HANDLERS['account add'](context('codex'))
+    await ACCOUNT_HANDLERS['account add'](context('claude'))
 
     expect(spawnMock).toHaveBeenCalledWith(
       getCmdExePath(),
-      ['/d', '/c', shim, 'login', '--device-auth'],
+      ['/d', '/c', shim, 'auth', 'login', '--claudeai'],
       expect.anything()
     )
   })
 
   it('explains an unspawnable Windows shim path instead of leaking the error sentinel', async () => {
     Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
-    resolveCliCommandMock.mockReturnValue('C:\\Users\\A&B\\codex.cmd')
+    resolveCliCommandMock.mockReturnValue('C:\\Users\\A&B\\claude.cmd')
 
-    const error = await ACCOUNT_HANDLERS['account add'](context('codex')).catch(
+    const error = await ACCOUNT_HANDLERS['account add'](context('claude')).catch(
       (thrown: unknown) => thrown
     )
 
     expect(spawnMock).not.toHaveBeenCalled()
     const message = error instanceof Error ? error.message : String(error)
     expect(message).not.toBe(WINDOWS_BATCH_UNSAFE_ARGUMENTS_ERROR)
-    expect(message).toContain('C:\\Users\\A&B\\codex.cmd')
+    expect(message).toContain('C:\\Users\\A&B\\claude.cmd')
     expect(message).toContain(WINDOWS_BATCH_UNSAFE_CHARACTERS_LABEL)
   })
 
@@ -268,7 +278,7 @@ describe('account CLI handlers', () => {
     const nodeBin = '/home/test/.nvm/versions/node/v22.0.0/bin'
     getVersionManagerBinPathsMock.mockReturnValue([nodeBin])
 
-    await ACCOUNT_HANDLERS['account add'](context('codex'))
+    await ACCOUNT_HANDLERS['account add'](context('claude'))
 
     const path = spawnMock.mock.calls[0]?.[2].env.PATH as string
     expect(path.split(delimiter)[0]).toBe(nodeBin)
@@ -281,7 +291,7 @@ describe('account CLI handlers', () => {
     const effectivePathBefore = process.env.PATH ?? process.env.Path ?? ''
     getVersionManagerBinPathsMock.mockReturnValue([nodeBin])
 
-    await ACCOUNT_HANDLERS['account add'](context('codex'))
+    await ACCOUNT_HANDLERS['account add'](context('claude'))
 
     const env = spawnMock.mock.calls[0]?.[2].env as NodeJS.ProcessEnv
     const pathValues = Object.entries(env)
@@ -313,29 +323,29 @@ describe('account CLI handlers', () => {
     Object.defineProperty(process, 'platform', { configurable: true, value: 'linux' })
     const kill = vi.fn()
     const child = Object.assign(new EventEmitter(), { kill })
-    let codexHome = ''
+    let configDir = ''
     spawnMock.mockImplementation((_command, _args, options: { env: Record<string, string> }) => {
-      codexHome = options.env.CODEX_HOME
+      configDir = options.env.CLAUDE_CONFIG_DIR
       return child
     })
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never)
     const listenersBefore = process.listeners('SIGINT')
 
-    const pending = ACCOUNT_HANDLERS['account add'](context('codex')).catch(() => {})
-    await vi.waitFor(() => expect(codexHome).not.toBe(''))
-    expect(existsSync(codexHome)).toBe(true)
+    const pending = ACCOUNT_HANDLERS['account add'](context('claude')).catch(() => {})
+    await vi.waitFor(() => expect(configDir).not.toBe(''))
+    expect(existsSync(configDir)).toBe(true)
 
     newSignalListener('SIGINT', listenersBefore)('SIGINT')
 
     await vi.waitFor(() => expect(kill).toHaveBeenCalledWith('SIGINT'))
     expect(exitSpy).not.toHaveBeenCalled()
-    expect(existsSync(codexHome)).toBe(true)
+    expect(existsSync(configDir)).toBe(true)
 
     child.emit('exit', 1)
     child.emit('close', 1)
     await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(130))
-    expect(existsSync(codexHome)).toBe(false)
-    expect(callMock).not.toHaveBeenCalledWith('accounts.addCodexFromHome', expect.anything())
+    expect(existsSync(configDir)).toBe(false)
+    expect(callMock).not.toHaveBeenCalledWith('accounts.addClaudeFromConfigDir', expect.anything())
 
     await pending
     exitSpy.mockRestore()
@@ -346,27 +356,27 @@ describe('account CLI handlers', () => {
     // delivers SIGHUP — Node's default terminates without running cleanup.
     Object.defineProperty(process, 'platform', { configurable: true, value: 'linux' })
     const child = Object.assign(new EventEmitter(), { kill: vi.fn() })
-    let codexHome = ''
+    let configDir = ''
     spawnMock.mockImplementation((_command, _args, options: { env: Record<string, string> }) => {
-      codexHome = options.env.CODEX_HOME
+      configDir = options.env.CLAUDE_CONFIG_DIR
       return child
     })
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never)
     const listenersBefore = process.listeners('SIGHUP')
 
-    const pending = ACCOUNT_HANDLERS['account add'](context('codex')).catch(() => {})
-    await vi.waitFor(() => expect(codexHome).not.toBe(''))
+    const pending = ACCOUNT_HANDLERS['account add'](context('claude')).catch(() => {})
+    await vi.waitFor(() => expect(configDir).not.toBe(''))
 
     newSignalListener('SIGHUP', listenersBefore)('SIGHUP')
 
     await vi.waitFor(() => expect(child.kill).toHaveBeenCalledWith('SIGHUP'))
     expect(exitSpy).not.toHaveBeenCalled()
-    expect(existsSync(codexHome)).toBe(true)
+    expect(existsSync(configDir)).toBe(true)
 
     child.emit('exit', 1)
     child.emit('close', 1)
     await vi.waitFor(() => expect(exitSpy).toHaveBeenCalledWith(129))
-    expect(existsSync(codexHome)).toBe(false)
+    expect(existsSync(configDir)).toBe(false)
 
     await pending
     exitSpy.mockRestore()
@@ -449,7 +459,7 @@ describe('account CLI handlers', () => {
           ? Promise.resolve({
               id: 'test',
               ok: true,
-              result: { claude: accountState('c@e.com'), codex: accountState('x@e.com') },
+              result: { claude: accountState('c@e.com') },
               _meta: { runtimeId: 'test-runtime' }
             })
           : new Promise(() => {})
@@ -458,9 +468,9 @@ describe('account CLI handlers', () => {
     const exitSpy = vi.spyOn(process, 'exit').mockImplementation((() => undefined) as never)
     const listenersBefore = process.listeners('SIGINT')
 
-    void ACCOUNT_HANDLERS['account add'](context('codex')).catch(() => {})
+    void ACCOUNT_HANDLERS['account add'](context('claude')).catch(() => {})
     await vi.waitFor(() =>
-      expect(callMock).toHaveBeenCalledWith('accounts.addCodexFromHome', expect.anything())
+      expect(callMock).toHaveBeenCalledWith('accounts.addClaudeFromConfigDir', expect.anything())
     )
 
     newSignalListener('SIGINT', listenersBefore)('SIGINT')
@@ -501,7 +511,7 @@ describe('account CLI handlers', () => {
     // Why: discovering a dead runtime after sign-in wastes a full OAuth round trip.
     callMock.mockRejectedValue(new Error('runtime not running'))
 
-    await expect(ACCOUNT_HANDLERS['account add'](context('codex'))).rejects.toThrow(
+    await expect(ACCOUNT_HANDLERS['account add'](context('claude'))).rejects.toThrow(
       'runtime not running'
     )
     expect(callMock).toHaveBeenCalledWith('status.get')
@@ -516,7 +526,7 @@ describe('account CLI handlers', () => {
       _meta: { runtimeId: 'test-runtime' }
     })
 
-    await expect(ACCOUNT_HANDLERS['account add'](context('codex'))).rejects.toThrow(
+    await expect(ACCOUNT_HANDLERS['account add'](context('claude'))).rejects.toThrow(
       'runtime is too old'
     )
     expect(callMock).toHaveBeenCalledOnce()
@@ -531,9 +541,9 @@ describe('account CLI handlers', () => {
       // silently would register the account on the wrong host.
       await expect(
         ACCOUNT_HANDLERS['account add']({
-          ...context('codex'),
+          ...context('claude'),
           flags: new Map<string, string | boolean>([
-            ['agent', 'codex'],
+            ['agent', 'claude'],
             [flag, 'homelab']
           ])
         })
@@ -576,13 +586,13 @@ describe('account CLI handlers', () => {
           ? Promise.resolve({
               id: 'test',
               ok: true,
-              result: { claude: accountState('c@e.com'), codex: accountState('x@e.com') },
+              result: { claude: accountState('c@e.com') },
               _meta: { runtimeId: 'test-runtime' }
             })
           : Promise.reject(new Error('registration rejected by runtime'))
     )
 
-    await expect(ACCOUNT_HANDLERS['account add'](context('codex'))).rejects.toThrow(
+    await expect(ACCOUNT_HANDLERS['account add'](context('claude'))).rejects.toThrow(
       'registration rejected by runtime'
     )
     expect(warnSpy).toHaveBeenCalledWith(
@@ -597,7 +607,9 @@ describe('account CLI handlers', () => {
       throw new Error('EBUSY: resource busy or locked')
     })
 
-    await expect(ACCOUNT_HANDLERS['account add'](context('codex', true))).rejects.toThrow('EBUSY')
+    await expect(ACCOUNT_HANDLERS['account add'](context('claude', true))).rejects.toThrow(
+      'Failed to clean up Claude login artifacts'
+    )
     expect(logSpy).not.toHaveBeenCalled()
   })
 
@@ -630,8 +642,7 @@ describe('account CLI handlers', () => {
           accounts: [{ id: 'claude-wsl', email: 'claude@example.com' }],
           activeAccountId: null,
           activeAccountIdsByRuntime: { host: null, wsl: { Ubuntu: 'claude-wsl' } }
-        },
-        codex: { accounts: [], activeAccountId: null }
+        }
       },
       _meta: { runtimeId: 'test-runtime' }
     })
@@ -648,8 +659,7 @@ describe('account CLI handlers', () => {
       id: 'test',
       ok: true,
       result: {
-        claude: { accounts: [], activeAccountId: null },
-        codex: { accounts: [], activeAccountId: null }
+        claude: { accounts: [], activeAccountId: null }
       },
       _meta: { runtimeId: 'test-runtime' }
     })

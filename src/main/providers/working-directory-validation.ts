@@ -14,7 +14,6 @@ const pendingWorkingDirectoryValidations = new Map<string, Promise<void>>()
 // libuv's 4 default fs threads the whole time, so a handful of distinct paths on
 // one unreachable server would starve every other async fs read in the daemon —
 // moving the head-of-line stall off the event loop and into the thread pool.
-// Matches the per-distro lane in rate-limits/auth-filesystem-operation.ts.
 const MAX_CONCURRENT_UNC_VALIDATIONS = 2
 
 type UncRouteLane = {

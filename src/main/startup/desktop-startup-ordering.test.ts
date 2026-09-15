@@ -230,39 +230,6 @@ describe('startup ordering', () => {
     )
   })
 
-  it('reconciles retained Codex homes after authoritative daemon inventory', () => {
-    const source = readFileSync(
-      join(process.cwd(), 'src/main/startup/main-process-pty-startup.ts'),
-      'utf8'
-    )
-    const startupStart = source.indexOf('export function startTerminalRuntimeStartupServices()')
-    expect(startupStart).toBeGreaterThanOrEqual(0)
-    const startup = source.slice(startupStart)
-    const daemonInitIndex = startup.indexOf('await initDaemonPtyProvider(signal')
-    const retainedPaneGateIndex = startup.indexOf(
-      'hasRecordedManagedHostCodexPane()',
-      daemonInitIndex
-    )
-    const inventoryIndex = startup.indexOf('await listLiveDaemonPtyIds()', daemonInitIndex)
-    const reconciliation = 'state.codexRuntimeHome?.reconcileLegacySharedHomeForRetainedPanes()'
-    const reconciliationIndex = startup.indexOf(reconciliation, inventoryIndex)
-    const hookReconciliationIndex = startup.indexOf(
-      'reconcileRetainedCodexHookHomes({',
-      inventoryIndex
-    )
-
-    expect(daemonInitIndex).toBeGreaterThanOrEqual(0)
-    expect(retainedPaneGateIndex).toBeGreaterThan(daemonInitIndex)
-    expect(inventoryIndex).toBeGreaterThan(daemonInitIndex)
-    expect(inventoryIndex).toBeGreaterThan(retainedPaneGateIndex)
-    expect(hookReconciliationIndex).toBeGreaterThan(inventoryIndex)
-    expect(hookReconciliationIndex).toBeLessThan(reconciliationIndex)
-    expect(reconciliationIndex).toBeGreaterThan(inventoryIndex)
-    // The call is intentionally kept after the authoritative inventory; anchoring on the state
-    // receiver avoids matching any prose that mentions the same operation.
-    expect(startup).toContain(reconciliation)
-  })
-
   it('exposes managed WSL reconciliation status to headless serve clients and diagnostics', () => {
     const serveSource = readFileSync(
       join(process.cwd(), 'src/main/startup/main-process-serve.ts'),
