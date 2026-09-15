@@ -44,8 +44,8 @@ vi.mock('@/hooks/useSkillFreshness', () => ({
   refreshSkillFreshness: mocks.freshnessRefresh
 }))
 
-vi.mock('../onboarding/OnboardingInlineCommandTerminal', () => ({
-  OnboardingInlineCommandTerminal: (props: {
+vi.mock('../inline-command-terminal/InlineCommandTerminal', () => ({
+  InlineCommandTerminal: (props: {
     command: string
     description: string
     shellOverride?: string

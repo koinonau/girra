@@ -11,7 +11,7 @@ import {
 } from '@stablyai/playwright-test'
 
 import { expect, forwardElectronProcessLogs, test } from './helpers/orca-app'
-import { getE2ECompletedOnboardingProfile } from './helpers/e2e-completed-onboarding-profile'
+import { getE2ELegacyBuildExistingUserProfile } from './helpers/e2e-existing-user-profile'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from './helpers/electron-process-shutdown'
 import {
   assertElectronResolvedIsolatedHome,
@@ -147,7 +147,7 @@ async function launchPackagedPairedClient(args: {
   try {
     writeFileSync(
       path.join(userDataDir, 'orca-data.json'),
-      `${JSON.stringify(getE2ECompletedOnboardingProfile(), null, 2)}\n`
+      `${JSON.stringify(getE2ELegacyBuildExistingUserProfile(), null, 2)}\n`
     )
     const { ELECTRON_RUN_AS_NODE: _unused, ...cleanEnv } = process.env
     void _unused

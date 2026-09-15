@@ -216,7 +216,7 @@ async function launchDesktopMode(
   win.once('show', () => {
     // Why: store can be null if init failed earlier; bail rather than throw inside an Electron event listener.
     const store = state.store
-    if (store && store.getOnboarding().closedAt !== null) {
+    if (store) {
       triggerStartupNotificationRegistration(store)
     }
   })

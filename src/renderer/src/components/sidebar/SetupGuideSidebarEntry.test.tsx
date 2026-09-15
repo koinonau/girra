@@ -5,7 +5,7 @@ import type { ReactNode } from 'react'
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { FeatureWallSetupProgress } from '../feature-wall/feature-wall-setup-progress'
+import type { SetupGuideProgress } from '../setup-guide/setup-guide-progress'
 import { SetupGuideSidebarEntry } from './SetupGuideSidebarEntry'
 
 const mocks = vi.hoisted(() => ({
@@ -44,7 +44,7 @@ vi.mock('../setup-guide/SetupGuideProgressRing', () => ({
   SetupGuideProgressRing: () => <span data-testid="setup-progress-ring" />
 }))
 
-function makeProgress(overrides: Partial<FeatureWallSetupProgress> = {}): FeatureWallSetupProgress {
+function makeProgress(overrides: Partial<SetupGuideProgress> = {}): SetupGuideProgress {
   return {
     ready: true,
     stepDone: {
@@ -63,9 +63,7 @@ function makeProgress(overrides: Partial<FeatureWallSetupProgress> = {}): Featur
   }
 }
 
-function makeAllDoneProgress(
-  overrides: Partial<FeatureWallSetupProgress> = {}
-): FeatureWallSetupProgress {
+function makeAllDoneProgress(overrides: Partial<SetupGuideProgress> = {}): SetupGuideProgress {
   return makeProgress({
     stepDone: {
       'default-agent': true,
@@ -83,7 +81,7 @@ function makeAllDoneProgress(
   })
 }
 
-function makeOnlyBrowserIncompleteProgress(): FeatureWallSetupProgress {
+function makeOnlyBrowserIncompleteProgress(): SetupGuideProgress {
   return makeAllDoneProgress({
     stepDone: {
       ...makeAllDoneProgress().stepDone,

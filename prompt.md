@@ -4,9 +4,9 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 3, Phase 4a and the ADRs are merged; Phase 4b is in review.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4 and the ADRs are merged; Phase 6 is in review.
 
-1. **Phase 5, Codex.** Unblocked once 4b merges. The largest phase: map it with read-only subagents and split it into pull requests, as Phases 3 and 4 were. Codex also appears in the launch roster, trust presets, hook targets, rate limits (`codex-*`, reset credits) and AI Vault.
+1. **Phase 5a, Codex accounts, managed homes, reset credits, rate limits and usage.** Unblocked once Phase 6 merges. A read-only map from 2026-09-15 is summarised in the build plan's Phase 5: about 211 files deleted and 115 edited, split into three areas, with four small stand-ins where out-of-scope Codex code uses the runtime home. Keep the wire shapes it lists (`AccountsSnapshot.codex` empty, `RateLimitState` Codex fields null, the `codex` status bar id and `codex-account-switching` interaction id accepted). Remap before starting, since Phase 6 moved files.
 2. **Launch roster** and **MiniMax usage.** Need the user; see `handover.md`.
 3. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 4. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.

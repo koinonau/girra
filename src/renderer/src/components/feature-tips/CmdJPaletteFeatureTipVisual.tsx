@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useState, type JSX } from 'react'
 import { Plus, Search } from 'lucide-react'
-import { usePrefersReducedMotion } from '@/components/feature-wall/feature-wall-modal-helpers'
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { formatShortcutKeyComboDetails, useShortcutKeyDetails } from '@/hooks/useShortcutLabel'
 import { translate } from '@/i18n/i18n'
 

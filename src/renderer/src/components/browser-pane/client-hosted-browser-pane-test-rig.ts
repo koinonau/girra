@@ -65,10 +65,7 @@ export function installClientHostedPaneApi(overrides?: {
         onZoomBrowserPage: inert,
         getZoomLevel: () => 0,
         writeClipboardText: vi.fn(async () => {}),
-        recordFeatureInteraction: vi.fn(async () => ({
-          featureInteractions: {},
-          contextualToursSeenIds: []
-        })),
+        recordFeatureInteraction: vi.fn(async () => ({ featureInteractions: {} })),
         set: vi.fn(async () => ({})),
         ...overrides?.ui
       },

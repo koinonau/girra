@@ -33,7 +33,7 @@ import {
   PROTECTED_SECRET_SLOT,
   type ProtectedSecretPersistence
 } from '../../protected-secret-persistence'
-import { normalizeNotificationSettings } from './onboarding-normalization'
+import { normalizeNotificationSettings } from './notification-normalization'
 import { retireLegacyInstructionsForClearedTextActionRecipes } from './source-control-settings'
 import {
   buildWorkspaceDirHistoryForUpdate,

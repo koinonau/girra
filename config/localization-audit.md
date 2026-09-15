@@ -126,7 +126,7 @@ Recommended migration order:
 3. App shell, sidebars, titlebar, status bar, command surfaces, and global
    dialogs/toasts.
 4. Task pages, source control, hosted review, and provider-specific UI.
-5. Terminal chrome, onboarding, feature tips, mobile, browser, and remaining
+5. Terminal chrome, setup guide, feature tips, mobile, browser, and remaining
    secondary surfaces.
 
 ## Proof Strategy

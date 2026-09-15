@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 3, the ADRs and the cross-version harness deletion are merged. Phase 4a (agent hook integrations) is merged, and 4b (Gemini, Grok, Kimi and Antigravity usage) is in its pull request.
+As of 2026-09-15: Phases 0 to 4, the ADRs and the cross-version harness deletion are merged. Phase 6 (feature wall, contextual tours and onboarding) is in its pull request, taken before Phase 5 because Phase 5's scope waits on the launch roster decision.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -18,7 +18,8 @@ As of 2026-09-15: Phases 0 to 3, the ADRs and the cross-version harness deletion
 - Phase 3b merged in [#10](https://github.com/koinonau/girra/pull/10): crash reporting. 108 files deleted, 23,966 lines removed.
 - Phase 3c merged in [#11](https://github.com/koinonau/girra/pull/11): telemetry and the hang watchdog that only fed it. 135 files deleted, 23,837 lines removed.
 - Phase 4a merged in [#12](https://github.com/koinonau/girra/pull/12): the managed hook integrations for 14 agent CLIs and Cursor's trust bypass. 94 files deleted, 20,455 lines removed.
-- Phase 4b deletes Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane: 30 files deleted, 6,923 lines removed and 246 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 4b merged in [#13](https://github.com/koinonau/girra/pull/13): Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane. 30 files deleted, 6,923 lines removed.
+- Phase 6 deletes the feature wall, contextual tours and first-run onboarding, and moves the setup guide checklist and feature tip visuals out: 189 files deleted, 38 renamed, 27,662 lines removed and 1,091 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -151,6 +152,15 @@ After Phase 4b, on 2026-09-15:
 | `pnpm lint` | 0 | 50 s | 114 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 18 s | Main 5,350 modules, renderer 12,161 |
 
+After Phase 6, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 2 s | No errors |
+| `pnpm test` | 1 | 685 s | Files: 5 failed, 8,057 passed, 61 skipped of 8,123. Tests: 5 failed, 75,326 passed, 355 skipped of 75,686. Only the known failures below |
+| `pnpm lint` | 0 | 48 s | 114 reliability gates; ratchets unchanged |
+| `pnpm build` | 0 | 19 s | Main 5,349 modules, renderer 12,054 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -227,6 +237,10 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: delete the Antigravity usage mirror with the Gemini fetcher. It only republished the Gemini quota read; the tree has no separate entry for it.
 - 2026-09-15: keep MiniMax usage fetching for now, although the tree unticks it, because the selection keeps MiniMax credentials and they serve only that fetch. See the open decision.
 - 2026-09-15: the `ui.set` schema keeps the removed status bar ids (`gemini`, `antigravity`, `kimi`, `grok`) and the three `_*StatusBarDefaultAdded` flags as deprecated, because the schema is strict and would reject an older client's whole update. The TypeScript types are narrowed, and hydration drops the stale ids.
+- 2026-09-15: the build plan had no phase for the feature wall, contextual tours and onboarding, which the tree unticks. Phase 6 took them with the relocation.
+- 2026-09-15: drop `UsagePage.tsx` and the other tree-kept cards inside the feature wall (usage accounts, keep awake, AI commit and PR, browser use skill, orchestration setup). `UsagePage` is a looping animation with hardcoded numbers, not a usage dashboard, and each card was mounted only by the deleted feature wall body and duplicates a settings pane. The real usage UI is the stats panes and status bar. Relocated instead: the setup guide checklist, the default agent and notification setup steps, the inline command terminal, agent feature setup, and the feature tips orchestration visual.
+- 2026-09-15: without onboarding, a fresh profile lands on Landing, the macOS notification prompt is requested at every startup (it guards itself), and a session that starts with no projects shows no app-open feature tip. Upgraded profiles keep their dismissed setup guide entry through a one-shot read of the retired `onboarding` block, which stays on disk.
+- 2026-09-15: `ui.set` still accepts `contextualToursSeenIds` and `contextualToursAutoEligible`, stripped before saving, because its schema is strict. Feature interactions the tours used to record are recorded by `useFeatureInteractionWhileVisible`.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -283,5 +297,6 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-14 | Words in file names mislead: most files named `artifact` are build, terminal or test artifacts, not the published artifacts feature | None; a subagent traced imports first | Decide from imports, never from names |
 | 2026-09-14 | Editors and shell prompts poll git, so a commit or `git rm` can hit `.git/index.lock` | Two failed commits | Retry once; the lock clears within a second |
 | 2026-09-14 | A subagent reported `pnpm tc` clean while one test file still failed to compile | One typecheck error found at verification | Rerun `pnpm tc` yourself before committing a subagent's work |
+| 2026-09-15 | The build plan omitted feature-tree drops that live outside its deletion table (feature wall, tours, onboarding) and misread `UsagePage.tsx` as a real dashboard | Caught only when Phase 6 was mapped | Diff the tree's unticked entries against the plan's phases before calling the plan complete |
 | 2026-09-15 | A subagent ran `pnpm format` across the repository and reformatted files other agents and the lead were editing | Eight format-only files restored; mixed edits left to re-read | Tell subagents to format only the files they changed |
 | 2026-09-14 | Feature share and line share differ: 103 of 535 features is 19%, but their code is 12% of source lines | "A fifth of the codebase" in the plan and an ADR draft | Measure lines before quoting a code proportion |

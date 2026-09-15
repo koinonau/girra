@@ -1,6 +1,5 @@
 import type { GlobalSettings } from './global-settings-types'
 import type { NotificationSettings } from './notification-settings-types'
-import type { OnboardingChecklistState, OnboardingState } from './onboarding-state-types'
 import type { RepoHookSettings } from './orca-yaml-hook-types'
 import type { PersistedState } from './persisted-state-types'
 import type { PersistedUIState } from './persisted-ui-state-types'
@@ -38,10 +37,6 @@ export const DEFAULT_TERMINAL_INACTIVE_PANE_OPACITY = 0.9
 export function normalizeAgentActivityDisplayMode(value: unknown): AgentActivityDisplayMode {
   return value === 'full' || value === 'compact' ? value : DEFAULT_AGENT_ACTIVITY_DISPLAY_MODE
 }
-
-// Why: onboarding wizard's last step index, centralized so backfill, clamps, and UI agree on the bound.
-export const ONBOARDING_FINAL_STEP = 5
-export const ONBOARDING_FLOW_VERSION = 4
 
 export const ORCA_BROWSER_PARTITION = 'persist:orca-browser'
 // Why: inert blank-tab URL shared by main/renderer so the attach policy can allow just this one data URL and reject others.
@@ -126,29 +121,6 @@ export function getDefaultNotificationSettings(): NotificationSettings {
   }
 }
 
-export function getDefaultOnboardingState(): OnboardingState {
-  return {
-    flowVersion: ONBOARDING_FLOW_VERSION,
-    closedAt: null,
-    outcome: null,
-    lastCompletedStep: -1,
-    checklist: {
-      addedRepo: false,
-      choseAgent: false,
-      ranFirstAgent: false,
-      ranSecondAgentOnSameTask: false,
-      triedCmdJ: false,
-      shapedSidebar: false,
-      reviewedDiff: false,
-      openedPr: false,
-      addedFolder: false,
-      openedFile: false,
-      ranAgentOnFile: false,
-      dismissed: false
-    } satisfies OnboardingChecklistState
-  }
-}
-
 /** The stock worktree root. Exported so callers can tell an untouched default apart
  *  from a workspace directory the user actually chose. */
 export function getDefaultWorkspaceDir(homeDir: string): string {
@@ -213,7 +185,6 @@ export function getDefaultPersistedState(homedir: string): PersistedState {
     legacyPaneKeyAliasEntries: [],
     automations: [],
     automationRuns: [],
-    onboarding: getDefaultOnboardingState(),
     codexResetCreditAttemptLedger: structuredClone(EMPTY_CODEX_RESET_CREDIT_ATTEMPT_LEDGER)
   }
 }
@@ -295,7 +266,6 @@ export function getDefaultUIState(): PersistedUIState {
     workspaceCleanup: { dismissals: {} },
     featureTipsSeenIds: [],
     featureInteractions: {},
-    contextualToursSeenIds: [],
     browserDefaultZoomLevel: DEFAULT_BROWSER_PAGE_ZOOM_LEVEL
   }
 }

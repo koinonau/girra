@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useLayoutEffect, useRef, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useAppStore } from '@/store'
+import { useFeatureInteractionWhileVisible } from '@/hooks/use-feature-interaction-while-visible'
 import type {
   BrowserLoadError,
   BrowserPage as BrowserPageState
@@ -19,7 +20,6 @@ import { attachBrowserClientPageToViewport } from './browser-client-page-rendere
 import { useBrowserClientHostedDownloadNotices } from './browser-client-hosted-download-notices'
 import { useBrowserClientHostedPopupNotices } from './browser-client-hosted-popup-notices'
 import { useBrowserClientHostedPermissionNotices } from './browser-client-hosted-permission-notices'
-import { useClientHostedBrowserIntroTour } from './use-client-hosted-browser-intro-tour'
 import { ClientHostedBrowserUnavailableNotice } from './client-hosted-browser-unavailable-notice'
 import { watchBrowserClientPageGuestLoss } from './host-guest/browser-client-page-guest-loss'
 import { useRestoredClientHostedRecoveryWindow } from './restored-client-hosted-recovery-window'
@@ -143,9 +143,9 @@ export function ClientHostedBrowserPagePane({
   useBrowserClientHostedDownloadNotices(browserTab.id)
   useBrowserClientHostedPopupNotices(browserTab.id)
   useBrowserClientHostedPermissionNotices(browserTab.id)
-  // Why: the tour points at controls that cannot work yet, and recording the interaction is a
-  // one-way write that would burn the tour on a pane the user has not really seen.
-  useClientHostedBrowserIntroTour(isActive && !attachmentError && placement !== null)
+  // Why: a staged or failed pane has not really been seen, so it must not count as an interaction.
+  const pageShown = isActive && !attachmentError && placement !== null
+  useFeatureInteractionWhileVisible('client-hosted-browser', pageShown)
   useBrowserPageFindShortcuts({
     browserTabId: browserTab.id,
     workspaceId,

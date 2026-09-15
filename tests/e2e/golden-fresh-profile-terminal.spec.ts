@@ -13,7 +13,7 @@ import {
   waitForActiveTerminalManager
 } from './helpers/terminal'
 
-test.use({ dismissOnboarding: false, seedTestRepo: false })
+test.use({ seedExistingUserProfile: false, seedTestRepo: false })
 
 async function createGitRepo(): Promise<string> {
   const root = realpathSync.native(await mkdtemp(path.join(os.tmpdir(), 'orca-e2e-golden-fresh-')))
@@ -41,14 +41,8 @@ async function stubFolderPicker(
   }, selectedPath)
 }
 
-async function selectCodexAndSkipToProject(page: Page): Promise<void> {
-  const codexButton = page.getByRole('button', { name: /^Codex\s/ }).first()
-  if (!(await codexButton.isVisible())) {
-    await page.getByText(/Show \d+ more agents/).click()
-  }
-  await codexButton.click()
-  const footer = page.locator('footer').filter({ has: page.getByRole('button', { name: /Skip/i }) })
-  await footer.getByRole('button', { name: /^Skip to project setup$/i }).click()
+async function openAddProjectFromLanding(page: Page): Promise<void> {
+  await page.locator('button', { hasText: /^Add project$/ }).click()
   await expect(page.getByRole('dialog', { name: /Add a project/i })).toBeVisible()
 }
 
@@ -59,9 +53,9 @@ test('fresh profile opens a live project terminal @golden', async ({
 }) => {
   await waitForSessionReady(orcaPage)
   await expect(orcaPage.locator('#root')).toBeVisible()
-  await expect(orcaPage.getByRole('heading', { name: /Pick your default agent/i })).toBeVisible()
+  await expect(orcaPage.getByText('Add a project to get started.')).toBeVisible()
 
-  await selectCodexAndSkipToProject(orcaPage)
+  await openAddProjectFromLanding(orcaPage)
   const repoPath = await createGitRepo()
   registerPostElectronShutdownCleanup(async () =>
     rmSync(path.dirname(repoPath), { recursive: true, force: true })

@@ -13,7 +13,6 @@ import {
   normalizeVisibleExecutionHostIds
 } from '../../../../../shared/execution-host'
 import { normalizeFeatureInteractions } from '../../../../../shared/feature-interactions'
-import { normalizeContextualTourIds } from '../../../../../shared/contextual-tours'
 import { normalizeFeatureTipIds } from '../../../../../shared/feature-tips'
 import {
   DEFAULT_HIDE_SLEEPING_WORKSPACES,
@@ -226,11 +225,6 @@ export function createUiHydrationActions(set: UISliceSet, _get: UISliceGet): Par
           taskResumeState: sanitizeTaskResumeState(ui.taskResumeState),
           featureTipsSeenIds: normalizeFeatureTipIds(ui.featureTipsSeenIds),
           featureInteractions: normalizeFeatureInteractions(ui.featureInteractions),
-          contextualToursSeenIds: normalizeContextualTourIds(ui.contextualToursSeenIds),
-          contextualToursAutoEligible:
-            typeof ui.contextualToursAutoEligible === 'boolean'
-              ? ui.contextualToursAutoEligible
-              : null,
           trustedOrcaHooks: hydrateTrustedOrcaHooks(ui.trustedOrcaHooks, validRepoIds),
           setupScriptPromptDismissedRepoIds:
             validRepoHostIdentities.size === 0

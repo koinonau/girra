@@ -12,7 +12,6 @@ import { useAppStore } from '../store'
 import { useLazyModalMounts } from './use-lazy-modal-mounts'
 import { selectAppRootSurfacePetEnabled } from './app-root-surface-settings'
 import type { FloatingWorkspacePanelState } from './use-floating-workspace-panel'
-import type { OnboardingGate } from './use-onboarding-and-feature-tips'
 
 const QuickOpen = lazy(() => import('../components/QuickOpen'))
 const WorktreeJumpPalette = lazy(() => import('../components/WorktreeJumpPalette'))
@@ -23,7 +22,6 @@ const StatusBar = lazy(() =>
   import('../components/status-bar/StatusBar').then((module) => ({ default: module.StatusBar }))
 )
 const SetupGuideModal = lazy(() => import('../components/setup-guide/SetupGuideModal'))
-const FeatureWallModal = lazy(() => import('../components/feature-wall/FeatureWallModal'))
 const FeatureTipsModal = lazy(() => import('../components/feature-tips/FeatureTipsModal'))
 const AddRepoDialog = lazy(() => import('../components/sidebar/AddRepoDialog'))
 const NonGitFolderDialog = lazy(() => import('../components/sidebar/NonGitFolderDialog'))
@@ -40,11 +38,6 @@ const SshPassphraseDialog = lazy(() =>
     default: module.SshPassphraseDialog
   }))
 )
-const ContextualTourOverlay = lazy(() =>
-  import('../components/contextual-tours/ContextualTourOverlay').then((module) => ({
-    default: module.ContextualTourOverlay
-  }))
-)
 const FloatingTerminalPanel = lazy(() =>
   import('../components/floating-terminal/FloatingTerminalPanel').then((module) => ({
     default: module.FloatingTerminalPanel
@@ -52,8 +45,6 @@ const FloatingTerminalPanel = lazy(() =>
 )
 // Why: lazy so the WebP asset + overlay module aren't fetched unless the experimental flag is on.
 const PetOverlay = lazy(() => import('../components/pet/PetOverlay'))
-// Why: lazy so onboarding's step modules + assets aren't fetched for users past first-launch.
-const OnboardingFlow = lazy(() => import('../components/onboarding/OnboardingFlow'))
 
 type BoundaryProps = {
   boundaryId: string
@@ -85,9 +76,8 @@ function OverlayBoundary({ children, ...props }: BoundaryProps): React.JSX.Eleme
  */
 export function AppRootSurfaces(props: {
   floatingWorkspace: FloatingWorkspacePanelState
-  onboardingGate: OnboardingGate
 }): React.JSX.Element {
-  const { floatingWorkspace, onboardingGate } = props
+  const { floatingWorkspace } = props
   const { mountedLazyModalIds, shouldMountAddRepoDialog } = useLazyModalMounts()
   const activeView = useAppStore((s) => s.activeView)
   const activeModal = useAppStore((s) => s.activeModal)
@@ -97,7 +87,6 @@ export function AppRootSurfaces(props: {
   const statusBarVisible = useAppStore((s) => s.statusBarVisible)
   const persistedUIReady = useAppStore((s) => s.persistedUIReady)
   const petVisible = useAppStore((s) => s.petVisible)
-  const activeContextualTourId = useAppStore((s) => s.activeContextualTourId)
   const hasSshCredentialRequest = useAppStore((s) => s.sshCredentialQueue.length > 0)
 
   const renderPetOverlay = shouldRenderPetOverlay({ persistedUIReady, petEnabled, petVisible })
@@ -118,7 +107,6 @@ export function AppRootSurfaces(props: {
             <FloatingTerminalPanel
               open={floatingWorkspace.open}
               onOpenChange={floatingWorkspace.setOpenWithFocus}
-              tourInteractionSnapshot={floatingWorkspace.tourInteractionSnapshotRef.current}
             />
           </OverlayBoundary>
         </Suspense>
@@ -201,22 +189,12 @@ export function AppRootSurfaces(props: {
             <SetupGuideModal />
           </ModalBoundary>
         ) : null}
-        {mountedLazyModalIds.has('feature-wall') ? (
-          <ModalBoundary boundaryId="modal.feature-wall" resetKey={activeModal === 'feature-wall'}>
-            <FeatureWallModal />
-          </ModalBoundary>
-        ) : null}
         {mountedLazyModalIds.has('feature-tips') ? (
           <ModalBoundary boundaryId="modal.feature-tips" resetKey={activeModal === 'feature-tips'}>
             <FeatureTipsModal />
           </ModalBoundary>
         ) : null}
       </Suspense>
-      {activeContextualTourId !== null ? (
-        <Suspense fallback={null}>
-          <ContextualTourOverlay />
-        </Suspense>
-      ) : null}
       {/* Why: mount only after UI hydration, else a hidden pet flashes while the store still holds default visibility. */}
       {renderPetOverlay ? (
         <Suspense fallback={null}>
@@ -250,23 +228,6 @@ export function AppRootSurfaces(props: {
       <ModalBoundary boundaryId="modal.markdown-template-picker" resetKey={activeModal}>
         <MarkdownTemplatePicker />
       </ModalBoundary>
-      {onboardingGate.onboarding && onboardingGate.shouldRender ? (
-        <Suspense fallback={null}>
-          <RecoverableRenderErrorBoundary
-            boundaryId="modal.onboarding"
-            title={translate('auto.App.f02d37278a', 'Onboarding hit an error.')}
-            description={translate(
-              'auto.App.221a95ba38',
-              'Retry onboarding or close it and continue in the app.'
-            )}
-          >
-            <OnboardingFlow
-              onboarding={onboardingGate.onboarding}
-              onOnboardingChange={onboardingGate.setOnboarding}
-            />
-          </RecoverableRenderErrorBoundary>
-        </Suspense>
-      ) : null}
       <OverlayBoundary boundaryId="overlay.recent-tab-switcher" resetKey={activeView}>
         <RecentTabSwitcher />
       </OverlayBoundary>

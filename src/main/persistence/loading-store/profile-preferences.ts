@@ -1,7 +1,5 @@
 import type { GlobalSettings } from '../../../shared/global-settings-types'
-import type { OnboardingChecklistState } from '../../../shared/onboarding-state-types'
 import type { PersistedState } from '../../../shared/persisted-state-types'
-import { getDefaultOnboardingState } from '../../../shared/constants'
 import type { FeatureInteractionId } from '../../../shared/feature-interactions'
 import {
   updateSettings as updateSettingsOperation,
@@ -87,36 +85,6 @@ export class ProfilePreferences {
 
   recordFeatureInteraction(id: FeatureInteractionId): PersistedState['ui'] {
     return recordFeatureInteractionOperation(getFeatureInteractionOperations(this), id)
-  }
-
-  getOnboarding(): PersistedState['onboarding'] {
-    const defaults = getDefaultOnboardingState()
-    return {
-      ...defaults,
-      ...this[profilePreferencesContext].runtime.state.onboarding,
-      checklist: {
-        ...defaults.checklist,
-        ...this[profilePreferencesContext].runtime.state.onboarding?.checklist
-      }
-    }
-  }
-
-  updateOnboarding(
-    updates: Partial<Omit<PersistedState['onboarding'], 'checklist'>> & {
-      checklist?: Partial<OnboardingChecklistState>
-    }
-  ): PersistedState['onboarding'] {
-    const current = this.getOnboarding()
-    this[profilePreferencesContext].runtime.state.onboarding = {
-      ...current,
-      ...updates,
-      checklist: {
-        ...current.checklist,
-        ...updates.checklist
-      }
-    }
-    scheduleSave(this[profilePreferencesContext].scheduling)
-    return this.getOnboarding()
   }
 
   getGitHubCache(): PersistedState['githubCache'] {

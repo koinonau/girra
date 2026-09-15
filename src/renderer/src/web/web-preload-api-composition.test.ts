@@ -28,7 +28,6 @@ describe('web preload API composition', () => {
       'ui',
       'diagnostics',
       'session',
-      'onboarding',
       'cache',
       'runtime',
       'nativeChat',

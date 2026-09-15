@@ -39,7 +39,6 @@ function buildMenuOptions() {
   return {
     onOpenSettings: vi.fn(),
     onOpenSetupGuide: vi.fn(),
-    onOpenFeatureTour: vi.fn(),
     onBeforeReload: vi.fn(),
     onZoomIn: vi.fn(),
     onZoomOut: vi.fn(),
@@ -320,9 +319,8 @@ describe('registerAppMenu', () => {
     )
 
     const helpLabels = getSubmenu(template, 'Help').map((item) => item.label)
-    expect(helpLabels).toEqual(
-      expect.arrayContaining(['Getting Started with Orca', 'Explore Orca'])
-    )
+    expect(helpLabels).toEqual(expect.arrayContaining(['Getting Started with Orca']))
+    expect(helpLabels).not.toContain('Explore Orca')
   })
 
   it.runIf(isMac)('keeps the macOS app-named menu with Settings and quit roles', () => {
@@ -336,7 +334,7 @@ describe('registerAppMenu', () => {
     // the system app menu. Without global Export, there is no File item left.
     expect(template.find((item) => item.label === 'File')).toBeUndefined()
     const helpLabels = getSubmenu(template, 'Help').map((item) => item.label)
-    expect(helpLabels).toEqual(['Explore Orca', 'Getting Started with Orca'])
+    expect(helpLabels).toEqual(['Getting Started with Orca'])
   })
 
   it('routes Getting Started with Orca through its callback', () => {
@@ -353,22 +351,6 @@ describe('registerAppMenu', () => {
 
     expect(options.onOpenSetupGuide).toHaveBeenCalledTimes(1)
     expect(options.onOpenSetupGuide).toHaveBeenCalledWith(targetWindow)
-  })
-
-  it('routes Feature tour through its callback', () => {
-    const options = buildMenuOptions()
-    registerAppMenu(options)
-
-    const featureTourItem = getSubmenu(getTemplate(), 'Help').find(
-      (entry) => entry.label === 'Explore Orca'
-    )
-    expect(featureTourItem?.accelerator).toBeUndefined()
-
-    const targetWindow = {} as Electron.BaseWindow
-    featureTourItem?.click?.({} as never, targetWindow, {} as Electron.KeyboardEvent)
-
-    expect(options.onOpenFeatureTour).toHaveBeenCalledTimes(1)
-    expect(options.onOpenFeatureTour).toHaveBeenCalledWith(targetWindow)
   })
 
   it('exposes an Appearance submenu under View with checkbox items reflecting state', () => {

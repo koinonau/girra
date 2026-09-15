@@ -33,7 +33,7 @@ export function normalizeLoadedProfileState(
   markNeedsSave: () => void
 ): PersistedState {
   const { defaults, migratedExternalVisibility, osc52ClipboardNoticePending } = terminal
-  const { normalizedOnboarding, normalizedProjectGroups, loadedCompactWorktreeCards } = profile
+  const { normalizedProjectGroups, loadedCompactWorktreeCards } = profile
   const projectCatalog = normalizeLoadedProjectCatalog(parsed, markNeedsSave)
   // Ordered: the host partitions drop the global fields this slice already owns.
   const workspaceSession = normalizeLoadedLocalSession(parsed, defaults, markNeedsSave)
@@ -69,7 +69,6 @@ export function normalizeLoadedProfileState(
     ui: normalizeLoadedUiState(
       parsed,
       defaults,
-      normalizedOnboarding,
       loadedCompactWorktreeCards,
       osc52ClipboardNoticePending,
       markNeedsSave
@@ -101,7 +100,6 @@ export function normalizeLoadedProfileState(
     ),
     legacyPaneKeyAliasEntries: normalizeLegacyPaneKeyAliasEntries(parsed.legacyPaneKeyAliasEntries),
     automations: Array.isArray(parsed.automations) ? parsed.automations : [],
-    automationRuns: normalizeLoadedAutomationRuns(parsed, markNeedsSave),
-    onboarding: normalizedOnboarding
+    automationRuns: normalizeLoadedAutomationRuns(parsed, markNeedsSave)
   }
 }

@@ -307,7 +307,7 @@ describe('repo slice runtime folder fallback', () => {
     })
     const store = createTestStore()
     // fetchWorktrees is stubbed so the post-add activation chain (which needs
-    // worktrees/onboarding APIs absent from this stub) stays out of scope.
+    // worktree APIs absent from this stub) stays out of scope.
     store.setState({ fetchWorktrees: vi.fn().mockResolvedValue(undefined) as never })
 
     await expect(store.getState().addRepoPath('/local/non-git', 'git')).resolves.toBeNull()

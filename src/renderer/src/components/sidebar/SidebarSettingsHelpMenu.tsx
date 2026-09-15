@@ -7,7 +7,6 @@ import {
   Keyboard,
   MessageSquareText,
   RotateCw,
-  School,
   ScrollText,
   Settings
 } from 'lucide-react'
@@ -26,7 +25,6 @@ import {
 import { useMountedRef } from '@/hooks/useMountedRef'
 import { useShortcutKeyDetails } from '@/hooks/useShortcutLabel'
 import { ShortcutKeyCombo } from '@/components/ShortcutKeyCombo'
-import { showOnboardingFromRenderer } from '../onboarding/show-onboarding-event'
 import { SetupGuideProgressRing } from '../setup-guide/SetupGuideProgressRing'
 import { useSetupGuideProgress } from '../setup-guide/use-setup-guide-progress'
 import { lazyWithRetry } from '@/lib/lazy-with-retry'
@@ -100,7 +98,6 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
   // Why sticky: the dialog animates itself closed off `open`, so unmounting on close cuts that short.
   const [feedbackDialogMounted, setFeedbackDialogMounted] = useState(false)
   const [isRestartingOrca, setIsRestartingOrca] = useState(false)
-  const lastShowOnboardingAtRef = React.useRef(0)
   const mountedRef = useMountedRef()
 
   const showMilestones =
@@ -118,15 +115,6 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
   const handleOpenFeedback = (): void => {
     setFeedbackDialogMounted(true)
     setFeedbackOpen(true)
-  }
-
-  const handleShowOnboarding = (): void => {
-    const now = Date.now()
-    if (now - lastShowOnboardingAtRef.current < 500) {
-      return
-    }
-    lastShowOnboardingAtRef.current = now
-    void showOnboardingFromRenderer()
   }
 
   const handleRestartOrca = (): void => {
@@ -252,17 +240,6 @@ export function SidebarSettingsHelpMenu(): React.JSX.Element {
                 />
               </DropdownMenuItem>
             ) : null}
-            <DropdownMenuItem
-              className="whitespace-nowrap"
-              onClick={handleShowOnboarding}
-              onSelect={handleShowOnboarding}
-            >
-              <School className="size-3.5" />
-              {translate(
-                'auto.components.sidebar.SidebarSettingsHelpMenu.b7e4d2a19c',
-                'Onboarding'
-              )}
-            </DropdownMenuItem>
             <ExternalMenuItem
               label={translate(
                 'auto.components.sidebar.SidebarSettingsHelpMenu.cdc87f897e',

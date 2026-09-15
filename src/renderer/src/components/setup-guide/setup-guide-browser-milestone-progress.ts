@@ -1,15 +1,12 @@
 import { useEffect, useMemo } from 'react'
 import { useAppStore } from '@/store'
-import {
-  FEATURE_WALL_SETUP_STEPS,
-  type FeatureWallSetupStepId
-} from '../../../../shared/feature-wall-setup-steps'
-import type { FeatureWallSetupProgress } from '../feature-wall/feature-wall-setup-progress'
+import { SETUP_GUIDE_STEPS, type SetupGuideStepId } from '../../../../shared/setup-guide-steps'
+import type { SetupGuideProgress } from './setup-guide-progress'
 
 export function useSetupGuideBrowserMilestoneProgress(
-  rawProgress: FeatureWallSetupProgress,
+  rawProgress: SetupGuideProgress,
   historicalSplitTerminalDone: boolean
-): FeatureWallSetupProgress {
+): SetupGuideProgress {
   const setupGuideSidebarDismissed = useAppStore((s) => s.setupGuideSidebarDismissed)
   const browserMilestoneMigrated = useAppStore((s) => s.setupGuideBrowserMilestoneMigrated)
   const browserMilestoneLegacyComplete = useAppStore(
@@ -45,7 +42,7 @@ export function useSetupGuideBrowserMilestoneProgress(
 }
 
 export function shouldMarkBrowserMilestoneLegacyComplete(input: {
-  stepDone: Partial<Record<FeatureWallSetupStepId, boolean>>
+  stepDone: Partial<Record<SetupGuideStepId, boolean>>
   historicalSplitTerminalDone: boolean
   setupGuideSidebarDismissed: boolean
 }): boolean {
@@ -56,26 +53,27 @@ export function shouldMarkBrowserMilestoneLegacyComplete(input: {
   // included the now-removed split-terminal milestone.
   return (
     input.historicalSplitTerminalDone &&
-    FEATURE_WALL_SETUP_STEPS.every((step) => step.id === 'browser' || input.stepDone[step.id])
+    SETUP_GUIDE_STEPS.every((step) => step.id === 'browser' || input.stepDone[step.id])
   )
 }
 
 export function getSetupGuideBrowserMilestoneAwareProgress(
-  progress: FeatureWallSetupProgress,
+  progress: SetupGuideProgress,
   browserMilestoneLegacyComplete: boolean
-): FeatureWallSetupProgress {
+): SetupGuideProgress {
   if (!browserMilestoneLegacyComplete) {
     return progress
   }
-  const stepDone = Object.fromEntries(
-    FEATURE_WALL_SETUP_STEPS.map((step) => [step.id, true])
-  ) as Record<FeatureWallSetupStepId, boolean>
+  const stepDone = Object.fromEntries(SETUP_GUIDE_STEPS.map((step) => [step.id, true])) as Record<
+    SetupGuideStepId,
+    boolean
+  >
   // Why: profiles that finished or dismissed the pre-browser checklist keep
   // that prior checklist contract after the browser milestone is introduced.
   return {
     ...progress,
     stepDone,
-    coreDoneCount: FEATURE_WALL_SETUP_STEPS.length,
-    coreTotal: FEATURE_WALL_SETUP_STEPS.length
+    coreDoneCount: SETUP_GUIDE_STEPS.length,
+    coreTotal: SETUP_GUIDE_STEPS.length
   }
 }

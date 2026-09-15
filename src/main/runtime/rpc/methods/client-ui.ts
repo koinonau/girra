@@ -66,11 +66,19 @@ export const CLIENT_UI_METHODS = [
     params: UiUpdate,
     // Why the fields are dropped here rather than removed from the schema: UiUpdate is strict, so
     // an unlisted key would make the dispatcher reject an old client's ENTIRE payload.
-    handler: (params, { runtime }) => ({
-      ui: omitPairingLocalUiFields(
-        runtime.updateUIState(omitPairingLocalUiFields(params) as Partial<PersistedUIState>)
-      )
-    })
+    handler: (params, { runtime }) => {
+      // Why: retired tour keys stay in the schema for old clients but must never reach storage.
+      const {
+        contextualToursSeenIds: _retiredSeenIds,
+        contextualToursAutoEligible: _retiredAutoEligible,
+        ...update
+      } = params
+      return {
+        ui: omitPairingLocalUiFields(
+          runtime.updateUIState(omitPairingLocalUiFields(update) as Partial<PersistedUIState>)
+        )
+      }
+    }
   }),
   defineMethod({
     name: 'ui.recordFeatureInteraction',

@@ -642,15 +642,10 @@ describe.each([
     expect(addressBar()).toBe(bar)
   })
 
-  // Why the tour is gated on a real placement: recording the interaction is a one-way write that
-  // burns the one-time tour, and a staged pane has no controls that work yet to point at.
-  it('does not burn the intro tour on a pane that is still connecting', () => {
+  // Why gated on a real placement: a staged pane has no working controls, so it has not really been seen.
+  it('does not record the client-hosted interaction on a pane that is still connecting', () => {
     const recordFeatureInteraction = vi.fn(async () => {})
-    useAppStore.setState({
-      persistedUIReady: true,
-      contextualToursSeenIds: ['client-hosted-browser'],
-      recordFeatureInteraction
-    } as unknown as Parameters<typeof useAppStore.setState>[0])
+    useAppStore.setState({ persistedUIReady: true, recordFeatureInteraction })
     stageClientHostedHandle()
     renderWorkspacePane()
 

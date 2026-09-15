@@ -17,11 +17,8 @@ import {
   useInstalledAgentSkill
 } from '@/hooks/useInstalledAgentSkills'
 import { useActiveProjectSkillRuntime } from '@/hooks/useActiveProjectSkillRuntime'
-import {
-  getFeatureWallSetupProgress,
-  type FeatureWallSetupProgress
-} from '../feature-wall/feature-wall-setup-progress'
-import { deriveIntegrationConnectionStatus } from '../feature-wall/use-integration-connection-status'
+import { getSetupGuideProgress, type SetupGuideProgress } from './setup-guide-progress'
+import { deriveIntegrationConnectionStatus } from './integrations/use-integration-connection-status'
 import { useSetupGuideBrowserMilestoneProgress } from './setup-guide-browser-milestone-progress'
 import {
   getComputerUsePermissionSetupState,
@@ -41,7 +38,7 @@ export function useSetupGuideProgress(
   shouldRefreshCoreState: boolean,
   orchestrationSkillInstalled: boolean,
   browserUseSkillInstalled: boolean
-): FeatureWallSetupProgress {
+): SetupGuideProgress {
   const settings = useAppStore((s) => s.settings)
   const featureInteractions = useAppStore((s) => s.featureInteractions)
   const worktreesByRepo = useAppStore((s) => s.worktreesByRepo)
@@ -280,7 +277,7 @@ export function useSetupGuideProgress(
 
   const rawProgress = useMemo(
     () =>
-      getFeatureWallSetupProgress({
+      getSetupGuideProgress({
         ready,
         settings,
         featureInteractions,

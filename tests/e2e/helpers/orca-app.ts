@@ -28,7 +28,7 @@ import { TEST_REPO_PATH_FILE } from '../global-setup'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from './electron-process-shutdown'
 import { getOrcaElectronLaunchArgs } from './electron-launch-args'
 import { retryTransientMainEvaluate } from './electron-main-evaluate-retry'
-import { getE2ECompletedOnboardingProfile } from './e2e-completed-onboarding-profile'
+import { getE2EExistingUserProfile } from './e2e-existing-user-profile'
 import {
   assertElectronResolvedIsolatedHome,
   createElectronHomeIsolation
@@ -40,13 +40,12 @@ type OrcaTestFixtures = {
   registerPostElectronShutdownCleanup: (cleanup: () => Promise<void>) => void
   sharedPage: Page
   orcaPage: Page
-  // Why: every fresh userData dir paints the first-launch onboarding overlay
-  // (closedAt=null), which is `fixed inset-0 z-[100]` and intercepts pointer
-  // events for every other test. Dismiss it by default; onboarding.spec.ts
-  // opts out via `test.use({ dismissOnboarding: false })`.
-  dismissOnboarding: boolean
+  // Why: seed an existing-user profile by default so first-run education
+  // cannot cover the UI under test. Fresh-profile specs opt out via
+  // `test.use({ seedExistingUserProfile: false })`.
+  seedExistingUserProfile: boolean
   // Why: most E2E specs need a ready project before assertions start. Golden
-  // first-run specs opt out so they can prove the zero-project onboarding path.
+  // first-run specs opt out so they can prove the zero-project path.
   seedTestRepo: boolean
   seededRepoPath: string
   // Synthetic-list specs need only the primary checkout; switching specs keep the two-row default.
@@ -175,7 +174,7 @@ export const test = base.extend<OrcaTestFixtures, OrcaWorkerFixtures>({
   // Test-scoped: one Electron app per test
   electronApp: async (
     {
-      dismissOnboarding,
+      seedExistingUserProfile,
       launchEnv,
       orcaAppExtraEnv,
       orcaAppExtraArgs,
@@ -190,13 +189,10 @@ export const test = base.extend<OrcaTestFixtures, OrcaWorkerFixtures>({
     const mainPath = path.join(process.cwd(), 'out', 'main', 'index.js')
     const userDataDir = mkdtempSync(path.join(os.tmpdir(), 'orca-e2e-userdata-'))
 
-    if (dismissOnboarding) {
-      // Why: onboarding renders a fullscreen `fixed inset-0 z-[100]` overlay
-      // when persisted `closedAt` is null, which intercepts pointer events for
-      // every other test. Seed a completed-onboarding profile.
+    if (seedExistingUserProfile) {
       writeFileSync(
         path.join(userDataDir, 'orca-data.json'),
-        `${JSON.stringify(getE2ECompletedOnboardingProfile(), null, 2)}\n`
+        `${JSON.stringify(getE2EExistingUserProfile(), null, 2)}\n`
       )
     }
     const headful = shouldLaunchHeadful(testInfo)
@@ -274,8 +270,7 @@ export const test = base.extend<OrcaTestFixtures, OrcaWorkerFixtures>({
     await removeUserDataDirAfterShutdown(userDataDir)
   },
 
-  // Default: dismiss the onboarding overlay so it doesn't intercept clicks.
-  dismissOnboarding: [true, { option: true }],
+  seedExistingUserProfile: [true, { option: true }],
   seedTestRepo: [true, { option: true }],
   // Test-scoped so generation scenarios can isolate Git indexes and remotes.
   seededRepoPath: async ({ testRepoPath }, provideFixture) => {

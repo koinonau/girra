@@ -2320,33 +2320,33 @@ html.native-shell .app-layout {
   }
 }
 
-.cli-tip-orchestration-frame .feature-wall-orch-stage {
-  --feature-wall-workspace-title-size: 11.5px;
-  --feature-wall-agent-message-size: 10.5px;
-  --feature-wall-agent-row-gap: 5px;
-  --feature-wall-agent-status-col: 10px;
-  --feature-wall-agent-icon-col: 12px;
-  --feature-wall-agent-status-box: 10px;
-  --feature-wall-agent-status-icon: 9px;
-  --feature-wall-agent-icon-box: 12px;
-  --feature-wall-child-indent: 22px;
+.cli-tip-orchestration-frame .orchestration-visual-stage {
+  --orchestration-visual-workspace-title-size: 11.5px;
+  --orchestration-visual-agent-message-size: 10.5px;
+  --orchestration-visual-agent-row-gap: 5px;
+  --orchestration-visual-agent-status-col: 10px;
+  --orchestration-visual-agent-icon-col: 12px;
+  --orchestration-visual-agent-status-box: 10px;
+  --orchestration-visual-agent-status-icon: 9px;
+  --orchestration-visual-agent-icon-box: 12px;
+  --orchestration-visual-child-indent: 22px;
   align-content: start !important;
   padding-top: 10px !important;
   padding-left: 12px !important;
   padding-right: 52px !important;
 }
 
-.cli-tip-orchestration-frame .feature-wall-agent-icon svg {
+.cli-tip-orchestration-frame .orchestration-visual-agent-icon svg {
   height: 11px;
   width: 11px;
 }
 
-.cli-tip-orchestration-frame .feature-wall-agent-status [aria-label] {
+.cli-tip-orchestration-frame .orchestration-visual-agent-status [aria-label] {
   height: 10px;
   width: 10px;
 }
 
-.cli-tip-orchestration-frame .feature-wall-agent-status [aria-label] > span {
+.cli-tip-orchestration-frame .orchestration-visual-agent-status [aria-label] > span {
   height: 6px;
   width: 6px;
   border-width: 1.5px;
@@ -2401,67 +2401,22 @@ html.native-shell .app-layout {
   }
 }
 
-/* ── Feature wall: agents-orchestration animations ───────────────── */
-
-/* Why: drives the supported-agents marquee on page 1 of the agents tile.
-   Track is duplicated in the DOM so a -50% translate loops seamlessly. */
-@keyframes feature-wall-marquee-flow {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.feature-wall-marquee-track {
-  animation: feature-wall-marquee-flow 36s linear infinite;
-}
-
-/* Shared click pulse for feature-wall fake cursors. Matches the Editor tour
-   ring so every animated mouse click reads as the same interaction. */
-.feature-wall-click-ring {
-  animation: feature-wall-click-ring 460ms ease-out forwards;
-}
-
-@keyframes feature-wall-click-ring {
-  0% {
-    transform: scale(0.4);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(1.4);
-    opacity: 0;
-  }
-}
-
-/* Why: smooth reveal for the Tasks-tile workspace card so it eases in once the
-   workspace flips from "Creating" to "Ready" instead of popping in. */
-@keyframes tasks-workspace-in {
-  0% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ── CLI feature tip: orchestration visual animations ─────────────── */
 
 /* Why: orchestrator → child connector arrows. Faint dashed strokes drawn in
    JS so endpoints follow the real card geometry as cards animate between
    phase 1 (parent + nested child) and phase 2 (parent + spawned peer). */
-.feature-wall-orch-arrows {
+.orchestration-visual-arrows {
   position: absolute;
   inset: 0;
   pointer-events: none;
   z-index: 1;
   transition: opacity 280ms ease;
 }
-.feature-wall-orch-arrows[data-fading='true'] {
+.orchestration-visual-arrows[data-fading='true'] {
   opacity: 0;
 }
-.feature-wall-orch-arrows path {
+.orchestration-visual-arrows path {
   fill: none;
   stroke: color-mix(in srgb, var(--foreground) 32%, transparent);
   stroke-width: 1.5;
@@ -2471,7 +2426,7 @@ html.native-shell .app-layout {
 /* Message envelope that travels along the dashed connector. Position is
    driven by `offset-path` so the bubble visibly follows the same shape the
    connector drew. */
-.feature-wall-bubble {
+.orchestration-visual-bubble {
   position: absolute;
   top: 0;
   left: 0;
@@ -2494,11 +2449,11 @@ html.native-shell .app-layout {
   will-change: offset-distance, opacity, transform;
   transform: translate(-12px, -12px) scale(0.7);
 }
-.feature-wall-bubble svg {
+.orchestration-visual-bubble svg {
   width: 13px;
   height: 13px;
 }
-.feature-wall-bubble.in-flight {
+.orchestration-visual-bubble.in-flight {
   opacity: 1;
   offset-distance: 100%;
   transform: translate(-12px, -12px) scale(1);
@@ -2507,7 +2462,7 @@ html.native-shell .app-layout {
     transform 280ms ease,
     opacity 280ms ease;
 }
-.feature-wall-bubble.landed {
+.orchestration-visual-bubble.landed {
   opacity: 0;
   offset-distance: 100%;
   transform: translate(-12px, -12px) scale(0.85);
@@ -2516,7 +2471,7 @@ html.native-shell .app-layout {
 
 /* When a message just lands, briefly tint the recipient line so the new
    text reads as a fresh inbound message rather than ambient text. */
-@keyframes feature-wall-msg-pop {
+@keyframes orchestration-visual-msg-pop {
   0% {
     color: rgb(180 83 9);
   }
@@ -2527,24 +2482,24 @@ html.native-shell .app-layout {
     color: var(--foreground);
   }
 }
-.feature-wall-msg-received {
-  animation: feature-wall-msg-pop 1100ms ease-out;
+.orchestration-visual-msg-received {
+  animation: orchestration-visual-msg-pop 1100ms ease-out;
 }
 
 /* Children container fades in once the orchestrator finishes creating. */
-.feature-wall-children-wrapper {
+.orchestration-visual-children-wrapper {
   opacity: 0;
   transform: translateY(6px);
   transition:
     opacity 320ms ease,
     transform 320ms ease;
 }
-.feature-wall-children-wrapper[data-visible='true'] {
+.orchestration-visual-children-wrapper[data-visible='true'] {
   opacity: 1;
   transform: none;
 }
 
-@keyframes feature-wall-child-card-in {
+@keyframes orchestration-visual-child-card-in {
   0% {
     opacity: 0;
     transform: translateY(4px);
@@ -2554,13 +2509,13 @@ html.native-shell .app-layout {
     transform: translateY(0);
   }
 }
-.feature-wall-child-card-shell {
-  animation: feature-wall-child-card-in 260ms ease-out both;
+.orchestration-visual-child-card-shell {
+  animation: orchestration-visual-child-card-in 260ms ease-out both;
 }
 
 /* Each child agent row stays collapsed until *its* dispatch bubble lands on
    it, so the child workspace visibly gains an agent as work arrives. */
-.feature-wall-spawn-row {
+.orchestration-visual-spawn-row {
   overflow: hidden;
   opacity: 1;
   max-height: 60px;
@@ -2572,7 +2527,7 @@ html.native-shell .app-layout {
     margin 320ms cubic-bezier(0.4, 0, 0.2, 1) 80ms,
     padding 320ms cubic-bezier(0.4, 0, 0.2, 1) 80ms;
 }
-.feature-wall-spawn-row[data-pending='true'] {
+.orchestration-visual-spawn-row[data-pending='true'] {
   opacity: 0;
   transform: translateY(2px);
   pointer-events: none;
@@ -2587,66 +2542,6 @@ html.native-shell .app-layout {
     max-height 320ms cubic-bezier(0.4, 0, 0.2, 1),
     margin 320ms cubic-bezier(0.4, 0, 0.2, 1),
     padding 320ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Brief one-shot pulse when the Codex limits popover swaps accounts and the
-   "0% used" label flashes from red to green. */
-@keyframes feature-wall-meta-pulse {
-  0% {
-    color: rgb(220 38 38);
-    transform: scale(1);
-  }
-  20% {
-    color: rgb(22 163 74);
-    transform: scale(1.08);
-  }
-  100% {
-    color: rgb(22 163 74);
-    transform: scale(1);
-  }
-}
-
-.feature-wall-meta-pulse {
-  color: rgb(22 163 74);
-  font-weight: 600;
-  animation: feature-wall-meta-pulse 1100ms ease-out 1;
-}
-
-.orca-contextual-tour-target-rings {
-  border-radius: 9999px;
-  pointer-events: none;
-}
-
-.orca-contextual-tour-target-rings::before {
-  content: '';
-  position: absolute;
-  inset: -2px;
-  border: 1px solid color-mix(in srgb, var(--ring) 72%, transparent);
-  border-radius: inherit;
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ring) 18%, transparent);
-  opacity: 0;
-  transform-origin: center;
-  animation: contextual-tour-target-ring 1.8s ease-out infinite;
-}
-
-@keyframes contextual-tour-target-ring {
-  0% {
-    opacity: 0.72;
-    transform: scale(0.68);
-  }
-  72%,
-  100% {
-    opacity: 0;
-    transform: scale(2.4);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .orca-contextual-tour-target-rings::before {
-    animation: none;
-    opacity: 0.72;
-    transform: scale(1.28);
-  }
 }
 
 /* ── Diff comment decorations ────────────────────────────────────── */
@@ -2962,23 +2857,4 @@ html.native-shell .app-layout {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 4px;
-}
-
-/* Why: tours need a distinct item surface without highlighting the underlying target. */
-.orca-contextual-tour-panel {
-  --contextual-tour-panel-surface: color-mix(in srgb, var(--foreground) 7%, var(--popover));
-  --contextual-tour-panel-border: color-mix(in srgb, var(--foreground) 14%, var(--border));
-  background: var(--contextual-tour-panel-surface);
-  border-color: var(--contextual-tour-panel-border);
-  box-shadow:
-    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 10%, transparent),
-    0 10px 24px rgba(0, 0, 0, 0.18);
-}
-
-.dark .orca-contextual-tour-panel {
-  --contextual-tour-panel-surface: color-mix(in srgb, var(--foreground) 10%, var(--popover));
-  --contextual-tour-panel-border: color-mix(in srgb, var(--foreground) 16%, var(--border));
-  box-shadow:
-    inset 0 1px 0 0 color-mix(in srgb, var(--foreground) 5%, transparent),
-    0 10px 24px rgba(0, 0, 0, 0.18);
 }

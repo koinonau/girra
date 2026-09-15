@@ -3,8 +3,8 @@
 import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { FEATURE_WALL_SETUP_STEPS } from '../../../../shared/feature-wall-setup-steps'
-import type { FeatureWallSetupProgress } from '../feature-wall/feature-wall-setup-progress'
+import { SETUP_GUIDE_STEPS } from '../../../../shared/setup-guide-steps'
+import type { SetupGuideProgress } from './setup-guide-progress'
 import { useAppStore } from '@/store'
 import SetupGuideModal from './SetupGuideModal'
 
@@ -16,7 +16,7 @@ const contentProbe = vi.hoisted(() => ({
   refreshEnabledStates: vi.fn()
 }))
 
-const progress: FeatureWallSetupProgress = {
+const progress: SetupGuideProgress = {
   ready: true,
   stepDone: {
     'default-agent': false,
@@ -29,7 +29,7 @@ const progress: FeatureWallSetupProgress = {
     'setup-script': false
   },
   coreDoneCount: 0,
-  coreTotal: FEATURE_WALL_SETUP_STEPS.length
+  coreTotal: SETUP_GUIDE_STEPS.length
 }
 
 vi.mock('./use-setup-guide-progress', async () => {
@@ -52,8 +52,8 @@ vi.mock('./use-setup-guide-progress', async () => {
   }
 })
 
-vi.mock('../feature-wall/FeatureWallSetupChecklist', () => ({
-  FeatureWallSetupChecklist: () => <div data-setup-guide-content="true" />
+vi.mock('./SetupGuideChecklist', () => ({
+  SetupGuideChecklist: () => <div data-setup-guide-content="true" />
 }))
 
 vi.mock('./SetupGuideProgressRing', () => ({

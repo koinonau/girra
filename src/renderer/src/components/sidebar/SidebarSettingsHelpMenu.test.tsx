@@ -42,10 +42,6 @@ vi.mock('@/hooks/useMountedRef', () => ({
   useMountedRef: () => ({ current: true })
 }))
 
-vi.mock('../onboarding/show-onboarding-event', () => ({
-  showOnboardingFromRenderer: vi.fn()
-}))
-
 vi.mock('../setup-guide/use-setup-guide-progress', () => ({
   useSetupGuideProgress: () => mocks.setupProgress
 }))
@@ -229,9 +225,9 @@ describe('SidebarSettingsHelpMenu', () => {
     expect(html).not.toContain('Milestones')
   })
 
-  it('renders the Onboarding menu item by default', () => {
+  it('does not render an Onboarding menu item', () => {
     const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('Onboarding')
+    expect(html).not.toContain('Onboarding')
   })
 
   it('renders Restart Orca by default', () => {

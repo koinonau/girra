@@ -521,8 +521,6 @@ describe('client UI RPC methods', () => {
       featureInteractions: {
         tasks: { firstInteractedAt: 100, interactionCount: 2 }
       },
-      contextualToursSeenIds: ['tasks'],
-      contextualToursAutoEligible: true,
       usageEmptyStateDismissed: true,
       browserDefaultZoomLevel: 1.5,
       manualRepoOrder: [{ hostId: 'runtime:node-b', repoId: 'repo-b' }]
@@ -573,6 +571,7 @@ describe('client UI RPC methods', () => {
       featureInteractions: {
         tasks: { firstInteractedAt: 100, interactionCount: 2 }
       },
+      // Why: retired tour keys must still validate for older clients, then be dropped.
       contextualToursSeenIds: ['tasks'],
       contextualToursAutoEligible: true,
       usageEmptyStateDismissed: true,
@@ -581,7 +580,12 @@ describe('client UI RPC methods', () => {
     }
     const response = await dispatcher.dispatch(makeRequest('ui.set', payload))
 
-    const { manualRepoOrder: _desktopOwnedOrder, ...forwarded } = payload
+    const {
+      manualRepoOrder: _desktopOwnedOrder,
+      contextualToursSeenIds: _retiredSeenIds,
+      contextualToursAutoEligible: _retiredAutoEligible,
+      ...forwarded
+    } = payload
     expect(runtime.updateUIState).toHaveBeenCalledWith({
       ...forwarded,
       worktreeCardProperties: ['status', 'unread', 'branch', 'automation', 'inline-agents']

@@ -38,6 +38,8 @@ export type FloatingPanelStoreState = {
   closeFile: (fileId: string) => void
   closeUnifiedTab: (tabId: string) => Tab | null
   markFileDirty: (fileId: string, dirty: boolean) => void
+  persistedUIReady: boolean
+  recordFeatureInteraction: (id: 'floating-workspace') => Promise<void>
   activateTab: (tabId: string) => void
   setActiveTab: (tabId: string) => void
   setTabCustomTitle: (tabId: string, title: string | null) => void

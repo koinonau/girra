@@ -5,9 +5,9 @@ import { setForegroundTerminalTabIds } from '@/lib/foreground-terminal-tabs'
 import { useClientHostedBrowserRows } from '@/lib/pane-manager/client-hosted-browser-row-state'
 import { useTerminalProviderSnapshotCapability } from './terminal/use-terminal-provider-snapshot-capability'
 import { getEffectiveLayoutForWorktree as getEffectiveLayout } from './terminal/split-group-mount'
-import { useContextualTour } from './contextual-tours/use-contextual-tour'
 import type { TerminalWorkspaceStoreController } from './use-terminal-workspace-store-bindings'
 import { useWorktreeFiles } from './terminal/use-worktree-files'
+import { useFeatureInteractionWhileVisible } from '@/hooks/use-feature-interaction-while-visible'
 
 export function useTerminalWorkspaceProjection(controller: TerminalWorkspaceStoreController) {
   const {
@@ -80,22 +80,19 @@ export function useTerminalWorkspaceProjection(controller: TerminalWorkspaceStor
   const activeWorktreeBrowserTabIdsKey = renderedActiveWorktreeId
     ? (browserTabsByWorktree[renderedActiveWorktreeId] ?? []).map((tab) => tab.id).join(',')
     : ''
-  const activeContextualTourId = useAppStore((state) => state.activeContextualTourId)
   const hasSplitTerminalPane = useAppStore((state) =>
     hasFeatureInteraction(state.featureInteractions, 'terminal-pane-split')
   )
-
-  useContextualTour(
+  useFeatureInteractionWhileVisible(
     'workspace-agent-sessions',
     Boolean(
       activeWorktreeId &&
       activeView === 'terminal' &&
       workspaceSessionReady &&
       activeTabType === 'terminal' &&
-      Boolean(activeTabId) &&
-      (!hasSplitTerminalPane || activeContextualTourId === 'workspace-agent-sessions')
-    ),
-    'workspace_agent_sessions_visible'
+      activeTabId &&
+      !hasSplitTerminalPane
+    )
   )
 
   return {
@@ -108,8 +105,6 @@ export function useTerminalWorkspaceProjection(controller: TerminalWorkspaceStor
     getEffectiveLayoutForWorktree,
     effectiveActiveLayout,
     activeWorktreeBrowserTabIdsKey,
-    activeContextualTourId,
-    hasSplitTerminalPane,
     terminalProviderSnapshotCapabilityRevision
   }
 }

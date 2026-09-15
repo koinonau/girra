@@ -14,15 +14,13 @@ import {
 } from '../applying-settings/ui-selection-normalization'
 import {
   readDeprecatedExperimentFlag,
-  resolveSetupGuideSidebarDismissedOnLoad
-} from '../applying-settings/onboarding-normalization'
+  readRetiredOnboardingClosed
+} from '../applying-settings/retired-persisted-fields'
 import type { PersistedState } from '../../../shared/persisted-state-types'
-import type { OnboardingState } from '../../../shared/onboarding-state-types'
 
 export function normalizeLoadedUiState(
   parsed: PersistedState,
   defaults: PersistedState,
-  normalizedOnboarding: OnboardingState,
   loadedCompactWorktreeCards: boolean,
   osc52ClipboardNoticePending: boolean,
   markNeedsSave: () => void
@@ -136,10 +134,10 @@ export function normalizeLoadedUiState(
   ) {
     markNeedsSave()
   }
-  const setupGuideSidebarDismissed = resolveSetupGuideSidebarDismissedOnLoad(
-    parsed.ui?.setupGuideSidebarDismissed,
-    normalizedOnboarding
-  )
+  const onboardingClosed = readRetiredOnboardingClosed(parsed)
+  // Why: once onboarding was closed, persisted false is just the old default, not a user opt-in to the sidebar checklist.
+  const setupGuideSidebarDismissed =
+    onboardingClosed || parsed.ui?.setupGuideSidebarDismissed === true
   if (
     parsed.ui?.setupGuideSidebarDismissed !== setupGuideSidebarDismissed &&
     (setupGuideSidebarDismissed || parsed.ui?.setupGuideSidebarDismissed !== undefined)
@@ -153,7 +151,7 @@ export function normalizeLoadedUiState(
       rawUsagePercentageDisplay: parsed.ui?.usagePercentageDisplay,
       isExistingProfile: isExistingPersistedProfile({
         repoCount: parsed.repos?.length ?? 0,
-        onboardingClosedAt: normalizedOnboarding.closedAt,
+        onboardingClosed,
         ui: parsed.ui
       })
     })

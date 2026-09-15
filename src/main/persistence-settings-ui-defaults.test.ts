@@ -4,11 +4,7 @@ import { join } from 'node:path'
 import { tmpdir } from 'node:os'
 import type { GlobalSettings } from '../shared/global-settings-types'
 import type { PersistedState } from '../shared/persisted-state-types'
-import {
-  getDefaultPersistedState,
-  ONBOARDING_FINAL_STEP,
-  ONBOARDING_FLOW_VERSION
-} from '../shared/constants'
+import { getDefaultPersistedState } from '../shared/constants'
 import {
   testState,
   createStore,
@@ -124,11 +120,7 @@ describe('Store', () => {
     const persisted = getDefaultPersistedState(testState.dir)
     writeDataFile({
       ...persisted,
-      onboarding: {
-        ...persisted.onboarding,
-        closedAt: 1,
-        outcome: 'completed'
-      },
+      onboarding: { closedAt: 1, outcome: 'completed' },
       ui: {
         ...persisted.ui,
         // Why: omit the notice key so load resolves eligibility for existing profiles.
@@ -145,11 +137,7 @@ describe('Store', () => {
     const persisted = getDefaultPersistedState(testState.dir)
     writeDataFile({
       ...persisted,
-      onboarding: {
-        ...persisted.onboarding,
-        closedAt: 1,
-        outcome: 'completed'
-      },
+      onboarding: { closedAt: 1, outcome: 'completed' },
       ui: {
         ...persisted.ui,
         usagePercentageDisplay: 'remaining',
@@ -301,47 +289,23 @@ describe('Store', () => {
     expect(reloaded.getUI().trayMinimizeNoticeShown).toBe(true)
   })
 
-  it('hides the setup guide sidebar entry for existing users backfilled as completed', async () => {
+  it('keeps the setup guide sidebar entry for existing profiles without an onboarding block', async () => {
     writeDataFile({
       schemaVersion: 1,
       ui: {}
     })
 
     const store = await createStore()
-    const onboarding = store.getOnboarding()
 
-    expect(onboarding.closedAt).not.toBeNull()
-    expect(onboarding.outcome).toBe('completed')
-    expect(onboarding.lastCompletedStep).toBe(ONBOARDING_FINAL_STEP)
-    expect(store.getUI().setupGuideSidebarDismissed).toBe(true)
+    expect(store.getUI().setupGuideSidebarDismissed).toBe(false)
     expect(store.getUI().setupGuideBrowserMilestoneMigrated).toBe(false)
     expect(store.getUI().setupGuideBrowserMilestoneLegacyComplete).toBe(false)
   })
 
-  it('persists the existing-user onboarding backfill back to disk', async () => {
-    // Why: the upgrade-cohort backfill is derived at load; assert it round-trips through a write intact (load-time scheduleSave via loadNeedsSave, no manual flush).
-    writeDataFile({
-      schemaVersion: 1,
-      ui: {}
-    })
-
-    const store = await createStore()
-    store.flush()
-    const persisted = readDataFile() as {
-      onboarding?: { closedAt: number | null; outcome: string | null; lastCompletedStep: number }
-      ui?: { setupGuideSidebarDismissed?: boolean }
-    }
-
-    expect(persisted.onboarding?.closedAt).not.toBeNull()
-    expect(persisted.onboarding?.outcome).toBe('completed')
-    expect(persisted.onboarding?.lastCompletedStep).toBe(ONBOARDING_FINAL_STEP)
-    expect(persisted.ui?.setupGuideSidebarDismissed).toBe(true)
-  })
-
-  it('keeps the setup guide sidebar entry available while onboarding is open', async () => {
+  it('keeps the setup guide sidebar entry available when retired onboarding was left open', async () => {
     writeDataFile({
       onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
+        flowVersion: 4,
         closedAt: null,
         outcome: null,
         lastCompletedStep: -1,
@@ -352,20 +316,12 @@ describe('Store', () => {
 
     const store = await createStore()
 
-    expect(store.getOnboarding().closedAt).toBeNull()
     expect(store.getUI().setupGuideSidebarDismissed).toBe(false)
   })
 
-  it('keeps new worktree card style off while onboarding is open', async () => {
+  it('keeps new worktree card style off by default on load', async () => {
     writeDataFile({
       settings: {},
-      onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
-        closedAt: null,
-        outcome: null,
-        lastCompletedStep: -1,
-        checklist: {}
-      },
       ui: {}
     })
 
@@ -374,17 +330,10 @@ describe('Store', () => {
     expect(store.getSettings().experimentalNewWorktreeCardStyle).toBe(false)
   })
 
-  it('preserves explicit new worktree card style opt-out while onboarding is open', async () => {
+  it('preserves explicit new worktree card style opt-out on load', async () => {
     writeDataFile({
       settings: {
         experimentalNewWorktreeCardStyle: false
-      },
-      onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
-        closedAt: null,
-        outcome: null,
-        lastCompletedStep: -1,
-        checklist: {}
       },
       ui: {}
     })
@@ -408,23 +357,10 @@ describe('Store', () => {
     expect(store.getSettings().experimentalNewWorktreeCardStyle).toBe(true)
   })
 
-  it('keeps new worktree card style off for existing users backfilled as completed', async () => {
-    writeDataFile({
-      schemaVersion: 1,
-      settings: {},
-      ui: {}
-    })
-
-    const store = await createStore()
-
-    expect(store.getOnboarding().closedAt).not.toBeNull()
-    expect(store.getSettings().experimentalNewWorktreeCardStyle).toBe(false)
-  })
-
-  it('treats persisted false setup guide sidebar dismissal as stale once onboarding is closed', async () => {
+  it('treats persisted false setup guide sidebar dismissal as stale once onboarding was closed', async () => {
     writeDataFile({
       onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
+        flowVersion: 4,
         closedAt: 123,
         outcome: 'dismissed',
         lastCompletedStep: 2,
@@ -438,75 +374,43 @@ describe('Store', () => {
     const store = await createStore()
 
     expect(store.getUI().setupGuideSidebarDismissed).toBe(true)
+    store.flush()
+    expect((readDataFile() as PersistedState).ui.setupGuideSidebarDismissed).toBe(true)
   })
 
-  it('keeps malformed completed onboarding closed for the setup guide sidebar gate', async () => {
-    writeDataFile({
-      onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
-        closedAt: 'yesterday',
-        outcome: 'completed',
-        lastCompletedStep: ONBOARDING_FINAL_STEP,
-        checklist: {}
-      },
-      ui: {
-        setupGuideSidebarDismissed: false
-      }
-    })
+  it.each([
+    [{ closedAt: 'yesterday', outcome: 'completed' }],
+    [{ closedAt: null, outcome: 'dismissed' }],
+    [{ outcome: 'completed' }]
+  ] as const)(
+    'keeps the setup guide sidebar dismissed when closed onboarding has a malformed timestamp: %o',
+    async (onboardingInput) => {
+      writeDataFile({
+        onboarding: {
+          flowVersion: 4,
+          lastCompletedStep: 5,
+          checklist: {},
+          ...onboardingInput
+        },
+        ui: {
+          setupGuideSidebarDismissed: false
+        }
+      })
 
-    const store = await createStore()
-    const onboarding = store.getOnboarding()
+      const store = await createStore()
 
-    expect(onboarding.closedAt).not.toBeNull()
-    expect(onboarding.outcome).toBe('completed')
-    expect(onboarding.lastCompletedStep).toBe(ONBOARDING_FINAL_STEP)
-    expect(store.getUI().setupGuideSidebarDismissed).toBe(true)
-  })
-
-  it('does not reopen the setup guide sidebar when closed onboarding has a null timestamp', async () => {
-    writeDataFile({
-      onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
-        closedAt: null,
-        outcome: 'dismissed',
-        lastCompletedStep: 1,
-        checklist: {}
-      },
-      ui: {}
-    })
-
-    const store = await createStore()
-
-    expect(store.getOnboarding().closedAt).not.toBeNull()
-    expect(store.getUI().setupGuideSidebarDismissed).toBe(true)
-  })
-
-  it('recovers a close timestamp when closed onboarding omits the closedAt key', async () => {
-    // Why: a block missing `closedAt` entirely (vs explicit null) must still stay closed via outcome recovery, guarding the `'closedAt' in raw` branch.
-    writeDataFile({
-      onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
-        outcome: 'completed',
-        lastCompletedStep: ONBOARDING_FINAL_STEP,
-        checklist: {}
-      },
-      ui: {}
-    })
-
-    const store = await createStore()
-
-    expect(store.getOnboarding().closedAt).not.toBeNull()
-    expect(store.getUI().setupGuideSidebarDismissed).toBe(true)
-  })
+      expect(store.getUI().setupGuideSidebarDismissed).toBe(true)
+    }
+  )
 
   it('does not mutate gate fields for a consistent closed-onboarding existing user', async () => {
-    // Why: the gate must be idempotent — a closed+completed user round-trips unchanged, and the backfill must not stomp closedAt with a fresh Date.now().
+    // Why: the gate must be idempotent, and the retired onboarding block round-trips verbatim for downgrades.
     const consistent = {
       onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
+        flowVersion: 4,
         closedAt: 123,
         outcome: 'completed',
-        lastCompletedStep: ONBOARDING_FINAL_STEP,
+        lastCompletedStep: 5,
         checklist: {}
       },
       ui: {
@@ -521,157 +425,10 @@ describe('Store', () => {
     store.flush()
     const persisted = readDataFile() as typeof consistent
 
-    // Flushing the loaded state preserves the persisted gate fields verbatim.
     expect(persisted.onboarding.closedAt).toBe(123)
     expect(persisted.onboarding.outcome).toBe('completed')
     expect(persisted.ui.setupGuideSidebarDismissed).toBe(true)
   })
-
-  it.each([
-    [3, 2],
-    [4, 2],
-    [5, 3],
-    [6, 3],
-    [9, 3]
-  ])(
-    'migrates unversioned seven-step onboarding progress %i before applying the current step bound',
-    async (legacyStep, expectedStep) => {
-      writeDataFile({
-        onboarding: {
-          closedAt: null,
-          outcome: null,
-          lastCompletedStep: legacyStep,
-          checklist: {}
-        }
-      })
-
-      const store = await createStore()
-      const onboarding = store.getOnboarding()
-
-      expect(onboarding.flowVersion).toBe(ONBOARDING_FLOW_VERSION)
-      expect(onboarding.lastCompletedStep).toBe(expectedStep)
-      expect(onboarding.closedAt).toBeNull()
-      expect(onboarding.outcome).toBeNull()
-    }
-  )
-
-  it.each([
-    [3, 2],
-    [4, 3],
-    [5, 3],
-    [9, 3]
-  ])(
-    'migrates versioned five-step onboarding progress %i before applying the current step bound',
-    async (legacyStep, expectedStep) => {
-      writeDataFile({
-        onboarding: {
-          flowVersion: 2,
-          closedAt: null,
-          outcome: null,
-          lastCompletedStep: legacyStep,
-          checklist: {}
-        }
-      })
-
-      const store = await createStore()
-      const onboarding = store.getOnboarding()
-
-      expect(onboarding.flowVersion).toBe(ONBOARDING_FLOW_VERSION)
-      expect(onboarding.lastCompletedStep).toBe(expectedStep)
-      expect(onboarding.closedAt).toBeNull()
-      expect(onboarding.outcome).toBeNull()
-    }
-  )
-
-  it.each([
-    [3, 3],
-    [4, 4],
-    [9, 4]
-  ])(
-    'migrates versioned four-step onboarding progress %i around the inserted Windows step',
-    async (legacyStep, expectedStep) => {
-      writeDataFile({
-        onboarding: {
-          flowVersion: 3,
-          closedAt: null,
-          outcome: null,
-          lastCompletedStep: legacyStep,
-          checklist: {}
-        }
-      })
-
-      const store = await createStore()
-      const onboarding = store.getOnboarding()
-
-      expect(onboarding.flowVersion).toBe(ONBOARDING_FLOW_VERSION)
-      expect(onboarding.lastCompletedStep).toBe(expectedStep)
-      expect(onboarding.closedAt).toBeNull()
-      expect(onboarding.outcome).toBeNull()
-    }
-  )
-
-  it('keeps current onboarding progress marked as the five-step flow', async () => {
-    writeDataFile({
-      onboarding: {
-        flowVersion: ONBOARDING_FLOW_VERSION,
-        closedAt: null,
-        outcome: null,
-        lastCompletedStep: 3,
-        checklist: {}
-      }
-    })
-
-    const store = await createStore()
-    const onboarding = store.getOnboarding()
-
-    expect(onboarding.flowVersion).toBe(ONBOARDING_FLOW_VERSION)
-    expect(onboarding.lastCompletedStep).toBe(3)
-  })
-
-  it('migrates legacy completed onboarding progress to the current final step', async () => {
-    writeDataFile({
-      onboarding: {
-        closedAt: 1,
-        outcome: 'completed',
-        lastCompletedStep: 7,
-        checklist: {}
-      }
-    })
-
-    const store = await createStore()
-    const onboarding = store.getOnboarding()
-
-    expect(onboarding.flowVersion).toBe(ONBOARDING_FLOW_VERSION)
-    expect(onboarding.outcome).toBe('completed')
-    expect(onboarding.lastCompletedStep).toBe(ONBOARDING_FINAL_STEP)
-  })
-
-  it.each([
-    [{ outcome: 'completed', lastCompletedStep: 7 }, 'completed', ONBOARDING_FINAL_STEP],
-    [{ closedAt: null, outcome: 'dismissed', lastCompletedStep: 2 }, 'dismissed', 2],
-    [
-      { closedAt: 'invalid', outcome: 'completed', lastCompletedStep: 7 },
-      'completed',
-      ONBOARDING_FINAL_STEP
-    ]
-  ] as const)(
-    'keeps closed onboarding closed when closedAt is missing or malformed',
-    async (onboardingInput, expectedOutcome, expectedStep) => {
-      writeDataFile({
-        onboarding: {
-          checklist: {},
-          ...onboardingInput
-        }
-      })
-
-      const store = await createStore()
-      const onboarding = store.getOnboarding()
-
-      expect(onboarding.closedAt).toEqual(expect.any(Number))
-      expect(onboarding.outcome).toBe(expectedOutcome)
-      expect(onboarding.lastCompletedStep).toBe(expectedStep)
-    }
-  )
 
   it('preserves legacy none grouping as ungrouped workspaces', async () => {
     writeDataFile({

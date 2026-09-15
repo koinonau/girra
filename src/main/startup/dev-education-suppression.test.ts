@@ -1,14 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import {
-  getDefaultOnboardingState,
-  getDefaultUIState,
-  ONBOARDING_FINAL_STEP,
-  ONBOARDING_FLOW_VERSION
-} from '../../shared/constants'
-import { CONTEXTUAL_TOUR_IDS } from '../../shared/contextual-tours'
+import { getDefaultUIState } from '../../shared/constants'
 import { FEATURE_INTERACTION_IDS } from '../../shared/feature-interactions'
 import { FEATURE_TIP_IDS } from '../../shared/feature-tips'
-import type { OnboardingState } from '../../shared/onboarding-state-types'
 import type { PersistedUIState } from '../../shared/persisted-ui-state-types'
 import {
   DEV_SHOW_FIRST_RUN_EDUCATION_ENV,
@@ -16,43 +9,17 @@ import {
   suppressDevEducationForStore
 } from './dev-education-suppression'
 
-function createStoreState(overrides?: {
-  onboarding?: Partial<OnboardingState>
-  ui?: Partial<PersistedUIState>
-}) {
-  let onboarding: OnboardingState = {
-    ...getDefaultOnboardingState(),
-    ...overrides?.onboarding,
-    checklist: {
-      ...getDefaultOnboardingState().checklist,
-      ...overrides?.onboarding?.checklist
-    }
-  }
+function createStoreState(overrides?: { ui?: Partial<PersistedUIState> }) {
   let ui: PersistedUIState = {
     ...getDefaultUIState(),
     ...overrides?.ui
   }
 
   return {
-    get onboarding() {
-      return onboarding
-    },
     get ui() {
       return ui
     },
     store: {
-      getOnboarding: vi.fn(() => onboarding),
-      updateOnboarding: vi.fn((updates: Partial<OnboardingState>) => {
-        onboarding = {
-          ...onboarding,
-          ...updates,
-          checklist: {
-            ...onboarding.checklist,
-            ...updates.checklist
-          }
-        }
-        return onboarding
-      }),
       getUI: vi.fn(() => ui),
       updateUI: vi.fn((updates: Partial<PersistedUIState>) => {
         ui = { ...ui, ...updates }
@@ -90,35 +57,21 @@ describe('shouldSuppressDevEducation', () => {
 })
 
 describe('suppressDevEducationForStore', () => {
-  it('marks onboarding and first-run education complete', () => {
+  it('marks first-run education complete', () => {
     const state = createStoreState()
 
     suppressDevEducationForStore(state.store, 1234)
 
-    expect(state.onboarding).toMatchObject({
-      flowVersion: ONBOARDING_FLOW_VERSION,
-      closedAt: 1234,
-      outcome: 'completed',
-      lastCompletedStep: ONBOARDING_FINAL_STEP
-    })
     expect(state.ui.featureTipsSeenIds).toEqual(FEATURE_TIP_IDS)
-    expect(state.ui.contextualToursSeenIds).toEqual(CONTEXTUAL_TOUR_IDS)
-    expect(state.ui.contextualToursAutoEligible).toBe(false)
     expect(Object.keys(state.ui.featureInteractions ?? {}).sort()).toEqual(
       [...FEATURE_INTERACTION_IDS].sort()
     )
   })
 
-  it('preserves completed onboarding and existing education history', () => {
+  it('preserves existing education history', () => {
     const state = createStoreState({
-      onboarding: {
-        closedAt: 99,
-        outcome: 'dismissed',
-        lastCompletedStep: 1
-      },
       ui: {
         featureTipsSeenIds: ['cmd-j-palette'],
-        contextualToursSeenIds: ['tasks'],
         featureInteractions: {
           tasks: { firstInteractedAt: 77, interactionCount: 3 }
         }
@@ -127,17 +80,7 @@ describe('suppressDevEducationForStore', () => {
 
     suppressDevEducationForStore(state.store, 1234)
 
-    expect(state.store.updateOnboarding).not.toHaveBeenCalled()
-    expect(state.onboarding).toMatchObject({
-      closedAt: 99,
-      outcome: 'dismissed',
-      lastCompletedStep: 1
-    })
     expect(state.ui.featureTipsSeenIds).toEqual(['cmd-j-palette', 'orca-cli'])
-    expect(state.ui.contextualToursSeenIds).toEqual([
-      'tasks',
-      ...CONTEXTUAL_TOUR_IDS.filter((id) => id !== 'tasks')
-    ])
     expect(state.ui.featureInteractions?.tasks).toEqual({
       firstInteractedAt: 77,
       interactionCount: 3
@@ -149,22 +92,14 @@ describe('suppressDevEducationForStore', () => {
       FEATURE_INTERACTION_IDS.map((id) => [id, { firstInteractedAt: 1, interactionCount: 1 }])
     )
     const state = createStoreState({
-      onboarding: {
-        closedAt: 1,
-        outcome: 'completed',
-        lastCompletedStep: ONBOARDING_FINAL_STEP
-      },
       ui: {
         featureTipsSeenIds: [...FEATURE_TIP_IDS],
-        contextualToursSeenIds: [...CONTEXTUAL_TOUR_IDS],
-        contextualToursAutoEligible: false,
         featureInteractions
       }
     })
 
     suppressDevEducationForStore(state.store, 1234)
 
-    expect(state.store.updateOnboarding).not.toHaveBeenCalled()
     expect(state.store.updateUI).not.toHaveBeenCalled()
   })
 })

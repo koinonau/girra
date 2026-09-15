@@ -2,7 +2,7 @@ import { Copy } from 'lucide-react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { OnboardingInlineCommandTerminal } from '@/components/onboarding/OnboardingInlineCommandTerminal'
+import { InlineCommandTerminal } from '@/components/inline-command-terminal/InlineCommandTerminal'
 import {
   buildSkillCommandForRuntime,
   buildSkillSetupTerminalCommand
@@ -76,7 +76,7 @@ export function CliSkillSetupTerminal(): React.JSX.Element {
           </TooltipContent>
         </Tooltip>
       </div>
-      <OnboardingInlineCommandTerminal
+      <InlineCommandTerminal
         command={skillCommand}
         prepareCommandForShell={prepareCommandForShell}
         title={translate(

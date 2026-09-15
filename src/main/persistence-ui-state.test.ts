@@ -141,7 +141,6 @@ describe('Store', () => {
         sidebarWidth: 400,
         showDotfilesByWorktree: { 'repo-1::/repo': false },
         featureTipsSeenIds: ['orca-cli'],
-        contextualToursSeenIds: ['tasks'],
         featureInteractions: {
           tasks: { firstInteractedAt: 100, interactionCount: 1 }
         }
@@ -155,7 +154,6 @@ describe('Store', () => {
         sidebarWidth: 400,
         showDotfilesByWorktree: { 'repo-1::/repo': false },
         featureTipsSeenIds: ['orca-cli'],
-        contextualToursSeenIds: ['tasks'],
         featureInteractions: {
           tasks: { firstInteractedAt: 100, interactionCount: 1 }
         }
@@ -336,19 +334,6 @@ describe('Store', () => {
     expect(store.getUI().workspaceCleanup?.dismissals).toHaveProperty('wt-1')
   })
 
-  it('updateUI merges contextual tour seen ids instead of replacing stale snapshots', async () => {
-    const store = await createStore()
-
-    store.updateUI({
-      contextualToursSeenIds: ['browser']
-    })
-    store.updateUI({
-      contextualToursSeenIds: ['workspace-agent-sessions', 'unknown', 'browser'] as never
-    })
-
-    expect(store.getUI().contextualToursSeenIds).toEqual(['browser', 'workspace-agent-sessions'])
-  })
-
   it('normalizes malformed persisted feature discovery state on read', async () => {
     writeDataFile({
       schemaVersion: 1,
@@ -357,7 +342,6 @@ describe('Store', () => {
       settings: {},
       ui: {
         featureTipsSeenIds: ['orca-cli', 'unknown-tip', 'orca-cli'],
-        contextualToursSeenIds: ['tasks', 'unknown', 'tasks'] as never,
         featureInteractions: {
           tasks: { firstInteractedAt: 100 },
           automations: { firstInteractedAt: 150, interactionCount: 4 },
@@ -372,7 +356,6 @@ describe('Store', () => {
     const store = await createStore()
 
     expect(store.getUI().featureTipsSeenIds).toEqual(['orca-cli'])
-    expect(store.getUI().contextualToursSeenIds).toEqual(['tasks'])
     expect(store.getUI().featureInteractions).toEqual({
       tasks: { firstInteractedAt: 100, interactionCount: 1 },
       automations: { firstInteractedAt: 150, interactionCount: 4 }

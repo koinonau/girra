@@ -49,7 +49,6 @@ const {
   registerHostedReviewHandlersMock,
   registerExportHandlersMock,
   registerCodexConfigSyncHandlersMock,
-  registerOnboardingHandlersMock,
   registerDashboardPopoutHandlersMock,
   isDashboardPopoutRendererMock,
   registerTerminalPreviewHandlersMock,
@@ -110,7 +109,6 @@ const {
   registerHostedReviewHandlersMock: vi.fn(),
   registerExportHandlersMock: vi.fn(),
   registerCodexConfigSyncHandlersMock: vi.fn(),
-  registerOnboardingHandlersMock: vi.fn(),
   registerDashboardPopoutHandlersMock: vi.fn(),
   isDashboardPopoutRendererMock: vi.fn(),
   registerTerminalPreviewHandlersMock: vi.fn(),
@@ -140,10 +138,6 @@ vi.mock('../runtime-environment-transport-routing', () => ({
 
 vi.mock('../codex-config-sync', () => ({
   registerCodexConfigSyncHandlers: registerCodexConfigSyncHandlersMock
-}))
-
-vi.mock('../onboarding', () => ({
-  registerOnboardingHandlers: registerOnboardingHandlersMock
 }))
 
 vi.mock('../dashboard-popout', () => ({

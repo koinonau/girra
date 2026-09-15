@@ -237,7 +237,7 @@ export async function waitForTerminalReady(page, timeoutMs = 60_000, terminalTab
  *     workspace (which would mask a broken restore).
  */
 export async function ensureTerminal(page, { allowCreate = true, timeoutMs = 60_000 } = {}) {
-  // Why: the agent-CLI feature-wall modal can already be up at first interaction
+  // Why: the CLI feature-tip modal can already be up at first interaction
   // (it renders off an async capability check that races app launch). Use the
   // Escape-free dismissal so we never inject a keypress into a restored terminal.
   await dismissKnownOverlays(page)

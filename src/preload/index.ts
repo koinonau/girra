@@ -41,7 +41,6 @@ import { codexConfigSyncApi } from './api/codex-config-sync-bridge'
 import { agentTrustApi } from './api/agent-trust-bridge'
 import { preflightApi } from './api/preflight-bridge'
 import { notificationsApi } from './api/notifications-bridge'
-import { onboardingApi } from './api/onboarding-bridge'
 import { dashboardApi } from './api/dashboard-bridge'
 import { terminalPreviewApi } from './api/terminal-preview-bridge'
 import { macosTccPromptsApi } from './api/macos-tcc-prompts-bridge'
@@ -120,7 +119,6 @@ const api = {
   agentTrust: agentTrustApi,
   preflight: preflightApi,
   notifications: notificationsApi,
-  onboarding: onboardingApi,
   dashboard: dashboardApi,
   terminalPreview: terminalPreviewApi,
   macosTccPrompts: macosTccPromptsApi,

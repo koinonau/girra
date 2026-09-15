@@ -118,19 +118,6 @@ describe('ProjectAddedDialog', () => {
     })
   })
 
-  it('accepts older onboarding modal data that uses projectId', async () => {
-    mocks.state.modalData = { projectId: 'repo-1' }
-    const { default: ProjectAddedDialog } = await import('./ProjectAddedDialog')
-
-    renderToStaticMarkup(<ProjectAddedDialog />)
-    await flushPromises()
-
-    expect(mocks.state.fetchWorktrees).toHaveBeenCalledWith('repo-1')
-    expect(mocks.finishProjectAddWithDefaultCheckout).toHaveBeenCalledWith(
-      expect.objectContaining({ repoId: 'repo-1' })
-    )
-  })
-
   it('activates the synthetic folder workspace for folder repos', async () => {
     mocks.state.repos = [makeRepo({ kind: 'folder' })]
     mocks.state.worktreesByRepo = {

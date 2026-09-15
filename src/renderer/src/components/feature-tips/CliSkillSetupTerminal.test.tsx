@@ -18,8 +18,8 @@ vi.mock('@/hooks/useActiveProjectSkillRuntime', () => ({
   useActiveProjectSkillRuntime: () => mocks.runtime
 }))
 
-vi.mock('@/components/onboarding/OnboardingInlineCommandTerminal', () => ({
-  OnboardingInlineCommandTerminal: ({
+vi.mock('@/components/inline-command-terminal/InlineCommandTerminal', () => ({
+  InlineCommandTerminal: ({
     command,
     prepareCommandForShell,
     shellOverride

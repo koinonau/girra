@@ -4,7 +4,6 @@ import type {
   FeatureInteractionState
 } from '../../../../../shared/feature-interactions'
 import type { FeatureTipId } from '../../../../../shared/feature-tips'
-import type { ContextualTourId } from '../../../../../shared/contextual-tours'
 import type { OrcaHookScriptKind } from '../../../lib/orca-hook-trust'
 import type { SettingsNavigationTarget } from '../../../lib/settings-navigation-types'
 import type { ExecutionHostId } from '../../../../../shared/execution-host'
@@ -46,7 +45,6 @@ export type UISliceContextual = {
     | 'project-added'
     | 'worktree-visibility'
     | 'setup-guide'
-    | 'feature-wall'
     | 'feature-tips'
     | 'new-workspace-composer'
     | 'confirm-orca-yaml-hooks'
@@ -57,32 +55,6 @@ export type UISliceContextual = {
   markFeatureTipsSeen: (ids: FeatureTipId[]) => void
   featureInteractions: FeatureInteractionState
   recordFeatureInteraction: (id: FeatureInteractionId) => Promise<void>
-  contextualToursSeenIds: ContextualTourId[]
-  contextualToursAutoEligible: boolean | null
-  activeContextualTourId: ContextualTourId | null
-  activeContextualTourStepIndex: number
-  activeContextualTourSource: string | null
-  activeContextualTourSourceDetached: boolean
-  activeContextualTourSuppressed: boolean
-  contextualTourShownThisSession: boolean
-  contextualToursOnboardingVisible: boolean
-  contextualToursBlockingSurfaceVisible: boolean
-  setContextualToursAutoEligible: (eligible: boolean) => void
-  setContextualToursOnboardingVisible: (visible: boolean) => void
-  setContextualToursBlockingSurfaceVisible: (visible: boolean) => void
-  requestContextualTour: (
-    id: ContextualTourId,
-    source: string,
-    options?: { force?: boolean }
-  ) => void
-  suppressContextualTour: (id: ContextualTourId, source: string) => void
-  detachContextualTourSource: (id: ContextualTourId, source: string) => void
-  advanceContextualTour: () => void
-  regressContextualTour: () => void
-  dismissContextualTour: (id?: ContextualTourId) => void
-  completeContextualTour: (id?: ContextualTourId) => void
-  cancelContextualTour: (id?: ContextualTourId) => void
-  markContextualToursSeen: (ids: ContextualTourId[]) => void
   trustedOrcaHooks: PersistedTrustedOrcaHooks
   markOrcaHookScriptConfirmed: (
     repoId: string,

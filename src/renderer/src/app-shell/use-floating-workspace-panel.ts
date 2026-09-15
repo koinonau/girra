@@ -3,7 +3,6 @@ import {
   TOGGLE_FLOATING_TERMINAL_EVENT,
   requestFloatingTerminalOpenMaximized
 } from '@/lib/floating-terminal'
-import { createFloatingWorkspaceTourInteractionSnapshot } from '@/lib/floating-workspace-tour-interaction-snapshot'
 import {
   persistFloatingTerminalPanelOpen,
   readPersistedFloatingTerminalPanelViewState
@@ -23,10 +22,6 @@ export function useFloatingWorkspacePanel() {
   const [open, setOpen] = useState(
     () => readPersistedFloatingTerminalPanelViewState()?.open === true
   )
-  const tourInteractionSnapshotRef = useRef<{
-    persisted?: Promise<void>
-    recordFeatureInteractionForTour: boolean
-  } | null>(null)
 
   const enabled = useAppStore((s) => s.settings?.floatingTerminalEnabled === true)
   // Why tracked separately: the flag reads false while settings are still loading, and a
@@ -85,11 +80,7 @@ export function useFloatingWorkspacePanel() {
   const setOpenWithFocus = useCallback(
     (nextOpen: SetStateAction<boolean>): void => {
       const resolvedOpen = typeof nextOpen === 'function' ? nextOpen(open) : nextOpen
-      // Why: recordFeatureInteraction updates Zustand subscribers; running it inside the state updater logs a render-phase update warning.
       if (resolvedOpen && !open) {
-        tourInteractionSnapshotRef.current = createFloatingWorkspaceTourInteractionSnapshot(
-          useAppStore.getState()
-        )
         rememberReturnFocus()
       } else if (!resolvedOpen && open) {
         restoreReturnFocus()
@@ -138,7 +129,6 @@ export function useFloatingWorkspacePanel() {
     // Why: once the floating workspace owns tabs, keep it mounted while closed so hidden terminal/browser/editor panes retain local state.
     shouldMountPanel: enabled && (open || visibleTabCount > 0),
     showToggleButton: enabled && (triggerLocation === 'floating-button' || !statusBarVisible),
-    tourInteractionSnapshotRef,
     visibleTabCount
   }
 }

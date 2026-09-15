@@ -7,11 +7,7 @@ import {
 } from '../menu/register-app-menu'
 import { zoomDashboardPopoutIfFocused } from '../window/dashboard-popout-window'
 import { mainProcessState as state } from './main-process-state'
-import {
-  openSettingsFromSystemMenu,
-  sendOpenFeatureTour,
-  sendOpenSetupGuide
-} from './main-window-actions'
+import { openSettingsFromSystemMenu, sendOpenSetupGuide } from './main-window-actions'
 import { logStartupMilestone } from './startup-diagnostics'
 
 export async function initializeMainProcessI18nAndMenu(): Promise<void> {
@@ -31,11 +27,8 @@ export async function initializeMainProcessI18nAndMenu(): Promise<void> {
     },
     onOpenSettings: openSettingsFromSystemMenu,
     onOpenSetupGuide: (targetWindow) => {
-      sendOpenSetupGuide(targetWindow instanceof BrowserWindow ? targetWindow : null)
-    },
-    onOpenFeatureTour: (targetWindow) => {
       // Why: use the invoking BrowserWindow so hidden/E2E and multi-window flows route to the right renderer, not global focus.
-      sendOpenFeatureTour(targetWindow instanceof BrowserWindow ? targetWindow : null)
+      sendOpenSetupGuide(targetWindow instanceof BrowserWindow ? targetWindow : null)
     },
     // Why: menu zoom must act on the window the user is looking at — routing to
     // the main window while the dashboard pop-out is focused zooms behind it.
