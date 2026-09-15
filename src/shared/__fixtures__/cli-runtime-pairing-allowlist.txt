@@ -16,4 +16,3 @@ src/main/external-editor-launch.ts
 # CodexAppServerInvocation whose cliPath is paired centrally in
 # codex-app-server-session.ts. Delete this entry if this file ever execs the
 # resolved CLI itself.
-src/main/codex/codex-trust-grant-host.ts

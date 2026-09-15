@@ -60,20 +60,10 @@ describe('AgentHookServer listener replay', () => {
     }
   })
 
-  it('caches and notifies status/main/plugin before retry scheduling and HTTP response', async () => {
+  it('caches and notifies status/main/plugin before the HTTP response', async () => {
     const server = new AgentHookServer()
     await server.start({ env: 'production' })
     const order: string[] = []
-    const internal = server as unknown as {
-      scheduleCodexSubagentPoll: (...args: unknown[]) => void
-    }
-    const originalCodexRetry = internal.scheduleCodexSubagentPoll.bind(server)
-    const codexRetry = vi
-      .spyOn(internal, 'scheduleCodexSubagentPoll')
-      .mockImplementation((...args) => {
-        order.push('codex-retry')
-        originalCodexRetry(...args)
-      })
     const unsubscribeStatus = server.subscribeStatusChanges(() => order.push('status-change'))
     server.setListener(() => {
       expect(server.getStatusSnapshotForPane(PANE)).toHaveLength(1)
@@ -87,28 +77,17 @@ describe('AgentHookServer listener replay', () => {
       })
       order.push('response')
       expect(response.status).toBe(204)
-      expect(order).toEqual([
-        'status-change',
-        'main-listener',
-        'plugin-listener',
-        'codex-retry',
-        'response'
-      ])
+      expect(order).toEqual(['status-change', 'main-listener', 'plugin-listener', 'response'])
     } finally {
       unsubscribeStatus()
       unsubscribePlugin()
-      codexRetry.mockRestore()
       server.stop()
     }
   })
 
-  it('fails open after a throwing callback with cache retained and retries skipped', async () => {
+  it('fails open after a throwing callback with cache retained', async () => {
     const server = new AgentHookServer()
     await server.start({ env: 'production' })
-    const internal = server as unknown as {
-      scheduleCodexSubagentPoll: (...args: unknown[]) => void
-    }
-    const codexRetry = vi.spyOn(internal, 'scheduleCodexSubagentPoll')
     server.setListener(() => {
       throw new Error('listener failed')
     })
@@ -119,13 +98,11 @@ describe('AgentHookServer listener replay', () => {
       })
       expect(response.status).toBe(204)
       expect(server.getStatusSnapshotForPane(PANE)).toHaveLength(1)
-      expect(codexRetry).not.toHaveBeenCalled()
     } finally {
-      codexRetry.mockRestore()
       server.stop()
     }
   })
-  it('ignores local nested Claude Stop while a parent Codex hook status is active', async () => {
+  it('ignores local nested Claude Stop while a parent Pi hook status is active', async () => {
     const server = new AgentHookServer()
     await server.start({ env: 'production' })
     try {
@@ -133,7 +110,7 @@ describe('AgentHookServer listener replay', () => {
       const listener = vi.fn()
       server.setListener(listener)
       const postHook = async (
-        source: 'codex' | 'claude',
+        source: 'pi' | 'claude',
         payload: Record<string, unknown>
       ): Promise<void> => {
         const response = await fetch(
@@ -150,9 +127,9 @@ describe('AgentHookServer listener replay', () => {
         expect(response.status).toBe(204)
       }
 
-      await postHook('codex', {
-        hook_event_name: 'UserPromptSubmit',
-        prompt: 'parent codex'
+      await postHook('pi', {
+        hook_event_name: 'before_agent_start',
+        prompt: 'parent pi'
       })
       await postHook('claude', {
         hook_event_name: 'Stop',
@@ -163,8 +140,8 @@ describe('AgentHookServer listener replay', () => {
         expect.objectContaining({
           paneKey: PANE,
           state: 'working',
-          prompt: 'parent codex',
-          agentType: 'codex'
+          prompt: 'parent pi',
+          agentType: 'pi'
         })
       ])
       const snapshot = server.getStatusSnapshot()[0]
@@ -174,8 +151,8 @@ describe('AgentHookServer listener replay', () => {
         expect.objectContaining({
           payload: expect.objectContaining({
             state: 'working',
-            prompt: 'parent codex',
-            agentType: 'codex'
+            prompt: 'parent pi',
+            agentType: 'pi'
           })
         })
       )
@@ -386,7 +363,7 @@ describe('AgentHookServer listener replay', () => {
           payload: {
             state: 'done',
             prompt: oversizedPrompt,
-            agentType: 'codex'
+            agentType: 'opencode'
           }
         },
         ' conn-9 '
@@ -401,7 +378,7 @@ describe('AgentHookServer listener replay', () => {
           connectionId: 'conn-9',
           payload: expect.objectContaining({
             state: 'done',
-            agentType: 'codex',
+            agentType: 'opencode',
             prompt: 'x'.repeat(AGENT_STATUS_MAX_FIELD_LENGTH)
           })
         })
@@ -454,110 +431,6 @@ describe('AgentHookServer listener replay', () => {
             state: 'working',
             prompt: 'form encoded',
             agentType: 'claude'
-          })
-        })
-      )
-    } finally {
-      server.stop()
-    }
-  })
-
-  it('tracks Codex agent statuses from form-encoded managed hook posts', async () => {
-    const server = new AgentHookServer()
-    await server.start({ env: 'production' })
-    try {
-      const env = server.buildPtyEnv()
-      const listener = vi.fn()
-      server.setListener(listener)
-      const postCodexHook = async (payload: Record<string, unknown>): Promise<void> => {
-        const params = new URLSearchParams({
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          env: 'production',
-          version: env.ORCA_AGENT_HOOK_VERSION ?? '',
-          payload: JSON.stringify(payload)
-        })
-        const response = await fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/codex`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
-          },
-          body: params
-        })
-        expect(response.status).toBe(204)
-      }
-
-      await postCodexHook({
-        hook_event_name: 'UserPromptSubmit',
-        prompt: 'ship codex hook status'
-      })
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          state: 'working',
-          agentType: 'codex',
-          prompt: 'ship codex hook status',
-          toolName: undefined,
-          toolInput: undefined
-        })
-      ])
-
-      await postCodexHook({
-        hook_event_name: 'PreToolUse',
-        tool_name: 'exec_command',
-        tool_input: { cmd: 'pnpm test', workdir: '/repo' }
-      })
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          state: 'working',
-          agentType: 'codex',
-          prompt: 'ship codex hook status',
-          toolName: 'exec_command',
-          toolInput: 'pnpm test'
-        })
-      ])
-
-      await postCodexHook({
-        hook_event_name: 'PermissionRequest',
-        tool_name: 'exec_command',
-        tool_input: { cmd: 'git push', workdir: '/repo' }
-      })
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          state: 'waiting',
-          agentType: 'codex',
-          prompt: 'ship codex hook status',
-          toolName: 'exec_command',
-          toolInput: 'git push'
-        })
-      ])
-
-      await postCodexHook({
-        hook_event_name: 'Stop',
-        last_assistant_message: 'done'
-      })
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          state: 'done',
-          agentType: 'codex',
-          prompt: 'ship codex hook status',
-          lastAssistantMessage: 'done'
-        })
-      ])
-      expect(listener).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          payload: expect.objectContaining({
-            state: 'done',
-            agentType: 'codex',
-            prompt: 'ship codex hook status',
-            lastAssistantMessage: 'done'
           })
         })
       )

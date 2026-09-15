@@ -827,13 +827,13 @@ describe('buildPosixAgentHookPostCommand', () => {
 
 describe('buildWindowsAgentHookCurlPostCommand', () => {
   it('posts form fields via curl.exe and reads the payload from stdin', () => {
-    const command = buildWindowsAgentHookCurlPostCommand('codex')
+    const command = buildWindowsAgentHookCurlPostCommand('claude')
 
     // Why: the fast path must not spawn a second PowerShell; that startup cost
     // is the regression this replaces.
     expect(command).not.toMatch(/powershell/i)
     expect(command).toContain('%SystemRoot%\\System32\\curl.exe')
-    expect(command).toContain('http://127.0.0.1:%ORCA_AGENT_HOOK_PORT%/hook/codex')
+    expect(command).toContain('http://127.0.0.1:%ORCA_AGENT_HOOK_PORT%/hook/claude')
     expect(command).toContain('-H "Content-Type: application/x-www-form-urlencoded"')
     expect(command).toContain('-H "X-Orca-Agent-Hook-Token: %ORCA_AGENT_HOOK_TOKEN%"')
     expect(command).toContain('--data-urlencode "paneKey=%ORCA_PANE_KEY%"')

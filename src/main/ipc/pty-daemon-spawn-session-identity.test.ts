@@ -45,9 +45,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow, recoveredAgentClaim, recoveredAgentSurface } = setupPtyIpcSuite()
@@ -67,7 +64,6 @@ describe('registerPtyHandlers', () => {
             GIT_CONFIG_KEY_0: 'http.proxy',
             GIT_CONFIG_VALUE_0: 'http://proxy.invalid'
           },
-          undefined,
           undefined,
           undefined,
           { command: 'claude' },
@@ -199,7 +195,7 @@ describe('registerPtyHandlers', () => {
       })
       it('falls back to process.env.PI_CODING_AGENT_DIR when baseEnv lacks it on the daemon path', async () => {
         // Why: buildPtyHostEnv reads `baseEnv.X ?? process.env.X` so the agent-dir guard works whether Pi's env came over IPC or via daemon fork.
-        const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
+        const env = await daemonSpawnAndGetEnv({}, undefined, {
           PI_CODING_AGENT_DIR: '/ambient/pi/agent'
         })
         expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
@@ -362,11 +358,9 @@ describe('registerPtyHandlers', () => {
         registerPtyHandlers(
           mainWindow as never,
           undefined,
-          undefined,
           (() => ({
             httpProxyUrl: 'http://proxy.example:8080',
-            httpProxyBypassRules: 'localhost',
-            codexSystemDefaultRealHomeEnabled: true
+            httpProxyBypassRules: 'localhost'
           })) as never,
           undefined,
           store as never
@@ -392,15 +386,10 @@ describe('registerPtyHandlers', () => {
         expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
         expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
         expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
-        expect(env.CODEX_HOME).toBeUndefined()
         expect(env.HTTP_PROXY).toBeUndefined()
         expect(env.HTTPS_PROXY).toBeUndefined()
         expect(env.NO_PROXY).toBeUndefined()
         expect(env.FOO).toBe('bar')
-        // Why: real-home routing is host-only. A null local-home resolver on
-        // SSH must not become a request to alter the remote Codex environment.
-        expect(spawnOptions.envToDelete ?? []).not.toContain('CODEX_HOME')
-        expect(spawnOptions.envToDelete ?? []).not.toContain('ORCA_CODEX_HOME')
         expect(spawnOptions.paneKey).toBe(makePaneKey('tab-1', leafId))
         expect(spawnOptions.tabId).toBe('tab-1')
         expect(openCodeBuildPtyEnvMock).not.toHaveBeenCalled()
@@ -477,14 +466,7 @@ describe('registerPtyHandlers', () => {
           getProfiles: vi.fn()
         } as never)
         handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          store as never
-        )
+        registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
         await expect(
           handlers.get('pty:spawn')!(null, {
@@ -534,14 +516,7 @@ describe('registerPtyHandlers', () => {
           getProfiles: vi.fn()
         } as never)
         handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          store as never
-        )
+        registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
         await expect(
           handlers.get('pty:spawn')!(null, {
@@ -591,14 +566,7 @@ describe('registerPtyHandlers', () => {
         } as never)
         setPtyOwnership(scopedPtyId, 'ssh-1')
         handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          store as never
-        )
+        registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
         try {
           await expect(

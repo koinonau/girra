@@ -232,7 +232,6 @@ describe('attachMainWindowServices', () => {
       createStore(),
       createRuntime() as never,
       undefined,
-      undefined,
       { onBeforeRendererReload }
     )
 
@@ -257,7 +256,6 @@ describe('attachMainWindowServices', () => {
       createMainWindow() as never,
       store,
       createRuntime() as never,
-      undefined,
       undefined,
       { awaitLocalPtyProviderStartup: () => providerStartup.promise }
     )
@@ -413,7 +411,6 @@ describe('attachMainWindowServices', () => {
       createStore(),
       createRuntime() as never,
       undefined,
-      undefined,
       { onBeforeRendererReload }
     )
 
@@ -433,7 +430,6 @@ describe('attachMainWindowServices', () => {
       mainWindow as never,
       createStore(),
       createRuntime() as never,
-      undefined,
       undefined,
       { onBeforeRendererReload }
     )
@@ -460,7 +456,6 @@ describe('attachMainWindowServices', () => {
       mainWindow as never,
       createStore(),
       createRuntime() as never,
-      undefined,
       undefined,
       { onBeforeRendererReload }
     )

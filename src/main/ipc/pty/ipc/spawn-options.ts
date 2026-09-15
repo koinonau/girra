@@ -1,10 +1,8 @@
 import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import { CLAUDE_AUTH_ENV_VARS } from '../../../claude-accounts/environment'
 import { LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS } from '../../../pty/legacy-terminal-shim-dir'
-import { CODEX_HOME_ENV_KEYS } from '../host-env/codex-home'
 import {
   mergePtyEnvDeletions,
-  removeCodexHomeDeletionRequests,
   getInheritedAgentHookEnvKeysToDelete,
   getInheritedClaudeSessionStampEnvKeysToDelete
 } from '../host-env/pi-agent'
@@ -38,15 +36,8 @@ export async function buildPtyIpcSpawnOptions(
     // Why: disable old hosts without removing ORCA_REAL_* while their Windows shim remains on PATH.
     ctx.isDaemonHostSpawn || args.connectionId ? LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS : [],
     ctx.isDaemonHostSpawn ? getInheritedAgentHookEnvKeysToDelete(ctx.spawnEnv) : [],
-    getInheritedClaudeSessionStampEnvKeysToDelete(ctx.spawnEnv),
-    ctx.skipCodexHomeEnv ? CODEX_HOME_ENV_KEYS : [],
-    // Why: the persistent daemon compares its own merged CODEX_HOME pair;
-    // main cannot safely decide ownership for a process it may not parent.
-    ctx.stripInheritedOrcaCodexHome ? ['ORCA_CODEX_HOME'] : []
+    getInheritedClaudeSessionStampEnvKeysToDelete(ctx.spawnEnv)
   )
-  if (ctx.codexResumeHomeSelected) {
-    ctx.combinedEnvToDelete = removeCodexHomeDeletionRequests(ctx.combinedEnvToDelete)
-  }
   deleteRequestedEnvKeys(ctx.spawnEnv, ctx.combinedEnvToDelete)
   promoteAgentTeamsShimPath(ctx.spawnEnv, ctx.requestedAgentTeamsPath)
   ctx.spawnOptions = {
@@ -59,9 +50,6 @@ export async function buildPtyIpcSpawnOptions(
     env: ctx.spawnEnv,
     historyIsolationEnabled: ctx.deps.getSettings?.()?.terminalScopeHistoryByWorktree ?? true,
     ...(ctx.isMintedSessionId ? { isNewSession: true } : {})
-  }
-  if (!args.connectionId && !ctx.isDaemonHostSpawn) {
-    ctx.spawnOptions.codexHomePathOverride = { value: ctx.selectedCodexHomePath }
   }
   if (ctx.combinedEnvToDelete) {
     ctx.spawnOptions.envToDelete = ctx.combinedEnvToDelete

@@ -163,7 +163,6 @@ const {
   applyAgentStatusHooksEnabledMock,
   detectInstalledAgentsWithShellPathHydrationMock,
   detectRemoteAgentsMock,
-  markCodexProjectTrustedMock,
   markCopilotFolderTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,
@@ -273,7 +272,6 @@ const {
     applyAgentStatusHooksEnabledMock: vi.fn() as TestMock,
     detectInstalledAgentsWithShellPathHydrationMock: vi.fn() as TestMock,
     detectRemoteAgentsMock: vi.fn() as TestMock,
-    markCodexProjectTrustedMock: vi.fn() as TestMock,
     markCopilotFolderTrustedMock: vi.fn() as TestMock,
     listGitLabMergeRequestsMock: vi.fn() as TestMock,
     listGitLabWorkItemsMock: vi.fn() as TestMock,
@@ -356,7 +354,6 @@ vi.mock('../../agent-hooks/managed-agent-hook-controls', () => ({
 }))
 
 vi.mock('../../agent-trust-presets', () => ({
-  markCodexProjectTrusted: markCodexProjectTrustedMock,
   markCopilotFolderTrusted: markCopilotFolderTrustedMock
 }))
 
@@ -629,7 +626,6 @@ export {
   applyAgentStatusHooksEnabledMock,
   detectInstalledAgentsWithShellPathHydrationMock,
   detectRemoteAgentsMock,
-  markCodexProjectTrustedMock,
   markCopilotFolderTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,

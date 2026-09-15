@@ -113,8 +113,7 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
             this.observations.rebind(event.paneKey)
           }
           this.recordCurrentAuthorityObservation(event)
-          const enriched = this.applyNormalizedStatus(event, normalized.onAccepted)
-          this.scheduleCodexSubagentPoll(source, aliasedBody, enriched)
+          this.applyNormalizedStatus(event, normalized.onAccepted)
         }
         res.writeHead(204)
         res.end()
@@ -179,7 +178,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
     this.onPaneStatusCleared = null
     this.onTransportInterference = null
     this.transportInterference.reset()
-    this.clearAllCodexSubagentPolls()
     this.endpointDir = null
     this.endpointFilePathCache = null
     this.endpointFileWritten = false

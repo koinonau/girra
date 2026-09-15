@@ -1,5 +1,4 @@
 import { win32 as pathWin32 } from 'node:path'
-import { shouldUseShellReadyStartupDelivery } from '../../shared/codex-startup-delivery'
 import { expandWindowsPathEnvironmentVariables } from '../../shared/windows-environment-expansion'
 import { dropInheritedOrcaFishHistory } from '../fish-history-session'
 import { dropIncoherentCondaActivationEnv } from '../pty/conda-activation-env'
@@ -8,10 +7,7 @@ import {
   POWERLEVEL10K_WIZARD_DISABLE_ENV,
   seedPowerlevel10kWizardEnv
 } from '../pty/powerlevel10k-wizard-env'
-import {
-  POSIX_SHELL_STARTUP_COMMAND_ENV,
-  supportsPosixShellStartupCommand
-} from '../pty/posix-shell-startup-command'
+import { POSIX_SHELL_STARTUP_COMMAND_ENV } from '../pty/posix-shell-startup-command'
 import { resolvePathEnvKey } from '../pty/windows-environment-path'
 import { selectShellStartupFeatures } from '../shell-startup-features'
 import {
@@ -37,7 +33,7 @@ export function finalizeLocalPtySpawnEnvironment(args: {
 }): HistoryInjectionResult | null {
   const { spawn, getOptions, plan, env } = args
   if (process.platform === 'win32') {
-    finalizeWindowsLocalPtySpawnEnvironment({ spawn, plan, env })
+    finalizeWindowsLocalPtySpawnEnvironment({ plan, env })
   }
   seedPowerlevel10kWizardEnv(env, { envToDelete: spawn.envToDelete })
   if (
@@ -92,28 +88,12 @@ export function finalizeLocalPtySpawnEnvironment(args: {
     // Why after history injection: the wrapper is what repairs a worktree
     // HISTFILE that the system zshrc clobbers, so the decision to wrap has to
     // see whether this spawn actually injected one.
-    const isCodexStartupCommand = plan.startupAgentRecognition?.agent === 'codex'
-    const codexStartupCommand = isCodexStartupCommand ? spawn.command : undefined
-    const codexRequiresShellReady =
-      codexStartupCommand !== undefined &&
-      shouldUseShellReadyStartupDelivery({
-        command: codexStartupCommand,
-        startupCommandDelivery: spawn.startupCommandDelivery
-      })
     // Why delete: ORCA_SHELL_FEATURES is Orca-owned, and only the launch
     // config below may name features for this shell.
     delete env.ORCA_SHELL_FEATURES
     delete env[POSIX_SHELL_STARTUP_COMMAND_ENV]
     plan.getFallbackShellReadyConfig = (shell) => {
-      const wrapperStartupCommand =
-        codexStartupCommand !== undefined && supportsPosixShellStartupCommand(shell)
-          ? codexStartupCommand
-          : undefined
-      // Why no line-editor widening here (unlike the daemon and relay): a Codex
-      // startup command this provider wraps is run by the wrapper's own prompt
-      // hook, never written into the PTY, so there is no early write to double-echo.
-      const waitsForShellReady =
-        Boolean(spawn.command) && (!isCodexStartupCommand || codexRequiresShellReady)
+      const waitsForShellReady = Boolean(spawn.command)
       return getShellLaunchConfig(
         shell,
         selectShellStartupFeatures({
@@ -124,8 +104,7 @@ export function finalizeLocalPtySpawnEnvironment(args: {
           // Why identical: the identity marker exists so the readiness
           // handshake can bind output to the right shell PID.
           emitsStartupIdentity: waitsForShellReady
-        }),
-        wrapperStartupCommand
+        })
       )
     }
     const shellLaunch = plan.getFallbackShellReadyConfig(plan.shellPath)

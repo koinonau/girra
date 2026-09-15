@@ -10,13 +10,10 @@ import { configureBrowserClientPageAutomationRuntime } from '../browser/browser-
 import { BrowserClientPageCommandError } from '../browser/browser-client-page-command-failure'
 import { handleGpuChildCrash } from './gpu-lifecycle'
 import { isGpuFallbackCrashCandidate } from '../crash-reporting/gpu-crash-fallback-decision'
-import { ensureRealHomeCodexHookState } from '../codex/codex-real-home-hook-install'
-import { isHostCodexRealHomeSelected } from './codex-launch-preparation'
 import {
   installManagedAgentHooks,
   resolveStartupManagedHookAction,
-  shouldContinueManagedHookStartup,
-  shouldInstallStartupManagedAgentHook
+  shouldContinueManagedHookStartup
 } from '../agent-hooks/managed-agent-hook-controls'
 import { shouldInstallManagedHooks } from './configure-process'
 import { mainProcessState as state } from './main-process-state'
@@ -83,45 +80,21 @@ export async function initializeReadyRuntimeServices(): Promise<void> {
     })
   }, WORKTREE_TRASH_SWEEP_FALLBACK_MS)
   nativeTheme.themeSource = store.getSettings().theme ?? 'system'
-  // Why (#16441): the real-home grant runs a codex app-server session. It stays
-  // ordered before managed-hook reconciliation — an incapable host must re-arm
-  // and complete the legacy real-home sweep first — but awaiting it inline
-  // stalled app init behind that session, so chain instead of blocking.
-  const startupManagedHookSettings = store.getSettings()
   const shouldReconcileStartupManagedHooks =
     shouldInstallManagedHooks(is.dev) &&
-    resolveStartupManagedHookAction(startupManagedHookSettings) === 'install'
-  const realHomeCodexHookState =
-    shouldReconcileStartupManagedHooks &&
-    shouldInstallStartupManagedAgentHook(startupManagedHookSettings, 'codex') &&
-    isHostCodexRealHomeSelected()
-      ? ensureRealHomeCodexHookState({
-          hooksEnabled: true,
-          userDataPath: app.getPath('userData')
-        }).catch((error: unknown) => {
-          console.warn('[codex-real-home-hooks] startup ensure failed:', error)
-        })
-      : Promise.resolve()
+    resolveStartupManagedHookAction(store.getSettings()) === 'install'
   // Why skip rather than remove when the off switch is set: the hook files are user-global but this
   // decision reads only THIS profile's settings, so removing here deletes the hooks every other Orca
   // instance depends on (STA-5679). Skipping already keeps removed hooks from reappearing on launch.
   if (shouldReconcileStartupManagedHooks) {
     const managedHookStore = store
-    void realHomeCodexHookState
-      .then(() =>
-        installManagedAgentHooks(managedHookStore.getSettings(), {
-          shouldHydrateShellPath: app.isPackaged,
-          shouldContinue: (agent) =>
-            shouldContinueManagedHookStartup(
-              state.isQuitting,
-              managedHookStore.getSettings(),
-              agent
-            )
-        })
-      )
-      .catch((error: unknown) =>
-        console.warn('[agent-hooks] failed to reconcile managed hooks on startup:', error)
-      )
+    void installManagedAgentHooks(managedHookStore.getSettings(), {
+      shouldHydrateShellPath: app.isPackaged,
+      shouldContinue: (agent) =>
+        shouldContinueManagedHookStartup(state.isQuitting, managedHookStore.getSettings(), agent)
+    }).catch((error: unknown) =>
+      console.warn('[agent-hooks] failed to reconcile managed hooks on startup:', error)
+    )
   }
   app.on('child-process-gone', (_event, details) => {
     if (

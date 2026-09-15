@@ -25,9 +25,7 @@ export function getLocalZshWrapperSpec(): ZshStartupHookSpec {
       "# Why: ~/.zshrc can export the user's default OpenCode config after spawn.",
     restores: {
       agentTeamsPath: true,
-      remoteCliBinDir: false,
-      codexHome: true,
-      codexLaunchPreflight: true
+      remoteCliBinDir: false
     }
   }
 }

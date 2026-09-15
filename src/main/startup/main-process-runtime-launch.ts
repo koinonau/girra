@@ -16,8 +16,6 @@ import {
   bindTerminalRuntimeStartupServices,
   startTerminalRuntimeStartupServices
 } from './main-process-pty-startup'
-import { prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
-import { prepareCodexSessionResumeForLaunch } from './codex-session-resume-launch'
 import { startWindowsDesktopBeforeShellPathReady } from './windows-desktop-shell-path-startup'
 import { repairKnownPoisonedInstallDirBeforeWindow } from './windows-install-dir-acl-recovery'
 import { registerServeSignalHandlers } from './serve-signal-handlers'
@@ -108,11 +106,9 @@ async function launchServeMode(
   await state.localPtyProviderStartupReady
   await registerHeadlessPtyRuntime(
     runtime,
-    prepareCodexRuntimeHomeForLaunch,
     () => state.store!.getSettings(),
     (target) => state.claudeRuntimeAuth!.prepareForClaudeLaunch(target),
-    state.store!,
-    prepareCodexSessionResumeForLaunch
+    state.store!
   )
   await runtime.refreshRestoredOrchestrationAuthority()
   await runtime.reconcileLegacyWorkerTerminals()

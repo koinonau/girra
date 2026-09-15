@@ -5,12 +5,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ManagedAgentHookTarget } from '../../shared/managed-agent-hook-targets'
 import { detectLocalManagedAgentCliPresence } from './local-agent-cli-presence'
 
-const codexTarget: ManagedAgentHookTarget = {
-  agent: 'codex',
-  tuiAgent: 'codex',
-  executableCandidates: ['codex']
-}
-
 const claudeTarget: ManagedAgentHookTarget = {
   agent: 'claude',
   tuiAgent: 'claude',
@@ -28,9 +22,9 @@ describe('detectLocalManagedAgentCliPresence', () => {
   })
 
   it('scans a deduped PATH once for all agent candidates', async () => {
-    const probe = vi.fn(async (filePath: string) => filePath.endsWith('/bin/codex'))
+    const probe = vi.fn(async (filePath: string) => filePath.endsWith('/bin/claude-code'))
     const result = await detectLocalManagedAgentCliPresence(
-      [codexTarget, claudeTarget],
+      [{ ...claudeTarget, executableCandidates: ['claude', 'claude-code'] }],
       { agentCmdOverrides: {} },
       {
         pathEnv: ['/bin', '/bin', '/usr/bin'].join(':'),
@@ -40,20 +34,19 @@ describe('detectLocalManagedAgentCliPresence', () => {
       }
     )
 
-    expect(result.codex?.state).toBe('found')
-    expect(result.claude?.state).toBe('missing')
+    expect(result.claude?.state).toBe('found')
     expect(probe.mock.calls.map(([filePath]) => filePath)).toEqual([
-      '/bin/codex',
       '/bin/claude',
-      '/usr/bin/claude'
+      '/usr/bin/claude',
+      '/bin/claude-code'
     ])
   })
 
   it('uses executable override paths as positive evidence', async () => {
-    const probe = vi.fn(async (filePath: string) => filePath === '/custom/bin/codex')
+    const probe = vi.fn(async (filePath: string) => filePath === '/custom/bin/claude')
     const result = await detectLocalManagedAgentCliPresence(
-      [codexTarget],
-      { agentCmdOverrides: { codex: '/custom/bin/codex --profile work' } },
+      [claudeTarget],
+      { agentCmdOverrides: { claude: '/custom/bin/claude --profile work' } },
       {
         pathEnv: '',
         pathDelimiter: ':',
@@ -62,8 +55,8 @@ describe('detectLocalManagedAgentCliPresence', () => {
       }
     )
 
-    expect(result.codex?.state).toBe('found')
-    expect(probe).toHaveBeenCalledWith('/custom/bin/codex')
+    expect(result.claude?.state).toBe('found')
+    expect(probe).toHaveBeenCalledWith('/custom/bin/claude')
   })
 
   it('preserves Windows override separators', async () => {
@@ -103,10 +96,10 @@ describe('detectLocalManagedAgentCliPresence', () => {
   })
 
   it('expands home-relative override paths', async () => {
-    const probe = vi.fn(async (filePath: string) => filePath === '/home/orca/bin/codex')
+    const probe = vi.fn(async (filePath: string) => filePath === '/home/orca/bin/claude')
     const result = await detectLocalManagedAgentCliPresence(
-      [codexTarget],
-      { agentCmdOverrides: { codex: '~/bin/codex --profile work' } },
+      [claudeTarget],
+      { agentCmdOverrides: { claude: '~/bin/claude --profile work' } },
       {
         pathEnv: '',
         pathDelimiter: ':',
@@ -116,15 +109,15 @@ describe('detectLocalManagedAgentCliPresence', () => {
       }
     )
 
-    expect(result.codex?.state).toBe('found')
-    expect(probe).toHaveBeenCalledWith('/home/orca/bin/codex')
+    expect(result.claude?.state).toBe('found')
+    expect(probe).toHaveBeenCalledWith('/home/orca/bin/claude')
   })
 
   it('reports relative override paths as unknown', async () => {
     const probe = vi.fn(async () => true)
     const result = await detectLocalManagedAgentCliPresence(
-      [codexTarget],
-      { agentCmdOverrides: { codex: 'bin/codex --profile work' } },
+      [claudeTarget],
+      { agentCmdOverrides: { claude: 'bin/claude --profile work' } },
       {
         pathEnv: '',
         pathDelimiter: ':',
@@ -133,14 +126,14 @@ describe('detectLocalManagedAgentCliPresence', () => {
       }
     )
 
-    expect(result.codex).toEqual({ state: 'unknown' })
+    expect(result.claude).toEqual({ state: 'unknown' })
     expect(probe).not.toHaveBeenCalled()
   })
 
   it('honors PATHEXT for Windows PATH candidates', async () => {
-    const probe = vi.fn(async (filePath: string) => filePath === 'C:\\Tools\\codex.CMD')
+    const probe = vi.fn(async (filePath: string) => filePath === 'C:\\Tools\\claude.CMD')
     const result = await detectLocalManagedAgentCliPresence(
-      [codexTarget],
+      [claudeTarget],
       { agentCmdOverrides: {} },
       {
         pathEnv: 'C:\\Other;C:\\Tools',
@@ -150,12 +143,12 @@ describe('detectLocalManagedAgentCliPresence', () => {
       }
     )
 
-    expect(result.codex?.state).toBe('found')
+    expect(result.claude?.state).toBe('found')
     expect(probe.mock.calls.map(([filePath]) => filePath)).toEqual([
-      'C:\\Other\\codex.EXE',
-      'C:\\Other\\codex.CMD',
-      'C:\\Tools\\codex.EXE',
-      'C:\\Tools\\codex.CMD'
+      'C:\\Other\\claude.EXE',
+      'C:\\Other\\claude.CMD',
+      'C:\\Tools\\claude.EXE',
+      'C:\\Tools\\claude.CMD'
     ])
   })
 
@@ -163,7 +156,7 @@ describe('detectLocalManagedAgentCliPresence', () => {
     const warning = vi.spyOn(console, 'warn').mockImplementation(() => {})
     try {
       const result = await detectLocalManagedAgentCliPresence(
-        [codexTarget],
+        [claudeTarget],
         { agentCmdOverrides: {} },
         {
           pathEnv: '',
@@ -177,7 +170,7 @@ describe('detectLocalManagedAgentCliPresence', () => {
         }
       )
 
-      expect(result.codex?.state).toBe('missing')
+      expect(result.claude?.state).toBe('missing')
       expect(warning).toHaveBeenCalledWith(
         '[agent-hooks] Shell PATH hydration failed; using inherited PATH:',
         expect.objectContaining({ message: 'shell unavailable' })
@@ -193,20 +186,20 @@ describe('detectLocalManagedAgentCliPresence', () => {
       tmpDir = mkdtempSync(join(tmpdir(), 'orca-cli-presence-'))
       const binDir = join(tmpDir, 'bin')
       mkdirSync(binDir)
-      const targetPath = join(tmpDir, 'codex-real')
+      const targetPath = join(tmpDir, 'claude-real')
       writeFileSync(targetPath, '#!/bin/sh\n')
       chmodSync(targetPath, 0o755)
-      symlinkSync(targetPath, join(binDir, 'codex'))
-      symlinkSync(join(tmpDir, 'missing'), join(binDir, 'claude'))
+      symlinkSync(targetPath, join(binDir, 'claude'))
+      symlinkSync(join(tmpDir, 'missing'), join(binDir, 'claude-broken'))
+      const detect = (executableCandidates: string[]) =>
+        detectLocalManagedAgentCliPresence(
+          [{ ...claudeTarget, executableCandidates }],
+          { agentCmdOverrides: {} },
+          { pathEnv: binDir, pathDelimiter: ':', platform: process.platform }
+        )
 
-      const result = await detectLocalManagedAgentCliPresence(
-        [codexTarget, claudeTarget],
-        { agentCmdOverrides: {} },
-        { pathEnv: binDir, pathDelimiter: ':', platform: process.platform }
-      )
-
-      expect(result.codex?.state).toBe('found')
-      expect(result.claude?.state).toBe('missing')
+      expect((await detect(['claude'])).claude?.state).toBe('found')
+      expect((await detect(['claude-broken'])).claude?.state).toBe('missing')
     }
   )
 })

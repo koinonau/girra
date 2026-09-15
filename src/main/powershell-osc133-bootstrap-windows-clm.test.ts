@@ -7,18 +7,18 @@ import { encodePowerShellCommand } from './powershell-osc133-bootstrap'
 import { resolveWindowsShellLaunchArgs } from './providers/windows-shell-args'
 
 const WINDOWS_POWERSHELLS = ['powershell.exe', 'pwsh.exe'] as const
-const PROFILE_CODEX_HOME = 'C:\\Profile Custom\\codex'
-const MANAGED_CODEX_HOME = 'C:\\Orca Managed\\codex-runtime-home'
+const PROFILE_CONFIG_DIR = 'C:\\Profile Custom\\opencode'
+const MANAGED_CONFIG_DIR = 'C:\\Orca Managed\\opencode-config'
 
 for (const shell of WINDOWS_POWERSHELLS) {
   describe.runIf(isAvailable(shell))(`${shell} managed home bootstrap`, () => {
     it.each(['FullLanguage', 'ConstrainedLanguage'] as const)(
-      'restores CODEX_HOME and continues startup in %s mode',
+      'restores OPENCODE_CONFIG_DIR and continues startup in %s mode',
       (languageMode) => {
         const cwd = mkdtempSync(join(tmpdir(), 'orca-powershell-clm-'))
         try {
           expect(runBootstrap(shell, languageMode, cwd)).toContain(
-            `mode=${languageMode};codexHome=${MANAGED_CODEX_HOME};orcaHome=${MANAGED_CODEX_HOME};startupCount=2;cwd=${cwd}`
+            `mode=${languageMode};configDir=${MANAGED_CONFIG_DIR};orcaConfigDir=${MANAGED_CONFIG_DIR};startupCount=2;cwd=${cwd}`
           )
         } finally {
           rmSync(cwd, { recursive: true, force: true })
@@ -53,8 +53,8 @@ function runBootstrap(
       encoding: 'utf8',
       env: {
         ...process.env,
-        CODEX_HOME: PROFILE_CODEX_HOME,
-        ORCA_CODEX_HOME: MANAGED_CODEX_HOME,
+        OPENCODE_CONFIG_DIR: PROFILE_CONFIG_DIR,
+        ORCA_OPENCODE_CONFIG_DIR: MANAGED_CONFIG_DIR,
         ORCA_TEST_BOOTSTRAP: encodedCommand,
         ORCA_TEST_LANGUAGE_MODE: languageMode
       },
@@ -93,7 +93,7 @@ $runner.Commands.Clear()
 $null = $runner.AddScript($bootstrap).Invoke()
 $runner.Commands.Clear()
 $runner.AddScript(
-  '"mode=$($ExecutionContext.SessionState.LanguageMode);codexHome=$env:CODEX_HOME;orcaHome=$env:ORCA_CODEX_HOME;startupCount=$env:ORCA_TEST_STARTUP_COUNT;cwd=$($PWD.Path)"'
+  '"mode=$($ExecutionContext.SessionState.LanguageMode);configDir=$env:OPENCODE_CONFIG_DIR;orcaConfigDir=$env:ORCA_OPENCODE_CONFIG_DIR;startupCount=$env:ORCA_TEST_STARTUP_COUNT;cwd=$($PWD.Path)"'
 ).Invoke()
 $runner.Dispose()
 $runspace.Dispose()

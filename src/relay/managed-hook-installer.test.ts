@@ -27,13 +27,13 @@ describe('registerManagedHookInstaller', () => {
     const installManagedHooks = vi.fn().mockResolvedValue({ installers: 14, errors: 0 })
     const handler = captureHandler(() => ({ installManagedHooks }))
 
-    await expect(handler({ agents: ['codex'] }, context(controller.signal))).resolves.toEqual({
+    await expect(handler({ agents: ['claude'] }, context(controller.signal))).resolves.toEqual({
       installers: 14,
       errors: 0
     })
     expect(installManagedHooks).toHaveBeenCalledWith({
       signal: controller.signal,
-      agents: ['codex']
+      agents: ['claude']
     })
   })
 
@@ -54,17 +54,17 @@ describe('registerManagedHookInstaller', () => {
     const handler = captureHandler(() => ({ installManagedHooks }))
     const fingerprint = 'SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'
 
-    await handler({ hostKeyFingerprint: fingerprint, agents: ['codex'] }, context())
-    await handler({ hostKeyFingerprint: 'ssh://untrusted-host', agents: ['codex'] }, context())
+    await handler({ hostKeyFingerprint: fingerprint, agents: ['claude'] }, context())
+    await handler({ hostKeyFingerprint: 'ssh://untrusted-host', agents: ['claude'] }, context())
 
     expect(installManagedHooks).toHaveBeenNthCalledWith(1, {
       signal: undefined,
       hostKeyFingerprint: fingerprint,
-      agents: ['codex']
+      agents: ['claude']
     })
     expect(installManagedHooks).toHaveBeenNthCalledWith(2, {
       signal: undefined,
-      agents: ['codex']
+      agents: ['claude']
     })
   })
 
@@ -80,17 +80,20 @@ describe('registerManagedHookInstaller', () => {
     })
   })
 
-  it('validates, deduplicates, and forwards the detected agent allowlist', async () => {
+  it('ignores retired agents, deduplicates, and forwards the detected agent allowlist', async () => {
     const installManagedHooks = vi.fn().mockResolvedValue({ installers: 1, errors: 0 })
     const handler = captureHandler(() => ({ installManagedHooks }))
 
-    await handler({ agents: ['codex', 'codex'] }, context())
+    await handler({ agents: ['claude', 'claude'] }, context())
 
     expect(installManagedHooks).toHaveBeenCalledWith({
       signal: undefined,
-      agents: ['codex']
+      agents: ['claude']
     })
-    await expect(handler({ agents: ['unknown'] }, context())).rejects.toThrow(
+    installManagedHooks.mockClear()
+    await handler({ agents: ['codex', 'claude'] }, context())
+    expect(installManagedHooks).toHaveBeenCalledWith({ signal: undefined, agents: ['claude'] })
+    await expect(handler({ agents: 'claude' }, context())).rejects.toThrow(
       'invalid_managed_hook_agents'
     )
   })

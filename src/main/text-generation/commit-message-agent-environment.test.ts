@@ -102,52 +102,9 @@ describe('prepareLocalCommitMessageAgentEnv', () => {
   })
 
   it('falls back to inherited env when managed account resolvers are unavailable', async () => {
-    await expect(prepareLocalCommitMessageAgentEnv('codex', undefined)).resolves.toEqual({
-      ok: true
-    })
     await expect(prepareLocalCommitMessageAgentEnv('claude', undefined)).resolves.toEqual({
       ok: true
     })
-  })
-
-  it('strips a nested-Orca CODEX_HOME override for Codex runs', async () => {
-    process.env.CODEX_HOME = '/nested-orca/codex-home'
-    process.env.ORCA_CODEX_HOME = '/nested-orca/codex-home'
-
-    const result = await prepareLocalCommitMessageAgentEnv('codex', {})
-
-    expect(result.ok).toBe(true)
-    const env = (result as { ok: true; env?: NodeJS.ProcessEnv }).env
-    expect(env).toBeDefined()
-    expect(env?.CODEX_HOME).toBeUndefined()
-    expect(env?.ORCA_CODEX_HOME).toBeUndefined()
-  })
-
-  it('preserves a user-owned CODEX_HOME for Codex runs', async () => {
-    process.env.CODEX_HOME = '/home/me/.config/codex'
-    delete process.env.ORCA_CODEX_HOME
-
-    const result = await prepareLocalCommitMessageAgentEnv('codex', {})
-
-    expect(result.ok).toBe(true)
-    const env = (result as { ok: true; env?: NodeJS.ProcessEnv }).env
-    expect(env?.CODEX_HOME).toBe('/home/me/.config/codex')
-  })
-
-  it('strips a nested-Orca CODEX_HOME override for WSL-local Codex runs', async () => {
-    process.env.CODEX_HOME = '/nested-orca/codex-home'
-    process.env.ORCA_CODEX_HOME = '/nested-orca/codex-home'
-
-    const result = await prepareLocalCommitMessageAgentEnv(
-      'codex',
-      {},
-      { runtime: 'wsl', wslDistro: 'Ubuntu' }
-    )
-
-    expect(result.ok).toBe(true)
-    const env = (result as { ok: true; env?: NodeJS.ProcessEnv }).env
-    expect(env?.CODEX_HOME).toBeUndefined()
-    expect(env?.ORCA_CODEX_HOME).toBeUndefined()
   })
 
   it('does not hydrate host shell config roots for WSL-local commit generation', async () => {

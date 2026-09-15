@@ -36,26 +36,26 @@ describe('markRemoteAgentWorkspaceTrusted', () => {
     })
   })
 
-  it('writes Codex trust to the remote home and canonicalized workspace path', async () => {
+  it('writes Copilot trust to the remote home and canonicalized workspace path', async () => {
     const fsProvider = makeFsProvider()
     mocks.getSshFilesystemProvider.mockReturnValue(fsProvider)
 
     await markRemoteAgentWorkspaceTrusted({
-      preset: 'codex',
+      preset: 'copilot',
       connectionId: 'ssh-1',
       workspacePath: '/repo/worktree'
     })
 
     expect(mocks.getActiveMultiplexer).toHaveBeenCalledWith('ssh-1')
     expect(fsProvider.realpath).toHaveBeenCalledWith('/repo/worktree')
-    expect(fsProvider.createDir).toHaveBeenCalledWith('/home/u/.codex')
+    expect(fsProvider.createDir).toHaveBeenCalledWith('/home/u/.copilot')
     expect(fsProvider.writeFile).toHaveBeenCalledWith(
-      '/home/u/.codex/config.toml',
-      expect.stringContaining('[projects."/real/repo/worktree"]')
+      '/home/u/.copilot/config.json',
+      expect.stringContaining('/real/repo/worktree')
     )
   })
 
-  it('writes Codex trust when the remote home is a Windows absolute path', async () => {
+  it('writes Copilot trust when the remote home is a Windows absolute path', async () => {
     const fsProvider = makeFsProvider({
       realpath: vi.fn(async () => 'C:/Users/alice/platform')
     })
@@ -65,15 +65,15 @@ describe('markRemoteAgentWorkspaceTrusted', () => {
     mocks.getSshFilesystemProvider.mockReturnValue(fsProvider)
 
     await markRemoteAgentWorkspaceTrusted({
-      preset: 'codex',
+      preset: 'copilot',
       connectionId: 'ssh-windows',
       workspacePath: 'C:\\Users\\alice\\platform'
     })
 
-    expect(fsProvider.createDir).toHaveBeenCalledWith('C:/Users/alice/.codex')
+    expect(fsProvider.createDir).toHaveBeenCalledWith('C:/Users/alice/.copilot')
     expect(fsProvider.writeFile).toHaveBeenCalledWith(
-      'C:/Users/alice/.codex/config.toml',
-      expect.stringContaining('[projects."C:/Users/alice/platform"]')
+      'C:/Users/alice/.copilot/config.json',
+      expect.stringContaining('C:/Users/alice/platform')
     )
   })
 
@@ -111,7 +111,7 @@ describe('markRemoteAgentWorkspaceTrusted', () => {
     mocks.getSshFilesystemProvider.mockReturnValue(fsProvider)
 
     await markRemoteAgentWorkspaceTrusted({
-      preset: 'codex',
+      preset: 'copilot',
       connectionId: 'ssh-1',
       workspacePath: '/repo/worktree'
     })

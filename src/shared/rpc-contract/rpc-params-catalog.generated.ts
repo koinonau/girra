@@ -20,7 +20,6 @@ import {
   RemoveAccountParams,
   SelectAccountParams
 } from './accounts-params'
-import { PrepareCodexForWslPaneParams } from './agent-hooks-params'
 import { CreateAgentSessionParams, EnsureAgentSessionParams } from './agent-session-params'
 import {
   AiVaultListSessionsParams,
@@ -526,7 +525,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'accounts.selectClaude': SelectAccountParams,
   'accounts.subscribe': null,
   'accounts.unsubscribe': AccountsUnsubscribeParams,
-  'agentHooks.prepareCodexForWslPane': PrepareCodexForWslPaneParams,
   'agentSession.cancel': CancelParams,
   'agentSession.close': OptionsParams,
   'agentSession.commands': OptionsParams,

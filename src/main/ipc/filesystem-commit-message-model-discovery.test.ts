@@ -252,7 +252,7 @@ describe('registerFilesystemHandlers', () => {
 
       expect(discoverCommitMessageModelsLocalMock).toHaveBeenCalledWith(
         'codex',
-        expect.any(Object),
+        undefined,
         'npx codex',
         { cwd: WORKTREE_FEATURE_PATH, wslDistro: 'Ubuntu' }
       )

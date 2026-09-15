@@ -3,12 +3,8 @@ import { registerCoreHandlers } from '../ipc/register-core-handlers/register-cor
 import { attachMainWindowServices } from '../window/attach-main-window-services'
 import { initTccPromptNotice } from '../macos-tcc-prompt-notice'
 import { mainProcessState as state } from './main-process-state'
-import { prepareLegacySharedCodexSessionResume } from '../codex/codex-legacy-session-resume'
-import { resolveHostCodexSessionSourceHome } from '../codex/codex-session-source-home'
 import { preserveAgentAuthBeforeRestart } from '../agent-auth-restart-preservation'
 import { emitPluginWorktreeLifecycle } from './main-process-pty-startup'
-import { isHostCodexRealHome, prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
-import { prepareCodexSessionResumeForLaunch } from './codex-session-resume-launch'
 import { isRecoveryReloadInFlight } from './main-window-lifecycle-flags'
 
 export function attachMainWindowCoreServices(
@@ -57,15 +53,6 @@ export function attachMainWindowCoreServices(
     state.agentAwakeService ?? undefined,
     keybindings,
     {
-      getAdditionalAiVaultCodexHomePaths: () => {
-        const sourceHome = resolveHostCodexSessionSourceHome(store.getSettings())
-        return sourceHome ? [sourceHome] : []
-      },
-      prepareAiVaultSessionResume: (args) =>
-        prepareLegacySharedCodexSessionResume(args, {
-          isHostSystemDefaultRealHome: () => isHostCodexRealHome(),
-          systemCodexHomePath: resolveHostCodexSessionSourceHome(store.getSettings())
-        }),
       onBeforeRelaunch: async () => {
         state.isQuitting = true
         await preserveAgentAuthBeforeRestart({ claudeRuntimeAuth, store })
@@ -82,10 +69,8 @@ export function attachMainWindowCoreServices(
     window,
     store,
     runtime,
-    prepareCodexRuntimeHomeForLaunch,
     (target) => claudeRuntimeAuth.prepareForClaudeLaunch(target),
     {
-      prepareCodexSessionResume: prepareCodexSessionResumeForLaunch,
       awaitLocalPtyStartup: () => state.localPtyStartupReady,
       awaitLocalPtyProviderStartup: () => state.localPtyProviderStartupReady,
       onBeforeRendererReload: ({ webContentsId }) => {

@@ -10,7 +10,7 @@ export function isLikelyInteractiveRedraw(data: string): boolean {
   if (data.length <= INTERACTIVE_OUTPUT_MAX_CHARS) {
     return true
   }
-  // Why the ANSI check: Codex-style TUIs repaint >1 KB per keypress (latency-sensitive), while plain command output should stay on the throughput batch path.
+  // Why the ANSI check: Full-screen TUIs repaint >1 KB per keypress (latency-sensitive), while plain command output should stay on the throughput batch path.
   return data.length <= INTERACTIVE_REDRAW_MAX_CHARS && data.includes('\x1b[')
 }
 

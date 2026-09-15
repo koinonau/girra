@@ -3,7 +3,6 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { RelayAgentHookServer } from './agent-hook-server'
-import type { AgentHookResultRetryScheduler } from './agent-hook-result-retry-scheduler'
 import { endpointDirForRelaySocket } from './agent-hook-endpoint-coordinates'
 import type { AgentHookRelayEnvelope } from '../shared/agent-hook-relay'
 import { makePaneKey } from '../shared/stable-pane-id'
@@ -14,7 +13,6 @@ const PANE_KEY = makePaneKey('tab-1', LEAF_ID)
 
 type RelayServerInternals = {
   state: { lastStatusByPaneKey: Map<string, unknown> }
-  retryScheduler: AgentHookResultRetryScheduler
 }
 
 describe('RelayAgentHookServer', () => {
@@ -81,7 +79,7 @@ describe('RelayAgentHookServer', () => {
 
   it('normalizes and forwards raw spooled hooks on startup', async () => {
     const spoolDir = join(dir, 'spool')
-    const spoolFile = join(spoolDir, 'pane-codex.jsonl')
+    const spoolFile = join(spoolDir, 'pane-claude.jsonl')
     mkdirSync(spoolDir)
     writeFileSync(
       spoolFile,
@@ -92,9 +90,9 @@ describe('RelayAgentHookServer', () => {
         env: 'remote',
         version: '1',
         launchToken: 'generation-token',
-        hookEventName: 'SubagentStop',
-        source: 'codex',
-        payload: { hook_event_name: 'SubagentStop', agent_id: 'child-spooled' },
+        hookEventName: 'UserPromptSubmit',
+        source: 'claude',
+        payload: { hook_event_name: 'UserPromptSubmit', prompt: 'spooled' },
         receivedAt: Date.now()
       })}\n`
     )
@@ -105,16 +103,16 @@ describe('RelayAgentHookServer', () => {
     try {
       expect(forward).toHaveBeenCalledTimes(1)
       expect(forward.mock.calls[0][0]).toMatchObject({
-        source: 'codex',
+        source: 'claude',
         paneKey: PANE_KEY,
         tabId: 'tab-1',
         worktreeId: 'wt-1',
         launchToken: 'generation-token',
-        hookEventName: 'SubagentStop',
+        hookEventName: 'UserPromptSubmit',
         isReplay: true,
         env: 'remote',
         version: '1',
-        payload: { state: 'working', agentType: 'codex' }
+        payload: { state: 'working', agentType: 'claude' }
       })
       expect(readFileSync(spoolFile)).toHaveLength(0)
     } finally {
@@ -124,15 +122,15 @@ describe('RelayAgentHookServer', () => {
 
   it('keeps the relay listening when spool replay forwarding fails', async () => {
     const spoolDir = join(dir, 'spool')
-    const spoolFile = join(spoolDir, 'pane-codex.jsonl')
+    const spoolFile = join(spoolDir, 'pane-claude.jsonl')
     mkdirSync(spoolDir)
     writeFileSync(
       spoolFile,
       `${JSON.stringify({
         paneKey: PANE_KEY,
-        source: 'codex',
-        hookEventName: 'SubagentStop',
-        payload: { hook_event_name: 'SubagentStop', agent_id: 'child-spooled' },
+        source: 'claude',
+        hookEventName: 'UserPromptSubmit',
+        payload: { hook_event_name: 'UserPromptSubmit', prompt: 'spooled' },
         receivedAt: Date.now()
       })}\n`
     )
@@ -152,7 +150,7 @@ describe('RelayAgentHookServer', () => {
     }
   })
 
-  it('caches before forwarding, schedules retries after forwarding, and responds last', async () => {
+  it('caches before forwarding and responds last', async () => {
     const order: string[] = []
     let server!: RelayAgentHookServer
     let internals!: RelayServerInternals
@@ -163,16 +161,8 @@ describe('RelayAgentHookServer', () => {
         order.push('forward')
       }
     })
-    // Characterization deliberately observes the server-owned scheduler without widening production API.
+    // Characterization deliberately observes the server-owned cache without widening production API.
     internals = server as unknown as RelayServerInternals
-    const retryScheduler = internals.retryScheduler
-    const originalCodexRetry = retryScheduler.scheduleCodexSubagentPoll.bind(retryScheduler)
-    const codexRetry = vi
-      .spyOn(retryScheduler, 'scheduleCodexSubagentPoll')
-      .mockImplementation((...args) => {
-        order.push('codex-retry')
-        originalCodexRetry(...args)
-      })
     await server.start()
     try {
       const { port, token } = server.getCoordinates()
@@ -190,10 +180,9 @@ describe('RelayAgentHookServer', () => {
       })
       order.push('response')
       expect(res.status).toBe(204)
-      expect(order).toEqual(['forward', 'codex-retry', 'response'])
+      expect(order).toEqual(['forward', 'response'])
     } finally {
       server.stop()
-      codexRetry.mockRestore()
     }
   })
 
@@ -204,10 +193,8 @@ describe('RelayAgentHookServer', () => {
         throw new Error('forward failed')
       }
     })
-    // Characterization deliberately observes cache/scheduler order without widening production API.
+    // Characterization deliberately observes the cache without widening production API.
     const internals = server as unknown as RelayServerInternals
-    const retryScheduler = internals.retryScheduler
-    const codexRetry = vi.spyOn(retryScheduler, 'scheduleCodexSubagentPoll')
     await server.start()
     try {
       const { port, token } = server.getCoordinates()
@@ -225,10 +212,8 @@ describe('RelayAgentHookServer', () => {
       })
       expect(res.status).toBe(204)
       expect(internals.state.lastStatusByPaneKey.has(PANE_KEY)).toBe(true)
-      expect(codexRetry).not.toHaveBeenCalled()
     } finally {
       server.stop()
-      codexRetry.mockRestore()
     }
   })
 

@@ -201,25 +201,6 @@ describe('shared agent-hook-listener', () => {
     )
   })
 
-  it('captures an approval envelope for a Codex PermissionRequest', () => {
-    const event = normalizeHookPayload(
-      state,
-      'codex',
-      {
-        paneKey: PANE_KEY,
-        payload: {
-          hook_event_name: 'PermissionRequest',
-          tool_name: 'shell',
-          input: { command: 'git push --force' }
-        }
-      },
-      'production'
-    )
-    expect(event?.payload.interactivePrompt).toBe(
-      JSON.stringify({ approval: { tool: 'shell', summary: 'git push --force' } })
-    )
-  })
-
   it('clears interactivePrompt on the next tool event after AskUserQuestion', () => {
     normalizeHookPayload(
       state,

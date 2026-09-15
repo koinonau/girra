@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { AgentHookServer, _internals } from './server'
-import { buildBody, postHookEvent, recentTs, PANE, GOOD_PANE } from './server.test-fixtures'
+import { recentTs, PANE, GOOD_PANE } from './server.test-fixtures'
 
 beforeEach(() => {
   _internals.resetCachesForTests()
@@ -370,90 +370,6 @@ describe('Last-status persistence', () => {
       // Why: migration must be one-time, else every launch re-prunes the same persisted idle rows.
       const persisted = JSON.parse(readFileSync(lastStatusPath(), 'utf8'))
       expect(persisted.entries[PANE].payload.subagents).toBeUndefined()
-    } finally {
-      server.stop()
-    }
-  })
-
-  it('restores Codex child hierarchy and reaps unconfirmed children on the next root Stop', async () => {
-    mkdirSync(join(userDataPath, 'agent-hooks'), { recursive: true })
-    const receivedAt = recentTs()
-    writeFileSync(
-      lastStatusPath(),
-      JSON.stringify({
-        version: 2,
-        entries: {
-          [PANE]: {
-            paneKey: PANE,
-            tabId: 'tab-1',
-            worktreeId: 'wt-1',
-            receivedAt,
-            stateStartedAt: recentTs(-1000),
-            payload: {
-              state: 'working',
-              prompt: 'coordinate reviews',
-              agentType: 'codex',
-              model: 'gpt-5.4',
-              subagents: [
-                {
-                  id: '11111111-2222-4333-8444-555555555555',
-                  state: 'working',
-                  startedAt: receivedAt - 5000,
-                  agentType: 'reviewer',
-                  model: 'gpt-5.4-mini'
-                }
-              ]
-            }
-          }
-        }
-      }),
-      'utf8'
-    )
-
-    const server = new AgentHookServer()
-    await server.start({ env: 'production', userDataPath })
-    try {
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          state: 'working',
-          model: 'gpt-5.4',
-          subagents: [
-            expect.objectContaining({
-              id: '11111111-2222-4333-8444-555555555555',
-              model: 'gpt-5.4-mini'
-            })
-          ]
-        })
-      ])
-
-      await postHookEvent(
-        server,
-        buildBody({
-          hook_event_name: 'PreToolUse',
-          agent_id: '11111111-2222-4333-8444-555555555555',
-          agent_type: 'reviewer',
-          model: 'gpt-5.4-mini',
-          tool_name: 'exec_command',
-          tool_input: { cmd: 'pnpm test' }
-        }),
-        '/hook/codex'
-      )
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          state: 'working',
-          model: 'gpt-5.4',
-          subagents: [expect.objectContaining({ model: 'gpt-5.4-mini' })]
-        })
-      ])
-
-      await postHookEvent(
-        server,
-        buildBody({ hook_event_name: 'Stop', model: 'gpt-5.4' }),
-        '/hook/codex'
-      )
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({ state: 'done', model: 'gpt-5.4', subagents: undefined })
-      ])
     } finally {
       server.stop()
     }

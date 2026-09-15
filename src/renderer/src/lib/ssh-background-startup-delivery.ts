@@ -2,32 +2,13 @@ import {
   createShellReadyMarkerScanState,
   scanForShellReadyMarker
 } from '@/components/terminal-pane/shell-ready-marker-scan'
-import {
-  isCodexStartupCommand,
-  shouldUseShellReadyStartupDelivery,
-  type StartupCommandDelivery
-} from '../../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../../shared/startup-command-delivery'
 import { buildStartupCommandSubmission } from '../../../shared/startup-command-submission'
 
-/**
- * Why every Codex launch waits and not only the prompt-carrying ones: the remote
- * shell is the host's to know, and it arms the ready marker for plain Codex too
- * (#18767). On such a host the wait ends at the prompt and costs nothing. On one
- * that never publishes a marker -- fish, sh, Windows, or a host predating #18767 --
- * the fallback below releases instead, at the same price prompt-carrying Codex
- * already paid there.
- */
 export function sshBackgroundLaunchWaitsForShellReady(startupPlan: {
-  launchCommand: string | null | undefined
   startupCommandDelivery?: StartupCommandDelivery
 }): boolean {
-  return (
-    isCodexStartupCommand(startupPlan.launchCommand) ||
-    shouldUseShellReadyStartupDelivery({
-      command: startupPlan.launchCommand,
-      startupCommandDelivery: startupPlan.startupCommandDelivery
-    })
-  )
+  return startupPlan.startupCommandDelivery === 'shell-ready'
 }
 
 const SSH_SHELL_READY_STARTUP_FALLBACK_MS = 1500

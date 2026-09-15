@@ -1,8 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { spawnMock } from './pty-ipc-mock-registry'
-import { BUNDLED_CLI_PATH, TEST_CODEX_HOME, makeDisposable } from './pty-ipc-test-constants'
+import { makeDisposable } from './pty-ipc-test-constants'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
-import { delimiter } from 'node:path'
 import { LocalPtyProvider } from '../providers/local-pty-provider'
 import { __resetPersistedWindowsPathCacheForTests } from '../pty/windows-environment-path'
 import { __setWindowsPathRegistryLoaderForTests } from '../pty/windows-path-registry-reader'
@@ -38,12 +37,9 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
-  const { handlers, mainWindow, spawnAndGetEnv, withBundledCli } = setupPtyIpcSuite()
+  const { handlers, mainWindow, spawnAndGetEnv } = setupPtyIpcSuite()
 
   describe('spawn environment', () => {
     it('routes headless browser launches through the owning Orca workspace', () => {
@@ -56,7 +52,6 @@ describe('registerPtyHandlers', () => {
           {
             isPackaged: true,
             userDataPath: '/tmp/orca-user-data',
-            selectedCodexHomePath: null,
             agentStatusHooksEnabled: false,
             routeBrowserOpensToClient: true
           }
@@ -79,7 +74,6 @@ describe('registerPtyHandlers', () => {
         {
           isPackaged: true,
           userDataPath: '/tmp/orca-user-data',
-          selectedCodexHomePath: null,
           agentStatusHooksEnabled: false,
           routeBrowserOpensToClient: true
         }
@@ -98,7 +92,6 @@ describe('registerPtyHandlers', () => {
           {
             isPackaged: true,
             userDataPath: '/tmp/orca-user-data',
-            selectedCodexHomePath: null,
             isWsl: true,
             agentStatusHooksEnabled: false,
             routeBrowserOpensToClient: true
@@ -115,9 +108,7 @@ describe('registerPtyHandlers', () => {
       }
     })
 
-    it('passes the PTY-resolved Codex home to the WSL relay lane', () => {
-      const runtimeHome =
-        '\\\\wsl.localhost\\Ubuntu\\home\\jin\\.local\\share\\orca\\codex-runtime-home\\home'
+    it('starts the WSL hook relay for the spawn distro', () => {
       const ensureForDistro = vi
         .spyOn(wslHookRelayManager, 'ensureForDistro')
         .mockImplementation(() => {})
@@ -129,13 +120,12 @@ describe('registerPtyHandlers', () => {
           {
             isPackaged: true,
             userDataPath: '/tmp/orca-user-data',
-            selectedCodexHomePath: runtimeHome,
             isWsl: true,
             wslDistro: 'Ubuntu',
             agentStatusHooksEnabled: true
           }
         )
-        expect(ensureForDistro).toHaveBeenCalledExactlyOnceWith('Ubuntu', runtimeHome)
+        expect(ensureForDistro).toHaveBeenCalledExactlyOnceWith('Ubuntu')
       } finally {
         ensureForDistro.mockRestore()
       }
@@ -164,7 +154,6 @@ describe('registerPtyHandlers', () => {
             buildPtyHostEnv(id, baseEnv, {
               isPackaged: true,
               userDataPath: '/tmp/orca-user-data',
-              selectedCodexHomePath: null,
               agentStatusHooksEnabled: false,
               isWsl: context?.isWsl,
               wslDistro: context?.wslDistro
@@ -225,7 +214,7 @@ describe('registerPtyHandlers', () => {
         stripAuthEnv: false,
         provenance: 'managed:account-1'
       }))
-      registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, prepareClaudeAuth)
+      registerPtyHandlers(mainWindow as never, undefined, undefined, prepareClaudeAuth)
 
       const spawnResult = (await handlers.get('pty:spawn')!(null, {
         cols: 80,
@@ -287,7 +276,7 @@ describe('registerPtyHandlers', () => {
       expect(env.TERM_PROGRAM).toBe('Orca')
     })
     it('keeps indexed Git prompt guards in a local agent terminal env', async () => {
-      const env = await spawnAndGetEnv(undefined, undefined, undefined, undefined, 'claude')
+      const env = await spawnAndGetEnv(undefined, undefined, undefined, 'claude')
       expect(env.GIT_TERMINAL_PROMPT).toBe('0')
       expect(env.GCM_INTERACTIVE).toBe('never')
       expect(Object.values(env)).toContain('credential.interactive')
@@ -295,7 +284,6 @@ describe('registerPtyHandlers', () => {
     })
     it('guards a trusted local agent when its command uses a custom wrapper', async () => {
       const env = await spawnAndGetEnv(
-        undefined,
         undefined,
         undefined,
         undefined,
@@ -317,198 +305,6 @@ describe('registerPtyHandlers', () => {
     it('falls back to a placeholder version when ORCA_APP_VERSION is unset', async () => {
       const env = await spawnAndGetEnv(undefined, { ORCA_APP_VERSION: undefined })
       expect(env.TERM_PROGRAM_VERSION).toBe('0.0.0-dev')
-    })
-    it('injects the selected Codex home into Orca terminal PTYs', async () => {
-      const env = await withBundledCli(() =>
-        spawnAndGetEnv(undefined, undefined, () => TEST_CODEX_HOME)
-      )
-      expect(env.CODEX_HOME).toBe(TEST_CODEX_HOME)
-      expect(env.ORCA_CODEX_HOME).toBe(TEST_CODEX_HOME)
-      // Why (STA-4270): a bare name would be resolved by the post-profile PATH the codex()
-      // wrapper inherits, so the preflight must carry the CLI's verified absolute path.
-      expect(env.ORCA_CODEX_LAUNCH_PREFLIGHT).toBe(BUNDLED_CLI_PATH)
-    })
-    it('skips the Codex launch preflight when the bundled CLI is not executable', async () => {
-      const env = await withBundledCli(
-        () => spawnAndGetEnv(undefined, undefined, () => TEST_CODEX_HOME),
-        { launcherExecutable: false }
-      )
-
-      expect(env.CODEX_HOME).toBe(TEST_CODEX_HOME)
-      expect(env.ORCA_CODEX_LAUNCH_PREFLIGHT).toBeUndefined()
-    })
-    // Why (STA-4270): profile scripts run before the codex() wrapper and routinely prepend
-    // directories to PATH, so a scratch `orca` there must never become the preflight.
-    it('pins the Codex launch preflight to the bundled CLI even when PATH leads elsewhere', async () => {
-      const env = await withBundledCli(() =>
-        spawnAndGetEnv(
-          { PATH: `/tmp/hijack-scratch${delimiter}/usr/bin` },
-          undefined,
-          () => TEST_CODEX_HOME
-        )
-      )
-
-      expect(env.ORCA_CODEX_LAUNCH_PREFLIGHT).toBe(BUNDLED_CLI_PATH)
-      expect(env.ORCA_CODEX_LAUNCH_PREFLIGHT).not.toBe('orca')
-      expect(env.ORCA_CODEX_LAUNCH_PREFLIGHT.startsWith('/tmp/hijack-scratch')).toBe(false)
-    })
-    it('does not install the Codex launch preflight when Codex hooks are disabled', async () => {
-      const env = await spawnAndGetEnv(
-        undefined,
-        undefined,
-        () => TEST_CODEX_HOME,
-        () => ({ agentStatusHooksEnabled: true, disabledTuiAgents: ['codex'] })
-      )
-
-      expect(env.CODEX_HOME).toBe(TEST_CODEX_HOME)
-      expect(env.ORCA_CODEX_LAUNCH_PREFLIGHT).toBeUndefined()
-    })
-    it('resumes an automatic Codex session from its prepared originating home', async () => {
-      const selectedHome = vi.fn(() => '/managed/current/home')
-      const prepareResume = vi.fn(async () => ({
-        outcome: 'resume' as const,
-        codexHomePath: '/managed/origin/home'
-      }))
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        selectedHome,
-        undefined,
-        undefined,
-        undefined,
-        { prepareCodexSessionResume: prepareResume }
-      )
-
-      await handlers.get('pty:spawn')!(null, {
-        cols: 80,
-        rows: 24,
-        command: 'codex resume session-a',
-        launchAgent: 'codex',
-        resumeProviderSession: {
-          key: 'session_id',
-          id: 'session-a',
-          transcriptPath: '/managed/origin/home/sessions/2026/07/20/rollout-a.jsonl'
-        }
-      })
-
-      const env = spawnMock.mock.calls.at(-1)![2].env as Record<string, string>
-      expect(prepareResume).toHaveBeenCalledWith(
-        expect.objectContaining({
-          providerSession: expect.objectContaining({ id: 'session-a' }),
-          target: { runtime: 'host' }
-        })
-      )
-      expect(selectedHome).not.toHaveBeenCalled()
-      expect(env.CODEX_HOME).toBe('/managed/origin/home')
-      expect(env.ORCA_CODEX_HOME).toBe('/managed/origin/home')
-    })
-    it('blocks a shared-runtime resume when auth reconciliation fails', async () => {
-      const selectedHome = vi.fn(() => {
-        throw new Error('Cannot safely launch Codex while stale runtime auth remains.')
-      })
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        selectedHome,
-        undefined,
-        undefined,
-        undefined,
-        {
-          prepareCodexSessionResume: async () => ({
-            outcome: 'resume' as const,
-            codexHomePath: '/managed/shared-mirror/home',
-            reconcileSharedRuntimeAuth: true
-          })
-        }
-      )
-
-      await expect(
-        handlers.get('pty:spawn')!(null, {
-          cols: 80,
-          rows: 24,
-          command: 'codex resume session-a',
-          launchAgent: 'codex',
-          resumeProviderSession: {
-            key: 'session_id',
-            id: 'session-a',
-            transcriptPath: '/managed/shared-mirror/home/sessions/2026/07/20/rollout-a.jsonl'
-          }
-        })
-      ).rejects.toThrow('Cannot safely launch Codex while stale runtime auth remains.')
-
-      expect(selectedHome).toHaveBeenCalledTimes(1)
-      expect(spawnMock).not.toHaveBeenCalled()
-    })
-    it('overrides an unmarked custom home when the resumed session originated in real home', async () => {
-      const selectedHome = vi.fn(() => '/managed/current/home')
-      const systemHome = '/Users/example/.codex'
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        selectedHome,
-        undefined,
-        undefined,
-        undefined,
-        {
-          prepareCodexSessionResume: async () => ({
-            outcome: 'resume' as const,
-            codexHomePath: systemHome
-          })
-        }
-      )
-
-      await handlers.get('pty:spawn')!(null, {
-        cols: 80,
-        rows: 24,
-        command: 'codex resume session-a',
-        env: { CODEX_HOME: '/custom/codex', REMOVE_ME: 'stale' },
-        envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME', 'REMOVE_ME'],
-        launchAgent: 'codex',
-        resumeProviderSession: {
-          key: 'session_id',
-          id: 'session-a',
-          transcriptPath: '/Users/example/.codex/sessions/2026/07/20/rollout-a.jsonl'
-        }
-      })
-
-      const env = spawnMock.mock.calls.at(-1)![2].env as Record<string, string>
-      expect(selectedHome).not.toHaveBeenCalled()
-      expect(env.CODEX_HOME).toBe(systemHome)
-      expect(env.ORCA_CODEX_HOME).toBe(systemHome)
-      expect(env.REMOVE_ME).toBeUndefined()
-    })
-    it('does not fall back to the selected account when automatic resume provenance is rejected', async () => {
-      const selectedHome = vi.fn(() => '/managed/current/home')
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        selectedHome,
-        undefined,
-        undefined,
-        undefined,
-        {
-          prepareCodexSessionResume: async () => {
-            throw new Error('origin unavailable')
-          }
-        }
-      )
-
-      await expect(
-        handlers.get('pty:spawn')!(null, {
-          cols: 80,
-          rows: 24,
-          command: 'codex resume session-a',
-          launchAgent: 'codex',
-          resumeProviderSession: {
-            key: 'session_id',
-            id: 'session-a',
-            transcriptPath: '/managed/origin/home/sessions/2026/07/20/rollout-a.jsonl'
-          }
-        })
-      ).rejects.toThrow('origin unavailable')
-
-      expect(selectedHome).not.toHaveBeenCalled()
-      expect(spawnMock).not.toHaveBeenCalled()
     })
   })
 })

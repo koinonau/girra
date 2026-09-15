@@ -29,7 +29,7 @@ describe('registerHeadlessPtyRuntime', () => {
     })
     const store = {} as never
 
-    const ready = registerHeadlessPtyRuntime({} as never, undefined, undefined, undefined, store)
+    const ready = registerHeadlessPtyRuntime({} as never, undefined, undefined, store)
 
     expect(events).toEqual(['handlers', 'hydrate'])
     expect(registerHandlersMock).toHaveBeenCalledOnce()

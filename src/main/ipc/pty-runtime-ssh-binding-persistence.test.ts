@@ -39,9 +39,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { mainWindow, mainWindowIpcEvent, getPtyWriteListener } = setupPtyIpcSuite()
@@ -74,14 +71,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnController = controller as unknown as RuntimeSpawnController
     const validLeafId = '11111111-1111-4111-8111-111111111111'
     const baseArgs = {
@@ -166,7 +156,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         runtime as never,
-        undefined,
         undefined,
         undefined,
         store as never
@@ -271,10 +260,8 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         runtime as never,
-        undefined,
         (() => ({
-          agentStatusHooksEnabled: false,
-          codexSystemDefaultRealHomeEnabled: true
+          agentStatusHooksEnabled: false
         })) as never,
         undefined,
         store as never
@@ -303,8 +290,6 @@ describe('registerPtyHandlers', () => {
       expect(env?.ORCA_PANE_KEY).toBeUndefined()
       expect(env?.ORCA_TAB_ID).toBeUndefined()
       expect(env?.ORCA_WORKTREE_ID).toBeUndefined()
-      expect(spawnOptions.envToDelete ?? []).not.toContain('CODEX_HOME')
-      expect(spawnOptions.envToDelete ?? []).not.toContain('ORCA_CODEX_HOME')
       expect(store.upsertSshRemotePtyLease).toHaveBeenCalledWith(
         expect.objectContaining({
           targetId: 'ssh-runtime-env',
@@ -383,14 +368,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnController = controller as unknown as RuntimeSpawnController
     const leafId = '11111111-1111-4111-8111-111111111111'
 
@@ -488,7 +466,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         runtime as never,
-        undefined,
         undefined,
         undefined,
         store as never
@@ -595,7 +572,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         runtime as never,
-        undefined,
         undefined,
         undefined,
         store as never

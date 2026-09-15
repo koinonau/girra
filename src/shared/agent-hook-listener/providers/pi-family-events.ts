@@ -53,7 +53,7 @@ export function normalizePiCompatibleEvent(
           : null
 
   if (isPiUiPrompt) {
-    // Why: waiting uses the same orange question icon as Claude/Codex input prompts.
+    // Why: waiting uses the same orange question icon as Claude input prompts.
     stateName = 'waiting'
   } else if (isPiUiPromptEnd) {
     stateName = hookPayload.is_idle === true ? 'done' : 'working'

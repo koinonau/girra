@@ -9,15 +9,12 @@ export type LocalPtyProviderOptions = {
     ctx?: {
       command?: string
       launchAgent?: PtySpawnOptions['launchAgent']
-      codexHomePathOverride?: PtySpawnOptions['codexHomePathOverride']
       cwd?: string
       shellPath?: string
       isWsl?: boolean
       wslDistro?: string | null
     }
-    // Why (#16441): Codex launch prep grants hook trust through a codex
-    // app-server session. `spawn` already awaits, so returning a promise keeps
-    // the Electron main thread responsive instead of blocking on spawnSync.
+    // Why a promise: env building may await async installs without blocking the Electron main thread.
   ) => Record<string, string> | Promise<Record<string, string>>
   /** Whether worktree-scoped shell history is enabled; when true (or absent) with a worktreeId, HISTFILE is scoped per-worktree. */
   isHistoryEnabled?: () => boolean

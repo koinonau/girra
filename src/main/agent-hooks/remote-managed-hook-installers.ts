@@ -1,13 +1,8 @@
 import type { SFTPWrapper } from 'ssh2'
 import type { AgentHookInstallStatus, AgentHookTarget } from '../../shared/agent-hook-types'
 import { claudeHookService } from '../claude/hook-service'
-import { codexHookService } from '../codex/hook-service'
 
 export type RemoteManagedHookInstallOptions = {
-  /** Explicit CODEX_HOME dir for redirected runtimes (for example WSL's managed runtime home). */
-  codexHomeDir?: string
-  /** Skip the trust write when a redirected runtime config is seeded by the launch path. */
-  deferTrustUntilConfigToml?: boolean
   /** Stops before starting the next installer when the owning relay request
    *  is cancelled. Individual filesystem mutations remain atomic. */
   signal?: AbortSignal
@@ -26,15 +21,7 @@ type RemoteManagedHookInstaller = readonly [
 ]
 
 const REMOTE_MANAGED_HOOK_INSTALLERS: readonly RemoteManagedHookInstaller[] = [
-  ['claude', (sftp, remoteHome) => claudeHookService.installRemote(sftp, remoteHome)],
-  [
-    'codex',
-    (sftp, remoteHome, options) =>
-      codexHookService.installRemote(sftp, remoteHome, {
-        codexHomeDir: options?.codexHomeDir,
-        deferTrustUntilConfigToml: options?.deferTrustUntilConfigToml
-      })
-  ]
+  ['claude', (sftp, remoteHome) => claudeHookService.installRemote(sftp, remoteHome)]
 ]
 
 /** Agents wired into the remote (SSH) hook installer. Exported so an invariant

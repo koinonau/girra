@@ -1,21 +1,12 @@
 import type { TuiAgent } from '../../../../shared/tui-agent'
-import type { AgentProviderSessionMetadata } from '../../../../shared/agent-session-resume'
 import type { NetworkProxySettings } from '../../../../shared/network-proxy'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
 import type { ClaudeAccountSelectionTarget } from '../../../claude-accounts/runtime-selection'
-import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
-import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
 
 export type BuildPtyHostEnvOptions = {
   isPackaged: boolean
   resourcesPath?: string
   userDataPath: string
-  selectedCodexHomePath: string | null
-  skipCodexHomeEnv?: boolean
-  /** System-default real-home routing (flag ON): inject no managed CODEX_HOME,
-   *  and strip only an inherited Orca-owned override so nested Orca panes do not
-   *  leak the parent's managed home. A user-set CODEX_HOME is preserved. */
-  stripInheritedOrcaCodexHome?: boolean
   /** Launch command the renderer chose (e.g. 'pi', 'omp', 'claude'); resolves the per-agent
    *  extension target for Pi/OMP. Undefined for bare shells → defaults to Pi. NEVER infer from
    *  disk presence (cross-agent shadowing when both dirs exist). */
@@ -26,34 +17,12 @@ export type BuildPtyHostEnvOptions = {
   /** Distro for WSL spawns (null = Windows default distro); drives the WSL hook relay + endpoint repoint. Only read when isWsl. */
   wslDistro?: string | null
   agentStatusHooksEnabled: boolean
-  codexStatusHooksEnabled?: boolean
   networkProxySettings?: NetworkProxySettings
   /** Headless paired runtimes hand browser launches to the client-hosted Orca browser. */
   routeBrowserOpensToClient?: boolean
   /** Keep indexed Git config off the sparse daemon wire; the daemon appends guard entries after merging its inherited env. */
   deferGitConfigGuardToDaemon?: boolean
 }
-
-export type CodexHomeLaunchContext = {
-  workspacePath?: string
-  launchAgent?: TuiAgent
-}
-
-// Why (#16441): Codex launch prep grants hook trust through a codex app-server
-// session. It resolves asynchronously so the Electron main thread stays
-// responsive; every consumer already runs inside an async spawn path.
-export type GetSelectedCodexHomePath = (
-  target?: AccountSelectionTarget,
-  launchEnv?: NodeJS.ProcessEnv,
-  launchContext?: CodexHomeLaunchContext
-) => string | null | Promise<string | null>
-
-export type PrepareCodexSessionResume = (args: {
-  providerSession: AgentProviderSessionMetadata
-  target: AccountSelectionTarget
-  launchEnv?: NodeJS.ProcessEnv
-  workspacePath?: string
-}) => Promise<CodexSessionResumePreparation | null>
 
 export type PrepareClaudeAuth = (
   target?: ClaudeAccountSelectionTarget

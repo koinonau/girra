@@ -1,7 +1,5 @@
 import type { AgentStatusState } from '../agent-status-types'
 import type { ClaudeSubagentRoster } from '../claude-subagent-roster'
-import type { CodexSubagentRoster } from '../codex-subagent-roster'
-import type { CodexSubagentTranscriptState } from '../codex-subagent-transcript'
 import type { AgentHookEventPayload, ToolSnapshot } from './listener-event'
 
 /** Per-listener-instance caches needing per-PTY teardown; Orca's main process and the relay each get their own, never shared. */
@@ -27,12 +25,6 @@ export type HookListenerState = {
    *  conversation was replaced (/clear, relaunch, resume), so claims the old session owned are void
    *  even when no SessionStart arrives — the backstop for the exits that emit no terminating hook. */
   claudeSessionOwnerByPaneKey: Map<string, string>
-  /** Live thread-spawn children per Codex pane. */
-  codexSubagentRosterByPaneKey: Map<string, CodexSubagentRoster>
-  /** Incremental parent/child rollout cursors for Codex collaboration v2. */
-  codexSubagentTranscriptByPaneKey: Map<string, CodexSubagentTranscriptState>
-  /** Root Codex state/model, kept separate from child hook traffic. */
-  codexLeadStateByPaneKey: Map<string, CodexLeadTurnState>
 }
 
 export type ClaudeLeadTurnState = {
@@ -48,11 +40,6 @@ export type ClaudeLeadTurnState = {
   stateBeforeWait?: Pick<ClaudeLeadTurnState, 'state' | 'interrupted' | 'turnCompletedAt'>
 }
 
-export type CodexLeadTurnState = {
-  state: 'working' | 'waiting' | 'done'
-  model?: string
-}
-
 export function createHookListenerState(): HookListenerState {
   return {
     warnedVersions: new Set(),
@@ -66,10 +53,7 @@ export function createHookListenerState(): HookListenerState {
     claudeRunningNonAgentTaskPaneKeys: new Set(),
     claudeActiveSessionCronPaneKeys: new Set(),
     claudeConsumedCompactPromptIdByPaneKey: new Map(),
-    claudeSessionOwnerByPaneKey: new Map(),
-    codexSubagentRosterByPaneKey: new Map(),
-    codexSubagentTranscriptByPaneKey: new Map(),
-    codexLeadStateByPaneKey: new Map()
+    claudeSessionOwnerByPaneKey: new Map()
   }
 }
 
@@ -84,9 +68,6 @@ export function clearPaneCacheState(state: HookListenerState, paneKey: string): 
   state.claudeRunningNonAgentTaskPaneKeys.delete(paneKey)
   state.claudeActiveSessionCronPaneKeys.delete(paneKey)
   state.claudeSessionOwnerByPaneKey.delete(paneKey)
-  state.codexSubagentRosterByPaneKey.delete(paneKey)
-  state.codexSubagentTranscriptByPaneKey.delete(paneKey)
-  state.codexLeadStateByPaneKey.delete(paneKey)
 }
 
 /** Does this pane still hold anything that can ASSERT a state — a stored row, or a Claude latch that
@@ -103,9 +84,7 @@ export function paneHasStateClaims(state: HookListenerState, paneKey: string): b
     state.claudeLeadStateByPaneKey.has(paneKey) ||
     state.claudeRunningNonAgentTaskPaneKeys.has(paneKey) ||
     state.claudeActiveSessionCronPaneKeys.has(paneKey) ||
-    state.claudeSessionOwnerByPaneKey.has(paneKey) ||
-    state.codexSubagentRosterByPaneKey.has(paneKey) ||
-    state.codexLeadStateByPaneKey.has(paneKey)
+    state.claudeSessionOwnerByPaneKey.has(paneKey)
   )
 }
 
@@ -155,9 +134,6 @@ export function movePaneCacheState(
   movePaneScopedSetEntries(state.claudeRunningNonAgentTaskPaneKeys, fromPaneKey, toPaneKey)
   movePaneScopedSetEntries(state.claudeActiveSessionCronPaneKeys, fromPaneKey, toPaneKey)
   movePaneScopedMapEntries(state.claudeSessionOwnerByPaneKey, fromPaneKey, toPaneKey)
-  movePaneScopedMapEntries(state.codexSubagentRosterByPaneKey, fromPaneKey, toPaneKey)
-  movePaneScopedMapEntries(state.codexSubagentTranscriptByPaneKey, fromPaneKey, toPaneKey)
-  movePaneScopedMapEntries(state.codexLeadStateByPaneKey, fromPaneKey, toPaneKey)
 }
 
 export function clearPaneTurnCacheState(state: HookListenerState, paneKey: string): void {
@@ -188,7 +164,4 @@ export function clearAllListenerCaches(state: HookListenerState): void {
   state.claudeRunningNonAgentTaskPaneKeys.clear()
   state.claudeActiveSessionCronPaneKeys.clear()
   state.claudeSessionOwnerByPaneKey.clear()
-  state.codexSubagentRosterByPaneKey.clear()
-  state.codexSubagentTranscriptByPaneKey.clear()
-  state.codexLeadStateByPaneKey.clear()
 }

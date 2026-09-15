@@ -2,7 +2,6 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV } from '../shared/setup-agent-sequencing'
 import * as ptyShellUtils from './pty-shell-utils'
 
 const { mockPtySpawn, mockPtyInstance, mockCreateShellPromptReadinessProbe } = vi.hoisted(() => ({
@@ -134,113 +133,6 @@ describe('PtyHandler', () => {
   )
 
   it.skipIf(process.platform === 'win32')(
-    'emits shell-ready markers for plain Codex on a line-editor shell',
-    async () => {
-      const oldShell = process.env.SHELL
-      const oldHome = process.env.HOME
-      const homeDir = mkdtempSync(join(tmpdir(), 'relay-plain-codex-spawn-'))
-
-      process.env.SHELL = '/bin/bash'
-      process.env.HOME = homeDir
-      try {
-        // No prefill flag and no shell-ready hint: the host decides from its own
-        // shell, because the client cannot see it (#18767).
-        const reply = await dispatcher.callRequest('pty.spawn', {
-          env: { HOME: homeDir },
-          command: 'codex'
-        })
-        expect(reply).toMatchObject({ shellReadyArmed: true })
-      } finally {
-        if (oldShell === undefined) {
-          delete process.env.SHELL
-        } else {
-          process.env.SHELL = oldShell
-        }
-        if (oldHome === undefined) {
-          delete process.env.HOME
-        } else {
-          process.env.HOME = oldHome
-        }
-        rmSync(homeDir, { recursive: true, force: true })
-      }
-
-      const spawnOptions = mockPtySpawn.mock.calls[0]?.[2] as
-        | { env?: Record<string, string> }
-        | undefined
-      expect(spawnOptions?.env?.ORCA_SHELL_FEATURES).toContain('ready')
-      vi.advanceTimersByTime(15_000)
-      expect(handler.retainedStartupCommandCount).toBe(0)
-    }
-  )
-
-  it.skipIf(process.platform === 'win32')(
-    'leaves plain Codex unwaited on a shell that emits the marker before its reader',
-    async () => {
-      const oldHome = process.env.HOME
-      const homeDir = mkdtempSync(join(tmpdir(), 'relay-plain-codex-fish-spawn-'))
-
-      process.env.HOME = homeDir
-      try {
-        const reply = await dispatcher.callRequest('pty.spawn', {
-          env: { HOME: homeDir, SHELL: '/usr/bin/fish' },
-          command: 'codex'
-        })
-        // Why the reply carries it: the client cannot see this shell, and without
-        // the verdict it waits the full fallback for a marker fish never emits.
-        expect(reply).toMatchObject({ shellReadyArmed: false })
-      } finally {
-        if (oldHome === undefined) {
-          delete process.env.HOME
-        } else {
-          process.env.HOME = oldHome
-        }
-        rmSync(homeDir, { recursive: true, force: true })
-      }
-
-      const spawnOptions = mockPtySpawn.mock.calls[0]?.[2] as
-        | { env?: Record<string, string> }
-        | undefined
-      expect(spawnOptions?.env?.ORCA_SHELL_FEATURES ?? '').not.toContain('ready')
-    }
-  )
-
-  it.skipIf(process.platform === 'win32')(
-    'emits shell-ready markers for renderer-delivered Codex native prefill commands',
-    async () => {
-      const oldShell = process.env.SHELL
-      const oldHome = process.env.HOME
-      const homeDir = mkdtempSync(join(tmpdir(), 'relay-codex-prefill-spawn-'))
-
-      process.env.SHELL = '/bin/bash'
-      process.env.HOME = homeDir
-      try {
-        await dispatcher.callRequest('pty.spawn', {
-          env: { HOME: homeDir },
-          command: "codex --prefill 'linked issue context'"
-        })
-      } finally {
-        if (oldShell === undefined) {
-          delete process.env.SHELL
-        } else {
-          process.env.SHELL = oldShell
-        }
-        if (oldHome === undefined) {
-          delete process.env.HOME
-        } else {
-          process.env.HOME = oldHome
-        }
-        rmSync(homeDir, { recursive: true, force: true })
-      }
-
-      const spawnOptions = mockPtySpawn.mock.calls[0]?.[2] as
-        | { env?: Record<string, string> }
-        | undefined
-      expect(spawnOptions?.env?.ORCA_SHELL_FEATURES).toContain('ready')
-      expect(handler.retainedStartupCommandCount).toBe(1)
-    }
-  )
-
-  it.skipIf(process.platform === 'win32')(
     'enables shell-ready marker env for provider-delivered startup commands',
     async () => {
       const oldShell = process.env.SHELL
@@ -255,45 +147,6 @@ describe('PtyHandler', () => {
           command: 'echo provider-owned',
           commandDelivery: 'provider',
           startupCommandDelivery: 'shell-ready'
-        })
-      } finally {
-        if (oldShell === undefined) {
-          delete process.env.SHELL
-        } else {
-          process.env.SHELL = oldShell
-        }
-        if (oldHome === undefined) {
-          delete process.env.HOME
-        } else {
-          process.env.HOME = oldHome
-        }
-        rmSync(homeDir, { recursive: true, force: true })
-      }
-
-      const spawnOptions = mockPtySpawn.mock.calls[0]?.[2] as
-        | { env?: Record<string, string> }
-        | undefined
-      expect(spawnOptions?.env?.ORCA_SHELL_FEATURES).toContain('ready')
-    }
-  )
-
-  it.skipIf(process.platform === 'win32')(
-    'uses the sequenced startup command hint for provider shell-ready detection',
-    async () => {
-      const oldShell = process.env.SHELL
-      const oldHome = process.env.HOME
-      const homeDir = mkdtempSync(join(tmpdir(), 'relay-provider-sequenced-ready-env-'))
-
-      process.env.SHELL = '/bin/bash'
-      process.env.HOME = homeDir
-      try {
-        await dispatcher.callRequest('pty.spawn', {
-          env: {
-            HOME: homeDir,
-            [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "codex --prefill 'linked issue context'"
-          },
-          command: 'bash -lc wait-for-setup-wrapper',
-          commandDelivery: 'provider'
         })
       } finally {
         if (oldShell === undefined) {

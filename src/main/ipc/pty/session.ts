@@ -18,7 +18,6 @@ import {
   isHiddenPtyDeliveryGateEnabled,
   shouldDropHiddenRendererPtyData
 } from '../pty-hidden-delivery-gate'
-import type { PrepareCodexSessionResume } from './host-env/types'
 import { tryGetProviderForPty } from './provider/registry'
 
 export type PtyDataPayload = {
@@ -48,7 +47,6 @@ export type SerializeResult = {
 } | null
 
 export type PtyIpcSessionOptions = {
-  prepareCodexSessionResume?: PrepareCodexSessionResume
   awaitLocalPtyStartup?: () => Promise<void>
   awaitLocalPtyProviderStartup?: () => Promise<void>
   // Why: returns true once for the crash-recovery reload so its did-finish-load skips the orphan sweep and keeps live PTYs (#5787).

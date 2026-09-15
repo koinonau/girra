@@ -226,7 +226,6 @@ export {
   applyAgentStatusHooksEnabledMock,
   detectInstalledAgentsWithShellPathHydrationMock,
   detectRemoteAgentsMock,
-  markCodexProjectTrustedMock,
   markCopilotFolderTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,

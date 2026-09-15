@@ -153,9 +153,9 @@ describe('installer-utils-remote', () => {
 
   it('parses settings.json with one leading BOM', async () => {
     const { sftp, fs } = createFakeSftp()
-    fs.files.set('/home/u/.codex/hooks.json', '\uFEFF{"version":1,"hooks":{}}')
+    fs.files.set('/home/u/.claude/settings.json', '\uFEFF{"version":1,"hooks":{}}')
 
-    const result = await readHooksJsonRemote(sftp, '/home/u/.codex/hooks.json')
+    const result = await readHooksJsonRemote(sftp, '/home/u/.claude/settings.json')
 
     expect(result).toEqual({ version: 1, hooks: {} })
   })
@@ -212,7 +212,7 @@ describe('installer-utils-remote', () => {
 
   it('preserves existing config file mode across atomic replacement', async () => {
     const { sftp, fs } = createFakeSftp()
-    const path = '/home/u/.codex/config.toml'
+    const path = '/home/u/.claude/settings.json'
     fs.files.set(path, 'old')
     fs.modes.set(path, 0o640)
 

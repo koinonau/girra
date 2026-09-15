@@ -1,8 +1,7 @@
 import { vi } from 'vitest'
 import type { TuiAgent } from '../../shared/tui-agent'
 import { registerPtyHandlers } from './pty'
-import { accessSyncMock, spawnMock, statSyncMock } from './pty-ipc-mock-registry'
-import { BUNDLED_CLI_PATH, BUNDLED_RESOURCES_PATH } from './pty-ipc-test-constants'
+import { spawnMock } from './pty-ipc-mock-registry'
 
 type IpcHandlerMap = Map<string, (_event: unknown, args: unknown) => unknown>
 
@@ -26,11 +25,6 @@ export function createPtyIpcSpawnDrivers(ctx: {
   async function spawnAndGetEnv(
     argsEnv?: Record<string, string>,
     processEnvOverrides?: Record<string, string | undefined>,
-    getSelectedCodexHomePath?: (
-      target?: { runtime?: 'host' | 'wsl'; wslDistro?: string | null },
-      launchEnv?: NodeJS.ProcessEnv,
-      launchContext?: { workspacePath?: string; launchAgent?: TuiAgent }
-    ) => string | null,
     getSettings?: () => {
       agentStatusHooksEnabled?: boolean
       disabledTuiAgents?: TuiAgent[]
@@ -58,12 +52,7 @@ export function createPtyIpcSpawnDrivers(ctx: {
     try {
       // Clear previously registered handlers so re-registration doesn't accumulate stale state.
       handlers.clear()
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        getSelectedCodexHomePath,
-        getSettings as never
-      )
+      registerPtyHandlers(mainWindow as never, undefined, getSettings as never)
       await handlers.get('pty:spawn')!(null, {
         cols: 80,
         rows: 24,
@@ -105,42 +94,6 @@ export function createPtyIpcSpawnDrivers(ctx: {
     ]
   }
 
-  // Why: the Codex launch preflight now carries the bundled CLI's verified absolute
-  // path, so these cases need a resources root whose launcher passes the exec check.
-  async function withBundledCli<T>(
-    run: () => Promise<T>,
-    options?: { launcherExecutable?: boolean }
-  ): Promise<T> {
-    const launcherExecutable = options?.launcherExecutable ?? true
-    const previousResourcesPath = process.resourcesPath
-    Object.defineProperty(process, 'resourcesPath', {
-      configurable: true,
-      value: BUNDLED_RESOURCES_PATH
-    })
-    // Why: only teach the launcher path to look like an executable file; every other
-    // stat/access keeps the permissive default the rest of the harness relies on.
-    statSyncMock.mockImplementation((target: string) => ({
-      isDirectory: () => target !== BUNDLED_CLI_PATH,
-      isFile: () => target === BUNDLED_CLI_PATH,
-      mode: 0o755,
-      size: 1
-    }))
-    if (!launcherExecutable) {
-      accessSyncMock.mockImplementation((target: string) => {
-        if (target === BUNDLED_CLI_PATH) {
-          throw new Error(`EACCES: ${target}`)
-        }
-      })
-    }
-    try {
-      return await run()
-    } finally {
-      Object.defineProperty(process, 'resourcesPath', {
-        configurable: true,
-        value: previousResourcesPath
-      })
-    }
-  }
   /** Saturates one PTY to its 512 KiB in-flight cap; leaves 88 KiB pending and no timers scheduled. */
   async function spawnAndSaturateRendererDeliveryGate(
     mockProc: ReturnType<typeof createMockProc>
@@ -160,5 +113,5 @@ export function createPtyIpcSpawnDrivers(ctx: {
     return spawnResult
   }
 
-  return { spawnAndGetEnv, spawnAndGetCall, withBundledCli, spawnAndSaturateRendererDeliveryGate }
+  return { spawnAndGetEnv, spawnAndGetCall, spawnAndSaturateRendererDeliveryGate }
 }

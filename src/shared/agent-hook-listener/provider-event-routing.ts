@@ -3,7 +3,6 @@ import { isKnownHarnessInjectedUserTurnText } from '../harness-injected-user-tur
 import type { ToolSnapshot } from './listener-event'
 import type { ExtractedPromptText } from './prompt-fields'
 import { extractClaudeToolFields } from './providers/claude-tool-fields'
-import { extractCodexToolFields } from './providers/codex-tool-fields'
 import { extractOpenCodeToolFields } from './providers/opencode-family-tool-fields'
 import { extractPiToolFields } from './providers/pi-family-tool-fields'
 
@@ -15,8 +14,6 @@ export function isNewTurnEvent(source: AgentHookSource, eventName: unknown): boo
     case 'claude':
       // Why: SessionStart lands an idle row (STA-3386) and must also drop stale
       // tool/prompt caches left by the pane's previous session.
-      return eventName === 'SessionStart' || eventName === 'UserPromptSubmit'
-    case 'codex':
       return eventName === 'SessionStart' || eventName === 'UserPromptSubmit'
     case 'opencode':
       return eventName === 'SessionStart'
@@ -58,8 +55,6 @@ export function extractToolFields(
   switch (source) {
     case 'claude':
       return extractClaudeToolFields(eventName, hookPayload)
-    case 'codex':
-      return extractCodexToolFields(eventName, hookPayload)
     case 'opencode':
       return extractOpenCodeToolFields(eventName, hookPayload)
     case 'pi':

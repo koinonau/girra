@@ -70,9 +70,16 @@ Split into pull requests. Phase 4a took the hook integrations (94 files, 20,455 
 
 Last, when you know the codebase. 125 files reference it, `src/shared` carries Codex-shaped types, and the rate-limit and AI Vault code branch on provider. Budget more time here than for phases 1 to 4 combined.
 
-Measured 2026-09-15: 1,086 production and 1,465 test files mention Codex. `src/main/codex-accounts/runtime-home-service*` is the hub most other Codex code imports. Sub-phases, in order: 5a accounts, managed homes, reset credits, rate-limit probing, usage, CLI lock and per-pane account registry; 5b hooks, trust, config.toml sync and the shell-launch preflight (the tree still ticks the preflight); 5c session backfill, migration, index heal and state-DB recovery; 5d app-server runtime, structured sessions, rewind, subagents, native chat and AI Vault scanners; 5e launch roster entries, after the roster decision.
+Measured 2026-09-15: 1,086 production and 1,465 test files mention Codex. `src/main/codex-accounts/runtime-home-service*` is the hub most other Codex code imports. Sub-phases, revised 2026-09-15 after the user dropped Codex and every agent but Claude Code, OpenCode and Pi:
+- 5a: accounts, managed homes, reset credits, rate-limit probing, usage, CLI lock and per-pane account registry.
+- 5b: Codex out of the PTY and shell environment, hooks, trust, startup, the agent-hooks CLI and RPC, and renderer terminal special cases.
+- 5c: roster leaves that do not change `TuiAgent`: OMP and Prime Agent out of Pi's hooks and overlays; title detection, keyboard and output-scraping special cases for dropped agents.
+- 5d: Codex and dropped agents out of structured sessions, native chat and AI Vault; then delete the rest of `src/main/codex` in one step, since its groups import each other both ways.
+- 5e: shrink `TuiAgent` and every roster registry last, because shrinking the union turns every comparison into a type error at once. Normalize stored agent ids and relax the `startupAgent` and `launchAgent` schemas.
 
-Phase 5a done 2026-09-15: 254 files deleted, 58,851 lines removed.
+Measured 2026-09-15 (read-only maps): the rest of Codex is about 350 files and 80,000 lines; the 31 other agents add about 140 files deleted and 630 edited.
+
+Phase 5a done 2026-09-15: 254 files deleted, 58,851 lines removed. Phase 5b: 179 files deleted, 41,801 lines removed.
 
 ### Phase 6. Relocation
 

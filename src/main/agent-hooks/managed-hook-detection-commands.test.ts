@@ -8,17 +8,21 @@ describe('managed hook detection commands', () => {
   it('omits disabled agents and includes safe command overrides', () => {
     const commands = buildManagedHookDetectionCommands(
       {
-        disabledTuiAgents: ['claude'],
-        agentCmdOverrides: { codex: '/opt/codex custom' }
+        disabledTuiAgents: ['opencode'],
+        agentCmdOverrides: { claude: '/opt/claude custom' }
       },
       'linux'
     )
 
-    expect(commands.some((command) => command.id === 'claude')).toBe(false)
-    expect(commands).toContainEqual({ id: 'codex', cmd: '/opt/codex' })
+    expect(commands).toContainEqual({ id: 'claude', cmd: '/opt/claude' })
+    expect(
+      buildManagedHookDetectionCommands({ disabledTuiAgents: ['claude'] }, 'linux').some(
+        (command) => command.id === 'claude'
+      )
+    ).toBe(false)
   })
 
   it('maps detected TUI ids back to managed hook targets', () => {
-    expect(detectedManagedHookAgents(['codex', 'opencode', 'droid'])).toEqual(['codex'])
+    expect(detectedManagedHookAgents(['claude', 'opencode', 'droid'])).toEqual(['claude'])
   })
 })

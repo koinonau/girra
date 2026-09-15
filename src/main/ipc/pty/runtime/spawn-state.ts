@@ -1,5 +1,4 @@
 import type { IPtyProvider, PtySpawnOptions, PtySpawnResult } from '../../../providers/types'
-import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
 import type { StablePaneOwner } from '../pane/stable-owner'
 import type { PaneSpawnReservation } from '../pane/spawn-reservation'
@@ -7,8 +6,7 @@ import type { AdoptStablePaneResult } from '../ipc/spawn-types'
 import type { PtyBindingSourceExpectation } from '../../../persistence'
 import type { PtyRuntimeControllerDeps } from './controller-deps'
 import type { TuiAgent } from '../../../../shared/tui-agent'
-import type { AgentProviderSessionMetadata } from '../../../../shared/agent-session-resume'
-import type { StartupCommandDelivery } from '../../../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../../../shared/startup-command-delivery'
 import type {
   AgentSessionExecutionClaim,
   AgentSessionSurfaceBinding
@@ -32,7 +30,6 @@ export type RuntimePtySpawnState = {
   effectiveSessionAppId: string | undefined
   isNewDaemonSession: boolean
   expectedWslDistro: string | null
-  codexSelectionTarget: AccountSelectionTarget
   launchCommand: string | undefined
   claudeAuth: ClaudeRuntimeAuthPreparation | null
   shouldPersistHostSessionBinding: boolean
@@ -47,10 +44,6 @@ export type RuntimePtySpawnState = {
     | undefined
   env: Record<string, string> | undefined
   requestedAgentTeamsPath: string | undefined
-  selectedCodexHomePath: string | null
-  codexResumeHomeSelected: boolean
-  skipCodexHomeEnv: boolean
-  stripInheritedOrcaCodexHome: boolean
   spawnOptions: PtySpawnOptions
   hadSessionSizeBeforeAttach: boolean
   sessionSizeBeforeAttach: { cols: number; rows: number } | undefined
@@ -91,7 +84,6 @@ export type RuntimePtySpawnArgs = {
   }
   env?: Record<string, string>
   envToDelete?: string[]
-  resumeProviderSession?: AgentProviderSessionMetadata
   connectionId?: string | null
   worktreeId?: string
   preAllocatedHandle?: string
@@ -143,17 +135,12 @@ export function createRuntimePtySpawnState(
     effectiveSessionAppId: undefined,
     isNewDaemonSession: false,
     expectedWslDistro: null,
-    codexSelectionTarget: { runtime: 'host' },
     launchCommand: undefined,
     claudeAuth: null,
     shouldPersistHostSessionBinding: false,
     hostSessionBinding: undefined,
     env: undefined,
     requestedAgentTeamsPath: undefined,
-    selectedCodexHomePath: null,
-    codexResumeHomeSelected: false,
-    skipCodexHomeEnv: false,
-    stripInheritedOrcaCodexHome: false,
     spawnOptions: { cols: args.cols, rows: args.rows },
     hadSessionSizeBeforeAttach: false,
     sessionSizeBeforeAttach: undefined,

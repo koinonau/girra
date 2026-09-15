@@ -132,24 +132,6 @@ __orca_deferred_init() {
       # an `alias omp` otherwise rewrites at parse time, aborting the rest of the file.
       function omp { __orca_omp "$@"; }
     fi
-
-    # Why: Codex must keep using Orca's runtime CODEX_HOME after rc files.
-    [[ -n "${ORCA_CODEX_HOME:-}" ]] && export CODEX_HOME="${ORCA_CODEX_HOME}"
-    # Why: a typed alias expands inside the shell, after pane launch prep.
-    # Why unalias inside the substitution: an alias named codex makes command -v
-    # report the alias text, and the subshell leaves the user's own alias intact.
-    # Why || : twice — zsh alone aborts inside the substitution, but every shell's
-    # assignment adopts its exit status, so an absent codex trips set -e in bash too.
-    __orca_codex_binary="$(unalias codex 2>/dev/null || :; command -v codex 2>/dev/null || :)"
-    if [[ -n "${ORCA_CODEX_LAUNCH_PREFLIGHT:-}" && -x "${ORCA_CODEX_LAUNCH_PREFLIGHT}" && -n "${__orca_codex_binary:-}" && -x "${__orca_codex_binary}" ]]; then
-      # Why the function reserved word: it suppresses alias expansion of the name,
-      # which otherwise rewrites this header at parse time and aborts the whole file.
-      function codex {
-        "${ORCA_CODEX_LAUNCH_PREFLIGHT}" agent hooks prepare-codex >/dev/null 2>&1 || :
-        command codex "$@"
-      }
-    fi
-    unset __orca_codex_binary
   fi
   if [[ -n "${_orca_histfile:-}" ]]; then
     HISTFILE="$_orca_histfile"

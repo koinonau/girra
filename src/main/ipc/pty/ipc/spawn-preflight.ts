@@ -10,7 +10,7 @@ import { resolveWslSessionContext } from '../../../daemon/wsl-session-context'
 import { LocalPtyProvider } from '../../../providers/local-pty-provider'
 import { normalizeWindowsTerminalCwd } from '../../../providers/windows-shell-args'
 import { wslUncDirectoryExistsAsync } from '../../../wsl'
-import { getCodexSelectionTargetForPty } from '../host-env/codex-home'
+import { getAccountSelectionTargetForPty } from '../host-env/account-selection-target'
 import {
   isClaudeLaunchCommand,
   recoverFreshSpawnProviderRouting,
@@ -217,7 +217,7 @@ export async function preparePtyIpcSpawnPreflight(ctx: PtyIpcSpawnState): Promis
         terminalWindowsWslDistro: ctx.terminalRuntimeOptions.terminalWindowsWslDistro
       })?.distro ?? null)
     : null
-  const initialSelectionTarget = getCodexSelectionTargetForPty(
+  const initialSelectionTarget = getAccountSelectionTargetForPty(
     initialShellOverride,
     ctx.cwd,
     ctx.expectedWslDistro

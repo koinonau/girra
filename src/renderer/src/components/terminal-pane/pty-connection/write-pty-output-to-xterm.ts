@@ -27,7 +27,7 @@ export function bindWritePtyOutputToXterm(session: ConnectPanePtySession): void 
     const parseHiddenStartupOutput =
       !foreground &&
       session.canUseHiddenOutputSnapshot(session.transport.getPtyId()) &&
-      session.shouldSnapshotHiddenCodexOutput &&
+      session.shouldSnapshotHiddenAgentOutput &&
       (opts?.hiddenStartupRendererQuery === true || containsHiddenStartupRendererQuery(data))
     const synchronizedForegroundScan =
       session.shouldProtectNativeWindowsSynchronizedOutput && foreground

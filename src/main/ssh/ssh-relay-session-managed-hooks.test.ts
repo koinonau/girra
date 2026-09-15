@@ -87,7 +87,7 @@ describe('SshRelaySession managed hooks', () => {
   it('installs only detected hooks without blocking provider registration', async () => {
     muxRequestMock.mockImplementation(async (method: string) => {
       if (method === 'preflight.detectAgents') {
-        return { agents: ['codex'] }
+        return { agents: ['claude'] }
       }
       return method === AGENT_HOOK_INSTALL_MANAGED_HOOKS_METHOD
         ? { installers: 1, errors: 0 }
@@ -105,7 +105,7 @@ describe('SshRelaySession managed hooks', () => {
     await vi.waitFor(() =>
       expect(muxRequestMock).toHaveBeenCalledWith(AGENT_HOOK_INSTALL_MANAGED_HOOKS_METHOD, {
         hostKeyFingerprint: 'SHA256:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        agents: ['codex']
+        agents: ['claude']
       })
     )
 

@@ -59,7 +59,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
       if (this.state.lastStatusByPaneKey.has(paneKey)) {
         statusChanged = true
       }
-      this.clearCodexSubagentPoll(paneKey)
       clearPaneCacheState(this.state, paneKey)
       this.activeHookTurnCompletedAtByPaneKey.delete(paneKey)
       this.runtimeObservedStatusPaneKeys.delete(paneKey)
@@ -91,7 +90,6 @@ export abstract class AgentHookServerTabCleanup extends AgentHookServerCleanup {
       | EnrichedAgentHookEventPayload
       | undefined
     const hadStatus = previousStatus !== undefined
-    this.clearCodexSubagentPoll(resolvedPaneKey)
     clearPaneCacheState(this.state, resolvedPaneKey)
     this.activeHookTurnCompletedAtByPaneKey.delete(resolvedPaneKey)
     this.currentAuthorityObservations.delete(resolvedPaneKey)

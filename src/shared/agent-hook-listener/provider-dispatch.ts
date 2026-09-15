@@ -4,7 +4,6 @@ import { readFirstString } from './interactive-tool'
 import type { HookListenerState } from './listener-state'
 import type { ExtractedPromptText } from './prompt-fields'
 import { normalizeClaudeEvent } from './providers/claude-events'
-import { normalizeCodexEvent } from './providers/codex-events'
 import { normalizeOpenCodeFamilyEvent } from './providers/opencode-family-events'
 import { normalizePiCompatibleEvent } from './providers/pi-family-events'
 
@@ -30,9 +29,6 @@ export function normalizeProviderEvent(input: {
   switch (source) {
     case 'claude':
       payload = normalizeClaudeEvent(state, eventName, promptText, paneKey, hookPayload)
-      break
-    case 'codex':
-      payload = normalizeCodexEvent(state, eventName, promptText, paneKey, hookPayload)
       break
     case 'opencode': {
       if (extractedPrompt.source === 'role_user_text') {

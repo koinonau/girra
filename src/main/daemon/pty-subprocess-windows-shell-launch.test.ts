@@ -78,7 +78,6 @@ import { createPtySubprocess } from './pty-subprocess'
 import { mockPtyProcess, useDaemonPtySubprocessEnv } from './pty-subprocess-test-harness'
 
 const POWERSHELL_OSC133_COMMAND_ARGS = ['-NoLogo', '-NoExit', '-EncodedCommand', expect.any(String)]
-const CODEX_LAUNCH_PREFLIGHT = 'C:\\Program Files\\Orca\\orca.exe'
 
 describe('createPtySubprocess', () => {
   useDaemonPtySubprocessEnv({
@@ -221,8 +220,7 @@ describe('createPtySubprocess', () => {
         cols: 80,
         rows: 24,
         shellOverride: 'cmd.exe',
-        terminalWindowsPowerShellImplementation: 'pwsh.exe',
-        env: { ORCA_CODEX_LAUNCH_PREFLIGHT: CODEX_LAUNCH_PREFLIGHT }
+        terminalWindowsPowerShellImplementation: 'pwsh.exe'
       })
     } finally {
       if (platform) {
@@ -232,13 +230,8 @@ describe('createPtySubprocess', () => {
 
     expect(spawnMock).toHaveBeenCalledWith(
       'cmd.exe',
-      [
-        '/K',
-        'chcp 65001 > nul & if defined ORCA_CODEX_LAUNCH_PREFLIGHT call %ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE%%ORCA_CODEX_LAUNCH_PREFLIGHT%%ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE% agent hooks prepare-codex > nul 2>&1'
-      ],
-      expect.objectContaining({
-        env: expect.objectContaining({ ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE: '"' })
-      })
+      ['/K', 'chcp 65001 > nul'],
+      expect.any(Object)
     )
   })
 
@@ -287,8 +280,7 @@ describe('createPtySubprocess', () => {
         rows: 24,
         cwd: 'C:\\repo\\orca',
         shellOverride: 'cmd.exe',
-        command: `codex ${'x'.repeat(7000)}`,
-        env: { ORCA_CODEX_LAUNCH_PREFLIGHT: CODEX_LAUNCH_PREFLIGHT }
+        command: `codex ${'x'.repeat(7000)}`
       })
     } finally {
       if (platform) {
@@ -298,10 +290,7 @@ describe('createPtySubprocess', () => {
 
     expect(spawnMock).toHaveBeenCalledWith(
       'cmd.exe',
-      [
-        '/K',
-        'chcp 65001 > nul & if defined ORCA_CODEX_LAUNCH_PREFLIGHT call %ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE%%ORCA_CODEX_LAUNCH_PREFLIGHT%%ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE% agent hooks prepare-codex > nul 2>&1'
-      ],
+      ['/K', 'chcp 65001 > nul'],
       expect.any(Object)
     )
     expect(handle!.startupCommandDeliveredInShellArgs).toBeUndefined()
@@ -320,8 +309,7 @@ describe('createPtySubprocess', () => {
         cols: 80,
         rows: 24,
         cwd: 'C:\\Users\\jin\\repo',
-        shellOverride: 'C:\\PortableGit\\bin\\bash.exe',
-        env: { ORCA_CODEX_LAUNCH_PREFLIGHT: CODEX_LAUNCH_PREFLIGHT }
+        shellOverride: 'C:\\PortableGit\\bin\\bash.exe'
       })
     } finally {
       if (platform) {
@@ -331,18 +319,10 @@ describe('createPtySubprocess', () => {
 
     expect(spawnMock).toHaveBeenCalledWith(
       'C:\\PortableGit\\bin\\bash.exe',
-      [
-        '-c',
-        expect.stringMatching(
-          /^chcp\.com 65001 >\/dev\/null 2>&1; exec "\$BASH" --rcfile '.*shell-ready\/bash\/rcfile' -i$/
-        )
-      ],
+      ['-c', 'chcp.com 65001 >/dev/null 2>&1; exec "$BASH" --login -i'],
       expect.objectContaining({
         cwd: 'C:\\Users\\jin\\repo',
-        env: expect.objectContaining({
-          CHERE_INVOKING: '1',
-          ORCA_CODEX_LAUNCH_PREFLIGHT: CODEX_LAUNCH_PREFLIGHT
-        })
+        env: expect.objectContaining({ CHERE_INVOKING: '1' })
       })
     )
   })

@@ -20,7 +20,6 @@ import { RetiredPaneSurfaceRegistry } from './retired-pane-surfaces'
 import { addWslEnvKeys } from '../shared/wsl-env'
 import { SHELL_STARTUP_FEATURE_ENV } from '../main/shell-startup-features'
 import { DEFAULT_SSH_RELAY_GRACE_PERIOD_SECONDS } from '../shared/ssh-types'
-import { shouldUseShellReadyStartupDelivery } from '../shared/codex-startup-delivery'
 import { buildStartupCommandSubmission } from '../shared/startup-command-submission'
 import { resolveSetupAgentSequenceLaunchCommand } from '../shared/setup-agent-sequencing'
 import {
@@ -1905,17 +1904,8 @@ export class PtyHandler {
       isUnattended: launchAgent !== undefined,
       platform: process.platform
     })
-    // Why the shell is part of the decision here and not on the client: the client
-    // cannot see which shell this host runs, and plain Codex must still wait where
-    // the marker rides the line editor rather than double-echoing an early write.
     const shouldEmitShellReadyMarker =
-      launchCommandHint !== undefined &&
-      shouldUseShellReadyStartupDelivery({
-        command: launchCommandHint,
-        startupCommandDelivery:
-          params.startupCommandDelivery === 'shell-ready' ? 'shell-ready' : undefined,
-        shellPath: shell
-      })
+      launchCommandHint !== undefined && params.startupCommandDelivery === 'shell-ready'
     const managedStartupCommand = shouldProviderDeliverCommand ? command : launchCommandHint
     // Why: both renderer- and provider-delivered startup commands use this marker; the delivering side strips it from output.
     const shellLaunch = getRelayShellLaunchConfig(shell, spawnEnv, process.platform, {
@@ -1933,7 +1923,7 @@ export class PtyHandler {
 
     // Why: SSH exec channels give the relay a minimal environment without
     // .zprofile/.bash_profile sourced. Spawning a login shell ensures PATH
-    // includes Homebrew, nvm, and user-installed CLIs (claude, codex, gh).
+    // includes Homebrew, nvm, and user-installed CLIs (claude, gh).
     // When overlays are injected, the launch wrapper keeps those paths after
     // user startup files re-export their defaults.
     let term: IPty

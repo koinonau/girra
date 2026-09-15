@@ -310,7 +310,7 @@ async function main() {
     const { ensureWslHookRelayForReattach } = await jiti.import(
       '../../src/main/agent-hooks/wsl-hook-relay-reattach.ts'
     )
-    const { codexHookService } = await jiti.import('../../src/main/codex/hook-service.ts')
+    const { claudeHookService } = await jiti.import('../../src/main/claude/hook-service.ts')
     const { MANAGED_AGENT_HOOK_TARGETS } = await jiti.import(
       '../../src/shared/managed-agent-hook-targets.ts'
     )
@@ -340,14 +340,14 @@ async function main() {
     ).stdout.trim()
     const instanceKey = `bench-${process.pid}-${Date.now().toString(36)}`
     const benchmarkRoot = `${guestHome}/.orca-wsl/benchmarks/${instanceKey}`
-    const scriptPath = `${benchmarkRoot}/.orca/agent-hooks/codex-hook.sh`
+    const scriptPath = `${benchmarkRoot}/.orca/agent-hooks/claude-hook.sh`
     const endpointPath = `${guestHome}/.orca-wsl/agent-hooks/instance-${instanceKey}/endpoint.env`
     cleanupPaths = [benchmarkRoot, `${guestHome}/.orca-wsl/agent-hooks/instance-${instanceKey}`]
     if (cleanupPaths.some((cleanupPath) => !cleanupPath.startsWith(`${guestHome}/.orca-wsl/`))) {
       throw new Error('Refusing to use an unexpected guest cleanup path')
     }
     const disabledTuiAgents = MANAGED_AGENT_HOOK_TARGETS.filter(
-      (target) => target.tuiAgent !== 'codex'
+      (target) => target.tuiAgent !== 'claude'
     ).map((target) => target.tuiAgent)
     const bundleVersion = readFileSync(versionPath, 'utf8').trim()
     const warnings = []
@@ -370,7 +370,6 @@ async function main() {
     ptyIpc.registerPtyHandlers(
       createRendererWindowStub(),
       runtime,
-      undefined,
       () => ({ agentStatusHooksEnabled: false }),
       undefined,
       undefined,
@@ -409,14 +408,9 @@ async function main() {
         ingest: () => {
           delivered++
         },
-        installHooks: async (sftp) => [
-          await codexHookService.installRemote(sftp, benchmarkRoot, {
-            codexHomeDir: `${benchmarkRoot}/codex-home`,
-            deferTrustUntilConfigToml: true
-          })
-        ],
+        installHooks: async (sftp) => [await claudeHookService.installRemote(sftp, benchmarkRoot)],
         managedHookSettings: () => ({
-          agentCmdOverrides: { codex: '/bin/true' },
+          agentCmdOverrides: { claude: '/bin/true' },
           disabledTuiAgents
         }),
         pluginSources: () => ({}),
@@ -427,7 +421,7 @@ async function main() {
 
     manager = await createManager('before-restart-token')
     manager.ensureForDistro(distro)
-    await waitFor('initial relay and generated Codex hook', async () => {
+    await waitFor('initial relay and generated Claude hook', async () => {
       const [endpoint, script] = await Promise.all([
         readGuestFile(distro, endpointPath),
         readGuestFile(distro, scriptPath)

@@ -159,37 +159,6 @@ describe('LocalPtyProvider', () => {
   })
 
   describe('spawn', () => {
-    it('delegates markerless Codex startup to the shell wrapper without a PTY write', async () => {
-      process.env.SHELL = '/bin/zsh'
-      const command = "codex '--dangerously-bypass-approvals-and-sandbox'"
-
-      await provider.spawn({ cols: 80, rows: 24, command })
-
-      const spawnEnv = spawnMock.mock.calls.at(-1)?.[2].env
-      expect(spawnEnv[POSIX_SHELL_STARTUP_COMMAND_ENV]).toBe(command)
-      expect(spawnEnv.ORCA_SHELL_FEATURES).toContain('startup')
-      expect(spawnEnv.ORCA_SHELL_FEATURES).not.toContain('ready')
-      expect(mockProc.write).not.toHaveBeenCalled()
-    })
-
-    it('keeps payload-bearing Codex startup in the wrapper readiness path', async () => {
-      process.env.SHELL = '/bin/zsh'
-      const command = "codex '--dangerously-bypass-approvals-and-sandbox' 'review this branch'"
-
-      await provider.spawn({
-        cols: 80,
-        rows: 24,
-        command,
-        startupCommandDelivery: 'shell-ready'
-      })
-
-      const spawnEnv = spawnMock.mock.calls.at(-1)?.[2].env
-      expect(spawnEnv[POSIX_SHELL_STARTUP_COMMAND_ENV]).toBe(command)
-      expect(spawnEnv.ORCA_SHELL_FEATURES).toContain('startup')
-      expect(spawnEnv.ORCA_SHELL_FEATURES).toContain('ready')
-      expect(mockProc.write).not.toHaveBeenCalled()
-    })
-
     it('scrubs an inherited wrapper startup command from ordinary panes', async () => {
       process.env.SHELL = '/bin/zsh'
 
@@ -208,7 +177,7 @@ describe('LocalPtyProvider', () => {
       vi.useFakeTimers()
       try {
         process.env.SHELL = '/bin/sh'
-        const command = "codex '--dangerously-bypass-approvals-and-sandbox'"
+        const command = "claude '--dangerously-skip-permissions'"
 
         await provider.spawn({ cols: 80, rows: 24, command })
 

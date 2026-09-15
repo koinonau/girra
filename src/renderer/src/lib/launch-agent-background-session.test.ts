@@ -346,13 +346,13 @@ describe('launchAgentBackgroundSession', () => {
     const { launchAgentBackgroundSession } = await import('./launch-agent-background-session')
 
     await launchAgentBackgroundSession({
-      agent: 'codex',
+      agent: 'copilot',
       worktreeId: 'wt-1',
       prompt: 'run the automation'
     })
 
     expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
+      preset: 'copilot',
       workspacePath: '/repo/worktree'
     })
     expect(mockSpawn).toHaveBeenCalled()

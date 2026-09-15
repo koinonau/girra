@@ -7,7 +7,7 @@ import {
   homedir,
   ipcMain,
   join,
-  markCodexProjectTrustedMock,
+  markCopilotFolderTrustedMock,
   mkdtemp,
   randomUUID,
   registerSshGitProvider,
@@ -189,8 +189,8 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--dangerously-bypass-approvals-and-sandbox' },
-        agentDefaultEnv: { codex: { CODEX_PROFILE: 'captured' } }
+        agentDefaultArgs: { copilot: '--allow-all-tools' },
+        agentDefaultEnv: { copilot: { COPILOT_PROFILE: 'captured' } }
       })
     }
     const runtime = new OrcaRuntimeService(runtimeStore)
@@ -213,7 +213,7 @@ describe('OrcaRuntimeService', () => {
       ipcMain.emit(
         'terminal:tabCreateReply',
         { sender: webContents },
-        { requestId: payload.requestId, tabId: 'tab-renderer', title: 'Codex' }
+        { requestId: payload.requestId, tabId: 'tab-renderer', title: 'Copilot' }
       )
     })
     runtime.attachWindow(1)
@@ -224,7 +224,7 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
+      command: 'copilot',
       rendererBacked: true
     })
 
@@ -232,18 +232,18 @@ describe('OrcaRuntimeService', () => {
       'terminal:requestTabCreate',
       expect.objectContaining({
         worktreeId: TEST_WORKTREE_ID,
-        command: "codex '--dangerously-bypass-approvals-and-sandbox'",
-        env: { CODEX_PROFILE: 'captured' },
-        launchAgent: 'codex',
+        command: "copilot '--allow-all-tools'",
+        env: { COPILOT_PROFILE: 'captured' },
+        launchAgent: 'copilot',
         launchConfig: {
-          agentCommand: "codex '--dangerously-bypass-approvals-and-sandbox'",
-          agentArgs: '--dangerously-bypass-approvals-and-sandbox',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentCommand: "copilot '--allow-all-tools'",
+          agentArgs: '--allow-all-tools',
+          agentEnv: { COPILOT_PROFILE: 'captured' }
         }
       })
     )
-    expect(markCodexProjectTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
-    expect(markCodexProjectTrustedMock.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(markCopilotFolderTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
+    expect(markCopilotFolderTrustedMock.mock.invocationCallOrder[0]).toBeLessThan(
       webContents.send.mock.invocationCallOrder[0]!
     )
   })

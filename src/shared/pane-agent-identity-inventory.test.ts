@@ -167,7 +167,6 @@ const INVENTORY: readonly InventoryGroup[] = [
     classification: 'action-consumer',
     paths: [
       ['src/renderer/src/components/tab-bar/native-chat-tab-agent-evidence.ts', 3],
-      ['src/renderer/src/components/terminal-pane/pty-connection/connect-pane-pty.ts', 2],
       ['src/renderer/src/components/terminal-pane/terminal-ctrl-enter.ts', 2],
       ['src/renderer/src/components/terminal-pane/terminal-windows-shift-enter.ts', 2],
       ['src/renderer/src/components/terminal-pane/use-notification-dispatch.ts', 2]
@@ -315,7 +314,6 @@ const INVENTORY: readonly InventoryGroup[] = [
     helper: 'detectAgentStatusFromTitle',
     classification: 'action-consumer',
     paths: [
-      ['src/renderer/src/components/terminal-pane/pty-connection/agent-task-complete-notify.ts', 2],
       [
         'src/renderer/src/components/terminal-pane/pty-connection/command-inferred-pane-agent.ts',
         3

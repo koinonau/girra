@@ -34,7 +34,7 @@ import type { AgentHookTarget } from './agent-hook-types'
 // Promoted from `src/main/agent-hooks/server.ts` so the relay can import it
 // without dragging Electron in (the shared listener module is the only place
 // that consumes it from the relay side).
-const AGENT_HOOK_SOURCES = ['claude', 'codex', 'opencode', 'pi', 'omp', 'prime-agent'] as const
+const AGENT_HOOK_SOURCES = ['claude', 'opencode', 'pi', 'omp', 'prime-agent'] as const
 
 export type AgentHookSource = (typeof AGENT_HOOK_SOURCES)[number]
 

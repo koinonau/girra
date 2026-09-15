@@ -71,7 +71,7 @@ export type PtySpawnResult = {
    *  into a terminal. */
   lastTitle?: string
   /** True when the reattached session uses the alternate screen buffer
-   *  (e.g., Codex CLI, vim). Normal-screen TUIs like Claude Code are false. */
+   *  (e.g., vim). Normal-screen TUIs like Claude Code are false. */
   isAlternateScreen?: boolean
   /** Buffered output returned by relay pty.attach. Unlike snapshot, this is
    *  incremental scrollback and must not clear the terminal before replay. */

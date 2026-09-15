@@ -8,15 +8,8 @@ import {
   addOrcaWslInteropEnv,
   stampWslOrchestrationCompatibilityHost
 } from '../../../pty/wsl-orca-env'
-import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import { markClaudePtyExited } from '../../../claude-accounts/live-pty-gate'
 import { buildPtyHostEnv } from '../host-env/assembly'
-import {
-  getCompatibleSelectedCodexHomePath,
-  isCodexStatusHooksEnabled,
-  shouldStripInheritedOrcaCodexHome
-} from '../host-env/codex-home'
-import type { GetSelectedCodexHomePath } from '../host-env/types'
 import { isCurrentPtyExit, ptyOwnership } from './ownership-state'
 import { localProvider } from './registry'
 import { clearProviderPtyState } from './state-cleanup'
@@ -24,14 +17,13 @@ import { clearProviderPtyState } from './state-cleanup'
 export function configureLocalPtyProvider(args: {
   runtime?: OrcaRuntimeService
   getSettings?: () => GlobalSettings
-  getSelectedCodexHomePath?: GetSelectedCodexHomePath
   trustedTerminalHandleEnv: Set<string>
 }): void {
   // Why: only LocalPtyProvider needs main-process hook injection; daemon-backed providers spawn subprocesses internally.
   if (!(localProvider instanceof LocalPtyProvider)) {
     return
   }
-  const { runtime, getSettings, getSelectedCodexHomePath, trustedTerminalHandleEnv } = args
+  const { runtime, getSettings, trustedTerminalHandleEnv } = args
   localProvider.configure({
     isHistoryEnabled: () => getSettings?.()?.terminalScopeHistoryByWorktree ?? true,
     getWindowsShell: () => getSettings?.()?.terminalWindowsShell,
@@ -39,39 +31,16 @@ export function configureLocalPtyProvider(args: {
       getSettings ? (getSettings()?.terminalWindowsPowerShellImplementation ?? 'auto') : undefined,
     pwshAvailable: () => isPwshAvailableAsync(),
     buildSpawnEnv: async (id, baseEnv, ctx) => {
-      const codexSelectionTarget: AccountSelectionTarget =
-        ctx?.isWsl === true
-          ? { runtime: 'wsl', wslDistro: ctx.wslDistro ?? null }
-          : { runtime: 'host' }
-      const selectedCodexHomePath = getCompatibleSelectedCodexHomePath(
-        codexSelectionTarget,
-        ctx?.codexHomePathOverride
-          ? ctx.codexHomePathOverride.value
-          : ((await getSelectedCodexHomePath?.(codexSelectionTarget, baseEnv, {
-              workspacePath: ctx?.cwd,
-              launchAgent: ctx?.launchAgent
-            })) ?? null)
-      )
-      const skipCodexHomeEnv = ctx?.isWsl === true && !selectedCodexHomePath
       const ptySettings = getSettings?.()
       const env = buildPtyHostEnv(id, baseEnv, {
         isPackaged: getAppEnvironment().isPackaged(),
         resourcesPath: process.resourcesPath,
         userDataPath: getAppEnvironment().getPath('userData'),
-        selectedCodexHomePath,
-        skipCodexHomeEnv,
-        stripInheritedOrcaCodexHome: shouldStripInheritedOrcaCodexHome({
-          target: codexSelectionTarget,
-          selectedCodexHomePath,
-          skipCodexHomeEnv,
-          settings: ptySettings
-        }),
         launchCommand: ctx?.command,
         launchAgent: ctx?.launchAgent,
         isWsl: ctx?.isWsl,
         wslDistro: ctx?.wslDistro ?? null,
         agentStatusHooksEnabled: isAgentStatusHooksEnabled(ptySettings),
-        codexStatusHooksEnabled: isCodexStatusHooksEnabled(ptySettings),
         networkProxySettings: ptySettings,
         routeBrowserOpensToClient: runtime?.shouldRelayTerminalBrowserOpens?.()
       })

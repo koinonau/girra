@@ -6,7 +6,7 @@ import type {
   AgentLaunchPreferences,
   AgentPromptDelivery
 } from '../../../shared/agent-session-host-authority'
-import type { StartupCommandDelivery } from '../../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../../shared/startup-command-delivery'
 import type { RuntimeTerminalCreate } from '../../../shared/runtime-types'
 import type { TuiAgent } from '../../../shared/tui-agent'
 

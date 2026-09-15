@@ -76,10 +76,7 @@ describe('agent hook listener relay dependency boundary', () => {
   it('keeps the transitive runtime graph inside Node builtins and shared modules', () => {
     const sharedRoot = resolve(__dirname)
     const listenerPathPrefix = resolve(sharedRoot, 'agent-hook-listener')
-    const relayConsumers = [
-      resolve(sharedRoot, '../relay/agent-hook-server.ts'),
-      resolve(sharedRoot, '../relay/agent-hook-result-retry-scheduler.ts')
-    ]
+    const relayConsumers = [resolve(sharedRoot, '../relay/agent-hook-server.ts')]
     const pending = relayConsumers.flatMap((consumer) =>
       readRuntimeSpecifiers(readFileSync(consumer, 'utf8'))
         .map((specifier) => resolveTypeScriptImport(consumer, specifier))
@@ -124,7 +121,6 @@ describe('agent hook listener relay dependency boundary', () => {
       'agent-hook-listener/hook-envelope.ts',
       'agent-hook-listener/listener-limits.ts',
       'agent-hook-listener/listener-state.ts',
-      'agent-hook-listener/providers/codex-state.ts',
       'agent-hook-listener/request-body.ts',
       'agent-hook-listener/source-routing.ts'
     ])

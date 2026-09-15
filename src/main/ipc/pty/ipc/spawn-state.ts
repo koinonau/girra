@@ -1,10 +1,8 @@
 import type { IPtyProvider, PtySpawnOptions, PtySpawnResult } from '../../../providers/types'
-import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import type { SleepingAgentLaunchConfig } from '../../../../shared/agent-session-resume'
 import type { ClaudeRuntimeAuthPreparation } from '../../../claude-accounts/runtime-auth-service'
 import type { PtySpawnTiming } from '../../pty-spawn-timing'
 import { createPtySpawnTiming } from '../../pty-spawn-timing'
-import { noCodexResumeLaunch, type CodexResumeLaunch } from '../host-env/codex-resume'
 import type { StablePaneOwner } from '../pane/stable-owner'
 import type { PaneSpawnReservation } from '../pane/spawn-reservation'
 import { localProvider } from '../provider/registry'
@@ -64,17 +62,11 @@ export type PtyIpcSpawnState = {
   validatedLeafId: string | null
   effectiveShellOverride: string | undefined
   nativeWindowsConptySpawn: boolean
-  codexSelectionTarget: AccountSelectionTarget
-  codexResumeLaunch: CodexResumeLaunch
   launchCommand: string | undefined
   env: Record<string, string> | undefined
-  selectedCodexHomePath: string | null
   spawnEnv: Record<string, string> | undefined
   spawnOptions: PtySpawnOptions
   combinedEnvToDelete: string[] | undefined
-  skipCodexHomeEnv: boolean
-  stripInheritedOrcaCodexHome: boolean
-  codexResumeHomeSelected: boolean
   hadSessionSizeBeforeAttach: boolean
   sessionSizeBeforeAttach: { cols: number; rows: number } | undefined
   initiallyHidden: boolean
@@ -135,17 +127,11 @@ export function createPtyIpcSpawnState(
     validatedLeafId: null,
     effectiveShellOverride: undefined,
     nativeWindowsConptySpawn: false,
-    codexSelectionTarget: { runtime: 'host' },
-    codexResumeLaunch: noCodexResumeLaunch(undefined),
     launchCommand: undefined,
     env: undefined,
-    selectedCodexHomePath: null,
     spawnEnv: undefined,
     spawnOptions: { cols: args.cols, rows: args.rows },
     combinedEnvToDelete: undefined,
-    skipCodexHomeEnv: false,
-    stripInheritedOrcaCodexHome: false,
-    codexResumeHomeSelected: false,
     hadSessionSizeBeforeAttach: false,
     sessionSizeBeforeAttach: undefined,
     initiallyHidden: false,

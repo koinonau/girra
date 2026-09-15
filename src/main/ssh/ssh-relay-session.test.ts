@@ -210,7 +210,7 @@ describe('SshRelaySession', () => {
     process.env.ORCA_FEATURE_REMOTE_AGENT_HOOKS = '1'
     muxRequestMock.mockImplementation(async (method: string) => {
       if (method === 'preflight.detectAgents') {
-        return { agents: ['codex'] }
+        return { agents: ['claude'] }
       }
       if (method === AGENT_HOOK_INSTALL_MANAGED_HOOKS_METHOD) {
         throw new Error('runtime unavailable')
@@ -238,7 +238,7 @@ describe('SshRelaySession', () => {
     process.env.ORCA_FEATURE_REMOTE_AGENT_HOOKS = '1'
     muxRequestMock.mockImplementation(async (method: string) => {
       if (method === 'preflight.detectAgents') {
-        return { agents: ['codex'] }
+        return { agents: ['claude'] }
       }
       if (method === AGENT_HOOK_INSTALL_MANAGED_HOOKS_METHOD) {
         throw Object.assign(new Error('request disposed'), { code: 'DISPOSED' })

@@ -139,52 +139,6 @@ describe('registerFilesystemHandlers', () => {
     )
   })
 
-  it('strips a nested-Orca CODEX_HOME override before local Codex generation', async () => {
-    const context = {
-      branch: 'feature/ai',
-      stagedSummary: 'M\tREADME.md',
-      stagedPatch: '+hello'
-    }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
-    resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
-    getStagedCommitContextMock.mockResolvedValue(context)
-    generateCommitMessageFromContextMock.mockResolvedValue({
-      success: true,
-      message: 'Update README'
-    })
-    const previousCodexHome = process.env.CODEX_HOME
-    const previousOrcaCodexHome = process.env.ORCA_CODEX_HOME
-    process.env.CODEX_HOME = '/nested-orca/codex-home'
-    process.env.ORCA_CODEX_HOME = '/nested-orca/codex-home'
-
-    try {
-      registerFilesystemHandlers(store as never, {})
-
-      await handlers.get('git:generateCommitMessage')!(null, {
-        worktreePath: WORKTREE_FEATURE_PATH
-      })
-
-      const target = generateCommitMessageFromContextMock.mock.calls[0]?.[2] as
-        | { kind: string; cwd: string; env?: NodeJS.ProcessEnv }
-        | undefined
-      expect(target).toMatchObject({ kind: 'local', cwd: WORKTREE_FEATURE_PATH })
-      expect(target?.env).toBeDefined()
-      expect(target?.env?.CODEX_HOME).toBeUndefined()
-      expect(target?.env?.ORCA_CODEX_HOME).toBeUndefined()
-    } finally {
-      for (const [key, value] of [
-        ['CODEX_HOME', previousCodexHome],
-        ['ORCA_CODEX_HOME', previousOrcaCodexHome]
-      ] as const) {
-        if (value === undefined) {
-          delete process.env[key]
-        } else {
-          process.env[key] = value
-        }
-      }
-    }
-  })
-
   it('routes local WSL project commit-message generation through the project runtime target', async () => {
     await withPlatform('win32', async () => {
       const context = {

@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   appendFileSync,
-  chmodSync,
   mkdirSync,
   mkdtempSync,
   readFileSync,
@@ -21,13 +20,14 @@ import {
 } from '../../shared/agent-hook-spool'
 import { AgentHookServer, _internals } from './server'
 import { buildBody } from './server.test-fixtures'
-import { _internals as codexInternals } from '../codex/hook-service'
+import { claudeHookService } from '../claude/hook-service'
+import { createManagedHookLocalFilesystem } from './managed-hook-local-filesystem'
 import { makePaneKey } from '../../shared/stable-pane-id'
 import { buildPosixHookSpoolLines } from './hook-stdin-contract'
 
 describe('agent hook spool', () => {
   it('appends each record with one printf write to prevent concurrent field interleaving', () => {
-    const spoolLine = buildPosixHookSpoolLines('codex').find((line) =>
+    const spoolLine = buildPosixHookSpoolLines('claude').find((line) =>
       line.includes('>> "$spool_file"')
     )
     expect(spoolLine).toBeDefined()
@@ -40,7 +40,7 @@ describe('agent hook spool', () => {
     const file = join(dir, 'pane.jsonl')
     writeFileSync(
       file,
-      '\n{"paneKey":"tab:1","source":"codex","receivedAt":1,"payload":{}}\n{"paneKey":'
+      '\n{"paneKey":"tab:1","source":"claude","receivedAt":1,"payload":{}}\n{"paneKey":'
     )
     expect(readSpoolRecords(file, 1)).toHaveLength(1)
   })
@@ -52,7 +52,7 @@ describe('agent hook spool', () => {
     const file = join(spool, 'pane-live.jsonl')
     const record = JSON.stringify({
       paneKey: 'tab:live',
-      source: 'codex',
+      source: 'claude',
       receivedAt: Date.now(),
       payload: { state: 'done' }
     })
@@ -83,7 +83,7 @@ describe('agent hook spool', () => {
     const live = join(spool, 'pane-live.jsonl')
     writeFileSync(
       live,
-      `\n${JSON.stringify({ paneKey: 'tab:live', source: 'codex', receivedAt: Date.now(), payload: { state: 'done' } })}\n`
+      `\n${JSON.stringify({ paneKey: 'tab:live', source: 'claude', receivedAt: Date.now(), payload: { state: 'done' } })}\n`
     )
     const ingested: SpoolRecord[] = []
     drainAgentHookSpool({
@@ -102,7 +102,7 @@ describe('agent hook spool', () => {
     const file = join(spool, 'pane-1.jsonl')
     writeFileSync(
       file,
-      `\n${JSON.stringify({ paneKey: 'tab:1', source: 'codex', launchToken: 'old', receivedAt: Date.now(), payload: { state: 'done' } })}\n`
+      `\n${JSON.stringify({ paneKey: 'tab:1', source: 'claude', launchToken: 'old', receivedAt: Date.now(), payload: { state: 'done' } })}\n`
     )
     const inode = statSync(file).ino
     const ingested: unknown[] = []
@@ -123,7 +123,7 @@ describe('agent hook spool', () => {
     const file = join(spool, 'pane-1.jsonl')
     writeFileSync(
       file,
-      `\n${JSON.stringify({ paneKey: 'tab:1', source: 'codex', launchToken: 'same', receivedAt: Date.now(), payload: { state: 'done' } })}\n`
+      `\n${JSON.stringify({ paneKey: 'tab:1', source: 'claude', launchToken: 'same', receivedAt: Date.now(), payload: { state: 'done' } })}\n`
     )
     const ingested: unknown[] = []
     drainAgentHookSpool({
@@ -135,21 +135,21 @@ describe('agent hook spool', () => {
     expect(ingested[0]).toMatchObject({ paneKey: 'tab:1', isReplay: true })
   })
 
-  it('replays a spooled Codex SubagentStop through the server after restart', async () => {
+  it('replays a spooled Claude SubagentStop through the server after restart', async () => {
     const userDataPath = mkdtempSync(join(tmpdir(), 'orca-spool-e2e-'))
     const paneKey = makePaneKey('tab-spool', '00000000-0000-4000-8000-000000000001')
     const launchToken = 'generation-token'
     const first = new AgentHookServer()
     await first.start({ env: 'production', userDataPath })
     const started = _internals.normalizeHookPayload(
-      'codex',
+      'claude',
       buildBody({ hook_event_name: 'SubagentStart', agent_id: 'child-spooled' }),
       'production'
     )!
     first.ingestRemote(
       {
         paneKey,
-        source: 'codex',
+        source: 'claude',
         hookEventName: 'SubagentStart',
         launchToken,
         payload: started.payload
@@ -157,13 +157,14 @@ describe('agent hook spool', () => {
       'spool-test'
     )
     expect(first.getStatusSnapshot()).toHaveLength(1)
+    expect(first.getStatusSnapshot()[0]!.subagents).toHaveLength(1)
     first.flushStatusPersistSync()
     first.stop()
     const spoolDir = join(userDataPath, 'agent-hooks', 'spool')
     mkdirSync(spoolDir, { recursive: true })
     writeFileSync(
       join(spoolDir, 'pane-tab-spooled_0.jsonl'),
-      `\n${JSON.stringify({ paneKey, source: 'codex', hookEventName: 'SubagentStop', launchToken, receivedAt: Date.now(), payload: { hook_event_name: 'SubagentStop', agent_id: 'child-spooled' } })}\n`
+      `\n${JSON.stringify({ paneKey, source: 'claude', hookEventName: 'SubagentStop', launchToken, receivedAt: Date.now(), payload: { hook_event_name: 'SubagentStop', agent_id: 'child-spooled' } })}\n`
     )
     const restarted = new AgentHookServer()
     await restarted.start({ env: 'production', userDataPath })
@@ -188,9 +189,9 @@ describe('agent hook spool', () => {
       first.ingestRemote(
         {
           paneKey,
-          source: 'codex',
+          source: 'claude',
           launchToken: 'old-generation',
-          payload: { state: 'working', agentType: 'codex', prompt: 'old' }
+          payload: { state: 'working', agentType: 'claude', prompt: 'old' }
         },
         'ssh-1'
       )
@@ -201,10 +202,10 @@ describe('agent hook spool', () => {
       second.ingestRemote(
         {
           paneKey,
-          source: 'codex',
+          source: 'claude',
           launchToken: 'new-generation',
           isReplay: true,
-          payload: { state: 'done', agentType: 'codex', prompt: 'stale completion' }
+          payload: { state: 'done', agentType: 'claude', prompt: 'stale completion' }
         },
         'ssh-2'
       )
@@ -219,7 +220,7 @@ describe('agent hook spool', () => {
     }
   })
 
-  it('spools when the endpoint is present but the receiver is unavailable', () => {
+  it('spools when the endpoint is present but the receiver is unavailable', async () => {
     const dir = mkdtempSync(join(tmpdir(), 'orca-spool-failure-'))
     const endpointDir = join(dir, 'agent-hooks')
     mkdirSync(endpointDir, { recursive: true })
@@ -228,14 +229,19 @@ describe('agent hook spool', () => {
       endpoint,
       'ORCA_AGENT_HOOK_PORT=9\nORCA_AGENT_HOOK_TOKEN=stale\nORCA_AGENT_HOOK_ENV=production\nORCA_AGENT_HOOK_VERSION=1\n'
     )
-    const script = join(dir, 'codex-hook.sh')
-    writeFileSync(script, codexInternals.getManagedScript('posix'))
-    chmodSync(script, 0o755)
+    await claudeHookService.installRemote(createManagedHookLocalFilesystem(), dir)
+    const scriptDir = join(dir, '.orca', 'agent-hooks')
+    const script = join(
+      scriptDir,
+      readdirSync(scriptDir).find((name) => name.endsWith('.sh'))!
+    )
     execFileSync('/bin/sh', [script], {
       input: '{"hook_event_name":"SubagentStop","agent_id":"child"}\n',
       env: {
         ...process.env,
         ORCA_AGENT_HOOK_ENDPOINT: endpoint,
+        CLAUDE_JOB_DIR: '',
+        DEVIN_PROJECT_DIR: '',
         ORCA_PANE_KEY: 'tab-failure:0',
         ORCA_TAB_ID: 'tab-failure',
         ORCA_AGENT_LAUNCH_TOKEN: 'generation-token'
@@ -256,14 +262,14 @@ describe('agent hook spool', () => {
     const first = new AgentHookServer()
     await first.start({ env: 'production', userDataPath })
     const started = _internals.normalizeHookPayload(
-      'codex',
+      'claude',
       buildBody({ hook_event_name: 'SubagentStart', agent_id: 'child-observed' }),
       'production'
     )!
     first.ingestRemote(
       {
         paneKey,
-        source: 'codex',
+        source: 'claude',
         hookEventName: 'SubagentStart',
         launchToken,
         payload: started.payload
@@ -276,7 +282,7 @@ describe('agent hook spool', () => {
     mkdirSync(spoolDir, { recursive: true })
     writeFileSync(
       join(spoolDir, 'pane-observed.jsonl'),
-      `\n${JSON.stringify({ paneKey, source: 'codex', hookEventName: 'SubagentStart', launchToken, receivedAt: Date.now(), payload: started.payload })}\n`
+      `\n${JSON.stringify({ paneKey, source: 'claude', hookEventName: 'SubagentStart', launchToken, receivedAt: Date.now(), payload: started.payload })}\n`
     )
     const restarted = new AgentHookServer()
     await restarted.start({ env: 'production', userDataPath })

@@ -148,7 +148,7 @@ describe('Claude session replacement voids the replaced session claims', () => {
   })
 
   it('voids nothing when a CHILD event carries a foreign session id', () => {
-    // Claude has no equivalent of the Codex child-session guard, so a child payload's own
+    // Claude has no child-session guard, so a child payload's own
     // session_id reaches the same extraction path as the lead's.
     const state = createHookListenerState()
     const paneKey = makePaneKey('child-session', LEAF_ID)

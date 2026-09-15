@@ -3,7 +3,7 @@
 // agent-hooks/server.ts) and each per-agent hook service. Lives in `shared/`
 // to keep a single source of truth for the version string and status contract.
 
-export const AGENT_HOOK_TARGETS = ['claude', 'codex'] as const
+export const AGENT_HOOK_TARGETS = ['claude'] as const
 export type AgentHookTarget = (typeof AGENT_HOOK_TARGETS)[number]
 
 export type AgentHookInstallState = 'installed' | 'not_installed' | 'partial' | 'error' | 'skipped'
@@ -29,7 +29,7 @@ export type AgentHookInstallStatus = {
 // silently producing partial payloads. Still at v1 because the endpoint-file
 // rollout is additive — pre-endpoint-file scripts still post the same JSON
 // body shape, and no in-wild v1 script exists that a future v2 receiver would
-// need to distinguish from: Claude/Codex installs run for everyone on first
+// need to distinguish from: Claude installs run for everyone on first
 // launch but no v1 fleet ever shipped. Reserve the next bump for a real wire
 // change.
 export const ORCA_HOOK_PROTOCOL_VERSION = '1' as const

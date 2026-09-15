@@ -12,25 +12,29 @@ describe('preflightAgentTrust', () => {
   afterEach(() => vi.unstubAllGlobals())
 
   it('marks a trust-gated agent with the host connection id', async () => {
-    await preflightAgentTrust({ agent: 'codex', workspacePath: '/repo/wt', connectionId: 'ssh-1' })
+    await preflightAgentTrust({
+      agent: 'copilot',
+      workspacePath: '/repo/wt',
+      connectionId: 'ssh-1'
+    })
 
     expect(markTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
+      preset: 'copilot',
       workspacePath: '/repo/wt',
       connectionId: 'ssh-1'
     })
   })
 
   it('omits a null connection id for local workspaces', async () => {
-    await preflightAgentTrust({ agent: 'codex', workspacePath: '/repo/wt', connectionId: null })
+    await preflightAgentTrust({ agent: 'copilot', workspacePath: '/repo/wt', connectionId: null })
 
-    expect(markTrusted).toHaveBeenCalledWith({ preset: 'codex', workspacePath: '/repo/wt' })
+    expect(markTrusted).toHaveBeenCalledWith({ preset: 'copilot', workspacePath: '/repo/wt' })
   })
 
   it.each([
     ['no agent', { agent: null, workspacePath: '/repo/wt' }],
-    ['no workspace path yet', { agent: 'codex' as const, workspacePath: null }],
-    ['an empty workspace path', { agent: 'codex' as const, workspacePath: '' }]
+    ['no workspace path yet', { agent: 'copilot' as const, workspacePath: null }],
+    ['an empty workspace path', { agent: 'copilot' as const, workspacePath: '' }]
   ])('skips the mark with %s', async (_label, args) => {
     await preflightAgentTrust(args)
 
@@ -47,7 +51,7 @@ describe('preflightAgentTrust', () => {
     markTrusted.mockRejectedValue(new Error('offline'))
 
     await expect(
-      preflightAgentTrust({ agent: 'codex', workspacePath: '/repo/wt' })
+      preflightAgentTrust({ agent: 'copilot', workspacePath: '/repo/wt' })
     ).resolves.toBeUndefined()
   })
 
@@ -55,7 +59,7 @@ describe('preflightAgentTrust', () => {
     vi.stubGlobal('window', { api: {} })
 
     await expect(
-      preflightAgentTrust({ agent: 'codex', workspacePath: '/repo/wt' })
+      preflightAgentTrust({ agent: 'copilot', workspacePath: '/repo/wt' })
     ).resolves.toBeUndefined()
   })
 })

@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Every remaining story waits on a user decision below.
+As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phase 5b (Codex out of terminals, hooks and startup) is in its pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -21,6 +21,7 @@ As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version ha
 - Phase 4b merged in [#13](https://github.com/koinonau/girra/pull/13): Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane. 30 files deleted, 6,923 lines removed.
 - Phase 6 merged in [#14](https://github.com/koinonau/girra/pull/14): the feature wall, contextual tours and first-run onboarding. 189 files deleted, 27,662 lines removed.
 - Phase 5a merged in [#15](https://github.com/koinonau/girra/pull/15): Codex accounts, managed homes, reset credits, rate limits, usage, the CLI lock, the per-pane account registry and stale-pane restart. 254 files deleted, 58,851 lines removed.
+- Phase 5b removes Codex from the PTY and shell environment, hooks, trust, startup, the CLI and RPC agent-hooks surface, and renderer terminal special cases, plus the 136 `src/main/codex` files and orphans that lost their last importer: 179 files deleted, 41,801 lines removed and 900 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 - Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
 
 ## Files
@@ -181,6 +182,15 @@ After Phase 7a, on 2026-09-15:
 | `pnpm lint` | 0 | 42 s | 114 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 15 s | Main 5,250 modules, renderer 12,019 |
 
+After Phase 5b, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 3 s | No errors |
+| `pnpm test` | 1 | 773 s | Files: 11 failed, 7,864 passed, 57 skipped of 7,932. Tests: 12 failed, 73,216 passed, 332 skipped of 73,560. The five known failures plus six stale tests (a deleted-file boundary check, two inventory entries, a CLI import floor, three commit-message env expectations), fixed before merge and passing alone (48 tests) |
+| `pnpm lint` | 0 | 45 s | 113 reliability gates (the Codex state-DB backfill gate lost its tests); `DIRECT_IMPORTER_PIN` 145 |
+| `pnpm build` | 0 | 17 s | Renderer 12,014 modules |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -265,6 +275,11 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: after 5a, Codex launches run on the user's own `~/.codex` (`prepareCodexRuntimeHomeForLaunch` returns null after the trust preset and real-home hook install). Known gaps until 5b to 5d: Windows has no Codex status hook install path, because the real-home lane still needs the shell probe; and resuming a legacy session from the shared mirror fails when the real-home lane is off.
 - 2026-09-15: the index heal CI job and its contract tests went with the orphaned index heal module.
 - 2026-09-15: remove the plugin kill-list's remote fetch, though the tree ticks it with a `[STRIP]` PHONE-HOME tag, because the selection drops phone-home. The plugin system and marketplace stay; nothing blocks a plugin now.
+- 2026-09-15: delete `src/main/codex` files as soon as kept code stops reaching them, measured by an import walk from non-test files outside the directory, rather than waiting for the phase that owns the directory. A pull request must typecheck, and those files broke once hook types narrowed.
+- 2026-09-15: the SSH relay's hook installer ignores agents it does not know instead of failing the whole install, so an older desktop asking for Codex hooks still gets Claude's.
+- 2026-09-15 (user): keep remote serving, pairing and the web UI (option A); remove only the mobile leftovers (`--mobile-pairing`, mobile session tabs, the mobile RPC allowlist, mobile-scope devices).
+- 2026-09-15 (user): workflows keep `pr.yml` and `unit-tests.yml` trimmed of Orca jobs and `e2e.yml` on demand, add one macOS build that signs and notarizes with the user's Apple developer account, and delete the rest; then re-enable Actions once the secrets exist (`MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`).
+- 2026-09-15 (user): delete remote skill install (the host-side `skills.install` API and the SSH relay skill handler). In its place, the Skills page gets an "Install kothar" action that opens a terminal on the chosen local or SSH host running the guided installer from gist `6d79d83dd27851d57fd1e346e04c7585` (`kothar-install-wizard.sh`, which installs the private `shanedolley/kothar` repository).
 - 2026-09-15 (user): the launch roster keeps only Claude Code (with its Agent Teams launch mode), OpenCode and Pi. Codex and every other agent go, including OMP and Prime Agent, which share Pi's hooks.
 - 2026-09-15 (user): keep MiniMax usage and credentials, although the tree unticks the usage fetch.
 - 2026-09-15 (user): the app is named Girra, and the CLI binary is `girra`. `.orca/`, `ORCA_*` and the `orca://` scheme are not part of that decision and stay for now. The Help menu, Support section and share card are left as they are.
@@ -276,9 +291,6 @@ All 2026-09-13 unless dated otherwise.
 
 ## Open Decisions
 
-- **Web renderer and pairing.** The feature tree keeps "Web UI served over the network", "Headless serve mode", "Cross-device session tab sync" and "Paired-runtime remote browser host", but drops "Web/mobile companion renderer" (`src/renderer/src/web`) and the mobile pairing items: end-to-end encryption, device tokens, QR pairing. The code does not split that way. Serve mode serves the web client built from `src/renderer/src/web`, and `src/main/runtime/runtime-rpc/` imports `device-registry.ts` and `e2ee-keypair.ts` for every remote client. Keep both, and drop only mobile-specific surfaces; or drop the web UI and remote serving with them. Phase 3a already removed the mobile pairing page, QR pairing, push and the cloud relay. Still in place: `orca serve --mobile-pairing`, the mobile session tab runtime, the mobile RPC allowlist and mobile-scope devices in the registry.
-- **Remote skill install.** Since skill sharing left, nothing calls the host-side skill install RPC (`skills.install`, uploads) or the SSH relay skill handler. Delete them, or add a local package source that uses them.
-- **Workflows.** Which of the 36 to keep before Actions is re-enabled. Until then, no change has CI.
 - **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it. Left for now (user, 2026-09-15).
 - **Star and support links.** The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL. Left for now (user, 2026-09-15).
 - **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug. Not part of the 2026-09-15 rename; they stay until decided.

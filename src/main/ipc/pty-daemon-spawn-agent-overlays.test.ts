@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { openCodeBuildPtyEnvMock, piBuildPtyEnvMock } from './pty-ipc-mock-registry'
-import { expectedOmpStatusExtension, TEST_CODEX_HOME } from './pty-ipc-test-constants'
+import { expectedOmpStatusExtension } from './pty-ipc-test-constants'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
 import { createDaemonActiveProviderFixtures } from './pty-ipc-daemon-provider-fixtures'
 import { SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV } from '../../shared/setup-agent-sequencing'
@@ -33,9 +33,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -49,7 +46,7 @@ describe('registerPtyHandlers', () => {
 
       // Why: under the daemon, LocalPtyProvider.buildSpawnEnv never runs, so host-local env injection must happen in the pty:spawn handler instead.
       it('injects OpenCode plugin env (OPENCODE_CONFIG_DIR) on the daemon path', async () => {
-        const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
+        const env = await daemonSpawnAndGetEnv({}, undefined, {
           OPENCODE_CONFIG_DIR: undefined
         })
         expect(openCodeBuildPtyEnvMock).toHaveBeenCalled()
@@ -100,7 +97,7 @@ describe('registerPtyHandlers', () => {
         expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(expectedOmpStatusExtension)
       })
       it('does not materialize agent homes when another daemon agent mentions OMP', async () => {
-        const env = await daemonSpawnAndGetEnv(undefined, undefined, undefined, undefined, {
+        const env = await daemonSpawnAndGetEnv(undefined, undefined, undefined, {
           command: 'codex "ask about omp"',
           launchAgent: 'codex'
         })
@@ -115,7 +112,6 @@ describe('registerPtyHandlers', () => {
         // Why: mirror of the local-spawn OMP threading assertion; the daemon path's `command` forwarding could silently regress otherwise.
         const env = await daemonSpawnAndGetEnv(
           { PI_CODING_AGENT_DIR: '/user/.omp/agent' },
-          undefined,
           undefined,
           undefined,
           { command: 'omp' }
@@ -143,7 +139,6 @@ describe('registerPtyHandlers', () => {
           },
           undefined,
           undefined,
-          undefined,
           { command: 'powershell wait-wrapper' }
         )
 
@@ -157,11 +152,6 @@ describe('registerPtyHandlers', () => {
           '/user/.omp/agent/extensions/orca-agent-status.ts'
         )
         expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
-      })
-      it('injects the selected Codex home on the daemon path', async () => {
-        const env = await daemonSpawnAndGetEnv({}, () => TEST_CODEX_HOME)
-        expect(env.CODEX_HOME).toBe(TEST_CODEX_HOME)
-        expect(env.ORCA_CODEX_HOME).toBe(TEST_CODEX_HOME)
       })
     })
   })

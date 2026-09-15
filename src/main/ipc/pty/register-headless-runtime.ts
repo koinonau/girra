@@ -2,21 +2,15 @@ import type { BrowserWindow } from 'electron'
 import type { OrcaRuntimeService } from '../../runtime/orca-runtime'
 import type { Store } from '../../persistence'
 import type { GlobalSettings } from '../../../shared/global-settings-types'
-import type {
-  GetSelectedCodexHomePath,
-  PrepareClaudeAuth,
-  PrepareCodexSessionResume
-} from './host-env/types'
+import type { PrepareClaudeAuth } from './host-env/types'
 import { registerPtyHandlers } from './register-handlers'
 import { hydrateLocalPtyRegistryAtBoot } from '../../memory/hydrate-local-pty-registry'
 
 export function registerHeadlessPtyRuntime(
   runtime: OrcaRuntimeService,
-  getSelectedCodexHomePath?: GetSelectedCodexHomePath,
   getSettings?: () => GlobalSettings,
   prepareClaudeAuth?: PrepareClaudeAuth,
-  store?: Store,
-  prepareCodexSessionResume?: PrepareCodexSessionResume
+  store?: Store
 ): Promise<void> {
   // Why: headless `orca serve` has no renderer window but still needs the same PTY handlers so remote clients can drive terminals.
   // Why a fake rather than null: `registerPtyHandlers` takes a non-null BrowserWindow. `isDestroyed: () => true`
@@ -31,14 +25,6 @@ export function registerHeadlessPtyRuntime(
       removeListener: () => {}
     }
   } as unknown as BrowserWindow
-  registerPtyHandlers(
-    headlessWindow,
-    runtime,
-    getSelectedCodexHomePath,
-    getSettings,
-    prepareClaudeAuth,
-    store,
-    { prepareCodexSessionResume }
-  )
+  registerPtyHandlers(headlessWindow, runtime, getSettings, prepareClaudeAuth, store)
   return store ? hydrateLocalPtyRegistryAtBoot(store) : Promise.resolve()
 }

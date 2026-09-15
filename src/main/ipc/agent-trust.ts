@@ -1,13 +1,9 @@
 import { ipcMain } from 'electron'
-import {
-  type AgentTrustPreset,
-  markCodexProjectTrusted,
-  markCopilotFolderTrusted
-} from '../agent-trust-presets'
+import { type AgentTrustPreset, markCopilotFolderTrusted } from '../agent-trust-presets'
 import { markRemoteAgentWorkspaceTrusted } from '../remote-agent-trust-presets'
 
 /**
- * Why: GitHub Copilot CLI and Codex gate first-launch in an
+ * Why: GitHub Copilot CLI gates first-launch in an
  * unfamiliar directory behind a "Do you trust this folder?" menu that consumes
  * keystrokes (numbered options / single-letter shortcuts). Orca's draft-URL
  * paste flow needs the input box, not the menu, so before Orca spawns the
@@ -38,8 +34,6 @@ export function registerAgentTrustHandlers(): void {
           })
         } else if (args.preset === 'copilot') {
           markCopilotFolderTrusted(args.workspacePath)
-        } else if (args.preset === 'codex') {
-          markCodexProjectTrusted(args.workspacePath)
         }
       } catch {
         // Best-effort: see Why above. The user can still accept the trust

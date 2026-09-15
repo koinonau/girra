@@ -395,7 +395,7 @@ describe('AgentsPane', () => {
   it('includes hook search metadata for the status setting', () => {
     expect(matchesSettingsSearch('hooks', getAgentsPaneSearchEntries())).toBe(true)
     expect(matchesSettingsSearch('waiting', getAgentsPaneSearchEntries())).toBe(true)
-    expect(matchesSettingsSearch('codex', getAgentsPaneSearchEntries())).toBe(true)
+    expect(matchesSettingsSearch('claude', getAgentsPaneSearchEntries())).toBe(true)
   })
 
   it('includes generated title search metadata', () => {

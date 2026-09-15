@@ -37,9 +37,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -213,7 +210,6 @@ describe('registerPtyHandlers', () => {
           registerPtyHandlers(
             mainWindow as never,
             runtime as never,
-            undefined,
             (() => settings) as never,
             undefined,
             store as never
@@ -268,12 +264,7 @@ describe('registerPtyHandlers', () => {
             terminalWindowsPowerShellImplementation: 'auto'
           }
           handlers.clear()
-          registerPtyHandlers(
-            mainWindow as never,
-            runtime as never,
-            undefined,
-            (() => settings) as never
-          )
+          registerPtyHandlers(mainWindow as never, runtime as never, (() => settings) as never)
           const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
             spawn(args: {
               cols: number
@@ -345,12 +336,7 @@ describe('registerPtyHandlers', () => {
               preparePtyExecutionContext: vi.fn().mockReturnValue(true)
             }
             handlers.clear()
-            registerPtyHandlers(
-              mainWindow as never,
-              runtime as never,
-              undefined,
-              (() => settings) as never
-            )
+            registerPtyHandlers(mainWindow as never, runtime as never, (() => settings) as never)
 
             await handlers.get('pty:spawn')!(null, {
               cols: 80,
@@ -389,7 +375,6 @@ describe('registerPtyHandlers', () => {
           registerPtyHandlers(
             mainWindow as never,
             runtime as never,
-            undefined,
             (() => settings) as never,
             undefined,
             store as never
@@ -478,7 +463,7 @@ describe('registerPtyHandlers', () => {
         const prev = mockedApp.isPackaged
         mockedApp.isPackaged = false
         try {
-          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
+          const env = await daemonSpawnAndGetEnv({}, undefined, {
             ORCA_AGENT_HOOK_ENDPOINT: '/tmp/stale-endpoint.env'
           })
           expect(env.ORCA_AGENT_HOOK_ENDPOINT).toBeUndefined()
@@ -503,7 +488,6 @@ describe('registerPtyHandlers', () => {
               ORCA_AGENT_TEAMS_TEAM_ID: 'team-test',
               TERM_PROGRAM: 'Orca'
             },
-            undefined,
             undefined,
             undefined,
             {
@@ -541,7 +525,7 @@ describe('registerPtyHandlers', () => {
         const prev = mockedApp.isPackaged
         mockedApp.isPackaged = false
         try {
-          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
+          const env = await daemonSpawnAndGetEnv({}, undefined, {
             PATH: '/system/bin'
           })
           expect(env.ORCA_USER_DATA_PATH).toBe('/tmp/orca-user-data')
@@ -560,7 +544,7 @@ describe('registerPtyHandlers', () => {
         const prev = mockedApp.isPackaged
         mockedApp.isPackaged = false
         try {
-          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
+          const env = await daemonSpawnAndGetEnv({}, undefined, {
             PATH: `/tmp/orca-user-data/orca-terminal-attribution/posix${delimiter}/system/bin`
           })
           expect(env.PATH).not.toContain('orca-terminal-attribution')
@@ -576,7 +560,6 @@ describe('registerPtyHandlers', () => {
             GIT_CONFIG_KEY_0: 'http.proxy',
             GIT_CONFIG_VALUE_0: 'http://proxy.invalid'
           },
-          undefined,
           undefined,
           undefined,
           { command: 'claude' }

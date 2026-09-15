@@ -42,14 +42,14 @@ describe('managed-hook local filesystem', () => {
     const cold = await installRemoteManagedAgentHooks(filesystem, home, options)
     const warm = await installRemoteManagedAgentHooks(filesystem, home, options)
 
-    expect(cold).toHaveLength(2)
+    expect(cold).toHaveLength(1)
     expect(cold.filter((result) => result.state === 'error')).toEqual([])
-    expect(warm).toHaveLength(2)
+    expect(warm).toHaveLength(1)
     expect(warm.filter((result) => result.state === 'error')).toEqual([])
     const files = await listFiles(home)
     expect(files.filter((path) => path.endsWith('.tmp'))).toEqual([])
     const scripts = files.filter((path) => path.includes(join('.orca', 'agent-hooks')))
-    expect(scripts.length).toBeGreaterThanOrEqual(2)
+    expect(scripts.length).toBeGreaterThanOrEqual(1)
     if (process.platform !== 'win32') {
       for (const script of scripts) {
         expect((await stat(script)).mode & 0o777).toBe(0o755)
@@ -57,7 +57,7 @@ describe('managed-hook local filesystem', () => {
     }
   })
 
-  it('isolates a malformed config while installing the remaining agents', async () => {
+  it('reports a malformed config as an error without rewriting it', async () => {
     const home = await createTempHome()
     const claudeConfig = join(home, '.claude', 'settings.json')
     await mkdir(join(home, '.claude'), { recursive: true })
@@ -67,9 +67,8 @@ describe('managed-hook local filesystem', () => {
       agents: REMOTE_MANAGED_HOOK_INSTALLER_AGENTS
     })
 
-    expect(results).toHaveLength(2)
+    expect(results).toHaveLength(1)
     expect(results.find((result) => result.agent === 'claude')?.state).toBe('error')
-    expect(results.find((result) => result.agent === 'codex')?.state).toBe('installed')
     expect(await readFile(claudeConfig, 'utf8')).toBe('{"hooks": }')
   })
 })

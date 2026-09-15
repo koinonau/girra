@@ -41,9 +41,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow, mainWindowIpcEvent, getPtyWriteListener } = setupPtyIpcSuite()
@@ -87,14 +84,7 @@ describe('registerPtyHandlers', () => {
         } as never)
         setPtyOwnership(scopedPtyId, 'ssh-1')
         handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          store as never
-        )
+        registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
         try {
           await expect(
@@ -152,14 +142,7 @@ describe('registerPtyHandlers', () => {
         } as never)
         setPtyOwnership('remote-pty', 'ssh-1')
         handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          store as never
-        )
+        registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
         try {
           await expect(
@@ -212,7 +195,6 @@ describe('registerPtyHandlers', () => {
         registerPtyHandlers(
           mainWindow as never,
           runtime as never,
-          undefined,
           undefined,
           undefined,
           store as never
@@ -433,7 +415,6 @@ describe('registerPtyHandlers', () => {
         registerPtyHandlers(
           mainWindow as never,
           runtime as never,
-          undefined,
           undefined,
           undefined,
           store as never

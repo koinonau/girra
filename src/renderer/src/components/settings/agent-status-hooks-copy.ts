@@ -31,11 +31,6 @@ export function getAgentStatusHooksSearchKeywords(): string[] {
       key: 'auto.components.settings.agents.search.f412abbba5',
       fallback: 'claude',
       englishOnly: true
-    },
-    {
-      key: 'auto.components.settings.agents.search.5ded38b843',
-      fallback: 'codex',
-      englishOnly: true
     }
   ])
 }

@@ -16,10 +16,7 @@ import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-const MANAGED_SCRIPTS = [
-  ['claude-hook.sh', 'claude'],
-  ['codex-hook.sh', 'codex']
-]
+const MANAGED_SCRIPTS = [['claude-hook.sh', 'claude']]
 
 function parseArgs(argv) {
   const result = { home: process.env.HOME ?? '', minMtime: 0 }

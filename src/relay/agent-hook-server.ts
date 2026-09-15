@@ -40,7 +40,6 @@ import {
 } from '../shared/agent-hook-spool'
 import { buildRelayHookPtyEnv, defaultEndpointDir } from './agent-hook-endpoint-coordinates'
 import { buildRelayHookEnvelope, hookBodyEnv, hookBodyVersion } from './agent-hook-envelope-build'
-import { AgentHookResultRetryScheduler } from './agent-hook-result-retry-scheduler'
 import {
   evictCachedPanesOverCap,
   selectReplayableCachedPanes
@@ -94,7 +93,6 @@ export class RelayAgentHookServer {
   private fixedToken: string | undefined
   private preferredPort: number
   private portFallbackApplied = false
-  private retryScheduler: AgentHookResultRetryScheduler
 
   constructor(options: RelayHookServerOptions) {
     this.env = options.env ?? REMOTE_AGENT_HOOK_ENV
@@ -104,14 +102,6 @@ export class RelayAgentHookServer {
     this.preferredPort = options.preferredPort ?? 0
     this.forward = options.forward
     this.isPaneSurfaceRetired = options.isPaneSurfaceRetired ?? (() => false)
-    this.retryScheduler = new AgentHookResultRetryScheduler({
-      state: this.state,
-      env: this.env,
-      isListening: () => this.server !== null,
-      applyEvent: (event, source, env, version) => {
-        this.applyEvent(event, source, env, version)
-      }
-    })
   }
 
   async start(options: RelayHookServerStartOptions = {}): Promise<void> {
@@ -201,7 +191,6 @@ export class RelayAgentHookServer {
     this.port = 0
     this.token = ''
     this.endpointFileWritten = false
-    this.retryScheduler.clearAll()
     clearAllListenerCaches(this.state)
     this.lastEnvelopeMetaByPaneKey.clear()
   }
@@ -225,7 +214,6 @@ export class RelayAgentHookServer {
 
   /** Drop a paneKey's cached entries on PTY exit so a terminated pane can't resurface as a ghost event on reconnect. */
   clearPaneState(paneKey: string): void {
-    this.retryScheduler.clearCodexSubagentPoll(paneKey)
     clearPaneCacheState(this.state, paneKey)
     this.lastEnvelopeMetaByPaneKey.delete(paneKey)
   }
@@ -283,7 +271,6 @@ export class RelayAgentHookServer {
         const env = hookBodyEnv(hookBody)
         const version = hookBodyVersion(hookBody)
         this.applyEvent(event, source, env, version)
-        this.retryScheduler.scheduleCodexSubagentPoll(source, hookBody, event, env, version)
       }
       res.writeHead(204)
       res.end()

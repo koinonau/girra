@@ -36,32 +36,6 @@ describe('DaemonPtyAdapter startup delivery', () => {
     rmSync(dir, { recursive: true, force: true })
   })
 
-  itOnPosix('preserves the existing fast-start timing for fish', async () => {
-    // The mock subprocess represents installed fish even on hosts without it.
-    const resolveShell = vi
-      .spyOn(localPtyUtils, 'resolveUnixShellPath')
-      .mockReturnValue('/usr/bin/fish')
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
-    try {
-      await adapter.spawn({
-        cols: 80,
-        rows: 24,
-        command: 'codex',
-        env: { SHELL: '/usr/bin/fish' }
-      })
-      await vi.advanceTimersByTimeAsync(299)
-      expect(lastSubprocess.write).not.toHaveBeenCalled()
-      await vi.advanceTimersByTimeAsync(1)
-      expect(lastSubprocess.write).toHaveBeenCalledExactlyOnceWith('codex\n')
-      expect(lastSpawnOpts).not.toEqual(
-        expect.objectContaining({ startupCommandDelivery: 'shell-ready' })
-      )
-    } finally {
-      vi.useRealTimers()
-      resolveShell.mockRestore()
-    }
-  })
-
   itOnPosix.for(['environment', 'override'] as const)(
     'waits for the fallback shell when the %s shell is missing',
     async (source, context) => {
@@ -71,7 +45,7 @@ describe('DaemonPtyAdapter startup delivery', () => {
       await adapter.spawn({
         cols: 80,
         rows: 24,
-        command: 'codex',
+        command: 'claude',
         env: { SHELL: source === 'environment' ? missingShell : '/bin/sh' },
         ...(source === 'override' ? { shellOverride: missingShell } : {})
       })
@@ -82,15 +56,15 @@ describe('DaemonPtyAdapter startup delivery', () => {
       )
       lastSubprocess._simulateData('\x1b]777;orca-shell-ready\x07\r\nuser@host $ ')
       await waitFor(() => vi.mocked(lastSubprocess.write).mock.calls.length > 0)
-      expect(lastSubprocess.write).toHaveBeenCalledExactlyOnceWith('codex\n')
+      expect(lastSubprocess.write).toHaveBeenCalledExactlyOnceWith('claude\n')
     }
   )
 
   itOnPosix.each([
-    { command: 'codex' },
-    { command: 'codex', startupCommandDelivery: 'fast' as const },
-    { command: "codex 'linked issue context'", startupCommandDelivery: 'shell-ready' as const }
-  ])('waits past 300ms and submits once after readiness: %j', async (startup) => {
+    { command: 'claude' },
+    { command: 'claude', startupCommandDelivery: 'fast' as const },
+    { command: "claude 'linked issue context'", startupCommandDelivery: 'shell-ready' as const }
+  ])('waits and submits once after readiness: %j', async (startup) => {
     await adapter.spawn({ cols: 80, rows: 24, ...startup, env: { SHELL: '/bin/zsh' } })
 
     await new Promise((resolve) => setTimeout(resolve, 350))

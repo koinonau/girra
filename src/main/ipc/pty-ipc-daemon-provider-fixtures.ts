@@ -93,11 +93,6 @@ export function createDaemonActiveProviderFixtures(ctx: {
 
   async function daemonSpawnAndGetOptions(
     argsEnv?: Record<string, string>,
-    getSelectedCodexHomePath?: (
-      target?: { runtime?: 'host' | 'wsl'; wslDistro?: string | null },
-      launchEnv?: NodeJS.ProcessEnv,
-      launchContext?: { workspacePath?: string; launchAgent?: TuiAgent }
-    ) => string | null,
     getSettings?: () => {
       httpProxyUrl?: string
       httpProxyBypassRules?: string
@@ -128,12 +123,7 @@ export function createDaemonActiveProviderFixtures(ctx: {
     }
     try {
       handlers.clear()
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        getSelectedCodexHomePath,
-        getSettings as never
-      )
+      registerPtyHandlers(mainWindow as never, undefined, getSettings as never)
       await handlers.get('pty:spawn')!(null, {
         cols: 80,
         rows: 24,
@@ -154,11 +144,6 @@ export function createDaemonActiveProviderFixtures(ctx: {
 
   async function daemonSpawnAndGetEnv(
     argsEnv?: Record<string, string>,
-    getSelectedCodexHomePath?: (
-      target?: { runtime?: 'host' | 'wsl'; wslDistro?: string | null },
-      launchEnv?: NodeJS.ProcessEnv,
-      launchContext?: { workspacePath?: string; launchAgent?: TuiAgent }
-    ) => string | null,
     getSettings?: () => {
       httpProxyUrl?: string
       httpProxyBypassRules?: string
@@ -175,7 +160,6 @@ export function createDaemonActiveProviderFixtures(ctx: {
     return (
       await daemonSpawnAndGetOptions(
         argsEnv,
-        getSelectedCodexHomePath,
         getSettings,
         processEnvOverrides,
         spawnArgs,

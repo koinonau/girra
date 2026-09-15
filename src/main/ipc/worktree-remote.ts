@@ -146,7 +146,7 @@ import {
 import { createSequencedSetupAgentCommands } from '../../shared/setup-agent-sequencing'
 import { shouldWaitForSetupBeforeAgentStartup } from '../../shared/setup-agent-startup-policy'
 import { createWorktreeCreateTimingRecorder } from '../worktree-create-timing'
-import { markCodexProjectTrusted, markCopilotFolderTrusted } from '../agent-trust-presets'
+import { markCopilotFolderTrusted } from '../agent-trust-presets'
 import {
   getLocalProjectGitExecOptions,
   getLocalProjectWorktreeGitOptions,
@@ -430,8 +430,6 @@ async function spawnLocalStartupAndSetupTerminals(args: {
       try {
         if (preset === 'copilot') {
           markCopilotFolderTrusted(worktree.path)
-        } else if (preset === 'codex') {
-          markCodexProjectTrusted(worktree.path)
         }
       } catch {
         // Best-effort: launch still proceeds and the agent can ask interactively.

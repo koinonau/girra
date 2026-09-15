@@ -251,10 +251,10 @@ async function startOrcadRuntime(
   // same call `--serve` makes, and it threads the store through. Without the store the
   // handlers install fine and every terminal.create then fails at persistence time.
   //
-  // Codex-home and Claude-auth preparation are left unset: both are desktop account
-  // flows. A launch that needs one fails with its own message rather than silently
-  // spawning an unauthenticated agent.
-  await registerHeadlessPtyRuntime(runtime, undefined, () => store.getSettings(), undefined, store)
+  // Claude-auth preparation is left unset: it is a desktop account flow. A launch that
+  // needs it fails with its own message rather than silently spawning an
+  // unauthenticated agent.
+  await registerHeadlessPtyRuntime(runtime, () => store.getSettings(), undefined, store)
 
   // Why: same post-registration reconciliation `--serve` performs. Skipping it leaves
   // restored orchestration rows claiming an authority this host never took over.

@@ -35,10 +35,11 @@ function readAgents(params: unknown): AgentHookTarget[] {
   if (raw === undefined) {
     return []
   }
-  if (!Array.isArray(raw) || !raw.every(isManagedAgentHookTarget)) {
+  if (!Array.isArray(raw)) {
     throw new Error('invalid_managed_hook_agents')
   }
-  return [...new Set(raw)]
+  // Why: an older desktop may still ask for retired agents (codex); install the ones this relay supports.
+  return [...new Set(raw.filter(isManagedAgentHookTarget))]
 }
 
 let managedHookRuntime: ManagedHookRuntime | null = null

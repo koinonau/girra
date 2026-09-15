@@ -30,7 +30,6 @@ vi.mock('../window/dashboard-popout-window', () => ({
 }))
 vi.mock('./synthetic-title-runtime', () => ({
   driveSyntheticTitleFromHook: vi.fn(),
-  shouldSuppressCodexAutoApprovalSyntheticTitleFromHook: () => false,
   stopAllSyntheticTitleSpinners: vi.fn()
 }))
 
@@ -49,7 +48,7 @@ function statusPayload(
     connectionId: null,
     receivedAt: 1,
     stateStartedAt: 1,
-    payload: { state: 'working', prompt: 'ship it', agentType: 'codex' },
+    payload: { state: 'working', prompt: 'ship it', agentType: 'claude' },
     ...over
   } as EnrichedAgentHookEventPayload
 }

@@ -4,10 +4,8 @@ import { makePaneKey, isTerminalLeafId } from '../../../../shared/stable-pane-id
 import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
 import { ptySizes } from '../delivery/visibility-state'
 import { shouldSeedPreAttachPtySize } from '../delivery/attached-pty-size'
-import { CODEX_HOME_ENV_KEYS } from '../host-env/codex-home'
 import {
   mergePtyEnvDeletions,
-  removeCodexHomeDeletionRequests,
   getInheritedAgentHookEnvKeysToDelete,
   getInheritedClaudeSessionStampEnvKeysToDelete
 } from '../host-env/pi-agent'
@@ -46,9 +44,6 @@ export async function buildRuntimePtySpawnOptions(
     historyIsolationEnabled: ctx.deps.getSettings?.()?.terminalScopeHistoryByWorktree ?? true,
     ...(ctx.isNewDaemonSession ? { isNewSession: true } : {})
   }
-  if (!args.connectionId && !ctx.isDaemonHostSpawn) {
-    ctx.spawnOptions.codexHomePathOverride = { value: ctx.selectedCodexHomePath }
-  }
   const startupTerminalColorQueryReplyColors = getStartupTerminalColorQueryReplyColors(args)
   if (startupTerminalColorQueryReplyColors) {
     ctx.spawnOptions.startupIngress = {
@@ -73,21 +68,6 @@ export async function buildRuntimePtySpawnOptions(
     // Why: ungated, unlike the agent-hook keys — the local provider and the relay host also spread their own process.env into every spawn.
     getInheritedClaudeSessionStampEnvKeysToDelete(ctx.env)
   )
-  if (ctx.skipCodexHomeEnv) {
-    ctx.spawnOptions.envToDelete = mergePtyEnvDeletions(
-      ctx.spawnOptions.envToDelete,
-      CODEX_HOME_ENV_KEYS
-    )
-  } else if (ctx.stripInheritedOrcaCodexHome) {
-    // Why: the daemon owns a persistent inherited environment that may
-    // differ from main. ORCA_CODEX_HOME asks it to compare/delete the pair.
-    ctx.spawnOptions.envToDelete = mergePtyEnvDeletions(ctx.spawnOptions.envToDelete, [
-      'ORCA_CODEX_HOME'
-    ])
-  }
-  if (ctx.codexResumeHomeSelected) {
-    ctx.spawnOptions.envToDelete = removeCodexHomeDeletionRequests(ctx.spawnOptions.envToDelete)
-  }
   deleteRequestedEnvKeys(ctx.env, ctx.spawnOptions.envToDelete)
   promoteAgentTeamsShimPath(ctx.env, ctx.requestedAgentTeamsPath)
   if (ctx.launchCommand !== undefined) {

@@ -23,19 +23,6 @@ function cloneProcessEnv(): Record<string, string> {
   return env
 }
 
-// Why: the headless Codex commit run must use the user's own ~/.codex. If Orca
-// itself was launched from a nested Orca terminal it can inherit an Orca-owned
-// CODEX_HOME override; strip only that (CODEX_HOME matching the private
-// ORCA_CODEX_HOME marker), preserving a user-set CODEX_HOME.
-function cloneProcessEnvWithoutOrcaCodexHomeOverride(): Record<string, string> {
-  const env = cloneProcessEnv()
-  if (env.ORCA_CODEX_HOME && env.CODEX_HOME === env.ORCA_CODEX_HOME) {
-    delete env.CODEX_HOME
-  }
-  delete env.ORCA_CODEX_HOME
-  return env
-}
-
 function readInheritedOrShellEnvVar(name: string, sourceName?: string): string | undefined {
   return (
     (sourceName ? process.env[sourceName] : undefined) ??
@@ -93,10 +80,6 @@ export async function prepareLocalCommitMessageAgentEnv(
   }
   if (!resolvers) {
     return { ok: true }
-  }
-
-  if (agentId === 'codex') {
-    return { ok: true, env: cloneProcessEnvWithoutOrcaCodexHomeOverride() }
   }
 
   try {

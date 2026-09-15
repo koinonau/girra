@@ -333,8 +333,7 @@ describe('RuntimeGitCommands', () => {
       params,
       expect.objectContaining({
         kind: 'local',
-        cwd: worktreePath,
-        env: expect.any(Object)
+        cwd: worktreePath
       })
     )
   })
@@ -383,8 +382,7 @@ describe('RuntimeGitCommands', () => {
       expect.objectContaining({
         kind: 'local',
         cwd: worktreePath,
-        wslDistro: 'Ubuntu',
-        env: expect.any(Object)
+        wslDistro: 'Ubuntu'
       })
     )
   })
