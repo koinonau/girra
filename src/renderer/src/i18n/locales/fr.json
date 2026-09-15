@@ -765,20 +765,6 @@
       "pluginCommandKeybindings": {
         "group": "Plugins"
       },
-      "feedback": {
-        "image": {
-          "attachments": {
-            "fallbackName": "Pièce jointe image",
-            "unsupportedType": "{{fileName}} n'est pas un type d'image pris en charge.",
-            "empty": "{{fileName}} est vide.",
-            "tooLarge": "{{fileName}} dépasse {{maxSize}}.",
-            "tooMany": "Vous pouvez joindre jusqu'à {{maxCount}} images.",
-            "dimensionsTooLarge": "{{fileName}} a des dimensions trop grandes pour un aperçu sans risque.",
-            "invalidImage": "{{fileName}} n'est pas une image valide prise en charge.",
-            "additionalErrors": "{{count}} images supplémentaires n'ont pas pu être jointes."
-          }
-        }
-      },
       "ephemeralVmWorktreeCreation": {
         "sparseCheckoutUnsupported": "Les recettes à racine provisionnée ne prennent pas en charge le sparse checkout."
       }
@@ -4524,28 +4510,6 @@
           "822ff300ad": "Ignorer",
           "5bfd5c8779": "Ignorer les scripts de setup"
         },
-        "SidebarFeedbackDialog": {
-          "8bf619e4cf": "Annuler",
-          "8de03e23c5": "Envoyez avec votre commentaire texte uniquement, ou connectez `gh` pour inclure votre identité GitHub.",
-          "d20439c560": "Vérification de l'identité GitHub…",
-          "5b120b9634": "Envoyer anonymement",
-          "c9e5ea0791": "GitHub :",
-          "d46ddd66fc": "Que pouvons-nous améliorer ?",
-          "3460258a54": "Suivre sur X",
-          "26108d3699": "Rejoindre Discord",
-          "d245c4ef6c": "Issues GitHub",
-          "9b33530b3d": "Autres moyens de nous contacter",
-          "a828fa4aee": "Partagez ce qui fonctionne, ce qui est cassé, ou ce qu'Orca devrait faire ensuite.",
-          "0eb643f07f": "Envoyer un commentaire",
-          "60b721e857": "Échec de l'envoi du commentaire. Réessayez.",
-          "7a46c228b8": "Merci pour votre commentaire.",
-          "a2fd890d9e": "Saisissez un commentaire avant d'envoyer.",
-          "f2e42e1307": "Envoyer",
-          "69969ba364": "Envoi…",
-          "imageReadFailed": "Impossible de lire les images jointes. Essayez de les joindre à nouveau.",
-          "attachWhileSending": "Attendez la fin de l'envoi du commentaire en cours avant de joindre d'autres images.",
-          "imagesNotDelivered": "Commentaire envoyé, mais la livraison des images n'a pas pu être confirmée."
-        },
         "SidebarFilter": {
           "e3b3898218": "Ajouter un projet",
           "92a23e6d07": "Réinitialiser les filtres",
@@ -4605,7 +4569,6 @@
           "5f83d86d92": "Journal des modifications",
           "cdc87f897e": "Docs",
           "e565171a7c": "Raccourcis clavier",
-          "4cf5b868d7": "Envoyer un commentaire",
           "a428c25998": "Paramètres",
           "2991a0106c": "Aide",
           "4e8f5710d3": "Impossible de redémarrer Orca.",
@@ -5418,11 +5381,6 @@
         "WorktreeDeveloperMenu": {
           "developer": "Développeur",
           "parkTerminal": "Parquer le terminal"
-        },
-        "SidebarFeedbackImageAttachments": {
-          "screenshotsHint": "Joignez jusqu'à {count} captures d'écran",
-          "attachImages": "Joindre",
-          "removeImage": "Supprimer {{fileName}}"
         },
         "WorkspaceKanbanSearchField": {
           "bdb753c78d": "Aucun espace de travail correspondant",
@@ -9974,8 +9932,6 @@
           "official": "Officiel",
           "installed": "Installés",
           "noDescription": "Aucune description fournie.",
-          "blocked": "Bloqué par la liste de sécurité d'Orca : {{value0}}",
-          "blockedAction": "Bloquée",
           "checkUpdate": "Vérifier les mises à jour",
           "install": "Installer"
         },
@@ -9998,7 +9954,6 @@
           "noContributions": "Métadonnées du manifeste uniquement",
           "capabilities": "Accès demandé",
           "workerWarning": "Les capabilities limitent la façon dont ce plugin utilise l'API d'Orca. Son worker s'exécute toujours comme un processus normal sur cet ordinateur, avec un accès complet à vos fichiers, au réseau et aux autres processus.",
-          "blocked": "La liste de sécurité d'Orca bloque ce plugin : {{value0}}",
           "current": "Ce contenu exact de plugin est déjà installé.",
           "close": "Fermer",
           "cancel": "Annuler",
@@ -10059,7 +10014,6 @@
           "rollbackFailed": "Impossible de restaurer ce plugin. Une version immuable précédente n'est peut-être pas disponible."
         },
         "PluginSettingsRow": {
-          "blocked": "Bloquée",
           "needsReview": "En attente de relecture",
           "restarting": "Redémarrage",
           "invalid": "Non valide",
@@ -10075,8 +10029,6 @@
           "dev": "Dev",
           "bundled": "Intégré",
           "noDescription": "Aucune description fournie.",
-          "killListMessage": "La liste de sécurité d'Orca a désactivé ce plugin : {{value0}}",
-          "viewAdvisory": "Consulter l'avis de sécurité",
           "runtimeError": "Le plugin s'est arrêté après une erreur d'activation ou de worker.",
           "restartCount": " · {{value0}} redémarrages",
           "moreActions": "Plus d'actions pour {{value0}}",

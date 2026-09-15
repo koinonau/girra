@@ -15,7 +15,6 @@ import { registerHostedReviewHandlers } from '../hosted-review'
 import { registerLinearHandlers } from '../linear'
 import { registerJiraHandlers } from '../jira'
 import { registerBitbucketHandlers } from '../bitbucket'
-import { registerFeedbackHandlers } from '../feedback'
 import { registerExportHandlers } from '../export'
 import { registerStatsHandlers } from '../stats'
 import { registerMemoryHandlers } from '../memory'
@@ -135,7 +134,6 @@ export function registerCoreHandlers(
   registerLinearHandlers()
   registerJiraHandlers()
   registerBitbucketHandlers()
-  registerFeedbackHandlers()
   registerExportHandlers()
   registerStatsHandlers(stats)
   registerMemoryHandlers(store)

@@ -395,11 +395,6 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     zh: '打开 {{value0}} 议题',
     ja: '{{value0}} イシューを開く'
   },
-  'auto.components.sidebar.SidebarFeedbackDialog.d245c4ef6c': {
-    ko: 'GitHub 이슈',
-    zh: 'GitHub 议题',
-    ja: 'GitHub イシュー'
-  },
   'auto.components.settings.CommitMessageAiPane.4f722a5f53': {
     ko: '사용자 지정 명령을 선택하는 커밋 메시지, PR 및 브랜치 이름 레시피에서 사용됩니다. 사용',
     zh: '由选择自定义命令的提交消息、拉取请求和分支名称配方使用。使用',

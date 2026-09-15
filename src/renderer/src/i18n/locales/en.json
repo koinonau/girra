@@ -906,20 +906,6 @@
       "pluginCommandKeybindings": {
         "group": "Plugins"
       },
-      "feedback": {
-        "image": {
-          "attachments": {
-            "fallbackName": "Image attachment",
-            "unsupportedType": "{{fileName}} is not a supported image type.",
-            "empty": "{{fileName}} is empty.",
-            "tooLarge": "{{fileName}} is larger than {{maxSize}}.",
-            "tooMany": "You can attach up to {{maxCount}} images.",
-            "dimensionsTooLarge": "{{fileName}} has dimensions that are too large to preview safely.",
-            "invalidImage": "{{fileName}} is not a valid supported image.",
-            "additionalErrors": "{{count}} additional images could not be attached."
-          }
-        }
-      },
       "activateAiVaultStructuredSession": {
         "unavailable": "The structured agent session is not available yet. Retry in a moment.",
         "gone": "This chat is no longer on this host, so it cannot be reopened here.",
@@ -4760,28 +4746,6 @@
           "822ff300ad": "Dismiss",
           "5bfd5c8779": "Dismiss setup scripts"
         },
-        "SidebarFeedbackDialog": {
-          "8bf619e4cf": "Cancel",
-          "8de03e23c5": "Submit with your typed feedback only, or connect `gh` to include GitHub identity.",
-          "d20439c560": "Checking GitHub identity…",
-          "5b120b9634": "Submit anonymously",
-          "c9e5ea0791": "GitHub:",
-          "d46ddd66fc": "What could we improve?",
-          "3460258a54": "Follow on X",
-          "26108d3699": "Join Discord",
-          "d245c4ef6c": "GitHub issues",
-          "9b33530b3d": "Other ways to reach us",
-          "a828fa4aee": "Share what's working, what's broken, or what Orca should do next.",
-          "0eb643f07f": "Send Feedback",
-          "60b721e857": "Failed to submit feedback. Please try again.",
-          "7a46c228b8": "Thanks for the feedback.",
-          "a2fd890d9e": "Please enter feedback before submitting.",
-          "f2e42e1307": "Send",
-          "69969ba364": "Sending…",
-          "imageReadFailed": "Could not read the attached images. Try attaching them again.",
-          "attachWhileSending": "Wait for the current feedback to finish sending before attaching more images.",
-          "imagesNotDelivered": "Feedback sent, but image delivery could not be confirmed."
-        },
         "SidebarFilter": {
           "e3b3898218": "Add project",
           "92a23e6d07": "Reset filters",
@@ -4844,7 +4808,6 @@
           "5f83d86d92": "Changelog",
           "cdc87f897e": "Docs",
           "e565171a7c": "Keyboard Shortcuts",
-          "4cf5b868d7": "Send Feedback",
           "a428c25998": "Settings",
           "2991a0106c": "Help",
           "4e8f5710d3": "Couldn't restart Orca.",
@@ -5665,11 +5628,6 @@
         "WorktreeDeveloperMenu": {
           "developer": "Developer",
           "parkTerminal": "Park terminal"
-        },
-        "SidebarFeedbackImageAttachments": {
-          "screenshotsHint": "Attach up to {count} screenshots",
-          "attachImages": "Attach",
-          "removeImage": "Remove {{fileName}}"
         },
         "WorkspaceKanbanSearchField": {
           "bdb753c78d": "No workspaces match",
@@ -10415,8 +10373,6 @@
           "official": "Official",
           "installed": "Installed",
           "noDescription": "No description provided.",
-          "blocked": "Blocked by Orca's safety list: {{value0}}",
-          "blockedAction": "Blocked",
           "checkUpdate": "Check for update",
           "install": "Install"
         },
@@ -10439,7 +10395,6 @@
           "noContributions": "Manifest metadata only",
           "capabilities": "Requested access",
           "workerWarning": "Capabilities limit how this plugin uses Orca's API. Its worker still runs as a normal process on this computer with full access to your files, network, and other processes.",
-          "blocked": "Orca's safety list blocks this plugin: {{value0}}",
           "current": "This exact plugin content is already installed.",
           "close": "Close",
           "cancel": "Cancel",
@@ -10500,7 +10455,6 @@
           "rollbackFailed": "Could not roll back this plugin. A previous immutable version may not be available."
         },
         "PluginSettingsRow": {
-          "blocked": "Blocked",
           "needsReview": "Needs review",
           "restarting": "Restarting",
           "invalid": "Invalid",
@@ -10516,8 +10470,6 @@
           "dev": "Dev",
           "bundled": "Bundled",
           "noDescription": "No description provided.",
-          "killListMessage": "Orca's safety list disabled this plugin: {{value0}}",
-          "viewAdvisory": "View advisory",
           "runtimeError": "The plugin stopped after an activation or worker error.",
           "restartCount": " · {{value0}} restarts",
           "moreActions": "More actions for {{value0}}",

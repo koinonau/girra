@@ -44,7 +44,7 @@ async function resolveAppVersion(): Promise<string> {
       return version.trim()
     }
   } catch {
-    // Best-effort: feedback/error copy should still show OS details.
+    // Best-effort: error copy should still show OS details.
   }
   return 'unknown'
 }

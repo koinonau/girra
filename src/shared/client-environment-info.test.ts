@@ -1,10 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
-  appendClientEnvironmentFooter,
   formatClientEnvironmentFooter,
   formatClientEnvironmentInfo,
-  hasClientEnvironmentFooter,
-  stripClientEnvironmentFooter
+  hasClientEnvironmentFooter
 } from './client-environment-info'
 
 const SAMPLE = {
@@ -64,46 +62,18 @@ describe('environment footer helpers', () => {
     expect(hasClientEnvironmentFooter('oops')).toBe(false)
   })
 
-  it('appends a footer once and leaves existing footers alone', () => {
-    const withFooter = appendClientEnvironmentFooter({
-      message: 'Working directory missing.',
-      info: SAMPLE
-    })
-    expect(withFooter).toContain('Working directory missing.')
-    expect(withFooter).toContain('Orca: 1.4.178-rc.2')
-    expect(appendClientEnvironmentFooter({ message: withFooter, info: SAMPLE })).toBe(withFooter)
-  })
-
-  it('treats footer-only text as empty user feedback', () => {
-    const footer = formatClientEnvironmentFooter(SAMPLE)
-    expect(stripClientEnvironmentFooter(`\n\n${footer}\n`).trim()).toBe('')
-    expect(stripClientEnvironmentFooter(`please fix tabs\n\n${footer}`).trimEnd()).toBe(
-      'please fix tabs'
-    )
-    expect(stripClientEnvironmentFooter(footer).trim()).toBe('')
-  })
-
-  it('counts authored text above or below the footer as user feedback', () => {
+  it('detects a footer with authored text below it', () => {
     const footer = formatClientEnvironmentFooter(SAMPLE)
     expect(hasClientEnvironmentFooter(`\n\n${footer}\ntyped below`)).toBe(true)
-    expect(stripClientEnvironmentFooter(`\n\n${footer}\ntyped below`).trim()).toBe('typed below')
-    expect(stripClientEnvironmentFooter(`actual report\n\n${footer}`).trim()).toBe('actual report')
-    expect(
-      stripClientEnvironmentFooter(`above\n\n${footer}\nbelow`).replace(/\n+/g, ' ').trim()
-    ).toBe('above below')
   })
 
   it('still detects an edited footer block', () => {
     const editedFooter = ['---', 'Orca: locally-built', 'OS: edited by user'].join('\n')
 
     expect(hasClientEnvironmentFooter(editedFooter)).toBe(true)
-    expect(stripClientEnvironmentFooter(editedFooter).trim()).toBe('')
   })
 
-  it('treats a report as user text after the footer is deleted', () => {
-    const withoutFooter = 'Tabs hang after waking the laptop.'
-
-    expect(hasClientEnvironmentFooter(withoutFooter)).toBe(false)
-    expect(stripClientEnvironmentFooter(withoutFooter)).toBe(withoutFooter)
+  it('reports no footer once it is deleted', () => {
+    expect(hasClientEnvironmentFooter('Tabs hang after waking the laptop.')).toBe(false)
   })
 })

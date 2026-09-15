@@ -19,7 +19,6 @@ import {
   type PluginMarketplaceCachedSnapshot,
   type PluginMarketplaceRegisteredSource
 } from './plugin-marketplace-store'
-import type { PluginKillListEntry } from '../../shared/plugins/plugin-kill-list'
 import { validateMarketplaceProvenance } from './plugin-marketplace-provenance'
 import { pluginMarketplaceErrorMessage } from './plugin-marketplace-error-message'
 import type {
@@ -38,7 +37,6 @@ type MarketplaceFetcher = (
 export class PluginMarketplaceService {
   private readonly store: PluginMarketplaceStore
   private readonly fetcher: MarketplaceFetcher
-  private readonly getKillListEntry: (pluginKey: string) => PluginKillListEntry | null
   private readonly refreshChains = new Map<string, Promise<PluginMarketplaceSourceState>>()
   private readonly sourceErrors = new Map<string, string>()
   private officialSeedPromise: Promise<PluginMarketplaceSourceState> | null = null
@@ -48,11 +46,9 @@ export class PluginMarketplaceService {
     pluginsDataDir: string
     fetcher?: MarketplaceFetcher
     store?: PluginMarketplaceStore
-    getKillListEntry?: (pluginKey: string) => PluginKillListEntry | null
   }) {
     this.store = options.store ?? new PluginMarketplaceStore(options.pluginsDataDir)
     this.fetcher = options.fetcher ?? fetchPluginMarketplace
-    this.getKillListEntry = options.getKillListEntry ?? (() => null)
   }
 
   async listSources(): Promise<PluginMarketplaceSourceState[]> {
@@ -271,7 +267,6 @@ export class PluginMarketplaceService {
       snapshot.marketplace.owner.toLowerCase() === OFFICIAL_MARKETPLACE_OWNER &&
       isOfficialPluginIdentity(entry.id) &&
       isOfficialOrganizationGitSource(entry.source.url)
-    const blocked = this.getKillListEntry(entry.id)
     return {
       marketplaceSourceId: source.id,
       marketplaceName: snapshot.marketplace.name,
@@ -282,15 +277,7 @@ export class PluginMarketplaceService {
       ...(entry.description ? { description: entry.description } : {}),
       categories: entry.categories,
       official,
-      bundled: false,
-      ...(blocked
-        ? {
-            blockedByKillList: {
-              reason: blocked.reason,
-              ...(blocked.advisoryUrl ? { advisoryUrl: blocked.advisoryUrl } : {})
-            }
-          }
-        : {})
+      bundled: false
     }
   }
 

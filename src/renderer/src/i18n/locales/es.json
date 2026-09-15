@@ -645,20 +645,6 @@
       },
       "pluginCommandKeybindings": {
         "group": "Plugins"
-      },
-      "feedback": {
-        "image": {
-          "attachments": {
-            "fallbackName": "Image attachment",
-            "unsupportedType": "{{fileName}} is not a supported image type.",
-            "empty": "{{fileName}} is empty.",
-            "tooLarge": "{{fileName}} is larger than {{maxSize}}.",
-            "tooMany": "You can attach up to {{maxCount}} images.",
-            "dimensionsTooLarge": "{{fileName}} has dimensions that are too large to preview safely.",
-            "invalidImage": "{{fileName}} is not a valid supported image.",
-            "additionalErrors": "{{count}} additional images could not be attached."
-          }
-        }
       }
     },
     "hooks": {
@@ -4092,28 +4078,6 @@
           "822ff300ad": "Descartar",
           "5bfd5c8779": "Descartar scripts de configuración"
         },
-        "SidebarFeedbackDialog": {
-          "8bf619e4cf": "Cancelar",
-          "8de03e23c5": "Envíalo solo con tu feedback escrito o conecta `gh` para incluir tu identidad de GitHub.",
-          "d20439c560": "Comprobando identidad de GitHub...",
-          "5b120b9634": "Enviar de forma anónima",
-          "c9e5ea0791": "GitHub:",
-          "d46ddd66fc": "¿Qué podríamos mejorar?",
-          "3460258a54": "Sigue en X",
-          "26108d3699": "Únete a Discord",
-          "d245c4ef6c": "Issues de GitHub",
-          "9b33530b3d": "Otras formas de contactarnos",
-          "a828fa4aee": "Comparte qué funciona, qué está roto o qué debería hacer Orca después.",
-          "0eb643f07f": "Enviar feedback",
-          "60b721e857": "No se pudo enviar el feedback. Inténtalo de nuevo.",
-          "7a46c228b8": "Gracias por el feedback.",
-          "a2fd890d9e": "Introduce feedback antes de enviarlo.",
-          "f2e42e1307": "Enviar",
-          "69969ba364": "Envío…",
-          "imageReadFailed": "Could not read the attached images. Try attaching them again.",
-          "attachWhileSending": "Wait for the current feedback to finish sending before attaching more images.",
-          "imagesNotDelivered": "Feedback sent, but image delivery could not be confirmed."
-        },
         "SidebarFilter": {
           "e3b3898218": "Agregar proyecto",
           "92a23e6d07": "Restablecer filtros",
@@ -4175,7 +4139,6 @@
           "5f83d86d92": "Changelog",
           "cdc87f897e": "Documentación",
           "e565171a7c": "Atajos de teclado",
-          "4cf5b868d7": "Enviar comentarios",
           "a428c25998": "Ajustes",
           "2991a0106c": "Ayuda",
           "4e8f5710d3": "No se pudo reiniciar Orca.",
@@ -4986,11 +4949,6 @@
         "WorktreeDeveloperMenu": {
           "developer": "Developer",
           "parkTerminal": "Park terminal"
-        },
-        "SidebarFeedbackImageAttachments": {
-          "screenshotsHint": "Attach up to {count} screenshots",
-          "attachImages": "Attach",
-          "removeImage": "Remove {{fileName}}"
         },
         "WorkspaceKanbanSearchField": {
           "bdb753c78d": "Ningún espacio de trabajo coincide",
@@ -9349,8 +9307,6 @@
           "official": "Oficial",
           "installed": "Instalado",
           "noDescription": "No description provided.",
-          "blocked": "Bloqueado por la lista de seguridad de Orca: {{value0}}",
-          "blockedAction": "Bloqueado",
           "checkUpdate": "Buscar actualización",
           "install": "Install"
         },
@@ -9373,7 +9329,6 @@
           "noContributions": "Solo metadatos del manifiesto",
           "capabilities": "Acceso solicitado",
           "workerWarning": "Las capacidades limitan cómo usa este plugin la API de Orca. Su proceso sigue ejecutándose como un proceso normal en este ordenador, con acceso completo a tus archivos, red y otros procesos.",
-          "blocked": "La lista de seguridad de Orca bloquea este plugin: {{value0}}",
           "current": "Este contenido exacto del plugin ya está instalado.",
           "close": "Close",
           "cancel": "Cancelar",
@@ -9434,7 +9389,6 @@
           "rollbackFailed": "No se pudo revertir este plugin. Es posible que no haya una versión inmutable anterior disponible."
         },
         "PluginSettingsRow": {
-          "blocked": "Bloqueado",
           "needsReview": "Requiere revisión",
           "restarting": "Reiniciando",
           "invalid": "No válido",
@@ -9450,8 +9404,6 @@
           "dev": "Desarrollo",
           "bundled": "Incluido",
           "noDescription": "No description provided.",
-          "killListMessage": "La lista de seguridad de Orca desactivó este plugin: {{value0}}",
-          "viewAdvisory": "Ver aviso",
           "runtimeError": "El plugin se detuvo tras un error de activación o del proceso.",
           "restartCount": " · {{value0}} reinicios",
           "moreActions": "Más acciones para {{value0}}",

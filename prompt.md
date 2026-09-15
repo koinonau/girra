@@ -4,10 +4,10 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, Phase 6 and the ADRs are merged; Phase 5a is in review.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6 and the ADRs are merged; Phase 7a is in review. Every item below waits on the user.
 
 1. **Phase 5b to 5d, remaining Codex integrations.** Blocked on the launch roster decision, which sets whether Codex stays launchable and so how much of hooks, trust, the shell-launch preflight, backfill, the app-server runtime, native chat and AI Vault goes. See the build plan's Phase 5 for the order.
-2. **Phase 7, Orca identity strip.** Its displayed-text sweep is unblocked; the help menu, `.orca/` and `ORCA_*`, and CLI binary parts need the user. Map it with a read-only subagent first.
+2. **Phase 7b, Orca identity strip.** Waits on the product name, CLI binary and "Orca CLI" prose decisions in `handover.md`, because much of the text is only correct once they land. The build plan's Phase 7 records the measured scope and the traps.
 3. **Launch roster** and **MiniMax usage.** Need the user; see `handover.md`.
 4. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
 5. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
