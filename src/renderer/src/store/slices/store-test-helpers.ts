@@ -21,11 +21,7 @@ import { createEditorSlice } from './editor'
 import { createStatsSlice } from './stats'
 import { createMemorySlice } from './memory'
 import { createWorkspaceSpaceSlice } from './workspace-space'
-import {
-  createClaudeUsageSlice,
-  createCodexUsageSlice,
-  createOpenCodeUsageSlice
-} from './usage-provider-slices'
+import { createClaudeUsageSlice, createOpenCodeUsageSlice } from './usage-provider-slices'
 import { createBrowserSlice } from './browser'
 import { createRateLimitSlice } from './rate-limits'
 import { createSshSlice } from './ssh'
@@ -76,7 +72,6 @@ export function createTestStore() {
     ...createMemorySlice(...a),
     ...createWorkspaceSpaceSlice(...a),
     ...createClaudeUsageSlice(...a),
-    ...createCodexUsageSlice(...a),
     ...createOpenCodeUsageSlice(...a),
     ...createBrowserSlice(...a),
     ...createRateLimitSlice(...a),

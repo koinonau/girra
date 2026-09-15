@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest'
 import type { ClaudeUsageDailyPoint } from '../../../../shared/claude-usage-types'
-import type { CodexUsageDailyPoint } from '../../../../shared/codex-usage-types'
+import type { OpenCodeUsageDailyPoint } from '../../../../shared/opencode-usage-types'
 import { ClaudeUsageDailyChart } from './ClaudeUsageDailyChart'
-import { CodexUsageDailyChart } from './CodexUsageDailyChart'
+import { UsageDailyChart } from './UsageDailyChart'
 
 function makeDay(index: number): string {
   return new Date(Date.UTC(2026, 0, 1 + index)).toISOString().slice(0, 10)
 }
 
 describe('usage daily charts', () => {
-  it('renders Codex/OpenCode daily charts for very large histories', () => {
-    const daily: CodexUsageDailyPoint[] = Array.from({ length: 130_000 }, (_, index) => ({
+  it('renders OpenCode daily charts for very large histories', () => {
+    const daily: OpenCodeUsageDailyPoint[] = Array.from({ length: 130_000 }, (_, index) => ({
       day: makeDay(index),
       inputTokens: index + 1,
       cachedInputTokens: 0,
@@ -19,7 +19,7 @@ describe('usage daily charts', () => {
       totalTokens: index + 1
     }))
 
-    expect(() => CodexUsageDailyChart({ daily })).not.toThrow()
+    expect(() => UsageDailyChart({ daily })).not.toThrow()
   })
 
   it('renders Claude daily charts for very large histories', () => {

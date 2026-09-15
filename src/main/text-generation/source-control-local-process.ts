@@ -16,7 +16,6 @@ import {
 } from './source-control-generation-limits'
 import type {
   InternalTextGenerationResult,
-  LocalProcessExecution,
   SpawnedSourceControlAgentProcess,
   SpawnSourceControlAgent,
   TextGenerationOperation
@@ -31,9 +30,7 @@ export async function killSourceControlAgentProcess(
   }
   if (process.platform === 'win32') {
     // taskkill owns the tree, but the own-Chromium gate can refuse the
-    // pid-addressed walk; the handle-addressed root kill below cannot reach the
-    // recycled pid it refused, and callers release the managed-home lock on this
-    // promise, so it must not resolve having killed nothing.
+    // pid-addressed walk; the handle-addressed root kill below still reaches the root.
     await terminateWindowsProcessTree(pid, { site: 'source-control-text-generation' })
   }
   try {
@@ -50,15 +47,10 @@ export function runLocalSourceControlPlan(input: {
   emptyResultName: string
   operation: TextGenerationOperation
   wslDistro?: string
-  holdHomeLockUntilExit: boolean
   spawnAgent: SpawnSourceControlAgent
-}): LocalProcessExecution<InternalTextGenerationResult> {
-  const { plan, cwd, operation, holdHomeLockUntilExit } = input
-  let markProcessClosed!: () => void
-  const processClosed = new Promise<void>((resolve) => {
-    markProcessClosed = resolve
-  })
-  const result = new Promise<InternalTextGenerationResult>((resolve) => {
+}): Promise<InternalTextGenerationResult> {
+  const { plan, cwd, operation } = input
+  return new Promise<InternalTextGenerationResult>((resolve) => {
     let child: SpawnedSourceControlAgentProcess
     try {
       child = input.spawnAgent({
@@ -71,7 +63,6 @@ export function runLocalSourceControlPlan(input: {
         useCwdForNative: true
       })
     } catch (error) {
-      markProcessClosed()
       if (error instanceof UnsafeWindowsBatchArgumentsError) {
         resolve({ success: false, error: userFacingUnsafeWindowsBatchArgs(plan.label) })
         return
@@ -93,13 +84,13 @@ export function runLocalSourceControlPlan(input: {
     let canceledByUser = false
     const laneKey = localGenerationLaneKey(operation, cwd)
     let timer: ReturnType<typeof setTimeout> | null = null
-    let terminationComplete: Promise<void> | null = null
+    let terminationStarted = false
     let detachChildListeners = (): void => {}
     const startTermination = (): void => {
-      terminationComplete ??= killSourceControlAgentProcess(child)
-    }
-    const markClosedAfterTermination = (): void => {
-      void (terminationComplete ?? Promise.resolve()).then(markProcessClosed)
+      if (!terminationStarted) {
+        terminationStarted = true
+        void killSourceControlAgentProcess(child)
+      }
     }
     const finalize = (value: InternalTextGenerationResult): void => {
       if (settled) {
@@ -112,9 +103,6 @@ export function runLocalSourceControlPlan(input: {
       }
       detachChildListeners()
       clearLocalGenerationCancelToken(laneKey, cancel)
-      if (!holdHomeLockUntilExit) {
-        markProcessClosed()
-      }
       resolve(value)
     }
     const cancel = (): void => {
@@ -150,9 +138,6 @@ export function runLocalSourceControlPlan(input: {
       stderr += chunk.toString('utf-8')
     }
     const onError = (error: Error): void => {
-      if (!child.pid) {
-        markProcessClosed()
-      }
       if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
         finalize({
           success: false,
@@ -167,7 +152,6 @@ export function runLocalSourceControlPlan(input: {
       })
     }
     const onClose = (code: number | null): void => {
-      markClosedAfterTermination()
       if (canceledByUser) {
         finalize({ success: false, error: 'Generation canceled.', canceled: true })
         return
@@ -192,10 +176,6 @@ export function runLocalSourceControlPlan(input: {
     }
     child.stdout?.on('data', onStdoutData)
     child.stderr?.on('data', onStderrData)
-    if (holdHomeLockUntilExit) {
-      child.once('exit', markClosedAfterTermination)
-      child.once('close', markClosedAfterTermination)
-    }
     child.on('error', onError)
     child.on('close', onClose)
     detachChildListeners = () => {
@@ -211,5 +191,4 @@ export function runLocalSourceControlPlan(input: {
       onError(error instanceof Error ? error : new Error(String(error)))
     }
   })
-  return { result, processClosed }
 }

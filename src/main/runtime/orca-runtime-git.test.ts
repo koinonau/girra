@@ -312,9 +312,7 @@ describe('RuntimeGitCommands', () => {
           commitMessageAi: { enabled: true, agentId: 'codex' },
           agentCmdOverrides: {}
         }) as GlobalSettings,
-      getCommitMessageAgentEnvironment: () => ({
-        prepareForCodexLaunch: () => '/managed/codex-home'
-      })
+      getCommitMessageAgentEnvironment: () => ({})
     })
 
     await expect(commands.generateRuntimeCommitMessage('id:wt-1')).resolves.toEqual({
@@ -336,7 +334,7 @@ describe('RuntimeGitCommands', () => {
       expect.objectContaining({
         kind: 'local',
         cwd: worktreePath,
-        env: expect.objectContaining({ CODEX_HOME: '/managed/codex-home' })
+        env: expect.any(Object)
       })
     )
   })
@@ -350,7 +348,6 @@ describe('RuntimeGitCommands', () => {
       stagedPatch: '+hello'
     }
     const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
-    const prepareForCodexLaunch = vi.fn(() => '\\\\wsl.localhost\\Ubuntu\\home\\tester\\.codex')
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({
@@ -368,9 +365,7 @@ describe('RuntimeGitCommands', () => {
           commitMessageAi: { enabled: true, agentId: 'codex' },
           agentCmdOverrides: {}
         }) as GlobalSettings,
-      getCommitMessageAgentEnvironment: () => ({
-        prepareForCodexLaunch
-      })
+      getCommitMessageAgentEnvironment: () => ({})
     })
 
     await expect(commands.generateRuntimeCommitMessage('id:wt-1')).resolves.toEqual({
@@ -382,10 +377,6 @@ describe('RuntimeGitCommands', () => {
       admissionTier: 'interactive',
       wslDistro: 'Ubuntu'
     })
-    expect(prepareForCodexLaunch).toHaveBeenCalledWith({
-      runtime: 'wsl',
-      wslDistro: 'Ubuntu'
-    })
     expect(mocks.generateCommitMessageFromContext).toHaveBeenCalledWith(
       context,
       params,
@@ -393,7 +384,7 @@ describe('RuntimeGitCommands', () => {
         kind: 'local',
         cwd: worktreePath,
         wslDistro: 'Ubuntu',
-        env: expect.objectContaining({ CODEX_HOME: '/home/tester/.codex' })
+        env: expect.any(Object)
       })
     )
   })

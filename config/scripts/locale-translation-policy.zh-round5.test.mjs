@@ -30,12 +30,12 @@ describe('locale-translation-policy zh round 5', () => {
     ).toBe('托管评审创建默认值')
     expect(
       repairTranslatedValue({
-        key: 'auto.components.settings.AccountsPane.3180536c7a',
-        enValue: 'Codex Accounts',
-        localeValue: 'Codex账户',
+        key: 'auto.components.settings.AccountsPane.8bbfd74556',
+        enValue: 'Claude Accounts',
+        localeValue: 'Claude账户',
         locale: 'zh'
       })
-    ).toBe('Codex 账户')
+    ).toBe('Claude 账户')
     expect(
       repairTranslatedValue({
         key: 'menu.showMobileButton',

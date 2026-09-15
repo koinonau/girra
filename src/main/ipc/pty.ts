@@ -12,10 +12,8 @@ export type {
   BuildPtyHostEnvOptions,
   CodexHomeLaunchContext,
   GetSelectedCodexHomePath,
-  PrepareCodexSessionResume,
-  CodexHomePtySpawnedLifecycleArgs
+  PrepareCodexSessionResume
 } from './pty/host-env/types'
-export { resolveCodexHomeAfterManagedAuthReadiness } from './pty/host-env/codex-home'
 export { buildPtyHostEnv } from './pty/host-env/assembly'
 export {
   registerSshPtyProvider,

@@ -101,7 +101,7 @@ describe('ProviderSegment monthly window', () => {
 
     try {
       const limits: ProviderRateLimits = {
-        provider: 'codex',
+        provider: 'opencode-go',
         session: windowOf(42, 300, now + remainingMs),
         weekly: windowOf(10, 10080, now + 6 * 24 * 60 * 60_000),
         updatedAt: now,
@@ -168,7 +168,7 @@ describe('undefined provider window safety (crash d2c1da69 / bb74236c)', () => {
   // getTightestUsageSection's reduce read `.usedPercent` of undefined and crashed
   // the status-bar overlay (TypeError in ProviderSegment).
   const partialProvider = {
-    provider: 'codex',
+    provider: 'opencode-go',
     weekly: windowOf(42, 10080),
     updatedAt: Date.now(),
     error: null,

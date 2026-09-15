@@ -14,7 +14,6 @@ import { registerWorktreeHandlers } from '../ipc/worktrees'
 import { registerWorkspaceCleanupHandlers } from '../ipc/workspace-cleanup'
 import {
   registerPtyHandlers,
-  type CodexHomePtySpawnedLifecycleArgs,
   type GetSelectedCodexHomePath,
   type PrepareCodexSessionResume
 } from '../ipc/pty'
@@ -57,8 +56,6 @@ export function attachMainWindowServices(
     onBeforeRendererReload?: (args: { webContentsId: number; ignoreCache: boolean }) => void
     // Why: lets the PTY orphan sweep skip the one crash-recovery reload (#5787).
     isRecoveryReloadInFlight?: (webContentsId: number) => boolean
-    onCodexHomePtySpawned?: (args: CodexHomePtySpawnedLifecycleArgs) => void
-    onPtyExit?: (id: string, exitSequence: number) => void
     onWorktreeLifecycle?: (event: RuntimeWorktreeLifecycleEvent) => void
   }
 ): void {
@@ -88,9 +85,7 @@ export function attachMainWindowServices(
       prepareCodexSessionResume: options?.prepareCodexSessionResume,
       awaitLocalPtyStartup: options?.awaitLocalPtyStartup,
       awaitLocalPtyProviderStartup: options?.awaitLocalPtyProviderStartup,
-      isRecoveryReloadInFlight: options?.isRecoveryReloadInFlight,
-      onCodexHomePtySpawned: options?.onCodexHomePtySpawned,
-      onPtyExit: options?.onPtyExit
+      isRecoveryReloadInFlight: options?.isRecoveryReloadInFlight
     }
   )
   // Why: register after registerPtyHandlers so pty:management:* IPC re-installs on macOS re-activation (docs/daemon-staleness-ux.md §Phase 1).

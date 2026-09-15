@@ -1,11 +1,7 @@
 import { isTerminalLeafId, makePaneKey } from '../../../../shared/stable-pane-id'
 import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
 import type { PtySpawnResult } from '../../../providers/types'
-import type { CodexPaneHomeRoute } from '../../../codex/codex-pane-account-registry'
 import { createPtySpawnTiming } from '../../pty-spawn-timing'
-import { allocatePtyLifecycleSequence } from '../host-env/types'
-import { snapshotCodexPaneHomeRoutes } from '../host-env/codex-home'
-import { getAppPtyId } from '../provider/registry'
 import {
   makePaneSpawnReservationKey,
   reservePaneSpawn,
@@ -19,43 +15,6 @@ export async function beginPtyIpcSpawn(
   ctx: PtyIpcSpawnState
 ): Promise<PtySpawnResult | { isReattach: true } | null> {
   const args = ctx.args
-  ctx.codexHomeLaunchStartedAt = !args.connectionId ? new Date() : undefined
-  ctx.codexHomeLaunchStartedSequence = !args.connectionId
-    ? allocatePtyLifecycleSequence()
-    : undefined
-  const initialLeafId =
-    typeof args.leafId === 'string' && isTerminalLeafId(args.leafId) ? args.leafId : null
-  const initialPaneKey =
-    typeof args.worktreeId === 'string' &&
-    typeof args.tabId === 'string' &&
-    isValidTerminalTabId(args.tabId) &&
-    args.tabId.length <= 512 &&
-    initialLeafId
-      ? makePaneKey(args.tabId, initialLeafId)
-      : null
-  const initialStablePanePtyId = (() => {
-    try {
-      return !args.connectionId && initialPaneKey
-        ? resolveStablePaneOwner(
-            ctx.deps.runtime,
-            ctx.deps.store,
-            initialPaneKey,
-            args.worktreeId,
-            args.connectionId
-          )?.ptyId
-        : undefined
-    } catch {
-      return undefined
-    }
-  })()
-  ctx.reattachedCodexHomeRoutes = !args.connectionId
-    ? new Map(
-        snapshotCodexPaneHomeRoutes([
-          initialStablePanePtyId,
-          args.sessionId ? getAppPtyId(args.connectionId, args.sessionId) : undefined
-        ])
-      )
-    : new Map<string, CodexPaneHomeRoute | null>()
   ctx.spawnTiming = createPtySpawnTiming()
   ctx.cwd = ctx.deps.resolvePtySpawnStartupCwd(args.worktreeId, args.cwd)
 

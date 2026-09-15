@@ -1,22 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import type {
-  ClaudeRateLimitAccountsState,
-  CodexRateLimitAccountsState
-} from '../../../../shared/managed-account-types'
-import type { CodexConfigSyncStatus } from '../../../../shared/codex-config-sync-types'
+import type { ClaudeRateLimitAccountsState } from '../../../../shared/managed-account-types'
 import { toast } from 'sonner'
 import { useAppStore } from '../../store'
 import { translate } from '@/i18n/i18n'
 import { isWebClientLocation } from '@/lib/web-client-location'
 import {
   emptyClaudeAccountsState,
-  emptyCodexAccountsState,
   hasRemoteProviderAccountOwner,
   watchProviderAccounts
 } from '@/runtime/runtime-provider-accounts-client'
 import {
   getAccountsClaudeSearchEntries,
-  getAccountsCodexSearchEntries,
   getAccountsLocationSearchEntries,
   getAccountsMiniMaxSearchEntries,
   getAccountsOpencodeSearchEntries,
@@ -25,10 +19,7 @@ import {
 import { getRemoteAccountsPaneScope } from './provider-account-scope'
 import { ProviderHostScopeControl } from './ProviderHostScopeControl'
 import { matchesSettingsSearch } from './settings-search'
-import { getCodexAccountAuthWarning } from './codex-account-auth-warning'
-import { getCodexConfigSyncWarning } from './codex-config-sync-warning'
 import {
-  getProviderAccountActiveIdForView,
   providerAccountIsActiveInView,
   providerAccountMatchesView
 } from './provider-account-visibility'
@@ -37,19 +28,13 @@ import type {
   AccountsPaneProps,
   AccountsPaneSectionModel,
   ClaudeAccountAction,
-  CodexAccountAction,
   RemoveAccountTarget
 } from './accounts-pane-types'
 import { EMPTY_WSL_DISTROS, getSelectedAccountRuntime } from './accounts-pane-runtime'
-import { watchCodexConfigSyncStatus } from './accounts-pane-config-sync'
-import {
-  createClaudeAccountActionRunner,
-  createCodexAccountActionRunner
-} from './accounts-pane-account-actions'
+import { createClaudeAccountActionRunner } from './accounts-pane-account-actions'
 import { createMiniMaxCredentialActions } from './accounts-pane-minimax-actions'
 import { renderAccountsLocationSection } from './accounts-pane-location-section'
 import { renderClaudeAccountsSection } from './accounts-pane-claude-section'
-import { renderCodexAccountsSection } from './accounts-pane-codex-section'
 import { renderOpenCodeAccountsSection } from './accounts-pane-provider-setting-sections'
 import { renderMiniMaxAccountsSection } from './accounts-pane-minimax-section'
 import { renderAccountsRemovalDialogs } from './accounts-pane-removal-dialogs'
@@ -66,8 +51,6 @@ export function AccountsPane({
   accountOwnerPlatform = null
 }: AccountsPaneProps): React.JSX.Element {
   const searchQuery = useAppStore((s) => s.settingsSearchQuery)
-  const codexRateLimits = useAppStore((s) => s.rateLimits.codex)
-  const codexRateLimitTarget = useAppStore((s) => s.rateLimits.codexTarget)
   const miniMaxRateLimits = useAppStore((s) => s.rateLimits.minimax)
   const recordFeatureInteraction = useAppStore((s) => s.recordFeatureInteraction)
   const fetchSettings = useAppStore((s) => s.fetchSettings)
@@ -125,16 +108,10 @@ export function AccountsPane({
       />
     ) : null
 
-  const [codexAccounts, setCodexAccounts] =
-    useState<CodexRateLimitAccountsState>(emptyCodexAccountsState)
-  const [codexAccountsLoaded, setCodexAccountsLoaded] = useState(false)
-  const [codexAction, setCodexAction] = useState<CodexAccountAction>('idle')
   const [claudeAccounts, setClaudeAccounts] =
     useState<ClaudeRateLimitAccountsState>(emptyClaudeAccountsState)
   const [claudeAction, setClaudeAction] = useState<ClaudeAccountAction>('idle')
-  // Why: capture the account's runtime slot when the dialog opens; the roster
-  // can change underneath an open dialog and lose the slot to diff for restarts.
-  const [removeCodexTarget, setRemoveCodexTarget] = useState<RemoveAccountTarget | null>(null)
+  // Why: capture the account's runtime slot when the dialog opens; the roster can change underneath it.
   const [removeClaudeTarget, setRemoveClaudeTarget] = useState<RemoveAccountTarget | null>(null)
   const accountVisibilityOptions = {
     remoteOwner: isRemoteAccountScope,
@@ -143,64 +120,14 @@ export function AccountsPane({
   const visibleClaudeAccounts = claudeAccounts.accounts.filter((account) =>
     providerAccountMatchesView(account, accountRuntime, accountVisibilityOptions)
   )
-  const visibleCodexAccounts = codexAccounts.accounts.filter((account) =>
-    providerAccountMatchesView(account, accountRuntime, accountVisibilityOptions)
-  )
-  const activeCodexAccountId = getProviderAccountActiveIdForView(codexAccounts, accountRuntime)
   // Why: System default lights only when no account row is active; while a remote
   // owner's platform is unknown WSL rows hide fail-closed, so check the full roster.
   const ownerPlatformUnknown = isRemoteAccountScope && accountOwnerPlatform === null
-  const systemCodexActive = !(
-    ownerPlatformUnknown ? codexAccounts.accounts : visibleCodexAccounts
-  ).some((account) =>
-    providerAccountIsActiveInView(account, codexAccounts, accountRuntime, accountVisibilityOptions)
-  )
   const systemClaudeActive = !(
     ownerPlatformUnknown ? claudeAccounts.accounts : visibleClaudeAccounts
   ).some((account) =>
     providerAccountIsActiveInView(account, claudeAccounts, accountRuntime, accountVisibilityOptions)
   )
-  // Why: the system default's real identity is host-scoped (it reflects the
-  // runtime's own ~/.codex), so only surface it in the host view. Per-distro
-  // WSL falls back to the generic label.
-  const systemCodexIdentity =
-    accountRuntime.runtime === 'host' ? codexAccounts.systemDefault : undefined
-  // Why: remote snapshots own their system-default identity, but the desktop's
-  // rate-limit poll must not be misattributed to a remote account owner.
-  const activeCodexAuthWarning = codexAccountsLoaded
-    ? getCodexAccountAuthWarning({
-        limits: isRemoteAccountScope ? null : codexRateLimits,
-        target: codexRateLimitTarget,
-        runtime: accountRuntime,
-        activeAccountId: activeCodexAccountId,
-        accountId: activeCodexAccountId,
-        authKind: activeCodexAccountId === null ? systemCodexIdentity?.authKind : undefined
-      })
-    : null
-  // Why: the mirror keeps serving the last synced settings when ~/.codex is
-  // unusable, so without this the user only sees their edits being ignored.
-  const [codexConfigSync, setCodexConfigSync] = useState<CodexConfigSyncStatus | null>(null)
-  useEffect(() => {
-    // Why: the status resolves the host's own ~/.codex and shared runtime home.
-    // A WSL or remote scope mirrors different homes entirely, so showing it there
-    // would name a config file that has nothing to do with the selected runtime.
-    if (isRemoteAccountScope || accountRuntime.runtime !== 'host') {
-      setCodexConfigSync(null)
-      return
-    }
-    // Why: a temporarily locked managed home clears on its own, but this effect
-    // only reruns on scope/runtime/selection changes — none of which a lock
-    // release triggers. Without a retry the warning would stick until remount.
-    // Serialized (timeout, not interval) so a slow response can never be
-    // overwritten by an older one.
-    return watchCodexConfigSyncStatus(setCodexConfigSync)
-    // Why: the status resolves whichever home the ACTIVE selection mirrors into
-    // (per-account, shared, or none for the real-home lane), so switching
-    // accounts must refetch or the banner describes the previous account.
-  }, [isRemoteAccountScope, accountRuntime.runtime, activeCodexAccountId, codexAccountsLoaded])
-  const codexConfigSyncWarning = getCodexConfigSyncWarning(codexConfigSync)
-  const systemCodexMissingSignIn = activeCodexAuthWarning === 'missing-sign-in'
-  const systemCodexNeedsSignIn = activeCodexAccountId === null && Boolean(activeCodexAuthWarning)
   const accountRuntimeUnavailable =
     accountRuntime.runtime === 'wsl' && !wslAvailable && !wslCapabilitiesLoading
 
@@ -244,15 +171,7 @@ export function AccountsPane({
       { activeRuntimeEnvironmentId },
       {
         onSnapshot: (snapshot) => {
-          // Why: a failed provider's half is a substituted empty roster, not
-          // authoritative data; keep prior state and leave the loaded gate shut.
-          if (!snapshot.failedProviders?.includes('codex')) {
-            setCodexAccounts(snapshot.codex)
-            setCodexAccountsLoaded(true)
-          }
-          if (!snapshot.failedProviders?.includes('claude')) {
-            setClaudeAccounts(snapshot.claude)
-          }
+          setClaudeAccounts(snapshot.claude)
         },
         onError: (error) => {
           toast.error(
@@ -270,17 +189,6 @@ export function AccountsPane({
     }
   }, [activeRuntimeEnvironmentId])
 
-  const runCodexAccountAction = createCodexAccountActionRunner({
-    settings,
-    accountRuntime,
-    isRemoteAccountScope,
-    codexAccounts,
-    setCodexAccounts,
-    setCodexAccountsLoaded,
-    setCodexAction,
-    fetchSettings,
-    recordFeatureInteraction
-  })
   const runClaudeAccountAction = createClaudeAccountActionRunner({
     settings,
     accountRuntime,
@@ -314,21 +222,6 @@ export function AccountsPane({
     systemClaudeActive,
     setRemoveClaudeTarget,
     runClaudeAccountAction,
-    codexAccounts,
-    codexAction,
-    visibleCodexAccounts,
-    systemCodexActive,
-    systemCodexNeedsSignIn,
-    systemCodexMissingSignIn,
-    systemCodexIdentity,
-    activeCodexAuthWarning,
-    activeCodexAccountId,
-    codexConfigSync,
-    codexConfigSyncWarning,
-    codexRateLimits,
-    codexRateLimitTarget,
-    setRemoveCodexTarget,
-    runCodexAccountAction,
     recordOpenCodeSettingEdit,
     miniMaxRateLimits,
     miniMaxApiKeyDraft,
@@ -352,9 +245,6 @@ export function AccountsPane({
     matchesSettingsSearch(searchQuery, getAccountsClaudeSearchEntries())
       ? renderClaudeAccountsSection(model)
       : null,
-    matchesSettingsSearch(searchQuery, getAccountsCodexSearchEntries())
-      ? renderCodexAccountsSection(model)
-      : null,
     matchesSettingsSearch(searchQuery, getAccountsOpencodeSearchEntries())
       ? renderOpenCodeAccountsSection(model)
       : null,
@@ -365,7 +255,7 @@ export function AccountsPane({
 
   return (
     <div className="space-y-8">
-      {renderAccountsRemovalDialogs(model, removeCodexTarget, removeClaudeTarget)}
+      {renderAccountsRemovalDialogs(model, removeClaudeTarget)}
       {visibleSections.map((section, index) => (
         <div key={index} className="space-y-8">
           {index > 0 ? <Separator /> : null}

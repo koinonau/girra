@@ -3,7 +3,6 @@ import { BarChart3, Bot, Check, ChevronDown, Clock, GitPullRequest } from 'lucid
 import { useAppStore } from '../../store'
 import { StatCard } from './StatCard'
 import { ClaudeUsagePane } from './ClaudeUsagePane'
-import { CodexUsagePane } from './CodexUsagePane'
 import { OpenCodeUsagePane } from './OpenCodeUsagePane'
 import { UsageOverviewPane } from './UsageOverviewPane'
 import { Button } from '../ui/button'
@@ -51,7 +50,7 @@ function formatTrackingSince(timestamp: number | null): string {
   })
 }
 
-type UsageTab = 'overview' | 'claude' | 'codex' | 'opencode'
+type UsageTab = 'overview' | 'claude' | 'opencode'
 
 const USAGE_ANALYTICS_OPTIONS = [
   {
@@ -64,12 +63,6 @@ const USAGE_ANALYTICS_OPTIONS = [
     id: 'claude',
     get label() {
       return translate('auto.components.stats.StatsPane.85457c02fe', 'Claude')
-    }
-  },
-  {
-    id: 'codex',
-    get label() {
-      return translate('auto.components.stats.StatsPane.7d26110cea', 'Codex')
     }
   },
   {
@@ -197,8 +190,6 @@ export function StatsPane(): React.JSX.Element {
             <UsageOverviewPane />
           ) : activeUsageTab === 'claude' ? (
             <ClaudeUsagePane />
-          ) : activeUsageTab === 'codex' ? (
-            <CodexUsagePane />
           ) : (
             <OpenCodeUsagePane />
           )}

@@ -15,10 +15,6 @@ import { resolveSessionFilePath } from '../native-chat/session-file-resolver'
 import { configuredAdditionalCodexHomePaths } from '../ai-vault/cached-session-list'
 import { getOrcaManagedCodexHomePath, getSystemCodexHomePath } from '../codex/codex-home-paths'
 
-type AdoptionSettings = {
-  codexManagedAccounts?: readonly { managedHomePath: string }[]
-}
-
 export function resolveCommittedStructuredAgentSessionAdoptionIntent(input: {
   host: StructuredAgentSessionHost | null
   envelope: { sessionId: string; clientOperationId: string }
@@ -62,7 +58,6 @@ export function resolveCommittedStructuredAgentSessionAdoptionIntent(input: {
 
 export async function resolveStructuredAgentSessionAdoptionForCreate(input: {
   host: StructuredAgentSessionHost | null
-  settings: AdoptionSettings
   agent: 'claude' | 'codex'
   providerSessionId: string
   selfSessionId: string
@@ -96,7 +91,6 @@ export async function resolveStructuredAgentSessionAdoptionForCreate(input: {
 
 /** Recognised adoption homes, most-preferred first. */
 function structuredAdoptionAccountHomeCandidates(input: {
-  settings: AdoptionSettings
   agent: 'claude' | 'codex'
   selectedAccountHomePath: string
 }): string[] {
@@ -105,7 +99,6 @@ function structuredAdoptionAccountHomeCandidates(input: {
   }
   return [
     input.selectedAccountHomePath,
-    ...(input.settings.codexManagedAccounts ?? []).map((account) => account.managedHomePath),
     ...configuredAdditionalCodexHomePaths(),
     getOrcaManagedCodexHomePath(),
     getSystemCodexHomePath()

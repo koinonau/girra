@@ -1,9 +1,5 @@
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
-import type {
-  ClaudeRateLimitAccountsState,
-  CodexRateLimitAccountsState,
-  CodexSystemDefaultIdentity
-} from '../../../../shared/managed-account-types'
+import type { ClaudeRateLimitAccountsState } from '../../../../shared/managed-account-types'
 import { resolveLocalAccountRuntimeTarget } from '../../../../shared/local-account-runtime'
 import { getRendererAppPlatform } from '../../lib/renderer-app-platform'
 import { translate } from '@/i18n/i18n'
@@ -17,29 +13,6 @@ export function getHostRuntimeLabel(): string {
     : translate('auto.components.settings.AccountsPane.9baf45d071', 'This device')
 }
 
-// Why: the system-default row has no stored identity, so surface the real
-// ~/.codex login live — the OAuth email when signed in, a clear custom-provider
-// note for env-key logins, and the generic fallback when signed out.
-export function getCodexSystemDefaultSubtitle(
-  identity: CodexSystemDefaultIdentity | undefined,
-  runtimeSentenceLabel: string
-): string {
-  if (identity?.authKind === 'oauth' && identity.email) {
-    return identity.email
-  }
-  if (identity?.authKind === 'api-key') {
-    return translate(
-      'auto.components.settings.AccountsPane.codexSystemDefaultCustomProvider',
-      'Custom provider — no usage tracked.'
-    )
-  }
-  return translate(
-    'auto.components.settings.AccountsPane.fcc4093fc1',
-    'Use your current {{value0}} Codex login.',
-    { value0: runtimeSentenceLabel }
-  )
-}
-
 export function getClaudeAccountLabel(
   state: ClaudeRateLimitAccountsState,
   accountId: string | null | undefined
@@ -48,16 +21,6 @@ export function getClaudeAccountLabel(
     return 'System default'
   }
   return state.accounts.find((account) => account.id === accountId)?.email ?? 'Claude account'
-}
-
-export function getCodexAccountRuntimeLabel(
-  account: CodexRateLimitAccountsState['accounts'][number],
-  hostLabel = getHostRuntimeLabel()
-): string {
-  if (account.managedHomeRuntime === 'wsl') {
-    return account.wslDistro ? `WSL ${account.wslDistro}` : 'WSL'
-  }
-  return hostLabel
 }
 
 export function getClaudeAccountRuntimeLabel(

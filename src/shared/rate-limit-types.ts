@@ -42,7 +42,7 @@ export type UsageRateLimitMetadata = {
 }
 
 export type ProviderRateLimits = {
-  provider: 'claude' | 'codex' | 'opencode-go' | 'minimax'
+  provider: 'claude' | 'opencode-go' | 'minimax'
   /** 5-hour session window, null if not available. */
   session: RateLimitWindow | null
   /** 7-day weekly window, null if not available. */
@@ -51,34 +51,12 @@ export type ProviderRateLimits = {
   fableWeekly?: RateLimitWindow | null
   /** 30-day monthly window (OpenCode Go), null if not available. */
   monthly?: RateLimitWindow | null
-  /** Available earned Codex rate-limit reset credits, if reported. */
-  rateLimitResetCredits?: {
-    availableCount: number
-    /** Total earned reset credits, including spent or expired credits, if reported. */
-    totalEarnedCount?: number
-    /** Unix ms timestamp for the next available reset credit expiry, if reported. */
-    nextExpiresAt?: number | null
-    credits?: {
-      status: string
-      expiresAt: number | null
-      grantedAt: number | null
-    }[]
-  } | null
-  /** Subscription plan tier for the active account (Codex `plan_type`, e.g. "plus"). */
-  planType?: string | null
   /** Unix ms timestamp of the last successful data update. */
   updatedAt: number
   /** Human-readable error message, null when status is 'ok'. */
   error: string | null
   status: ProviderRateLimitStatus
   usageMetadata?: UsageRateLimitMetadata
-}
-
-export type CodexRateLimitResetOutcome = 'reset' | 'nothingToReset' | 'noCredit' | 'alreadyRedeemed'
-
-export type CodexRateLimitResetResult = {
-  outcome: CodexRateLimitResetOutcome
-  state: RateLimitState
 }
 
 export type RateLimitRuntimeTarget = {
@@ -95,7 +73,8 @@ export type InactiveAccountUsage = {
 
 export type RateLimitState = {
   claude: ProviderRateLimits | null
-  codex: ProviderRateLimits | null
+  /** Retired Codex slot, always null. Older paired clients still dereference it. */
+  codex: null
   opencodeGo: ProviderRateLimits | null
   minimax: ProviderRateLimits | null
   /**
@@ -113,7 +92,9 @@ export type RateLimitState = {
    */
   minimaxApiKeyConfigured: boolean
   claudeTarget: RateLimitRuntimeTarget
-  codexTarget: RateLimitRuntimeTarget
+  /** Retired, always host. Older paired clients still read `codexTarget.runtime`. */
+  codexTarget: { runtime: 'host'; wslDistro: null }
   inactiveClaudeAccounts: InactiveAccountUsage[]
-  inactiveCodexAccounts: InactiveAccountUsage[]
+  /** Retired, always empty. Older paired clients still call `inactiveCodexAccounts.find`. */
+  inactiveCodexAccounts: never[]
 }

@@ -36,13 +36,24 @@ describe('terminal PTY identity replacement', () => {
         [worktreeId]: [makeTab({ id: 'tab-1', worktreeId, ptyId: replacementPtyId })]
       },
       ptyIdsByTabId: { 'tab-1': [replacementPtyId] },
-      pendingCodexPaneRestartIds: { [stalePtyId]: true }
+      migrationUnsupportedByPtyId: {
+        [stalePtyId]: {
+          ptyId: stalePtyId,
+          paneKey: 'tab-1:leaf-1',
+          reason: 'legacy-numeric-pane-key',
+          source: 'local',
+          updatedAt: 1
+        }
+      }
     })
 
     store.getState().updateTabPtyId('tab-1', replacementPtyId, stalePtyId)
 
     expect(store.getState().ptyIdsByTabId['tab-1']).toEqual([replacementPtyId])
-    expect(store.getState().pendingCodexPaneRestartIds).toEqual({ [replacementPtyId]: true })
+    expect(Object.keys(store.getState().migrationUnsupportedByPtyId)).toEqual([replacementPtyId])
+    expect(store.getState().migrationUnsupportedByPtyId[replacementPtyId]?.ptyId).toBe(
+      replacementPtyId
+    )
   })
 
   it('publishes pane and tab replacement identities in one store commit', () => {

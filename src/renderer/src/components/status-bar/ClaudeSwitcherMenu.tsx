@@ -19,12 +19,12 @@ import {
   useWindowsTerminalCapabilities
 } from '@/lib/windows-terminal-capabilities'
 import {
-  getCodexStatusRuntimeKey,
+  getAccountStatusRuntimeKey,
   getStatusBarPreferredWslDistro,
   shouldIncludeSettingsWslRuntime,
-  toCodexStatusRuntimeTarget,
+  toAccountStatusRuntimeTarget,
   type ClaudeStatusSwitchGroup,
-  type CodexStatusRuntimeTarget
+  type AccountStatusRuntimeTarget
 } from './status-bar-runtime-targets'
 import {
   buildClaudeStatusSwitchGroups,
@@ -98,11 +98,6 @@ export function ClaudeSwitcherMenu({
   // Why: keyed on owner id, not settings identity, so routine settings mutations don't re-run the remote snapshot fetch.
   const loadAccounts = useCallback(async () => {
     const snapshot = await fetchProviderAccountsSnapshot({ activeRuntimeEnvironmentId })
-    // Why: a failed Claude half is a substituted empty roster; keep prior state.
-    if (snapshot.failedProviders?.includes('claude')) {
-      console.error('Claude account list failed; keeping previous status bar state.')
-      return
-    }
     if (mountedRef.current) {
       setAccounts(snapshot.claude)
     }
@@ -132,7 +127,7 @@ export function ClaudeSwitcherMenu({
 
   const handleSelectAccount = async (
     accountId: string | null,
-    target: CodexStatusRuntimeTarget
+    target: AccountStatusRuntimeTarget
   ): Promise<void> => {
     if (isSwitching) {
       return
@@ -165,8 +160,8 @@ export function ClaudeSwitcherMenu({
   }
 
   const handleSelectRuntime = async (group: ClaudeStatusSwitchGroup): Promise<void> => {
-    const currentKey = getCodexStatusRuntimeKey(
-      normalizeClaudeStatusRuntimeTarget(accountState, toCodexStatusRuntimeTarget(claudeTarget))
+    const currentKey = getAccountStatusRuntimeKey(
+      normalizeClaudeStatusRuntimeTarget(accountState, toAccountStatusRuntimeTarget(claudeTarget))
     )
     if (group.key === currentKey) {
       return
@@ -179,8 +174,8 @@ export function ClaudeSwitcherMenu({
     }
   }
 
-  const selectedRuntimeKey = getCodexStatusRuntimeKey(
-    normalizeClaudeStatusRuntimeTarget(accountState, toCodexStatusRuntimeTarget(claudeTarget))
+  const selectedRuntimeKey = getAccountStatusRuntimeKey(
+    normalizeClaudeStatusRuntimeTarget(accountState, toAccountStatusRuntimeTarget(claudeTarget))
   )
   const fallbackWslDistro = getStatusBarPreferredWslDistro(
     settings,
@@ -188,7 +183,7 @@ export function ClaudeSwitcherMenu({
   )
   const switchGroups = buildClaudeStatusSwitchGroups(
     accountState,
-    toCodexStatusRuntimeTarget(claudeTarget),
+    toAccountStatusRuntimeTarget(claudeTarget),
     {
       fallbackWslDistro,
       includeFallbackWsl: !hasActiveRuntimeEnvironment && shouldIncludeSettingsWslRuntime(settings),

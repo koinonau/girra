@@ -1,7 +1,7 @@
 import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { runProcessSync, type ProcessResult } from '../shared/child-process/run-process'
-import { writeFileAtomically } from './codex-accounts/fs-utils'
+import { writeFileAtomically } from './fs-utils'
 
 /**
  * Turns off the macOS accent picker for Orca's own preferences domain (#14746).

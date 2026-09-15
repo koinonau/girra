@@ -41,7 +41,7 @@ export function buildCapabilitySettingsSections({
       ),
       description: translate(
         'auto.hooks.useSettingsNavigationMetadata.b1c2f8b0ac',
-        'Optional account switching and usage setup for Claude, Codex, OpenCode Go, and MiniMax.'
+        'Optional account switching and usage setup for Claude, OpenCode Go, and MiniMax.'
       ),
       icon: UserCog,
       searchEntries: getAccountsPaneSearchEntries(),

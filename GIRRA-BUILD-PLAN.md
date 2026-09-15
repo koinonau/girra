@@ -72,6 +72,8 @@ Last, when you know the codebase. 125 files reference it, `src/shared` carries C
 
 Measured 2026-09-15: 1,086 production and 1,465 test files mention Codex. `src/main/codex-accounts/runtime-home-service*` is the hub most other Codex code imports. Sub-phases, in order: 5a accounts, managed homes, reset credits, rate-limit probing, usage, CLI lock and per-pane account registry; 5b hooks, trust, config.toml sync and the shell-launch preflight (the tree still ticks the preflight); 5c session backfill, migration, index heal and state-DB recovery; 5d app-server runtime, structured sessions, rewind, subagents, native chat and AI Vault scanners; 5e launch roster entries, after the roster decision.
 
+Phase 5a done 2026-09-15: 254 files deleted, 58,851 lines removed.
+
 ### Phase 6. Relocation
 
 Move `Unified usage dashboard` out of `components/feature-wall/`. You cut the marketing directory but kept the dashboard, and it is the only real feature in there.

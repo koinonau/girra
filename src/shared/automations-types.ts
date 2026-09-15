@@ -31,6 +31,7 @@ export function isFinalAutomationRunStatus(status: AutomationRunStatus): boolean
 }
 
 export type AutomationSchedulePreset = 'hourly' | 'daily' | 'weekdays' | 'weekly' | 'custom'
+// Why: persisted runs from before Codex usage was retired still carry 'codex'.
 export type AutomationRunUsageProvider = 'claude' | 'codex'
 export type AutomationRunUsageStatus = 'known' | 'unavailable'
 export type AutomationRunUsageAttribution = 'provider_session_time_window'

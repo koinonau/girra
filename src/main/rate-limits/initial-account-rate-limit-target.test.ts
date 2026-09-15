@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { getDefaultSettings } from '../../shared/constants'
 import type { GlobalSettings } from '../../shared/global-settings-types'
 import { getInitialClaudeRateLimitTarget } from './claude-rate-limit-target'
-import { getInitialCodexRateLimitTarget } from './codex-rate-limit-target'
 
 type RuntimeSelection = {
   host: string | null
@@ -19,13 +18,6 @@ type Scenario = {
 }
 
 const providers = [
-  {
-    name: 'Codex',
-    getTarget: getInitialCodexRateLimitTarget,
-    selectionSettings: (selection: RuntimeSelection) => ({
-      activeCodexManagedAccountIdsByRuntime: selection
-    })
-  },
   {
     name: 'Claude',
     getTarget: getInitialClaudeRateLimitTarget,

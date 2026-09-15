@@ -611,40 +611,44 @@ describe('AutomationService', () => {
     expect(store.listAutomationRuns(automation.id).some((entry) => entry.id === run.id)).toBe(false)
   })
 
-  it('records unsupported usage cleanly for completed agents without local usage stores', async () => {
-    vi.setSystemTime(new Date('2026-05-13T10:00:00'))
-    const store = await createStore()
-    store.addRepo(makeRepo())
-    const automation = store.createAutomation({
-      name: 'Gemini check',
-      prompt: 'Check spend',
-      agentId: 'gemini',
-      projectId: 'r1',
-      workspaceMode: 'existing',
-      workspaceId: 'wt1',
-      timezone: 'UTC',
-      rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
-      dtstart: new Date('2026-05-13T00:00:00Z').getTime()
-    })
-    const run = store.createAutomationRun(automation, Date.now(), 'manual')
-    store.updateAutomationRun({
-      runId: run.id,
-      status: 'dispatched',
-      workspaceId: 'wt1',
-      terminalSessionId: 'tab-1',
-      error: null
-    })
-    const service = new AutomationService(store, { tickMs: 60_000 })
+  it.each(['gemini', 'codex'] as const)(
+    'records unsupported usage cleanly for completed %s runs without a local usage store',
+    async (agentId) => {
+      vi.setSystemTime(new Date('2026-05-13T10:00:00'))
+      const store = await createStore()
+      store.addRepo(makeRepo())
+      const automation = store.createAutomation({
+        name: 'Spend check',
+        prompt: 'Check spend',
+        agentId,
+        projectId: 'r1',
+        workspaceMode: 'existing',
+        workspaceId: 'wt1',
+        timezone: 'UTC',
+        rrule: 'FREQ=DAILY;BYHOUR=9;BYMINUTE=0',
+        dtstart: new Date('2026-05-13T00:00:00Z').getTime()
+      })
+      const run = store.createAutomationRun(automation, Date.now(), 'manual')
+      store.updateAutomationRun({
+        runId: run.id,
+        status: 'dispatched',
+        workspaceId: 'wt1',
+        terminalSessionId: 'tab-1',
+        error: null
+      })
+      const service = new AutomationService(store, { tickMs: 60_000 })
 
-    const updated = await service.markDispatchResult({
-      runId: run.id,
-      status: 'completed',
-      workspaceId: 'wt1',
-      terminalSessionId: 'tab-1',
-      error: null
-    })
+      const updated = await service.markDispatchResult({
+        runId: run.id,
+        status: 'completed',
+        workspaceId: 'wt1',
+        terminalSessionId: 'tab-1',
+        error: null
+      })
 
-    expect(updated.usage?.status).toBe('unavailable')
-    expect(updated.usage?.unavailableReason).toBe('provider_unsupported')
-  })
+      expect(updated.usage?.status).toBe('unavailable')
+      expect(updated.usage?.provider).toBeNull()
+      expect(updated.usage?.unavailableReason).toBe('provider_unsupported')
+    }
+  )
 })

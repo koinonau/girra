@@ -2,11 +2,11 @@ import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { ClaudeRateLimitAccountsState } from '../../../../shared/managed-account-types'
 import { translate } from '@/i18n/i18n'
 import {
-  getCodexStatusRuntimeKey,
-  getCodexStatusRuntimeLabel,
-  getCodexStatusWslKey,
+  getAccountStatusRuntimeKey,
+  getAccountStatusRuntimeLabel,
+  getAccountStatusWslKey,
   type ClaudeStatusSwitchGroup,
-  type CodexStatusRuntimeTarget,
+  type AccountStatusRuntimeTarget,
   type StatusSwitchGroupOptions
 } from './status-bar-runtime-targets'
 
@@ -20,7 +20,7 @@ function getSingleConcreteClaudeWslDistro(state: ClaudeRateLimitAccountsState): 
     }
   }
   for (const account of state.accounts) {
-    const key = getCodexStatusWslKey(account.wslDistro)
+    const key = getAccountStatusWslKey(account.wslDistro)
     if (account.managedAuthRuntime === 'wsl' && key !== '__default__') {
       keys.add(key)
     }
@@ -30,8 +30,8 @@ function getSingleConcreteClaudeWslDistro(state: ClaudeRateLimitAccountsState): 
 
 export function normalizeClaudeStatusRuntimeTarget(
   state: ClaudeRateLimitAccountsState,
-  target: CodexStatusRuntimeTarget
-): CodexStatusRuntimeTarget {
+  target: AccountStatusRuntimeTarget
+): AccountStatusRuntimeTarget {
   if (target.runtime !== 'wsl' || target.wslDistro) {
     return target
   }
@@ -41,13 +41,13 @@ export function normalizeClaudeStatusRuntimeTarget(
 
 export function getClaudeStatusActiveId(
   state: ClaudeRateLimitAccountsState,
-  target: CodexStatusRuntimeTarget
+  target: AccountStatusRuntimeTarget
 ): string | null {
   const selection = state.activeAccountIdsByRuntime
   if (target.runtime === 'host') {
     return selection?.host ?? state.activeAccountId ?? null
   }
-  const distroSelection = selection?.wsl?.[getCodexStatusWslKey(target.wslDistro)]
+  const distroSelection = selection?.wsl?.[getAccountStatusWslKey(target.wslDistro)]
   if (target.wslDistro || distroSelection) {
     return distroSelection ?? null
   }
@@ -57,7 +57,7 @@ export function getClaudeStatusActiveId(
 
 function getClaudeStatusAccountsForTarget(
   state: ClaudeRateLimitAccountsState,
-  target: CodexStatusRuntimeTarget
+  target: AccountStatusRuntimeTarget
 ): ClaudeStatusAccount[] {
   if (target.runtime === 'host') {
     return state.accounts.filter((account) => account.managedAuthRuntime !== 'wsl')
@@ -65,23 +65,23 @@ function getClaudeStatusAccountsForTarget(
   return state.accounts.filter(
     (account) =>
       account.managedAuthRuntime === 'wsl' &&
-      getCodexStatusWslKey(account.wslDistro) === getCodexStatusWslKey(target.wslDistro)
+      getAccountStatusWslKey(account.wslDistro) === getAccountStatusWslKey(target.wslDistro)
   )
 }
 
 export function buildClaudeStatusSwitchGroups(
   state: ClaudeRateLimitAccountsState,
-  currentTarget: CodexStatusRuntimeTarget,
+  currentTarget: AccountStatusRuntimeTarget,
   options: StatusSwitchGroupOptions = {}
 ): ClaudeStatusSwitchGroup[] {
   const groups: ClaudeStatusSwitchGroup[] = []
   const normalizedCurrentTarget = normalizeClaudeStatusRuntimeTarget(state, currentTarget)
-  const makeGroup = (target: CodexStatusRuntimeTarget): ClaudeStatusSwitchGroup => {
+  const makeGroup = (target: AccountStatusRuntimeTarget): ClaudeStatusSwitchGroup => {
     const activeId = getClaudeStatusActiveId(state, target)
     const accountsForTarget = getClaudeStatusAccountsForTarget(state, target)
     return {
-      key: getCodexStatusRuntimeKey(target),
-      label: getCodexStatusRuntimeLabel(target, options.hostLabel),
+      key: getAccountStatusRuntimeKey(target),
+      label: getAccountStatusRuntimeLabel(target, options.hostLabel),
       runtimeTarget: target,
       targets: [
         {
@@ -104,15 +104,15 @@ export function buildClaudeStatusSwitchGroups(
 
   const wslKeys = new Set<string>(Object.keys(state.activeAccountIdsByRuntime?.wsl ?? {}))
   if (normalizedCurrentTarget.runtime === 'wsl') {
-    wslKeys.add(getCodexStatusWslKey(normalizedCurrentTarget.wslDistro))
+    wslKeys.add(getAccountStatusWslKey(normalizedCurrentTarget.wslDistro))
   }
   for (const account of state.accounts) {
     if (account.managedAuthRuntime === 'wsl') {
-      wslKeys.add(getCodexStatusWslKey(account.wslDistro))
+      wslKeys.add(getAccountStatusWslKey(account.wslDistro))
     }
   }
   if (options.includeFallbackWsl) {
-    wslKeys.add(getCodexStatusWslKey(options.fallbackWslDistro))
+    wslKeys.add(getAccountStatusWslKey(options.fallbackWslDistro))
   }
   if (currentTarget.runtime === 'wsl' && currentTarget.wslDistro === null) {
     const concreteDistro = getSingleConcreteClaudeWslDistro(state)

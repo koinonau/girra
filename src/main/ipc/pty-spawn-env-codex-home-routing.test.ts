@@ -6,7 +6,7 @@ import {
   piBuildPtyEnvMock,
   ensureCodexBackfillRecoveryMock
 } from './pty-ipc-mock-registry'
-import { posixOnlyIt, TEST_CODEX_HOME, TEST_CODEX_AUTH_JSON } from './pty-ipc-test-constants'
+import { posixOnlyIt, TEST_CODEX_HOME } from './pty-ipc-test-constants'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
 import { registerPtyHandlers } from './pty'
 
@@ -37,9 +37,6 @@ vi.mock('../memory/pty-registry', () =>
 )
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
-)
-vi.mock('../codex/codex-pane-account-registry', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexPaneAccountRegistryModuleMock())
 )
 vi.mock('../codex/codex-state-db-backfill-recovery', () =>
   import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
@@ -190,7 +187,7 @@ describe('registerPtyHandlers', () => {
       expect(env.ORCA_AGENT_HOOK_ENDPOINT).toBeUndefined()
       expect(env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS).toBeUndefined()
     })
-    it('overrides ambient CODEX_HOME with the Orca-managed home for system default', async () => {
+    it('overrides ambient CODEX_HOME with the selected Codex home', async () => {
       const env = await spawnAndGetEnv(
         undefined,
         { CODEX_HOME: '/tmp/system-codex-home' },
@@ -199,71 +196,13 @@ describe('registerPtyHandlers', () => {
       expect(env.CODEX_HOME).toBe(TEST_CODEX_HOME)
       expect(env.ORCA_CODEX_HOME).toBe(TEST_CODEX_HOME)
     })
-    it('waits for managed Codex auth before spawning a local PTY', async () => {
-      vi.useFakeTimers()
-      let authReady = false
-      readFileSyncMock.mockImplementation((filePath: string) => {
-        if (!filePath.endsWith('auth.json')) {
-          return ''
-        }
-        if (!authReady) {
-          throw Object.assign(new Error('missing auth'), { code: 'ENOENT' })
-        }
-        return TEST_CODEX_AUTH_JSON
-      })
-      handlers.clear()
-      registerPtyHandlers(mainWindow as never, undefined, () => TEST_CODEX_HOME, (() => ({
-        codexManagedAccounts: [
-          {
-            id: 'account-1',
-            managedHomePath: TEST_CODEX_HOME,
-            managedHomeRuntime: 'host'
-          }
-        ]
-      })) as never)
-
-      const spawnPromise = handlers.get('pty:spawn')!(null, {
-        cols: 80,
-        rows: 24,
-        launchAgent: 'codex'
-      })
-      await vi.advanceTimersByTimeAsync(0)
-      expect(spawnMock).not.toHaveBeenCalled()
-
-      authReady = true
-      await vi.advanceTimersByTimeAsync(25)
-      await spawnPromise
-
-      expect(spawnMock.mock.calls.at(-1)?.[2].env).toMatchObject({
-        CODEX_HOME: TEST_CODEX_HOME,
-        ORCA_CODEX_HOME: TEST_CODEX_HOME
-      })
-    })
     it('arbitrates the exact backfill owner before spawning Codex', async () => {
       let releaseRecovery!: () => void
       ensureCodexBackfillRecoveryMock.mockReturnValue(
         new Promise<void>((resolve) => (releaseRecovery = resolve))
       )
-      readFileSyncMock.mockReturnValue(TEST_CODEX_AUTH_JSON)
-      const onCodexHomePtySpawned = vi.fn()
       handlers.clear()
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        () => TEST_CODEX_HOME,
-        (() => ({
-          codexManagedAccounts: [
-            {
-              id: 'account-1',
-              managedHomePath: TEST_CODEX_HOME,
-              managedHomeRuntime: 'host'
-            }
-          ]
-        })) as never,
-        undefined,
-        undefined,
-        { onCodexHomePtySpawned }
-      )
+      registerPtyHandlers(mainWindow as never, undefined, () => TEST_CODEX_HOME)
 
       const spawnPromise = handlers.get('pty:spawn')!(null, {
         cols: 80,
@@ -274,57 +213,10 @@ describe('registerPtyHandlers', () => {
         expect(ensureCodexBackfillRecoveryMock).toHaveBeenCalledWith(TEST_CODEX_HOME)
       )
       expect(spawnMock).not.toHaveBeenCalled()
-      expect(onCodexHomePtySpawned).not.toHaveBeenCalled()
 
       releaseRecovery()
-      const result = (await spawnPromise) as { id: string }
+      await spawnPromise
       expect(spawnMock).toHaveBeenCalledTimes(1)
-      expect(onCodexHomePtySpawned).toHaveBeenCalledWith({
-        id: result.id,
-        codexHomePath: TEST_CODEX_HOME,
-        startedAt: expect.any(Date),
-        startedSequence: expect.any(Number)
-      })
-    })
-    it('does not gate a bare local shell on managed Codex auth', async () => {
-      readFileSyncMock.mockImplementation((filePath: string) => {
-        if (filePath.endsWith('auth.json')) {
-          throw Object.assign(new Error('missing auth'), { code: 'ENOENT' })
-        }
-        return ''
-      })
-      handlers.clear()
-      const onCodexHomePtySpawned = vi.fn()
-      registerPtyHandlers(
-        mainWindow as never,
-        undefined,
-        () => TEST_CODEX_HOME,
-        (() => ({
-          codexManagedAccounts: [
-            {
-              id: 'account-1',
-              managedHomePath: TEST_CODEX_HOME,
-              managedHomeRuntime: 'host'
-            }
-          ]
-        })) as never,
-        undefined,
-        undefined,
-        { onCodexHomePtySpawned }
-      )
-
-      const result = (await handlers.get('pty:spawn')!(null, {
-        cols: 80,
-        rows: 24
-      })) as { id: string }
-
-      expect(spawnMock).toHaveBeenCalledOnce()
-      expect(onCodexHomePtySpawned).toHaveBeenCalledWith({
-        id: result.id,
-        codexHomePath: TEST_CODEX_HOME,
-        startedAt: expect.any(Date),
-        startedSequence: expect.any(Number)
-      })
     })
     it('leaves an inherited CODEX_HOME untouched for system default when the flag is OFF', async () => {
       // Why: flag OFF must stay byte-identical to today. With no managed home

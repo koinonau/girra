@@ -2,11 +2,7 @@ import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
 import { ptyOwnership, ptyIncarnationById, deletePtyOwnership } from '../provider/ownership-state'
 import { ptySizes } from '../delivery/visibility-state'
 import { commitRuntimePtySize } from './spawn-commit-pty-size'
-import {
-  shouldSkipCodexHomeEnvForWindowsShell,
-  recordCodexPaneAccountForSpawn,
-  codexReattachedHomeRouteField
-} from '../host-env/codex-home'
+import { shouldSkipCodexHomeEnvForWindowsShell } from '../host-env/codex-home'
 import { markClaudePtySpawned } from '../../../claude-accounts/live-pty-gate'
 import { registerPty } from '../../../memory/pty-registry'
 import { rememberPaneKeyForPty } from '../pane/key-state'
@@ -72,17 +68,6 @@ export async function commitRuntimePtySpawn(ctx: RuntimePtySpawnState) {
         ...(providerReattachLaunchIdentity ? { providerReattachLaunchIdentity } : {})
       }
     )
-    if (!args.connectionId) {
-      ctx.deps.options?.onCodexHomePtySpawned?.({
-        id: ctx.result.id,
-        codexHomePath: ctx.selectedCodexHomePath,
-        reattached: true,
-        startedAt: ctx.codexHomeLaunchStartedAt,
-        startedSequence: ctx.codexHomeLaunchStartedSequence,
-        ...codexReattachedHomeRouteField(ctx.reattachedCodexHomeRoutes, ctx.result.id, true),
-        ...(ctx.env ? { launchEnv: ctx.env } : {})
-      })
-    }
     // Why: this branch returns before the normal commit site; without this the cache keeps
     // whatever the caller requested.
     commitRuntimePtySize(ctx, adoptedResult)
@@ -130,16 +115,6 @@ export async function commitRuntimePtySpawn(ctx: RuntimePtySpawnState) {
   if (ctx.effectiveSessionAppId !== undefined && ctx.effectiveSessionAppId !== ctx.result.id) {
     ptySizes.delete(ctx.effectiveSessionAppId)
   }
-  recordCodexPaneAccountForSpawn({
-    ptyId: ctx.result.id,
-    isDaemonHostSpawn: ctx.isDaemonHostSpawn,
-    isReattach: ctx.result.isReattach === true,
-    pinnedByResume: ctx.codexResumeHomeSelected,
-    launchCodexHomePath: ctx.selectedCodexHomePath,
-    launchEnv: args.env,
-    target: ctx.codexSelectionTarget,
-    settings: ctx.deps.getSettings?.()
-  })
   if (ctx.hostSessionBinding && !ctx.stablePaneBindingPersisted) {
     try {
       const binding = {
@@ -246,24 +221,6 @@ export async function commitRuntimePtySpawn(ctx: RuntimePtySpawnState) {
   }
   // Why: runtime-owned/background spawns bypass mounted-pane state, so inventory consumers need an explicit signal.
   ctx.deps.sendPtySpawnedToRenderer(ctx.result.id)
-  if (!args.connectionId) {
-    ctx.deps.options?.onCodexHomePtySpawned?.({
-      id: ctx.result.id,
-      codexHomePath: ctx.selectedCodexHomePath,
-      startedAt: ctx.codexHomeLaunchStartedAt,
-      startedSequence: ctx.codexHomeLaunchStartedSequence,
-      ...codexReattachedHomeRouteField(
-        ctx.reattachedCodexHomeRoutes,
-        ctx.result.id,
-        ctx.result.isReattach === true
-      ),
-      ...(ctx.result.isReattach === true
-        ? { reattached: true }
-        : ctx.env
-          ? { launchEnv: ctx.env }
-          : {})
-    })
-  }
   const response = {
     id: ctx.result.id,
     ...(ctx.result.incarnationId ? { incarnationId: ctx.result.incarnationId } : {}),

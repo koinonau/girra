@@ -46,12 +46,9 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
     runtime: state.runtime,
     stats: state.stats,
     claudeUsage: state.claudeUsage,
-    codexUsage: state.codexUsage,
     openCodeUsage: state.openCodeUsage,
     rateLimits: state.rateLimits,
     automations: state.automations,
-    codexAccounts: state.codexAccounts,
-    codexRuntimeHome: state.codexRuntimeHome,
     claudeAccounts: state.claudeAccounts,
     claudeRuntimeAuth: state.claudeRuntimeAuth,
     keybindings: state.keybindings

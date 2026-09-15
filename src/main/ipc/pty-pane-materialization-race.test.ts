@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { wslUncDirectoryExistsAsyncMock, getCodexPaneAccountMock } from './pty-ipc-mock-registry'
+import { wslUncDirectoryExistsAsyncMock } from './pty-ipc-mock-registry'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
 import { makePaneKey } from '../../shared/stable-pane-id'
 import { registerPtyHandlers, getPtyIdForPaneKey, setLocalPtyProvider } from './pty'
@@ -31,9 +31,6 @@ vi.mock('../memory/pty-registry', () =>
 )
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
-)
-vi.mock('../codex/codex-pane-account-registry', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexPaneAccountRegistryModuleMock())
 )
 vi.mock('../codex/codex-state-db-backfill-recovery', () =>
   import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
@@ -381,20 +378,16 @@ describe('registerPtyHandlers', () => {
     {
       label: 'git worktree',
       worktreeId: 'repo-1::/tmp/live-owner',
-      cwd: '/tmp/live-owner',
-      paneAccountAtStart: { homeRoute: 'shared-home' },
-      expectedHomeRouteAtStart: 'shared-home'
+      cwd: '/tmp/live-owner'
     },
     {
       label: 'folder workspace',
       worktreeId: 'folder:live-owner',
-      cwd: '/tmp',
-      paneAccountAtStart: null,
-      expectedHomeRouteAtStart: null
+      cwd: '/tmp'
     }
   ])(
     'adopts a completed runtime-owned pane before replacement launch preflight ($label)',
-    async ({ worktreeId, cwd, paneAccountAtStart, expectedHomeRouteAtStart }) => {
+    async ({ worktreeId, cwd }) => {
       type StableAdoption = {
         result: { id: string; incarnationId?: string; isReattach?: boolean }
         owner: { handle?: string; tabId: string; leafId: string; ptyId: string }
@@ -484,7 +477,6 @@ describe('registerPtyHandlers', () => {
       const prepareClaudeAuth = vi.fn(() => {
         throw new Error('replacement auth preflight must not run')
       })
-      const onCodexHomePtySpawned = vi.fn()
       let controller: RuntimeSpawnController | null = null
       const runtime = {
         setPtyController: vi.fn((value) => {
@@ -522,8 +514,7 @@ describe('registerPtyHandlers', () => {
         undefined,
         undefined,
         prepareClaudeAuth,
-        store as never,
-        { onCodexHomePtySpawned }
+        store as never
       )
       const spawnController = controller as unknown as RuntimeSpawnController
       await spawnController.spawn({
@@ -613,10 +604,8 @@ describe('registerPtyHandlers', () => {
       runtime.beginPtyRegistration.mockImplementation(() => {
         runtimeSecondAdoption ??= spawnController.adoptStablePane(adoptionArgs)
       })
-      getCodexPaneAccountMock.mockReturnValue(paneAccountAtStart)
       const rendererFirstMount = handlers.get('pty:spawn')!(null, mountArgs)
       await vi.waitFor(() => expect(providerSpawn).toHaveBeenCalledTimes(3))
-      getCodexPaneAccountMock.mockReturnValue({ homeRoute: 'real-home' })
       releaseAttach()
       await vi.waitFor(() => expect(runtimeSecondAdoption).not.toBeNull())
       const pendingRuntimeAdoption = runtimeSecondAdoption
@@ -656,14 +645,6 @@ describe('registerPtyHandlers', () => {
         id: 'pty-live-owner',
         incarnationId: 'inc-live-owner',
         isReattach: true
-      })
-      expect(onCodexHomePtySpawned).toHaveBeenCalledWith({
-        id: 'pty-live-owner',
-        codexHomePath: null,
-        reattached: true,
-        reattachedHomeRoute: expectedHomeRouteAtStart,
-        startedAt: expect.any(Date),
-        startedSequence: expect.any(Number)
       })
       expect(claimedResult).toMatchObject({
         id: 'pty-live-owner',

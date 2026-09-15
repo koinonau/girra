@@ -3,24 +3,17 @@ import { getDefaultSettings } from '../../shared/constants'
 import type { RateLimitState } from '../../shared/rate-limit-types'
 import { createAccountRuntimeTargetSettingsSync } from './account-runtime-target-sync'
 
-function createServiceTargets(
-  claudeTarget: RateLimitState['claudeTarget'],
-  codexTarget: RateLimitState['codexTarget']
-) {
-  const state = { claudeTarget, codexTarget } as RateLimitState
+function createServiceTargets(claudeTarget: RateLimitState['claudeTarget']) {
+  const state = { claudeTarget } as RateLimitState
   return {
     getState: vi.fn(() => state),
-    refreshClaudeForTarget: vi.fn(async () => state),
-    refreshCodexForTarget: vi.fn(async () => state)
+    refreshClaudeForTarget: vi.fn(async () => state)
   }
 }
 
 describe('createAccountRuntimeTargetSettingsSync', () => {
-  it('retargets only Claude and Codex when auto changes to WSL', async () => {
-    const service = createServiceTargets(
-      { runtime: 'host', wslDistro: null },
-      { runtime: 'host', wslDistro: null }
-    )
+  it('retargets Claude when auto changes to WSL', async () => {
+    const service = createServiceTargets({ runtime: 'host', wslDistro: null })
     const settings = {
       ...getDefaultSettings('/tmp'),
       localAccountRuntime: 'auto' as const,
@@ -37,18 +30,15 @@ describe('createAccountRuntimeTargetSettingsSync', () => {
       settings
     )
 
-    const expectedTarget = { runtime: 'wsl', wslDistro: 'Ubuntu' }
     expect(service.refreshClaudeForTarget).toHaveBeenCalledOnce()
-    expect(service.refreshClaudeForTarget).toHaveBeenCalledWith(expectedTarget)
-    expect(service.refreshCodexForTarget).toHaveBeenCalledOnce()
-    expect(service.refreshCodexForTarget).toHaveBeenCalledWith(expectedTarget)
+    expect(service.refreshClaudeForTarget).toHaveBeenCalledWith({
+      runtime: 'wsl',
+      wslDistro: 'Ubuntu'
+    })
   })
 
   it('does no work for unrelated settings updates', async () => {
-    const service = createServiceTargets(
-      { runtime: 'host', wslDistro: null },
-      { runtime: 'host', wslDistro: null }
-    )
+    const service = createServiceTargets({ runtime: 'host', wslDistro: null })
     const settings = getDefaultSettings('/tmp')
     const syncSettings = createAccountRuntimeTargetSettingsSync(service, settings, 'win32')
 
@@ -56,14 +46,10 @@ describe('createAccountRuntimeTargetSettingsSync', () => {
 
     expect(service.getState).not.toHaveBeenCalled()
     expect(service.refreshClaudeForTarget).not.toHaveBeenCalled()
-    expect(service.refreshCodexForTarget).not.toHaveBeenCalled()
   })
 
   it('preserves a manual runtime when the settings-derived policy does not change', async () => {
-    const service = createServiceTargets(
-      { runtime: 'wsl', wslDistro: 'Ubuntu' },
-      { runtime: 'wsl', wslDistro: 'Ubuntu' }
-    )
+    const service = createServiceTargets({ runtime: 'wsl', wslDistro: 'Ubuntu' })
     const initialSettings = {
       ...getDefaultSettings('/tmp'),
       localAccountRuntime: 'host' as const
@@ -81,14 +67,10 @@ describe('createAccountRuntimeTargetSettingsSync', () => {
 
     expect(service.getState).not.toHaveBeenCalled()
     expect(service.refreshClaudeForTarget).not.toHaveBeenCalled()
-    expect(service.refreshCodexForTarget).not.toHaveBeenCalled()
   })
 
-  it('refreshes only the provider whose current target differs', async () => {
-    const service = createServiceTargets(
-      { runtime: 'host', wslDistro: null },
-      { runtime: 'wsl', wslDistro: 'Ubuntu' }
-    )
+  it('refreshes Claude back to host when the policy leaves WSL', async () => {
+    const service = createServiceTargets({ runtime: 'wsl', wslDistro: 'Ubuntu' })
     const initialSettings = {
       ...getDefaultSettings('/tmp'),
       localWindowsRuntimeDefault: { kind: 'wsl' as const, distro: 'Ubuntu' }
@@ -101,8 +83,25 @@ describe('createAccountRuntimeTargetSettingsSync', () => {
       settings
     )
 
+    expect(service.refreshClaudeForTarget).toHaveBeenCalledOnce()
+    expect(service.refreshClaudeForTarget).toHaveBeenCalledWith({ runtime: 'host' })
+  })
+
+  it('skips the refresh when the service already uses the new target', async () => {
+    const service = createServiceTargets({ runtime: 'host', wslDistro: null })
+    const initialSettings = {
+      ...getDefaultSettings('/tmp'),
+      localWindowsRuntimeDefault: { kind: 'wsl' as const, distro: 'Ubuntu' }
+    }
+    const settings = getDefaultSettings('/tmp')
+    const syncSettings = createAccountRuntimeTargetSettingsSync(service, initialSettings, 'win32')
+
+    await syncSettings(
+      { localWindowsRuntimeDefault: settings.localWindowsRuntimeDefault },
+      settings
+    )
+
+    expect(service.getState).toHaveBeenCalledOnce()
     expect(service.refreshClaudeForTarget).not.toHaveBeenCalled()
-    expect(service.refreshCodexForTarget).toHaveBeenCalledOnce()
-    expect(service.refreshCodexForTarget).toHaveBeenCalledWith({ runtime: 'host' })
   })
 })

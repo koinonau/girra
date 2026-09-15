@@ -29,7 +29,6 @@ import type {
 } from '../slices/terminal-tab-retirement'
 import type {
   AutomaticAgentResumeClaim,
-  CodexRestartNotice,
   HydrateWorkspaceSessionOptions,
   ReconnectPersistedTerminalsOptions
 } from './terminal-contracts'
@@ -172,18 +171,6 @@ export type TerminalActions = {
   suppressPtyExit: (ptyId: string) => void
   consumeSuppressedPtyExit: (ptyId: string) => boolean
   isPtyShutdownPending: (ptyId: string) => boolean
-  queueCodexPaneRestarts: (ptyIds: string[]) => void
-  consumePendingCodexPaneRestart: (ptyId: string) => boolean
-  markCodexRestartNotices: (
-    notices: (Pick<CodexRestartNotice, 'previousAccountLabel' | 'nextAccountLabel'> &
-      Partial<Pick<CodexRestartNotice, 'previousAccountId' | 'nextAccountId'>> & {
-        homeRouteChanged?: boolean
-        ptyId: string
-      })[]
-  ) => string[]
-  clearCodexRestartNotice: (ptyId: string) => void
-  dismissCodexRestartNotices: (ptyIds: string[]) => void
-  reopenCodexRestartPrompt: (ptyId: string) => void
   replaceTerminalLayoutPanePtyId: (tabId: string, leafId: string, ptyId: string) => void
   setTabPaneExpanded: (tabId: string, expanded: boolean) => void
   setTabCanExpandPane: (tabId: string, canExpand: boolean) => void

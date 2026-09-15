@@ -218,7 +218,6 @@ describe('registerFilesystemHandlers', () => {
         models: [{ id: 'gpt-5.5', label: 'GPT-5.5' }],
         defaultModelId: 'gpt-5.5'
       })
-      const prepareForCodexLaunch = vi.fn(() => '\\\\wsl.localhost\\Ubuntu\\home\\tester\\.codex')
       const wslStore = {
         ...store,
         getRepos: () => [
@@ -244,20 +243,16 @@ describe('registerFilesystemHandlers', () => {
         })
       }
 
-      registerFilesystemHandlers(wslStore as never, { prepareForCodexLaunch })
+      registerFilesystemHandlers(wslStore as never, {})
 
       await handlers.get('git:discoverCommitMessageModels')!(null, {
         agentId: 'codex',
         worktreePath: WORKTREE_FEATURE_PATH
       })
 
-      expect(prepareForCodexLaunch).toHaveBeenCalledWith({
-        runtime: 'wsl',
-        wslDistro: 'Ubuntu'
-      })
       expect(discoverCommitMessageModelsLocalMock).toHaveBeenCalledWith(
         'codex',
-        expect.objectContaining({ CODEX_HOME: '/home/tester/.codex' }),
+        expect.any(Object),
         'npx codex',
         { cwd: WORKTREE_FEATURE_PATH, wslDistro: 'Ubuntu' }
       )

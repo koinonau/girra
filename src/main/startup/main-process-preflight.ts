@@ -58,7 +58,6 @@ import { initSessionParseCachePersistence } from '../ai-vault/session-parse-cach
 import { initOrcaProfilePaths } from '../orca-profiles/profile-index-store'
 import { initStatsPath } from '../stats/collector'
 import { initClaudeUsagePath } from '../claude-usage/store'
-import { initCodexUsagePath } from '../codex-usage/store'
 import { initOpenCodeUsagePath } from '../opencode-usage/store'
 import { registerDocPreviewSchemePrivileges } from '../browser/doc-preview-protocol'
 import {
@@ -235,7 +234,6 @@ export function runMainProcessPreflight(options: MainProcessPreflightOptions): b
   // Why: same timing as initDataPath — capture userData before app.setName changes it. See persistence.ts:20-28.
   initStatsPath()
   initClaudeUsagePath()
-  initCodexUsagePath()
   initOpenCodeUsagePath()
   // Why: Electron resolves the macOS safeStorage Keychain service name
   // ("<app name> Safe Storage") before `ready`, so the setName in whenReady is

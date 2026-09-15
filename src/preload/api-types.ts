@@ -1,19 +1,9 @@
 import type { ElectronAPI } from '@electron-toolkit/preload'
-import type {
-  ClaudeAccountsApi,
-  CodexAccountsApi,
-  CodexConfigSyncApi,
-  MinimaxCredentialsApi
-} from './api/agent-account-api'
+import type { ClaudeAccountsApi, MinimaxCredentialsApi } from './api/agent-account-api'
 import type { HooksApi } from './api/agent-hook-api'
 import type { SkillsApi } from './api/agent-skill-api'
 import type { AgentAwakeApi, AgentStatusApi, AgentTrustApi } from './api/agent-status-api'
-import type {
-  ClaudeUsageApi,
-  CodexUsageApi,
-  OpenCodeUsageApi,
-  RateLimitsApi
-} from './api/agent-usage-api'
+import type { ClaudeUsageApi, OpenCodeUsageApi, RateLimitsApi } from './api/agent-usage-api'
 import type { AiVaultApi } from './api/ai-vault-api'
 import type { AppApi, E2EApi, PlatformApi } from './api/app-api'
 import type { AutomationsApi } from './api/automation-api'
@@ -88,10 +78,8 @@ export type PreloadApi = {
   agentAwake: AgentAwakeApi
   localhostWorktreeLabels: LocalhostWorktreeLabelsApi
   keybindings: KeybindingsApi
-  codexAccounts: CodexAccountsApi
   claudeAccounts: ClaudeAccountsApi
   cli: CliApi
-  codexConfigSync: CodexConfigSyncApi
   agentTrust: AgentTrustApi
   preflight: PreflightApi
   notifications: NotificationsApi
@@ -115,7 +103,6 @@ export type PreloadApi = {
   stats: StatsApi
   memory: MemoryApi
   claudeUsage: ClaudeUsageApi
-  codexUsage: CodexUsageApi
   openCodeUsage: OpenCodeUsageApi
   aiVault: AiVaultApi
   nativeChat: NativeChatApi
@@ -136,7 +123,7 @@ export type PreloadApi = {
   mobile: MobileApi
 }
 
-export type { ClaudeUsageApi, CodexUsageApi, OpenCodeUsageApi } from './api/agent-usage-api'
+export type { ClaudeUsageApi, OpenCodeUsageApi } from './api/agent-usage-api'
 export type { AiVaultApi } from './api/ai-vault-api'
 export type { AutomationsApi, ExternalAutomationManagerResult } from './api/automation-api'
 export type { AppApi } from './api/app-api'

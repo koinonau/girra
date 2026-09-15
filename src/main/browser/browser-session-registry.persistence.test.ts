@@ -136,7 +136,7 @@ function installModuleMocks(
     isScopedStagedCookieImport: vi.fn(() => false),
     removeCookieImportScopeMarker: vi.fn()
   }))
-  vi.doMock('../codex-accounts/fs-utils', () => ({
+  vi.doMock('../fs-utils', () => ({
     renameFileWithWindowsRetry: vi.fn((source: string, target: string) => {
       const sourceKey = fsKey(source)
       const targetKey = fsKey(target)

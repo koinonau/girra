@@ -4,8 +4,7 @@
 // scanner.ts yielded with `setTimeout(resolve, 0)`, which Node clamps to ~1ms. The
 // loops yield once per FILE_SCAN_BATCH_SIZE files across two passes, so a machine with
 // thousands of transcripts spent seconds parked on timers doing no work. setImmediate
-// yields on the same tick's check phase with no clamp. The sibling scanner
-// (src/main/codex-usage/scanner.ts) already used setImmediate.
+// yields on the same tick's check phase with no clamp.
 //
 // The yield exists to keep the main process responsive during a scan, so this also
 // measures worst-case latency for a concurrent task -- a "faster" yield that starved

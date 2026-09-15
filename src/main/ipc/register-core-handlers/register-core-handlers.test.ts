@@ -29,7 +29,6 @@ const {
   registerRuntimeEnvironmentHandlersMock,
   registerEphemeralVmHandlersMock,
   registerAiVaultHandlersMock,
-  registerCodexAccountHandlersMock,
   registerAgentHookHandlersMock,
   registerAgentTrustHandlersMock,
   registerClaudeAccountHandlersMock,
@@ -48,7 +47,6 @@ const {
   registerGitLabHandlersMock,
   registerHostedReviewHandlersMock,
   registerExportHandlersMock,
-  registerCodexConfigSyncHandlersMock,
   registerDashboardPopoutHandlersMock,
   isDashboardPopoutRendererMock,
   registerTerminalPreviewHandlersMock,
@@ -89,7 +87,6 @@ const {
   registerRuntimeEnvironmentHandlersMock: vi.fn(),
   registerEphemeralVmHandlersMock: vi.fn(),
   registerAiVaultHandlersMock: vi.fn(),
-  registerCodexAccountHandlersMock: vi.fn(),
   registerAgentHookHandlersMock: vi.fn(),
   registerAgentTrustHandlersMock: vi.fn(),
   registerClaudeAccountHandlersMock: vi.fn(),
@@ -108,7 +105,6 @@ const {
   registerGitLabHandlersMock: vi.fn(),
   registerHostedReviewHandlersMock: vi.fn(),
   registerExportHandlersMock: vi.fn(),
-  registerCodexConfigSyncHandlersMock: vi.fn(),
   registerDashboardPopoutHandlersMock: vi.fn(),
   isDashboardPopoutRendererMock: vi.fn(),
   registerTerminalPreviewHandlersMock: vi.fn(),
@@ -134,10 +130,6 @@ vi.mock('../../shared/runtime-environment-store', () => ({
 
 vi.mock('../runtime-environment-transport-routing', () => ({
   callRuntimeEnvironment: callRuntimeEnvironmentMock
-}))
-
-vi.mock('../codex-config-sync', () => ({
-  registerCodexConfigSyncHandlers: registerCodexConfigSyncHandlersMock
 }))
 
 vi.mock('../dashboard-popout', () => ({
@@ -285,10 +277,6 @@ vi.mock('../ai-vault', () => ({
   registerAiVaultHandlers: registerAiVaultHandlersMock
 }))
 
-vi.mock('../codex-accounts', () => ({
-  registerCodexAccountHandlers: registerCodexAccountHandlersMock
-}))
-
 vi.mock('../agent-hooks', () => ({
   registerAgentHookHandlers: registerAgentHookHandlersMock
 }))
@@ -385,7 +373,6 @@ describe('registerCoreHandlers', () => {
     registerRuntimeEnvironmentHandlersMock.mockReset()
     registerEphemeralVmHandlersMock.mockReset()
     registerAiVaultHandlersMock.mockReset()
-    registerCodexAccountHandlersMock.mockReset()
     registerAgentHookHandlersMock.mockReset()
     registerAgentTrustHandlersMock.mockReset()
     registerClaudeAccountHandlersMock.mockReset()
@@ -421,9 +408,7 @@ describe('registerCoreHandlers', () => {
     const runtime = { marker: 'runtime', getAgentBrowserBridge: () => null }
     const stats = { marker: 'stats' }
     const claudeUsage = { marker: 'claudeUsage' }
-    const codexUsage = { marker: 'codexUsage' }
     const openCodeUsage = { marker: 'openCodeUsage' }
-    const codexAccounts = { marker: 'codexAccounts', runtimeHomeService: { marker: 'runtimeHome' } }
     const claudeAccounts = { marker: 'claudeAccounts' }
     const rateLimits = { marker: 'rateLimits' }
     const agentAwakeService = { marker: 'agentAwakeService' }
@@ -435,9 +420,7 @@ describe('registerCoreHandlers', () => {
       runtime as never,
       stats as never,
       claudeUsage as never,
-      codexUsage as never,
       openCodeUsage as never,
-      codexAccounts as never,
       claudeAccounts as never,
       rateLimits as never,
       null,
@@ -458,24 +441,16 @@ describe('registerCoreHandlers', () => {
 
     expect(registerUsageProviderHandlersMock).toHaveBeenCalledWith({
       claudeUsage,
-      codexUsage,
       openCodeUsage
     })
     expect(registerAppHandlersMock).toHaveBeenCalledWith(store, { onBeforeRelaunch })
-    expect(registerCodexAccountHandlersMock).toHaveBeenCalledWith(
-      codexAccounts,
-      expect.any(Function)
-    )
     expect(registerAgentHookHandlersMock).toHaveBeenCalledWith(runtime, {
       getPtyIdForPaneKey: expect.any(Function)
     })
-    expect(registerCodexConfigSyncHandlersMock).toHaveBeenCalledWith(
-      codexAccounts.runtimeHomeService
-    )
     expect(registerPetHandlersMock).toHaveBeenCalled()
     expect(registerClaudeAccountHandlersMock).toHaveBeenCalledWith(claudeAccounts)
     expect(registerMiniMaxCredentialsHandlersMock).toHaveBeenCalledWith(rateLimits)
-    expect(registerRateLimitHandlersMock).toHaveBeenCalledWith(rateLimits, codexAccounts)
+    expect(registerRateLimitHandlersMock).toHaveBeenCalledWith(rateLimits)
     expect(registerGitHubHandlersMock).toHaveBeenCalledWith(store, stats)
     expect(registerLinearHandlersMock).toHaveBeenCalled()
     expect(registerJiraHandlersMock).toHaveBeenCalled()
@@ -589,9 +564,7 @@ describe('registerCoreHandlers', () => {
     const runtime2 = { marker: 'runtime2', getAgentBrowserBridge: () => null }
     const stats2 = { marker: 'stats2' }
     const claudeUsage2 = { marker: 'claudeUsage2' }
-    const codexUsage2 = { marker: 'codexUsage2' }
     const openCodeUsage2 = { marker: 'openCodeUsage2' }
-    const codexAccounts2 = { marker: 'codexAccounts2' }
     const claudeAccounts2 = { marker: 'claudeAccounts2' }
     const rateLimits2 = { marker: 'rateLimits2' }
 
@@ -600,9 +573,7 @@ describe('registerCoreHandlers', () => {
       runtime2 as never,
       stats2 as never,
       claudeUsage2 as never,
-      codexUsage2 as never,
       openCodeUsage2 as never,
-      codexAccounts2 as never,
       claudeAccounts2 as never,
       rateLimits2 as never,
       42

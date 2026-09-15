@@ -1,13 +1,8 @@
-import { consumeCodexRateLimitResetCredit } from '../codex-fetcher'
 import { RateLimitServiceInactiveAccounts } from './service-inactive-accounts'
 import {
-  normalizeCodexAccountSelectionTarget,
   normalizeClaudeAccountSelectionTarget,
-  type CodexAccountSelectionTarget,
   type ClaudeAccountSelectionTarget,
-  type RateLimitRuntimeTarget,
-  type RateLimitState,
-  type CodexRateLimitResetResult
+  type RateLimitState
 } from './service-types'
 
 export abstract class RateLimitServiceAccountRefresh extends RateLimitServiceInactiveAccounts {
@@ -31,89 +26,6 @@ export abstract class RateLimitServiceAccountRefresh extends RateLimitServiceIna
       ...this.state,
       minimax: this.withFetchingStatus(null, 'minimax')
     })
-  }
-
-  async refreshForCodexAccountChange(
-    outgoingAccountId?: string | null,
-    target?: CodexAccountSelectionTarget
-  ): Promise<RateLimitState> {
-    const nextTarget = normalizeCodexAccountSelectionTarget(target)
-    // Why: weekly-only plans report no session window, so gating on session alone
-    // dropped their snapshot and left the switcher's inline bars empty.
-    if (
-      outgoingAccountId &&
-      (this.state.codex?.session || this.state.codex?.weekly) &&
-      this.isSameCodexTarget(this.codexFetchTarget, nextTarget)
-    ) {
-      this.inactiveCodexCache.set(outgoingAccountId, this.state.codex)
-    }
-    this.codexFetchTarget = nextTarget
-    this.codexFetchGeneration += 1
-    // Why: a new account/target starts with a clean retry schedule.
-    this.activeFailureStreakByProvider.codex = 0
-    this.inactiveCodexAccountsGeneration += 1
-    this.pruneInactiveCodexState()
-    // Why: the switch must NOT reset the inactive-fetch debounce — re-probing
-    // every inactive account per switch spawns codex in each credential home
-    // and endangers rotating refresh tokens; the switcher shows the cached
-    // snapshot (seeded above for the outgoing account) until the debounce ends.
-    // Why: clear the old Codex view immediately, else the previous account's limits show under the newly selected identity until the next poll.
-    this.updateState({
-      ...this.state,
-      codex: this.withFetchingStatus(null, 'codex')
-    })
-    await this.fetchCodexOnly({ force: true })
-    return this.getState()
-  }
-
-  async refreshCodexForTarget(target?: CodexAccountSelectionTarget): Promise<RateLimitState> {
-    const nextTarget = normalizeCodexAccountSelectionTarget(target)
-    const targetChanged = !this.isSameCodexTarget(this.codexFetchTarget, nextTarget)
-    this.codexFetchTarget = nextTarget
-    this.codexFetchGeneration += 1
-    this.activeFailureStreakByProvider.codex = 0
-    this.updateState({
-      ...this.state,
-      codex: this.withFetchingStatus(targetChanged ? null : this.state.codex, 'codex')
-    })
-    await this.fetchCodexOnly({ force: true })
-    return this.getState()
-  }
-
-  async consumeCodexRateLimitResetCredit(options: {
-    idempotencyKey: string
-    target: RateLimitRuntimeTarget
-    codexHomePath: string | null
-  }): Promise<CodexRateLimitResetResult> {
-    const codexTarget = normalizeCodexAccountSelectionTarget(options.target)
-    const codexHomePath = options.codexHomePath
-    const scopedStateBeforeReset = this.getState()
-    const missingWslCodexHome = codexHomePath
-      ? null
-      : this.getMissingWslCodexHomeResult(codexTarget)
-    if (missingWslCodexHome) {
-      if (this.isSameCodexTarget(this.codexFetchTarget, codexTarget)) {
-        await this.fetchCodexOnly({ force: true })
-      }
-      throw new Error(missingWslCodexHome.error ?? 'Codex home unavailable')
-    }
-    try {
-      const outcome = await consumeCodexRateLimitResetCredit({
-        codexHomePath,
-        idempotencyKey: options.idempotencyKey
-      })
-      const state = await this.fetchCodexResetResultState(
-        codexTarget,
-        codexHomePath,
-        scopedStateBeforeReset
-      )
-      return { outcome, state }
-    } catch (error) {
-      if (this.isSameCodexTarget(this.codexFetchTarget, codexTarget)) {
-        await this.fetchCodexOnly({ force: true })
-      }
-      throw error
-    }
   }
 
   async refreshForClaudeAccountChange(

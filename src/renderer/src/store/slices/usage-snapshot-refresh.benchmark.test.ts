@@ -3,11 +3,11 @@ import { create } from 'zustand'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AppState } from '../types'
 import type {
-  CodexUsageScanState,
-  CodexUsageSnapshot,
-  CodexUsageSummary
-} from '../../../../shared/codex-usage-types'
-import { createCodexUsageSlice } from './usage-provider-slices'
+  OpenCodeUsageScanState,
+  OpenCodeUsageSnapshot,
+  OpenCodeUsageSummary
+} from '../../../../shared/opencode-usage-types'
+import { createOpenCodeUsageSlice } from './usage-provider-slices'
 
 type Deferred<T> = {
   promise: Promise<T>
@@ -28,23 +28,23 @@ async function flushImmediatePromises(): Promise<void> {
   }
 }
 
-function createCodexOnlyStore() {
-  return create<AppState>()((...args) => createCodexUsageSlice(...args) as AppState)
+function createOpenCodeOnlyStore() {
+  return create<AppState>()((...args) => createOpenCodeUsageSlice(...args) as AppState)
 }
 
-function createScanState(overrides: Partial<CodexUsageScanState> = {}): CodexUsageScanState {
+function createScanState(overrides: Partial<OpenCodeUsageScanState> = {}): OpenCodeUsageScanState {
   return {
     enabled: true,
     isScanning: false,
     lastScanStartedAt: 100,
     lastScanCompletedAt: 200,
     lastScanError: null,
-    hasAnyCodexData: true,
+    hasAnyOpenCodeData: true,
     ...overrides
   }
 }
 
-function createSummary(totalTokens: number): CodexUsageSummary {
+function createSummary(totalTokens: number): OpenCodeUsageSummary {
   return {
     scope: 'orca',
     range: '30d',
@@ -58,11 +58,11 @@ function createSummary(totalTokens: number): CodexUsageSummary {
     estimatedCostUsd: 1,
     topModel: 'gpt-5',
     topProject: 'orca',
-    hasAnyCodexData: true
+    hasAnyOpenCodeData: true
   }
 }
 
-function createSnapshot(totalTokens: number, scanState = createScanState()): CodexUsageSnapshot {
+function createSnapshot(totalTokens: number, scanState = createScanState()): OpenCodeUsageSnapshot {
   return {
     scanState,
     summary: createSummary(totalTokens),
@@ -82,13 +82,13 @@ function createSnapshot(totalTokens: number, scanState = createScanState()): Cod
   }
 }
 
-describe('Codex usage cached snapshot benchmark', () => {
+describe('OpenCode usage cached snapshot benchmark', () => {
   beforeEach(() => {
     vi.clearAllMocks()
   })
 
   it('renders cached usage before a slow refresh completes', async () => {
-    const slowRefresh = createDeferred<CodexUsageScanState>()
+    const slowRefresh = createDeferred<OpenCodeUsageScanState>()
     const getSnapshot = vi
       .fn()
       .mockResolvedValueOnce(createSnapshot(100))
@@ -97,7 +97,7 @@ describe('Codex usage cached snapshot benchmark', () => {
 
     vi.stubGlobal('window', {
       api: {
-        codexUsage: {
+        openCodeUsage: {
           getScanState: vi.fn(() => Promise.resolve(createScanState())),
           getSnapshot,
           refresh,
@@ -110,12 +110,12 @@ describe('Codex usage cached snapshot benchmark', () => {
       }
     })
 
-    const store = createCodexOnlyStore()
+    const store = createOpenCodeOnlyStore()
     const startedAt = performance.now()
-    const fetchPromise = store.getState().fetchCodexUsage()
+    const fetchPromise = store.getState().fetchOpenCodeUsage()
 
     await flushImmediatePromises()
-    expect(store.getState().codexUsageSummary?.totalTokens).toBe(100)
+    expect(store.getState().openCodeUsageSummary?.totalTokens).toBe(100)
     const cachedRenderMs = performance.now() - startedAt
 
     expect(cachedRenderMs).toBeLessThan(10)
@@ -125,11 +125,11 @@ describe('Codex usage cached snapshot benchmark', () => {
     slowRefresh.resolve(createScanState({ lastScanCompletedAt: 300 }))
     await fetchPromise
 
-    expect(store.getState().codexUsageSummary?.totalTokens).toBe(200)
+    expect(store.getState().openCodeUsageSummary?.totalTokens).toBe(200)
     expect(getSnapshot).toHaveBeenCalledTimes(2)
-    expect(window.api.codexUsage.getSummary).not.toHaveBeenCalled()
-    expect(window.api.codexUsage.getDaily).not.toHaveBeenCalled()
-    expect(window.api.codexUsage.getBreakdown).not.toHaveBeenCalled()
-    expect(window.api.codexUsage.getRecentSessions).not.toHaveBeenCalled()
+    expect(window.api.openCodeUsage.getSummary).not.toHaveBeenCalled()
+    expect(window.api.openCodeUsage.getDaily).not.toHaveBeenCalled()
+    expect(window.api.openCodeUsage.getBreakdown).not.toHaveBeenCalled()
+    expect(window.api.openCodeUsage.getRecentSessions).not.toHaveBeenCalled()
   })
 })

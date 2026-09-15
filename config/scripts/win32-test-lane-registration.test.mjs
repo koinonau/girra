@@ -49,9 +49,7 @@ import { classifyPrJobs } from './pr-code-change-scope.mjs'
  *     block exists only for Windows, which is the shape worth a lane entry.
  *   - a gate whose condition crosses a module boundary or a function call --
  *     an imported flag, an imported `describeOnWindows`, `isWindows()`.
- *     `legacy-wsl-runtime-auth-drain-apply-script.test.ts` imports its
- *     `isWindows`; it happens to be a POSIX-only gate, so nothing is missed
- *     today, but a win32-only one written that way would be.
+ *     A win32-only gate written that way would be missed.
  *   - `runIf(<win32> || <x>)` and `skipIf(<not win32> && <x>)` are rejected on
  *     purpose: both can run off Windows, so neither is a win32-only gate. That
  *     holds whether the condition is written at the gate or routed through a

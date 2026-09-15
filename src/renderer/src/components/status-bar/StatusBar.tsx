@@ -2,12 +2,6 @@ import React from 'react'
 import { StatusBarSurface } from './StatusBarSurface'
 
 export {
-  buildCodexStatusSwitchGroups,
-  getCodexStatusActiveId,
-  normalizeCodexStatusRuntimeTarget,
-  resolveCodexStatusAccountState
-} from './status-bar-codex-accounts'
-export {
   buildClaudeStatusSwitchGroups,
   getClaudeStatusActiveId,
   normalizeClaudeStatusRuntimeTarget,
@@ -16,13 +10,10 @@ export {
 export {
   getStatusBarPreferredWslDistro,
   type ClaudeStatusSwitchGroup,
-  type ClaudeStatusSwitchTarget,
-  type CodexStatusRuntimeTarget,
-  type CodexStatusSwitchGroup,
-  type CodexStatusSwitchTarget
+  type AccountStatusRuntimeTarget,
+  type ClaudeStatusSwitchTarget
 } from './status-bar-runtime-targets'
 export { ClaudeSwitcherMenu } from './ClaudeSwitcherMenu'
-export { CodexSwitcherMenu } from './CodexSwitcherMenu'
 export { InlineUsageBars } from './InlineProviderUsage'
 export { ProviderDetailsMenu } from './ProviderDetailsMenu'
 export { ProviderSegment } from './StatusBarProviderSegment'

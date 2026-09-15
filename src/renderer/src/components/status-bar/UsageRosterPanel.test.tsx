@@ -31,12 +31,12 @@ vi.mock('@/components/ui/dropdown-menu', () => ({
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { UsageRosterPanel, UsageRow } from './UsageRosterPanel'
 
-const signedOutCodex: ProviderRateLimits = {
-  provider: 'codex',
+const signedOutProvider: ProviderRateLimits = {
+  provider: 'opencode-go',
   session: null,
   weekly: null,
   updatedAt: 0,
-  error: 'ChatGPT authentication required to read rate limits',
+  error: 'Authentication required to read rate limits',
   status: 'error'
 }
 
@@ -48,7 +48,7 @@ describe('UsageRow', () => {
   it('renders sign-in as row copy instead of nesting an interactive button', () => {
     const markup = renderToStaticMarkup(
       <UsageRow
-        p={signedOutCodex}
+        p={signedOutProvider}
         display="used"
         state={{ kind: 'sign-in', statusLabel: 'not signed in' }}
         showSignInAction
@@ -65,7 +65,7 @@ describe('UsageRow', () => {
     const markup = renderToStaticMarkup(
       <UsageRow
         p={{
-          ...signedOutCodex,
+          ...signedOutProvider,
           session: {
             usedPercent: 25,
             windowMinutes: 300,
@@ -95,7 +95,7 @@ describe('UsageRow', () => {
         <UsageRosterPanel
           providers={[
             {
-              ...signedOutCodex,
+              ...signedOutProvider,
               session: {
                 usedPercent: 25,
                 windowMinutes: 300,
@@ -139,7 +139,7 @@ describe('UsageRow', () => {
     const markup = renderToStaticMarkup(
       <UsageRow
         p={{
-          ...signedOutCodex,
+          ...signedOutProvider,
           session: {
             usedPercent: 25,
             windowMinutes: 300,
@@ -218,7 +218,7 @@ describe('UsageRow', () => {
     const markup = renderToStaticMarkup(
       <UsageRow
         p={{
-          ...signedOutCodex,
+          ...signedOutProvider,
           session: {
             usedPercent: 25,
             windowMinutes: 300,

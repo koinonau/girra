@@ -1,6 +1,4 @@
 import type { DirectSshAuthority } from '../../../../shared/ssh-types'
-import type { TerminalTab } from '../../../../shared/terminal-tab-types'
-import type { CodexRestartNotice } from '../terminals/terminal-contracts'
 import {
   directSshAuthoritiesEqual,
   liveBindingMatches,
@@ -20,26 +18,6 @@ export type {
   DirectSshTerminalBindingState
 } from './direct-ssh-terminal-recovery-types'
 
-function clearPtyBinding(
-  state: DirectSshTerminalBindingState,
-  tab: TerminalTab,
-  next: {
-    ptyIdsByTabId: Record<string, string[]>
-    pendingCodexPaneRestartIds: Record<string, true>
-    codexRestartNoticeByPtyId: Record<string, CodexRestartNotice>
-  }
-): void {
-  const clearedPtyIds = new Set([tab.ptyId, ...(state.ptyIdsByTabId[tab.id] ?? [])])
-  next.ptyIdsByTabId[tab.id] = []
-  for (const ptyId of clearedPtyIds) {
-    if (!ptyId) {
-      continue
-    }
-    delete next.pendingCodexPaneRestartIds[ptyId]
-    delete next.codexRestartNoticeByPtyId[ptyId]
-  }
-}
-
 export function clearDirectSshTerminalBindings(
   state: DirectSshTerminalBindingState,
   terminalWorkspaceKeys: ReadonlySet<string>,
@@ -47,8 +25,6 @@ export function clearDirectSshTerminalBindings(
 ): DirectSshTerminalBindingClearResult {
   let tabsByWorktree = state.tabsByWorktree
   const ptyIdsByTabId = { ...state.ptyIdsByTabId }
-  const pendingCodexPaneRestartIds = { ...state.pendingCodexPaneRestartIds }
-  const codexRestartNoticeByPtyId = { ...state.codexRestartNoticeByPtyId }
   const scopedTabIds = new Set<string>()
   let clearedCount = 0
 
@@ -72,11 +48,7 @@ export function clearDirectSshTerminalBindings(
         nextTabs = [...tabs]
       }
       nextTabs[index] = { ...tabWithoutActivationSpawn, ptyId: null }
-      clearPtyBinding(state, tab, {
-        ptyIdsByTabId,
-        pendingCodexPaneRestartIds,
-        codexRestartNoticeByPtyId
-      })
+      ptyIdsByTabId[tab.id] = []
       clearedCount += 1
     }
     if (nextTabs !== tabs) {
@@ -103,8 +75,6 @@ export function clearDirectSshTerminalBindings(
     patch: {
       tabsByWorktree,
       ptyIdsByTabId,
-      pendingCodexPaneRestartIds,
-      codexRestartNoticeByPtyId,
       directSshPaneRetryByTabId,
       directSshLivePtyBindingByTabId
     }

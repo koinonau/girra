@@ -4,7 +4,7 @@ import type {
   OpenCodeUsageSessionRow,
   OpenCodeUsageSummary
 } from '../../../../shared/opencode-usage-types'
-import { CodexUsageDailyChart } from './CodexUsageDailyChart'
+import { UsageDailyChart } from './UsageDailyChart'
 import { UsageBreakdownSection } from './UsageBreakdownSection'
 import { UsageRecentSessionsTable } from './UsageRecentSessionsTable'
 import { translate } from '@/i18n/i18n'
@@ -26,7 +26,7 @@ export function OpenCodeUsageDetails({
 }: OpenCodeUsageDetailsProps): React.JSX.Element {
   return (
     <>
-      <CodexUsageDailyChart daily={daily} />
+      <UsageDailyChart daily={daily} />
 
       <div className="grid gap-4 xl:grid-cols-2">
         <UsageBreakdownSection

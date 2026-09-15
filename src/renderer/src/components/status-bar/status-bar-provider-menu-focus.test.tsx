@@ -88,7 +88,7 @@ async function renderProviderDetailsMenu(): Promise<unknown> {
   const { ProviderDetailsMenu } = await import('./StatusBar')
   return ProviderDetailsMenu({
     provider: {
-      provider: 'codex',
+      provider: 'claude',
       status: 'ok',
       error: null,
       updatedAt: Date.now(),
@@ -107,7 +107,7 @@ async function renderProviderDetailsMenu(): Promise<unknown> {
     },
     compact: false,
     iconOnly: false,
-    ariaLabel: 'Open Codex usage details'
+    ariaLabel: 'Open Claude usage details'
   })
 }
 

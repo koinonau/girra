@@ -6,13 +6,10 @@ import type {
 } from '../../../shared/rate-limit-types'
 import {
   type ActiveRateLimitProvider,
-  type InactiveCodexAccountInfo,
   type InternalRateLimitState,
-  type CodexHomePathResolver,
   type ClaudeAuthPreparationResolver,
   type OpenCodeGoRateLimitConfig,
   type MiniMaxRateLimitConfig,
-  type NormalizedCodexAccountSelectionTarget,
   type NormalizedClaudeAccountSelectionTarget,
   type InactiveClaudeAccountInfo,
   type NetworkProxySettings,
@@ -22,7 +19,6 @@ import {
 export abstract class RateLimitServiceState {
   protected state: InternalRateLimitState = {
     claude: null,
-    codex: null,
     opencodeGo: null,
     minimax: null
   }
@@ -32,14 +28,12 @@ export abstract class RateLimitServiceState {
   // Why: throttle repeated focus/show/restore events so one outage doesn't create a tight provider retry loop.
   protected lastActiveFailureRetryAtByProvider: Record<ActiveRateLimitProvider, number> = {
     claude: 0,
-    codex: 0,
     'opencode-go': 0,
     minimax: 0
   }
   // Why: consecutive failures drive exponential backoff of the fast activation-retry lane; reset on any success/unavailable result.
   protected activeFailureStreakByProvider: Record<ActiveRateLimitProvider, number> = {
     claude: 0,
-    codex: 0,
     'opencode-go': 0,
     minimax: 0
   }
@@ -47,11 +41,9 @@ export abstract class RateLimitServiceState {
   protected detachWindowListeners: (() => void) | null = null
   protected isFetching = false
   protected fullFetchQueued = false
-  protected codexOnlyFetchQueued = false
   protected claudeOnlyFetchQueued = false
   protected activeFetchAbortControllers = new Set<AbortController>()
   protected fetchIdleResolvers: (() => void)[] = []
-  protected codexFetchGeneration = 0
   protected claudeFetchGeneration = 0
   // Why: statusline ingest must attribute live windows to the selected account without re-running the side-effectful auth sync per post.
   protected lastClaudeAuthSnapshot: { configDir: string | null; provenance: string } | null = null
@@ -59,11 +51,6 @@ export abstract class RateLimitServiceState {
   protected minimaxFetchGeneration = 0
   protected lastOpencodeConfigHash = ''
   protected lastMiniMaxConfigHash = ''
-  protected codexHomePathResolver: CodexHomePathResolver | null = null
-  protected codexFetchTarget: NormalizedCodexAccountSelectionTarget = {
-    runtime: 'host',
-    wslDistro: null
-  }
   protected claudeAuthPreparationResolver: ClaudeAuthPreparationResolver | null = null
   protected claudeFetchTarget: NormalizedClaudeAccountSelectionTarget = {
     runtime: 'host',
@@ -72,17 +59,11 @@ export abstract class RateLimitServiceState {
   protected openCodeGoConfigResolver: (() => OpenCodeGoRateLimitConfig) | null = null
   protected miniMaxConfigResolver: (() => MiniMaxRateLimitConfig) | null = null
   protected inactiveClaudeAccountsResolver: (() => InactiveClaudeAccountInfo[]) | null = null
-  protected inactiveCodexAccountsResolver: (() => InactiveCodexAccountInfo[]) | null = null
   protected networkProxySettingsResolver: (() => NetworkProxySettings) | null = null
   protected inactiveClaudeCache = new Map<string, ProviderRateLimits>()
-  protected inactiveCodexCache = new Map<string, ProviderRateLimits>()
   protected inactiveClaudeFetching = new Set<string>()
-  protected inactiveCodexFetching = new Set<string>()
-  protected inactiveCodexFetchInFlight = false
   protected lastInactiveClaudeFetchAt = 0
   protected inactiveClaudeAccountsGeneration = 0
-  protected lastInactiveCodexFetchAt = 0
-  protected inactiveCodexAccountsGeneration = 0
   protected stateListeners = new Set<(state: RateLimitState) => void>()
 
   constructor() {}

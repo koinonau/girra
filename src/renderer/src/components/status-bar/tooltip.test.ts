@@ -16,7 +16,6 @@ vi.mock('@/i18n/i18n', () => ({
 import {
   barColor,
   clampUsedPercent,
-  formatResetCreditExpiry,
   formatResetCountdown,
   getProviderUsageErrorMessage,
   getProviderUsageStatusLabel,
@@ -37,7 +36,7 @@ function provider(overrides: Partial<ProviderRateLimits> = {}): ProviderRateLimi
   }
 }
 
-const PROVIDER_IDS: ProviderRateLimits['provider'][] = ['claude', 'codex', 'opencode-go', 'minimax']
+const PROVIDER_IDS: ProviderRateLimits['provider'][] = ['claude', 'opencode-go', 'minimax']
 
 afterEach(() => {
   vi.useRealTimers()
@@ -54,22 +53,6 @@ describe('formatResetCountdown', () => {
   })
 })
 
-describe('formatResetCreditExpiry', () => {
-  it('shows singular and plural expiry countdowns', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-06-20T12:00:00Z'))
-
-    expect(formatResetCreditExpiry(Date.parse('2026-06-20T14:30:00Z'), 1)).toBe('Expires in 2h 30m')
-    expect(formatResetCreditExpiry(Date.parse('2026-06-25T12:00:00Z'), 2)).toBe(
-      'Next expires in 5d'
-    )
-  })
-
-  it('omits expiry copy when the backend has not reported an expiry', () => {
-    expect(formatResetCreditExpiry(null, 1)).toBeNull()
-  })
-})
-
 describe('provider usage error copy', () => {
   it('frames Claude auth-shaped usage failures as usage refresh failures', () => {
     const p = provider({ error: 'Invalid authentication credentials' })
@@ -81,8 +64,8 @@ describe('provider usage error copy', () => {
   })
 
   it('frames provider credential and session failures without showing raw auth details', () => {
-    const codex = provider({
-      provider: 'codex',
+    const opencodeGo = provider({
+      provider: 'opencode-go',
       error:
         'Your access token could not be refreshed because your refresh token was already used. Please log out and sign in again.'
     })
@@ -91,9 +74,9 @@ describe('provider usage error copy', () => {
       error: 'MiniMax credentials not found'
     })
 
-    expect(getProviderUsageStatusLabel(codex)).toBe('Refresh failed')
-    expect(getProviderUsageErrorMessage(codex)).toBe(
-      'Codex usage could not be refreshed. Agent sessions may still be signed in.'
+    expect(getProviderUsageStatusLabel(opencodeGo)).toBe('Refresh failed')
+    expect(getProviderUsageErrorMessage(opencodeGo)).toBe(
+      'OpenCode Go usage could not be refreshed. Agent sessions may still be signed in.'
     )
     expect(getProviderUsageErrorMessage(minimax)).toBe(
       'MiniMax usage could not be refreshed. Agent sessions may still be signed in.'
@@ -101,24 +84,24 @@ describe('provider usage error copy', () => {
   })
 
   it('frames credential-file and login failures as auth-shaped usage failures', () => {
-    const codex = provider({
-      provider: 'codex',
-      error: 'Codex credentials-file is invalid'
+    const minimax = provider({
+      provider: 'minimax',
+      error: 'MiniMax credentials-file is invalid'
     })
     const opencodeGo = provider({
       provider: 'opencode-go',
       error: 'Please log in before refreshing usage.'
     })
 
-    expect(getProviderUsageErrorMessage(codex)).toBe(
-      'Codex usage could not be refreshed. Agent sessions may still be signed in.'
+    expect(getProviderUsageErrorMessage(minimax)).toBe(
+      'MiniMax usage could not be refreshed. Agent sessions may still be signed in.'
     )
     expect(getProviderUsageErrorMessage(opencodeGo)).toBe(
       'OpenCode Go usage could not be refreshed. Agent sessions may still be signed in.'
     )
   })
 
-  it('frames known Codex auth refresh failures as auth-shaped usage failures', () => {
+  it('frames known auth refresh failures as auth-shaped usage failures', () => {
     const cases = [
       'Please reauthenticate before checking usage.',
       'Not logged in.',
@@ -129,8 +112,8 @@ describe('provider usage error copy', () => {
     ]
 
     for (const error of cases) {
-      expect(getProviderUsageErrorMessage(provider({ provider: 'codex', error }))).toBe(
-        'Codex usage could not be refreshed. Agent sessions may still be signed in.'
+      expect(getProviderUsageErrorMessage(provider({ provider: 'opencode-go', error }))).toBe(
+        'OpenCode Go usage could not be refreshed. Agent sessions may still be signed in.'
       )
     }
   })
@@ -153,17 +136,17 @@ describe('provider usage error copy', () => {
     )
   })
 
-  it('classifies the Codex chatgpt-auth-required rate-limits read error as auth, not Limited', () => {
+  it('classifies an auth-required rate-limits read error as auth, not Limited', () => {
     // Why: the message mentions "rate limits" only as the object it failed to
     // read; labeling it "Limited" would wrongly imply the user hit a limit.
     const p = provider({
-      provider: 'codex',
-      error: 'chatgpt authentication required to read rate limits'
+      provider: 'opencode-go',
+      error: 'authentication required to read rate limits'
     })
 
     expect(getProviderUsageStatusLabel(p)).toBe('Refresh failed')
     expect(getProviderUsageErrorMessage(p)).toBe(
-      'Codex usage could not be refreshed. Agent sessions may still be signed in.'
+      'OpenCode Go usage could not be refreshed. Agent sessions may still be signed in.'
     )
   })
 

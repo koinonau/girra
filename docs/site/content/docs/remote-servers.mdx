@@ -29,11 +29,10 @@ Server computer · Orca server
 
 Install and authenticate Codex, Claude Code, OpenCode, `git`, and any provider CLIs on the **server computer**. A login on your laptop does not automatically carry over to the server.
 
-On a headless `orca serve` host, register managed Claude/Codex accounts from the server shell (the remote client disables **Add account**):
+On a headless `orca serve` host, register managed Claude accounts from the server shell (the remote client disables **Add account**):
 
 ```bash
 orca account add --agent claude
-orca account add --agent codex
 orca account list
 ```
 

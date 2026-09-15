@@ -41,21 +41,6 @@ function makeState(): DirectSshTerminalBindingState {
       'folder-live': 'ssh-target@@pty-2',
       'other-live': 'ssh-other@@pty-3'
     },
-    pendingCodexPaneRestartIds: {
-      'ssh-target@@pty-1': true,
-      'ssh-target@@pty-split': true,
-      'ssh-other@@pty-3': true
-    },
-    codexRestartNoticeByPtyId: {
-      'ssh-target@@pty-1': {
-        previousAccountLabel: 'old',
-        nextAccountLabel: 'new'
-      },
-      'ssh-other@@pty-3': {
-        previousAccountLabel: 'old',
-        nextAccountLabel: 'new'
-      }
-    },
     directSshPaneRetryByTabId: {},
     directSshLivePtyBindingByTabId: {},
     directSshPaneRetryHistoryByTabId: {}
@@ -98,15 +83,7 @@ describe('clearDirectSshTerminalBindings', () => {
     expect(result.patch?.tabsByWorktree?.['repo::/other-host']).toBe(
       state.tabsByWorktree['repo::/other-host']
     )
-    expect(result.patch?.pendingCodexPaneRestartIds).toEqual({
-      'ssh-other@@pty-3': true
-    })
-    expect(result.patch?.codexRestartNoticeByPtyId).toEqual({
-      'ssh-other@@pty-3': {
-        previousAccountLabel: 'old',
-        nextAccountLabel: 'new'
-      }
-    })
+    expect(result.patch?.ptyIdsByTabId?.['other-live']).toEqual(['ssh-other@@pty-3'])
   })
 
   it('re-arms reconnectable disconnects without erasing retry history', () => {

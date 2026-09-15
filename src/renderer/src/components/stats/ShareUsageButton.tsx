@@ -75,8 +75,8 @@ export function ShareUsageButton(props: ShareUsageButtonProps): React.JSX.Elemen
   }, [captureToClipboard, clearCopiedResetTimer])
 
   const handleShareToX = useCallback(async () => {
-    const { provider, summary, range } = props
-    const providerName = provider === 'claude' ? 'Claude' : 'Codex'
+    const { summary, range } = props
+    const providerName = 'Claude'
     const rangeLabel =
       range === '7d'
         ? 'last 7 days'
@@ -86,10 +86,7 @@ export function ShareUsageButton(props: ShareUsageButtonProps): React.JSX.Elemen
             ? 'last 90 days'
             : 'all-time'
 
-    const totalTokens =
-      provider === 'claude'
-        ? summary.inputTokens + summary.outputTokens
-        : (summary as unknown as { totalTokens: number }).totalTokens
+    const totalTokens = summary.inputTokens + summary.outputTokens
 
     const cost = summary.estimatedCostUsd
     const costStr =

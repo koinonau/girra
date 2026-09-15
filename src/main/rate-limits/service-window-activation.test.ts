@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { RateLimitService } from './service'
 import { fetchClaudeRateLimits } from './claude-fetcher'
-import { fetchCodexRateLimits } from './codex-fetcher'
 import { fetchMiniMaxRateLimits } from './minimax/minimax-fetcher'
 import { fetchOpenCodeGoRateLimits } from './opencode-go-usage-fetcher'
 import {
@@ -19,11 +18,6 @@ import {
 vi.mock('./claude-fetcher', () => ({
   fetchClaudeRateLimits: vi.fn(),
   fetchManagedAccountUsage: vi.fn()
-}))
-
-vi.mock('./codex-fetcher', () => ({
-  consumeCodexRateLimitResetCredit: vi.fn(),
-  fetchCodexRateLimits: vi.fn()
 }))
 
 vi.mock('./opencode-go-usage-fetcher', () => ({
@@ -78,7 +72,6 @@ describe('RateLimitService', () => {
     const intervalSpy = vi.spyOn(globalThis, 'setInterval')
     try {
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 12))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
       const service = new RateLimitService()
 
       service.setPollingInterval(Number.NaN)
@@ -100,7 +93,6 @@ describe('RateLimitService', () => {
 
   it('fetches usage on the first active window event after deferred startup', async () => {
     vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 12))
-    vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
     const service = new RateLimitService()
     const window = new FakeRateLimitWindow()
 
@@ -109,14 +101,14 @@ describe('RateLimitService', () => {
     await Promise.resolve()
 
     expect(fetchClaudeRateLimits).not.toHaveBeenCalled()
-    expect(fetchCodexRateLimits).not.toHaveBeenCalled()
+    expect(fetchOpenCodeGoRateLimits).not.toHaveBeenCalled()
 
     window.emit('focus')
     await Promise.resolve()
     await Promise.resolve()
 
     expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
-    expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
+    expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
 
     service.stop()
   })
@@ -125,7 +117,6 @@ describe('RateLimitService', () => {
     vi.useFakeTimers()
     try {
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 12))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()
 
@@ -133,12 +124,12 @@ describe('RateLimitService', () => {
       service.start({ fetchImmediately: false })
 
       expect(fetchClaudeRateLimits).not.toHaveBeenCalled()
-      expect(fetchCodexRateLimits).not.toHaveBeenCalled()
+      expect(fetchOpenCodeGoRateLimits).not.toHaveBeenCalled()
 
       await vi.advanceTimersByTimeAsync(1000)
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
+      expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
 
       service.stop()
     } finally {
@@ -152,7 +143,6 @@ describe('RateLimitService', () => {
       vi.mocked(fetchClaudeRateLimits)
         .mockResolvedValueOnce(errorProvider('claude', 'auth restarting'))
         .mockResolvedValueOnce(okProvider('claude', 12))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
 
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()
@@ -161,13 +151,12 @@ describe('RateLimitService', () => {
 
       await vi.advanceTimersByTimeAsync(1000)
       expect(service.getState().claude?.status).toBe('error')
-      expect(service.getState().codex?.status).toBe('ok')
+      expect(service.getState().opencodeGo?.status).toBe('ok')
 
       window.emit('focus')
       await vi.advanceTimersByTimeAsync(0)
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
-      expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchMiniMaxRateLimits).toHaveBeenCalledTimes(1)
       expect(service.getState().claude?.status).toBe('ok')
@@ -182,7 +171,6 @@ describe('RateLimitService', () => {
     vi.useFakeTimers()
     try {
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(errorProvider('claude', 'still failing'))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
 
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()
@@ -359,7 +347,7 @@ describe('RateLimitService', () => {
 
       // The 15- and 30-minute poll cycles land inside the 40-minute window: other providers refresh, Claude is skipped.
       await vi.advanceTimersByTimeAsync(15 * 60 * 1000)
-      expect(vi.mocked(fetchCodexRateLimits).mock.calls.length).toBeGreaterThan(1)
+      expect(vi.mocked(fetchOpenCodeGoRateLimits).mock.calls.length).toBeGreaterThan(1)
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
 
       await vi.advanceTimersByTimeAsync(15 * 60 * 1000)
@@ -437,7 +425,6 @@ describe('RateLimitService', () => {
       vi.mocked(fetchClaudeRateLimits)
         .mockResolvedValueOnce(errorProvider('claude', 'still failing'))
         .mockImplementationOnce(() => secondClaude.promise)
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
 
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()
@@ -480,7 +467,6 @@ describe('RateLimitService', () => {
       // (which hits Claude's tight-budget endpoint). A durable OpenCode Go error must
       // not drive that full fetch every 30s — it stays on the 5-minute cadence.
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 12))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
       vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(
         errorProvider('opencode-go', 'session expired')
       )
@@ -524,7 +510,6 @@ describe('RateLimitService', () => {
     vi.useFakeTimers()
     try {
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(unavailableProvider('claude'))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(unavailableProvider('codex'))
       vi.mocked(fetchOpenCodeGoRateLimits).mockResolvedValue(unavailableProvider('opencode-go'))
       vi.mocked(fetchMiniMaxRateLimits).mockResolvedValue(unavailableProvider('minimax'))
 
@@ -540,7 +525,6 @@ describe('RateLimitService', () => {
       await vi.advanceTimersByTimeAsync(0)
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(1)
-      expect(fetchCodexRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(1)
       expect(fetchMiniMaxRateLimits).toHaveBeenCalledTimes(1)
 
@@ -549,7 +533,6 @@ describe('RateLimitService', () => {
       await vi.advanceTimersByTimeAsync(0)
 
       expect(fetchClaudeRateLimits).toHaveBeenCalledTimes(2)
-      expect(fetchCodexRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchOpenCodeGoRateLimits).toHaveBeenCalledTimes(2)
       expect(fetchMiniMaxRateLimits).toHaveBeenCalledTimes(2)
 
@@ -563,7 +546,6 @@ describe('RateLimitService', () => {
     vi.useFakeTimers()
     try {
       vi.mocked(fetchClaudeRateLimits).mockResolvedValue(okProvider('claude', 12))
-      vi.mocked(fetchCodexRateLimits).mockResolvedValue(okProvider('codex', 24))
 
       const service = new RateLimitService()
       const window = new FakeRateLimitWindow()

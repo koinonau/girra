@@ -1,9 +1,6 @@
 import type { ProviderRateLimits, RateLimitWindow } from '../../../../shared/rate-limit-types'
-import {
-  formatResetCountdown,
-  formatResetDuration
-} from '../../../../shared/rate-limit-reset-format'
-import { ClaudeIcon, MiniMaxIcon, OpenAIIcon, OpenCodeGoIcon } from './icons'
+import { formatResetCountdown } from '../../../../shared/rate-limit-reset-format'
+import { ClaudeIcon, MiniMaxIcon, OpenCodeGoIcon } from './icons'
 import { translate } from '@/i18n/i18n'
 import {
   getProviderDisplayName,
@@ -48,36 +45,11 @@ export function formatTimeAgo(ts: number): string {
 // implementation is shared with mobile in src/shared/rate-limit-reset-format.
 export { formatResetCountdown }
 
-export function formatResetCreditExpiry(
-  expiresAt: number | null | undefined,
-  count: number
-): string | null {
-  if (!expiresAt) {
-    return null
-  }
-  const duration = formatResetDuration(expiresAt - Date.now())
-  if (duration === 'now') {
-    return count > 1
-      ? translate('auto.components.status.bar.tooltip.7ec6e030a0', 'Next expires now')
-      : translate('auto.components.status.bar.tooltip.d1e442a9e5', 'Expires now')
-  }
-  return count > 1
-    ? translate('auto.components.status.bar.tooltip.6cf9eaed10', 'Next expires in {{value0}}', {
-        value0: duration
-      })
-    : translate('auto.components.status.bar.tooltip.20ad66aed1', 'Expires in {{value0}}', {
-        value0: duration
-      })
-}
-
 // ---------------------------------------------------------------------------
 // Shared icon component
 // ---------------------------------------------------------------------------
 
 export function ProviderIcon({ provider }: { provider: string }): React.JSX.Element {
-  if (provider === 'codex') {
-    return <OpenAIIcon size={13} />
-  }
   if (provider === 'opencode-go') {
     return <OpenCodeGoIcon size={13} />
   }
@@ -221,13 +193,11 @@ export function ProviderPanel({
   p,
   inverted = false,
   className,
-  showResetCredits = true,
   usagePercentageDisplay = 'used'
 }: {
   p: ProviderRateLimits | null
   inverted?: boolean
   className?: string
-  showResetCredits?: boolean
   usagePercentageDisplay?: UsagePercentageDisplay
 }): React.JSX.Element {
   const windowSections = p ? getWindowSections(p) : []
@@ -281,14 +251,6 @@ export function ProviderPanel({
   }
 
   const updatedAgo = p.updatedAt ? `Updated ${formatTimeAgo(p.updatedAt)}` : 'Not yet updated'
-  const resetCreditCount =
-    showResetCredits && p.provider === 'codex'
-      ? (p.rateLimitResetCredits?.availableCount ?? null)
-      : null
-  const resetCreditExpiry =
-    resetCreditCount != null
-      ? formatResetCreditExpiry(p.rateLimitResetCredits?.nextExpiresAt, resetCreditCount)
-      : null
 
   return (
     <div className={`${className ?? 'w-full'} space-y-3 text-xs`}>
@@ -298,21 +260,6 @@ export function ProviderPanel({
           {name}
         </div>
         <div className={faintClass}>{updatedAgo}</div>
-        {resetCreditCount !== null && resetCreditCount !== undefined ? (
-          <div className={mutedClass}>
-            {resetCreditCount === 1
-              ? translate(
-                  'auto.components.status.bar.tooltip.45198c7d95',
-                  '1 rate-limit reset available'
-                )
-              : translate(
-                  'auto.components.status.bar.tooltip.bce421cba3',
-                  '{{value0}} rate-limit resets available',
-                  { value0: resetCreditCount }
-                )}
-          </div>
-        ) : null}
-        {resetCreditExpiry ? <div className={faintClass}>{resetCreditExpiry}</div> : null}
       </div>
 
       <div className={`border-t ${dividerClass}`} />

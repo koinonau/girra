@@ -16,12 +16,9 @@ import { pluginConsentRequestSchema } from '../plugins/plugin-consent-request'
 import {
   AccountsUnsubscribeParams,
   AddClaudeFromConfigDirParams,
-  AddCodexFromHomeParams,
-  ConsumeCodexResetCreditParams,
   ListAccountsParams,
   RemoveAccountParams,
-  SelectAccountParams,
-  SelectCodexAccountForTargetParams
+  SelectAccountParams
 } from './accounts-params'
 import { PrepareCodexForWslPaneParams } from './agent-hooks-params'
 import { CreateAgentSessionParams, EnsureAgentSessionParams } from './agent-session-params'
@@ -524,14 +521,9 @@ import {
 // schema client-side runs the coercing transforms and rewrites the wire bytes.
 export const RPC_PARAMS_BY_METHOD = {
   'accounts.addClaudeFromConfigDir': AddClaudeFromConfigDirParams,
-  'accounts.addCodexFromHome': AddCodexFromHomeParams,
-  'accounts.consumeCodexResetCredit': ConsumeCodexResetCreditParams,
   'accounts.list': ListAccountsParams,
   'accounts.removeClaude': RemoveAccountParams,
-  'accounts.removeCodex': RemoveAccountParams,
   'accounts.selectClaude': SelectAccountParams,
-  'accounts.selectCodex': SelectAccountParams,
-  'accounts.selectCodexForTarget': SelectCodexAccountForTargetParams,
   'accounts.subscribe': null,
   'accounts.unsubscribe': AccountsUnsubscribeParams,
   'agentHooks.prepareCodexForWslPane': PrepareCodexForWslPaneParams,

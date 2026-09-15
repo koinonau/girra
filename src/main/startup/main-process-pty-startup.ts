@@ -1,20 +1,6 @@
 import { app } from 'electron'
 import { getPtyIdForPaneKey } from '../ipc/pty'
-import {
-  getDaemonProvider,
-  initDaemonPtyProvider,
-  listLiveDaemonPtyIds
-} from '../daemon/daemon-init'
-import {
-  getCodexPaneAccount,
-  hasAnyRecordedLegacyWslCodexPane,
-  hasRecordedManagedHostCodexPane,
-  isCodexPaneHomeRouteProvenAwayFromSharedHome,
-  reconcileCodexPaneAccountsWithLivePtys,
-  type CodexPaneHomeRoute
-} from '../codex/codex-pane-account-registry'
-import { reconcileRetainedCodexHookHomes } from '../codex/retained-codex-hook-state'
-import { codexHookService } from '../codex/hook-service'
+import { getDaemonProvider, initDaemonPtyProvider } from '../daemon/daemon-init'
 import { isAgentStatusHooksEnabled } from '../agent-hooks/managed-agent-hook-controls'
 import { agentHookServer } from '../agent-hooks/server'
 import {
@@ -36,46 +22,6 @@ export function emitPluginWorktreeLifecycle(event: RuntimeWorktreeLifecycleEvent
       ? { worktreeId: event.worktreeId, path: event.path, branch: event.branch }
       : { worktreeId: event.worktreeId, path: event.path }
   )
-}
-
-export function handleCodexHomePtySpawned(args: {
-  id: string
-  codexHomePath: string | null
-  reattached?: boolean
-  reattachedHomeRoute?: CodexPaneHomeRoute | null
-  launchEnv?: NodeJS.ProcessEnv
-  startedAt?: Date
-  startedSequence?: number
-}): void {
-  // Why: only shared or ambiguous retained shells can create rollout logs that still need publication.
-  if (args.reattached && args.startedSequence !== undefined) {
-    const paneAccount = getCodexPaneAccount(args.id)
-    const homeRoute =
-      args.reattachedHomeRoute !== undefined
-        ? (args.reattachedHomeRoute ?? undefined)
-        : paneAccount?.homeRoute
-    if (state.codexSessionMigration && isCodexPaneHomeRouteProvenAwayFromSharedHome(homeRoute)) {
-      state.codexSessionMigration.ignoreLaunch(args.id, args.startedSequence)
-      return
-    }
-  }
-  const fullScanRequired =
-    state.codexRuntimeHome?.beginHostSystemDefaultSessionMigrationLaunch(args.codexHomePath, {
-      reattached: args.reattached,
-      launchEnv: args.launchEnv
-    }) ?? null
-  if (fullScanRequired !== null) {
-    state.codexSessionMigration?.beginLaunch(
-      args.id,
-      args.reattached === true || fullScanRequired,
-      args.startedAt,
-      args.startedSequence
-    )
-  }
-}
-
-export function handlePtyExit(id: string, exitSequence: number): void {
-  state.codexSessionMigration?.finishLaunch(id, exitSequence)
 }
 
 /** A PTY that dies while Orca is down never runs the teardown that clears pane
@@ -128,34 +74,6 @@ export function startTerminalRuntimeStartupServices(): WindowsDesktopStartupServ
       await initDaemonPtyProvider(signal, {
         macosLoginSessionWatch: process.platform === 'darwin' && !state.isServeMode
       })
-      // Why: a retained shell keeps its launch-time Codex home even when the current routing lane changes.
-      const hasRetainedManagedHostPane = hasRecordedManagedHostCodexPane()
-      if (
-        state.codexRuntimeHome &&
-        (hasRetainedManagedHostPane || hasAnyRecordedLegacyWslCodexPane())
-      ) {
-        const livePtyIds = await listLiveDaemonPtyIds()
-        if (livePtyIds) {
-          reconcileCodexPaneAccountsWithLivePtys(livePtyIds)
-          const settings = state.store?.getSettings()
-          // Why (#16441): each retained home can run a codex app-server grant
-          // session. Awaiting them here delayed the first window by N sessions;
-          // a retained shell cannot invoke Codex before this provider serves.
-          if (hasRetainedManagedHostPane) {
-            void reconcileRetainedCodexHookHomes({
-              hookService: codexHookService,
-              hooksEnabled:
-                isAgentStatusHooksEnabled(settings) &&
-                settings?.disabledTuiAgents.includes('codex') !== true,
-              runtimeHomePaths: state.codexRuntimeHome.getRetainedHostCodexHookHomePaths(livePtyIds)
-            }).catch((error) =>
-              console.warn('[codex-hook-service] retained Codex home reconcile failed:', error)
-            )
-          }
-        }
-      }
-      // Why: retained shells can invoke Codex immediately after the startup gate.
-      state.codexRuntimeHome?.reconcileLegacySharedHomeForRetainedPanes()
       logStartupMilestone('startup-service-done', { service: 'daemon-pty-provider' })
     },
     // Why: PTY spawn env reads ORCA_AGENT_HOOK_* from live server state, so the renderer awaits this before restored terminals reconnect.

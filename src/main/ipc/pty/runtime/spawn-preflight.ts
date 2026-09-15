@@ -6,9 +6,9 @@ import { isTerminalLeafId } from '../../../../shared/stable-pane-id'
 import { getAppPtyId, getProvider, getRelayPtyId } from '../provider/registry'
 import { buildPtyHostEnv } from '../host-env/assembly'
 import {
+  CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE,
   getCompatibleSelectedCodexHomePath,
   getCodexSelectionTargetForPty,
-  resolveCodexHomeAfterManagedAuthReadiness,
   shouldSkipCodexHomeEnvForWindowsShell,
   shouldStripInheritedOrcaCodexHome,
   isCodexStatusHooksEnabled,
@@ -195,32 +195,12 @@ export async function prepareRuntimePtySpawn(
   if (
     !ctx.preAdoptedStablePane &&
     args.launchAgent === 'codex' &&
-    ctx.callerRequestedSessionId === undefined
+    ctx.callerRequestedSessionId === undefined &&
+    codexResumeHome &&
+    !codexHomePathsEqual(ctx.selectedCodexHomePath, codexResumeHome.codexHomePath)
   ) {
-    const resolution = resolveCodexHomeAfterManagedAuthReadiness({
-      selectedCodexHomePath: ctx.selectedCodexHomePath,
-      getSettings: () => ctx.deps.getSettings?.(),
-      requiredCodexHomePath: codexResumeHome?.codexHomePath,
-      target: ctx.codexSelectionTarget,
-      resolveCurrent: async () =>
-        getCompatibleSelectedCodexHomePath(
-          ctx.codexSelectionTarget,
-          (await ctx.deps.getSelectedCodexHomePath?.(ctx.codexSelectionTarget, ctx.env, {
-            workspacePath: ctx.cwd,
-            launchAgent: 'codex'
-          })) ?? null
-        ),
-      resolveAfterUnavailable: async (unavailableManagedHomePath) =>
-        getCompatibleSelectedCodexHomePath(
-          ctx.codexSelectionTarget,
-          (await ctx.deps.getSelectedCodexHomePath?.(ctx.codexSelectionTarget, ctx.env, {
-            workspacePath: ctx.cwd,
-            launchAgent: 'codex',
-            unavailableManagedHomePath
-          })) ?? null
-        )
-    })
-    ctx.selectedCodexHomePath = resolution instanceof Promise ? await resolution : resolution
+    // Why: a resume must never run under a home other than the one that owns its rollout.
+    throw new Error(CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE)
   }
   if (args.launchAgent === 'codex' && ctx.selectedCodexHomePath) {
     await ensureCodexStateDbBackfillRecoveryStarted(ctx.selectedCodexHomePath)

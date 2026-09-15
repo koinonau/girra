@@ -1,7 +1,7 @@
 import { mkdtempSync, rmSync, statSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { copyFileWithWindowsRetry } from '../codex-accounts/fs-utils'
+import { copyFileWithWindowsRetry } from '../fs-utils'
 
 const SNAPSHOT_ATTEMPTS = 5
 

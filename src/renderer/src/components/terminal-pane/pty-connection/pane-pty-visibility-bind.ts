@@ -1,8 +1,5 @@
 import { scheduleRuntimeGraphSync } from '@/runtime/sync-runtime-graph'
 import { useAppStore } from '@/store'
-// Why: a restored pane's stale-account prompt can only be raised once a PTY is
-// actually attached — nothing is inspectable while the session hydrates.
-import { notifyCodexPaneBoundForStaleSweep } from '@/lib/codex-stale-pane-sweep'
 import { createTerminalGitHubPRLinkDetector } from '../../../../../shared/terminal-github-pr-link-detector'
 import { setRendererPtyVisibilityClaim } from '../pty-renderer-delivery-claims'
 import { AGENT_TASK_COMPLETE_NOTIFICATION_GRACE_MS } from '../agent-task-complete-policy'
@@ -89,7 +86,6 @@ export function installPanePtyVisibilityBind(session: ConnectPanePtySession): vo
     session.syncHiddenRendererPtyDelivery()
     // A live bind proves this pane is current again after detach/reattach.
     useAppStore.getState().restoreAgentPaneAuthority?.(session.cacheKey)
-    notifyCodexPaneBoundForStaleSweep(ptyId)
     const tabPtyIds = useAppStore.getState().ptyIdsByTabId?.[session.deps.tabId] ?? []
     const directSshRetryAttemptId =
       session.capturedDirectSshRetryPtyAccepted && session.directSshRetryAttempt

@@ -3,7 +3,6 @@ import {
   lastInputAtByPty,
   SYNTHETIC_KILL_EXIT_DUPLICATE_WINDOW_MS
 } from './visibility-state'
-import { allocatePtyLifecycleSequence } from '../host-env/types'
 import { makePtyDataPayload, sendPtyDataToRenderer } from './payload'
 import { getRendererInFlightCharsForPty } from './accounting'
 import { clearFlushTimerIfIdle } from './flush'
@@ -157,7 +156,6 @@ export function sendPtyExitToRenderer(
   session: PtyIpcSession,
   payload: { id: string; code: number; incarnationId?: string }
 ): void {
-  session.options?.onPtyExit?.(payload.id, allocatePtyLifecycleSequence())
   const release = preparePtyExitForRenderer(session, payload)
   if (!release) {
     return

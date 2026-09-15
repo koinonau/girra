@@ -1,14 +1,9 @@
 import type { ClaudeUsageBreakdownKind, ClaudeUsageSnapshot } from '../../shared/claude-usage-types'
-import type { CodexUsageBreakdownKind, CodexUsageSnapshot } from '../../shared/codex-usage-types'
 import type {
   OpenCodeUsageBreakdownKind,
   OpenCodeUsageSnapshot
 } from '../../shared/opencode-usage-types'
-import type {
-  CodexRateLimitResetResult,
-  RateLimitRuntimeTarget,
-  RateLimitState
-} from '../../shared/rate-limit-types'
+import type { RateLimitRuntimeTarget, RateLimitState } from '../../shared/rate-limit-types'
 
 export type UsageProviderSnapshot = {
   scanState: unknown
@@ -40,19 +35,14 @@ export type UsageProviderApi<Snapshot extends UsageProviderSnapshot, BreakdownKi
 
 export type ClaudeUsageApi = UsageProviderApi<ClaudeUsageSnapshot, ClaudeUsageBreakdownKind>
 
-export type CodexUsageApi = UsageProviderApi<CodexUsageSnapshot, CodexUsageBreakdownKind>
-
 export type OpenCodeUsageApi = UsageProviderApi<OpenCodeUsageSnapshot, OpenCodeUsageBreakdownKind>
 
 export type RateLimitsApi = {
   get: () => Promise<RateLimitState>
   refresh: () => Promise<RateLimitState>
-  refreshCodexForTarget: (target: RateLimitRuntimeTarget) => Promise<RateLimitState>
-  consumeCodexResetCredit: () => Promise<CodexRateLimitResetResult>
   refreshClaudeForTarget: (target: RateLimitRuntimeTarget) => Promise<RateLimitState>
   setPollingInterval: (ms: number) => Promise<void>
   fetchInactiveClaudeAccounts: () => Promise<void>
-  fetchInactiveCodexAccounts: () => Promise<void>
   refreshMiniMax: () => Promise<RateLimitState>
   onUpdate: (callback: (state: RateLimitState) => void) => () => void
 }

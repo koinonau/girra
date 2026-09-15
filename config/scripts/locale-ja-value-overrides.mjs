@@ -394,8 +394,6 @@ const JA_AUDIT_OVERRIDES = {
     'テキストレシピで「カスタムコマンド」を使用したときに Orca が実行するコマンドライン。',
   'Let programs in the terminal copy to the system clipboard through OSC 52, including over SSH.':
     'ターミナル内のプログラムが、OSC 52 を使ってシステムのクリップボードにコピーできるようにします（SSH 経由を含む）。',
-  'Choose which optional saved Codex account powers live quota reads.':
-    'ライブクォータの取得に使用する、保存済みの Codex アカウント（任意）を選択します。',
   'This plugin has no worker process. Its instructional content can still cause actions when you or an agent use it. Review the instructions and commands below before enabling it.':
     'このプラグインにはワーカープロセスがありません。それでも、ユーザーや Agent が使用したときに、記載された手順が操作を引き起こす可能性があります。有効にする前に、以下の手順とコマンドを確認してください。',
   'This removes the saved SSH host and its credentials from this computer. Remote files are not deleted.':
@@ -478,8 +476,8 @@ const JA_AUDIT_OVERRIDES = {
     '実験的機能の Orca プラグインをインストール・管理します。',
   "Resident memory held by Orca plus the processes under each worktree's terminals.":
     'Orca が保持する常駐メモリと、各ワークツリーのターミナル配下で実行中のプロセス。',
-  'No local Claude, Codex, or OpenCode usage found yet. The overview will populate after the next agent session writes token logs.':
-    'ローカルの Claude、Codex、OpenCode の使用状況はまだ見つかりません。次の Agent セッションがトークンログを書き込むと、概要に反映されます。',
+  'No local Claude or OpenCode usage found yet. The overview will populate after the next agent session writes token logs.':
+    'ローカルの Claude、OpenCode の使用状況はまだ見つかりません。次の Agent セッションがトークンログを書き込むと、概要に反映されます。',
   'Choose or add a project before creating a workspace.':
     'ワークスペースを作成する前に、プロジェクトを選択または追加してください。',
   'Choose a project to get started.': '開始するには、プロジェクトを選択してください。',
@@ -491,8 +489,6 @@ const JA_AUDIT_OVERRIDES = {
     'プロジェクトが WSL を継承できるようにするには、先に WSL ディストリビューションを選択してください。',
   'Choose a different base branch before creating a {{value0}}.':
     '{{value0}} を作成する前に、別のベースブランチを選択してください。',
-  'Optional. Orca can use your normal Codex login; add accounts only if you want quick switching in Orca.':
-    '任意。Orca は通常の Codex ログインを使用できます。Orca 上ですばやく切り替えたい場合にのみ、アカウントを追加してください。',
   'Optional. Orca can use your normal Claude login; add accounts only if you want quick switching without moving chat sessions.':
     '任意。Orca は通常の Claude ログインを使用できます。チャットセッションを移さずにすばやく切り替えたい場合にのみ、アカウントを追加してください。',
   'Optional. Orca works with your existing provider logins; add accounts only if you want Orca to help switch between them.':

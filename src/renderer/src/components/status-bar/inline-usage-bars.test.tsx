@@ -99,10 +99,10 @@ describe('InlineUsageBars', () => {
     expect(markup).toContain('32% used now')
   })
 
-  it('keeps the footer meter for weekly-only Codex usage', async () => {
+  it('keeps the footer meter for weekly-only usage', async () => {
     const { ProviderSegment } = await import('./StatusBar')
     const limits: ProviderRateLimits = {
-      provider: 'codex',
+      provider: 'opencode-go',
       session: null,
       weekly: {
         usedPercent: 37,

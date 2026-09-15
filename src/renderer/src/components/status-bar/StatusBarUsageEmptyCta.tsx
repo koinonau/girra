@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAppStore } from '../../store'
-import { ClaudeIcon, MiniMaxIcon, OpenAIIcon, OpenCodeGoIcon } from './icons'
+import { ClaudeIcon, MiniMaxIcon, OpenCodeGoIcon } from './icons'
 import { translate } from '@/i18n/i18n'
 
 // Why: a brand-new user has no configured provider, so the bottom-left would
@@ -18,7 +18,7 @@ export function StatusBarUsageEmptyCta(): React.JSX.Element {
   const dismissUsageEmptyState = useAppStore((s) => s.dismissUsageEmptyState)
 
   // Why: the accounts pane lists every provider, so we don't preselect a
-  // section ID — a brand-new user has no "Claude" or "Codex" yet.
+  // section ID, since a brand-new user has no "Claude" yet.
   const handleOpenSettings = useCallback(() => {
     recordFeatureInteraction('usage-tracking')
     openSettingsTarget({ pane: 'accounts', repoId: null })
@@ -99,7 +99,6 @@ export function StatusBarUsageEmptyCta(): React.JSX.Element {
               )}
             </span>
             <ClaudeIcon size={13} />
-            <OpenAIIcon size={13} />
             <OpenCodeGoIcon size={13} />
             <MiniMaxIcon size={13} />
           </div>

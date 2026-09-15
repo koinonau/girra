@@ -60,9 +60,9 @@ describe('getUsageRosterRowState', () => {
     expect(
       getUsageRosterRowState(
         provider({
-          provider: 'codex',
+          provider: 'opencode-go',
           status: 'error',
-          error: 'ChatGPT authentication required to read rate limits'
+          error: 'Authentication required to read rate limits'
         }),
         false
       )

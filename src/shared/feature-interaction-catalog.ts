@@ -121,6 +121,7 @@ export const FEATURE_INTERACTIONS = [
     interaction: 'Computer Use setup or permission flow opened'
   },
   { id: 'computer-use', interaction: 'computer-use runtime method used' },
+  // Why: the Codex account feature is gone; the id stays so ui.set accepts older stored interactions.
   {
     id: 'codex-account-switching',
     interaction: 'Codex managed account added, selected, reauthenticated, or removed'

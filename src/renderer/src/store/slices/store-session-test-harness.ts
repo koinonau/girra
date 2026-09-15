@@ -1,7 +1,7 @@
 import { vi, type Mock } from 'vitest'
 import type { BrowserTab } from '../../../../shared/browser-workspace-types'
 
-/** Shape shared by the Claude/Codex/OpenCode usage-scanner namespaces. */
+/** Shape shared by the Claude/OpenCode usage-scanner namespaces. */
 type UsageScannerMocks = {
   getScanState: Mock
   setEnabled: Mock
@@ -20,7 +20,6 @@ export type StoreSessionMockApi = {
   settings: { get: Mock; set: Mock }
   cache: { getGitHub: Mock; setGitHub: Mock }
   claudeUsage: UsageScannerMocks
-  codexUsage: UsageScannerMocks
   openCodeUsage: UsageScannerMocks
   runtimeEnvironments: { prepareBrowserClientHostPlacement: Mock }
 }
@@ -64,22 +63,6 @@ export function createStoreSessionMockApi(): StoreSessionMockApi {
         lastScanCompletedAt: null,
         lastScanError: null,
         hasAnyClaudeData: false
-      }),
-      setEnabled: vi.fn().mockResolvedValue({}),
-      refresh: vi.fn().mockResolvedValue({}),
-      getSummary: vi.fn().mockResolvedValue(null),
-      getDaily: vi.fn().mockResolvedValue([]),
-      getBreakdown: vi.fn().mockResolvedValue([]),
-      getRecentSessions: vi.fn().mockResolvedValue([])
-    },
-    codexUsage: {
-      getScanState: vi.fn().mockResolvedValue({
-        enabled: false,
-        isScanning: false,
-        lastScanStartedAt: null,
-        lastScanCompletedAt: null,
-        lastScanError: null,
-        hasAnyCodexData: false
       }),
       setEnabled: vi.fn().mockResolvedValue({}),
       refresh: vi.fn().mockResolvedValue({}),

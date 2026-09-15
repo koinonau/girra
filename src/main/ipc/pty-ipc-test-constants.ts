@@ -40,15 +40,6 @@ export const TEST_CODEX_HOME =
   process.platform === 'win32'
     ? 'C:\\Users\\test\\AppData\\Roaming\\orca\\codex-runtime-home\\home'
     : '/tmp/orca-codex-home'
-export const TEST_CODEX_AUTH_JSON = JSON.stringify({
-  tokens: {
-    access_token: 'access',
-    id_token: 'e30.eyJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20ifQ.sig',
-    refresh_token: 'refresh',
-    account_id: 'account'
-  },
-  last_refresh: '2026-07-31T00:00:00Z'
-})
 
 /** What node-pty's onData/onExit registrations hand back. */
 export type MockDisposable = { dispose: Mock }

@@ -6,10 +6,9 @@ import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { AgentProviderSessionMetadata } from '../../../../shared/agent-session-resume'
 import type { TerminalStartupCwdMissingDirFallback } from '../../../../shared/terminal-startup-cwd'
-import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
+import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
 import type {
-  CodexHomePtySpawnedLifecycleArgs,
   GetSelectedCodexHomePath,
   PrepareClaudeAuth,
   PrepareCodexSessionResume
@@ -29,7 +28,7 @@ export type PtyRuntimeControllerDeps = {
     connectionId?: string | null
     launchAgent?: TuiAgent
     providerSession?: AgentProviderSessionMetadata
-    target: CodexAccountSelectionTarget
+    target: AccountSelectionTarget
     launchEnv?: NodeJS.ProcessEnv
     workspacePath?: string
   }) => PreparedCodexResumeHome | null
@@ -77,7 +76,6 @@ export type PtyRuntimeControllerDeps = {
   getSelectedCodexHomePath?: GetSelectedCodexHomePath
   prepareClaudeAuth?: PrepareClaudeAuth
   options?: {
-    onCodexHomePtySpawned?: (args: CodexHomePtySpawnedLifecycleArgs) => void
     prepareCodexSessionResume?: PrepareCodexSessionResume
   }
   trustedTerminalHandleEnv: Set<string>

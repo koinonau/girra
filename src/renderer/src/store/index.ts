@@ -17,11 +17,7 @@ import { createEditorSlice } from './slices/editor'
 import { createStatsSlice } from './slices/stats'
 import { createMemorySlice } from './slices/memory'
 import { createWorkspaceSpaceSlice } from './slices/workspace-space'
-import {
-  createClaudeUsageSlice,
-  createCodexUsageSlice,
-  createOpenCodeUsageSlice
-} from './slices/usage-provider-slices'
+import { createClaudeUsageSlice, createOpenCodeUsageSlice } from './slices/usage-provider-slices'
 import { createBrowserSlice } from './slices/browser'
 import { createRateLimitSlice } from './slices/rate-limits'
 import { createSshSlice } from './slices/ssh'
@@ -83,7 +79,6 @@ export const useAppStore: UseBoundStore<StoreApi<AppState>> = create<AppState>()
       ...createMemorySlice(...a),
       ...createWorkspaceSpaceSlice(...a),
       ...createClaudeUsageSlice(...a),
-      ...createCodexUsageSlice(...a),
       ...createOpenCodeUsageSlice(...a),
       ...createBrowserSlice(...a),
       ...createRateLimitSlice(...a),

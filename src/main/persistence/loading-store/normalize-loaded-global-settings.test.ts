@@ -35,3 +35,22 @@ describe('retired Agents sidebar setting', () => {
     expect(normalized.agentsSidebarMigratedFromExperimental).toBe(true)
   })
 })
+
+describe('retired Codex account settings', () => {
+  it('drops the Codex account keys so they stop round-tripping', () => {
+    const normalized = normalizeLegacyProfile({
+      codexManagedAccounts: [{ id: 'account-1', managedHomePath: '/data/codex-accounts/a/home' }],
+      activeCodexManagedAccountId: 'account-1',
+      activeCodexManagedAccountIdsByRuntime: { host: 'account-1', wsl: {} },
+      skipCodexRateLimitResetConfirm: true
+    })
+    for (const key of [
+      'codexManagedAccounts',
+      'activeCodexManagedAccountId',
+      'activeCodexManagedAccountIdsByRuntime',
+      'skipCodexRateLimitResetConfirm'
+    ]) {
+      expect(key in normalized).toBe(false)
+    }
+  })
+})

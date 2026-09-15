@@ -2,10 +2,6 @@ import { mkdirSync, existsSync, unlinkSync } from 'node:fs'
 import { mkdir, open, rm } from 'node:fs/promises'
 import { durableWriteTempPath, renameDurable, writeFileDurableSync } from '../../durable-file-write'
 import { dirname } from 'node:path'
-import {
-  parseCodexResetCreditAttemptLedger,
-  type CodexResetCreditAttemptLedger
-} from '../../../shared/codex-reset-credit-attempt-ledger'
 
 import type { StoreRuntimeState } from './store-runtime-state'
 import type { StateSerializationSecretHandlingOperations } from './state-serialization-secret-handling'
@@ -83,35 +79,6 @@ export class PrimaryStateWriteOperations {
 
   flushActiveViewPreferenceOrThrow(): void {
     this[primaryStateWriteOperationsContext].runtime.activeViewPreference.flushOrThrow()
-  }
-
-  getCodexResetCreditAttemptLedger(): CodexResetCreditAttemptLedger {
-    return parseCodexResetCreditAttemptLedger(
-      this[primaryStateWriteOperationsContext].runtime.state.codexResetCreditAttemptLedger
-    )
-  }
-
-  replaceCodexResetCreditAttemptLedgerAndFlush(ledger: CodexResetCreditAttemptLedger): void {
-    if (this[primaryStateWriteOperationsContext].runtime.writesFrozen) {
-      throw new Error('Cannot persist Codex reset-credit attempts while writes are frozen')
-    }
-    const next = parseCodexResetCreditAttemptLedger(ledger)
-    const previous = this[primaryStateWriteOperationsContext].runtime.state
-      .codexResetCreditAttemptLedger
-      ? structuredClone(
-          this[primaryStateWriteOperationsContext].runtime.state.codexResetCreditAttemptLedger
-        )
-      : undefined
-    this[primaryStateWriteOperationsContext].runtime.state.codexResetCreditAttemptLedger = next
-    try {
-      this[primaryStateWriteOperationsContext].runtime.flushOrThrow()
-    } catch (error) {
-      // Why: callers use a successful return as the durability barrier before
-      // handing a scarce-credit mutation to the provider.
-      this[primaryStateWriteOperationsContext].runtime.state.codexResetCreditAttemptLedger =
-        previous
-      throw error
-    }
   }
 }
 

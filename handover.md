@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, the ADRs and the cross-version harness deletion are merged. Phase 6 (feature wall, contextual tours and onboarding) is in its pull request, taken before Phase 5 because Phase 5's scope waits on the launch roster decision.
+As of 2026-09-15: Phases 0 to 4, Phase 6, the ADRs and the cross-version harness deletion are merged. Phase 5a (Codex accounts, managed homes, reset credits, rate limits and usage) is in its pull request. Phase 6 went before Phase 5 because most of Phase 5 waits on the launch roster decision.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -19,7 +19,8 @@ As of 2026-09-15: Phases 0 to 4, the ADRs and the cross-version harness deletion
 - Phase 3c merged in [#11](https://github.com/koinonau/girra/pull/11): telemetry and the hang watchdog that only fed it. 135 files deleted, 23,837 lines removed.
 - Phase 4a merged in [#12](https://github.com/koinonau/girra/pull/12): the managed hook integrations for 14 agent CLIs and Cursor's trust bypass. 94 files deleted, 20,455 lines removed.
 - Phase 4b merged in [#13](https://github.com/koinonau/girra/pull/13): Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane. 30 files deleted, 6,923 lines removed.
-- Phase 6 deletes the feature wall, contextual tours and first-run onboarding, and moves the setup guide checklist and feature tip visuals out: 189 files deleted, 38 renamed, 27,662 lines removed and 1,091 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 6 merged in [#14](https://github.com/koinonau/girra/pull/14): the feature wall, contextual tours and first-run onboarding. 189 files deleted, 27,662 lines removed.
+- Phase 5a deletes Codex accounts, managed homes, reset credits, rate-limit probing, usage, the CLI lock, the per-pane account registry and stale-pane restart, with the session migration and index heal modules they orphaned: 254 files deleted, 58,851 lines removed and 1,541 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -161,6 +162,15 @@ After Phase 6, on 2026-09-15:
 | `pnpm lint` | 0 | 48 s | 114 reliability gates; ratchets unchanged |
 | `pnpm build` | 0 | 19 s | Main 5,349 modules, renderer 12,054 |
 
+After Phase 5a, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 1, then 0 | 5 s | Two errors the subagents had reported clean: a stale re-export in `orca-runtime.ts` and a `'codex'` status bar id in a typed test fixture. Fixed, then clean |
+| `pnpm test` | 1 | 668 s | Files: 6 failed, 7,950 passed, 60 skipped of 8,016. Tests: 6 failed, 74,327 passed, 351 skipped of 74,684. The five known failures plus `terminal-pane-hook-order-parity`, whose pin moved from 209 to 207 hooks with the restart state; fixed and passing alone |
+| `pnpm lint` | 0 | 48 s | 114 reliability gates; ratchets lowered (`DIRECT_IMPORTER_PIN` 147, `UNHIDDEN_SPAWNER_PIN` 63) |
+| `pnpm build` | 0 | Untimed | Failed on the typecheck step, then passed after the fix. Main 5,256 modules, renderer 12,025 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -241,6 +251,9 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: drop `UsagePage.tsx` and the other tree-kept cards inside the feature wall (usage accounts, keep awake, AI commit and PR, browser use skill, orchestration setup). `UsagePage` is a looping animation with hardcoded numbers, not a usage dashboard, and each card was mounted only by the deleted feature wall body and duplicates a settings pane. The real usage UI is the stats panes and status bar. Relocated instead: the setup guide checklist, the default agent and notification setup steps, the inline command terminal, agent feature setup, and the feature tips orchestration visual.
 - 2026-09-15: without onboarding, a fresh profile lands on Landing, the macOS notification prompt is requested at every startup (it guards itself), and a session that starts with no projects shows no app-open feature tip. Upgraded profiles keep their dismissed setup guide entry through a one-shot read of the retired `onboarding` block, which stays on disk.
 - 2026-09-15: `ui.set` still accepts `contextualToursSeenIds` and `contextualToursAutoEligible`, stripped before saving, because its schema is strict. Feature interactions the tours used to record are recorded by `useFeatureInteractionWhileVisible`.
+- 2026-09-15: Phase 5a keeps the Codex wire shapes older paired clients dereference: `AccountsSnapshot.codex` is always `{ accounts: [], activeAccountId: null }`, `RateLimitState` always publishes `codex: null`, a host `codexTarget` and empty `inactiveCodexAccounts`, `ui.set` accepts the `codex` status bar id, and the catalog keeps `codex-account-switching`. The Codex account RPC methods and the `accounts.codex-reset-credit.v1` capability are gone. Retired Codex settings keys are stripped on load; managed homes stay on disk.
+- 2026-09-15: after 5a, Codex launches run on the user's own `~/.codex` (`prepareCodexRuntimeHomeForLaunch` returns null after the trust preset and real-home hook install). Known gaps until 5b to 5d: Windows has no Codex status hook install path, because the real-home lane still needs the shell probe; and resuming a legacy session from the shared mirror fails when the real-home lane is off.
+- 2026-09-15: the index heal CI job and its contract tests went with the orphaned index heal module.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.

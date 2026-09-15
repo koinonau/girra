@@ -10,10 +10,9 @@ import type { TerminalStartupCwdMissingDirFallback } from '../../../../shared/te
 import type { OrcaRuntimeService } from '../../../runtime/orca-runtime'
 import type { Store } from '../../../persistence'
 import type { PtySpawnResult } from '../../../providers/types'
-import type { CodexAccountSelectionTarget } from '../../../codex-accounts/runtime-selection'
+import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
 import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
 import type {
-  CodexHomePtySpawnedLifecycleArgs,
   GetSelectedCodexHomePath,
   PrepareClaudeAuth,
   PrepareCodexSessionResume
@@ -84,7 +83,6 @@ export type PtySpawnIpcDeps = {
   prepareClaudeAuth?: PrepareClaudeAuth
   options?: {
     prepareCodexSessionResume?: PrepareCodexSessionResume
-    onCodexHomePtySpawned?: (args: CodexHomePtySpawnedLifecycleArgs) => void
   }
   getLocalPtyStartupPromise: (connectionId?: string | null) => Promise<void> | undefined
   adoptStablePane: (args: AdoptStablePaneArgs) => Promise<AdoptStablePaneResult | null>
@@ -99,7 +97,7 @@ export type PtySpawnIpcDeps = {
     connectionId?: string | null
     launchAgent?: TuiAgent
     providerSession?: AgentProviderSessionMetadata
-    target: CodexAccountSelectionTarget
+    target: AccountSelectionTarget
     launchEnv?: NodeJS.ProcessEnv
     workspacePath?: string
   }) => PreparedCodexResumeHome | null

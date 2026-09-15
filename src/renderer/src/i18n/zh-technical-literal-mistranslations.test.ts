@@ -70,12 +70,10 @@ describe('zh provider usage wording (#12881)', () => {
     for (const [key, brand] of [
       // status bar item menu
       ['3885eb74d8', 'Claude'],
-      ['c0909c686e', 'Codex'],
       ['8c86cd77b0', 'OpenCode Go'],
       ['3bbf140864', 'MiniMax'],
       // Settings > Appearance search index — mirrors the menu labels
       ['9dc15020d7', 'Claude'],
-      ['54b1acf24f', 'Codex'],
       ['bc046e7899', 'OpenCode Go'],
       ['0f08f6b483', 'MiniMax'],
       // Settings > Accounts search index

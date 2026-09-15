@@ -148,6 +148,7 @@ describe('createUISlice hydratePersistedUI', () => {
       makePersistedUI({
         statusBarItems: [
           'claude',
+          'codex',
           'gemini',
           'kimi',
           'grok',

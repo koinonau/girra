@@ -60,6 +60,10 @@ type RetiredGlobalSettings = {
   terminalScrollbackBytes?: unknown
   enableGitHubAttribution?: unknown
   showAgentsSidebar?: unknown
+  codexManagedAccounts?: unknown
+  activeCodexManagedAccountId?: unknown
+  activeCodexManagedAccountIdsByRuntime?: unknown
+  skipCodexRateLimitResetConfirm?: unknown
 }
 
 export function stripRetiredGlobalSettings(
@@ -69,11 +73,20 @@ export function stripRetiredGlobalSettings(
     terminalScrollbackBytes: _legacyScrollbackBytes,
     enableGitHubAttribution: _legacyGitHubAttribution,
     showAgentsSidebar: _legacyShowAgentsSidebar,
+    // Why: Codex managed accounts were removed; their homes stay on disk but the settings stop round-tripping.
+    codexManagedAccounts: _retiredCodexAccounts,
+    activeCodexManagedAccountId: _retiredCodexActiveAccount,
+    activeCodexManagedAccountIdsByRuntime: _retiredCodexActiveAccountsByRuntime,
+    skipCodexRateLimitResetConfirm: _retiredCodexResetConfirm,
     ...rest
   } = (settings ?? {}) as Partial<GlobalSettings> & RetiredGlobalSettings
   void _legacyScrollbackBytes
   void _legacyGitHubAttribution
   void _legacyShowAgentsSidebar
+  void _retiredCodexAccounts
+  void _retiredCodexActiveAccount
+  void _retiredCodexActiveAccountsByRuntime
+  void _retiredCodexResetConfirm
   return rest
 }
 

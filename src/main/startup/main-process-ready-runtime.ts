@@ -11,6 +11,7 @@ import { BrowserClientPageCommandError } from '../browser/browser-client-page-co
 import { handleGpuChildCrash } from './gpu-lifecycle'
 import { isGpuFallbackCrashCandidate } from '../crash-reporting/gpu-crash-fallback-decision'
 import { ensureRealHomeCodexHookState } from '../codex/codex-real-home-hook-install'
+import { isHostCodexRealHomeSelected } from './codex-launch-preparation'
 import {
   installManagedAgentHooks,
   resolveStartupManagedHookAction,
@@ -93,7 +94,7 @@ export async function initializeReadyRuntimeServices(): Promise<void> {
   const realHomeCodexHookState =
     shouldReconcileStartupManagedHooks &&
     shouldInstallStartupManagedAgentHook(startupManagedHookSettings, 'codex') &&
-    state.codexRuntimeHome?.isHostSystemDefaultRealHomeSelected()
+    isHostCodexRealHomeSelected()
       ? ensureRealHomeCodexHookState({
           hooksEnabled: true,
           userDataPath: app.getPath('userData')

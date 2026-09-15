@@ -3,15 +3,11 @@ import { registerCoreHandlers } from '../ipc/register-core-handlers/register-cor
 import { attachMainWindowServices } from '../window/attach-main-window-services'
 import { initTccPromptNotice } from '../macos-tcc-prompt-notice'
 import { mainProcessState as state } from './main-process-state'
-import { prepareCodexAiVaultSessionResume } from '../codex/codex-ai-vault-session-resume'
+import { prepareLegacySharedCodexSessionResume } from '../codex/codex-legacy-session-resume'
 import { resolveHostCodexSessionSourceHome } from '../codex/codex-session-source-home'
 import { preserveAgentAuthBeforeRestart } from '../agent-auth-restart-preservation'
-import {
-  emitPluginWorktreeLifecycle,
-  handleCodexHomePtySpawned,
-  handlePtyExit
-} from './main-process-pty-startup'
-import { prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
+import { emitPluginWorktreeLifecycle } from './main-process-pty-startup'
+import { isHostCodexRealHome, prepareCodexRuntimeHomeForLaunch } from './codex-launch-preparation'
 import { prepareCodexSessionResumeForLaunch } from './codex-session-resume-launch'
 import { isRecoveryReloadInFlight } from './main-window-lifecycle-flags'
 
@@ -25,28 +21,22 @@ export function attachMainWindowCoreServices(
   const runtime = state.runtime
   const stats = state.stats
   const claudeUsage = state.claudeUsage
-  const codexUsage = state.codexUsage
   const openCodeUsage = state.openCodeUsage
-  const codexAccounts = state.codexAccounts
   const claudeAccounts = state.claudeAccounts
   const rateLimits = state.rateLimits
   const automations = state.automations
   const keybindings = state.keybindings
-  const codexRuntimeHome = state.codexRuntimeHome
   const claudeRuntimeAuth = state.claudeRuntimeAuth
   if (
     !store ||
     !runtime ||
     !stats ||
     !claudeUsage ||
-    !codexUsage ||
     !openCodeUsage ||
-    !codexAccounts ||
     !claudeAccounts ||
     !rateLimits ||
     !automations ||
     !keybindings ||
-    !codexRuntimeHome ||
     !claudeRuntimeAuth
   ) {
     throw new Error('Main window services must be initialized before attaching')
@@ -56,34 +46,29 @@ export function attachMainWindowCoreServices(
     runtime,
     stats,
     claudeUsage,
-    codexUsage,
     openCodeUsage,
-    codexAccounts,
     claudeAccounts,
     rateLimits,
     window.webContents.id,
     automations,
     {
-      prepareForCodexLaunch: prepareCodexRuntimeHomeForLaunch,
       prepareForClaudeLaunch: (target) => claudeRuntimeAuth.prepareForClaudeLaunch(target)
     },
     state.agentAwakeService ?? undefined,
     keybindings,
     {
-      getAdditionalAiVaultCodexHomePaths: () =>
-        codexRuntimeHome.getHostCodexHomePathsForSessionDiscovery(),
+      getAdditionalAiVaultCodexHomePaths: () => {
+        const sourceHome = resolveHostCodexSessionSourceHome(store.getSettings())
+        return sourceHome ? [sourceHome] : []
+      },
       prepareAiVaultSessionResume: (args) =>
-        prepareCodexAiVaultSessionResume(args, {
-          runtimeHome: codexRuntimeHome,
+        prepareLegacySharedCodexSessionResume(args, {
+          isHostSystemDefaultRealHome: () => isHostCodexRealHome(),
           systemCodexHomePath: resolveHostCodexSessionSourceHome(store.getSettings())
         }),
       onBeforeRelaunch: async () => {
         state.isQuitting = true
-        await preserveAgentAuthBeforeRestart({
-          codexRuntimeHome,
-          claudeRuntimeAuth,
-          store
-        })
+        await preserveAgentAuthBeforeRestart({ claudeRuntimeAuth, store })
       }
     },
     state.pluginService ?? undefined,
@@ -110,8 +95,6 @@ export function attachMainWindowCoreServices(
       },
       // Why: let the PTY layer skip its orphan sweep on the recovery reload that re-fires did-finish-load, so live local sessions survive (#5787).
       isRecoveryReloadInFlight,
-      onCodexHomePtySpawned: handleCodexHomePtySpawned,
-      onPtyExit: handlePtyExit,
       onWorktreeLifecycle: emitPluginWorktreeLifecycle
     }
   )

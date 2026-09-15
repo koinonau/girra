@@ -3,36 +3,22 @@ import type { RateLimitRuntimeTarget } from '../../../../shared/rate-limit-types
 import { resolveLocalAccountRuntimeTarget } from '../../../../shared/local-account-runtime'
 import { getRendererAppPlatform } from '../../lib/renderer-app-platform'
 
-export type CodexStatusRuntimeTarget = {
+export type AccountStatusRuntimeTarget = {
   runtime: 'host' | 'wsl'
   wslDistro: string | null
-}
-
-export type CodexStatusSwitchTarget = {
-  id: string | null
-  label: string
-  active: boolean
-  runtimeTarget: CodexStatusRuntimeTarget
-}
-
-export type CodexStatusSwitchGroup = {
-  key: string
-  label: string
-  runtimeTarget: CodexStatusRuntimeTarget
-  targets: CodexStatusSwitchTarget[]
 }
 
 export type ClaudeStatusSwitchTarget = {
   id: string | null
   label: string
   active: boolean
-  runtimeTarget: CodexStatusRuntimeTarget
+  runtimeTarget: AccountStatusRuntimeTarget
 }
 
 export type ClaudeStatusSwitchGroup = {
   key: string
   label: string
-  runtimeTarget: CodexStatusRuntimeTarget
+  runtimeTarget: AccountStatusRuntimeTarget
   targets: ClaudeStatusSwitchTarget[]
 }
 
@@ -46,13 +32,13 @@ function getHostRuntimeLabel(): string {
   return navigator.userAgent.includes('Windows') ? 'Windows' : 'This device'
 }
 
-export function getCodexStatusWslKey(wslDistro: string | null | undefined): string {
+export function getAccountStatusWslKey(wslDistro: string | null | undefined): string {
   const trimmed = wslDistro?.trim()
   return trimmed ? trimmed : '__default__'
 }
 
-export function getCodexStatusRuntimeLabel(
-  target: CodexStatusRuntimeTarget,
+export function getAccountStatusRuntimeLabel(
+  target: AccountStatusRuntimeTarget,
   hostLabel = getHostRuntimeLabel()
 ): string {
   if (target.runtime === 'host') {
@@ -61,13 +47,13 @@ export function getCodexStatusRuntimeLabel(
   return target.wslDistro ? `WSL ${target.wslDistro}` : 'WSL default'
 }
 
-export function getCodexStatusRuntimeKey(target: CodexStatusRuntimeTarget): string {
-  return target.runtime === 'host' ? 'host' : `wsl:${getCodexStatusWslKey(target.wslDistro)}`
+export function getAccountStatusRuntimeKey(target: AccountStatusRuntimeTarget): string {
+  return target.runtime === 'host' ? 'host' : `wsl:${getAccountStatusWslKey(target.wslDistro)}`
 }
 
-export function toCodexStatusRuntimeTarget(
+export function toAccountStatusRuntimeTarget(
   target: RateLimitRuntimeTarget | undefined
-): CodexStatusRuntimeTarget {
+): AccountStatusRuntimeTarget {
   if (target?.runtime === 'wsl') {
     return { runtime: 'wsl', wslDistro: target.wslDistro }
   }

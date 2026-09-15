@@ -29,15 +29,13 @@ const {
   scheduleTerminalWebglAtlasRecovery,
   scheduleRuntimeGraphSync,
   shouldSeedCacheTimerOnInitialTitle,
-  toastInfo,
-  notifyCodexPaneBoundForStaleSweep
+  toastInfo
 } = vi.hoisted(() => ({
   resetAndRefreshAllTerminalWebglAtlases: vi.fn(),
   scheduleTerminalWebglAtlasRecovery: vi.fn(),
   scheduleRuntimeGraphSync: vi.fn(),
   shouldSeedCacheTimerOnInitialTitle: vi.fn(() => false),
-  toastInfo: vi.fn(),
-  notifyCodexPaneBoundForStaleSweep: vi.fn()
+  toastInfo: vi.fn()
 }))
 
 let mockStoreState: StoreState
@@ -83,10 +81,6 @@ vi.mock('sonner', () => ({
   toast: {
     info: toastInfo
   }
-}))
-
-vi.mock('@/lib/codex-stale-pane-sweep', () => ({
-  notifyCodexPaneBoundForStaleSweep
 }))
 
 // Why: the working→idle test invokes the real useNotificationDispatch hook outside React, so useCallback must pass through (safe suite-wide: no test here renders React).
@@ -553,47 +547,5 @@ describe('connectPanePty', () => {
 
     expect(deps.clearTerminalTabUnread).not.toHaveBeenCalled()
     expect(deps.clearWorktreeUnread).not.toHaveBeenCalled()
-  })
-
-  // Why: on a stale-codex pane (pending account-switch restart), onData bytes must not count as user interaction; production also blocks sendInput here.
-  it('does not clear unread when onData fires on a stale codex pane', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex-stale')
-    transportFactoryQueue.push(transport)
-    // isCodexPaneStale reads codexRestartNoticeByPtyId; seed a restart notice to trigger the stale branch.
-    mockStoreState = {
-      ...mockStoreState,
-      tabsByWorktree: {
-        'wt-1': [{ id: 'tab-1', ptyId: 'pty-codex-stale' }]
-      },
-      ptyIdsByTabId: {
-        'tab-1': ['pty-codex-stale']
-      },
-      codexRestartNoticeByPtyId: {
-        'pty-codex-stale': { previousAccountLabel: 'A', nextAccountLabel: 'B' }
-      }
-    }
-
-    const pane = createPane(1)
-    let onDataHandler: ((data: string) => void) | null = null
-    pane.terminal.onData = vi.fn(((handler: (data: string) => void) => {
-      onDataHandler = handler
-      return { dispose: vi.fn() }
-    }) as typeof pane.terminal.onData)
-
-    const manager = createManager(1)
-    const deps = createDeps()
-
-    connectPanePty(pane as never, manager as never, deps as never)
-
-    if (!onDataHandler) {
-      throw new Error('expected onData handler to be registered')
-    }
-    ;(onDataHandler as (data: string) => void)('a')
-
-    expect(deps.clearTerminalTabUnread).not.toHaveBeenCalled()
-    expect(deps.clearWorktreeUnread).not.toHaveBeenCalled()
-    // Stale-codex input is also blocked from reaching the transport.
-    expect(transport.sendInput).not.toHaveBeenCalled()
   })
 })

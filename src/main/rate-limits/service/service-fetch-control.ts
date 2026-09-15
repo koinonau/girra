@@ -2,12 +2,7 @@ import { RateLimitServiceState } from './service-state'
 
 export abstract class RateLimitServiceFetchControl extends RateLimitServiceState {
   protected waitForFetchIdle(): Promise<void> {
-    if (
-      !this.isFetching &&
-      !this.fullFetchQueued &&
-      !this.codexOnlyFetchQueued &&
-      !this.claudeOnlyFetchQueued
-    ) {
+    if (!this.isFetching && !this.fullFetchQueued && !this.claudeOnlyFetchQueued) {
       return Promise.resolve()
     }
     // Why: explicit-refresh callers must await the queued follow-up cycle when a poll is in flight, else the UI stops spinning early.
@@ -17,12 +12,7 @@ export abstract class RateLimitServiceFetchControl extends RateLimitServiceState
   }
 
   protected resolveFetchIdleWaiters(): void {
-    if (
-      this.isFetching ||
-      this.fullFetchQueued ||
-      this.codexOnlyFetchQueued ||
-      this.claudeOnlyFetchQueued
-    ) {
+    if (this.isFetching || this.fullFetchQueued || this.claudeOnlyFetchQueued) {
       return
     }
     const resolvers = this.fetchIdleResolvers
@@ -63,7 +53,6 @@ export abstract class RateLimitServiceFetchControl extends RateLimitServiceState
 
   protected clearQueuedFetches(): void {
     this.fullFetchQueued = false
-    this.codexOnlyFetchQueued = false
     this.claudeOnlyFetchQueued = false
   }
 

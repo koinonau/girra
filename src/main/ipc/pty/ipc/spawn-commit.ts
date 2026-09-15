@@ -4,10 +4,7 @@ import { markClaudePtySpawned } from '../../../claude-accounts/live-pty-gate'
 import { registerPty } from '../../../memory/pty-registry'
 import type { PtySpawnResult } from '../../../providers/types'
 import { clearMigrationUnsupportedPtysForPaneKey } from '../../../agent-hooks/migration-unsupported-pty-state'
-import {
-  shouldSkipCodexHomeEnvForWindowsShell,
-  codexReattachedHomeRouteField
-} from '../host-env/codex-home'
+import { shouldSkipCodexHomeEnvForWindowsShell } from '../host-env/codex-home'
 import { rememberPaneKeyForPty } from '../pane/key-state'
 import { resolvePaneSpawnReservation } from '../pane/spawn-reservation'
 import { seedTerminalRestoreRecordsFromSpawnResult } from '../pane/agent-session-owners'
@@ -216,24 +213,6 @@ export async function commitPtyIpcSpawn(ctx: PtyIpcSpawnState): Promise<PtySpawn
   }
   // Why: renderer tab state cannot reliably infer background and reattached PTYs in the daemon inventory.
   ctx.deps.sendPtySpawnedToRenderer(ctx.result.id)
-  if (!args.connectionId) {
-    ctx.deps.options?.onCodexHomePtySpawned?.({
-      id: ctx.result.id,
-      codexHomePath: ctx.selectedCodexHomePath,
-      startedAt: ctx.codexHomeLaunchStartedAt,
-      startedSequence: ctx.codexHomeLaunchStartedSequence,
-      ...codexReattachedHomeRouteField(
-        ctx.reattachedCodexHomeRoutes,
-        ctx.result.id,
-        ctx.result.isReattach === true
-      ),
-      ...(ctx.result.isReattach === true
-        ? { reattached: true }
-        : ctx.baseEnv
-          ? { launchEnv: ctx.baseEnv }
-          : {})
-    })
-  }
   return resolvePaneSpawnReservation(
     ctx.paneSpawnReservationKey,
     ctx.paneSpawnReservation,
