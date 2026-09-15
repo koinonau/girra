@@ -256,10 +256,6 @@ describe('recoverSkillDeleteTransaction', () => {
 
     const order: string[] = []
     await recoverSkillDeleteTransaction(stateDirectory, canonicalPath, {
-      prepareExtractedSkill: async () => undefined,
-      observeSkill: async () => {
-        throw new Error('unused')
-      },
       rename: async (_source, target) => {
         order.push(target)
       },

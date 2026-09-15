@@ -32,20 +32,6 @@
 <tr>
 <td width="50%" valign="middle">
 
-### 移动 Companion 应用
-
-用手机监控并指挥你的智能体 — 智能体完成时收到通知，随时随地发送后续指令。
-
-[iOS App Store](https://apps.apple.com/us/app/orca-ide/id6766130217) · [Android APK](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.48/app-release.apk) · [文档 →](https://www.onorca.dev/docs/mobile)
-
-</td>
-<td width="50%">
-  <a href="https://www.onorca.dev/docs/mobile"><picture><source srcset="../assets/feature-wall/mobile-companion-app-showcase.gif" type="image/gif"><img src="../assets/feature-wall/mobile-companion-app-showcase.jpg" alt="Orca 桌面端与移动 companion 应用" width="100%" /></picture></a>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="middle">
-
 ### 并行 Worktree
 
 把一个提示同时分发给五个智能体，每个都在自己隔离的 git worktree 中运行 — 比较结果，合并最佳方案。
@@ -197,13 +183,6 @@ brew install --cask stablyai/orca/orca
 # Arch Linux (AUR) — or stably-orca-git to build from source
 yay -S stably-orca-bin
 ```
-
-### 移动 Companion 应用 — iOS、Android
-
-与桌面应用配对，用手机监控并指挥你的智能体。
-
-- **iOS:** [从 App Store 下载](https://apps.apple.com/us/app/orca-ide/id6766130217)
-- **Android:** [下载 APK](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.48/app-release.apk)
 
 ---
 

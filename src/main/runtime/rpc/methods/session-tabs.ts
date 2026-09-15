@@ -11,7 +11,6 @@ import {
   projectSessionTabsForClient,
   subscribeSessionTabsInventory
 } from './session-tabs-inventory'
-import { SESSION_TAB_MARKDOWN_METHODS } from './session-tab-markdown-methods'
 import { SESSION_TAB_MUTATION_METHODS } from './session-tab-mutation-methods'
 import { createSessionTabsRetirementProofDelta } from './session-tabs-retirement-proof-delta'
 import { restoreStructuredTabsIfSupported } from './structured-session-tab-restore'
@@ -192,6 +191,5 @@ export const SESSION_TAB_METHODS = [
       runtime.cleanupSubscriptionsByPrefix(`${cleanupPrefix}:`)
       return { unsubscribed: true }
     }
-  }),
-  ...SESSION_TAB_MARKDOWN_METHODS
+  })
 ]

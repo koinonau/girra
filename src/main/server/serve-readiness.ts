@@ -10,8 +10,9 @@ export type ServePairingReadiness =
       endpoint: string
       deviceId: string
       webClientUrl: string | null
-      scope: 'runtime' | 'mobile'
-      qr: string | null
+      // Why kept: schema version 1 of orca_server_ready publishes both fields.
+      scope: 'runtime'
+      qr: null
     }
   | {
       available: false
@@ -114,9 +115,6 @@ function renderHumanReadiness(readiness: ServeReadiness): string {
   if (readiness.pairing.available) {
     if (readiness.pairing.webClientUrl) {
       lines.push(`Web client URL: ${readiness.pairing.webClientUrl}`)
-    }
-    if (readiness.pairing.scope === 'mobile' && readiness.pairing.qr) {
-      lines.push(`Mobile pairing QR:\n${readiness.pairing.qr}`)
     }
     lines.push(`Pairing URL: ${readiness.pairing.url}`)
   } else {

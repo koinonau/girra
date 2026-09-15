@@ -26,9 +26,9 @@ describe('web pairing input', () => {
   })
 
   it('preserves optional device scope metadata', () => {
-    expect(parseWebPairingInput(`orca://pair?code=${encodeOffer({ scope: 'mobile' })}`)).toEqual({
+    expect(parseWebPairingInput(`orca://pair?code=${encodeOffer({ scope: 'runtime' })}`)).toEqual({
       ...offer,
-      scope: 'mobile'
+      scope: 'runtime'
     })
   })
 
@@ -49,10 +49,8 @@ describe('web pairing input', () => {
     expect(parseWebPairingInput(encodeOffer({ endpoint }))).toMatchObject({ endpoint: expected })
   })
 
-  it('treats invalid device scope metadata as unknown', () => {
-    expect(parseWebPairingInput(`orca://pair?code=${encodeOffer({ scope: 'admin' })}`)).toEqual(
-      offer
-    )
+  it.each(['admin', 'mobile'])('treats %s device scope metadata as unknown', (scope) => {
+    expect(parseWebPairingInput(`orca://pair?code=${encodeOffer({ scope })}`)).toEqual(offer)
   })
 
   it('rejects orca URLs outside the exact pairing route', () => {
@@ -70,7 +68,7 @@ describe('web pairing input', () => {
     })
   })
 
-  it('shows the connect screen for mobile-scope and legacy unknown-scope offers', () => {
+  it('shows the connect screen for retired mobile-scope and legacy unknown-scope offers', () => {
     const mobileInput = `orca://pair?code=${encodeOffer({ scope: 'mobile' })}`
     const legacyInput = `orca://pair?code=${encodeOffer()}`
 

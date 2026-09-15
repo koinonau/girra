@@ -132,3 +132,7 @@ export const ORCA_LINEAR_SKILL_UPDATE_COMMAND =
 
 export const LINEAR_TICKETS_SKILL_UPDATE_COMMAND =
   buildAgentFeatureSkillUpdateCommand(LINEAR_TICKETS_SKILL_NAME)
+
+// Why: needs bash, so never route it through the Windows npx wrappers.
+export const KOTHAR_INSTALL_WIZARD_COMMAND =
+  'curl -fsSL https://gist.githubusercontent.com/shanedolley/6d79d83dd27851d57fd1e346e04c7585/raw/kothar-install-wizard.sh | bash'

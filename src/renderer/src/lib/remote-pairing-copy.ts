@@ -12,11 +12,6 @@ export function translateHostAccessLinkError(kind: HostAccessLinkErrorKind): str
         'auto.lib.remotePairingCopy.invalidInput',
         'Enter an Orca access link or bare pairing code.'
       )
-    case 'mobile-only':
-      return translate(
-        'auto.lib.remotePairingCopy.mobileOnly',
-        'This link grants mobile-only access. Generate a link for another Orca client.'
-      )
     case 'invalid-destination':
       return translate(
         'auto.lib.remotePairingCopy.invalidDestination',

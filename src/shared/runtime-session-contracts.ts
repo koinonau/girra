@@ -22,7 +22,7 @@ export type RuntimeDesktopWindowStatus = 'available' | 'openable' | 'initializin
 
 export const HEADLESS_RUNTIME_WINDOW_ID = 0
 
-export type DeviceScope = 'mobile' | 'runtime'
+export type DeviceScope = 'runtime'
 
 export type RuntimeTerminalDriverState =
   | { kind: 'idle' }

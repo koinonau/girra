@@ -137,8 +137,7 @@
         "7a566540de": "URL o código de emparejamiento",
         "cb4d287238": "Nombre del servidor",
         "3affe7de3a": "Pega una URL de emparejamiento de un servidor Orca accesible desde este navegador.",
-        "e3bcd082ac": "Conectar con Orca",
-        "mobileScopeRejected": "Este código QR solo da acceso limitado para móvil. Para usar la app web completa, abre el enlace para navegador desde Ajustes → Servidores remotos de Orca → Comparte este servidor Orca → Nuevo enlace."
+        "e3bcd082ac": "Conectar con Orca"
       },
       "webPreloadApi": {
         "aiVaultUnavailableForHost": "El historial de sesiones de Agents no está disponible para este host de ejecución.",
@@ -249,8 +248,6 @@
           "78e08cd877": "Git no pudo eliminar de forma segura la rama \"{{value0}}\", así que Orca la conservó para evitar perder commits locales.",
           "3b57982bf6": "Git no pudo eliminar de forma segura la rama \"{{value0}}\" después de eliminar el espacio de trabajo \"{{value1}}\", así que Orca la conservó para evitar perder commits locales.",
           "81f13f48d2": "Git no pudo eliminar de forma segura la rama \"{{value0}}\" después de eliminar el worktree \"{{value1}}\", así que Orca la conservó para evitar perder commits locales.",
-          "runtimeScopeForbiddenTitle": "Esta conexión tiene acceso limitado (móvil)",
-          "runtimeScopeForbiddenDescription": "Los espacios de trabajo no están disponibles con un emparejamiento de acceso móvil. Vuelve a conectarte con el enlace del navegador desde Ajustes → Servidores remotos de Orca → Comparte este servidor Orca.",
           "createdWithoutParentNesting": "Creado sin anidarlo bajo \"{{value0}}\"",
           "createdWithoutParentNestingUnnamed": "Creado sin anidarlo bajo el worktree padre seleccionado",
           "createdWithoutParentNestingDetail": "El espacio de trabajo padre ya no estaba disponible. Puedes establecerlo desde el menú del espacio de trabajo."
@@ -308,7 +305,6 @@
       },
       "remotePairingCopy": {
         "invalidInput": "Introduce un enlace de acceso de Orca o un código de emparejamiento.",
-        "mobileOnly": "Este enlace concede acceso solo para dispositivos móviles. Genera un enlace para otro cliente de Orca.",
         "invalidDestination": "Este enlace de acceso contiene un destino no válido.",
         "unsupportedDestination": "Este enlace de acceso contiene un destino no compatible.",
         "nonConnectableDestination": "Este enlace de acceso contiene un destino al que no se puede conectar.",
@@ -3598,7 +3594,6 @@
           "closeSkills": "Cerrar skills",
           "closeTooltip": "Cerrar · Esc",
           "moreActions": "Más acciones",
-          "emptyCopy": "Las carpetas de skills analizadas están vacías. Instala un paquete compartido o actualiza después de añadir una skill.",
           "retry": "Reintentar",
           "deleteSkills": "Eliminar skills…"
         },
@@ -5976,29 +5971,6 @@
           "0a452d4d3b": "{{value0}} dispositivos emuladores detectados.",
           "f62a1bb759": "Orca seleccionará automáticamente un dispositivo emulador después de que se detecten los dispositivos.",
           "b2fd62ea75": "Dispositivo predeterminado para nuevas pestañas del emulador y comandos de conexión de agentes. La selección automática prefiere un dispositivo que ya esté en ejecución."
-        },
-        "MobileNetworkInterfaceSection": {
-          "63d5e4ae1e": "Regenera el código QR y escanéalo desde la aplicación móvil de Orca.",
-          "87985ba6f5": "En este menú de Interfaz de red, elija la dirección Tailscale, generalmente una IP 100.x.y.z.",
-          "1f7c26d36a": "Inicie sesión en la misma tailnet en ambos dispositivos.",
-          "668016be7a": "en su computadora y teléfono.",
-          "1dc87a7fbc": "Tailscale",
-          "51d29927eb": "Instalar",
-          "9fc5d203ff": "Orca Mobile se conecta directamente a esta computadora. Para usarlo fuera de la misma LAN, coloque su computadora y teléfono en la misma red superpuesta privada, luego genere el código QR con esa dirección de red seleccionada.",
-          "39fad211d9": "Conéctate fuera de tu Wi-Fi con una tailnet",
-          "a9db5d771d": "Actualizar interfaces de red",
-          "d536b5e20d": "Elija qué dirección de red anunciar en el código QR. Utilice su dirección LAN para el emparejamiento de la misma red o una dirección de red superpuesta (Tailscale, ZeroTier) para el acceso entre redes.",
-          "406a35121c": "Interfaz de red",
-          "c541f67790": "Generar código QR",
-          "1e64659126": "Regenerar"
-        },
-        "MobilePane": {
-          "relayDegradedNotice": "No se pudo contactar con Relay: este código solo funciona en tu LAN o Tailscale. Genera uno nuevo e inténtalo de nuevo."
-        },
-        "MobileSettingsPane": {
-          "9a3c280e49": "GitHub Releases",
-          "b0088412a1": "o el APK de Android desde",
-          "c8491c17ef": "Controla Orca desde tu teléfono escaneando un código QR. Beta/vista previa temprana: espera errores y cambios importantes. Obtén la app para iOS en"
         },
         "NotificationsPane": {
           "906b4afebf": "Enviar notificación de prueba",
@@ -9091,27 +9063,6 @@
           "567633ff50": "Right-click pastes the clipboard into the terminal. Control-click to open the context menu.",
           "c64497148a": "Right-click pastes the clipboard. Control-click opens the context menu."
         },
-        "MobileRelayStatusSection": {
-          "registered": "Registered",
-          "connecting": "Connecting",
-          "reconnecting": "Reconnecting",
-          "offline": "Offline",
-          "title": "Orca Relay",
-          "automatic": "Connect from anywhere when a phone is paired",
-          "signInPrompt": "Sign in on this desktop to connect from anywhere",
-          "directStillAvailable": "LAN and Tailscale connections remain available.",
-          "directNeedsNoAccount": "LAN and Tailscale pairing still work without an account.",
-          "signIn": "Sign in",
-          "unavailable": "Unavailable",
-          "standby": "Standby — no relay devices"
-        },
-        "MobileRelayBetaAvailability": {
-          "about": "Acerca de la beta de Orca Relay",
-          "beta": "Beta",
-          "availability": "Disponible en",
-          "testFlight": "TestFlight",
-          "androidApk": "APK de Android"
-        },
         "SkillUsageExampleDialog": {
           "copiedPrompt": "Prompt de ejemplo copiado.",
           "copyFailed": "No se pudo copiar el prompt.",
@@ -11011,36 +10962,6 @@
             "listLabel": "Run targets",
             "label": "Run on",
             "browse": "Browse run targets"
-          }
-        }
-      },
-      "mobile": {
-        "MobileHero": {
-          "bb0074ce11": "Código QR de emparejamiento",
-          "ca85e595a7": "No se encontraron interfaces",
-          "79d2f480da": "Interfaz de red para anunciar",
-          "7af266b80d": "Código QR de instalación",
-          "relayDegradedNotice": "No se pudo contactar con Relay: este código solo funciona en tu LAN o Tailscale."
-        },
-        "MobilePage": {
-          "1b4509a8a1": "emparejado",
-          "c5909374cf": "introducción"
-        },
-        "MobilePageToolbar": {
-          "a4f8c2d91e": "Eliminar Orca Mobile de la barra lateral izquierda",
-          "b7e3d1c84a": "Mostrar Orca Mobile en la barra lateral izquierda"
-        },
-        "mobile": {
-          "platform": {
-            "copy": {
-              "2a532d6fd7": "Escanea con la cámara de tu Android para descargar el APK más reciente desde GitHub Releases.",
-              "432db52b73": "Escanea con la cámara de tu iPhone para abrir la App Store."
-            }
-          }
-        },
-        "slides": {
-          "WorktreeListSlide": {
-            "c5ad56786d": "hilandero"
           }
         }
       },

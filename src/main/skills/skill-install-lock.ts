@@ -17,19 +17,11 @@ import {
   skillInstallLockOwnerProcessIsAlive,
   type SkillInstallLockOwner
 } from './skill-install-lock-owner'
-import {
-  cleanupReleasedSkillInstallLock,
-  reclaimReleasedSkillInstallLock
-} from './skill-install-lock-release'
+import { cleanupReleasedSkillInstallLock } from './skill-install-lock-release'
 import { skillInstallStateKey } from './skill-install-provenance'
 
 const LOCK_RETRY_MS = 50
 const LOCK_STALE_MS = 30 * 60 * 1000
-const MAX_STARTUP_LOCKS = 128
-const LOCK_NAME = /^[a-f0-9]{64}\.lock$/
-const LEGACY_OWNER_NAME = /^[a-f0-9]{64}\.lock\.[a-f0-9-]{36}\.owner$/
-const CANDIDATE_LOCK_NAME = /^[a-f0-9]{64}\.lock\.[a-f0-9-]{36}\.candidate$/
-const RELEASED_LOCK_NAME = /^[a-f0-9]{64}\.lock\.[a-f0-9-]{36}\.released$/
 const OWNER_ENTRY_NAME = /^([a-f0-9-]{36})\.owner$/
 const RELEASE_ENTRY_NAME = /^([a-f0-9-]{36})\.released$/
 const activeLockTokens = new Set<string>()
@@ -133,48 +125,6 @@ async function removeStaleLock(path: string): Promise<void> {
     await removeStaleLockDirectory(path)
   } else if (lockStat?.isFile()) {
     await removeStaleLegacyLock(path)
-  }
-}
-
-export async function reclaimDeadSkillInstallLocks(stateDirectory: string): Promise<{
-  scanned: number
-  reclaimed: number
-  truncated: boolean
-}> {
-  const directory = join(stateDirectory, 'locks')
-  const entries = await readdir(directory, { withFileTypes: true }).catch((error) => {
-    if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
-      return []
-    }
-    throw error
-  })
-  const locks = entries
-    .filter(
-      (entry) =>
-        (LOCK_NAME.test(entry.name) && (entry.isFile() || entry.isDirectory())) ||
-        (entry.isFile() && LEGACY_OWNER_NAME.test(entry.name)) ||
-        (entry.isDirectory() && CANDIDATE_LOCK_NAME.test(entry.name)) ||
-        (entry.isDirectory() && RELEASED_LOCK_NAME.test(entry.name))
-    )
-    .sort((left, right) => left.name.localeCompare(right.name))
-  let reclaimed = 0
-  for (const lock of locks.slice(0, MAX_STARTUP_LOCKS)) {
-    const path = join(directory, lock.name)
-    await (LEGACY_OWNER_NAME.test(lock.name)
-      ? removeStaleLegacyLock(path)
-      : CANDIDATE_LOCK_NAME.test(lock.name)
-        ? removeStaleLockDirectory(path, LOCK_STALE_MS)
-        : RELEASED_LOCK_NAME.test(lock.name)
-          ? reclaimReleasedSkillInstallLock(path)
-          : removeStaleLock(path))
-    if (!(await stat(path).catch(() => null))) {
-      reclaimed += 1
-    }
-  }
-  return {
-    scanned: Math.min(locks.length, MAX_STARTUP_LOCKS),
-    reclaimed,
-    truncated: locks.length > MAX_STARTUP_LOCKS
   }
 }
 

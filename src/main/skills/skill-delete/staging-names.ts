@@ -4,11 +4,9 @@
  * not surface them, or a skill mid-transaction shows up as a second row (and,
  * for delete, as a row the user can delete again).
  *
- * The four conventions in the tree today:
- *   `.<name>.orca-skill-delete-<uuid>`      (service)
- *   `.<name>.orca-remove-backup-<uuid>`     (skill-remove-transaction)
- *   `.<name>.orca-placement-backup-<id>`    (skill-placement-transaction-controller)
- *   `.<name>.orca-placement-staging-<id>`   (skill-placement-transaction-controller)
+ * Delete stages as `.<name>.orca-skill-delete-<uuid>` (service). Builds that
+ * installed skills left `.orca-remove-backup-` and `.orca-placement-` siblings,
+ * which can still sit on disk.
  *
  * Matched by shape rather than by an enumerated list so the native walker and
  * WSL's `find -prune` (which can only express a glob) cannot drift apart.

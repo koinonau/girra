@@ -1,16 +1,9 @@
 // Why: this channel keeps E2EE framing out of RPC handlers, which consume plaintext across transports.
 import type { WebSocket } from 'ws'
 import { deriveSharedKey, encrypt, decrypt, encryptBytes, decryptBytes } from './e2ee-crypto'
-import {
-  DesktopMobileE2EEV2Session,
-  type DesktopMobileE2EEV2Context
-} from './mobile-e2ee-v2-desktop-session'
-import type { DesktopMobileE2EEV2OutboundItem as V2OutboundItem } from './mobile-e2ee-v2-desktop-outbound'
-import { handleDesktopMobileE2EEV2Inbound } from './mobile-e2ee-v2-desktop-inbound'
 import { authenticateMobileE2EE, decodeMobileE2EEPublicKey } from './mobile-e2ee-auth-validation'
 import {
   isMobileE2EEBinaryPayloadWithinLimit,
-  isMobileE2EEOutboundItemWithinLimit,
   isMobileE2EETextPayloadWithinLimit
 } from './mobile-e2ee-outbound-admission'
 import { parseRemoteRuntimeJsonText } from '../../../shared/remote-runtime-request-frames'
@@ -18,6 +11,7 @@ import type { MobileE2EEOutboundMemoryBudget } from './mobile-e2ee-outbound-memo
 import { MobileE2EEDesktopOutboundOwner } from './mobile-e2ee-desktop-outbound-owner'
 import { parseRuntimeClientCapabilities } from './runtime-client-capabilities'
 import type { RuntimeCapability } from '../../../shared/protocol-version'
+import type { DeviceScope } from '../../../shared/runtime-types'
 
 const HANDSHAKE_TIMEOUT_MS = 10_000
 const MAX_CONSECUTIVE_DECRYPT_FAILURES = 5
@@ -27,15 +21,13 @@ export type E2EEChannelOptions = {
   resolveAuthenticatedDevice: (token: string) => E2EEAuthenticatedDevice | null
   onReady: (channel: E2EEChannel, device: E2EEAuthenticatedDevice) => void
   onError: (code: number, reason: string) => void
-  transportContext?: DesktopMobileE2EEV2Context
-  requireV2?: boolean
   outboundMemoryBudget?: MobileE2EEOutboundMemoryBudget
 }
 
 export type E2EEAuthenticatedDevice = {
   deviceId: string
   deviceToken: string
-  scope: 'mobile' | 'runtime'
+  scope: DeviceScope
 }
 
 export class E2EEChannel {
@@ -48,10 +40,7 @@ export class E2EEChannel {
   private readonly resolveAuthenticatedDevice: (token: string) => E2EEAuthenticatedDevice | null
   private readonly onReady: (channel: E2EEChannel, device: E2EEAuthenticatedDevice) => void
   private readonly onError: (code: number, reason: string) => void
-  private readonly transportContext: DesktopMobileE2EEV2Context
-  private readonly requireV2: boolean
   private readonly outbound: MobileE2EEDesktopOutboundOwner
-  private v2Session: DesktopMobileE2EEV2Session | null = null
   // Why: the handler is set after readiness because its reply closure needs this channel's encryption state.
   private messageHandler:
     | ((
@@ -72,8 +61,6 @@ export class E2EEChannel {
     this.resolveAuthenticatedDevice = options.resolveAuthenticatedDevice
     this.onReady = options.onReady
     this.onError = options.onError
-    this.transportContext = options.transportContext ?? { transport: 'direct' }
-    this.requireV2 = options.requireV2 ?? false
     this.outbound = new MobileE2EEDesktopOutboundOwner(ws, options.outboundMemoryBudget)
 
     this.handshakeTimer = setTimeout(() => {
@@ -105,10 +92,6 @@ export class E2EEChannel {
       return
     }
 
-    if (this.v2Session) {
-      this.handleV2RawMessage(raw)
-      return
-    }
     const sharedKey = this.sharedKey
     if (!sharedKey) {
       return
@@ -191,28 +174,6 @@ export class E2EEChannel {
       return
     }
 
-    if (hello.type === 'e2ee_hello' && hello.v === 2) {
-      const session = DesktopMobileE2EEV2Session.create({
-        hello,
-        serverSecretKey: this.serverSecretKey,
-        expectedContext: this.transportContext
-      })
-      if (!session) {
-        this.onError(4001, 'Invalid e2ee_hello v2')
-        return
-      }
-      this.v2Session = session
-      this.state = 'awaiting_auth'
-      if (this.ws.readyState === this.ws.OPEN) {
-        this.ws.send(JSON.stringify(session.ready))
-      }
-      return
-    }
-
-    if (this.requireV2) {
-      this.onError(4001, 'E2EE v2 required')
-      return
-    }
     if (hello.type !== 'e2ee_hello' || typeof hello.publicKeyB64 !== 'string') {
       this.onError(4001, 'Invalid e2ee_hello')
       return
@@ -239,7 +200,6 @@ export class E2EEChannel {
   private handleAuth(plaintext: string): void {
     const authentication = authenticateMobileE2EE({
       plaintext,
-      v2Session: this.v2Session,
       resolveDevice: this.resolveAuthenticatedDevice
     })
     if (!authentication.ok) {
@@ -262,45 +222,7 @@ export class E2EEChannel {
     // Why: transport-bound identity checks must complete before the peer sees
     // authentication success.
     this.onReady(this, authenticatedDevice)
-    this.sendEncryptedControl(
-      this.v2Session
-        ? {
-            type: 'e2ee_authenticated',
-            v: 2,
-            transcriptHashB64: this.v2Session.transcriptHashB64
-          }
-        : { type: 'e2ee_authenticated' }
-    )
-  }
-
-  private handleV2RawMessage(raw: string | Uint8Array<ArrayBufferLike>): void {
-    handleDesktopMobileE2EEV2Inbound({
-      session: this.v2Session!,
-      raw,
-      awaitingAuth: this.state === 'awaiting_auth',
-      onDecryptFailure: () => this.trackDecryptFailure(),
-      onDecryptSuccess: () => (this.consecutiveFailures = 0),
-      onAuth: (plaintext) => this.handleAuth(plaintext),
-      onBinary: (plaintext) => this.binaryMessageHandler?.(plaintext),
-      onText: (plaintext) =>
-        this.messageHandler?.(
-          plaintext,
-          (response) => this.enqueueV2({ kind: 'text', plaintext: response }),
-          (response) => this.enqueueV2({ kind: 'binary', plaintext: response })
-        ),
-      onProtocolError: () => this.onError(4001, 'Invalid binary message before authentication')
-    })
-  }
-
-  private enqueueV2(item: V2OutboundItem): boolean {
-    if (!this.v2Session || this.ws.readyState !== this.ws.OPEN) {
-      return false
-    }
-    if (!isMobileE2EEOutboundItemWithinLimit(item)) {
-      this.closeForOutboundBudget()
-      return false
-    }
-    return this.outbound.enqueueV2(item, this.v2Session, () => this.closeForOutboundBudget())
+    this.sendEncryptedControl({ type: 'e2ee_authenticated' })
   }
 
   // Why: kills the whole remote session, for an oversized reply or a backed-up link.
@@ -309,9 +231,7 @@ export class E2EEChannel {
   }
 
   private sendEncryptedControl(message: unknown): void {
-    if (this.v2Session) {
-      this.enqueueV2({ kind: 'text', plaintext: JSON.stringify(message) })
-    } else if (this.ws.readyState === this.ws.OPEN && this.sharedKey) {
+    if (this.ws.readyState === this.ws.OPEN && this.sharedKey) {
       const frame = encrypt(JSON.stringify(message), this.sharedKey)
       this.outbound.sendLegacyFrame(frame, () => this.closeForOutboundBudget())
     }
@@ -324,7 +244,6 @@ export class E2EEChannel {
     }
     this.sharedKey = null
     this.authenticatedDevice = null
-    this.v2Session = null
     this.messageHandler = null
     this.binaryMessageHandler = null
     this.outbound.dispose()

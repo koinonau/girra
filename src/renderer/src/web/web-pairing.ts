@@ -115,7 +115,7 @@ function decodePairingPayload(base64url: string): WebPairingOffer | null {
 }
 
 function parseWebPairingScope(value: unknown): DeviceScope | null {
-  return value === 'mobile' || value === 'runtime' ? value : null
+  return value === 'runtime' ? value : null
 }
 
 function extractPairingCodeFromUrl(url: string): string | null {

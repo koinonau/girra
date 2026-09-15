@@ -199,7 +199,3 @@ export type {
   RuntimeWorktreeRemoveResult,
   RuntimeWorktreeStatus
 } from './runtime-worktree-contracts'
-export type {
-  RuntimeMarkdownReadTabResult,
-  RuntimeMarkdownSaveTabResult
-} from './mobile-markdown-document'

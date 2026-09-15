@@ -137,22 +137,13 @@ describe('serveOrcaApp', () => {
       serveOrcaApp({
         json: true,
         port: '6768',
-        pairingAddress: '100.64.1.20',
-        mobilePairing: true
+        pairingAddress: '100.64.1.20'
       })
     ).resolves.toBe(0)
 
     expect(spawnMock).toHaveBeenCalledWith(
       '/Applications/Orca.app/Contents/MacOS/Orca',
-      [
-        '--serve',
-        '--serve-json',
-        '--serve-port',
-        '6768',
-        '--serve-pairing-address',
-        '100.64.1.20',
-        '--serve-mobile-pairing'
-      ],
+      ['--serve', '--serve-json', '--serve-port', '6768', '--serve-pairing-address', '100.64.1.20'],
       expect.objectContaining({
         cwd: resolve(__dirname, '../../..')
       })

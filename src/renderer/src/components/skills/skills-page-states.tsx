@@ -58,8 +58,8 @@ export function SkillsEmptyState({ onRefresh }: { onRefresh: () => void }): Reac
         </h2>
         <p className="max-w-sm text-xs leading-5 text-muted-foreground">
           {translate(
-            'auto.components.skills.SkillsPage.emptyCopyRefresh',
-            'The scanned skill folders are empty. Refresh after adding a skill.'
+            'auto.components.skills.SkillsPage.emptyCopyKothar',
+            'The scanned skill folders are empty. Install kothar from More actions, or refresh after adding a skill.'
           )}
         </p>
       </div>

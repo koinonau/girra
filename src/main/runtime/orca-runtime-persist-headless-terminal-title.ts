@@ -1,8 +1,6 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { OrcaRuntimeWithMoveHeadlessMobileSessionTab } from './orca-runtime-move-headless-mobile-session-tab'
 import type {
-  RuntimeMarkdownReadTabResult,
-  RuntimeMarkdownSaveTabResult,
   RuntimeMobileSessionTabGroup,
   RuntimeMobileSessionTabsSnapshot
 } from '../../shared/runtime-types'
@@ -137,30 +135,6 @@ export class OrcaRuntimeWithPersistHeadlessTerminalTitle extends OrcaRuntimeWith
       return null
     }
     return tab.type === 'terminal' ? tab.parentTabId : tab.id
-  }
-
-  async readMobileMarkdownTab(
-    worktreeSelector: string,
-    tabId: string
-  ): Promise<RuntimeMarkdownReadTabResult> {
-    const worktreeId = await this.resolveMobileMarkdownWorktreeId(worktreeSelector, tabId)
-    if (!this.notifier?.readMobileMarkdownTab) {
-      throw new Error('renderer_unavailable')
-    }
-    return await this.notifier.readMobileMarkdownTab(worktreeId, tabId)
-  }
-
-  async saveMobileMarkdownTab(
-    worktreeSelector: string,
-    tabId: string,
-    baseVersion: string,
-    content: string
-  ): Promise<RuntimeMarkdownSaveTabResult> {
-    const worktreeId = await this.resolveMobileMarkdownWorktreeId(worktreeSelector, tabId)
-    if (!this.notifier?.saveMobileMarkdownTab) {
-      throw new Error('renderer_unavailable')
-    }
-    return await this.notifier.saveMobileMarkdownTab(worktreeId, tabId, baseVersion, content)
   }
 
   // Why: `getRepo(id)` is host-blind and never read `worktree.hostId`, which outranks every repo

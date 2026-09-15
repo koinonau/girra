@@ -47,7 +47,7 @@ describe('OrcaRuntimeRpcServer', () => {
       const offer = server.createPairingOffer({
         address: '127.0.0.1',
         name: 'mobile-test',
-        scope: 'mobile'
+        scope: 'runtime'
       })
       expect(offer.available).toBe(true)
       if (!offer.available) {

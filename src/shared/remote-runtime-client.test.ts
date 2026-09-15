@@ -399,7 +399,7 @@ describe('sendRemoteRuntimeRequest', () => {
     try {
       const request = sendRemoteRuntimeRequest(
         server.pairing,
-        'skills.install',
+        'skills.delete',
         {},
         60_000,
         undefined,

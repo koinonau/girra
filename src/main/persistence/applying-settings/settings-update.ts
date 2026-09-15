@@ -20,11 +20,6 @@ import { normalizeWorktreeVisibilityDefaults } from '../../../shared/external-wo
 import { normalizePRBotAuthorOverrides } from '../../../shared/pr-bot-author-overrides'
 import type { PersistedState } from '../../../shared/persisted-state-types'
 import {
-  addMobilePairingCustomAddress,
-  normalizeMobilePairingCustomAddress,
-  normalizeMobilePairingCustomAddresses
-} from '../../../shared/mobile-pairing-custom-address'
-import {
   mergeLegacyCommitMessageAiIntoSourceControlAi,
   normalizeSourceControlAiSettings,
   projectSourceControlAiToLegacyCommitMessageAi
@@ -174,33 +169,6 @@ export function updateSettings(
     sanitizedUpdates.prBotAuthorOverrides = normalizePRBotAuthorOverrides(
       updates.prBotAuthorOverrides
     )
-  }
-  if ('mobilePairingCustomAddress' in updates) {
-    sanitizedUpdates.mobilePairingCustomAddress = normalizeMobilePairingCustomAddress(
-      updates.mobilePairingCustomAddress
-    )
-  }
-  if ('mobilePairingCustomAddresses' in updates) {
-    sanitizedUpdates.mobilePairingCustomAddresses = normalizeMobilePairingCustomAddresses(
-      updates.mobilePairingCustomAddresses
-    )
-  }
-  if (
-    'mobilePairingCustomAddress' in sanitizedUpdates ||
-    'mobilePairingCustomAddresses' in sanitizedUpdates
-  ) {
-    const mobilePairingCustomAddress =
-      'mobilePairingCustomAddress' in sanitizedUpdates
-        ? sanitizedUpdates.mobilePairingCustomAddress
-        : operations.state.settings.mobilePairingCustomAddress
-    if (mobilePairingCustomAddress) {
-      sanitizedUpdates.mobilePairingCustomAddresses = addMobilePairingCustomAddress(
-        sanitizedUpdates.mobilePairingCustomAddresses ??
-          operations.state.settings.mobilePairingCustomAddresses ??
-          [],
-        mobilePairingCustomAddress
-      )
-    }
   }
   const historyWithPreviousLayout = buildWorkspaceDirHistoryForUpdate(
     operations.state.settings,

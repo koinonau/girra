@@ -14,7 +14,7 @@ import type { RuntimeGitCommandSurface } from './runtime-git-command-surface'
 import type { RuntimeRepositoryCommandSurface } from './runtime-repository-command-surface'
 import type { RuntimeReviewCommandSurface } from './runtime-review-command-surface'
 import type { RuntimeServiceCommandSurface } from './runtime-service-command-surface'
-import type { RuntimeSkillCommandSurface } from './runtime-skill-command-surface'
+import type { RuntimeSkillDiscoveryProviderRootsSurface } from './runtime-skill-discovery-provider-roots'
 
 export type PtyIncarnationHandleRecord = {
   handle: string
@@ -336,7 +336,7 @@ export type RuntimeInstalledCommandSurfaces = RuntimeEdgeCommandSurface &
   RuntimeRepositoryCommandSurface &
   RuntimeReviewCommandSurface &
   RuntimeServiceCommandSurface &
-  RuntimeSkillCommandSurface
+  RuntimeSkillDiscoveryProviderRootsSurface
 
 export type RuntimeCommandSurfaceHost<T> = T & RuntimeInstalledCommandSurfaces
 

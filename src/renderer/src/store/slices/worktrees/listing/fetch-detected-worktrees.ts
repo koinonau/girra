@@ -15,7 +15,6 @@ import {
   worktreeHostMatchOptions
 } from './worktree-host-ownership'
 import { fetchKnownSshWorktreesForRepo } from './known-ssh-worktree-fetch'
-import { notifyRuntimeScopeForbiddenIfNeeded } from './runtime-scope-forbidden-toast'
 import { settingsForRepoOwner } from './worktree-owner-settings'
 
 export function createFetchDetectedWorktrees(
@@ -89,9 +88,6 @@ export function createFetchDetectedWorktrees(
       })
       return admitted ? refresh.result : null
     } catch (err) {
-      if (notifyRuntimeScopeForbiddenIfNeeded(err)) {
-        return null
-      }
       console.error(`Failed to fetch detected worktrees for repo ${repoId}:`, err)
       return null
     }

@@ -15,7 +15,6 @@ import {
 } from './worktree-host-ownership'
 import { fetchKnownSshWorktreesForRepo } from './known-ssh-worktree-fetch'
 import { mergeFetchedWorktrees } from './fetched-worktree-merge'
-import { notifyRuntimeScopeForbiddenIfNeeded } from './runtime-scope-forbidden-toast'
 import { mapReposForWorktreeRefresh } from './worktree-refresh-pool'
 import { settingsForKnownRepoOwner } from './worktree-owner-settings'
 
@@ -71,9 +70,6 @@ export function createFetchAllWorktrees(
             refresh
           })
         } catch (err) {
-          if (notifyRuntimeScopeForbiddenIfNeeded(err)) {
-            return
-          }
           console.error(`Failed to fetch worktrees for repo ${r.id}:`, err)
         }
       })
@@ -136,9 +132,7 @@ export function createFetchAllWorktrees(
             detected: refresh.result
           }
         } catch (err) {
-          if (!notifyRuntimeScopeForbiddenIfNeeded(err)) {
-            console.error(`Failed to fetch worktrees for repo ${r.id}:`, err)
-          }
+          console.error(`Failed to fetch worktrees for repo ${r.id}:`, err)
           return { repoId: r.id, ok: false as const }
         }
       }

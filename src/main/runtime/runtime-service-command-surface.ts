@@ -3,7 +3,6 @@ import type { RuntimeAiVaultCommands } from './runtime-ai-vault-commands'
 import type { RuntimeBrowserDriverController } from './runtime-browser-driver-controller'
 import type { RuntimeClientEventBus } from './runtime-client-event-bus'
 import type { RuntimeMessageWaiters } from './runtime-message-waiters'
-import type { RuntimeMobileNotificationController } from './runtime-mobile-notification-controller'
 import type { RuntimeNativeChatDraftResolutions } from './runtime-native-chat-draft-resolutions'
 import type { RuntimeSubscriptionRegistry } from './runtime-subscription-registry'
 
@@ -20,13 +19,6 @@ export type RuntimeServiceCommandSurface = {
   cleanupSubscriptionsByPrefix: RuntimeSubscriptionRegistry['cleanupByPrefix']
   cleanupSubscriptionsForConnection: RuntimeSubscriptionRegistry['cleanupForConnection']
   cleanupSubscriptionIfOwnedByConnection: RuntimeSubscriptionRegistry['cleanupIfOwnedByConnection']
-  onNotificationDispatched: RuntimeMobileNotificationController['onDispatched']
-  getMobileNotificationListenerCount: RuntimeMobileNotificationController['getListenerCount']
-  dispatchMobileNotification: RuntimeMobileNotificationController['dispatch']
-  getMissedNotificationsSince: RuntimeMobileNotificationController['getMissedSince']
-  getMobileNotificationEpoch: RuntimeMobileNotificationController['getEpoch']
-  dismissMobileNotification: RuntimeMobileNotificationController['dismiss']
-  dispatchPluginNotification: RuntimeMobileNotificationController['dispatchPlugin']
   setAccountServices: RuntimeAccountController['setServices']
   setCommitMessageAgentEnvironmentResolvers: RuntimeAccountController['setCommitMessageAgentEnvironment']
   getCommitMessageAgentEnvironmentResolvers: RuntimeAccountController['getCommitMessageAgentEnvironment']
@@ -49,7 +41,6 @@ type RuntimeServiceCommandOwners = {
   clientEvents: RuntimeClientEventBus
   nativeChatDraftResolutions: RuntimeNativeChatDraftResolutions
   subscriptions: RuntimeSubscriptionRegistry
-  mobileNotifications: RuntimeMobileNotificationController
   accounts: RuntimeAccountController
   browserDrivers: RuntimeBrowserDriverController
   messageWaiters: RuntimeMessageWaiters
@@ -63,7 +54,6 @@ export function installRuntimeServiceCommandSurface(
   const events = owners.clientEvents
   const drafts = owners.nativeChatDraftResolutions
   const subscriptions = owners.subscriptions
-  const notifications = owners.mobileNotifications
   const accounts = owners.accounts
   const browsers = owners.browserDrivers
   const waiters = owners.messageWaiters
@@ -81,13 +71,6 @@ export function installRuntimeServiceCommandSurface(
     cleanupSubscriptionsForConnection: subscriptions.cleanupForConnection.bind(subscriptions),
     cleanupSubscriptionIfOwnedByConnection:
       subscriptions.cleanupIfOwnedByConnection.bind(subscriptions),
-    onNotificationDispatched: notifications.onDispatched.bind(notifications),
-    getMobileNotificationListenerCount: notifications.getListenerCount.bind(notifications),
-    dispatchMobileNotification: notifications.dispatch.bind(notifications),
-    getMissedNotificationsSince: notifications.getMissedSince.bind(notifications),
-    getMobileNotificationEpoch: notifications.getEpoch.bind(notifications),
-    dismissMobileNotification: notifications.dismiss.bind(notifications),
-    dispatchPluginNotification: notifications.dispatchPlugin.bind(notifications),
     setAccountServices: accounts.setServices.bind(accounts),
     setCommitMessageAgentEnvironmentResolvers:
       accounts.setCommitMessageAgentEnvironment.bind(accounts),

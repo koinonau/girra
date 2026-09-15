@@ -109,8 +109,7 @@ export function initializeMainProcessRuntime(): OrcaRuntimeService {
       state.runtimeRpc?.getDeviceRegistry()?.getDevice(pairedDeviceId)?.name ?? null,
     buildAgentHookPtyEnv: () =>
       isAgentStatusHooksEnabled(state.store?.getSettings()) ? agentHookServer.buildPtyEnv() : {},
-    orchestrationEnvironmentTransport,
-    skillTransactionRecovery: state.skillTransactionRecovery
+    orchestrationEnvironmentTransport
   })
   state.runtime = runtime
   agentHookServer.subscribeEnrichedStatus((enriched) =>

@@ -38,7 +38,7 @@ export type SkillDeleteServiceInput = {
   repos: readonly Repo[]
   providerRootOverrides?: SkillProviderRootOverrides
   filesystem: SkillInstallFilesystem
-  /** `<userData>/skill-installs` — the same state root install and remove use. */
+  /** `<userData>/skill-installs`, which also holds receipts older builds wrote on install. */
   stateDirectory: string
   wslDistro?: string | null
   homeDir?: string

@@ -65,11 +65,6 @@ describe('serve-mode-argv', () => {
     expect(
       normalizeServeModeArgv(['/AppRun', 'serve', '--port', '6768', '--no-pairing=false'])
     ).toEqual(['/AppRun', '--serve', '--serve-port', '6768', '--no-pairing=false'])
-    expect(normalizeServeModeArgv(['/AppRun', 'serve', '--mobile-pairing=0'])).toEqual([
-      '/AppRun',
-      '--serve',
-      '--mobile-pairing=0'
-    ])
   })
 
   it('leaves real GUI launch argv alone', () => {
@@ -150,7 +145,6 @@ describe('serve-mode-argv', () => {
       '--serve-pairing-address',
       '100.64.1.20',
       '--serve-no-pairing',
-      '--serve-mobile-pairing',
       '--serve-recipe-json',
       '--serve-project-root',
       '/srv/repo'

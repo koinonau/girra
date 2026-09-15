@@ -32,12 +32,6 @@ export const SKILL_INSTALL_BUSY_FAILURE: SkillInstallFailure = {
   retryable: true
 }
 
-export const SKILL_INSTALL_CANCELLED_FAILURE: SkillInstallFailure = {
-  category: 'cancelled',
-  code: 'skill-install-cancelled',
-  retryable: true
-}
-
 function retryableCode(code: string): boolean {
   return (
     code.includes('busy') ||

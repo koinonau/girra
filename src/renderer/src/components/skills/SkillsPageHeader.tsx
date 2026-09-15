@@ -1,9 +1,10 @@
-import { BookOpen, MoreHorizontal, Trash2, X } from 'lucide-react'
+import { BookOpen, Download, MoreHorizontal, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
@@ -13,6 +14,42 @@ import { skillCountLabel } from './skill-display-labels'
 import { SKILLS_PAGE_COLUMN } from './skills-page-column'
 import { SkillsSourcesPopover } from './SkillsSourcesPopover'
 import type { SkillSourceInventoryEntry } from './skill-source-inventory'
+import type { KotharSshInstallTarget } from './use-kothar-install-targets'
+
+function MenuItemWithReason({
+  disabled,
+  reason,
+  destructive = false,
+  onSelect,
+  children
+}: {
+  disabled: boolean
+  reason: string | null
+  destructive?: boolean
+  onSelect: () => void
+  children: React.ReactNode
+}): React.JSX.Element {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className="pointer-events-auto block">
+          <DropdownMenuItem
+            variant={destructive ? 'destructive' : 'default'}
+            disabled={disabled}
+            onSelect={onSelect}
+          >
+            {children}
+          </DropdownMenuItem>
+        </span>
+      </TooltipTrigger>
+      {disabled && reason ? (
+        <TooltipContent side="left" sideOffset={4}>
+          {reason}
+        </TooltipContent>
+      ) : null}
+    </Tooltip>
+  )
+}
 
 export function SkillsPageHeader({
   skillCount,
@@ -22,7 +59,12 @@ export function SkillsPageHeader({
   onClose,
   deleteSupported,
   deleteUnsupportedReason,
-  onStartDelete
+  onStartDelete,
+  installKotharDisabled,
+  installKotharDisabledReason,
+  onInstallKothar,
+  sshInstallTargets,
+  onInstallKotharOnSshHost
 }: {
   skillCount: number
   sourceEntries: readonly SkillSourceInventoryEntry[]
@@ -35,6 +77,11 @@ export function SkillsPageHeader({
   deleteSupported: boolean
   deleteUnsupportedReason: string | null
   onStartDelete: () => void
+  installKotharDisabled: boolean
+  installKotharDisabledReason: string | null
+  onInstallKothar: () => void
+  sshInstallTargets: readonly KotharSshInstallTarget[]
+  onInstallKotharOnSshHost: (target: KotharSshInstallTarget) => void
 }): React.JSX.Element {
   return (
     <header className="shrink-0 border-b border-border">
@@ -95,25 +142,39 @@ export function SkillsPageHeader({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="pointer-events-auto block">
-                  <DropdownMenuItem
-                    variant="destructive"
-                    disabled={!deleteSupported}
-                    onSelect={onStartDelete}
-                  >
-                    <Trash2 />
-                    {translate('auto.components.skills.SkillsPage.deleteSkills', 'Delete skills…')}
-                  </DropdownMenuItem>
-                </span>
-              </TooltipTrigger>
-              {deleteSupported || !deleteUnsupportedReason ? null : (
-                <TooltipContent side="left" sideOffset={4}>
-                  {deleteUnsupportedReason}
-                </TooltipContent>
-              )}
-            </Tooltip>
+            <MenuItemWithReason
+              disabled={installKotharDisabled}
+              reason={installKotharDisabledReason}
+              onSelect={onInstallKothar}
+            >
+              <Download />
+              {translate('auto.components.skills.SkillsPage.installKothar', 'Install kothar…')}
+            </MenuItemWithReason>
+            {sshInstallTargets.map((target) => (
+              <MenuItemWithReason
+                key={target.targetId}
+                disabled={target.disabledReason !== null}
+                reason={target.disabledReason}
+                onSelect={() => onInstallKotharOnSshHost(target)}
+              >
+                <Download />
+                {translate(
+                  'auto.components.skills.SkillsPage.installKotharOnHost',
+                  'Install kothar on {{value0}}…',
+                  { value0: target.label }
+                )}
+              </MenuItemWithReason>
+            ))}
+            <DropdownMenuSeparator />
+            <MenuItemWithReason
+              destructive
+              disabled={!deleteSupported}
+              reason={deleteUnsupportedReason}
+              onSelect={onStartDelete}
+            >
+              <Trash2 />
+              {translate('auto.components.skills.SkillsPage.deleteSkills', 'Delete skills…')}
+            </MenuItemWithReason>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

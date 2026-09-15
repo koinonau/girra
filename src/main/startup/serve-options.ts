@@ -8,7 +8,6 @@ export type ServeOptions = {
   wsPort?: number
   pairingAddress: string | null
   noPairing: boolean
-  mobilePairing: boolean
   recipeJson: boolean
   projectRoot: string | null
 }
@@ -117,7 +116,6 @@ export function getServeOptions(argv: readonly string[]): ServeOptions {
       '--serve-pairing-address'
     ),
     noPairing: lastBooleanValue(optionsArgv, ['--serve-no-pairing', '--no-pairing']),
-    mobilePairing: lastBooleanValue(optionsArgv, ['--serve-mobile-pairing', '--mobile-pairing']),
     recipeJson: lastBooleanValue(optionsArgv, ['--serve-recipe-json', '--recipe-json']),
     projectRoot: valueAfter(
       optionsArgv,

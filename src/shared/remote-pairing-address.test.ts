@@ -85,15 +85,4 @@ describe('remote pairing address', () => {
       value: { endpointKind: 'loopback' }
     })
   })
-
-  it('rejects mobile-only access grants', () => {
-    const link = encodePairingOffer({
-      v: PAIRING_OFFER_VERSION,
-      endpoint: 'wss://orca.example.com',
-      deviceToken: 'token',
-      publicKeyB64: 'key',
-      scope: 'mobile'
-    })
-    expect(parseHostAccessLink(link)).toMatchObject({ ok: false, kind: 'mobile-only' })
-  })
 })

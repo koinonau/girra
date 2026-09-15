@@ -24,7 +24,6 @@ export const CLI_BOOLEAN_FLAGS = new Set([
   'messages',
   'me',
   'mobile',
-  'mobile-pairing',
   'no-pairing',
   'screen',
   'parent-current',

@@ -58,7 +58,6 @@ export function shouldRouteSubscriptionBySupport(method: string): boolean {
     method === 'session.tabs.subscribe' ||
     method === 'session.tabs.subscribeAll' ||
     method === 'accounts.subscribe' ||
-    method === 'notifications.subscribe' ||
     method === 'files.watch'
   )
 }

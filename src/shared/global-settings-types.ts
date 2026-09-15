@@ -389,10 +389,6 @@ export type GlobalSettings = {
    *  `null` (default) holds phone size indefinitely; a finite value schedules restore.
    *  Clamped on read to [5_000ms, 60min]. See docs/mobile-fit-hold.md. */
   mobileAutoRestoreFitMs: number | null
-  /** Explicit custom address restored when generating future mobile pairing codes. */
-  mobilePairingCustomAddress?: string | null
-  /** Saved custom addresses available in both mobile pairing pickers. */
-  mobilePairingCustomAddresses?: string[]
   /** Experimental: floating animated pet in the bottom-right corner. Opt-in cosmetic;
    *  off never mounts the overlay, and toggling takes effect instantly (renderer-side). */
   experimentalPet: boolean

@@ -105,7 +105,7 @@ describe('mobile pairing userData path stability', () => {
         deviceId: 'late-phone',
         name: 'iPhone',
         token: 'late-token',
-        scope: 'mobile',
+        scope: 'runtime',
         pairedAt: 1,
         lastSeenAt: 2
       }
@@ -144,7 +144,7 @@ describe('mobile pairing userData path stability', () => {
         deviceId: 'late-phone',
         name: 'iPhone',
         token: 'late-token',
-        scope: 'mobile',
+        scope: 'runtime',
         pairedAt: 1,
         lastSeenAt: 2
       }
@@ -218,7 +218,14 @@ describe('mobile pairing userData path stability', () => {
     initDataPath()
 
     const devices = JSON.stringify([
-      { deviceId: 'phone', name: 'iPhone', token: 't', scope: 'mobile', pairedAt: 1, lastSeenAt: 2 }
+      {
+        deviceId: 'phone',
+        name: 'iPhone',
+        token: 't',
+        scope: 'runtime',
+        pairedAt: 1,
+        lastSeenAt: 2
+      }
     ])
     writeFileSync(join(canonicalDir, DEVICE_REGISTRY_FILENAME), devices)
 

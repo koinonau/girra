@@ -76,7 +76,6 @@ const result = spawnSync(
     'tests/e2e/ssh-port-forward-lifecycle.spec.ts',
     'tests/e2e/ssh-reconnect-tab-destruction.spec.ts',
     'tests/e2e/ssh-restart-tab-accumulation.spec.ts',
-    'tests/e2e/ssh-skill-installation.spec.ts',
     'tests/e2e/ssh-terminal-window-wake-stale-grid-repro.spec.ts',
     '--config',
     'tests/playwright.config.ts',

@@ -137,8 +137,7 @@
         "7a566540de": "配对 URL 或代码",
         "cb4d287238": "服务器名称",
         "3affe7de3a": "粘贴来自该浏览器可以访问的 Orca 服务器的配对 URL。",
-        "e3bcd082ac": "连接到 Orca",
-        "mobileScopeRejected": "此二维码仅授予受限（移动端）访问权限。若要使用完整 Web 应用，请从设置 → 远程 Orca 服务器 → 分享此 Orca 服务器 → 新链接打开浏览器访问链接。"
+        "e3bcd082ac": "连接到 Orca"
       },
       "webPreloadApi": {
         "aiVaultUnavailableForHost": "此执行主机不支持 Agent 会话历史记录。",
@@ -252,8 +251,6 @@
           "78e08cd877": "Git 无法安全删除分支\"{{value0}}\"，因此 Orca 将其保留以避免丢失本地提交。",
           "3b57982bf6": "删除工作区\"{{value1}}\"后，Git 无法安全删除分支\"{{value0}}\"，因此 Orca 将其保留以避免丢失本地提交。",
           "81f13f48d2": "删除工作树\"{{value1}}\"后，Git 无法安全删除分支\"{{value0}}\"，因此 Orca 将其保留以避免丢失本地提交。",
-          "runtimeScopeForbiddenTitle": "此连接具有受限（移动端）访问权限",
-          "runtimeScopeForbiddenDescription": "移动端范围的配对无法使用工作区。请通过设置 → 远程 Orca 服务器 → 分享此 Orca 服务器中的浏览器访问链接重新连接。",
           "createdWithoutParentNesting": "已创建，但未嵌套在“{{value0}}”下",
           "createdWithoutParentNestingUnnamed": "已创建，但未嵌套在所选父工作树下",
           "createdWithoutParentNestingDetail": "父工作树已不可用。您可以从工作区菜单中重新设置。"
@@ -311,7 +308,6 @@
       },
       "remotePairingCopy": {
         "invalidInput": "请输入 Orca 访问链接或配对代码。",
-        "mobileOnly": "此链接仅授予移动端访问权限。请为另一个 Orca 客户端生成链接。",
         "invalidDestination": "此访问链接包含无效的目标地址。",
         "unsupportedDestination": "此访问链接包含不受支持的目标地址。",
         "nonConnectableDestination": "此访问链接包含无法连接的目标地址。",
@@ -3613,7 +3609,6 @@
           "closeSkills": "关闭技能",
           "closeTooltip": "关闭 · Esc",
           "moreActions": "更多操作",
-          "emptyCopy": "扫描的技能文件夹为空。请安装共享包，或添加技能后刷新。",
           "retry": "重试",
           "deleteSkills": "删除技能…"
         },
@@ -6027,29 +6022,6 @@
           "0a452d4d3b": "检测到 {{value0}} 个模拟器设备。",
           "f62a1bb759": "检测到设备后，Orca 会自动选择一个模拟器设备。",
           "b2fd62ea75": "新模拟器标签页和智能体附加命令使用的默认设备。自动选择会优先使用已在运行的设备。"
-        },
-        "MobileNetworkInterfaceSection": {
-          "63d5e4ae1e": "重新生成二维码并从 Orca 手机应用程序扫描。",
-          "87985ba6f5": "在此网络接口菜单中，选择 Tailscale 地址，通常是 100.x.y.z IP。",
-          "1f7c26d36a": "在两台设备上登录相同的 tailnet。",
-          "668016be7a": "在您的计算机和手机上。",
-          "1dc87a7fbc": "Tailscale",
-          "51d29927eb": "安装",
-          "9fc5d203ff": "Orca 手机端 直接连接到此计算机。要在远离同一局域网的地方使用它，请将您的计算机和手机置于同一私有覆盖网络上，然后使用所选的网络地址生成二维码。",
-          "39fad211d9": "使用尾网连接 Wi-Fi 外部",
-          "a9db5d771d": "刷新网络接口",
-          "d536b5e20d": "选择要在 QR 码中公布的网络地址。使用 LAN 地址进行同网络配对，或使用覆盖网络地址（Tailscale、ZeroTier）进行跨网络访问。",
-          "406a35121c": "网络接口",
-          "c541f67790": "生成二维码",
-          "1e64659126": "再生"
-        },
-        "MobilePane": {
-          "relayDegradedNotice": "无法连接 Relay — 此二维码仅在局域网或 Tailscale 内可用。请重新生成后再试。"
-        },
-        "MobileSettingsPane": {
-          "9a3c280e49": "GitHub 发布",
-          "b0088412a1": "或 Android APK 来自",
-          "c8491c17ef": "通过扫描二维码从手机控制 Orca。 Beta/早期预览 - 预计会出现错误和重大更改。从以下位置获取 iOS 应用程序"
         },
         "NotificationsPane": {
           "906b4afebf": "发送测试通知",
@@ -9161,27 +9133,6 @@
           "567633ff50": "右键点击将剪贴板内容粘贴到终端。按住 Control 键点击以打开上下文菜单。",
           "c64497148a": "右键点击粘贴剪贴板内容。按住 Control 键点击打开上下文菜单。"
         },
-        "MobileRelayStatusSection": {
-          "registered": "已注册",
-          "connecting": "正在连接",
-          "reconnecting": "正在重新连接",
-          "offline": "离线",
-          "title": "Orca Relay",
-          "automatic": "手机配对后可从任何地方连接",
-          "signInPrompt": "在此桌面端登录以从任何地方连接",
-          "directStillAvailable": "局域网和 Tailscale 连接仍然可用。",
-          "directNeedsNoAccount": "无需账户即可使用局域网和 Tailscale 配对。",
-          "signIn": "登录",
-          "unavailable": "不可用",
-          "standby": "待机 — 无 Relay 设备"
-        },
-        "MobileRelayBetaAvailability": {
-          "about": "关于 Orca Relay 测试版",
-          "beta": "测试版",
-          "availability": "可用平台：",
-          "testFlight": "TestFlight",
-          "androidApk": "Android APK"
-        },
         "SkillUsageExampleDialog": {
           "copiedPrompt": "复制示例提示。",
           "copyFailed": "复制提示失败。",
@@ -11081,36 +11032,6 @@
             "listLabel": "运行目标",
             "label": "运行在",
             "browse": "浏览运行目标"
-          }
-        }
-      },
-      "mobile": {
-        "MobileHero": {
-          "bb0074ce11": "配对二维码",
-          "ca85e595a7": "没有找到接口",
-          "79d2f480da": "用于广告的网络接口",
-          "7af266b80d": "安装二维码",
-          "relayDegradedNotice": "无法连接 Relay — 此二维码仅在局域网或 Tailscale 内可用。"
-        },
-        "MobilePage": {
-          "1b4509a8a1": "配对的",
-          "c5909374cf": "简介"
-        },
-        "MobilePageToolbar": {
-          "a4f8c2d91e": "从左侧边栏隐藏 Orca 手机端",
-          "b7e3d1c84a": "在左侧边栏显示 Orca 手机端"
-        },
-        "mobile": {
-          "platform": {
-            "copy": {
-              "2a532d6fd7": "使用 Android 相机扫描以从 GitHub Releases 下载最新的 APK。",
-              "432db52b73": "使用 iPhone 相机扫描以打开 App Store。"
-            }
-          }
-        },
-        "slides": {
-          "WorktreeListSlide": {
-            "c5ad56786d": "旋转器"
           }
         }
       },

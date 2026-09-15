@@ -41,7 +41,7 @@ export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
 
   revokeRuntimeAccess(deviceId: string): boolean {
     const device = this.deviceRegistry?.getDevice(deviceId)
-    if (device?.scope !== 'runtime' || !this.deviceRegistry?.removeDevice(deviceId)) {
+    if (!device || !this.deviceRegistry?.removeDevice(deviceId)) {
       return false
     }
     this.runtime.forgetClientNavigationState(deviceId)
@@ -119,8 +119,7 @@ export class RuntimeRpcPairing extends RuntimeRpcNetworkExposure {
       pairingUrl,
       endpoint,
       deviceId: device.deviceId,
-      webClientUrl:
-        this.webClientRoot && scope === 'runtime' ? createWebClientUrl(endpoint, pairingUrl) : null
+      webClientUrl: this.webClientRoot ? createWebClientUrl(endpoint, pairingUrl) : null
     }
   }
 }

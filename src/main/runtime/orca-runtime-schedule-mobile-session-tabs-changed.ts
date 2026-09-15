@@ -3,7 +3,6 @@ import { OrcaRuntimeWithStoredMobileSnapshotHasStalePreservedTab } from './orca-
 import type {
   BrowserTabInfo,
   RuntimeMobileSessionClientTab,
-  RuntimeMobileSessionMarkdownTab,
   RuntimeMobileSessionTabGroup,
   RuntimeMobileSessionTabsResult
 } from '../../shared/runtime-types'
@@ -106,24 +105,6 @@ export class OrcaRuntimeWithScheduleMobileSessionTabsChanged extends OrcaRuntime
         )
       }
     }
-  }
-
-  protected async resolveMobileMarkdownWorktreeId(
-    worktreeSelector: string,
-    tabId: string
-  ): Promise<string> {
-    const worktreeId =
-      this.getValidatedExplicitWorktreeIdSelector(worktreeSelector) ??
-      (await this.resolveWorktreeSelector(worktreeSelector)).id
-    const snapshot = this.mobileSessionTabsByWorktree.get(worktreeId)
-    const tab = snapshot?.tabs.find(
-      (candidate): candidate is RuntimeMobileSessionMarkdownTab =>
-        candidate.type === 'markdown' && candidate.id === tabId
-    )
-    if (!tab) {
-      throw new Error('tab_not_found')
-    }
-    return worktreeId
   }
 
   protected getLiveBrowserTabsByPageId(worktreeId: string): Map<string, BrowserTabInfo> {

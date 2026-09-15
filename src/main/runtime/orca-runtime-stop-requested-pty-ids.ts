@@ -31,7 +31,6 @@ import { OrchestrationMailboxPointerDelivery } from './orchestration/mailbox-poi
 import { OrchestrationMailboxNotificationCoordinator } from './orchestration/mailbox-notification-coordinator'
 import type { RuntimeMessageWaiter } from './runtime-message-waiters'
 import { RuntimeMessageWaiters } from './runtime-message-waiters'
-import type { RuntimeSkillCommands } from './runtime-skill-command-surface'
 import { RuntimeTerminalStreamConsumers } from './runtime-terminal-stream-consumers'
 import type { RecentPtyOutputBuffer } from './recent-pty-output-buffer'
 
@@ -242,8 +241,6 @@ export class OrcaRuntimeWithStopRequestedPtyIds extends OrcaRuntimeWithRuntimeId
     })
 
   protected readonly messageWaiters = new RuntimeMessageWaiters()
-
-  protected readonly skillCommands: RuntimeSkillCommands
 
   // Why: mobile clients subscribe to terminal output via terminal.subscribe.
   // These listeners fire on every onPtyData call, enabling real-time streaming

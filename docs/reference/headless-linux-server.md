@@ -407,8 +407,8 @@ depend on an interactive shell profile.
 ## Upgrade
 
 `orca serve` never updates itself. In headless mode Orca wires up no auto-updater
-at all — the built-in updater only runs in the desktop GUI, and no paired mobile
-or web client can trigger it remotely. Upgrading is always a deliberate step:
+at all — the built-in updater only runs in the desktop GUI, and no paired
+desktop or web client can trigger it remotely. Upgrading is always a deliberate step:
 replace the AppImage and restart the service.
 
 Two facts make the persisted-state transition predictable:
@@ -417,7 +417,7 @@ Two facts make the persisted-state transition predictable:
   data is under `/home/orca/.config/` (Orca uses both an `orca` and an `Orca`
   directory there), fully independent of `/opt/orca/orca-linux.AppImage`.
   Replacing the binary never touches projects, worktree metadata, terminal
-  history, orchestration state, or paired-device keys — so mobile and web
+  history, orchestration state, or paired-device keys — so desktop and web
   clients reconnect after an upgrade without re-pairing.
 - **New builds migrate old state on load.** Orca loads older `orca-data.json`
   state into the current schema and writes it back in the current shape, so a

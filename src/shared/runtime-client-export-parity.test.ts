@@ -99,8 +99,6 @@ type RuntimeTypeInventory = [
   Runtime.RuntimeGitCheckoutResult,
   Runtime.RuntimeGitLocalBranches,
   Runtime.RuntimeGraphStatus,
-  Runtime.RuntimeMarkdownReadTabResult,
-  Runtime.RuntimeMarkdownSaveTabResult,
   Runtime.RuntimeMobileSessionBrowserTab,
   Runtime.RuntimeMobileSessionClientTab,
   Runtime.RuntimeMobileSessionCreateTerminalResult,

@@ -32,20 +32,6 @@
 <tr>
 <td width="50%" valign="middle">
 
-### Companion móvel
-
-Monitore e conduza seus agentes pelo celular — receba uma notificação quando um agente terminar e envie instruções de acompanhamento de qualquer lugar.
-
-[App Store para iOS](https://apps.apple.com/us/app/orca-ide/id6766130217) · [TestFlight](https://testflight.apple.com/join/YjeGMQBA) · [APK Android 0.0.48](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.48/app-release.apk) · [Docs →](https://www.onorca.dev/docs/mobile)
-
-</td>
-<td width="50%">
-  <a href="https://www.onorca.dev/docs/mobile"><picture><source srcset="../assets/feature-wall/mobile-companion-app-showcase.gif" type="image/gif"><img src="../assets/feature-wall/mobile-companion-app-showcase.jpg" alt="Orca desktop com o app companion móvel" width="100%" /></picture></a>
-</td>
-</tr>
-<tr>
-<td width="50%" valign="middle">
-
 ### Worktrees paralelos
 
 Envie um mesmo prompt para cinco agentes, cada um em seu próprio worktree git isolado — compare os resultados e faça merge do vencedor.
@@ -198,13 +184,6 @@ brew install --cask stablyai/orca/orca
 # Arch Linux (AUR) — ou stably-orca-git para compilar a partir do código-fonte
 yay -S stably-orca-bin
 ```
-
-### Companion móvel — iOS, Android
-
-Conecte ao app desktop para monitorar e conduzir seus agentes pelo celular.
-
-- **iOS:** [Baixar na App Store](https://apps.apple.com/us/app/orca-ide/id6766130217) ou [entrar no TestFlight](https://testflight.apple.com/join/YjeGMQBA)
-- **Android:** [Baixar APK 0.0.48](https://github.com/stablyai/orca/releases/download/mobile-android-v0.0.48/app-release.apk)
 
 ---
 

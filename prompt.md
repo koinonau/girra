@@ -4,11 +4,11 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a to 5d, 6, 7a and the ADRs are merged; Phase 5e is in review.
+Measured 2026-09-16. No tracker exists, so these come from the build plan's phases. Phases 0 to 6, 7a and the ADRs are merged; the remote serving cleanup and kothar install is in review.
 
-1. **Remote serving cleanup and kothar install.** Remove the mobile leftovers; delete remote skill install; add the Skills page "Install kothar" action (see `handover.md`).
-2. **Phase 7b, Girra identity.** Rename the app to Girra and the CLI to `girra`, then sweep displayed text. The build plan's Phase 7 records the scope and traps.
-3. **Workflows.** Prune to the kept set, add the signed macOS build, then re-enable Actions once the user has added the secrets.
+1. **Phase 7b, Girra identity.** Rename the app to Girra and the CLI to `girra`, then sweep displayed text. The build plan's Phase 7 records the scope and traps; remap first, since its map predates Phase 5.
+2. **Workflows.** Prune to the kept set, add the signed macOS build, then re-enable Actions once the user has added the secrets. Drop the pull request template's skill upstream boundary item, whose document does not exist.
+3. **Mobile client dead code.** Remove the presence lock, driver overlays, phone-fit, display mode and `clientKind: 'mobile'` branches deferred by the remote serving cleanup (see `handover.md`).
 
 ## Backlog
 

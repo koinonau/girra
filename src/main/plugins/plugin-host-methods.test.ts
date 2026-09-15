@@ -134,8 +134,7 @@ function createTerminalHarness(terminalHandles: string[]): {
     listTerminals: vi.fn().mockResolvedValue({
       terminals: terminalHandles.map((handle) => ({ handle, title: null }))
     }),
-    sendTerminal: vi.fn().mockResolvedValue({ accepted: true }),
-    dispatchPluginNotification: vi.fn().mockResolvedValue({ delivered: true })
+    sendTerminal: vi.fn().mockResolvedValue({ accepted: true })
   }
   return {
     delegate,

@@ -36,8 +36,13 @@ describe('pairing offer', () => {
   })
 
   it('preserves optional device scope metadata', () => {
-    const scopedOffer: PairingOffer = { ...offer, scope: 'mobile' }
+    const scopedOffer: PairingOffer = { ...offer, scope: 'runtime' }
     expect(decodePairingOffer(encodePairingOffer(scopedOffer))).toEqual(scopedOffer)
+  })
+
+  it('rejects a retired mobile-scope offer', () => {
+    const code = Buffer.from(JSON.stringify({ ...offer, scope: 'mobile' })).toString('base64url')
+    expect(parsePairingCode(`orca://pair?code=${code}`)).toBeNull()
   })
 
   it('round-trips a TLS reverse-proxy endpoint with an explicit port and path', () => {

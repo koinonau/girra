@@ -6,7 +6,6 @@ import type { WebSocketTransport } from '../rpc/ws-transport'
 import type { DeviceScope } from '../device-registry'
 import { RuntimeRpcRequestAdmission } from './runtime-rpc-request-admission'
 import { classifyRuntimeLongPoll } from './runtime-rpc-long-poll'
-import { MOBILE_RPC_METHOD_ALLOWLIST } from './runtime-rpc-mobile-method-allowlist'
 
 // Why: status.get has no per-connection context in the dispatcher, so stamp the scope here at the transport boundary.
 function injectDeviceScope(response: string, scope: DeviceScope): string {
@@ -69,20 +68,7 @@ export class RuntimeRpcWebSocketDispatch extends RuntimeRpcRequestAdmission {
       reply(JSON.stringify(this.buildError(request.id, 'unauthorized', 'Invalid device token')))
       return
     }
-    if (device.scope === 'mobile' && !MOBILE_RPC_METHOD_ALLOWLIST.has(request.method)) {
-      reply(
-        JSON.stringify(
-          this.buildError(
-            request.id,
-            'forbidden',
-            `Method '${request.method}' is not available to mobile clients`
-          )
-        )
-      )
-      return
-    }
-
-    // Why: bind deviceToken to this socket so ws.on('close') knows which mobile client disconnected.
+    // Why: bind deviceToken to this socket so ws.on('close') knows which client disconnected.
     if (wsTransport && ws) {
       wsTransport.setClientId(ws, token)
     }
@@ -113,12 +99,6 @@ export class RuntimeRpcWebSocketDispatch extends RuntimeRpcRequestAdmission {
         // Why: gates the mobile-only payload diet so full-screen web/desktop clients aren't truncated.
         clientKind: device.scope,
         clientCapabilities: authenticatedSocket?.clientCapabilities,
-        updateClientCapabilities:
-          authenticatedSocket && device.scope === 'mobile'
-            ? (clientCapabilities) => {
-                authenticatedSocket.clientCapabilities = clientCapabilities
-              }
-            : undefined,
         signal: abortRegistration?.signal,
         sendBinary,
         registerBinaryStreamHandler: (streamId, handler) =>

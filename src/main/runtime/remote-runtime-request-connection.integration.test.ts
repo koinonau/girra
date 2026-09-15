@@ -490,7 +490,6 @@ describe('remote runtime request connection integration', () => {
       ]
       const clientEventListeners = new Set<(event: RuntimeClientEvent) => void>()
       const accountsListeners = new Set<(snapshot: unknown) => void>()
-      const notificationListeners = new Set<(event: unknown) => void>()
       const sessionTabListeners = new Set<(snapshot: unknown) => void>()
       const subscriptionCleanups = new Map<string, () => void>()
       const sessionTabSnapshot = {
@@ -556,10 +555,6 @@ describe('remote runtime request connection integration', () => {
         onAccountsChanged: (listener: (snapshot: unknown) => void) => {
           accountsListeners.add(listener)
           return () => accountsListeners.delete(listener)
-        },
-        onNotificationDispatched: (listener: (event: unknown) => void) => {
-          notificationListeners.add(listener)
-          return () => notificationListeners.delete(listener)
         },
         listMobileSessionTabs: () => sessionTabSnapshot,
         listAllMobileSessionTabs: () => [sessionTabSnapshot],
@@ -667,7 +662,6 @@ describe('remote runtime request connection integration', () => {
             ['runtime.clientEvents.subscribe', undefined],
             ['session.tabs.subscribe', { worktree: 'id:wt-1' }],
             ['accounts.subscribe', undefined],
-            ['notifications.subscribe', undefined],
             ['files.watch', { worktree: 'id:wt-1' }]
           ] as const
           const mixedSubscriptions = await Promise.all(

@@ -1,5 +1,5 @@
 // Why: per-device tokens replace the shared runtime auth token for WebSocket
-// (mobile) connections. Each paired device gets its own revocable token so
+// connections. Each paired device gets its own revocable token so
 // compromising one device doesn't expose others. The registry is a simple
 // JSON file with hardened permissions matching the runtime metadata pattern.
 import { randomBytes, randomUUID } from 'node:crypto'
@@ -46,7 +46,7 @@ export class DeviceRegistry {
 
   addDevice(
     name: string,
-    scope: DeviceScope = 'mobile',
+    scope: DeviceScope = 'runtime',
     pairingReach: RuntimePairingReach = 'network'
   ): DeviceEntry {
     return this.createAndPersistDevice(this.devices, name, scope, pairingReach)
@@ -80,7 +80,7 @@ export class DeviceRegistry {
   // existing never-used entry if present; otherwise mints a new one.
   getOrCreatePendingDevice(
     name: string,
-    scope: DeviceScope = 'mobile',
+    scope: DeviceScope = 'runtime',
     pairingReach: RuntimePairingReach = 'network'
   ): DeviceEntry {
     const existing = this.devices.find((d) => d.lastSeenAt === 0 && d.scope === scope)
@@ -114,7 +114,7 @@ export class DeviceRegistry {
   // pre-pairing token.
   rotatePendingDevice(
     name: string,
-    scope: DeviceScope = 'mobile',
+    scope: DeviceScope = 'runtime',
     pairingReach: RuntimePairingReach = 'network'
   ): DeviceEntry {
     const retainedDevices = this.devices.filter((d) => d.lastSeenAt !== 0 || d.scope !== scope)
@@ -220,15 +220,15 @@ export class DeviceRegistry {
     try {
       hardenExistingSecureFile(this.registryPath)
       const parsed = JSON.parse(readFileSync(this.registryPath, 'utf-8')) as DeviceEntry[]
-      this.devices = parsed.map((device) => ({
-        ...device,
-        // Why: older registries only existed for phone pairing. Treat missing
-        // scope as mobile so legacy device tokens do not gain new CLI powers.
-        scope: device.scope === 'runtime' ? 'runtime' : 'mobile',
-        // Why: registries written before this field existed only ever held network-reach grants (phones and
-        // LAN links), so a missing value must keep binding every interface on reconnect.
-        pairingReach: device.pairingReach === 'this-computer' ? 'this-computer' : 'network'
-      }))
+      // Why: mobile and scopeless entries came from phone pairing; upgrading them would grant CLI powers.
+      this.devices = parsed
+        .filter((device) => device.scope === 'runtime')
+        .map((device) => ({
+          ...device,
+          // Why: registries written before this field existed only ever held network-reach grants (phones and
+          // LAN links), so a missing value must keep binding every interface on reconnect.
+          pairingReach: device.pairingReach === 'this-computer' ? 'this-computer' : 'network'
+        }))
       this.registryUnreadable = false
     } catch (error) {
       // "Cannot read" is not "is empty". Saving an empty list over a registry we were merely

@@ -46,8 +46,6 @@ export function normalizeLoadedGlobalSettings(
     migratedWindowsRuntimeDefault,
     migratedLocalAccountRuntime,
     loadedCompactWorktreeCards,
-    mobilePairingCustomAddress,
-    mobilePairingCustomAddresses,
     normalizedNotifications,
     normalizedSourceControlGroupOrder
   } = profile
@@ -107,8 +105,6 @@ export function normalizeLoadedGlobalSettings(
     terminalQuickCommands: normalizeTerminalQuickCommands(parsed.settings?.terminalQuickCommands),
     terminalCustomThemes: normalizeTerminalCustomThemes(parsed.settings?.terminalCustomThemes),
     appIcon: normalizeAppIconId(parsed.settings?.appIcon),
-    mobilePairingCustomAddress,
-    mobilePairingCustomAddresses,
     // Why: persisted settings may be hand-edited or from older builds; keep tray-minimize false unless stored value is true.
     minimizeToTrayOnClose: parsed.settings?.minimizeToTrayOnClose === true,
     // Why: missing means default-on; round-trips unchanged on non-mac since darwin consumers gate the effect.

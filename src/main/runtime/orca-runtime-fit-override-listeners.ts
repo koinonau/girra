@@ -1,7 +1,6 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { OrcaRuntimeWithStopRequestedPtyIds } from './orca-runtime-stop-requested-pty-ids'
 import { RuntimeSubscriptionRegistry } from './runtime-subscription-registry'
-import { RuntimeMobileNotificationController } from './runtime-mobile-notification-controller'
 import type {
   ProviderBufferAcquisition,
   RuntimeHeadlessTerminal,
@@ -32,8 +31,6 @@ export class OrcaRuntimeWithFitOverrideListeners extends OrcaRuntimeWithStopRequ
   >()
 
   protected readonly subscriptions = new RuntimeSubscriptionRegistry()
-
-  protected readonly mobileNotifications = new RuntimeMobileNotificationController()
 
   protected ptysById = new Map<string, RuntimePtyWorktreeRecord>()
 

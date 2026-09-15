@@ -11,7 +11,6 @@ export type ParsedHostAccessLink = {
 
 export type HostAccessLinkErrorKind =
   | 'invalid-input'
-  | 'mobile-only'
   | 'invalid-destination'
   | 'unsupported-destination'
   | 'non-connectable-destination'
@@ -93,13 +92,6 @@ export function parseHostAccessLink(input: string): ParseHostAccessLinkResult {
       ok: false,
       kind: 'invalid-input',
       message: 'Enter an Orca access link or bare pairing code.'
-    }
-  }
-  if (pairing.scope === 'mobile') {
-    return {
-      ok: false,
-      kind: 'mobile-only',
-      message: 'This link grants mobile-only access. Generate a link for another Orca client.'
     }
   }
   let endpoint: URL

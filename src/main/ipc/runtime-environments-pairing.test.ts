@@ -330,7 +330,6 @@ describe('registerRuntimeEnvironmentHandlers', () => {
 
   it.each([
     [{ protocolVersion: MIN_COMPATIBLE_RUNTIME_SERVER_VERSION - 1 }, 'protocol-incompatible'],
-    [{ protocolVersion: 999_999, deviceScope: 'mobile' }, 'access-link-invalid'],
     [null, 'connection-interrupted']
   ])('does not save a host with rejected status %o', async (status, expectedKind) => {
     registerRuntimeEnvironmentHandlers(store as never)

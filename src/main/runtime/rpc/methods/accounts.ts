@@ -64,7 +64,7 @@ export const ACCOUNT_METHODS = [
   }),
   // Why: streaming counterpart so mobile usage bars refresh in place when the
   // desktop's 5-minute rate-limit poll completes or when the user switches
-  // accounts on either side. Mirrors the notifications.subscribe pattern.
+  // accounts on either side.
   defineStreamingMethod({
     name: 'accounts.subscribe',
     params: null,

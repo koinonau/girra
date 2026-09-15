@@ -323,11 +323,6 @@ import {
 import { CreateProject } from './linear-project-create-params'
 import { NativeChatSession, NativeChatUnsubscribe } from './native-chat-params'
 import {
-  NotificationGetMissedSinceParams,
-  NotificationUnsubscribeParams,
-  NotificationsSubscribeParams
-} from './notifications-params'
-import {
   FederationDispatchParams,
   FederationFleetSnapshotParams,
   FederationOutputReadParams,
@@ -411,7 +406,6 @@ import {
   RepoUpdate
 } from './repo-params'
 import { BrowserTarget } from './rpc-param-primitives'
-import { ClientCapabilitiesUpdate } from './runtime-client-capabilities-params'
 import { SessionTabsUnsubscribeAllParams } from './session-tabs-params'
 import {
   ActivateTab,
@@ -419,17 +413,12 @@ import {
   CloseTab,
   CreateTerminalTab,
   MoveTab,
-  SaveMarkdownTab,
   SessionTabsUnsubscribe,
   SetTabProps,
   UpdatePaneLayout,
   WorktreeTabSelector
 } from './session-tabs-schemas-params'
-import {
-  SkillsCancelInstallParams,
-  SkillsDiscoverParams,
-  SkillsGetInstallProgressParams
-} from './skills-params'
+import { SkillsDiscoverParams } from './skills-params'
 import { SshTarget } from './ssh-params'
 import {
   AttachParams,
@@ -498,18 +487,7 @@ import {
   WorktreeSortOrder,
   WorktreeTeardownMissingTerminalsParams
 } from './worktree-params'
-import { SkillBundleInstallRequestSchema } from '../skill-bundle-install-contract'
 import { SkillDeleteRequestSchema } from '../skill-delete-contract'
-import {
-  SkillInstallPreviewRequestSchema,
-  SkillInstallRequestSchema,
-  SkillRemoveRequestSchema
-} from '../skill-install-contract'
-import {
-  SkillUploadBeginRequestSchema,
-  SkillUploadChunkRequestSchema,
-  SkillUploadCommitRequestSchema
-} from '../skill-upload-session-contract'
 
 // Why: the host parses params with these schemas, so a client that matches this map
 // matches the dispatcher. Clients must import it for types only — parsing a params
@@ -897,15 +875,10 @@ export const RPC_PARAMS_BY_METHOD = {
   'linear.teamStates': TeamId,
   'linear.testConnection': WorkspaceSelection,
   'linear.updateIssue': IssueUpdateOfLinearParams,
-  'markdown.readTab': ActivateTab,
-  'markdown.saveTab': SaveMarkdownTab,
   'nativeChat.readSession': NativeChatSession,
   'nativeChat.subscribe': NativeChatSession,
   'nativeChat.unsubscribe': NativeChatUnsubscribe,
   'network.browserTunnel': BrowserNetworkTunnelAttachParams,
-  'notifications.getMissedSince': NotificationGetMissedSinceParams,
-  'notifications.subscribe': NotificationsSubscribeParams,
-  'notifications.unsubscribe': NotificationUnsubscribeParams,
   'orchestration.ask': AskParams,
   'orchestration.check': CheckParams,
   'orchestration.dispatch': DispatchParams,
@@ -991,7 +964,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'repo.show': RepoSelector,
   'repo.sparsePresets': RepoSelector,
   'repo.update': RepoUpdate,
-  'runtime.clientCapabilities.update': ClientCapabilitiesUpdate,
   'runtime.clientEvents.subscribe': null,
   'runtime.clientEvents.unsubscribe': ClientEventsUnsubscribeParams,
   'session.tabs.activate': ActivateTab,
@@ -1013,20 +985,9 @@ export const RPC_PARAMS_BY_METHOD = {
   'settings.update': SettingsUpdate,
   'settings.updatePRBotAuthorOverride': PRBotAuthorOverrideUpdate,
   'settings.updateTerminalQuickCommands': TerminalQuickCommandsUpdate,
-  'skills.beginUpload': SkillUploadBeginRequestSchema,
-  'skills.cancelInstall': SkillsCancelInstallParams,
-  'skills.cancelUpload': SkillUploadCommitRequestSchema,
-  'skills.commitUpload': SkillUploadCommitRequestSchema,
   'skills.delete': SkillDeleteRequestSchema,
   'skills.discover': SkillsDiscoverParams,
-  'skills.getInstallProgress': SkillsGetInstallProgressParams,
-  'skills.install': SkillInstallRequestSchema,
-  'skills.installBundle': SkillBundleInstallRequestSchema,
-  'skills.listManagedInstalls': null,
   'skills.previewDelete': SkillDeleteRequestSchema,
-  'skills.previewInstall': SkillInstallPreviewRequestSchema,
-  'skills.removeInstall': SkillRemoveRequestSchema,
-  'skills.uploadChunk': SkillUploadChunkRequestSchema,
   'ssh.connect': SshTarget,
   'ssh.getState': SshTarget,
   'ssh.listRemovedTargetLabels': null,

@@ -65,6 +65,8 @@ type RetiredGlobalSettings = {
   activeCodexManagedAccountIdsByRuntime?: unknown
   skipCodexRateLimitResetConfirm?: unknown
   codexSessionSourceHome?: unknown
+  mobilePairingCustomAddress?: unknown
+  mobilePairingCustomAddresses?: unknown
 }
 
 export function stripRetiredGlobalSettings(
@@ -81,6 +83,9 @@ export function stripRetiredGlobalSettings(
     skipCodexRateLimitResetConfirm: _retiredCodexResetConfirm,
     // Why: Codex terminal launches were removed, so its history import home has no reader.
     codexSessionSourceHome: _retiredCodexSessionSourceHome,
+    // Why: the mobile app that read the custom pairing addresses was removed.
+    mobilePairingCustomAddress: _retiredMobilePairingCustomAddress,
+    mobilePairingCustomAddresses: _retiredMobilePairingCustomAddresses,
     ...rest
   } = (settings ?? {}) as Partial<GlobalSettings> & RetiredGlobalSettings
   void _legacyScrollbackBytes
@@ -91,6 +96,8 @@ export function stripRetiredGlobalSettings(
   void _retiredCodexActiveAccountsByRuntime
   void _retiredCodexResetConfirm
   void _retiredCodexSessionSourceHome
+  void _retiredMobilePairingCustomAddress
+  void _retiredMobilePairingCustomAddresses
   return rest
 }
 

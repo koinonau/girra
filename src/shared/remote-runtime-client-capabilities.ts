@@ -11,7 +11,6 @@ import {
   WORKTREE_VISIBILITY_SOURCE_DEFAULTS_RUNTIME_CAPABILITY,
   type RuntimeCapability
 } from './protocol-version'
-import { SKILL_INSTALL_RESULT_V2_CAPABILITY } from './skill-install-capability'
 
 // Keep every remote request transport on the same mixed-version capability contract.
 export function remoteRuntimeClientCapabilities(
@@ -25,7 +24,6 @@ export function remoteRuntimeClientCapabilities(
       SESSION_TAB_CLOSE_INTENT_RUNTIME_CAPABILITY,
       SESSION_TABS_AUTHORITATIVE_INVENTORY_RUNTIME_CAPABILITY,
       AGENT_SESSION_BOUNDARY_RUNTIME_CAPABILITY,
-      SKILL_INSTALL_RESULT_V2_CAPABILITY,
       WORKTREE_GITHUB_PR_SUPPRESSION_RUNTIME_CAPABILITY,
       WORKTREE_VISIBILITY_DEFAULTS_RUNTIME_CAPABILITY,
       WORKTREE_VISIBILITY_SOURCE_DEFAULTS_RUNTIME_CAPABILITY,

@@ -40,7 +40,7 @@ opt-ins to network reach, and the startup log says so on every launch.
 The bind is **pinned**, not defaulted. Two things widen the desktop's listener on their own —
 `orca serve`'s wide default, and a startup where some device has connected before — and an
 unattended host's exposure must be exactly what the operator asked for on every launch. A
-mobile pairing offer, which normally rebinds to all interfaces, is refused while the bind is
+pairing offer, which normally rebinds to all interfaces, is refused while the bind is
 pinned to loopback and reports `network_exposure_failed` rather than advertising an endpoint
 nothing can reach.
 
