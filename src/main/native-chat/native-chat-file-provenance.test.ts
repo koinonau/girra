@@ -7,10 +7,10 @@ function terminalTab(): RuntimeMobileSessionClientTab {
   return {
     type: 'terminal',
     id: 'tab-1',
-    title: 'Codex',
+    title: 'Claude',
     parentTabId: 'parent-1',
     leafId: 'leaf-1',
-    launchAgent: 'codex',
+    launchAgent: 'claude',
     agentStatus: {
       state: 'done',
       prompt: '',
@@ -18,7 +18,7 @@ function terminalTab(): RuntimeMobileSessionClientTab {
       stateStartedAt: 1,
       paneKey: 'parent-1:leaf-1',
       stateHistory: [],
-      agentType: 'codex',
+      agentType: 'claude',
       providerSession: {
         key: 'session_id',
         id: 'session-1',
@@ -57,7 +57,7 @@ describe('nativeChatTranscriptIncludesPath', () => {
       })
     ).resolves.toBe(true)
     expect(readTranscript).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-1',
       transcriptPath: '/host/transcripts/session-1.jsonl',
       limit: 2000

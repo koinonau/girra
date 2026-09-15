@@ -9,7 +9,7 @@ describe('SSH claimed PTY incarnation validation', () => {
       keyId: 'key',
       identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-      agent: 'codex' as const
+      agent: 'claude' as const
     }
     const surface = {
       worktreeId: 'worktree',

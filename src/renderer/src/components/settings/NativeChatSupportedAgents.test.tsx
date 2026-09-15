@@ -12,13 +12,7 @@ import { i18n } from '@/i18n/i18n'
 import { getAgentCatalog } from '@/lib/agent-catalog'
 import { NativeChatSupportedAgents } from './NativeChatSupportedAgents'
 
-const EXPECTED_SUPPORTED_AGENTS = [
-  'claude',
-  'openclaude',
-  'codex',
-  'grok',
-  'omp'
-] as const satisfies readonly TuiAgent[]
+const EXPECTED_SUPPORTED_AGENTS = ['claude'] as const satisfies readonly TuiAgent[]
 const SUPPORTED_AGENTS_LABEL_KEY = 'auto.components.settings.NativeChatSupportedAgents.label'
 
 function getRenderedChips(): { agent: string; label: string; role: string }[] {

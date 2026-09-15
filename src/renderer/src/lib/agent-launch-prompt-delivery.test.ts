@@ -36,11 +36,11 @@ describe('seedNativeChatLaunchDraftForAgentTab', () => {
     // newlines made every Linear launch invisible in chat. Send now clears every
     // parked line first, so there is nothing left to glue.
     const text = 'Linked Linear issue: STA-1234\nhttps://linear.app/o/issue/STA-1234\n'
-    seedNativeChatLaunchDraftForAgentTab({ tabId: 'linear-tab', agent: 'codex', text })
+    seedNativeChatLaunchDraftForAgentTab({ tabId: 'linear-tab', agent: 'claude', text })
 
     expect(mocks.seedNativeChatLaunchDraft).toHaveBeenCalledWith({
       tabId: 'linear-tab',
-      agent: 'codex',
+      agent: 'claude',
       text,
       createdAt: expect.any(Number)
     })
@@ -49,13 +49,13 @@ describe('seedNativeChatLaunchDraftForAgentTab', () => {
   it('seeds single-line text', () => {
     seedNativeChatLaunchDraftForAgentTab({
       tabId: 'issue-tab',
-      agent: 'codex',
+      agent: 'claude',
       text: 'https://github.com/o/r/issues/12'
     })
 
     expect(mocks.seedNativeChatLaunchDraft).toHaveBeenCalledWith({
       tabId: 'issue-tab',
-      agent: 'codex',
+      agent: 'claude',
       text: 'https://github.com/o/r/issues/12',
       createdAt: expect.any(Number)
     })
@@ -72,7 +72,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
     await expect(
       deliverLaunchPromptToAgentTab({
         tabId: 'tab-1',
-        agent: 'codex',
+        agent: 'claude',
         content: 'Fix failing checks',
         submit: true,
         forcePaste: true
@@ -81,13 +81,13 @@ describe('deliverLaunchPromptToAgentTab', () => {
 
     expect(mocks.seedNativeChatLaunchPrompt).toHaveBeenCalledWith({
       tabId: 'tab-1',
-      agent: 'codex',
+      agent: 'claude',
       text: 'Fix failing checks',
       createdAt: expect.any(Number)
     })
     expect(mocks.pasteDraftWhenAgentReady).toHaveBeenCalledWith({
       tabId: 'tab-1',
-      agent: 'codex',
+      agent: 'claude',
       content: 'Fix failing checks',
       submit: true,
       forcePaste: true,
@@ -99,7 +99,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
   it('does not seed a launch prompt for drafts, unsupported agents, or empty content', async () => {
     await deliverLaunchPromptToAgentTab({
       tabId: 'draft-tab',
-      agent: 'codex',
+      agent: 'claude',
       content: 'Review first',
       submit: false,
       forcePaste: false
@@ -125,7 +125,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
   it('seeds a native-chat launch draft for supported unsubmitted content', async () => {
     await deliverLaunchPromptToAgentTab({
       tabId: 'draft-tab',
-      agent: 'codex',
+      agent: 'claude',
       content: 'Review first',
       submit: false,
       forcePaste: false
@@ -133,7 +133,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
 
     expect(mocks.seedNativeChatLaunchDraft).toHaveBeenCalledWith({
       tabId: 'draft-tab',
-      agent: 'codex',
+      agent: 'claude',
       text: 'Review first',
       createdAt: expect.any(Number)
     })
@@ -145,7 +145,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
     const content = 'Forked from session\n\nhttps://example.test/context'
     await deliverLaunchPromptToAgentTab({
       tabId: 'fork-tab',
-      agent: 'codex',
+      agent: 'claude',
       content,
       submit: false,
       forcePaste: false
@@ -153,7 +153,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
 
     expect(mocks.seedNativeChatLaunchDraft).toHaveBeenCalledWith({
       tabId: 'fork-tab',
-      agent: 'codex',
+      agent: 'claude',
       text: content,
       createdAt: expect.any(Number)
     })
@@ -162,7 +162,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
   it('does not seed a launch draft for submitted, unsupported, or empty content', async () => {
     await deliverLaunchPromptToAgentTab({
       tabId: 'submit-tab',
-      agent: 'codex',
+      agent: 'claude',
       content: 'Fix failing checks',
       submit: true,
       forcePaste: true
@@ -192,7 +192,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
 
     await deliverLaunchPromptToAgentTab({
       tabId: 'draft-tab',
-      agent: 'codex',
+      agent: 'claude',
       content: 'Review first',
       submit: false,
       forcePaste: false
@@ -225,7 +225,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
     await expect(
       deliverLaunchPromptToAgentTab({
         tabId: 'tab-1',
-        agent: 'codex',
+        agent: 'claude',
         content: 'Large generated prompt',
         submit: true,
         forcePaste: true
@@ -273,7 +273,7 @@ describe('deliverLaunchPromptToAgentTab', () => {
 
     await deliverLaunchPromptToAgentTab({
       tabId: 'tab-1',
-      agent: 'codex',
+      agent: 'claude',
       content: 'Fix failing checks',
       submit: true,
       forcePaste: true,

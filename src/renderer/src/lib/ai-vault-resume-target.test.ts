@@ -72,7 +72,7 @@ describe('ai vault session storage compatibility', () => {
   it('allows host-tagged SSH sessions only on the matching SSH target', () => {
     expect(
       canResumeAiVaultSessionOnTarget({
-        sessionFilePath: '/home/ada/.codex/sessions/remote.jsonl',
+        sessionFilePath: '/home/ada/.claude/sessions/remote.jsonl',
         sessionExecutionHostId: 'ssh:dev-box',
         targetStatus: 'ssh',
         targetExecutionHostId: 'ssh:dev-box'
@@ -80,7 +80,7 @@ describe('ai vault session storage compatibility', () => {
     ).toBe(true)
     expect(
       canResumeAiVaultSessionOnTarget({
-        sessionFilePath: '/home/ada/.codex/sessions/remote.jsonl',
+        sessionFilePath: '/home/ada/.claude/sessions/remote.jsonl',
         sessionExecutionHostId: 'ssh:dev-box',
         targetStatus: 'ssh',
         targetExecutionHostId: 'ssh:other-box'
@@ -88,7 +88,7 @@ describe('ai vault session storage compatibility', () => {
     ).toBe(false)
     expect(
       canResumeAiVaultSessionOnTarget({
-        sessionFilePath: '/home/ada/.codex/sessions/remote.jsonl',
+        sessionFilePath: '/home/ada/.claude/sessions/remote.jsonl',
         sessionExecutionHostId: 'ssh:dev-box',
         targetStatus: 'local',
         targetExecutionHostId: 'local'
@@ -96,7 +96,7 @@ describe('ai vault session storage compatibility', () => {
     ).toBe(false)
     expect(
       canResumeAiVaultSessionOnTarget({
-        sessionFilePath: '/home/ada/.codex/sessions/remote.jsonl',
+        sessionFilePath: '/home/ada/.claude/sessions/remote.jsonl',
         sessionExecutionHostId: 'ssh:dev-box',
         targetStatus: 'local'
       })
@@ -117,7 +117,7 @@ describe('ai vault session storage compatibility', () => {
   it('allows runtime sessions only on the matching runtime target', () => {
     expect(
       canResumeAiVaultSessionOnTarget({
-        sessionFilePath: '/home/ada/.codex/sessions/remote.jsonl',
+        sessionFilePath: '/home/ada/.claude/sessions/remote.jsonl',
         sessionExecutionHostId: 'runtime:env-1',
         targetStatus: 'runtime',
         targetExecutionHostId: 'runtime:env-1'
@@ -125,7 +125,7 @@ describe('ai vault session storage compatibility', () => {
     ).toBe(true)
     expect(
       canResumeAiVaultSessionOnTarget({
-        sessionFilePath: '/home/ada/.codex/sessions/remote.jsonl',
+        sessionFilePath: '/home/ada/.claude/sessions/remote.jsonl',
         sessionExecutionHostId: 'runtime:env-1',
         targetStatus: 'runtime',
         targetExecutionHostId: 'runtime:env-2'

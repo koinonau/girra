@@ -80,7 +80,7 @@ async function executeRequest(request: AiVaultServiceRequest): Promise<AiVaultSe
     const startedAt = performance.now()
     const result = await scanAiVaultSessions({ ...request.options, signal: controller.signal })
     for (const session of result.sessions) {
-      if ((session.agent === 'claude' || session.agent === 'codex') && session.title.trim()) {
+      if (session.agent === 'claude' && session.title.trim()) {
         cacheServiceTitle(titleIndex, {
           agent: session.agent,
           sessionId: session.sessionId,

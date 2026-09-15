@@ -129,7 +129,7 @@ describe('createSessionWriteSubscriber', () => {
     useAppStore.getState().setAgentStatus('tab-1:1', {
       state: 'working',
       prompt: 'Fix tests',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     useAppStore.getState().setCacheTimerStartedAt('tab-1:pane-1', Date.now())
     vi.advanceTimersByTime(200)
@@ -168,12 +168,12 @@ describe('createSessionWriteSubscriber', () => {
       {
         state: 'working',
         prompt: 'Fix tests',
-        agentType: 'codex'
+        agentType: 'claude'
       },
       'Codex',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
-      { providerSession: { key: 'session_id', id: 'codex-session-1' } }
+      { providerSession: { key: 'session_id', id: 'claude-session-1' } }
     )
     vi.advanceTimersByTime(200)
 
@@ -181,7 +181,7 @@ describe('createSessionWriteSubscriber', () => {
       patch: {
         sleepingAgentSessionsByPaneKey: {
           'tab-1:leaf-1': expect.objectContaining({
-            providerSession: { key: 'session_id', id: 'codex-session-1' },
+            providerSession: { key: 'session_id', id: 'claude-session-1' },
             origin: 'live'
           })
         }

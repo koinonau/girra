@@ -50,7 +50,7 @@ describe('activateStructuredAgentSessionTab', () => {
       sortOrder: 0,
       createdAt: 0,
       isPinned: false,
-      agentSessionAgent: 'codex'
+      agentSessionAgent: 'claude'
     } satisfies Tab
     mocks.state = {
       unifiedTabsByWorktree: { 'wt-1': [tab] },

@@ -50,7 +50,7 @@ beforeEach(async () => {
     hostId: 'local'
   })
   adapter = {
-    supportsLocation: (location) =>
+    supportsCreate: (location) =>
       location.executionHostId === 'local' && location.wslDistro === null,
     acquire: vi.fn(async (input) => {
       acquisitions++
@@ -67,11 +67,12 @@ beforeEach(async () => {
           observedAt: HOST_TEST_NOW,
           origin: input.fence > 1 ? ('resumed' as const) : ('created' as const),
           handle: {
-            provider: 'codex' as const,
-            threadId:
-              input.identity.providerHandle.kind === 'codex'
-                ? input.identity.providerHandle.threadId
-                : `00000000-0000-4000-8000-${String(acquisitions).padStart(12, '0')}`
+            provider: 'claude' as const,
+            sessionId:
+              input.identity.providerHandle.kind === 'claude'
+                ? input.identity.providerHandle.sessionId
+                : `00000000-0000-4000-8000-${String(acquisitions).padStart(12, '0')}`,
+            leafUuid: null
           }
         }
       }

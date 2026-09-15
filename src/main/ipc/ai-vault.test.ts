@@ -13,7 +13,6 @@ const mocks = vi.hoisted(() => ({
   resolveAiVaultSessionTitlesInWorker: vi.fn(),
   scanRemoteAiVaultSessions: vi.fn(),
   listClaudeSubagentSessions: vi.fn(),
-  listOmpSubagentSessions: vi.fn(),
   scanRuntimeAiVaultSessions: vi.fn(),
   getAiVaultWslHomeDirs: vi.fn(),
   getSshFilesystemProvider: vi.fn(),
@@ -44,10 +43,6 @@ vi.mock('../ai-vault/remote-session-scanner', () => ({
 
 vi.mock('../ai-vault/session-scanner-claude-subagents', () => ({
   listClaudeSubagentSessions: mocks.listClaudeSubagentSessions
-}))
-
-vi.mock('../ai-vault/session-scanner-omp-subagent-listing', () => ({
-  listOmpSubagentSessions: mocks.listOmpSubagentSessions
 }))
 
 vi.mock('../ai-vault/session-delete', () => ({
@@ -91,7 +86,6 @@ vi.mock('./ssh', () => ({
   requestActiveSshAiVaultSessionTitles: mocks.requestActiveSshAiVaultSessionTitles
 }))
 
-const { OMP_SESSIONS_DIR } = await import('../ai-vault/session-scanner-roots')
 const { _internals, registerAiVaultHandlers } = await import('./ai-vault')
 const { deleteAiVaultSession: deleteAiVaultSessionWithDeps } = await import('./ai-vault-delete')
 
@@ -106,7 +100,6 @@ beforeEach(() => {
     result([session('ssh:dev-box', 'remote-session')])
   )
   mocks.listClaudeSubagentSessions.mockResolvedValue({ sessions: [], issues: [] })
-  mocks.listOmpSubagentSessions.mockResolvedValue({ sessions: [], issues: [] })
   mocks.scanRuntimeAiVaultSessions.mockResolvedValue(
     result([session('runtime:remote-server', 'runtime-session')])
   )
@@ -349,7 +342,7 @@ describe('listAiVaultSessions host routing', () => {
     expect(result.sessions.map((entry) => entry.executionHostId)).toEqual(['ssh:dev-box', 'local'])
     expect(result.issues).toEqual([
       expect.objectContaining({
-        agent: 'codex',
+        agent: 'claude',
         path: 'runtime environments',
         message: 'runtime store is invalid'
       })
@@ -393,7 +386,7 @@ describe('listAiVaultSessions host routing', () => {
     expect(result.sessions.map((entry) => entry.executionHostId)).toEqual(['local'])
     expect(result.issues).toEqual([
       expect.objectContaining({
-        agent: 'codex',
+        agent: 'claude',
         path: 'SSH hosts',
         message: 'relay session map is unavailable'
       })
@@ -433,7 +426,7 @@ describe('listAiVaultSessions host routing', () => {
     expect(result.issues).toMatchObject([
       {
         executionHostId: 'ssh:disconnected',
-        agent: 'codex',
+        agent: 'claude',
         path: 'disconnected'
       }
     ])
@@ -507,10 +500,10 @@ describe('listAiVaultSessions host routing', () => {
 
 describe('resolveAiVaultSessionTitles host routing', () => {
   const requests = [
-    { agent: 'codex' as const, sessionId: 'session-1', transcriptPath: '/tmp/session.jsonl' }
+    { agent: 'claude' as const, sessionId: 'session-1', transcriptPath: '/tmp/session.jsonl' }
   ]
   const titles = {
-    titles: [{ agent: 'codex' as const, sessionId: 'session-1', title: 'Exact title' }]
+    titles: [{ agent: 'claude' as const, sessionId: 'session-1', title: 'Exact title' }]
   }
 
   it('routes local identities to the worker without a broad scan', async () => {
@@ -574,79 +567,6 @@ describe('resolveAiVaultSessionTitles host routing', () => {
     expect(mocks.scanRemoteAiVaultSessions).not.toHaveBeenCalled()
   })
 })
-
-describe('prepareSessionResume IPC', () => {
-  it('awaits the host-local targeted resume preparation', async () => {
-    const prepareSessionResume = vi.fn().mockResolvedValue({ useRealCodexHome: true })
-    registerAiVaultHandlers({ prepareSessionResume })
-    const registration = mocks.ipcHandle.mock.calls.find(
-      ([channel]) => channel === 'aiVault:prepareSessionResume'
-    )
-    const handler = registration?.[1] as
-      | ((_event: unknown, args: unknown) => Promise<unknown>)
-      | undefined
-    const args = {
-      agent: 'codex',
-      filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-      codexHome: '/managed',
-      executionHostId: 'local'
-    }
-
-    await expect(handler?.({}, args)).resolves.toEqual({ useRealCodexHome: true })
-    expect(prepareSessionResume).toHaveBeenCalledWith(args)
-  })
-
-  it('prepares saved-runtime sessions on the transcript-owning runtime', async () => {
-    const prepareSessionResume = vi.fn()
-    const prepareRuntimeSessionResume = vi.fn().mockResolvedValue({ useRealCodexHome: true })
-    registerAiVaultHandlers({ prepareSessionResume, prepareRuntimeSessionResume })
-    const args = {
-      agent: 'codex' as const,
-      filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-      codexHome: '/managed',
-      executionHostId: 'runtime:env-123' as const
-    }
-
-    await expect(getPrepareSessionResumeHandler()({}, args)).resolves.toEqual({
-      useRealCodexHome: true
-    })
-    expect(prepareRuntimeSessionResume).toHaveBeenCalledWith('env-123', args)
-    expect(prepareSessionResume).not.toHaveBeenCalled()
-  })
-
-  it('preserves SSH session homes without reading their paths locally', async () => {
-    const prepareSessionResume = vi.fn()
-    const prepareRuntimeSessionResume = vi.fn()
-    registerAiVaultHandlers({ prepareSessionResume, prepareRuntimeSessionResume })
-
-    await expect(
-      getPrepareSessionResumeHandler()(
-        {},
-        {
-          agent: 'codex',
-          filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-          codexHome: '/managed',
-          executionHostId: 'ssh:dev-box'
-        }
-      )
-    ).resolves.toEqual({ useRealCodexHome: false })
-    expect(prepareSessionResume).not.toHaveBeenCalled()
-    expect(prepareRuntimeSessionResume).not.toHaveBeenCalled()
-  })
-})
-
-function getPrepareSessionResumeHandler(): (
-  event: unknown,
-  args: unknown
-) => Promise<{ useRealCodexHome: boolean }> {
-  const registration = mocks.ipcHandle.mock.calls.find(
-    ([channel]) => channel === 'aiVault:prepareSessionResume'
-  )
-  if (!registration) {
-    throw new Error('aiVault:prepareSessionResume was not registered')
-  }
-  return registration[1]
-}
 
 function getIpcHandler(channel: string): (...args: unknown[]) => unknown {
   const registration = mocks.ipcHandle.mock.calls.find(([registered]) => registered === channel)
@@ -722,70 +642,21 @@ describe('listAiVaultSubagentSessions gating', () => {
 
   it('returns empty for an agent with no sibling subagent layout', async () => {
     const result = await _internals.listAiVaultSubagentSessions({
-      agent: 'codex',
+      agent: 'pi',
       parentFilePath: join(claudeRoot, 'proj', 'sess.jsonl'),
       executionHostId: 'local'
     })
 
     expect(result).toEqual({ sessions: [], issues: [] })
     expect(mocks.listClaudeSubagentSessions).not.toHaveBeenCalled()
-    expect(mocks.listOmpSubagentSessions).not.toHaveBeenCalled()
-  })
-
-  it('lists subagents for a local OMP session inside the sessions root', async () => {
-    const parentFilePath = join(
-      OMP_SESSIONS_DIR,
-      'home-app-85dfa2f0',
-      '2026-05-01T10-00-00-000Z_cccccccc-dddd-4eee-8fff-000000000000.jsonl'
-    )
-
-    await _internals.listAiVaultSubagentSessions({
-      agent: 'omp',
-      parentFilePath,
-      executionHostId: 'local'
-    })
-
-    expect(mocks.listOmpSubagentSessions).toHaveBeenCalledWith({ parentFilePath })
-    expect(mocks.listClaudeSubagentSessions).not.toHaveBeenCalled()
-  })
-
-  it('returns empty for a remote OMP session without reading the filesystem', async () => {
-    const result = await _internals.listAiVaultSubagentSessions({
-      agent: 'omp',
-      parentFilePath: join(OMP_SESSIONS_DIR, 'slug', 'sess.jsonl'),
-      executionHostId: 'ssh:dev-box'
-    })
-
-    expect(result).toEqual({ sessions: [], issues: [] })
-    expect(mocks.listOmpSubagentSessions).not.toHaveBeenCalled()
-  })
-
-  it('rejects an OMP path that only sits inside another agent root', async () => {
-    // Each agent's allowlist is its own root: a Claude path must not be
-    // readable through the OMP branch (or vice versa).
-    const crossAgent = await _internals.listAiVaultSubagentSessions({
-      agent: 'omp',
-      parentFilePath: join(claudeRoot, 'proj', 'sess.jsonl'),
-      executionHostId: 'local'
-    })
-    const traversal = await _internals.listAiVaultSubagentSessions({
-      agent: 'omp',
-      // Built with sep (not join) so the `..` segments survive into the arg.
-      parentFilePath: [OMP_SESSIONS_DIR, '..', '..', '..', 'etc', 'passwd.jsonl'].join(sep),
-      executionHostId: 'local'
-    })
-
-    expect(crossAgent).toEqual({ sessions: [], issues: [] })
-    expect(traversal).toEqual({ sessions: [], issues: [] })
-    expect(mocks.listOmpSubagentSessions).not.toHaveBeenCalled()
   })
 })
 
 describe('deleteAiVaultSession', () => {
   const args = {
-    agent: 'gemini' as const,
+    agent: 'pi' as const,
     sessionId: 'session-1',
-    filePath: '/home/ada/.gemini/tmp/sess.json',
+    filePath: '/home/ada/.pi/agent/sessions/sess.jsonl',
     executionHostId: 'local' as const
   }
 
@@ -802,7 +673,7 @@ describe('deleteAiVaultSession', () => {
     expect(result).toEqual({ outcome: 'deleted' })
     expect(mocks.deleteAiVaultSessionFile).toHaveBeenCalledWith(
       expect.objectContaining({
-        agent: 'gemini',
+        agent: 'pi',
         sessionId: args.sessionId,
         filePath: args.filePath,
         executionHostId: 'local'
@@ -817,7 +688,7 @@ describe('deleteAiVaultSession', () => {
   it('does not invalidate any cache when the executor rejects (e.g. non-local host)', async () => {
     mocks.deleteAiVaultSessionFile.mockResolvedValue({
       outcome: 'rejected',
-      agent: 'gemini',
+      agent: 'pi',
       reason: 'non-local-host'
     })
 
@@ -826,7 +697,7 @@ describe('deleteAiVaultSession', () => {
       executionHostId: 'ssh:dev-box'
     })
 
-    expect(result).toEqual({ outcome: 'rejected', agent: 'gemini', reason: 'non-local-host' })
+    expect(result).toEqual({ outcome: 'rejected', agent: 'pi', reason: 'non-local-host' })
     expect(mocks.invalidateAiVaultSessionListCache).not.toHaveBeenCalled()
     expect(mocks.invalidateSessionParseCacheEntry).not.toHaveBeenCalled()
   })
@@ -834,7 +705,7 @@ describe('deleteAiVaultSession', () => {
   it('does not invalidate any cache when the executor fails', async () => {
     mocks.deleteAiVaultSessionFile.mockResolvedValue({
       outcome: 'failed',
-      agent: 'gemini',
+      agent: 'pi',
       error: 'EPERM'
     })
 
@@ -934,9 +805,9 @@ function session(
   sessionId: string
 ): AiVaultSession {
   return {
-    id: `${executionHostId}:codex:${sessionId}:/tmp/${sessionId}.jsonl`,
+    id: `${executionHostId}:claude:${sessionId}:/tmp/${sessionId}.jsonl`,
     executionHostId,
-    agent: 'codex',
+    agent: 'claude',
     sessionId,
     title: sessionId,
     cwd: '/repo',
@@ -957,7 +828,7 @@ function session(
     previewMessages: [],
     queuedMessageCount: 0,
     subagentTranscriptCount: 0,
-    resumeCommand: `codex resume ${sessionId}`,
+    resumeCommand: `claude --resume ${sessionId}`,
     subagent: null
   }
 }

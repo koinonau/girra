@@ -326,7 +326,7 @@ it('names a session on its first chunk, not only when the read ends', () => {
 })
 
 it('commits a whole-file read over the ceiling in one transaction, never a chunk', () => {
-  // The whole-file readers (Grok, Cursor, Gemini, OpenCode) pass no identity:
+  // The whole-file readers (OpenCode) pass no identity:
   // their formats are rewritten in place and have no resumable state to ask.
   const writer = new SessionSearchIndexWriter(index.db, 400)
   const write = writer.beginWrite(syntheticCandidate(), 'replace', 0)!

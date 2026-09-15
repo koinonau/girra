@@ -61,10 +61,7 @@ export function isNativeChatSkillForAgent(
     return false
   }
   if (!result) {
-    return (
-      agent === 'codex' &&
-      (skill.providers.includes('codex') || skill.providers.includes('agent-skills'))
-    )
+    return false
   }
   // Why: canonical-path dedup keeps one row per file, but a symlinked skill can
   // be reachable through several roots; any shared or agent-owned root grants

@@ -3,7 +3,7 @@ import type { AgentSessionLease, AgentSessionRecord } from '../../../shared/agen
 export type StructuredProviderSessionOwnership = {
   sessionId: string
   workspaceId: string
-  provider: 'claude' | 'codex'
+  provider: 'claude'
   providerSessionId: string
   lease: AgentSessionLease
 }
@@ -16,8 +16,7 @@ export function listStructuredProviderSessionOwnership(
       sessionId: record.sessionId,
       workspaceId: record.location.workspaceId,
       provider: record.provider,
-      providerSessionId:
-        link.handle.provider === 'codex' ? link.handle.threadId : link.handle.sessionId,
+      providerSessionId: link.handle.sessionId,
       lease: record.lease
     }))
   )

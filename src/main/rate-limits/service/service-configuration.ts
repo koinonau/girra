@@ -93,18 +93,14 @@ export abstract class RateLimitServiceConfiguration extends RateLimitServiceAcco
     this.pruneInactiveClaudeState()
     return {
       ...this.state,
-      codex: null,
       // Why: the cookie lives on the filesystem, not GlobalSettings; surface its presence so the renderer keeps the MiniMax bar across reloads.
       minimaxCookieConfigured: hasMiniMaxSessionCookie(),
       minimaxApiKeyConfigured: hasMiniMaxApiKey(),
       claudeTarget: this.claudeFetchTarget,
-      // Why: retired Codex fields stay on the wire for older paired clients.
-      codexTarget: { runtime: 'host', wslDistro: null },
       inactiveClaudeAccounts: this.buildInactiveArray(
         this.inactiveClaudeCache,
         this.inactiveClaudeFetching
-      ),
-      inactiveCodexAccounts: []
+      )
     }
   }
 }

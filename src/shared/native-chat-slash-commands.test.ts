@@ -10,14 +10,7 @@ import {
 } from './native-chat-slash-commands'
 
 describe('getAgentSlashCommands', () => {
-  it('returns Codex-specific commands (e.g. /model, /resume) for codex', () => {
-    const names = getAgentSlashCommands('codex').map((c) => c.name)
-    expect(names).toContain('model')
-    expect(names).toContain('resume')
-    expect(names).toContain('diff')
-  })
-
-  it('returns Claude commands for claude (no Codex-only /model)', () => {
+  it('returns Claude commands for claude', () => {
     const names = getAgentSlashCommands('claude').map((c) => c.name)
     expect(names).toContain('clear')
     expect(names).toContain('compact')
@@ -44,16 +37,16 @@ describe('isSlashCommandDraft', () => {
 })
 
 describe('filterSlashCommands', () => {
-  const codex = getAgentSlashCommands('codex')
+  const claude = getAgentSlashCommands('claude')
 
   it('returns all commands for an empty query (bare /)', () => {
-    expect(filterSlashCommands(codex, '')).toHaveLength(codex.length)
+    expect(filterSlashCommands(claude, '')).toHaveLength(claude.length)
   })
 
   it('prefix-matches case-insensitively', () => {
-    const names = filterSlashCommands(codex, 'mod').map((c) => c.name)
-    expect(names).toEqual(['model'])
-    expect(filterSlashCommands(codex, 'MOD').map((c) => c.name)).toEqual(['model'])
+    const names = filterSlashCommands(claude, 'com').map((c) => c.name)
+    expect(names).toEqual(['compact'])
+    expect(filterSlashCommands(claude, 'COM').map((c) => c.name)).toEqual(['compact'])
   })
 })
 
@@ -106,7 +99,7 @@ describe('a session that reports its own command surface', () => {
 
   it('keeps a reported description and argument hint the curated catalog never claims', () => {
     expect(
-      sessionSlashCommandSuggestions('codex', [
+      sessionSlashCommandSuggestions('claude', [
         {
           name: 'opsx:apply',
           kind: 'command',

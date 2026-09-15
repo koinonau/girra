@@ -209,7 +209,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
     const { pickAttachment } = useNativeChatFileAttachmentActions(paneKey, attachExternalPaths)
     const { dispatch: dispatchSessionOptionCommand, isDispatching: isDispatchingSessionOption } =
       useNativeChatSessionOptionCommand({
-        agent,
         disabled,
         onSlashCommand,
         resolveTarget,
@@ -296,7 +295,6 @@ const NativeChatComposerPane = forwardRef<NativeChatComposerHandle, NativeChatCo
     }, [cancelPendingSends, isWorking, onStop, resolveTarget])
 
     const dispatchPtyPickerCommand = useNativeChatPickerCommandDispatch({
-      agent,
       disabled,
       isDispatchingSessionOption,
       resolveTarget,

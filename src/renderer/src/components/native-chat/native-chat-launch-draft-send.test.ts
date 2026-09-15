@@ -50,9 +50,9 @@ describe('planNativeChatLaunchDraftSend', () => {
     ].join('\n')
 
     const result = resolveNativeChatLaunchDraftSend({
-      launchDraft: { agent: 'codex', text: SEEDED },
+      launchDraft: { agent: 'claude', text: SEEDED },
       launchDraftResolved: false,
-      agent: 'codex',
+      agent: 'claude',
       readScreen: () => samePrefixEdit
     })
     expect(result.plan.kind).toBe('replace-draft')
@@ -73,7 +73,8 @@ describe('planNativeChatLaunchDraftSend', () => {
 
 describe('agentInputLineCleared', () => {
   it('confirms only an observably empty prompt', () => {
-    expect(agentInputLineCleared('› \n  gpt-5.6 · ~/repo')).toBe(true)
+    const cleared = ['─'.repeat(40), '❯ ', '─'.repeat(40)].join('\n')
+    expect(agentInputLineCleared(cleared)).toBe(true)
   })
 
   it('does not call a different nonempty prompt cleared', () => {

@@ -58,7 +58,7 @@ function installHost(options: {
         getRecord: (sessionId: string) =>
           ({
             sessionId,
-            provider: 'codex',
+            provider: 'claude',
             location: { executionHostId: 'local', wslDistro: null },
             lease: { ...lease, runtimeFence: 1, deathEvidence: null }
           }) as unknown as AgentSessionRecord
@@ -74,7 +74,7 @@ function registerWorker(worktreeId = 'wt_1'): string {
   structuredWorkerIdentities.register({
     handle,
     sessionId: SESSION_ID,
-    agent: 'codex',
+    agent: 'claude',
     paneKey: mintStructuredWorkerPaneKey(SESSION_ID),
     processIncarnation: structuredWorkerProcessIncarnation(SESSION_ID),
     worktreeId,
@@ -83,7 +83,7 @@ function registerWorker(worktreeId = 'wt_1'): string {
   return handle
 }
 
-const PTY_TERMINAL = { handle: 'term_a', worktreeId: 'wt_1', agentIdentity: 'claude' as const }
+const PTY_TERMINAL = { handle: 'term_a', worktreeId: 'wt_1', agentIdentity: 'opencode' as const }
 
 describe('group addressing and structured workers', () => {
   beforeEach(() => {
@@ -95,7 +95,7 @@ describe('group addressing and structured workers', () => {
     const handle = registerWorker()
     installHost({})
     expect(listAddressableStructuredWorkers()).toEqual([
-      { handle, worktreeId: 'wt_1', agentIdentity: 'codex' }
+      { handle, worktreeId: 'wt_1', agentIdentity: 'claude' }
     ])
   })
 
@@ -116,15 +116,17 @@ describe('group addressing and structured workers', () => {
     expect(resolveGroupAddress('@all', 'term_sender', recipients, () => 'idle')).toContain(handle)
   })
 
-  it('reaches a structured worker through @worktree: and @codex, but not @claude', () => {
+  it('reaches a structured worker through @worktree: and @claude, but not @opencode', () => {
     const handle = registerWorker('wt_2')
     installHost({})
     const recipients = [PTY_TERMINAL, ...listAddressableStructuredWorkers()]
     expect(resolveGroupAddress('@worktree:wt_2', 'term_sender', recipients, () => 'idle')).toEqual([
       handle
     ])
-    expect(resolveGroupAddress('@codex', 'term_sender', recipients, () => 'idle')).toEqual([handle])
     expect(resolveGroupAddress('@claude', 'term_sender', recipients, () => 'idle')).toEqual([
+      handle
+    ])
+    expect(resolveGroupAddress('@opencode', 'term_sender', recipients, () => 'idle')).toEqual([
       'term_a'
     ])
   })
@@ -220,7 +222,7 @@ describe('sendGroupMessage actually composes structured workers in', () => {
     expect(inserted.map((row) => row.to)).toEqual([handle])
   })
 
-  it('reads a structured worker identity for @codex off its Dispatch row handle', async () => {
+  it('reads a structured worker identity for @claude off its Dispatch row handle', async () => {
     const handle = registerWorker()
     installHost({})
     const inserted: { to: string }[] = []
@@ -239,10 +241,10 @@ describe('sendGroupMessage actually composes structured workers in', () => {
           worktreeId: 'wt_1'
         },
         {
-          dispatchId: 'ctx_pty_claude',
+          dispatchId: 'ctx_pty_opencode',
           runId: 'run_1',
           dispatchStatus: 'dispatched',
-          agentTerminalHandle: 'term_claude',
+          agentTerminalHandle: 'term_opencode',
           worktreeId: 'wt_1'
         }
       ],
@@ -255,7 +257,7 @@ describe('sendGroupMessage actually composes structured workers in', () => {
     }
     const runtime = {
       listTerminals: async () => ({
-        terminals: [{ handle: 'term_claude', worktreeId: 'wt_1', agentIdentity: 'claude' }]
+        terminals: [{ handle: 'term_opencode', worktreeId: 'wt_1', agentIdentity: 'opencode' }]
       }),
       getAgentStatusForHandle: () => 'idle',
       getLiveTerminalPaneKey: () => null,
@@ -267,7 +269,7 @@ describe('sendGroupMessage actually composes structured workers in', () => {
       runtime: runtime as never,
       db: db as never,
       from: 'term_sender',
-      groupAddress: '@codex',
+      groupAddress: '@claude',
       senderPaneKey: undefined,
       senderRunId: 'run_1',
       explicitRunId: undefined,

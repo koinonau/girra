@@ -19,8 +19,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 
 let root: string
@@ -34,7 +34,7 @@ function now(): number {
 }
 
 function item(ordinal: number): AgentJournalItemIdentity {
-  return { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal }
+  return { provider: 'claude', sessionId: 'thread-1', uuid: `turn-1-${ordinal}` }
 }
 
 function replace(input: {

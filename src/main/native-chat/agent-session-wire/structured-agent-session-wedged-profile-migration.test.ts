@@ -70,17 +70,17 @@ function wedgedRecord(overrides: WedgeOverrides): AgentSessionRecord {
     schemaVersion: 2,
     sessionId: SESSION,
     location: LOCATION,
-    provider: 'codex',
+    provider: 'claude',
     providerHandleChain: [
       {
-        linkId: `codex-${fence}-link`,
-        handle: { provider: 'codex', threadId: THREAD },
+        linkId: `claude-${fence}-link`,
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'created',
         mintedAtFence: fence,
         observedAt: NOW - 10_000
       }
     ],
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     createdAt: NOW - 100_000,
     updatedAt: NOW - 10_000,
     lease: {
@@ -88,7 +88,7 @@ function wedgedRecord(overrides: WedgeOverrides): AgentSessionRecord {
       runtimeKind: overrides.runtimeKind ?? 'native',
       runtimeFence: fence,
       handoffStage: overrides.handoffStage,
-      provenHandleLinkId: `codex-${fence}-link`,
+      provenHandleLinkId: `claude-${fence}-link`,
       ownerProcess: overrides.ownerProcess ?? null,
       reservedSpawnToken: overrides.reservedSpawnToken ?? null,
       leaseDeadlineAt: NOW - 9_000,
@@ -155,7 +155,7 @@ beforeEach(async () => {
     },
     link: {
       linkId: `link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: 'resumed' as const,
       mintedAtFence: fence,
       observedAt: NOW
@@ -180,24 +180,19 @@ function isAcquirable(lease: NonNullable<ReturnType<typeof store.getRecord>>['le
   )
 }
 
-async function seedRunningTurn(provider: 'codex' | 'claude' = 'codex'): Promise<void> {
+async function seedRunningTurn(): Promise<void> {
   const journal = await openAgentSessionJournal({
     identity: {
       sessionId: SESSION,
       workspaceId: LOCATION.workspaceId,
       hostId: LOCATION.executionHostId,
-      agent: provider,
-      providerHandle:
-        provider === 'codex'
-          ? { kind: 'codex', threadId: THREAD }
-          : { kind: 'claude', sessionId: 'provider-session-alpha-1', leafUuid: null }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
     },
     journalDir: journalDirectoryFor(root, { workspaceId: LOCATION.workspaceId, sessionId: SESSION })
   })
   await journal.appendItem(
-    provider === 'codex'
-      ? { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 0 }
-      : { provider: 'claude', sessionId: 'provider-session-alpha-1', uuid: 'uuid-running' },
+    { provider: 'claude', sessionId: THREAD, uuid: 'uuid-running' },
     { kind: 'turn', turnId: 'turn-1', state: 'running', startedAt: NOW - 5_000 },
     { fence: 13 }
   )
@@ -222,65 +217,41 @@ function restoredJournal(): AgentSessionJournal {
 }
 
 describe('already-wedged profiles become usable on load', () => {
-  it.each(['codex', 'claude'] as const)(
-    'settles a wedged %s journal on boot without opening a provider child',
-    async (provider) => {
-      const record = wedgedRecord({
+  it('settles a wedged journal on boot without opening a provider child', async () => {
+    await seedStore(
+      wedgedRecord({
         claimStatus: 'live',
         handoffStage: null,
         ownerProcess: DEAD_OWNER
       })
-      const providerRecord: AgentSessionRecord =
-        provider === 'codex'
-          ? record
-          : {
-              ...record,
-              provider: 'claude',
-              accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
-              lease: { ...record.lease, provenHandleLinkId: 'claude-13-link' },
-              providerHandleChain: [
-                {
-                  linkId: 'claude-13-link',
-                  handle: {
-                    provider: 'claude',
-                    sessionId: 'provider-session-alpha-1',
-                    leafUuid: null
-                  },
-                  origin: 'created',
-                  mintedAtFence: 13,
-                  observedAt: NOW - 10_000
-                }
-              ]
-            }
-      await seedStore(providerRecord)
-      await seedRunningTurn(provider)
-      openHost()
+    )
+    await seedRunningTurn()
+    openHost()
 
-      await host.restoreReadableSessions()
+    await host.restoreReadableSessions()
 
-      expect(host.hasSession(SESSION)).toBe(true)
-      const firstCursor = restoredJournal().cursor()
-      expect(activeStructuredAgentSessionTurnId(restoredJournal().snapshot().items)).toBe(null)
-      expect(store.getRecord(SESSION)?.lease).toMatchObject({
-        claimStatus: 'released',
-        handoffStage: null,
-        settlementRetryRequired: undefined,
-        settlementRetryId: undefined
-      })
-      expect(acquire).not.toHaveBeenCalled()
+    expect(host.hasSession(SESSION)).toBe(true)
+    const firstCursor = restoredJournal().cursor()
+    expect(activeStructuredAgentSessionTurnId(restoredJournal().snapshot().items)).toBe(null)
+    expect(store.getRecord(SESSION)?.lease).toMatchObject({
+      claimStatus: 'released',
+      handoffStage: null,
+      settlementRetryRequired: undefined,
+      settlementRetryId: undefined
+    })
+    expect(acquire).not.toHaveBeenCalled()
 
-      await host.flushAllStreamedEvents()
-      store = await AgentSessionRecordStore.open({
-        directory: join(root, 'store'),
-        hostId: 'local'
-      })
-      openHost()
-      await host.restoreReadableSessions()
+    await host.flushAllStreamedEvents()
+    store = await AgentSessionRecordStore.open({
+      directory: join(root, 'store'),
+      hostId: 'local'
+    })
+    openHost()
+    await host.restoreReadableSessions()
 
-      expect(restoredJournal().cursor()).toEqual(firstCursor)
-      expect(activeStructuredAgentSessionTurnId(restoredJournal().snapshot().items)).toBe(null)
-    }
-  )
+    expect(restoredJournal().cursor()).toEqual(firstCursor)
+    expect(activeStructuredAgentSessionTurnId(restoredJournal().snapshot().items)).toBe(null)
+  })
 
   it('settles restart eviction through attach when a hold arrives before the boot sweep', async () => {
     await seedStore(
@@ -376,7 +347,7 @@ describe('already-wedged profiles become usable on load', () => {
     expect(await host.attach(CALLER, params)).toMatchObject({ ok: true })
     const fence = store.getRecord(SESSION)!.lease.runtimeFence
     await restoredJournal().appendItem(
-      { provider: 'codex', threadId: THREAD, turnId: 'turn-2', ordinal: 0 },
+      { provider: 'claude', sessionId: THREAD, uuid: 'uuid-turn-2' },
       { kind: 'turn', turnId: 'turn-2', state: 'running', startedAt: NOW },
       { fence }
     )
@@ -407,10 +378,10 @@ describe('already-wedged profiles become usable on load', () => {
     expect(isAcquirable(lease)).toBe(true)
     // A real re-adjudication, not a no-op: the eviction minted a new generation.
     expect(lease?.runtimeFence).toBeGreaterThan(13)
-    // The conversation survived: the codex thread was resumed, not recreated.
+    // The conversation survived: the provider session was resumed, not recreated.
     expect(store.getRecord(SESSION)?.providerHandleChain[0]).toMatchObject({
-      linkId: 'codex-13-link',
-      handle: { threadId: THREAD }
+      linkId: 'claude-13-link',
+      handle: { sessionId: THREAD }
     })
     // Why NOT acquired here: startup spawning a provider child for every recovered record is the
     // accumulation this stack removed. Unlatching is the migration's job; spawning is a hold's.
@@ -506,7 +477,7 @@ describe('already-wedged profiles become usable on load', () => {
         process: { hostId: 'local', pid: 4242, processStartTimeMs: 1, spawnToken: 'spawn-new' },
         link: {
           linkId: `link-${fence}`,
-          handle: { provider: 'codex' as const, threadId: THREAD },
+          handle: { provider: 'claude' as const, sessionId: THREAD, leafUuid: null },
           origin: 'resumed' as const,
           mintedAtFence: fence,
           observedAt: NOW

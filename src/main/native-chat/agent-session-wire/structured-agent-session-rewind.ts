@@ -1,6 +1,4 @@
-import { readAgentJournalTurn } from '../../../shared/agent-session-turn-record'
 import {
-  agentJournalItemKey,
   agentJournalSubmissionKey,
   parseAgentJournalItemKey
 } from '../../../shared/agent-session-journal-item-key'
@@ -20,7 +18,6 @@ import { conversationCommandBlocked } from './structured-conversation-command-ad
 import { rewindRefusal } from './structured-rewind-refusal'
 import { persistRewindRecord, recoverStructuredRewind } from './structured-rewind-recovery'
 import { replaceClaudeRewindOwner } from './structured-rewind-claude-owner'
-import { mergeRetainedHostLifecycleRows } from './structured-rewind-retained-host-rows'
 
 export async function rewindStructuredAgentSession(
   context: StructuredAgentSessionMutationContext,
@@ -95,55 +92,34 @@ export async function rewindStructuredAgentSession(
           const selected = snapshot.items.findIndex((item) => item.itemId === params.itemId)
           const key = selected === -1 ? null : parseAgentJournalItemKey(providerKey(params.itemId))
           const head = agentSessionProviderHandleChainHead(record.providerHandleChain)?.handle
-          if (!key || !head || key.provider !== head.provider) {
+          if (
+            key?.provider !== 'claude' ||
+            head?.provider !== 'claude' ||
+            key.sessionId !== head.sessionId
+          ) {
             return rewindRefusal('invalid-target')
           }
-          let boundary = selected
-          let claude: Parameters<typeof replaceClaudeRewindOwner>[3] | undefined
-          if (key.provider === 'codex' && head.provider === 'codex') {
-            if (key.threadId !== head.threadId) {
-              return rewindRefusal('invalid-target')
-            }
-            boundary = snapshot.items.findIndex((item) => {
-              const identity = parseAgentJournalItemKey(providerKey(item.itemId))
-              return (
-                (identity?.provider === 'codex' &&
-                  identity.threadId === key.threadId &&
-                  identity.turnId === key.turnId) ||
-                readAgentJournalTurn(item.body)?.turnId === key.turnId
-              )
-            })
-          } else if (key.provider === 'claude' && head.provider === 'claude') {
-            if (key.sessionId !== head.sessionId) {
-              return rewindRefusal('invalid-target')
-            }
-            const previous = snapshot.items
-              .slice(0, boundary)
-              .map((item) => parseAgentJournalItemKey(providerKey(item.itemId)))
-              .findLast(
-                (identity) =>
-                  identity?.provider === 'claude' && identity.sessionId === key.sessionId
-              )
-            if (previous?.provider !== 'claude') {
-              return rewindRefusal('invalid-target')
-            }
-            const prompts = snapshot.items
-              .slice(boundary)
-              .filter((item) => item.body.kind === 'message' && item.body.role === 'user')
-            const prompt =
-              prompts.length === 1
-                ? parseAgentJournalItemKey(providerKey(prompts[0]!.itemId))
-                : null
-            claude = {
-              targetUuid: previous.uuid,
-              previousLeafUuid: head.leafUuid ?? '',
-              ...(prompt?.provider === 'claude' ? { dropsTurn: prompt.uuid } : {})
-            }
-          } else {
+          const previous = snapshot.items
+            .slice(0, selected)
+            .map((item) => parseAgentJournalItemKey(providerKey(item.itemId)))
+            .findLast(
+              (identity) => identity?.provider === 'claude' && identity.sessionId === key.sessionId
+            )
+          if (previous?.provider !== 'claude') {
             return rewindRefusal('invalid-target')
+          }
+          const prompts = snapshot.items
+            .slice(selected)
+            .filter((item) => item.body.kind === 'message' && item.body.role === 'user')
+          const prompt =
+            prompts.length === 1 ? parseAgentJournalItemKey(providerKey(prompts[0]!.itemId)) : null
+          const claude: Parameters<typeof replaceClaudeRewindOwner>[3] = {
+            targetUuid: previous.uuid,
+            previousLeafUuid: head.leafUuid ?? '',
+            ...(prompt?.provider === 'claude' ? { dropsTurn: prompt.uuid } : {})
           }
           const retained = snapshot.items
-            .slice(0, boundary)
+            .slice(0, selected)
             .map(({ itemId, body, observedAt }) => ({
               itemId: providerKey(itemId),
               body,
@@ -156,7 +132,7 @@ export async function rewindStructuredAgentSession(
           ) {
             return rewindRefusal('history-limit')
           }
-          let prepared: AgentSessionRewindRecord = {
+          const prepared: AgentSessionRewindRecord = {
             operationId: clientOperationId,
             callerKey: caller.callerKey,
             itemId: params.itemId,
@@ -167,44 +143,15 @@ export async function rewindStructuredAgentSession(
           }
           await persistRewindRecord(store, sessionId, ctx.fence, prepared)
           ctx.publish()
-          const provider = claude
-            ? await replaceClaudeRewindOwner(attachContext, caller.callerKey, params, claude)
-            : await ctx.adapter.rewind!({
-                sessionId,
-                fence: ctx.fence,
-                beforeTurnId: key.provider === 'codex' ? key.turnId : '',
-                onPrepared: async (items) => {
-                  const retained = mergeRetainedHostLifecycleRows(
-                    prepared.retained,
-                    items.map(({ identity, body }) => ({
-                      itemId: agentJournalItemKey(identity),
-                      body,
-                      observedAt: ctx.now()
-                    }))
-                  )
-                  if (
-                    retained.length > 10_000 ||
-                    Buffer.byteLength(JSON.stringify(retained), 'utf8') >
-                      AGENT_SESSION_HISTORY_MAX_PAGE_BYTES
-                  ) {
-                    throw new Error('agent_session_rewind:history-limit')
-                  }
-                  prepared = { ...prepared, retained }
-                  await persistRewindRecord(store, sessionId, ctx.fence, prepared)
-                },
-                onReverted: async () => {
-                  await persistRewindRecord(store, sessionId, ctx.fence, {
-                    ...prepared,
-                    providerApplied: true
-                  })
-                }
-              })
+          const provider = await replaceClaudeRewindOwner(
+            attachContext,
+            caller.callerKey,
+            params,
+            claude
+          )
           const fence = store.getRecord(sessionId)!.lease.runtimeFence
           if (!provider.ok) {
-            const reason =
-              'reason' in provider
-                ? provider.reason
-                : (provider.refusal.rewindReason ?? 'outcome-unknown')
+            const reason = provider.refusal.rewindReason ?? 'outcome-unknown'
             if (reason !== 'outcome-unknown') {
               await persistRewindRecord(store, sessionId, fence, {
                 ...prepared,
@@ -219,25 +166,8 @@ export async function rewindStructuredAgentSession(
             }
             return rewindRefusal(reason)
           }
-          const confirmed = provider.items
-            ? mergeRetainedHostLifecycleRows(
-                prepared.retained,
-                provider.items.map(({ identity, body }) => ({
-                  itemId: agentJournalItemKey(identity),
-                  body,
-                  observedAt: ctx.now()
-                }))
-              )
-            : prepared.retained
-          if (
-            Buffer.byteLength(JSON.stringify(confirmed), 'utf8') >
-            AGENT_SESSION_HISTORY_MAX_PAGE_BYTES
-          ) {
-            throw new Error('agent_session_rewind:history-limit')
-          }
           await persistRewindRecord(store, sessionId, fence, {
             ...prepared,
-            retained: confirmed,
             phase: 'provider-succeeded',
             hydrationVerified: true
           })

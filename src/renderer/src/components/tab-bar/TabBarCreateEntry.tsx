@@ -63,14 +63,10 @@ function TabBarCreateEntrySession({
   const [error, setError] = useState<string | null>(null)
   const [switchError, setSwitchError] = useState<string | null>(null)
   const [selectionGuidance, setSelectionGuidance] = useState<string | null>(null)
-  // One hook per structured provider: the launch registry is keyed by agent, and hooks cannot run
-  // inside the option render loop.
-  const structuredLaunchStatusByAgent = {
-    claude: useStructuredAgentLaunchStatus(worktreeId, 'claude'),
-    codex: useStructuredAgentLaunchStatus(worktreeId, 'codex')
-  }
+  // Claude is the only structured provider; hooks cannot run inside the option render loop.
+  const claudeStructuredLaunchStatus = useStructuredAgentLaunchStatus(worktreeId, 'claude')
   const isStructuredLaunchPending = (agent: TuiAgent): boolean =>
-    isAgentSessionHandleProvider(agent) && structuredLaunchStatusByAgent[agent] === 'pending'
+    isAgentSessionHandleProvider(agent) && claudeStructuredLaunchStatus === 'pending'
   // null = follow ranking (deferred tabs can prepend); set on arrow keys only.
   const [pinnedOptionId, setPinnedOptionId] = useState<string | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)

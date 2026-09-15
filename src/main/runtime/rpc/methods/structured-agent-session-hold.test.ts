@@ -64,11 +64,12 @@ beforeEach(async () => {
   host = new StructuredAgentSessionHost({
     store,
     adapter: {
+      supportsCreate: () => true,
       acquire: async ({ fence, spawnToken }) => ({
         process: { hostId: 'local', pid: 4242, processStartTimeMs: 1_700_000_000_000, spawnToken },
         link: {
           linkId: `link-${fence}`,
-          handle: { provider: 'codex', threadId: THREAD },
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: store.getRecord(SESSION)?.providerHandleChain.length ? 'resumed' : 'created',
           mintedAtFence: fence,
           observedAt: NOW

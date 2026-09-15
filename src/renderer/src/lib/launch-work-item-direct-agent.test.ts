@@ -70,9 +70,9 @@ const settings = {
   agentDefaultEnv: {},
   experimentalNativeChat: true,
   nativeChatSessionOptions: {
-    codex: {
-      model: 'gpt-5.2-codex',
-      valuesByModel: { 'gpt-5.2-codex': { effort: 'medium' } }
+    claude: {
+      model: 'opus',
+      valuesByModel: { opus: { effort: 'medium' } }
     }
   }
 }
@@ -80,31 +80,29 @@ const settings = {
 describe('buildDirectWorkItemAgentStartupPlan', () => {
   it('omits native-chat preferences when the new workspace opens in terminal mode', () => {
     const result = buildDirectWorkItemAgentStartupPlan({
-      agent: 'codex',
+      agent: 'claude',
       draftContent: 'Review issue 42',
       promptDelivery: 'draft',
       settings: { ...settings, openAgentTabsInChatByDefault: false },
-      launchPlatform: 'darwin',
-      nativeChatTranscriptIsLocalReadable: true
+      launchPlatform: 'darwin'
     })
 
-    expect(result.startupPlan?.launchCommand).not.toContain("'-m'")
+    expect(result.startupPlan?.launchCommand).not.toContain("'--model'")
     expect(result.startupPlan?.sessionOptions).toBeUndefined()
   })
 
   it('applies native-chat preferences when the new workspace opens in chat', () => {
     const result = buildDirectWorkItemAgentStartupPlan({
-      agent: 'codex',
+      agent: 'claude',
       draftContent: 'Review issue 42',
       promptDelivery: 'draft',
       settings: { ...settings, openAgentTabsInChatByDefault: true },
-      launchPlatform: 'darwin',
-      nativeChatTranscriptIsLocalReadable: true
+      launchPlatform: 'darwin'
     })
 
-    expect(result.startupPlan?.launchCommand).toContain("'-m' 'gpt-5.2-codex'")
+    expect(result.startupPlan?.launchCommand).toContain("'--model' 'opus'")
     expect(result.startupPlan?.sessionOptions).toEqual({
-      model: 'gpt-5.2-codex',
+      model: 'opus',
       effort: 'medium'
     })
   })

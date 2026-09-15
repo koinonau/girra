@@ -28,7 +28,6 @@ export function VaultSessionRow({
   session,
   liveState,
   resumeStartup,
-  realHomeResumeStartup,
   worktreeInfo,
   vaultScope,
   detailsExpanded,
@@ -55,7 +54,6 @@ export function VaultSessionRow({
   session: AiVaultSession
   liveState: AgentStatusState | null
   resumeStartup: AiVaultResumeStartup
-  realHomeResumeStartup: AiVaultResumeStartup
   worktreeInfo: AiVaultSessionWorktreeInfo | null
   vaultScope: AiVaultScope
   detailsExpanded: boolean
@@ -103,18 +101,13 @@ export function VaultSessionRow({
         command: resumeStartup.command,
         sessionFilePath: session.filePath,
         sessionExecutionHostId: session.executionHostId,
-        codexHome: session.codexHome,
-        // Why: always sent (null when absent) so drop targets can tell "no cwd"
-        // from "payload predates the repin field".
         sessionCwd: session.cwd ?? null,
         ...(resumeStartup.env ? { env: resumeStartup.env } : {}),
-        ...(resumeStartup.envToDelete ? { envToDelete: resumeStartup.envToDelete } : {}),
-        ...(resumeStartup.launchConfig ? { launchConfig: resumeStartup.launchConfig } : {}),
-        realHomeStartup: realHomeResumeStartup
+        ...(resumeStartup.launchConfig ? { launchConfig: resumeStartup.launchConfig } : {})
       })
       window.dispatchEvent(new Event(AI_VAULT_SESSION_DRAG_START_EVENT))
     },
-    [realHomeResumeStartup, resumeDisabled, session, resumeStartup]
+    [resumeDisabled, session, resumeStartup]
   )
 
   return (

@@ -19,7 +19,7 @@ import {
 } from '../orca-runtime-test-fixtures.spec'
 
 describe('OrcaRuntimeService', () => {
-  it('settles a foreground Codex prompt when launch metadata has not arrived', async () => {
+  it('settles a foreground Claude prompt when launch metadata has not arrived', async () => {
     vi.useFakeTimers()
     try {
       const writes: string[] = []
@@ -39,7 +39,7 @@ describe('OrcaRuntimeService', () => {
           return true
         },
         kill: () => true,
-        getForegroundProcess: async () => 'codex'
+        getForegroundProcess: async () => 'claude'
       })
       const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`)
 
@@ -90,7 +90,7 @@ describe('OrcaRuntimeService', () => {
     }
   })
 
-  it('gives a late Codex render marker a fresh quiescence window', async () => {
+  it('gives a late Claude render marker a fresh quiescence window', async () => {
     vi.useFakeTimers()
     try {
       const writes: string[] = []
@@ -114,7 +114,7 @@ describe('OrcaRuntimeService', () => {
         getForegroundProcess: async () => null
       })
       const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-        launchAgent: 'codex'
+        launchAgent: 'claude'
       })
 
       const sendPromise = runtime.sendTerminalAgentPrompt(handle, 'review this change')

@@ -11,7 +11,7 @@ vi.mock('@/lib/client-login-shell', () => ({
   getClientLoginShell: () => clientLoginShell.value
 }))
 
-import { buildAiVaultResumeCopyCommandForWorktree } from './ai-vault-resume-command'
+import type { buildAiVaultResumeCopyCommandForWorktree } from './ai-vault-resume-command'
 import { resolveAiVaultResumeStartupShell } from './ai-vault-resume-shell'
 
 type ResumeShellState = Parameters<typeof buildAiVaultResumeCopyCommandForWorktree>[0]['state']
@@ -25,8 +25,8 @@ function makeState(worktreeHostId?: string): ResumeShellState {
     repos: [{ id: 'repo-1', path: '/home/alice/repo' }],
     projects: [{ id: 'repo-1', sourceRepoIds: ['repo-1'] }],
     settings: {
-      agentDefaultArgs: { codex: '' },
-      agentDefaultEnv: { codex: {} }
+      agentDefaultArgs: { claude: '' },
+      agentDefaultEnv: { claude: {} }
     },
     worktreesByRepo: {
       'repo-1': [
@@ -81,44 +81,5 @@ describe('resolveAiVaultResumeStartupShell', () => {
         })
       )
     ).toBe('posix')
-  })
-})
-
-describe('copied real-home Codex resume command', () => {
-  const session = {
-    agent: 'codex' as const,
-    sessionId: 'session one',
-    cwd: '/home/alice/repo',
-    codexHome: null
-  }
-
-  it('clears inherited Codex homes for a worktree on an SSH host', () => {
-    expect(
-      withLoginShell('/opt/homebrew/bin/fish', () =>
-        buildAiVaultResumeCopyCommandForWorktree({
-          state: makeState('ssh:target-1'),
-          worktreeId: 'repo-1::worktree-1',
-          session
-        })
-      )
-    ).toBe(
-      `cd '/home/alice/repo' && env -u CODEX_HOME -u ORCA_CODEX_HOME codex 'resume' 'session one'`
-    )
-  })
-
-  it('emits the same self-contained teardown under an sh-family login shell', () => {
-    // Why identical to the fish case: this text is COPIED, so it may be pasted
-    // into any shell — it carries its own fish/sh branch instead of guessing.
-    expect(
-      withLoginShell('/bin/bash', () =>
-        buildAiVaultResumeCopyCommandForWorktree({
-          state: makeState(),
-          worktreeId: 'repo-1::worktree-1',
-          session
-        })
-      )
-    ).toBe(
-      `cd '/home/alice/repo' && env -u CODEX_HOME -u ORCA_CODEX_HOME codex 'resume' 'session one'`
-    )
   })
 })

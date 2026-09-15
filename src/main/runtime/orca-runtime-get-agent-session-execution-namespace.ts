@@ -150,13 +150,10 @@ export class OrcaRuntimeWithGetAgentSessionExecutionNamespace extends OrcaRuntim
       }),
       agentEnv: {
         ...resolveTuiAgentLaunchEnv(request.agent, settings.agentDefaultEnv),
-        ...(handoffAuthority && request.agent === 'codex'
-          ? { CODEX_HOME: handoffAuthority.providerRoot }
-          : handoffAuthority && request.agent === 'claude'
-            ? { CLAUDE_CONFIG_DIR: handoffAuthority.providerRoot }
-            : {})
+        ...(handoffAuthority && request.agent === 'claude'
+          ? { CLAUDE_CONFIG_DIR: handoffAuthority.providerRoot }
+          : {})
       },
-      ompResumeFilePath: request.ompResumeFilePath,
       sessionOptions: this.toAgentSessionOptions(request.launchPreferences),
       sessionOptionsOverrideAgentArgs: Boolean(request.launchPreferences),
       platform,

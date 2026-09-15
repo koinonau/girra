@@ -139,14 +139,7 @@ export function attachStructuredAgentSession(
           acquisitionGeneration: acquisitionGeneration ?? previous?.acquisitionGeneration ?? null
         })
         if (!rewind) {
-          await recoverStructuredRewind(
-            context.deps.store,
-            sessionId,
-            attached.journal,
-            fence,
-            context.deps.adapter,
-            context.now
-          )
+          await recoverStructuredRewind(context.deps.store, sessionId, attached.journal, fence)
         }
         await recoverInterruptedCompaction(context.deps.store, sessionId, attached.journal, fence)
         if (attached.recovery) {

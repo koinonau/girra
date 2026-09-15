@@ -42,7 +42,7 @@ describe('agent prompt submission runtime', () => {
     const { runtime, handle, writes } = await createAgentPromptSubmissionRuntime(
       (runtime, data) => {
         if (data === '\r') {
-          runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+          runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
         }
       }
     )
@@ -58,8 +58,8 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
       }
     })
 
@@ -93,10 +93,10 @@ describe('agent prompt submission runtime', () => {
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
         runtime.onPtyData('pty-prompt', '\x1b]0;plain shell\x07', Date.now())
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
       }
     })
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
     const submission = runtime.sendTerminalAgentPrompt(handle, 'review this')
     const rejected = expect(submission).rejects.toThrow('agent_prompt_stalled')
 
@@ -110,7 +110,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data.includes(AGENT_PROMPT_BRACKETED_PASTE_END)) {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude waiting for permission\x07', Date.now())
       }
     })
     const submission = runtime.sendTerminalAgentPrompt(handle, 'review this')
@@ -124,7 +124,7 @@ describe('agent prompt submission runtime', () => {
 
   it('does not paste into an existing permission prompt', async () => {
     const { runtime, handle, writes } = await createPromptRuntime(() => undefined)
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude waiting for permission\x07', Date.now())
 
     await expect(runtime.sendTerminalAgentPrompt(handle, 'review this')).rejects.toThrow(
       'agent_prompt_blocked'
@@ -136,7 +136,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)
     const { runtime, handle, writes } = await createPromptRuntime(() => undefined)
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
     vi.setSystemTime(2_000)
     runtime.onPtyData(
       'pty-prompt',
@@ -155,7 +155,7 @@ describe('agent prompt submission runtime', () => {
     runtime.onPtyData(
       'pty-prompt',
       '\x1b]9999;{"state":"working","agentType":"opencode"}\x07' +
-        '\x1b]0;Codex waiting for permission\x07',
+        '\x1b]0;Claude waiting for permission\x07',
       Date.now()
     )
 
@@ -169,12 +169,12 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
       }
     })
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]0;Codex waiting for permission\x1b]9999;{"state":"working","agentType":"opencode"',
+      '\x1b]0;Claude waiting for permission\x1b]9999;{"state":"working","agentType":"opencode"',
       Date.now()
     )
     runtime.onPtyData('pty-prompt', '}\x07\x07', Date.now())
@@ -194,7 +194,7 @@ describe('agent prompt submission runtime', () => {
       'Permission required\nAllow once\nAllow always\nReject\n',
       Date.now()
     )
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
     runtime.onPtyData(
       'pty-prompt',
       '\x1b]9999;{"state":"waiting","agentType":"opencode"}\x07',
@@ -211,7 +211,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
       }
     })
     runtime.seedTerminalRestoreTail('pty-prompt', {
@@ -238,7 +238,7 @@ describe('agent prompt submission runtime', () => {
         )
       }
     })
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
     const submission = runtime.sendTerminalAgentPrompt(handle, 'review this')
     const rejected = expect(submission).rejects.toThrow('agent_prompt_blocked')
 
@@ -249,10 +249,10 @@ describe('agent prompt submission runtime', () => {
   })
 
   it.each([
-    '\x1b]0;Codex waiting for permission\x07\x1b]0;Codex idle\x07',
+    '\x1b]0;Claude waiting for permission\x07\x1b]0;Claude idle\x07',
     '\x1b]9999;{"state":"working","agentType":"opencode"}\x07' +
-      '\x1b]0;Codex waiting for permission\x07',
-    '\x1b]0;Codex waiting for permission\x07' +
+      '\x1b]0;Claude waiting for permission\x07',
+    '\x1b]0;Claude waiting for permission\x07' +
       '\x1b]9999;{"state":"working","agentType":"opencode"}\x07'
   ])('does not send Enter after coalesced permission activity', async (output) => {
     vi.useFakeTimers()
@@ -278,7 +278,7 @@ describe('agent prompt submission runtime', () => {
       beforeWrite: () => {
         writeChecks += 1
         if (writeChecks === 2) {
-          runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
+          runtime.onPtyData('pty-prompt', '\x1b]0;Claude waiting for permission\x07', Date.now())
         }
       }
     })
@@ -303,7 +303,7 @@ describe('agent prompt submission runtime', () => {
             'Permission required\nAllow once\nAllow always\nReject\n',
             Date.now()
           )
-          runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+          runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
         }
       }
     })
@@ -321,7 +321,7 @@ describe('agent prompt submission runtime', () => {
       '\x1b]9999;{"state":"done","agentType":"opencode"}\x07',
       Date.now()
     )
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude waiting for permission\x07', Date.now())
 
     await expect(runtime.sendTerminalAgentPrompt(handle, 'review this')).rejects.toThrow(
       'agent_prompt_blocked'
@@ -353,7 +353,7 @@ describe('agent prompt submission runtime', () => {
       write: (_ptyId, data) => {
         writes.push(data)
         if (data === '\r') {
-          runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+          runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
         }
         return true
       },
@@ -368,7 +368,7 @@ describe('agent prompt submission runtime', () => {
     runtime.onPtyData(
       'pty-prompt',
       'Permission required\nAllow once\nAllow always\nReject\n' +
-        '\x1b]0;Codex waiting for permission\x07',
+        '\x1b]0;Claude waiting for permission\x07',
       Date.now()
     )
     vi.setSystemTime(2_000)
@@ -384,7 +384,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
       }
     })
     runtime.onPtyData(
@@ -404,7 +404,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)
     const { runtime, handle, writes } = await createPromptRuntime(() => undefined)
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude waiting for permission\x07', Date.now())
     vi.setSystemTime(2_000)
     runtime.onPtyData(
       'pty-prompt',
@@ -449,7 +449,7 @@ describe('agent prompt submission runtime', () => {
       if (data === '\r') {
         runtime.onPtyData('pty-prompt', 'output from the existing turn', Date.now())
       }
-    }, 'codex')
+    }, 'claude')
     runtime.onPtyData(
       'pty-prompt',
       '\x1b]9999;{"state":"working","agentType":"opencode"}\x07',
@@ -487,7 +487,7 @@ describe('agent prompt submission runtime', () => {
           terminalHandle: handle,
           state: hook.state,
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           // Why: every hook ping refreshes receivedAt, including same-state tool pings.
           receivedAt: Date.now(),
@@ -506,7 +506,7 @@ describe('agent prompt submission runtime', () => {
     })
     handle = (
       await runtime.createTerminal(`path:${AGENT_PROMPT_TEST_WORKTREE_PATH}`, {
-        launchAgent: 'codex'
+        launchAgent: 'claude'
       })
     ).handle
     return { runtime, handle, writes }
@@ -664,7 +664,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
       }
     })
     runtime.synchronizePtyOutputSequenceFromProvider(
@@ -721,7 +721,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude waiting for permission\x07', Date.now())
       }
     })
     const submission = runtime.sendTerminalAgentPrompt(handle, 'review this')
@@ -739,8 +739,8 @@ describe('agent prompt submission runtime', () => {
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
         enterCount += 1
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
       }
     })
 
@@ -762,8 +762,8 @@ describe('agent prompt submission runtime', () => {
 
   it('reserves a lifecycle transition for only one queued prompt receipt', async () => {
     vi.useFakeTimers()
-    const { runtime, handle } = await createAgentPromptSubmissionRuntime(() => undefined, 'codex')
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+    const { runtime, handle } = await createAgentPromptSubmissionRuntime(() => undefined, 'claude')
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
 
     const firstPromise = runtime.sendTerminalAgentPrompt(handle, 'first prompt', {
       acceptQueued: true,
@@ -780,7 +780,7 @@ describe('agent prompt submission runtime', () => {
     await vi.runAllTimersAsync()
     const second = await secondPromise
 
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07\x1b]0;Codex working\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07\x1b]0;Claude working\x07', Date.now())
     const firstObserved = runtime.observeTerminalAgentPrompt(handle, first.prompt!, 1_000)
     await vi.runAllTimersAsync()
     const secondObserved = runtime.observeTerminalAgentPrompt(handle, second.prompt!, 1_000)
@@ -806,7 +806,7 @@ describe('agent prompt submission runtime', () => {
     })
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
       if (data === '\r') {
-        runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+        runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
       }
     })
 

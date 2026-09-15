@@ -88,7 +88,7 @@ const terminalTabSchema = z.object({
   generatedTitle: z.string().nullable().optional(),
   aiVaultTitle: z
     .object({
-      agent: z.enum(['claude', 'codex']),
+      agent: z.enum(['claude']),
       sessionId: z.string(),
       title: z.string()
     })
@@ -132,7 +132,7 @@ const tabSchema = z.object({
   worktreeId: z.string(),
   executionHostId: executionHostIdSchema.optional(),
   contentType: tabContentTypeSchema,
-  agentSessionAgent: z.enum(['codex', 'claude']).optional().catch(undefined),
+  agentSessionAgent: z.enum(['claude']).optional().catch(undefined),
   // Why: a structured terminal tab must recover its durable host session after
   // restart; omitting this additive field silently routes it back through PTY.
   structuredSessionId: z.string().min(1).optional().catch(undefined),
@@ -140,7 +140,7 @@ const tabSchema = z.object({
   generatedLabel: z.string().nullable().optional(),
   aiVaultTitle: z
     .object({
-      agent: z.enum(['claude', 'codex']),
+      agent: z.enum(['claude']),
       sessionId: z.string(),
       title: z.string()
     })

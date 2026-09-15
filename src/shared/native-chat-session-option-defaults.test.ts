@@ -8,88 +8,91 @@ import {
 } from './native-chat-session-option-defaults'
 import type { PersistedNativeChatSessionOptions } from './native-chat-session-options'
 
-const persistedGrok = (
+const persistedOpencode = (
   model: string | undefined,
   valuesByModel: Record<string, Record<string, string>> = {}
 ): PersistedNativeChatSessionOptions => ({
-  grok: { ...(model ? { model } : {}), valuesByModel }
+  opencode: { ...(model ? { model } : {}), valuesByModel }
 })
 
 describe('clearNativeChatSessionOptionModel', () => {
   it('drops the model a retired id would otherwise launch as -m', () => {
     const cleared = clearNativeChatSessionOptionModel(
-      persistedGrok('grok-build', { 'grok-build': { effort: 'low' } }),
-      'grok'
+      persistedOpencode('build-model', { 'build-model': { effort: 'low' } }),
+      'opencode'
     )
-    expect(cleared.grok?.model).toBeUndefined()
+    expect(cleared.opencode?.model).toBeUndefined()
     // Resolution keys off `model`, so clearing it is what stops the flag going out.
-    expect(resolveNativeChatSessionOptionDefaults(cleared, 'grok')).toBeUndefined()
+    expect(resolveNativeChatSessionOptionDefaults(cleared, 'opencode')).toBeUndefined()
   })
 
   it('keeps the per-model values so a reselect restores the old effort', () => {
     const cleared = clearNativeChatSessionOptionModel(
-      persistedGrok('grok-build', { 'grok-build': { effort: 'low' } }),
-      'grok'
+      persistedOpencode('build-model', { 'build-model': { effort: 'low' } }),
+      'opencode'
     )
-    expect(cleared.grok?.valuesByModel).toEqual({ 'grok-build': { effort: 'low' } })
+    expect(cleared.opencode?.valuesByModel).toEqual({ 'build-model': { effort: 'low' } })
     const reselected = updateNativeChatSessionOptionDefaults({
       persisted: cleared,
-      agent: 'grok',
-      modelId: 'grok-build',
+      agent: 'opencode',
+      modelId: 'build-model',
       optionId: 'model',
-      value: 'grok-build'
+      value: 'build-model'
     })
-    expect(resolveNativeChatSessionOptionDefaults(reselected, 'grok')).toEqual({
-      model: 'grok-build',
+    expect(resolveNativeChatSessionOptionDefaults(reselected, 'opencode')).toEqual({
+      model: 'build-model',
       effort: 'low'
     })
   })
 
   it('leaves every other agent untouched', () => {
     const cleared = clearNativeChatSessionOptionModel(
-      { ...persistedGrok('grok-build'), claude: { model: 'opus', valuesByModel: {} } },
-      'grok'
+      { ...persistedOpencode('build-model'), claude: { model: 'opus', valuesByModel: {} } },
+      'opencode'
     )
     expect(cleared.claude).toEqual({ model: 'opus', valuesByModel: {} })
   })
 
   it('is a no-op when nothing is persisted for the agent', () => {
-    expect(clearNativeChatSessionOptionModel(undefined, 'grok')).toEqual({})
-    expect(clearNativeChatSessionOptionModel({}, 'grok')).toEqual({})
-    const untouched = persistedGrok(undefined, { 'grok-4.5': { effort: 'high' } })
-    expect(clearNativeChatSessionOptionModel(untouched, 'grok')).toEqual(untouched)
+    expect(clearNativeChatSessionOptionModel(undefined, 'opencode')).toEqual({})
+    expect(clearNativeChatSessionOptionModel({}, 'opencode')).toEqual({})
+    const untouched = persistedOpencode(undefined, { 'older-model': { effort: 'high' } })
+    expect(clearNativeChatSessionOptionModel(untouched, 'opencode')).toEqual(untouched)
   })
 })
 
 describe('resolveNativeChatSessionOptionDefaults', () => {
   it('emits nothing until a model is explicitly picked, preserving the CLI default', () => {
-    expect(resolveNativeChatSessionOptionDefaults(undefined, 'grok')).toBeUndefined()
-    expect(resolveNativeChatSessionOptionDefaults(persistedGrok(undefined), 'grok')).toBeUndefined()
-    expect(resolveNativeChatSessionOptionDefaults(persistedGrok('   '), 'grok')).toBeUndefined()
+    expect(resolveNativeChatSessionOptionDefaults(undefined, 'opencode')).toBeUndefined()
+    expect(
+      resolveNativeChatSessionOptionDefaults(persistedOpencode(undefined), 'opencode')
+    ).toBeUndefined()
+    expect(
+      resolveNativeChatSessionOptionDefaults(persistedOpencode('   '), 'opencode')
+    ).toBeUndefined()
   })
 
   it('returns a stale id verbatim, which is why retirement happens upstream', () => {
     // Nothing here validates the id against the host; a retired one still resolves
     // and becomes `-m <id>`. Only clearing the persisted value prevents that.
-    expect(resolveNativeChatSessionOptionDefaults(persistedGrok('grok-build'), 'grok')).toEqual({
-      model: 'grok-build'
+    expect(
+      resolveNativeChatSessionOptionDefaults(persistedOpencode('build-model'), 'opencode')
+    ).toEqual({
+      model: 'build-model'
     })
   })
 })
 
 describe('resolveStructuredLaunchSeedOptions', () => {
-  const persistedCodex = (
+  const persistedClaude = (
     valuesByModel: Record<string, Record<string, string | boolean>>
   ): PersistedNativeChatSessionOptions =>
-    ({ codex: { model: 'gpt-5.6-sol', valuesByModel } }) as PersistedNativeChatSessionOptions
+    ({ claude: { model: 'opus', valuesByModel } }) as PersistedNativeChatSessionOptions
 
   it('seeds the saved model and effort a structured create must apply', () => {
     expect(
-      resolveStructuredLaunchSeedOptions(
-        persistedCodex({ 'gpt-5.6-sol': { effort: 'medium' } }),
-        'codex'
-      )
-    ).toEqual({ model: 'gpt-5.6-sol', effort: 'medium' })
+      resolveStructuredLaunchSeedOptions(persistedClaude({ opus: { effort: 'medium' } }), 'claude')
+    ).toEqual({ model: 'opus', effort: 'medium' })
   })
 
   it('drops ids the providers only accept mid-session', () => {
@@ -97,29 +100,23 @@ describe('resolveStructuredLaunchSeedOptions', () => {
     // neither belongs in the reservation's Record<string, string>.
     expect(
       resolveStructuredLaunchSeedOptions(
-        persistedCodex({
-          'gpt-5.6-sol': { effort: 'high', fastMode: true, personality: 'concise' }
+        persistedClaude({
+          opus: { effort: 'high', fastMode: true, personality: 'concise' }
         }),
-        'codex'
+        'claude'
       )
-    ).toEqual({ model: 'gpt-5.6-sol', effort: 'high' })
+    ).toEqual({ model: 'opus', effort: 'high' })
   })
 
   it('drops a seeded id whose persisted value is not a usable string', () => {
     // settings.json is user-writable, so a non-string `effort` must not reach a
     // record typed Record<string, string> and be emitted as a turn option.
     expect(
-      resolveStructuredLaunchSeedOptions(
-        persistedCodex({ 'gpt-5.6-sol': { effort: true } }),
-        'codex'
-      )
-    ).toEqual({ model: 'gpt-5.6-sol' })
+      resolveStructuredLaunchSeedOptions(persistedClaude({ opus: { effort: true } }), 'claude')
+    ).toEqual({ model: 'opus' })
     expect(
-      resolveStructuredLaunchSeedOptions(
-        persistedCodex({ 'gpt-5.6-sol': { effort: '  ' } }),
-        'codex'
-      )
-    ).toEqual({ model: 'gpt-5.6-sol' })
+      resolveStructuredLaunchSeedOptions(persistedClaude({ opus: { effort: '  ' } }), 'claude')
+    ).toEqual({ model: 'opus' })
   })
 
   it('seeds nothing when the stored values empty the model out', () => {
@@ -128,14 +125,14 @@ describe('resolveStructuredLaunchSeedOptions', () => {
     // guard, and that throw is not a wire refusal code — it escapes as a raw
     // error the client reads as unknown, stranding the launch with no fallback.
     expect(
-      resolveStructuredLaunchSeedOptions(persistedCodex({ 'gpt-5.6-sol': { model: '' } }), 'codex')
+      resolveStructuredLaunchSeedOptions(persistedClaude({ opus: { model: '' } }), 'claude')
     ).toBeUndefined()
   })
 
   it('seeds nothing until a model is picked, so the CLI default survives', () => {
-    expect(resolveStructuredLaunchSeedOptions(undefined, 'codex')).toBeUndefined()
+    expect(resolveStructuredLaunchSeedOptions(undefined, 'claude')).toBeUndefined()
     expect(
-      resolveStructuredLaunchSeedOptions({ codex: { valuesByModel: {} } }, 'codex')
+      resolveStructuredLaunchSeedOptions({ claude: { valuesByModel: {} } }, 'claude')
     ).toBeUndefined()
   })
 })

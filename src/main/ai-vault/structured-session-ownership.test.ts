@@ -7,7 +7,6 @@ import type { AiVaultListResult, AiVaultSession } from '../../shared/ai-vault-ty
 import type { StructuredProviderSessionOwnership } from '../native-chat/agent-session-wire/structured-provider-session-ownership'
 import { setStructuredAgentSessionHost } from '../native-chat/agent-session-wire/structured-agent-session-registry'
 import {
-  assertLegacyAiVaultResumeAllowed,
   assertLegacyAiVaultResumeCommandAllowed,
   projectStructuredAiVaultSessions
 } from './structured-session-ownership'
@@ -29,14 +28,12 @@ describe('structured AI Vault ownership', () => {
 
   it('derives typed refusals from the single writer predicate for live and proving leases', async () => {
     installOwnership()
-    expect(() =>
-      assertLegacyAiVaultResumeAllowed({
-        agent: 'codex',
-        filePath: `/sessions/rollout-${PROVIDER_SESSION}.jsonl`,
-        codexHome: null,
-        executionHostId: 'local'
-      })
-    ).toThrow('agent_session_conflict')
+    await expect(
+      assertLegacyAiVaultResumeCommandAllowed(
+        `claude --resume '${PROVIDER_SESSION}'`,
+        async () => undefined
+      )
+    ).rejects.toThrow('agent_session_conflict')
 
     installOwnership({
       lease: agentSessionLeaseFixture({
@@ -47,14 +44,13 @@ describe('structured AI Vault ownership', () => {
     })
     await expect(
       assertLegacyAiVaultResumeCommandAllowed(
-        `codex resume '${PROVIDER_SESSION}'`,
+        `claude --resume '${PROVIDER_SESSION}'`,
         async () => undefined
       )
     ).rejects.toThrow('agent_session_ownership_unknown')
   })
 
   it.each([
-    `codex resume --last`,
     `claude --resume`,
     `claude -r`,
     `claude --continue`,
@@ -64,7 +60,7 @@ describe('structured AI Vault ownership', () => {
     `claude --continue "keep going"`,
     `claude -c 019fd532-7c11-7a90-b6de-4e1a2c3d5f61`
   ])('refuses resume commands without a provably different target: %s', async (command) => {
-    installOwnership(command.startsWith('claude') ? { provider: 'claude' } : {})
+    installOwnership()
 
     await expect(
       assertLegacyAiVaultResumeCommandAllowed(command, async () => undefined)
@@ -76,7 +72,7 @@ describe('structured AI Vault ownership', () => {
 
     await expect(
       assertLegacyAiVaultResumeCommandAllowed(
-        'codex resume 019fd532-7c11-7a90-b6de-4e1a2c3d5f61',
+        'claude --resume 019fd532-7c11-7a90-b6de-4e1a2c3d5f61',
         async () => undefined
       )
     ).resolves.toBeUndefined()
@@ -87,7 +83,7 @@ function installOwnership(overrides: Partial<StructuredProviderSessionOwnership>
   const ownership: StructuredProviderSessionOwnership = {
     sessionId: 'session-alpha',
     workspaceId: 'workspace-1',
-    provider: 'codex',
+    provider: 'claude',
     providerSessionId: PROVIDER_SESSION,
     lease: agentSessionLeaseFixture(),
     ...overrides
@@ -105,7 +101,11 @@ function installOwnership(overrides: Partial<StructuredProviderSessionOwnership>
             providerHandleChain: [
               {
                 ...record.providerHandleChain[0]!,
-                handle: { provider: ownership.provider, threadId: ownership.providerSessionId }
+                handle: {
+                  provider: 'claude',
+                  sessionId: ownership.providerSessionId,
+                  leafUuid: null
+                }
               }
             ],
             lease: { ...ownership.lease, sessionId: ownership.sessionId }
@@ -118,15 +118,15 @@ function installOwnership(overrides: Partial<StructuredProviderSessionOwnership>
 
 function listResult(): AiVaultListResult {
   const session: AiVaultSession = {
-    id: `local:codex:${PROVIDER_SESSION}`,
+    id: `local:claude:${PROVIDER_SESSION}`,
     executionHostId: 'local',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: PROVIDER_SESSION,
     title: 'Owned',
     cwd: '/repo',
     branch: null,
     model: null,
-    filePath: `/sessions/rollout-${PROVIDER_SESSION}.jsonl`,
+    filePath: `/projects/-repo/${PROVIDER_SESSION}.jsonl`,
     codexHome: null,
     createdAt: null,
     updatedAt: null,
@@ -136,7 +136,7 @@ function listResult(): AiVaultListResult {
     previewMessages: [],
     queuedMessageCount: 0,
     subagentTranscriptCount: 0,
-    resumeCommand: `codex resume '${PROVIDER_SESSION}'`,
+    resumeCommand: `claude --resume '${PROVIDER_SESSION}'`,
     subagent: null
   }
   return { sessions: [session], issues: [], scannedAt: '2026-08-11T00:00:00.000Z' }

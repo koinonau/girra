@@ -10,8 +10,6 @@ import type { SessionFileCandidate } from '../ai-vault/session-scanner-types'
 // its temp directories, this module only shapes records and drives the parser.
 
 export const CLAUDE_SESSION_ID = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee'
-export const CODEX_SESSION_ID = '019f0000-1111-7222-8333-444444444444'
-export const CODEX_ROLLOUT_FILE = `rollout-2026-05-01T10-00-00-${CODEX_SESSION_ID}.jsonl`
 
 const RECORD_EPOCH_MS = 1740000000000
 
@@ -50,13 +48,11 @@ export function assistantRecord(
 
 export async function sessionCandidate(
   agent: SessionFileCandidate['agent'],
-  path: string,
-  codexHome: string | null = null
+  path: string
 ): Promise<SessionFileCandidate> {
   const fileStat = await stat(path)
   return {
     agent,
-    codexHome,
     file: {
       path,
       mtimeMs: fileStat.mtimeMs,
@@ -70,49 +66,18 @@ export async function sessionCandidate(
 
 export async function parseTranscript(
   path: string,
-  agent: SessionFileCandidate['agent'] = 'claude',
-  codexHome: string | null = null
+  agent: SessionFileCandidate['agent'] = 'claude'
 ): Promise<{ stats: SessionParseStats }> {
   const stats = createSessionParseStats()
-  await parseAgentSessionFileCached(
-    await sessionCandidate(agent, path, codexHome),
-    process.platform,
-    stats
-  )
+  await parseAgentSessionFileCached(await sessionCandidate(agent, path), process.platform, stats)
   return { stats }
 }
 
-function codexLine(record: Record<string, unknown>): string {
-  return JSON.stringify(record)
-}
-
-/** Minimal Codex rollout: meta, one user message, one completed shell command. */
-export function codexRolloutLines(command: string[], output: string, prompt: string): string[] {
+/** Minimal Claude turn: one user prompt, one tool call, and its result. */
+export function claudeToolTurnLines(command: string, output: string, prompt: string): string[] {
   return [
-    codexLine({
-      timestamp: recordTimestamp(0),
-      type: 'session_meta',
-      payload: { id: CODEX_SESSION_ID, cwd: '/repo/app', git: { branch: 'main' } }
-    }),
-    codexLine({
-      timestamp: recordTimestamp(1),
-      type: 'response_item',
-      payload: { type: 'message', role: 'user', content: prompt }
-    }),
-    codexLine({
-      timestamp: recordTimestamp(2),
-      type: 'response_item',
-      payload: {
-        type: 'function_call',
-        call_id: 'call-1',
-        name: 'shell',
-        arguments: JSON.stringify({ command })
-      }
-    }),
-    codexLine({
-      timestamp: recordTimestamp(3),
-      type: 'response_item',
-      payload: { type: 'function_call_output', call_id: 'call-1', output }
-    })
+    userRecord(0, prompt),
+    assistantRecord(1, [{ type: 'tool_use', id: 'call-1', name: 'Bash', input: { command } }]),
+    userRecord(2, [{ type: 'tool_result', tool_use_id: 'call-1', content: output }])
   ]
 }

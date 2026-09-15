@@ -106,8 +106,8 @@ describe('caller filters', () => {
   it('narrows by agent, and by updated-at floor', async () => {
     const db = await openIndex()
     addSession(db, 1, '/work/app', { agent: 'claude', updatedAt: '2026-09-01T00:00:00.000Z' })
-    addSession(db, 2, '/work/app', { agent: 'codex', updatedAt: '2026-09-05T00:00:00.000Z' })
-    expect(selected(db, { agents: ['codex'] })).toEqual([2])
+    addSession(db, 2, '/work/app', { agent: 'pi', updatedAt: '2026-09-05T00:00:00.000Z' })
+    expect(selected(db, { agents: ['pi'] })).toEqual([2])
     expect(selected(db, { since: '2026-09-03T00:00:00.000Z' })).toEqual([2])
     expect(selected(db, { agents: ['claude'], since: '2026-09-03T00:00:00.000Z' })).toEqual([])
   })

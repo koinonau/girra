@@ -28,7 +28,7 @@ function sleepingRecord(
     paneKey: `${tabId}:${leafId}`,
     tabId,
     worktreeId: WORKTREE_ID,
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: providerSessionId },
     prompt: 'resume',
     state: 'working',
@@ -66,7 +66,7 @@ function runtimeSnapshot(
         id: 'structured-agent-session-live-session',
         title: 'Codex Chat',
         sessionId: 'live-session',
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         isActive: false
       }
     ]
@@ -364,7 +364,7 @@ describe('worktree agent activation gate', () => {
     await expect(runWorktreeAgentActivationGate(WORKTREE_ID, deps)).resolves.toBe('resumed')
 
     expect(resume).toHaveBeenCalledWith(WORKTREE_ID, {
-      skipClaimKeys: new Set([`${WORKTREE_ID}\0codex\0session_id\0live-session`])
+      skipClaimKeys: new Set([`${WORKTREE_ID}\0claude\0session_id\0live-session`])
     })
   })
 
@@ -411,7 +411,7 @@ describe('worktree agent activation gate', () => {
       recordInteraction: false
     })
     expect(resume).toHaveBeenCalledWith(WORKTREE_ID, {
-      skipClaimKeys: new Set([`${WORKTREE_ID}\0codex\0session_id\0live-session`])
+      skipClaimKeys: new Set([`${WORKTREE_ID}\0claude\0session_id\0live-session`])
     })
   })
 
@@ -482,7 +482,7 @@ describe('worktree agent activation gate', () => {
     ).resolves.toBe('resumed')
 
     expect(resume).toHaveBeenCalledWith(WORKTREE_ID, {
-      skipClaimKeys: new Set([`${WORKTREE_ID}\0codex\0session_id\0live-session`])
+      skipClaimKeys: new Set([`${WORKTREE_ID}\0claude\0session_id\0live-session`])
     })
   })
 
@@ -502,7 +502,7 @@ describe('worktree agent activation gate', () => {
     ).resolves.toBe('structured')
 
     expect(resume).toHaveBeenCalledWith(WORKTREE_ID, {
-      skipClaimKeys: new Set([`${WORKTREE_ID}\0codex\0session_id\0live-session`])
+      skipClaimKeys: new Set([`${WORKTREE_ID}\0claude\0session_id\0live-session`])
     })
   })
   it('does not mint a second surface for a PTY bound only in the persisted layout', async () => {

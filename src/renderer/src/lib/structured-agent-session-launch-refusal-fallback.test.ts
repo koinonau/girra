@@ -24,8 +24,8 @@ vi.mock('@/i18n/i18n', () => ({
 }))
 
 vi.mock('@/lib/agent-catalog', () => ({
-  getAgentCatalog: () => [{ id: 'codex', label: 'Codex' }],
-  getAgentLabel: () => 'Codex'
+  getAgentCatalog: () => [{ id: 'claude', label: 'Claude' }],
+  getAgentLabel: () => 'Claude'
 }))
 
 vi.mock('@/runtime/structured-agent-session-client', () => ({
@@ -91,9 +91,9 @@ function publishedSnapshot(worktreeId: string, sessionId: string): RuntimeMobile
       {
         type: 'agent-session',
         id: 'tab-1',
-        title: 'Codex',
+        title: 'Claude',
         sessionId,
-        agent: 'codex',
+        agent: 'claude',
         isActive: true
       }
     ]
@@ -120,7 +120,7 @@ describe('legacy terminal fallback after a refused structured create', () => {
       const legacyTerminals: string[] = []
       replyToCreates(refused(code))
 
-      const launch = startStructuredAgentLaunch(worktreeId, 'codex')
+      const launch = startStructuredAgentLaunch(worktreeId, 'claude')
       void launch.claimDefinitiveRefusalFallback(() => {
         legacyTerminals.push('legacy-terminal')
       })
@@ -143,7 +143,7 @@ describe('legacy terminal fallback after a refused structured create', () => {
     const legacyTerminals: string[] = []
     replyToCreates(refused('agent_session_operation_unknown'), { ok: true })
 
-    const launch = startStructuredAgentLaunch(worktreeId, 'codex')
+    const launch = startStructuredAgentLaunch(worktreeId, 'claude')
     const fallbackRan = launch.claimDefinitiveRefusalFallback(() => {
       legacyTerminals.push('legacy-terminal')
     })
@@ -167,7 +167,7 @@ describe('legacy terminal fallback after a refused structured create', () => {
     const legacyTerminals: string[] = []
     replyToCreates(refused('structured_agent_session_unsupported'))
 
-    const launch = startStructuredAgentLaunch(worktreeId, 'codex')
+    const launch = startStructuredAgentLaunch(worktreeId, 'claude')
     const fallbackRan = launch.claimDefinitiveRefusalFallback(() => {
       legacyTerminals.push('legacy-terminal')
     })
@@ -196,7 +196,7 @@ describe('legacy terminal fallback after a refused structured create', () => {
       })
     )
 
-    const launch = startStructuredAgentLaunch('wt-old-runtime', 'codex')
+    const launch = startStructuredAgentLaunch('wt-old-runtime', 'claude')
     const fallbackRan = launch.claimDefinitiveRefusalFallback(() => {
       legacyTerminals.push('legacy-terminal')
     })
@@ -207,6 +207,6 @@ describe('legacy terminal fallback after a refused structured create', () => {
     await expect(fallbackRan).resolves.toBe(true)
     expect(legacyTerminals).toEqual(['legacy-terminal'])
     expect(mocks.call).toHaveBeenCalledOnce()
-    expect(getStructuredAgentLaunchStatus('wt-old-runtime', 'codex')).toBe('idle')
+    expect(getStructuredAgentLaunchStatus('wt-old-runtime', 'claude')).toBe('idle')
   })
 })

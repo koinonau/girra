@@ -4,8 +4,6 @@ import { getAgentImageHandling, isNativeChatPastedImagePath } from './native-cha
 describe('image paste agent map', () => {
   it('vision-capable TUIs take image attachments', () => {
     expect(getAgentImageHandling('claude')).toBe('attachment')
-    expect(getAgentImageHandling('codex')).toBe('attachment')
-    expect(getAgentImageHandling('grok')).toBe('attachment')
   })
 
   it('unknown/custom agent is unsupported', () => {

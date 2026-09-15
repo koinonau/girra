@@ -11,7 +11,7 @@ const request: WorktreeCreationRequest = {
   repoId: 'repo-1',
   name: 'routing-recovery',
   setupDecision: 'run',
-  agent: 'codex',
+  agent: 'claude',
   agentLaunchRoute: 'structured-native-chat',
   pendingFirstAgentMessageRename: false,
   note: '',
@@ -132,7 +132,7 @@ describe('structured worktree creation unknown outcome', () => {
 
     expect(store.updatePendingWorktreeCreation).toHaveBeenCalledWith('creation-1', {
       status: 'error',
-      error: 'Could not confirm whether Codex chat opened. Retry to check again.',
+      error: 'Could not confirm whether Claude chat opened. Retry to check again.',
       structuredLaunchRecoveryWorktreeId: 'worktree-1'
     })
     expect(store.removePendingWorktreeCreation).not.toHaveBeenCalled()

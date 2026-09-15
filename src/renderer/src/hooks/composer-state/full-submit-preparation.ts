@@ -11,7 +11,6 @@ type FullSubmitPreparationInput = Pick<
   | 'prepareFullSubmitSource'
   | 'repoId'
   | 'resolvedSetupDecision'
-  | 'selectedRepo'
   | 'selectedRepoAgentLaunchPlatform'
   | 'selectedRepoExecutionHostId'
   | 'selectedRepoIsGit'
@@ -34,7 +33,6 @@ import {
   resolveTuiAgentLaunchEnv
 } from '../../../../shared/tui-agent-launch-defaults'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import { tuiAgentToAgentKind } from '../../../../shared/agent-kind'
 import type { PendingSmartGitHubSubmitResolution } from './source-selection-decisions'
@@ -50,7 +48,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
     prepareFullSubmitSource,
     repoId,
     resolvedSetupDecision,
-    selectedRepo,
     selectedRepoAgentLaunchPlatform,
     selectedRepoExecutionHostId,
     selectedRepoIsGit,
@@ -188,12 +185,7 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
             openAgentTabsInChatByDefault: settings?.openAgentTabsInChatByDefault,
             nativeChatSessionOptions: settings?.nativeChatSessionOptions
           },
-          {
-            agent: tuiAgent,
-            nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-              selectedRepo?.connectionId
-            )
-          }
+          { agent: tuiAgent }
         ),
         platform: selectedRepoAgentLaunchPlatform,
         shell: selectedRepoStartupShell,
@@ -249,7 +241,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
       prepareFullSubmitSource,
       repoId,
       resolvedSetupDecision,
-      selectedRepo,
       selectedRepoAgentLaunchPlatform,
       selectedRepoExecutionHostId,
       selectedRepoIsGit,

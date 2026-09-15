@@ -57,9 +57,7 @@ function Watcher(): null {
 describe('passive terminal seeding during native chat creation', () => {
   it.each([
     ['claude', 'pending', 0],
-    ['codex', 'pending', 0],
     ['claude', 'unknown', 0],
-    ['codex', 'unknown', 0],
     ['claude', 'idle', 1]
   ] as const)('handles %s launch status %s', async (agent, status, expectedTabs) => {
     let finishGate!: (outcome: 'empty') => void

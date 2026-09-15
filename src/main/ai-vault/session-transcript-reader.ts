@@ -19,10 +19,6 @@ const NEWLINE_BYTE = 0x0a
 export type TranscriptReadStats = {
   incremental: number
   fullParses: number
-  // Transcripts the parser already excluded (Codex workers), re-listed after a
-  // write and dismissed without reading. Counted apart from `incremental` so a
-  // scan span still shows how much work the early stop actually removed.
-  earlyStopped: number
   bytesRead: number
 }
 
@@ -75,13 +71,8 @@ export async function readResumableTranscript(args: {
   const channel = canResume ? resume.channel : new TranscriptMessageChannel()
   const state = canResume ? resume.state.clone() : args.stateFactory(channel)
   const startOffset = canResume ? resume.byteOffset : 0
-  // Mirrors the reader's entry guard so a dismissed transcript is not reported
-  // as an incremental parse that read nothing.
-  const stoppedBeforeRead = state.shouldStop?.() === true
   if (args.stats) {
-    if (stoppedBeforeRead) {
-      args.stats.earlyStopped++
-    } else if (canResume) {
+    if (canResume) {
       args.stats.incremental++
     } else {
       args.stats.fullParses++
@@ -100,11 +91,7 @@ export async function readResumableTranscript(args: {
     const readResult = await consumeCompleteJsonlLines({
       path: file.path,
       start: startOffset,
-      onLine: (line) => state.consumeLine(line),
-      // Bound: the optional hooks are declared as methods, so a parser written
-      // with method syntax must not lose `this` on the way into the reader.
-      onLineBytes: state.consumeLineBytes?.bind(state),
-      shouldStop: state.shouldStop?.bind(state)
+      onLine: (line) => state.consumeLine(line)
     })
     if (args.stats) {
       args.stats.bytesRead += readResult.bytesRead
@@ -137,7 +124,7 @@ export async function readResumableTranscript(args: {
 
 /**
  * Read a transcript whose format is rewritten in place rather than appended
- * (whole-JSON documents, Kimi's state doc, OpenCode). There is no cursor to
+ * (OpenCode's session doc and SQLite rows). There is no cursor to
  * keep, so every read is a whole-file `replace`.
  */
 export async function readWholeTranscript(args: {

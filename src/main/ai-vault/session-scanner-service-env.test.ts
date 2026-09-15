@@ -31,36 +31,12 @@ describe('buildAiVaultServiceEnv', () => {
 
   it('keeps the agent-home variables the scanner discovers sessions through', () => {
     const env = buildAiVaultServiceEnv(
-      {
-        CODEX_HOME: '/home/dev/.codex',
-        CLINE_SESSION_DATA_DIR: '/home/dev/cline-sessions',
-        COPILOT_HOME: '/home/dev/.copilot',
-        DEVIN_HOME: '/home/dev/.devin',
-        GROK_HOME: '/home/dev/.grok',
-        KIMI_CODE_HOME: '/home/dev/.kimi-code',
-        OMP_CODING_AGENT_DIR: '/home/dev/.omp/agent/sessions',
-        OPENCLAW_STATE_DIR: '/home/dev/.openclaw',
-        PI_CODING_AGENT_DIR: '/home/dev/.pi/agent/sessions',
-        PRIME_AGENT_CODING_AGENT_DIR: '/home/dev/.prime/agent',
-        PRIME_AGENT_CODING_AGENT_SESSION_DIR: '/home/dev/.prime/legacy-sessions',
-        PRIME_AGENT_SESSION_DIR: '/home/dev/.prime/sessions'
-      },
+      { PI_CODING_AGENT_DIR: '/home/dev/.pi/agent/sessions' },
       'linux'
     )
 
     expect(env).toEqual({
-      CODEX_HOME: '/home/dev/.codex',
-      CLINE_SESSION_DATA_DIR: '/home/dev/cline-sessions',
-      COPILOT_HOME: '/home/dev/.copilot',
-      DEVIN_HOME: '/home/dev/.devin',
-      GROK_HOME: '/home/dev/.grok',
-      KIMI_CODE_HOME: '/home/dev/.kimi-code',
-      OMP_CODING_AGENT_DIR: '/home/dev/.omp/agent/sessions',
-      OPENCLAW_STATE_DIR: '/home/dev/.openclaw',
       PI_CODING_AGENT_DIR: '/home/dev/.pi/agent/sessions',
-      PRIME_AGENT_CODING_AGENT_DIR: '/home/dev/.prime/agent',
-      PRIME_AGENT_CODING_AGENT_SESSION_DIR: '/home/dev/.prime/legacy-sessions',
-      PRIME_AGENT_SESSION_DIR: '/home/dev/.prime/sessions',
       ELECTRON_RUN_AS_NODE: '1'
     })
   })
@@ -80,15 +56,15 @@ describe('buildAiVaultServiceEnv', () => {
   })
 
   it('ignores a POSIX variable that only matches an allowed name by case', () => {
-    expect(buildAiVaultServiceEnv({ codex_home: '/tmp/spoof' }, 'linux')).toEqual({
+    expect(buildAiVaultServiceEnv({ pi_coding_agent_dir: '/tmp/spoof' }, 'linux')).toEqual({
       ELECTRON_RUN_AS_NODE: '1'
     })
   })
 
   it('resolves a lowercased Windows variable the OS would still honour', () => {
-    const env = buildAiVaultServiceEnv({ codex_home: 'C:\\codex', Path: 'C:\\bin' }, 'win32')
+    const env = buildAiVaultServiceEnv({ pi_coding_agent_dir: 'C:\\pi', Path: 'C:\\bin' }, 'win32')
 
-    expect(env.CODEX_HOME).toBe('C:\\codex')
+    expect(env.PI_CODING_AGENT_DIR).toBe('C:\\pi')
     expect(env.PATH).toBe('C:\\bin')
   })
 
@@ -122,11 +98,11 @@ describe('buildRelayAiVaultServiceEnv', () => {
   // agent-home override on the remote host is not part of how it finds roots.
   it('withholds the agent-home variables the desktop child needs', () => {
     const env = buildRelayAiVaultServiceEnv(
-      { CODEX_HOME: '/remote/.codex', PATH: '/usr/bin' },
+      { PI_CODING_AGENT_DIR: '/remote/.pi', PATH: '/usr/bin' },
       'linux'
     )
 
-    expect(env.CODEX_HOME).toBeUndefined()
+    expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
     expect(env.PATH).toBe('/usr/bin')
   })
 

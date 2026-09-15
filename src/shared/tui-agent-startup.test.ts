@@ -314,19 +314,18 @@ describe('tui agent startup plans', () => {
 
   it('builds Windows resume plans that PowerShell can invoke', () => {
     const plan = buildAgentResumeStartupPlan({
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: 's1' },
       cmdOverrides: {},
       platform: 'win32'
     })
 
-    expect(plan?.launchCommand).toBe("codex 'resume' 's1'")
-    expect(plan?.startupCommandDelivery).toBe('shell-ready')
+    expect(plan?.launchCommand).toBe("claude '--resume' 's1'")
   })
 
   it('quotes Windows resume argv for cmd.exe when shell is cmd', () => {
     const plan = buildAgentResumeStartupPlan({
-      agent: 'grok',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: '019fc272-80fa-7a91-80a2-9c461ef1a9da' },
       cmdOverrides: {},
       agentArgs: '--permission-mode bypassPermissions',
@@ -337,16 +336,16 @@ describe('tui agent startup plans', () => {
     // Why: cmd.exe treats single quotes as literal characters. Resume must use
     // double quotes (or unquoted tokens) so the CLI receives clean argv.
     expect(plan?.launchCommand).toBe(
-      'grok "--permission-mode" "bypassPermissions" "--resume" "019fc272-80fa-7a91-80a2-9c461ef1a9da"'
+      'claude "--permission-mode" "bypassPermissions" "--resume" "019fc272-80fa-7a91-80a2-9c461ef1a9da"'
     )
   })
 
   it('keeps cmd-quoted agentCommand aligned with cmd resume suffix', () => {
     const plan = buildAgentResumeStartupPlan({
-      agent: 'grok',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: '019fc272-80fa-7a91-80a2-9c461ef1a9da' },
       cmdOverrides: {},
-      agentCommand: 'grok "--permission-mode" "bypassPermissions"',
+      agentCommand: 'claude "--permission-mode" "bypassPermissions"',
       platform: 'win32',
       shell: 'cmd'
     })
@@ -354,53 +353,35 @@ describe('tui agent startup plans', () => {
     // Regression: agentCommand from a prior cmd launch + PowerShell-default resume
     // suffix produced mixed quoting and broke reboot restore on cmd.exe tabs.
     expect(plan?.launchCommand).toBe(
-      'grok "--permission-mode" "bypassPermissions" "--resume" "019fc272-80fa-7a91-80a2-9c461ef1a9da"'
+      'claude "--permission-mode" "bypassPermissions" "--resume" "019fc272-80fa-7a91-80a2-9c461ef1a9da"'
     )
   })
 
   it('honors command overrides when building POSIX resume plans', () => {
     const plan = buildAgentResumeStartupPlan({
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: 's1' },
-      cmdOverrides: { codex: 'codex --profile work' },
+      cmdOverrides: { claude: 'claude --profile work' },
       platform: 'linux'
     })
 
-    expect(plan?.launchCommand).toBe("codex --profile work 'resume' 's1'")
+    expect(plan?.launchCommand).toBe("claude --profile work '--resume' 's1'")
   })
 
   it('uses a captured launch command when building resume plans after overrides change', () => {
     const plan = buildAgentResumeStartupPlan({
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: 's1' },
-      cmdOverrides: { codex: 'codex --profile changed' },
-      agentCommand: 'codex --profile captured',
+      cmdOverrides: { claude: 'claude --profile changed' },
+      agentCommand: 'claude --profile captured',
       platform: 'linux'
     })
 
-    expect(plan?.launchCommand).toBe("codex --profile captured 'resume' 's1'")
+    expect(plan?.launchCommand).toBe("claude --profile captured '--resume' 's1'")
     expect(plan?.launchConfig).toEqual({
-      agentCommand: 'codex --profile captured',
+      agentCommand: 'claude --profile captured',
       agentArgs: '',
       agentEnv: {}
-    })
-  })
-
-  it('keeps an AI Vault OMP file locator separate from provider identity', () => {
-    const plan = buildAgentResumeStartupPlan({
-      agent: 'omp',
-      providerSession: { key: 'session_id', id: 'omp-session-1' },
-      cmdOverrides: {},
-      ompResumeFilePath: '/custom/root/project/session.jsonl',
-      platform: 'linux'
-    })
-
-    expect(plan?.launchCommand).toBe("omp '--resume' '/custom/root/project/session.jsonl'")
-    expect(plan?.launchConfig).toEqual({
-      agentCommand: 'omp',
-      agentArgs: '',
-      agentEnv: {},
-      ompResumeFilePath: '/custom/root/project/session.jsonl'
     })
   })
 

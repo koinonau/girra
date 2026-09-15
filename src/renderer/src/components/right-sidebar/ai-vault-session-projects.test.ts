@@ -102,7 +102,7 @@ describe('buildAiVaultProjectContext', () => {
 
   it('falls back to repo ids for legacy records without project metadata', () => {
     const repo = makeRepo({ id: 'repo-legacy', displayName: 'Legacy', path: '/repo/legacy' })
-    const session = makeSession({ id: 'codex:legacy', cwd: '/repo/legacy/src' })
+    const session = makeSession({ id: 'claude:legacy', cwd: '/repo/legacy/src' })
 
     const context = buildAiVaultProjectContext({
       repos: [repo],
@@ -231,7 +231,7 @@ describe('buildAiVaultProjectContext', () => {
     const repoB = makeRepo({ id: 'repo-b', displayName: 'Main Checkout', path: '/work/main' })
     const project = makeProject({ id: 'project-1', displayName: 'Canonical Project' })
     const firstSession = makeSession({ id: 'claude:first', cwd: '/work/fork/src' })
-    const secondSession = makeSession({ id: 'codex:second', cwd: '/work/main/src' })
+    const secondSession = makeSession({ id: 'claude:second', cwd: '/work/main/src' })
 
     const context = buildAiVaultProjectContext({
       repos: [repoA, repoB],

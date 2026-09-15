@@ -82,9 +82,6 @@ export function launchSleepingAgentSession(
         ? launchConfig.agentEnv
         : resolveTuiAgentLaunchEnv(record.agent, state.settings?.agentDefaultEnv),
     ...(launchConfig?.agentCommand ? { agentCommand: launchConfig.agentCommand } : {}),
-    ...(launchConfig?.ompResumeFilePath
-      ? { ompResumeFilePath: launchConfig.ompResumeFilePath }
-      : {}),
     platform: resumeTarget.platform,
     shell: resumeTarget.shell
   })

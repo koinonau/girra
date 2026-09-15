@@ -42,11 +42,11 @@ export function hostTestAttachParams(
       payloadFingerprint: '0'.repeat(64)
     },
     location: HOST_TEST_LOCATION,
-    provider: 'codex',
-    agent: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    provider: 'claude',
+    agent: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     runtimeKind: 'native',
-    providerHandle: { kind: 'codex', threadId: HOST_TEST_THREAD },
+    providerHandle: { kind: 'claude', sessionId: HOST_TEST_THREAD, leafUuid: null },
     ...overrides
   }
   return {

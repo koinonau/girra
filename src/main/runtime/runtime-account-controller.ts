@@ -12,8 +12,6 @@ export type RuntimeAccountServices = {
 
 export type AccountsSnapshot = {
   claude: ClaudeRateLimitAccountsState
-  // Why: older paired desktops read codex.accounts unguarded, so the retired slot stays on the wire.
-  codex: { accounts: []; activeAccountId: null }
   rateLimits: RateLimitState
 }
 
@@ -41,7 +39,6 @@ export class RuntimeAccountController {
     const { claudeAccounts, rateLimits } = this.requireServices()
     return {
       claude: claudeAccounts.listAccounts(),
-      codex: retiredCodexAccounts(),
       rateLimits: rateLimits.getState()
     }
   }
@@ -83,7 +80,6 @@ export class RuntimeAccountController {
     return services.rateLimits.onStateChange((rateLimits) => {
       listener({
         claude: services.claudeAccounts.listAccounts(),
-        codex: retiredCodexAccounts(),
         rateLimits
       })
     })
@@ -95,8 +91,4 @@ export class RuntimeAccountController {
     }
     return this.services
   }
-}
-
-function retiredCodexAccounts(): AccountsSnapshot['codex'] {
-  return { accounts: [], activeAccountId: null }
 }

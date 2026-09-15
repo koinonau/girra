@@ -29,7 +29,7 @@ import {
 
 const WORKTREE_ID = 'repo-1::worktree-1'
 const TERMINAL_ID = 'terminal-1'
-const STRUCTURED_ID = 'structured-agent-session-codex-1'
+const STRUCTURED_ID = 'structured-agent-session-claude-1'
 const PRIMARY_GROUP = 'primary-group'
 const SECONDARY_GROUP = 'secondary-group'
 
@@ -60,12 +60,12 @@ function createSnapshot(): WebSessionTabsSyncState {
     },
     {
       id: STRUCTURED_ID,
-      entityId: 'codex-1',
+      entityId: 'claude-1',
       groupId: SECONDARY_GROUP,
       worktreeId: WORKTREE_ID,
       contentType: 'agent-session',
-      agentSessionAgent: 'codex',
-      label: 'Codex Chat',
+      agentSessionAgent: 'claude',
+      label: 'Claude Chat',
       customLabel: null,
       color: null,
       sortOrder: 1,
@@ -165,7 +165,7 @@ function expectExactSplit(state: {
 describe('local structured session tab projection', () => {
   it('removes only locally mirrored structured tabs when the feature is disabled', () => {
     const mirrored = applyLocalStructuredSessionTabSnapshots(createSnapshot(), [
-      structuredInventory('epoch-1', 1, 'codex-1')
+      structuredInventory('epoch-1', 1, 'claude-1')
     ])
 
     const disabled = removeLocalStructuredSessionTabs(mirrored)
@@ -364,9 +364,9 @@ describe('local structured session tab projection', () => {
         {
           type: 'agent-session' as const,
           id: STRUCTURED_ID,
-          title: 'Codex Chat',
-          sessionId: 'codex-1',
-          agent: 'codex' as const,
+          title: 'Claude Chat',
+          sessionId: 'claude-1',
+          agent: 'claude' as const,
           isActive: true
         }
       ]
@@ -468,7 +468,7 @@ describe('local structured session tab projection', () => {
       publicationEpoch: 'epoch-1',
       snapshotVersion: 1,
       activeGroupId: 'structured-group',
-      activeTabId: 'agent-session:codex-1',
+      activeTabId: 'agent-session:claude-1',
       activeTabType: 'agent-session',
       tabGroups: [
         {
@@ -478,8 +478,8 @@ describe('local structured session tab projection', () => {
         },
         {
           id: 'structured-group',
-          activeTabId: 'agent-session:codex-1',
-          tabOrder: ['agent-session:codex-1']
+          activeTabId: 'agent-session:claude-1',
+          tabOrder: ['agent-session:claude-1']
         }
       ],
       tabGroupLayout: {
@@ -502,10 +502,10 @@ describe('local structured session tab projection', () => {
         },
         {
           type: 'agent-session',
-          id: 'agent-session:codex-1',
-          title: 'Codex Chat',
-          sessionId: 'codex-1',
-          agent: 'codex',
+          id: 'agent-session:claude-1',
+          title: 'Claude Chat',
+          sessionId: 'claude-1',
+          agent: 'claude',
           isActive: true
         }
       ]
@@ -515,12 +515,12 @@ describe('local structured session tab projection', () => {
       tabGroups: [
         {
           id: 'structured-group',
-          activeTabId: 'agent-session:codex-1',
-          tabOrder: ['agent-session:codex-1']
+          activeTabId: 'agent-session:claude-1',
+          tabOrder: ['agent-session:claude-1']
         }
       ],
       tabGroupLayout: undefined,
-      tabs: [expect.objectContaining({ type: 'agent-session', agent: 'codex' })]
+      tabs: [expect.objectContaining({ type: 'agent-session', agent: 'claude' })]
     })
   })
 
@@ -531,14 +531,14 @@ describe('local structured session tab projection', () => {
       publicationEpoch: 'epoch-1',
       snapshotVersion: 2,
       activeGroupId: SECONDARY_GROUP,
-      activeTabId: 'agent-session:codex-1',
+      activeTabId: 'agent-session:claude-1',
       activeTabType: 'agent-session',
       tabGroups: [
         { id: PRIMARY_GROUP, activeTabId: TERMINAL_ID, tabOrder: [TERMINAL_ID] },
         {
           id: SECONDARY_GROUP,
-          activeTabId: 'agent-session:codex-1',
-          tabOrder: ['agent-session:codex-1']
+          activeTabId: 'agent-session:claude-1',
+          tabOrder: ['agent-session:claude-1']
         }
       ],
       tabGroupLayout: state.layoutByWorktree[WORKTREE_ID],
@@ -556,10 +556,10 @@ describe('local structured session tab projection', () => {
         },
         {
           type: 'agent-session',
-          id: 'agent-session:codex-1',
-          title: 'Codex Chat',
-          sessionId: 'codex-1',
-          agent: 'codex',
+          id: 'agent-session:claude-1',
+          title: 'Claude Chat',
+          sessionId: 'claude-1',
+          agent: 'claude',
           isActive: true
         }
       ]
@@ -605,22 +605,22 @@ describe('local structured session tab projection', () => {
       publicationEpoch: 'structured:restart-1',
       snapshotVersion: 1,
       activeGroupId: SECONDARY_GROUP,
-      activeTabId: 'agent-session:codex-1',
+      activeTabId: 'agent-session:claude-1',
       activeTabType: 'agent-session' as const,
       tabGroups: [
         {
           id: SECONDARY_GROUP,
-          activeTabId: 'agent-session:codex-1',
-          tabOrder: ['agent-session:codex-1']
+          activeTabId: 'agent-session:claude-1',
+          tabOrder: ['agent-session:claude-1']
         }
       ],
       tabs: [
         {
           type: 'agent-session' as const,
-          id: 'agent-session:codex-1',
-          title: 'Codex Chat',
-          sessionId: 'codex-1',
-          agent: 'codex' as const,
+          id: 'agent-session:claude-1',
+          title: 'Claude Chat',
+          sessionId: 'claude-1',
+          agent: 'claude' as const,
           isActive: true
         }
       ]
@@ -660,23 +660,23 @@ describe('local structured session tab projection', () => {
       publicationEpoch: 'structured:epoch-1',
       snapshotVersion: 1,
       activeGroupId: SECONDARY_GROUP,
-      activeTabId: 'agent-session:codex-1',
+      activeTabId: 'agent-session:claude-1',
       activeTabType: 'agent-session' as const,
       tabGroups: [
         { id: PRIMARY_GROUP, activeTabId: TERMINAL_ID, tabOrder: [TERMINAL_ID] },
         {
           id: SECONDARY_GROUP,
-          activeTabId: 'agent-session:codex-1',
-          tabOrder: ['agent-session:codex-1']
+          activeTabId: 'agent-session:claude-1',
+          tabOrder: ['agent-session:claude-1']
         }
       ],
       tabs: [
         {
           type: 'agent-session' as const,
-          id: 'agent-session:codex-1',
-          title: 'Codex Chat',
-          sessionId: 'codex-1',
-          agent: 'codex' as const,
+          id: 'agent-session:claude-1',
+          title: 'Claude Chat',
+          sessionId: 'claude-1',
+          agent: 'claude' as const,
           isActive: true
         }
       ]
@@ -685,7 +685,7 @@ describe('local structured session tab projection', () => {
     recordWebSessionFocusIntent(
       { environmentId: 'local-structured-session' },
       WORKTREE_ID,
-      'agent-session:codex-1',
+      'agent-session:claude-1',
       undefined,
       TERMINAL_ID
     )
@@ -782,9 +782,9 @@ function structuredInventory(
       {
         type: 'agent-session',
         id: `agent-session:${sessionId}`,
-        title: 'Codex Chat',
+        title: 'Claude Chat',
         sessionId,
-        agent: 'codex',
+        agent: 'claude',
         isActive: true
       }
     ]

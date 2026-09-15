@@ -15,18 +15,12 @@ export async function consumeCompleteJsonlLines(args: {
   path: string
   start: number
   onLine: (line: string) => void
-  onLineBytes?: (line: Buffer) => void
-  shouldStop?: () => boolean
 }): Promise<JsonlReadResult> {
-  if (args.shouldStop?.()) {
-    return { consumedThrough: args.start, trailingPartialLine: null, bytesRead: 0 }
-  }
   let consumedThrough = args.start
   let bytesRead = 0
   // A piece list avoids O(record^2) copying when one record spans many chunks.
   let remainderParts: Buffer[] = []
   let remainderLength = 0
-  let stopped = false
 
   const stream = openTranscriptReadStream(args.path, { start: args.start }, 'scan')
   for await (const chunk of stream as AsyncIterable<Buffer>) {
@@ -50,24 +44,11 @@ export async function consumeCompleteJsonlLines(args: {
         remainderLength = 0
       }
       const lineEnd = line.at(-1) === CARRIAGE_RETURN_BYTE ? line.length - 1 : line.length
-      if (args.onLineBytes) {
-        args.onLineBytes(line.subarray(0, lineEnd))
-      } else {
-        args.onLine(line.toString('utf-8', 0, lineEnd))
-      }
+      args.onLine(line.toString('utf-8', 0, lineEnd))
       lineStart = newlineIndex + 1
-      if (args.shouldStop?.()) {
-        stopped = true
-        break
-      }
       newlineIndex = data.indexOf(NEWLINE_BYTE, lineStart)
     }
     consumedThrough += carriedLength + lineStart
-    if (stopped) {
-      remainderParts = []
-      remainderLength = 0
-      break
-    }
     if (lineStart < data.length) {
       // Copy the tail so retaining it does not pin the whole chunk buffer.
       remainderParts = [Buffer.from(data.subarray(lineStart))]

@@ -7,7 +7,6 @@ function session(id: number, overrides: Partial<SessionRow> = {}): SessionRow {
     agent: 'claude',
     session_id: String(id),
     file_path: `/synthetic/${id}.jsonl`,
-    codex_home: null,
     title: 'fixture',
     cwd: '/repo/app',
     branch: null,

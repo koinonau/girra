@@ -14,7 +14,7 @@ import {
 const turn: AgentJournalTurnLifecycle = {
   turnId: 't1',
   state: 'completed',
-  userItemId: 'codex:thread:t1:0',
+  userItemId: 'claude:thread:t1:0',
   startedAt: 1_000,
   completedAt: 8_200,
   durationMs: 7_172
@@ -49,18 +49,15 @@ describe('readAgentJournalTurn', () => {
 })
 
 describe('legacyAgentJournalTurnStatusBody', () => {
-  it('names the agent from the lifecycle identity and never calls an unobserved end completed', () => {
-    expect(legacyAgentJournalTurnStatusBody(turn, 'legacy:claude:s:turn-lifecycle%3At1')).toEqual({
+  it('never calls an unobserved end completed', () => {
+    expect(legacyAgentJournalTurnStatusBody(turn)).toEqual({
       kind: 'status',
       text: 'Claude turn completed',
       turnLifecycle: turn
     })
     expect(
-      legacyAgentJournalTurnStatusBody(
-        { turnId: 't2', state: 'unverifiable', startedAt: 1 },
-        'legacy:codex:s:turn-lifecycle%3At2'
-      ).text
-    ).toBe('Codex turn outcome unverifiable')
+      legacyAgentJournalTurnStatusBody({ turnId: 't2', state: 'unverifiable', startedAt: 1 }).text
+    ).toBe('Claude turn outcome unverifiable')
   })
 })
 

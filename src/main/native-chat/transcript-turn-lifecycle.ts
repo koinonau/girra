@@ -8,12 +8,7 @@ import {
   timestampMs
 } from '../ai-vault/session-scanner-values'
 import { decodeClaudeTranscriptLine } from './transcript-line-decoders-claude'
-import {
-  claudeInterruptedMessageId,
-  CODEX_EVENT_TURN_ABORTED,
-  CODEX_EVENT_TURN_COMPLETE,
-  CODEX_EVENT_TURN_STARTED
-} from './transcript-turn-markers'
+import { claudeInterruptedMessageId } from './transcript-turn-markers'
 
 export type NativeChatTurnLifecycleDecoder = (
   line: string,
@@ -23,43 +18,7 @@ export type NativeChatTurnLifecycleDecoder = (
 export function nativeChatTurnLifecycleDecoderForAgent(
   agent: AgentType
 ): NativeChatTurnLifecycleDecoder | null {
-  const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
-  if (transcriptAgent === 'codex') {
-    return decodeCodexTurnLifecycle
-  }
-  if (transcriptAgent === 'claude') {
-    return decodeClaudeTurnLifecycle
-  }
-  return null
-}
-
-export function decodeCodexTurnLifecycle(
-  line: string,
-  fallbackId: string
-): NativeChatTurnLifecycle | null {
-  const record = parseJsonObject(line)
-  const payload = asRecord(record?.payload)
-  if (record?.type !== 'event_msg' || !payload) {
-    return null
-  }
-  if (
-    payload.type !== CODEX_EVENT_TURN_STARTED &&
-    payload.type !== CODEX_EVENT_TURN_COMPLETE &&
-    payload.type !== CODEX_EVENT_TURN_ABORTED
-  ) {
-    return null
-  }
-  const state =
-    payload.type === CODEX_EVENT_TURN_STARTED
-      ? 'working'
-      : payload.type === CODEX_EVENT_TURN_ABORTED
-        ? 'interrupted'
-        : 'completed'
-  return {
-    state,
-    turnId: extractString(payload.turn_id) ?? fallbackId,
-    timestamp: lifecycleTimestamp(record.timestamp)
-  }
+  return resolveNativeChatTranscriptAgent(agent) === 'claude' ? decodeClaudeTurnLifecycle : null
 }
 
 /** Claude stop reasons that end the lead generation (not mid-turn tool_use). */

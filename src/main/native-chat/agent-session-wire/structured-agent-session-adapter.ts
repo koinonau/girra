@@ -4,15 +4,13 @@ import type {
 } from '../../../shared/agent-session-rewind'
 // What the wire needs from a provider adapter.
 //
-// Phase 2 implements this over the Codex app-server and the Claude Agent SDK;
-// nothing here starts, resumes, or talks to a process. The wire owns the
+// The Claude adapter implements this; nothing here starts, resumes, or talks to a process. The wire owns the
 // journal and the lease, so an adapter only has to answer "did the provider
 // take this?" — and it answers `unknown` rather than guessing, because the
 // journal renders that as delivery unconfirmed instead of as failure.
 
 import type {
   AgentJournalItemIdentity,
-  AgentJournalItemBody,
   AgentJournalMessageItem,
   AgentSessionJournalIdentity
 } from '../../../shared/agent-session-journal-types'
@@ -160,26 +158,6 @@ export type StructuredAgentSessionAdapter = {
     fence: number
   }): Promise<AgentSessionDispatchOutcome>
   rewindSupport?(sessionId: string): AgentSessionRewindSupport
-  recoverRewind?(input: {
-    sessionId: string
-    fence: number
-    beforeTurnId: string
-  }): Promise<
-    | { ok: true; items: { identity: AgentJournalItemIdentity; body: AgentJournalItemBody }[] }
-    | { ok: false; reason: AgentSessionRewindReason }
-  >
-  rewind?(input: {
-    sessionId: string
-    fence: number
-    beforeTurnId: string
-    onPrepared?: (
-      items: { identity: AgentJournalItemIdentity; body: AgentJournalItemBody }[]
-    ) => Promise<void>
-    onReverted?: () => Promise<void>
-  }): Promise<
-    | { ok: true; items?: { identity: AgentJournalItemIdentity; body: AgentJournalItemBody }[] }
-    | { ok: false; reason: AgentSessionRewindReason }
-  >
   compact?(input: {
     turnId: string
     sessionId: string

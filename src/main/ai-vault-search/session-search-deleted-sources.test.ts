@@ -187,7 +187,7 @@ it('holds a root that went from holding transcripts to empty in one pass', async
 // one shape the grace exists for: there is no intermediate directory whose
 // absence could stop the walk.
 it('holds a flat root that emptied in one pass, and retires it on the next', async () => {
-  const root = harness.roots.copilotSessionsDir ?? ''
+  const root = harness.roots.piSessionsDir ?? ''
   await mkdir(root, { recursive: true })
   const held = join(root, 'session.jsonl')
 
@@ -197,15 +197,14 @@ it('holds a flat root that emptied in one pass, and retires it on the next', asy
   expect((await retire([held], { roots: [root] })).retired).toEqual([held])
 })
 
-// OpenClaw's discovery merges two directories into one delimiter-joined label.
-// Roots reach this function as the real directories behind that label, so one
-// of them being unreachable never touches the other's rows.
-it('judges each merged-root directory on its own', async () => {
-  const current = join(harness.roots.openclawStateDir ?? '', 'agents')
-  const legacy = join(harness.roots.openclawLegacyStateDir ?? '', 'agents')
-  const onMissing = join(current, 'main', 'sessions', 'mounted.jsonl')
-  const deleted = join(legacy, 'main', 'sessions', 'deleted.jsonl')
-  await mkdir(join(legacy, 'main', 'sessions'), { recursive: true })
+// One agent lists a root per host (local and each WSL home), so one of them
+// being unreachable never touches the other's rows.
+it('judges each root directory on its own', async () => {
+  const current = join(harness.root, 'wsl-home', 'projects')
+  const legacy = join(harness.root, 'host-home', 'projects')
+  const onMissing = join(current, 'main', 'mounted.jsonl')
+  const deleted = join(legacy, 'main', 'deleted.jsonl')
+  await mkdir(join(legacy, 'main'), { recursive: true })
 
   const result = await retire([onMissing, deleted], { roots: [current, legacy] })
   expect(result.retired).toEqual([deleted])
@@ -290,7 +289,6 @@ it('does not index a source whose messages the channel cannot reach', () => {
   expect(
     parserPublishesMessages({
       agent: 'opencode',
-      codexHome: null,
       file: { path: `${db}#session-1`, mtimeMs: 1, modifiedAt: '', sizeBytes: 0 }
     })
   ).toBe(false)

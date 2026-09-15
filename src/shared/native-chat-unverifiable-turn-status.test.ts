@@ -25,7 +25,7 @@ describe('authoritative unknown turn duration at the shared status consumer', ()
         body: { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'hello' }] }
       }
       const recoveredTurn: AgentJournalRenderItem = {
-        itemId: 'legacy:codex:s:turn-lifecycle%3At1',
+        itemId: 'legacy:claude:s:turn-lifecycle%3At1',
         revision: 2,
         sequence: 2,
         observedAt: 60_000,

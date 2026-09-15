@@ -2,8 +2,6 @@ import type { AgentType } from './agent-status-types'
 import { getAgentSlashCommands, type SlashCommandSuggestion } from './native-chat-slash-commands'
 
 export type NativeChatAgentProfile = {
-  skillPrefix: '$' | '/'
-  /** OpenClaude reads Claude-owned roots, so this can differ from the agent. */
   skillSourceOwner: AgentType
   /** The agent's own harness expands a slash command out of the message text, so
    *  the chat host claims only the commands it implements itself. */
@@ -14,26 +12,9 @@ export type NativeChatAgentProfile = {
 }
 
 const NATIVE_CHAT_AGENT_PROFILES: Partial<Record<AgentType, NativeChatAgentProfile>> = {
-  codex: {
-    skillPrefix: '$',
-    skillSourceOwner: 'codex',
-    // The app-server has no slash parser, but the model owns goal tools and
-    // calls create_goal itself when `/goal <objective>` reaches it as prose.
-    textDrivenCommands: ['goal']
-  },
   claude: {
-    skillPrefix: '/',
     skillSourceOwner: 'claude',
     expandsSlashCommandsFromText: true
-  },
-  openclaude: {
-    skillPrefix: '/',
-    skillSourceOwner: 'claude',
-    expandsSlashCommandsFromText: true
-  },
-  grok: {
-    skillPrefix: '/',
-    skillSourceOwner: 'grok'
   }
 }
 
@@ -44,10 +25,9 @@ export function getNativeChatAgentProfile(
 }
 
 /** The catalog that send classification, collision detection, and transcript
- *  envelope surfacing key off. Grok has no verified catalog yet, so its slash
- *  surface stays skills-only — this is the single place that policy lives. */
+ *  envelope surfacing key off. */
 export function getVerifiedNativeChatCommands(agent: AgentType): readonly SlashCommandSuggestion[] {
-  return agent === 'grok' ? [] : getAgentSlashCommands(agent)
+  return getAgentSlashCommands(agent)
 }
 
 /** The mirror of the claimed set: catalog commands this agent acts on when they

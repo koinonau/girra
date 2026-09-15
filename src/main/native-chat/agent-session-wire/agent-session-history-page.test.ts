@@ -36,8 +36,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 
 const journals = createTrackedJournalOpener()
@@ -52,7 +52,7 @@ function tick(): number {
 }
 
 function item(ordinal: number): AgentJournalItemIdentity {
-  return { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal }
+  return { provider: 'claude', sessionId: 'thread-1', uuid: `turn-1-${ordinal}` }
 }
 
 function body(text: string): AgentJournalItemBody {
@@ -156,7 +156,7 @@ describe('readAgentSessionHistory', () => {
       throw new Error(`expected a page, got reset ${page.reset}`)
     }
     expect(page.page.items).toHaveLength(0)
-    expect(page.page.removedItemIds).toEqual(['codex:thread-1:turn-1:1'])
+    expect(page.page.removedItemIds).toEqual(['claude:thread-1:turn-1-1'])
   })
 
   it('reports a forward read with no cursor as cursor_ahead rather than serving the tail', async () => {
@@ -316,7 +316,7 @@ describe('projectJournalBatch', () => {
   it('publishes every nested lifecycle mutation atomically at the outer cursor', async () => {
     const turn: AgentJournalItemIdentity = {
       provider: 'legacy',
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-1',
       recordId: 'turn-lifecycle:turn-1'
     }
@@ -429,16 +429,11 @@ describe('projectJournalBatch', () => {
     await journal.resolveDispatch({
       clientMessageId: 'client-follow-up',
       state: 'accepted',
-      providerIdentity: {
-        provider: 'codex',
-        threadId: 'thread-1',
-        turnId: 'predicted',
-        ordinal: 0
-      },
+      providerIdentity: { provider: 'claude', sessionId: 'thread-1', uuid: 'predicted-0' },
       fence: 1
     })
     await journal.appendItem(
-      { provider: 'codex', threadId: 'thread-1', turnId: 'root-turn', ordinal: 2 },
+      { provider: 'claude', sessionId: 'thread-1', uuid: 'root-turn-2' },
       message,
       { fence: 1 }
     )
@@ -497,10 +492,10 @@ async function reopenWithRawRows(rows: readonly RawSeedRow[]): Promise<AgentSess
 }
 
 describe('pre-existing oversized identities', () => {
-  // The exact escape from the round-two review: a legal 5 MiB Codex turnId
+  // The exact escape from the round-two review: a legal 5 MiB provider uuid
   // admitted before bounding, then tombstoned. Its removal id alone exceeds
   // the 4 MiB outbound cap, so no page can ever carry it.
-  const HUGE_ITEM_ID = `codex:thread-1:${'h'.repeat(5 * 1024 * 1024)}:1`
+  const HUGE_ITEM_ID = `claude:thread-1:${'h'.repeat(5 * 1024 * 1024)}`
 
   it('answers an unfittable pre-existing removal with a bounded reset instead of an unsendable page', async () => {
     const seq = journal.cursor().sequence
@@ -548,7 +543,7 @@ describe('pre-existing oversized identities', () => {
     const seq = journal.cursor().sequence
     const removalIds = Array.from(
       { length: 30 },
-      (_, index) => `codex:thread-1:${'r'.repeat(250 * 1024)}:${index}`
+      (_, index) => `claude:thread-1:${'r'.repeat(250 * 1024)}${index}`
     )
     const reopened = await reopenWithRawRows(
       removalIds.map((itemId, index) => ({
@@ -630,10 +625,9 @@ describe('pre-existing oversized identities', () => {
 describe('identity bounding at admission', () => {
   it('bounds a new oversized provider identity so its item and removal share one sendable key', async () => {
     const oversized: AgentJournalItemIdentity = {
-      provider: 'codex',
-      threadId: 'thread-1',
-      turnId: 'T'.repeat(5 * 1024 * 1024),
-      ordinal: 1
+      provider: 'claude',
+      sessionId: 'thread-1',
+      uuid: 'T'.repeat(5 * 1024 * 1024)
     }
     const start = { epoch: journal.epoch, sequence: journal.cursor().sequence }
     const appended = await journal.appendItem(oversized, body('bounded'), { fence: 1 })

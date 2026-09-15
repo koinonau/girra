@@ -11,7 +11,7 @@ describe('blockingAiVaultScanIssue', () => {
   it('surfaces the cause when a scan returns no sessions', () => {
     const issue = {
       executionHostId: 'ssh:dev-box' as const,
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       kind: 'host' as const,
       path: 'dev-box',
       message: 'Remote connection dropped. Reconnect the SSH target.'
@@ -25,7 +25,7 @@ describe('blockingAiVaultScanIssue', () => {
       blockingAiVaultScanIssue(
         result(
           [{ id: 'session' }],
-          [{ agent: 'codex', path: '/bad.jsonl', message: 'Malformed transcript' }]
+          [{ agent: 'claude', path: '/bad.jsonl', message: 'Malformed transcript' }]
         )
       )
     ).toBeNull()
@@ -34,7 +34,7 @@ describe('blockingAiVaultScanIssue', () => {
   it('does not block an empty scan for a skipped transcript', () => {
     expect(
       blockingAiVaultScanIssue(
-        result([], [{ agent: 'codex', path: '/bad.jsonl', message: 'Malformed transcript' }])
+        result([], [{ agent: 'claude', path: '/bad.jsonl', message: 'Malformed transcript' }])
       )
     ).toBeNull()
   })
@@ -43,7 +43,7 @@ describe('blockingAiVaultScanIssue', () => {
 describe('aiVaultScanNoticeIssues', () => {
   it('surfaces scope truncation without counting it as a skipped transcript', () => {
     const scopeIssue = {
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       kind: 'scope' as const,
       path: '/home/ada',
       message: 'Only the first 64 project paths were scanned.'
@@ -58,20 +58,20 @@ describe('aiVaultScanNoticeIssues', () => {
   it('keeps kinded issues as notices and counts only transcripts as skipped', () => {
     const hostIssue = {
       executionHostId: 'ssh:dev-box' as const,
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       kind: 'host' as const,
       path: 'dev-box',
       message: 'Remote connection dropped.'
     }
     const scopeIssue = {
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       kind: 'scope' as const,
       path: '/home/ada',
       message: 'Only the first 64 project paths were scanned.'
     }
     const partial = result(
       [{ id: 'session' }],
-      [hostIssue, scopeIssue, { agent: 'codex', path: '/bad.jsonl', message: 'Malformed' }]
+      [hostIssue, scopeIssue, { agent: 'claude', path: '/bad.jsonl', message: 'Malformed' }]
     )
 
     expect(aiVaultScanNoticeIssues(partial)).toEqual([hostIssue, scopeIssue])
@@ -99,7 +99,7 @@ describe('aiVaultScanNoticeIssues', () => {
   it('does not repeat the blocking issue as a notice row', () => {
     const hostIssue = {
       executionHostId: 'ssh:dev-box' as const,
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       kind: 'host' as const,
       path: 'dev-box',
       message: 'Remote connection dropped.'
@@ -139,12 +139,12 @@ describe('skippedAiVaultTranscriptReasons', () => {
           [],
           [
             {
-              agent: 'codex',
+              agent: 'claude',
               kind: 'scope',
               path: '/home/dev',
               message: 'Only the first 64 project paths were scanned.'
             },
-            { agent: 'codex', kind: 'host', path: 'dev-box', message: 'Reconnect the SSH target.' }
+            { agent: 'claude', kind: 'host', path: 'dev-box', message: 'Reconnect the SSH target.' }
           ]
         )
       )
@@ -153,7 +153,7 @@ describe('skippedAiVaultTranscriptReasons', () => {
 
   it('dedupes repeats and caps the list so a 500-issue scan stays readable', () => {
     const issues = Array.from({ length: 40 }, (_unused, index) => ({
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       path: `/transcripts/${index}.jsonl`,
       message: `Unreadable transcript ${index % 5}`
     }))

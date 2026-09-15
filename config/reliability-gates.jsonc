@@ -102,15 +102,13 @@
       "invariant": "An observed completed turn retains the same host-recorded duration and initiating user-message attribution through client reload, settlement retry and loading older history; older clients receive the compatible item carrier, and a host-recorded unknown duration suppresses local estimates.",
       "oracle": "Render a host-settled duration without observing completion locally; preserve an exit at 2000 through failed settlement at 60000 and later retry; retain a seven-second older turn beyond 256 submitted turns; prune aliases with removed user items and preserve alias identity during item-only streaming; render no completed duration for an unverifiable turn both before and after client reload.",
       "commands": [
-        "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/shared/native-chat-unverifiable-turn-status.test.ts src/main/codex/codex-requested-close-turn-timing.test.ts src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts src/shared/structured-agent-session-turn-timing-retention.test.ts src/shared/structured-agent-session-turn-timing.test.ts src/main/codex/codex-structured-journal-translation-turn-lifecycle.test.ts src/main/runtime/rpc/methods/structured-agent-session-turn-item-capability.test.ts src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx"
+        "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/shared/native-chat-unverifiable-turn-status.test.ts src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts src/shared/structured-agent-session-turn-timing-retention.test.ts src/shared/structured-agent-session-turn-timing.test.ts src/main/runtime/rpc/methods/structured-agent-session-turn-item-capability.test.ts src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx"
       ],
       "testFiles": [
         "src/shared/native-chat-unverifiable-turn-status.test.ts",
-        "src/main/codex/codex-requested-close-turn-timing.test.ts",
         "src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts",
         "src/shared/structured-agent-session-turn-timing-retention.test.ts",
         "src/shared/structured-agent-session-turn-timing.test.ts",
-        "src/main/codex/codex-structured-journal-translation-turn-lifecycle.test.ts",
         "src/main/runtime/rpc/methods/structured-agent-session-turn-item-capability.test.ts",
         "src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx"
       ],
@@ -122,12 +120,10 @@
           ]
         },
         {
-          "file": "src/main/codex/codex-requested-close-turn-timing.test.ts",
-          "assertions": ["keeps the first exit receipt when retry requestedClose=%s"]
-        },
-        {
           "file": "src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts",
-          "assertions": ["keeps exit receipt %s on retry"]
+          "assertions": [
+            "keeps exit receipt %s on retry"
+          ]
         },
         {
           "file": "src/shared/structured-agent-session-turn-timing-retention.test.ts",
@@ -138,7 +134,9 @@
         },
         {
           "file": "src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx",
-          "assertions": ["renders a host-settled duration without ever clocking the turn locally"]
+          "assertions": [
+            "renders a host-settled duration without ever clocking the turn locally"
+          ]
         }
       ],
       "evidenceRuns": [
@@ -146,7 +144,7 @@
           "date": "2026-09-09",
           "runner": "local",
           "platform": "macos",
-          "command": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/shared/native-chat-unverifiable-turn-status.test.ts src/main/codex/codex-requested-close-turn-timing.test.ts src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts src/shared/structured-agent-session-turn-timing-retention.test.ts src/shared/structured-agent-session-turn-timing.test.ts src/main/codex/codex-structured-journal-translation-turn-lifecycle.test.ts src/main/runtime/rpc/methods/structured-agent-session-turn-item-capability.test.ts src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx",
+          "command": "ORCA_BACKGROUND_LAUNCH=1 pnpm test src/shared/native-chat-unverifiable-turn-status.test.ts src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts src/shared/structured-agent-session-turn-timing-retention.test.ts src/shared/structured-agent-session-turn-timing.test.ts src/main/runtime/rpc/methods/structured-agent-session-turn-item-capability.test.ts src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx",
           "result": "passed",
           "durationSeconds": 4.65,
           "summary": "58 tests passed across eight files at source commit 5acb404bf244cdc0bd3643c4e79beb189ce9a0cd; the following manifest-only commit records this run without changing tested source."

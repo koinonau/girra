@@ -25,7 +25,6 @@ export function useComposerSubmitOrchestration(
     disabledTuiAgents: target.workspaceIdentityState.disabledTuiAgents,
     folderCreateDisabled: source.composerNavigationActions.folderCreateDisabled,
     folderSourceRepos: target.runtimeTargetSelection.folderSourceRepos,
-    folderTargetConnectionId: target.runtimeTargetSelection.folderTargetConnectionId,
     folderTargetIsRemote: target.runtimeTargetSelection.folderTargetIsRemote,
     folderTargetRuntimeEnvironmentId:
       target.runtimeTargetSelection.folderTargetRuntimeEnvironmentId,
@@ -75,7 +74,6 @@ export function useComposerSubmitOrchestration(
     prepareFullSubmitSource: fullSubmitSourcePreparation.prepareFullSubmitSource,
     repoId: target.initialTargetState.repoId,
     resolvedSetupDecision: target.derivedComposerState.resolvedSetupDecision,
-    selectedRepo: target.runtimeTargetSelection.selectedRepo,
     selectedRepoAgentLaunchPlatform: target.runtimeTargetSelection.selectedRepoAgentLaunchPlatform,
     selectedRepoExecutionHostId: target.runtimeTargetSelection.selectedRepoExecutionHostId,
     selectedRepoIsGit: target.runtimeTargetSelection.selectedRepoIsGit,

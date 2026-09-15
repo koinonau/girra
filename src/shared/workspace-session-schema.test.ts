@@ -239,7 +239,7 @@ describe('parseWorkspaceSession', () => {
             defaultTitle: 'Terminal 1',
             generatedTitle: 'Refactor auth',
             aiVaultTitle: {
-              agent: 'codex',
+              agent: 'claude',
               sessionId: 'session-1',
               title: 'Provider thread name'
             },
@@ -263,7 +263,7 @@ describe('parseWorkspaceSession', () => {
             label: 'Claude working',
             generatedLabel: 'Refactor auth',
             aiVaultTitle: {
-              agent: 'codex',
+              agent: 'claude',
               sessionId: 'session-1',
               title: 'Provider thread name'
             },
@@ -566,9 +566,9 @@ describe('parseWorkspaceSession', () => {
             groupId: 'group1',
             worktreeId: 'wt',
             contentType: 'agent-session',
-            agentSessionAgent: 'codex',
-            structuredSessionId: 'codex-session-1',
-            label: 'Codex Chat',
+            agentSessionAgent: 'claude',
+            structuredSessionId: 'claude-session-1',
+            label: 'Claude Chat',
             customLabel: null,
             color: null,
             sortOrder: 0,
@@ -583,8 +583,8 @@ describe('parseWorkspaceSession', () => {
     if (result.ok) {
       expect(result.value.unifiedTabs?.wt[0]).toMatchObject({
         contentType: 'agent-session',
-        agentSessionAgent: 'codex',
-        structuredSessionId: 'codex-session-1'
+        agentSessionAgent: 'claude',
+        structuredSessionId: 'claude-session-1'
       })
       expect(result.value.activeTabTypeByWorktree?.wt).toBe('agent-session')
     }

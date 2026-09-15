@@ -67,10 +67,10 @@ describe('reattach payload context', () => {
 
   it('uses the connect startup plan without rebuilding or scheduling paste delivery', async () => {
     const startup = {
-      command: 'codex resume provider-session',
-      agent: 'codex',
+      command: 'claude --resume provider-session',
+      agent: 'claude',
       resumeProviderSession: { key: 'session_id', id: 'provider-session' },
-      launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+      launchConfig: { agentCommand: 'claude', agentArgs: '', agentEnv: {} },
       launchToken: 'transport-launch-token',
       useLiveEntry: false,
       hasSleepingRecord: false,

@@ -10,7 +10,6 @@ export type SessionRow = {
   agent: AiVaultAgent
   session_id: string
   file_path: string
-  codex_home: string | null
   title: string
   cwd: string | null
   branch: string | null

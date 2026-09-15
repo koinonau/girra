@@ -155,7 +155,7 @@ function makeSurvivingAgentRecord(index: number): SleepingAgentSessionRecord {
     paneKey: makePaneKey(pane.tabId, pane.leafId),
     tabId: pane.tabId,
     worktreeId: WORKTREE_ID,
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: `provider-session-${index + 1}` },
     prompt: 'keep working',
     state: 'working',

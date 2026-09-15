@@ -55,21 +55,18 @@ describe('NativeChatSessionGate', () => {
     clearNativeChatDraftCacheForTests()
   })
 
-  it.each(['codex', 'claude'] as const)(
-    'opens the resolved native chat session from a %s title fallback',
-    (resolvedAgent) => {
-      renderResolution({
-        paneKey: 'tab-1:leaf-1',
-        launchAgent: null,
-        resolvedAgent,
-        ptyId: 'pty-1'
-      })
+  it('opens the resolved native chat session from a title fallback', () => {
+    renderResolution({
+      paneKey: 'tab-1:leaf-1',
+      launchAgent: null,
+      resolvedAgent: 'claude',
+      ptyId: 'pty-1'
+    })
 
-      expect(screen.getByTestId('native-chat-resolution')).toHaveTextContent(
-        `${resolvedAgent}:no-session:tab-1:leaf-1`
-      )
-    }
-  )
+    expect(screen.getByTestId('native-chat-resolution')).toHaveTextContent(
+      'claude:no-session:tab-1:leaf-1'
+    )
+  })
 
   it('keeps live hook identity ahead of a stale title fallback', () => {
     renderResolution({
@@ -80,7 +77,7 @@ describe('NativeChatSessionGate', () => {
         agentType: 'claude',
         providerSession: { key: 'session_id', id: 'claude-session' }
       }),
-      resolvedAgent: 'codex',
+      resolvedAgent: 'opencode',
       ptyId: 'pty-1'
     })
 
@@ -93,12 +90,12 @@ describe('NativeChatSessionGate', () => {
     const paneKey = 'tab-1:leaf-1'
     const connectedEntry = entry({
       paneKey,
-      agentType: 'codex',
-      providerSession: { key: 'session_id', id: 'codex-session' }
+      agentType: 'claude',
+      providerSession: { key: 'session_id', id: 'claude-session' }
     })
     const renderGate = (
       agentStatusEntry?: AgentStatusEntry,
-      launchAgent: 'codex' | null = null
+      launchAgent: 'claude' | null = null
     ) => (
       <NativeChatSessionGate
         paneKey={paneKey}
@@ -116,22 +113,22 @@ describe('NativeChatSessionGate', () => {
     const composer = screen.getByRole('textbox', { name: 'Message draft' })
 
     fireEvent.change(composer, { target: { value: 'keep this unsent message' } })
-    view.rerender(renderGate(undefined, 'codex'))
+    view.rerender(renderGate(undefined, 'claude'))
 
-    expect(screen.getByText('Session codex-session')).toBeInTheDocument()
+    expect(screen.getByText('Session claude-session')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Message draft' })).toHaveValue(
       'keep this unsent message'
     )
 
     view.rerender(renderGate())
 
-    expect(screen.getByText('Session codex-session')).toBeInTheDocument()
+    expect(screen.getByText('Session claude-session')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Message draft' })).toHaveValue(
       'keep this unsent message'
     )
 
     view.rerender(renderGate(connectedEntry))
-    expect(screen.getByText('Session codex-session')).toBeInTheDocument()
+    expect(screen.getByText('Session claude-session')).toBeInTheDocument()
     expect(screen.getByRole('textbox', { name: 'Message draft' })).toHaveValue(
       'keep this unsent message'
     )
@@ -141,7 +138,7 @@ describe('NativeChatSessionGate', () => {
     renderResolution({
       paneKey: 'tab-1:leaf-1',
       launchAgent: null,
-      resolvedAgent: 'gemini',
+      resolvedAgent: 'opencode',
       ptyId: 'pty-1'
     })
 

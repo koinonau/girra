@@ -66,7 +66,7 @@ function accepted(): AgentSessionDispatchOutcome {
   ordinal += 1
   return {
     state: 'accepted',
-    providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal }
+    providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: `item-${ordinal}` }
   }
 }
 
@@ -90,15 +90,15 @@ async function attach(): Promise<AgentSessionRecord | null> {
 /** Puts a pending approval in the journal BEFORE attach, which is the only way
  *  1d can stage one: the adapter that would emit it is phase 2's. */
 async function seedApproval(optionId = 'allow'): Promise<{ itemId: string; revision: number }> {
-  const identity = { provider: 'codex' as const, threadId: THREAD, turnId: 'turn-1', ordinal: 99 }
+  const identity = { provider: 'claude' as const, sessionId: THREAD, uuid: 'item-99' }
   const journalDir = journalDirectoryFor(root, { workspaceId: 'workspace-1', sessionId: SESSION })
   const journal = await journals.open({
     identity: {
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: THREAD }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
     },
     journalDir
   })
@@ -129,7 +129,7 @@ beforeEach(async () => {
     },
     link: {
       linkId: `link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: store.getRecord(SESSION)?.providerHandleChain.length ? 'resumed' : 'created',
       mintedAtFence: fence,
       observedAt: NOW

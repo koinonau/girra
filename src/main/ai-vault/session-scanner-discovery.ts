@@ -1,7 +1,6 @@
 import type { Dirent } from 'node:fs'
 import { extname, join } from 'node:path'
 import { SessionNewestFiles } from './session-newest-files'
-import type { SessionSidecarObservation } from './session-sidecar-stat'
 import type { AiVaultAgent, AiVaultScanIssue } from '../../shared/ai-vault-types'
 import { wslGatedReaddir, wslGatedStat } from '../native-chat/wsl-transcript-fs-access'
 import { WslTranscriptFsError } from '../native-chat/wsl-transcript-fs-gate'
@@ -16,11 +15,9 @@ export async function discoverFiles(args: {
   issues: AiVaultScanIssue[]
   extensions: string[]
   filePredicate?: (path: string) => boolean
-  contentDependencyPath?: (path: string) => string | undefined | Promise<string | undefined>
   directoryPredicate?: (name: string, depth: number) => boolean
 }): Promise<SessionFileDiscovery> {
   const files = new SessionNewestFiles(args.limit)
-  let refusedSidecar = false
   try {
     await forEachSessionFile(
       args.rootDir,
@@ -34,27 +31,13 @@ export async function discoverFiles(args: {
       async (path) => {
         try {
           const fileStat = await wslGatedStat(path, 'scan')
-          const sidecarPath = await args.contentDependencyPath?.(path)
-          const sidecar = await observeSessionSidecar(sidecarPath)
-          if (sidecar === 'unknown' && !refusedSidecar) {
-            // One issue per root: a refused sibling is a property of the tree,
-            // not of each transcript that happens to point at it.
-            refusedSidecar = true
-            recordSessionScanIssue(args.issues, {
-              agent: args.agent,
-              path: sidecarPath ?? args.rootDir,
-              message: 'Session metadata could not be read this scan.'
-            })
-          }
           files.add({
             path,
             mtimeMs: fileStat.mtimeMs,
             modifiedAt: new Date(fileStat.mtimeMs).toISOString(),
             sizeBytes: fileStat.size,
-            sidecar,
             dev: fileStat.dev,
-            ino: fileStat.ino,
-            nlink: fileStat.nlink
+            ino: fileStat.ino
           })
         } catch (err) {
           recordSessionScanIssue(args.issues, {
@@ -80,38 +63,6 @@ export async function discoverFiles(args: {
     return { agent: args.agent, rootDir: args.rootDir, files: [] }
   }
   return { agent: args.agent, rootDir: args.rootDir, files: files.newest() }
-}
-
-/**
- * A sibling that cannot be statted is not "no sibling": it must not take the
- * transcript down with it, and it must not read as absent either, or the parse
- * cache would treat a session enriched from a file nobody can see as current
- * forever. Only a genuinely missing path is `'none'`; every other failure —
- * a stalled WSL distro, EACCES, EIO — is `'unknown'`.
- */
-async function observeSessionSidecar(
-  filePath: string | undefined
-): Promise<SessionSidecarObservation> {
-  if (!filePath) {
-    return 'none'
-  }
-  try {
-    const fileStat = await wslGatedStat(filePath, 'scan')
-    return { path: filePath, mtimeMs: fileStat.mtimeMs, sizeBytes: fileStat.size }
-  } catch (error) {
-    return isMissingSidecarError(error) ? 'none' : 'unknown'
-  }
-}
-
-function isMissingSidecarError(error: unknown): boolean {
-  if (error instanceof WslTranscriptFsError) {
-    return false
-  }
-  const code =
-    error && typeof error === 'object' && 'code' in error && typeof error.code === 'string'
-      ? error.code
-      : null
-  return code === 'ENOENT' || code === 'ENOTDIR'
 }
 
 export type SessionFileWalkOptions = {

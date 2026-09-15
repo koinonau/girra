@@ -28,7 +28,7 @@ afterEach(() => {
 })
 
 describe('native chat creation completed in the background', () => {
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'runs setup once without an idle shell or focus change for %s',
     async (agent) => {
       const worktree = makeCreatedAgentWorktree()

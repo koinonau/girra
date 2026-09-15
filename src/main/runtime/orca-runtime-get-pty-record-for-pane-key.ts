@@ -131,7 +131,7 @@ export class OrcaRuntimeWithGetPtyRecordForPaneKey extends OrcaRuntimeWithPruneM
         foregroundProcess = await this.ptyController.confirmForegroundProcess(ptyId)
         agent = recognizeAgentProcess(foregroundProcess)?.agent
       }
-      if (agent !== 'claude' && agent !== 'codex') {
+      if (agent !== 'claude') {
         return false
       }
       if (

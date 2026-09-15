@@ -28,8 +28,8 @@ describe('structured session live TUI restart survival', () => {
         workspaceId: 'workspace-1',
         workspaceKind: 'git-worktree'
       },
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'tui',
       expectedFence: null,
       spawnToken: 'toggle-tui-spawn',
@@ -60,7 +60,7 @@ describe('structured session live TUI restart survival', () => {
       fence: reserved.record.lease.runtimeFence,
       link: {
         linkId: 'toggle-tui-link',
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'created',
         mintedAtFence: reserved.record.lease.runtimeFence,
         observedAt: NOW

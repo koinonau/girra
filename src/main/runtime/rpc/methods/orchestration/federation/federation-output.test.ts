@@ -402,14 +402,15 @@ describe('orchestration federated worker output', () => {
     await writeFile(
       transcriptPath,
       `${JSON.stringify({
-        type: 'event_msg',
-        payload: { id: 'remote-message', type: 'agent_message', message: 'Windows result' }
+        type: 'assistant',
+        uuid: 'remote-message',
+        message: { role: 'assistant', content: [{ type: 'text', text: 'Windows result' }] }
       })}\n`
     )
     vi.spyOn(workerRuntime, 'getExactWorkerProviderSession').mockReturnValue({
       paneKey: 'tab_worker:bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
       processIncarnation: 'windows_runtime:pty:1',
-      agent: 'codex',
+      agent: 'claude',
       providerSession: {
         key: 'session_id',
         id: 'windows-session',
@@ -430,7 +431,7 @@ describe('orchestration federated worker output', () => {
         ok: true,
         result: {
           source: 'transcript',
-          provider: 'codex',
+          provider: 'claude',
           server: { environmentId: 'environment_windows' },
           transcript: {
             messages: [

@@ -24,7 +24,7 @@ async function createWith(launchPreferences?: Record<string, string>) {
   await createStructuredWorkerSessionForWorktree({
     runtime: {} as never,
     worktreeId: 'repo::wt',
-    agent: 'codex',
+    agent: 'claude',
     dispatchId: 'ctx_1',
     ...(launchPreferences ? { launchPreferences } : {}),
     effects: []
@@ -34,13 +34,13 @@ async function createWith(launchPreferences?: Record<string, string>) {
 
 describe('a structured worker seeds the dispatch launch preferences', () => {
   it('carries --model and --effort into the session create', async () => {
-    expect(await createWith({ model: 'gpt-5.6-sol', effort: 'high' })).toMatchObject({
-      options: { model: 'gpt-5.6-sol', effort: 'high' }
+    expect(await createWith({ model: 'opus', effort: 'high' })).toMatchObject({
+      options: { model: 'opus', effort: 'high' }
     })
   })
 
   it('carries only the model when no --effort was asked for', async () => {
-    expect((await createWith({ model: 'gpt-5.6-sol' })).options).toEqual({ model: 'gpt-5.6-sol' })
+    expect((await createWith({ model: 'opus' })).options).toEqual({ model: 'opus' })
   })
 
   it.each([
@@ -57,9 +57,9 @@ describe('a structured worker seeds the dispatch launch preferences', () => {
 describe('the create the seed options land in', () => {
   const settingsResolved = {
     location: { executionHostId: 'local', wslDistro: null, workspaceId: 'repo::wt' },
-    provider: 'codex',
-    agent: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/host/.codex' },
+    provider: 'claude',
+    agent: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/host/.claude' },
     runtimeKind: 'native',
     options: { model: 'saved-model', effort: 'low' }
   }
@@ -77,7 +77,7 @@ describe('the create the seed options land in', () => {
         payloadFingerprint: ''
       },
       worktree: 'id:repo::wt',
-      agent: 'codex',
+      agent: 'claude',
       caller: { callerKey: 'orchestration:dispatch:ctx_1' },
       ...(options ? { options } : {})
     })
@@ -85,8 +85,8 @@ describe('the create the seed options land in', () => {
   }
 
   it("replaces the saved selection the host resolved with the dispatch's own", async () => {
-    expect((await prepare({ model: 'gpt-5.6-sol', effort: 'high' })).options).toEqual({
-      model: 'gpt-5.6-sol',
+    expect((await prepare({ model: 'opus', effort: 'high' })).options).toEqual({
+      model: 'opus',
       effort: 'high'
     })
   })
@@ -98,7 +98,7 @@ describe('the create the seed options land in', () => {
   it('does not let the seed options move the attach fingerprint', async () => {
     // Options are the session's initial state, not its identity: a retry re-resolves them and must
     // replay rather than conflict.
-    const [seeded, unseeded] = await Promise.all([prepare({ model: 'gpt-5.6-sol' }), prepare()])
+    const [seeded, unseeded] = await Promise.all([prepare({ model: 'opus' }), prepare()])
     expect(seeded.envelope.payloadFingerprint).toBe(unseeded.envelope.payloadFingerprint)
   })
 })

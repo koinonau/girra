@@ -75,7 +75,7 @@ function seedHuskTab(
   ptyBinding: string | null
 ): void {
   state.tabsByWorktree = {
-    [worktreeId]: [{ id: HUSK_TAB_ID, title: 'Codex', ptyId: null } as never]
+    [worktreeId]: [{ id: HUSK_TAB_ID, title: 'Claude', ptyId: null } as never]
   }
   state.unifiedTabsByWorktree = {
     [worktreeId]: [
@@ -116,14 +116,14 @@ function seedSleepingRecord(worktreeId: string, sessionId: string): void {
         paneKey,
         tabId: HUSK_TAB_ID,
         worktreeId,
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         providerSession: { key: 'session_id' as const, id: sessionId },
         prompt: 'resume prior task',
         state: 'working' as const,
         origin: 'quit' as const,
         capturedAt: 1000,
         updatedAt: 1000,
-        terminalTitle: 'Codex'
+        terminalTitle: 'Claude'
       }
     }
   }))
@@ -141,7 +141,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     // Hibernation cleared the pane's PTY binding: the husk cannot resume in place.
     seedHuskTab(state, worktree.id, null)
     useAppStore.setState(state)
-    seedSleepingRecord(worktree.id, 'codex-session-A')
+    seedSleepingRecord(worktree.id, 'claude-session-A')
 
     activateAndRevealWorktree(worktree.id)
     await waitForWorktreeAgentActivationGateForTests(worktree.id)
@@ -153,11 +153,11 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     const replacement = tabsAfterFirst.find((tab) => tab.id !== HUSK_TAB_ID)!
     expect(afterFirst.automaticAgentResumeClaimsByTabId[replacement.id]?.providerSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-A'
+      id: 'claude-session-A'
     })
     expect(afterFirst.consumeTabStartupCommand(replacement.id)?.resumeProviderSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-A'
+      id: 'claude-session-A'
     })
 
     // Reopening must not fork more tabs or launch another resume.
@@ -173,7 +173,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     seedHuskTab(state, worktree.id, 'pty-live-1')
     state.ptyIdsByTabId = { [HUSK_TAB_ID]: ['pty-live-1'] }
     useAppStore.setState(state)
-    seedSleepingRecord(worktree.id, 'codex-session-B')
+    seedSleepingRecord(worktree.id, 'claude-session-B')
 
     activateAndRevealWorktree(worktree.id)
     await waitForWorktreeAgentActivationGateForTests(worktree.id)
@@ -192,7 +192,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     // still mount keep-alive and cold-restore in place on activation.
     state.tabsByWorktree = {
       [worktree.id]: [
-        { id: HUSK_TAB_ID, title: 'Codex', ptyId: null } as never,
+        { id: HUSK_TAB_ID, title: 'Claude', ptyId: null } as never,
         { id: 'other-tab-1', title: 'shell', ptyId: null } as never
       ]
     }
@@ -225,7 +225,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     state.activeTabIdByWorktree = { [worktree.id]: 'other-tab-1' }
     state.activeTabTypeByWorktree = { [worktree.id]: 'terminal' }
     useAppStore.setState(state)
-    seedSleepingRecord(worktree.id, 'codex-session-D')
+    seedSleepingRecord(worktree.id, 'claude-session-D')
 
     activateAndRevealWorktree(worktree.id)
     activateAndRevealWorktree(worktree.id)
@@ -249,7 +249,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     state.activeTabIdByWorktree = { [worktree.id]: HUSK_TAB_ID }
     state.activeTabTypeByWorktree = { [worktree.id]: 'terminal' }
     useAppStore.setState(state)
-    seedSleepingRecord(worktree.id, 'codex-session-C')
+    seedSleepingRecord(worktree.id, 'claude-session-C')
 
     activateAndRevealWorktree(worktree.id)
     await waitForWorktreeAgentActivationGateForTests(worktree.id)
@@ -272,7 +272,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     const worktree = { ...makeWorktree(), createdWithAgent: undefined, hostId: RUNTIME_HOST_ID }
     const state = baseState(worktree)
     state.tabsByWorktree = {
-      [worktree.id]: [{ id: webTabId, title: 'Codex', ptyId: null } as never]
+      [worktree.id]: [{ id: webTabId, title: 'Claude', ptyId: null } as never]
     }
     state.unifiedTabsByWorktree = {
       [worktree.id]: [
@@ -311,14 +311,14 @@ describe('preserved-pane replacement contract on workspace activation', () => {
           paneKey,
           tabId: webTabId,
           worktreeId: worktree.id,
-          agent: 'codex' as const,
-          providerSession: { key: 'session_id' as const, id: 'codex-session-E' },
+          agent: 'claude' as const,
+          providerSession: { key: 'session_id' as const, id: 'claude-session-E' },
           prompt: 'resume prior task',
           state: 'working' as const,
           origin: 'quit' as const,
           capturedAt: 1000,
           updatedAt: 1000,
-          terminalTitle: 'Codex'
+          terminalTitle: 'Claude'
         }
       }
     }))
@@ -346,8 +346,8 @@ describe('preserved-pane replacement contract on workspace activation', () => {
       .filter((id) => id !== webTabId)
     expect(replacementIds).toHaveLength(1)
     expect(replayed.automaticAgentResumeClaimsByTabId[replacementIds[0]!]).toMatchObject({
-      launchAgent: 'codex',
-      providerSession: { key: 'session_id', id: 'codex-session-E' }
+      launchAgent: 'claude',
+      providerSession: { key: 'session_id', id: 'claude-session-E' }
     })
   })
 
@@ -374,14 +374,14 @@ describe('preserved-pane replacement contract on workspace activation', () => {
           paneKey,
           tabId: webTabId,
           worktreeId: worktree.id,
-          agent: 'codex' as const,
-          providerSession: { key: 'session_id' as const, id: 'codex-session-F' },
+          agent: 'claude' as const,
+          providerSession: { key: 'session_id' as const, id: 'claude-session-F' },
           prompt: 'resume prior task',
           state: 'working' as const,
           origin: 'quit' as const,
           capturedAt: 1000,
           updatedAt: 1000,
-          terminalTitle: 'Codex'
+          terminalTitle: 'Claude'
         }
       }
     }))
@@ -396,11 +396,11 @@ describe('preserved-pane replacement contract on workspace activation', () => {
     const replacement = tabs[0]!
     expect(after.automaticAgentResumeClaimsByTabId[replacement.id]?.providerSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-F'
+      id: 'claude-session-F'
     })
     expect(after.consumeTabStartupCommand(replacement.id)?.resumeProviderSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-F'
+      id: 'claude-session-F'
     })
   })
 })

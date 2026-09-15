@@ -175,7 +175,7 @@ describe('structured session cold restoration', () => {
               groupId: 'group-1',
               worktreeId: 'workspace-1',
               contentType: 'agent-session',
-              label: 'Codex Chat',
+              label: 'Claude Chat',
               customLabel: null,
               color: null,
               sortOrder: 0,
@@ -232,7 +232,7 @@ describe('structured session cold restoration', () => {
         {
           sessionId: 'agent-session:agent-session:restored-session',
           workspaceId: 'workspace-1',
-          agent: 'codex'
+          agent: 'claude'
         }
       ]
     } as never)
@@ -385,7 +385,7 @@ describe('structured session cold restoration', () => {
     await runtime.publishStructuredAgentSessionTab({
       workspaceId: 'workspace-1',
       sessionId: 'session-1',
-      agent: 'codex',
+      agent: 'claude',
       activate: true
     })
 

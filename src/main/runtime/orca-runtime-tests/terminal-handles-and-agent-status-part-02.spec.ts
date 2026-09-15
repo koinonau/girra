@@ -304,7 +304,7 @@ describe('OrcaRuntimeService', () => {
     expect(getForegroundProcess).toHaveBeenCalledTimes(1)
   })
 
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'authorizes settled CLI prompts only after positive %s foreground identity',
     async (agent) => {
       const runtime = new OrcaRuntimeService(store)

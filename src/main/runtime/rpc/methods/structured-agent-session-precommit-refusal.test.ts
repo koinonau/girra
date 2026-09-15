@@ -30,12 +30,12 @@ function createParams(overrides: Record<string, unknown> = {}) {
       payloadFingerprint: computeAgentSessionPayloadFingerprint({
         method: 'agentSession.create',
         sessionId: SESSION,
-        fields: { worktree: WORKTREE, agent: 'codex' }
+        fields: { worktree: WORKTREE, agent: 'claude' }
       }),
       ...(overrides.envelope as Record<string, unknown> | undefined)
     },
     worktree: WORKTREE,
-    agent: 'codex'
+    agent: 'claude'
   }
 }
 
@@ -59,9 +59,9 @@ const resolvedIntent = {
     workspaceId: 'workspace-1',
     workspaceKind: 'git-worktree'
   },
-  provider: 'codex',
-  agent: 'codex',
-  accountHome: { variable: 'CODEX_HOME', path: '/host/.codex' },
+  provider: 'claude',
+  agent: 'claude',
+  accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/host/.claude' },
   runtimeKind: 'native'
 }
 

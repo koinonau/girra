@@ -66,13 +66,8 @@ import type { ClaudeAccountService } from '../../claude-accounts/service'
 import type { AutomationService } from '../../automations/service'
 import type { AgentAwakeService } from '../../agent-awake-service'
 import type { KeybindingService } from '../../keybindings/keybinding-service'
-import type {
-  AiVaultPrepareSessionResumeArgs,
-  AiVaultPrepareSessionResumeResult
-} from '../../../shared/ai-vault-resume-preparation'
 import {
   getSavedRuntimeAiVaultHostInfos,
-  prepareRuntimeAiVaultSessionResume,
   resolveRuntimeAiVaultSessionTitles,
   scanRuntimeAiVaultSessions
 } from '../../ai-vault/runtime-session-scanner'
@@ -83,10 +78,6 @@ let registered = false
 
 type CoreHandlerLifecycleOptions = {
   onBeforeRelaunch?: () => void | Promise<void>
-  getAdditionalAiVaultCodexHomePaths?: () => readonly string[]
-  prepareAiVaultSessionResume?: (
-    args: AiVaultPrepareSessionResumeArgs
-  ) => Promise<AiVaultPrepareSessionResumeResult>
 }
 
 export function registerCoreHandlers(
@@ -180,16 +171,12 @@ export function registerCoreHandlers(
   registerEphemeralVmHandlers(store, pluginService)
   registerAiVaultHandlers({
     ensureStructuredSessionOwnership: () => runtime.ensureStructuredAgentSessionHost(),
-    getAdditionalCodexHomePaths: lifecycleOptions.getAdditionalAiVaultCodexHomePaths,
-    prepareSessionResume: lifecycleOptions.prepareAiVaultSessionResume,
     getActiveRuntimeAiVaultHostInfos: () =>
       getSavedRuntimeAiVaultHostInfos(app.getPath('userData')),
     scanRuntimeAiVaultSessions: async (environmentId, args, options) =>
       scanRuntimeAiVaultSessions(app.getPath('userData'), environmentId, args, options),
     resolveRuntimeAiVaultSessionTitles: async (environmentId, args) =>
-      resolveRuntimeAiVaultSessionTitles(app.getPath('userData'), environmentId, args),
-    prepareRuntimeSessionResume: async (environmentId, args) =>
-      prepareRuntimeAiVaultSessionResume(app.getPath('userData'), environmentId, args)
+      resolveRuntimeAiVaultSessionTitles(app.getPath('userData'), environmentId, args)
   })
   registerNativeChatHandlers()
   registerClipboardHandlers(store)

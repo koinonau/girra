@@ -24,8 +24,8 @@ const identity: AgentSessionJournalIdentity = {
   sessionId: 'bounded-catch-up',
   workspaceId: 'folder-workspace',
   hostId: 'remote-host',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 const journals = createTrackedJournalOpener()
 let root: string | undefined

@@ -34,29 +34,17 @@ it('copies only the carried line when the next chunk contains many complete line
   expect(copied).toBeLessThan(1000)
 })
 
-it('preserves UTF-8/CRLF carry, byte callbacks and stop offsets', async () => {
+it('preserves UTF-8/CRLF carry and offsets', async () => {
   source.chunks = [Buffer.from('ab\r'), Buffer.from('\ncd\npartial')]
   const lines: string[] = []
   expect(
     await consumeCompleteJsonlLines({
       path: '/log',
       start: 5,
-      onLine: () => {},
-      onLineBytes: (line) => lines.push(line.toString())
+      onLine: (line) => lines.push(line)
     })
   ).toEqual({ consumedThrough: 12, trailingPartialLine: 'partial', bytesRead: 14 })
   expect(lines).toEqual(['ab', 'cd'])
-  let stopped = false
-  expect(
-    await consumeCompleteJsonlLines({
-      path: '/log',
-      start: 5,
-      onLine: () => {
-        stopped = true
-      },
-      shouldStop: () => stopped
-    })
-  ).toEqual({ consumedThrough: 9, trailingPartialLine: null, bytesRead: 14 })
   const unicode = Buffer.from('🦀\n')
   source.chunks = [unicode.subarray(0, 2), unicode.subarray(2)]
   const onLine = vi.fn()

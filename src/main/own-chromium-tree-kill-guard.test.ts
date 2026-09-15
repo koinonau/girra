@@ -17,7 +17,6 @@ import {
   admitSelfInitiatedTreeKill,
   installMainProcessTreeKillGate
 } from './own-chromium-tree-kill-guard'
-import { killCodexAppServerProcessTree } from './codex/codex-app-server-process-tree-kill'
 import { setProcessTreeKillGate } from '../shared/child-process/process-tree-kill-gate'
 import { _resetTracerForTests, setActiveSink } from './observability/tracer'
 
@@ -134,35 +133,6 @@ describe('refusing to tree-kill our own Chromium processes', () => {
       expect.anything(),
       expect.any(Function)
     )
-  })
-
-  it('refuses the codex app-server deadline kill against one of our own pids', () => {
-    const spawnImpl = vi.fn(() => ({ on: vi.fn(), unref: vi.fn() }))
-    const child = { pid: RENDERER_PID, kill: vi.fn() }
-
-    killCodexAppServerProcessTree(child as never, {
-      platform: 'win32',
-      spawnImpl: spawnImpl as never
-    })
-
-    // The deadline timer fires on `child.pid` alone; a reaped-then-recycled pid
-    // is the stale-pid mechanism this gate exists to stop.
-    expect(spawnImpl).not.toHaveBeenCalled()
-  })
-
-  it('still lets the codex app-server deadline kill reach a foreign pid', () => {
-    const killer = { on: vi.fn(), unref: vi.fn() }
-    const spawnImpl = vi.fn(() => killer)
-
-    killCodexAppServerProcessTree({ pid: 7777, kill: vi.fn() } as never, {
-      platform: 'win32',
-      spawnImpl: spawnImpl as never
-    })
-
-    expect(spawnImpl).toHaveBeenCalledWith('taskkill', ['/pid', '7777', '/t', '/f'], {
-      stdio: 'ignore',
-      windowsHide: true
-    })
   })
 
   // Fail-open is the deliberate choice — see `orca-chromium-process-pids.ts` for why refusing everything is worse.

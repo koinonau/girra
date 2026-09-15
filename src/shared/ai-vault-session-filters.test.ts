@@ -40,13 +40,13 @@ const baseSession: AiVaultSession = {
 
 const otherSession: AiVaultSession = {
   ...baseSession,
-  id: 'codex:2',
-  agent: 'codex',
+  id: 'pi:2',
+  agent: 'pi',
   sessionId: 'session-2',
   title: 'Repair terminal tabs',
   cwd: '/Users/ada/other/packages/ui',
   branch: 'fix/terminal',
-  filePath: '/Users/ada/.codex/sessions/session-2.jsonl',
+  filePath: '/Users/ada/.pi/agent/sessions/session-2.jsonl',
   previewMessages: []
 }
 

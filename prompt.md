@@ -4,13 +4,12 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 5b, 6, 7a and the ADRs are merged; Phase 5c is in review.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a to 5c, 6, 7a and the ADRs are merged; Phase 5d is in review.
 
-1. **Phase 5d, structured sessions, native chat and AI Vault.** Remove Codex and the dropped agents from them, keep `AiVaultSession.codexHome: null` on the wire, then delete what remains of `src/main/codex` in one step.
-2. **Phase 5e, roster registries.** Shrink `TuiAgent` and every registry to Claude Code (with Agent Teams), OpenCode and Pi; normalize stored agent ids (default agent to auto-pick, stale automations disabled); relax `startupAgent` and `launchAgent` schemas; renderer catalog, icons, locales, docs and skill guides.
-3. **Remote serving cleanup and kothar install.** Remove the mobile leftovers; delete remote skill install; add the Skills page "Install kothar" action (see `handover.md`).
-4. **Phase 7b, Girra identity.** Rename the app to Girra and the CLI to `girra`, then sweep displayed text. The build plan's Phase 7 records the scope and traps.
-5. **Workflows.** Prune to the kept set, add the signed macOS build, then re-enable Actions once the user has added the secrets.
+1. **Phase 5e, roster registries.** Remap first with a read-only subagent; the 2026-09-15 maps lived in a session scratchpad. Shrink `TuiAgent` and every registry to Claude Code (with Agent Teams), OpenCode and Pi; normalize stored agent ids (default agent to auto-pick, stale automations disabled); relax `startupAgent` and `launchAgent` schemas; renderer catalog, icons, locales, docs and skill guides.
+2. **Remote serving cleanup and kothar install.** Remove the mobile leftovers; delete remote skill install; add the Skills page "Install kothar" action (see `handover.md`).
+3. **Phase 7b, Girra identity.** Rename the app to Girra and the CLI to `girra`, then sweep displayed text. The build plan's Phase 7 records the scope and traps.
+4. **Workflows.** Prune to the kept set, add the signed macOS build, then re-enable Actions once the user has added the secrets.
 
 ## Backlog
 

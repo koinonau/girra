@@ -34,11 +34,11 @@ describe('readAiVaultSessionTitlesFromFiles', () => {
 
     await expect(
       resolveHostReadableAiVaultTitleRequests([
-        { agent: 'codex', sessionId: 'present', transcriptPath: path },
+        { agent: 'claude', sessionId: 'present', transcriptPath: path },
         { agent: 'claude', sessionId: 'missing', transcriptPath: `${path}.missing` }
       ])
     ).resolves.toEqual([
-      { agent: 'codex', sessionId: 'present', transcriptPath: path },
+      { agent: 'claude', sessionId: 'present', transcriptPath: path },
       { agent: 'claude', sessionId: 'missing' }
     ])
   })
@@ -46,21 +46,21 @@ describe('readAiVaultSessionTitlesFromFiles', () => {
   it('reads only the exact requested transcript and validates its identity', async () => {
     const path = await transcriptPath()
     parseAgentSessionFileCached.mockResolvedValue({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-1',
       title: '  Exact title  '
     })
 
     await expect(
       readAiVaultSessionTitlesFromFiles([
-        { agent: 'codex', sessionId: 'session-1', transcriptPath: path }
+        { agent: 'claude', sessionId: 'session-1', transcriptPath: path }
       ])
     ).resolves.toEqual({
-      titles: [{ agent: 'codex', sessionId: 'session-1', title: 'Exact title' }]
+      titles: [{ agent: 'claude', sessionId: 'session-1', title: 'Exact title' }]
     })
     expect(parseAgentSessionFileCached).toHaveBeenCalledTimes(1)
     expect(parseAgentSessionFileCached.mock.calls[0]?.[0]).toMatchObject({
-      agent: 'codex',
+      agent: 'claude',
       file: { path }
     })
   })
@@ -68,14 +68,14 @@ describe('readAiVaultSessionTitlesFromFiles', () => {
   it('rejects a transcript whose parsed identity does not match the request', async () => {
     const path = await transcriptPath()
     parseAgentSessionFileCached.mockResolvedValue({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'different-session',
       title: 'Wrong title'
     })
 
     await expect(
       readAiVaultSessionTitlesFromFiles([
-        { agent: 'codex', sessionId: 'session-1', transcriptPath: path }
+        { agent: 'claude', sessionId: 'session-1', transcriptPath: path }
       ])
     ).resolves.toEqual({ titles: [] })
   })
@@ -96,14 +96,14 @@ describe('readAiVaultSessionTitlesFromFiles', () => {
   it('caps exact transcript reads at 64 identities', async () => {
     const path = await transcriptPath()
     parseAgentSessionFileCached.mockResolvedValue({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-0',
       title: 'Title'
     })
 
     await readAiVaultSessionTitlesFromFiles(
       Array.from({ length: 65 }, (_, index) => ({
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         sessionId: `session-${index}`,
         transcriptPath: path
       }))

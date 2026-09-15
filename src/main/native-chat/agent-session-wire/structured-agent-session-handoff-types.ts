@@ -12,7 +12,7 @@ export type StructuredTuiOwner = {
   process: AgentSessionProcessIdentity
   link: AgentSessionProviderHandleLink
   transcriptPath?: string
-  /** Codex app-server resume, not row-by-row legacy import, restores this owner's history. */
+  /** Provider resume, not row-by-row legacy import, restores this owner's history. */
   historySource?: 'provider-resume'
   /** This owner came from an existing terminal view rather than a structured-session tab. */
   adoptedTerminal?: true
@@ -47,7 +47,7 @@ export type StructuredAgentSessionHandoffTransport = {
   revealNativeSession?(input: {
     workspaceId: string
     sessionId: string
-    agent?: 'claude' | 'codex'
+    agent?: 'claude'
     adoptedTerminal?: true
   }): Promise<void> | void
   waitForTuiExit(owner: StructuredTuiOwner): Promise<{ transcriptPath?: string }>

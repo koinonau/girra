@@ -162,7 +162,7 @@ describe('submission and dispatch state machine', () => {
     kind: 'submission',
     clientMessageId: 'cm_1',
     payloadFingerprint: 'fp_1',
-    providerHandle: { kind: 'codex', threadId: 'thread-1' },
+    providerHandle: { kind: 'claude', sessionId: 'session-1', leafUuid: null },
     body: { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'hi' }] },
     ...base(1)
   }
@@ -180,13 +180,13 @@ describe('submission and dispatch state machine', () => {
         kind: 'dispatch',
         clientMessageId: 'cm_1',
         state: 'accepted',
-        providerItemId: 'codex:thread-1:turn-1:0',
+        providerItemId: 'claude:session-1:accepted-1',
         reason: null,
         ...base(2)
       }
     ])
     expect(state.receipts.get('cm_1')?.cursor).toEqual({ epoch: EPOCH, sequence: 2 })
-    expect(state.submissions.get('cm_1')?.providerItemId).toBe('codex:thread-1:turn-1:0')
+    expect(state.submissions.get('cm_1')?.providerItemId).toBe('claude:session-1:accepted-1')
   })
 
   it('folds the provider echo into the submission bubble instead of adding a second one', () => {
@@ -196,13 +196,13 @@ describe('submission and dispatch state machine', () => {
         kind: 'dispatch',
         clientMessageId: 'cm_1',
         state: 'accepted',
-        providerItemId: 'codex:thread-1:turn-1:0',
+        providerItemId: 'claude:session-1:accepted-1',
         reason: null,
         ...base(2)
       },
       {
         kind: 'item',
-        itemId: 'codex:thread-1:turn-1:0',
+        itemId: 'claude:session-1:accepted-1',
         revision: 1,
         body: { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'hi' }] },
         ...base(3)
@@ -316,7 +316,7 @@ describe('submission and dispatch state machine', () => {
     expect(state.aliases.has(providerItemId)).toBe(false)
   })
 
-  it.each(['codex:thread-1:turn-1:0', 'claude:session-1:user-1'])(
+  it.each(['claude:session-1:accepted-1', 'claude:session-1:user-1'])(
     'preserves submitted text and attachments when %s is restored',
     (providerItemId) => {
       const body: AgentJournalMessageItem = {
@@ -358,13 +358,13 @@ describe('submission and dispatch state machine', () => {
         kind: 'submission',
         clientMessageId: 'early-client',
         payloadFingerprint: sendFingerprint(body),
-        providerHandle: { kind: 'codex', threadId: 'thread-1' },
+        providerHandle: { kind: 'claude', sessionId: 'session-1', leafUuid: null },
         body,
         ...base(1)
       },
       {
         kind: 'item',
-        itemId: 'codex:thread-1:root-turn:2',
+        itemId: 'claude:session-1:early-echo',
         revision: 1,
         body,
         ...base(2)
@@ -373,7 +373,7 @@ describe('submission and dispatch state machine', () => {
         kind: 'dispatch',
         clientMessageId: 'early-client',
         state: 'accepted',
-        providerItemId: 'codex:thread-1:predicted-turn:0',
+        providerItemId: 'claude:session-1:early-dispatch',
         reason: null,
         ...base(3)
       }
@@ -385,7 +385,7 @@ describe('submission and dispatch state machine', () => {
   })
 
   it.each([5, 10])(
-    'reconciles %i rapid sends across an interleaved cancel when Codex reuses the root turn',
+    'reconciles %i rapid sends across an interleaved cancel when echoes carry other ids',
     (count) => {
       const rows: JournalRow[] = []
       for (let index = 0; index < count; index += 1) {
@@ -395,7 +395,7 @@ describe('submission and dispatch state machine', () => {
             kind: 'submission',
             clientMessageId: `client-${index}`,
             payloadFingerprint: sendFingerprint(body),
-            providerHandle: { kind: 'codex', threadId: 'thread-1' },
+            providerHandle: { kind: 'claude', sessionId: 'session-1', leafUuid: null },
             body,
             ...base(rows.length + 1)
           },
@@ -403,7 +403,7 @@ describe('submission and dispatch state machine', () => {
             kind: 'dispatch',
             clientMessageId: `client-${index}`,
             state: 'accepted',
-            providerItemId: `codex:thread-1:predicted-turn-${index}:0`,
+            providerItemId: `claude:session-1:dispatch-${index}`,
             reason: null,
             ...base(rows.length + 2)
           }
@@ -419,7 +419,7 @@ describe('submission and dispatch state machine', () => {
       for (let index = 0; index < count; index += 1) {
         rows.push({
           kind: 'item',
-          itemId: `codex:thread-1:root-turn:${index}`,
+          itemId: `claude:session-1:echo-${index}`,
           revision: 1,
           body: userText(`RAPID_${index + 1}`),
           ...base(rows.length + 1)
@@ -559,12 +559,12 @@ describe('malformed persisted item keys', () => {
 })
 
 describe('bounded item-key collisions', () => {
-  it('keeps an oversized turn and its raw digest-form mimic as separate items', () => {
-    const oversizedTurnId = 'a'.repeat(MAX_JOURNAL_KEY_COMPONENT_CHARS + 1)
-    const digestFormMimic = boundJournalKeyComponent(oversizedTurnId)
-    const keyFor = (turnId: string) =>
-      agentJournalItemKey({ provider: 'codex', threadId: 'thread-1', turnId, ordinal: 0 })
-    const oversizedKey = keyFor(oversizedTurnId)
+  it('keeps an oversized uuid and its raw digest-form mimic as separate items', () => {
+    const oversizedUuid = 'a'.repeat(MAX_JOURNAL_KEY_COMPONENT_CHARS + 1)
+    const digestFormMimic = boundJournalKeyComponent(oversizedUuid)
+    const keyFor = (uuid: string) =>
+      agentJournalItemKey({ provider: 'claude', sessionId: 'session-1', uuid })
+    const oversizedKey = keyFor(oversizedUuid)
     const mimicKey = keyFor(digestFormMimic)
 
     const state = fold([

@@ -8,66 +8,10 @@ import {
 } from '../../../shared/agent-session-journal-item-key'
 import type { AgentJournalItemIdentity } from '../../../shared/agent-session-journal-types'
 
-// Fixtures mirror the shapes the providers actually emit: a resumed Codex
-// thread renumbers its items positionally, and a forked Claude session copies
-// history with the ORIGINAL item uuids.
+// Fixtures mirror the shapes Claude emits: a forked session copies history with
+// the ORIGINAL item uuids.
 
-const THREAD = '019fd8ca-edbe-7c43-b231-4c7aea3a2d89'
-const TURN_A = '019fd8ca-edbe-7c43-b231-4c7aea3a2d89'
-const TURN_B = '019fd8cb-1c40-7a02-9f31-0f1a54b7c211'
-
-describe('codex identity survives positional renumbering', () => {
-  it('keys the same logical item identically before and after a resume', () => {
-    // First run: the app server labels the second turn's user message item-3.
-    const live: AgentJournalItemIdentity = {
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: TURN_B,
-      ordinal: 0
-    }
-    // After `thread/resume` the same item comes back as item-1 of the replayed
-    // history. Ordinal-within-turn is unchanged, so the key is unchanged.
-    const resumed: AgentJournalItemIdentity = {
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: TURN_B,
-      ordinal: 0
-    }
-    expect(agentJournalItemKey(resumed)).toBe(agentJournalItemKey(live))
-  })
-
-  it('separates two items inside one turn', () => {
-    const first = agentJournalItemKey({
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: TURN_A,
-      ordinal: 0
-    })
-    const second = agentJournalItemKey({
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: TURN_A,
-      ordinal: 1
-    })
-    expect(first).not.toBe(second)
-  })
-
-  it('disambiguates a fork that copies turns keeping their original turn ids', () => {
-    const original = agentJournalItemKey({
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: TURN_A,
-      ordinal: 0
-    })
-    const forked = agentJournalItemKey({
-      provider: 'codex',
-      threadId: '019fd900-77aa-7c19-8bd0-2b3c4d5e6f70',
-      turnId: TURN_A,
-      ordinal: 0
-    })
-    expect(forked).not.toBe(original)
-  })
-})
+const SESSION = '019fd8ca-edbe-7c43-b231-4c7aea3a2d89'
 
 describe('claude identity', () => {
   it('keys on (session id, uuid)', () => {
@@ -116,13 +60,13 @@ describe('key encoding', () => {
   it('cannot be collided by a separator inside an id', () => {
     const a = agentJournalItemKey({
       provider: 'legacy',
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'a:b',
       recordId: 'c'
     })
     const b = agentJournalItemKey({
       provider: 'legacy',
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'a',
       recordId: 'b:c'
     })
@@ -148,29 +92,28 @@ describe('key encoding', () => {
 })
 
 describe('bounded component domain separation', () => {
-  const oversizedTurnId = 'a'.repeat(MAX_JOURNAL_KEY_COMPONENT_CHARS + 1)
-  const digestFormMimic = boundJournalKeyComponent(oversizedTurnId)
-  const keyFor = (turnId: string) =>
-    agentJournalItemKey({ provider: 'codex', threadId: THREAD, turnId, ordinal: 0 })
+  const oversizedUuid = 'a'.repeat(MAX_JOURNAL_KEY_COMPONENT_CHARS + 1)
+  const digestFormMimic = boundJournalKeyComponent(oversizedUuid)
+  const keyFor = (uuid: string) =>
+    agentJournalItemKey({ provider: 'claude', sessionId: SESSION, uuid })
 
   it('separates an oversized component from the raw string matching its digest form', () => {
-    const oversizedKey = keyFor(oversizedTurnId)
-    expect(oversizedKey).toBe(`codex:${THREAD}:${digestFormMimic}:0`)
+    const oversizedKey = keyFor(oversizedUuid)
+    expect(oversizedKey).toBe(`claude:${SESSION}:${digestFormMimic}`)
     expect(oversizedKey).not.toBe(keyFor(digestFormMimic))
   })
 
   it('keeps both persisted key spellings stable through parse and re-key', () => {
-    for (const turnId of [oversizedTurnId, digestFormMimic]) {
-      const key = keyFor(turnId)
+    for (const uuid of [oversizedUuid, digestFormMimic]) {
+      const key = keyFor(uuid)
       const parsed = parseAgentJournalItemKey(key)
       expect(parsed).not.toBeNull()
       expect(agentJournalItemKey(parsed as AgentJournalItemIdentity)).toBe(key)
     }
     expect(parseAgentJournalItemKey(keyFor(digestFormMimic))).toEqual({
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: digestFormMimic,
-      ordinal: 0
+      provider: 'claude',
+      sessionId: SESSION,
+      uuid: digestFormMimic
     })
   })
 })
@@ -181,10 +124,9 @@ describe('oversized identity bounding on Unicode boundaries', () => {
   // surrogate and `encodeURIComponent` threw `URIError: URI malformed`.
   const STRADDLING = `${'a'.repeat(39)}😀${'x'.repeat(1100)}`
   const straddlingIdentity: AgentJournalItemIdentity = {
-    provider: 'codex',
-    threadId: THREAD,
-    turnId: STRADDLING,
-    ordinal: 0
+    provider: 'claude',
+    sessionId: SESSION,
+    uuid: STRADDLING
   }
 
   it('keys a valid astral id whose character straddles the head cut', () => {
@@ -197,7 +139,7 @@ describe('oversized identity bounding on Unicode boundaries', () => {
   it('stays deterministic and collision-resistant for straddling ids', () => {
     expect(agentJournalItemKey(straddlingIdentity)).toBe(agentJournalItemKey(straddlingIdentity))
     // A different oversized value sharing the same head still gets its own key.
-    expect(agentJournalItemKey({ ...straddlingIdentity, turnId: `${STRADDLING}y` })).not.toBe(
+    expect(agentJournalItemKey({ ...straddlingIdentity, uuid: `${STRADDLING}y` })).not.toBe(
       agentJournalItemKey(straddlingIdentity)
     )
   })
@@ -241,20 +183,18 @@ describe('ill-formed UTF-16 identity totality', () => {
 
   it('keys an oversized id carrying a lone low surrogate inside the head', () => {
     const identity: AgentJournalItemIdentity = {
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: `${LONE_LOW}${'x'.repeat(1100)}`,
-      ordinal: 0
+      provider: 'claude',
+      sessionId: SESSION,
+      uuid: `${LONE_LOW}${'x'.repeat(1100)}`
     }
     expect(() => agentJournalItemKey(identity)).not.toThrow()
   })
 
   it('keys an oversized id with a lone high surrogate away from the head cut', () => {
     const identity: AgentJournalItemIdentity = {
-      provider: 'codex',
-      threadId: THREAD,
-      turnId: `${'a'.repeat(10)}${LONE_HIGH}${'b'.repeat(1100)}`,
-      ordinal: 0
+      provider: 'claude',
+      sessionId: SESSION,
+      uuid: `${'a'.repeat(10)}${LONE_HIGH}${'b'.repeat(1100)}`
     }
     expect(() => agentJournalItemKey(identity)).not.toThrow()
   })
@@ -283,7 +223,7 @@ describe('ill-formed UTF-16 identity totality', () => {
 
 describe('malformed persisted keys decode to null instead of throwing', () => {
   it('returns null for malformed percent sequences', () => {
-    for (const key of ['%', 'claude:%E0%A4%A:u-1', 'codex:a:b:1%ZZ', 'claude:%ED%A0%BD:u-1']) {
+    for (const key of ['%', 'claude:%E0%A4%A:u-1', 'claude:a:1%ZZ', 'claude:%ED%A0%BD:u-1']) {
       expect(parseAgentJournalItemKey(key)).toBeNull()
     }
   })

@@ -21,12 +21,7 @@ import { attachRuntimeWorktreeAgentRows } from './runtime-worktree-agent-rows'
  */
 const WORKTREE_ID = 'repo-1::/workspace/app'
 const SESSION = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'
-const IDENTITY = {
-  provider: 'codex',
-  threadId: 'thread-1',
-  turnId: 'turn-1',
-  ordinal: 0
-} as const
+const IDENTITY = { provider: 'claude', sessionId: 'claude-session-1' } as const
 
 let root: string
 const journals = createTrackedJournalOpener()
@@ -48,18 +43,18 @@ async function awaitingApproval() {
       sessionId: SESSION,
       workspaceId: WORKTREE_ID,
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: 'thread-1' }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: 'claude-session-1', leafUuid: null }
     },
     journalDir: join(root, SESSION)
   })
   await journal.appendItem(
-    { ...IDENTITY, ordinal: 1 },
+    { ...IDENTITY, uuid: 'item-1' },
     { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'rm the branch' }] },
     { fence: 1 }
   )
   await journal.appendItem(
-    { ...IDENTITY, ordinal: 2 },
+    { ...IDENTITY, uuid: 'item-2' },
     {
       kind: 'approval',
       title: 'Run the command?',
@@ -75,7 +70,7 @@ async function awaitingApproval() {
       {
         journal,
         hasProviderChild: true,
-        params: { location: { workspaceId: WORKTREE_ID }, provider: 'codex' as const }
+        params: { location: { workspaceId: WORKTREE_ID }, provider: 'claude' as const }
       }
     ]
   ])

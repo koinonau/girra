@@ -44,9 +44,7 @@ const mocks = vi.hoisted(() => ({
   sendHandle: { cancel: vi.fn(), settleAfterMs: 500 },
   sendNativeChatMessage: vi.fn(),
   sendNativeChatMessageWithImageAttachments: vi.fn(),
-  sendNativeChatTypedCommand: vi.fn(),
   sendNativeChatMessageVerified: vi.fn(),
-  typeNativeChatCommand: vi.fn(),
   trackPendingSend: vi.fn(),
   setDraft: vi.fn(),
   draftScopeKeys: [] as string[],
@@ -76,10 +74,8 @@ vi.mock('@/lib/agent-paste-draft', () => ({
 }))
 vi.mock('./native-chat-runtime-send', () => ({
   sendNativeChatMessage: (...args: unknown[]) => mocks.sendNativeChatMessage(...args),
-  sendNativeChatTypedCommand: (...args: unknown[]) => mocks.sendNativeChatTypedCommand(...args),
   sendNativeChatMessageVerified: (...args: unknown[]) =>
     mocks.sendNativeChatMessageVerified(...args),
-  typeNativeChatCommand: (...args: unknown[]) => mocks.typeNativeChatCommand(...args),
   submitNativeChatPrompt: vi.fn()
 }))
 vi.mock('./native-chat-runtime-image-send', () => ({
@@ -200,9 +196,7 @@ describe('NativeChatComposer', () => {
     })
     mocks.sendNativeChatMessage.mockReturnValue(mocks.sendHandle)
     mocks.sendNativeChatMessageWithImageAttachments.mockReturnValue(mocks.sendHandle)
-    mocks.sendNativeChatTypedCommand.mockReturnValue(mocks.sendHandle)
     mocks.sendNativeChatMessageVerified.mockResolvedValue(true)
-    mocks.typeNativeChatCommand.mockResolvedValue(true)
     mocks.sendHandle.settleAfterMs = 500
     Object.defineProperty(window, 'api', {
       configurable: true,
@@ -223,7 +217,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
         isWorking
         onStop={onStop}
       />
@@ -245,7 +239,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
         onOptimisticSend={onOptimisticSend}
       />
     )
@@ -275,7 +269,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:structured"
         targetPtyId={null}
-        agent="codex"
+        agent="claude"
         structuredTransport={{
           send,
           dispatchCommand,
@@ -300,43 +294,42 @@ describe('NativeChatComposer', () => {
   })
 
   // The structured menu offers only what a pick can carry out: the host's own
-  // commands, plus the ones the agent itself runs from message text (Codex `/goal`).
-  // Listing the agent's whole TUI catalog here answered every pick with
+  // commands. Listing the agent's whole TUI catalog here answered every pick with
   // "not available in chat sessions".
-  it.each([
-    ['claude', 'compact', ['model', 'effort']],
-    ['codex', 'vim', ['model', 'effort', 'goal']]
-  ] as const)('offers %s only actionable structured slash commands', (agent, withheld, offered) => {
-    mocks.draft = '/'
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey={`tab-1:structured-${agent}`}
-        targetPtyId={null}
-        agent={agent}
-        structuredTransport={{
-          send: vi.fn(() => true),
-          dispatchCommand: vi.fn(async () => ({ handled: false, accepted: false, error: null })),
-          optionsSurface: {
-            getSnapshot: () => [],
-            setOption: vi.fn(),
-            invokeAction: vi.fn(),
-            subscribe: () => () => {}
-          },
-          optionSnapshot: [],
-          onError: vi.fn(),
-          sessionId: 'session-test',
-          runtimeEnvironmentId: null
-        }}
-      />
-    )
+  it.each([['claude', 'compact', ['model', 'effort']]] as const)(
+    'offers %s only actionable structured slash commands',
+    (agent, withheld, offered) => {
+      mocks.draft = '/'
+      render(
+        <NativeChatComposer
+          terminalTabId="tab-1"
+          paneKey={`tab-1:structured-${agent}`}
+          targetPtyId={null}
+          agent={agent}
+          structuredTransport={{
+            send: vi.fn(() => true),
+            dispatchCommand: vi.fn(async () => ({ handled: false, accepted: false, error: null })),
+            optionsSurface: {
+              getSnapshot: () => [],
+              setOption: vi.fn(),
+              invokeAction: vi.fn(),
+              subscribe: () => () => {}
+            },
+            optionSnapshot: [],
+            onError: vi.fn(),
+            sessionId: 'session-test',
+            runtimeEnvironmentId: null
+          }}
+        />
+      )
 
-    const names = (mocks.fieldProps?.autocomplete?.items ?? [])
-      .filter((item) => item.kind === 'command')
-      .map((item) => item.name)
-    expect(names).toEqual([...offered])
-    expect(names).not.toContain(withheld)
-  })
+      const names = (mocks.fieldProps?.autocomplete?.items ?? [])
+        .filter((item) => item.kind === 'command')
+        .map((item) => item.name)
+      expect(names).toEqual([...offered])
+      expect(names).not.toContain(withheld)
+    }
+  )
 
   it('sends structured image attachments through the durable transport', async () => {
     mocks.draft = ''
@@ -347,7 +340,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:structured"
         targetPtyId={null}
-        agent="codex"
+        agent="claude"
         structuredTransport={{
           send,
           dispatchCommand: vi.fn(async () => ({
@@ -383,7 +376,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -392,7 +385,6 @@ describe('NativeChatComposer', () => {
     act(() => mocks.fieldProps?.onSend?.())
 
     expect(mocks.sendNativeChatMessage).not.toHaveBeenCalled()
-    expect(mocks.sendNativeChatTypedCommand).not.toHaveBeenCalled()
     expect(mocks.sendNativeChatMessageWithImageAttachments).not.toHaveBeenCalled()
   })
 
@@ -403,7 +395,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
     expect(mocks.fieldProps?.sendButtonDisabled).toBe(true)
@@ -414,7 +406,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
     expect(mocks.fieldProps?.sendButtonDisabled).toBe(false)
@@ -430,55 +422,20 @@ describe('NativeChatComposer', () => {
     )
   })
 
-  it('types Codex slash composer sends instead of pasting them', () => {
-    mocks.draft = '/status'
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
-
-    act(() => mocks.fieldProps?.onSend?.())
-
-    expect(mocks.sendNativeChatTypedCommand).toHaveBeenCalledWith({}, 'pty-1', '/status')
-    expect(mocks.sendNativeChatMessage).not.toHaveBeenCalled()
-  })
-
-  it('keeps Codex skill sends pasted', () => {
-    mocks.draft = '$ref-oss'
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-      />
-    )
-
-    act(() => mocks.fieldProps?.onSend?.())
-
-    expect(mocks.sendNativeChatMessage).toHaveBeenCalledWith({}, 'pty-1', '$ref-oss', undefined)
-    expect(mocks.sendNativeChatTypedCommand).not.toHaveBeenCalled()
-  })
-
-  it.each(['claude', 'openclaude'] as const)('keeps %s slash composer sends pasted', (agent) => {
+  it('keeps slash composer sends pasted', () => {
     mocks.draft = '/clear'
     render(
       <NativeChatComposer
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent={agent}
+        agent="claude"
       />
     )
 
     act(() => mocks.fieldProps?.onSend?.())
 
     expect(mocks.sendNativeChatMessage).toHaveBeenCalledWith({}, 'pty-1', '/clear', undefined)
-    expect(mocks.sendNativeChatTypedCommand).not.toHaveBeenCalled()
   })
 
   it('retires the launch-draft seed once a send clears the TUI input line', () => {
@@ -487,7 +444,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
     expect(mocks.clearNativeChatLaunchDraft).not.toHaveBeenCalled()
@@ -503,7 +460,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-before"
-        agent="codex"
+        agent="claude"
       />
     )
     const field = view.getByTestId('native-chat-composer-field')
@@ -513,7 +470,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId={null}
-        agent="codex"
+        agent="claude"
       />
     )
     view.rerender(
@@ -521,7 +478,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-after"
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -535,7 +492,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
     const previousField = view.getByTestId('native-chat-composer-field')
@@ -547,7 +504,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-2"
         targetPtyId="pty-2"
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -561,7 +518,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -576,7 +533,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
     const textarea = document.createElement('textarea')
@@ -603,7 +560,7 @@ describe('NativeChatComposer', () => {
         terminalTabId="tab-1"
         paneKey="tab-1:leaf-1"
         targetPtyId="pty-1"
-        agent="codex"
+        agent="claude"
       />
     )
     const textarea = document.createElement('textarea')
@@ -818,32 +775,5 @@ describe('NativeChatComposer', () => {
     )
     expect(mocks.confirmationObserver?.dispose).toHaveBeenCalledOnce()
     expect(onSwitchToTerminal).not.toHaveBeenCalled()
-  })
-
-  it('types the Codex picker command and switches to the terminal', async () => {
-    mocks.sendHandle.settleAfterMs = 0
-    const onSwitchToTerminal = vi.fn()
-    render(
-      <NativeChatComposer
-        terminalTabId="tab-1"
-        paneKey="tab-1:leaf-1"
-        targetPtyId="pty-1"
-        agent="codex"
-        onSwitchToTerminal={onSwitchToTerminal}
-      />
-    )
-
-    await act(async () => {
-      await mocks.fieldProps?.sessionOptionsSurface?.invokeAction('model')
-    })
-
-    expect(mocks.typeNativeChatCommand).toHaveBeenCalledWith(
-      {},
-      'pty-1',
-      '/model',
-      expect.any(AbortSignal)
-    )
-    expect(mocks.sendNativeChatMessageVerified).not.toHaveBeenCalled()
-    expect(onSwitchToTerminal).toHaveBeenCalledOnce()
   })
 })

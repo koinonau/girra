@@ -20,7 +20,7 @@ describe('usePersistedAiVaultViewOptions', () => {
     const first = renderHook(() => usePersistedAiVaultViewOptions())
 
     act(() => {
-      first.result.current.setAgentEnabled('codex', false)
+      first.result.current.setAgentEnabled('pi', false)
       first.result.current.setSort('created')
       first.result.current.setGroup('folder')
       first.result.current.setHideEmptySessions(true)
@@ -29,7 +29,7 @@ describe('usePersistedAiVaultViewOptions', () => {
     first.unmount()
 
     const restored = renderHook(() => usePersistedAiVaultViewOptions())
-    expect(restored.result.current.agents).not.toContain('codex')
+    expect(restored.result.current.agents).not.toContain('pi')
     expect(restored.result.current.sort).toBe('created')
     expect(restored.result.current.group).toBe('folder')
     expect(restored.result.current.hideEmptySessions).toBe(true)
@@ -79,7 +79,7 @@ describe('usePersistedAiVaultViewOptions', () => {
   it('resets every persisted option to its default', () => {
     const hook = renderHook(() => usePersistedAiVaultViewOptions())
     act(() => {
-      hook.result.current.setAgentEnabled('codex', false)
+      hook.result.current.setAgentEnabled('pi', false)
       hook.result.current.setSort('created')
       hook.result.current.setGroup('agent')
       hook.result.current.setHideEmptySessions(true)

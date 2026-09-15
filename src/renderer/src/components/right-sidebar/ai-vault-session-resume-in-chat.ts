@@ -25,10 +25,7 @@ export type AiVaultResumeInChatEligibility =
   | { available: false; reason: AiVaultResumeInChatBlockedReason }
 
 /**
- * Claude and Codex do not have the same freedom about *where* a conversation may be resumed.
- *
- * Codex is handed the rollout file and a cwd, so it can resume into any workspace. Claude's SDK
- * stores transcripts under a project key derived from the launch cwd, so resuming from a workspace
+ * Claude cannot resume a conversation from just any workspace. Claude's SDK stores transcripts under a project key derived from the launch cwd, so resuming from a workspace
  * other than the one the conversation was recorded in looks in a directory the transcript is not in.
  * That is a resume that silently yields nothing, which is worse than a disabled affordance.
  */

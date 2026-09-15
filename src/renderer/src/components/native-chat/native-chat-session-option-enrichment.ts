@@ -1,15 +1,8 @@
 import type { AgentType } from '../../../../shared/agent-status-types'
 import {
   getAgentSessionOptionCatalog,
-  mergeCatalogModels,
-  mergeDiscoveredAuthoritativeModels,
   type CatalogModel
 } from '../../../../shared/agent-session-option-catalog'
-import { resolveNativeChatSessionOptionDefaults } from '../../../../shared/native-chat-session-option-defaults'
-import type {
-  PersistedNativeChatSessionOptions,
-  SessionOptionValue
-} from '../../../../shared/native-chat-session-options'
 
 type CatalogEnrichmentEntry = {
   agent: AgentType
@@ -49,26 +42,6 @@ export function subscribeNativeChatEnrichedModels(
   return () => entry.listeners.delete(listener)
 }
 
-export function resolveNativeChatLaunchSessionOptions(
-  persisted: PersistedNativeChatSessionOptions | null | undefined,
-  agent: AgentType
-): Record<string, SessionOptionValue> | undefined {
-  const values = resolveNativeChatSessionOptionDefaults(persisted, agent)
-  if (!values || !getAgentSessionOptionCatalog(agent)?.discoveredModelsAreAuthoritative) {
-    return values
-  }
-  let probed = false
-  for (const entry of enrichmentByAgentHost.values()) {
-    if (entry.agent === agent && entry.models) {
-      probed = true
-      if (entry.models.some((model) => model.id === values.model)) {
-        return values
-      }
-    }
-  }
-  return probed ? undefined : values
-}
-
 export function ensureNativeChatModelEnrichment(args: {
   agent: AgentType
   hostKey: string
@@ -101,12 +74,7 @@ export function ensureNativeChatModelEnrichment(args: {
       if (!discovered || discovered.length === 0) {
         return
       }
-      entry.models =
-        args.agent === 'claude'
-          ? [...discovered]
-          : catalog.discoveredModelsAreAuthoritative
-            ? mergeDiscoveredAuthoritativeModels(catalog.models, discovered)
-            : mergeCatalogModels(catalog.models, discovered)
+      entry.models = [...discovered]
       for (const listener of entry.listeners) {
         listener([...entry.models])
       }

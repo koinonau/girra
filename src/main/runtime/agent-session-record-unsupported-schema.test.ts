@@ -23,8 +23,8 @@ function reserveRequest(): AgentSessionReserveRequest {
       workspaceId: 'workspace-1',
       workspaceKind: 'git-worktree'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/user/.codex' },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/user/.claude' },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'spawn-new',

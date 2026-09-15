@@ -2,17 +2,12 @@ import { useCallback, type Dispatch, type SetStateAction } from 'react'
 import type { AgentType } from '../../../../shared/agent-status-types'
 import type { NativeChatLaunchDraft } from '@/lib/native-chat-launch-prompt'
 import { useAppStore } from '../../store'
-import {
-  sendNativeChatMessage,
-  sendNativeChatTypedCommand,
-  submitNativeChatPrompt
-} from './native-chat-runtime-send'
+import { sendNativeChatMessage, submitNativeChatPrompt } from './native-chat-runtime-send'
 import type { NativeChatSendHandle } from './native-chat-runtime-send'
 import { sendNativeChatMessageWithImageAttachments } from './native-chat-runtime-image-send'
 import { resolveNativeChatLaunchDraftSend } from './native-chat-launch-draft-send'
 import type { NativeChatResolvedTarget } from './native-chat-composer-target'
 import { pushHistory, type HistoryState } from './native-chat-composer-state'
-import { isSlashCommandDraft } from '../../../../shared/native-chat-slash-commands'
 import type { NativeChatPickerState } from './use-native-chat-picker-state'
 import type { NativeChatSendLifecycle } from './use-native-chat-send-lifecycle'
 import type { NativeChatPtySessionOptionsSurface } from './native-chat-pty-session-options'
@@ -64,10 +59,7 @@ export function useNativeChatPtyComposerSend(args: {
     let pendingHandle: NativeChatSendHandle | null = null
     // Why: slash-like text must not silently drop its attached images.
     if (classification !== 'chat' && imagePaths.length === 0) {
-      pendingHandle =
-        args.agent === 'codex' && isSlashCommandDraft(text)
-          ? sendNativeChatTypedCommand(target.settings, target.ptyId, text)
-          : sendNativeChatMessage(target.settings, target.ptyId, text, sendOptions)
+      pendingHandle = sendNativeChatMessage(target.settings, target.ptyId, text, sendOptions)
     } else if (imagePaths.length > 0) {
       pendingHandle = sendNativeChatMessageWithImageAttachments(
         target.settings,

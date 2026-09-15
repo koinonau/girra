@@ -41,7 +41,7 @@ describe('activity event agent contexts', () => {
       color: null,
       sortOrder: 0,
       createdAt: 1,
-      agentSessionAgent: 'codex'
+      agentSessionAgent: 'claude'
     } satisfies Tab
 
     const result = build({
@@ -97,7 +97,7 @@ describe('activity event agent contexts', () => {
       color: null,
       sortOrder: 0,
       createdAt: 1,
-      agentSessionAgent: 'codex'
+      agentSessionAgent: 'claude'
     } satisfies Tab
     const resolveWorktree = vi.fn((_worktreeId, executionHostId) =>
       executionHostId === 'runtime:env-1' ? runtimeWorktree : localWorktree

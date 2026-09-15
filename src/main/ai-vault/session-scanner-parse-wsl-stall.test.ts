@@ -74,8 +74,7 @@ function candidate(path: string, bytes: Buffer, mtimeMs: number): SessionFileCan
       mtimeMs,
       modifiedAt: new Date(mtimeMs).toISOString(),
       sizeBytes: bytes.length
-    },
-    codexHome: null
+    }
   }
 }
 

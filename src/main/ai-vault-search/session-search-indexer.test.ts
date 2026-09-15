@@ -293,22 +293,20 @@ it('widens history by constructing a new instance and narrows by purging on its 
 it.skipIf(!CAN_DENY_READ)(
   'names an unreadable root as degraded and keeps indexing the others',
   async () => {
-    const blocked = join(harness.roots.codexSessionsDir ?? '', 'blocked')
+    const blocked = join(harness.roots.piSessionsDir ?? '', 'blocked')
     await mkdir(blocked, { recursive: true })
     await writeClaudeTranscript(transcriptPath(), ['a readable claude session'], SESSION_ID)
-    await chmod(harness.roots.codexSessionsDir ?? '', 0o000)
+    await chmod(harness.roots.piSessionsDir ?? '', 0o000)
     try {
       await newIndexer().start()
       const status = indexer?.status()
       expect(status?.phase).toBe('degraded')
-      expect(status?.degradedRoots.map((root) => root.root)).toContain(
-        harness.roots.codexSessionsDir
-      )
+      expect(status?.degradedRoots.map((root) => root.root)).toContain(harness.roots.piSessionsDir)
       expect(status?.degradedRoots[0]?.reason).toBeTruthy()
       // A degraded root is not a degraded index: everything else still lands.
       expect(sessionsMatching('readable')).toEqual([SESSION_ID])
     } finally {
-      await chmod(harness.roots.codexSessionsDir ?? '', 0o755)
+      await chmod(harness.roots.piSessionsDir ?? '', 0o755)
     }
   }
 )

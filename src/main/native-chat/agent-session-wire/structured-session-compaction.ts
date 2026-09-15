@@ -1,7 +1,6 @@
 type PendingCompaction = {
   identity: string
   commandTurnId?: string
-  turnId?: string
   error?: string
   compacted: boolean
   finish: (result: { error?: string }) => void
@@ -9,13 +8,6 @@ type PendingCompaction = {
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' ? (value as Record<string, unknown>) : {}
-}
-
-export function isCodexCompactionComplete(method: string, params: unknown): boolean {
-  return (
-    method === 'thread/compacted' ||
-    (method === 'item/completed' && record(record(params).item).type === 'contextCompaction')
-  )
 }
 
 /** A receipt is not completion; keep listening through the provider's terminal frame. */
@@ -84,35 +76,8 @@ export class StructuredSessionCompaction {
     return this.pending.get(sessionId)?.commandTurnId === turnId
   }
 
-  providerTurnId(sessionId: string, turnId: string): string | undefined {
-    return this.ownsTurn(sessionId, turnId) ? this.pending.get(sessionId)?.turnId : turnId
-  }
-
   ended(sessionId: string): void {
     this.pending.get(sessionId)?.finish({ error: 'The provider exited during compaction.' })
-  }
-
-  codex(sessionId: string, method: string, value: unknown): void {
-    const pending = this.pending.get(sessionId)
-    const params = record(value)
-    if (!pending || params.threadId !== pending.identity) {
-      return
-    }
-    const turn = record(params.turn)
-    if (method === 'turn/started' && typeof turn.id === 'string') {
-      pending.turnId = turn.id
-    }
-    if (isCodexCompactionComplete(method, params)) {
-      pending.compacted = true
-    }
-    if (method === 'turn/completed' && turn.id === pending.turnId) {
-      const error = record(turn.error).message
-      pending.finish(
-        turn.status === 'completed' && pending.compacted
-          ? {}
-          : { error: typeof error === 'string' ? error : 'Compaction did not complete.' }
-      )
-    }
   }
 
   claude(sessionId: string, message: Record<string, unknown>): void {

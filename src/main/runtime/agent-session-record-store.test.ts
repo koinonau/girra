@@ -185,7 +185,7 @@ describe('acquisition path', () => {
     ).rejects.toThrow('agent_session_ownership_unknown')
   })
 
-  it('accepts provider proof only for the reserved provider at the current fence', async () => {
+  it('accepts provider proof only at the current fence', async () => {
     const store = await open()
     await store.reserveOwner(reserveRequest())
     await store.commitProcessIdentity({
@@ -195,16 +195,6 @@ describe('acquisition path', () => {
       now: NOW
     })
 
-    await expect(
-      store.proveOwner({
-        sessionId: 'session-alpha',
-        fence: 1,
-        link: handleLink({
-          handle: { provider: 'codex', threadId: 'thread-1' }
-        }),
-        now: NOW
-      })
-    ).rejects.toThrow('agent_session_provider_handle_provider_mismatch')
     await expect(
       store.proveOwner({
         sessionId: 'session-alpha',
@@ -245,10 +235,6 @@ describe('acquisition path', () => {
   })
 
   it.each([
-    [
-      'provider',
-      { provider: 'codex', accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' } }
-    ],
     ['account', { accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude-other' } }]
   ] as const)("refuses to change a session's pinned %s", async (_name, overrides) => {
     const store = await open()

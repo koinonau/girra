@@ -10,9 +10,9 @@ import { agentJournalItemKey } from '../../../shared/agent-session-journal-item-
 import { isSubagentGroupBlock } from '../../../shared/native-chat-types'
 import type { NativeChatSubagentEntry } from '../../../shared/native-chat-types'
 import {
-  codexSubagentGroupBody,
-  codexSubagentGroupIdentity
-} from '../../codex/codex-subagent-roster'
+  claudeSubagentGroupBody,
+  claudeSubagentGroupIdentity
+} from '../../claude/claude-subagent-group-row'
 import type { openAgentSessionJournal } from './journal-store-factory'
 import { createTrackedJournalOpener } from './journal-store-test-open'
 import { staleSubagentRosterRevisions } from './journal-subagent-liveness'
@@ -21,11 +21,11 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'provider-session-1', leafUuid: null }
 }
 
-const GROUP_ID = 'thread-1:turn-1'
+const GROUP_ID = 'turn-1'
 
 let root: string
 let clock = 1_000
@@ -50,8 +50,8 @@ async function open(overrides: Partial<Parameters<typeof openAgentSessionJournal
 /** The row as the producer writes it: the structured block plus its twin. */
 function rosterRow(agents: NativeChatSubagentEntry[]) {
   return {
-    identity: codexSubagentGroupIdentity(GROUP_ID),
-    body: codexSubagentGroupBody(GROUP_ID, agents)
+    identity: claudeSubagentGroupIdentity(GROUP_ID),
+    body: claudeSubagentGroupBody(GROUP_ID, agents)
   }
 }
 

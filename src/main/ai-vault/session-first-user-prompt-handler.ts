@@ -14,7 +14,6 @@ export function handleAiVaultGetFirstUserPrompt(
     agent: args.agent,
     filePath: args.filePath,
     sessionId: typeof args.sessionId === 'string' ? args.sessionId : undefined,
-    executionHostId: args.executionHostId,
-    codexHome: args.codexHome
+    executionHostId: args.executionHostId
   })
 }

@@ -47,10 +47,12 @@ export function createClaudeTuiResumeLaunchBuilder(
 ): (input: { record: AgentSessionRecord; spawnToken: string }) => Promise<ClaudeTuiResumeLaunch> {
   return async ({ record, spawnToken }) => {
     if (record.provider !== 'claude') {
-      throw new Error(`session ${record.sessionId} is a ${record.provider} session`)
+      throw new Error(`session ${record.sessionId} is a ${String(record.provider)} session`)
     }
     if (record.accountHome.variable !== 'CLAUDE_CONFIG_DIR') {
-      throw new Error(`claude sessions pin CLAUDE_CONFIG_DIR, not ${record.accountHome.variable}`)
+      throw new Error(
+        `claude sessions pin CLAUDE_CONFIG_DIR, not ${String(record.accountHome.variable)}`
+      )
     }
     const head = agentSessionProviderHandleChainHead(record.providerHandleChain)
     if (head?.handle.provider !== 'claude') {

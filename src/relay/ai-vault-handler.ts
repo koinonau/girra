@@ -106,7 +106,7 @@ export class AiVaultHandler {
         issues: [
           {
             executionHostId: LOCAL_EXECUTION_HOST_ID,
-            agent: 'codex',
+            agent: 'claude',
             kind: 'host',
             path: this.remoteHome,
             message: `Agent Session History service unavailable: ${error instanceof Error ? error.message : String(error)}`
@@ -123,7 +123,7 @@ export class AiVaultHandler {
         ...result.issues,
         {
           executionHostId: LOCAL_EXECUTION_HOST_ID,
-          agent: 'codex',
+          agent: 'claude',
           kind: 'scope',
           path: this.remoteHome,
           message: `Only the first ${AI_VAULT_SCOPE_PATHS_MAX_COUNT} project paths were scanned.`
@@ -148,7 +148,7 @@ function normalizeTitleRequests(raw: unknown): AiVaultSessionTitleRequest[] {
     const transcriptPath =
       typeof record.transcriptPath === 'string' ? record.transcriptPath.trim() : ''
     if (
-      (agent !== 'claude' && agent !== 'codex') ||
+      agent !== 'claude' ||
       !sessionId ||
       sessionId.length > 512 ||
       !transcriptPath ||

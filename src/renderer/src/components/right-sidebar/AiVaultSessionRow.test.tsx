@@ -9,15 +9,15 @@ import type { AiVaultSessionWorktreeInfo } from './ai-vault-session-worktree'
 import { VaultSessionRow } from './AiVaultSessionRow'
 
 const session = {
-  id: 'local:gemini:sess-1:/home/a/.gemini/s.json',
+  id: 'local:pi:sess-1:/home/a/.pi/agent/sessions/s.jsonl',
   executionHostId: 'local',
-  agent: 'gemini',
+  agent: 'pi',
   sessionId: 'sess-1',
   title: 'A session',
   cwd: null,
   branch: null,
   model: null,
-  filePath: '/home/a/.gemini/s.json',
+  filePath: '/home/a/.pi/agent/sessions/s.jsonl',
   codexHome: null,
   createdAt: null,
   updatedAt: null,
@@ -27,7 +27,7 @@ const session = {
   previewMessages: [{ role: 'assistant', text: 'Ready when you are' }],
   queuedMessageCount: 0,
   subagentTranscriptCount: 0,
-  resumeCommand: 'gemini --resume sess-1',
+  resumeCommand: 'pi --session sess-1',
   subagent: null
 } as unknown as AiVaultSession
 
@@ -69,8 +69,7 @@ function renderRow(
       <VaultSessionRow
         session={session}
         liveState={null}
-        resumeStartup={{ command: 'gemini --resume sess-1' }}
-        realHomeResumeStartup={{ command: 'gemini --resume sess-1' }}
+        resumeStartup={{ command: 'pi --session sess-1' }}
         worktreeInfo={overrides.worktreeInfo ?? null}
         vaultScope="all"
         detailsExpanded={overrides.detailsExpanded ?? false}
@@ -97,7 +96,7 @@ function expectAgentIdentity(): void {
   const metadata = screen.getByTestId('ai-vault-session-metadata')
   // AgentIcon is an <svg> for the hand-drawn agents and an <img> for the rest.
   expect(metadata.querySelector('svg, img')).toBeTruthy()
-  expect(within(metadata).getByText('Gemini')).toBeTruthy()
+  expect(within(metadata).getByText('Pi')).toBeTruthy()
   expect(within(metadata).getByText('2 msgs')).toBeTruthy()
 }
 

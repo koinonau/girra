@@ -21,14 +21,14 @@ describe('sleepingAgentSessionsByPaneKey after reminted-hook settlement', () => 
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'omp',
-          providerSession: { key: 'session_id', id: 'omp-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the reminted pane',
           state: 'working',
           capturedAt: 1,
           updatedAt: 1,
           origin: 'live',
-          terminalTitle: 'OMP ready'
+          terminalTitle: 'Claude ready'
         }
       }
     })
@@ -38,9 +38,9 @@ describe('sleepingAgentSessionsByPaneKey after reminted-hook settlement', () => 
       {
         state: 'working',
         prompt: 'finish the reminted pane',
-        agentType: 'omp'
+        agentType: 'claude'
       },
-      'OMP ready',
+      'Claude ready',
       { updatedAt: 2 },
       { tabId: 'tab-1', worktreeId: 'wt-1' }
     )
@@ -49,9 +49,9 @@ describe('sleepingAgentSessionsByPaneKey after reminted-hook settlement', () => 
       {
         state: 'done',
         prompt: 'finish the reminted pane',
-        agentType: 'omp'
+        agentType: 'claude'
       },
-      'OMP ready',
+      'Claude ready',
       { updatedAt: 3 },
       { tabId: 'tab-1', worktreeId: 'wt-1' }
     )

@@ -19,9 +19,9 @@ function reservedRecord(): AgentSessionRecord {
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
+    provider: 'claude',
     providerHandleChain: [],
-    accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex' },
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude' },
     lease: {
       sessionId: 'session-probe',
       runtimeKind: 'native',

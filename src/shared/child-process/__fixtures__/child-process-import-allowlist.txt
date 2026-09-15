@@ -52,8 +52,6 @@ src/main/browser/agent-browser-bridge-types.ts
 src/main/browser/browser-route-egress-electron-launch.ts
 src/main/browser/browser-route-persisted-worker-electron-process.ts
 src/main/claude-accounts/keychain.ts
-src/main/codex/codex-app-server-posix-supervisor.ts
-src/main/codex/codex-app-server-session.ts
 src/main/computer/desktop-script-provider-bridge.ts
 src/main/computer/macos-computer-use-permission-status.ts
 src/main/computer/macos-computer-use-permissions.ts

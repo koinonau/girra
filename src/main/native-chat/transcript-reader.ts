@@ -8,12 +8,7 @@ import { errorMessage } from '../ai-vault/session-scanner-values'
 import { resolveSessionFilePath, type ResolveSessionFileOptions } from './session-file-resolver'
 import { openTranscriptReadStream } from './wsl-transcript-fs-access'
 import { wslTranscriptFsRefusal } from './wsl-transcript-fs-gate'
-import {
-  decodeClaudeTranscriptLine,
-  decodeCodexTranscriptLine,
-  decodeGrokTranscriptLine,
-  decodeOmpTranscriptLine
-} from './transcript-line-decoders'
+import { decodeClaudeTranscriptLine } from './transcript-line-decoders'
 import { decodeTranscriptStream } from './transcript-stream-lines'
 
 export type ReadTranscriptResult =
@@ -31,7 +26,7 @@ export type ReadTranscriptOptions = ResolveSessionFileOptions & {
 }
 
 /**
- * Read the ENTIRE Claude/Codex JSONL transcript for an agent + session id into
+ * Read the ENTIRE Claude JSONL transcript for an agent + session id into
  * the NativeChatMessage model. Unlike the AI-Vault preview scan, this applies
  * NO message cap. Unknown record types are skipped rather than throwing, so a
  * single malformed/unrecognized line cannot fail the whole read. The per-line
@@ -54,18 +49,8 @@ export async function readNativeChatTranscript(
     return { error: `No transcript found for ${agent} session ${sessionId}`, notFound: true }
   }
   try {
-    const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
-    if (transcriptAgent === 'claude') {
+    if (resolveNativeChatTranscriptAgent(agent) === 'claude') {
       return { messages: await readTranscript(filePath, decodeClaudeTranscriptLine) }
-    }
-    if (transcriptAgent === 'codex') {
-      return { messages: await readTranscript(filePath, decodeCodexTranscriptLine) }
-    }
-    if (transcriptAgent === 'grok') {
-      return { messages: await readTranscript(filePath, decodeGrokTranscriptLine) }
-    }
-    if (transcriptAgent === 'omp') {
-      return { messages: await readTranscript(filePath, decodeOmpTranscriptLine) }
     }
     return { error: `Unsupported agent for Chat UI transcript: ${agent}` }
   } catch (err) {

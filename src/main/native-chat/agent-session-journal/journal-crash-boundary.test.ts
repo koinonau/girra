@@ -32,17 +32,14 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 
-const TURN_ID = '019fd8ca-edbe-7c43-b231-4c7aea3a2d89'
-
 const ACCEPTED_IDENTITY: AgentJournalItemIdentity = {
-  provider: 'codex',
-  threadId: 'thread-1',
-  turnId: TURN_ID,
-  ordinal: 0
+  provider: 'claude',
+  sessionId: 'thread-1',
+  uuid: 'user-0'
 }
 
 let root: string
@@ -68,7 +65,7 @@ async function open() {
   })
 }
 
-/** A Codex `userMessage` history item; `clientId` is the echoed client message id. */
+/** A provider user-message history item; `clientId` is the echoed client message id. */
 function history(input: {
   itemId: string
   clientId: string | null
@@ -79,7 +76,7 @@ function history(input: {
     providerItemId: input.itemId,
     clientMessageId: input.clientId,
     payloadFingerprint: digestPayload(input.text),
-    identity: { provider: 'codex', threadId: 'thread-1', turnId: TURN_ID, ordinal: input.ordinal }
+    identity: { provider: 'claude', sessionId: 'thread-1', uuid: `user-${input.ordinal}` }
   }
 }
 
@@ -371,7 +368,7 @@ describe('reconciliation matching', () => {
           providerItemId: 'item-1',
           clientMessageId: null,
           payloadFingerprint: digestPayload('different payload, same rendered text'),
-          identity: { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal: 0 }
+          identity: { provider: 'claude', sessionId: 'thread-1', uuid: 'turn-1-0' }
         }
       ])
     })

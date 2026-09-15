@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto'
 import type { TranscriptMessage } from '../ai-vault/session-transcript-consumers'
 
-// Why: Claude `--resume` and Codex fork copy the parent transcript into a new
+// Why: Claude `--resume` and fork copy the parent transcript into a new
 // file under a new session id, so one conversation lands N times in results.
 // The shared opening prefix is what identifies the copy; the tail diverges.
 const CONTENT_HASH_MESSAGE_LIMIT = 8

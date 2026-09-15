@@ -30,8 +30,8 @@ function makeState(): ResumableAgentState {
     repos: [{ id: 'repo-1', path: '/Users/ada/repo' }],
     projects: [{ id: 'repo-1', sourceRepoIds: ['repo-1'] }],
     settings: {
-      agentDefaultArgs: { claude: '', codex: '' },
-      agentDefaultEnv: { claude: {}, codex: {} }
+      agentDefaultArgs: { claude: '' },
+      agentDefaultEnv: { claude: {} }
     },
     worktreesByRepo: {
       'repo-1': [{ id: 'repo-1::worktree-1', repoId: 'repo-1', path: '/Users/ada/repo' }]
@@ -39,44 +39,37 @@ function makeState(): ResumableAgentState {
   } as unknown as ResumableAgentState
 }
 
-const KIMI_SESSION = {
-  agent: 'kimi' as const,
-  sessionId: 'session_431324d7-2165-42f0-9ecd-9f93437b3201',
-  cwd: '/Users/ada/repo/packages/api',
-  codexHome: null
+const OPENCODE_SESSION = {
+  agent: 'opencode' as const,
+  sessionId: 'ses_431324d72165',
+  cwd: '/Users/ada/repo/packages/api'
 }
 
-describe('AI Vault resume for Kimi', () => {
+describe('AI Vault resume for OpenCode', () => {
   it('keeps the cd prefix on the copied resume line', () => {
-    // Why: Kimi sessions are work-dir-scoped — resuming from the worktree root instead of the
-    // session's own cwd fails with "created under a different directory".
     expect(
       buildAiVaultResumeCopyCommandForWorktree({
         state: makeState(),
         worktreeId: 'repo-1::worktree-1',
-        session: KIMI_SESSION
+        session: OPENCODE_SESSION
       })
-    ).toBe(
-      "cd '/Users/ada/repo/packages/api' && kimi '--yolo' '--session' 'session_431324d7-2165-42f0-9ecd-9f93437b3201'"
-    )
+    ).toBe("cd '/Users/ada/repo/packages/api' && opencode '--session' 'ses_431324d72165'")
   })
 
   it('takes the resumable-agent startup plan so the pane claims the provider session', () => {
-    // Why: the plan branch applies Kimi's default launch args, so a resumed pane starts with the
-    // same permission flag Orca gives a fresh one.
     expect(
       buildAiVaultResumeStartupForWorktree({
         state: makeState(),
         worktreeId: 'repo-1::worktree-1',
-        session: KIMI_SESSION
+        session: OPENCODE_SESSION
       })
     ).toMatchObject({
-      command: "kimi '--yolo' '--session' 'session_431324d7-2165-42f0-9ecd-9f93437b3201'",
+      command: "opencode '--session' 'ses_431324d72165'",
       cwd: '/Users/ada/repo/packages/api',
-      launchConfig: { agentCommand: "kimi '--yolo'" },
+      launchConfig: { agentCommand: 'opencode' },
       providerSession: {
         key: 'session_id',
-        id: 'session_431324d7-2165-42f0-9ecd-9f93437b3201'
+        id: 'ses_431324d72165'
       }
     })
   })

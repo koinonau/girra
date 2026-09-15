@@ -68,7 +68,7 @@ export function structuredSlashCommands(
     )
   ]
   // Why: a host with no catalog to report would otherwise hide the commands the
-  // agent itself implements, e.g. Codex's `/goal`.
+  // agent itself implements.
   return [
     ...hostOwned,
     ...getTextDrivenNativeChatCommands(agent).filter(
@@ -94,7 +94,7 @@ function structuredRecognizedCommands(agent: AgentType): readonly SlashCommandSu
  *  would be silently dropped, whereas a pass-through command is a real send. */
 export function isStructuredAgentSessionComposerCommand(
   text: string,
-  agent: AgentType = 'codex'
+  agent: AgentType = 'claude'
 ): boolean {
   const command = commandParts(text)
   return Boolean(

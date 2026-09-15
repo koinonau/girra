@@ -8,15 +8,9 @@ import type { ExecutionHostId } from '../../shared/execution-host'
 import { setImmediate as yieldToEventLoop } from 'node:timers/promises'
 import type { RemoteHostPlatform } from '../ssh/ssh-remote-platform'
 import {
-  codexRolloutHardlinkIdentity,
-  dedupeCodexRolloutFileAliases,
-  dedupeCodexSessionsBySessionId
-} from './codex-session-root-dedup'
-import {
   parseRemoteSessionFileCached,
   remoteSessionParseHostKey
 } from './remote-session-parse-cache'
-import { remoteCodexIndexedTitleReader } from './remote-session-scanner-codex-index'
 import { discoverRemoteSourceCandidates } from './remote-session-scanner-discovery'
 import { remoteSessionSources } from './remote-session-scanner-sources'
 import type {
@@ -25,12 +19,10 @@ import type {
   RemoteSessionFilesystemProvider
 } from './remote-session-scanner-types'
 import { sessionSortTime } from './session-scanner-accumulator'
-import { createAntigravityWorkspaceResolver } from './session-scanner-antigravity-history'
 import { errorMessage } from './session-scanner-values'
 import { mapRemoteScanBatches } from './remote-session-scan-batching'
 import { throwIfAiVaultScanCancelled } from './ai-vault-scan-cancellation'
 import { recordSessionScanIssue } from './session-scan-issues'
-import { refreshCodexTitleFromIndex } from './session-scanner-codex-cached-title'
 import { limitRemoteScanFilesystemConcurrency } from './remote-session-scan-concurrency'
 import { aiVaultScanLimit } from '../../shared/ai-vault-session-depth'
 
@@ -62,40 +54,18 @@ export async function scanRemoteAiVaultSessions(args: {
     provider,
     executionHostId: args.executionHostId,
     hostPlatform: args.hostPlatform,
-    signal: args.signal,
-    titleCaches: new Map(),
-    antigravityWorkspaceResolver: createAntigravityWorkspaceResolver(async (historyPath) => {
-      try {
-        throwIfAiVaultScanCancelled(args.signal)
-        const read = await provider.readFile(historyPath)
-        throwIfAiVaultScanCancelled(args.signal)
-        return read.isBinary ? null : read.content
-      } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
-          throw error
-        }
-        return null
-      }
-    })
+    signal: args.signal
   }
-  const candidates = dedupeCodexRolloutFileAliases(
-    (
-      await mapRemoteScanBatches(
-        remoteSessionSources(args.remoteHome, args.hostPlatform),
-        REMOTE_SCAN_CONCURRENCY,
-        (source) => discoverRemoteSourceCandidates({ source, context, issues }),
-        args.signal
-      )
+  const candidates = (
+    await mapRemoteScanBatches(
+      remoteSessionSources(args.remoteHome, args.hostPlatform),
+      REMOTE_SCAN_CONCURRENCY,
+      (source) => discoverRemoteSourceCandidates({ source, context, issues }),
+      args.signal
     )
-      .flat()
-      .sort((left, right) => right.file.mtimeMs - left.file.mtimeMs),
-    {
-      isCodex: (candidate) => candidate.source.agent === 'codex',
-      getFilePath: (candidate) => candidate.file.path,
-      getCodexHome: (candidate) => candidate.source.codexHome ?? null,
-      getHardlinkIdentity: (candidate) => codexRolloutHardlinkIdentity(candidate.file)
-    }
   )
+    .flat()
+    .sort((left, right) => right.file.mtimeMs - left.file.mtimeMs)
 
   const parsed = await parseRemoteSessionCandidates({
     candidates: candidates.slice(0, limit * REMOTE_PARSE_CANDIDATE_MULTIPLIER),
@@ -103,12 +73,11 @@ export async function scanRemoteAiVaultSessions(args: {
     issues,
     limit
   })
-  const parsedSessions = dedupeCodexSessionsBySessionId(parsed.sessions)
-  const cappedSessions = parsedSessions
+  const cappedSessions = parsed.sessions
     .sort((left, right) => sessionSortTime(right) - sessionSortTime(left))
     .slice(0, limit)
   const scopePaths = normalizeRemoteScopePaths(args.scopePaths ?? [])
-  const parsedScopeSessions = parsedSessions.filter((session) =>
+  const parsedScopeSessions = parsed.sessions.filter((session) =>
     isRemoteSessionInScope(session, scopePaths)
   )
   const extraScopeSessions = await scanRemoteInScopeSessions({
@@ -119,10 +88,7 @@ export async function scanRemoteAiVaultSessions(args: {
     limit,
     alreadyParsedFilePaths: parsed.parsedFilePaths
   })
-  const scopeSessions = dedupeCodexSessionsBySessionId([
-    ...parsedScopeSessions,
-    ...extraScopeSessions
-  ])
+  const scopeSessions = [...parsedScopeSessions, ...extraScopeSessions]
     .sort((left, right) => sessionSortTime(right) - sessionSortTime(left))
     .slice(0, limit)
 
@@ -160,8 +126,6 @@ async function parseRemoteSessionCandidates(args: {
       batch.map((candidate) => parseRemoteSessionCandidate(candidate, args.context, args.issues))
     )
     sessions.push(...results.filter(isAiVaultSession))
-    const uniqueSessions = dedupeCodexSessionsBySessionId(sessions)
-    sessions.splice(0, sessions.length, ...uniqueSessions)
     index += batchSize
     await yieldToEventLoop()
   }
@@ -213,7 +177,7 @@ async function scanRemoteInScopeSessions(args: {
   if (index < candidates.length && sessions.length < args.limit) {
     recordSessionScanIssue(args.issues, {
       executionHostId: args.context.executionHostId,
-      agent: 'codex',
+      agent: 'claude',
       kind: 'scope',
       path: 'Agent Session History scan',
       message: `Only the ${REMOTE_SCOPE_PARSE_CANDIDATE_LIMIT} most recent remote transcripts were checked for this workspace; older sessions may be missing.`
@@ -242,8 +206,7 @@ async function parseRemoteSessionCandidate(
           return null
         }
         return await candidate.source.parse(candidate.file, read.content, context)
-      },
-      refreshReusedSession: reusedCodexTitleRefresh(candidate, context)
+      }
     })
     throwIfAiVaultScanCancelled(context.signal)
     // Mirror the local rule: every session carries its sibling subagent
@@ -264,22 +227,6 @@ async function parseRemoteSessionCandidate(
     })
     return null
   }
-}
-
-// Codex thread names live in `<CODEX_HOME>/session_index.jsonl`, not the
-// rollout, and are written after it — so a transcript-keyed cache hit would
-// pin the fallback title forever. Local counterpart:
-// session-scanner-parse-cache.ts's reuse path.
-function reusedCodexTitleRefresh(
-  candidate: RemoteSessionCandidate,
-  context: RemoteScannerContext
-): ((session: AiVaultSession) => Promise<AiVaultSession>) | undefined {
-  const codexHome = candidate.source.agent === 'codex' ? candidate.source.codexHome : undefined
-  if (!codexHome) {
-    return undefined
-  }
-  const readIndexedTitle = remoteCodexIndexedTitleReader(codexHome, context)
-  return (session) => refreshCodexTitleFromIndex(session, readIndexedTitle)
 }
 
 function mergeRemoteSessions(

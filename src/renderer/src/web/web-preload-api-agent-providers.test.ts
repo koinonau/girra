@@ -267,7 +267,7 @@ describe('web AI Vault preload API', () => {
       issues: [
         expect.objectContaining({
           executionHostId: 'local',
-          agent: 'codex'
+          agent: 'claude'
         })
       ],
       scannedAt: expect.any(String)

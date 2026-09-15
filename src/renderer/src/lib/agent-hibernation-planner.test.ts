@@ -133,16 +133,6 @@ describe('agent sleep planner', () => {
     ).toEqual([])
   })
 
-  it('treats an idle done copilot pane as a hibernation candidate', () => {
-    const copilot = entry({
-      agentType: 'copilot',
-      providerSession: { key: 'session_id', id: '940237d9-c712-48e8-bca1-fd75fc4a8d4b' }
-    })
-    expect(
-      plannedPaneKeys(snapshot({ agentStatusByPaneKey: { [copilot.paneKey]: copilot } }))
-    ).toEqual([copilot.paneKey])
-  })
-
   it('blocks done panes until their live subagent roster clears', () => {
     const withIdleTeammate = entry({
       subagents: [
@@ -466,10 +456,6 @@ describe('agent sleep planner', () => {
         id: 'pi-session-1',
         transcriptPath: '/tmp/pi-session-1.jsonl'
       }
-    },
-    {
-      agent: 'omp' as const,
-      providerSession: { key: 'session_id' as const, id: 'omp-session-1' }
     }
   ])(
     'still hibernates completed $agent panes that only retain live resume identity',
@@ -699,21 +685,9 @@ describe('agent sleep planner', () => {
 
 describe('live resume anchors do not block hibernation (#10238 regression)', () => {
   // Why: setAgentStatus writes an `origin: 'live'` anchor for EVERY resumable agent the
-  // moment its turn ends, but only Pi/OMP/prime-agent were exempted from the
-  // already-sleeping rejection — so no Claude or Codex pane could ever hibernate.
-  const NON_PI_AGENTS = [
-    'claude',
-    'codex',
-    'gemini',
-    'antigravity',
-    'opencode',
-    'mimo-code',
-    'droid',
-    'grok',
-    'devin',
-    'copilot',
-    'kimi'
-  ] as const
+  // moment its turn ends, but only Pi was exempted from the already-sleeping
+  // rejection, so no Claude pane could ever hibernate.
+  const NON_PI_AGENTS = ['claude', 'opencode'] as const
 
   function liveAnchor(
     agent: string,
@@ -735,11 +709,7 @@ describe('live resume anchors do not block hibernation (#10238 regression)', () 
   }
 
   it.each(NON_PI_AGENTS)('plans a long-idle done %s pane holding only its live anchor', (agent) => {
-    // Antigravity resumes by conversation id; the rest resume by session id.
-    const providerSession =
-      agent === 'antigravity'
-        ? ({ key: 'conversation_id', id: `${agent}-conversation-1` } as const)
-        : ({ key: 'session_id', id: `${agent}-session-1` } as const)
+    const providerSession = { key: 'session_id', id: `${agent}-session-1` } as const
     const agentEntry = entry({ agentType: agent, providerSession })
     expect(
       plannedPaneKeys(
@@ -794,7 +764,7 @@ describe('idle clock anchors on stateStartedAt, not updatedAt', () => {
       )[0]!.signature
     const baseline = sigFor(base)
     // updatedAt held constant throughout, so today's signature would NOT change.
-    expect(sigFor(entry({ stateStartedAt: OLD, updatedAt: OLD, agentType: 'codex' }))).not.toBe(
+    expect(sigFor(entry({ stateStartedAt: OLD, updatedAt: OLD, agentType: 'opencode' }))).not.toBe(
       baseline
     )
     expect(

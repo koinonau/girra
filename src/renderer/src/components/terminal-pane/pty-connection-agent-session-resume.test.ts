@@ -172,8 +172,8 @@ describe('connectPanePty', () => {
       settings: {
         ...mockStoreState.settings,
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--model changed' },
-        agentDefaultEnv: { codex: { CODEX_PROFILE: 'changed' } }
+        agentDefaultArgs: { claude: '--model changed' },
+        agentDefaultEnv: { claude: { CODEX_PROFILE: 'changed' } }
       },
       agentStatusByPaneKey: {},
       sleepingAgentSessionsByPaneKey: {
@@ -181,8 +181,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -214,7 +214,8 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--model' 'gpt-5' '--reasoning-effort' 'high' 'resume' 'codex-session-1'",
+        command:
+          "codex '--model' 'gpt-5' '--reasoning-effort' 'high' '--resume' 'claude-session-1'",
         env: expect.objectContaining({
           CODEX_PROFILE: 'captured',
           ORCA_PANE_KEY: paneKey,
@@ -226,7 +227,7 @@ describe('connectPanePty', () => {
       })
     )
     expect(mockStoreState.registerAgentLaunchConfig).toHaveBeenCalledWith(paneKey, launchConfig, {
-      agentType: 'codex',
+      agentType: 'claude',
       launchToken,
       tabId: 'tab-1',
       leafId: LEAF_1
@@ -276,7 +277,7 @@ describe('connectPanePty', () => {
     const transport = createMockTransport()
     transportFactoryQueue.push(transport)
     const paneKey = makePaneKey('tab-1', LEAF_1)
-    const launchConfig = { agentCommand: 'codex', agentArgs: '', agentEnv: {} }
+    const launchConfig = { agentCommand: 'claude', agentArgs: '', agentEnv: {} }
     mockStoreState = {
       ...mockStoreState,
       tabsByWorktree: { 'wt-1': [{ id: 'tab-1', ptyId: null }] },
@@ -296,10 +297,10 @@ describe('connectPanePty', () => {
       createManager(1) as never,
       createDeps({
         startup: {
-          command: 'codex',
+          command: 'claude',
           launchConfig,
           launchToken: 'launch-token-1',
-          launchAgent: 'codex'
+          launchAgent: 'claude'
         }
       }) as never
     )
@@ -308,7 +309,7 @@ describe('connectPanePty', () => {
       await new Promise((resolve) => setTimeout(resolve, 70))
 
       expect(mockStoreState.registerAgentLaunchConfig).toHaveBeenCalledWith(paneKey, launchConfig, {
-        agentType: 'codex',
+        agentType: 'claude',
         launchToken: 'launch-token-1',
         tabId: 'tab-1',
         leafId: LEAF_1
@@ -352,15 +353,15 @@ describe('connectPanePty', () => {
       settings: {
         ...mockStoreState.settings,
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--model changed' }
+        agentDefaultArgs: { claude: '--model changed' }
       },
       agentStatusByPaneKey: {
         [paneKey]: {
           paneKey,
           state: 'working',
           prompt: 'finish the task',
-          agentType: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' }
+          agentType: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' }
         }
       },
       agentLaunchConfigByPaneKey: {
@@ -384,14 +385,14 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--model' 'gpt-5-mini' 'resume' 'codex-session-1'",
+        command: "codex '--model' 'gpt-5-mini' '--resume' 'claude-session-1'",
         env: expect.objectContaining({
           ORCA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
         })
       })
     )
     expect(mockStoreState.registerAgentLaunchConfig).toHaveBeenCalledWith(paneKey, launchConfig, {
-      agentType: 'codex',
+      agentType: 'claude',
       launchToken: expect.stringMatching(new RegExp(`^${UUID_RE}$`)),
       tabId: 'tab-1',
       leafId: LEAF_1
@@ -497,15 +498,15 @@ describe('connectPanePty', () => {
       settings: {
         ...mockStoreState.settings,
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--model current' }
+        agentDefaultArgs: { claude: '--model current' }
       },
       agentStatusByPaneKey: {
         [paneKey]: {
           paneKey,
           state: 'working',
           prompt: 'finish the task',
-          agentType: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' }
+          agentType: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' }
         }
       },
       agentLaunchConfigByPaneKey: {
@@ -523,8 +524,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'older-codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'older-claude-session' },
           prompt: 'older task',
           state: 'working',
           capturedAt: 1,
@@ -550,12 +551,12 @@ describe('connectPanePty', () => {
     await new Promise((resolve) => setTimeout(resolve, 70))
 
     expect(mockStoreState.getAgentLaunchConfigForStatusEntry).toHaveBeenCalledWith(
-      expect.objectContaining({ paneKey, agentType: 'codex' })
+      expect.objectContaining({ paneKey, agentType: 'claude' })
     )
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--model' 'current' 'resume' 'codex-session-1'"
+        command: "claude '--model' 'current' '--resume' 'claude-session-1'"
       })
     )
     expect(mockStoreState.registerAgentLaunchConfig).toHaveBeenCalledWith(
@@ -564,7 +565,7 @@ describe('connectPanePty', () => {
         agentArgs: '--model current'
       }),
       expect.objectContaining({
-        agentType: 'codex',
+        agentType: 'claude',
         tabId: 'tab-1',
         leafId: LEAF_1
       })
@@ -613,8 +614,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,

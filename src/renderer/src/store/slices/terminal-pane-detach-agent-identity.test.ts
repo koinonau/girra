@@ -55,7 +55,7 @@ describe('syncPaneDetachPtyOwnership agent identity', () => {
           paneKey: sourcePaneKey,
           tabId: sourceTabId,
           worktreeId,
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'session-1' },
           prompt: 'continue',
           state: 'working',

@@ -146,7 +146,7 @@ describe('structured agent-session owner probe', () => {
       record(null, { claimStatus: 'reserved', reservedSpawnToken: 'token-1' })
     )
 
-    // Evicting here would put a second writer on a live Codex thread.
+    // Evicting here would put a second writer on a live provider session.
     expect(result.outcome).toBe('indeterminate')
   })
 
@@ -231,7 +231,6 @@ describe('structured agent-session runtime install', () => {
         claimKeyId: 'key-1',
         resolveWorkspacePath: async () => stateDirectory!,
         resolveClaudeAuthPolicy: () => ({ stripAuthEnv: true }),
-        resolveEnvironment: async () => ({}),
         reapOrphanChildren,
         onError
       })
@@ -258,7 +257,6 @@ describe('structured agent-session runtime install', () => {
         claimKeyId: 'key-1',
         resolveWorkspacePath: async () => stateDirectory!,
         resolveClaudeAuthPolicy: () => ({ stripAuthEnv: true }),
-        resolveEnvironment: async () => ({}),
         reapOrphanChildren: async () => {
           throw failure
         }
@@ -290,12 +288,11 @@ describe('structured agent-session runtime install', () => {
         hostId: HOST_ID,
         claimKeyId: 'key-1',
         resolveWorkspacePath: async () => stateDirectory!,
-        resolveEnvironment: async () => ({}),
         resolveClaudeAuthPolicy: () => ({ stripAuthEnv: true }),
         readProcessStartTime: async () => 1_700_000_000_000
       })
 
-      expect(host.supportsCreate(location, 'codex')).toBe(false)
+      expect(host.supportsCreate(location, 'claude')).toBe(false)
     } finally {
       __setWindowsProcessTreeLoaderForTests()
       Object.defineProperty(process, 'platform', { configurable: true, value: originalPlatform })
@@ -312,8 +309,8 @@ describe('a teardown that fails is retried by the next stop', () => {
     sessionId: 'session-teardown-retry',
     workspaceId: 'ws-1',
     hostId: HOST_ID,
-    agent: 'codex',
-    providerHandle: { kind: 'codex', threadId: 'thread-1' }
+    agent: 'claude',
+    providerHandle: { kind: 'claude', sessionId: 'claude-session-1', leafUuid: null }
   }
   const journals = createTrackedJournalOpener()
   let directory: string | null = null
@@ -335,7 +332,6 @@ describe('a teardown that fails is retried by the next stop', () => {
       hostId: HOST_ID,
       claimKeyId: 'key-1',
       resolveWorkspacePath: async () => directory!,
-      resolveEnvironment: async () => ({}),
       reapOrphanChildren: async () => [],
       resolveClaudeAuthPolicy: () => ({ stripAuthEnv: true })
     })

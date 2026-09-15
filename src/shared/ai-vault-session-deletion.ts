@@ -21,29 +21,8 @@ export type AiVaultDeleteSessionResult =
 // wrote is derivable from the one path the scanner surfaced, and none of it is
 // shared with another session.
 //
-// The rest are excluded, recorded here because the UI deliberately won't say
-// why (a provider's storage layout is Orca's problem, not the reader's):
-// - antigravity, kimi: a separate registry (history.jsonl / session_index.jsonl)
-//   would keep a dangling entry. Antigravity's carries no conversation id, so
-//   which line to drop can't be determined at all.
-// - codex: session_index.jsonl plus hardlink aliases between the Orca-managed
-//   home and ~/.codex, so a one-sided delete reappears on the next scan.
-// - opencode 1.17.x: a SQLite row, not a file.
-export const AI_VAULT_DELETABLE_AGENTS = [
-  'gemini',
-  'copilot',
-  'cursor',
-  'hermes',
-  'devin',
-  'openclaw',
-  'droid',
-  'pi',
-  'omp',
-  'claude',
-  'rovo',
-  'grok',
-  'cline'
-] as const satisfies readonly AiVaultAgent[]
+// OpenCode is excluded: a 1.17.x session is a SQLite row, not a file.
+export const AI_VAULT_DELETABLE_AGENTS = ['pi', 'claude'] as const satisfies readonly AiVaultAgent[]
 
 export type AiVaultDeletableAgent = (typeof AI_VAULT_DELETABLE_AGENTS)[number]
 
@@ -67,8 +46,8 @@ export type AiVaultSessionDeleteRejectionCode =
   // The scanner would never have surfaced this path as a session row, so it is
   // not a session to delete (wrong extension, or a pruned subagent transcript).
   | 'undiscoverable-path'
-  // A directory-shaped agent's file sits directly in the sessions root, so it
-  // names no session dir of its own — removing it would trash every session.
+  // A Claude transcript stem names no session dir of its own, so removing its
+  // derived dir would trash every session beside it.
   | 'no-session-directory'
   // fs-side guard: lstat disagrees with the removal's declared kind (a symlink,
   // or a file where the plan expects a directory).

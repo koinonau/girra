@@ -118,14 +118,9 @@ export class OrcaRuntimeWithSerializeAgentPromptSubmission extends OrcaRuntimeWi
         result.available &&
         recognizeAgentProcess(result.process) !== null
       ) {
-        // Codex's final native spinner can arrive after its done hook, then clear to the cwd.
-        const confirmedStatus =
-          recoverCompletedHook && recognizeAgentProcess(result.process)?.agent === 'codex'
-            ? 'idle'
-            : undefined
         const restoredStatus = this.ptyTitleTrackersByPtyId
           .get(ptyId)
-          ?.tracker.restoreLastAgentExit(confirmedStatus)
+          ?.tracker.restoreLastAgentExit()
         if (restoredStatus !== null && restoredStatus !== undefined) {
           current.lastAgentStatus = restoredStatus
           if (restoredStatus === 'idle') {

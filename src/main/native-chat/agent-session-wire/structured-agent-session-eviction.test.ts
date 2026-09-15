@@ -103,7 +103,7 @@ describe('structured agent session eviction', () => {
   })
 })
 
-// Closing the codex child is not silent: the adapter emits its `ended` event and flushes coalesced
+// Closing the provider child is not silent: the adapter emits its `ended` event and flushes coalesced
 // text as it shuts down, and those rows are what clear the running-turn marker. If the sink is
 // already closed the journal keeps claiming the agent is working, forever.
 describe('rows the provider emits while closing', () => {
@@ -119,7 +119,7 @@ describe('rows the provider emits while closing', () => {
       eventSink: sink,
       adapter: {
         closeSession: async () => {
-          // What codex-structured-session-close does on its way out.
+          // What a provider adapter's close does on its way out.
           sink.sink.publish()
           return true
         }

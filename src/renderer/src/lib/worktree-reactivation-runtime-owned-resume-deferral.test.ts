@@ -47,7 +47,7 @@ function baseState(worktree: ReturnType<typeof makeCreatedAgentWorktree>): Parti
     activeRepoId: 'repo-1',
     activeView: 'terminal',
     tabsByWorktree: {
-      [worktree.id]: [{ id: WEB_TAB_ID, title: 'Codex', ptyId: null } as never]
+      [worktree.id]: [{ id: WEB_TAB_ID, title: 'Claude', ptyId: null } as never]
     },
     unifiedTabsByWorktree: {
       [worktree.id]: [
@@ -111,7 +111,7 @@ function seedSleepingRecord(worktreeId: string, sessionId: string): string {
         paneKey,
         tabId: WEB_TAB_ID,
         worktreeId,
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         providerSession: { key: 'session_id' as const, id: sessionId },
         prompt: 'keep working',
         state: 'working' as const,
@@ -119,7 +119,7 @@ function seedSleepingRecord(worktreeId: string, sessionId: string): string {
         origin: 'live' as const,
         capturedAt: 1000,
         updatedAt: 1000,
-        terminalTitle: 'Codex'
+        terminalTitle: 'Claude'
       }
     }
   }))
@@ -134,7 +134,7 @@ describe('runtime-owned worktree activation with an unhydrated host mirror', () 
   it('does not relaunch a resume tab while remote PTY liveness is unknown', () => {
     const worktree = makeRuntimeOwnedWorktree()
     useAppStore.setState(baseState(worktree))
-    const paneKey = seedSleepingRecord(worktree.id, 'codex-session-live-1')
+    const paneKey = seedSleepingRecord(worktree.id, 'claude-session-live-1')
 
     activateAndRevealWorktree(worktree.id, { notifyHostRuntime: false })
 
@@ -153,7 +153,7 @@ describe('runtime-owned worktree activation with an unhydrated host mirror', () 
     const state = baseState(worktree)
     state.ptyIdsByTabId = { [WEB_TAB_ID]: ['pty-host-old-1'] }
     useAppStore.setState(state)
-    const paneKey = seedSleepingRecord(worktree.id, 'codex-session-live-2')
+    const paneKey = seedSleepingRecord(worktree.id, 'claude-session-live-2')
 
     activateAndRevealWorktree(worktree.id, { notifyHostRuntime: false })
 
@@ -175,7 +175,7 @@ describe('runtime-owned worktree activation with an unhydrated host mirror', () 
     // Local husk tab: same shape, non-mirror tab id.
     const localTabId = 'husk-tab-1'
     state.tabsByWorktree = {
-      [worktree.id]: [{ id: localTabId, title: 'Codex', ptyId: null } as never]
+      [worktree.id]: [{ id: localTabId, title: 'Claude', ptyId: null } as never]
     }
     state.unifiedTabsByWorktree = {
       [worktree.id]: [
@@ -212,14 +212,14 @@ describe('runtime-owned worktree activation with an unhydrated host mirror', () 
           paneKey,
           tabId: localTabId,
           worktreeId: worktree.id,
-          agent: 'codex' as const,
-          providerSession: { key: 'session_id' as const, id: 'codex-session-dead-1' },
+          agent: 'claude' as const,
+          providerSession: { key: 'session_id' as const, id: 'claude-session-dead-1' },
           prompt: 'resume prior task',
           state: 'working' as const,
           origin: 'quit' as const,
           capturedAt: 1000,
           updatedAt: 1000,
-          terminalTitle: 'Codex'
+          terminalTitle: 'Claude'
         }
       }
     }))
@@ -233,7 +233,7 @@ describe('runtime-owned worktree activation with an unhydrated host mirror', () 
     const replacement = tabs.find((tab) => tab.id !== localTabId)!
     expect(after.automaticAgentResumeClaimsByTabId[replacement.id]?.providerSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-dead-1'
+      id: 'claude-session-dead-1'
     })
   })
 })

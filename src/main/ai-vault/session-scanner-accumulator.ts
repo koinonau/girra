@@ -90,13 +90,13 @@ export function accumulatorSessionIdentity(
   }
 }
 
-export function cloneSessionAccumulator(accumulator: SessionAccumulator): SessionAccumulator {
+function cloneSessionAccumulator(accumulator: SessionAccumulator): SessionAccumulator {
   return { ...accumulator, previewMessages: [...accumulator.previewMessages] }
 }
 
 // Resumable fold for parsers whose only parse state is the accumulator itself
-// (cursor, copilot, droid, openclaw/pi, gemini-jsonl). Parsers with extra
-// closure state (claude, codex) build their own ResumableSessionParseState.
+// (pi). Parsers with extra closure state (claude) build their own
+// ResumableSessionParseState.
 export function accumulatorFoldResumeState(
   accumulator: SessionAccumulator,
   consumeRecordLine: (accumulator: SessionAccumulator, line: string) => void
@@ -111,9 +111,6 @@ export function accumulatorFoldResumeState(
     },
     // Finalize a snapshot: the live accumulator (and its preview array) keeps
     // accumulating appended lines after this session object is handed out.
-    // A sibling file's metadata is merged onto this result by the parse cache,
-    // never into the fold, so re-merging it later starts from what the
-    // transcript alone said (see session-scanner-sidecar-enrichment.ts).
     finalize: (platform, options) =>
       finalizeSession(cloneSessionAccumulator(accumulator), platform, options)
   }
@@ -123,7 +120,6 @@ export function finalizeSession(
   accumulator: SessionAccumulator,
   platform: NodeJS.Platform,
   options: {
-    codexHome?: string | null
     executionHostId?: ExecutionHostId
     executionHostPlatform?: NodeJS.Platform | null
   } = {}
@@ -152,7 +148,7 @@ export function finalizeSession(
     branch: accumulator.branch,
     model: accumulator.model,
     filePath: accumulator.filePath,
-    codexHome: accumulator.agent === 'codex' ? (options.codexHome ?? null) : null,
+    codexHome: null,
     createdAt: accumulator.createdAt,
     updatedAt: accumulator.updatedAt,
     modifiedAt: accumulator.modifiedAt,
@@ -167,21 +163,15 @@ export function finalizeSession(
     resumeCommand: buildAiVaultResumeCommand({
       agent: accumulator.agent,
       sessionId,
-      resumeFilePath: accumulator.filePath,
       cwd: accumulator.cwd,
-      platform,
-      codexHome: options.codexHome
+      platform
     }),
     subagent: null
   }
 }
 
-/**
- * The title a session gets when neither the transcript nor the agent named it.
- * Exported so a later merge can tell "the fold found no title" from a real one
- * without re-deriving the string (session-scanner-sidecar-enrichment.ts).
- */
-export function generatedSessionTitle(agent: AiVaultAgent, sessionId: string): string {
+/** The title a session gets when neither the transcript nor the agent named it. */
+function generatedSessionTitle(agent: AiVaultAgent, sessionId: string): string {
   return `${aiVaultAgentLabel(agent)} ${sessionId.slice(0, 8)}`
 }
 
@@ -309,7 +299,7 @@ export function seedFullFirstUserPrompt(
   }
 }
 
-export function timestampIso(value: unknown): string | null {
+function timestampIso(value: unknown): string | null {
   const parsed = timestampMs(value)
   return Number.isFinite(parsed) ? new Date(parsed).toISOString() : null
 }

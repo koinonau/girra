@@ -141,9 +141,9 @@ describe('send', () => {
     await attach()
     dispatch.mockImplementationOnce(async () => ({
       state: 'unknown' as const,
-      reason: 'codex app-server started a turn it did not name in time'
+      reason: 'provider started a turn it did not name in time'
     }))
-    const body = hostTestMessage('a turn codex owns but did not name')
+    const body = hostTestMessage('a turn the provider owns but did not name')
     const params = { envelope: envelope('agentSession.send', { body }), body }
 
     const first = await host.send(CALLER, params)

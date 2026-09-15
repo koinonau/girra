@@ -7,25 +7,17 @@ import { OrcaRuntimeService } from './orca-runtime'
 
 const {
   probeAgentSessionProcessIdentity,
-  proveCodexTuiRollout,
   readClaudeTranscriptLeafUuid,
   readStructuredTuiProcessIdentity,
-  resolveSessionFilePath,
-  resolvePinnedCodexRolloutProof
+  resolveSessionFilePath
 } = vi.hoisted(() => ({
   probeAgentSessionProcessIdentity: vi.fn(),
-  proveCodexTuiRollout: vi.fn(),
   readClaudeTranscriptLeafUuid: vi.fn(),
   readStructuredTuiProcessIdentity: vi.fn(),
-  resolveSessionFilePath: vi.fn(),
-  resolvePinnedCodexRolloutProof: vi.fn()
+  resolveSessionFilePath: vi.fn()
 }))
 
 vi.mock('./structured-tui-process-identity', () => ({ readStructuredTuiProcessIdentity }))
-vi.mock('../codex/codex-tui-rollout-proof', () => ({
-  proveCodexTuiRollout,
-  resolvePinnedCodexRolloutProof
-}))
 vi.mock('../native-chat/session-file-resolver', () => ({
   readClaudeTranscriptLeafUuid,
   resolveSessionFilePath
@@ -60,17 +52,20 @@ describe('structured TUI launch tab binding', () => {
       machine: 'native:test',
       principal: 'uid:1',
       container: 'native',
-      providerRoot: '/tmp/codex-home'
+      providerRoot: '/tmp/claude-home'
     }
     const signer = createEphemeralAgentSessionClaimSigner('profile-test')
     const claim = signer.createClaim({
       namespace,
-      identity: { agent: 'codex', providerSession: { key: 'session_id', id: 'thread-1' } },
+      identity: { agent: 'claude', providerSession: { key: 'session_id', id: 'session-1-claude' } },
       canonicalWorktreeId: WORKTREE_ID
     })
     const terminalHandle = 'term_cold_owner'
     const leafId = '23013912-13f8-44e5-818f-d40a1ff4e8c5'
-    resolvePinnedCodexRolloutProof.mockResolvedValue('/tmp/codex-home/sessions/thread-1.jsonl')
+    resolveSessionFilePath.mockResolvedValue(
+      '/tmp/claude-home/projects/worktree/session-1-claude.jsonl'
+    )
+    readClaudeTranscriptLeafUuid.mockResolvedValue('leaf-cold')
     const writeAgentSessionProof = vi.fn(() => false)
     const runtime = new OrcaRuntimeService(undefined, undefined, {
       agentSessionClaimSigner: signer
@@ -81,7 +76,7 @@ describe('structured TUI launch tab binding', () => {
           id: 'pty-cold-owner',
           incarnationId: 'incarnation-1',
           cwd: '/tmp/structured-handoff',
-          title: 'codex',
+          title: 'claude',
           worktreeId: WORKTREE_ID,
           terminalHandle,
           agentSessionOwners: [
@@ -139,9 +134,6 @@ describe('structured TUI launch tab binding', () => {
       folderWorkspace: null
     }))
     internal.getAgentSessionExecutionNamespace = () => namespace
-    proveCodexTuiRollout.mockResolvedValueOnce({
-      transcriptPath: '/tmp/codex-home/sessions/thread-1.jsonl'
-    })
     probeAgentSessionProcessIdentity.mockResolvedValue({
       outcome: 'identity-matched',
       matchedOn: ['process-start-time']
@@ -181,13 +173,18 @@ describe('structured TUI launch tab binding', () => {
     coldPty.tabId = 'tab-cold-owner'
     coldPty.paneKey = `tab-cold-owner:${leafId}`
     coldPty.launchToken = 'spawn-token'
-    coldPty.launchAgent = 'codex'
+    coldPty.launchAgent = 'claude'
 
     const owner = await internal.createStructuredAgentSessionHandoffTransport().recoverTuiOwner({
       sessionId: 'session-1',
       location: { workspaceId: WORKTREE_ID, executionHostId: 'local' },
-      accountHome: { variable: 'CODEX_HOME', path: namespace.providerRoot },
-      providerHandleChain: [{ handle: { provider: 'codex', threadId: 'thread-1' }, observedAt: 1 }],
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: namespace.providerRoot },
+      providerHandleChain: [
+        {
+          handle: { provider: 'claude', sessionId: 'session-1-claude', leafUuid: null },
+          observedAt: 1
+        }
+      ],
       lease: {
         ownerProcess: {
           hostId: 'local',
@@ -205,15 +202,12 @@ describe('structured TUI launch tab binding', () => {
       paneKey: `tab-cold-owner:${leafId}`,
       ptyId: 'pty-cold-owner'
     })
-    expect(proveCodexTuiRollout).toHaveBeenCalledWith(
-      expect.objectContaining({
-        codexHome: namespace.providerRoot,
-        threadId: 'thread-1',
-        readOutput: expect.any(Function),
-        write: expect.any(Function)
-      })
-    )
-    expect(resolvePinnedCodexRolloutProof).not.toHaveBeenCalled()
+    expect(owner.transcriptPath).toBe('/tmp/claude-home/projects/worktree/session-1-claude.jsonl')
+    expect(owner.link.handle).toEqual({
+      provider: 'claude',
+      sessionId: 'session-1-claude',
+      leafUuid: 'leaf-cold'
+    })
     expect(writeAgentSessionProof).not.toHaveBeenCalled()
     expect(agentSessionPtyWriteGate.boundSessionId('pty-cold-owner')).toBe('session-1')
     agentSessionPtyWriteGate.unbindPty('pty-cold-owner')
@@ -472,7 +466,7 @@ describe('structured TUI launch tab binding', () => {
           disabledTuiAgents: [],
           agentCmdOverrides: {},
           agentDefaultArgs: {
-            codex: '-m gpt-5.6-sol -c model_reasoning_effort=high'
+            claude: '--model sonnet --effort high'
           },
           agentDefaultEnv: {}
         })
@@ -502,7 +496,7 @@ describe('structured TUI launch tab binding', () => {
       }>
       markLocalWorkspaceTrustedForAgent(): void
       waitForTerminal(): Promise<unknown>
-      waitForAdoptedStructuredTuiProof(): Promise<{ transcriptPath?: string }>
+      waitForStructuredClaudeTuiProof(): Promise<{ transcriptPath: string; leafUuid: string }>
       waitForStructuredTuiPtyExit(): Promise<void>
       closeTerminal(handle: string): Promise<unknown>
       handles: Map<
@@ -525,7 +519,11 @@ describe('structured TUI launch tab binding', () => {
     internal.markLocalWorkspaceTrustedForAgent = vi.fn()
     const waitForTerminal = vi.fn(async () => ({}))
     internal.waitForTerminal = waitForTerminal
-    const waitForAdoptedStructuredTuiProof = vi.fn(async () => {
+    const waitForStructuredClaudeTuiProof = vi.fn(async () => {
+      // Only the launch proof runs before reveal; the reprove below runs after it.
+      if (waitForStructuredClaudeTuiProof.mock.calls.length > 1) {
+        return { transcriptPath: '/tmp/transcript.jsonl', leafUuid: 'leaf-1' }
+      }
       const snapshot = await runtime.listMobileSessionTabs(`id:${WORKTREE_ID}`)
       expect(snapshot.tabs).toContainEqual(
         expect.objectContaining({
@@ -537,9 +535,9 @@ describe('structured TUI launch tab binding', () => {
         })
       )
       expect(revealTerminalSession).not.toHaveBeenCalled()
-      return { transcriptPath: '/tmp/rollout.jsonl' }
+      return { transcriptPath: '/tmp/transcript.jsonl', leafUuid: 'leaf-1' }
     })
-    internal.waitForAdoptedStructuredTuiProof = waitForAdoptedStructuredTuiProof
+    internal.waitForStructuredClaudeTuiProof = waitForStructuredClaudeTuiProof
     const waitForStructuredTuiPtyExit = vi.fn(async () => {})
     internal.waitForStructuredTuiPtyExit = waitForStructuredTuiPtyExit
     const closeTerminal = vi.fn(async () => undefined)
@@ -561,11 +559,14 @@ describe('structured TUI launch tab binding', () => {
       record: {
         sessionId: 'session-1',
         location: { workspaceId: WORKTREE_ID, executionHostId: 'local' },
-        accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex-home' },
-        launchArgs: ['--search'],
-        options: { model: 'gpt-5.6-terra', effort: 'medium' },
+        accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude-home' },
+        launchArgs: ['--verbose'],
+        options: { model: 'opus', effort: 'medium' },
         providerHandleChain: [
-          { handle: { provider: 'codex', threadId: 'thread-1' }, observedAt: 1 }
+          {
+            handle: { provider: 'claude', sessionId: 'session-1-claude', leafUuid: null },
+            observedAt: 1
+          }
         ]
       } as never,
       fence: 3,
@@ -586,7 +587,7 @@ describe('structured TUI launch tab binding', () => {
       expect.any(String),
       expect.objectContaining({ condition: 'tui-idle' })
     )
-    expect(waitForAdoptedStructuredTuiProof).toHaveBeenCalledOnce()
+    expect(waitForStructuredClaudeTuiProof).toHaveBeenCalledOnce()
     expect(onSpawned).toHaveBeenCalledWith(
       expect.objectContaining({
         terminal: expect.objectContaining({ ptyId: 'pty-structured' }),
@@ -596,15 +597,13 @@ describe('structured TUI launch tab binding', () => {
     expect(onSpawned.mock.invocationCallOrder[0]).toBeLessThan(
       waitForTerminal.mock.invocationCallOrder[0]!
     )
-    expect(waitForAdoptedStructuredTuiProof.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(waitForStructuredClaudeTuiProof.mock.invocationCallOrder[0]).toBeLessThan(
       revealTerminalSession.mock.invocationCallOrder[0]!
     )
     const launchCommand = spawn.mock.calls[0]?.[0]?.command
-    expect(launchCommand).toContain("'-m' 'gpt-5.6-terra'")
-    expect(launchCommand).toContain("'-c' 'model_reasoning_effort=medium'")
-    expect(launchCommand).toContain("'--search'")
-    expect(launchCommand).not.toContain('gpt-5.6-sol')
-    expect(launchCommand).not.toContain('model_reasoning_effort=high')
+    expect(launchCommand).toContain("'--verbose'")
+    expect(launchCommand).toContain('opus')
+    expect(launchCommand).not.toContain('sonnet')
 
     Object.assign(internal.handles.get(owner.terminal.handle)!, {
       rendererGraphEpoch: -1,
@@ -671,8 +670,14 @@ describe('structured TUI launch tab binding', () => {
     pty.launchToken = null
     const persistedRecord = {
       sessionId: 'session-1',
-      providerHandleChain: [{ handle: { provider: 'codex', threadId: 'thread-1' }, observedAt: 1 }],
-      lease: { ownerProcess: owner.process, provenHandleLinkId: owner.link.linkId }
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude-home' },
+      providerHandleChain: [
+        {
+          handle: { provider: 'claude', sessionId: 'session-1-claude', leafUuid: null },
+          observedAt: 1
+        }
+      ],
+      lease: { ownerProcess: owner.process, provenHandleLinkId: owner.link.linkId, runtimeFence: 3 }
     } as never
 
     const rebound = await transport.reproveTuiOwner({ record: persistedRecord, owner })
@@ -684,10 +689,10 @@ describe('structured TUI launch tab binding', () => {
     expect(rebound.terminal.handle).not.toBe(owner.terminal.handle)
     await transport.waitForTuiExit(rebound)
     expect(waitForStructuredTuiPtyExit).toHaveBeenCalledWith('pty-structured')
-    expect(waitForAdoptedStructuredTuiProof).toHaveBeenCalledOnce()
+    expect(waitForStructuredClaudeTuiProof).toHaveBeenCalledTimes(2)
 
     await expect(transport.closeTuiOwner?.(rebound)).resolves.toEqual({
-      transcriptPath: '/tmp/rollout.jsonl'
+      transcriptPath: '/tmp/transcript.jsonl'
     })
     expect(closeTerminal).toHaveBeenCalledWith(rebound.terminal.handle)
 

@@ -63,8 +63,8 @@ vi.mock('@/i18n/i18n', () => ({
 }))
 
 vi.mock('@/lib/agent-catalog', () => ({
-  getAgentLabel: () => 'Codex',
-  getAgentCatalog: () => [{ id: 'codex', label: 'Codex' }]
+  getAgentLabel: () => 'Claude',
+  getAgentCatalog: () => [{ id: 'claude', label: 'Claude' }]
 }))
 
 import type { StructuredAgentSessionLaunchIntent } from '@/lib/launch-structured-agent-session'
@@ -79,7 +79,7 @@ function launchIntent(worktreeId: string, sessionId: string): StructuredAgentSes
   return {
     worktreeId,
     sessionId,
-    agent: 'codex',
+    agent: 'claude',
     params: {
       envelope: {
         sessionId,
@@ -88,7 +88,7 @@ function launchIntent(worktreeId: string, sessionId: string): StructuredAgentSes
         payloadFingerprint: `fingerprint-${sessionId}`
       },
       worktree: `id:${worktreeId}`,
-      agent: 'codex'
+      agent: 'claude'
     }
   }
 }
@@ -105,9 +105,9 @@ function publishedSnapshot(worktreeId: string, sessionId: string): RuntimeMobile
       {
         type: 'agent-session',
         id: 'tab-1',
-        title: 'Codex',
+        title: 'Claude',
         sessionId,
-        agent: 'codex',
+        agent: 'claude',
         isActive: true
       }
     ]
@@ -146,8 +146,8 @@ describe('coalesced launch delivery mode', () => {
       publishedSnapshot(args.worktreeId, intent.sessionId)
     ])
 
-    startStructuredAgentLaunch(args.worktreeId, 'codex', args.established)
-    const joiner = startStructuredAgentLaunch(args.worktreeId, 'codex', args.joining)
+    startStructuredAgentLaunch(args.worktreeId, 'claude', args.established)
+    const joiner = startStructuredAgentLaunch(args.worktreeId, 'claude', args.joining)
     resolveLaunch({ sessionId: intent.sessionId, fence: 1 })
     await flushLaunchSettlement()
     return { intent, joiner }

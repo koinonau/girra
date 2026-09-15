@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type * as NodeFsPromisesModule from 'node:fs/promises'
 
-const UNC_PATH = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout.jsonl'
+const UNC_PATH = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\session.jsonl'
 const EMPTY_STATS = { size: 0, mtimeMs: 1, ctimeMs: 1, ino: 1, dev: 1 }
 
 const mocks = vi.hoisted(() => ({
@@ -64,7 +64,7 @@ describe('installed WSL transcript watcher lifecycle', () => {
   it('settles the guarded initial drain when the distro stops after install', async () => {
     const onInitialSnapshot = vi.fn()
     const subscription = await installTranscriptWatcher(UNC_PATH, () => null, {
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-session',
       reconciliationIntervalMs: 100,
       onAppend: () => {},
@@ -84,7 +84,7 @@ describe('installed WSL transcript watcher lifecycle', () => {
   it('does not settle after unsubscribe wins a delayed running probe', async () => {
     const onInitialSnapshot = vi.fn()
     const subscription = await installTranscriptWatcher(UNC_PATH, () => null, {
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-session',
       onAppend: () => {},
       onInitialSnapshot
@@ -108,7 +108,7 @@ describe('installed WSL transcript watcher lifecycle', () => {
 
   it('suspends observation while stopped and resumes after an explicit start', async () => {
     const subscription = await installTranscriptWatcher(UNC_PATH, () => null, {
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-session',
       reconciliationIntervalMs: 100,
       onAppend: () => {}
@@ -131,7 +131,7 @@ describe('installed WSL transcript watcher lifecycle', () => {
 
   it('returns the running reconciliation promise to the shared observer', async () => {
     const subscription = await installTranscriptWatcher(UNC_PATH, () => null, {
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-session',
       onAppend: () => {}
     })
@@ -154,7 +154,7 @@ describe('installed WSL transcript watcher lifecycle', () => {
 
   it('defers a failed observed UNC probe to the next shared observation', async () => {
     const subscription = await installTranscriptWatcher(UNC_PATH, () => null, {
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-session',
       onAppend: () => {}
     })

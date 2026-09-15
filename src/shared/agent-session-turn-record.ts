@@ -31,12 +31,9 @@ export function agentJournalTurnBody(turn: AgentJournalTurnLifecycle): AgentJour
   return { kind: 'turn', ...turn }
 }
 
-/** The pre-v3 carrier, for clients that predate the `turn` item. The agent name
- *  comes from the lifecycle identity (`legacy:<agent>:…`). */
+/** The pre-v3 carrier, for clients that predate the `turn` item. */
 export function legacyAgentJournalTurnStatusBody(
-  turn: AgentJournalTurnLifecycle,
-  itemId: string
+  turn: AgentJournalTurnLifecycle
 ): AgentJournalStatusItem {
-  const agent = itemId.startsWith('legacy:claude:') ? 'Claude' : 'Codex'
-  return { kind: 'status', text: agentTurnLifecycleText(agent, turn.state), turnLifecycle: turn }
+  return { kind: 'status', text: agentTurnLifecycleText(turn.state), turnLifecycle: turn }
 }

@@ -67,7 +67,7 @@ describe('walkSessionFiles WSL gate refusals', () => {
   it('rethrows gate refusals instead of reporting an empty tree', async () => {
     const refusal = new WslTranscriptFsError('timeout', 'slow share')
     await expect(
-      walkSessionFiles('\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions', 'codex', [], {
+      walkSessionFiles('\\\\wsl.localhost\\Ubuntu\\home\\ada\\.pi\\agent\\sessions', 'pi', [], {
         extensions: new Set(['.jsonl']),
         readDirectory: async () => {
           throw refusal
@@ -78,7 +78,7 @@ describe('walkSessionFiles WSL gate refusals', () => {
 
   it('still treats ordinary readdir failures as an empty tree', async () => {
     await expect(
-      walkSessionFiles('/missing/root', 'codex', [], {
+      walkSessionFiles('/missing/root', 'pi', [], {
         extensions: new Set(['.jsonl']),
         readDirectory: async () => {
           throw Object.assign(new Error('no such directory'), { code: 'ENOENT' })
@@ -89,7 +89,7 @@ describe('walkSessionFiles WSL gate refusals', () => {
 })
 
 describe('discoverFiles containment for a stalled WSL root', () => {
-  const UNC_ROOT = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions'
+  const UNC_ROOT = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.pi\\agent\\sessions'
 
   it('contains a stalled readdir to one root so a Promise.all fan-out still resolves', async () => {
     vi.useFakeTimers()
@@ -101,14 +101,14 @@ describe('discoverFiles containment for a stalled WSL root', () => {
       const discovery = discoverFiles({
         rootDir: UNC_ROOT,
         limit: 10,
-        agent: 'codex',
+        agent: 'pi',
         issues,
         extensions: ['.jsonl']
       })
       const healthy = discoverFiles({
-        rootDir: '/home/ada/.codex/sessions',
+        rootDir: '/home/ada/.pi/agent/sessions',
         limit: 10,
-        agent: 'codex',
+        agent: 'pi',
         issues: [],
         extensions: ['.jsonl']
       })
@@ -116,10 +116,10 @@ describe('discoverFiles containment for a stalled WSL root', () => {
       await vi.advanceTimersByTimeAsync(WSL_TRANSCRIPT_FS_SCAN_TIMEOUT_MS + 1)
 
       await expect(Promise.all([discovery, healthy])).resolves.toEqual([
-        { agent: 'codex', rootDir: UNC_ROOT, files: [] },
-        { agent: 'codex', rootDir: '/home/ada/.codex/sessions', files: [] }
+        { agent: 'pi', rootDir: UNC_ROOT, files: [] },
+        { agent: 'pi', rootDir: '/home/ada/.pi/agent/sessions', files: [] }
       ])
-      expect(issues).toEqual([{ agent: 'codex', path: UNC_ROOT, message: SLOW_MESSAGE }])
+      expect(issues).toEqual([{ agent: 'pi', path: UNC_ROOT, message: SLOW_MESSAGE }])
     }
   })
 
@@ -133,7 +133,7 @@ describe('discoverFiles containment for a stalled WSL root', () => {
       const discovery = discoverFiles({
         rootDir: UNC_ROOT,
         limit: 10,
-        agent: 'codex',
+        agent: 'pi',
         issues,
         extensions: ['.jsonl']
       })
@@ -142,7 +142,7 @@ describe('discoverFiles containment for a stalled WSL root', () => {
       // stuck, every later file fast-fails on the route instead of queueing.
       await vi.advanceTimersByTimeAsync(WSL_TRANSCRIPT_FS_SCAN_TIMEOUT_MS * 2 + 2)
 
-      await expect(discovery).resolves.toEqual({ agent: 'codex', rootDir: UNC_ROOT, files: [] })
+      await expect(discovery).resolves.toEqual({ agent: 'pi', rootDir: UNC_ROOT, files: [] })
       expect(issues).toHaveLength(names.length)
       expect(issues.every((issue) => issue.path.startsWith(UNC_ROOT))).toBe(true)
     }

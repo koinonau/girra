@@ -246,9 +246,9 @@ function relayTimeoutError(): Error {
 // the full session schema rather than a partial stub.
 function remoteSession(): AiVaultSession {
   return {
-    id: 'ssh:dev-box:codex:remote-session:/home/dev/remote-session.jsonl',
+    id: 'ssh:dev-box:claude:remote-session:/home/dev/remote-session.jsonl',
     executionHostId: 'ssh:dev-box',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: 'remote-session',
     title: 'remote-session',
     cwd: '/home/dev/repo',
@@ -264,7 +264,7 @@ function remoteSession(): AiVaultSession {
     previewMessages: [],
     queuedMessageCount: 0,
     subagentTranscriptCount: 0,
-    resumeCommand: 'codex resume remote-session',
+    resumeCommand: 'claude --resume remote-session',
     subagent: null
   }
 }

@@ -70,7 +70,7 @@ function seededByNextLaunch(): Record<string, string> | undefined {
         mutation as Parameters<typeof applyNativeChatSessionOptionSettingsMutation>[1]
       ) ?? persisted
   }
-  return resolveStructuredLaunchSeedOptions(persisted, 'codex')
+  return resolveStructuredLaunchSeedOptions(persisted, 'claude')
 }
 
 const LOCAL_TARGET = { kind: 'local' } as const
@@ -125,7 +125,7 @@ describe('useStructuredAgentSession working state', () => {
     const { result } = renderHook(() =>
       useStructuredAgentSession({
         sessionId: 'session-1',
-        agent: 'codex',
+        agent: 'claude',
         target: LOCAL_TARGET,
         isVisible: true
       })
@@ -152,7 +152,7 @@ describe('useStructuredAgentSession working state', () => {
     const { result } = renderHook(() =>
       useStructuredAgentSession({
         sessionId: 'session-1',
-        agent: 'codex',
+        agent: 'claude',
         target: LOCAL_TARGET,
         isVisible: true
       })
@@ -193,7 +193,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -225,7 +225,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -272,7 +272,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -327,7 +327,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -373,7 +373,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -446,7 +446,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -459,7 +459,7 @@ describe('useStructuredAgentSession options', () => {
     expect(seededByNextLaunch()).toEqual({ model: 'gpt-fast', effort: 'low' })
     expect(mocks.enqueueSettingsWrite).toHaveBeenCalledWith(LOCAL_TARGET, {
       type: 'apply-picks',
-      agent: 'codex',
+      agent: 'claude',
       picks: [
         { modelId: 'gpt-fast', optionId: 'model', value: 'gpt-fast' },
         { modelId: 'gpt-fast', optionId: 'effort', value: 'low' }
@@ -481,7 +481,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: remoteTarget,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -493,7 +493,7 @@ describe('useStructuredAgentSession options', () => {
 
     expect(mocks.enqueueSettingsWrite).toHaveBeenCalledWith(
       remoteTarget,
-      expect.objectContaining({ type: 'apply-picks', agent: 'codex' })
+      expect.objectContaining({ type: 'apply-picks', agent: 'claude' })
     )
   })
 
@@ -510,7 +510,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -534,7 +534,7 @@ describe('useStructuredAgentSession options', () => {
       useStructuredAgentSession({
         sessionId: 'session-1',
         target: LOCAL_TARGET,
-        agent: 'codex',
+        agent: 'claude',
         isVisible: true
       })
     )
@@ -594,7 +594,7 @@ describe('turn timing', () => {
         useStructuredAgentSession({
           sessionId: 'session-1',
           target: LOCAL_TARGET,
-          agent: 'codex',
+          agent: 'claude',
           isVisible: true
         })
       )

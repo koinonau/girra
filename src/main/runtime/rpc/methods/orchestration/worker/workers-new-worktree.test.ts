@@ -169,21 +169,22 @@ describe('orchestration new-worktree workers', () => {
     mockCreatedWorktree()
 
     const { result } = await startWorker({
-      model: 'custom-codex-model',
+      agent: 'claude',
+      model: 'custom-claude-model',
       effort: 'high'
     })
 
     expect(runtime.createManagedWorktree).toHaveBeenCalledWith(
       expect.objectContaining({
-        startupAgent: 'codex',
-        startupLaunchPreferences: { model: 'custom-codex-model', effort: 'high' }
+        startupAgent: 'claude',
+        startupLaunchPreferences: { model: 'custom-claude-model', effort: 'high' }
       })
     )
     expect(result).toMatchObject({
       state: 'ready',
       launch: {
-        requested: { agent: 'codex', model: 'custom-codex-model', effort: 'high' },
-        effective: { agent: 'codex', model: 'custom-codex-model', effort: 'high' }
+        requested: { agent: 'claude', model: 'custom-claude-model', effort: 'high' },
+        effective: { agent: 'claude', model: 'custom-claude-model', effort: 'high' }
       }
     })
   })

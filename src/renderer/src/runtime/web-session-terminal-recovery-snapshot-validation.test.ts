@@ -158,7 +158,7 @@ const fullSnapshot: RuntimeMobileSessionTabsResult = {
     },
     { ...file, mode: 'diff', diffSource: 'unstaged' },
     { ...markdown, mode: 'edit' },
-    { ...agent, agent: 'codex' }
+    { ...agent, agent: 'claude' }
   ]
 }
 

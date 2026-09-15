@@ -79,14 +79,14 @@ function titleResponse(
     id,
     ok: true,
     kind: 'titles',
-    value: { titles: [{ agent: 'codex', sessionId: 'session', title }] }
+    value: { titles: [{ agent: 'claude', sessionId: 'session', title }] }
   }
 }
 
 describe('AiVaultScannerWorkerClient', () => {
   it('serializes requests in FIFO order and ignores stale responses', async () => {
     const { client, worker } = setup()
-    const first = client.resolveTitles([{ agent: 'codex', sessionId: 'session' }])
+    const first = client.resolveTitles([{ agent: 'claude', sessionId: 'session' }])
     const second = client.resolveTitles([{ agent: 'claude', sessionId: 'other' }])
 
     expect(worker.posted).toHaveLength(1)
@@ -109,7 +109,7 @@ describe('AiVaultScannerWorkerClient', () => {
     const { client, worker } = setup()
     const controller = new AbortController()
     const first = client.resolveTitles(
-      [{ agent: 'codex', sessionId: 'session' }],
+      [{ agent: 'claude', sessionId: 'session' }],
       controller.signal
     )
     const second = client.resolveTitles([{ agent: 'claude', sessionId: 'other' }])
@@ -135,7 +135,7 @@ describe('AiVaultScannerWorkerClient', () => {
     ['exit', 1]
   ] as const)('restarts queued work after a worker %s', async (event, value) => {
     const { client, workers } = setupWorkerFactory()
-    const first = client.resolveTitles([{ agent: 'codex', sessionId: 'first' }])
+    const first = client.resolveTitles([{ agent: 'claude', sessionId: 'first' }])
     const second = client.resolveTitles([{ agent: 'claude', sessionId: 'second' }])
 
     workers[0]!.emit(event, value)
@@ -153,7 +153,7 @@ describe('AiVaultScannerWorkerClient', () => {
     vi.useFakeTimers()
     try {
       const { client, worker } = setup()
-      const result = client.resolveTitles([{ agent: 'codex', sessionId: 'session' }])
+      const result = client.resolveTitles([{ agent: 'claude', sessionId: 'session' }])
       const requestId = worker.posted[0]!.id
       worker.emit('message', titleResponse(requestId, 'title'))
       await result
@@ -169,14 +169,14 @@ describe('AiVaultScannerWorkerClient', () => {
 
   it('bounds queued calls while one request is active', async () => {
     const { client } = setup()
-    const active = client.resolveTitles([{ agent: 'codex', sessionId: 'active' }])
+    const active = client.resolveTitles([{ agent: 'claude', sessionId: 'active' }])
     const queued = Array.from({ length: 16 }, (_, index) =>
-      client.resolveTitles([{ agent: 'codex', sessionId: `queued-${index}` }])
+      client.resolveTitles([{ agent: 'claude', sessionId: `queued-${index}` }])
     )
 
-    await expect(client.resolveTitles([{ agent: 'codex', sessionId: 'overflow' }])).rejects.toThrow(
-      'queue is full'
-    )
+    await expect(
+      client.resolveTitles([{ agent: 'claude', sessionId: 'overflow' }])
+    ).rejects.toThrow('queue is full')
     client.dispose()
     await expect(active).rejects.toThrow('disposed')
     await Promise.all(queued.map((promise) => expect(promise).rejects.toThrow('disposed')))
@@ -184,7 +184,7 @@ describe('AiVaultScannerWorkerClient', () => {
 
   it('terminates and rejects active and queued calls on disposal', async () => {
     const { client, worker } = setup()
-    const active = client.resolveTitles([{ agent: 'codex', sessionId: 'active' }])
+    const active = client.resolveTitles([{ agent: 'claude', sessionId: 'active' }])
     const queued = client.resolveTitles([{ agent: 'claude', sessionId: 'queued' }])
 
     client.dispose()

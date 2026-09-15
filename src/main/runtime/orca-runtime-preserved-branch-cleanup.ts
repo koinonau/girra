@@ -14,10 +14,6 @@ import type { StructuredAgentSessionStatusSink } from '../native-chat/agent-sess
 import type { ObservedAgentStatusPaneIdentity } from '../ipc/agent-status-ipc-boundary'
 import type { AgentHookAuthorityAttestation } from '../agent-hooks/server'
 import type { RuntimeDesktopWindowStatus } from '../../shared/runtime-types'
-import type {
-  AiVaultPrepareSessionResumeArgs,
-  AiVaultPrepareSessionResumeResult
-} from '../../shared/ai-vault-resume-preparation'
 import type { AgentSessionClaimSigner } from './agent-session-claim-identity'
 import type { AgentStatus } from '../../shared/agent-detection'
 import { RuntimeLegacyWorkerTerminalRecoveryPersistence } from './runtime-legacy-worker-terminal-recovery-persistence'
@@ -99,17 +95,6 @@ export class OrcaRuntimeWithPreservedBranchCleanup extends OrcaRuntimeWithTermin
   protected readonly buildAgentHookPtyEnv: (() => Record<string, string>) | null
 
   protected readonly getDesktopWindowStatusFn: () => RuntimeDesktopWindowStatus
-
-  protected readonly prepareAiVaultSessionResumeFn:
-    | ((args: AiVaultPrepareSessionResumeArgs) => Promise<AiVaultPrepareSessionResumeResult>)
-    | null
-
-  protected readonly prepareCodexStructuredLaunchFn:
-    | ((input: {
-        workspacePath: string
-        launchEnv: NodeJS.ProcessEnv
-      }) => string | null | Promise<string | null>)
-    | null
 
   protected readonly agentSessionClaimSigner: AgentSessionClaimSigner
 
@@ -292,7 +277,7 @@ export class OrcaRuntimeWithPreservedBranchCleanup extends OrcaRuntimeWithTermin
       this.workspaceSessionWorktreeHasRuntimeOwnedPtyCandidate(session, worktreeId, tabs)
   })
 
-  protected readonly aiVault = new RuntimeAiVaultCommands(() => this.prepareAiVaultSessionResumeFn)
+  protected readonly aiVault = new RuntimeAiVaultCommands()
 
   protected readonly claudeAgentTeams = new ClaudeAgentTeamsService()
 

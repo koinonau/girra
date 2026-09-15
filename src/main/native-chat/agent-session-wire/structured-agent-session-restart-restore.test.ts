@@ -29,7 +29,7 @@ describe('restart journal restoration', () => {
       active -= 1
       return {
         journal: {},
-        params: { location: { workspaceId: 'workspace-1' }, provider: 'codex' },
+        params: { location: { workspaceId: 'workspace-1' }, provider: 'claude' },
         fence: 1,
         hasProviderChild: false,
         sessionId
@@ -77,9 +77,9 @@ describe('restart journal restoration', () => {
         workspaceId: 'workspace-1',
         workspaceKind: 'folder'
       },
-      provider: 'codex',
-      agent: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex' },
+      provider: 'claude',
+      agent: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude' },
       runtimeKind: 'native'
     }
     restoreRead.mockResolvedValue({

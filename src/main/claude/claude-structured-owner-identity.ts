@@ -2,6 +2,7 @@ import type { AgentSessionJournalIdentity } from '../../shared/agent-session-jou
 import type { AgentSessionProviderHandleLink } from '../../shared/agent-session-provider-handle'
 import type { AgentSessionProcessIdentity } from '../../shared/agent-session-record'
 import { readProcessStartTimeMs } from '../runtime/agent-session-process-identity-probe'
+import { AGENT_SESSION_SPAWN_TOKEN_ENV } from '../runtime/agent-session-spawn-token-readback'
 
 export function claudeProviderHandleLink(input: {
   sessionId: string
@@ -23,9 +24,7 @@ export function claudeProviderHandleLink(input: {
   }
 }
 
-/** The child echoes its spawn token here so the owner probe can tell a live
- *  child of this reservation from a same-pid stranger. */
-export const CLAUDE_SPAWN_TOKEN_ENV = 'ORCA_AGENT_SESSION_SPAWN_TOKEN'
+export const CLAUDE_SPAWN_TOKEN_ENV = AGENT_SESSION_SPAWN_TOKEN_ENV
 
 const START_TIME_READ_ATTEMPTS = 3
 

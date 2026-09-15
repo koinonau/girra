@@ -10,11 +10,6 @@
 import { existsSync } from 'node:fs'
 import { join } from 'node:path'
 import type { AgentSessionRecord } from '../../shared/agent-session-record'
-import { createCodexStructuredLaunchResolver } from '../codex/codex-structured-launch-resolution'
-import {
-  CodexStructuredSessionAdapter,
-  type CodexStructuredSessionAdapterDeps
-} from '../codex/codex-structured-session-adapter'
 import type { ClaudeStructuredSessionAdapterDeps } from '../claude/claude-structured-session-adapter'
 import {
   StructuredAgentSessionHost,
@@ -35,7 +30,6 @@ import {
   createStructuredAgentSessionOwnerProbes
 } from './structured-agent-session-owner-probe'
 import { agentSessionPtyWriteGate } from './agent-session-pty-write-gate'
-import { resolveLoginShellEnvironment } from '../startup/login-shell-environment'
 import { recordAgentSessionProviderHandle } from './agent-session-provider-handle-transition'
 import type { ClaudeStructuredAuthPolicy } from '../claude-accounts/claude-structured-auth-policy'
 import { createStructuredClaudeRuntimeAdapter } from './structured-claude-runtime-adapter'
@@ -61,23 +55,17 @@ export type StructuredAgentSessionRuntimeDeps = {
   /** Key id this host's claims are minted under. */
   claimKeyId: string
   resolveWorkspacePath: (workspaceId: string) => Promise<string>
-  resolveCodexCommand?: (options?: { pathEnv?: string | null; homePath?: string }) => string
   resolveClaudeCommand?: () => string
   /** Provider transports are overridden only to drive the runtime against scripted children. */
-  openCodexConnection?: CodexStructuredSessionAdapterDeps['openConnection']
   openClaudeConnection?: ClaudeStructuredSessionAdapterDeps['openConnection']
-  /** Scripted app-servers carry fake pids the real start-time read cannot answer for. */
-  readProcessStartTime?: CodexStructuredSessionAdapterDeps['readProcessStartTime']
+  /** Scripted children carry fake pids the real start-time read cannot answer for. */
+  readProcessStartTime?: ClaudeStructuredSessionAdapterDeps['readProcessStartTime']
   resolveLaunchArgs?: (provider: AgentSessionRecord['provider']) => Promise<string[]> | string[]
-  resolveLaunchEnv?: () => Promise<NodeJS.ProcessEnv>
-  resolveLaunchEnvOverlay?: () => Promise<Record<string, string>> | Record<string, string>
   resolveClaudeLaunchEnv?: () => Promise<Record<string, string>> | Record<string, string>
   /** Required, and asserted at install time — an absent policy must not degrade to a guess. */
   resolveClaudeAuthPolicy: () => Promise<ClaudeStructuredAuthPolicy> | ClaudeStructuredAuthPolicy
   /** Raw settings getter; the reader that fails closed around it is built here, in checked code. */
   getClaudeManagedAccountGateSettings?: () => ClaudeManagedAccountGateSettings
-  resolveEnvironment?: () => Promise<NodeJS.ProcessEnv>
-  resolveCodexOverrides?: () => NodeJS.ProcessEnv
   onError?: (input: { scope: string; error: unknown }) => void
   /** Every structured-session status projection, for host-side reactions such as the first-work
    *  workspace rename that CLI agents get from their hooks. */
@@ -133,8 +121,8 @@ export async function waitForStructuredAgentSessionRecovery(): Promise<void> {
   await installed?.waitForRecovery()
 }
 
-/** Drops the host and reaps every Codex child under it. Runtime teardown and
- *  test isolation take the same path, so neither can leave a live app-server.
+/** Drops the host and reaps every provider child under it. Runtime teardown and
+ *  test isolation take the same path, so neither can leave a live child.
  *
  *  A teardown that fails is RETRIED by the next stop rather than forgotten: the
  *  host keeps every journal whose close rejected, and this is the only handle
@@ -188,13 +176,6 @@ async function install(deps: StructuredAgentSessionRuntimeDeps): Promise<Install
   if (typeof deps.resolveClaudeAuthPolicy !== 'function') {
     throw new Error(CLAUDE_STRUCTURED_AUTH_POLICY_REQUIRED)
   }
-  const bootEnvironment = (deps.resolveEnvironment ?? resolveLoginShellEnvironment)()
-  const resolveCodexEnvironment = async (): Promise<NodeJS.ProcessEnv> => ({
-    ...(await bootEnvironment),
-    ...(await deps.resolveLaunchEnv?.()),
-    ...(await deps.resolveLaunchEnvOverlay?.()),
-    ...deps.resolveCodexOverrides?.()
-  })
   const store = await AgentSessionRecordStore.open({
     directory: join(deps.stateDirectory, RECORD_STORE_DIR_NAME),
     hostId: deps.hostId
@@ -218,33 +199,6 @@ async function install(deps: StructuredAgentSessionRuntimeDeps): Promise<Install
   try {
     let host: StructuredAgentSessionHost | null = null
     let recoveryChain = Promise.resolve()
-    const codex = new CodexStructuredSessionAdapter({
-      resolveLaunch: createCodexStructuredLaunchResolver({
-        store,
-        resolveWorkspacePath: deps.resolveWorkspacePath,
-        resolveEnvironment: resolveCodexEnvironment,
-        ...(deps.resolveCodexCommand ? { resolveCommand: deps.resolveCodexCommand } : {})
-      }),
-      ...(deps.openCodexConnection ? { openConnection: deps.openCodexConnection } : {}),
-      ...(deps.readProcessStartTime ? { readProcessStartTime: deps.readProcessStartTime } : {}),
-      onBackgroundTasksChanged: (sessionId, state) =>
-        host?.publishBackgroundTaskState(sessionId, state),
-      onEvent: (event) => {
-        if (event.type !== 'ended' || !('cause' in event) || event.cause !== 'unexpected-exit') {
-          return
-        }
-        // Serialize recovery with teardown. Exit callbacks arrive from child
-        // process tasks, so a fire-and-forget callback can otherwise append
-        // after the host has flushed and its journal directory is removed.
-        recoveryChain = recoveryChain.then(async () => {
-          try {
-            await host?.handleAdapterEvent(event)
-          } catch (error) {
-            deps.onError?.({ scope: `structured-agent-session-exit:${event.sessionId}`, error })
-          }
-        })
-      }
-    })
     const claude = createStructuredClaudeRuntimeAdapter({
       store,
       resolveWorkspacePath: deps.resolveWorkspacePath,
@@ -281,9 +235,7 @@ async function install(deps: StructuredAgentSessionRuntimeDeps): Promise<Install
       ...(deps.openClaudeConnection ? { openClaudeConnection: deps.openClaudeConnection } : {}),
       ...(deps.readProcessStartTime ? { readProcessStartTime: deps.readProcessStartTime } : {})
     })
-    const adapter = new StructuredAgentSessionAdapterRouter({ codex, claude }, async () => {
-      await Promise.all([codex.closeAll(), claude.closeAll()])
-    })
+    const adapter = new StructuredAgentSessionAdapterRouter({ claude }, () => claude.closeAll())
     host = new StructuredAgentSessionHost({
       store,
       adapter,
@@ -319,8 +271,7 @@ async function install(deps: StructuredAgentSessionRuntimeDeps): Promise<Install
         // reacquiring. Observe until the chain stops growing.
         for (;;) {
           // Claude reaches the chain only once its close ladder and transcript
-          // write publish the exit, so an observed death is not yet a chained
-          // one. Codex publishes inside its own exit callback and needs nothing.
+          // write publish the exit, so an observed death is not yet a chained one.
           await claude.drainObservedExits()
           const observed = recoveryChain
           await observed

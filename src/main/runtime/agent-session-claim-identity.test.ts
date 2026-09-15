@@ -10,7 +10,7 @@ import {
 describe('agent session claim identity', () => {
   it('creates stable opaque identity and worktree digests', () => {
     const signer = createEphemeralAgentSessionClaimSigner('profile-1')
-    const identity = canonicalizeAgentSessionIdentity('codex', {
+    const identity = canonicalizeAgentSessionIdentity('claude', {
       key: 'session_id',
       id: 'session-1'
     })
@@ -37,30 +37,30 @@ describe('agent session claim identity', () => {
 
   it('rejects malformed and unsupported provider identity', () => {
     expect(() =>
-      canonicalizeAgentSessionIdentity('codex', { key: 'session_id', id: '-unsafe' })
+      canonicalizeAgentSessionIdentity('claude', { key: 'session_id', id: '-unsafe' })
     ).toThrow('agent_session_identity_required')
     expect(() =>
       canonicalizeAgentSessionIdentity('blank', { key: 'session_id', id: 'session-1' })
     ).toThrow('agent_session_identity_required')
   })
 
-  it('canonicalizes Prime identity by its transcript path', () => {
-    const dir = mkdtempSync(join(tmpdir(), 'orca-prime-claim-'))
+  it('canonicalizes Pi identity by its transcript path', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'orca-pi-claim-'))
     const transcriptPath = join(dir, 'session.jsonl')
     try {
       writeFileSync(transcriptPath, '{}\n')
       const canonicalTranscriptPath = realpathSync(transcriptPath)
       expect(
-        canonicalizeAgentSessionIdentity('prime-agent', {
+        canonicalizeAgentSessionIdentity('pi', {
           key: 'session_id',
-          id: 'prime-session-1',
+          id: 'pi-session-1',
           transcriptPath
         })
       ).toEqual({
-        agent: 'prime-agent',
+        agent: 'pi',
         providerSession: {
           key: 'session_id',
-          id: 'prime-session-1',
+          id: 'pi-session-1',
           transcriptPath: canonicalTranscriptPath
         }
       })

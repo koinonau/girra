@@ -65,7 +65,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         repo1: [makeWorktree({ id: wt, repoId: 'repo1', path: '/path/wt1' })]
       },
       tabsByWorktree: {
-        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Codex', ptyId: 'pty-agent' })]
+        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Claude', ptyId: 'pty-agent' })]
       },
       terminalLayoutsByTabId: {
         'tab-1': {
@@ -94,10 +94,10 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       {
         state: 'done',
         prompt: 'resume target',
-        agentType: 'codex',
+        agentType: 'claude',
         lastAssistantMessage: 'done'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 2000, stateStartedAt: 1000 },
       { tabId: 'tab-1', worktreeId: wt },
       { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -170,7 +170,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         repo1: [makeWorktree({ id: wt, repoId: 'repo1', path: '/path/wt1' })]
       },
       tabsByWorktree: {
-        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Codex', ptyId: 'pty-agent' })]
+        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Claude', ptyId: 'pty-agent' })]
       },
       terminalLayoutsByTabId: {
         'tab-1': {
@@ -192,8 +192,8 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       .getState()
       .setAgentStatus(
         targetPaneKey,
-        { state: 'done', prompt: 'resume target', agentType: 'codex' },
-        'Codex',
+        { state: 'done', prompt: 'resume target', agentType: 'claude' },
+        'Claude',
         { updatedAt: 2000, stateStartedAt: 1000 },
         { tabId: 'tab-1', worktreeId: wt }
       )
@@ -368,7 +368,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         repo1: [makeWorktree({ id: wt, repoId: 'repo1', path: '/path/wt1' })]
       },
       tabsByWorktree: {
-        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Codex', ptyId: 'pty-agent' })]
+        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Claude', ptyId: 'pty-agent' })]
       },
       terminalLayoutsByTabId: {
         'tab-1': {
@@ -389,8 +389,8 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       .getState()
       .setAgentStatus(
         targetPaneKey,
-        { state: 'done', prompt: 'resume target', agentType: 'codex' },
-        'Codex',
+        { state: 'done', prompt: 'resume target', agentType: 'claude' },
+        'Claude',
         { updatedAt: 2000, stateStartedAt: 1000 },
         { tabId: 'tab-1', worktreeId: wt },
         { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -410,7 +410,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
     // Why: done resumable agent keeps its origin:'live' anchor (#9454); a failed kill rolls back to it, not undefined, and never commits worktree-sleep.
     expect(state.sleepingAgentSessionsByPaneKey[targetPaneKey]).toMatchObject({
       origin: 'live',
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: 'target-session' }
     })
     expect(state.agentStatusByPaneKey[targetPaneKey]).toBeDefined()
@@ -449,7 +449,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         repo1: [makeRuntimeOwnedWorktree({ id: wt, repoId: 'repo1', path: '/path/wt1' })]
       },
       tabsByWorktree: {
-        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Codex' })]
+        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Claude' })]
       },
       terminalLayoutsByTabId: {
         'tab-1': {
@@ -475,8 +475,8 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       .getState()
       .setAgentStatus(
         targetPaneKey,
-        { state: 'done', prompt: 'resume target', agentType: 'codex' },
-        'Codex',
+        { state: 'done', prompt: 'resume target', agentType: 'claude' },
+        'Claude',
         { updatedAt: 2000, stateStartedAt: 1000 },
         { tabId: 'tab-1', worktreeId: wt },
         { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -534,7 +534,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
           makeTab({
             id: 'tab-1',
             worktreeId: wt,
-            title: 'Codex',
+            title: 'Claude',
             ptyId: 'ssh:ssh-1@@pty-agent'
           })
         ]
@@ -554,8 +554,8 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       .getState()
       .setAgentStatus(
         targetPaneKey,
-        { state: 'done', prompt: 'resume target', agentType: 'codex' },
-        'Codex',
+        { state: 'done', prompt: 'resume target', agentType: 'claude' },
+        'Claude',
         { updatedAt: 2000, stateStartedAt: 1000 },
         { tabId: 'tab-1', worktreeId: wt },
         { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -583,8 +583,8 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         .getState()
         .setAgentStatus(
           targetPaneKey,
-          { state: 'working', prompt: 'still running', agentType: 'codex' },
-          'Codex',
+          { state: 'working', prompt: 'still running', agentType: 'claude' },
+          'Claude',
           { updatedAt: 3000, stateStartedAt: 3000 },
           { tabId: 'tab-1', worktreeId: wt },
           { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -595,7 +595,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         repo1: [makeWorktree({ id: wt, repoId: 'repo1', path: '/path/wt1' })]
       },
       tabsByWorktree: {
-        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Codex', ptyId: 'pty-agent' })]
+        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Claude', ptyId: 'pty-agent' })]
       },
       terminalLayoutsByTabId: {
         'tab-1': {
@@ -612,10 +612,10 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       {
         state: 'done',
         prompt: 'stale done',
-        agentType: 'codex',
+        agentType: 'claude',
         lastAssistantMessage: 'old done'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 2000, stateStartedAt: 1000 },
       { tabId: 'tab-1', worktreeId: wt },
       { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -664,7 +664,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
         repo1: [makeRuntimeOwnedWorktree({ id: wt, repoId: 'repo1', path: '/path/wt1' })]
       },
       tabsByWorktree: {
-        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Codex' })]
+        [wt]: [makeTab({ id: 'tab-1', worktreeId: wt, title: 'Claude' })]
       },
       terminalLayoutsByTabId: {
         'tab-1': {
@@ -690,8 +690,8 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       .getState()
       .setAgentStatus(
         targetPaneKey,
-        { state: 'done', prompt: 'resume target', agentType: 'codex' },
-        'Codex',
+        { state: 'done', prompt: 'resume target', agentType: 'claude' },
+        'Claude',
         { updatedAt: 2000, stateStartedAt: 1000 },
         { tabId: 'tab-1', worktreeId: wt },
         { providerSession: { key: 'session_id', id: 'target-session' } }
@@ -717,7 +717,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
     // Why: done resumable agent keeps its origin:'live' anchor (#9454); a failed target-only stop rolls back to it, not undefined, and never commits worktree-sleep.
     expect(state.sleepingAgentSessionsByPaneKey[targetPaneKey]).toMatchObject({
       origin: 'live',
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: 'target-session' }
     })
     expect(state.agentStatusByPaneKey[targetPaneKey]).toBeDefined()

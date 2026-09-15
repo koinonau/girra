@@ -9,37 +9,15 @@ import type {
   TranscriptMessageSink,
   TranscriptSessionIdentity
 } from './session-transcript-consumers'
-import type { SessionSidecarObservation } from './session-sidecar-stat'
 
 export type AiVaultScanOptions = {
   claudeProjectsDir?: string
-  codexSessionsDir?: string
-  additionalCodexSessionsDirs?: readonly string[]
-  // Why: tests inject a sandbox "real ~/.codex" so real-home attribution
-  // (codexHome null → unprefixed resume) is testable without the user's home.
-  defaultCodexHomeDir?: string
   wslHomeDirs?: readonly string[]
-  geminiSessionsDir?: string
-  antigravityBrainDir?: string
-  copilotSessionsDir?: string
-  cursorProjectsDir?: string
   opencodeStorageDir?: string
   // Why: OpenCode 1.17.x stores sessions in SQLite; tests inject a temp DB
   // here so they don't depend on the real ~/.local/share/opencode.
   opencodeDbPaths?: readonly string[]
-  grokSessionsDir?: string
-  devinTranscriptsDir?: string
-  hermesSessionsDir?: string
-  rovoSessionsDir?: string
-  openclawStateDir?: string
-  openclawLegacyStateDir?: string
   piSessionsDir?: string
-  ompSessionsDir?: string
-  primeAgentSessionsDir?: string
-  droidSessionsDir?: string
-  droidProjectsDir?: string
-  clineSessionsDir?: string
-  kimiSessionsDir?: string
   limit?: number
   unlimited?: boolean
   limitPerAgent?: number
@@ -62,21 +40,14 @@ export type FileWithMtime = {
   // such as OpenCode SQLite rows omit it. The transcript's own length: a byte
   // offset into it may be compared against this directly.
   sizeBytes?: number
-  // What discovery saw of the agent's sibling file, tracked apart from the
-  // transcript's own stat (see session-sidecar-stat.ts).
-  sidecar?: SessionSidecarObservation
-  // Present when discovery can prove filesystem identity. Codex dual-root
-  // scans use a multi-link inode to collapse only actual hardlink aliases.
+  // Filesystem identity, so the search index notices a new file renamed over a transcript.
   dev?: number
   ino?: number
-  nlink?: number
 }
 
 export type SessionFileCandidate = {
   agent: AiVaultAgent
   file: FileWithMtime
-  codexHome: string | null
-  antigravityHistoryPath?: string
 }
 
 export type SessionFileDiscovery = {
@@ -101,11 +72,6 @@ export type ResumableParseFinalizeOptions = {
 // read or a display-only trailing line can never corrupt the cached fold.
 export type ResumableSessionParseState = {
   consumeLine(line: string): void
-  // Optional zero-copy path for parsers that can reject irrelevant records
-  // from a bounded byte prefix before decoding a potentially huge JSONL line.
-  consumeLineBytes?(line: Buffer): void
-  // Lets a parser terminate an excluded transcript without draining the file.
-  shouldStop?(): boolean
   // What the fold knows about the session right now, for a consumer that has to
   // commit before the read ends (see TranscriptSessionIdentity).
   identity?(): TranscriptSessionIdentity | null
@@ -145,12 +111,4 @@ export type SessionAccumulator = {
   queuedMessageCount: number
   subagentTranscriptCount: number
   latestTimestampMs: number
-}
-
-export type CodexUsageSnapshot = {
-  inputTokens: number
-  cachedInputTokens: number
-  outputTokens: number
-  reasoningOutputTokens: number
-  totalTokens: number
 }

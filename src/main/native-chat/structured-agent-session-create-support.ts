@@ -17,7 +17,7 @@ export type StructuredAgentSessionCreateSupport = {
  * however wrong it was. The runtime hands over the two facts it owns and this decides.
  */
 export function resolveStructuredAgentSessionCreateSupport(input: {
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   location: AgentSessionExecutionLocation
   adapterSupportsCreate: boolean
   getSettings: () => ClaudeManagedAccountGateSettings
@@ -33,11 +33,9 @@ export function resolveStructuredAgentSessionCreateSupport(input: {
             : 'agent'
     }
   }
-  // Claude only: Codex resolves its account on a different path, so its answer is untouched here.
   // `wsl` is the closest existing reason — the cause is a WSL-bound account rather than a WSL
   // workspace — and no client reads the field, so it stays as-is.
   if (
-    input.agent === 'claude' &&
     !structuredClaudeMatchesActiveManagedAccount(
       readClaudeManagedAccountGateSettings(input.getSettings)
     )

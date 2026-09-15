@@ -16,7 +16,7 @@ export type NativeChatToolCategory =
   | 'read'
   | 'search'
   | 'listFiles'
-  /** A shell command that ran unclassified — Codex's own word for one. */
+  /** A shell command that ran unclassified. */
   | 'unknown'
   | 'fileChange'
   | 'webSearch'
@@ -63,17 +63,17 @@ export const NATIVE_CHAT_TOOL_ICON_NAMES: Record<NativeChatToolCategory, NativeC
  * A `Map`, not an object: an object index answers `__proto__` with a truthy value.
  */
 const CATEGORY_BY_ROW_WORD = new Map<string, NativeChatToolCategory>([
-  // Codex's classified shell rows.
+  // Classified shell rows, and Claude's `Read`.
   ['read', 'read'],
   ['search', 'search'],
   ['list', 'listFiles'],
-  // Codex's rollout-transcript names for a shell call, which the activity set
-  // below does not carry: `isCommandToolName` also picks the running row's copy,
-  // and this vocabulary only picks a glyph.
+  // Rollout-transcript names for a shell call, which the activity set below does
+  // not carry: `isCommandToolName` also picks the running row's copy, and this
+  // vocabulary only picks a glyph.
   ['exec', 'unknown'],
   ['local_shell', 'unknown'],
-  // Every Codex file change projects as a `Diff` call, and the edit set below
-  // names the tools that carry the edit in their input, not that projection.
+  // A projected file change is a `Diff` call, and the edit set below names the
+  // tools that carry the edit in their input, not that projection.
   ['diff', 'fileChange'],
   // Claude's tool names, which its lane renders verbatim.
   ['grep', 'search'],
@@ -155,10 +155,9 @@ export function nativeChatToolRunIconName(
 
 /** Whether a call reads as terminal activity, for a lane with no per-category
  *  glyph (mobile) that only chooses between a terminal and a generic tool.
- *  The row word cannot decide it alone: Codex names a classified shell row
- *  `read` / `search` / `list`, which lowercase to Claude's own `Read` / `Grep` /
- *  `Glob`, and those ran no command. So the input breaks the tie — Codex keeps
- *  the command it ran, while Claude's `Read` carries only a file path. */
+ *  The row word cannot decide it alone: a classified shell row named `read`
+ *  lowercases to Claude's own `Read`, which ran no command. So the input breaks
+ *  the tie: a shell row keeps the command it ran, while `Read` carries a path. */
 export function isShellActivityToolCall(call: { name: string; input?: unknown }): boolean {
   return isCommandToolName(call.name) || toolInputCommand(call.input) !== null
 }

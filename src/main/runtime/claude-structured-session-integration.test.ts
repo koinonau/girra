@@ -405,7 +405,6 @@ beforeEach(async () => {
         hostId: 'local',
         claimKeyId: 'key-1',
         resolveWorkspacePath: async (workspaceId) => `/repos/${workspaceId}`,
-        resolveCodexCommand: () => '/usr/local/bin/codex',
         resolveClaudeCommand: () => '/usr/local/bin/claude',
         readProcessStartTime: async (pid: number) => pid * 10,
         resolveClaudeLaunchEnv: () => claudeLaunchEnv,

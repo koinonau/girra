@@ -25,8 +25,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 
 const DISCLOSURE_ITEM_ID = agentJournalItemKey(JOURNAL_FILE_FORMAT_REMNANT_DISCLOSURE_IDENTITY)
@@ -72,7 +72,7 @@ describe('a chat whose history is still in the pre-SQLite format', () => {
 
     expect(disclosure(journal)).toContain('send a message to pick up where you left off')
     expect(disclosure(journal)).toContain(join(root, 'log.jsonl'))
-    expect(disclosure(journal)).toContain('Codex')
+    expect(disclosure(journal)).toContain('Claude')
   })
 
   // Both files is the normal shape of a pre-SQLite directory: every epoch roll
@@ -140,7 +140,7 @@ describe('a chat whose history is still in the pre-SQLite format', () => {
   it('stays out of a journal this open just repaired', async () => {
     const journal = await open()
     await journal.appendItem(
-      { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal: 0 },
+      { provider: 'claude', sessionId: 'thread-1', uuid: 'turn-1-0' },
       { kind: 'message', role: 'assistant', blocks: [{ type: 'text', text: 'history' }] },
       { fence: 1 }
     )

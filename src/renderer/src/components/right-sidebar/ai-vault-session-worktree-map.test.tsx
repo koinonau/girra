@@ -12,15 +12,15 @@ import {
 
 function makeSession(overrides: Partial<AiVaultSession>): AiVaultSession {
   return {
-    id: 'codex:session-1',
+    id: 'claude:session-1',
     executionHostId: 'local',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: 'session-1',
     title: 'Find the pane',
     cwd: '/repo/orca/src',
     branch: null,
     model: null,
-    filePath: '/home/ada/.codex/session-1.jsonl',
+    filePath: '/home/ada/.claude/session-1.jsonl',
     codexHome: null,
     createdAt: null,
     updatedAt: '2026-06-24T10:00:00.000Z',
@@ -30,7 +30,7 @@ function makeSession(overrides: Partial<AiVaultSession>): AiVaultSession {
     previewMessages: [],
     queuedMessageCount: 0,
     subagentTranscriptCount: 0,
-    resumeCommand: "codex resume 'session-1'",
+    resumeCommand: "claude --resume 'session-1'",
     subagent: null,
     ...overrides
   }
@@ -74,9 +74,9 @@ function makeRepo(overrides: Partial<Repo> = {}): Repo {
 
 const worktreeA = makeWorktree({ id: 'repo-1::/repo/alpha', path: '/repo/alpha' })
 const worktreeB = makeWorktree({ id: 'repo-1::/repo/beta', path: '/repo/beta' })
-const sessionInA = makeSession({ id: 'codex:in-a', cwd: '/repo/alpha/src' })
-const sessionInB = makeSession({ id: 'codex:in-b', cwd: '/repo/beta' })
-const sessionUnmatched = makeSession({ id: 'codex:lost', cwd: '/elsewhere/deep' })
+const sessionInA = makeSession({ id: 'claude:in-a', cwd: '/repo/alpha/src' })
+const sessionInB = makeSession({ id: 'claude:in-b', cwd: '/repo/beta' })
+const sessionUnmatched = makeSession({ id: 'claude:lost', cwd: '/elsewhere/deep' })
 const repos = [makeRepo()]
 const worktrees = [worktreeA, worktreeB]
 const sessions = [sessionInA, sessionInB, sessionUnmatched]
@@ -127,9 +127,9 @@ describe('useAiVaultSessionWorktreeMap', () => {
       sessionInA, // active worktree
       sessionInB, // non-active worktree
       sessionUnmatched, // no worktree match
-      makeSession({ id: 'codex:ssh', cwd: '/srv/orca/src', executionHostId: 'ssh:target-1' }),
-      makeSession({ id: 'codex:attic', cwd: '/repo/attic' }),
-      makeSession({ id: 'codex:no-cwd', cwd: null, branch: 'feature/x' })
+      makeSession({ id: 'claude:ssh', cwd: '/srv/orca/src', executionHostId: 'ssh:target-1' }),
+      makeSession({ id: 'claude:attic', cwd: '/repo/attic' }),
+      makeSession({ id: 'claude:no-cwd', cwd: null, branch: 'feature/x' })
     ]
 
     const { result } = renderHook(() =>
@@ -161,8 +161,8 @@ describe('useAiVaultSessionWorktreeMap', () => {
     // explicit escapes so tooling can't silently re-normalize the fixture.
     const nfcCafe = makeWorktree({ id: 'repo-1::/repo/caf\u00e9', path: '/repo/caf\u00e9' })
     const cjk = makeWorktree({ id: 'repo-1::/repo/作業区', path: '/repo/作業区' })
-    const nfdSession = makeSession({ id: 'codex:nfd', cwd: '/repo/cafe\u0301/src' })
-    const cjkSession = makeSession({ id: 'codex:cjk', cwd: '/repo/作業区/src' })
+    const nfdSession = makeSession({ id: 'claude:nfd', cwd: '/repo/cafe\u0301/src' })
+    const cjkSession = makeSession({ id: 'claude:cjk', cwd: '/repo/作業区/src' })
 
     const { result } = renderHook(() =>
       useAiVaultSessionWorktreeMap({
@@ -194,7 +194,7 @@ describe('useAiVaultSessionWorktreeMap', () => {
       id: 'repo-1::/repo/alpha-sibling',
       path: '/repo/alpha-sibling'
     })
-    const session = makeSession({ id: 'codex:sibling', cwd: '/repo/alpha-sibling/src' })
+    const session = makeSession({ id: 'claude:sibling', cwd: '/repo/alpha-sibling/src' })
 
     const { result } = renderHook(() =>
       useAiVaultSessionWorktreeMap({
@@ -216,7 +216,7 @@ describe('useAiVaultSessionWorktreeMap', () => {
       makeWorktree({ id: `repo-1::/repo/w${i}`, path: `/repo/w${i}` })
     )
     const manySessions = Array.from({ length: 400 }, (_, i) =>
-      makeSession({ id: `codex:s${i}`, cwd: `/repo/w${i % manyWorktrees.length}/src` })
+      makeSession({ id: `claude:s${i}`, cwd: `/repo/w${i % manyWorktrees.length}/src` })
     )
 
     const startedAt = performance.now()

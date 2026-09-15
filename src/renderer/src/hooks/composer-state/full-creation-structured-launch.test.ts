@@ -28,7 +28,7 @@ import { settleFullCreationStructuredLaunch } from './full-creation-structured-l
 const plan = (overrides: Partial<AgentSessionLaunchVerdict> = {}) =>
   adoptAgentSessionLaunchVerdict({
     route: 'structured-native-chat',
-    agent: 'codex',
+    agent: 'claude',
     prompt: 'Fix the route',
     promptDelivery: 'auto-submit',
     ...overrides
@@ -36,9 +36,9 @@ const plan = (overrides: Partial<AgentSessionLaunchVerdict> = {}) =>
 
 const baseArgs = {
   plan: plan(),
-  agent: 'codex' as const,
+  agent: 'claude' as const,
   worktreeId: 'worktree-1',
-  startup: { command: 'codex' } as never,
+  startup: { command: 'claude' } as never,
   pendingFirstAgentMessageRename: true,
   applyWorktreeMeta: vi.fn().mockResolvedValue(undefined)
 }
@@ -66,7 +66,7 @@ describe('settleFullCreationStructuredLaunch', () => {
     ).resolves.toEqual({ kind: 'structured', sessionId: 'session-1' })
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'worktree-1',
-      'codex',
+      'claude',
       { prompt: 'Fix the route', promptDelivery: 'draft' },
       expect.anything()
     )
@@ -95,7 +95,7 @@ describe('settleFullCreationStructuredLaunch', () => {
     })
     expect(mocks.activateAndRevealWorktree).toHaveBeenCalledWith('worktree-1', {
       sidebarRevealBehavior: 'auto',
-      agent: 'codex',
+      agent: 'claude',
       createNewTerminalForStartup: true,
       startup: baseArgs.startup
     })

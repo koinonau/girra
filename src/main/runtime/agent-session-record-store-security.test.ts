@@ -18,8 +18,8 @@ function reserveRequest(): AgentSessionReserveRequest {
       workspaceId: 'workspace-created',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/accounts/created' },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/accounts/created' },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'spawn-created',

@@ -84,9 +84,9 @@ describe('native chat transcript resolve polling', () => {
   it('retries WSL translation from shared observations, never installing the raw guest path', async () => {
     setPlatform('win32')
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-id',
-      transcriptPath: '/home/ada/.codex/sessions/rollout-session-id.jsonl',
+      transcriptPath: '/home/ada/.claude/projects/app/session-id.jsonl',
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -105,15 +105,15 @@ describe('native chat transcript resolve polling', () => {
 
   it('installs the translated UNC path once the WSL transcript becomes readable', async () => {
     setPlatform('win32')
-    const unc = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout-session-id.jsonl'
+    const unc = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\app\\session-id.jsonl'
     const engine = { unsubscribe: vi.fn(), watching: true }
     mocks.toHostReadable.mockResolvedValue(unc)
     mocks.install.mockResolvedValue(engine)
 
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-id',
-      transcriptPath: '/home/ada/.codex/sessions/rollout-session-id.jsonl',
+      transcriptPath: '/home/ada/.claude/projects/app/session-id.jsonl',
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -186,9 +186,9 @@ describe('native chat transcript resolve polling', () => {
         })
     )
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-id',
-      transcriptPath: '/home/ada/.codex/sessions/rollout-session-id.jsonl',
+      transcriptPath: '/home/ada/.claude/projects/app/session-id.jsonl',
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -213,7 +213,7 @@ describe('native chat transcript resolve polling', () => {
     const cancelled = new Error('setup cancelled')
     const setup = subscribeNativeChatTranscript(
       {
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'session-id',
         onAppend: () => {}
       },
@@ -242,7 +242,7 @@ describe('native chat transcript resolve polling', () => {
     const cancelled = new Error('setup cancelled')
     const setup = subscribeNativeChatTranscript(
       {
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'session-id',
         onAppend: () => {}
       },

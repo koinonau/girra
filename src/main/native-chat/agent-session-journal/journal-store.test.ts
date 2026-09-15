@@ -28,8 +28,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 
 let root: string
@@ -41,7 +41,7 @@ function tick(): number {
 }
 
 function item(ordinal: number): AgentJournalItemIdentity {
-  return { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal }
+  return { provider: 'claude', sessionId: 'thread-1', uuid: `turn-1-${ordinal}` }
 }
 
 function body(value: string): AgentJournalItemBody {
@@ -113,15 +113,14 @@ describe('sequences', () => {
   })
 
   it('preserves an oversized identity and its raw digest-form mimic across reopen', async () => {
-    const oversizedTurnId = 'a'.repeat(MAX_JOURNAL_KEY_COMPONENT_CHARS + 1)
-    const digestFormMimic = boundJournalKeyComponent(oversizedTurnId)
-    const identityFor = (turnId: string): AgentJournalItemIdentity => ({
-      provider: 'codex',
-      threadId: 'thread-1',
-      turnId,
-      ordinal: 0
+    const oversizedUuid = 'a'.repeat(MAX_JOURNAL_KEY_COMPONENT_CHARS + 1)
+    const digestFormMimic = boundJournalKeyComponent(oversizedUuid)
+    const identityFor = (uuid: string): AgentJournalItemIdentity => ({
+      provider: 'claude',
+      sessionId: 'thread-1',
+      uuid
     })
-    const oversizedIdentity = identityFor(oversizedTurnId)
+    const oversizedIdentity = identityFor(oversizedUuid)
     const mimicIdentity = identityFor(digestFormMimic)
     const journal = await open()
 
@@ -281,7 +280,7 @@ describe('lifecycle batches', () => {
     const journal = await open()
     const turn: AgentJournalItemIdentity = {
       provider: 'legacy',
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-1',
       recordId: 'turn-lifecycle:turn-1'
     }

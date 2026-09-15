@@ -1,6 +1,5 @@
 import { isKnownHarnessInjectedUserTurnText } from '../../shared/harness-injected-user-turns'
 import { getFirstUserPromptCaptureMode } from './session-scanner-first-user-prompt-capture'
-import { stripGrokUserQueryEnvelope } from './session-scanner-grok-user-text'
 // Direct import: session-scanner-values re-exports this module, so going through
 // it here would close an import cycle.
 import { sliceAtCodeUnitLimit } from './session-scanner-text-normalization'
@@ -9,8 +8,7 @@ import { sliceAtCodeUnitLimit } from './session-scanner-text-normalization'
 // 220-char list preview cap.
 const FULL_FIRST_USER_PROMPT_SAFETY_LIMIT = 256 * 1024
 
-// Codex uses input_text; most others use text. Never treat tool/image blocks as
-// the written first ask.
+// Never treat tool/image blocks as the written first ask.
 const TEXT_LIKE_BLOCK_TYPES = new Set(['text', 'input_text', 'output_text'])
 
 /** True only while an on-demand first-prompt read is re-parsing one transcript. */
@@ -55,10 +53,7 @@ export function normalizeFullFirstUserPromptText(value: string): string | null {
 }
 
 function finalizeFullFirstUserPrompt(value: string): string | null {
-  // Why: Grok (and some pasted transcripts) wrap the real ask in <user_query>;
-  // strip that before copy so the clipboard is the typed prompt, not user_info.
-  const unwrapped = stripGrokUserQueryEnvelope(value.replace(/^\uFEFF/, ''))
-  const trimmed = unwrapped.trim()
+  const trimmed = value.replace(/^\uFEFF/, '').trim()
   if (!trimmed) {
     return null
   }
@@ -69,15 +64,7 @@ function finalizeFullFirstUserPrompt(value: string): string | null {
     return null
   }
   // Bound before scanning so a multi-MB paste cannot force a full lowercase copy.
-  const bounded = sliceAtCodeUnitLimit(trimmed, FULL_FIRST_USER_PROMPT_SAFETY_LIMIT)
-  // Reject pure Grok bootstrap dumps even when they arrived via a non-Grok path.
-  // Safe on the bounded slice: stripGrokUserQueryEnvelope above already unwrapped
-  // any <user_query>, wherever it sat, so a match here means there was none.
-  const lower = bounded.toLowerCase()
-  if (lower.startsWith('<user_info>') && !lower.includes('<user_query>')) {
-    return null
-  }
-  return bounded
+  return sliceAtCodeUnitLimit(trimmed, FULL_FIRST_USER_PROMPT_SAFETY_LIMIT)
 }
 
 function isSuppressedFullFirstUserPrompt(value: string): boolean {

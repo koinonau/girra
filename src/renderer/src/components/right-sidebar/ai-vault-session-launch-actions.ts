@@ -7,7 +7,6 @@ import {
 import { launchAiVaultSessionInNewTab } from '@/lib/launch-ai-vault-session'
 import { useAppStore } from '@/store'
 import type { AiVaultAgent, AiVaultSession } from '../../../../shared/ai-vault-types'
-import { prepareAiVaultSessionForResume } from '@/lib/ai-vault-session-resume-preparation'
 import type { Worktree } from '../../../../shared/worktree/types'
 import { translate } from '@/i18n/i18n'
 import { agentLabel } from './ai-vault-session-filters'
@@ -64,18 +63,13 @@ export function useAiVaultSessionLaunchActions({
 
   const copyResumeCommand = useCallback(
     async (session: AiVaultSession, worktreeId?: string | null): Promise<void> => {
-      try {
-        const preparedSession = await prepareAiVaultSessionForResume(session)
-        await window.api.ui.writeClipboardText(buildResumeCommand(preparedSession, worktreeId))
-        toast.success(
-          translate(
-            'auto.components.right.sidebar.AiVaultPanel.resumeCommandCopied',
-            'Resume command copied'
-          )
+      await window.api.ui.writeClipboardText(buildResumeCommand(session, worktreeId))
+      toast.success(
+        translate(
+          'auto.components.right.sidebar.AiVaultPanel.resumeCommandCopied',
+          'Resume command copied'
         )
-      } catch (error) {
-        notifyAiVaultSessionPreparationFailure(error)
-      }
+      )
     },
     [buildResumeCommand]
   )
@@ -106,31 +100,22 @@ export function useAiVaultSessionLaunchActions({
           )
         )
       }
-      void prepareAiVaultSessionForResume(session)
-        .then((preparedSession) => {
-          const launchResult = launchAiVaultSessionInNewTab({
-            agent: session.agent,
-            worktreeId: targetId.worktreeId,
-            ...buildResumeStartup(preparedSession, targetId.worktreeId)
-          })
-          if (launchResult.tabId === null) {
-            void launchResult.runtimeLaunch.then((outcome) => {
-              if (outcome.status === 'failed') {
-                toast.error(
-                  outcome.message ||
-                    translate(
-                      'auto.lib.launch.agent.in.new.tab.11cce5cc77',
-                      'Could not launch {{value0}} in a new terminal.',
-                      { value0: agentLabel(session.agent) }
-                    )
+      const launchResult = launchAiVaultSessionInNewTab({
+        agent: session.agent,
+        worktreeId: targetId.worktreeId,
+        ...buildResumeStartup(session, targetId.worktreeId)
+      })
+      if (launchResult.tabId === null) {
+        void launchResult.runtimeLaunch.then((outcome) => {
+          if (outcome.status === 'failed') {
+            toast.error(
+              outcome.message ||
+                translate(
+                  'auto.lib.launch.agent.in.new.tab.11cce5cc77',
+                  'Could not launch {{value0}} in a new terminal.',
+                  { value0: agentLabel(session.agent) }
                 )
-                return
-              }
-              if (useAppStore.getState().activeWorktreeId !== targetId.worktreeId) {
-                activateAiVaultResumeWorkspace(targetId.worktreeId)
-              }
-              showQueuedToast()
-            })
+            )
             return
           }
           if (useAppStore.getState().activeWorktreeId !== targetId.worktreeId) {
@@ -138,7 +123,12 @@ export function useAiVaultSessionLaunchActions({
           }
           showQueuedToast()
         })
-        .catch(notifyAiVaultSessionPreparationFailure)
+        return
+      }
+      if (useAppStore.getState().activeWorktreeId !== targetId.worktreeId) {
+        activateAiVaultResumeWorkspace(targetId.worktreeId)
+      }
+      showQueuedToast()
     },
     [activeWorktree?.id, activeWorktreeId, buildResumeStartup, targetState]
   )
@@ -215,17 +205,6 @@ export function useAiVaultSessionLaunchActions({
     continuationRequest,
     handleContinuationDialogOpenChange
   }
-}
-
-function notifyAiVaultSessionPreparationFailure(error: unknown): void {
-  toast.error(
-    error instanceof Error
-      ? error.message
-      : translate(
-          'auto.components.right.sidebar.AiVaultPanel.prepareSessionResumeFailed',
-          'Could not prepare this session for resume.'
-        )
-  )
 }
 
 function resolveAiVaultSessionLaunchTargetOrNotify(

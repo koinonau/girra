@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CODEX_SESSION_OPTION_CATALOG } from './agent-session-option-catalog-claude-codex'
+import { CLAUDE_SESSION_OPTION_CATALOG } from './agent-session-option-catalog-claude'
 import { buildNativeChatSessionOptionSnapshot } from './native-chat-session-option-snapshot'
 import { createNativeChatSessionOptionRecord } from './native-chat-session-option-state'
 import {
@@ -9,10 +9,10 @@ import {
 } from './structured-agent-session-options'
 
 describe('structured agent session options', () => {
-  it('projects native Codex selects while bridge Codex keeps its agent picker', () => {
+  it('projects native Claude selects on a separate transport from the bridge', () => {
     const state = applyStructuredAgentSessionOptions(
-      createStructuredAgentSessionOptionState('codex'),
-      CODEX_SESSION_OPTION_CATALOG,
+      createStructuredAgentSessionOptionState('claude'),
+      CLAUDE_SESSION_OPTION_CATALOG,
       {
         models: [
           {
@@ -42,11 +42,11 @@ describe('structured agent session options', () => {
       kind: { type: 'select', currentValue: 'medium' }
     })
 
-    const bridgeRecord = createNativeChatSessionOptionRecord('codex')
-    bridgeRecord.model = { value: 'gpt-5.6-sol', source: 'reported' }
+    const bridgeRecord = createNativeChatSessionOptionRecord('claude')
+    bridgeRecord.model = { value: 'opus', source: 'reported' }
     const bridge = buildNativeChatSessionOptionSnapshot({
-      catalog: CODEX_SESSION_OPTION_CATALOG,
-      models: CODEX_SESSION_OPTION_CATALOG.models,
+      catalog: CLAUDE_SESSION_OPTION_CATALOG,
+      models: CLAUDE_SESSION_OPTION_CATALOG.models,
       record: bridgeRecord,
       mode: 'live',
       modelLabel: 'Model',
@@ -55,16 +55,13 @@ describe('structured agent session options', () => {
     // Same catalog, same `dispatched` vocabulary — only the transport separates them.
     expect(structured.every((descriptor) => descriptor.transport === 'agent-session')).toBe(true)
     expect(bridge.every((descriptor) => descriptor.transport === 'catalog')).toBe(true)
-    expect(bridge[0]).toMatchObject({ action: { type: 'agent-picker' } })
-    expect(bridge.find((descriptor) => descriptor.id === 'effort')).toMatchObject({
-      action: { type: 'agent-picker' }
-    })
+    expect(bridge[0]).not.toHaveProperty('action')
   })
 
   it('uses provider-scoped models and retains the current unknown id', () => {
     const state = applyStructuredAgentSessionOptions(
-      createStructuredAgentSessionOptionState('codex'),
-      CODEX_SESSION_OPTION_CATALOG,
+      createStructuredAgentSessionOptionState('claude'),
+      CLAUDE_SESSION_OPTION_CATALOG,
       {
         models: [
           {
@@ -86,8 +83,8 @@ describe('structured agent session options', () => {
 
   it('projects live options as directly settable descriptors', () => {
     const state = applyStructuredAgentSessionOptions(
-      createStructuredAgentSessionOptionState('codex'),
-      CODEX_SESSION_OPTION_CATALOG,
+      createStructuredAgentSessionOptionState('claude'),
+      CLAUDE_SESSION_OPTION_CATALOG,
       {
         models: [
           {

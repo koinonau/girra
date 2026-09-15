@@ -11,7 +11,6 @@ import { useDetectedAgents } from '@/hooks/useDetectedAgents'
 import { useAgentDetectionTargetForWorktree } from '@/hooks/useAgentDetectionTarget'
 import { getConnectionIdFromState } from '@/lib/connection-context'
 import { getLocalProjectExecutionRuntimeContext } from '@/lib/local-preflight-context'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { getRuntimeEnvironmentIdForWorktree } from '@/lib/worktree-runtime-owner'
 import { getActiveRuntimeTarget } from '@/runtime/runtime-rpc-client'
 import { useOptionalShortcutLabel, useShortcutLabel } from '@/hooks/useShortcutLabel'
@@ -84,7 +83,6 @@ export type TabBarRuntimeModel = {
   unifiedTabByVisibleId: Map<string, Tab>
   workspaceHasSimulatorTab: boolean
   toggleTabViewMode: (tabId: string) => void
-  nativeChatTranscriptIsLocalReadable: boolean
   managedBrowserCreationEnabled: boolean
   mobileEmulatorCreationEnabled: boolean
 } & TabBarAgentProjections
@@ -252,9 +250,6 @@ export function useTabBarRuntimeModel({
   // Why: every retained TabBar observes the same hot maps; one feature-gated selector shares their projections.
   const { nativeChatEnabled, tabAgentTypesByTabId, nativeChatTabWideFallbackUnsafeTabsById } =
     useAppStore(useShallow(selectTabBarAgentProjections))
-  const nativeChatTranscriptIsLocalReadable = useAppStore((s) =>
-    isNativeChatTranscriptLocalReadable(getConnectionIdFromState(s, worktreeId))
-  )
 
   return {
     newTerminalShortcut,
@@ -282,7 +277,6 @@ export function useTabBarRuntimeModel({
     nativeChatEnabled,
     tabAgentTypesByTabId,
     nativeChatTabWideFallbackUnsafeTabsById,
-    nativeChatTranscriptIsLocalReadable,
     managedBrowserCreationEnabled,
     mobileEmulatorCreationEnabled
   }

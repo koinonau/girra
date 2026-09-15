@@ -12,13 +12,11 @@ import {
   structuredAdoptionConflictError
 } from '../native-chat/structured-agent-session-history-adoption'
 import { resolveSessionFilePath } from '../native-chat/session-file-resolver'
-import { configuredAdditionalCodexHomePaths } from '../ai-vault/cached-session-list'
-import { getOrcaManagedCodexHomePath, getSystemCodexHomePath } from '../codex/codex-home-paths'
 
 export function resolveCommittedStructuredAgentSessionAdoptionIntent(input: {
   host: StructuredAgentSessionHost | null
   envelope: { sessionId: string; clientOperationId: string }
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   callerKey?: string
   resumeFrom?: { providerSessionId: string }
   location: AgentSessionExecutionLocation
@@ -58,7 +56,7 @@ export function resolveCommittedStructuredAgentSessionAdoptionIntent(input: {
 
 export async function resolveStructuredAgentSessionAdoptionForCreate(input: {
   host: StructuredAgentSessionHost | null
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   providerSessionId: string
   selfSessionId: string
   selectedAccountHomePath: string
@@ -77,30 +75,11 @@ export async function resolveStructuredAgentSessionAdoptionForCreate(input: {
   return resolveStructuredAgentSessionAdoption({
     agent: input.agent,
     providerSessionId: input.providerSessionId,
-    candidateAccountHomes: structuredAdoptionAccountHomeCandidates(input),
+    // Recognised adoption homes, most-preferred first.
+    candidateAccountHomes: [input.selectedAccountHomePath, join(homedir(), '.claude')],
     resolveTranscript: async ({ agent, providerSessionId, accountHomePath }) =>
-      resolveSessionFilePath(
-        agent,
-        providerSessionId,
-        agent === 'claude'
-          ? { claudeProjectsDir: join(accountHomePath, 'projects') }
-          : { codexSessionsDirs: [join(accountHomePath, 'sessions')] }
-      )
+      resolveSessionFilePath(agent, providerSessionId, {
+        claudeProjectsDir: join(accountHomePath, 'projects')
+      })
   })
-}
-
-/** Recognised adoption homes, most-preferred first. */
-function structuredAdoptionAccountHomeCandidates(input: {
-  agent: 'claude' | 'codex'
-  selectedAccountHomePath: string
-}): string[] {
-  if (input.agent === 'claude') {
-    return [input.selectedAccountHomePath, join(homedir(), '.claude')]
-  }
-  return [
-    input.selectedAccountHomePath,
-    ...configuredAdditionalCodexHomePaths(),
-    getOrcaManagedCodexHomePath(),
-    getSystemCodexHomePath()
-  ]
 }

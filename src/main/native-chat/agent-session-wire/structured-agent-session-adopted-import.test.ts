@@ -17,7 +17,7 @@ import { agentSessionJournalCloseRetries } from '../agent-session-journal/journa
 import * as legacyImport from '../agent-session-journal/journal-legacy-import'
 
 const NOW = 1_800_000_000_000
-const SESSION = 'codex_adopting_session'
+const SESSION = 'claude_adopting_session'
 const THREAD = 'adopted-thread'
 const OPERATION = `${NOW}-${'1'.padStart(32, '0')}`
 let root: string | null = null
@@ -32,24 +32,16 @@ afterEach(async () => {
   vi.restoreAllMocks()
 })
 
-/** A minimal Codex rollout the legacy transcript decoder can read back. */
-async function writeCodexRollout(path: string, text: string): Promise<void> {
-  const lines = [
-    JSON.stringify({
-      type: 'session_meta',
-      payload: { id: THREAD, timestamp: '2026-09-06T18:00:00.000Z', cwd: '/workspace' }
-    }),
-    JSON.stringify({
-      type: 'response_item',
-      timestamp: '2026-09-06T18:00:01.000Z',
-      payload: {
-        type: 'message',
-        role: 'user',
-        content: text
-      }
-    })
-  ]
-  await writeFile(path, `${lines.join('\n')}\n`, 'utf8')
+/** A minimal Claude transcript the legacy transcript decoder can read back. */
+async function writeClaudeTranscript(path: string, text: string): Promise<void> {
+  const line = JSON.stringify({
+    type: 'user',
+    uuid: 'user-1',
+    sessionId: THREAD,
+    timestamp: '2026-09-06T18:00:01.000Z',
+    message: { role: 'user', content: text }
+  })
+  await writeFile(path, `${line}\n`, 'utf8')
 }
 
 function attachParams(transcriptPath?: string): AgentSessionAttachParams {
@@ -66,12 +58,12 @@ function attachParams(transcriptPath?: string): AgentSessionAttachParams {
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    agent: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    provider: 'claude',
+    agent: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     runtimeKind: 'native',
     adopt: {
-      providerHandle: { kind: 'codex', threadId: THREAD },
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null },
       ...(transcriptPath ? { transcriptPath } : {})
     }
   }
@@ -96,7 +88,7 @@ function adapter(): StructuredAgentSessionAdapter {
         process: { hostId: 'local', pid: 4242, processStartTimeMs: NOW, spawnToken },
         link: {
           linkId: 'resumed-link',
-          handle: { provider: 'codex', threadId: THREAD },
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: 'resumed',
           mintedAtFence: fence,
           observedAt: NOW
@@ -137,8 +129,8 @@ async function attach(
 describe('adopting a provider conversation on create', () => {
   it('seeds the chain from the adopted handle and fills the journal from its transcript', async () => {
     root = await mkdtemp(join(tmpdir(), 'orca-adopt-import-'))
-    const transcriptPath = join(root, 'rollout.jsonl')
-    await writeCodexRollout(transcriptPath, 'token ORCA-ADOPT-1')
+    const transcriptPath = join(root, 'transcript.jsonl')
+    await writeClaudeTranscript(transcriptPath, 'token ORCA-ADOPT-1')
     const sessionAdapter = adapter()
 
     const result = await attach(transcriptPath, sessionAdapter)
@@ -152,13 +144,17 @@ describe('adopting a provider conversation on create', () => {
 
   it('replays create without replacing journal-only messages or rereading the source', async () => {
     root = await mkdtemp(join(tmpdir(), 'orca-adopt-replay-'))
-    const transcriptPath = join(root, 'rollout.jsonl')
-    await writeCodexRollout(transcriptPath, 'original turn')
+    const transcriptPath = join(root, 'transcript.jsonl')
+    await writeClaudeTranscript(transcriptPath, 'original turn')
     const sessionAdapter = adapter()
     const first = await attach(transcriptPath, sessionAdapter, async ({ journal }) => {
       await journal.appendItem(
-        { provider: 'legacy', agent: 'codex', sessionId: THREAD, recordId: 'journal-only' },
-        { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'not yet in rollout' }] },
+        { provider: 'legacy', agent: 'claude', sessionId: THREAD, recordId: 'journal-only' },
+        {
+          kind: 'message',
+          role: 'user',
+          blocks: [{ type: 'text', text: 'not yet in transcript' }]
+        },
         { fence: 1 }
       )
       await journal.close()
@@ -173,7 +169,7 @@ describe('adopting a provider conversation on create', () => {
       throw new Error('attach failed')
     }
     expect(replay.cursor.epoch).toBe(first.cursor.epoch)
-    expect(JSON.stringify(replay.value.page.items)).toContain('not yet in rollout')
+    expect(JSON.stringify(replay.value.page.items)).toContain('not yet in transcript')
     expect(sessionAdapter.acquire).toHaveBeenCalledTimes(1)
   })
 
@@ -181,9 +177,9 @@ describe('adopting a provider conversation on create', () => {
     'refuses %s source before claiming a conversation',
     async (kind) => {
       root = await mkdtemp(join(tmpdir(), 'orca-adopt-preflight-'))
-      const transcriptPath = join(root, 'rollout.jsonl')
+      const transcriptPath = join(root, 'transcript.jsonl')
       if (kind === 'oversized') {
-        await writeCodexRollout(transcriptPath, 'original turn')
+        await writeClaudeTranscript(transcriptPath, 'original turn')
         await truncate(transcriptPath, 16 * 1024 * 1024 + 1)
       } else if (kind === 'empty' || kind === 'invalid') {
         await writeFile(transcriptPath, kind === 'empty' ? '' : 'not json\n')
@@ -212,8 +208,8 @@ describe('adopting a provider conversation on create', () => {
 
   it('still releases acquisition and closes the provisional journal on an import write failure', async () => {
     root = await mkdtemp(join(tmpdir(), 'orca-adopt-write-failure-'))
-    const transcriptPath = join(root, 'rollout.jsonl')
-    await writeCodexRollout(transcriptPath, 'valid source')
+    const transcriptPath = join(root, 'transcript.jsonl')
+    await writeClaudeTranscript(transcriptPath, 'valid source')
     vi.spyOn(AgentSessionJournal.prototype, 'replaceEpochItems').mockRejectedValueOnce(
       new Error('disk write failed')
     )
@@ -227,8 +223,8 @@ describe('adopting a provider conversation on create', () => {
 
   it('prepares a valid source once before acquisition and imports those exact items', async () => {
     root = await mkdtemp(join(tmpdir(), 'orca-adopt-once-'))
-    const transcriptPath = join(root, 'rollout.jsonl')
-    await writeCodexRollout(transcriptPath, 'prepared before acquiring')
+    const transcriptPath = join(root, 'transcript.jsonl')
+    await writeClaudeTranscript(transcriptPath, 'prepared before acquiring')
     const prepare = vi.spyOn(legacyImport, 'prepareLegacyTranscriptImport')
     const sessionAdapter = adapter()
     const acquire = sessionAdapter.acquire

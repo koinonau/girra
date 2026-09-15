@@ -35,7 +35,7 @@ export const CLEANUP_METHODS = [
 
 /** Starts, extends, retains or reads work, so every one stays refused once the setting is off. */
 export const ADMISSION_METHODS = [
-  { method: 'agentSession.createSupport', params: { worktree: 'id:workspace-1', agent: 'codex' } },
+  { method: 'agentSession.createSupport', params: { worktree: 'id:workspace-1', agent: 'claude' } },
   {
     method: 'agentSession.create',
     params: {
@@ -44,11 +44,11 @@ export const ADMISSION_METHODS = [
         payloadFingerprint: computeAgentSessionPayloadFingerprint({
           method: 'agentSession.create',
           sessionId: SESSION,
-          fields: { worktree: 'id:workspace-1', agent: 'codex' }
+          fields: { worktree: 'id:workspace-1', agent: 'claude' }
         })
       }),
       worktree: 'id:workspace-1',
-      agent: 'codex'
+      agent: 'claude'
     }
   },
   { method: 'agentSession.ensure', params: attachParams() },

@@ -111,7 +111,7 @@ function seedSleepingRecord(worktreeId: string, sessionId: string): string {
         paneKey,
         tabId: WEB_TAB_ID,
         worktreeId,
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         providerSession: { key: 'session_id' as const, id: sessionId },
         prompt: 'keep working',
         state: 'working' as const,
@@ -158,7 +158,7 @@ describe('parked mirrored-pane resume replay', () => {
   it('replays the deferred sweep and relaunches once the mirror retracts the pane', () => {
     const worktree = makeRuntimeOwnedWorktree()
     seedState(worktree)
-    const paneKey = seedSleepingRecord(worktree.id, 'codex-session-replay-1')
+    const paneKey = seedSleepingRecord(worktree.id, 'claude-session-replay-1')
 
     expect(resumeSleepingAgentSessionsForWorktree(worktree.id)).toBe(0)
     expect(useAppStore.getState().sleepingAgentSessionsByPaneKey[paneKey]).toBeDefined()
@@ -172,7 +172,7 @@ describe('parked mirrored-pane resume replay', () => {
     expect(tabs).toHaveLength(1)
     expect(after.automaticAgentResumeClaimsByTabId[tabs[0]!.id]?.providerSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-replay-1'
+      id: 'claude-session-replay-1'
     })
     expect(after.sleepingAgentSessionsByPaneKey[paneKey]).toBeUndefined()
   })
@@ -180,7 +180,7 @@ describe('parked mirrored-pane resume replay', () => {
   it('replays without relaunching when the mirror reports the host PTY live', () => {
     const worktree = makeRuntimeOwnedWorktree()
     seedState(worktree)
-    const paneKey = seedSleepingRecord(worktree.id, 'codex-session-replay-2')
+    const paneKey = seedSleepingRecord(worktree.id, 'claude-session-replay-2')
 
     resumeSleepingAgentSessionsForWorktree(worktree.id)
 
@@ -205,7 +205,7 @@ describe('parked mirrored-pane resume replay', () => {
 
     const worktree = makeRuntimeOwnedWorktree()
     seedState(worktree)
-    const paneKey = seedSleepingRecord(worktree.id, 'codex-session-replay-3')
+    const paneKey = seedSleepingRecord(worktree.id, 'claude-session-replay-3')
 
     expect(resumeSleepingAgentSessionsForWorktree(worktree.id)).toBe(0)
     expect(useAppStore.getState().sleepingAgentSessionsByPaneKey[paneKey]).toBeDefined()

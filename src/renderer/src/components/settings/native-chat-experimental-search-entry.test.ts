@@ -3,7 +3,7 @@ import { getNativeChatExperimentalSearchEntry } from './native-chat-experimental
 import { matchesSettingsSearch } from './settings-search'
 
 describe('native chat experimental search entry', () => {
-  it.each(['openclaude', 'omp'])('matches the supported-agent keyword %s', (query) => {
+  it.each(['claude'])('matches the supported-agent keyword %s', (query) => {
     expect(matchesSettingsSearch(query, getNativeChatExperimentalSearchEntry())).toBe(true)
   })
 })

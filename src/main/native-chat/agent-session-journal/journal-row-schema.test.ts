@@ -50,7 +50,7 @@ describe('journal row validation', () => {
         ...BASE,
         kind: 'epoch',
         reason: 'session_created',
-        providerHandle: { kind: 'codex', threadId: 't' }
+        providerHandle: { kind: 'claude', sessionId: 't', leafUuid: null }
       })
     ).toBe(true)
     expect(
@@ -69,7 +69,7 @@ describe('journal row validation', () => {
         kind: 'submission',
         clientMessageId: 'm-1',
         payloadFingerprint: 'a'.repeat(64),
-        providerHandle: { kind: 'codex', threadId: 't' },
+        providerHandle: { kind: 'claude', sessionId: 't', leafUuid: null },
         body: { kind: 'message', role: 'user', blocks: [] }
       })
     ).toBe(true)
@@ -79,7 +79,7 @@ describe('journal row validation', () => {
         kind: 'dispatch',
         clientMessageId: 'm-1',
         state: 'accepted',
-        providerItemId: 'codex:t:turn:0',
+        providerItemId: 'claude:t:user-1',
         reason: null
       })
     ).toBe(true)
@@ -125,11 +125,11 @@ describe('journal row validation', () => {
       kind: 'submission',
       clientMessageId: 'm-1',
       payloadFingerprint: 'a'.repeat(64),
-      providerHandle: { kind: 'codex', threadId: 't' },
+      providerHandle: { kind: 'claude', sessionId: 't', leafUuid: null },
       body: { kind: 'message', role: 'user', blocks: [] }
     }
     expect(parse({ ...submission, payloadFingerprint: undefined as never })).toBe(false)
-    expect(parse({ ...submission, providerHandle: 'codex' })).toBe(false)
+    expect(parse({ ...submission, providerHandle: 'claude' })).toBe(false)
     expect(parse({ ...submission, body: 'hi' })).toBe(false)
   })
 
@@ -178,7 +178,7 @@ describe('journal row validation', () => {
         kind: 'submission',
         clientMessageId: 'm-1',
         payloadFingerprint: 'a'.repeat(64),
-        providerHandle: { kind: 'codex', threadId: 't' },
+        providerHandle: { kind: 'claude', sessionId: 't', leafUuid: null },
         body: { kind: 'status', text: 'not a message' }
       })
     ).toBe(false)

@@ -5,7 +5,6 @@ import type { AiVaultSession } from '../../../../shared/ai-vault-types'
 import type { AgentSessionHandleProvider } from '../../../../shared/agent-session-provider-handle'
 import { hasRuntimeRpcErrorCode } from '../../../../shared/runtime-rpc-error-code'
 import { parseWorkspaceKey } from '../../../../shared/workspace-scope'
-import { prepareAiVaultSessionForResume } from '@/lib/ai-vault-session-resume-preparation'
 import { adoptAgentSessionLaunchVerdict } from '@/lib/agent-session-launch-plan'
 import {
   activateAndRevealFolderWorkspace,
@@ -31,14 +30,11 @@ export async function resumeAiVaultSessionInNewChat(
   worktreeId: string
 ): Promise<void> {
   try {
-    // Codex rows can live under a shared legacy home; the same preparation the terminal resume
-    // runs re-pins them, and its result is what names the conversation the host will look for.
-    const preparedSession = await prepareAiVaultSessionForResume(session)
     const settlement = await adoptAgentSessionLaunchVerdict({
       route: 'structured-native-chat',
       agent,
       worktreeId,
-      resumeFrom: { providerSessionId: preparedSession.sessionId }
+      resumeFrom: { providerSessionId: session.sessionId }
     }).launch({})
     if (settlement?.kind === 'failed') {
       notifyAiVaultSessionResumeInChatFailure(settlement.error)

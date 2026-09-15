@@ -73,13 +73,13 @@ const structuredTab = {
   groupId: 'group-1',
   contentType: 'agent-session',
   entityId: 'session-1',
-  label: 'Codex Chat',
+  label: 'Claude Chat',
   customLabel: null,
   color: null,
   sortOrder: 0,
   createdAt: 0,
   isPinned: false,
-  agentSessionAgent: 'codex'
+  agentSessionAgent: 'claude'
 } satisfies Tab
 
 const providerSession = { key: 'session_id', id: '01a002e9-9a1c-7d42-a642-e481f64446f1' } as const
@@ -88,7 +88,7 @@ function summary(overrides: Partial<AgentSessionStatusSummary> = {}): AgentSessi
   return {
     sessionId: 'session-1',
     workspaceId: 'wt-1',
-    agent: 'codex',
+    agent: 'claude',
     status: 'working',
     hostExecutionOwned: true,
     latestPrompt: 'hello',
@@ -169,11 +169,11 @@ describe('StructuredAgentSessionStatusBridge', () => {
       expect.objectContaining({
         state: 'working',
         prompt: 'hello',
-        agentType: 'codex',
+        agentType: 'claude',
         sessionBoundary: false,
         tabId: structuredTab.id,
         worktreeId: 'wt-1',
-        terminalTitle: 'Codex Chat',
+        terminalTitle: 'Claude Chat',
         terminalResumeEligible: false,
         providerSession
       })
@@ -356,7 +356,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
         type: 'snapshot',
         sessions: [
           summary({
-            model: 'gpt-5-codex',
+            model: 'sonnet',
             toolName: 'shell',
             toolInput: 'pnpm test',
             lastAssistantMessage: 'Running the suite now.'
@@ -366,7 +366,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
     )
     expect(statuses()).toEqual([
       expect.objectContaining({
-        model: 'gpt-5-codex',
+        model: 'sonnet',
         toolName: 'shell',
         toolInput: 'pnpm test',
         lastAssistantMessage: 'Running the suite now.'
@@ -380,7 +380,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
         session: summary({
           status: 'idle',
           updatedAt: 2,
-          model: 'gpt-5-codex',
+          model: 'sonnet',
           lastAssistantMessage: 'Suite is green.'
         })
       })
@@ -388,7 +388,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
     expect(statuses()).toEqual([
       expect.objectContaining({
         state: 'done',
-        model: 'gpt-5-codex',
+        model: 'sonnet',
         lastAssistantMessage: 'Suite is green.'
       })
     ])
@@ -402,7 +402,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
         session: summary({
           status: 'idle',
           updatedAt: 3,
-          model: 'gpt-5-codex',
+          model: 'sonnet',
           lastAssistantMessage: 'Suite is green — 412 passed.'
         })
       })
@@ -439,7 +439,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
     expect(mocks.store?.getState().agentStatusByPaneKey).toBe(before)
   })
 
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'sorts restored %s completions by host time and advances identical turns',
     async (agent) => {
       const now = Date.now()
@@ -554,7 +554,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
     expect(feed().target).toEqual({ kind: 'environment', environmentId: 'env-1' })
   })
 
-  it('does not project an unknown provider as Codex', async () => {
+  it('does not project an unknown provider as Claude', async () => {
     mocks.store?.setState({
       unifiedTabsByWorktree: {
         'wt-1': [{ ...structuredTab, agentSessionAgent: 'gemini' }]

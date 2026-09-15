@@ -38,7 +38,7 @@ const sleepingAgentFor = (worktreeId: string, tabId = 'tab-1') => ({
     paneKey: `${tabId}:leaf-1`,
     tabId,
     worktreeId,
-    agent: 'codex' as const,
+    agent: 'claude' as const,
     providerSession: { key: 'session_id' as const, id: 'sess-1' },
     prompt: 'sleeping',
     state: 'waiting' as const,

@@ -17,7 +17,7 @@ const {
 
 const SESSION_ID = 'a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d'
 
-function installRecordProvider(provider: 'claude' | 'codex' | null): void {
+function installRecordProvider(provider: 'claude' | null): void {
   hostRef.current = {
     deps: { store: { getRecord: () => (provider ? { provider } : null) } }
   }
@@ -59,26 +59,25 @@ describe('structuredWorkerAgent', () => {
   })
 
   it('reads a rehydrated worker provider off the durable record', () => {
-    installRecordProvider('codex')
+    installRecordProvider('claude')
     const identity = rehydratedIdentity()
     expect(identity.agent).toBeNull()
-    // Defaulting here is what stamped a restarted Codex worker's frozen archive as Claude.
-    expect(structuredWorkerAgent(identity)).toBe('codex')
+    expect(structuredWorkerAgent(identity)).toBe('claude')
   })
 
   it('keeps the provider this process registered, without consulting the record', () => {
-    installRecordProvider('claude')
+    installRecordProvider(null)
     const handle = mintStructuredWorkerHandle()
     const identity = structuredWorkerIdentities.register({
       handle,
       sessionId: SESSION_ID,
-      agent: 'codex',
+      agent: 'claude',
       paneKey: mintStructuredWorkerPaneKey(SESSION_ID),
       processIncarnation: structuredWorkerProcessIncarnation(SESSION_ID),
       worktreeId: 'wt_1',
       hostScope: { kind: 'local', hostId: 'local' }
     })
-    expect(structuredWorkerAgent(identity)).toBe('codex')
+    expect(structuredWorkerAgent(identity)).toBe('claude')
   })
 
   it('falls back to claude only when no record can name the provider', () => {

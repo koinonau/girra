@@ -96,7 +96,6 @@ describe('launchAiVaultSessionInNewTab', () => {
       command: "claude '--dangerously-skip-permissions' '--effort' 'max' '--resume' 'session-1'",
       cwd: 'C:\\Users\\alice\\repo',
       env: { ANTHROPIC_BASE_URL: 'https://claude.example.test' },
-      envToDelete: ['CODEX_HOME'],
       launchConfig: {
         agentCommand: "claude '--dangerously-skip-permissions' '--effort' 'max'",
         agentArgs: '--dangerously-skip-permissions --effort max',
@@ -111,7 +110,6 @@ describe('launchAiVaultSessionInNewTab', () => {
     expect(mockQueueTabStartupCommand).toHaveBeenCalledWith('tab-1', {
       command: "claude '--dangerously-skip-permissions' '--effort' 'max' '--resume' 'session-1'",
       env: { ANTHROPIC_BASE_URL: 'https://claude.example.test' },
-      envToDelete: ['CODEX_HOME'],
       launchConfig: {
         agentCommand: "claude '--dangerously-skip-permissions' '--effort' 'max'",
         agentArgs: '--dangerously-skip-permissions --effort max',
@@ -129,11 +127,11 @@ describe('launchAiVaultSessionInNewTab', () => {
 
   it('creates a split group before launching when a split direction is provided', () => {
     launchAiVaultSessionInNewTab({
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1',
       targetGroupId: 'group-1',
       splitDirection: 'right',
-      command: 'codex resume session-2'
+      command: 'claude --resume session-2'
     })
 
     expect(mockCreateEmptySplitGroup).toHaveBeenCalledWith('wt-1', 'group-1', 'right')
@@ -145,16 +143,15 @@ describe('launchAiVaultSessionInNewTab', () => {
     runtimeMocks.isWebRuntimeSessionActive.mockReturnValue(true)
 
     const result = launchAiVaultSessionInNewTab({
-      agent: 'codex',
+      agent: 'opencode',
       worktreeId: 'wt-1',
       targetGroupId: 'group-1',
-      command: "codex resume 'session-1'",
-      env: { CODEX_PROFILE: 'runtime' },
-      envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+      command: "opencode --session 'session-1'",
+      env: { OPENCODE_CONFIG: 'runtime' },
       launchConfig: {
-        agentCommand: 'codex',
+        agentCommand: 'opencode',
         agentArgs: '',
-        agentEnv: { CODEX_PROFILE: 'runtime' }
+        agentEnv: { OPENCODE_CONFIG: 'runtime' }
       },
       providerSession: { key: 'session_id', id: 'session-1' }
     })
@@ -165,14 +162,13 @@ describe('launchAiVaultSessionInNewTab', () => {
       environmentId: 'env-1',
       targetGroupId: 'group-1',
       agentSessionKind: 'resume',
-      launchAgent: 'codex',
-      command: "codex resume 'session-1'",
-      env: { CODEX_PROFILE: 'runtime' },
-      envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+      launchAgent: 'opencode',
+      command: "opencode --session 'session-1'",
+      env: { OPENCODE_CONFIG: 'runtime' },
       launchConfig: {
-        agentCommand: 'codex',
+        agentCommand: 'opencode',
         agentArgs: '',
-        agentEnv: { CODEX_PROFILE: 'runtime' }
+        agentEnv: { OPENCODE_CONFIG: 'runtime' }
       },
       providerSession: { key: 'session_id', id: 'session-1' },
       agentArgs: '',

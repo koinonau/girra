@@ -21,7 +21,6 @@ export function syntheticCandidate(
   const at = new Date(1740000000000)
   return {
     agent: 'claude',
-    codexHome: null,
     file: {
       path: SYNTHETIC_TRANSCRIPT,
       mtimeMs: at.getTime(),

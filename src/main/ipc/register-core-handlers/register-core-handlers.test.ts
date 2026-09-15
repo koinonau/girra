@@ -406,7 +406,6 @@ describe('registerCoreHandlers', () => {
     const rateLimits = { marker: 'rateLimits' }
     const agentAwakeService = { marker: 'agentAwakeService' }
     const onBeforeRelaunch = vi.fn()
-    const getAdditionalAiVaultCodexHomePaths = vi.fn(() => ['/runtime/codex/home'])
 
     registerCoreHandlers(
       store as never,
@@ -421,7 +420,7 @@ describe('registerCoreHandlers', () => {
       undefined,
       agentAwakeService as never,
       undefined,
-      { getAdditionalAiVaultCodexHomePaths, onBeforeRelaunch }
+      { onBeforeRelaunch }
     )
 
     const aiVaultOptions = registerAiVaultHandlersMock.mock.calls[0]?.[0]
@@ -476,10 +475,8 @@ describe('registerCoreHandlers', () => {
     expect(registerEphemeralVmHandlersMock).toHaveBeenCalledWith(store, undefined)
     expect(registerAiVaultHandlersMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        getAdditionalCodexHomePaths: getAdditionalAiVaultCodexHomePaths,
         getActiveRuntimeAiVaultHostInfos: expect.any(Function),
-        scanRuntimeAiVaultSessions: expect.any(Function),
-        prepareRuntimeSessionResume: expect.any(Function)
+        scanRuntimeAiVaultSessions: expect.any(Function)
       })
     )
     expect(aiVaultOptions.getActiveRuntimeAiVaultHostInfos()).toEqual([])
@@ -508,7 +505,7 @@ describe('registerCoreHandlers', () => {
       issues: [
         expect.objectContaining({
           executionHostId: 'runtime:env-123',
-          agent: 'codex',
+          agent: 'claude',
           path: 'env-123',
           message: expect.stringContaining('Invalid aiVault.listSessions response')
         })
@@ -526,26 +523,6 @@ describe('registerCoreHandlers', () => {
         executionHostId: 'runtime:env-123'
       },
       3000
-    )
-
-    callRuntimeEnvironmentMock.mockResolvedValueOnce({
-      ok: true,
-      result: { useRealCodexHome: true }
-    })
-    const prepareArgs = {
-      agent: 'codex',
-      filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-      codexHome: '/managed',
-      executionHostId: 'runtime:env-123'
-    }
-    await expect(
-      aiVaultOptions.prepareRuntimeSessionResume('env-123', prepareArgs)
-    ).resolves.toEqual({ useRealCodexHome: true })
-    expect(callRuntimeEnvironmentMock).toHaveBeenLastCalledWith(
-      '/test/user-data',
-      'env-123',
-      'aiVault.prepareSessionResume',
-      prepareArgs
     )
   })
 

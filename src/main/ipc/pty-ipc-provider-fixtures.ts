@@ -227,7 +227,7 @@ export function createPtyIpcProviderFixtures(ctx: { mainWindow: unknown }) {
     keyId: 'claim-key',
     identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-    agent: 'codex' as const
+    agent: 'claude' as const
   }
   const recoveredAgentSurface = {
     worktreeId: 'repo-1::/tmp/recovered-worktree',

@@ -1,7 +1,6 @@
 import type { AgentType } from '../../../../shared/agent-status-types'
 import {
   createClaudeCatalogOptions,
-  getAgentSessionOptionCatalog,
   type CatalogModel
 } from '../../../../shared/agent-session-option-catalog'
 import {
@@ -74,14 +73,12 @@ export async function discoverNativeChatCatalogModels(
   context: RuntimeGitContext
 ): Promise<CatalogModel[] | null> {
   const result = await discoverRuntimeCommitMessageModels(context, agent)
-  const catalog = getAgentSessionOptionCatalog(agent)
   if (
     !result.success ||
     result.models.length === 0 ||
-    // Why: a spec's static fallback list must never pass as a probe result for an
-    // agent whose published list replaces rather than extends the seed.
-    ((agent === 'claude' || catalog?.discoveredModelsAreAuthoritative) &&
-      result.catalogOrigin !== 'probe')
+    // Why: a spec's static fallback list must never pass as a probe result, since the
+    // published list replaces rather than extends the seed.
+    (agent === 'claude' && result.catalogOrigin !== 'probe')
   ) {
     return null
   }

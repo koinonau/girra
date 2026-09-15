@@ -41,7 +41,7 @@ export function FirstPromptCard({
   // Bumped on unmount/cleanup so a late response cannot write into a dead card.
   const generationRef = useRef(0)
 
-  const { agent, codexHome, executionHostId, filePath, sessionId } = session
+  const { agent, executionHostId, filePath, sessionId } = session
 
   const loadFullPrompt = useCallback((): Promise<string | null> => {
     if (fullTextRef.current != null) {
@@ -72,8 +72,7 @@ export function FirstPromptCard({
         agent,
         filePath,
         sessionId,
-        executionHostId,
-        codexHome
+        executionHostId
       }),
       deadline
     ])
@@ -108,7 +107,7 @@ export function FirstPromptCard({
 
     loadPromiseRef.current = promise
     return promise
-  }, [agent, codexHome, executionHostId, filePath, sessionId])
+  }, [agent, executionHostId, filePath, sessionId])
 
   // Why: list rows never carry the full first prompt (payload/perf). Load the
   // untruncated body once when this details card mounts. Parent keys this card by

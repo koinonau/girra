@@ -78,7 +78,7 @@ const request = {
   repoId: 'repo-1',
   name: 'routing-recovery',
   setupDecision: 'run' as const,
-  agent: 'codex' as const,
+  agent: 'claude' as const,
   agentLaunchRoute: 'structured-native-chat' as const,
   pendingFirstAgentMessageRename: true,
   note: '',
@@ -149,7 +149,7 @@ describe('launchStructuredWorktreeSession', () => {
         primaryTabId: null
       })
     ).resolves.toEqual({ ...idle, activation: { primaryTabId: null }, primaryTabId: null })
-    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'codex', {
+    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'claude', {
       prompt: 'Fix the route'
     })
     expect(mocks.activateStructuredAgentSessionById).toHaveBeenCalledExactlyOnceWith({
@@ -180,7 +180,7 @@ describe('launchStructuredWorktreeSession', () => {
       primaryTabId: null
     })
 
-    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'codex', {
+    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'claude', {
       prompt: 'PR #1 context',
       promptDelivery: 'draft'
     })
@@ -228,7 +228,7 @@ describe('launchStructuredWorktreeSession', () => {
       primaryTabId: null,
       recoverUnknownLaunch: true
     })
-    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'codex', {})
+    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'claude', {})
   })
 
   it('returns cancelled without starting a launch when the creation is already gone', async () => {
@@ -286,7 +286,7 @@ describe('launchStructuredWorktreeSession', () => {
     storeWithWorktree()
     refusedLaunch()
     mocks.activateAndRevealWorktree.mockReturnValue({ primaryTabId: 'terminal-tab' })
-    const startup = { kind: 'agent', agent: 'codex', prompt: 'Fix the route' }
+    const startup = { kind: 'agent', agent: 'claude', prompt: 'Fix the route' }
 
     await expect(
       launchStructuredWorktreeSession({
@@ -309,7 +309,7 @@ describe('launchStructuredWorktreeSession', () => {
       pendingFirstAgentMessageRename: true
     })
     expect(mocks.preflightAgentTrust).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'claude',
       workspacePath: '/tmp/worktree-1',
       connectionId: 'ssh-1'
     })
@@ -358,7 +358,7 @@ describe('launchStructuredWorktreeSession', () => {
     )
     expect(mocks.ensureWebRuntimeWorktreeTerminalAfterWake).toHaveBeenCalledWith('worktree-1', {
       startup: undefined,
-      agent: 'codex',
+      agent: 'claude',
       activate: false
     })
   })
@@ -526,7 +526,7 @@ describe('launchStructuredWorktreeSession', () => {
         repoId: 'repo-1',
         name: 'routing-recovery',
         setupDecision: 'run',
-        agent: 'codex',
+        agent: 'claude',
         agentLaunchRoute: 'structured-native-chat',
         pendingFirstAgentMessageRename: false,
         note: '',
@@ -581,7 +581,7 @@ describe('launchStructuredWorktreeSession', () => {
           repoId: 'repo-1',
           name: 'routing-recovery',
           setupDecision: 'run',
-          agent: 'codex',
+          agent: 'claude',
           agentLaunchRoute: 'structured-native-chat',
           pendingFirstAgentMessageRename: false,
           note: '',
@@ -623,7 +623,7 @@ describe('launchStructuredWorktreeSession', () => {
         repoId: 'repo-1',
         name: 'routing-recovery',
         setupDecision: 'run',
-        agent: 'codex',
+        agent: 'claude',
         pendingFirstAgentMessageRename: false,
         note: '',
         startupPlan: null,

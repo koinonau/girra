@@ -13,9 +13,9 @@ import {
 } from './ai-vault-original-pane'
 
 const SESSION: AiVaultSession = {
-  id: 'codex:target-session',
+  id: 'claude:target-session',
   executionHostId: 'local',
-  agent: 'codex',
+  agent: 'claude',
   sessionId: 'target-session',
   title: 'Target session',
   cwd: '/repo',
@@ -31,7 +31,7 @@ const SESSION: AiVaultSession = {
   previewMessages: [],
   queuedMessageCount: 0,
   subagentTranscriptCount: 0,
-  resumeCommand: "codex resume 'target-session'",
+  resumeCommand: "claude --resume 'target-session'",
   subagent: null
 }
 
@@ -174,7 +174,7 @@ describe('AI Vault original-pane index', () => {
     )
     const liveDirect = {
       ...unrelatedEntry(1),
-      agentType: 'codex',
+      agentType: 'claude',
       paneKey: `tab-1:${leafIds[0]}`,
       tabId: 'tab-1',
       worktreeId: 'wt-1',
@@ -183,7 +183,7 @@ describe('AI Vault original-pane index', () => {
     } as AgentStatusEntry
     const livePrompt = {
       ...unrelatedEntry(2),
-      agentType: 'codex',
+      agentType: 'claude',
       paneKey: `tab-2:${leafIds[1]}`,
       tabId: 'tab-2',
       worktreeId: 'wt-1',
@@ -192,7 +192,7 @@ describe('AI Vault original-pane index', () => {
     } as AgentStatusEntry
     const retainedEntry = {
       ...unrelatedEntry(3),
-      agentType: 'codex',
+      agentType: 'claude',
       paneKey: `tab-3:${leafIds[2]}`,
       tabId: 'tab-3',
       worktreeId: 'wt-1',
@@ -208,7 +208,7 @@ describe('AI Vault original-pane index', () => {
           entry: retainedEntry,
           worktreeId: 'wt-1',
           tab: tabs[2],
-          agentType: 'codex',
+          agentType: 'claude',
           startedAt: 1
         }
       },
@@ -217,7 +217,7 @@ describe('AI Vault original-pane index', () => {
           paneKey: 'tab-4:1',
           tabId: 'tab-4',
           worktreeId: 'wt-1',
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'sleeping-direct' },
           prompt: 'Sleeping',
           state: 'done',

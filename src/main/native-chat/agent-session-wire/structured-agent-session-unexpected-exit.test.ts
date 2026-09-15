@@ -51,7 +51,7 @@ function lifecycleItem(
   turnLifecycle: { state: 'running' | 'completed'; startedAt: number; completedAt?: number }
 ): AgentJournalRenderItem {
   return {
-    itemId: agentJournalItemKey({ provider: 'codex', threadId: 'thread-1', turnId, ordinal: 0 }),
+    itemId: agentJournalItemKey({ provider: 'claude', sessionId: 'thread-1', uuid: turnId }),
     revision: 1,
     sequence,
     observedAt: sequence,
@@ -222,7 +222,7 @@ describe('provider-exit recovery tickets', () => {
         },
         {
           kind: 'item',
-          identity: { provider: 'codex', threadId: 'thread-1', turnId: 'turn-2', ordinal: 0 },
+          identity: { provider: 'claude', sessionId: 'thread-1', uuid: 'turn-2' },
           body: {
             kind: 'turn',
             turnId: 'turn-2',

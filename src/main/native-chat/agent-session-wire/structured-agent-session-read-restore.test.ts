@@ -15,7 +15,7 @@ import { journalDirectoryFor } from '../agent-session-journal/journal-paths'
 import type { AgentSessionJournal } from '../agent-session-journal/journal-store'
 import { restoreStructuredAgentSessionRead } from './structured-agent-session-read-restore'
 
-const SESSION_ID = 'codex_read_restore_fixture'
+const SESSION_ID = 'claude_read_restore_fixture'
 const WORKSPACE_ID = 'repo-1::/tmp/workspace'
 
 const RECORD = {
@@ -27,17 +27,17 @@ const RECORD = {
     workspaceId: WORKSPACE_ID,
     workspaceKind: 'git-worktree'
   },
-  provider: 'codex',
+  provider: 'claude',
   providerHandleChain: [
     {
-      linkId: 'codex-1-thread-1',
-      handle: { provider: 'codex', threadId: 'thread-1' },
+      linkId: 'claude-1-session-1',
+      handle: { provider: 'claude', sessionId: 'thread-1', leafUuid: null },
       origin: 'created',
       mintedAtFence: 1,
       observedAt: 1
     }
   ],
-  accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex-home' },
+  accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude-home' },
   createdAt: 1,
   updatedAt: 2,
   lease: { sessionId: SESSION_ID, runtimeKind: 'native', runtimeFence: 1 }

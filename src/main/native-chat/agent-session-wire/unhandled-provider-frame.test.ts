@@ -33,23 +33,13 @@ describe('unhandled provider frame journal fallback', () => {
     const cyclic: { warning?: unknown } = {}
     cyclic.warning = cyclic
 
-    const item = unhandledProviderFrameJournalItem('codex', 'frame', cyclic)
+    const item = unhandledProviderFrameJournalItem('claude', 'frame', cyclic)
 
-    expect(item?.body.text).toBe('codex · frame')
+    expect(item?.body.text).toBe('claude · frame')
     expect(item?.body.providerFrame?.payload.head).toContain('unserializable payload')
   })
 
   it('routes provider lifecycle, startup, and status frames away from the timeline', () => {
-    expect(unhandledProviderFrameJournalItem('codex', 'notification:thread/started', {})).toBeNull()
-    expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:mcpServer/startupStatus/updated', {})
-    ).toBeNull()
-    expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:remoteControl/status/changed', {})
-    ).toBeNull()
-    expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:thread/tokenUsage/updated', {})
-    ).toBeNull()
     expect(unhandledProviderFrameJournalItem('claude', 'message:system:init', {})).toBeNull()
     expect(
       unhandledProviderFrameJournalItem('claude', 'message:result', {
@@ -61,13 +51,7 @@ describe('unhandled provider frame journal fallback', () => {
 
   it('never creates generic rows for delta-shaped frames that report no failure', () => {
     expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:item/commandExecution/outputDelta', {
-        itemId: 'exec-1',
-        delta: 'x'
-      })
-    ).toBeNull()
-    expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:item/future/outputDelta', {
+      unhandledProviderFrameJournalItem('future-provider', 'notification:item/future/outputDelta', {
         itemId: 'future-1',
         delta: 'y'
       })
@@ -75,21 +59,22 @@ describe('unhandled provider frame journal fallback', () => {
   })
 
   it('surfaces an unknown delta-shaped frame whose payload reports an error', () => {
-    const row = unhandledProviderFrameJournalItem('codex', 'notification:item/future/outputDelta', {
-      error: 'stream broke mid-item'
-    })
+    const row = unhandledProviderFrameJournalItem(
+      'future-provider',
+      'notification:item/future/outputDelta',
+      { error: 'stream broke mid-item' }
+    )
 
     expect(row).not.toBeNull()
     expect(row?.classification).toBe('error-surface')
     expect(row?.body.providerFrame).toMatchObject({
-      provider: 'codex',
+      provider: 'future-provider',
       kind: 'notification:item/future/outputDelta'
     })
   })
 
-  it('renders codex systemError and Claude error result variants', () => {
-    const codex = unhandledProviderFrameJournalItem('codex', 'notification:thread/status/changed', {
-      threadId: 'thread-1',
+  it('renders systemError and Claude error result variants', () => {
+    const system = unhandledProviderFrameJournalItem('future-provider', 'notification:status', {
       status: { type: 'systemError' }
     })
     const claude = unhandledProviderFrameJournalItem('claude', 'message:result', {
@@ -98,10 +83,7 @@ describe('unhandled provider frame journal fallback', () => {
       result: 'Provider request failed'
     })
 
-    expect(codex?.body.providerFrame).toMatchObject({
-      provider: 'codex',
-      kind: 'notification:thread/status/changed'
-    })
+    expect(system?.classification).toBe('error-surface')
     expect(claude?.body.providerFrame).toMatchObject({
       provider: 'claude',
       kind: 'message:result'
@@ -126,51 +108,12 @@ describe('unhandled provider frame journal fallback', () => {
     })
   })
 
-  it('keeps failed startup variants visible while suppressing startup progress', () => {
-    const kind = 'notification:mcpServer/startupStatus/updated'
-
-    expect(
-      unhandledProviderFrameJournalItem('codex', kind, {
-        name: 'filesystem',
-        status: 'starting',
-        error: null,
-        failureReason: null
-      })
-    ).toBeNull()
-    expect(
-      unhandledProviderFrameJournalItem('codex', kind, {
-        name: 'filesystem',
-        status: 'failed',
-        error: 'server exited',
-        failureReason: null
-      })
-    ).not.toBeNull()
-  })
-
-  it('surfaces a failed hook completion while suppressing successful hook lifecycle', () => {
-    const kind = 'notification:hook/completed'
-
-    expect(
-      unhandledProviderFrameJournalItem('codex', kind, {
-        run: { id: 'hook-1', status: 'completed' }
-      })
-    ).toBeNull()
-    expect(
-      unhandledProviderFrameJournalItem('codex', kind, {
-        run: { id: 'hook-1', status: 'failed' }
-      })
-    ).not.toBeNull()
-  })
-
-  it('keeps unknown substantive frames visible for both providers', () => {
-    expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:future/event', {})
-    ).not.toBeNull()
+  it('keeps unknown substantive frames visible', () => {
     expect(unhandledProviderFrameJournalItem('claude', 'message:future/event', {})).not.toBeNull()
   })
 
   it('leads with the provider sentence instead of naming the opcode', () => {
-    const row = unhandledProviderFrameJournalItem('codex', 'notification:warning', {
+    const row = unhandledProviderFrameJournalItem('future-provider', 'notification:warning', {
       message: 'Your plan limit resets in 2 hours.'
     })
     expect(row?.body.text).toBe('Your plan limit resets in 2 hours.')
@@ -181,7 +124,7 @@ describe('unhandled provider frame journal fallback', () => {
   it('bounds a provider sentence inline', () => {
     const message = 'abcdefghij'
     const row = unhandledProviderFrameJournalItem(
-      'codex',
+      'future-provider',
       'notification:warning',
       { message },
       { inlineHeadBytes: 8 }
@@ -193,27 +136,27 @@ describe('unhandled provider frame journal fallback', () => {
 
   it('unwraps a nested sentence and falls back to the opcode when there is none', () => {
     expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:warning', {
+      unhandledProviderFrameJournalItem('future-provider', 'notification:warning', {
         warning: { text: 'Sandbox is degraded.' }
       })?.body.text
     ).toBe('Sandbox is degraded.')
     expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:future/event', { count: 3 })?.body
-        .text
-    ).toBe('codex \u00b7 notification:future/event')
+      unhandledProviderFrameJournalItem('future-provider', 'notification:future/event', {
+        count: 3
+      })?.body.text
+    ).toBe('future-provider \u00b7 notification:future/event')
   })
 })
 
 describe('a failed provider dependency', () => {
   it('leads with the failure the provider reported, not the method name', () => {
     const item = unhandledProviderFrameJournalItem(
-      'codex',
+      'future-provider',
       'notification:mcpServer/startupStatus/updated',
       {
-        threadId: 'thread-1',
-        name: 'codex_apps',
+        name: 'filesystem',
         status: 'failed',
-        error: 'MCP client for `codex_apps` failed to start: authentication token invalidated',
+        error: 'MCP client for `filesystem` failed to start: authentication token invalidated',
         failureReason: 'reauthenticationRequired'
       }
     )
@@ -221,52 +164,17 @@ describe('a failed provider dependency', () => {
     expect(item?.body.text).toContain('failed to start')
     expect(item?.body.text).not.toContain('notification:mcpServer')
   })
-
-  it('stays out of the timeline while the dependency is merely starting', () => {
-    expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:mcpServer/startupStatus/updated', {
-        threadId: 'thread-1',
-        name: 'codex_apps',
-        status: 'starting'
-      })
-    ).toBeNull()
-  })
 })
 
 describe('typed notice metadata', () => {
-  it('publishes readable compaction statuses for both provider forms', () => {
+  it('assigns the error tone and readable text to a failed frame', () => {
     expect(
-      unhandledProviderFrameJournalItem('codex', 'notification:thread/compacted', {})
-    ).toMatchObject({
-      classification: 'timeline-substantive',
-      body: { kind: 'status', text: 'Context compacted', presentation: 'compaction' }
-    })
-    expect(unhandledProviderFrameJournalItem('codex', 'item:contextCompaction', {})).toMatchObject({
-      body: { kind: 'status', text: 'Context compacted', presentation: 'compaction' }
-    })
-  })
-  it.each([
-    ['warning', { message: 'Check this' }, 'warning', 'Check this'],
-    ['guardianWarning', { message: 'Review required' }, 'warning', 'Review required'],
-    [
-      'configWarning',
-      { summary: 'Invalid option', details: 'Remove the option' },
-      'warning',
-      'Invalid option\n\nRemove the option'
-    ],
-    [
-      'deprecationNotice',
-      { summary: 'Old option', details: 'Use its replacement' },
-      'notice',
-      'Old option\n\nUse its replacement'
-    ],
-    ['error', { error: { message: 'Connection failed' } }, 'error', 'Connection failed']
-  ])('assigns the tone and readable text for %s', (method, payload, tone, text) => {
-    expect(
-      unhandledProviderFrameJournalItem('codex', `notification:${method}`, payload)
+      unhandledProviderFrameJournalItem('future-provider', 'notification:error', {
+        error: { message: 'Connection failed' }
+      })
     ).toMatchObject({
       classification: 'error-surface',
-      body: { kind: 'status', text, tone }
+      body: { kind: 'status', text: 'Connection failed', tone: 'error' }
     })
   })
 })

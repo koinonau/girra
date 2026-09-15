@@ -9,7 +9,6 @@ import type {
   AgentJournalResolution
 } from '../../../shared/agent-session-journal-types'
 import type { AgentSessionPromptResult } from '../../../shared/agent-session-wire'
-import { decodeCodexQuestionOptionId } from '../../codex/codex-structured-prompt-replies'
 import type { AgentSessionTurnContext, TurnOutcome } from './structured-agent-session-turns'
 
 function invalid(message: string): TurnOutcome<never> {
@@ -64,7 +63,7 @@ export async function performPrompt(
       }
     }
   }
-  const freeText = decodeCodexQuestionOptionId(input.optionId)
+  const freeText = decodeFreeTextOptionId(input.optionId)
   const acceptsFreeText =
     item.body.kind === 'question' &&
     prompt.freeTextQuestionId !== undefined &&
@@ -129,5 +128,21 @@ export async function performPrompt(
   return {
     ok: true,
     value: { itemId: appended.itemId, revision: appended.revision, resolution }
+  }
+}
+
+/** A free-text answer arrives as `<questionId>:<answer>`, both URI-encoded. */
+function decodeFreeTextOptionId(optionId: string): { questionId: string; answer: string } | null {
+  const separator = optionId.indexOf(':')
+  if (separator <= 0) {
+    return null
+  }
+  try {
+    return {
+      questionId: decodeURIComponent(optionId.slice(0, separator)),
+      answer: decodeURIComponent(optionId.slice(separator + 1))
+    }
+  } catch {
+    return null
   }
 }

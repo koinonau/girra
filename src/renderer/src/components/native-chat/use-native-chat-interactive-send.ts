@@ -4,22 +4,12 @@ import { sendRuntimePtyInput } from '@/runtime/runtime-terminal-inspection'
 import { getSettingsForAgentTabRuntimeOwner } from '@/lib/agent-paste-draft'
 import type { AgentType } from '../../../../shared/native-chat-types'
 import {
-  resolveNativeChatTranscriptAgent,
-  shouldStepNativeChatAskAnswer
-} from '../../../../shared/native-chat-agent-support'
-import {
   buildAskAnswerKeys,
-  buildCodexAskAnswerKeys,
-  formatAskAnswer,
   hasAskAnswer,
   type AskAnswerSelection,
   type AskPrompt
 } from './native-chat-interactive-prompt'
-import {
-  sendNativeChatAskAnswer,
-  sendNativeChatMessage,
-  type NativeChatSendHandle
-} from './native-chat-runtime-send'
+import { sendNativeChatAskAnswer, type NativeChatSendHandle } from './native-chat-runtime-send'
 import { inferQuestionAnsweredFromCurrentStatus } from '../terminal-pane/agent-question-answered-inference'
 
 // ESC is the agent-TUI interrupt/cancel key over the PTY (matches how the
@@ -46,9 +36,8 @@ export type NativeChatInteractiveSend = {
  * Reuse the desktop composer's exact send path for the interactive cards:
  * resolve this tab's live ptyId + runtime owner settings, then write bytes via
  * `sendRuntimePtyInput` (which branches local pty:write vs remote runtime RPC,
- * so SSH panes work unchanged). Claude and Codex answers use their respective
- * selector keystrokes via `sendNativeChatAskAnswer`; other agents still go through
- * `sendNativeChatMessage`. Control strings (option digits, ESC) are written raw.
+ * so SSH panes work unchanged). Answers drive Claude's selector keystrokes via
+ * `sendNativeChatAskAnswer`. Control strings (option digits, ESC) are written raw.
  */
 export function useNativeChatInteractiveSend(
   terminalTabId: string,
@@ -93,62 +82,47 @@ export function useNativeChatInteractiveSend(
       // Cancel any prior in-flight answer before starting a new one.
       cancelInFlight()
       const settings = getSettingsForAgentTabRuntimeOwner(terminalTabId)
-      // Claude and Codex ignore pasted labels but have different selector state
-      // machines; Grok commits pasted text. OpenClaude follows Claude's path.
-      const stepsAnswer = shouldStepNativeChatAskAnswer(agent)
-      const buildsCodexAnswer = resolveNativeChatTranscriptAgent(agent) === 'codex'
       // Why: pin the answered question's baseline BEFORE delivery. A late settle
       // callback (paced writes + remote acceptance can span seconds on SSH) must
       // not read the live status and mint a fresh baseline for a replacement
       // question that became current meanwhile — that would clear the new
       // question's wait. The server re-validates this captured baseline and
       // rejects a changed status, matching the terminal keystroke path.
-      const questionStatusBaseline = stepsAnswer
-        ? useAppStore.getState().agentStatusByPaneKey[paneKey]
-        : undefined
+      const questionStatusBaseline = useAppStore.getState().agentStatusByPaneKey[paneKey]
       let settledHandle: NativeChatSendHandle | null = null
-      const onSettled = stepsAnswer
-        ? (delivered: boolean): void => {
-            if (settledHandle && inFlightRef.current === settledHandle) {
-              // Why: a completed verified send otherwise retains its timers,
-              // promises, and prompt callback until the next send or unmount.
-              inFlightRef.current = null
-            }
-            if (delivered) {
-              inferQuestionAnsweredFromCurrentStatus({
-                paneKey,
-                getStatusEntry: () => questionStatusBaseline,
-                inferQuestionAnswered: (request) =>
-                  window.api.agentStatus.inferQuestionAnswered(request).catch((err) => {
-                    console.warn('[agent-question] native-chat inference failed:', err)
-                    return false
-                  })
+      const onSettled = (delivered: boolean): void => {
+        if (settledHandle && inFlightRef.current === settledHandle) {
+          // Why: a completed verified send otherwise retains its timers,
+          // promises, and prompt callback until the next send or unmount.
+          inFlightRef.current = null
+        }
+        if (delivered) {
+          inferQuestionAnsweredFromCurrentStatus({
+            paneKey,
+            getStatusEntry: () => questionStatusBaseline,
+            inferQuestionAnswered: (request) =>
+              window.api.agentStatus.inferQuestionAnswered(request).catch((err) => {
+                console.warn('[agent-question] native-chat inference failed:', err)
+                return false
               })
-            }
-            onDeliverySettled?.(delivered)
-          }
-        : undefined
-      const handle: NativeChatSendHandle = stepsAnswer
-        ? sendNativeChatAskAnswer(
-            settings,
-            targetPtyId,
-            buildsCodexAnswer
-              ? buildCodexAskAnswerKeys(prompt, selections)
-              : buildAskAnswerKeys(prompt, selections),
-            onSettled
-          )
-        : sendNativeChatMessage(settings, targetPtyId, formatAskAnswer(prompt, selections))
+          })
+        }
+        onDeliverySettled?.(delivered)
+      }
+      const handle = sendNativeChatAskAnswer(
+        settings,
+        targetPtyId,
+        buildAskAnswerKeys(prompt, selections),
+        onSettled
+      )
       // Why: native-chat answer writes bypass xterm.onData. Infer only after
       // every paced selector write has fired, so an early digit in a multi-step
       // answer cannot dismiss the wait or cancel the remaining writes.
       settledHandle = handle
       inFlightRef.current = handle
-      return {
-        settleAfterMs: handle.settleAfterMs,
-        waitsForVerifiedDelivery: onSettled !== undefined
-      }
+      return { settleAfterMs: handle.settleAfterMs, waitsForVerifiedDelivery: true }
     },
-    [terminalTabId, paneKey, targetPtyId, agent, cancelInFlight]
+    [terminalTabId, paneKey, targetPtyId, cancelInFlight]
   )
 
   // Stop/cancel: drop any pending answer writes, then send ESC to interrupt.

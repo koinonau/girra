@@ -3,10 +3,10 @@ import type * as NodeFsModule from 'node:fs'
 import type * as NodeFsPromisesModule from 'node:fs/promises'
 import type * as GateModule from './wsl-transcript-fs-gate'
 
-const UNC_PATH = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\a.jsonl'
-const LEGACY_UNC_PATH = '\\\\wsl$\\Ubuntu\\home\\ada\\.codex\\sessions\\a.jsonl'
-const WINDOWS_PATH = 'C:\\Users\\ada\\.codex\\sessions\\a.jsonl'
-const POSIX_PATH = '/home/ada/.codex/sessions/a.jsonl'
+const UNC_PATH = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\a.jsonl'
+const LEGACY_UNC_PATH = '\\\\wsl$\\Ubuntu\\home\\ada\\.claude\\projects\\a.jsonl'
+const WINDOWS_PATH = 'C:\\Users\\ada\\.claude\\projects\\a.jsonl'
+const POSIX_PATH = '/home/ada/.claude/projects/a.jsonl'
 
 const mocks = vi.hoisted(() => ({
   stat: vi.fn(),

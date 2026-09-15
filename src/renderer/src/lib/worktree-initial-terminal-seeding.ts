@@ -10,8 +10,6 @@ import { useAppStore } from '@/store'
 import { queueHookCommandsForFirstWorktreeTab } from '@/lib/hook-command-delayed-delivery'
 import { resolveWorkspaceTerminalHostAuthority } from '@/lib/workspace-terminal-host-authority'
 import { initialAgentTabViewModeProps } from './native-chat-initial-view-mode'
-import { getConnectionId } from '@/lib/connection-context'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { seedNativeChatAppliedSessionOptions } from '@/components/native-chat/native-chat-session-option-cache'
 import type {
   InitialTerminalOptions,
@@ -227,10 +225,7 @@ export function ensureWorktreeHasInitialTerminal(
             agent: launchAgent,
             // Why: argv-prefill launches carry the draft in `command` and set no
             // draftPrompt, so gating on draftPrompt alone misses them entirely.
-            ...draftViewModeProps(resolveStartupLaunchDraftText(sequencedStartup)),
-            nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-              getConnectionId(worktreeId)
-            )
+            ...draftViewModeProps(resolveStartupLaunchDraftText(sequencedStartup))
           })
         }
       : {}),

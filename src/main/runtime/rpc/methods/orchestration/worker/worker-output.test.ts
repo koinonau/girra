@@ -6,10 +6,12 @@ import type { OrcaRuntimeService } from '../../../../orca-runtime'
 import * as sshFilesystemDispatch from '../../../../../providers/ssh-filesystem-dispatch'
 import { readExactWorkerOutput } from './worker-output'
 
-function codexMessage(id: string, text: string): string {
+function claudeMessage(id: string, text: string): string {
   return JSON.stringify({
-    type: 'event_msg',
-    payload: { id, type: 'agent_message', message: text }
+    type: 'assistant',
+    uuid: id,
+    timestamp: '2026-08-03T12:00:00.000Z',
+    message: { role: 'assistant', content: [{ type: 'text', text }] }
   })
 }
 
@@ -26,12 +28,12 @@ describe('exact orchestration worker output', () => {
     directory = await mkdtemp(join(tmpdir(), 'orca-worker-output-'))
     transcriptA = join(directory, 'session-a.jsonl')
     transcriptB = join(directory, 'session-b.jsonl')
-    await writeFile(transcriptA, `${codexMessage('a', 'worker A only')}\n`)
-    await writeFile(transcriptB, `${codexMessage('b', 'worker B only')}\n`)
+    await writeFile(transcriptA, `${claudeMessage('a', 'worker A only')}\n`)
+    await writeFile(transcriptB, `${claudeMessage('b', 'worker B only')}\n`)
     providerSession = {
       paneKey: 'tab:worker',
       processIncarnation: 'pty:incarnation-1',
-      agent: 'codex',
+      agent: 'claude',
       providerSession: {
         key: 'session_id',
         id: 'session-a',
@@ -77,7 +79,7 @@ describe('exact orchestration worker output', () => {
 
     expect(result).toMatchObject({
       source: 'transcript',
-      provider: 'codex',
+      provider: 'claude',
       transcript: {
         messages: [{ id: 'a', blocks: [{ type: 'text', text: 'worker A only' }] }]
       }
@@ -94,7 +96,7 @@ describe('exact orchestration worker output', () => {
 
     expect(result).toMatchObject({
       source: 'transcript',
-      provider: 'codex',
+      provider: 'claude',
       transcript: { messages: [], limited: false, returnedMessageCount: 0 },
       fallbackReason: null,
       sourceExact: true,
@@ -129,7 +131,7 @@ describe('exact orchestration worker output', () => {
 
     expect(result).toMatchObject({
       source: 'transcript',
-      provider: 'codex',
+      provider: 'claude',
       transcript: {
         messages: [{ id: 'a', blocks: [{ type: 'text', text: 'worker A only' }] }]
       }
@@ -152,7 +154,7 @@ describe('exact orchestration worker output', () => {
   })
 
   it('marks clipped transcript content incomplete without dropping its cursor', async () => {
-    await writeFile(transcriptA, `${codexMessage('a', 'x'.repeat(5_000))}\n`)
+    await writeFile(transcriptA, `${claudeMessage('a', 'x'.repeat(5_000))}\n`)
 
     const result = await read()
 
@@ -180,37 +182,6 @@ describe('exact orchestration worker output', () => {
       fallbackReason: 'remote_capability_unavailable'
     })
     expect(sshProviderLookup).toHaveBeenCalledWith('ssh-target')
-  })
-
-  it('reads Grok through the shared Native Chat transcript decoder', async () => {
-    await writeFile(
-      transcriptA,
-      `${JSON.stringify({
-        id: 'grok-a',
-        type: 'assistant',
-        content: 'Grok worker only'
-      })}\n`
-    )
-    providerSession = {
-      ...providerSession!,
-      agent: 'grok',
-      providerSession: {
-        key: 'session_id',
-        id: 'session-grok',
-        transcriptPath: transcriptA
-      }
-    }
-
-    const result = await read()
-
-    expect(result).toMatchObject({
-      source: 'transcript',
-      provider: 'grok',
-      transcript: {
-        messages: [{ role: 'assistant', blocks: [{ type: 'text', text: 'Grok worker only' }] }]
-      }
-    })
-    expect(readTerminal).not.toHaveBeenCalled()
   })
 
   it('labels OpenCode as a terminal fallback when no transcript decoder exists', async () => {
@@ -295,7 +266,7 @@ describe('exact orchestration worker output', () => {
     const before = await stat(transcriptA, { bigint: true })
     await writeFile(
       transcriptA,
-      `${codexMessage('replacement', 'unrelated transcript')}\n${' '.repeat(512)}`
+      `${claudeMessage('replacement', 'unrelated transcript')}\n${' '.repeat(512)}`
     )
     const after = await stat(transcriptA, { bigint: true })
     expect(after.ino).toBe(before.ino)
@@ -325,7 +296,7 @@ describe('exact orchestration worker output', () => {
     providerSession = {
       paneKey: 'tab:worker',
       processIncarnation: 'pty:incarnation-1',
-      agent: 'codex',
+      agent: 'claude',
       providerSession: {
         key: 'session_id',
         id: 'session-a',

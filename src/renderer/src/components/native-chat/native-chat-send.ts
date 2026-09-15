@@ -40,8 +40,8 @@ export function buildNativeChatPasteBytes(text: string): string {
   return sanitizeBracketedPasteText(text)
 }
 
-/** Image attachments must look like a real terminal image paste to Claude/Codex
- *  TUIs. A plain typed path (or @file mention) is treated as text/file-read. */
+/** Image attachments must look like a real terminal image paste to the Claude
+ *  TUI. A plain typed path (or @file mention) is treated as text/file-read. */
 export function buildNativeChatImagePasteBytes(filePath: string): string {
   return wrapTerminalBracketedPasteText(filePath)
 }

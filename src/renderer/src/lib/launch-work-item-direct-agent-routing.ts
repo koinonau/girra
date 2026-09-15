@@ -10,7 +10,6 @@ import {
   buildDirectWorkItemStartupOpts
 } from '@/lib/launch-work-item-direct-agent'
 import type { AgentSessionLaunchPlan } from '@/lib/agent-session-launch-plan'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { resolveSourceControlLaunchPlatform } from '@/lib/source-control-launch-platform'
 import { preflightAgentTrust } from '@/lib/agent-trust-preflight'
 
@@ -39,9 +38,6 @@ export function buildDirectWorkItemStartup(args: {
     promptDelivery: args.promptDelivery,
     settings: args.settings,
     launchPlatform,
-    nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-      args.launchConnectionId
-    ),
     // Why: SSH hosts run the plain `orca` shim, so the Linux-only `orca-ide` rename is not applied.
     isRemote: typeof args.launchConnectionId === 'string'
   })

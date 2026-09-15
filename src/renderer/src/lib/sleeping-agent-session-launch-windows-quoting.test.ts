@@ -65,7 +65,7 @@ const record: SleepingAgentSessionRecord = {
   paneKey: 'tab-1::leaf-1',
   tabId: 'tab-1',
   worktreeId: 'wt-1',
-  agent: 'codex',
+  agent: 'claude',
   providerSession: { key: 'session_id', id: SESSION_ID },
   prompt: 'finish the task',
   state: 'done',
@@ -110,7 +110,7 @@ describe('launchSleepingAgentSession Windows shell quoting', () => {
     store.settings.terminalWindowsShell = 'cmd.exe'
 
     await expect(launch()).resolves.toBe(
-      `codex "--dangerously-bypass-approvals-and-sandbox" "resume" "${SESSION_ID}"`
+      `claude "--dangerously-skip-permissions" "--resume" "${SESSION_ID}"`
     )
   })
 
@@ -118,7 +118,7 @@ describe('launchSleepingAgentSession Windows shell quoting', () => {
     store.settings.terminalWindowsShell = 'powershell.exe'
 
     await expect(launch()).resolves.toBe(
-      `codex '--dangerously-bypass-approvals-and-sandbox' 'resume' '${SESSION_ID}'`
+      `claude '--dangerously-skip-permissions' '--resume' '${SESSION_ID}'`
     )
   })
 
@@ -126,7 +126,7 @@ describe('launchSleepingAgentSession Windows shell quoting', () => {
     store.settings.terminalWindowsShell = 'git-bash'
 
     await expect(launch()).resolves.toBe(
-      `codex '--dangerously-bypass-approvals-and-sandbox' 'resume' '${SESSION_ID}'`
+      `claude '--dangerously-skip-permissions' '--resume' '${SESSION_ID}'`
     )
   })
 
@@ -145,7 +145,7 @@ describe('launchSleepingAgentSession Windows shell quoting', () => {
     }
 
     await expect(launch()).resolves.toBe(
-      `codex '--dangerously-bypass-approvals-and-sandbox' 'resume' '${SESSION_ID}'`
+      `claude '--dangerously-skip-permissions' '--resume' '${SESSION_ID}'`
     )
   })
 })

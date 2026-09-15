@@ -1,5 +1,5 @@
 import { chmod, mkdir, rename, rm } from 'node:fs/promises'
-import { delimiter, dirname, join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { resetSessionParseCacheForTests } from '../ai-vault/session-scanner-parse-cache'
 import { resetTranscriptConsumersForTests } from '../ai-vault/session-transcript-consumers'
@@ -17,7 +17,7 @@ import {
 
 /*
  * The lifecycle matrix: every operation a caller can perform, against every
- * shape an unreachable root takes, against both ways discovery reports a root.
+ * shape an unreachable root takes.
  *
  * The indexer is immutable, so "every operation" is a shorter list than it was:
  * `pause`, `resume`, `clear`, `setHistoryDays` and `invalidate` are gone, and
@@ -29,8 +29,7 @@ import {
  * What each cell asserts:
  *   A. No row is retired for a file that still exists. Throwing the index away
  *      is the one exception, and it is stated per operation rather than excused.
- *   B. The unreachable root is named in `degradedRoots`, by a real directory
- *      path — never the delimiter-joined label a merged discovery reports.
+ *   B. The unreachable root is named in `degradedRoots`.
  *   C. The phase is never `current` while a root is degraded.
  *   D. Once the root is reachable again, a sweep indexes everything under it.
  *
@@ -57,8 +56,6 @@ type RootShape = {
   writeHealthy: (path: string, session: string) => Promise<void>
 }
 
-const OPENCLAW_SESSION_DIR = join('agents', 'main', 'sessions')
-
 const ROOT_SHAPES: RootShape[] = [
   {
     name: 'roots discovery reports one per directory',
@@ -67,16 +64,6 @@ const ROOT_SHAPES: RootShape[] = [
     writeDetached: (path, session) =>
       writeClaudeTranscript(path, [`detached ${session}`], fullSessionId(session)),
     healthyFile: (harness, session) => join(harness.roots.piSessionsDir ?? '', `${session}.jsonl`),
-    writeHealthy: (path, session) => writeMessageGraphTranscript(path, [`healthy ${session}`])
-  },
-  {
-    name: 'roots a merged discovery joins into one label',
-    detachedRoot: (harness) => join(harness.roots.openclawStateDir ?? '', 'agents'),
-    detachedFile: (harness, session) =>
-      join(harness.roots.openclawStateDir ?? '', OPENCLAW_SESSION_DIR, `${session}.jsonl`),
-    writeDetached: (path, session) => writeMessageGraphTranscript(path, [`detached ${session}`]),
-    healthyFile: (harness, session) =>
-      join(harness.roots.openclawLegacyStateDir ?? '', OPENCLAW_SESSION_DIR, `${session}.jsonl`),
     writeHealthy: (path, session) => writeMessageGraphTranscript(path, [`healthy ${session}`])
   }
 ]
@@ -297,11 +284,7 @@ for (const roots of ROOT_SHAPES) {
             // A deadline that expires on the first file reads one transcript a
             // pass, so the setup drives passes until the index has caught up.
             await driveUntilIndexed(SESSIONS.length * 2)
-            const detachedIds = detachedPaths.map((_path, index) =>
-              roots === ROOT_SHAPES[0]
-                ? fullSessionId(SESSIONS[index] ?? '')
-                : (SESSIONS[index] ?? '')
-            )
+            const detachedIds = SESSIONS.map((session) => fullSessionId(session))
             const healthyIds = SESSIONS.map((session) => session)
             expect(indexedSessions()).toEqual([...detachedIds, ...healthyIds].sort())
             // One cycle so the watch set holds the recency window, which is the
@@ -350,9 +333,8 @@ for (const roots of ROOT_SHAPES) {
               if (operation.clearsIndex && !unreachable.visibleWithNoRows) {
                 expect(degraded).not.toContain(detachedRoot)
               } else {
-                // B: named, by a real directory rather than a joined label.
+                // B: named.
                 expect(degraded).toContain(detachedRoot)
-                expect(degraded.every((root) => !root.includes(delimiter))).toBe(true)
                 // C: not current while a root is degraded.
                 expect(status?.phase).not.toBe('current')
               }

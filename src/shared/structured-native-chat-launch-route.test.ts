@@ -52,12 +52,13 @@ describe('the settings default', () => {
 })
 
 describe('per-launch structured feasibility', () => {
-  it.each(['claude', 'codex'] as const)('supports a local %s launch', (agent) => {
-    expect(support({ agent })).toEqual({ supported: true })
+  it('supports a local claude launch', () => {
+    expect(support({ agent: 'claude' })).toEqual({ supported: true })
   })
 
   it.each([
     ['a reused PTY agent', { reusesTerminal: true }, 'reused-terminal'],
+    ['codex', { agent: 'codex' }, 'agent-without-structured-session'],
     ['grok', { agent: 'grok' }, 'agent-without-structured-session'],
     ['openclaude', { agent: 'openclaude' }, 'agent-without-structured-session'],
     ['a floating workspace', { workspaceKind: 'floating' }, 'floating-workspace'],
@@ -72,14 +73,11 @@ describe('per-launch structured feasibility', () => {
     }
   )
 
-  // The client cannot see whether the host can read a provider child's start time, so neither
-  // provider is refused here on platform; agentSession.createSupport answers that at create time.
-  it.each(['claude', 'codex'] as const)(
-    'leaves a Windows %s launch to the executing host',
-    (agent) => {
-      expect(support({ agent })).toEqual({ supported: true })
-    }
-  )
+  // The client cannot see whether the host can read a provider child's start time, so the
+  // provider is not refused here on platform; agentSession.createSupport answers that at create time.
+  it('leaves a Windows claude launch to the executing host', () => {
+    expect(support({ agent: 'claude' })).toEqual({ supported: true })
+  })
 
   it('blocks a WSL or repair-required project runtime', () => {
     expect(

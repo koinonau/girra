@@ -24,8 +24,8 @@ async function liveStore(): Promise<AgentSessionRecordStore> {
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: root },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: root },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'spawn-renewal',
@@ -55,7 +55,7 @@ async function liveStore(): Promise<AgentSessionRecordStore> {
     fence: reserved.record.lease.runtimeFence,
     link: {
       linkId: 'link-renewal',
-      handle: { provider: 'codex', threadId: 'thread-renewal' },
+      handle: { provider: 'claude', sessionId: 'thread-renewal', leafUuid: null },
       origin: 'created',
       mintedAtFence: reserved.record.lease.runtimeFence,
       observedAt: NOW

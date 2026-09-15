@@ -25,8 +25,8 @@ async function establishOwner(
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: directory },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: directory },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken,
@@ -52,7 +52,7 @@ async function establishOwner(
     fence,
     link: {
       linkId: `link-${suffix}`,
-      handle: { provider: 'codex', threadId: `thread-${suffix}` },
+      handle: { provider: 'claude', sessionId: `session-${suffix}`, leafUuid: null },
       origin: 'created',
       mintedAtFence: fence,
       observedAt: NOW

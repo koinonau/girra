@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import { MAX_CODEX_SUBAGENTS_PER_GROUP } from '../../codex/codex-structured-journal-limits'
 import {
   boundWorkerTranscriptMessages,
   redactWorkerTerminalLines
@@ -85,9 +84,8 @@ describe('worker transcript wire bounds', () => {
 
     const block = result.messages[0]?.blocks[0]
     expect(block?.type).toBe('subagent-group')
-    expect(block?.type === 'subagent-group' ? block.agents : []).toHaveLength(
-      MAX_CODEX_SUBAGENTS_PER_GROUP
-    )
+    // Matches MAX_WORKER_TRANSCRIPT_SUBAGENTS in worker-transcript-payload.ts.
+    expect(block?.type === 'subagent-group' ? block.agents : []).toHaveLength(64)
     expect(JSON.stringify(result.messages)).not.toContain('dcap_')
     expect(result.limited).toBe(true)
     expect(result.warnings).toEqual(
@@ -177,7 +175,7 @@ describe('worker transcript wire bounds', () => {
   })
 
   it('keeps fallback identifiers stable without exposing the transcript path', () => {
-    const transcriptPath = 'C:\\Users\\worker\\.codex\\session.jsonl'
+    const transcriptPath = 'C:\\Users\\worker\\.claude\\session.jsonl'
     const message = {
       id: `${transcriptPath}:0000000000000042`,
       turnId: `${transcriptPath}:0000000000000001`,

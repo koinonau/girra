@@ -185,8 +185,8 @@ export function briefToolArg(input: unknown): string {
 }
 
 /** The shell command a call carries in its input, or null when it carries none.
- *  Codex keeps the raw command on a classified `read`/`search`/`list` row, so
- *  this is what tells one apart from a Claude tool of the same lowercased word. */
+ *  A classified shell row keeps its raw command, which tells it apart from a
+ *  Claude tool of the same lowercased word. */
 export function toolInputCommand(input: unknown): string | null {
   const normalized = normalizeToolInput(input)
   return isToolInputRecord(normalized) ? firstPrimaryToolArg(normalized, COMMAND_ARG_KEYS) : null
@@ -196,8 +196,8 @@ function isToolInputRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
-/** Codex delivers tool arguments as a JSON string. Parse those into the object
- *  shape every helper below already understands; leave prose strings alone. */
+/** Parse tool arguments delivered as a JSON string into the object shape every
+ *  helper below already understands; leave prose strings alone. */
 function normalizeToolInput(input: unknown): unknown {
   if (typeof input !== 'string') {
     return input

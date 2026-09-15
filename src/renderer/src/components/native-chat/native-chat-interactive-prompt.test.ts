@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   buildAskAnswerKeys,
-  buildCodexAskAnswerKeys,
-  formatAskAnswer,
   hasAskAnswer,
   parseApprovalFromStatus,
   parseAskFromStatus,
@@ -132,49 +130,6 @@ describe('parseInteractivePrompt', () => {
   })
 })
 
-describe('formatAskAnswer', () => {
-  it('joins selected option labels per question, one line each', () => {
-    const prompt: AskPrompt = {
-      questions: [
-        { question: 'q1', multiSelect: true, options: [{ label: 'A' }, { label: 'B' }] },
-        { question: 'q2', multiSelect: false, options: [{ label: 'C' }] }
-      ]
-    }
-    expect(formatAskAnswer(prompt, [{ indices: [0, 1] }, { indices: [0] }])).toBe('A, B\nC')
-  })
-
-  it('appends free-text after picked labels', () => {
-    const prompt: AskPrompt = {
-      questions: [{ question: 'q1', multiSelect: true, options: [{ label: 'A' }, { label: 'B' }] }]
-    }
-    expect(formatAskAnswer(prompt, [{ indices: [0], other: '  extra ' }])).toBe('A, extra')
-  })
-
-  it('preserves empty answers as empty lines so N lines == N questions', () => {
-    const prompt: AskPrompt = {
-      questions: [
-        { question: 'q1', multiSelect: false, options: [{ label: 'A' }] },
-        { question: 'q2', multiSelect: false, options: [{ label: 'B' }] }
-      ]
-    }
-    // Leading blank stays an empty line: '\nB' (2 lines), not 'B'.
-    expect(formatAskAnswer(prompt, [{ indices: [] }, { indices: [0] }])).toBe('\nB')
-  })
-
-  it('keeps one line per question with a blank middle answer (3 questions)', () => {
-    const prompt: AskPrompt = {
-      questions: [
-        { question: 'q1', multiSelect: false, options: [{ label: 'A' }] },
-        { question: 'q2', multiSelect: false, options: [{ label: 'B' }] },
-        { question: 'q3', multiSelect: false, options: [{ label: 'C' }] }
-      ]
-    }
-    const answer = formatAskAnswer(prompt, [{ indices: [0] }, { indices: [] }, { indices: [0] }])
-    expect(answer).toBe('A\n\nC')
-    expect(answer.split('\n')).toHaveLength(3)
-  })
-})
-
 const single = (options: string[], multiSelect = false): AskPrompt => ({
   questions: [{ question: 'q', multiSelect, options: options.map((label) => ({ label })) }]
 })
@@ -238,52 +193,6 @@ describe('buildAskAnswerKeys', () => {
 
   it('is empty when nothing is answered', () => {
     expect(buildAskAnswerKeys(single(['Tabs', 'Spaces']), [{ indices: [] }])).toEqual([])
-  })
-})
-
-describe('buildCodexAskAnswerKeys', () => {
-  it("submits the final multi-question option without Claude's extra Enter", () => {
-    const prompt: AskPrompt = {
-      questions: [
-        { question: 'q1', multiSelect: false, options: [{ label: 'A' }, { label: 'B' }] },
-        { question: 'q2', multiSelect: false, options: [{ label: 'C' }, { label: 'D' }] }
-      ]
-    }
-
-    expect(buildCodexAskAnswerKeys(prompt, [{ indices: [1] }, { indices: [0] }])).toEqual([
-      { raw: '2' },
-      { raw: '1' }
-    ])
-  })
-
-  it('adds free text as notes before committing the selected row', () => {
-    expect(
-      buildCodexAskAnswerKeys(single(['Tabs', 'Spaces']), [
-        { indices: [1], other: 'Keep existing files' }
-      ])
-    ).toEqual([{ raw: '\x1b[B' }, { raw: '\t' }, { text: 'Keep existing files' }, { raw: '\r' }])
-  })
-
-  it("targets Codex's synthetic None-of-the-above row for a custom answer", () => {
-    expect(
-      buildCodexAskAnswerKeys(single(['Tabs', 'Spaces']), [{ indices: [], other: 'Four spaces' }])
-    ).toEqual([{ raw: '\x1b[A' }, { raw: '\t' }, { text: 'Four spaces' }, { raw: '\r' }])
-  })
-
-  it('clears skipped rows and confirms the partial answer once', () => {
-    const prompt: AskPrompt = {
-      questions: [
-        { question: 'q1', multiSelect: false, options: [{ label: 'A' }, { label: 'B' }] },
-        { question: 'q2', multiSelect: false, options: [{ label: 'C' }, { label: 'D' }] }
-      ]
-    }
-
-    expect(buildCodexAskAnswerKeys(prompt, [{ indices: [] }, { indices: [1] }])).toEqual([
-      { raw: '\x7f' },
-      { raw: '\x1b[C' },
-      { raw: '2' },
-      { raw: '\r' }
-    ])
   })
 })
 

@@ -55,7 +55,7 @@ describe('rewind recovery of newer durable records', () => {
       kind: 'turn' as const,
       turnId: 'turn',
       state: 'completed',
-      userItemId: 'codex:thread:turn:0',
+      userItemId: 'claude:session:turn',
       startedAt: 10,
       completedAt: 20,
       durationMs: 10

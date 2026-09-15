@@ -96,7 +96,7 @@ describe('closeTerminalTabInWorkspaceSession', () => {
             paneKey: 'terminal-1:leaf-left',
             tabId: 'terminal-1',
             worktreeId: WORKTREE_ID,
-            agent: 'codex',
+            agent: 'claude',
             providerSession: { key: 'session_id', id: 'session-1' },
             prompt: 'continue',
             state: 'working',

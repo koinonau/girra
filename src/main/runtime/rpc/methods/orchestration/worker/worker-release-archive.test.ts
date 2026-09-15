@@ -4,11 +4,12 @@ import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createOrchestrationWorkerReleaseHarness } from './worker-release.test-support'
 
-function codexMessage(id: string, text: string): string {
+function claudeMessage(id: string, text: string): string {
   return JSON.stringify({
+    type: 'assistant',
+    uuid: id,
     timestamp: '2026-08-03T12:00:00.000Z',
-    type: 'event_msg',
-    payload: { id, type: 'agent_message', message: text }
+    message: { role: 'assistant', content: [{ type: 'text', text }] }
   })
 }
 
@@ -114,17 +115,17 @@ describe('orchestration worker release archive', () => {
   it('reads an immutable transcript snapshot after the provider file disappears', async () => {
     h.setup()
     const directory = await mkdtemp(join(tmpdir(), 'orca-worker-release-snapshot-'))
-    const transcriptPath = join(directory, 'rollout.jsonl')
+    const transcriptPath = join(directory, 'session.jsonl')
     try {
       await writeFile(
         transcriptPath,
-        `${codexMessage('snapshot-one', 'frozen first')}\n${codexMessage('snapshot-two', 'frozen second')}\n`
+        `${claudeMessage('snapshot-one', 'frozen first')}\n${claudeMessage('snapshot-two', 'frozen second')}\n`
       )
       vi.mocked(h.runtime.getExactWorkerProviderSession).mockReturnValue({
-        agent: 'codex',
+        agent: 'claude',
         processIncarnation: 'runtime_test:term_worker:1',
         providerSession: {
-          key: 'codex:snapshot-session',
+          key: 'claude:snapshot-session',
           id: 'snapshot-session',
           transcriptPath
         }
@@ -159,21 +160,14 @@ describe('orchestration worker release archive', () => {
   it('preserves payload clipping metadata in the released transcript snapshot', async () => {
     h.setup()
     const directory = await mkdtemp(join(tmpdir(), 'orca-worker-release-clipped-snapshot-'))
-    const transcriptPath = join(directory, 'rollout.jsonl')
+    const transcriptPath = join(directory, 'session.jsonl')
     try {
-      await writeFile(
-        transcriptPath,
-        `${JSON.stringify({
-          timestamp: '2026-08-03T12:00:00.000Z',
-          type: 'event_msg',
-          payload: { id: 'clipped-message', type: 'agent_message', message: 'x'.repeat(5_000) }
-        })}\n`
-      )
+      await writeFile(transcriptPath, `${claudeMessage('clipped-message', 'x'.repeat(5_000))}\n`)
       vi.mocked(h.runtime.getExactWorkerProviderSession).mockReturnValue({
-        agent: 'codex',
+        agent: 'claude',
         processIncarnation: 'runtime_test:term_worker:1',
         providerSession: {
-          key: 'codex:clipped-session',
+          key: 'claude:clipped-session',
           id: 'clipped-session',
           transcriptPath
         }

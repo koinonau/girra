@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  CLAUDE_SESSION_OPTION_CATALOG,
-  CODEX_SESSION_OPTION_CATALOG
-} from './agent-session-option-catalog-claude-codex'
+import { CLAUDE_SESSION_OPTION_CATALOG } from './agent-session-option-catalog-claude'
 import {
   applyNativeChatReportedSessionOptions,
   createNativeChatSessionOptionRecord,
@@ -54,7 +51,6 @@ describe('matchNativeChatCatalogModelId', () => {
     expect(matchNativeChatCatalogModelId(CLAUDE_SESSION_OPTION_CATALOG, 'claude-sonnet-5')).toBe(
       'sonnet'
     )
-    expect(matchNativeChatCatalogModelId(CODEX_SESSION_OPTION_CATALOG, 'gpt-5.5')).toBe('gpt-5.5')
   })
 
   it('returns null for unrecognized reports', () => {

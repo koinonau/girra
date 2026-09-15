@@ -327,12 +327,16 @@ describe('claude structured launch resolution', () => {
       })
     ).rejects.toThrow(/local host/)
     await expect(
-      resolverFor(record({ provider: 'codex' } as Partial<AgentSessionRecord>))({
+      resolverFor(record({ provider: 'codex' } as unknown as Partial<AgentSessionRecord>))({
         identity: IDENTITY
       })
     ).rejects.toThrow(/codex session/)
     await expect(
-      resolverFor(record({ accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex' } }))({
+      resolverFor(
+        record({
+          accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex' }
+        } as unknown as Partial<AgentSessionRecord>)
+      )({
         identity: IDENTITY
       })
     ).rejects.toThrow(/CLAUDE_CONFIG_DIR/)

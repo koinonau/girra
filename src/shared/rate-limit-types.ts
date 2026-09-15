@@ -73,8 +73,6 @@ export type InactiveAccountUsage = {
 
 export type RateLimitState = {
   claude: ProviderRateLimits | null
-  /** Retired Codex slot, always null. Older paired clients still dereference it. */
-  codex: null
   opencodeGo: ProviderRateLimits | null
   minimax: ProviderRateLimits | null
   /**
@@ -92,9 +90,5 @@ export type RateLimitState = {
    */
   minimaxApiKeyConfigured: boolean
   claudeTarget: RateLimitRuntimeTarget
-  /** Retired, always host. Older paired clients still read `codexTarget.runtime`. */
-  codexTarget: { runtime: 'host'; wslDistro: null }
   inactiveClaudeAccounts: InactiveAccountUsage[]
-  /** Retired, always empty. Older paired clients still call `inactiveCodexAccounts.find`. */
-  inactiveCodexAccounts: never[]
 }

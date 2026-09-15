@@ -11,21 +11,18 @@ vi.mock('../wsl-running-path-filter', () => ({
 }))
 
 import {
-  configureHostReadableTranscriptPathSources,
   isGuestAbsoluteLinuxPath,
   needsWslHostTranslation,
   resetHostReadableTranscriptPathCacheForTests,
-  toHostReadableTranscriptPath,
-  wslCodexSessionsDirs
+  toHostReadableTranscriptPath
 } from './host-readable-transcript-path'
 import { WslTranscriptFsError } from './wsl-transcript-fs-gate'
 
 const UBUNTU_HOME = '\\\\wsl.localhost\\Ubuntu\\home\\ada'
 const DEBIAN_HOME = '\\\\wsl.localhost\\Debian\\home\\other'
-const ROLLOUT_LINUX =
-  '/home/ada/.local/share/orca/codex-runtime-home/home/sessions/2026/07/24/rollout-sess.jsonl'
-const ROLLOUT_UNC =
-  '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.local\\share\\orca\\codex-runtime-home\\home\\sessions\\2026\\07\\24\\rollout-sess.jsonl'
+const TRANSCRIPT_LINUX = '/home/ada/.claude/projects/-home-ada-app/sess.jsonl'
+const TRANSCRIPT_UNC =
+  '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\-home-ada-app\\sess.jsonl'
 
 beforeEach(() => {
   resetHostReadableTranscriptPathCacheForTests()
@@ -37,7 +34,7 @@ beforeEach(() => {
 
 describe('isGuestAbsoluteLinuxPath', () => {
   it('accepts absolute POSIX guest paths', () => {
-    expect(isGuestAbsoluteLinuxPath('/home/ada/.codex/sessions/rollout.jsonl')).toBe(true)
+    expect(isGuestAbsoluteLinuxPath('/home/ada/.claude/projects/transcript.jsonl')).toBe(true)
   })
 
   it('rejects UNC, relative, and drive-letter forms', () => {
@@ -51,21 +48,21 @@ describe('isGuestAbsoluteLinuxPath', () => {
 
 describe('needsWslHostTranslation', () => {
   it('is win32-only', () => {
-    expect(needsWslHostTranslation(ROLLOUT_LINUX, 'win32')).toBe(true)
-    expect(needsWslHostTranslation(ROLLOUT_LINUX, 'darwin')).toBe(false)
-    expect(needsWslHostTranslation(ROLLOUT_UNC, 'win32')).toBe(false)
+    expect(needsWslHostTranslation(TRANSCRIPT_LINUX, 'win32')).toBe(true)
+    expect(needsWslHostTranslation(TRANSCRIPT_LINUX, 'darwin')).toBe(false)
+    expect(needsWslHostTranslation(TRANSCRIPT_UNC, 'win32')).toBe(false)
   })
 })
 
 describe('toHostReadableTranscriptPath', () => {
   it('translates a WSL guest path to its UNC twin on Windows (#10326)', async () => {
     await expect(
-      toHostReadableTranscriptPath(ROLLOUT_LINUX, {
+      toHostReadableTranscriptPath(TRANSCRIPT_LINUX, {
         platform: 'win32',
-        pathExists: async (candidate) => candidate === ROLLOUT_UNC,
+        pathExists: async (candidate) => candidate === TRANSCRIPT_UNC,
         listWslHomeDirs: async () => [UBUNTU_HOME]
       })
-    ).resolves.toBe(ROLLOUT_UNC)
+    ).resolves.toBe(TRANSCRIPT_UNC)
   })
 
   it('never probes the bare guest path on Windows', async () => {
@@ -102,17 +99,17 @@ describe('toHostReadableTranscriptPath', () => {
   it('probes an already-UNC transcript only while its distro is running', async () => {
     const pathExists = vi.fn().mockResolvedValue(true)
     await expect(
-      toHostReadableTranscriptPath(ROLLOUT_UNC, { platform: 'win32', pathExists })
-    ).resolves.toBe(ROLLOUT_UNC)
-    expect(wslMocks.filterPathsToRunningWslDistrosAsync).toHaveBeenCalledWith([ROLLOUT_UNC])
-    expect(pathExists).toHaveBeenCalledWith(ROLLOUT_UNC)
+      toHostReadableTranscriptPath(TRANSCRIPT_UNC, { platform: 'win32', pathExists })
+    ).resolves.toBe(TRANSCRIPT_UNC)
+    expect(wslMocks.filterPathsToRunningWslDistrosAsync).toHaveBeenCalledWith([TRANSCRIPT_UNC])
+    expect(pathExists).toHaveBeenCalledWith(TRANSCRIPT_UNC)
   })
 
   it('does not probe an already-UNC transcript after its distro stops', async () => {
     const pathExists = vi.fn().mockResolvedValue(true)
     wslMocks.filterPathsToRunningWslDistrosAsync.mockResolvedValue([])
     await expect(
-      toHostReadableTranscriptPath(ROLLOUT_UNC, { platform: 'win32', pathExists })
+      toHostReadableTranscriptPath(TRANSCRIPT_UNC, { platform: 'win32', pathExists })
     ).resolves.toBeNull()
     expect(pathExists).not.toHaveBeenCalled()
   })
@@ -120,7 +117,7 @@ describe('toHostReadableTranscriptPath', () => {
   it('tries the distro whose $HOME prefixes the guest path first', async () => {
     const seen: string[] = []
     await expect(
-      toHostReadableTranscriptPath('/home/ada/.codex/sessions/rollout.jsonl', {
+      toHostReadableTranscriptPath('/home/ada/.claude/projects/transcript.jsonl', {
         platform: 'win32',
         pathExists: async (candidate) => {
           seen.push(candidate)
@@ -128,13 +125,13 @@ describe('toHostReadableTranscriptPath', () => {
         },
         listWslHomeDirs: async () => [DEBIAN_HOME, UBUNTU_HOME]
       })
-    ).resolves.toBe('\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout.jsonl')
+    ).resolves.toBe('\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\transcript.jsonl')
     expect(seen).toHaveLength(1)
   })
 
   it('probes only the attested distro when multiple guests contain the same path', async () => {
     const seen: string[] = []
-    const guestPath = '/home/ada/.codex/sessions/rollout-same.jsonl'
+    const guestPath = '/home/ada/.claude/projects/transcript-same.jsonl'
 
     await expect(
       toHostReadableTranscriptPath(guestPath, {
@@ -146,9 +143,11 @@ describe('toHostReadableTranscriptPath', () => {
         },
         listWslHomeDirs: async () => [DEBIAN_HOME, UBUNTU_HOME]
       })
-    ).resolves.toBe('\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout-same.jsonl')
+    ).resolves.toBe(
+      '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\transcript-same.jsonl'
+    )
     expect(seen).toEqual([
-      '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout-same.jsonl'
+      '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\transcript-same.jsonl'
     ])
   })
 
@@ -157,7 +156,7 @@ describe('toHostReadableTranscriptPath', () => {
     wslMocks.filterPathsToRunningWslDistrosAsync.mockResolvedValue([])
 
     await expect(
-      toHostReadableTranscriptPath('/home/ada/.codex/sessions/rollout-stopped.jsonl', {
+      toHostReadableTranscriptPath('/home/ada/.claude/projects/transcript-stopped.jsonl', {
         platform: 'win32',
         wslDistro: 'Ubuntu',
         pathExists,
@@ -166,7 +165,7 @@ describe('toHostReadableTranscriptPath', () => {
     ).resolves.toBeNull()
     expect(pathExists).not.toHaveBeenCalled()
     expect(wslMocks.filterPathsToRunningWslDistrosAsync).toHaveBeenCalledWith([
-      '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout-stopped.jsonl'
+      '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\transcript-stopped.jsonl'
     ])
   })
 
@@ -188,7 +187,7 @@ describe('toHostReadableTranscriptPath', () => {
     wslMocks.filterPathsToRunningWslDistrosAsync.mockResolvedValue([])
 
     await expect(
-      toHostReadableTranscriptPath(ROLLOUT_UNC, {
+      toHostReadableTranscriptPath(TRANSCRIPT_UNC, {
         platform: 'win32',
         wslDistro: 'Ubuntu',
         pathExists
@@ -199,7 +198,7 @@ describe('toHostReadableTranscriptPath', () => {
 
   it('returns null when no distro maps to an existing file', async () => {
     await expect(
-      toHostReadableTranscriptPath(ROLLOUT_LINUX, {
+      toHostReadableTranscriptPath(TRANSCRIPT_LINUX, {
         platform: 'win32',
         pathExists: async () => false,
         listWslHomeDirs: async () => [UBUNTU_HOME]
@@ -241,14 +240,14 @@ describe('toHostReadableTranscriptPath', () => {
 
   it('does not translate guest paths off Windows', async () => {
     await expect(
-      toHostReadableTranscriptPath('/home/ada/rollout.jsonl', {
+      toHostReadableTranscriptPath('/home/ada/transcript.jsonl', {
         platform: 'darwin',
-        pathExists: async (candidate) => candidate === '/home/ada/rollout.jsonl',
+        pathExists: async (candidate) => candidate === '/home/ada/transcript.jsonl',
         listWslHomeDirs: async () => {
           throw new Error('should not enumerate distros')
         }
       })
-    ).resolves.toBe('/home/ada/rollout.jsonl')
+    ).resolves.toBe('/home/ada/transcript.jsonl')
   })
 
   it('enumerates WSL homes once across repeated resolve-poll ticks', async () => {
@@ -256,13 +255,12 @@ describe('toHostReadableTranscriptPath', () => {
     // 500ms poll tick would hammer the main process.
     const listWslHomeDirs = vi.fn(async () => [UBUNTU_HOME])
     for (let tick = 0; tick < 5; tick += 1) {
-      await toHostReadableTranscriptPath(ROLLOUT_LINUX, {
+      await toHostReadableTranscriptPath(TRANSCRIPT_LINUX, {
         platform: 'win32',
         pathExists: async () => false,
         listWslHomeDirs
       })
     }
-    await wslCodexSessionsDirs({ platform: 'win32', listWslHomeDirs })
     expect(listWslHomeDirs).toHaveBeenCalledTimes(1)
   })
 
@@ -277,11 +275,11 @@ describe('toHostReadableTranscriptPath', () => {
         .mockResolvedValueOnce([UBUNTU_HOME])
         .mockResolvedValue([UBUNTU_HOME, DEBIAN_HOME])
 
-      const debianRollout = '\\\\wsl.localhost\\Debian\\home\\other\\x.jsonl'
+      const debianTranscript = '\\\\wsl.localhost\\Debian\\home\\other\\x.jsonl'
       const call = (): Promise<string | null> =>
         toHostReadableTranscriptPath('/home/other/x.jsonl', {
           platform: 'win32',
-          pathExists: async (candidate) => candidate === debianRollout,
+          pathExists: async (candidate) => candidate === debianTranscript,
           listWslHomeDirs
         })
 
@@ -290,7 +288,7 @@ describe('toHostReadableTranscriptPath', () => {
       expect(listWslHomeDirs).toHaveBeenCalledTimes(1)
 
       vi.setSystemTime(Date.now() + 6 * 60_000)
-      await expect(call()).resolves.toBe(debianRollout)
+      await expect(call()).resolves.toBe(debianTranscript)
       expect(listWslHomeDirs).toHaveBeenCalledTimes(2)
     } finally {
       vi.useRealTimers()
@@ -303,50 +301,11 @@ describe('toHostReadableTranscriptPath', () => {
       .mockResolvedValueOnce([])
     const pathExists = vi.fn(async () => false)
 
-    await toHostReadableTranscriptPath(ROLLOUT_LINUX, { platform: 'win32', pathExists })
+    await toHostReadableTranscriptPath(TRANSCRIPT_LINUX, { platform: 'win32', pathExists })
     pathExists.mockClear()
-    await toHostReadableTranscriptPath(ROLLOUT_LINUX, { platform: 'win32', pathExists })
+    await toHostReadableTranscriptPath(TRANSCRIPT_LINUX, { platform: 'win32', pathExists })
 
     expect(wslMocks.listRunningWslHomeDirsAsync).toHaveBeenCalledTimes(2)
     expect(pathExists).not.toHaveBeenCalled()
-  })
-})
-
-describe('wslCodexSessionsDirs', () => {
-  it('returns nothing off Windows', async () => {
-    await expect(
-      wslCodexSessionsDirs({ platform: 'darwin', listWslHomeDirs: async () => [UBUNTU_HOME] })
-    ).resolves.toEqual([])
-  })
-
-  it('lists the managed and system Codex roots per distro home', async () => {
-    await expect(
-      wslCodexSessionsDirs({ platform: 'win32', listWslHomeDirs: async () => [UBUNTU_HOME] })
-    ).resolves.toEqual([
-      `${UBUNTU_HOME}\\.local\\share\\orca\\codex-runtime-home\\home\\sessions`,
-      `${UBUNTU_HOME}\\.codex\\sessions`
-    ])
-  })
-
-  it('includes WSL managed-account session roots supplied by the runtime', async () => {
-    const accountHome = `${UBUNTU_HOME}\\.local\\share\\orca\\codex-accounts\\account-1\\home`
-    configureHostReadableTranscriptPathSources({
-      getAdditionalCodexHomePaths: () => [accountHome, '/host/account/home']
-    })
-
-    await expect(
-      wslCodexSessionsDirs({ platform: 'win32', listWslHomeDirs: async () => [UBUNTU_HOME] })
-    ).resolves.toContain(`${accountHome}\\sessions`)
-  })
-
-  it('excludes managed-account roots in stopped distros', async () => {
-    configureHostReadableTranscriptPathSources({
-      getAdditionalCodexHomePaths: () => [`${UBUNTU_HOME}\\.codex-account`]
-    })
-    wslMocks.filterPathsToRunningWslDistrosAsync.mockResolvedValue([])
-
-    await expect(
-      wslCodexSessionsDirs({ platform: 'win32', listWslHomeDirs: async () => [] })
-    ).resolves.toEqual([])
   })
 })

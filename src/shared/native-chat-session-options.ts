@@ -49,9 +49,9 @@ export type SessionOptionDescriptor = {
   transport: NativeChatLiveOptionTransport
   settable: boolean
   disabledReason?: SessionOptionDisabledReason
-  /** Why: picker-only and toggle-only PTY commands cannot be represented as
-   * a truthful radio/checkbox state, so the producer exposes an action row. */
-  action?: { type: 'agent-picker' | 'toggle-command' }
+  /** Why: toggle-only PTY commands cannot be represented as a truthful
+   * checkbox state, so the producer exposes an action row. */
+  action?: { type: 'toggle-command' }
 }
 
 /** A value we typed at the agent and have never read back. Only the terminal

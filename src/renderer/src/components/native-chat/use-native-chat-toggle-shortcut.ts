@@ -4,9 +4,7 @@ import type { AgentType } from '../../../../shared/agent-status-types'
 import type { TerminalLayoutSnapshot } from '../../../../shared/terminal-tab-types'
 import { resolveNativeChatTabAgentEvidence } from '../tab-bar/native-chat-tab-agent-evidence'
 import { canToggleNativeChat } from './native-chat-availability'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { isMacPlatform, matchesNativeChatToggleShortcut } from './native-chat-shortcut'
-import { getConnectionIdFromState } from '@/lib/connection-context'
 import {
   isNativeChatTabWideFallbackSafe,
   resolveNativeChatActiveLayoutLeafId
@@ -68,7 +66,7 @@ export function useNativeChatToggleShortcut(worktreeId: string, isWorktreeActive
         (candidate) => candidate.id === tab.entityId
       )
       // Carry the agent identity (not just "an agent exists") so the chord stays
-      // inert on unsupported agents (e.g. Gemini), matching the menu/header gate.
+      // inert on unsupported agents, matching the menu/header gate.
       // Pane keys are `${entityId}:${leafId}` — the backing terminal tab id, not
       // the unified tab id.
       const terminalLayout = state.terminalLayoutsByTabId[tab.entityId]
@@ -89,9 +87,6 @@ export function useNativeChatToggleShortcut(worktreeId: string, isWorktreeActive
           launchAgent: detectedAgent || !tabWideFallbackSafe ? null : terminalTab?.launchAgent,
           detectedAgent,
           resolvedAgent: detectedAgent ? null : titleFallbackAgent,
-          nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-            getConnectionIdFromState(state, worktreeId)
-          ),
           isChatViewMode: tab.viewMode === 'chat'
         })
       ) {

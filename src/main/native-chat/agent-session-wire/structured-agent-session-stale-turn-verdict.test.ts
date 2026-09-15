@@ -9,12 +9,7 @@ import {
 } from './structured-agent-session-stale-turn-verdict'
 
 const THREAD = 'thread-1'
-const RUNNING_IDENTITY = {
-  provider: 'codex' as const,
-  threadId: THREAD,
-  turnId: 'turn-2',
-  ordinal: 0
-}
+const RUNNING_IDENTITY = { provider: 'claude' as const, sessionId: THREAD, uuid: 'turn-2' }
 
 function lifecycleItem(
   turnId: string,
@@ -23,7 +18,7 @@ function lifecycleItem(
   extra: { startedAt?: number; completedAt?: number } = {}
 ): AgentJournalRenderItem {
   return {
-    itemId: agentJournalItemKey({ provider: 'codex', threadId: THREAD, turnId, ordinal: 0 }),
+    itemId: agentJournalItemKey({ provider: 'claude', sessionId: THREAD, uuid: turnId }),
     revision: 1,
     sequence,
     observedAt: sequence,

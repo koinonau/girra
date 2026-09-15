@@ -19,8 +19,3 @@ export function claudeInterruptedMessageId(record: Record<string, unknown>): str
   }
   return extractString(record.interruptedMessageId) ?? undefined
 }
-
-/** Codex `event_msg` payload types that bound a turn's lifecycle. */
-export const CODEX_EVENT_TURN_STARTED = 'task_started'
-export const CODEX_EVENT_TURN_COMPLETE = 'task_complete'
-export const CODEX_EVENT_TURN_ABORTED = 'turn_aborted'

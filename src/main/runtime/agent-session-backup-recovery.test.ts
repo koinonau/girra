@@ -25,8 +25,8 @@ async function seedLiveSession(sessionId: string): Promise<number> {
       workspaceId: 'workspace-1',
       workspaceKind: 'git-worktree'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'seed-live',
@@ -56,7 +56,7 @@ async function seedLiveSession(sessionId: string): Promise<number> {
       origin: 'created',
       mintedAtFence: fence,
       observedAt: NOW,
-      handle: { provider: 'codex', threadId: `thread-${sessionId}` }
+      handle: { provider: 'claude', sessionId: `provider-${sessionId}`, leafUuid: null }
     },
     now: NOW
   })
@@ -99,8 +99,8 @@ async function seedSession(sessionId: string): Promise<number> {
       workspaceId: 'workspace-1',
       workspaceKind: 'git-worktree'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'seed',

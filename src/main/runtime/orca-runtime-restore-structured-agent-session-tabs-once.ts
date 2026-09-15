@@ -70,7 +70,7 @@ export class OrcaRuntimeWithRestoreStructuredAgentSessionTabsOnce extends OrcaRu
       await this.replaceStructuredAgentSessionTab(replacement)
     }
     for (const session of host?.listSessionTabs() ?? []) {
-      if (session.agent !== 'codex' && session.agent !== 'claude') {
+      if (session.agent !== 'claude') {
         continue
       }
       let sessionId = session.sessionId
@@ -90,7 +90,7 @@ export class OrcaRuntimeWithRestoreStructuredAgentSessionTabsOnce extends OrcaRu
   async publishStructuredAgentSessionTab(input: {
     workspaceId: string
     sessionId: string
-    agent: 'claude' | 'codex'
+    agent: 'claude'
     activate: boolean
     notify?: boolean
     replacesSessionId?: string

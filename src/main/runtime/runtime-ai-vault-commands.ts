@@ -1,8 +1,4 @@
 import type {
-  AiVaultPrepareSessionResumeArgs,
-  AiVaultPrepareSessionResumeResult
-} from '../../shared/ai-vault-resume-preparation'
-import type {
   AiVaultSessionTitleRequest,
   AiVaultSessionTitlesResult
 } from '../../shared/ai-vault-session-title'
@@ -11,12 +7,6 @@ import { listAiVaultSessions } from '../ai-vault/cached-session-list'
 import { resolveLocalAiVaultSessionTitles } from '../ai-vault/session-title-resolver'
 
 export class RuntimeAiVaultCommands {
-  constructor(
-    private readonly getPrepareResume: () =>
-      | ((args: AiVaultPrepareSessionResumeArgs) => Promise<AiVaultPrepareSessionResumeResult>)
-      | null
-  ) {}
-
   list(args?: AiVaultListArgs): Promise<AiVaultListResult> {
     return listAiVaultSessions(args)
   }
@@ -26,9 +16,5 @@ export class RuntimeAiVaultCommands {
     signal?: AbortSignal
   ): Promise<AiVaultSessionTitlesResult> {
     return resolveLocalAiVaultSessionTitles(requests, signal)
-  }
-
-  prepare(args: AiVaultPrepareSessionResumeArgs): Promise<AiVaultPrepareSessionResumeResult> {
-    return this.getPrepareResume()?.(args) ?? Promise.resolve({ useRealCodexHome: false })
   }
 }

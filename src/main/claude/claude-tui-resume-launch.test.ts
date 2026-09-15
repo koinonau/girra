@@ -179,7 +179,9 @@ describe('Claude TUI resume launch', () => {
     ).rejects.toThrow('claude_tui_resume_handle_required')
     await expect(
       build({
-        record: record({ accountHome: { variable: 'CODEX_HOME', path: '/wrong' } }),
+        record: record({
+          accountHome: { variable: 'CODEX_HOME', path: '/wrong' }
+        } as unknown as Partial<AgentSessionRecord>),
         spawnToken: 'spawn'
       })
     ).rejects.toThrow(/CLAUDE_CONFIG_DIR/)

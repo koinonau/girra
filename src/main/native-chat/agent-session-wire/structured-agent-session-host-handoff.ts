@@ -168,8 +168,7 @@ async function importTuiHistory(
     throw new Error('agent_session_identity_required')
   }
   const options = structuredTuiTranscriptImportOptions(record, input.transcriptPath)
-  const providerSessionId =
-    head.handle.provider === 'claude' ? head.handle.sessionId : head.handle.threadId
+  const providerSessionId = head.handle.sessionId
   const imported = await importLegacyTranscriptIntoJournal({
     journal: session.journal,
     agent: head.handle.provider,
@@ -190,9 +189,7 @@ export function structuredTuiTranscriptImportOptions(
   if (transcriptPath) {
     return { filePath: transcriptPath }
   }
-  return record.provider === 'claude'
-    ? { claudeProjectsDir: join(record.accountHome.path, 'projects') }
-    : { codexSessionsDirs: [join(record.accountHome.path, 'sessions')] }
+  return { claudeProjectsDir: join(record.accountHome.path, 'projects') }
 }
 
 export async function acquireNativeHandoffOwner(

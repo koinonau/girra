@@ -100,13 +100,4 @@ describe('structured Claude managed-account gate', () => {
       runtime.getStructuredAgentSessionCreateSupport('id:workspace-1', 'claude')
     ).resolves.toMatchObject({ supported: false })
   })
-
-  /** The gate is Claude's alone: Codex resolves its account separately and this lane must not
-   *  change any Codex answer. */
-  it('leaves Codex supported under the same WSL-only Claude account', async () => {
-    const runtime = runtimeWithAccounts(WSL_ONLY)
-    await expect(
-      runtime.getStructuredAgentSessionCreateSupport('id:workspace-1', 'codex')
-    ).resolves.toMatchObject({ supported: true })
-  })
 })

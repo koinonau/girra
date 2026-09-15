@@ -15,8 +15,8 @@ import {
 } from '../../shared/agent-prompt-injection'
 import type { AgentPromptWaitTextCache } from './agent-prompt-submission-verification'
 import {
+  AGENT_PROMPT_EFFECT_TIMEOUT_MS,
   isTerminalSendSettlementAgent,
-  resolveAgentPromptEffectTimeoutMs,
   verifyAgentPromptSubmission
 } from './agent-prompt-submission-verification'
 
@@ -91,7 +91,7 @@ export class OrcaRuntimeWithWriteTerminalAgentPrompt extends OrcaRuntimeWithReso
     if (!this.ptyController?.write(ptyId, AGENT_PROMPT_SUBMIT)) {
       throw new Error(options.suffixFailureError ?? 'terminal_not_writable')
     }
-    const effectTimeoutMs = resolveAgentPromptEffectTimeoutMs(this.getPtyAgent(ptyId))
+    const effectTimeoutMs = AGENT_PROMPT_EFFECT_TIMEOUT_MS
     if (!options.acceptQueued || !options.requestId) {
       await verifyAgentPromptSubmission({
         baseline,

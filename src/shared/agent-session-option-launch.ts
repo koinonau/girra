@@ -60,13 +60,10 @@ export function resolveAgentSessionOptionLaunch(
       return model && includeCatalogDefaults ? [[option.id, option.kind.defaultValue]] : []
     })
   )
-  const composedModelId = catalog.composeModelValue
-    ? catalog.composeModelValue(modelId, modelValues)
-    : modelId
   const modelOverridden = catalog.modelApply.agentArgsOverride?.(trailingAgentArgs) === true
 
   if (catalog.modelApply.launchArgs) {
-    args.push(...catalog.modelApply.launchArgs(composedModelId))
+    args.push(...catalog.modelApply.launchArgs(modelId))
     if (!modelOverridden) {
       appliedValues.model = modelId
     }
@@ -74,12 +71,6 @@ export function resolveAgentSessionOptionLaunch(
   for (const option of modelOptions) {
     const value = modelValues[option.id]
     if (value === undefined) {
-      continue
-    }
-    if (option.apply.composedIntoModel) {
-      if (catalog.modelApply.launchArgs && !modelOverridden) {
-        appliedValues[option.id] = value
-      }
       continue
     }
     if (!option.apply.launchArgs) {

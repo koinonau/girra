@@ -15,11 +15,9 @@ describe('structuredSlashCommands', () => {
   }
   const REFUSAL = /is not available in chat sessions/
 
-  // The composer menu and the dispatcher read the same policy. When they disagreed,
-  // a Claude session was offered Codex-only tokens that missed the command guard
-  // and reached the model as literal prompt text instead of erroring. A row is
-  // honored either way now: the host answers it, or it passes through to the agent.
-  it.each(['codex', 'claude'] as const)(
+  // The composer menu and the dispatcher read the same policy: every offered row is
+  // honored, either answered by the host or passed through to the agent.
+  it.each(['claude'] as const)(
     'offers %s only commands the host answers or the agent runs',
     async (agent) => {
       const offered = structuredSlashCommands(['clear', 'compact'], agent)
@@ -33,24 +31,6 @@ describe('structuredSlashCommands', () => {
       }
     }
   )
-
-  // Codex reports no catalog of its own, so this fallback is its whole `/` menu —
-  // without the row, a command that now works is impossible to discover.
-  it('offers Codex the /goal the model acts on, described from the catalog', () => {
-    const offered = structuredSlashCommands(['clear', 'compact'], 'codex')
-    expect(offered.map((command) => command.name)).toEqual([
-      'model',
-      'effort',
-      'clear',
-      'compact',
-      'goal'
-    ])
-    expect(offered.find((command) => command.name === 'goal')?.description).toBe(
-      'Set or view the goal'
-    )
-    // Picking it must reach the model, not the host's refusal.
-    expect(isStructuredAgentSessionComposerCommand('/goal', 'codex')).toBe(false)
-  })
 
   it('adds nothing for an agent whose own harness expands its commands', () => {
     expect(structuredSlashCommands(['clear', 'compact'], 'claude').map((c) => c.name)).toEqual([
@@ -83,8 +63,6 @@ describe('isStructuredAgentSessionComposerCommand', () => {
   // The menu hides TUI-only commands, but the guard must still claim a typed one
   // so it is answered here instead of sent to the model as prose.
   it.each([
-    ['codex', 'vim'],
-    ['codex', 'clear'],
     ['claude', 'compact'],
     ['claude', 'clear']
   ] as const)('claims the unoffered %s command /%s', (agent, name) => {
@@ -98,20 +76,13 @@ describe('isStructuredAgentSessionComposerCommand', () => {
 
 describe('dispatchStructuredAgentSessionComposerCommand', () => {
   const controller = {
-    agent: 'codex' as const,
+    agent: 'claude' as const,
     snapshot: [],
     invokeAction: async () => true,
     setOption: async () => true
   }
 
-  it('names what does work when a TUI-only command is typed', async () => {
-    const outcome = await dispatchStructuredAgentSessionComposerCommand('/vim', controller)
-    expect(outcome.handled).toBe(true)
-    expect(outcome.error).toBe(
-      '/vim is not available in chat sessions. Use the slash menu to see available commands.'
-    )
-  })
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'handles %s conversation commands without message fallthrough',
     async (agent) => {
       const runConversationCommand = vi.fn(async () => ({ accepted: true, error: null }))
@@ -180,30 +151,4 @@ describe('agent-implemented commands pass through to the agent', () => {
       ).toBe(true)
     }
   )
-
-  // Codex's app-server has no slash parser, but the model owns goal tools and
-  // creates a real goal from `/goal <objective>` arriving as prose.
-  it('passes /goal through on Codex, arguments and all', async () => {
-    expect(isStructuredAgentSessionComposerCommand('/goal', 'codex')).toBe(false)
-    expect(
-      await dispatchStructuredAgentSessionComposerCommand('/goal ship the fix', {
-        ...controller,
-        agent: 'codex'
-      })
-    ).toEqual(PASSED_THROUGH)
-  })
-
-  it('keeps refusing a Codex command the model cannot carry out', async () => {
-    expect(isStructuredAgentSessionComposerCommand('/permissions', 'codex')).toBe(true)
-    expect(
-      await dispatchStructuredAgentSessionComposerCommand('/permissions', {
-        ...controller,
-        agent: 'codex'
-      })
-    ).toMatchObject({
-      handled: true,
-      error:
-        '/permissions is not available in chat sessions. Use the slash menu to see available commands.'
-    })
-  })
 })

@@ -1,9 +1,7 @@
 import { app, ipcMain } from 'electron'
 import {
-  configureAiVaultSessionSources,
   listAiVaultSessions as listCachedLocalAiVaultSessions,
-  resetAiVaultSessionListCacheForTests,
-  type AiVaultSessionSources
+  resetAiVaultSessionListCacheForTests
 } from '../ai-vault/cached-session-list'
 import { deleteAiVaultSession, registerAiVaultDeleteHandler } from './ai-vault-delete'
 import { listAiVaultSubagentSessions } from './ai-vault-subagent-list'
@@ -26,7 +24,6 @@ import {
   type AiVaultSubagentListResult
 } from '../../shared/ai-vault-types'
 import { handleAiVaultGetFirstUserPrompt } from '../ai-vault/session-first-user-prompt-handler'
-import { registerAiVaultResumeHandler, type AiVaultResumeHandlerOptions } from './ai-vault-resume'
 import {
   LOCAL_EXECUTION_HOST_ID,
   parseExecutionHostId,
@@ -68,12 +65,12 @@ const AI_VAULT_ALL_HOST_RUNTIME_TIMEOUT_MS = 3_000
 const AI_VAULT_ALL_HOST_SSH_RELAY_TIMEOUT_MS = 15_000
 const AI_VAULT_ALL_HOST_SSH_TIMEOUT_MS = 20_000
 
-type AiVaultHandlerOptions = AiVaultSessionSources &
-  AiVaultResumeHandlerOptions & {
-    getActiveRuntimeAiVaultHostInfos?: () => readonly RuntimeAiVaultHostInfo[]
-    scanRuntimeAiVaultSessions?: RuntimeAiVaultScanner
-    resolveRuntimeAiVaultSessionTitles?: RuntimeAiVaultSessionTitleResolver
-  }
+type AiVaultHandlerOptions = {
+  ensureStructuredSessionOwnership?: () => Promise<void>
+  getActiveRuntimeAiVaultHostInfos?: () => readonly RuntimeAiVaultHostInfo[]
+  scanRuntimeAiVaultSessions?: RuntimeAiVaultScanner
+  resolveRuntimeAiVaultSessionTitles?: RuntimeAiVaultSessionTitleResolver
+}
 
 let scanCoordinator = new AiVaultScanCoordinator()
 let handlerOptions: AiVaultHandlerOptions = {}
@@ -255,9 +252,8 @@ async function scanLocalAiVaultSessions(
   args?: AiVaultListArgs,
   signal?: AbortSignal
 ): Promise<AiVaultListResult> {
-  // Why: the shared cache module owns codex-home/WSL sourcing and the local
-  // scan cache, so the desktop IPC path and the runtime RPC method (mobile)
-  // share one cache instance and one source of managed-Codex homes.
+  // Why: the shared cache module owns WSL sourcing and the local scan cache, so
+  // the desktop IPC path and the runtime RPC method (mobile) share one cache.
   return listCachedLocalAiVaultSessions(
     {
       limit: args?.limit,
@@ -271,11 +267,6 @@ async function scanLocalAiVaultSessions(
 
 export function registerAiVaultHandlers(options: AiVaultHandlerOptions = {}): void {
   handlerOptions = options
-  // Why: configure the SAME shared cache module the runtime RPC method uses so
-  // there is exactly one cache instance and neither caller drops codex-home or
-  // WSL injection. The runtime also configures these sources from its deps
-  // (serve-mode reachable); this desktop path supplies the same source.
-  configureAiVaultSessionSources(options)
   ipcMain.handle('aiVault:listSessions', async (event, args?: AiVaultListArgs) => {
     const requestToken =
       typeof args?.requestToken === 'string' && args.requestToken.length <= 128
@@ -310,7 +301,6 @@ export function registerAiVaultHandlers(options: AiVaultHandlerOptions = {}): vo
       }
     }
   )
-  registerAiVaultResumeHandler(options)
   ipcMain.handle(
     'aiVault:listSubagentSessions',
     (_event, args?: AiVaultSubagentListArgs): Promise<AiVaultSubagentListResult> =>

@@ -13,7 +13,7 @@ function session(id: string, cwd: string, index: number): AiVaultSession {
   return {
     id,
     executionHostId: 'local',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: id,
     title: id,
     cwd,

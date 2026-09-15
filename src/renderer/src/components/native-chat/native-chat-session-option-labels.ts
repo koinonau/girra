@@ -63,7 +63,7 @@ export function nativeChatSessionOptionDisabledReason(
 }
 
 export function nativeChatModelPillLabel(descriptor: SessionOptionDescriptor): string {
-  // Why: show the value only (Codex/Conductor style). "Model:" is redundant —
+  // Why: show the value only. "Model:" is redundant —
   // the control's aria-label/tooltip already names the category.
   // Only `unknown` withholds the value; a `default` source still names the model
   // the launch will use, so it renders like any observed one.

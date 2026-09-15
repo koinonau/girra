@@ -143,7 +143,7 @@ describe('editFilesFromToolPair', () => {
     expect(files?.[0]?.changeKind).toBe('edited')
     expect(files?.[0]?.added).toBe(1)
     expect(files?.[0]?.removed).toBe(1)
-    // Codex hunk headers are context anchors, so no row may claim a file position.
+    // Begin Patch hunk headers are context anchors, so no row may claim a file position.
     expect(files?.[0]?.lineNumbersKnown).toBe(false)
   })
 
@@ -351,10 +351,9 @@ describe('editFilesFromToolPair', () => {
     ).toBeNull()
     expect(
       settledFiles({
-        name: 'apply_patch',
-        input: {
-          changes: [{ path: 'a.ts', kind: { type: 'update' }, diff: '@@ -1 +1 @@\n-a\n+b' }]
-        },
+        name: 'Diff',
+        input: { path: 'a.ts' },
+        result: { output: '@@ -1 +1 @@\n-a\n+b' },
         state: 'failed'
       })
     ).toBeNull()
@@ -388,33 +387,6 @@ describe('editFilesFromToolPair', () => {
     expect(files?.[0]?.truncated).toBe(true)
     // The clipped body ends mid-line, so its one row is real and must survive.
     expect(files?.[0]?.lines).toHaveLength(1)
-  })
-
-  it('reads Codex structured changes, stripping the move marker from the body', () => {
-    const files = settledFiles({
-      name: 'apply_patch',
-      input: {
-        changes: [
-          {
-            path: 'old.ts',
-            kind: { type: 'update', move_path: 'new.ts' },
-            diff: '@@ -1,2 +1,2 @@\n-a\n+b\n\nMoved to: new.ts'
-          }
-        ]
-      }
-    })
-    expect(files?.[0]?.changeKind).toBe('renamed')
-    expect(files?.[0]?.lines.some((line) => line.text.includes('Moved to'))).toBe(false)
-    expect(gutter(files)).toEqual([1, 1])
-  })
-
-  it('reads a Codex add change, which arrives as raw content with no hunk header', () => {
-    const files = settledFiles({
-      name: 'apply_patch',
-      input: { changes: [{ path: 'new.ts', kind: { type: 'add' }, diff: 'one\ntwo' }] }
-    })
-    expect(files?.[0]?.changeKind).toBe('added')
-    expect(files?.[0]?.added).toBe(2)
   })
 
   it('renders the file a write actually wrote, not one its content quotes', () => {
@@ -532,16 +504,10 @@ describe('editFilesFromToolPair', () => {
       input: { path: 'docs/index.md' },
       result: { output: body }
     })
-    const fromChanges = settledFiles({
-      name: 'apply_patch',
-      input: { changes: [{ path: 'docs/index.md', kind: { type: 'update' }, diff: body }] }
-    })
-    for (const files of [fromPatch, fromChanges]) {
-      expect(files?.[0]?.changeKind).toBe('edited')
-      expect(files?.[0]?.oldPath).toBeNull()
-      expect(files?.[0]?.path).toBe('docs/index.md')
-      expect(files?.[0]?.lines.at(-1)?.text).toBe('See Moved to: docs/archive/index.md')
-    }
+    expect(fromPatch?.[0]?.changeKind).toBe('edited')
+    expect(fromPatch?.[0]?.oldPath).toBeNull()
+    expect(fromPatch?.[0]?.path).toBe('docs/index.md')
+    expect(fromPatch?.[0]?.lines.at(-1)?.text).toBe('See Moved to: docs/archive/index.md')
   })
 
   it('accepts either spelling of the command that applies an envelope', () => {

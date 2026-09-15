@@ -23,14 +23,14 @@ describe('AI Vault view option persistence', () => {
   it('normalizes malformed fields and removes unknown or duplicate agents', () => {
     expect(
       normalizeAiVaultViewOptions({
-        disabledAgents: ['codex', 'unknown', 'codex', 7],
+        disabledAgents: ['claude', 'unknown', 'claude', 7],
         sort: 'invalid',
         group: 'agent',
         hideEmptySessions: 'yes',
         sessionLimit: 999
       })
     ).toEqual({
-      disabledAgents: ['codex'],
+      disabledAgents: ['claude'],
       sort: 'updated',
       group: 'agent',
       hideEmptySessions: false,
@@ -120,7 +120,7 @@ describe('AI Vault view option persistence', () => {
     expect(
       writeAiVaultViewOptions(
         {
-          disabledAgents: ['codex'],
+          disabledAgents: ['claude'],
           sort: 'created',
           group: 'folder',
           hideEmptySessions: true,
@@ -132,7 +132,7 @@ describe('AI Vault view option persistence', () => {
     expect(storage.setItem).toHaveBeenCalledWith(
       AI_VAULT_VIEW_OPTIONS_STORAGE_KEY,
       JSON.stringify({
-        disabledAgents: ['codex'],
+        disabledAgents: ['claude'],
         sort: 'created',
         group: 'folder',
         hideEmptySessions: true,

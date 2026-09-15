@@ -19,7 +19,7 @@ type Delivery = 'auto-submit' | 'submit-after-ready' | 'draft'
 const structuredPlan = (prompt: string, promptDelivery: Delivery, onPromptDelivered?: () => void) =>
   adoptAgentSessionLaunchVerdict({
     route: 'structured-native-chat',
-    agent: 'codex',
+    agent: 'claude',
     worktreeId: 'wt-1',
     prompt,
     promptDelivery,
@@ -74,7 +74,7 @@ describe('launchAgentInStructuredNewTab', () => {
 
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'wt-1',
-      'codex',
+      'claude',
       { prompt: 'Fix it', promptDelivery: 'submit-after-ready', onPromptDelivered },
       expect.objectContaining({ legacyFallback: expect.any(Function) })
     )

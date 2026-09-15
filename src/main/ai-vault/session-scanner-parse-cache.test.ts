@@ -1,4 +1,4 @@
-import { appendFile, mkdir, mkdtemp, rm, stat, writeFile } from 'node:fs/promises'
+import { appendFile, mkdtemp, rm, stat, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -35,7 +35,7 @@ async function claudeCandidate(path: string): Promise<SessionFileCandidate> {
     modifiedAt: fileStat.mtime.toISOString(),
     sizeBytes: fileStat.size
   }
-  return { agent: 'claude', file, codexHome: null }
+  return { agent: 'claude', file }
 }
 
 function userRecord(index: number, text: string): string {
@@ -251,32 +251,25 @@ describe('parseAgentSessionFileCached', () => {
 
   it('caches non-Claude sessions by mtime and size', async () => {
     const root = await makeTempDir()
-    await mkdir(join(root, '2026', '05', '01'), { recursive: true })
-    const path = join(
-      root,
-      '2026',
-      '05',
-      '01',
-      'rollout-2026-05-01T10-00-00-019f0000-1111-7222-8333-444444444444.jsonl'
-    )
+    const path = join(root, 'pi-session.jsonl')
     await writeFile(
       path,
       `${JSON.stringify({
+        type: 'session',
+        id: 'pi-session',
         timestamp: '2026-05-01T11:00:00.000Z',
-        type: 'session_meta',
-        payload: { id: '019f0000-1111-7222-8333-444444444444', cwd: '/repo/app' }
+        cwd: '/repo/app'
       })}\n`
     )
     const fileStat = await stat(path)
     const candidate: SessionFileCandidate = {
-      agent: 'codex',
+      agent: 'pi',
       file: {
         path,
         mtimeMs: fileStat.mtimeMs,
         modifiedAt: fileStat.mtime.toISOString(),
         sizeBytes: fileStat.size
-      },
-      codexHome: null
+      }
     }
     const stats = createSessionParseStats()
     const first = await parseAgentSessionFileCached(candidate, process.platform, stats)

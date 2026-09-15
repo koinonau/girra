@@ -18,8 +18,8 @@ function request(overrides: Partial<AgentSessionReserveRequest> = {}): AgentSess
       workspaceId: 'workspace-1',
       workspaceKind: 'git-worktree'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'spawn-a',

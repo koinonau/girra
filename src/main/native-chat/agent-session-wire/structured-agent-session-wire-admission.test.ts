@@ -33,8 +33,8 @@ beforeEach(async () => {
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: 'thread-1' }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
     },
     journalDir: root
   })
@@ -149,7 +149,7 @@ function expectAdmitted(value: unknown): void {
 }
 
 function item(ordinal: number): AgentJournalItemIdentity {
-  return { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal }
+  return { provider: 'claude', sessionId: 'thread-1', uuid: `turn-1-${ordinal}` }
 }
 
 function body(text: string): AgentJournalItemBody {
@@ -159,7 +159,7 @@ function body(text: string): AgentJournalItemBody {
 /** Stages a pre-bounding oversized removal id — the one remaining producer of a
  *  `cursor_compacted` reset — straight into the session database. */
 async function reopenWithOversizedRemoval(afterSequence: number): Promise<AgentSessionJournal> {
-  const hugeItemId = `codex:thread-1:${'h'.repeat(5 * 1024 * 1024)}:1`
+  const hugeItemId = `claude:thread-1:${'h'.repeat(5 * 1024 * 1024)}`
   const base = { v: AGENT_SESSION_JOURNAL_SCHEMA_VERSION, epoch: journal.epoch, fence: 1, ts: 1 }
   const rows: JournalRow[] = [
     {
@@ -188,8 +188,8 @@ async function reopenWithOversizedRemoval(afterSequence: number): Promise<AgentS
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: 'thread-1' }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
     },
     journalDir: root
   })

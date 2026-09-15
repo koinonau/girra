@@ -94,7 +94,6 @@ export type SessionSearchHit = {
   agent: AiVaultAgent
   sessionId: string
   filePath: string
-  codexHome: string | null
   title: string
   cwd: string | null
   branch: string | null

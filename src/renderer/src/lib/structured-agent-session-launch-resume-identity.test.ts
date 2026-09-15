@@ -20,7 +20,7 @@ vi.mock('@/i18n/i18n', () => ({
 }))
 
 vi.mock('@/lib/agent-catalog', () => ({
-  getAgentCatalog: () => [{ id: 'codex', label: 'Codex' }]
+  getAgentCatalog: () => [{ id: 'claude', label: 'Claude' }]
 }))
 
 vi.mock('@/runtime/structured-agent-session-client', () => ({
@@ -67,7 +67,7 @@ describe('a launch that adopts a conversation is its own identity', () => {
       if (method === 'agentSession.create') {
         return new Promise(() => {})
       }
-      // Both providers now ask the executing host before creating.
+      // The launch asks the executing host before creating.
       if (method === 'agentSession.createSupport') {
         return { supported: true }
       }
@@ -79,8 +79,8 @@ describe('a launch that adopts a conversation is its own identity', () => {
     // A joining caller is handed the EXISTING intent and contributes only its prompt, so joining
     // here would silently drop the adoption and open a blank chat instead.
     const worktreeId = 'wt-resume-vs-blank'
-    const blank = startStructuredAgentLaunch(worktreeId, 'codex')
-    const resume = startStructuredAgentLaunch(worktreeId, 'codex', {
+    const blank = startStructuredAgentLaunch(worktreeId, 'claude')
+    const resume = startStructuredAgentLaunch(worktreeId, 'claude', {
       resumeFrom: { providerSessionId: 'thread-1' }
     })
 
@@ -95,10 +95,10 @@ describe('a launch that adopts a conversation is its own identity', () => {
 
   it('does not hand a blank launch the resume already pending for the same worktree', async () => {
     const worktreeId = 'wt-blank-vs-resume'
-    const resume = startStructuredAgentLaunch(worktreeId, 'codex', {
+    const resume = startStructuredAgentLaunch(worktreeId, 'claude', {
       resumeFrom: { providerSessionId: 'thread-1' }
     })
-    const blank = startStructuredAgentLaunch(worktreeId, 'codex')
+    const blank = startStructuredAgentLaunch(worktreeId, 'claude')
 
     await flushLaunchDispatch()
 
@@ -108,10 +108,10 @@ describe('a launch that adopts a conversation is its own identity', () => {
 
   it('keeps two resumes of different rows apart', async () => {
     const worktreeId = 'wt-two-rows'
-    const first = startStructuredAgentLaunch(worktreeId, 'codex', {
+    const first = startStructuredAgentLaunch(worktreeId, 'claude', {
       resumeFrom: { providerSessionId: 'thread-1' }
     })
-    const second = startStructuredAgentLaunch(worktreeId, 'codex', {
+    const second = startStructuredAgentLaunch(worktreeId, 'claude', {
       resumeFrom: { providerSessionId: 'thread-2' }
     })
 
@@ -127,8 +127,8 @@ describe('a launch that adopts a conversation is its own identity', () => {
   it('coalesces a duplicate click on the same row', async () => {
     const worktreeId = 'wt-same-row-twice'
     const resumeFrom = { providerSessionId: 'thread-1' }
-    const first = startStructuredAgentLaunch(worktreeId, 'codex', { resumeFrom })
-    const second = startStructuredAgentLaunch(worktreeId, 'codex', { resumeFrom })
+    const first = startStructuredAgentLaunch(worktreeId, 'claude', { resumeFrom })
+    const second = startStructuredAgentLaunch(worktreeId, 'claude', { resumeFrom })
 
     await flushLaunchDispatch()
 
@@ -136,10 +136,10 @@ describe('a launch that adopts a conversation is its own identity', () => {
     expect(createParams()).toHaveLength(1)
   })
 
-  it('keeps the same row apart across worktrees and agents', async () => {
+  it('keeps the same row apart across worktrees', async () => {
     const resumeFrom = { providerSessionId: 'thread-1' }
-    const here = startStructuredAgentLaunch('wt-here', 'codex', { resumeFrom })
-    const there = startStructuredAgentLaunch('wt-there', 'codex', { resumeFrom })
+    const here = startStructuredAgentLaunch('wt-here', 'claude', { resumeFrom })
+    const there = startStructuredAgentLaunch('wt-there', 'claude', { resumeFrom })
 
     await flushLaunchDispatch()
 
@@ -150,13 +150,12 @@ describe('a launch that adopts a conversation is its own identity', () => {
   it('reports a pending resume as a launch in flight for the worktree', () => {
     // "Is a chat starting here" means any launch for the pair, not only the blank one.
     const worktreeId = 'wt-resume-status'
-    expect(getStructuredAgentLaunchStatus(worktreeId, 'codex')).toBe('idle')
+    expect(getStructuredAgentLaunchStatus(worktreeId, 'claude')).toBe('idle')
 
-    startStructuredAgentLaunch(worktreeId, 'codex', {
+    startStructuredAgentLaunch(worktreeId, 'claude', {
       resumeFrom: { providerSessionId: 'thread-1' }
     })
 
-    expect(getStructuredAgentLaunchStatus(worktreeId, 'codex')).toBe('pending')
-    expect(getStructuredAgentLaunchStatus(worktreeId, 'claude')).toBe('idle')
+    expect(getStructuredAgentLaunchStatus(worktreeId, 'claude')).toBe('pending')
   })
 })

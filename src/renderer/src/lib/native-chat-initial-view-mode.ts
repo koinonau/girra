@@ -3,10 +3,7 @@ import { agentTabsDefaultToNativeChat } from '../../../shared/structured-native-
 import type { Tab } from '../../../shared/tab-types'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import { canMirrorLaunchDraftToNativeChat } from '@/lib/native-chat-launch-draft-mirrorability'
-import {
-  isNativeChatSupportedAgent,
-  nativeChatRequiresLocalTranscript
-} from '@/lib/native-chat-supported-agent'
+import { isNativeChatSupportedAgent } from '@/lib/native-chat-supported-agent'
 
 export type NativeChatLaunchPromptDelivery = 'auto-submit' | 'draft' | 'submit-after-ready'
 
@@ -26,18 +23,11 @@ export function decideInitialAgentTabViewMode(args: {
   promptDelivery?: NativeChatLaunchPromptDelivery
   /** The unsent launch context, when `promptDelivery` is `'draft'`. */
   launchDraftText?: string
-  nativeChatTranscriptIsLocalReadable?: boolean
 }): Tab['viewMode'] {
   if (!agentTabsDefaultToNativeChat(args)) {
     return undefined
   }
   if (!isNativeChatSupportedAgent(args.agent)) {
-    return undefined
-  }
-  if (
-    nativeChatRequiresLocalTranscript(args.agent) &&
-    args.nativeChatTranscriptIsLocalReadable !== true
-  ) {
     return undefined
   }
   if (
@@ -58,7 +48,6 @@ export function initialAgentTabViewModeProps(
     agent?: TuiAgent | null
     promptDelivery?: NativeChatLaunchPromptDelivery
     launchDraftText?: string
-    nativeChatTranscriptIsLocalReadable?: boolean
   } = {}
 ): { viewMode?: Tab['viewMode'] } {
   const viewMode = decideInitialAgentTabViewMode({
@@ -66,8 +55,7 @@ export function initialAgentTabViewModeProps(
     openAgentTabsInChatByDefault: settings?.openAgentTabsInChatByDefault,
     agent: options.agent,
     promptDelivery: options.promptDelivery,
-    launchDraftText: options.launchDraftText,
-    nativeChatTranscriptIsLocalReadable: options.nativeChatTranscriptIsLocalReadable
+    launchDraftText: options.launchDraftText
   })
   return viewMode ? { viewMode } : {}
 }

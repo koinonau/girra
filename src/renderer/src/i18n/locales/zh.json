@@ -7759,8 +7759,7 @@
             },
             "nativeChat": {
               "title": "Chat UI",
-              "description": "预览受支持的智能体终端会话的桌面聊天界面。",
-              "grok": "grok"
+              "description": "预览受支持的智能体终端会话的桌面聊天界面。"
             },
             "agentDashboard": {
               "title": "智能体仪表盘",
@@ -10701,7 +10700,6 @@
             "openSupportedWorkspace": "在恢复会话之前，请先打开一个工作区。",
             "localSessionSshWorkspaceUnsupported": "此会话的历史记录存储在本机上，因此无法在 SSH 工作区中恢复。请改为打开一个本地工作区。",
             "sessionHostMismatchUnsupported": "此会话属于其他主机。请打开同一主机上的工作区以恢复它。",
-            "prepareSessionResumeFailed": "无法为恢复准备此会话。",
             "sessionDeleted": "会话已删除",
             "sessionDeleteFailed": "无法删除会话"
           },
@@ -13283,7 +13281,6 @@
         "thinking": "思考",
         "options": "选项",
         "sessionOptions": "会话选项",
-        "chooseInAgentPicker": "在智能体选择器中选择…",
         "toggleOption": "切换{{value0}}",
         "pillAccessibleName": "{{value0}} {{value1}}",
         "valueUnknown": "当前值未知 — 请选择开或关",

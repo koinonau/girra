@@ -35,8 +35,7 @@ afterEach(() => {
 
 /**
  * Honouring CLAUDE_CONFIG_DIR fixed new sessions but would otherwise hide every
- * transcript written before the user adopted the variable. The Codex resolver in this
- * same file already searches managed-then-default and de-dupes; Claude does the same.
+ * transcript written before the user adopted the variable, so Claude searches both and de-dupes.
  */
 describe('claude transcript roots', () => {
   it('searches the config-dir root first, then the default home', async () => {

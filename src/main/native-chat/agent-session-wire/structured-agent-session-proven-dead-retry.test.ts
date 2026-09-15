@@ -39,8 +39,8 @@ describe('structured session proven-dead TUI retry', () => {
         workspaceId: 'workspace-1',
         workspaceKind: 'folder'
       },
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'tui',
       expectedFence: null,
       spawnToken: 'tui-spawn',
@@ -67,7 +67,7 @@ describe('structured session proven-dead TUI retry', () => {
       fence: tuiFence,
       link: {
         linkId: 'tui-link',
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'created',
         mintedAtFence: tuiFence,
         observedAt: NOW
@@ -86,8 +86,8 @@ describe('structured session proven-dead TUI retry', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: THREAD }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
       },
       journalDir: join(root, 'journal')
     })
@@ -135,7 +135,7 @@ describe('structured session proven-dead TUI retry', () => {
           fence,
           link: {
             linkId: 'native-link',
-            handle: { provider: 'codex', threadId: THREAD },
+            handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
             origin: 'resumed',
             mintedAtFence: fence,
             observedAt: NOW

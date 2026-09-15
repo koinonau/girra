@@ -75,17 +75,6 @@ export const AgentArgs = z
   )
   .nullable()
 
-export const OmpResumeFilePath = z
-  .string()
-  .min(1)
-  .refine((value) => value === value.trim(), 'Invalid OMP resume path')
-  .refine(
-    (value) =>
-      !hasUnsafeProviderSessionIdChars(value) &&
-      Buffer.byteLength(value, 'utf8') <= MAX_TRANSCRIPT_PATH_BYTES,
-    'Invalid OMP resume path'
-  )
-
 export const ProviderSession = z
   .object({
     key: z.enum(['session_id', 'conversation_id']),
@@ -125,7 +114,6 @@ export const ExplicitEnsure = z
     worktree: WorktreeSelector,
     agent: z.enum(RESUMABLE_TUI_AGENTS),
     providerSession: ProviderSession,
-    ompResumeFilePath: OmpResumeFilePath.optional(),
     agentArgs: AgentArgs.optional(),
     launchPreferences: LaunchPreferences.optional(),
     presentation: Presentation.optional(),
@@ -133,14 +121,7 @@ export const ExplicitEnsure = z
   })
   .strict()
   .superRefine((value, context) => {
-    if (value.ompResumeFilePath !== undefined && value.agent !== 'omp') {
-      context.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['ompResumeFilePath'],
-        message: 'OMP resume path requires the OMP agent'
-      })
-    }
-    if (getAgentResumeArgv(value.agent, value.providerSession, value.ompResumeFilePath) === null) {
+    if (getAgentResumeArgv(value.agent, value.providerSession) === null) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
         path: ['providerSession'],

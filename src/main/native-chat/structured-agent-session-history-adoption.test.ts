@@ -14,26 +14,26 @@ import {
 const OPERATION = '1800000000000-00000000000000000000000000000001'
 
 function committedReplay(overrides: { callerKey?: string; operationId?: string } = {}) {
-  const lease = agentSessionLeaseFixture({ sessionId: 'codex_adopted' })
+  const lease = agentSessionLeaseFixture({ sessionId: 'claude_adopted' })
   return findCommittedStructuredAgentSessionAdoptionReplay({
-    agent: 'codex',
+    agent: 'claude',
     providerSessionId: 'thread-1',
-    selfSessionId: 'codex_adopted',
+    selfSessionId: 'claude_adopted',
     callerKey: overrides.callerKey ?? 'client-1',
     operationId: overrides.operationId ?? OPERATION,
     record: {
       ...agentSessionRecordFixture(lease),
-      provider: 'codex',
+      provider: 'claude',
       providerHandleChain: [
         {
-          linkId: 'codex-1-thread-1',
+          linkId: 'claude-1-thread-1',
           origin: 'adopted',
           mintedAtFence: 1,
           observedAt: 1_800_000_000_000,
-          handle: { provider: 'codex', threadId: 'thread-1' }
+          handle: { provider: 'claude', sessionId: 'thread-1', leafUuid: null }
         }
       ],
-      accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex-original' }
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude-original' }
     },
     operations: [
       {
@@ -43,7 +43,7 @@ function committedReplay(overrides: { callerKey?: string; operationId?: string }
         operationTimestamp: 1_800_000_000_000,
         recordedAt: 1_800_000_000_000,
         expiresAt: 1_900_000_000_000,
-        outcome: { status: 'succeeded', sessionId: 'codex_adopted' }
+        outcome: { status: 'succeeded', sessionId: 'claude_adopted' }
       }
     ]
   })
@@ -53,8 +53,8 @@ function ownership(
   overrides: Partial<StructuredAgentSessionAdoptionOwnership> = {}
 ): StructuredAgentSessionAdoptionOwnership {
   return {
-    sessionId: 'codex_owner',
-    provider: 'codex',
+    sessionId: 'claude_owner',
+    provider: 'claude',
     providerSessionId: 'thread-1',
     lease: agentSessionLeaseFixture(),
     ...overrides
@@ -67,9 +67,9 @@ describe('findConflictingStructuredAdoption', () => {
 
     expect(
       findConflictingStructuredAdoption({
-        agent: 'codex',
+        agent: 'claude',
         providerSessionId: 'thread-1',
-        selfSessionId: 'codex_new',
+        selfSessionId: 'claude_new',
         ownership: [ownership({ sessionId: 'other', providerSessionId: 'thread-2' }), owner]
       })
     ).toBe(owner)
@@ -78,21 +78,10 @@ describe('findConflictingStructuredAdoption', () => {
   it('exempts the requesting session, so a committed create replays instead of refusing', () => {
     expect(
       findConflictingStructuredAdoption({
-        agent: 'codex',
-        providerSessionId: 'thread-1',
-        selfSessionId: 'codex_new',
-        ownership: [ownership({ sessionId: 'codex_new' })]
-      })
-    ).toBeNull()
-  })
-
-  it('ignores an identical id held under the other provider', () => {
-    expect(
-      findConflictingStructuredAdoption({
         agent: 'claude',
         providerSessionId: 'thread-1',
         selfSessionId: 'claude_new',
-        ownership: [ownership({ provider: 'codex' })]
+        ownership: [ownership({ sessionId: 'claude_new' })]
       })
     ).toBeNull()
   })
@@ -100,9 +89,9 @@ describe('findConflictingStructuredAdoption', () => {
   it('finds nothing when no session holds the conversation', () => {
     expect(
       findConflictingStructuredAdoption({
-        agent: 'codex',
+        agent: 'claude',
         providerSessionId: 'thread-unheld',
-        selfSessionId: 'codex_new',
+        selfSessionId: 'claude_new',
         ownership: [ownership()]
       })
     ).toBeNull()
@@ -112,8 +101,8 @@ describe('findConflictingStructuredAdoption', () => {
 describe('findCommittedStructuredAgentSessionAdoptionReplay', () => {
   it('returns the record-pinned account and adopted handle for the exact committed operation', () => {
     expect(committedReplay()).toMatchObject({
-      record: { accountHome: { path: '/home/dev/.codex-original' } },
-      providerHandle: { kind: 'codex', threadId: 'thread-1' }
+      record: { accountHome: { path: '/home/dev/.claude-original' } },
+      providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
     })
   })
 
@@ -189,18 +178,18 @@ describe('resolveStructuredAgentSessionAdoption', () => {
     const resolveTranscript = vi
       .fn()
       .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce('/home/dev/.codex/sessions/thread-1.jsonl')
+      .mockResolvedValueOnce('/home/dev/.claude/projects/app/thread-1.jsonl')
 
     await expect(
       resolveStructuredAgentSessionAdoption({
-        agent: 'codex',
+        agent: 'claude',
         providerSessionId: 'thread-1',
-        candidateAccountHomes: ['/home/dev/.orca-codex', '/home/dev/.codex', '/never/probed'],
+        candidateAccountHomes: ['/home/dev/.claude-work', '/home/dev/.claude', '/never/probed'],
         resolveTranscript
       })
     ).resolves.toEqual({
-      accountHomePath: '/home/dev/.codex',
-      transcriptPath: '/home/dev/.codex/sessions/thread-1.jsonl'
+      accountHomePath: '/home/dev/.claude',
+      transcriptPath: '/home/dev/.claude/projects/app/thread-1.jsonl'
     })
     expect(resolveTranscript).toHaveBeenCalledTimes(2)
   })

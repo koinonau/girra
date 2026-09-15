@@ -1,11 +1,9 @@
-import { join } from 'node:path'
 import {
   clearAiVaultBackgroundRestartCircuit,
   resetAiVaultScannerBackgroundForTests,
   scanAiVaultSessionsInBackground
 } from './session-scanner-background'
 import { listRunningWslHomeDirsAsync } from '../wsl'
-import { filterPathsToRunningWslDistrosAsync } from '../wsl-running-path-filter'
 import type { AiVaultListArgs, AiVaultListResult } from '../../shared/ai-vault-types'
 import { LOCAL_EXECUTION_HOST_ID } from '../../shared/execution-host'
 import { AiVaultScanCoordinator } from './ai-vault-scan-coordinator'
@@ -21,14 +19,6 @@ import {
 // mobile screen for the same scope must not double-scan hundreds of transcripts.
 const AI_VAULT_CACHE_TTL_MS = 60_000
 
-// Why: codex-home + WSL home dirs must be sourced from a serve-mode-reachable
-// seam (the OrcaRuntimeService deps), NOT the window-only registerCoreHandlers
-// path — `orca serve` never runs that path, so sourcing it there would silently
-// drop managed-Codex sessions from remote/SSH results.
-export type AiVaultSessionSources = {
-  getAdditionalCodexHomePaths?: () => readonly string[]
-}
-
 type CachedAiVaultList = {
   key: string
   depth: AiVaultSessionDepth
@@ -38,22 +28,11 @@ type CachedAiVaultList = {
 
 let cachedList: CachedAiVaultList | null = null
 let scanCoordinator = new AiVaultScanCoordinator()
-let sources: AiVaultSessionSources = {}
 // Bumped on every invalidation. A scan that started before an invalidation
 // carries the old generation and must not write its (now stale) result back
 // into the cache — otherwise a delete's invalidation is silently undone by an
 // in-flight scan that resolves just after it.
 let cacheGeneration = 0
-
-export function configureAiVaultSessionSources(next: AiVaultSessionSources): void {
-  sources = next
-}
-
-/** The extra Codex homes session discovery scans. Anything that decides what a listed row may be
- *  resumed from must read the same set, or a row can be listed and then refuse to resume. */
-export function configuredAdditionalCodexHomePaths(): readonly string[] {
-  return sources.getAdditionalCodexHomePaths?.() ?? []
-}
 
 export async function listAiVaultSessions(
   args?: AiVaultListArgs,
@@ -86,20 +65,12 @@ export async function listAiVaultSessions(
     force: args?.force,
     signal: options.signal,
     start: async (scanSignal) => {
-      const configuredCodexHomes = sources.getAdditionalCodexHomePaths?.() ?? []
-      const [additionalCodexHomes, wslHomeDirs] = await Promise.all([
-        filterPathsToRunningWslDistrosAsync(configuredCodexHomes),
-        getAiVaultWslHomeDirs()
-      ])
-      const additionalCodexSessionsDirs = additionalCodexHomes.map((homePath) =>
-        join(homePath, 'sessions')
-      )
+      const wslHomeDirs = await getAiVaultWslHomeDirs()
       const result = await scanAiVaultSessionsInBackground(
         {
           limit: args?.limit,
           unlimited: args?.unlimited,
           scopePaths: args?.scopePaths,
-          additionalCodexSessionsDirs,
           wslHomeDirs,
           // Why: this scan is always host-local; callers addressing this host by a
           // runtime id get the result restamped at the RPC edge, never rescanned.
@@ -155,6 +126,5 @@ export function invalidateAiVaultSessionListCache(): void {
 export function resetAiVaultSessionListCacheForTests(): void {
   invalidateAiVaultSessionListCache()
   scanCoordinator = new AiVaultScanCoordinator()
-  sources = {}
   resetAiVaultScannerBackgroundForTests()
 }

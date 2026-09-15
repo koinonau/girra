@@ -29,7 +29,7 @@ describe('clear pane identity', () => {
               entityId: contentType === 'terminal' ? 'local-pane' : 'old-session',
               contentType,
               structuredSessionId: contentType === 'terminal' ? 'old-session' : undefined,
-              agentSessionAgent: 'codex',
+              agentSessionAgent: 'claude',
               worktreeId: WT,
               groupId: 'local-group',
               label: 'Old',
@@ -80,8 +80,8 @@ describe('clear pane identity', () => {
             id: 'agent-session:new-session',
             sessionId: 'new-session',
             replacesSessionId: 'old-session',
-            agent: 'codex',
-            title: 'Codex Chat',
+            agent: 'claude',
+            title: 'Claude Chat',
             isActive: true
           }
         ],
@@ -92,7 +92,7 @@ describe('clear pane identity', () => {
           type: 'agent-session' as const,
           id: 'agent-session:old-session',
           sessionId: 'old-session',
-          agent: 'codex' as const,
+          agent: 'claude' as const,
           title: 'History',
           isActive: false
         }
@@ -141,7 +141,7 @@ describe('clear pane identity', () => {
         contentType: 'agent-session' as const,
         worktreeId: WT,
         groupId: 'g',
-        label: 'Codex Chat',
+        label: 'Claude Chat',
         customLabel: null,
         color: null,
         createdAt: 1,
@@ -154,7 +154,7 @@ describe('clear pane identity', () => {
         id: 'new-tab',
         sessionId: 'new-session',
         replacesSessionId: 'old-session',
-        agent: 'codex',
+        agent: 'claude',
         title: 'New',
         isActive: false
       },
@@ -162,7 +162,7 @@ describe('clear pane identity', () => {
         type: 'agent-session',
         id: 'old-tab',
         sessionId: 'old-session',
-        agent: 'codex',
+        agent: 'claude',
         title: 'Old',
         isActive: true
       }

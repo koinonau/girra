@@ -182,8 +182,8 @@ describe('connectPanePty', () => {
             paneKey,
             tabId: 'tab-1',
             worktreeId: 'wt-1',
-            agent: 'codex',
-            providerSession: { key: 'session_id', id: 'codex-session-1' },
+            agent: 'claude',
+            providerSession: { key: 'session_id', id: 'claude-session-1' },
             prompt: 'finish the task',
             state: 'working',
             capturedAt: 1,
@@ -212,7 +212,7 @@ describe('connectPanePty', () => {
       expect(transport.connect).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
-          command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'",
+          command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
           commandDelivery: 'provider',
           startupCommandDelivery: 'shell-ready',
           env: expect.objectContaining({
@@ -225,7 +225,7 @@ describe('connectPanePty', () => {
         })
       )
       expect(transport.sendInput).not.toHaveBeenCalledWith(
-        "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'\r"
+        "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'\r"
       )
     } finally {
       globalThis.setTimeout = originalSetTimeout
@@ -281,8 +281,8 @@ describe('connectPanePty', () => {
             paneKey,
             tabId: 'tab-1',
             worktreeId: 'wt-1',
-            agent: 'codex',
-            providerSession: { key: 'session_id', id: 'codex-session-1' },
+            agent: 'claude',
+            providerSession: { key: 'session_id', id: 'claude-session-1' },
             prompt: 'finish the task',
             // Mirrors the user's scenario: a stopped/completed agent that hibernated.
             state: 'done',
@@ -314,7 +314,7 @@ describe('connectPanePty', () => {
       expect(transport.connect).toHaveBeenNthCalledWith(
         2,
         expect.objectContaining({
-          command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'",
+          command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
           env: expect.objectContaining({
             ORCA_PANE_KEY: paneKey,
             ORCA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
@@ -398,8 +398,8 @@ describe('connectPanePty', () => {
             paneKey,
             tabId: 'tab-1',
             worktreeId: 'wt-1',
-            agent: 'codex',
-            providerSession: { key: 'session_id', id: 'codex-session-1' },
+            agent: 'claude',
+            providerSession: { key: 'session_id', id: 'claude-session-1' },
             prompt: 'finish the task',
             state: 'done',
             origin: 'worktree-sleep',
@@ -432,7 +432,7 @@ describe('connectPanePty', () => {
 
   it('quotes a cold-restore resume command for a cmd.exe Windows tab', async () => {
     await expect(runWindowsColdRestoreResume({ terminalWindowsShell: 'cmd.exe' })).resolves.toBe(
-      'codex "--dangerously-bypass-approvals-and-sandbox" "resume" "codex-session-1"'
+      'claude "--dangerously-skip-permissions" "--resume" "claude-session-1"'
     )
   })
 
@@ -442,13 +442,13 @@ describe('connectPanePty', () => {
         terminalWindowsShell: 'powershell.exe',
         tabShellOverride: 'cmd.exe'
       })
-    ).resolves.toBe('codex "--dangerously-bypass-approvals-and-sandbox" "resume" "codex-session-1"')
+    ).resolves.toBe('claude "--dangerously-skip-permissions" "--resume" "claude-session-1"')
   })
 
   it('keeps PowerShell quoting for a cold-restore resume on a PowerShell Windows tab', async () => {
     await expect(
       runWindowsColdRestoreResume({ terminalWindowsShell: 'powershell.exe' })
-    ).resolves.toBe("codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'")
+    ).resolves.toBe("claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'")
   })
 
   it('keeps a contentless reattach when the sleeping record represents a live session', async () => {
@@ -472,8 +472,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           origin: 'live',
@@ -518,8 +518,8 @@ describe('connectPanePty', () => {
         [paneKey]: {
           state: 'working',
           prompt: 'new live task',
-          agentType: 'codex',
-          providerSession: { key: 'session_id', id: 'live-codex-session' },
+          agentType: 'claude',
+          providerSession: { key: 'session_id', id: 'live-claude-session' },
           paneKey,
           updatedAt: 2,
           stateStartedAt: 2,
@@ -531,8 +531,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'old-codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'old-claude-session' },
           prompt: 'old completed task',
           state: 'done',
           origin: 'worktree-sleep',

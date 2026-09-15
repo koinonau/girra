@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react'
-import type { AgentType } from '../../../../shared/agent-status-types'
 import type { NativeChatResolvedTarget } from './native-chat-composer-target'
 import { pushHistory, type HistoryState } from './native-chat-composer-state'
-import { sendNativeChatMessageVerified, typeNativeChatCommand } from './native-chat-runtime-send'
+import { sendNativeChatMessageVerified } from './native-chat-runtime-send'
 import { cancelNativeChatPtySends, waitForNativeChatPtyIdle } from './native-chat-pty-send-queue'
 import {
   createClaudeModelSwitchConfirmationObserver,
@@ -11,13 +10,12 @@ import {
 import type { NativeChatSessionOptionDispatchCommand } from './native-chat-session-option-command-dispatch'
 
 export function useNativeChatSessionOptionCommand(args: {
-  agent: AgentType
   disabled: boolean
   onSlashCommand?: (command: string) => void
   resolveTarget: () => NativeChatResolvedTarget | null
   setHistory: Dispatch<SetStateAction<HistoryState>>
 }): { dispatch: NativeChatSessionOptionDispatchCommand; isDispatching: boolean } {
-  const { agent, disabled, onSlashCommand, resolveTarget, setHistory } = args
+  const { disabled, onSlashCommand, resolveTarget, setHistory } = args
   const mountedRef = useRef(true)
   const activeObserversRef = useRef(new Set<ClaudeModelSwitchConfirmationObserver>())
   const activeSendsRef = useRef(new Set<AbortController>())
@@ -82,20 +80,12 @@ export function useNativeChatSessionOptionCommand(args: {
           // submit immediately so historical output cannot satisfy the match.
           observer.arm()
         }
-        const accepted =
-          agent === 'codex'
-            ? await typeNativeChatCommand(
-                target.settings,
-                target.ptyId,
-                command,
-                sendController.signal
-              )
-            : await sendNativeChatMessageVerified(
-                target.settings,
-                target.ptyId,
-                command,
-                sendController.signal
-              )
+        const accepted = await sendNativeChatMessageVerified(
+          target.settings,
+          target.ptyId,
+          command,
+          sendController.signal
+        )
         if (!accepted) {
           throw new Error('The terminal did not accept the command.')
         }
@@ -116,7 +106,7 @@ export function useNativeChatSessionOptionCommand(args: {
         }
       }
     },
-    [agent, disabled, onSlashCommand, resolveTarget, setHistory]
+    [disabled, onSlashCommand, resolveTarget, setHistory]
   )
 
   return { dispatch, isDispatching }

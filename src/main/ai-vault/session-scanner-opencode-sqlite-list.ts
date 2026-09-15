@@ -65,8 +65,7 @@ function rowToCandidate(row: SessionRow, dbPath: string): SessionFileCandidate {
       path: buildOpenCodeSqliteCandidatePath(dbPath, row.id),
       mtimeMs,
       modifiedAt: new Date(mtimeMs).toISOString()
-    },
-    codexHome: null
+    }
   }
 }
 

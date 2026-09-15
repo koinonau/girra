@@ -182,7 +182,7 @@ export function createClaudeStructuredLaunchResolver(
       throw new Error(`no durable agent-session record for ${identity.sessionId}`)
     }
     if (record.provider !== 'claude') {
-      throw new Error(`session ${identity.sessionId} is a ${record.provider} session`)
+      throw new Error(`session ${identity.sessionId} is a ${String(record.provider)} session`)
     }
     if (
       record.location.executionHostId !== LOCAL_EXECUTION_HOST_ID ||
@@ -193,7 +193,9 @@ export function createClaudeStructuredLaunchResolver(
       )
     }
     if (record.accountHome.variable !== 'CLAUDE_CONFIG_DIR') {
-      throw new Error(`claude sessions pin CLAUDE_CONFIG_DIR, not ${record.accountHome.variable}`)
+      throw new Error(
+        `claude sessions pin CLAUDE_CONFIG_DIR, not ${String(record.accountHome.variable)}`
+      )
     }
     // Every acquisition, not just the first: the account state can change under a live session, and
     // a reacquire after an unexpected exit would otherwise spawn under whatever it has become.

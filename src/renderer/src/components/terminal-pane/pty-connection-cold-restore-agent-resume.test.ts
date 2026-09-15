@@ -165,14 +165,14 @@ describe('connectPanePty', () => {
         [paneKey]: {
           state: 'working',
           prompt: 'finish the task',
-          agentType: 'codex',
+          agentType: 'claude',
           paneKey,
           updatedAt: 1,
           stateStartedAt: 1,
           stateHistory: [],
           providerSession: {
             key: 'session_id',
-            id: 'codex-session-1',
+            id: 'claude-session-1',
             transcriptPath: '/Users/example/.codex/sessions/2026/07/20/rollout-session.jsonl'
           }
         }
@@ -202,10 +202,10 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'",
+        command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
         resumeProviderSession: {
           key: 'session_id',
-          id: 'codex-session-1',
+          id: 'claude-session-1',
           transcriptPath: '/Users/example/.codex/sessions/2026/07/20/rollout-session.jsonl'
         },
         env: expect.objectContaining({
@@ -263,12 +263,12 @@ describe('connectPanePty', () => {
         [paneKey]: {
           state: 'working',
           prompt: 'finish the task',
-          agentType: 'codex',
+          agentType: 'claude',
           paneKey,
           updatedAt: 1,
           stateStartedAt: 1,
           stateHistory: [],
-          providerSession: { key: 'session_id', id: "codex-session-1's" }
+          providerSession: { key: 'session_id', id: "claude-session-1's" }
         }
       }
     } as StoreState
@@ -292,7 +292,7 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: `codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'"'"'s'`,
+        command: `claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'"'"'s'`,
         env: expect.objectContaining({
           ORCA_PANE_KEY: paneKey,
           ORCA_TAB_ID: 'tab-1',
@@ -319,7 +319,7 @@ describe('connectPanePty', () => {
     transportFactoryQueue.push(transport)
     const paneKey = makePaneKey('tab-1', LEAF_1)
     const transcriptPath =
-      '\\\\?\\C:\\Users\\Example\\.codex\\sessions\\2026\\07\\20\\rollout-codex-session-1.jsonl'
+      '\\\\?\\C:\\Users\\Example\\.codex\\sessions\\2026\\07\\20\\rollout-claude-session-1.jsonl'
     // Why: after restart agentStatusByPaneKey is empty — the persisted sleeping record is the only provider session id source (#5232).
     mockStoreState = {
       ...mockStoreState,
@@ -336,10 +336,10 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
+          agent: 'claude',
           providerSession: {
             key: 'session_id',
-            id: 'codex-session-1',
+            id: 'claude-session-1',
             transcriptPath
           },
           prompt: 'finish the task',
@@ -377,10 +377,10 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'",
+        command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
         resumeProviderSession: {
           key: 'session_id',
-          id: 'codex-session-1',
+          id: 'claude-session-1',
           transcriptPath
         },
         env: expect.objectContaining({
@@ -428,8 +428,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -483,8 +483,8 @@ describe('connectPanePty', () => {
           paneKey: legacyPaneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -494,8 +494,8 @@ describe('connectPanePty', () => {
           paneKey: duplicateLegacyPaneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 2,
@@ -524,7 +524,7 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'"
+        command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'"
       })
     )
     expect(mockStoreState.clearSleepingAgentSession).toHaveBeenCalledWith(legacyPaneKey)
@@ -563,8 +563,8 @@ describe('connectPanePty', () => {
           paneKey: firstLegacyPaneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -574,8 +574,8 @@ describe('connectPanePty', () => {
           paneKey: secondLegacyPaneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-2' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-2' },
           prompt: 'finish another task',
           state: 'working',
           capturedAt: 2,

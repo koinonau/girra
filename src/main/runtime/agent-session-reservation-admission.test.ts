@@ -164,15 +164,15 @@ describe('adopted conversation ownership', () => {
     expect(record.providerHandleChain).toEqual([link])
   })
 
-  it('refuses a Codex adoption another record already holds', () => {
+  it('refuses an adoption another record already holds', () => {
     const holder: AgentSessionRecord = {
-      ...agentSessionRecordFixture(agentSessionLeaseFixture({ sessionId: 'session-codex' })),
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+      ...agentSessionRecordFixture(agentSessionLeaseFixture({ sessionId: 'session-claude' })),
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
       providerHandleChain: [
         {
-          linkId: 'codex-1-thread-1',
-          handle: { provider: 'codex', threadId: 'thread-1' },
+          linkId: 'claude-1-session-1',
+          handle: { provider: 'claude', sessionId: 'thread-1', leafUuid: null },
           origin: 'created',
           mintedAtFence: 7,
           observedAt: NOW
@@ -184,12 +184,12 @@ describe('adopted conversation ownership', () => {
       applyAgentSessionReservation(
         storeState([holder]),
         reserveRequest({
-          sessionId: 'session-codex-adopting',
-          provider: 'codex',
-          accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+          sessionId: 'session-claude-adopting',
+          provider: 'claude',
+          accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
           adoptedHandleLink: adoptedLink({
-            linkId: 'codex-1-thread-1-adopted',
-            handle: { provider: 'codex', threadId: 'thread-1' }
+            linkId: 'claude-1-session-1-adopted',
+            handle: { provider: 'claude', sessionId: 'thread-1', leafUuid: null }
           })
         }),
         LEASE_TTL_MS

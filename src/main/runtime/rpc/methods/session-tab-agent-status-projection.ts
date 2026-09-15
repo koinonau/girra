@@ -15,40 +15,31 @@ import { structuredNativeChatProjectionEnabled } from './structured-agent-sessio
 type SessionTabsPayload = RuntimeMobileSessionTabsResult | RuntimeMobileSessionTabsSnapshot
 
 /** Capped at 128px / one line in every shipped mobile build, so ~15-18 characters render. */
-export const STRUCTURED_CHAT_UPDATE_REQUIRED_TAB_TITLE = 'Update to view'
 export const CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE = 'Open on desktop'
 
+// Every structured tab is Claude, so rendering one needs both capabilities.
 function clientCanRenderStructuredAgentSessionTab(
-  tab: RuntimeMobileSessionAgentTab,
   clientCapabilities: readonly RuntimeCapability[] | undefined
 ): boolean {
-  if (!clientCapabilities?.includes(STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY)) {
-    return false
-  }
-  return (
-    tab.agent === 'codex' ||
+  return Boolean(
+    clientCapabilities?.includes(STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY) &&
     clientCapabilities.includes(CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY)
   )
 }
 
-function resolveMobileStructuredChatFallbackTitle(
-  tab: RuntimeMobileSessionAgentTab,
-  args: {
-    clientKind: 'mobile' | 'runtime' | undefined
-    clientCapabilities: readonly RuntimeCapability[] | undefined
-    structuredNativeChatEnabled?: boolean
-  }
-): string | null {
+function resolveMobileStructuredChatFallbackTitle(args: {
+  clientKind: 'mobile' | 'runtime' | undefined
+  clientCapabilities: readonly RuntimeCapability[] | undefined
+  structuredNativeChatEnabled?: boolean
+}): string | null {
   if (
     args.clientKind !== 'mobile' ||
     args.structuredNativeChatEnabled !== true ||
-    clientCanRenderStructuredAgentSessionTab(tab, args.clientCapabilities)
+    clientCanRenderStructuredAgentSessionTab(args.clientCapabilities)
   ) {
     return null
   }
-  return tab.agent === 'claude'
-    ? CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE
-    : STRUCTURED_CHAT_UPDATE_REQUIRED_TAB_TITLE
+  return CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE
 }
 
 export function projectSessionTabAgentStatus<TPayload extends SessionTabsPayload>(
@@ -73,15 +64,14 @@ export function projectSessionTabAgentStatus<TPayload extends SessionTabsPayload
     })
   } else {
     projected = structuredVisible ? payload : projectAgentSessionTabsOut(payload, () => true)
-    // Why: a paired client renders only codex structured tabs unless it says otherwise
-    // (mobile's resolveMobileNativeChat returns null for every other agent), so an
+    // Why: a paired client without the Claude capability renders no structured tab, so an
     // ungated row would list and select into a pane that shows neither chat nor terminal.
     if (
       structuredVisible &&
       clientKind !== undefined &&
       !clientCapabilities?.includes(CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY)
     ) {
-      projected = projectAgentSessionTabsOut(projected, (tab) => tab.agent !== 'codex')
+      projected = projectAgentSessionTabsOut(projected, () => true)
     }
   }
   // Why: only paired runtimes have legacy `done` completion side effects; mobile must keep its row without changing the exact v2 auth shape.
@@ -117,7 +107,7 @@ function projectUnsupportedAgentSessionTabTitles<TPayload extends SessionTabsPay
     if (tab.type !== 'agent-session') {
       return tab
     }
-    const title = resolveMobileStructuredChatFallbackTitle(tab, args)
+    const title = resolveMobileStructuredChatFallbackTitle(args)
     if (title === null) {
       return tab
     }
@@ -139,7 +129,7 @@ export function assertAgentSessionTabDestructiveMutationSupported(
   const tab = payload.tabs.find((candidate) => candidate.id === tabId)
   if (
     tab?.type === 'agent-session' &&
-    !clientCanRenderStructuredAgentSessionTab(tab, clientCapabilities)
+    !clientCanRenderStructuredAgentSessionTab(clientCapabilities)
   ) {
     throw new Error('structured_agent_session_unsupported')
   }

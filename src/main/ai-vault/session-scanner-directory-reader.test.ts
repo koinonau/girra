@@ -18,12 +18,12 @@ describe('walkSessionFiles directory reader', () => {
     tempRoot = await mkdtemp(join(tmpdir(), 'orca-session-reader-'))
     const nested = join(tempRoot, '2026', '08', '09')
     await mkdir(nested, { recursive: true })
-    const rollout = join(nested, 'rollout-session.jsonl')
+    const rollout = join(nested, 'session.jsonl')
     await writeFile(rollout, '{}\n')
     const readDirectory = vi.fn((dirPath: string) => readdir(dirPath, { withFileTypes: true }))
 
     await expect(
-      walkSessionFiles(tempRoot, 'codex', [], {
+      walkSessionFiles(tempRoot, 'claude', [], {
         extensions: new Set(['.jsonl']),
         readDirectory
       })
@@ -37,7 +37,7 @@ describe('walkSessionFiles directory reader', () => {
     })
 
     await expect(
-      walkSessionFiles('missing', 'codex', [], {
+      walkSessionFiles('missing', 'claude', [], {
         extensions: new Set(['.jsonl']),
         readDirectory
       })
@@ -53,7 +53,7 @@ describe('walkSessionFiles directory reader', () => {
     })
 
     await expect(
-      walkSessionFiles('cancelled', 'codex', [], {
+      walkSessionFiles('cancelled', 'claude', [], {
         extensions: new Set(['.jsonl']),
         readDirectory,
         signal: controller.signal

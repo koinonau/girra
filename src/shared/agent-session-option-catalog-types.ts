@@ -6,7 +6,6 @@ import type {
 } from './native-chat-session-options'
 
 export type CatalogAgentInteractionDetection = 'claude-model-switch-confirmation'
-export type CatalogCommandDelivery = 'type'
 
 export type CatalogMidSessionApply =
   | {
@@ -16,7 +15,6 @@ export type CatalogMidSessionApply =
       detectAgentInteraction?: CatalogAgentInteractionDetection
     }
   | { kind: 'toggle-command'; command: string }
-  | { kind: 'agent-picker'; command: string; delivery?: CatalogCommandDelivery }
   | { kind: 'unsupported' }
 
 export type CatalogOptionApply = {
@@ -26,7 +24,6 @@ export type CatalogOptionApply = {
   agentArgsOverride?: (tokens: readonly string[]) => boolean
   /** Removes conflicting defaults before a more specific launch choice is inserted. */
   removeAgentArgs?: (tokens: readonly string[]) => string[]
-  composedIntoModel?: true
   midSession?: CatalogMidSessionApply
 }
 
@@ -60,11 +57,6 @@ export type AgentSessionOptionCatalog = {
   supportsWorkerLaunchPreferences?: true
   /** Launch-safe options for opaque model ids that are absent from the static catalog. */
   unknownModelOptions?: CatalogOption[]
-  composeModelValue?: (modelId: string, values: Record<string, SessionOptionValue>) => string
-  /** Why: a seeded id the CLI has retired is a fatal launch, so a successful probe
-   * must be able to drop it rather than only add. Membership only — option menus
-   * still come from the seed. */
-  discoveredModelsAreAuthoritative?: true
   /** Set only when the `isDefault` model is provably what the CLI runs with no model
    * flag, so an untouched draft may show it as selected. Off means `isDefault` stays
    * decorative: agents whose default comes from account or user config would otherwise

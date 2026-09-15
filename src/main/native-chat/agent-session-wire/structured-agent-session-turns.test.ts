@@ -11,8 +11,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: 'session-1',
   workspaceId: 'workspace-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: 'thread-1' }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
 }
 
 let root: string | null = null
@@ -32,7 +32,7 @@ describe('performCancel', () => {
     const journal = await journals.open({ identity: IDENTITY, journalDir: root })
     const lifecycleIdentity = {
       provider: 'legacy' as const,
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       sessionId: 'session-1',
       recordId: 'turn-lifecycle:turn-1'
     }
@@ -80,7 +80,7 @@ describe('performCancel', () => {
     await journal.appendItem(
       {
         provider: 'legacy',
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'session-1',
         recordId: 'turn-lifecycle:turn-1'
       },

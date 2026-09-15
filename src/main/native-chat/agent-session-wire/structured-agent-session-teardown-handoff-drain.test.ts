@@ -45,7 +45,7 @@ function tuiOwner(fence: number, spawnToken: string): StructuredTuiOwner {
     process: { hostId: 'local', pid: 5200, processStartTimeMs: NOW, spawnToken },
     link: {
       linkId: `tui-link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: 'resumed',
       mintedAtFence: fence,
       observedAt: NOW
@@ -78,7 +78,7 @@ function adapter(): StructuredAgentSessionAdapter {
       process: { hostId: 'local', pid: 4242, processStartTimeMs: NOW, spawnToken },
       link: {
         linkId: `native-link-${fence}`,
-        handle: { provider: 'codex' as const, threadId: THREAD },
+        handle: { provider: 'claude' as const, sessionId: THREAD, leafUuid: null },
         origin: 'created' as const,
         mintedAtFence: fence,
         observedAt: NOW

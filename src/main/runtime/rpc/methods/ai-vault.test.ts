@@ -1,9 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { RpcDispatcher } from '../dispatcher'
 import type { RpcRequest } from '../core'
-import { OrcaRuntimeService } from '../../orca-runtime'
+import type { OrcaRuntimeService } from '../../orca-runtime'
 import type { AiVaultListResult, AiVaultSession } from '../../../../shared/ai-vault-types'
-import type { AiVaultScanOptions } from '../../../ai-vault/session-scanner-types'
 import {
   AI_VAULT_SESSION_TITLES_RUNTIME_CAPABILITY,
   RUNTIME_CAPABILITIES
@@ -20,13 +19,8 @@ vi.mock('../../../ai-vault/session-scanner-worker-spawn', () => ({
   resetAiVaultScannerWorkerForTests: vi.fn()
 }))
 
+import { AI_VAULT_METHODS, AiVaultListSessionsParams } from './ai-vault'
 import {
-  AI_VAULT_METHODS,
-  AiVaultListSessionsParams,
-  AiVaultPrepareSessionResumeParams
-} from './ai-vault'
-import {
-  configureAiVaultSessionSources,
   listAiVaultSessions,
   resetAiVaultSessionListCacheForTests
 } from '../../../ai-vault/cached-session-list'
@@ -96,11 +90,11 @@ describe('aiVault.resolveSessionTitles handler', () => {
 
   it('advertises and routes the bounded exact-title capability', async () => {
     resolveAiVaultSessionTitlesInWorker.mockResolvedValue({
-      titles: [{ agent: 'codex', sessionId: 'session-1', title: 'Exact title' }]
+      titles: [{ agent: 'claude', sessionId: 'session-1', title: 'Exact title' }]
     })
     const dispatcher = makeDispatcher()
     const requests = [
-      { agent: 'codex', sessionId: 'session-1', transcriptPath: '/tmp/session.jsonl' }
+      { agent: 'claude', sessionId: 'session-1', transcriptPath: '/tmp/session.jsonl' }
     ]
 
     await expect(
@@ -113,11 +107,28 @@ describe('aiVault.resolveSessionTitles handler', () => {
     expect(RUNTIME_CAPABILITIES).toContain(AI_VAULT_SESSION_TITLES_RUNTIME_CAPABILITY)
   })
 
+  it('drops title requests for agents other than Claude instead of rejecting the batch', async () => {
+    resolveAiVaultSessionTitlesInWorker.mockResolvedValue({ titles: [] })
+    const dispatcher = makeDispatcher()
+    const requests = [
+      { agent: 'codex', sessionId: 'retired' },
+      { agent: 'claude', sessionId: 'session-1' }
+    ]
+
+    await expect(
+      dispatcher.dispatch(makeRequest('aiVault.resolveSessionTitles', { requests }))
+    ).resolves.toMatchObject({ ok: true })
+    expect(resolveAiVaultSessionTitlesInWorker).toHaveBeenCalledWith(
+      [{ agent: 'claude', sessionId: 'session-1' }],
+      undefined
+    )
+  })
+
   it('forwards transport cancellation to the background scanner', async () => {
     resolveAiVaultSessionTitlesInWorker.mockResolvedValue({ titles: [] })
     const dispatcher = makeDispatcher()
     const controller = new AbortController()
-    const requests = [{ agent: 'codex', sessionId: 'session-1' }]
+    const requests = [{ agent: 'claude', sessionId: 'session-1' }]
 
     await dispatcher.dispatch(makeRequest('aiVault.resolveSessionTitles', { requests }), {
       signal: controller.signal
@@ -129,7 +140,7 @@ describe('aiVault.resolveSessionTitles handler', () => {
   it('rejects more than 64 title identities before reaching the host', async () => {
     const dispatcher = makeDispatcher()
     const requests = Array.from({ length: 65 }, (_, index) => ({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: `session-${index}`
     }))
 
@@ -182,42 +193,6 @@ describe('aiVault.listSessions params schema', () => {
     expect(AiVaultListSessionsParams.safeParse({ executionHostId: 'ssh:dev-box' }).success).toBe(
       false
     )
-  })
-})
-
-describe('aiVault.prepareSessionResume', () => {
-  it('validates bounded paths and executes against the receiving host identity', async () => {
-    expect(
-      AiVaultPrepareSessionResumeParams.safeParse({
-        agent: 'codex',
-        filePath: '/managed/sessions/rollout-a.jsonl',
-        codexHome: '/managed'
-      }).success
-    ).toBe(true)
-    const prepareAiVaultSessionResume = vi.fn().mockResolvedValue({ useRealCodexHome: true })
-    const runtime = {
-      getRuntimeId: () => 'test-runtime',
-      ensureStructuredAgentSessionHost: vi.fn(async () => undefined),
-      prepareAiVaultSessionResume
-    } as unknown as OrcaRuntimeService
-    const dispatcher = new RpcDispatcher({ runtime, methods: AI_VAULT_METHODS })
-
-    const response = await dispatcher.dispatch(
-      makeRequest('aiVault.prepareSessionResume', {
-        agent: 'codex',
-        filePath: '/managed/sessions/rollout-a.jsonl',
-        codexHome: '/managed',
-        executionHostId: 'ssh:spoofed'
-      })
-    )
-
-    expect(response).toMatchObject({ ok: true, result: { useRealCodexHome: true } })
-    expect(prepareAiVaultSessionResume).toHaveBeenCalledWith({
-      agent: 'codex',
-      filePath: '/managed/sessions/rollout-a.jsonl',
-      codexHome: '/managed',
-      executionHostId: 'local'
-    })
   })
 })
 
@@ -392,30 +367,5 @@ describe('aiVault.listSessions handler + shared cache', () => {
       'runtime:remote-server:claude:sess-1:/tmp/t.jsonl'
     )
     expect(runtimeResponse.result.issues[0]?.executionHostId).toBe('runtime:remote-server')
-  })
-
-  it('injects codex-home dirs sourced from the runtime (serve-mode reachable)', async () => {
-    configureAiVaultSessionSources({
-      getAdditionalCodexHomePaths: () => ['/runtime/codex/home']
-    })
-    const dispatcher = makeDispatcher()
-    await dispatcher.dispatch(makeRequest('aiVault.listSessions', {}))
-    const options = scanAiVaultSessionsInWorker.mock.calls[0]?.[0] as AiVaultScanOptions
-    // Why: the codex-home is sourced from the runtime, not the window-only
-    // registerCoreHandlers path, so it survives in serve mode.
-    expect(options.additionalCodexSessionsDirs).toContain('/runtime/codex/home/sessions')
-    expect(options.wslHomeDirs).toEqual([])
-  })
-
-  it('forwards codex-home through the real OrcaRuntimeService construction path', async () => {
-    // Why: the dispatcher test above seeds the cache module directly, so it would
-    // still pass if OrcaRuntimeService stopped forwarding the codex-home source.
-    // Construct the real runtime to lock that cross-layer wiring in place.
-    const runtime = new OrcaRuntimeService(null, undefined, {
-      getAdditionalAiVaultCodexHomePaths: () => ['/ctor/codex/home']
-    })
-    await runtime.listAiVaultSessions({})
-    const options = scanAiVaultSessionsInWorker.mock.calls[0]?.[0] as AiVaultScanOptions
-    expect(options.additionalCodexSessionsDirs).toContain('/ctor/codex/home/sessions')
   })
 })

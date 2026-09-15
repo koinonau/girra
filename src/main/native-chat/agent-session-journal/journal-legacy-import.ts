@@ -21,12 +21,7 @@ import type {
 import type { NativeChatBlock, NativeChatMessage } from '../../../shared/native-chat-types'
 import { resolveNativeChatTranscriptAgent } from '../../../shared/native-chat-agent-support'
 import { resolveSessionFilePath, type ResolveSessionFileOptions } from '../session-file-resolver'
-import {
-  decodeClaudeTranscriptLine,
-  decodeCodexTranscriptLine,
-  decodeGrokTranscriptLine,
-  decodeOmpTranscriptLine
-} from '../transcript-line-decoders'
+import { decodeClaudeTranscriptLine } from '../transcript-line-decoders'
 import { decodeTranscriptStream } from '../transcript-stream-lines'
 import { boundSubagentEntryId } from '../subagent-entry-id-bounds'
 import { createLegacyIdentityTracker } from './journal-legacy-identity'
@@ -113,8 +108,7 @@ export async function prepareLegacyTranscriptImport(input: {
 }): Promise<{ ok: true; items: JournalReplacementItem[] } | { ok: false; error: string }> {
   const options = input.options ?? {}
   const limits = options.limits ?? DEFAULT_JOURNAL_PAYLOAD_LIMITS
-  const transcriptAgent = resolveNativeChatTranscriptAgent(input.agent)
-  if (!transcriptAgent) {
+  if (resolveNativeChatTranscriptAgent(input.agent) !== 'claude') {
     return { ok: false, error: `Unsupported agent for journal import: ${input.agent}` }
   }
   const filePath =
@@ -142,7 +136,6 @@ export async function prepareLegacyTranscriptImport(input: {
   try {
     decoded = await decodeWithIdentities({
       filePath,
-      transcriptAgent,
       agent: input.agent,
       sessionId: input.sessionId,
       decodedMessageIdentities: options.decodedMessageIdentities
@@ -169,28 +162,19 @@ export async function prepareLegacyTranscriptImport(input: {
   return { ok: true, items: replacement }
 }
 
-const TRANSCRIPT_DECODERS = {
-  claude: decodeClaudeTranscriptLine,
-  codex: decodeCodexTranscriptLine,
-  grok: decodeGrokTranscriptLine,
-  omp: decodeOmpTranscriptLine
-} as const
-
 /** Run the real decoder while recording an identity anchor per emitted message,
  *  index-aligned with `messages`. */
 async function decodeWithIdentities(input: {
   filePath: string
-  transcriptAgent: keyof typeof TRANSCRIPT_DECODERS
   agent: AgentType
   sessionId: string
   decodedMessageIdentities?: true
 }): Promise<{ messages: NativeChatMessage[]; identities: AgentJournalItemIdentity[] }> {
   const tracker = createLegacyIdentityTracker({
-    transcriptAgent: input.transcriptAgent,
     agent: input.agent,
     sessionId: input.sessionId
   })
-  const decode = TRANSCRIPT_DECODERS[input.transcriptAgent]
+  const decode = decodeClaudeTranscriptLine
   const identities: AgentJournalItemIdentity[] = []
   let lineIndex = 0
 

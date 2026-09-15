@@ -33,18 +33,14 @@ function choiceWithCurrent(
 function settableState(args: {
   mode: NativeChatSessionOptionMode
   liveTransport: NativeChatLiveOptionTransport
-  apply: { launchArgs?: unknown; composedIntoModel?: true; midSession?: CatalogMidSessionApply }
-  composedModelApply?: { midSession?: CatalogMidSessionApply }
+  apply: { launchArgs?: unknown; midSession?: CatalogMidSessionApply }
 }): Pick<SessionOptionDescriptor, 'settable' | 'disabledReason'> {
   if (args.mode === 'draft') {
-    return args.apply.launchArgs || args.apply.composedIntoModel
+    return args.apply.launchArgs
       ? { settable: true }
       : { settable: false, disabledReason: 'available-after-session-start' }
   }
   if (args.liveTransport === 'agent-session') {
-    return { settable: true }
-  }
-  if (args.apply.composedIntoModel && args.composedModelApply?.midSession?.kind === 'command') {
     return { settable: true }
   }
   const midSession = args.apply.midSession
@@ -62,9 +58,6 @@ function actionForApply(
   if (mode !== 'live' || liveTransport === 'agent-session') {
     return undefined
   }
-  if (apply.midSession?.kind === 'agent-picker') {
-    return { type: 'agent-picker' }
-  }
   // Why: only unknown flip-only options are actions; once we have a tracked
   // baseline the UI can show absolute On/Off without inventing a start state.
   return isFlipOnlyMidSession(apply.midSession) && !tracked ? { type: 'toggle-command' } : undefined
@@ -76,11 +69,10 @@ function optionDescriptor(args: {
   mode: NativeChatSessionOptionMode
   liveTransport: NativeChatLiveOptionTransport
   modelIsCliDefault: boolean
-  composedModelApply: AgentSessionOptionCatalog['modelApply']
 }): SessionOptionDescriptor | null {
-  const { option, tracked, mode, liveTransport, modelIsCliDefault, composedModelApply } = args
+  const { option, tracked, mode, liveTransport, modelIsCliDefault } = args
   const action = actionForApply(option.apply, tracked, mode, liveTransport)
-  const settable = settableState({ mode, liveTransport, apply: option.apply, composedModelApply })
+  const settable = settableState({ mode, liveTransport, apply: option.apply })
   // Why: the launch only emits `values[id] ?? defaultValue` alongside a model flag, so
   // a draft names this option's value exactly when a model was picked. Under the CLI's
   // own default no flag is sent at all, and the CLI's unstated choice is not ours to name.
@@ -253,8 +245,7 @@ export function buildNativeChatSessionOptionSnapshot(args: {
       tracked: trackedValues[option.id],
       mode,
       liveTransport,
-      modelIsCliDefault: effectiveModelId === defaultModelId,
-      composedModelApply: catalog.modelApply
+      modelIsCliDefault: effectiveModelId === defaultModelId
     })
     if (descriptor) {
       snapshot.push(descriptor)

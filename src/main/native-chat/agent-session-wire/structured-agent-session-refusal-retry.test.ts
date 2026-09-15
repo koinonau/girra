@@ -89,7 +89,7 @@ async function createHarness(options: { attached?: boolean; transport?: boolean 
       },
       link: {
         linkId: `link-${fence}`,
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'created',
         mintedAtFence: fence,
         observedAt: NOW
@@ -97,7 +97,7 @@ async function createHarness(options: { attached?: boolean; transport?: boolean 
     }),
     dispatch: async () => ({
       state: 'accepted',
-      providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 1 }
+      providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-1' }
     }),
     cancelTurn: async () => ({ cancelled: true }),
     answerPrompt: async () => undefined,

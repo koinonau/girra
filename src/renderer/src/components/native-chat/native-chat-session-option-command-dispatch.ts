@@ -1,7 +1,4 @@
-import type {
-  CatalogAgentInteractionDetection,
-  CatalogCommandDelivery
-} from '../../../../shared/agent-session-option-catalog'
+import type { CatalogAgentInteractionDetection } from '../../../../shared/agent-session-option-catalog'
 import type { ClaudeModelSwitchOutcome } from './claude-model-switch-confirmation'
 
 export type NativeChatSessionOptionDispatchResult = {
@@ -13,7 +10,6 @@ export type NativeChatSessionOptionDispatchCommand = (
   options?: {
     detectAgentInteraction?: CatalogAgentInteractionDetection
     expectedChoiceLabel?: string
-    delivery?: CatalogCommandDelivery
   }
 ) =>
   | Promise<NativeChatSessionOptionDispatchResult | void>

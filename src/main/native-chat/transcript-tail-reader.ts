@@ -5,12 +5,7 @@ import type {
 } from '../../shared/native-chat-types'
 import { resolveNativeChatTranscriptAgent } from '../../shared/native-chat-agent-support'
 import { resolveSessionFilePath, type ResolveSessionFileOptions } from './session-file-resolver'
-import {
-  decodeClaudeTranscriptLine,
-  decodeCodexTranscriptLine,
-  decodeGrokTranscriptLine,
-  decodeOmpTranscriptLine
-} from './transcript-line-decoders'
+import { decodeClaudeTranscriptLine } from './transcript-line-decoders'
 import { transcriptFallbackId } from './transcript-fallback-id'
 import {
   nativeChatTurnLifecycleDecoderForAgent,
@@ -34,20 +29,7 @@ export const MAX_NATIVE_CHAT_TRANSCRIPT_RECORD_BYTES = 2 * 1024 * 1024
 export type NativeChatLineDecoder = (line: string, fallbackId: string) => NativeChatMessage | null
 
 export function nativeChatLineDecoderForAgent(agent: AgentType): NativeChatLineDecoder | null {
-  const transcriptAgent = resolveNativeChatTranscriptAgent(agent)
-  if (transcriptAgent === 'claude') {
-    return decodeClaudeTranscriptLine
-  }
-  if (transcriptAgent === 'codex') {
-    return decodeCodexTranscriptLine
-  }
-  if (transcriptAgent === 'grok') {
-    return decodeGrokTranscriptLine
-  }
-  if (transcriptAgent === 'omp') {
-    return decodeOmpTranscriptLine
-  }
-  return null
+  return resolveNativeChatTranscriptAgent(agent) === 'claude' ? decodeClaudeTranscriptLine : null
 }
 
 export async function readNativeChatTranscriptTailFile(

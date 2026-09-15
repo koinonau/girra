@@ -81,11 +81,11 @@ async function createPromptContractHarness(
     }
     if (outcome === 'accepted') {
       startedTurns += 1
-      runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+      runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
     }
-  }, 'codex')
+  }, 'claude')
   const { runtime, handle } = fixture
-  runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
+  runtime.onPtyData('pty-prompt', '\x1b]0;Claude idle\x07', Date.now())
 
   const temporaryRoot = mkdtempSync(join(tmpdir(), 'orca-worker-prompt-contract-'))
   temporaryRoots.push(temporaryRoot)
@@ -149,7 +149,7 @@ async function createPromptContractHarness(
         from: 'term_coord',
         worktree: 'new-child',
         name: `prompt-contract-${outcome}`,
-        agent: 'codex'
+        agent: 'claude'
       }
     },
     requestId: `${REQUEST_ID}_${outcome}`,
@@ -312,7 +312,7 @@ describe('orchestration worker-start prompt contract', () => {
 
     await vi.runAllTimersAsync()
     const response = await pending
-    // Codex supports turn-start observation and no turn started, so ready would be a lie: the
+    // Claude supports turn-start observation and no turn started, so ready would be a lie: the
     // paste can sit unsent in the composer while the receipt looks like a healthy dispatch.
     expect(response).toMatchObject({
       ok: true,
@@ -378,8 +378,8 @@ describe('orchestration worker-start prompt contract', () => {
 
   it('does not attribute output from the old busy turn to a queued prompt', async () => {
     vi.useFakeTimers()
-    const { runtime, handle } = await createAgentPromptSubmissionRuntime(() => undefined, 'codex')
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+    const { runtime, handle } = await createAgentPromptSubmissionRuntime(() => undefined, 'claude')
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
     const pending = runtime.sendTerminalAgentPrompt(handle, 'queued prompt', {
       acceptQueued: true,
       requestId: 'busy-swallowed',

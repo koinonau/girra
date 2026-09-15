@@ -180,7 +180,7 @@ describe('registerPtyHandlers', () => {
         keyId: 'key-1',
         identityDigest: 'a'.repeat(43),
         worktreeScopeDigest: 'b'.repeat(43),
-        agent: 'codex'
+        agent: 'claude'
       },
       generation: 'gen-1',
       phase: 'live',
@@ -210,7 +210,7 @@ describe('registerPtyHandlers', () => {
       onReplay: vi.fn(() => () => {}),
       onExit: vi.fn(() => () => {}),
       listProcesses: vi.fn(async () => [
-        { id: 'agent-pty', cwd: '/workspace', title: 'codex', agentSessionOwners: [owner] },
+        { id: 'agent-pty', cwd: '/workspace', title: 'claude', agentSessionOwners: [owner] },
         { id: 'plain-pty', cwd: '/tmp', title: 'zsh' }
       ]),
       // Why: this provider serializes claims, so its silence about an owner is authoritative.

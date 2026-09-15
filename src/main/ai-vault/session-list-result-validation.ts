@@ -54,7 +54,12 @@ const aiVaultSessionSchema = z.object({
   branch: z.string().nullable(),
   model: z.string().nullable(),
   filePath: z.string(),
-  codexHome: z.string().nullable(),
+  // Why: retired Codex field; older hosts still send a string, which no reader uses.
+  codexHome: z
+    .string()
+    .nullable()
+    .optional()
+    .transform(() => null),
   createdAt: z.string().nullable(),
   updatedAt: z.string().nullable(),
   modifiedAt: z.string(),
@@ -146,7 +151,7 @@ export function parseAiVaultListResult(value: unknown): AiVaultListResult {
   const invalidCount = malformedSessionCount + malformedIssueCount
   if (invalidCount > 0) {
     issues.push({
-      agent: 'codex',
+      agent: 'claude',
       path: 'aiVault.listSessions',
       message: `Skipped ${invalidCount} invalid Agent Session History result ${invalidCount === 1 ? 'entry' : 'entries'}.`
     })

@@ -46,6 +46,7 @@ let hostErrors: unknown[]
 function adapter(): StructuredAgentSessionAdapter {
   return {
     acquire,
+    supportsCreate: () => true,
     closeSession,
     releaseAcquisition: vi.fn(async () => true),
     dispatch,
@@ -101,7 +102,7 @@ function envelope(method: string, fields: Record<string, unknown>): AgentSession
 
 function emitTurnLifecycle(state: 'running' | 'completed', ordinal: number): void {
   sink?.appendItem(
-    { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal },
+    { provider: 'claude', sessionId: THREAD, uuid: `turn-1-${ordinal}` },
     { kind: 'status', text: state, turnLifecycle: { turnId: 'turn-1', state } }
   )
 }
@@ -132,7 +133,7 @@ beforeEach(async () => {
       acquisitionGeneration: `generation-${++generation}`,
       link: {
         linkId: `link-${fence}`,
-        handle: { provider: 'codex' as const, threadId: THREAD },
+        handle: { provider: 'claude' as const, sessionId: THREAD, leafUuid: null },
         origin: store.getRecord(SESSION)?.providerHandleChain.length
           ? ('resumed' as const)
           : ('created' as const),
@@ -267,7 +268,7 @@ describe('startup', () => {
     // The record is readable — the tab comes back, history answers — and nothing is running.
     expect(acquire).not.toHaveBeenCalled()
     expect(host.listSessionTabs()).toEqual([
-      { sessionId: SESSION, workspaceId: 'workspace-1', agent: 'codex' }
+      { sessionId: SESSION, workspaceId: 'workspace-1', agent: 'claude' }
     ])
     expect(host.history({ sessionId: SESSION, direction: 'tail' }).ok).toBe(true)
     expect(store.getRecord(SESSION)?.lease.claimStatus).toBe('released')
@@ -304,7 +305,7 @@ describe('a session evicted and opened again', () => {
       emit: (event) => events.push(event)
     })
     sink?.appendItem(
-      { provider: 'codex', threadId: THREAD, turnId: 'turn-2', ordinal: 1 },
+      { provider: 'claude', sessionId: THREAD, uuid: 'turn-2-1' },
       { kind: 'message', role: 'assistant', blocks: [{ type: 'text', text: 'back again' }] }
     )
     sink?.publish()
@@ -359,7 +360,7 @@ describe('an unexpected provider exit', () => {
     vi.spyOn(session!.journal, 'appendItem').mockRejectedValueOnce(new Error('disk unavailable'))
 
     sink?.appendItem(
-      { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 1 },
+      { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-1' },
       { kind: 'message', role: 'assistant', blocks: [{ type: 'text', text: 'lost write' }] }
     )
 
@@ -423,7 +424,7 @@ describe('an unexpected provider exit', () => {
     })
     dispatch.mockResolvedValueOnce({
       state: 'accepted',
-      providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-next', ordinal: 1 }
+      providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-next-1' }
     })
     const body = hostTestMessage('a distinct next message')
     await expect(
@@ -535,7 +536,7 @@ describe('an unexpected provider exit', () => {
 
     dispatch.mockResolvedValueOnce({
       state: 'accepted',
-      providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-next', ordinal: 1 }
+      providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-next-1' }
     })
     const body = hostTestMessage('a distinct next message after failed-barrier recovery')
     await expect(

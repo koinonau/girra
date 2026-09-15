@@ -29,23 +29,16 @@ afterEach(async () => {
 describe('AiVaultHandler', () => {
   it('resolves an exact transcript title without invoking the broad scanner', async () => {
     const remoteHome = await makeTemporaryHome()
-    const transcriptPath = join(remoteHome, 'session.jsonl')
+    const transcriptPath = join(remoteHome, 'ssh-session.jsonl')
     await writeFile(
       transcriptPath,
       [
         JSON.stringify({
-          timestamp: '2026-07-26T01:00:00.000Z',
-          type: 'session_meta',
-          payload: { id: 'ssh-session', cwd: join(remoteHome, 'repo') }
-        }),
-        JSON.stringify({
+          type: 'user',
+          sessionId: 'ssh-session',
           timestamp: '2026-07-26T01:00:01.000Z',
-          type: 'response_item',
-          payload: {
-            type: 'message',
-            role: 'user',
-            content: [{ type: 'text', text: 'Resolve only this transcript' }]
-          }
+          cwd: join(remoteHome, 'repo'),
+          message: { role: 'user', content: 'Resolve only this transcript' }
         })
       ].join('\n')
     )
@@ -60,44 +53,29 @@ describe('AiVaultHandler', () => {
     await expect(
       dispatcher.call(SSH_AI_VAULT_RESOLVE_SESSION_TITLES_METHOD, {
         requests: [
-          { agent: 'codex', sessionId: 'ssh-session', transcriptPath },
-          { agent: 'codex', sessionId: 'other', transcriptPath: '' }
+          { agent: 'claude', sessionId: 'ssh-session', transcriptPath },
+          { agent: 'claude', sessionId: 'other', transcriptPath: '' }
         ]
       })
     ).resolves.toEqual({
-      titles: [{ agent: 'codex', sessionId: 'ssh-session', title: 'Resolve only this transcript' }]
+      titles: [{ agent: 'claude', sessionId: 'ssh-session', title: 'Resolve only this transcript' }]
     })
     expect(scanRemoteSessions).not.toHaveBeenCalled()
   })
 
   it('discovers and parses sessions entirely on the relay host', async () => {
     const remoteHome = await makeTemporaryHome()
-    const transcriptPath = join(
-      remoteHome,
-      '.codex',
-      'sessions',
-      '2026',
-      '07',
-      '26',
-      'rollout-test.jsonl'
-    )
+    const transcriptPath = join(remoteHome, '.claude', 'projects', '-repo', 'ssh-session.jsonl')
     await mkdir(dirname(transcriptPath), { recursive: true })
     await writeFile(
       transcriptPath,
       [
         JSON.stringify({
-          timestamp: '2026-07-26T01:00:00.000Z',
-          type: 'session_meta',
-          payload: { id: 'ssh-session', cwd: join(remoteHome, 'repo') }
-        }),
-        JSON.stringify({
+          type: 'user',
+          sessionId: 'ssh-session',
           timestamp: '2026-07-26T01:00:01.000Z',
-          type: 'response_item',
-          payload: {
-            type: 'message',
-            role: 'user',
-            content: [{ type: 'text', text: 'Scan on the SSH target' }]
-          }
+          cwd: join(remoteHome, 'repo'),
+          message: { role: 'user', content: 'Scan on the SSH target' }
         })
       ].join('\n')
     )
@@ -345,7 +323,7 @@ describe('AiVaultHandler', () => {
       await expect(
         dispatcher.call(SSH_AI_VAULT_RESOLVE_SESSION_TITLES_METHOD, {
           requests: [
-            { agent: 'codex', sessionId: 'ssh-session', transcriptPath: '/home/ada/s.jsonl' }
+            { agent: 'claude', sessionId: 'ssh-session', transcriptPath: '/home/ada/s.jsonl' }
           ]
         })
       ).resolves.toEqual({ titles: [] })

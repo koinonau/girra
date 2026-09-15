@@ -15,9 +15,7 @@ import { SessionSearchStore } from './session-search-store'
 import {
   assistantRecord,
   CLAUDE_SESSION_ID as SESSION_ID,
-  CODEX_ROLLOUT_FILE,
-  CODEX_SESSION_ID,
-  codexRolloutLines,
+  claudeToolTurnLines,
   parseTranscript,
   userRecord
 } from './session-search-transcript-fixtures'
@@ -96,17 +94,16 @@ it('indexes a Claude transcript through the reader and resumes on append', async
 
 it('keeps a tool result searchable but out of the conversation half', async () => {
   const root = await makeTempDir()
-  const codexHome = await makeTempDir()
-  const path = join(root, CODEX_ROLLOUT_FILE)
+  const path = join(root, `${SESSION_ID}.jsonl`)
   await writeFile(
     path,
-    `${codexRolloutLines(
-      ['rg', 'pericardium'],
+    `${claudeToolTurnLines(
+      'rg pericardium',
       `outputonly ${'padding '.repeat(600)}tailonly`,
       'promptonly search for the module'
     ).join('\n')}\n`
   )
-  await parseTranscript(path, 'codex', codexHome)
+  await parseTranscript(path)
   expect(errors).toEqual([])
 
   expect(sessionsMatching('pericardium')).toHaveLength(1)
@@ -154,25 +151,6 @@ it('names the session mid-read, before the reader has finished the file', async 
     sessionId: SESSION_ID,
     cwd: '/repo/app',
     createdAt: expect.any(String)
-  })
-})
-
-it('names a Codex session mid-read from its own opening record', async () => {
-  const root = await makeTempDir()
-  const codexHome = await makeTempDir()
-  const path = join(root, CODEX_ROLLOUT_FILE)
-  await writeFile(
-    path,
-    `${codexRolloutLines(['rg', 'pericardium'], 'src/main/pericardium.ts:12: match', 'search for the pericardium module').join('\n')}\n`
-  )
-  const seen = recordIdentityPerMessage()
-  await parseTranscript(path, 'codex', codexHome)
-
-  // Codex builds its own resumable state rather than the shared accumulator
-  // fold, so it is the other half of the surface a chunked commit depends on.
-  expect(seen[0]).toMatchObject({
-    sessionId: CODEX_SESSION_ID,
-    cwd: '/repo/app'
   })
 })
 

@@ -90,7 +90,7 @@ export function filterAiVaultSessions(
       return false
     }
     // Hide plain empty sessions, but keep sessions with resumable content
-    // (some parsers only learn turns from previews, e.g. Grok) and zero-turn
+    // (some parsers only learn turns from previews) and zero-turn
     // sessions that still carry recoverable content (queued prompts /
     // subagent transcripts) so a lost conversation is surfaced distinctly.
     if (

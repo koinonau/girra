@@ -39,7 +39,7 @@ function session(agent: AiVaultSession['agent'] = 'claude'): AiVaultSession {
 describe('AI Vault session continuation', () => {
   it('supports both cross-Agent and same-Agent continuation', () => {
     expect(canContinueAiVaultSessionInNewSession(session('claude'), 'worktree-1')).toBe(true)
-    expect(canContinueAiVaultSessionInNewSession(session('codex'), 'worktree-1')).toBe(true)
+    expect(canContinueAiVaultSessionInNewSession(session('claude'), 'worktree-1')).toBe(true)
     expect(canContinueAiVaultSessionInNewSession(session(), null)).toBe(false)
   })
 

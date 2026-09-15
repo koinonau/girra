@@ -172,8 +172,8 @@ describe('orchestration while Structured Chat owns an agent session', () => {
     const reserved = await recordStore.reserveOwner({
       sessionId: SESSION_ID,
       location: LOCATION,
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex-home' },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude-home' },
       runtimeKind,
       expectedFence,
       spawnToken,
@@ -198,7 +198,7 @@ describe('orchestration while Structured Chat owns an agent session', () => {
       fence,
       link: {
         linkId: `link-${fence}`,
-        handle: { provider: 'codex', threadId: 'thread-1' },
+        handle: { provider: 'claude', sessionId: 'thread-1', leafUuid: null },
         origin: fence === 1 ? 'created' : 'resumed',
         mintedAtFence: fence,
         observedAt: now

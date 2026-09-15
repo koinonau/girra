@@ -157,7 +157,7 @@ function seedWorkspace(options: { helper?: boolean } = {}): void {
     settings: {
       ...initialAppStoreState.settings,
       agentCmdOverrides: {},
-      agentDefaultArgs: { codex: '--dangerously-bypass-approvals-and-sandbox' },
+      agentDefaultArgs: { claude: '--dangerously-skip-permissions' },
       setupScriptLaunchMode: 'new-tab'
     },
     markWorktreeVisited: vi.fn(),
@@ -173,7 +173,7 @@ function recordWorkingWorker() {
     .getState()
     .setAgentStatus(
       ORIGINAL_PANE_KEY,
-      { state: 'working', prompt: 'review PR 4626', agentType: 'codex' },
+      { state: 'working', prompt: 'review PR 4626', agentType: 'claude' },
       'PR 4626 unified correction r3',
       { updatedAt: 1_786_361_478_130, stateStartedAt: 1_786_361_478_130 },
       { tabId: ORIGINAL_TAB_ID, worktreeId: WORKTREE_ID, terminalHandle: TERMINAL_HANDLE },
@@ -189,7 +189,7 @@ function completeRecordedWorker(
     .getState()
     .setAgentStatus(
       ORIGINAL_PANE_KEY,
-      { state: 'done', prompt: 'review PR 4626', agentType: 'codex' },
+      { state: 'done', prompt: 'review PR 4626', agentType: 'claude' },
       'PR 4626 unified correction r3',
       { updatedAt: 1_786_361_625_666, stateStartedAt: 1_786_361_625_666 },
       { tabId: ORIGINAL_TAB_ID, worktreeId: WORKTREE_ID, terminalHandle: TERMINAL_HANDLE },
@@ -204,7 +204,7 @@ function completeRecordedWorker(
     paneKey: ORIGINAL_PANE_KEY,
     tabId: ORIGINAL_TAB_ID,
     worktreeId: WORKTREE_ID,
-    agent: 'codex',
+    agent: 'claude',
     providerSession,
     state: 'done',
     origin: 'live'
@@ -316,7 +316,7 @@ async function releaseCompletedWorker(terminalState: 'running' | 'exited'): Prom
     const started = (await call('orchestration.workerStart', {
       task: task.id,
       from: 'terminal-coordinator',
-      agent: 'codex'
+      agent: 'claude'
     })) as { dispatchId: string; state: string }
     expect(started.state).toBe('ready')
     expect(db.getWorkerDispatch(started.dispatchId)?.state).toBe('ready')
@@ -475,7 +475,7 @@ describe('completed background-worker retirement resume matrix', () => {
     expect(useAppStore.getState().sleepingAgentSessionsByPaneKey[ORIGINAL_PANE_KEY]).toBeUndefined()
     expectCanaryUnchanged()
 
-    // Case 6: normal Codex exit leaves the shell pane; helper close retires only the helper.
+    // Case 6: normal agent exit leaves the shell pane; helper close retires only the helper.
     seedWorkspace({ helper: true })
     recordCompletedWorker()
     useAppStore.setState({
@@ -485,7 +485,7 @@ describe('completed background-worker retirement resume matrix', () => {
           paneKey: HELPER_PANE_KEY,
           tabId: HELPER_TAB_ID,
           worktreeId: WORKTREE_ID,
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'unrelated-helper-session' },
           prompt: 'helper',
           state: 'working',

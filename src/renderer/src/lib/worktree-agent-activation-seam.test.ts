@@ -48,7 +48,7 @@ function baseState(): Partial<AppState> {
     sleepingAgentSessionsByPaneKey: {},
     settings: {
       agentCmdOverrides: {},
-      defaultTuiAgent: 'codex',
+      defaultTuiAgent: 'claude',
       setupScriptLaunchMode: 'new-tab'
     } as AppState['settings'],
     markWorktreeVisited: vi.fn(),
@@ -70,9 +70,9 @@ function structuredSnapshot(worktreeId: string): RuntimeMobileSessionTabsResult 
       {
         type: 'agent-session',
         id: 'structured-agent-session-chat-1',
-        title: 'Codex Chat',
+        title: 'Claude Chat',
         sessionId: 'chat-1',
-        agent: 'codex',
+        agent: 'claude',
         isActive: false
       }
     ]
@@ -92,7 +92,7 @@ function orphanTerminalRow(
     branch: worktree.branch ?? 'main',
     tabId: `pty:${ptyId}`,
     leafId: `pty:${ptyId}`,
-    title: 'Codex',
+    title: 'Claude',
     connected: true,
     writable: true,
     lastOutputAt: null,
@@ -147,7 +147,7 @@ function stubInventory(args?: {
           {
             id: args.livePtyId,
             cwd: worktree.path,
-            title: 'Codex',
+            title: 'Claude',
             agentOwnership: 'present' as const
           }
         ]
@@ -176,7 +176,7 @@ describe('worktree agent activation seam', () => {
             groupId,
             worktreeId: worktree.id,
             contentType: 'agent-session',
-            label: 'Codex Chat',
+            label: 'Claude Chat',
             customLabel: null,
             color: null,
             sortOrder: 0,
@@ -208,7 +208,7 @@ describe('worktree agent activation seam', () => {
 
   it('adopts a live terminal without spawning a fallback', async () => {
     const worktree = makeWorktree()
-    const livePtyId = `${worktree.id}@@live-codex`
+    const livePtyId = `${worktree.id}@@live-claude`
     useAppStore.setState(baseState())
     stubInventory({ livePtyId })
 
@@ -269,7 +269,7 @@ describe('worktree agent activation seam', () => {
   // surface at all is not — the user asked for a pane and must get one.
   it('still seeds a usable pane when the census cannot prove who owns a live PTY', async () => {
     const worktree = makeWorktree()
-    const livePtyId = `${worktree.id}@@live-codex`
+    const livePtyId = `${worktree.id}@@live-claude`
     useAppStore.setState(baseState())
     stubInventory({ livePtyId, unverifiableCensus: true })
 

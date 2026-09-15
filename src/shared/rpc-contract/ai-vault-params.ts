@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { parseExecutionHostId } from '../execution-host'
-import { AI_VAULT_AGENTS, AI_VAULT_SCOPE_PATHS_MAX_COUNT } from '../ai-vault-types'
+import { AI_VAULT_SCOPE_PATHS_MAX_COUNT } from '../ai-vault-types'
 import { OptionalBoolean } from './rpc-param-primitives'
 import { AI_VAULT_SESSION_TITLE_REQUEST_MAX_COUNT } from '../ai-vault-session-title'
 
@@ -52,22 +52,20 @@ export const AiVaultListSessionsParams = z
     }
   })
 
-export const AiVaultPrepareSessionResumeParams = z.object({
-  agent: z.enum(AI_VAULT_AGENTS),
-  sessionId: z.string().min(1).max(512).optional(),
-  filePath: z.string().min(1).max(AI_VAULT_SCOPE_PATH_MAX_LENGTH),
-  codexHome: z.string().min(1).max(AI_VAULT_SCOPE_PATH_MAX_LENGTH).nullable(),
-  executionHostId: z.string().optional()
-})
-
 export const AiVaultSessionTitlesParams = z.object({
   requests: z
     .array(
       z.object({
-        agent: z.enum(['claude', 'codex']),
+        agent: z.string(),
         sessionId: z.string().min(1).max(512),
         transcriptPath: z.string().min(1).max(32_768).optional()
       })
     )
     .max(AI_VAULT_SESSION_TITLE_REQUEST_MAX_COUNT)
+    // Why: older clients still send Codex tab requests; dropping them keeps the Claude ones.
+    .transform((requests) =>
+      requests.flatMap((request) =>
+        request.agent === 'claude' ? [{ ...request, agent: 'claude' as const }] : []
+      )
+    )
 })

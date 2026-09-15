@@ -32,7 +32,7 @@ function skill(overrides: Partial<DiscoveredSkill>): DiscoveredSkill {
     id: overrides.name ?? 'skill',
     name: 'typescript',
     description: null,
-    providers: ['codex'],
+    providers: ['claude'],
     sourceKind: 'repo',
     sourceLabel: 'Repository',
     rootPath: '/repo/.agents/skills',
@@ -102,25 +102,25 @@ describe('deriveComposerAutocomplete — one grammar for every agent', () => {
     skill({ name: 'typescript' }),
     skill({ name: 'react-useeffect', directoryPath: '/repo/.agents/skills/react-useeffect' })
   ]
-  const codex = getNativeChatAgentProfile('codex')
+  const claude = getNativeChatAgentProfile('claude')
 
-  it('offers Codex skills under `/`, tokenised as the form Codex invokes', () => {
-    const result = deriveComposerAutocomplete('use /type', 9, COMMANDS, skills, codex)
+  it('offers skills under `/`, tokenised as a slash command', () => {
+    const result = deriveComposerAutocomplete('use /type', 9, COMMANDS, skills, claude)
     expect(result.mode).toBe('slash')
     if (result.mode !== 'slash') {
       return
     }
     expect(result.query).toBe('type')
-    expect(result.items.map((entry) => entry.token)).toEqual(['$typescript'])
+    expect(result.items.map((entry) => entry.token)).toEqual(['/typescript'])
   })
 
-  it('no longer treats `$` as a composer trigger', () => {
-    expect(deriveComposerAutocomplete('use $type', 9, COMMANDS, skills, codex).mode).toBe('none')
-    expect(deriveComposerAutocomplete('$react', 6, COMMANDS, skills, codex).mode).toBe('none')
+  it('does not treat `$` as a composer trigger', () => {
+    expect(deriveComposerAutocomplete('use $type', 9, COMMANDS, skills, claude).mode).toBe('none')
+    expect(deriveComposerAutocomplete('$react', 6, COMMANDS, skills, claude).mode).toBe('none')
   })
 
   it('does not fire inside shell-style text', () => {
-    expect(deriveComposerAutocomplete('price$tag', 9, COMMANDS, skills, codex).mode).toBe('none')
+    expect(deriveComposerAutocomplete('price$tag', 9, COMMANDS, skills, claude).mode).toBe('none')
   })
 })
 
@@ -202,24 +202,24 @@ describe('apply suggestions', () => {
       kind: 'skill',
       id: 'skill:typescript',
       name: 'typescript',
-      token: '$typescript',
+      token: '/typescript',
       description: null,
       sources: []
     })
-    expect(result.draft).toBe('use $typescript  now')
-    expect(result.caret).toBe('use $typescript '.length)
-    expect(result.insertedToken).toBe('$typescript')
+    expect(result.draft).toBe('use /typescript  now')
+    expect(result.caret).toBe('use /typescript '.length)
+    expect(result.insertedToken).toBe('/typescript')
   })
 })
 
 describe('native skill and command picker', () => {
-  it('puts Codex commands and skills in one `/` menu, each with its own token', () => {
+  it('puts commands and skills in one `/` menu', () => {
     const slash = deriveComposerAutocomplete(
       '/',
       1,
       COMMANDS,
       [skill({ name: 'browser' })],
-      getNativeChatAgentProfile('codex')
+      getNativeChatAgentProfile('claude')
     )
     expect(slash.mode).toBe('slash')
     if (slash.mode !== 'slash') {
@@ -230,24 +230,8 @@ describe('native skill and command picker', () => {
       ['/clear', '/compact', '/help']
     )
     expect(slash.items.filter((item) => item.kind === 'skill').map((item) => item.token)).toEqual([
-      '$browser'
+      '/browser'
     ])
-  })
-
-  it('keeps a Codex command and a same-named skill as separate rows', () => {
-    const result = deriveComposerAutocomplete(
-      '/clear',
-      6,
-      COMMANDS,
-      [skill({ name: 'clear' })],
-      getNativeChatAgentProfile('codex')
-    )
-    expect(result.mode).toBe('slash')
-    if (result.mode !== 'slash') {
-      return
-    }
-    expect(result.items.map((item) => item.token)).toEqual(['/clear', '$clear'])
-    expect(result.items.find((item) => item.kind === 'command')?.skillCollision).toBe(false)
   })
 
   it('offers the same commands and skills for a `/` typed mid-prompt as for a leading one', () => {
@@ -303,33 +287,14 @@ describe('native skill and command picker', () => {
     ).toBe('none')
   })
 
-  it('opens the mid-prompt `/` menu for Codex too, tokenised for Codex', () => {
-    const result = deriveComposerAutocomplete(
-      'validate it with /elec',
-      22,
-      COMMANDS,
-      [skill({ name: 'electron' })],
-      getNativeChatAgentProfile('codex')
-    )
-    expect(result.mode).toBe('slash')
-    if (result.mode !== 'slash') {
-      return
-    }
-    expect(result.dispatchable).toBe(false)
-    expect(result.items.map((item) => item.token)).toEqual(['$electron'])
+  it('loads the skill catalog for both `/` trigger positions', () => {
+    const profile = getNativeChatAgentProfile('claude')
+    expect(isSkillPickerTriggered('/elec', profile)).toBe(true)
+    expect(isSkillPickerTriggered('validate it with /elec', profile)).toBe(true)
+    expect(isSkillPickerTriggered('open /Users/me', profile)).toBe(false)
+    // Without a catalog fetch the menu would sit on a permanent loading row.
+    expect(isSkillPickerTriggered('use $elec', profile)).toBe(false)
   })
-
-  it.each(['claude', 'codex'] as const)(
-    'loads the skill catalog for both `/` trigger positions on %s',
-    (agent) => {
-      const profile = getNativeChatAgentProfile(agent)
-      expect(isSkillPickerTriggered('/elec', profile)).toBe(true)
-      expect(isSkillPickerTriggered('validate it with /elec', profile)).toBe(true)
-      expect(isSkillPickerTriggered('open /Users/me', profile)).toBe(false)
-      // Without a catalog fetch the menu would sit on a permanent loading row.
-      expect(isSkillPickerTriggered('use $elec', profile)).toBe(false)
-    }
-  )
 
   it('applyPickerSuggestion replaces a mid-prompt /token at the caret', () => {
     const result = applyPickerSuggestion('validate it with /elec now', 22, {
@@ -373,7 +338,6 @@ describe('native skill and command picker', () => {
         skill({ name: 'stale-on-disk', skillFilePath: '/home/stale/SKILL.md', sourceKind: 'home' })
       ],
       '',
-      '/',
       ['dataviz', 'ref-oss']
     )
     // The scanned-but-unreported skill is gone; the reported-but-unscanned one is
@@ -388,15 +352,14 @@ describe('native skill and command picker', () => {
       [],
       [skill({ name: 'ref-oss', skillFilePath: '/home/ref-oss/SKILL.md' })],
       '',
-      '/',
       undefined
     )
     expect(items.map((item) => item.name)).toEqual(['ref-oss'])
-    expect(buildNativeChatPickerItems([], [skill({})], '', '/', [])).toEqual([])
+    expect(buildNativeChatPickerItems([], [skill({})], '', [])).toEqual([])
   })
 
   it('rejects a session-reported name that is not a safe insertion token', () => {
-    const items = buildNativeChatPickerItems([], [], '', '/', ['ok', 'two words', 'cle\u200bar'])
+    const items = buildNativeChatPickerItems([], [], '', ['ok', 'two words', 'cle\u200bar'])
     expect(items.map((item) => item.name)).toEqual(['ok'])
   })
 
@@ -413,8 +376,7 @@ describe('native skill and command picker', () => {
           skillFilePath: '/4/SKILL.md'
         })
       ],
-      'deploy',
-      '$'
+      'deploy'
     )
     expect(items.map((item) => item.name)).toEqual([
       'deploy',
@@ -429,13 +391,13 @@ describe('native skill and command picker', () => {
       skill({ name: 'clear', skillFilePath: '/project/clear/SKILL.md', sourceKind: 'repo' }),
       skill({ name: 'clear', skillFilePath: '/home/clear/SKILL.md', sourceKind: 'home' })
     ]
-    const skillOnly = buildNativeChatPickerItems([], duplicateSkills, '', '$')
+    const skillOnly = buildNativeChatPickerItems([], duplicateSkills, '')
     expect(skillOnly).toEqual([
       expect.objectContaining({ kind: 'skill', name: 'clear', sources: expect.any(Array) })
     ])
     expect(skillOnly[0].kind === 'skill' ? skillOnly[0].sources : []).toHaveLength(2)
 
-    const collision = buildNativeChatPickerItems(COMMANDS, duplicateSkills, 'clear', '/')
+    const collision = buildNativeChatPickerItems(COMMANDS, duplicateSkills, 'clear')
     expect(collision).toEqual([
       expect.objectContaining({ kind: 'command', name: 'clear', skillCollision: true })
     ])
@@ -446,12 +408,11 @@ describe('native skill and command picker', () => {
     const items = buildNativeChatPickerItems(
       [],
       [skill({ name: longName, skillFilePath: '/long/SKILL.md' })],
-      '',
-      '$'
+      ''
     )
     expect(items.map((item) => item.name)).toEqual([longName])
     const applied = applyPickerSuggestion('/sk', 3, items[0])
-    expect(applied.draft).toBe(`$${longName} `)
+    expect(applied.draft).toBe(`/${longName} `)
   })
 
   it('rejects names carrying zero-width characters instead of inserting them', () => {
@@ -464,8 +425,7 @@ describe('native skill and command picker', () => {
           skillFilePath: '/repo/.agents/skills/safe-dir/SKILL.md'
         })
       ],
-      '',
-      '$'
+      ''
     )
     expect(items.map((item) => item.name)).toEqual(['safe-dir'])
   })
@@ -480,8 +440,7 @@ describe('native skill and command picker', () => {
           skillFilePath: '/repo/.agents/skills/safe-name/SKILL.md'
         })
       ],
-      '',
-      '$'
+      ''
     )
     expect(items.map((item) => item.name)).toEqual(['safe-name'])
   })
@@ -500,23 +459,21 @@ describe('native skill and command picker', () => {
   })
 
   it('classifies sends only from the origin tag and exact command catalog', () => {
-    expect(classifyNativeChatSend('/browser do work', COMMANDS, '/browser', '/')).toBe('chat')
-    expect(classifyNativeChatSend('/clear', COMMANDS, null, '/')).toBe('command')
-    expect(classifyNativeChatSend('/Clear', COMMANDS, null, '/')).toBe('unknown-token')
-    expect(classifyNativeChatSend('/usr/bin/python is missing', COMMANDS, null, '/')).toBe(
+    expect(classifyNativeChatSend('/browser do work', COMMANDS, '/browser')).toBe('chat')
+    expect(classifyNativeChatSend('/clear', COMMANDS, null)).toBe('command')
+    expect(classifyNativeChatSend('/Clear', COMMANDS, null)).toBe('unknown-token')
+    expect(classifyNativeChatSend('/usr/bin/python is missing', COMMANDS, null)).toBe(
       'unknown-token'
     )
-    expect(classifyNativeChatSend('ordinary prompt', COMMANDS, null, '/')).toBe('chat')
+    expect(classifyNativeChatSend('ordinary prompt', COMMANDS, null)).toBe('chat')
   })
 
   it('leading whitespace makes a slash draft prose, never a dispatched command', () => {
-    expect(classifyNativeChatSend(' /clear', COMMANDS, null, '/')).toBe('chat')
+    expect(classifyNativeChatSend(' /clear', COMMANDS, null)).toBe('chat')
   })
 
-  it('treats a leading $ token as unknown only for the $-prefix (Codex) profile', () => {
-    expect(classifyNativeChatSend('$deploy now', COMMANDS, null, '$')).toBe('unknown-token')
-    expect(classifyNativeChatSend('$PATH is wrong', COMMANDS, null, '/')).toBe('chat')
-    expect(classifyNativeChatSend('$50 is the budget', COMMANDS, null, null)).toBe('chat')
+  it('treats a leading $ token as prose', () => {
+    expect(classifyNativeChatSend('$PATH is wrong', COMMANDS, null)).toBe('chat')
   })
 
   it('treats a one-edit token swap as a new trigger occurrence', () => {
@@ -531,7 +488,7 @@ describe('native skill and command picker', () => {
   })
 
   it('suppresses only the dismissed trigger occurrence', () => {
-    const profile = getNativeChatAgentProfile('codex')
+    const profile = getNativeChatAgentProfile('claude')
     expect(deriveComposerAutocomplete('use /bro', 8, COMMANDS, [skill({})], profile).mode).toBe(
       'slash'
     )
@@ -559,7 +516,7 @@ it('preserves known skill completion for unclassified session members only', () 
     skill({ description: 'TypeScript skill' }),
     skill({ name: 'not-loaded', skillFilePath: '/not-loaded/SKILL.md' })
   ]
-  const items = buildNativeChatPickerItems(commands, diskSkills, '', '/', [])
+  const items = buildNativeChatPickerItems(commands, diskSkills, '', [])
   expect(items.map(({ name, kind }) => ({ name, kind }))).toEqual([
     { name: 'clear', kind: 'command' },
     { name: 'project-check', kind: 'command' },
@@ -573,6 +530,6 @@ it('preserves known skill completion for unclassified session members only', () 
     { name: 'typescript', kind: 'command' }
   ])
   expect(
-    buildNativeChatPickerItems(classified, diskSkills, '', '/', []).map(({ kind }) => kind)
+    buildNativeChatPickerItems(classified, diskSkills, '', []).map(({ kind }) => kind)
   ).toEqual(['command'])
 })

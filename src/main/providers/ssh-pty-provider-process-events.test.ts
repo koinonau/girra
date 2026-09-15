@@ -64,7 +64,7 @@ describe('SshPtyProvider process listings and events', () => {
               keyId: 'key',
               identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-              agent: 'codex'
+              agent: 'claude'
             },
             generation: 'generation-1',
             phase: 'live',
@@ -102,7 +102,7 @@ describe('SshPtyProvider process listings and events', () => {
               keyId: 'key',
               identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
               worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-              agent: 'codex'
+              agent: 'claude'
             },
             generation: 'generation-1',
             phase: 'live',

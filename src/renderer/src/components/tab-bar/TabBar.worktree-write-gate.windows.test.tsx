@@ -27,9 +27,6 @@ vi.mock('@/hooks/useAgentDetectionTarget', () => tabBarRuntimeModelStubs().detec
 vi.mock('@/lib/connection-context', () => tabBarRuntimeModelStubs().connectionContext())
 vi.mock('@/lib/worktree-runtime-owner', () => tabBarRuntimeModelStubs().runtimeOwner())
 vi.mock('@/runtime/runtime-rpc-client', () => tabBarRuntimeModelStubs().runtimeRpcClient())
-vi.mock('@/lib/native-chat-transcript-readability', () =>
-  tabBarRuntimeModelStubs().nativeChatReadability()
-)
 vi.mock('@/lib/client-creation-action-policy', () => tabBarRuntimeModelStubs().creationPolicy())
 vi.mock('./tab-agent-types-by-tab-id', () => tabBarRuntimeModelStubs().agentProjections())
 vi.mock('@/lib/local-preflight-context', () => tabBarRuntimeModelStubs().localPreflight())

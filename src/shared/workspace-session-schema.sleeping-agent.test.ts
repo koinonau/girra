@@ -14,8 +14,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -32,7 +32,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     })
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.agent).toBe('codex')
+      expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.agent).toBe('claude')
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.origin).toBe('live')
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.launchConfig).toEqual({
         agentArgs: '',
@@ -48,8 +48,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
         paneKey: 'tab1:pane-1',
         tabId: 'tab1',
         worktreeId: 'wt',
-        agent: 'codex',
-        providerSession: { key: 'session_id', id: 'codex-session' },
+        agent: 'claude',
+        providerSession: { key: 'session_id', id: 'claude-session' },
         prompt: 'continue',
         state: 'done',
         capturedAt: 10,
@@ -73,7 +73,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     }
   )
 
-  it('hydrates a persisted Kimi sleeping agent record', () => {
+  it('drops a persisted sleeping record for a retired agent', () => {
     const result = parseWorkspaceSession({
       activeRepoId: null,
       activeWorktreeId: null,
@@ -101,11 +101,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     })
     expect(result.ok).toBe(true)
     if (result.ok) {
-      // Why: the record must survive the resumable-agent refine, or restore silently drops it.
-      expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']).toMatchObject({
-        agent: 'kimi',
-        providerSession: { key: 'session_id', id: 'session_431324d7-2165-42f0-9ecd-9f93437b3201' }
-      })
+      expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']).toBeUndefined()
     }
   })
 
@@ -145,43 +141,6 @@ describe('parseWorkspaceSession sleeping agents', () => {
           transcriptPath: '/tmp/pi-session.jsonl'
         }
       )
-    }
-  })
-
-  it('preserves the AI Vault OMP resume file through hydration', () => {
-    const result = parseWorkspaceSession({
-      activeRepoId: null,
-      activeWorktreeId: null,
-      activeTabId: null,
-      tabsByWorktree: {},
-      terminalLayoutsByTabId: {},
-      sleepingAgentSessionsByPaneKey: {
-        'tab1:pane-1': {
-          paneKey: 'tab1:pane-1',
-          tabId: 'tab1',
-          worktreeId: 'wt',
-          agent: 'omp',
-          providerSession: { key: 'session_id', id: 'omp-session' },
-          prompt: '',
-          state: 'working',
-          capturedAt: 10,
-          updatedAt: 10,
-          launchConfig: {
-            agentArgs: '',
-            agentEnv: {},
-            ompResumeFilePath: '/custom/omp-sessions/project/session.jsonl'
-          },
-          origin: 'quit'
-        }
-      }
-    })
-
-    expect(result.ok).toBe(true)
-    if (result.ok) {
-      expect(
-        result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.launchConfig
-          ?.ompResumeFilePath
-      ).toBe('/custom/omp-sessions/project/session.jsonl')
     }
   })
 
@@ -226,8 +185,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -243,7 +202,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       const record = result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']
-      expect(record?.agent).toBe('codex')
+      expect(record?.agent).toBe('claude')
       expect(record?.launchConfig).toBeUndefined()
     }
   })
@@ -253,7 +212,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
       "__proto__": {
         "paneKey": "__proto__",
         "worktreeId": "wt",
-        "agent": "codex",
+        "agent": "claude",
         "providerSession": { "key": "session_id", "id": "bad-session" },
         "prompt": "bad",
         "state": "working",
@@ -264,8 +223,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
         "paneKey": "tab1:pane-1",
         "tabId": "tab1",
         "worktreeId": "wt",
-        "agent": "codex",
-        "providerSession": { "key": "session_id", "id": "codex-session" },
+        "agent": "claude",
+        "providerSession": { "key": "session_id", "id": "claude-session" },
         "prompt": "continue",
         "state": "working",
         "capturedAt": 10,
@@ -291,7 +250,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
         false
       )
       const record = result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']
-      expect(record?.agent).toBe('codex')
+      expect(record?.agent).toBe('claude')
       expect(record?.launchConfig).toBeUndefined()
       expect(({} as Record<string, unknown>).polluted).toBeUndefined()
     }
@@ -309,8 +268,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -343,8 +302,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -360,7 +319,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       const record = result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']
-      expect(record?.agent).toBe('codex')
+      expect(record?.agent).toBe('claude')
       expect(record?.launchConfig).toBeUndefined()
     }
   })
@@ -377,8 +336,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'devin',
-          providerSession: { key: 'session_id', id: 'devin-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -439,8 +398,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'done',
           capturedAt: 10,
@@ -469,8 +428,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -524,8 +483,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -545,7 +504,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     })
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.agent).toBe('codex')
+      expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.agent).toBe('claude')
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab2:pane-1']).toBeUndefined()
     }
   })
@@ -562,8 +521,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -573,7 +532,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab2:pane-1',
           tabId: 'tab2',
           worktreeId: 'wt',
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: '--last' },
           prompt: 'ignore me',
           state: 'working',
@@ -585,7 +544,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.providerSession.id).toBe(
-        'codex-session'
+        'claude-session'
       )
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab2:pane-1']).toBeUndefined()
     }
@@ -603,8 +562,8 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'tab1:pane-1',
           tabId: 'tab1',
           worktreeId: 'wt',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 10,
@@ -614,7 +573,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
           paneKey: 'other-tab:pane-1',
           tabId: 'tab2',
           worktreeId: 'wt',
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'mismatched-session' },
           prompt: 'ignore me',
           state: 'working',
@@ -626,7 +585,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
     expect(result.ok).toBe(true)
     if (result.ok) {
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab1:pane-1']?.providerSession.id).toBe(
-        'codex-session'
+        'claude-session'
       )
       expect(result.value.sleepingAgentSessionsByPaneKey?.['tab2:pane-1']).toBeUndefined()
     }

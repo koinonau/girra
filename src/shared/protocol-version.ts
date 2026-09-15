@@ -129,8 +129,6 @@ export const AGENT_SESSION_BOUNDARY_RUNTIME_CAPABILITY =
   'agent-session.session-boundary.v1' as const
 export const AGENT_SESSION_HOST_AUTHORITY_RUNTIME_CAPABILITY =
   'agent-session.host-authority.v1' as const
-export const AGENT_SESSION_OMP_RESUME_PATH_RUNTIME_CAPABILITY =
-  'agent-session.omp-resume-path.v1' as const
 // Why: structured sessions are journal-backed, not PTY-backed, so an incapable client must not
 // receive their journal or drive their lifecycle. Mobile may receive a metadata-only placeholder;
 // the host still refuses agentSession.* methods and destructive tab mutations without capability.
@@ -140,7 +138,7 @@ export const STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY = 'agent-session.struct
 export const AGENT_SESSION_PENDING_SEND_RESULT_RUNTIME_CAPABILITY =
   'agent-session.pending-send-result.v1' as const
 // Why: paired clients advertise Claude-structured support so the host can gate its agent-specific
-// journal and lifecycle surfaces independently from Codex support.
+// journal and lifecycle surfaces apart from the generic structured capability.
 export const CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY =
   'agent-session.structured.claude.v1' as const
 // Why: paired structured clients explicitly hold every visible session surface, allowing the host
@@ -179,10 +177,6 @@ export const AGENT_SESSION_BACKGROUND_TASK_STOP_CAPABILITY =
 // stop capability above, which a client can advertise while predating this.
 export const AGENT_SESSION_BACKGROUND_TASK_ROW_STOP_CAPABILITY =
   'agent-session.background-task-row-stop.v1' as const
-// Why: adding kimi to RESUMABLE_TUI_AGENTS grows terminal.ensureAgentSession's enum, and an
-// older host answers the unknown member with invalid_argument — a code the launch fallback does
-// not retry on — so clients must probe before taking the host-authority path.
-export const AGENT_SESSION_KIMI_RESUME_RUNTIME_CAPABILITY = 'agent-session.kimi-resume.v1' as const
 // Why: older runtimes strip mutation owner fields, so clients must fence writes before RPC.
 export const FILE_MUTATION_OWNERSHIP_RUNTIME_CAPABILITY = 'files.mutation-ownership.v1' as const
 export const FILE_MUTATION_OWNERSHIP_UPDATE_REQUIRED_MESSAGE =
@@ -278,7 +272,6 @@ export const RUNTIME_CAPABILITIES = [
   SESSION_TABS_AUTHORITATIVE_INVENTORY_RUNTIME_CAPABILITY,
   AGENT_SESSION_BOUNDARY_RUNTIME_CAPABILITY,
   AGENT_SESSION_HOST_AUTHORITY_RUNTIME_CAPABILITY,
-  AGENT_SESSION_OMP_RESUME_PATH_RUNTIME_CAPABILITY,
   STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
   AGENT_SESSION_PENDING_SEND_RESULT_RUNTIME_CAPABILITY,
   STRUCTURED_AGENT_SESSION_HOLD_RUNTIME_CAPABILITY,
@@ -289,7 +282,6 @@ export const RUNTIME_CAPABILITIES = [
   AGENT_SESSION_BACKGROUND_TASK_STOP_CAPABILITY,
   AGENT_SESSION_TURN_ITEM_CAPABILITY,
   AGENT_SESSION_BACKGROUND_TASK_ROW_STOP_CAPABILITY,
-  AGENT_SESSION_KIMI_RESUME_RUNTIME_CAPABILITY,
   FILE_MUTATION_OWNERSHIP_RUNTIME_CAPABILITY,
   GITHUB_MARK_PR_READY_RUNTIME_CAPABILITY,
   GITLAB_READY_FOR_REVIEW_RUNTIME_CAPABILITY,

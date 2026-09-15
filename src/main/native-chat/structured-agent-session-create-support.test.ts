@@ -66,10 +66,6 @@ describe('resolveStructuredAgentSessionCreateSupport', () => {
     ).toEqual({ supported: false, reason: 'wsl' })
   })
 
-  it('leaves Codex to the adapter answer under the same WSL-only account', () => {
-    expect(support({ agent: 'codex', getSettings: () => WSL_ONLY })).toEqual({ supported: true })
-  })
-
   it.each([
     ['remote', { ...LOCAL, executionHostId: 'ssh:host-a' }, 'remote'],
     ['wsl workspace', { ...LOCAL, wslDistro: 'Ubuntu' }, 'wsl'],

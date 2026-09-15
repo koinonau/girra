@@ -12,27 +12,27 @@ describe('resolveNativeChatTabAgentEvidence', () => {
         {
           label: 'Summarize recent commits',
           aiVaultTitle: {
-            agent: 'codex',
-            sessionId: 'thread-1',
+            agent: 'claude',
+            sessionId: 'session-1',
             title: 'Summarize recent commits'
           }
         }
       )
-    ).toBe('codex')
+    ).toBe('claude')
   })
 
   it('keeps the committed process-title signal ahead of retained metadata', () => {
     expect(
       resolveNativeChatTabAgentEvidence(
         {
-          title: 'Claude Code',
-          aiVaultTitle: { agent: 'codex', sessionId: 'thread-1', title: 'Old title' }
+          title: 'OpenCode',
+          aiVaultTitle: { agent: 'claude', sessionId: 'session-1', title: 'Old title' }
         },
         {
           label: 'Old title',
           aiVaultTitle: null
         }
       )
-    ).toBe('claude')
+    ).toBe('opencode')
   })
 })

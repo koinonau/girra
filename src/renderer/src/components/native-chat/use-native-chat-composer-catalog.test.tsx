@@ -48,13 +48,6 @@ describe('composer catalog authority', () => {
       'clear'
     ])
   })
-  // Codex reports no catalog, so the hook's fallback is its entire `/` menu; the
-  // agent has to reach structuredSlashCommands or `/goal` is invisible there.
-  it('offers Codex the commands its model runs from message text', () => {
-    const { result } = renderHook(() => useNativeChatComposerCatalog('codex', transport()))
-    expect(result.current.agentCommands).toEqual(structuredSlashCommands([], 'codex'))
-    expect(result.current.agentCommands.map(({ name }) => name)).toContain('goal')
-  })
   it('leaves the Claude route on its own commands, reported or not', () => {
     const reported = [{ name: 'init', kind: 'command' as const }]
     const withReport = renderHook(() => useNativeChatComposerCatalog('claude', transport(reported)))
@@ -113,7 +106,6 @@ it('Enter completes a known pre-init skill while still dispatching a built-in co
           }
         ],
         '',
-        '/',
         catalog.sessionSkillNames
       )
       return useNativeChatComposerKeyDown({

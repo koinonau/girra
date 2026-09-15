@@ -298,7 +298,7 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
     expect(backgroundTabIds).toHaveLength(1)
     expect(backgroundTabIds[0]).not.toBe(BG_MIRROR_TAB_ID)
     expect(replayed.automaticAgentResumeClaimsByTabId[backgroundTabIds[0]!]).toMatchObject({
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       providerSession: { key: 'session_id', id: 'codex-session-bg-1' }
     })
   })

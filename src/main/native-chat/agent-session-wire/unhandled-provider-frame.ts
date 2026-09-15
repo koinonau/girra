@@ -5,7 +5,6 @@ import {
   DEFAULT_JOURNAL_PAYLOAD_LIMITS,
   type JournalPayloadLimits
 } from '../agent-session-journal/journal-payload-bounds'
-import { codexGoalRowText } from '../../codex/codex-goal-journal-rows'
 import { classifyProviderFrame } from './provider-frame-disposition'
 
 export type UnhandledProviderFrameJournalItem = {
@@ -88,45 +87,15 @@ export function unhandledProviderFrameJournalItem(
   }
   const serialized = serializeProviderPayload(payload)
   const bounded = boundPayload(serialized, limits)
-  // Why: the opcode alone ("codex · notification:warning") tells the user nothing
-  // and reads as protocol noise. Lead with the provider's own sentence when it has
-  // one; the raw frame stays behind the row's disclosure either way.
-  const method = kind.startsWith('notification:') ? kind.slice('notification:'.length) : kind
-  const compaction =
-    provider === 'codex' && (method === 'thread/compacted' || method === 'item:contextCompaction')
-  const noticeTone =
-    provider === 'codex'
-      ? method === 'deprecationNotice'
-        ? 'notice'
-        : ['warning', 'guardianWarning', 'configWarning'].includes(method)
-          ? 'warning'
-          : undefined
-      : undefined
-  const tone = noticeTone ?? (classification === 'error-surface' ? 'error' : undefined)
-  let message = readableProviderFrameText(payload)
-  if (
-    provider === 'codex' &&
-    (method === 'configWarning' || method === 'deprecationNotice') &&
-    typeof payload === 'object' &&
-    payload !== null
-  ) {
-    const record = payload as Record<string, unknown>
-    message =
-      [record.summary, record.details]
-        .filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
-        .join('\n\n') || message
-  }
-  const goalText = provider === 'codex' ? codexGoalRowText(method, payload) : null
+  // Why: the opcode alone tells the user nothing and reads as protocol noise. Lead with the
+  // provider's own sentence when it has one; the raw frame stays behind the row's disclosure.
+  const message = readableProviderFrameText(payload)
   const display = message ? boundInlineText(message, limits) : null
-  const goalDisplay = goalText ? boundInlineText(goalText, limits) : null
   return {
     body: {
       kind: 'status',
-      text: compaction
-        ? 'Context compacted'
-        : (goalDisplay?.text ?? display?.text ?? `${provider} · ${kind}`),
-      ...(compaction ? { presentation: 'compaction' } : {}),
-      ...(tone ? { tone } : {}),
+      text: display?.text ?? `${provider} · ${kind}`,
+      ...(classification === 'error-surface' ? { tone: 'error' } : {}),
       providerFrame: { provider, kind, payload: bounded }
     },
     classification: classification === 'error-surface' ? 'error-surface' : 'timeline-substantive'

@@ -9,13 +9,16 @@ describe('pinnedAgentSessionLaunchEnv', () => {
   it('layers the pinned account home over the shell environment', async () => {
     await expect(
       pinnedAgentSessionLaunchEnv(
-        async () => ({ EXAMPLE_GATEWAY_TOKEN: 'shell-exported', CODEX_HOME: '/shell/home' }),
+        async () => ({
+          EXAMPLE_GATEWAY_TOKEN: 'shell-exported',
+          CLAUDE_CONFIG_DIR: '/shell/home'
+        }),
         hostTestAttachParams(null)
       )
     ).resolves.toEqual({
       launchEnv: {
         EXAMPLE_GATEWAY_TOKEN: 'shell-exported',
-        CODEX_HOME: '/home/dev/.codex'
+        CLAUDE_CONFIG_DIR: '/home/dev/.claude'
       }
     })
   })

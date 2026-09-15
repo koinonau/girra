@@ -32,10 +32,10 @@ describe('spawnAiVaultServiceProcess', () => {
   })
 
   it('still passes through a relocated agent home', () => {
-    vi.stubEnv('CODEX_HOME', '/home/dev/elsewhere/.codex')
+    vi.stubEnv('PI_CODING_AGENT_DIR', '/home/dev/elsewhere/.pi')
     spawnAiVaultServiceProcess()
 
-    expect(forkOptions().env?.CODEX_HOME).toBe('/home/dev/elsewhere/.codex')
+    expect(forkOptions().env?.PI_CODING_AGENT_DIR).toBe('/home/dev/elsewhere/.pi')
     vi.unstubAllEnvs()
   })
 

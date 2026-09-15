@@ -150,10 +150,10 @@ function SubagentElapsed({
  *  never nested into the transcript as turns of their own.
  *
  *  Every state is drawn exactly as the journal recorded it. Turn state is NOT
- *  consulted: `spawn_agent` children outlive the turn that spawned them and keep
+ *  consulted: children outlive the turn that spawned them and keep
  *  reporting into this group long after a newer turn opened, so a turn boundary
  *  is a fact about the turn and never evidence that contact with a child was
- *  lost. Only a host can say that, and one does: `CodexSubagentRoster.settleSession`
+ *  lost. Only a host can say that, and one does: `ClaudeSubagentRoster.settleSession`
  *  when the provider goes away, and `staleSubagentRosterRevisions` on the next
  *  journal open when the host itself died mid-flight. */
 export function NativeChatSubagentRun({

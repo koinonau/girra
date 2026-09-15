@@ -335,8 +335,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -362,11 +362,11 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledTimes(1)
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
-        command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'",
-        launchAgent: 'codex',
+        command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
+        launchAgent: 'claude',
         launchConfig: {
-          agentCommand: "codex '--dangerously-bypass-approvals-and-sandbox'",
-          agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+          agentCommand: "claude '--dangerously-skip-permissions'",
+          agentArgs: '--dangerously-skip-permissions',
           agentEnv: {}
         },
         launchToken: expect.stringMatching(new RegExp(`^${UUID_RE}$`)),

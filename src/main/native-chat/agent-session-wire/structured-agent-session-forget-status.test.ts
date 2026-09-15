@@ -29,15 +29,15 @@ vi.mock('./structured-agent-session-attach-flow', () => ({
 }))
 
 const SESSION = '019fd532-7c11-7a90-b6de-4e1a2c3d5f60'
-const TURN = { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal: 0 } as const
-const PROMPT = { ...TURN, ordinal: 1 }
+const TURN = { provider: 'claude', sessionId: 'thread-1', uuid: 'turn-1-0' } as const
+const PROMPT = { ...TURN, uuid: 'turn-1-1' }
 
 const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: SESSION,
   workspaceId: 'repo-1::/workspace/app',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: SESSION }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: SESSION, leafUuid: null }
 }
 
 let root: string
@@ -75,7 +75,7 @@ async function workingSession(): Promise<{
       SESSION,
       {
         journal,
-        params: { location: { workspaceId: IDENTITY.workspaceId }, provider: 'codex' },
+        params: { location: { workspaceId: IDENTITY.workspaceId }, provider: 'claude' },
         fence: 1,
         hasProviderChild: true,
         acquisitionGeneration: null

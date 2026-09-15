@@ -35,7 +35,7 @@ import type { OrcaRuntimeService } from './orca-runtime'
 
 export type LiveStructuredSessionInWorkspace = {
   sessionId: string
-  agent: 'claude' | 'codex'
+  agent: 'claude'
 }
 
 export type UnclosedStructuredSession = LiveStructuredSessionInWorkspace & {

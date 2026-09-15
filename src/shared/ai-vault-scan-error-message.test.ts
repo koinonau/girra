@@ -68,7 +68,7 @@ describe('describeAiVaultScanError', () => {
   })
 
   it('passes scanner-authored messages through untouched', () => {
-    const authored = 'Could not read /Users/x/.codex/sessions: EACCES'
+    const authored = 'Could not read /Users/x/.pi/agent/sessions: EACCES'
     expect(describeAiVaultScanError(authored)).toBe(authored)
     expect(describeAiVaultScanError('SSH relay is not ready')).toBe('SSH relay is not ready')
   })

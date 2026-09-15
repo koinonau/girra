@@ -1,19 +1,13 @@
 import { defineMethod } from '../core'
 import { restampAiVaultListResult } from '../../../ai-vault/session-list-results'
-import type { AiVaultPrepareSessionResumeArgs } from '../../../../shared/ai-vault-resume-preparation'
-import { LOCAL_EXECUTION_HOST_ID } from '../../../../shared/execution-host'
 import { describeAiVaultScanError } from '../../../../shared/ai-vault-scan-error-message'
 import { STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY } from '../../../../shared/protocol-version'
-import {
-  assertLegacyAiVaultResumeAllowed,
-  projectStructuredAiVaultSessions
-} from '../../../ai-vault/structured-session-ownership'
+import { projectStructuredAiVaultSessions } from '../../../ai-vault/structured-session-ownership'
 import {
   AiVaultListSessionsParams,
-  AiVaultPrepareSessionResumeParams,
   AiVaultSessionTitlesParams
 } from '../../../../shared/rpc-contract/ai-vault-params'
-export { AiVaultListSessionsParams, AiVaultPrepareSessionResumeParams, AiVaultSessionTitlesParams }
+export { AiVaultListSessionsParams, AiVaultSessionTitlesParams }
 
 export const AI_VAULT_METHODS = [
   defineMethod({
@@ -52,24 +46,6 @@ export const AI_VAULT_METHODS = [
         clientKind === undefined ||
           (clientCapabilities?.includes(STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY) ?? false)
       )
-    }
-  }),
-  defineMethod({
-    name: 'aiVault.prepareSessionResume',
-    params: AiVaultPrepareSessionResumeParams,
-    handler: async (params, { runtime }) => {
-      const args: AiVaultPrepareSessionResumeArgs = {
-        agent: params.agent,
-        ...(params.sessionId ? { sessionId: params.sessionId } : {}),
-        filePath: params.filePath,
-        codexHome: params.codexHome,
-        // Why: the RPC executes on the transcript-owning host; never let a
-        // client-provided runtime/SSH stamp escape that host boundary.
-        executionHostId: LOCAL_EXECUTION_HOST_ID
-      }
-      await runtime.ensureStructuredAgentSessionHost()
-      assertLegacyAiVaultResumeAllowed(args)
-      return runtime.prepareAiVaultSessionResume(args)
     }
   })
 ]
