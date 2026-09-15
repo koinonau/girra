@@ -648,20 +648,6 @@
       },
       "pluginCommandKeybindings": {
         "group": "Plugins"
-      },
-      "feedback": {
-        "image": {
-          "attachments": {
-            "fallbackName": "图片附件",
-            "unsupportedType": "{{fileName}} 不是受支持的图片类型。",
-            "empty": "{{fileName}} 为空。",
-            "tooLarge": "{{fileName}} 大于 {{maxSize}}。",
-            "tooMany": "最多可附加 {{maxCount}} 张图片。",
-            "dimensionsTooLarge": "{{fileName}} 的尺寸过大，无法安全预览。",
-            "invalidImage": "{{fileName}} 不是有效的受支持图片。",
-            "additionalErrors": "还有 {{count}} 张图片无法附加。"
-          }
-        }
       }
     },
     "hooks": {
@@ -4121,28 +4107,6 @@
           "822ff300ad": "关闭",
           "5bfd5c8779": "关闭安装脚本"
         },
-        "SidebarFeedbackDialog": {
-          "8bf619e4cf": "取消",
-          "8de03e23c5": "仅提交您输入的反馈，或连接“gh”以包含 GitHub 身份。",
-          "d20439c560": "检查 GitHub 身份...",
-          "5b120b9634": "匿名提交",
-          "c9e5ea0791": "GitHub：",
-          "d46ddd66fc": "我们可以改进什么？",
-          "3460258a54": "关注 X",
-          "26108d3699": "加入 Discord",
-          "d245c4ef6c": "GitHub 议题",
-          "9b33530b3d": "其他联系我们的方式",
-          "a828fa4aee": "分享什么是有效的、什么是有问题的，或者 Orca 接下来应该做什么。",
-          "0eb643f07f": "发送反馈",
-          "60b721e857": "提交反馈失败。请再试一次。",
-          "7a46c228b8": "感谢您的反馈。",
-          "a2fd890d9e": "请在提交前输入反馈。",
-          "f2e42e1307": "发送",
-          "69969ba364": "正在发送...",
-          "imageReadFailed": "无法读取附加的图片。请重新附加。",
-          "attachWhileSending": "请等待当前反馈发送完成，再附加更多图片。",
-          "imagesNotDelivered": "反馈已发送，但无法确认图片已送达。"
-        },
         "SidebarFilter": {
           "e3b3898218": "添加项目",
           "92a23e6d07": "重置筛选条件",
@@ -4204,7 +4168,6 @@
           "5f83d86d92": "变更日志",
           "cdc87f897e": "文档",
           "e565171a7c": "键盘快捷键",
-          "4cf5b868d7": "发送反馈",
           "a428c25998": "设置",
           "2991a0106c": "帮助",
           "4e8f5710d3": "无法重新启动 Orca。",
@@ -5034,11 +4997,6 @@
         "WorktreeDeveloperMenu": {
           "developer": "Developer",
           "parkTerminal": "Park terminal"
-        },
-        "SidebarFeedbackImageAttachments": {
-          "screenshotsHint": "最多附加 {count} 张截图",
-          "attachImages": "Attach",
-          "removeImage": "Remove {{fileName}}"
         },
         "WorkspaceKanbanSearchField": {
           "bdb753c78d": "没有匹配的工作区",
@@ -9419,8 +9377,6 @@
           "official": "官方",
           "installed": "已安装",
           "noDescription": "未提供描述。",
-          "blocked": "已被 Orca 安全列表阻止：{{value0}}",
-          "blockedAction": "已阻止",
           "checkUpdate": "检查更新",
           "install": "Install"
         },
@@ -9443,7 +9399,6 @@
           "noContributions": "仅清单元数据",
           "capabilities": "请求的访问权限",
           "workerWarning": "能力限制了此插件如何使用 Orca 的 API。其工作进程仍作为普通进程在此计算机上运行，可以完全访问您的文件、网络和其他进程。",
-          "blocked": "Orca 的安全列表阻止了此插件：{{value0}}",
           "current": "此插件内容已安装。",
           "close": "关闭",
           "cancel": "取消",
@@ -9504,7 +9459,6 @@
           "rollbackFailed": "无法回滚此插件。之前的不可变版本可能不可用。"
         },
         "PluginSettingsRow": {
-          "blocked": "已阻止",
           "needsReview": "需要审查",
           "restarting": "正在重启",
           "invalid": "无效",
@@ -9520,8 +9474,6 @@
           "dev": "开发",
           "bundled": "捆绑",
           "noDescription": "未提供描述。",
-          "killListMessage": "Orca 的安全列表禁用了此插件：{{value0}}",
-          "viewAdvisory": "查看公告",
           "runtimeError": "插件在激活或工作进程错误后停止。",
           "restartCount": " · {{value0}} 次重启",
           "moreActions": "{{value0}} 的更多操作",

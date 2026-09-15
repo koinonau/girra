@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, Phase 6, the ADRs and the cross-version harness deletion are merged. Phase 5a (Codex accounts, managed homes, reset credits, rate limits and usage) is in its pull request. Phase 6 went before Phase 5 because most of Phase 5 waits on the launch roster decision.
+As of 2026-09-15: Phases 0 to 4, Phase 5a, Phase 6, the ADRs and the cross-version harness deletion are merged. Phase 7a (the last calls to Orca's servers) is in its pull request. Every remaining story waits on a user decision below.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -20,7 +20,8 @@ As of 2026-09-15: Phases 0 to 4, Phase 6, the ADRs and the cross-version harness
 - Phase 4a merged in [#12](https://github.com/koinonau/girra/pull/12): the managed hook integrations for 14 agent CLIs and Cursor's trust bypass. 94 files deleted, 20,455 lines removed.
 - Phase 4b merged in [#13](https://github.com/koinonau/girra/pull/13): Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane. 30 files deleted, 6,923 lines removed.
 - Phase 6 merged in [#14](https://github.com/koinonau/girra/pull/14): the feature wall, contextual tours and first-run onboarding. 189 files deleted, 27,662 lines removed.
-- Phase 5a deletes Codex accounts, managed homes, reset credits, rate-limit probing, usage, the CLI lock, the per-pane account registry and stale-pane restart, with the session migration and index heal modules they orphaned: 254 files deleted, 58,851 lines removed and 1,541 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 5a merged in [#15](https://github.com/koinonau/girra/pull/15): Codex accounts, managed homes, reset credits, rate limits, usage, the CLI lock, the per-pane account registry and stale-pane restart. 254 files deleted, 58,851 lines removed.
+- Phase 7a deletes the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links: 22 files deleted, 4,552 lines removed and 156 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -171,6 +172,15 @@ After Phase 5a, on 2026-09-15:
 | `pnpm lint` | 0 | 48 s | 114 reliability gates; ratchets lowered (`DIRECT_IMPORTER_PIN` 147, `UNHIDDEN_SPAWNER_PIN` 63) |
 | `pnpm build` | 0 | Untimed | Failed on the typecheck step, then passed after the fix. Main 5,256 modules, renderer 12,025 |
 
+After Phase 7a, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 2 s | No errors |
+| `pnpm test` | 1 | 643 s | Files: 5 failed, 7,943 passed, 60 skipped of 8,008. Tests: 5 failed, 74,208 passed, 351 skipped of 74,564. Only the known failures below |
+| `pnpm lint` | 0 | 42 s | 114 reliability gates; ratchets unchanged |
+| `pnpm build` | 0 | 15 s | Main 5,250 modules, renderer 12,019 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -254,6 +264,7 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: Phase 5a keeps the Codex wire shapes older paired clients dereference: `AccountsSnapshot.codex` is always `{ accounts: [], activeAccountId: null }`, `RateLimitState` always publishes `codex: null`, a host `codexTarget` and empty `inactiveCodexAccounts`, `ui.set` accepts the `codex` status bar id, and the catalog keeps `codex-account-switching`. The Codex account RPC methods and the `accounts.codex-reset-credit.v1` capability are gone. Retired Codex settings keys are stripped on load; managed homes stay on disk.
 - 2026-09-15: after 5a, Codex launches run on the user's own `~/.codex` (`prepareCodexRuntimeHomeForLaunch` returns null after the trust preset and real-home hook install). Known gaps until 5b to 5d: Windows has no Codex status hook install path, because the real-home lane still needs the shell probe; and resuming a legacy session from the shared mirror fails when the real-home lane is off.
 - 2026-09-15: the index heal CI job and its contract tests went with the orphaned index heal module.
+- 2026-09-15: remove the plugin kill-list's remote fetch, though the tree ticks it with a `[STRIP]` PHONE-HOME tag, because the selection drops phone-home. The plugin system and marketplace stay; nothing blocks a plugin now.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -267,7 +278,9 @@ All 2026-09-13 unless dated otherwise.
 - **MiniMax usage.** The tree unticks "MiniMax usage fetch" but ticks "MiniMax credential storage", and the credentials exist only to feed that fetch (`src/main/rate-limits/minimax`, `src/main/minimax`). Keep both, or delete both with the MiniMax account section and status bar item.
 - **Remote skill install.** Since skill sharing left, nothing calls the host-side skill install RPC (`skills.install`, uploads) or the SSH relay skill handler. Delete them, or add a local package source that uses them.
 - **Workflows.** Which of the 36 to keep before Actions is re-enabled. Until then, no change has CI.
-- **Help menu.** Seventeen links point at Orca's docs. Remove the menu or repoint it.
+- **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it.
+- **Product name and bundle id.** Renaming `productName` (`Orca`) and `BASE_APP_NAME` renames the macOS safe-storage key, so stored encrypted secrets must be re-entered, and may move the user-data directory. Renaming `appId` (`com.stablyai.orca`) resets macOS privacy grants, changes the Windows notification identity, installs beside Orca instead of upgrading it, and must change in about 12 files at once, including a trust check in the Computer Use Swift helper. Prompt text such as "Orca would like to access…" is only right after the rename. Recommendation: rename both in one change, since girra has no installed users to disturb.
+- **"Orca CLI" in prose, and the star and support links.** About 55 strings per locale say "Orca CLI" while the binary stays `orca`; "Girra CLI" reads oddly beside `orca …` commands until the CLI binary decision lands. The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL.
 - **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug.
 - **CLI binary.** Rename `orca` if both apps will run side by side.
 

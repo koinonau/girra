@@ -645,20 +645,6 @@
       },
       "pluginCommandKeybindings": {
         "group": "プラグイン"
-      },
-      "feedback": {
-        "image": {
-          "attachments": {
-            "fallbackName": "画像の添付",
-            "unsupportedType": "{{fileName}} は対応していない画像形式です。",
-            "empty": "{{fileName}} は空です。",
-            "tooLarge": "{{fileName}} は {{maxSize}} を超えています。",
-            "tooMany": "画像は最大 {{maxCount}} 件まで添付できます。",
-            "dimensionsTooLarge": "{{fileName}} は画像サイズが大きすぎるため、安全にプレビューできません。",
-            "invalidImage": "{{fileName}} は有効な画像として読み取れません。",
-            "additionalErrors": "ほかに {{count}} 件の画像を添付できませんでした。"
-          }
-        }
       }
     },
     "hooks": {
@@ -4073,28 +4059,6 @@
           "822ff300ad": "閉じる",
           "5bfd5c8779": "セットアップスクリプトを閉じる"
         },
-        "SidebarFeedbackDialog": {
-          "8bf619e4cf": "キャンセル",
-          "8de03e23c5": "入力したフィードバックのみを送信するか、「gh」に接続して GitHub ID を含めます。",
-          "d20439c560": "GitHub ID を確認しています…",
-          "5b120b9634": "匿名で送信",
-          "c9e5ea0791": "GitHub:",
-          "d46ddd66fc": "何を改善できるでしょうか?",
-          "3460258a54": "Xをフォロー",
-          "26108d3699": "Discord に参加",
-          "d245c4ef6c": "GitHub Issue",
-          "9b33530b3d": "その他の連絡方法",
-          "a828fa4aee": "何が機能しているのか、何が壊れているのか、Orca が次に何をすべきかを共有します。",
-          "0eb643f07f": "フィードバックを送信する",
-          "60b721e857": "フィードバックの送信に失敗しました。もう一度試す。",
-          "7a46c228b8": "フィードバックありがとうございます。",
-          "a2fd890d9e": "送信する前に、フィードバックを入力してください。",
-          "f2e42e1307": "送信",
-          "69969ba364": "送信中…",
-          "imageReadFailed": "添付された画像を読み取れませんでした。もう一度添付してください。",
-          "attachWhileSending": "現在のフィードバックの送信が完了してから、画像を追加してください。",
-          "imagesNotDelivered": "フィードバックを送信しましたが、画像が届いたかどうかは確認できませんでした。"
-        },
         "SidebarFilter": {
           "e3b3898218": "プロジェクトを追加",
           "92a23e6d07": "フィルターをリセットする",
@@ -4156,7 +4120,6 @@
           "5f83d86d92": "変更履歴",
           "cdc87f897e": "ドキュメント",
           "e565171a7c": "キーボードショートカット",
-          "4cf5b868d7": "フィードバックを送信する",
           "a428c25998": "設定",
           "2991a0106c": "ヘルプ",
           "4e8f5710d3": "Orca を再起動できませんでした。",
@@ -4986,11 +4949,6 @@
         "WorktreeDeveloperMenu": {
           "developer": "Developer",
           "parkTerminal": "ターミナルを退避"
-        },
-        "SidebarFeedbackImageAttachments": {
-          "screenshotsHint": "スクリーンショットは最大 {count} 件まで添付できます",
-          "attachImages": "Attach",
-          "removeImage": "{{fileName}} を削除"
         },
         "WorkspaceKanbanSearchField": {
           "bdb753c78d": "一致するワークスペースはありません",
@@ -9349,8 +9307,6 @@
           "official": "公式",
           "installed": "インストール済み",
           "noDescription": "説明はありません。",
-          "blocked": "Orca の安全リストによりブロック: {{value0}}",
-          "blockedAction": "ブロック中",
           "checkUpdate": "更新を確認",
           "install": "インストール"
         },
@@ -9373,7 +9329,6 @@
           "noContributions": "マニフェストメタデータのみ",
           "capabilities": "要求されたアクセス",
           "workerWarning": "機能はこのプラグインが Orca APIを使用する方法を制限します。ワーカーは引き続きコンピュータで通常のプロセスとして実行され、ファイル、ネットワーク、その他のプロセスへの完全なアクセス権を持ちます。",
-          "blocked": "Orca の安全リストがこのプラグインをブロック: {{value0}}",
           "current": "このプラグインコンテンツはすでにインストールされています。",
           "close": "閉じる",
           "cancel": "キャンセル",
@@ -9434,7 +9389,6 @@
           "rollbackFailed": "このプラグインをロールバックできませんでした。以前の不変バージョンが利用できない可能性があります。"
         },
         "PluginSettingsRow": {
-          "blocked": "ブロック中",
           "needsReview": "レビュー待ち",
           "restarting": "再起動中",
           "invalid": "無効",
@@ -9450,8 +9404,6 @@
           "dev": "開発",
           "bundled": "同梱",
           "noDescription": "説明はありません。",
-          "killListMessage": "Orca の安全リストがこのプラグインを無効にしました: {{value0}}",
-          "viewAdvisory": "アドバイザリーを表示",
           "runtimeError": "プラグインが有効化またはワーカーエラー後に停止しました。",
           "restartCount": " · {{value0}}回再起動",
           "moreActions": "{{value0}}の追加操作",
