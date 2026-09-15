@@ -23,7 +23,7 @@ describe('agent completion coordinator', () => {
 
     const turn = {
       prompt: 'fix the bug',
-      agentType: 'cursor' as const
+      agentType: 'opencode' as const
     }
 
     // 'waiting' (e.g. a PermissionRequest) is mid-turn, not a completion.
@@ -51,12 +51,12 @@ describe('agent completion coordinator', () => {
     expect(dispatchCompletion).not.toHaveBeenCalled()
     expect(dispatchAttention).toHaveBeenCalledTimes(2)
     expect(dispatchAttention).toHaveBeenLastCalledWith(
-      'cursor',
+      'opencode',
       expect.objectContaining({
         source: 'hook',
         agentStatus: expect.objectContaining({
           state: 'waiting',
-          agentType: 'cursor',
+          agentType: 'opencode',
           toolInput: 'git status'
         })
       })
@@ -78,10 +78,10 @@ describe('agent completion coordinator', () => {
 
     const turn = {
       prompt: 'fix the bug',
-      agentType: 'copilot' as const
+      agentType: 'claude' as const
     }
 
-    // 'blocked' (e.g. a Copilot elicitation dialog) is mid-turn, not a completion.
+    // 'blocked' (e.g. a Claude elicitation dialog) is mid-turn, not a completion.
     coordinator.observeHookStatus({ state: 'working', ...turn })
     coordinator.observeHookStatus({
       state: 'blocked',
@@ -93,12 +93,12 @@ describe('agent completion coordinator', () => {
 
     expect(dispatchCompletion).not.toHaveBeenCalled()
     expect(dispatchAttention).toHaveBeenCalledWith(
-      'copilot',
+      'claude',
       expect.objectContaining({
         source: 'hook',
         agentStatus: expect.objectContaining({
           state: 'blocked',
-          agentType: 'copilot',
+          agentType: 'claude',
           toolInput: 'npm install'
         })
       })
@@ -120,7 +120,7 @@ describe('agent completion coordinator', () => {
 
     const turn = {
       prompt: 'fix the bug',
-      agentType: 'cursor' as const
+      agentType: 'opencode' as const
     }
 
     coordinator.observeHookStatus({ state: 'working', ...turn })
@@ -140,12 +140,12 @@ describe('agent completion coordinator', () => {
 
     expect(dispatchCompletion).not.toHaveBeenCalled()
     expect(dispatchAttention).toHaveBeenCalledWith(
-      'cursor',
+      'opencode',
       expect.objectContaining({
         source: 'hook',
         agentStatus: expect.objectContaining({
           state: 'waiting',
-          agentType: 'cursor',
+          agentType: 'opencode',
           toolInput: 'pnpm test'
         })
       })
@@ -167,7 +167,7 @@ describe('agent completion coordinator', () => {
 
     const turn = {
       prompt: 'fix the bug',
-      agentType: 'cursor' as const
+      agentType: 'opencode' as const
     }
 
     // Realistic flow: the agent pauses for a permission prompt mid-turn, resumes,
@@ -201,7 +201,7 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    const turn = { prompt: 'fix the bug', agentType: 'cursor' as const }
+    const turn = { prompt: 'fix the bug', agentType: 'opencode' as const }
     coordinator.observeHookStatus({ state: 'working', ...turn })
     coordinator.observeHookStatus({
       state: 'waiting',

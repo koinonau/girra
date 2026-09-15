@@ -15,7 +15,6 @@ import {
   MAXIMUM_REPOSITORY_SKILL_ROOTS
 } from './skill-freshness-inventory'
 import { describeObservedSkillFile, skillPackageDigest } from './skill-package-identity'
-import { MAXIMUM_PLUGIN_SCAN_ENTRIES } from './skill-plugin-cache-scan'
 import { getSkillFreshnessDisplayStatus } from '../../renderer/src/lib/skill-freshness-display-status'
 
 const temporaryDirectories: string[] = []
@@ -321,7 +320,7 @@ describe('read-only skill freshness inventory', () => {
 
   it('trusts the updater lock for upstream bytes beside an agent CLI sidecar (#12694)', async () => {
     // The reported folder shape after a successful update: `skills update` wrote
-    // source-repo HEAD no bundle knows yet, and Codex's own agents/openai.yaml sits
+    // source-repo HEAD no bundle knows yet, and an agent CLI's own agents/openai.yaml sits
     // beside it. The lock records the source tree — SKILL.md alone — so a folder hash
     // taken over the sidecar too can never match it, and the copy the command just
     // wrote would be reported as a failed update.
@@ -537,7 +536,7 @@ describe('read-only skill freshness inventory', () => {
   it('keeps an unreadable foreign-home placement visible without withholding the update', async () => {
     const test = await fixture()
     await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.oldMarkdown)
-    const inaccessiblePath = join(test.homeDir, '.codex', 'skills', 'orca-cli')
+    const inaccessiblePath = join(test.homeDir, '.claude', 'skills', 'orca-cli')
 
     const inventory = await inventorySkillFreshness({
       currentAppVersion: '2.0.0',
@@ -592,89 +591,32 @@ describe('read-only skill freshness inventory', () => {
     expect(inventory.eligibleUpdateNames).toEqual(['orca-cli'])
   })
 
-  it.each([
-    ['repo', 'repo-scope'],
-    ['plugin', 'plugin-cache']
-  ] as const)(
-    'keeps an official %s placement informational without withholding the update',
-    async (kind, topology) => {
-      const test = await fixture()
-      await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.oldMarkdown)
-      let repos: Repo[] = []
-      if (kind === 'repo') {
-        const repoPath = join(test.root, 'repo')
-        await test.writeSkill(join(repoPath, '.agents', 'skills'), test.currentMarkdown)
-        repos = [{ id: 'repo', path: repoPath }] as unknown as Repo[]
-      } else {
-        await test.writeSkill(
-          join(test.homeDir, '.codex', 'plugins', 'cache', 'vendor', 'skills'),
-          test.currentMarkdown
-        )
-      }
-
-      const inventory = await inventorySkillFreshness({
-        currentAppVersion: '2.0.0',
-        homeDir: test.homeDir,
-        repos,
-        resourceRoot: test.resourceRoot
-      })
-
-      expect(inventory.installations.some((entry) => entry.topology === topology)).toBe(true)
-      expect(inventory.eligibleUpdateNames).toEqual(['orca-cli'])
-    }
-  )
-
-  it('keeps another ecosystem’s same-name plugin skill unrecognized', async () => {
-    // Why: Codex ships its own `computer-use` plugin. Reported in #10633 — the copy is
-    // not ours, not the user's to delete, and left amber with no action available.
+  it('keeps an official repo placement informational without withholding the update', async () => {
     const test = await fixture()
-    await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.currentMarkdown)
-    const pluginRoot = join(
-      test.homeDir,
-      '.codex',
-      'plugins',
-      'cache',
-      'openai-bundled',
-      'orca-cli'
-    )
-    await mkdir(pluginRoot, { recursive: true })
-    await writeFile(join(pluginRoot, 'SKILL.md'), '---\nname: orca-cli\n---\n\nAnother tool.\n')
+    await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.oldMarkdown)
+    const repoPath = join(test.root, 'repo')
+    await test.writeSkill(join(repoPath, '.agents', 'skills'), test.currentMarkdown)
 
     const inventory = await inventorySkillFreshness({
       currentAppVersion: '2.0.0',
       homeDir: test.homeDir,
-      repos: [],
+      repos: [{ id: 'repo', path: repoPath }] as unknown as Repo[],
       resourceRoot: test.resourceRoot
     })
 
-    expect(inventory.installations).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({
-          unresolvedPath: pluginRoot,
-          topology: 'plugin-cache',
-          status: 'unrecognized'
-        })
-      ])
-    )
-    expect(inventory.eligibleUpdateNames).toEqual([])
+    expect(inventory.installations.some((entry) => entry.topology === 'repo-scope')).toBe(true)
+    expect(inventory.eligibleUpdateNames).toEqual(['orca-cli'])
   })
 
-  it('reads a plugin-cache copy with untouched official files as current', async () => {
+  it('reads a repo copy with untouched official files as current', async () => {
     // The deliberate posture change behind #12694: an unlisted neighbour is not evidence
     // of an edit, so the bytes Orca owns decide alone — here and in every scope, not just
     // the canonical copy the updater writes. The drifted-SKILL.md case above still fails
     // closed, which is what keeps "unrecognized" meaningful.
     const test = await fixture()
     await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.currentMarkdown)
-    const withSidecarRoot = join(
-      test.homeDir,
-      '.codex',
-      'plugins',
-      'cache',
-      'openai-bundled',
-      'modified',
-      'orca-cli'
-    )
+    const repoPath = join(test.root, 'repo')
+    const withSidecarRoot = join(repoPath, '.agents', 'skills', 'orca-cli')
     await mkdir(withSidecarRoot, { recursive: true })
     await writeFile(join(withSidecarRoot, 'SKILL.md'), test.currentMarkdown)
     await writeFile(join(withSidecarRoot, 'README.md'), 'Neighbouring file Orca never shipped\n')
@@ -682,7 +624,7 @@ describe('read-only skill freshness inventory', () => {
     const inventory = await inventorySkillFreshness({
       currentAppVersion: '2.0.0',
       homeDir: test.homeDir,
-      repos: [],
+      repos: [{ id: 'repo', path: repoPath }] as unknown as Repo[],
       resourceRoot: test.resourceRoot
     })
 
@@ -715,22 +657,6 @@ describe('read-only skill freshness inventory', () => {
     })
 
     expect(inventory.installations.some((entry) => entry.status === 'unrecognized')).toBe(true)
-  })
-
-  it('does not classify an empty plugin-cache directory as a skill', async () => {
-    const test = await fixture()
-    await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.currentMarkdown)
-    const emptyRoot = join(test.homeDir, '.codex', 'plugins', 'cache', 'vendor', 'orca-cli')
-    await mkdir(emptyRoot, { recursive: true })
-
-    const inventory = await inventorySkillFreshness({
-      currentAppVersion: '2.0.0',
-      homeDir: test.homeDir,
-      repos: [],
-      resourceRoot: test.resourceRoot
-    })
-
-    expect(inventory.installations.some((entry) => entry.unresolvedPath === emptyRoot)).toBe(false)
   })
 
   it('accepts CRLF as the same official text identity', async () => {
@@ -799,121 +725,4 @@ describe('read-only skill freshness inventory', () => {
     // command does not touch, so the limit is reported without blocking the update.
     expect(inventory.eligibleUpdateNames).toEqual(['orca-cli'])
   })
-
-  it('scans a real-shaped plugin cache completely and leaves eligibility unchanged', async () => {
-    const test = await fixture()
-    await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.oldMarkdown)
-    const packageRoot = join(
-      test.homeDir,
-      '.codex',
-      'plugins',
-      'cache',
-      'openai-bundled',
-      'orca-cli',
-      '1.0.0'
-    )
-    await mkdir(join(packageRoot, '.codex-plugin'), { recursive: true })
-    await writeFile(join(packageRoot, '.codex-plugin', 'plugin.json'), '{"skills":"./skills/"}\n')
-    const pluginSkill = await test.writeSkill(join(packageRoot, 'skills'), test.currentMarkdown)
-    await mkdir(join(pluginSkill, 'templates', 'starter', 'examples', 'd1', 'app', 'api'), {
-      recursive: true
-    })
-
-    const inventory = await inventorySkillFreshness({
-      currentAppVersion: '2.0.0',
-      homeDir: test.homeDir,
-      repos: [],
-      resourceRoot: test.resourceRoot
-    })
-
-    // The plugin copy is real and reported at its own path — never at a joined path,
-    // and never at the same-named plugin directory two levels above it.
-    expect(inventory.scanIssues).toEqual([])
-    expect(inventory.installations).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ topology: 'plugin-cache', unresolvedPath: pluginSkill })
-      ])
-    )
-    // Why: a plugin-cache copy is not convergent, so it neither grants nor withholds
-    // the update. The outdated canonical copy alone decides, exactly as before.
-    expect(inventory.eligibleUpdateNames).toEqual(['orca-cli'])
-  })
-
-  it('reports incomplete plugin coverage without inventing per-skill installations', async () => {
-    const test = await fixture()
-    await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.currentMarkdown)
-    const pluginCache = join(test.homeDir, '.codex', 'plugins', 'cache')
-    await mkdir(join(pluginCache, ...Array.from({ length: 11 }, (_, index) => `level-${index}`)), {
-      recursive: true
-    })
-
-    const inventory = await inventorySkillFreshness({
-      currentAppVersion: '2.0.0',
-      homeDir: test.homeDir,
-      repos: [],
-      resourceRoot: test.resourceRoot
-    })
-
-    expect(inventory.installations).toHaveLength(1)
-    expect(inventory.installations[0]).toMatchObject({
-      name: 'orca-cli',
-      status: 'current',
-      topology: 'canonical-copy'
-    })
-    expect(inventory.installations).not.toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ errorCategory: 'plugin-cache-scan-incomplete' })
-      ])
-    )
-    expect(inventory.scanIssues).toEqual([
-      expect.objectContaining({
-        rootId: 'codex-plugin-cache',
-        sourceLabel: 'Codex plugin cache',
-        reason: 'depth-limit',
-        errorCode: null
-      })
-    ])
-  })
-
-  it.skipIf(process.platform === 'win32')(
-    'invents no installations when the plugin cache trips the entry budget (#10918)',
-    async () => {
-      const test = await fixture()
-      await test.writeSkill(join(test.homeDir, '.agents', 'skills'), test.currentMarkdown)
-      const pluginCache = join(test.homeDir, '.codex', 'plugins', 'cache')
-      await mkdir(pluginCache, { recursive: true })
-      // Why: the production bound, not an injected one — #10918 is the real constant
-      // collapsing the scan to the cache root, and only a real cache proves that path.
-      const entries = Array.from({ length: MAXIMUM_PLUGIN_SCAN_ENTRIES + 1 }, (_, index) =>
-        join(pluginCache, `entry-${index}`)
-      )
-      for (let index = 0; index < entries.length; index += 512) {
-        await Promise.all(entries.slice(index, index + 512).map((path) => writeFile(path, '')))
-      }
-
-      const inventory = await inventorySkillFreshness({
-        currentAppVersion: '2.0.0',
-        homeDir: test.homeDir,
-        repos: [],
-        resourceRoot: test.resourceRoot
-      })
-
-      // Why: assert the bound actually tripped first — if the fixture stopped reaching it,
-      // the placement assertion below would still pass and cover nothing.
-      expect(inventory.scanIssues).toEqual([
-        expect.objectContaining({
-          rootId: 'codex-plugin-cache',
-          path: pluginCache,
-          reason: 'entry-limit',
-          errorCode: null
-        })
-      ])
-      // Why: the truncated root is not evidence of a copy. Fabricating one per manifest name
-      // is what pinned an unclearable "Needs attention" on every card in #10918.
-      expect(inventory.installations).toEqual([
-        expect.objectContaining({ name: 'orca-cli', status: 'current', topology: 'canonical-copy' })
-      ])
-    },
-    90_000
-  )
 })

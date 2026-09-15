@@ -265,12 +265,12 @@ describe('detach completed split pane → sidebar retention', () => {
     })
 
     detach(store, SOURCE_TAB, TARGET_TAB)
-    // Why: terminalHandle is pty-scoped, so a fresh codex run carries the same handle.
+    // Why: terminalHandle is pty-scoped, so a fresh opencode run carries the same handle.
     const result = collect({
       currentPaneKey: TARGET_PANE_KEY,
       currentTabId: TARGET_TAB,
       currentStartedAt: 900,
-      currentAgentType: 'codex',
+      currentAgentType: 'opencode',
       terminalHandle: 'term_shared'
     })
 
@@ -408,7 +408,7 @@ describe('detach completed split pane → sidebar retention', () => {
       id: TARGET_TAB,
       worktreeId: WORKTREE_ID,
       title: 'Destination',
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
     const retained = collect({
       tabIndex: new Map([[TARGET_TAB, { tab: destinationTab }]])

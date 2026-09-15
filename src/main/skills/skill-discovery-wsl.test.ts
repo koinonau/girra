@@ -3,12 +3,12 @@ import type { SkillScanRoot } from './skill-discovery-sources'
 import { buildWslSkillDiscoveryCommand, parseWslSkillDiscoveryOutput } from './skill-discovery-wsl'
 
 const homeRoot: SkillScanRoot = {
-  id: 'home-codex',
-  label: 'Codex home',
-  path: '/home/alice/.codex/skills',
+  id: 'home-claude',
+  label: 'Claude home',
+  path: '/home/alice/.claude/skills',
   sourceKind: 'home',
-  providers: ['codex'],
-  owner: 'codex'
+  providers: ['claude'],
+  owner: 'claude'
 }
 const repoRoot: SkillScanRoot = {
   id: 'repo-agents',
@@ -35,7 +35,7 @@ describe('WSL skill discovery', () => {
       record(
         'S',
         '0',
-        '/home/alice/.codex/skills/.system/review/SKILL.md',
+        '/home/alice/.claude/skills/.system/review/SKILL.md',
         '/opt/orca/review/SKILL.md',
         '1700000000',
         markdown
@@ -59,13 +59,13 @@ describe('WSL skill discovery', () => {
         description: 'Review this change',
         sourceKind: 'bundled',
         rootPath: homeRoot.path,
-        skillFilePath: '/home/alice/.codex/skills/.system/review/SKILL.md',
+        skillFilePath: '/home/alice/.claude/skills/.system/review/SKILL.md',
         updatedAt: 1_700_000_000_000
       })
     ])
     expect(result.sources).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ id: 'home-codex', exists: true }),
+        expect.objectContaining({ id: 'home-claude', exists: true }),
         expect.objectContaining({ id: 'repo-agents', exists: false, skippedReason: 'missing' })
       ])
     )

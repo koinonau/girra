@@ -116,10 +116,10 @@ describe('SshGitProvider', () => {
       const pending = provider
         .executeCommitMessagePlan(
           {
-            binary: 'codex',
-            args: ['exec', 'PROMPT'],
+            binary: 'opencode',
+            args: ['run', 'PROMPT'],
             stdinPayload: null,
-            label: 'Codex'
+            label: 'OpenCode'
           },
           '/home/user/repo',
           60_000
@@ -160,10 +160,10 @@ describe('SshGitProvider', () => {
 
     const result = await provider.executeCommitMessagePlan(
       {
-        binary: 'codex',
-        args: ['exec', 'PROMPT'],
+        binary: 'opencode',
+        args: ['run', 'PROMPT'],
         stdinPayload: null,
-        label: 'Codex'
+        label: 'OpenCode'
       },
       '/home/user/repo',
       60_000
@@ -172,8 +172,8 @@ describe('SshGitProvider', () => {
     expect(mux.request).toHaveBeenCalledWith(
       'agent.execNonInteractive',
       {
-        binary: 'codex',
-        args: ['exec', 'PROMPT'],
+        binary: 'opencode',
+        args: ['run', 'PROMPT'],
         cwd: '/home/user/repo',
         stdin: null,
         timeoutMs: 60_000,
@@ -202,10 +202,10 @@ describe('SshGitProvider', () => {
       })
     })
     const plan = {
-      binary: 'codex',
-      args: ['exec', 'PROMPT'],
+      binary: 'opencode',
+      args: ['run', 'PROMPT'],
       stdinPayload: null,
-      label: 'Codex'
+      label: 'OpenCode'
     }
 
     const commit = provider.executeCommitMessagePlan(plan, '/home/user/repo', 60_000)
@@ -221,8 +221,8 @@ describe('SshGitProvider', () => {
       1,
       'agent.execNonInteractive',
       {
-        binary: 'codex',
-        args: ['exec', 'PROMPT'],
+        binary: 'opencode',
+        args: ['run', 'PROMPT'],
         cwd: '/home/user/repo',
         stdin: null,
         timeoutMs: 60_000,
@@ -234,8 +234,8 @@ describe('SshGitProvider', () => {
       2,
       'agent.execNonInteractive',
       {
-        binary: 'codex',
-        args: ['exec', 'PROMPT'],
+        binary: 'opencode',
+        args: ['run', 'PROMPT'],
         cwd: '/home/user/repo',
         stdin: null,
         timeoutMs: 60_000,

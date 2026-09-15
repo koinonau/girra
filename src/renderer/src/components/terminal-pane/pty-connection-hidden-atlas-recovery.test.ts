@@ -492,7 +492,7 @@ describe('connectPanePty', () => {
     expect(pane.terminal.write).toHaveBeenCalledWith('backgrounded document output\r\n')
   })
 
-  it('keeps hidden Codex startup output parsing briefly when launch attribution names the agent', async () => {
+  it('keeps hidden OpenCode startup output parsing briefly when launch attribution names the agent', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -512,7 +512,7 @@ describe('connectPanePty', () => {
         startup: {
           command: 'wrapped-agent',
           telemetry: {
-            agent_kind: 'codex',
+            agent_kind: 'opencode',
             launch_source: 'tab_bar_quick_launch',
             request_kind: 'new'
           }
@@ -535,7 +535,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps hidden Grok startup output parsing briefly when launch attribution names the agent', async () => {
+  it('keeps hidden Pi startup output parsing briefly when launch attribution names the agent', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -555,7 +555,7 @@ describe('connectPanePty', () => {
         startup: {
           command: 'wrapped-agent',
           telemetry: {
-            agent_kind: 'grok',
+            agent_kind: 'pi',
             launch_source: 'tab_bar_quick_launch',
             request_kind: 'new'
           }
@@ -578,7 +578,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps hidden bare Codex startup commands parsing briefly', async () => {
+  it('keeps hidden bare OpenCode startup commands parsing briefly', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -595,7 +595,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -614,7 +614,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps hidden bare Grok startup commands parsing briefly', async () => {
+  it('keeps hidden path-qualified Claude startup commands parsing briefly', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -631,7 +631,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: '/Users/me/.grok/bin/grok --permission-mode bypassPermissions' }
+        startup: { command: '/Users/me/.local/bin/claude --dangerously-skip-permissions' }
       }) as never
     )
     await flushAsyncTicks(6)

@@ -208,7 +208,7 @@ function writeGhShim(fixtureDir, ghHangMs) {
 }
 
 function buildLaunchEnvironment({ fixtureDir, githubRepos, ghShimDir }) {
-  // Why: keep Codex home work inside the benchmark fixture and keep the
+  // Why: keep Claude config work inside the benchmark fixture and keep the
   // default-ON rollout from adding unrelated migration work to timings.
   const isolatedHome = join(fixtureDir, 'home')
   mkdirSync(isolatedHome, { recursive: true })
@@ -221,8 +221,7 @@ function buildLaunchEnvironment({ fixtureDir, githubRepos, ghShimDir }) {
     ORCA_E2E_HOME_DIR: isolatedHome,
     ORCA_E2E_HEADLESS: '1'
   }
-  delete env.CODEX_HOME
-  delete env.ORCA_CODEX_HOME
+  delete env.CLAUDE_CONFIG_DIR
   if (ghShimDir) {
     env.PATH = `${ghShimDir}${delimiter}${env.PATH ?? ''}`
   }

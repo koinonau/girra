@@ -8,8 +8,8 @@ describe('resolvePublishedPaneAgentIdentity', () => {
     // Minimized from real recorded titles. Each is a pane of one agent whose task text names
     // another; before this, `@<other>` routing delivered to them.
     it.each([
-      ['Switch Claude and Codex off the load balancer… - opencode', 'opencode'],
-      ['Review the Claude session-history fix', 'codex'],
+      ['Switch Claude and Pi off the load balancer… - opencode', 'opencode'],
+      ['Review the Claude session-history fix', 'pi'],
       ['✳ Fix the text cursor blink', 'claude']
     ])('keeps %j as its launched agent', (title, launchAgent) => {
       expect(resolve({ launchAgent: launchAgent as never, title })).toBe(launchAgent)
@@ -20,26 +20,26 @@ describe('resolvePublishedPaneAgentIdentity', () => {
     // The ranking assertion. Every other case here either yields no title evidence or agrees with
     // the launch record, so without this one the suite passes even with title ranked FIRST —
     // verified by mutation. `✳ Claude Code` is a parseable, unambiguous Claude title, and it still
-    // must not rename a pane Orca launched as Codex.
-    expect(resolve({ launchAgent: 'codex', title: '✳ Claude Code' })).toBe('codex')
+    // must not rename a pane Orca launched as OpenCode.
+    expect(resolve({ launchAgent: 'opencode', title: '✳ Claude Code' })).toBe('opencode')
   })
 
   it('prefers the live foreground process to the launch record', () => {
-    // The pane was launched as Claude and the user then started Codex in it. The process is the
+    // The pane was launched as Claude and the user then started OpenCode in it. The process is the
     // more direct observation, so it wins.
-    expect(resolve({ launchAgent: 'claude', foregroundAgent: 'codex' })).toBe('codex')
+    expect(resolve({ launchAgent: 'claude', foregroundAgent: 'opencode' })).toBe('opencode')
   })
 
   describe('title is the last resort, and the parser is what makes that safe', () => {
     // The misdelivery this PR exists to stop, re-checked with title ALLOWED at the bottom. The old
     // code matched `buildAgentNameRe('claude').test(title)`; the parser is categorically stricter
     // and yields nothing for a name that only appears in task text.
-    it('does not name a Codex pane Claude from its task text', () => {
+    it('does not name a Pi pane Claude from its task text', () => {
       expect(resolve({ title: 'Review the Claude session-history fix' })).toBeUndefined()
     })
 
     it('reads the owner suffix, not the agents named in the task text', () => {
-      expect(resolve({ title: 'Switch Claude and Codex off the load balancer… - opencode' })).toBe(
+      expect(resolve({ title: 'Switch Claude and Pi off the load balancer… - opencode' })).toBe(
         'opencode'
       )
     })
@@ -51,42 +51,42 @@ describe('resolvePublishedPaneAgentIdentity', () => {
     })
 
     it('still declines a bare worktree name that merely contains an agent word', () => {
-      expect(resolve({ title: 'review-14600-codex' })).toBeUndefined()
+      expect(resolve({ title: 'review-14600-opencode' })).toBeUndefined()
     })
 
     it('lets every stronger source outrank an unambiguous title', () => {
-      expect(resolve({ title: '✳ Claude Code', hookAgent: 'codex', hookIsLive: true })).toBe(
-        'codex'
+      expect(resolve({ title: '✳ Claude Code', hookAgent: 'opencode', hookIsLive: true })).toBe(
+        'opencode'
       )
-      expect(resolve({ title: '✳ Claude Code', foregroundAgent: 'codex' })).toBe('codex')
-      expect(resolve({ title: '✳ Claude Code', launchAgent: 'codex' })).toBe('codex')
+      expect(resolve({ title: '✳ Claude Code', foregroundAgent: 'opencode' })).toBe('opencode')
+      expect(resolve({ title: '✳ Claude Code', launchAgent: 'opencode' })).toBe('opencode')
     })
   })
 
   it('publishes nothing when the title names no agent unambiguously', () => {
     // Absence is meaningful: it tells a caller to fail closed rather than guess.
     expect(resolve({ title: '◐ Rebase PR #14624 onto main' })).toBeUndefined()
-    expect(resolve({ title: 'Fix the codex bug' })).toBeUndefined()
+    expect(resolve({ title: 'Fix the opencode bug' })).toBeUndefined()
     expect(resolve({})).toBeUndefined()
   })
 
   it('publishes nothing for a hyphenated worktree name that contains an agent word', () => {
-    expect(resolve({ title: 'review-14600-codex' })).toBeUndefined()
+    expect(resolve({ title: 'review-14600-opencode' })).toBeUndefined()
   })
 
   describe('identity must not depend on how the agent was started', () => {
-    // Most agents are started by typing `claude` / `codex` at a shell, not through Orca's agent
+    // Most agents are started by typing `claude` / `opencode` at a shell, not through Orca's agent
     // launcher. Those panes have no launch record at all, so anything that leans on one works for
     // roughly half of real usage.
     it('identifies a shell-started agent from its own hook report', () => {
-      expect(resolve({ hookAgent: 'codex', hookIsLive: true })).toBe('codex')
+      expect(resolve({ hookAgent: 'opencode', hookIsLive: true })).toBe('opencode')
     })
 
     it('identifies a shell-started agent on WSL, where the process signal is useless', () => {
       // The Windows host reads the foreground process of a WSL pane as `wsl.exe`, not the agent
       // running inside the distro — so `foregroundAgent` cannot name it and there is no launch
       // record. Without hook evidence this pane is unaddressable.
-      expect(resolve({ hookAgent: 'codex', hookIsLive: false })).toBe('codex')
+      expect(resolve({ hookAgent: 'opencode', hookIsLive: false })).toBe('opencode')
     })
 
     it('still resolves when only a launch record exists', () => {
@@ -107,17 +107,19 @@ describe('resolvePublishedPaneAgentIdentity', () => {
       // Both are records, and neither expires without run keys. The launch record is the one Orca
       // stamped for the CURRENT process, so promoting the hook above it lets a stale hook from a
       // previous agent hijack the pane. Matches pane-agent-owner.ts.
-      expect(resolve({ launchAgent: 'claude', hookAgent: 'codex', hookIsLive: false })).toBe(
+      expect(resolve({ launchAgent: 'claude', hookAgent: 'opencode', hookIsLive: false })).toBe(
         'claude'
       )
     })
 
     it('lets a live hook outrank a stale launch record', () => {
-      expect(resolve({ launchAgent: 'claude', hookAgent: 'codex', hookIsLive: true })).toBe('codex')
+      expect(resolve({ launchAgent: 'claude', hookAgent: 'opencode', hookIsLive: true })).toBe(
+        'opencode'
+      )
     })
 
     it('lets the live foreground process outrank a stale launch record', () => {
-      expect(resolve({ launchAgent: 'claude', foregroundAgent: 'codex' })).toBe('codex')
+      expect(resolve({ launchAgent: 'claude', foregroundAgent: 'opencode' })).toBe('opencode')
     })
   })
 })

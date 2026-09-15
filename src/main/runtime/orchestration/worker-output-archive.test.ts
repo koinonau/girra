@@ -24,10 +24,12 @@ describe('worker output archive summary', () => {
   })
 })
 
-function codexMessage(id: string, text: string): string {
+function claudeMessage(id: string, text: string): string {
   return JSON.stringify({
-    type: 'event_msg',
-    payload: { id, type: 'agent_message', message: text }
+    type: 'assistant',
+    uuid: id,
+    timestamp: '2026-07-24T12:00:00.000Z',
+    message: { role: 'assistant', content: [{ type: 'text', text }] }
   })
 }
 
@@ -40,7 +42,7 @@ describe('worker output archive WSL routing', () => {
   beforeEach(async () => {
     directory = await mkdtemp(join(tmpdir(), 'orca-worker-archive-'))
     transcriptPath = join(directory, 'session.jsonl')
-    await writeFile(transcriptPath, `${codexMessage('wsl', 'WSL archive output')}\n`)
+    await writeFile(transcriptPath, `${claudeMessage('wsl', 'WSL archive output')}\n`)
     sshProviderLookup = vi.spyOn(sshFilesystemDispatch, 'getSshFilesystemProvider')
   })
 
@@ -51,10 +53,11 @@ describe('worker output archive WSL routing', () => {
   })
 
   it('keeps WSL relay sessions on the local guarded transcript resolver', async () => {
-    const guestTranscriptPath = '/home/ada/.codex/sessions/rollout-wsl.jsonl'
+    const guestTranscriptPath = '/home/ada/.claude/projects/-home-ada-repo/wsl-session.jsonl'
     transcriptReadSpy = vi.spyOn(workerTranscriptRead, 'readWorkerTranscript').mockResolvedValue({
       ok: true,
-      filePath: '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\rollout-wsl.jsonl',
+      filePath:
+        '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\-home-ada-repo\\wsl-session.jsonl',
       sourceFingerprint: 'wsl-source',
       boundaryCheckpoint: 'wsl-boundary',
       messages: [
@@ -76,7 +79,7 @@ describe('worker output archive WSL routing', () => {
       processIncarnation: 'pty:wsl-incarnation',
       connectionId: 'wsl:Ubuntu',
       wslDistro: 'Ubuntu',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       providerSession: {
         key: 'session_id',
         id: 'wsl-session',
@@ -97,7 +100,7 @@ describe('worker output archive WSL routing', () => {
     })
 
     expect(workerTranscriptRead.readWorkerTranscript).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-session',
       transcriptPath: guestTranscriptPath,
       wslDistro: 'Ubuntu',
@@ -122,11 +125,11 @@ describe('worker output archive WSL routing', () => {
         paneKey: 'tab:ssh-worker',
         processIncarnation: 'pty:ssh-incarnation',
         connectionId: 'ssh:remote-host',
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         providerSession: {
           key: 'session_id',
           id: 'ssh-session',
-          transcriptPath: '/home/ada/.codex/sessions/rollout-ssh.jsonl'
+          transcriptPath: '/home/ada/.claude/projects/-home-ada-repo/ssh-session.jsonl'
         },
         observedAt: Date.now()
       })),
@@ -172,7 +175,7 @@ describe('worker output archive WSL routing', () => {
       getExactWorkerProviderSession: vi.fn(() => ({
         paneKey: 'tab:worker',
         processIncarnation: 'pty:incarnation',
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         providerSession: {
           key: 'session_id',
           id: 'empty-session',

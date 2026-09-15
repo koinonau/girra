@@ -54,7 +54,7 @@ function agentStatus(paneKey: string, state: AgentStatusEntry['state']): AgentSt
     prompt: '',
     updatedAt: 1,
     stateStartedAt: 1,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
     stateHistory: []
   }
@@ -117,17 +117,17 @@ describe('resolveTabAgentFromSignals', () => {
     ).toBe('pi')
   })
 
-  it("uses completed OpenClaude hook identity over Claude's generic task-title heuristic", () => {
+  it("uses completed Pi hook identity over Claude's generic task-title heuristic", () => {
     expect(
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: true,
         isRemote: false,
         title: '✳ Say hi',
         hookAgent: null,
-        focusedCompletedHookAgent: 'openclaude',
-        launchAgent: 'openclaude'
+        focusedCompletedHookAgent: 'pi',
+        launchAgent: 'pi'
       })
-    ).toBe('openclaude')
+    ).toBe('pi')
   })
 
   it('keeps launch identity over title identity while hooks have not arrived', () => {
@@ -137,21 +137,21 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: '✳ Say hi',
         hookAgent: null,
-        launchAgent: 'openclaude'
+        launchAgent: 'pi'
       })
-    ).toBe('openclaude')
+    ).toBe('pi')
   })
 
-  it("keeps Codex launch intent over Claude's generic spinner title fallback", () => {
+  it("keeps OpenCode launch intent over Claude's generic spinner title fallback", () => {
     expect(
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: false,
         isRemote: false,
-        title: '⠸ codex-quarter-flash-202606191419',
+        title: '⠸ opencode-quarter-flash-202606191419',
         hookAgent: null,
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('does not infer Claude identity from a generic spinner title without context', () => {
@@ -187,21 +187,21 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: '⠸ Claude Code',
         hookAgent: null,
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
-  it("uses Codex hook identity over Claude's generic task-title heuristic", () => {
+  it("uses OpenCode hook identity over Claude's generic task-title heuristic", () => {
     expect(
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: true,
         isRemote: false,
         title: '✳ improve-pr-actions-customization',
-        hookAgent: 'codex',
-        launchAgent: 'codex'
+        hookAgent: 'opencode',
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('keeps launch identity over explicit Claude Code titles without hook evidence', () => {
@@ -211,9 +211,9 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: '✳ Claude Code',
         hookAgent: null,
-        launchAgent: 'openclaude'
+        launchAgent: 'pi'
       })
-    ).toBe('openclaude')
+    ).toBe('pi')
   })
 
   it('lets an explicit title override stale launch identity after the pane shows newer activity', () => {
@@ -223,7 +223,7 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: '✳ Claude Code',
         hookAgent: null,
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
     ).toBe('claude')
   })
@@ -284,12 +284,12 @@ describe('resolveTabAgentFromSignals', () => {
         title: '✳ Claude Code',
         hookAgent: null,
 
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
-  // Pi/OMP identity (shared title-identity group, launchAgent-loss flicker)
+  // Pi identity (title-identity group, launchAgent-loss flicker)
   // lives in use-tab-agent-pi-identity.test.ts.
 
   it('prefers explicit hook identity over a conflicting title mention', () => {
@@ -297,7 +297,7 @@ describe('resolveTabAgentFromSignals', () => {
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: true,
         isRemote: false,
-        title: '✳ Gemini CLI',
+        title: '✳ Pi CLI',
         hookAgent: 'claude',
         launchAgent: 'claude'
       })
@@ -309,9 +309,9 @@ describe('resolveTabAgentFromSignals', () => {
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: true,
         isRemote: false,
-        title: '✦ Gemini CLI',
+        title: '✦ Pi CLI',
         hookAgent: 'claude',
-        launchAgent: 'gemini'
+        launchAgent: 'pi'
       })
     ).toBe('claude')
   })
@@ -323,8 +323,8 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: 'Terminal 1',
         hookAgent: 'claude',
-        siblingHookAgent: 'gemini',
-        launchAgent: 'codex'
+        siblingHookAgent: 'pi',
+        launchAgent: 'opencode'
       })
     ).toBe('claude')
   })
@@ -337,9 +337,9 @@ describe('resolveTabAgentFromSignals', () => {
         title: 'Terminal 1',
         hookAgent: null,
         siblingHookAgent: 'claude',
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('uses sibling-pane hook fallback when no launch metadata exists', () => {
@@ -360,11 +360,11 @@ describe('resolveTabAgentFromSignals', () => {
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: false,
         isRemote: false,
-        title: '✳ Gemini CLI',
+        title: '✳ Pi CLI',
         hookAgent: null,
-        launchAgent: 'gemini'
+        launchAgent: 'pi'
       })
-    ).toBe('gemini')
+    ).toBe('pi')
   })
 
   it('keeps launch identity over Claude-owned punctuation-prefixed task text', () => {
@@ -382,11 +382,11 @@ describe('resolveTabAgentFromSignals', () => {
       resolveTabAgentFromSignals({
         hasObservedAgentSignal: false,
         isRemote: false,
-        title: '* Review Codex behavior',
+        title: '* Review OpenCode behavior',
         hookAgent: null,
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('treats Claude-prefixed title text as Claude only when it names Claude', () => {
@@ -420,7 +420,7 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: 'zsh',
         hookAgent: null,
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
     ).toBeNull()
   })
@@ -432,7 +432,7 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: false,
         title: 'zsh',
         hookAgent: null,
-        siblingHookAgent: 'gemini',
+        siblingHookAgent: 'pi',
         launchAgent: 'claude'
       })
     ).toBe('claude')
@@ -472,10 +472,10 @@ describe('resolveTabAgentFromSignals', () => {
         hasObservedAgentSignal: true,
         isRemote: true,
         title: 'Terminal 1',
-        hookAgent: 'codex',
+        hookAgent: 'opencode',
         launchAgent: 'claude'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('keeps completed remote hook identity after the terminal title returns to a shell', () => {
@@ -485,10 +485,10 @@ describe('resolveTabAgentFromSignals', () => {
         isRemote: true,
         title: 'zsh',
         hookAgent: null,
-        focusedCompletedHookAgent: 'codex',
-        launchAgent: 'codex'
+        focusedCompletedHookAgent: 'opencode',
+        launchAgent: 'opencode'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('clears local launch identity once a completed hook and shell title prove exit', () => {
@@ -521,7 +521,7 @@ describe('useTabAgent', () => {
     color: null,
     sortOrder: 0,
     createdAt: 1,
-    launchAgent: 'codex'
+    launchAgent: 'opencode'
   }
 
   beforeEach(() => {
@@ -570,10 +570,10 @@ describe('useTabAgent', () => {
     })
 
     const root = await renderHookProbe(baseTab)
-    await rerenderHookProbe(root, { ...baseTab, title: '✳ Codex' })
+    await rerenderHookProbe(root, { ...baseTab, title: '✳ OpenCode' })
     await rerenderHookProbe(root, { ...baseTab, title: 'zsh' })
 
-    expect(latestHookAgent).toBe('codex')
+    expect(latestHookAgent).toBe('opencode')
     expect(getForegroundProcess).not.toHaveBeenCalled()
   })
 
@@ -595,7 +595,7 @@ describe('useTabAgent', () => {
 
     await renderHookProbe({ ...baseTab, title: 'zsh' })
 
-    expect(latestHookAgent).toBe('codex')
+    expect(latestHookAgent).toBe('opencode')
     expect(clearTabLaunchAgent).not.toHaveBeenCalled()
   })
 
@@ -617,7 +617,7 @@ describe('useTabAgent', () => {
 
     const root = await renderHookProbe(baseTab)
 
-    expect(latestHookAgent).toBe('codex')
+    expect(latestHookAgent).toBe('opencode')
     expect(clearTabLaunchAgent).not.toHaveBeenCalled()
 
     // Why: crash/kill exits drop the live row without a completed hook.
@@ -660,7 +660,7 @@ describe('useTabAgent', () => {
       launchAgent: undefined
     })
 
-    expect(latestHookAgent).toBe('codex')
+    expect(latestHookAgent).toBe('opencode')
     expect(getForegroundProcess).not.toHaveBeenCalled()
   })
 
@@ -680,7 +680,7 @@ describe('useTabAgent', () => {
       launchAgent: 'claude'
     })
 
-    expect(latestHookAgent).toBe('codex')
+    expect(latestHookAgent).toBe('opencode')
     expect(getForegroundProcess).not.toHaveBeenCalled()
   })
 
@@ -826,7 +826,7 @@ describe('useTabAgent', () => {
     })
 
     const root = await renderHookProbe(baseTab)
-    expect(latestHookAgent).toBe('codex')
+    expect(latestHookAgent).toBe('opencode')
 
     // Why: a respawn/focus switch can land the new ptyId, the dropped row, and
     // a shell title in one commit — the previous generation's observed signal

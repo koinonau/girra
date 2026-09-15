@@ -38,7 +38,7 @@ describe('AgentHookServer startup failure lifecycle', () => {
         paneKey: PANE,
         tabId: 'tab-lifecycle',
         worktreeId: 'wt-lifecycle',
-        payload: { state: 'working', prompt: 'surviving PTY', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'surviving PTY', agentType: 'opencode' }
       },
       'ssh-lifecycle'
     )
@@ -87,7 +87,7 @@ describe('AgentHookServer startup failure lifecycle', () => {
           paneKey: PANE,
           tabId: 'tab-lifecycle',
           worktreeId: 'wt-lifecycle',
-          payload: { state: 'working', prompt: 'newer in-process state', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'newer in-process state', agentType: 'opencode' }
         },
         'ssh-lifecycle'
       )
@@ -96,7 +96,11 @@ describe('AgentHookServer startup failure lifecycle', () => {
         tabId: 'tab-lifecycle',
         worktreeId: 'wt-lifecycle',
         connectionId: 'ssh-lifecycle',
-        payload: { state: 'working' as const, prompt: 'newer in-process state', agentType: 'codex' }
+        payload: {
+          state: 'working' as const,
+          prompt: 'newer in-process state',
+          agentType: 'opencode'
+        }
       }
       server.ingestTerminalStatus(duplicateOsc)
 
@@ -135,7 +139,7 @@ describe('AgentHookServer startup failure lifecycle', () => {
           paneKey: PANE,
           tabId: 'tab-lifecycle',
           worktreeId: 'wt-lifecycle',
-          payload: { state: 'done', prompt: 'newer in-process state', agentType: 'codex' }
+          payload: { state: 'done', prompt: 'newer in-process state', agentType: 'opencode' }
         },
         'ssh-lifecycle'
       )

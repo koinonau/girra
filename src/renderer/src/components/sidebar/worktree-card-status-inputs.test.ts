@@ -43,7 +43,7 @@ function makeLayout(root: TerminalPaneLayoutNode, ptyId: string): TerminalLayout
 describe('worktree card status input selectors', () => {
   it('stays shallow-equal when unrelated tabs receive PTY ids or pane titles', () => {
     const worktreeId = 'repo1::/path/wt1'
-    const paneTitles = { 0: 'codex [working]' }
+    const paneTitles = { 0: 'opencode [working]' }
     const ptyIds = ['pty-1']
     const state: SelectorState = {
       tabsByWorktree: {
@@ -157,7 +157,7 @@ describe('worktree card status input selectors', () => {
       tabsByWorktree: {
         [worktreeId]: [makeTab('tab-1', worktreeId)]
       },
-      runtimePaneTitlesByTabId: { 'tab-1': { 0: 'codex [working]' } },
+      runtimePaneTitlesByTabId: { 'tab-1': { 0: 'opencode [working]' } },
       ptyIdsByTabId: { 'tab-1': ['pty-1'] },
       terminalLayoutsByTabId: {
         'tab-1': makeLayout(
@@ -184,7 +184,7 @@ describe('worktree card status input selectors', () => {
       tabsByWorktree: {
         [worktreeId]: [makeTab('tab-1', worktreeId)]
       },
-      runtimePaneTitlesByTabId: { 'tab-1': { 0: 'codex [working]' } },
+      runtimePaneTitlesByTabId: { 'tab-1': { 0: 'opencode [working]' } },
       ptyIdsByTabId: { 'tab-1': ['pty-1'] }
     }
     const unrelatedUpdate: SelectorState = {

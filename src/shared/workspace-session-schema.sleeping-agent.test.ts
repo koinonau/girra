@@ -20,7 +20,7 @@ describe('parseWorkspaceSession sleeping agents', () => {
           state: 'working',
           capturedAt: 10,
           updatedAt: 9,
-          terminalTitle: 'Codex',
+          terminalTitle: 'Claude Code',
           lastAssistantMessage: 'done',
           launchConfig: {
             agentArgs: '',

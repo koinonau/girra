@@ -57,32 +57,32 @@ function storeWithDivergedTitleSlots(args: {
 describe('hook-driven tab title writes', () => {
   it('exposes the tab record title separately from the pane slot title', () => {
     const store = storeWithDivergedTitleSlots({
-      tabTitle: 'Codex - action required',
-      paneSlotTitle: 'Codex ready'
+      tabTitle: 'Pi - action required',
+      paneSlotTitle: 'Pi ready'
     })
 
     const resolved = resolvePaneKey(store, PANE_KEY)
 
-    expect(resolved.title).toBe('Codex ready')
-    expect(resolved.tabTitle).toBe('Codex - action required')
+    expect(resolved.title).toBe('Pi ready')
+    expect(resolved.tabTitle).toBe('Pi - action required')
   })
 
-  // Why: Orca writes "Codex - action required" itself on a blocked/waiting hook, into `tab.title`
+  // Why: Orca writes "Pi - action required" itself on a blocked/waiting hook, into `tab.title`
   // only. When `done` arrived, the no-op guard compared the resolved title against the PANE slot —
-  // which still read "Codex ready" — so the write was skipped and the tab kept asserting a question
+  // which still read "Pi ready" — so the write was skipped and the tab kept asserting a question
   // the agent had already finished asking, for as long as the pane stayed unmounted.
   it('rewrites a stale action-required tab title once the agent reports done', () => {
     const store = storeWithDivergedTitleSlots({
-      tabTitle: 'Codex - action required',
-      paneSlotTitle: 'Codex ready'
+      tabTitle: 'Pi - action required',
+      paneSlotTitle: 'Pi ready'
     })
     const resolved = resolvePaneKey(store, PANE_KEY)
     const nextTitle = resolveAgentStatusTerminalTitle(
-      { agentType: 'codex', state: 'done' },
+      { agentType: 'pi', state: 'done' },
       resolved.title
     )
 
-    expect(nextTitle).toBe('Codex ready')
+    expect(nextTitle).toBe('Pi ready')
     // Comparing against the pane slot is what skipped the write.
     expect(
       shouldApplyResolvedAgentTerminalTitleToTab(store, PANE_KEY, resolved.title, nextTitle)
@@ -95,13 +95,13 @@ describe('hook-driven tab title writes', () => {
 
   it('still skips the write when the tab record already holds the resolved title', () => {
     const store = storeWithDivergedTitleSlots({
-      tabTitle: 'Codex ready',
-      paneSlotTitle: 'Codex ready'
+      tabTitle: 'Pi ready',
+      paneSlotTitle: 'Pi ready'
     })
     const resolved = resolvePaneKey(store, PANE_KEY)
 
     expect(
-      shouldApplyResolvedAgentTerminalTitleToTab(store, PANE_KEY, resolved.tabTitle, 'Codex ready')
+      shouldApplyResolvedAgentTerminalTitleToTab(store, PANE_KEY, resolved.tabTitle, 'Pi ready')
     ).toBe(false)
   })
 })
@@ -114,31 +114,31 @@ describe('hook-driven tab title IPC integration', () => {
   })
 
   it.each([
-    { mode: 'live', states: ['done'], title: 'Codex - action required', expected: 'Codex ready' },
+    { mode: 'live', states: ['done'], title: 'Pi - action required', expected: 'Pi ready' },
     {
       mode: 'snapshot',
       states: ['waiting', 'done'],
-      title: 'Codex ready',
-      expected: 'Codex ready'
+      title: 'Pi ready',
+      expected: 'Pi ready'
     },
     {
       mode: 'snapshot',
       states: ['done', 'waiting'],
-      title: 'Codex ready',
-      expected: 'Codex - action required'
+      title: 'Pi ready',
+      expected: 'Pi - action required'
     },
     {
       mode: 'inactive-pane',
       states: ['done'],
-      title: 'Codex - action required',
-      expected: 'Codex - action required'
+      title: 'Pi - action required',
+      expected: 'Pi - action required'
     }
   ] as const)(
     'applies $mode $states against the tab title slot',
     async ({ mode, states, title, expected }) => {
       vi.resetModules()
       const store = createTestStore()
-      const seeded = storeWithDivergedTitleSlots({ tabTitle: title, paneSlotTitle: 'Codex ready' })
+      const seeded = storeWithDivergedTitleSlots({ tabTitle: title, paneSlotTitle: 'Pi ready' })
       const otherLeaf = '22222222-2222-4222-8222-222222222222'
       if (mode === 'inactive-pane') {
         seeded.terminalLayoutsByTabId[TAB_ID] = {
@@ -150,7 +150,7 @@ describe('hook-driven tab title IPC integration', () => {
           },
           activeLeafId: otherLeaf,
           expandedLeafId: null,
-          titlesByLeafId: { [LEAF_ID]: 'Codex ready', [otherLeaf]: title }
+          titlesByLeafId: { [LEAF_ID]: 'Pi ready', [otherLeaf]: title }
         }
       }
       store.setState({ ...seeded, workspaceSessionReady: true, activeWorktreeId: null })
@@ -159,7 +159,7 @@ describe('hook-driven tab title IPC integration', () => {
         worktreeId: WORKTREE_ID,
         connectionId: null,
         state,
-        agentType: 'codex',
+        agentType: 'pi',
         prompt: 'Title clearing test',
         receivedAt: Date.now() + index,
         stateStartedAt: Date.now() + index
@@ -192,7 +192,7 @@ describe('hook-driven tab title IPC integration', () => {
         })
         expect(store.getState().tabsByWorktree[WORKTREE_ID][0].title).toBe(expected)
         expect(store.getState().agentStatusByPaneKey[PANE_KEY].terminalTitle).toBe(
-          states.at(-1) === 'done' ? 'Codex ready' : 'Codex - action required'
+          states.at(-1) === 'done' ? 'Pi ready' : 'Pi - action required'
         )
         expect(updateTitle).toHaveBeenCalledTimes(mode === 'live' ? 1 : 0)
         expect(updateTitles).toHaveBeenCalledTimes(mode === 'snapshot' ? 1 : 0)

@@ -10,7 +10,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ proceed with the release'],
         typedRows: ['────────', '❯'],
-        promptGlyphBoldRows: [false, false],
         rowsBelow: [],
         typedRowsBelow: [],
         beforeCursor: '❯ ',
@@ -30,14 +29,13 @@ describe('detectTerminalComposerDraft', () => {
 
   it('keeps stock dim placeholders out of draft metadata', () => {
     const context = {
-      rows: ['› Ask Codex to do anything'],
-      typedRows: ['›'],
-      promptGlyphBoldRows: [true],
-      rowsBelow: ['', 'gpt-5.6 · ~/repo'],
-      typedRowsBelow: ['', 'gpt-5.6 · ~/repo'],
-      beforeCursor: '› ',
+      rows: ['────────', '❯ Try "refactor the parser"'],
+      typedRows: ['────────', '❯'],
+      rowsBelow: [],
+      typedRowsBelow: [],
+      beforeCursor: '❯ ',
       afterCursor: '',
-      rawAfterCursor: 'Ask Codex to do anything',
+      rawAfterCursor: 'Try "refactor the parser"',
       cursorHidden: false,
       cursorViewportRow: 4
     }
@@ -50,14 +48,13 @@ describe('detectTerminalComposerDraft', () => {
     // The placeholder normally clears the moment you type, but a repaint can land the two on the
     // row together. Classifying that as a placeholder would mask the row the user's text is on.
     const context = {
-      rows: ['\u203a \uc548\ub155Ask Codex to do anything'],
-      typedRows: ['\u203a \uc548\ub155'],
-      promptGlyphBoldRows: [true],
-      rowsBelow: ['', 'gpt-5.6 \u00b7 ~/repo'],
-      typedRowsBelow: ['', 'gpt-5.6 \u00b7 ~/repo'],
-      beforeCursor: '\u203a \uc548\ub155',
+      rows: ['────────', '❯ \uc548\ub155Try "refactor the parser"'],
+      typedRows: ['────────', '❯ \uc548\ub155'],
+      rowsBelow: [],
+      typedRowsBelow: [],
+      beforeCursor: '❯ \uc548\ub155',
       afterCursor: '',
-      rawAfterCursor: 'Ask Codex to do anything',
+      rawAfterCursor: 'Try "refactor the parser"',
       cursorHidden: false,
       cursorViewportRow: 4
     }
@@ -67,7 +64,7 @@ describe('detectTerminalComposerDraft', () => {
       promptRow: 4,
       cursorRow: 4,
       endRow: 4,
-      promptGlyph: '\u203a'
+      promptGlyph: '❯'
     })
     expect(hasTerminalComposerPlaceholder(context)).toBe(false)
   })
@@ -77,7 +74,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ review the change'],
         typedRows: ['────────', '❯ review the change'],
-        promptGlyphBoldRows: [false, false],
         rowsBelow: [],
         typedRowsBelow: [],
         beforeCursor: '❯ review the change',
@@ -94,7 +90,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['last command output', '❯ git status'],
         typedRows: ['last command output', '❯ git status'],
-        promptGlyphBoldRows: [false, false],
         rowsBelow: [],
         typedRowsBelow: [],
         beforeCursor: '❯ git status',
@@ -109,9 +104,8 @@ describe('detectTerminalComposerDraft', () => {
   it('rejects a hidden-cursor dialog even when its selected row uses a composer glyph', () => {
     expect(
       detectTerminalComposerDraft({
-        rows: ['› 1. Yes, continue', '  Press enter to continue'],
-        typedRows: ['› 1. Yes, continue', '  Press enter to continue'],
-        promptGlyphBoldRows: [true, false],
+        rows: ['────────', '❯ 1. Yes, continue', '  Press enter to continue'],
+        typedRows: ['────────', '❯ 1. Yes, continue', '  Press enter to continue'],
         rowsBelow: [],
         typedRowsBelow: [],
         beforeCursor: '  Press enter to continue',
@@ -128,7 +122,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ proceed with the release'],
         typedRows: ['────────', '❯'],
-        promptGlyphBoldRows: [false, false],
         rowsBelow: ['  and close the pull request', '────────'],
         typedRowsBelow: ['', '────────'],
         beforeCursor: '❯ ',
@@ -146,81 +139,10 @@ describe('detectTerminalComposerDraft', () => {
     })
   })
 
-  it('recognizes the bold Codex ultra composer glyph', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['» review the change'],
-        typedRows: ['» review the change'],
-        promptGlyphBoldRows: [true],
-        rowsBelow: ['gpt-5.6 · ~/repo'],
-        typedRowsBelow: ['gpt-5.6 · ~/repo'],
-        beforeCursor: '» review the change',
-        afterCursor: '',
-        rawAfterCursor: '',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })
-    ).toMatchObject({ text: 'review the change', promptGlyph: '»' })
-  })
-
-  it('recognizes the bold Codex composer when its footer is visible', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['› review the change'],
-        typedRows: ['› review the change'],
-        promptGlyphBoldRows: [true],
-        rowsBelow: ['gpt-5.6 · ~/repo'],
-        typedRowsBelow: ['gpt-5.6 · ~/repo'],
-        beforeCursor: '› review the change',
-        afterCursor: '',
-        rawAfterCursor: '',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })
-    ).toMatchObject({ text: 'review the change', promptGlyph: '›' })
-  })
-
-  it('recognizes a Codex composer with a context-only status footer', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['› review the change'],
-        typedRows: ['› review the change'],
-        promptGlyphBoldRows: [true],
-        rowsBelow: ['', '  Context 12% used'],
-        typedRowsBelow: ['', ''],
-        rowsBelowWrapped: [false, false],
-        beforeCursor: '› review the change',
-        afterCursor: '',
-        rawAfterCursor: '',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })
-    ).toMatchObject({ text: 'review the change', promptGlyph: '›' })
-  })
-
-  it('recognizes a Codex composer with an arbitrary dimmed thread-title footer', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['› review the change'],
-        typedRows: ['› review the change'],
-        promptGlyphBoldRows: [true],
-        rowsBelow: ['', '  Release train'],
-        typedRowsBelow: ['', ''],
-        rowsBelowWrapped: [false, false],
-        beforeCursor: '› review the change',
-        afterCursor: '',
-        rawAfterCursor: '',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })
-    ).toMatchObject({ text: 'review the change', promptGlyph: '›' })
-  })
-
-  it('preserves an ordinary shell prompt that uses the Codex glyph', () => {
+  it('preserves an ordinary shell prompt that starts with a chevron glyph', () => {
     const context = {
       rows: ['last command output', '› git status'],
       typedRows: ['last command output', '› git status'],
-      promptGlyphBoldRows: [false, true],
       rowsBelow: [],
       typedRowsBelow: [],
       beforeCursor: '› git status',
@@ -235,37 +157,37 @@ describe('detectTerminalComposerDraft', () => {
   })
 
   it('keeps the side-thread placeholder out of draft metadata', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['› Ask a follow-up question'],
-        typedRows: ['›'],
-        promptGlyphBoldRows: [true],
-        rowsBelow: [],
-        typedRowsBelow: [],
-        beforeCursor: '› ',
-        afterCursor: '',
-        rawAfterCursor: 'Ask a follow-up question',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })
-    ).toBeNull()
+    const context = {
+      rows: ['────────', '❯ Ask a follow-up question'],
+      typedRows: ['────────', '❯'],
+      rowsBelow: [],
+      typedRowsBelow: [],
+      beforeCursor: '❯ ',
+      afterCursor: '',
+      rawAfterCursor: 'Ask a follow-up question',
+      cursorHidden: false,
+      cursorViewportRow: 4
+    }
+
+    expect(detectTerminalComposerDraft(context)).toBeNull()
+    expect(hasTerminalComposerPlaceholder(context)).toBe(true)
   })
 
   it('keeps a wrapped stock placeholder out of draft metadata', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['› Ask Codex to do'],
-        typedRows: ['›'],
-        promptGlyphBoldRows: [true],
-        rowsBelow: ['  anything'],
-        typedRowsBelow: [''],
-        beforeCursor: '› ',
-        afterCursor: '',
-        rawAfterCursor: 'Ask Codex to do',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })
-    ).toBeNull()
+    const context = {
+      rows: ['────────', '❯ Try "refactor the'],
+      typedRows: ['────────', '❯'],
+      rowsBelow: ['  parser"'],
+      typedRowsBelow: [''],
+      beforeCursor: '❯ ',
+      afterCursor: '',
+      rawAfterCursor: 'Try "refactor the',
+      cursorHidden: false,
+      cursorViewportRow: 4
+    }
+
+    expect(detectTerminalComposerDraft(context)).toBeNull()
+    expect(hasTerminalComposerPlaceholder(context)).toBe(true)
   })
 
   it('joins soft-wrapped continuation rows without inserting a newline', () => {
@@ -273,7 +195,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ proceed with the'],
         typedRows: ['────────', '❯'],
-        promptGlyphBoldRows: [false, false],
         rowsWrapped: [false, false],
         rowsBelow: ['release'],
         typedRowsBelow: [''],
@@ -292,7 +213,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ proceed '],
         typedRows: ['────────', '❯'],
-        promptGlyphBoldRows: [false, false],
         rowsWrapped: [false, false],
         rowsBelow: ['deploy · verify', '────────'],
         typedRowsBelow: ['', '────────'],
@@ -306,30 +226,11 @@ describe('detectTerminalComposerDraft', () => {
     ).toBe('proceed deploy · verify')
   })
 
-  it('keeps a model-like continuation before the Codex status footer', () => {
-    expect(
-      detectTerminalComposerDraft({
-        rows: ['› compare '],
-        typedRows: ['› compare '],
-        promptGlyphBoldRows: [true],
-        rowsBelow: ['gpt-5 · verify', 'gpt-5.6 · Context 12% used'],
-        typedRowsBelow: ['gpt-5 · verify', 'gpt-5.6 · Context 12% used'],
-        rowsBelowWrapped: [false, false],
-        beforeCursor: '› compare ',
-        afterCursor: '',
-        rawAfterCursor: '',
-        cursorHidden: false,
-        cursorViewportRow: 4
-      })?.text
-    ).toBe('compare\ngpt-5 · verify')
-  })
-
   it('keeps typed soft-wrapped rows below a restored cursor in the draft', () => {
     expect(
       detectTerminalComposerDraft({
         rows: ['────────', '❯ proceed with the '],
         typedRows: ['────────', '❯ proceed with the '],
-        promptGlyphBoldRows: [false, false],
         rowsWrapped: [false, false],
         rowsBelow: ['release'],
         typedRowsBelow: ['release'],
@@ -348,7 +249,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ first line'],
         typedRows: ['────────', '❯ first line'],
-        promptGlyphBoldRows: [false, false],
         rowsWrapped: [false, false],
         rowsBelow: ['  second line', '────────'],
         typedRowsBelow: ['  second line', '────────'],
@@ -367,7 +267,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ first line'],
         typedRows: ['────────', '❯ first line'],
-        promptGlyphBoldRows: [false, false],
         rowsWrapped: [false, false],
         rowsBelow: ['', '  second line', '────────'],
         typedRowsBelow: ['', '  second line', '────────'],
@@ -386,7 +285,6 @@ describe('detectTerminalComposerDraft', () => {
       detectTerminalComposerDraft({
         rows: ['────────', '❯ first line'],
         typedRows: ['────────', '❯ first line'],
-        promptGlyphBoldRows: [false, false],
         rowsBelow: ['', '────────'],
         typedRowsBelow: ['', '────────'],
         beforeCursor: '❯ first line',

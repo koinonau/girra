@@ -371,11 +371,11 @@ describe('connectPanePty', () => {
       expect(setHiddenRendererPty).toHaveBeenLastCalledWith('pty-id', true)
     })
 
-    it('marks hidden codex panes immediately — no startup renderer-query window remains', async () => {
+    it('marks hidden agent panes immediately with no startup renderer-query window', async () => {
       enableMainAuthority()
       const deps = createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       })
       const { transport, dataCallback } = await connectHiddenPane(deps)
       const setHiddenRendererPty = getSetHiddenRendererPtyMock()
@@ -385,7 +385,7 @@ describe('connectPanePty', () => {
       transportOptions.onPtySpawn?.('pty-id')
       const factsHandler = await import('./terminal-side-effect-facts-handler')
 
-      // Why: Phase 6 deleted the 10s codex window — codex startups gate like any hidden pane; main answers their startup probes.
+      // Why: agent startups gate like any hidden pane; main answers their startup probes.
       dataCallback('startup probe output\r\n')
       expect(setHiddenRendererPty).toHaveBeenCalledWith('pty-id', true)
 
@@ -558,14 +558,14 @@ describe('connectPanePty', () => {
       expect(transport.connect.mock.calls[0]![0]).not.toHaveProperty('initiallyHidden')
     })
 
-    it('declares hidden-at-spawn for hidden codex panes too', async () => {
+    it('declares hidden-at-spawn for hidden agent panes too', async () => {
       enableMainAuthority()
       const deps = createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       })
       const { transport } = await connectHiddenPane(deps)
-      // Why: the 10s codex startup window is gone — codex spawns are main-owned from byte zero (main pin: pty.test.ts DA1-from-model).
+      // Why: agent spawns are main-owned from byte zero (main pin: pty.test.ts DA1-from-model).
       expect(transport.connect).toHaveBeenCalledWith(
         expect.objectContaining({ initiallyHidden: true })
       )

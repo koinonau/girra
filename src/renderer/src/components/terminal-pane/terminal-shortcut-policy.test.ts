@@ -90,9 +90,8 @@ describe('resolveTerminalShortcutAction', () => {
     })
   })
 
-  it('uses the Codex-compatible Shift+Enter sequence on Windows win32-input-mode panes', () => {
-    // Default and explicit legacy encodings both keep Codex-on-PowerShell
-    // newlining instead of ignoring the chord.
+  it('uses the legacy Esc+CR Shift+Enter sequence on Windows win32-input-mode panes', () => {
+    // Default and explicit legacy encodings both keep newlining instead of ignoring the chord.
     expect(
       resolveTerminalShortcutAction(
         event({ key: 'Enter', code: 'Enter', shiftKey: true }),
@@ -750,7 +749,7 @@ describe('kitty keyboard protocol panes', () => {
 
   it('encodes Option+letter as kitty CSI-u with the physical base key in compose mode', () => {
     // macOS composition reports key='π' for Option+P on ABC/compose layouts;
-    // OMP binds alt+p (temporary model) and alt+m (model selector).
+    // Agent TUIs bind Option chords such as alt+p and alt+m.
     expect(resolveKitty(event({ key: 'π', code: 'KeyP', altKey: true }))).toEqual({
       type: 'sendInput',
       data: '\x1b[112;3u'

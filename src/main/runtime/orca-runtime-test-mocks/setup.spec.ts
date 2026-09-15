@@ -52,7 +52,7 @@ export function acknowledgeAgentPromptSubmit(
   data: string
 ): void {
   if (data === '\r') {
-    runtime.onPtyData(ptyId, '\x1b]0;Codex working\x07', Date.now())
+    runtime.onPtyData(ptyId, '\x1b]0;Claude working\x07', Date.now())
   }
 }
 
@@ -163,7 +163,6 @@ const {
   applyAgentStatusHooksEnabledMock,
   detectInstalledAgentsWithShellPathHydrationMock,
   detectRemoteAgentsMock,
-  markCopilotFolderTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,
   listGitLabIssuesMock,
@@ -272,7 +271,6 @@ const {
     applyAgentStatusHooksEnabledMock: vi.fn() as TestMock,
     detectInstalledAgentsWithShellPathHydrationMock: vi.fn() as TestMock,
     detectRemoteAgentsMock: vi.fn() as TestMock,
-    markCopilotFolderTrustedMock: vi.fn() as TestMock,
     listGitLabMergeRequestsMock: vi.fn() as TestMock,
     listGitLabWorkItemsMock: vi.fn() as TestMock,
     listGitLabIssuesMock: vi.fn() as TestMock,
@@ -351,10 +349,6 @@ vi.mock('../../preflight/agent-detection', () => ({
 
 vi.mock('../../agent-hooks/managed-agent-hook-controls', () => ({
   applyAgentStatusHooksEnabled: applyAgentStatusHooksEnabledMock
-}))
-
-vi.mock('../../agent-trust-presets', () => ({
-  markCopilotFolderTrusted: markCopilotFolderTrustedMock
 }))
 
 vi.mock('../../hooks', () => ({
@@ -626,7 +620,6 @@ export {
   applyAgentStatusHooksEnabledMock,
   detectInstalledAgentsWithShellPathHydrationMock,
   detectRemoteAgentsMock,
-  markCopilotFolderTrustedMock,
   listGitLabMergeRequestsMock,
   listGitLabWorkItemsMock,
   listGitLabIssuesMock,

@@ -125,8 +125,8 @@ describe('cleanGeneratedCommitMessage', () => {
   })
 
   it('strips a leading list marker from the commit subject', () => {
-    expect(cleanGeneratedCommitMessage('● Add Copilot entry to agent results')).toBe(
-      'Add Copilot entry to agent results'
+    expect(cleanGeneratedCommitMessage('● Add Pi entry to agent results')).toBe(
+      'Add Pi entry to agent results'
     )
     expect(cleanGeneratedCommitMessage('1. Add numbered entry')).toBe('Add numbered entry')
   })
@@ -137,25 +137,25 @@ describe('cleanGeneratedCommitMessage', () => {
 })
 
 describe('excerptAgentFailureOutput', () => {
-  // Real Codex failure shape: config preamble first, operative ERROR line last.
-  const codexErrorLine =
-    'ERROR: {"type":"error","status":400,"error":{"type":"invalid_request_error","message":"The \'gpt-5.3-codex-spark\' model is not supported when using Codex with a ChatGPT account."}}'
-  const codexStderr = [
+  // Tail-anchored failure shape: config preamble first, operative ERROR line last.
+  const tailErrorLine =
+    'ERROR: {"type":"error","status":400,"error":{"type":"invalid_request_error","message":"The \'openai/gpt-5.5\' model is not supported when using OpenCode with this workspace billing plan."}}'
+  const tailAnchoredStderr = [
     '--------',
     'workdir: C:\\Storage\\Projects\\bagplanner',
-    'model: gpt-5.3-codex-spark',
+    'model: openai/gpt-5.5',
     'reasoning effort: medium',
     '--------',
     'user',
     'You are generating a single git commit message...',
     'hook: SessionStart',
     'hook: SessionStart Completed',
-    codexErrorLine
+    tailErrorLine
   ].join('\n')
 
-  it('excerpts both ends so a tail-anchored Codex error stays visible', () => {
-    expect(excerptAgentFailureOutput('', codexStderr)).toBe(
-      `-------- workdir: C:\\Storage\\Projects\\bagplanner … ${codexErrorLine.slice(0, 130).trimEnd()}…`
+  it('excerpts both ends so a tail-anchored agent error stays visible', () => {
+    expect(excerptAgentFailureOutput('', tailAnchoredStderr)).toBe(
+      `-------- workdir: C:\\Storage\\Projects\\bagplanner … ${tailErrorLine.slice(0, 130).trimEnd()}…`
     )
   })
 
@@ -334,13 +334,13 @@ describe('planCustomCommand', () => {
   })
 
   it('substitutes {prompt} as a whole token via argv', () => {
-    const r = planCustomCommand('codex exec {prompt}', 'PROMPT')
-    expect(r).toEqual({ ok: true, binary: 'codex', args: ['exec', 'PROMPT'], stdinPayload: null })
+    const r = planCustomCommand('opencode run {prompt}', 'PROMPT')
+    expect(r).toEqual({ ok: true, binary: 'opencode', args: ['run', 'PROMPT'], stdinPayload: null })
   })
 
   it('treats "{prompt}" identically to bare {prompt} (no shell, no double-quoting)', () => {
-    const a = planCustomCommand('codex exec {prompt}', 'PROMPT')
-    const b = planCustomCommand('codex exec "{prompt}"', 'PROMPT')
+    const a = planCustomCommand('opencode run {prompt}', 'PROMPT')
+    const b = planCustomCommand('opencode run "{prompt}"', 'PROMPT')
     expect(a).toEqual(b)
   })
 

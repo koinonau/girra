@@ -4,7 +4,7 @@ import { appendNormalizedToTailBuffer } from './terminal-tail-buffer'
 
 const SPINNER = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴']
 
-/** A Claude Code / Codex spinner chunk: many CR-redraw frames, then one completed line. */
+/** A Claude Code spinner chunk: many CR-redraw frames, then one completed line. */
 function spinnerChunk(index: number, chunkChars: number): string {
   const parts: string[] = []
   let length = 0

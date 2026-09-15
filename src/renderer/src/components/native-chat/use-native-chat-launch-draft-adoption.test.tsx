@@ -98,7 +98,7 @@ describe('useNativeChatLaunchDraftSignal', () => {
     }
   })
 
-  it('resolves on an undated user turn (Grok omits row timestamps)', () => {
+  it('resolves on an undated user turn', () => {
     const { result } = renderSignal([userTurn('u1', null)])
 
     expect(result.current.launchDraftResolved).toBe(true)
@@ -203,7 +203,7 @@ describe('useNativeChatLaunchDraftSignal', () => {
 
   it('ignores a draft seeded for another agent', () => {
     mocks.storeState.nativeChatLaunchDraftByTabId = {
-      'tab-1': launchDraft({ agent: 'codex', createdAt: SEEDED_AT })
+      'tab-1': launchDraft({ agent: 'opencode', createdAt: SEEDED_AT })
     }
     const { result } = renderSignal([userTurn('u1', null)])
 
@@ -235,7 +235,7 @@ describe('useNativeChatLaunchDraftAdoption', () => {
   })
 
   it('does nothing for a different agent or a missing seed', () => {
-    setup({ launchDraft: launchDraft({ agent: 'codex' }) })
+    setup({ launchDraft: launchDraft({ agent: 'opencode' }) })
     setup({ launchDraft: null })
 
     expect(mocks.markNativeChatLaunchDraftAdopted).not.toHaveBeenCalled()

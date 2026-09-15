@@ -316,12 +316,12 @@ describe('OrcaRuntimeService', () => {
             id: tabId,
             ptyId: null,
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex',
+            title: 'Claude',
             customTitle: null,
             color: null,
             sortOrder: 0,
             createdAt: 1,
-            launchAgent: 'codex'
+            launchAgent: 'claude'
           }
         ]
       },
@@ -339,13 +339,13 @@ describe('OrcaRuntimeService', () => {
         {
           id: ptyId,
           cwd: TEST_WORKTREE_PATH,
-          title: 'Codex',
+          title: 'Claude',
           worktreeId: TEST_WORKTREE_ID
         },
         {
           id: splitPtyId,
           cwd: TEST_WORKTREE_PATH,
-          title: 'Codex',
+          title: 'Claude',
           worktreeId: TEST_WORKTREE_ID
         }
       ]
@@ -378,7 +378,7 @@ describe('OrcaRuntimeService', () => {
       presentation: 'background',
       tabId,
       leafId,
-      launchAgent: 'codex'
+      launchAgent: 'claude'
     })
     const split = await runtime.splitTerminal(created.handle, { direction: 'vertical' })
     publishRendererOmission(2)
@@ -442,7 +442,7 @@ describe('OrcaRuntimeService', () => {
       tabId: 'laptop-tab',
       leafId: HEADLESS_LEAF_ID
     })
-    runtime.onPtyData('laptop-created-pty', '\x1b]0;Codex working\x07', Date.now())
+    runtime.onPtyData('laptop-created-pty', '\x1b]0;Claude working\x07', Date.now())
     runtime.onPtyData('laptop-created-pty', 'Claude is working...\r\n', Date.now())
 
     const phoneTabs = await runtime.listMobileSessionTabs(`id:${TEST_WORKTREE_ID}`)

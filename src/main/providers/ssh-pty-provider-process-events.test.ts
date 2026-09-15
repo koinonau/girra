@@ -56,7 +56,7 @@ describe('SshPtyProvider process listings and events', () => {
         id: 'pty-1',
         incarnationId: 'incarnation-1',
         cwd: '/home',
-        title: 'codex',
+        title: 'opencode',
         agentSessionOwners: [
           {
             claim: {
@@ -94,7 +94,7 @@ describe('SshPtyProvider process listings and events', () => {
       {
         id: 'pty-1',
         cwd: '/home',
-        title: 'codex',
+        title: 'opencode',
         agentSessionOwners: [
           {
             claim: {

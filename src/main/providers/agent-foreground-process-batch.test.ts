@@ -15,14 +15,14 @@ describe('batched foreground process correlation', () => {
       [
         '100 1 100 101 Ss /bin/zsh',
         '101 100 100 101 S+ node /opt/not-an-agent',
-        '102 100 101 101 S  node /opt/codex'
+        '102 100 101 101 S  node /opt/opencode'
       ].join('\n')
     )
     expect(
       resolveAgentForegroundProcessesFromIndex(buildProcessTableIndex(rows), [
         { rootPid: 100, fallbackProcess: 'zsh' }
       ])
-    ).toEqual([{ available: true, processName: 'codex', shellOwnsEveryTtyProcessGroup: false }])
+    ).toEqual([{ available: true, processName: 'opencode', shellOwnsEveryTtyProcessGroup: false }])
   })
 
   it('reports whether the shell itself owns the terminal, named process or not', () => {
@@ -77,7 +77,7 @@ describe('batched foreground process correlation', () => {
           pgid: rootPid + 1,
           tpgid: rootPid + 1,
           stat: 'S',
-          command: 'node /opt/codex'
+          command: 'node /opt/opencode'
         }
       ]
     }).flat()
@@ -96,7 +96,7 @@ describe('batched foreground process correlation', () => {
       { readRows: async () => rows, stats }
     )
     expect(results).toHaveLength(paneCount)
-    expect(results.every((result) => result.processName === 'codex')).toBe(true)
+    expect(results.every((result) => result.processName === 'opencode')).toBe(true)
     expect(stats).toMatchObject({ captures: 1, indexBuilds: 1, rowVisits: paneCount * 2 })
     expect(stats.indexLookups).toBeLessThanOrEqual(paneCount * 4)
   })

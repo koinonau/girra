@@ -11,6 +11,8 @@ import {
   mergeLegacyCommitMessageAiIntoSourceControlAi,
   sourceControlAiSettingsFromLegacy
 } from '../../../shared/source-control-ai'
+import { CUSTOM_AGENT_ID } from '../../../shared/commit-message-agent-spec'
+import { isTuiAgent } from '../../../shared/tui-agent-config'
 import {
   normalizeOsc52ClipboardDefaultOn,
   osc52ClipboardDefaultOnOverridesPersistedOff
@@ -82,20 +84,18 @@ export function prepareLoadedTerminalSettings(
   if (migratedTerminalTuiScrollSensitivity.needsSave) {
     markNeedsSave()
   }
-  const rawSourceControlAi = parsed.settings?.sourceControlAi
+  // Why: a retired agent id fails every generation; fall back to auto-pick, never remap.
+  const rawSourceControlAi = withLoadableAgentId(parsed.settings?.sourceControlAi, markNeedsSave)
   const rawSourceControlAiMissing = rawSourceControlAi === undefined
   const rawSourceControlAiActionsMissing =
     rawSourceControlAi !== undefined && rawSourceControlAi.actions === undefined
   if (rawSourceControlAiMissing || rawSourceControlAiActionsMissing) {
     markNeedsSave()
   }
-  const legacyCommitMessageAi = parsed.settings?.commitMessageAi
+  const legacyCommitMessageAi = withLoadableAgentId(parsed.settings?.commitMessageAi, markNeedsSave)
   const migratedSourceControlAi = rawSourceControlAiMissing
     ? sourceControlAiSettingsFromLegacy(legacyCommitMessageAi ?? defaults.settings.commitMessageAi)
-    : mergeLegacyCommitMessageAiIntoSourceControlAi(
-        parsed.settings?.sourceControlAi,
-        legacyCommitMessageAi
-      )
+    : mergeLegacyCommitMessageAiIntoSourceControlAi(rawSourceControlAi, legacyCommitMessageAi)
   // Why (issue #903): old 'true' default broke non-US Option-layer chars; flip 'true'→'auto' once so the layout probe decides.
   const rawOptionAsAlt = parsed.settings?.terminalMacOptionAsAlt
   const alreadyMigrated = parsed.settings?.terminalMacOptionAsAltMigrated === true
@@ -169,4 +169,16 @@ export function prepareLoadedTerminalSettings(
     migratedFloatingTerminalTrustedCwds,
     osc52ClipboardNoticePending
   }
+}
+
+function withLoadableAgentId<T extends { agentId?: string | null }>(
+  settings: T | undefined,
+  markNeedsSave: () => void
+): T | undefined {
+  const agentId: unknown = settings?.agentId
+  if (!settings || agentId == null || isTuiAgent(agentId) || agentId === CUSTOM_AGENT_ID) {
+    return settings
+  }
+  markNeedsSave()
+  return { ...settings, agentId: null }
 }

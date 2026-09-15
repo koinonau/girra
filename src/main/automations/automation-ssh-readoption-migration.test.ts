@@ -17,7 +17,7 @@ function makeAutomation(overrides: Partial<Automation> = {}): Automation {
     name: 'Nightly',
     prompt: 'go',
     precheck: null,
-    agentId: 'codex',
+    agentId: 'opencode',
     projectId: 'repo-1',
     executionTargetType: 'ssh',
     executionTargetId: OLD_ID,

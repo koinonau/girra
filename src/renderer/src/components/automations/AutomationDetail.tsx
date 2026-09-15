@@ -3,7 +3,8 @@ import { Pencil, Pause, Play, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { getAgentCatalog, AgentIcon } from '@/lib/agent-catalog'
+import { AgentIcon } from '@/lib/agent-catalog'
+import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import type { Automation, AutomationRun } from '../../../../shared/automations-types'
 import { formatUiAutomationSchedule } from './automation-schedule-label'
 import { formatAutomationPrecheckTimeout } from '../../../../shared/automation-precheck'
@@ -19,6 +20,7 @@ import { getAutomationHostDetailDisplay } from './automation-host-detail-display
 import { getAutomationSourceDisplay } from './automation-source-display'
 import { translate } from '@/i18n/i18n'
 import { AutomationPromptDisclosure } from './AutomationPromptDisclosure'
+import { getAgentLabel } from './automation-draft-model'
 
 type AutomationDetailProps = {
   automation: Automation | null
@@ -71,12 +73,14 @@ function ToolbarIconButton({
   label,
   children,
   onClick,
-  className
+  className,
+  disabled
 }: {
   label: string
   children: React.ReactNode
   onClick: () => void
   className?: string
+  disabled?: boolean
 }): React.JSX.Element {
   return (
     <Tooltip>
@@ -88,6 +92,7 @@ function ToolbarIconButton({
           aria-label={label}
           onClick={onClick}
           className={className}
+          disabled={disabled}
         >
           {children}
         </Button>
@@ -131,8 +136,7 @@ export function AutomationDetail({
       : usageSummary.unavailableRuns > 0
         ? 'Unavailable'
         : 'No runs'
-  const agentLabel =
-    getAgentCatalog().find((agent) => agent.id === automation.agentId)?.label ?? automation.agentId
+  const agentLabel = getAgentLabel(automation.agentId)
   const runLocationLabel =
     automation.workspaceMode === 'new_per_run'
       ? (automation.baseBranch ?? projectDefaultBaseRef ?? 'Project default')
@@ -204,6 +208,8 @@ export function AutomationDetail({
                   )
             }
             onClick={() => onToggle(automation)}
+            // Why: an automation whose agent was dropped stays paused until edited to a known agent.
+            disabled={!automation.enabled && !isTuiAgent(automation.agentId)}
           >
             {automation.enabled ? <Pause className="size-4" /> : <Play className="size-4" />}
           </ToolbarIconButton>

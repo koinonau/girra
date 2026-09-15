@@ -151,7 +151,7 @@ describe('createSessionWriteSubscriber', () => {
             id: 'tab-1',
             ptyId: null,
             worktreeId: 'wt-1',
-            title: 'Codex',
+            title: 'Claude',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -170,7 +170,7 @@ describe('createSessionWriteSubscriber', () => {
         prompt: 'Fix tests',
         agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
       { providerSession: { key: 'session_id', id: 'claude-session-1' } }
@@ -228,7 +228,7 @@ describe('createSessionWriteSubscriber', () => {
     useAppStore.setState({
       workspaceSessionReady: true,
       hydrationSucceeded: true,
-      ...makeTerminalSessionState('⠋ Codex is thinking')
+      ...makeTerminalSessionState('⠋ OpenCode is thinking')
     })
     vi.advanceTimersByTime(200)
     persist.mockClear()
@@ -238,7 +238,7 @@ describe('createSessionWriteSubscriber', () => {
         'wt-1': [
           {
             ...useAppStore.getState().tabsByWorktree['wt-1'][0],
-            title: '⠙ Codex is thinking'
+            title: '⠙ OpenCode is thinking'
           }
         ]
       }
@@ -260,7 +260,7 @@ describe('createSessionWriteSubscriber', () => {
               id: `tab-${index}`,
               ptyId: `${worktreeId}@@pty-1`,
               worktreeId,
-              title: '⠋ Codex is thinking',
+              title: '⠋ OpenCode is thinking',
               customTitle: null,
               color: null,
               sortOrder: 0,
@@ -287,7 +287,7 @@ describe('createSessionWriteSubscriber', () => {
         [changedWorktreeId]: [
           {
             ...tabsByWorktree[changedWorktreeId][0],
-            title: '⠙ Codex is thinking'
+            title: '⠙ OpenCode is thinking'
           }
         ]
       }
@@ -433,7 +433,7 @@ describe('createSessionWriteSubscriber', () => {
     useAppStore.setState({
       workspaceSessionReady: true,
       hydrationSucceeded: true,
-      ...makeTerminalSessionState('⠋ Codex is thinking')
+      ...makeTerminalSessionState('⠋ OpenCode is thinking')
     })
     vi.advanceTimersByTime(200)
     persist.mockClear()
@@ -443,7 +443,7 @@ describe('createSessionWriteSubscriber', () => {
         'wt-1': [
           {
             ...useAppStore.getState().unifiedTabsByWorktree['wt-1'][0],
-            label: '⠙ Codex is thinking'
+            label: '⠙ OpenCode is thinking'
           }
         ]
       }
@@ -492,12 +492,12 @@ describe('createSessionWriteSubscriber', () => {
     useAppStore.setState({
       workspaceSessionReady: true,
       hydrationSucceeded: true,
-      ...makeTerminalSessionState('⠋ Codex is thinking')
+      ...makeTerminalSessionState('⠋ OpenCode is thinking')
     })
     vi.advanceTimersByTime(200)
     persist.mockClear()
 
-    useAppStore.getState().updateTabTitle('tab-1', '⠙ Codex is thinking')
+    useAppStore.getState().updateTabTitle('tab-1', '⠙ OpenCode is thinking')
     vi.advanceTimersByTime(200)
 
     expect(persist).not.toHaveBeenCalled()
@@ -542,7 +542,7 @@ describe('createSessionWriteSubscriber', () => {
             id: 'tab-1',
             ptyId: 'pty-1',
             worktreeId: 'wt-1',
-            title: 'Codex ready',
+            title: 'OpenCode ready',
             defaultTitle: 'Terminal 1',
             customTitle: null,
             color: null,

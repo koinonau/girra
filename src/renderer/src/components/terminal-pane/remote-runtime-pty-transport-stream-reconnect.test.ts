@@ -95,7 +95,7 @@ describe('createRemoteRuntimePtyTransport', () => {
     const { streamId } = latestSubscribePayload()
     emitOutput(
       streamId,
-      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07after\x1b]0;. Claude working\x07\x07'
+      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"opencode"}\x07after\x1b]0;. Claude working\x07\x07'
     )
 
     expect(onData).toHaveBeenCalledWith(
@@ -106,7 +106,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       expect(onAgentStatus).toHaveBeenCalledWith({
         state: 'working',
         prompt: 'ship it',
-        agentType: 'codex'
+        agentType: 'opencode'
       })
     )
     expect(onTitleChange).toHaveBeenCalledWith('. Claude working', '. Claude working')
@@ -131,7 +131,7 @@ describe('createRemoteRuntimePtyTransport', () => {
     const { streamId } = latestSubscribePayload()
     emitOutput(
       streamId,
-      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07after'
+      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"opencode"}\x07after'
     )
 
     expect(onData).toHaveBeenCalledWith('beforeafter', expect.objectContaining({ seq: 1 }))
@@ -139,7 +139,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       expect(onAgentStatus).toHaveBeenCalledWith({
         state: 'working',
         prompt: 'ship it',
-        agentType: 'codex'
+        agentType: 'opencode'
       })
     )
   })

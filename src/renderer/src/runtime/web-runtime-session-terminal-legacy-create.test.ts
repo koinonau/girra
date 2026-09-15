@@ -98,7 +98,7 @@ describe('createWebRuntimeSessionTerminal', () => {
         afterTabId: 'web-terminal-host-tab-1%3A%3Aleaf-1',
         targetGroupId: 'group-left',
         agentSessionKind: 'fresh',
-        agent: 'codex',
+        agent: 'opencode',
         activate: true
       })
     ).resolves.toEqual({ status: 'created' })
@@ -113,7 +113,7 @@ describe('createWebRuntimeSessionTerminal', () => {
         command: undefined,
         cwd: undefined,
         startupCommandDelivery: undefined,
-        agent: 'codex',
+        agent: 'opencode',
         activate: false,
         select: true,
         navigation: 'caller'
@@ -128,7 +128,7 @@ describe('createWebRuntimeSessionTerminal', () => {
 
   it.each([
     {
-      agent: 'codex' as const,
+      agent: 'opencode' as const,
       predecessor: 'web-terminal-host-tab-1',
       afterTabId: 'web-terminal-host-tab-1%3A%3Aleaf-1'
     },
@@ -280,7 +280,7 @@ describe('createWebRuntimeSessionTerminal', () => {
     await expect(
       createWebRuntimeSessionTerminal({
         worktreeId: WORKTREE_ID,
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         targetGroupId: 'group-left'
       })
     ).resolves.toEqual({ status: 'created' })
@@ -295,7 +295,7 @@ describe('createWebRuntimeSessionTerminal', () => {
         command: undefined,
         cwd: undefined,
         startupCommandDelivery: undefined,
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         activate: false,
         select: true,
         navigation: 'caller'
@@ -341,13 +341,13 @@ describe('createWebRuntimeSessionTerminal', () => {
       createWebRuntimeSessionTerminal({
         worktreeId: WORKTREE_ID,
         agentSessionKind: 'resume',
-        launchAgent: 'codex',
-        command: "codex resume 'session-1'",
-        env: { CODEX_PROFILE: 'captured' },
+        launchAgent: 'opencode',
+        command: "opencode --session 'session-1'",
+        env: { OPENCODE_CONFIG: 'captured' },
         launchConfig: {
-          agentCommand: 'codex',
+          agentCommand: 'opencode',
           agentArgs: '',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentEnv: { OPENCODE_CONFIG: 'captured' }
         },
         providerSession: { key: 'session_id', id: 'session-1' }
       })
@@ -360,16 +360,16 @@ describe('createWebRuntimeSessionTerminal', () => {
         worktree: `id:${WORKTREE_ID}`,
         afterTabId: undefined,
         targetGroupId: undefined,
-        command: "codex resume 'session-1'",
+        command: "opencode --session 'session-1'",
         cwd: undefined,
-        env: { CODEX_PROFILE: 'captured' },
+        env: { OPENCODE_CONFIG: 'captured' },
         startupCommandDelivery: undefined,
         launchConfig: {
-          agentCommand: 'codex',
+          agentCommand: 'opencode',
           agentArgs: '',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentEnv: { OPENCODE_CONFIG: 'captured' }
         },
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         activate: false,
         select: true,
         navigation: 'caller'

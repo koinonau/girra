@@ -557,7 +557,7 @@ describe('StructuredAgentSessionStatusBridge', () => {
   it('does not project an unknown provider as Claude', async () => {
     mocks.store?.setState({
       unifiedTabsByWorktree: {
-        'wt-1': [{ ...structuredTab, agentSessionAgent: 'gemini' }]
+        'wt-1': [{ ...structuredTab, agentSessionAgent: 'opencode' }]
       }
     })
     render(<StructuredAgentSessionStatusBridge />)

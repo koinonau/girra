@@ -133,7 +133,7 @@ function stripPersistedPtyOwnership(userDataDir: string): void {
   for (const record of Object.values(session.sleepingAgentSessionsByPaneKey ?? {})) {
     if (record.providerSession?.id === PROVIDER_SESSION_ID) {
       // Why: the e2e proof should verify Orca launches the resumed command,
-      // not depend on a developer machine having a real Codex CLI installed.
+      // not depend on a developer machine having a real Claude CLI installed.
       record.launchConfig = { agentCommand: 'echo', agentArgs: '', agentEnv: {} }
     }
   }
@@ -183,7 +183,7 @@ test('resumes a live agent record after force-exit restart when pane PTY ownersh
 
     const descriptor = await waitForActivePaneHookDescriptor(page)
     const ptyId = await waitForActivePanePtyId(page)
-    const transcriptPath = session.seedCodexResumeRollout(PROVIDER_SESSION_ID, repoPath)
+    const transcriptPath = session.seedClaudeResumeTranscript(PROVIDER_SESSION_ID, repoPath)
     const marker = `AGENT_LIVE_FORCE_EXIT_${Date.now()}`
     await execInTerminal(page, ptyId, `echo ${marker}`)
     await waitForTerminalOutput(page, marker)
@@ -192,8 +192,8 @@ test('resumes a live agent record after force-exit restart when pane PTY ownersh
       ({ paneKey, worktreeId: wtId, providerSessionId, transcriptPath }) => {
         window.__store?.getState().setAgentStatus(
           paneKey,
-          { state: 'working', prompt: 'finish the task', agentType: 'codex' },
-          'Codex',
+          { state: 'working', prompt: 'finish the task', agentType: 'claude' },
+          'Claude',
           undefined,
           { worktreeId: wtId },
           {

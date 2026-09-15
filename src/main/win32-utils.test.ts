@@ -27,15 +27,15 @@ function withPlatform<T>(platform: NodeJS.Platform, fn: () => T): T {
 describe('isWindowsBatchScript', () => {
   it('detects .cmd and .bat on win32', () => {
     withPlatform('win32', () => {
-      expect(isWindowsBatchScript('C:\\tools\\codex.cmd')).toBe(true)
-      expect(isWindowsBatchScript('C:\\tools\\codex.BAT')).toBe(true)
+      expect(isWindowsBatchScript('C:\\tools\\claude.cmd')).toBe(true)
+      expect(isWindowsBatchScript('C:\\tools\\claude.BAT')).toBe(true)
     })
   })
 
   it('returns false for non-batch extensions', () => {
     withPlatform('win32', () => {
-      expect(isWindowsBatchScript('C:\\tools\\codex.exe')).toBe(false)
-      expect(isWindowsBatchScript('C:\\tools\\codex')).toBe(false)
+      expect(isWindowsBatchScript('C:\\tools\\claude.exe')).toBe(false)
+      expect(isWindowsBatchScript('C:\\tools\\claude')).toBe(false)
     })
   })
 
@@ -66,14 +66,14 @@ describe('getSpawnArgsForWindows', () => {
     process.env.ComSpec = 'C:\\Windows\\System32\\cmd.exe'
     try {
       withPlatform('win32', () => {
-        const { spawnCmd, spawnArgs } = getSpawnArgsForWindows('C:\\tools\\codex.cmd', [
+        const { spawnCmd, spawnArgs } = getSpawnArgsForWindows('C:\\tools\\claude.cmd', [
           'login',
           '--foo'
         ])
         expect(spawnCmd).toBe('C:\\Windows\\System32\\cmd.exe')
         // Why: /d disables AutoRun; /c runs the batch command and exits.
         // Separate argv entries avoid cmd.exe seeing Node-escaped quotes.
-        expect(spawnArgs).toEqual(['/d', '/c', 'C:\\tools\\codex.cmd', 'login', '--foo'])
+        expect(spawnArgs).toEqual(['/d', '/c', 'C:\\tools\\claude.cmd', 'login', '--foo'])
       })
     } finally {
       if (originalComSpec === undefined) {
@@ -153,10 +153,10 @@ describe('getSpawnArgsForWindows', () => {
   })
 
   it('rejects cmd metacharacters in executable paths passed through start /wait', () => {
-    expect(() => wrapWindowsStartWait('C:\\Users\\A%B\\codex.exe', ['login'])).toThrow(
+    expect(() => wrapWindowsStartWait('C:\\Users\\A%B\\claude.exe', ['login'])).toThrow(
       UnsafeWindowsBatchArgumentsError
     )
-    expect(() => wrapWindowsStartWait('C:\\Tools\\codex.exe', ['log&in'])).toThrow(
+    expect(() => wrapWindowsStartWait('C:\\Tools\\claude.exe', ['log&in'])).toThrow(
       UnsafeWindowsBatchArgumentsError
     )
   })
@@ -195,16 +195,16 @@ describe('getSpawnArgsForWindows', () => {
 
   it('passes .exe through unchanged on win32', () => {
     withPlatform('win32', () => {
-      const { spawnCmd, spawnArgs } = getSpawnArgsForWindows('C:\\tools\\codex.exe', ['login'])
-      expect(spawnCmd).toBe('C:\\tools\\codex.exe')
+      const { spawnCmd, spawnArgs } = getSpawnArgsForWindows('C:\\tools\\claude.exe', ['login'])
+      expect(spawnCmd).toBe('C:\\tools\\claude.exe')
       expect(spawnArgs).toEqual(['login'])
     })
   })
 
   it('passes posix paths through unchanged on non-win32', () => {
     withPlatform('darwin', () => {
-      const { spawnCmd, spawnArgs } = getSpawnArgsForWindows('/usr/local/bin/codex', ['login'])
-      expect(spawnCmd).toBe('/usr/local/bin/codex')
+      const { spawnCmd, spawnArgs } = getSpawnArgsForWindows('/usr/local/bin/claude', ['login'])
+      expect(spawnCmd).toBe('/usr/local/bin/claude')
       expect(spawnArgs).toEqual(['login'])
     })
   })

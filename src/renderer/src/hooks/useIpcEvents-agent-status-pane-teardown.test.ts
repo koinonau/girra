@@ -139,7 +139,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'done',
       prompt: 'late completion',
-      agentType: 'codex',
+      agentType: 'opencode',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_699_999_999_100
     })
@@ -195,7 +195,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'working',
       prompt: 'runtime child',
-      agentType: 'codex',
+      agentType: 'opencode',
       worktreeId: 'wt-1',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_700_000_000_000,
@@ -207,7 +207,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     expect(setAgentStatus).toHaveBeenCalledTimes(1)
     expect(setAgentStatus).toHaveBeenCalledWith(
       FUTURE_PANE_KEY,
-      expect.objectContaining({ state: 'working', prompt: 'runtime child', agentType: 'codex' }),
+      expect.objectContaining({ state: 'working', prompt: 'runtime child', agentType: 'opencode' }),
       undefined,
       { updatedAt: 1_700_000_000_200, stateStartedAt: 1_700_000_000_000 },
       expectWorktreeRouting('wt-1'),
@@ -240,7 +240,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
         [FUTURE_PANE_KEY]: {
           state: 'working',
           prompt: 'hidden worker',
-          agentType: 'codex',
+          agentType: 'opencode',
           updatedAt: 1_700_000_000_200,
           stateStartedAt: 1_700_000_000_000,
           paneKey: FUTURE_PANE_KEY,
@@ -288,7 +288,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'working',
       prompt: 'hidden worker',
-      agentType: 'codex',
+      agentType: 'opencode',
       worktreeId: 'wt-1',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_700_000_000_000,
@@ -300,7 +300,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     expect(setAgentStatus).toHaveBeenCalledTimes(1)
     expect(setAgentStatus).toHaveBeenCalledWith(
       FUTURE_PANE_KEY,
-      expect.objectContaining({ state: 'working', prompt: 'hidden worker', agentType: 'codex' }),
+      expect.objectContaining({ state: 'working', prompt: 'hidden worker', agentType: 'opencode' }),
       undefined,
       { updatedAt: 1_700_000_000_200, stateStartedAt: 1_700_000_000_000 },
       expectWorktreeRouting('wt-1'),
@@ -402,7 +402,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'working',
       prompt: 'stale snapshot',
-      agentType: 'codex',
+      agentType: 'opencode',
       worktreeId: 'wt-1',
       connectionId: 'ssh-a',
       receivedAt: 100,
@@ -420,7 +420,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'working',
       prompt: 'replayed',
-      agentType: 'codex',
+      agentType: 'opencode',
       worktreeId: 'wt-1',
       connectionId: 'ssh-a',
       receivedAt: 101,
@@ -453,7 +453,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
         [FUTURE_PANE_KEY]: {
           state: 'done',
           prompt: 'hidden worker',
-          agentType: 'codex',
+          agentType: 'opencode',
           updatedAt: 1_700_000_000_200,
           stateStartedAt: 1_700_000_000_000,
           paneKey: FUTURE_PANE_KEY,

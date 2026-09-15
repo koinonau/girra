@@ -14,7 +14,7 @@ function status(
     stateStartedAt: 190,
     state: 'working',
     prompt: '',
-    agentType: 'codex',
+    agentType: 'claude',
     providerSession: { key: 'session_id', id: sessionId },
     ...overrides
   }
@@ -40,7 +40,7 @@ describe('exact worker provider session selection', () => {
       paneKey: 'tab:worker',
       processIncarnation: 'pty:incarnation',
       connectionId: 'ssh-windows',
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: 'exact' },
       observedAt: 250
     })
@@ -93,7 +93,7 @@ describe('exact worker provider session selection', () => {
           providerSession: {
             key: 'session_id',
             id: 'wsl-session',
-            transcriptPath: '/home/ada/.codex/sessions/rollout-wsl.jsonl'
+            transcriptPath: '/home/ada/.claude/projects/-home-ada-repo/wsl-session.jsonl'
           }
         })
       ]

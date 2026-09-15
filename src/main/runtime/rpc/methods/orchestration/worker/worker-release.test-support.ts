@@ -151,7 +151,7 @@ export function createOrchestrationWorkerReleaseHarness(): OrchestrationWorkerRe
     const result = (await call('orchestration.workerStart', {
       task: task.id,
       from: 'term_coord',
-      ...(options.terminal ? { terminal: options.terminal } : { agent: 'codex' })
+      ...(options.terminal ? { terminal: options.terminal } : { agent: 'claude' })
     })) as { dispatchId: string; state: string }
     expect(result.state).toBe('ready')
     return { taskId: task.id, dispatchId: result.dispatchId }

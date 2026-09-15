@@ -9,7 +9,7 @@ import { getIcaclsExePath, resolveCurrentWindowsIdentity } from '../win32-utils'
  * Why this exists (PR #1152): Chromium's BrowserWindow constructor resets the
  * userData DACL to a Protected DACL whose propagated child ACEs carry the
  * Inherit-Only flag, so file writes inside pre-existing subdirectories
- * (codex-runtime-home, agent-hooks, …) fail with EPERM. Explicit ACEs survive
+ * (agent-hooks, …) fail with EPERM. Explicit ACEs survive
  * future DACL propagation, so granting them once fixes the tree permanently.
  *
  * Why not `icacls /T` synchronously (the previous implementation): NTFS

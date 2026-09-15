@@ -23,13 +23,13 @@ beforeEach(() => {
 
 describe('closeStructuredAgentSession', () => {
   it('closes a local session without a redundant capability probe', async () => {
-    await expect(closeStructuredAgentSession({ kind: 'local' }, 'codex-session-1')).resolves.toBe(
+    await expect(closeStructuredAgentSession({ kind: 'local' }, 'claude-session-1')).resolves.toBe(
       'closed'
     )
 
     expect(mocks.supportsCapability).not.toHaveBeenCalled()
     expect(mocks.call).toHaveBeenCalledWith({ kind: 'local' }, 'agentSession.close', {
-      sessionId: 'codex-session-1'
+      sessionId: 'claude-session-1'
     })
   })
 
@@ -49,7 +49,7 @@ describe('closeStructuredAgentSession', () => {
     await expect(
       closeStructuredAgentSession(
         { kind: 'environment', environmentId: 'legacy-env' },
-        'codex-session-1'
+        'claude-session-1'
       )
     ).resolves.toBe('unsupported')
 

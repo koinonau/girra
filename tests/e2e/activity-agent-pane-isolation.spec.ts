@@ -55,7 +55,7 @@ async function seedActivityThread(
         {
           state,
           prompt: thread.prompt,
-          agentType: 'codex',
+          agentType: 'claude',
           lastAssistantMessage: message
         },
         title,
@@ -90,7 +90,7 @@ async function seedActivityThreadsForSplitPanes(
   await seedActivityThread(
     page,
     first,
-    'Codex left pane',
+    'Claude left pane',
     'blocked',
     'Left pane is waiting for user input.',
     now - 2_000
@@ -98,7 +98,7 @@ async function seedActivityThreadsForSplitPanes(
   await seedActivityThread(
     page,
     second,
-    'Codex right pane',
+    'Claude right pane',
     'done',
     'Right pane finished its turn.',
     now - 1_000
@@ -358,7 +358,7 @@ test.describe('Activity Agent Pane Isolation', () => {
     await seedActivityThread(
       orcaPage,
       splitGroupThread,
-      'Codex split group pane',
+      'Claude split group pane',
       'blocked',
       'Split group pane is waiting for user input.',
       now

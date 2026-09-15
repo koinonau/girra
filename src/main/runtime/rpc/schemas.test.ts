@@ -177,7 +177,7 @@ describe('RPC optional pipe schemas', () => {
       setupDecision: 'run',
       activate: true,
       startupDraft: 'https://github.com/acme/app/pull/123',
-      createdWithAgent: 'codex',
+      createdWithAgent: 'claude',
       linkedPR: 123,
       baseBranch: 'origin/main',
       compareBaseRef: 'origin/main',

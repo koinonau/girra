@@ -10,9 +10,9 @@ import { waitForWorktreeAgentActivationGateForTests } from './worktree-agent-act
 // a runtime-owned (paired remote) worktree's web-mirror tab holds a sleeping
 // record for an agent whose host PTY is STILL ALIVE, but at activation time the
 // client's mirror has not yet received the host snapshot (ptyIdsByTabId empty).
-// Activation must NOT relaunch `codex resume <id>` — the original process holds
-// the session (codex -32600 "already has an active writer") and the relaunch
-// strands a bare shell while the live agent becomes a tab-less ghost.
+// Activation must NOT relaunch `claude --resume <id>`: the original process still holds
+// the session, and the relaunch strands a bare shell while the live agent becomes a
+// tab-less ghost.
 //
 // The resume fallback stays correct for LOCAL worktrees (control below).
 
@@ -140,7 +140,7 @@ describe('runtime-owned worktree activation with an unhydrated host mirror', () 
 
     const after = useAppStore.getState()
     const tabs = after.tabsByWorktree[worktree.id] ?? []
-    // RED on main: a replacement `codex resume` tab is appended even though the
+    // RED on main: a replacement `claude --resume` tab is appended even though the
     // host PTY may be (and in the incident, was) alive.
     expect(tabs.map((tab) => tab.id)).toEqual([WEB_TAB_ID])
     // The record is the only recovery evidence; deferral must retain it.

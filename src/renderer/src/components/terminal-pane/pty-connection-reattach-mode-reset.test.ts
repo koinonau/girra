@@ -718,7 +718,7 @@ describe('connectPanePty', () => {
     })
     transportFactoryQueue.push(transport)
     // Why: broad token matching would classify this ordinary ssh title as an agent and preserve stale modes into a bare shell.
-    setReattachPaneTitle('ssh devin@host')
+    setReattachPaneTitle('ssh claude@host')
 
     const pane = createPane(1)
     const textarea = {} as HTMLTextAreaElement
@@ -750,7 +750,7 @@ describe('connectPanePty', () => {
     const transport = createMockTransport('tab-pty')
     transport.connect.mockImplementation(async ({ sessionId }: { sessionId?: string }) => {
       if (sessionId) {
-        return { id: sessionId, snapshot: 'restored idle codex snapshot' }
+        return { id: sessionId, snapshot: 'restored idle agent snapshot' }
       }
       return null
     })
@@ -758,10 +758,10 @@ describe('connectPanePty', () => {
     mockStoreState = {
       ...mockStoreState,
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-1', ptyId: 'tab-pty', title: 'Codex done' }]
+        'wt-1': [{ id: 'tab-1', ptyId: 'tab-pty', title: 'OpenCode done' }]
       },
       runtimePaneTitlesByTabId: {
-        'tab-1': { 1: 'Codex done' }
+        'tab-1': { 1: 'OpenCode done' }
       },
       settings: {
         ...mockStoreState.settings

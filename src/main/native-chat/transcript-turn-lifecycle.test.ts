@@ -7,7 +7,7 @@ import {
 describe('native chat transcript turn lifecycle', () => {
   it('exposes a lifecycle decoder only for transcript formats with explicit boundaries', () => {
     expect(nativeChatTurnLifecycleDecoderForAgent('claude')).not.toBeNull()
-    expect(nativeChatTurnLifecycleDecoderForAgent('codex')).toBeNull()
+    expect(nativeChatTurnLifecycleDecoderForAgent('opencode')).toBeNull()
   })
 
   it('uses Claude terminal stop_reasons and excludes tool-result user rows', () => {

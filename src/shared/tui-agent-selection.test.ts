@@ -7,29 +7,29 @@ import {
 
 describe('pickTuiAgent', () => {
   it('uses an installed preferred agent', () => {
-    expect(pickTuiAgent('codex', ['claude', 'codex'])).toBe('codex')
+    expect(pickTuiAgent('opencode', ['claude', 'opencode'])).toBe('opencode')
   })
 
   it('falls back in desktop catalog order when the preference is absent or stale', () => {
-    expect(pickTuiAgent(null, ['cursor', 'codex'])).toBe('codex')
-    expect(pickTuiAgent('gemini', ['cursor', 'codex'])).toBe('codex')
-    expect(pickTuiAgent(null, ['continue', 'command-code'])).toBe('command-code')
+    expect(pickTuiAgent(null, ['pi', 'opencode'])).toBe('opencode')
+    expect(pickTuiAgent('claude', ['pi', 'opencode'])).toBe('opencode')
+    expect(pickTuiAgent(null, ['pi', 'claude-agent-teams'])).toBe('claude-agent-teams')
   })
 
   it('respects the explicit blank terminal preference', () => {
-    expect(pickTuiAgent('blank', ['cursor', 'claude'])).toBeNull()
+    expect(pickTuiAgent('blank', ['pi', 'claude'])).toBeNull()
   })
 
   it('ignores disabled preferred and fallback agents', () => {
-    expect(pickTuiAgent('codex', ['claude', 'codex'], ['codex'])).toBe('claude')
-    expect(pickTuiAgent(null, ['claude', 'codex'], ['claude', 'codex'])).toBeNull()
+    expect(pickTuiAgent('opencode', ['claude', 'opencode'], ['opencode'])).toBe('claude')
+    expect(pickTuiAgent(null, ['claude', 'opencode'], ['claude', 'opencode'])).toBeNull()
   })
 })
 
 describe('normalizeDisabledTuiAgents', () => {
   it('dedupes supported agent ids and drops unsupported values', () => {
-    expect(normalizeDisabledTuiAgents(['codex', 'unknown', 'codex', null, 'claude'])).toEqual([
-      'codex',
+    expect(normalizeDisabledTuiAgents(['pi', 'codex', 'pi', null, 'claude'])).toEqual([
+      'pi',
       'claude'
     ])
   })
@@ -37,8 +37,8 @@ describe('normalizeDisabledTuiAgents', () => {
 
 describe('haveSameDisabledTuiAgents', () => {
   it('compares the normalized disabled-agent sets', () => {
-    expect(haveSameDisabledTuiAgents(['codex', 'claude'], ['claude', 'codex'])).toBe(true)
-    expect(haveSameDisabledTuiAgents(['codex', 'unknown'], ['codex'])).toBe(true)
-    expect(haveSameDisabledTuiAgents(['codex'], ['claude'])).toBe(false)
+    expect(haveSameDisabledTuiAgents(['pi', 'claude'], ['claude', 'pi'])).toBe(true)
+    expect(haveSameDisabledTuiAgents(['pi', 'codex'], ['pi'])).toBe(true)
+    expect(haveSameDisabledTuiAgents(['pi'], ['claude'])).toBe(false)
   })
 })

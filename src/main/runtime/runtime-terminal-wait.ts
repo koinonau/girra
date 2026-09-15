@@ -4,8 +4,7 @@ import type {
 } from '../../shared/runtime-types'
 import {
   detectExplicitIdleStatusFromTitle,
-  detectTerminalWaitBlockedReason,
-  isKnownReadyPromptPreview
+  detectTerminalWaitBlockedReason
 } from './terminal-wait-detection'
 import {
   buildPtyTerminalWaitBlockedResult,
@@ -63,11 +62,7 @@ export class RuntimeTerminalWait {
       if (condition === 'tui-idle' && pty.pty.lastAgentStatus === 'idle') {
         return buildPtyTerminalWaitResult(handle, condition, pty.pty)
       }
-      if (
-        condition === 'tui-idle' &&
-        (this.deps.getAdoptedPtyIdleStatus(pty.pty) === 'idle' ||
-          isKnownReadyPromptPreview(ptyWaitText))
-      ) {
+      if (condition === 'tui-idle' && this.deps.getAdoptedPtyIdleStatus(pty.pty) === 'idle') {
         return buildPtyTerminalWaitResult(handle, condition, pty.pty)
       }
       return await new Promise<RuntimeTerminalWaitResult>((resolve, reject) => {
@@ -117,10 +112,7 @@ export class RuntimeTerminalWait {
             )
           } else if (live.pty.lastAgentStatus === 'idle') {
             this.waiters.resolve(waiter, buildPtyTerminalWaitResult(handle, condition, live.pty))
-          } else if (
-            this.deps.getAdoptedPtyIdleStatus(live.pty) === 'idle' ||
-            isKnownReadyPromptPreview(livePtyWaitText)
-          ) {
+          } else if (this.deps.getAdoptedPtyIdleStatus(live.pty) === 'idle') {
             this.waiters.resolve(waiter, buildPtyTerminalWaitResult(handle, condition, live.pty))
           } else {
             this.polls.startPty(waiter, live.pty)
@@ -152,10 +144,7 @@ export class RuntimeTerminalWait {
     }
     if (condition === 'tui-idle') {
       const fastPathTitle = leaf.paneTitle ?? this.deps.getTabTitle(leaf.tabId)
-      if (
-        (fastPathTitle && detectExplicitIdleStatusFromTitle(fastPathTitle) === 'idle') ||
-        isKnownReadyPromptPreview(leafWaitText)
-      ) {
+      if (fastPathTitle && detectExplicitIdleStatusFromTitle(fastPathTitle) === 'idle') {
         return buildTerminalWaitResult(handle, condition, leaf)
       }
     }
@@ -221,14 +210,9 @@ export class RuntimeTerminalWait {
             // the first waiter consumes the status and all later ones see null.
             this.waiters.resolve(waiter, buildTerminalWaitResult(handle, condition, live.leaf))
           } else {
-            // Why: renderer-synced previews can show a known ready prompt even
-            // while the last OSC title is still "working"; keep polling the
-            // preview/title until the waiter resolves or hits its timeout.
+            // Why: keep polling the title until the waiter resolves or hits its timeout.
             const fastPathTitle = live.leaf.paneTitle ?? this.deps.getTabTitle(live.leaf.tabId)
-            if (
-              (fastPathTitle && detectExplicitIdleStatusFromTitle(fastPathTitle) === 'idle') ||
-              isKnownReadyPromptPreview(liveLeafWaitText)
-            ) {
+            if (fastPathTitle && detectExplicitIdleStatusFromTitle(fastPathTitle) === 'idle') {
               this.waiters.resolve(waiter, buildTerminalWaitResult(handle, condition, live.leaf))
             } else {
               this.polls.startLeaf(waiter, live.leaf)

@@ -100,7 +100,7 @@ function makeAgentEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusE
     tabId: 'terminal-1',
     worktreeId: 'wt-1',
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'claude',
     providerSession: { key: 'session_id', id: 'sess-live' },
     ...overrides
   }
@@ -382,7 +382,7 @@ describe('workspace-tab-palette-search', () => {
       entry: retainedEntry,
       worktreeId: 'wt-1',
       tab: makeTerminalTab({ id: 'terminal-1', title: 'Retained Title' }),
-      agentType: 'codex',
+      agentType: 'claude',
       startedAt: 1
     }
     const sleeping: SleepingAgentSessionRecord = {
@@ -440,7 +440,7 @@ describe('workspace-tab-palette-search', () => {
           entry: retainedEntry,
           worktreeId: 'wt-1',
           tab: makeTerminalTab(),
-          agentType: 'codex',
+          agentType: 'claude',
           startedAt: 1
         }
       },

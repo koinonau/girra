@@ -7,7 +7,7 @@ import type { OpenFile } from '@/store/slices/editor'
 import type { FileContent } from './editor-panel-content-types'
 import { useLocalLogTail } from './useLocalLogTail'
 
-const FILE_PATH = '/home/user/.codex/sessions/log.jsonl'
+const FILE_PATH = '/home/user/.claude/projects/log.jsonl'
 const FILE_IDENTITY = '1:2:3'
 
 const openFile = {

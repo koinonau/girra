@@ -3,7 +3,7 @@ import { resolveTerminalProcessExitRestartStartup } from './terminal-process-exi
 
 describe('terminal process exit restart', () => {
   it('retries the original startup after a Git Bash capacity failure', () => {
-    const startup = { command: 'codex --resume session-1' }
+    const startup = { command: 'claude --resume session-1' }
 
     expect(
       resolveTerminalProcessExitRestartStartup({
@@ -32,7 +32,7 @@ describe('terminal process exit restart', () => {
         paneId: 1,
         exitCode: 7,
         reason: 'process-failed',
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       })
     ).toBeNull()
   })

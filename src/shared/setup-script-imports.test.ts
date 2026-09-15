@@ -5,8 +5,7 @@ import {
   SETUP_SCRIPT_IMPORT_MAX_CMUX_COMMANDS,
   SETUP_SCRIPT_IMPORT_MAX_COMMAND_PARTS,
   SETUP_SCRIPT_IMPORT_MAX_FIELD_BYTES,
-  SETUP_SCRIPT_IMPORT_MAX_FIELD_CODE_UNITS,
-  SETUP_SCRIPT_IMPORT_MAX_TOML_LINES
+  SETUP_SCRIPT_IMPORT_MAX_FIELD_CODE_UNITS
 } from './setup-script-import-limits'
 
 function makeReader(files: Record<string, string>) {
@@ -73,20 +72,7 @@ describe('inspectSetupScriptImportCandidates', () => {
     await expect(inspect(`${exactUtf8}é`)).resolves.toEqual([])
   })
 
-  it('bounds Codex multiline script accumulation at the exact field limit', async () => {
-    const inspect = (setup: string) =>
-      inspectSetupScriptImportCandidates(
-        makeReader({
-          '.codex/environments/environment.toml': `[setup]\nscript = """${setup}"""`
-        })
-      )
-    const exact = 'x'.repeat(SETUP_SCRIPT_IMPORT_MAX_FIELD_CODE_UNITS)
-
-    await expect(inspect(exact)).resolves.toMatchObject([{ provider: 'codex', setup: exact }])
-    await expect(inspect(`${exact}x`)).resolves.toEqual([])
-  })
-
-  it('bounds cmux command scans and Codex TOML line splitting', async () => {
+  it('bounds cmux command scans', async () => {
     const commands = Array.from({ length: SETUP_SCRIPT_IMPORT_MAX_CMUX_COMMANDS }, (_, index) => ({
       name: index === SETUP_SCRIPT_IMPORT_MAX_CMUX_COMMANDS - 1 ? 'Setup' : 'Build',
       command: 'pnpm install'
@@ -103,20 +89,6 @@ describe('inspectSetupScriptImportCandidates', () => {
             commands: [...commands, { name: 'Overflow', command: 'true' }]
           })
         })
-      )
-    ).resolves.toEqual([])
-
-    const exactToml = `[setup]\nscript = "pnpm install"${'\n'.repeat(
-      SETUP_SCRIPT_IMPORT_MAX_TOML_LINES - 2
-    )}`
-    await expect(
-      inspectSetupScriptImportCandidates(
-        makeReader({ '.codex/environments/environment.toml': exactToml })
-      )
-    ).resolves.toMatchObject([{ provider: 'codex' }])
-    await expect(
-      inspectSetupScriptImportCandidates(
-        makeReader({ '.codex/environments/environment.toml': `${exactToml}\n` })
       )
     ).resolves.toEqual([])
   })
@@ -289,43 +261,11 @@ describe('inspectSetupScriptImportCandidates', () => {
     ])
   })
 
-  it('imports setup and cleanup scripts from Codex environment config', async () => {
-    const candidates = await inspectSetupScriptImportCandidates(
-      makeReader({
-        '.codex/environments/environment.toml': `
-[setup]
-script = """
-npm ci
-pnpm build
-"""
-
-[cleanup]
-script = "pnpm clean"
-
-[actions.test]
-command = "pnpm test"
-`
-      })
-    )
-
-    expect(candidates).toEqual([
-      {
-        provider: 'codex',
-        label: 'Codex environment',
-        files: ['.codex/environments/environment.toml'],
-        setup: 'npm ci\npnpm build',
-        archive: 'pnpm clean',
-        unsupportedFields: ['[actions.test]']
-      }
-    ])
-  })
-
   it('ignores malformed or setup-less configs', async () => {
     const candidates = await inspectSetupScriptImportCandidates(
       makeReader({
         '.superset/config.json': '{',
         'conductor.json': JSON.stringify({ scripts: { run: 'pnpm dev' } }),
-        '.codex/environments/environment.toml': '[cleanup]\nscript = "pnpm clean"',
         '.cmux/cmux.json': JSON.stringify({
           commands: [{ name: 'Build', keywords: ['build'], command: 'pnpm build' }]
         })

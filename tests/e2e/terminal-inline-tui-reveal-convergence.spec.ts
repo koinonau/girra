@@ -18,17 +18,17 @@ import {
 } from './helpers/terminal'
 import { waitForTabParked } from './helpers/terminal-hidden-parking'
 
-// Field bug (v1.4.144-rc.4): switching back to a workspace whose Codex TUI kept
+// Field bug (v1.4.144-rc.4): switching back to a workspace whose inline agent TUI kept
 // streaming while hidden shows a mostly-blank terminal — live block (input box)
 // missing, viewport stranded mid-buffer — until a manual resize (Cmd+L) forces
-// SIGWINCH and Codex repaints. The alt-screen park/reveal specs never caught it
-// because Codex runs in INLINE mode and keeps writing across the reveal.
+// SIGWINCH and the agent repaints. The alt-screen park/reveal specs never caught it
+// because inline agents such as Claude Code run in INLINE mode and keep writing across the reveal.
 //
-// These tests drive a codex-shaped inline TUI that never stops writing, hide
+// These tests drive an agent-shaped inline TUI that never stops writing, hide
 // the pane across the gate/park boundaries, reveal, and require convergence to
 // the live frame WITHOUT any resize:
 //  1. viewport anchored at the buffer bottom (not stranded mid-scrollback),
-//  2. a recent CODEX_FRAME + the input-box row visible in the on-screen rows,
+//  2. a recent AGENT_FRAME + the input-box row visible in the on-screen rows,
 //  3. still following (frame number advances on screen) after convergence,
 //  4. xterm grid == fit proposal == PTY-applied size (no stale 80x24 PTY).
 
@@ -38,8 +38,8 @@ test.use({
   orcaAppExtraEnv: { ORCA_E2E_TERMINAL_PARKING_DELAY_MS: String(PARKING_DELAY_MS) }
 })
 
-const FIXTURE_PATH = path.join(__dirname, 'fixtures', 'codex-inline-live-block-fixture.cjs')
-const FRAME_RE = /CODEX_FRAME_(\d+)/g
+const FIXTURE_PATH = path.join(__dirname, 'fixtures', 'inline-live-block-fixture.cjs')
+const FRAME_RE = /AGENT_FRAME_(\d+)/g
 const INPUT_BOX_MARKER = 'INPUT_BOX_READY_MARKER'
 // The fixture ticks every 60ms; allow a generous parse/delivery lag while
 // still rejecting a frozen frame from before the hide.
@@ -289,7 +289,7 @@ type StreamingTabSetup = {
 // serial tests, so reusing the initial tab would type the launch command into
 // the previous test's still-running fixture instead of a shell prompt.
 //
-// Why agent-marked: a real Codex tab carries launchAgent/telemetry, which
+// Why agent-marked: a real agent tab carries launchAgent/telemetry, which
 // flips the reveal into the live-agent reattach branches (mode-preserving
 // resets, hidden startup query grammar, post-replay focus-in) — the branches
 // the field bug lives behind.
@@ -301,7 +301,7 @@ async function startStreamingInlineTui(
   await waitForSessionReady(page)
   const worktreeId = await waitForActiveWorktree(page)
   await ensureTerminalVisible(page)
-  const heartbeatPath = testInfo.outputPath(`codex-inline-heartbeat-${Date.now()}.txt`)
+  const heartbeatPath = testInfo.outputPath(`inline-agent-heartbeat-${Date.now()}.txt`)
   const command = `node ${JSON.stringify(FIXTURE_PATH)} ${JSON.stringify(heartbeatPath)} ${options.historyLinesPerSecond ?? 4} ${options.seedLines ?? 120}`
   const tabId = await page.evaluate(
     ({ worktreeId, command }) => {
@@ -310,12 +310,12 @@ async function startStreamingInlineTui(
         throw new Error('startStreamingInlineTui: window.__store is unavailable')
       }
       const state = store.getState()
-      const tab = state.createTab(worktreeId, undefined, undefined, { launchAgent: 'codex' })
+      const tab = state.createTab(worktreeId, undefined, undefined, { launchAgent: 'claude' })
       state.queueTabStartupCommand(tab.id, {
         command,
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         telemetry: {
-          agent_kind: 'codex',
+          agent_kind: 'claude-code',
           launch_source: 'tab_bar_quick_launch',
           request_kind: 'new'
         }
@@ -612,7 +612,7 @@ test.describe('Inline TUI reveal convergence', () => {
         await waitForTabParked(orcaPage, setup.tabId, { parkDelayMs: PARKING_DELAY_MS })
 
         // Accumulate a field-sized backlog against the parked (unmounted)
-        // view so the reveal replay races the live stream, like a real Codex.
+        // view so the reveal replay races the live stream, like a real inline agent.
         await streamWhileParked(setup, 100)
 
         // Reveal under CPU throttle: a long replay parse + throttled frames is

@@ -136,7 +136,7 @@ describe('normalizeAgentSessionConversationName joiners', () => {
 
   it('drops a tag-character payload hidden after a real title', () => {
     // Tag characters mirror ASCII, so this run decodes to readable text that no
-    // surface draws — it reached the user's own Codex history via thread/name/set.
+    // surface draws, yet it would still reach the provider's own session history.
     const hidden = Array.from('ransom', (c) =>
       String.fromCodePoint(0xe0000 + c.charCodeAt(0))
     ).join('')

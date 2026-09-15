@@ -20,7 +20,7 @@ function makeAgentEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusE
     prompt: 'Review complete',
     updatedAt: NOW,
     stateStartedAt: NOW,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey: PANE_KEY,
     stateHistory: [],
     ...overrides
@@ -98,7 +98,7 @@ describe('acknowledgeAgents with a clock-skewed execution host', () => {
           }),
           worktreeId: 'wt-1',
           tab: makeTerminalTab('tab-1', 'wt-1'),
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: NOW + 1_000
         }
       }

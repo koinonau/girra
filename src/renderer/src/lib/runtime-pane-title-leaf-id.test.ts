@@ -28,24 +28,24 @@ describe('resolveRuntimePaneTitleForLeaf', () => {
   })
 
   it('maps a single-leaf pane title to its leaf', () => {
-    expect(resolveRuntimePaneTitleForLeaf(leafLayout, { 1: 'Codex' }, LEAF_A)).toBe('Codex')
+    expect(resolveRuntimePaneTitleForLeaf(leafLayout, { 1: 'OpenCode' }, LEAF_A)).toBe('OpenCode')
   })
 
   it('resolves split-pane titles to the matching leaf by replay order', () => {
-    expect(resolveRuntimePaneTitleForLeaf(splitLayout, { 1: 'zsh', 2: 'Codex' }, LEAF_A)).toBe(
+    expect(resolveRuntimePaneTitleForLeaf(splitLayout, { 1: 'zsh', 2: 'OpenCode' }, LEAF_A)).toBe(
       'zsh'
     )
-    expect(resolveRuntimePaneTitleForLeaf(splitLayout, { 1: 'zsh', 2: 'Codex' }, LEAF_B)).toBe(
-      'Codex'
+    expect(resolveRuntimePaneTitleForLeaf(splitLayout, { 1: 'zsh', 2: 'OpenCode' }, LEAF_B)).toBe(
+      'OpenCode'
     )
   })
 
   it('does not attribute a lone background split title to an unrelated leaf', () => {
-    expect(resolveRuntimePaneTitleForLeaf(splitLayout, { 2: 'Codex' }, LEAF_A)).toBeNull()
+    expect(resolveRuntimePaneTitleForLeaf(splitLayout, { 2: 'OpenCode' }, LEAF_A)).toBeNull()
   })
 
   it('uses a lone title when the tab has no resolved layout root', () => {
-    expect(resolveRuntimePaneTitleForLeaf(undefined, { 7: 'Codex' }, LEAF_A)).toBe('Codex')
+    expect(resolveRuntimePaneTitleForLeaf(undefined, { 7: 'OpenCode' }, LEAF_A)).toBe('OpenCode')
   })
 })
 
@@ -58,7 +58,7 @@ describe('resolveRuntimePaneTitleLeafResolution', () => {
   })
 
   it('reports an unrelated sparse split title without attributing it to the leaf', () => {
-    expect(resolveRuntimePaneTitleLeafResolution(splitLayout, { 2: 'Codex' }, LEAF_A)).toEqual({
+    expect(resolveRuntimePaneTitleLeafResolution(splitLayout, { 2: 'OpenCode' }, LEAF_A)).toEqual({
       title: null,
       hasAnyPaneTitle: true
     })
@@ -66,9 +66,9 @@ describe('resolveRuntimePaneTitleLeafResolution', () => {
 
   it('reports the matching leaf title when one resolves', () => {
     expect(
-      resolveRuntimePaneTitleLeafResolution(splitLayout, { 1: 'zsh', 2: 'Codex' }, LEAF_B)
+      resolveRuntimePaneTitleLeafResolution(splitLayout, { 1: 'zsh', 2: 'OpenCode' }, LEAF_B)
     ).toEqual({
-      title: 'Codex',
+      title: 'OpenCode',
       hasAnyPaneTitle: true
     })
   })

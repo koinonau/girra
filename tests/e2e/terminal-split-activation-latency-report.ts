@@ -1,4 +1,4 @@
-import { summarizeLatencies, type LatencyDistribution } from './codex-composer-echo-latency-probe'
+import { summarizeLatencies, type LatencyDistribution } from './terminal-echo-latency-probe'
 import type { SplitLatencySample } from './terminal-split-activation-latency-phases'
 
 export type BenchmarkRevisionIdentity = {

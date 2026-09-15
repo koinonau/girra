@@ -130,7 +130,7 @@ export function buildAgentPromptWithContext(
   }
   // Why: the new-workspace flow launches each agent with a single plain-text
   // startup prompt. Appending attachments and bounded linked context keeps
-  // extra data visible to Claude/Codex/OpenCode without cluttering the textarea.
+  // extra data visible to Claude/OpenCode/Pi without cluttering the textarea.
   if (!trimmedPrompt) {
     return sections.join('\n\n')
   }
@@ -284,7 +284,7 @@ async function deliverAgentStartupToTerminal(
   const draftPrompt = startup.draftPrompt ?? null
   const runtimeSettings = getSettingsForAgentTabRuntimeOwner(tabId)
   // Why: followupPrompt is the legacy path for stdin-after-start agents
-  // (aider, goose, etc.) that need their initial prompt typed into the live
+  // (e.g. Claude Agent Teams) that need their initial prompt typed into the live
   // session and submitted. Wait until the agent owns the PTY before writing.
   if (startup.followupPrompt) {
     const delivered = await sendFollowupPromptWhenAgentReady({

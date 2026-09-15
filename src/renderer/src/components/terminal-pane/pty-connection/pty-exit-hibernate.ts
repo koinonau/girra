@@ -248,7 +248,7 @@ export function installPtyExitHibernate(session: ConnectPanePtySession): void {
     }
     // Why: intentional restarts suppress the PTY exit ahead of time so the
     // pane stays mounted and can reconnect in place. Without consuming the
-    // suppression here, split-pane Codex restarts would still close the pane
+    // suppression here, split-pane agent restarts would still close the pane
     // because this handler runs before the tab-level close logic sees the exit.
     if (isSuppressedExit) {
       // Why: the action that suppressed the exit owns whether the leaf binding

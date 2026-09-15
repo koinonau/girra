@@ -182,15 +182,15 @@ describe('AgentMap', () => {
     const onSpawnAgent = vi.fn()
     renderMap([card()], {
       onSpawnAgent,
-      launchableAgentsByWorktreeId: { 'worktree-1': ['claude', 'codex'] }
+      launchableAgentsByWorktreeId: { 'worktree-1': ['claude', 'opencode'] }
     })
     fireEvent.click(screen.getByRole('button', { name: 'Open Agent map worktree details' }))
 
     expect(screen.getByText('Start a new agent')).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /Codex/ }))
+    fireEvent.click(screen.getByRole('button', { name: /OpenCode/ }))
 
     // The raw worktree id, not the host-qualified map identity.
-    expect(onSpawnAgent).toHaveBeenCalledWith({ worktreeId: 'worktree-1', agent: 'codex' })
+    expect(onSpawnAgent).toHaveBeenCalledWith({ worktreeId: 'worktree-1', agent: 'opencode' })
   })
 
   it('explains an empty picker rather than offering nothing', () => {

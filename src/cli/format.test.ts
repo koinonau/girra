@@ -183,7 +183,7 @@ describe('formatAutomationShow', () => {
       name: 'Nightly',
       prompt: 'Run checks',
       precheck: null,
-      agentId: 'codex',
+      agentId: 'claude',
       projectId: 'repo-legacy',
       executionTargetType: 'local',
       executionTargetId: 'local',

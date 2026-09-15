@@ -96,7 +96,7 @@ describe('registerFilesystemHandlers', () => {
   })
 
   it('allows git operations on worktrees outside repo/workspace roots', async () => {
-    // Linked worktrees can live anywhere on disk (e.g. ~/.codex/worktrees/).
+    // Linked worktrees can live anywhere on disk (e.g. ~/.claude/worktrees/).
     // As long as the path matches a worktree reported by `git worktree list`
     // for a registered repo, it should be allowed — the security boundary is
     // worktree registration, not directory containment.

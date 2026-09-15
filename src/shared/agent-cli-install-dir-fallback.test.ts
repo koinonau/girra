@@ -16,7 +16,7 @@ import { getSystemCliInstallDirectories } from './system-cli-install-dirs'
  * under a temp home -- hence a synthetic fs rather than a fixture tree.
  *
  * Every staged path goes through `join`, because the lookup builds candidates
- * with the host's `join`: a literal `/opt/homebrew/bin/codex` would never match
+ * with the host's `join`: a literal `/opt/homebrew/bin/claude` would never match
  * on a Windows dev machine.
  */
 const fsFixture = vi.hoisted(() => ({ executables: new Set<string>() }))
@@ -82,19 +82,19 @@ describe('agent CLI install-dir fallback', () => {
     const home = '/Users/tester'
     stage(
       join(home, '.local', 'bin', 'claude'),
-      join('/opt/homebrew/bin', 'codex'),
-      join('/usr/local/bin', 'cursor-agent'),
+      join('/opt/homebrew/bin', 'pi'),
+      join('/usr/local/bin', 'orca'),
       join(home, '.opencode', 'bin', 'opencode')
     )
     expect(
-      resolveAll(['claude', 'codex', 'cursor-agent', 'opencode'], {
+      resolveAll(['claude', 'pi', 'orca', 'opencode'], {
         platform: 'darwin',
         homePath: home
       })
     ).toEqual({
       claude: join(home, '.local', 'bin', 'claude'),
-      codex: join('/opt/homebrew/bin', 'codex'),
-      'cursor-agent': join('/usr/local/bin', 'cursor-agent'),
+      pi: join('/opt/homebrew/bin', 'pi'),
+      orca: join('/usr/local/bin', 'orca'),
       opencode: join(home, '.opencode', 'bin', 'opencode')
     })
   })
@@ -102,19 +102,19 @@ describe('agent CLI install-dir fallback', () => {
   it('finds Linux CLIs in Linuxbrew, snap and nix prefixes, not the macOS brew prefix', () => {
     const home = '/home/tester'
     stage(
-      join('/home/linuxbrew/.linuxbrew/bin', 'codex'),
-      join('/snap/bin', 'cursor-agent'),
+      join('/home/linuxbrew/.linuxbrew/bin', 'pi'),
+      join('/snap/bin', 'orca'),
       join(home, '.nix-profile', 'bin', 'opencode'),
       join('/opt/homebrew/bin', 'claude')
     )
     expect(
-      resolveAll(['codex', 'cursor-agent', 'opencode', 'claude'], {
+      resolveAll(['pi', 'orca', 'opencode', 'claude'], {
         platform: 'linux',
         homePath: home
       })
     ).toEqual({
-      codex: join('/home/linuxbrew/.linuxbrew/bin', 'codex'),
-      'cursor-agent': join('/snap/bin', 'cursor-agent'),
+      pi: join('/home/linuxbrew/.linuxbrew/bin', 'pi'),
+      orca: join('/snap/bin', 'orca'),
       opencode: join(home, '.nix-profile', 'bin', 'opencode'),
       // Why unresolved: /opt/homebrew is an Apple Silicon prefix; Linuxbrew uses another.
       claude: 'claude'
@@ -123,9 +123,9 @@ describe('agent CLI install-dir fallback', () => {
 
   it('leaves the win32 branch on its own install dirs', () => {
     const home = 'C:/Users/tester'
-    stage(join(home, 'AppData', 'Roaming', 'npm', 'codex.cmd'), join('/usr/local/bin', 'claude'))
-    expect(resolveAll(['codex', 'claude'], { platform: 'win32', homePath: home })).toEqual({
-      codex: join(home, 'AppData', 'Roaming', 'npm', 'codex.cmd'),
+    stage(join(home, 'AppData', 'Roaming', 'npm', 'opencode.cmd'), join('/usr/local/bin', 'claude'))
+    expect(resolveAll(['opencode', 'claude'], { platform: 'win32', homePath: home })).toEqual({
+      opencode: join(home, 'AppData', 'Roaming', 'npm', 'opencode.cmd'),
       claude: 'claude'
     })
   })
@@ -154,7 +154,7 @@ describe('agent CLI install-dir fallback', () => {
   })
 
   // Why both resolvers and both platforms: resolveCliCommand is what every
-  // spawn site (codex login, app-server, session-index heal) calls, and its
+  // spawn site (claude login, skill updates, rate-limit probes) calls, and its
   // list was once spelled separately from resolveCliCommands'. A same-named
   // binary in /usr/local/bin must never shadow the one a version manager owns.
   describe.each([
@@ -166,26 +166,26 @@ describe('agent CLI install-dir fallback', () => {
     }
   ])('$platform: system dirs stay last', ({ platform, home, systemDir }) => {
     it('lets a version-manager install outrank a system one', () => {
-      const managed = join(home, '.volta', 'bin', 'codex')
-      stage(managed, join(systemDir, 'codex'), join('/usr/local/bin', 'codex'))
-      expect(resolveCliCommand('codex', { platform, homePath: home })).toBe(managed)
-      expect(resolveAll(['codex'], { platform, homePath: home })).toEqual({ codex: managed })
+      const managed = join(home, '.volta', 'bin', 'claude')
+      stage(managed, join(systemDir, 'claude'), join('/usr/local/bin', 'claude'))
+      expect(resolveCliCommand('claude', { platform, homePath: home })).toBe(managed)
+      expect(resolveAll(['claude'], { platform, homePath: home })).toEqual({ claude: managed })
     })
 
     it('lets an npm --user (~/.local/bin) install outrank a system one', () => {
-      const managed = join(home, '.local', 'bin', 'codex')
-      stage(managed, join(systemDir, 'codex'))
-      expect(resolveCliCommand('codex', { platform, homePath: home })).toBe(managed)
-      expect(resolveAll(['codex'], { platform, homePath: home })).toEqual({ codex: managed })
+      const managed = join(home, '.local', 'bin', 'claude')
+      stage(managed, join(systemDir, 'claude'))
+      expect(resolveCliCommand('claude', { platform, homePath: home })).toBe(managed)
+      expect(resolveAll(['claude'], { platform, homePath: home })).toEqual({ claude: managed })
     })
 
     it('lets a copy already on PATH outrank every install dir', () => {
-      const onPath = join('/custom/bin', 'codex')
+      const onPath = join('/custom/bin', 'claude')
       const pathEnv = [GUI_LAUNCH_PATH, '/custom/bin'].join(delimiter)
-      stage(onPath, join(home, '.volta', 'bin', 'codex'), join(systemDir, 'codex'))
-      expect(resolveCliCommand('codex', { platform, homePath: home, pathEnv })).toBe(onPath)
-      expect(resolveCliCommands(['codex'], { platform, homePath: home, pathEnv })).toEqual(
-        new Map([['codex', onPath]])
+      stage(onPath, join(home, '.volta', 'bin', 'claude'), join(systemDir, 'claude'))
+      expect(resolveCliCommand('claude', { platform, homePath: home, pathEnv })).toBe(onPath)
+      expect(resolveCliCommands(['claude'], { platform, homePath: home, pathEnv })).toEqual(
+        new Map([['claude', onPath]])
       )
     })
   })
@@ -221,7 +221,7 @@ describe('agent CLI install-dir fallback', () => {
     'reports a system-installed CLI as detected, not just resolved',
     () => {
       stage(
-        join('/usr/local/bin', 'codex'),
+        join('/usr/local/bin', 'claude'),
         join(MOCK_HOME, '.opencode', 'bin', 'opencode'),
         // Why pi: it is a probed detect command on every runtime (tui-agent-config.ts,
         // no detectUnsupportedRuntimes) and its installer defaults to ~/.vite-plus/bin,
@@ -229,8 +229,8 @@ describe('agent CLI install-dir fallback', () => {
         join(MOCK_HOME, '.vite-plus', 'bin', 'pi')
       )
       // All three come from the fallback: the stubbed PATH holds no system dir.
-      expect(detectCommandsInInstallDirs(['codex', 'opencode', 'pi', 'cursor-agent'])).toEqual(
-        new Set(['codex', 'opencode', 'pi'])
+      expect(detectCommandsInInstallDirs(['claude', 'opencode', 'pi', 'orca'])).toEqual(
+        new Set(['claude', 'opencode', 'pi'])
       )
     }
   )

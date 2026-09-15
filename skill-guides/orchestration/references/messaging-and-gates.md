@@ -39,11 +39,10 @@ coordinator calls; a dispatched worker instead copies the exact `--from` and
 capability arguments in its preamble. `check` is the exception: it identifies
 its caller with `--terminal`, never `--from`.
 
-Group addresses include `@all`, `@idle`, `@claude`, `@codex`, `@opencode`,
-`@gemini`, `@droid`, `@grok`, `@cursor`, and `@worktree:<id>`. Every group but
-`@worktree:<id>` means the live Dispatches of the sender's own Run. Mail goes
-to each `dispatch:<id>` mailbox, except a worker coordinating a child Run
-receives it in that `run:<id>` mailbox. A sender bound to no Run is refused;
+Group addresses include `@all`, `@idle`, `@claude`, `@opencode`, and
+`@worktree:<id>`. Every group but `@worktree:<id>` means the live Dispatches of
+the sender's own Run. Mail goes to each `dispatch:<id>` mailbox, except a worker
+coordinating a child Run receives it in that `run:<id>` mailbox. A sender bound to no Run is refused;
 `--run` must match the group audience and never grants membership.
 A Run group excludes its owning coordinator; a worker raising a blocker sends
 to `run:<id>`. A worker that created its own Run addresses that Run's workers,

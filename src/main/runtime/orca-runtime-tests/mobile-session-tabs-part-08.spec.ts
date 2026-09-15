@@ -314,7 +314,7 @@ describe('OrcaRuntimeService', () => {
         connectionId: null,
         state: 'working',
         prompt: 'unrelated task',
-        agentType: 'codex',
+        agentType: 'claude',
         receivedAt: Date.now(),
         stateStartedAt: Date.now()
       }

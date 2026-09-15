@@ -1,7 +1,9 @@
 import type { AgentSessionRecord } from '../../shared/agent-session-record'
 import { agentSessionProviderHandleChainHead } from '../../shared/agent-session-provider-handle'
-import { withCliRuntimeOnPath } from '../../shared/node-cli-command-resolution'
-import { resolveClaudeCommand } from '../codex-cli/command'
+import {
+  resolveClaudeCommand,
+  withCliRuntimeOnPath
+} from '../../shared/node-cli-command-resolution'
 import { getSpawnArgsForWindows } from '../win32-utils'
 import type { ClaudeStructuredAuthPolicy } from '../claude-accounts/claude-structured-auth-policy'
 import {

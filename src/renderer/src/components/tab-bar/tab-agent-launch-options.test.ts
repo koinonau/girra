@@ -7,76 +7,69 @@ import {
 
 describe('tab agent launch options', () => {
   it('orders detected agents by the configured default first', () => {
-    expect(orderTabLaunchAgents('codex', ['claude', 'codex', 'gemini'])).toEqual([
-      'codex',
+    expect(orderTabLaunchAgents('opencode', ['claude', 'opencode', 'pi'])).toEqual([
+      'opencode',
       'claude',
-      'gemini'
+      'pi'
     ])
   })
 
   it('excludes disabled agents from the launch list', () => {
-    expect(orderTabLaunchAgents(null, ['claude', 'codex', 'openclaude'], ['openclaude'])).toEqual([
+    expect(orderTabLaunchAgents(null, ['claude', 'opencode', 'pi'], ['pi'])).toEqual([
       'claude',
-      'codex'
+      'opencode'
     ])
   })
 
   it('drops a disabled default agent instead of surfacing it first', () => {
-    const ordered = orderTabLaunchAgents(
-      'openclaude',
-      ['claude', 'codex', 'openclaude'],
-      ['openclaude']
-    )
-    expect(ordered).not.toContain('openclaude')
-    expect(ordered).toEqual(['claude', 'codex'])
+    const ordered = orderTabLaunchAgents('pi', ['claude', 'opencode', 'pi'], ['pi'])
+    expect(ordered).not.toContain('pi')
+    expect(ordered).toEqual(['claude', 'opencode'])
   })
 
   it('keeps a disabled agent out of new-tab search results', () => {
     const options = buildTabAgentLaunchOptions(
-      orderTabLaunchAgents('codex', ['claude', 'codex', 'openclaude'], ['openclaude'])
+      orderTabLaunchAgents('opencode', ['claude', 'opencode', 'pi'], ['pi'])
     )
-    expect(findMatchingTabAgentLaunchOptions('open', options).map((o) => o.agent)).toEqual([])
+    expect(findMatchingTabAgentLaunchOptions('pi', options).map((o) => o.agent)).toEqual([])
   })
 
   it('matches detected agents by id, label, command, and command override', () => {
-    const options = buildTabAgentLaunchOptions(['claude', 'codex', 'antigravity'], {
-      codex: 'codex-beta'
+    const options = buildTabAgentLaunchOptions(['claude', 'claude-agent-teams', 'opencode'], {
+      opencode: 'opencode-beta'
     })
 
     expect(
-      findMatchingTabAgentLaunchOptions('Claude', options).map((option) => option.agent)
-    ).toEqual(['claude'])
-    expect(findMatchingTabAgentLaunchOptions('openai codex', options)).toEqual([])
+      findMatchingTabAgentLaunchOptions('Claude Agent Teams', options).map((option) => option.agent)
+    ).toEqual(['claude-agent-teams'])
+    expect(findMatchingTabAgentLaunchOptions('sst opencode', options)).toEqual([])
     expect(
-      findMatchingTabAgentLaunchOptions('codex-beta', options).map((option) => option.agent)
-    ).toEqual(['codex'])
-    expect(findMatchingTabAgentLaunchOptions('agy', options).map((option) => option.agent)).toEqual(
-      ['antigravity']
-    )
+      findMatchingTabAgentLaunchOptions('opencode-beta', options).map((option) => option.agent)
+    ).toEqual(['opencode'])
+    expect(
+      findMatchingTabAgentLaunchOptions('orca', options).map((option) => option.agent)
+    ).toEqual(['claude-agent-teams'])
   })
 
   it('matches agents on a partial prefix so the launcher actually searches', () => {
-    const options = buildTabAgentLaunchOptions(['claude', 'codex', 'gemini', 'antigravity'])
+    const options = buildTabAgentLaunchOptions(['claude', 'opencode', 'pi'])
 
     // Each is one character short of the full agent name.
-    expect(findMatchingTabAgentLaunchOptions('gemin', options).map((o) => o.agent)).toEqual([
-      'gemini'
+    expect(findMatchingTabAgentLaunchOptions('opencod', options).map((o) => o.agent)).toEqual([
+      'opencode'
     ])
     expect(findMatchingTabAgentLaunchOptions('clau', options).map((o) => o.agent)).toEqual([
       'claude'
     ])
-    expect(findMatchingTabAgentLaunchOptions('anti', options).map((o) => o.agent)).toEqual([
-      'antigravity'
-    ])
   })
 
   it('ranks an exact alias above weaker prefix matches', () => {
-    const options = buildTabAgentLaunchOptions(['codex', 'copilot', 'codebuff'])
+    const options = buildTabAgentLaunchOptions(['claude-agent-teams', 'claude'])
 
-    // "co" prefixes all three; "codex" exactly matches one and must lead.
-    expect(findMatchingTabAgentLaunchOptions('codex', options)[0]?.agent).toBe('codex')
-    expect(findMatchingTabAgentLaunchOptions('co', options).map((o) => o.agent)).toEqual(
-      expect.arrayContaining(['codex', 'copilot', 'codebuff'])
+    // "clau" prefixes both; "claude" exactly matches one and must lead.
+    expect(findMatchingTabAgentLaunchOptions('claude', options)[0]?.agent).toBe('claude')
+    expect(findMatchingTabAgentLaunchOptions('clau', options).map((o) => o.agent)).toEqual(
+      expect.arrayContaining(['claude-agent-teams', 'claude'])
     )
   })
 
@@ -89,13 +82,13 @@ describe('tab agent launch options', () => {
   })
 
   it('requires at least two characters before a prefix matches (no single-key flood)', () => {
-    const options = buildTabAgentLaunchOptions(['claude', 'codex', 'copilot', 'cursor'])
+    const options = buildTabAgentLaunchOptions(['claude', 'claude-agent-teams', 'opencode', 'pi'])
 
     // A lone "c" must not surface (and auto-launch) an agent.
     expect(findMatchingTabAgentLaunchOptions('c', options)).toEqual([])
     // Two characters is enough to start searching.
-    expect(findMatchingTabAgentLaunchOptions('co', options).map((o) => o.agent)).toEqual(
-      expect.arrayContaining(['codex', 'copilot'])
+    expect(findMatchingTabAgentLaunchOptions('cl', options).map((o) => o.agent)).toEqual(
+      expect.arrayContaining(['claude', 'claude-agent-teams'])
     )
   })
 })

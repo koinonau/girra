@@ -23,7 +23,7 @@ import {
   FAKE_AGENT_WINDOWS_SHELL
 } from './helpers/fake-agent-command-override'
 
-type TranscriptProvider = 'claude' | 'grok' | 'omp'
+type TranscriptProvider = 'claude'
 
 const PROVIDERS: readonly {
   agent: TranscriptProvider
@@ -59,55 +59,11 @@ const PROVIDERS: readonly {
       ]
         .map((record) => JSON.stringify(record))
         .join('\n')}\n`
-  },
-  {
-    agent: 'grok',
-    title: 'Grok ready',
-    first: 'Grok transcript first',
-    second: 'Grok transcript second',
-    third: 'Grok transcript after cursor',
-    transcript: (sessionId, first, second, third) =>
-      `${[
-        { id: `${sessionId}-assistant-1`, type: 'assistant', content: first },
-        { id: `${sessionId}-assistant-2`, type: 'assistant', content: second },
-        { id: `${sessionId}-assistant-3`, type: 'assistant', content: third }
-      ]
-        .map((record) => JSON.stringify(record))
-        .join('\n')}\n`
-  },
-  {
-    agent: 'omp',
-    title: 'OMP ready',
-    first: 'OMP transcript first',
-    second: 'OMP transcript second',
-    third: 'OMP transcript after cursor',
-    transcript: (sessionId, first, second, third) =>
-      `${[
-        {
-          type: 'message',
-          id: `${sessionId}-user-1`,
-          message: { role: 'user', content: [{ type: 'text', text: first }] }
-        },
-        {
-          type: 'message',
-          id: `${sessionId}-assistant-1`,
-          message: { role: 'assistant', content: [{ type: 'text', text: second }] }
-        },
-        {
-          type: 'message',
-          id: `${sessionId}-assistant-2`,
-          message: { role: 'assistant', content: [{ type: 'text', text: third }] }
-        }
-      ]
-        .map((record) => JSON.stringify(record))
-        .join('\n')}\n`
   }
 ]
 
 const fakeCliDir = mkdtempSync(path.join(os.tmpdir(), 'orca-e2e-worker-transcript-providers-'))
 const capabilityLedgerPath = path.join(fakeCliDir, 'capabilities.jsonl')
-const fakeGrokHome = path.join(fakeCliDir, 'grok-home')
-const fakeOmpHome = path.join(fakeCliDir, 'omp-home')
 
 function writeFakeProvider(agent: TranscriptProvider, title: string): string {
   const configPath = path.join(fakeCliDir, `${agent}-config.json`)
@@ -121,7 +77,7 @@ async function sendProviderHook() {
   if (hookSent) return
   hookSent = true
   const config = JSON.parse(readFileSync(configPath, 'utf8'))
-  const payload = ${providerHookPayload(agent)}
+  const payload = ${providerHookPayload()}
   await fetch('http://127.0.0.1:' + process.env.ORCA_AGENT_HOOK_PORT + '${hookPath}', {
     method: 'POST',
     headers: {
@@ -162,14 +118,8 @@ setInterval(() => {}, 60_000)
   return buildFakeAgentCommandOverride(executable)
 }
 
-function providerHookPayload(agent: TranscriptProvider): string {
-  if (agent === 'claude') {
-    return "({ hook_event_name: 'UserPromptSubmit', session_id: config.sessionId, transcript_path: config.transcriptPath, prompt: 'Read the provider transcript' })"
-  }
-  if (agent === 'grok') {
-    return "({ hook_event_name: 'user_prompt_submit', sessionId: config.sessionId, cwd: config.cwd, grokHome: config.grokHome, prompt: 'Read the provider transcript' })"
-  }
-  return "({ hook_event_name: 'before_agent_start', session_id: config.sessionId, session_file: config.transcriptPath, prompt: 'Read the provider transcript' })"
+function providerHookPayload(): string {
+  return "({ hook_event_name: 'UserPromptSubmit', session_id: config.sessionId, transcript_path: config.transcriptPath, prompt: 'Read the provider transcript' })"
 }
 
 const agentCommands = Object.fromEntries(
@@ -179,9 +129,7 @@ const agentCommands = Object.fromEntries(
 const test = base.extend({
   launchEnv: [
     {
-      PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`,
-      GROK_HOME: fakeGrokHome,
-      OMP_CODING_AGENT_DIR: fakeOmpHome
+      PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`
     },
     { option: true }
   ]
@@ -238,25 +186,17 @@ test('worker-read uses provider transcripts across supported orchestration agent
     paneKey: coordinatorPane.paneKey
   })
   const coordinatorHandle = coordinator.result.terminal.handle
-  const coordinatorSummary = await listWorker(client, coordinatorHandle)
+  await listWorker(client, coordinatorHandle)
   const coordinatorTerminal = await client.call<{ terminal: { worktreeId: string } }>(
     'terminal.show',
     { terminal: coordinatorHandle }
   )
-  let coordinatorWorktreePath = coordinatorSummary.worktreePath
   await expect
     .poll(async () => {
-      const listed = await client.call<{ worktrees: { id: string; path: string }[] }>(
-        'worktree.list',
-        {}
-      )
-      const worktree = listed.result.worktrees.find(
+      const listed = await client.call<{ worktrees: { id: string }[] }>('worktree.list', {})
+      return listed.result.worktrees.some(
         (candidate) => candidate.id === coordinatorTerminal.result.terminal.worktreeId
       )
-      if (worktree?.path) {
-        coordinatorWorktreePath = worktree.path
-      }
-      return Boolean(worktree)
     })
     .toBe(true)
   const run = await client.call<{ run: { id: string } }>('orchestration.runCreate', {
@@ -274,18 +214,7 @@ test('worker-read uses provider transcripts across supported orchestration agent
       path.join(os.tmpdir(), `orca-e2e-${provider.agent}-transcript-`)
     )
     const sessionId = `e2e-${provider.agent}-session`
-    const transcriptPath =
-      provider.agent === 'grok'
-        ? path.join(
-            fakeGrokHome,
-            'sessions',
-            encodeURIComponent(coordinatorWorktreePath),
-            sessionId,
-            'chat_history.jsonl'
-          )
-        : provider.agent === 'omp'
-          ? path.join(fakeOmpHome, 'workspace', `2026-08-30T00-00-00_${sessionId}.jsonl`)
-          : path.join(transcriptDir, `${provider.agent}-session.jsonl`)
+    const transcriptPath = path.join(transcriptDir, `${provider.agent}-session.jsonl`)
     const initialTranscript = provider
       .transcript(sessionId, provider.first, provider.second, provider.third)
       .split('\n')
@@ -297,13 +226,7 @@ test('worker-read uses provider transcripts across supported orchestration agent
     // is emitted through the same authenticated path as a real provider hook.
     writeFileSync(
       path.join(fakeCliDir, `${provider.agent}-config.json`),
-      JSON.stringify({
-        sessionId,
-        transcriptPath,
-        ...(provider.agent === 'grok'
-          ? { cwd: coordinatorWorktreePath, grokHome: fakeGrokHome }
-          : {})
-      })
+      JSON.stringify({ sessionId, transcriptPath })
     )
     const started = await client.call<{
       dispatchId: string

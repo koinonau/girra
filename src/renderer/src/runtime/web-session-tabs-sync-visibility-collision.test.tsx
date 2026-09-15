@@ -123,7 +123,7 @@ function makeTerminalSnapshot(
           prompt: 'build',
           updatedAt: 100,
           stateStartedAt: 90,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: `${parentTabId}:${leafId}`,
           tabId: parentTabId,
           worktreeId: WORKTREE,

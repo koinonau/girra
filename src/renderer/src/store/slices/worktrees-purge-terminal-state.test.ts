@@ -56,12 +56,12 @@ describe('purgeWorktreeTerminalState direct (design §4.4)', () => {
       automaticAgentResumeClaimsByTabId: {
         'tab-1': {
           worktreeId: 'repoA::/a/wt1',
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           providerSession: { key: 'session_id', id: 'sess-1' }
         },
         'tab-3': {
           worktreeId: 'repoA::/a/wt2',
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           providerSession: { key: 'session_id', id: 'sess-3' }
         }
       },
@@ -127,7 +127,7 @@ describe('purgeWorktreeTerminalState direct (design §4.4)', () => {
     expect(s.automaticAgentResumeClaimsByTabId).toEqual({
       'tab-3': {
         worktreeId: 'repoA::/a/wt2',
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         providerSession: { key: 'session_id', id: 'sess-3' }
       }
     })

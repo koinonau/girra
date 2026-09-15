@@ -162,7 +162,7 @@ describe('orchestration detached mailbox routing', () => {
     const harness = createRuntime(db)
     const run = createBoundRun(db, 'Working Run')
     await harness.runtime.listTerminals()
-    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Codex working\x07', 1)
+    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Claude working\x07', 1)
     const fullMailboxScan = vi.spyOn(db, 'getUndeliveredUnreadMessages')
     const message = insertDirectRunMessage(db, run.id, 'Direct coordinator status')
 

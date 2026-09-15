@@ -199,7 +199,7 @@ describe('AutomationsListPanel flat table layout', () => {
       automation: makeAutomation({
         id: 'auto-1',
         name: 'Nightly Sync',
-        agentId: 'codex',
+        agentId: 'opencode',
         rrule: 'FREQ=DAILY;BYHOUR=2;BYMINUTE=0',
         nextRunAt: 10000,
         lastRunAt: 5000,

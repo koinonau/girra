@@ -8,16 +8,17 @@ import {
 } from './agent-picker-search'
 import { AGENT_CATALOG, type AgentCatalogEntry } from './agent-catalog'
 
+// Why: ranking is roster-agnostic, so fake ids keep every scoring rule covered.
 const agents = [
   entry('claude', 'Claude', 'claude'),
-  entry('codex', 'Codex', 'codex'),
-  entry('copilot', 'GitHub Copilot', 'copilot'),
+  entry('coder-x', 'Coder X', 'coderx'),
+  entry('grand-central', 'Grand Central', 'grandc'),
   entry('opencode', 'OpenCode', 'opencode'),
-  entry('mistral-vibe', 'Mistral Vibe', 'vibe'),
-  entry('qwen-code', 'Qwen Code', 'qwen-code'),
-  entry('crush', 'Charm', 'crush'),
-  entry('antigravity', 'Antigravity', 'agy'),
-  entry('cursor', 'Cursor', 'cursor-agent')
+  entry('mega-vibe', 'Mega Vibe', 'vibe'),
+  entry('quick-code', 'Quick Code', 'quick-code'),
+  entry('charm', 'Charm', 'glam'),
+  entry('lift', 'Lift', 'hoist'),
+  entry('pointer', 'Pointer', 'pointer-agent')
 ]
 
 afterEach(() => {
@@ -36,24 +37,24 @@ describe('agent picker search', () => {
       searchAgentPickerEntries(agents, 'cod')
         .map((agent) => agent.id)
         .slice(0, 3)
-    ).toEqual(['codex', 'opencode', 'qwen-code'])
+    ).toEqual(['coder-x', 'opencode', 'quick-code'])
   })
 
   it('matches multi-word agents by initials and ordered shorthand', () => {
-    expect(searchAgentPickerEntries(agents, 'gc')[0]?.id).toBe('copilot')
-    expect(searchAgentPickerEntries(agents, 'mv')[0]?.id).toBe('mistral-vibe')
-    expect(searchAgentPickerEntries(agents, 'qc')[0]?.id).toBe('qwen-code')
+    expect(searchAgentPickerEntries(agents, 'gc')[0]?.id).toBe('grand-central')
+    expect(searchAgentPickerEntries(agents, 'mv')[0]?.id).toBe('mega-vibe')
+    expect(searchAgentPickerEntries(agents, 'qc')[0]?.id).toBe('quick-code')
   })
 
   it('matches command aliases that do not appear in the display label', () => {
-    expect(searchAgentPickerEntries(agents, 'agy')[0]?.id).toBe('antigravity')
-    expect(searchAgentPickerEntries(agents, 'cursor-agent')[0]?.id).toBe('cursor')
+    expect(searchAgentPickerEntries(agents, 'hoist')[0]?.id).toBe('lift')
+    expect(searchAgentPickerEntries(agents, 'pointer-agent')[0]?.id).toBe('pointer')
   })
 
   it('normalizes accepted pasted whitespace without regex replacement', () => {
     const replaceSpy = vi.spyOn(String.prototype, 'replace')
 
-    expect(searchAgentPickerEntries(agents, '  qwen\n\tcode  ')[0]?.id).toBe('qwen-code')
+    expect(searchAgentPickerEntries(agents, '  quick\n\tcode  ')[0]?.id).toBe('quick-code')
 
     expect(replaceSpy).not.toHaveBeenCalled()
   })
@@ -135,7 +136,7 @@ describe('agent picker search', () => {
         filteredAgents,
         rawQuery: 'gc'
       })
-    ).toBe('copilot')
+    ).toBe('grand-central')
     expect(
       getAgentPickerCommandValue({
         blankValue: '__none__',
@@ -148,9 +149,9 @@ describe('agent picker search', () => {
   })
 })
 
-function entry(id: AgentCatalogEntry['id'], label: string, cmd: string): AgentCatalogEntry {
+function entry(id: string, label: string, cmd: string): AgentCatalogEntry {
   return {
-    id,
+    id: id as AgentCatalogEntry['id'],
     label,
     cmd,
     homepageUrl: 'https://example.com'

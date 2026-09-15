@@ -411,18 +411,18 @@ describe('registerWorktreeHandlers', () => {
     const result = await handlers['worktrees:create'](null, {
       repoId: 'repo-1',
       name: 'improve-dashboard',
-      createdWithAgent: 'codex'
+      createdWithAgent: 'opencode'
     })
 
     expect(store.setWorktreeMeta).toHaveBeenCalledWith(
       'repo-1::/workspace/improve-dashboard',
       expect.objectContaining({
-        createdWithAgent: 'codex'
+        createdWithAgent: 'opencode'
       })
     )
     expect(result).toMatchObject({
       worktree: expect.objectContaining({
-        createdWithAgent: 'codex'
+        createdWithAgent: 'opencode'
       })
     })
   })

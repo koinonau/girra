@@ -338,7 +338,7 @@ describe('remote-paired pane: host snapshot mirror vs client byte-derived status
         .getState()
         .setAgentStatus(
           LOCAL_PANE_KEY,
-          { state: 'working', prompt: 'unrelated local work', agentType: 'codex' },
+          { state: 'working', prompt: 'unrelated local work', agentType: 'opencode' },
           undefined,
           { updatedAt: T0 - 10_000 },
           { tabId: 'local-tab-1', worktreeId: LOCAL_WT }

@@ -18,7 +18,7 @@ export function createFederationWorkerStartRequest(
       worktree: 'new-top-level',
       repo: 'id:windows-repo',
       name: 'windows-audit',
-      agent: 'codex',
+      agent: 'claude',
       ...overrides
     }
   }

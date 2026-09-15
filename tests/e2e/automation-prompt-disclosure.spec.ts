@@ -24,7 +24,7 @@ test('automation detail keeps short prompts readable and reveals a very long pro
         throw new Error('Seeded test repo is not available')
       }
       const base = {
-        agentId: 'codex' as const,
+        agentId: 'claude' as const,
         repo: `id:${repo.id}`,
         workspaceMode: 'new_per_run' as const,
         reuseSession: false,

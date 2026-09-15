@@ -191,7 +191,7 @@ describe('worktree name retirement registry', () => {
     ).resolves.toEqual({ exhaustedTiers: 0, names: ['nautilus'] })
   })
 
-  it('preserves a Codex-only local retirement across remove and re-add', async () => {
+  it('preserves a local retirement with no Claude bucket across remove and re-add', async () => {
     const workspaceDir = join(testState.dir, 'workspaces')
     const oldRepo = {
       id: REPO,
@@ -207,7 +207,7 @@ describe('worktree name retirement registry', () => {
       await import('./worktree-name-retirement')
     await retireGeneratedWorktreeName(store, oldRepo, store.getSettings(), 'nautilus')
 
-    // The deleted workspace has no Claude bucket; Codex rollout files are not backfilled.
+    // The deleted workspace has no Claude bucket, so nothing on disk backfills the name.
     store.removeProject(REPO)
     const newRepo = { ...oldRepo, id: OTHER_REPO }
     store.addRepo(newRepo)

@@ -110,7 +110,7 @@ async function seedPlacement(name, tag) {
 
 async function installFakeAgentCommands() {
   await mkdir(fakeBin, { recursive: true })
-  for (const name of ['codex', 'claude']) {
+  for (const name of ['claude']) {
     const executable = path.join(fakeBin, process.platform === 'win32' ? `${name}.cmd` : name)
     await writeFile(
       executable,
@@ -146,7 +146,6 @@ function execSkills(args) {
         ...process.env,
         HOME: home,
         USERPROFILE: home,
-        CODEX_HOME: path.join(home, '.codex'),
         CLAUDE_CONFIG_DIR: path.join(home, '.claude'),
         XDG_STATE_HOME: stateHome,
         GIT_CONFIG_COUNT: '1',
@@ -164,7 +163,6 @@ try {
   const targetHistorical = historicalRelease(targetName)
   const controlHistorical = historicalRelease(controlName)
   await installFakeAgentCommands()
-  await mkdir(path.join(home, '.codex'), { recursive: true })
   await mkdir(path.join(home, '.claude'), { recursive: true })
   await seedPlacement(targetName, targetHistorical.tag)
   await seedPlacement(controlName, controlHistorical.tag)

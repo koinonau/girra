@@ -1,6 +1,6 @@
 import type { Page } from '@stablyai/playwright-test'
 
-export type CodexEchoLatencySample = {
+export type EchoLatencySample = {
   index: number
   char: string
   /** keydown -> xterm finished parsing the echoed glyph (real echo latency). */
@@ -9,8 +9,8 @@ export type CodexEchoLatencySample = {
   keyToRenderMs: number | null
 }
 
-export type CodexEchoProbeReport = {
-  samples: CodexEchoLatencySample[]
+export type EchoProbeReport = {
+  samples: EchoLatencySample[]
   keysObserved: number
   parseEvents: number
   renderEvents: number
@@ -21,8 +21,8 @@ export type CodexEchoProbeReport = {
 declare global {
   // oxlint-disable-next-line typescript-eslint/consistent-type-definitions -- declaration merging requires interface
   interface Window {
-    __codexEchoProbe?: {
-      report(): CodexEchoProbeReport
+    __terminalEchoProbe?: {
+      report(): EchoProbeReport
       dispose(): void
     }
   }
@@ -36,7 +36,7 @@ declare global {
  * Timestamps here are taken inside the renderer with performance.now(), so the
  * measured window contains no cross-process work at all.
  */
-export async function installCodexEchoLatencyProbe(page: Page, target: string): Promise<void> {
+export async function installEchoLatencyProbe(page: Page, target: string): Promise<void> {
   await page.evaluate((target) => {
     type PendingSample = {
       index: number
@@ -57,15 +57,15 @@ export async function installCodexEchoLatencyProbe(page: Page, target: string): 
     const manager = tabId ? window.__paneManagers?.get(tabId) : null
     const pane = manager?.getActivePane?.() ?? manager?.getPanes?.()[0] ?? null
     if (!pane) {
-      throw new Error('Codex echo probe: no active terminal pane')
+      throw new Error('Terminal echo probe: no active terminal pane')
     }
     const terminal = pane.terminal
     if (typeof terminal.onWriteParsed !== 'function') {
-      throw new Error('Codex echo probe: xterm build has no onWriteParsed')
+      throw new Error('Terminal echo probe: xterm build has no onWriteParsed')
     }
 
-    const samples: CodexEchoLatencySample[] = []
-    const awaitingRender: { sample: CodexEchoLatencySample; startedAt: number }[] = []
+    const samples: EchoLatencySample[] = []
+    const awaitingRender: { sample: EchoLatencySample; startedAt: number }[] = []
     // Why a queue, not one slot: a slow echo can still be outstanding when the
     // next key is pressed, and a single slot silently discards that sample.
     const pending: PendingSample[] = []
@@ -98,7 +98,7 @@ export async function installCodexEchoLatencyProbe(page: Page, target: string): 
           break
         }
         entry.parsedAt = performance.now()
-        const sample: CodexEchoLatencySample = {
+        const sample: EchoLatencySample = {
           index: entry.index,
           char: entry.char,
           keyToParseMs: entry.parsedAt - entry.startedAt,
@@ -139,7 +139,7 @@ export async function installCodexEchoLatencyProbe(page: Page, target: string): 
     const parsedDisposable = terminal.onWriteParsed(observeParse)
     const renderDisposable = terminal.onRender(observeRender)
 
-    window.__codexEchoProbe = {
+    window.__terminalEchoProbe = {
       report: () => ({
         samples: [...samples],
         keysObserved,
@@ -158,11 +158,11 @@ export async function installCodexEchoLatencyProbe(page: Page, target: string): 
 }
 
 /** Drains every recorded sample in a single round-trip once typing has finished. */
-export async function collectCodexEchoLatencyReport(page: Page): Promise<CodexEchoProbeReport> {
+export async function collectEchoLatencyReport(page: Page): Promise<EchoProbeReport> {
   return page.evaluate(() => {
-    const probe = window.__codexEchoProbe
+    const probe = window.__terminalEchoProbe
     if (!probe) {
-      throw new Error('Codex echo probe was never installed')
+      throw new Error('Terminal echo probe was never installed')
     }
     const report = probe.report()
     probe.dispose()

@@ -37,7 +37,7 @@ describe('applyWebSessionTabsSnapshot', () => {
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           isActive: true,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           startupCwd: '/worktree/packages/web',
           status: 'ready',
           terminal: 'terminal-1'
@@ -55,7 +55,7 @@ describe('applyWebSessionTabsSnapshot', () => {
       {
         id: mirroredId,
         ptyId: 'remote:web-env-1@@terminal-1',
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         startupCwd: '/worktree/packages/web',
         title: 'host shell',
         worktreeId: WT
@@ -82,13 +82,13 @@ describe('applyWebSessionTabsSnapshot', () => {
       id: toWebTerminalSurfaceTabId('host-tab-1'),
       ptyId: 'remote:web-env-1@@terminal-1',
       worktreeId: WT,
-      title: 'Codex',
-      defaultTitle: 'Codex',
+      title: 'OpenCode',
+      defaultTitle: 'OpenCode',
       customTitle: null,
       color: null,
       sortOrder: 0,
       createdAt: NOW,
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     }
 
     const patch = applyWebSessionTabsSnapshot(

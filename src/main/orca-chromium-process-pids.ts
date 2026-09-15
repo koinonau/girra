@@ -21,7 +21,7 @@ import { getAppEnvironment, hasAppEnvironment } from '../shared/app-environment'
  * `terminateWindowsProcessTree` resolves without killing, and
  * `killSourceControlAgentProcess` returns that straight to a caller that then
  * releases the managed-home lock, so failing closed would trade one unreadable
- * metrics table for every PTY, git, codex and notebook tree in main leaking at
+ * metrics table for every PTY, git and notebook tree in main leaking at
  * once.
  *
  * Host coverage: only Electron main installs a Chromium-backed AppEnvironment

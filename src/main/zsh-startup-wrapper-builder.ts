@@ -48,8 +48,6 @@ export type ZshStartupHookSpec = {
   readyMarkerEscaped: string
   /** OSC 133 command-lifecycle hooks (behind the `markers` feature). */
   osc133CommandMarkers: boolean
-  /** Local-only command delivery from the first zle line editor. */
-  startupCommandDelivery: boolean
   /** Comment heading the overlay restores inside the hook. */
   overlayRestoreComment: string
   restores: ZshWrapperRestoreSpec
@@ -136,15 +134,9 @@ function buildDeferredInit(spec: ZshStartupHookSpec): string {
     precmd_functions=(\${precmd_functions:#__orca_deferred_init})
   fi`
     : `  precmd_functions=(\${precmd_functions:#__orca_deferred_init})`
-  const lineInitRegistration = spec.startupCommandDelivery
-    ? `  if __orca_has_feature ready || __orca_has_feature startup; then
-    __orca_emit_ready_marker=""
-    __orca_has_feature ready && __orca_emit_ready_marker=1
-${indentBlock(getZshShellReadyMarkerRegistrationBlock(spec.readyMarkerEscaped, true), '    ')}
-  fi`
-    : featureGuard('ready', [
-        indentBlock(getZshShellReadyMarkerRegistrationBlock(spec.readyMarkerEscaped), '')
-      ])
+  const lineInitRegistration = featureGuard('ready', [
+    indentBlock(getZshShellReadyMarkerRegistrationBlock(spec.readyMarkerEscaped), '')
+  ])
 
   return `__orca_deferred_init() {
   # Why first: this body runs after the user's own config, so it would otherwise

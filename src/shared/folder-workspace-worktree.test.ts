@@ -119,14 +119,14 @@ describe('folderWorkspaceToWorktree', () => {
   it('projects first-message rename state for folder workspace cards', () => {
     const worktree = folderWorkspaceToWorktree(
       makeFolderWorkspace({
-        createdWithAgent: 'codex',
+        createdWithAgent: 'opencode',
         pendingFirstAgentMessageRename: true,
         firstAgentMessageRenameError: 'No model configured'
       })
     )
 
     expect(worktree).toMatchObject({
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       pendingFirstAgentMessageRename: true,
       firstAgentMessageRenameError: 'No model configured'
     })

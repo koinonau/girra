@@ -170,7 +170,7 @@ describe('terminal tail sentinel index', () => {
 
   it('finds a sentinel split across two chunks once the line completes', () => {
     const sim = saturatedSim()
-    feed(sim, 'Codex asks: press ent')
+    feed(sim, 'Agent asks: press ent')
     // Still only a partial line, and no alternative matches the fragment yet.
     expect(indexedMayContainBlockedSignal(sim.lines, sim.partialLine)).toBe(false)
     assertMatchesFullScan(sim)
@@ -370,7 +370,7 @@ function randomChunk(random: () => number, profile: 'streaming' | 'tui'): string
   }
   if (roll < 0.63) {
     // Sentinel split across a chunk boundary.
-    return random() < 0.5 ? 'Codex asks: press ent' : 'er to confirm\n'
+    return random() < 0.5 ? 'Agent asks: press ent' : 'er to confirm\n'
   }
   if (roll < 0.7) {
     // TUI redraw: move the cursor up a few rows and rewrite them.

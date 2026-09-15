@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => {
   const store = {
-    settings: { defaultTuiAgent: 'codex' },
+    settings: { defaultTuiAgent: 'opencode' },
     repos: [
       {
         id: 'repo-1',
@@ -139,15 +139,15 @@ describe('startFixChecksAgent', () => {
         updatedAt: 1
       }
     ]
-    mocks.store.ensureDetectedAgents.mockResolvedValue(['codex'])
-    mocks.store.ensureRemoteDetectedAgents.mockResolvedValue(['codex'])
+    mocks.store.ensureDetectedAgents.mockResolvedValue(['opencode'])
+    mocks.store.ensureRemoteDetectedAgents.mockResolvedValue(['opencode'])
     mocks.activateAndRevealWorktree.mockReturnValue(true)
     mocks.findGithubPrWorkspaceAttachment.mockReturnValue(null)
     mocks.getConnectionId.mockReturnValue(null)
     mocks.launchAgentInNewTab.mockReturnValue({ tabId: 'tab-1' })
     mocks.launchWorkItemDirect.mockResolvedValue(true)
     mocks.pickSourceControlLaunchAgent.mockImplementation(({ detectedAgents }) => {
-      return detectedAgents.includes('codex') ? 'codex' : null
+      return detectedAgents.includes('opencode') ? 'opencode' : null
     })
     mocks.readSourceControlLaunchRecipeAgentId.mockReturnValue(null)
     mocks.resolveSourceControlActionRecipe.mockReturnValue({

@@ -22,9 +22,9 @@ import type { WebSessionTabsSyncState } from './web-session-tabs-sync'
 import { resetWebSessionTabsSnapshotFreshnessForTests } from './web-session-tabs-sync'
 
 const WORKTREE = 'repo-1::/tmp/wt-reveal'
-const HOST_TAB_ID = 'agent-session:codex-reveal-1'
+const HOST_TAB_ID = 'agent-session:claude-reveal-1'
 // The projection renames a host tab id into the renderer's own namespace.
-const SESSION_TAB = 'structured-agent-session-codex-reveal-1'
+const SESSION_TAB = 'structured-agent-session-claude-reveal-1'
 // One string for the renderer's whole lifetime, which is exactly why retiring it is unrecoverable.
 const RENDERER_EPOCH = 'renderer:11111111-2222-3333-4444-555555555555'
 
@@ -80,9 +80,9 @@ function chatFrame(epoch: string, version: number): RuntimeMobileSessionTabsResu
       {
         type: 'agent-session',
         id: HOST_TAB_ID,
-        title: 'Codex Chat',
-        sessionId: 'codex-reveal-1',
-        agent: 'codex',
+        title: 'Claude Chat',
+        sessionId: 'claude-reveal-1',
+        agent: 'claude',
         isActive: true
       }
     ]

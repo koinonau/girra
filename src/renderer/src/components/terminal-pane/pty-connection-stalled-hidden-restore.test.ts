@@ -154,7 +154,7 @@ describe('connectPanePty', () => {
     >
     const snapshot = createDeferred<{ data: string; cols: number; rows: number; seq: number }>()
     getMainBufferSnapshot.mockReturnValue(snapshot.promise)
-    const hidden = 'hidden-codex-output\r\n'
+    const hidden = 'hidden-opencode-output\r\n'
     const firstLive = 'first-live-output\r\n'
     const secondLive = 'second-live-output\r\n'
 
@@ -162,7 +162,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)
@@ -250,7 +250,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)
@@ -340,14 +340,14 @@ describe('connectPanePty', () => {
       typeof vi.fn
     >
     getMainBufferSnapshot.mockResolvedValue(null)
-    const hidden = 'hidden-codex-output\r\n'
+    const hidden = 'hidden-opencode-output\r\n'
     const live = 'visible-after-null-retries\r\n'
 
     const pane = createPane(1)
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)
@@ -399,14 +399,14 @@ describe('connectPanePty', () => {
     getMainBufferSnapshot.mockReturnValue(
       createDeferred<{ data: string; cols: number; rows: number; seq: number }>().promise
     )
-    const hidden = 'hidden-codex-output\r\n'
+    const hidden = 'hidden-opencode-output\r\n'
     const liveOverflow = 'v'.repeat(512 * 1024 + 1)
 
     const pane = createPane(1)
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)
@@ -449,7 +449,7 @@ describe('connectPanePty', () => {
     getMainBufferSnapshot.mockReturnValue(
       createDeferred<{ data: string; cols: number; rows: number; seq: number }>().promise
     )
-    const hidden = 'hidden-codex-output\r\n'
+    const hidden = 'hidden-opencode-output\r\n'
     const chunkCount = 2_000
     const liveChunk = 'x'
 
@@ -457,7 +457,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)
@@ -637,7 +637,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)

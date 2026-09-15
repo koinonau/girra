@@ -397,7 +397,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'done',
       prompt: 'inactive prompt',
-      agentType: 'codex',
+      agentType: 'pi',
       lastAssistantMessage: 'inactive completion',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_699_999_999_100
@@ -409,7 +409,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'done',
         prompt: 'inactive prompt',
-        agentType: 'codex',
+        agentType: 'pi',
         lastAssistantMessage: 'inactive completion'
       }),
       'Inactive Tab',
@@ -419,7 +419,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     )
   })
 
-  it('keeps manual or missing-attribution Codex permission attention actionable', async () => {
+  it('keeps manual or missing-attribution Pi permission attention actionable', async () => {
     const setAgentStatus = vi.fn()
     const updateTabTitle = vi.fn()
     const observeAgentHookCompletionForNotification = vi.fn()
@@ -433,7 +433,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       workspaceSessionReady: true,
       settings: { terminalFontSize: 13, notifications: { enabled: true, agentTaskComplete: true } },
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Codex' }]
+        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Pi' }]
       },
       terminalLayoutsByTabId: {
         'tab-future': {
@@ -482,7 +482,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       worktreeId: 'wt-1',
       state: 'waiting',
       prompt: 'manual permission',
-      agentType: 'codex',
+      agentType: 'pi',
       receivedAt: 1_700_000_000_400,
       stateStartedAt: 1_699_999_999_400
     })
@@ -493,14 +493,14 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'waiting',
         prompt: 'manual permission',
-        agentType: 'codex'
+        agentType: 'pi'
       }),
-      'Codex - action required',
+      'Pi - action required',
       { updatedAt: 1_700_000_000_400, stateStartedAt: 1_699_999_999_400 },
       expectWorktreeRouting('wt-1'),
       undefined
     )
-    expect(updateTabTitle).toHaveBeenCalledWith('tab-future', 'Codex - action required')
+    expect(updateTabTitle).toHaveBeenCalledWith('tab-future', 'Pi - action required')
     expect(observeAgentHookCompletionForNotification).toHaveBeenCalledTimes(1)
   })
 })

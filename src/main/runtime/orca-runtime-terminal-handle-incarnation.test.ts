@@ -58,7 +58,7 @@ describe('runtime terminal handle incarnation fencing', () => {
     const handle = runtime.preAllocateHandleForPty(PTY_ID)
     register(runtime, 'incarnation-1')
     syncGraph(runtime)
-    const inspectProcess = vi.fn().mockResolvedValue({ foregroundProcess: 'codex' })
+    const inspectProcess = vi.fn().mockResolvedValue({ foregroundProcess: 'claude' })
     runtime.setPtyController({
       write: vi.fn(() => true),
       kill: () => true,
@@ -71,7 +71,7 @@ describe('runtime terminal handle incarnation fencing', () => {
     )
     await expect(
       runtime.inspectTerminalProcess(handle, { expectedIncarnationId: 'incarnation-1' })
-    ).resolves.toEqual({ foregroundProcess: 'codex' })
+    ).resolves.toEqual({ foregroundProcess: 'claude' })
     expect(inspectProcess).toHaveBeenCalledWith(PTY_ID, { expectedIncarnationId: 'incarnation-1' })
   })
 

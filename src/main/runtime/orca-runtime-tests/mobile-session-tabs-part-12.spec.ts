@@ -31,7 +31,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'aider',
+        agent: 'claude-agent-teams',
         agentPrompt: 'Review this diff'
       })
     ).rejects.toThrow('does not support startup prompt quick commands')
@@ -224,7 +224,7 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        disabledTuiAgents: ['codex'],
+        disabledTuiAgents: ['claude'],
         agentCmdOverrides: {}
       })
     } as never)
@@ -238,7 +238,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'codex'
+        agent: 'claude'
       })
     ).rejects.toThrow('Selected agent is disabled')
     expect(spawn).not.toHaveBeenCalled()
@@ -250,7 +250,7 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        disabledTuiAgents: ['codex'],
+        disabledTuiAgents: ['claude'],
         agentCmdOverrides: {}
       })
     } as never)
@@ -265,7 +265,7 @@ describe('OrcaRuntimeService', () => {
     await expect(
       runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
         afterTabId: 'stale-tab',
-        agent: 'codex'
+        agent: 'claude'
       })
     ).rejects.toThrow('after_tab_not_found')
     expect(spawn).not.toHaveBeenCalled()

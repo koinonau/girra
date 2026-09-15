@@ -230,7 +230,7 @@ export function createAutomationDispatchCompletion(args: {
         handleAgentDone()
       }
     }
-    // Why: Codex/Claude completion normally arrives through the global
+    // Why: agent completion normally arrives through the global
     // hook IPC listener, not the hidden PTY OSC fallback.
     unsubscribeAgentStatus = useAppStore.subscribe(checkCurrentStatus)
     checkCurrentStatus()

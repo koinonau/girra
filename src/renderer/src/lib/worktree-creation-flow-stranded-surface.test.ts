@@ -226,11 +226,11 @@ describe('a throw after createWorktree succeeds no longer strands the creation s
 
   it('activating branch: routes draft and follow-up delivery to the stamped agent tab', async () => {
     const request = makeRequest({
-      agent: 'codex',
+      agent: 'opencode',
       startupPlan: {
-        agent: 'codex',
-        launchCommand: 'codex',
-        expectedProcess: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
+        expectedProcess: 'opencode',
         draftPrompt: 'draft context',
         followupPrompt: 'follow-up context',
         launchConfig: { agentArgs: '', agentEnv: {} }
@@ -238,7 +238,7 @@ describe('a throw after createWorktree succeeds no longer strands the creation s
     })
     seedPendingCreation(request)
     store.tabsByWorktree = {
-      'wt-1': [{ id: 'default-tab' }, { id: 'agent-tab', launchAgent: 'codex' }]
+      'wt-1': [{ id: 'default-tab' }, { id: 'agent-tab', launchAgent: 'opencode' }]
     }
     vi.mocked(activateAndRevealWorktree).mockImplementation(() => {
       throw new Error('reveal exploded after default tabs were created')

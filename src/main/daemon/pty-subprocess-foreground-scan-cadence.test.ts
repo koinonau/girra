@@ -175,11 +175,11 @@ describe('daemon pty foreground scan cadence', () => {
   })
 
   it('keeps the fast identity refresh for a Windows session with a cached agent', async () => {
-    resolveAgentForegroundProcessMock.mockResolvedValue('codex')
+    resolveAgentForegroundProcessMock.mockResolvedValue('opencode')
     const { handle } = await spawnShellSubprocess('powershell.exe', 'win32')
 
     await readForegroundAt(handle, 0)
-    expect(await readForegroundAt(handle, 1_000)).toBe('codex')
+    expect(await readForegroundAt(handle, 1_000)).toBe('opencode')
     await readForegroundAt(handle, 3_000)
     await readForegroundAt(handle, 5_000)
 

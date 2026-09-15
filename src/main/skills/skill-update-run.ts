@@ -4,8 +4,7 @@ import {
   type SkillUpdateRun,
   type SkillUpdateStartResult
 } from '../../shared/skill-freshness'
-import { resolveCliCommand } from '../codex-cli/command'
-import { withCliRuntimeOnPath } from '../../shared/node-cli-command-resolution'
+import { resolveCliCommand, withCliRuntimeOnPath } from '../../shared/node-cli-command-resolution'
 import { killWithDescendantSweep } from '../pty-descendant-termination'
 import { getSpawnArgsForWindows, WINDOWS_BATCH_UNSAFE_CHARACTERS_LABEL } from '../win32-utils'
 

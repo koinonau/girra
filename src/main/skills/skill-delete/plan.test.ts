@@ -69,7 +69,7 @@ describe('buildSkillDeletePlan placement enumeration', () => {
       await mkdir(join(home, '.claude', 'skills'), { recursive: true })
       await symlink(canonicalDirectory, join(home, '.claude', 'skills', 'demo'), 'dir')
       // An alias-file: a real directory whose SKILL.md is a symlink.
-      const aliasFileDirectory = join(home, '.codex', 'skills', 'demo')
+      const aliasFileDirectory = join(home, '.config', 'opencode', 'skills', 'demo')
       await mkdir(aliasFileDirectory, { recursive: true })
       await symlink(file, join(aliasFileDirectory, 'SKILL.md'))
 
@@ -184,12 +184,28 @@ describe('buildSkillDeletePlan placement enumeration', () => {
 
   it.skipIf(WINDOWS)('refuses a plugin-cache skill symlinked into a plain home root', async () => {
     const { home } = await fixture()
-    const cached = join(home, '.codex', 'plugins', 'cache', 'pack', 'demo')
+    const pluginId = 'pack@marketplace'
+    const install = join(home, '.claude', 'plugins', 'cache', 'pack', '1.0.0')
+    const cached = join(install, 'skills', 'demo')
     const file = await writeSkill(cached, 'demo')
+    await writeFile(
+      join(home, '.claude', 'plugins', 'installed_plugins.json'),
+      JSON.stringify({ plugins: { [pluginId]: [{ scope: 'user', installPath: install }] } })
+    )
+    await writeFile(
+      join(home, '.claude', 'settings.json'),
+      JSON.stringify({ enabledPlugins: { [pluginId]: true } })
+    )
     await mkdir(join(home, '.agents', 'skills'), { recursive: true })
     await symlink(cached, join(home, '.agents', 'skills', 'demo'), 'dir')
 
-    const resolved = await plan(home, await request(file))
+    const resolved = await buildSkillDeletePlan({
+      request: await request(file),
+      target: { kind: 'native-host', cwd: home },
+      repos: [],
+      filesystem: nativeSkillInstallFilesystem,
+      homeDir: home
+    })
     expect(resolved.plan.skills[0].blocked).toBe('plugin')
   })
 

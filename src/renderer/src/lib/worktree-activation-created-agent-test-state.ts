@@ -23,7 +23,7 @@ export function makeCreatedAgentWorktree(): Worktree {
     isPinned: false,
     sortOrder: 0,
     lastActivityAt: 0,
-    createdWithAgent: 'codex'
+    createdWithAgent: 'opencode'
   }
 }
 

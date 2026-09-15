@@ -33,7 +33,7 @@ docker image inspect "$auth_image" --format '{{json .Config.Entrypoint}}'
 docker run -d --name "$name" -p 127.0.0.1::22 -e "ORCA_SSH_PUBLIC_KEY=$pubkey" "$auth_image"
 docker ps -a --filter "name=$name"
 docker logs "$name"
-ssh -i "$key" -p "$port" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes user@127.0.0.1 'codex --version'
+ssh -i "$key" -p "$port" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes user@127.0.0.1 'claude --version'
 ```
 
 Inspect the auth image entrypoint and do this startup-only `docker run` before the full clone and

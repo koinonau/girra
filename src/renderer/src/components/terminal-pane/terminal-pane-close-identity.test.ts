@@ -6,7 +6,7 @@ import {
 
 describe('shouldClearLaunchAgentForClosedPane', () => {
   it('clears launch identity only when the launch-owning PTY closes', () => {
-    const tab = { launchAgent: 'codex' as const, ptyId: 'pty-agent' }
+    const tab = { launchAgent: 'opencode' as const, ptyId: 'pty-agent' }
 
     expect(shouldClearLaunchAgentForClosedPane(tab, 'pty-agent')).toBe(true)
     expect(shouldClearLaunchAgentForClosedPane(tab, 'pty-shell')).toBe(false)
@@ -22,7 +22,7 @@ describe('shouldClearLaunchAgentForClosedPane', () => {
 
 describe('resolveTabTitleAfterPaneClose', () => {
   it('uses the promoted sibling title when one is known', () => {
-    expect(resolveTabTitleAfterPaneClose({ 2: 'codex' }, 2)).toBe('codex')
+    expect(resolveTabTitleAfterPaneClose({ 2: 'opencode' }, 2)).toBe('opencode')
   })
 
   it('resets to the tab fallback when the promoted shell has no title', () => {

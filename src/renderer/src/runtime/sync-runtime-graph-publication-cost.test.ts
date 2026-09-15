@@ -84,9 +84,9 @@ function makeTitleCountingState(worktreeCount: number): {
       prompt: 'Investigate publication pressure',
       updatedAt: 1_700_000_000_000,
       stateStartedAt: 1_699_999_999_000,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey: changedPaneKey,
-      terminalTitle: 'codex [working]',
+      terminalTitle: 'opencode [working]',
       stateHistory: []
     }
   }

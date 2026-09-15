@@ -62,7 +62,7 @@ try {
         '--skill',
         'orca-cli',
         '--agent',
-        'codex',
+        'claude-code',
         '--dry-run',
         '--json'
       ])

@@ -9,6 +9,7 @@ import {
   writeManagedClaudeKeychainCredentials
 } from './keychain'
 import { restorePlatform, setPlatform } from './claude-account-service-test-harness'
+import type * as NodeCliCommandResolution from '../../shared/node-cli-command-resolution'
 
 const CLAUDE_SERVICE_TEST_ROOT = join(tmpdir(), 'orca-claude-service-config-dir-test')
 
@@ -22,7 +23,8 @@ const commandMocks = vi.hoisted(() => ({
   resolveClaudeCommand: vi.fn(() => 'claude')
 }))
 
-vi.mock('../codex-cli/command', () => ({
+vi.mock('../../shared/node-cli-command-resolution', async (importOriginal) => ({
+  ...(await importOriginal<typeof NodeCliCommandResolution>()),
   resolveClaudeCommand: commandMocks.resolveClaudeCommand
 }))
 

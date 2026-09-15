@@ -32,8 +32,8 @@ import {
 import { RuntimeClient } from '../../src/cli/runtime-client'
 import type { RuntimeTerminalListResult } from '../../src/shared/runtime-types'
 import {
-  CODEX_IDLE_TITLE,
-  CODEX_WORKING_TITLE,
+  CLAUDE_IDLE_TITLE,
+  CLAUDE_WORKING_TITLE,
   createMailPaneAgent
 } from './helpers/orchestration-mail-pane-agent'
 import { mailDisposition, readMailRow } from './helpers/orchestration-mail-store'
@@ -110,10 +110,10 @@ test('keeps mail pending across a restart and delivers it when the agent reports
       .poll(() => agent.hasStarted(), { timeout: 60_000, message: 'agent never started' })
       .toBe(true)
 
-    agent.setTitle(CODEX_WORKING_TITLE)
-    await waitForObservedTitle(firstClient, originalHandle, CODEX_WORKING_TITLE)
-    agent.setTitle(CODEX_IDLE_TITLE)
-    await waitForObservedTitle(firstClient, originalHandle, CODEX_IDLE_TITLE)
+    agent.setTitle(CLAUDE_WORKING_TITLE)
+    await waitForObservedTitle(firstClient, originalHandle, CLAUDE_WORKING_TITLE)
+    agent.setTitle(CLAUDE_IDLE_TITLE)
+    await waitForObservedTitle(firstClient, originalHandle, CLAUDE_IDLE_TITLE)
     const titlesBeforeRestart = agent.titleEmitCount()
     const run = await firstClient.call<{ run: { id: string } }>('orchestration.runCreate', {
       objective: 'Restart-safe mailbox delivery',
@@ -142,7 +142,7 @@ test('keeps mail pending across a restart and delivers it when the agent reports
         },
         { timeout: 120_000, message: 'agent pane never came back writable after restart' }
       )
-      .toBe(CODEX_IDLE_TITLE)
+      .toBe(CLAUDE_IDLE_TITLE)
     expect(restoredHandle).toBeTruthy()
 
     // The process has emitted nothing since the restart, so whatever the runtime
@@ -167,7 +167,7 @@ test('keeps mail pending across a restart and delivers it when the agent reports
 
     // Re-emitting the SAME idle title changes no status — only its liveness — so
     // the pointer appearing here is delivery resuming on the agent's own signal.
-    agent.setTitle(CODEX_IDLE_TITLE)
+    agent.setTitle(CLAUDE_IDLE_TITLE)
     await expect
       .poll(() => agent.titleEmitCount(), { timeout: 30_000 })
       .toBeGreaterThan(titlesBeforeRestart)

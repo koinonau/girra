@@ -15,7 +15,7 @@ import {
 // is visually distinct from 'idle' (grey dot) and the sidebar's 'active'
 // (emerald dot), while the sidebar collapses 'done'/'active' to the same
 // emerald dot and relies on a tooltip. It sits next to the agent icon
-// (Claude/Codex/etc.) — two distinct glyphs: one for *who* (agent icon) and
+// (Claude/OpenCode/etc.) — two distinct glyphs: one for *who* (agent icon) and
 // one for *what state* (this indicator). Keeping them separate keeps each
 // scannable instead of fused into one decorated icon.
 

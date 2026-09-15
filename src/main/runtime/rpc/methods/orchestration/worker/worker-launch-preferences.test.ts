@@ -40,13 +40,7 @@ describe('orchestration worker launch preferences', () => {
 
   it('rejects model selection for agents without a launch catalog', () => {
     expect(() =>
-      resolveWorkerLaunchPreferences({ agent: 'grok', model: 'grok-code-fast-1' })
-    ).toThrow('does not support launch-time model selection')
-  })
-
-  it('does not expose deprecated Gemini model selection to worker-start', () => {
-    expect(() =>
-      resolveWorkerLaunchPreferences({ agent: 'gemini', model: 'gemini-3-pro-preview' })
+      resolveWorkerLaunchPreferences({ agent: 'opencode', model: 'openai/gpt-5.4' })
     ).toThrow('does not support launch-time model selection')
   })
 
@@ -105,7 +99,7 @@ describe('orchestration worker launch preferences', () => {
 
   it('uses the requested launch receipt when an older worker omits it', () => {
     const requested = createPendingWorkerLaunchReceipt({
-      agent: 'codex',
+      agent: 'claude',
       model: 'gpt-5.6-sol',
       effort: 'high'
     })
@@ -120,7 +114,7 @@ describe('orchestration worker launch preferences', () => {
   it.each([' custom-model', 'custom-model '])(
     'rejects model ids with surrounding whitespace: %j',
     (model) => {
-      expect(WorkerStartParams.safeParse({ task: 'task_1', agent: 'codex', model }).success).toBe(
+      expect(WorkerStartParams.safeParse({ task: 'task_1', agent: 'claude', model }).success).toBe(
         false
       )
     }
@@ -130,14 +124,14 @@ describe('orchestration worker launch preferences', () => {
     expect(
       WorkerStartParams.safeParse({
         task: 'task_1',
-        agent: 'codex',
+        agent: 'claude',
         model: 'm'.repeat(513)
       }).success
     ).toBe(false)
     expect(
       WorkerStartParams.safeParse({
         task: 'task_1',
-        agent: 'codex',
+        agent: 'claude',
         model: 'custom-model',
         effort: 'e'.repeat(513)
       }).success
@@ -145,12 +139,12 @@ describe('orchestration worker launch preferences', () => {
   })
 
   it('requires exactly one task identity', () => {
-    expect(WorkerStartParams.safeParse({ agent: 'codex' }).success).toBe(false)
+    expect(WorkerStartParams.safeParse({ agent: 'claude' }).success).toBe(false)
     expect(
-      WorkerStartParams.safeParse({ task: 'task_1', spec: 'new work', agent: 'codex' }).success
+      WorkerStartParams.safeParse({ task: 'task_1', spec: 'new work', agent: 'claude' }).success
     ).toBe(false)
     expect(
-      WorkerStartParams.safeParse({ spec: 'new work', agent: 'codex', from: 'term_coord' }).success
+      WorkerStartParams.safeParse({ spec: 'new work', agent: 'claude', from: 'term_coord' }).success
     ).toBe(true)
   })
 })

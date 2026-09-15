@@ -339,7 +339,7 @@ function annotateMeasurement(
 }
 
 test.describe('Terminal foreground redraw freeze repro', () => {
-  test('@headful Codex-style line rewrites request a visible row refresh', async ({
+  test('@headful agent status line rewrites request a visible row refresh', async ({
     orcaPage
   }, testInfo) => {
     await waitForSessionReady(orcaPage)
@@ -375,7 +375,7 @@ test.describe('Terminal foreground redraw freeze repro', () => {
           },
           {
             timeout: 5_000,
-            message: 'Codex-style terminal rewrites did not request an xterm refresh'
+            message: 'Agent status line rewrites did not request an xterm refresh'
           }
         )
         .toBeGreaterThan(0)

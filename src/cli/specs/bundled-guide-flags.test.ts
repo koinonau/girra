@@ -34,7 +34,7 @@ function collectGuideInvocations(): GuideInvocation[] {
       if (!spec) {
         continue
       }
-      // Why: a quoted flag value belongs to the nested program (`--command 'codex --model ...'`), not to orca.
+      // Why: a quoted flag value belongs to the nested program (`--command 'claude --model ...'`), not to orca.
       const orcaArgs = invocation.replace(/'[^']*'|"[^"]*"/g, ' ')
       const flags = [...orcaArgs.matchAll(/(?:^|[\s[(])--([a-z][a-z0-9-]*)/g)].map(
         (flag) => flag[1]

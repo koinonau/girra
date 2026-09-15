@@ -9,7 +9,7 @@ function card(paneKey: string, worktreeId: string, idle: boolean): DashboardCard
   return {
     paneKey,
     ptyId: `pty-${paneKey}`,
-    agentType: 'codex',
+    agentType: 'opencode',
     bucket: idle ? 'idle' : 'working',
     dotState: idle ? 'idle' : 'working',
     task: '',

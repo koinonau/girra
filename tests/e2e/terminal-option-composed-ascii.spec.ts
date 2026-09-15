@@ -228,7 +228,7 @@ test.describe('Option-composed ASCII in a kitty-keyboard pane', () => {
     await setMacOptionAsAlt(orcaPage, 'false')
     await clearPtyWriteLog(electronApp)
 
-    // #8031: OMP-class TUIs bind Option+P, which composes the non-ASCII `π`.
+    // #8031: some TUIs bind Option+P, which composes the non-ASCII `π`.
     const dispatch = await pressOptionComposedKey(orcaPage, { key: 'π', code: 'KeyP' })
     expect(dispatch.keydownDefaultPrevented).toBe(true)
 

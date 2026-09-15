@@ -93,15 +93,13 @@ export function buildAgentStartupPlan(args: {
   const quotedPrompt = quoteStartupArg(trimmedPrompt, shell)
 
   if (config.promptInjectionMode === 'argv') {
-    const promptSeparator = config.argvPromptSeparator ? ` ${config.argvPromptSeparator}` : ''
     return {
       agent,
-      launchCommand: `${baseCommand.command}${promptSeparator} ${quotedPrompt}`,
+      launchCommand: `${baseCommand.command} ${quotedPrompt}`,
       expectedProcess: config.expectedProcess,
       followupPrompt: null,
       launchConfig,
       ...appliedSessionOptionProps(baseCommand.appliedSessionOptions),
-      ...(agent === 'codex' ? { startupCommandDelivery: 'shell-ready' as const } : {}),
       ...(args.agentEnv ? { env: { ...args.agentEnv } } : {})
     }
   }
@@ -110,30 +108,6 @@ export function buildAgentStartupPlan(args: {
     return {
       agent,
       launchCommand: `${baseCommand.command} --prompt ${quotedPrompt}`,
-      expectedProcess: config.expectedProcess,
-      followupPrompt: null,
-      launchConfig,
-      ...appliedSessionOptionProps(baseCommand.appliedSessionOptions),
-      ...(args.agentEnv ? { env: { ...args.agentEnv } } : {})
-    }
-  }
-
-  if (config.promptInjectionMode === 'flag-prompt-interactive') {
-    return {
-      agent,
-      launchCommand: `${baseCommand.command} --prompt-interactive ${quotedPrompt}`,
-      expectedProcess: config.expectedProcess,
-      followupPrompt: null,
-      launchConfig,
-      ...appliedSessionOptionProps(baseCommand.appliedSessionOptions),
-      ...(args.agentEnv ? { env: { ...args.agentEnv } } : {})
-    }
-  }
-
-  if (config.promptInjectionMode === 'flag-interactive') {
-    return {
-      agent,
-      launchCommand: `${baseCommand.command} -i ${quotedPrompt}`,
       expectedProcess: config.expectedProcess,
       followupPrompt: null,
       launchConfig,
@@ -208,8 +182,6 @@ export function buildAgentDraftLaunchPlan(args: {
       expectedProcess: config.expectedProcess,
       launchConfig,
       ...appliedSessionOptionProps(baseCommand.appliedSessionOptions),
-      // Why: native draft flags carry user text on argv and must survive rc-file startup.
-      ...(agent === 'codex' ? { startupCommandDelivery: 'shell-ready' as const } : {}),
       ...(args.agentEnv ? { env: { ...args.agentEnv } } : {})
     }
   } else if (config.draftPromptEnvVar) {

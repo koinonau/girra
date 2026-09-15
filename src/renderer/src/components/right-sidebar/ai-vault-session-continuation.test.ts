@@ -52,7 +52,6 @@ describe('AI Vault session continuation', () => {
 
     expect(request).toMatchObject({
       worktreeId: 'worktree-1',
-      workspacePath: '/Users/ada/Desktop/current-worktree',
       initialCwd: '/Users/ada/Desktop/Client App',
       launchSource: 'sidebar',
       source: {

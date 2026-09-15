@@ -900,7 +900,7 @@ CLI installs into all ~75 agents it knows and leaves a config directory for each
 Override the targets yourself, or narrow to the shared directory alone:
 
 ```bash
-orca skills install --skill orca-cli --agent claude-code,codex
+orca skills install --skill orca-cli --agent claude-code
 orca skills install --skill orca-cli --agent universal
 ```
 

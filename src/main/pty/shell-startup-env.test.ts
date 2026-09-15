@@ -360,36 +360,44 @@ describe('readShellStartupEnvVar', () => {
 
     it('reads an exported set from config.fish', () => {
       mockFishFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME /home/alice/.codex\n'
+        '/home/alice/.config/fish/config.fish':
+          'set -gx OPENCODE_CONFIG_DIR /home/alice/.opencode\n'
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('/home/alice/.codex')
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe(
+        '/home/alice/.opencode'
+      )
     })
 
     it('lets config.fish win over a conf.d snippet, matching fish source order', () => {
       mockFishFiles(
         {
-          '/home/alice/.config/fish/conf.d/10-agents.fish': 'set -gx CODEX_HOME /from/confd\n',
-          '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME /from/config\n'
+          '/home/alice/.config/fish/conf.d/10-agents.fish':
+            'set -gx OPENCODE_CONFIG_DIR /from/confd\n',
+          '/home/alice/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/config\n'
         },
         ['10-agents.fish']
       )
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('/from/config')
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe(
+        '/from/config'
+      )
     })
 
     it('sources conf.d snippets in filename order', () => {
       mockFishFiles(
         {
-          '/home/alice/.config/fish/conf.d/aaa.fish': 'set -gx CODEX_HOME /from/aaa\n',
-          '/home/alice/.config/fish/conf.d/zzz.fish': 'set -gx CODEX_HOME /from/zzz\n'
+          '/home/alice/.config/fish/conf.d/aaa.fish': 'set -gx OPENCODE_CONFIG_DIR /from/aaa\n',
+          '/home/alice/.config/fish/conf.d/zzz.fish': 'set -gx OPENCODE_CONFIG_DIR /from/zzz\n'
         },
         ['zzz.fish', 'aaa.fish', 'notes.txt']
       )
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('/from/zzz')
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe('/from/zzz')
     })
 
     it('honors XDG_CONFIG_HOME', () => {
-      mockFishFiles({ '/cfg/fish/config.fish': 'set -gx CODEX_HOME /from/xdg\n' })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH, '/cfg')).toBe('/from/xdg')
+      mockFishFiles({ '/cfg/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/xdg\n' })
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH, '/cfg')).toBe(
+        '/from/xdg'
+      )
     })
 
     // Why also via the env: the argument defaults to process.env.XDG_CONFIG_HOME, so without
@@ -397,65 +405,72 @@ describe('readShellStartupEnvVar', () => {
     it('defaults configHome to XDG_CONFIG_HOME from the environment', () => {
       process.env.XDG_CONFIG_HOME = '/cfg'
       __resetShellStartupEnvCache()
-      mockFishFiles({ '/cfg/fish/config.fish': 'set -gx CODEX_HOME /from/env-xdg\n' })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('/from/env-xdg')
+      mockFishFiles({ '/cfg/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/env-xdg\n' })
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe(
+        '/from/env-xdg'
+      )
     })
 
     it('ignores sets that are not exported', () => {
       mockFishFiles({
         '/home/alice/.config/fish/config.fish':
-          'set -g CODEX_HOME /global\nset -l CODEX_HOME /local\nset CODEX_HOME /plain\n'
+          'set -g OPENCODE_CONFIG_DIR /global\nset -l OPENCODE_CONFIG_DIR /local\nset OPENCODE_CONFIG_DIR /plain\n'
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBeUndefined()
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBeUndefined()
     })
 
     it('accepts every fish export spelling', () => {
       for (const line of [
-        'set -x CODEX_HOME /a',
-        'set -xg CODEX_HOME /a',
-        'set -gx CODEX_HOME /a',
-        'set -Ux CODEX_HOME /a',
-        'set --export --global CODEX_HOME /a'
+        'set -x OPENCODE_CONFIG_DIR /a',
+        'set -xg OPENCODE_CONFIG_DIR /a',
+        'set -gx OPENCODE_CONFIG_DIR /a',
+        'set -Ux OPENCODE_CONFIG_DIR /a',
+        'set --export --global OPENCODE_CONFIG_DIR /a'
       ]) {
         __resetShellStartupEnvCache()
         mockFishFiles({ '/home/alice/.config/fish/config.fish': `${line}\n` })
-        expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('/a')
+        expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe('/a')
       }
     })
 
     it('expands $HOME in double quotes and keeps single quotes literal', () => {
       mockFishFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME "$HOME/.codex" # note\n'
+        '/home/alice/.config/fish/config.fish':
+          'set -gx OPENCODE_CONFIG_DIR "$HOME/.opencode" # note\n'
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('/home/alice/.codex')
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe(
+        '/home/alice/.opencode'
+      )
 
       __resetShellStartupEnvCache()
       mockFishFiles({
-        '/home/alice/.config/fish/config.fish': "set -gx CODEX_HOME '$HOME/.codex'\n"
+        '/home/alice/.config/fish/config.fish': "set -gx OPENCODE_CONFIG_DIR '$HOME/.opencode'\n"
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBe('$HOME/.codex')
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBe(
+        '$HOME/.opencode'
+      )
     })
 
     it('does not read zsh or bash startup files for a fish user', () => {
       mockFishFiles({
-        '/home/alice/.zshrc': 'export CODEX_HOME=/from/zsh\n',
-        '/home/alice/.bash_profile': 'export CODEX_HOME=/from/bash\n'
+        '/home/alice/.zshrc': 'export OPENCODE_CONFIG_DIR=/from/zsh\n',
+        '/home/alice/.bash_profile': 'export OPENCODE_CONFIG_DIR=/from/bash\n'
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBeUndefined()
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBeUndefined()
     })
 
     it('ignores a commented assignment', () => {
       mockFishFiles({
-        '/home/alice/.config/fish/config.fish': '# set -gx CODEX_HOME /from-comment\n'
+        '/home/alice/.config/fish/config.fish': '# set -gx OPENCODE_CONFIG_DIR /from-comment\n'
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBeUndefined()
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBeUndefined()
     })
 
     it('does not match a different variable with the same prefix', () => {
       mockFishFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME_BACKUP /backup\n'
+        '/home/alice/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR_BACKUP /backup\n'
       })
-      expect(readShellStartupEnvVar('CODEX_HOME', '/home/alice', FISH)).toBeUndefined()
+      expect(readShellStartupEnvVar('OPENCODE_CONFIG_DIR', '/home/alice', FISH)).toBeUndefined()
     })
   })
 
@@ -483,12 +498,12 @@ describe('readShellStartupEnvVar', () => {
     it("prefers the session env's XDG_CONFIG_HOME over the main process's", () => {
       process.env.XDG_CONFIG_HOME = '/main-process-cfg'
       mockStartupFiles({
-        '/session-cfg/fish/config.fish': 'set -gx CODEX_HOME /from/session\n',
-        '/main-process-cfg/fish/config.fish': 'set -gx CODEX_HOME /from/main-process\n'
+        '/session-cfg/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/session\n',
+        '/main-process-cfg/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/main-process\n'
       })
 
       expect(
-        readSessionShellStartupEnvVar('CODEX_HOME', {
+        readSessionShellStartupEnvVar('OPENCODE_CONFIG_DIR', {
           HOME: '/home/alice',
           SHELL: FISH,
           XDG_CONFIG_HOME: '/session-cfg'
@@ -499,22 +514,22 @@ describe('readShellStartupEnvVar', () => {
     it('falls back to the main process XDG_CONFIG_HOME when the session env lacks one', () => {
       process.env.XDG_CONFIG_HOME = '/main-process-cfg'
       mockStartupFiles({
-        '/main-process-cfg/fish/config.fish': 'set -gx CODEX_HOME /from/main-process\n'
+        '/main-process-cfg/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/main-process\n'
       })
 
       expect(
-        readSessionShellStartupEnvVar('CODEX_HOME', { HOME: '/home/alice', SHELL: FISH })
+        readSessionShellStartupEnvVar('OPENCODE_CONFIG_DIR', { HOME: '/home/alice', SHELL: FISH })
       ).toBe('/from/main-process')
     })
 
     it("falls back to fish's own ~/.config default when neither env has one", () => {
       delete process.env.XDG_CONFIG_HOME
       mockStartupFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME /from/default\n'
+        '/home/alice/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/default\n'
       })
 
       expect(
-        readSessionShellStartupEnvVar('CODEX_HOME', { HOME: '/home/alice', SHELL: FISH })
+        readSessionShellStartupEnvVar('OPENCODE_CONFIG_DIR', { HOME: '/home/alice', SHELL: FISH })
       ).toBe('/from/default')
     })
 
@@ -522,25 +537,25 @@ describe('readShellStartupEnvVar', () => {
       delete process.env.XDG_CONFIG_HOME
       process.env.HOME = '/home/root-user'
       mockStartupFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME "$HOME/.codex"\n',
-        '/home/root-user/.config/fish/config.fish': 'set -gx CODEX_HOME /from/wrong-home\n'
+        '/home/alice/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR "$HOME/.opencode"\n',
+        '/home/root-user/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/wrong-home\n'
       })
 
       expect(
-        readSessionShellStartupEnvVar('CODEX_HOME', { HOME: '/home/alice', SHELL: FISH })
-      ).toBe('/home/alice/.codex')
+        readSessionShellStartupEnvVar('OPENCODE_CONFIG_DIR', { HOME: '/home/alice', SHELL: FISH })
+      ).toBe('/home/alice/.opencode')
     })
 
     it('lets an explicit shell override beat the session SHELL', () => {
       delete process.env.XDG_CONFIG_HOME
       mockStartupFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME /from/fish\n',
-        '/home/alice/.zshrc': 'export CODEX_HOME=/from/zsh\n'
+        '/home/alice/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/fish\n',
+        '/home/alice/.zshrc': 'export OPENCODE_CONFIG_DIR=/from/zsh\n'
       })
 
       expect(
         readSessionShellStartupEnvVar(
-          'CODEX_HOME',
+          'OPENCODE_CONFIG_DIR',
           { HOME: '/home/alice', SHELL: '/bin/zsh' },
           FISH
         )
@@ -552,10 +567,12 @@ describe('readShellStartupEnvVar', () => {
       process.env.HOME = '/home/alice'
       process.env.SHELL = FISH
       mockStartupFiles({
-        '/home/alice/.config/fish/config.fish': 'set -gx CODEX_HOME /from/process-env\n'
+        '/home/alice/.config/fish/config.fish': 'set -gx OPENCODE_CONFIG_DIR /from/process-env\n'
       })
 
-      expect(readSessionShellStartupEnvVar('CODEX_HOME', undefined)).toBe('/from/process-env')
+      expect(readSessionShellStartupEnvVar('OPENCODE_CONFIG_DIR', undefined)).toBe(
+        '/from/process-env'
+      )
     })
   })
 })

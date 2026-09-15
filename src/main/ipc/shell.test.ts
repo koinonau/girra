@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { normalize, resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
+import type * as NodeCliCommandResolution from '../../shared/node-cli-command-resolution'
 
 const {
   getSpawnArgsForWindowsMock,
@@ -46,7 +47,8 @@ vi.mock('node:child_process', () => ({
   spawn: spawnMock
 }))
 
-vi.mock('../codex-cli/command', () => ({
+vi.mock('../../shared/node-cli-command-resolution', async (importOriginal) => ({
+  ...(await importOriginal<typeof NodeCliCommandResolution>()),
   resolveCliCommand: resolveCliCommandMock
 }))
 

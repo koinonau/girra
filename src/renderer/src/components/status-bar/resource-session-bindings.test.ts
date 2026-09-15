@@ -150,7 +150,7 @@ describe('resource session bindings', () => {
       workspaceSessionReady: true
     }
     const sessions = [
-      { id: 'pty-agent', cwd: '/workspace', title: 'codex', agentOwnership: 'present' as const },
+      { id: 'pty-agent', cwd: '/workspace', title: 'opencode', agentOwnership: 'present' as const },
       { id: 'pty-shell', cwd: '/tmp', title: 'shell', agentOwnership: 'absent' as const }
     ]
 
@@ -174,7 +174,7 @@ describe('resource session bindings', () => {
         title: 'deferred',
         agentOwnership: 'absent' as const
       },
-      { id: 'pty-agent', cwd: '/workspace', title: 'codex', agentOwnership: 'present' as const },
+      { id: 'pty-agent', cwd: '/workspace', title: 'opencode', agentOwnership: 'present' as const },
       { id: 'pty-orphan', cwd: '/tmp', title: 'orphan', agentOwnership: 'absent' as const }
     ]
 

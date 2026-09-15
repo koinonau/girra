@@ -11,6 +11,7 @@ import {
 import os from 'node:os'
 import path from 'node:path'
 import type { RuntimeClient } from '../../../src/cli/runtime-client'
+import { encodeClaudeProjectPath } from '../../../src/main/ai-vault/claude-project-dir-encoding'
 import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../../src/shared/orca-profiles'
 import type {
   RuntimeTerminalListResult,
@@ -20,21 +21,19 @@ import { buildFakeAgentCommandOverride } from './fake-agent-command-override'
 import { FAKE_AGENT_PASTE_END_SCANNER_SOURCE } from './fake-agent-paste-end-scanner'
 
 const fakeCliDir = mkdtempSync(path.join(os.tmpdir(), 'orca-e2e-retired-worker-'))
-const lifecycleLedgerPath = path.join(fakeCliDir, 'codex-lifecycle.jsonl')
-export const completedWorkerFakeCodexCommand = buildFakeAgentCommandOverride(
-  path.join(fakeCliDir, process.platform === 'win32' ? 'codex.cmd' : 'codex')
+const lifecycleLedgerPath = path.join(fakeCliDir, 'worker-lifecycle.jsonl')
+export const completedWorkerFakeClaudeCommand = buildFakeAgentCommandOverride(
+  path.join(fakeCliDir, process.platform === 'win32' ? 'claude.cmd' : 'claude')
 )
-const fakeCodexSource = `
+const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
-const ledger = process.env.ORCA_E2E_CODEX_LIFECYCLE_LEDGER
+const ledger = process.env.ORCA_E2E_WORKER_LIFECYCLE_LEDGER
 const append = (event) => appendFileSync(ledger, JSON.stringify({ pid: process.pid, ...event }) + '\\n')
 const args = process.argv.slice(2)
-if (args.includes('app-server')) {
-  process.stderr.write("error: unrecognized subcommand 'app-server'\\n")
-  process.exit(2)
-}
+// Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
+if (require('node:path').basename(process.cwd()) === 'rate-limit-pty-cwd') process.exit(0)
 append({ event: 'spawn', args })
-process.stdout.write('\\u001b]0;Codex Ready\\u0007OpenAI Codex\\nmodel: e2e\\ndirectory: e2e\\n')
+process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 ${FAKE_AGENT_PASTE_END_SCANNER_SOURCE}
 process.stdin.on('data', (chunk) => {
   const input = chunk.toString()
@@ -51,8 +50,8 @@ process.stdin.on('data', (chunk) => {
   fakeAgentMaybeAck(pasteEndScan, input, (mode) => {
     append({ event: 'ack', mode })
     const message = mode === 'bracketed' ? 'ACK' : 'PASTE_PROTOCOL_ERROR'
-    process.stdout.write('\\u001b]0;Codex Working\\u0007' + message + '\\n')
-    setTimeout(() => process.stdout.write('\\u001b]0;Codex Ready\\u0007'), 10)
+    process.stdout.write('\\u001b]0;Claude working\\u0007' + message + '\\n')
+    setTimeout(() => process.stdout.write('\\u001b]0;Claude ready\\u0007'), 10)
   })
 })
 process.stdin.setRawMode?.(true)
@@ -60,26 +59,26 @@ process.stdin.resume()
 setInterval(() => {}, 60_000)
 `
 
-function installCompletedWorkerFakeCodex(): void {
+function installCompletedWorkerFakeClaude(): void {
   mkdirSync(fakeCliDir, { recursive: true })
   if (process.platform === 'win32') {
-    writeFileSync(path.join(fakeCliDir, 'fake-codex.js'), fakeCodexSource)
+    writeFileSync(path.join(fakeCliDir, 'fake-claude.js'), fakeClaudeSource)
     writeFileSync(
-      path.join(fakeCliDir, 'codex.cmd'),
-      '@echo off\r\nnode "%~dp0\\fake-codex.js" %*\r\n'
+      path.join(fakeCliDir, 'claude.cmd'),
+      '@echo off\r\nnode "%~dp0\\fake-claude.js" %*\r\n'
     )
   } else {
-    const executable = path.join(fakeCliDir, 'codex')
-    writeFileSync(executable, `#!/usr/bin/env node\n${fakeCodexSource}`)
+    const executable = path.join(fakeCliDir, 'claude')
+    writeFileSync(executable, `#!/usr/bin/env node\n${fakeClaudeSource}`)
     chmodSync(executable, 0o755)
   }
 }
 
-installCompletedWorkerFakeCodex()
+installCompletedWorkerFakeClaude()
 
 export const completedWorkerLaunchEnv = {
   PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`,
-  ORCA_E2E_CODEX_LIFECYCLE_LEDGER: lifecycleLedgerPath
+  ORCA_E2E_WORKER_LIFECYCLE_LEDGER: lifecycleLedgerPath
 }
 
 export type LifecycleEvent = {
@@ -97,7 +96,7 @@ export type TerminalIdentity = Pick<
 
 export function clearCompletedWorkerLedger(): void {
   // Another spec can clean up this cached fixture before the next test uses it.
-  installCompletedWorkerFakeCodex()
+  installCompletedWorkerFakeClaude()
   rmSync(lifecycleLedgerPath, { force: true })
 }
 
@@ -155,28 +154,22 @@ export function runBuiltOrcaCli(
   return JSON.parse(output) as unknown
 }
 
-export function seedCurrentCodexTranscript(
+export function seedCurrentClaudeTranscript(
   isolatedHome: string,
   providerSessionId: string,
   cwd: string
 ): string {
-  const now = new Date()
-  const transcriptDir = path.join(
-    isolatedHome,
-    '.codex',
-    'sessions',
-    String(now.getUTCFullYear()),
-    String(now.getUTCMonth() + 1).padStart(2, '0'),
-    String(now.getUTCDate()).padStart(2, '0')
-  )
+  const transcriptDir = path.join(isolatedHome, '.claude', 'projects', encodeClaudeProjectPath(cwd))
   mkdirSync(transcriptDir, { recursive: true })
-  const transcriptPath = path.join(transcriptDir, `rollout-${providerSessionId}.jsonl`)
+  const transcriptPath = path.join(transcriptDir, `${providerSessionId}.jsonl`)
   writeFileSync(
     transcriptPath,
     `${JSON.stringify({
-      timestamp: now.toISOString(),
-      type: 'session_meta',
-      payload: { id: providerSessionId, cwd }
+      type: 'user',
+      sessionId: providerSessionId,
+      cwd,
+      timestamp: new Date().toISOString(),
+      message: { role: 'user', content: 'Report completion' }
     })}\n`
   )
   return transcriptPath

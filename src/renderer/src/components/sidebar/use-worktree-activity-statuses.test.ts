@@ -29,7 +29,7 @@ describe('selectWorktreeActivityStatuses', () => {
         other: []
       },
       runtimePaneTitlesByTabId: {
-        'other-tab': { 0: 'codex [working]' }
+        'other-tab': { 0: 'opencode [working]' }
       },
       ptyIdsByTabId: {
         'other-tab': ['other-pty']

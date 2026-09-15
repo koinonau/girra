@@ -271,8 +271,8 @@ describe('createPaneForegroundAgentTracker', () => {
     expect(confirmForegroundProcess).not.toHaveBeenCalled()
   })
 
-  it('reads the foreground for a visible PTY so restored running Codex panes regain identity', async () => {
-    readForegroundProcess.mockResolvedValue('codex')
+  it('reads the foreground for a visible PTY so restored running OpenCode panes regain identity', async () => {
+    readForegroundProcess.mockResolvedValue('opencode')
     const tracker = makeTracker()
 
     tracker.onVisiblePtyBound()
@@ -282,7 +282,7 @@ describe('createPaneForegroundAgentTracker', () => {
     await flushSettleRead(VISIBLE_PTY_SETTLE_MS)
 
     expect(readForegroundProcess).toHaveBeenCalledExactlyOnceWith('pty-1')
-    expect(publish).toHaveBeenLastCalledWith({ agent: 'codex', shellForeground: false })
+    expect(publish).toHaveBeenLastCalledWith({ agent: 'opencode', shellForeground: false })
   })
 
   it('does not retry or publish visible PTY reads for an idle shell foreground', async () => {
@@ -299,7 +299,7 @@ describe('createPaneForegroundAgentTracker', () => {
   })
 
   it('lets command-start sampling supersede a pending visible PTY read', async () => {
-    readForegroundProcess.mockResolvedValue('codex')
+    readForegroundProcess.mockResolvedValue('opencode')
     const tracker = makeTracker()
 
     tracker.onVisiblePtyBound()
@@ -307,11 +307,11 @@ describe('createPaneForegroundAgentTracker', () => {
     await flushSettleRead(VISIBLE_PTY_SETTLE_MS)
 
     expect(readForegroundProcess).toHaveBeenCalledExactlyOnceWith('pty-1')
-    expect(publish).toHaveBeenLastCalledWith({ agent: 'codex', shellForeground: false })
+    expect(publish).toHaveBeenLastCalledWith({ agent: 'opencode', shellForeground: false })
   })
 
   it('does not let visible PTY sampling downgrade pending command-start sampling', async () => {
-    readForegroundProcess.mockResolvedValueOnce('bash').mockResolvedValueOnce('codex')
+    readForegroundProcess.mockResolvedValueOnce('bash').mockResolvedValueOnce('opencode')
     const tracker = makeTracker()
 
     tracker.onCommandStarted()
@@ -321,11 +321,11 @@ describe('createPaneForegroundAgentTracker', () => {
 
     await flushSettleRead(WRAPPER_RESOLVE_RETRY_MS)
     expect(readForegroundProcess).toHaveBeenCalledTimes(2)
-    expect(publish).toHaveBeenLastCalledWith({ agent: 'codex', shellForeground: false })
+    expect(publish).toHaveBeenLastCalledWith({ agent: 'opencode', shellForeground: false })
   })
 
   it('retries visible PTY reads only while a foreground wrapper may resolve to an agent', async () => {
-    readForegroundProcess.mockResolvedValueOnce('node').mockResolvedValueOnce('codex')
+    readForegroundProcess.mockResolvedValueOnce('node').mockResolvedValueOnce('opencode')
     const tracker = makeTracker()
 
     tracker.onVisiblePtyBound()
@@ -335,7 +335,7 @@ describe('createPaneForegroundAgentTracker', () => {
 
     await flushSettleRead(WRAPPER_RESOLVE_RETRY_MS)
     expect(readForegroundProcess).toHaveBeenCalledTimes(2)
-    expect(publish).toHaveBeenLastCalledWith({ agent: 'codex', shellForeground: false })
+    expect(publish).toHaveBeenLastCalledWith({ agent: 'opencode', shellForeground: false })
   })
 
   it('re-reads on a bounded ladder while the read still sees an interpreter wrapper', async () => {
@@ -465,26 +465,26 @@ describe('createPaneForegroundAgentTracker', () => {
   })
 
   it('confirms the foreground before clearing a pane an agent has owned', async () => {
-    readForegroundProcess.mockResolvedValue('codex')
+    readForegroundProcess.mockResolvedValue('opencode')
     const tracker = makeTracker()
 
     tracker.onCommandStarted()
     await flushSettleRead(COMMAND_SETTLE_MS)
     expect(publish).toHaveBeenLastCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       shellForeground: false
     })
 
     publish.mockClear()
     readForegroundProcess.mockClear()
     tracker.onCommandFinished()
-    // Why: a leaked nested-shell 133;D must not clear Codex before the read.
+    // Why: a leaked nested-shell 133;D must not clear OpenCode before the read.
     expect(publish).not.toHaveBeenCalled()
 
     await flushSettleRead(COMMAND_SETTLE_MS)
     expect(readForegroundProcess).toHaveBeenCalledExactlyOnceWith('pty-1')
     expect(publish).toHaveBeenLastCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       routingTrusted: true,
       shellForeground: false
     })
@@ -492,7 +492,7 @@ describe('createPaneForegroundAgentTracker', () => {
   })
 
   it('marks shell foreground when the confirming read shows the agent is gone', async () => {
-    readForegroundProcess.mockResolvedValueOnce('codex').mockResolvedValue('zsh')
+    readForegroundProcess.mockResolvedValueOnce('opencode').mockResolvedValue('zsh')
     const tracker = makeTracker()
 
     tracker.onCommandStarted()
@@ -507,18 +507,18 @@ describe('createPaneForegroundAgentTracker', () => {
   })
 
   it('signals confirmed shell foreground only when the read proves the agent exited', async () => {
-    // Reads: command-start=codex, first finish=codex (still running), then a
+    // Reads: command-start=opencode, first finish=opencode (still running), then a
     // bounded zsh→zsh→zsh confirmation for genuine exit.
     readForegroundProcess
-      .mockResolvedValueOnce('codex')
-      .mockResolvedValueOnce('codex')
+      .mockResolvedValueOnce('opencode')
+      .mockResolvedValueOnce('opencode')
       .mockResolvedValue('zsh')
     const tracker = makeTracker()
 
     tracker.onCommandStarted()
     await flushSettleRead(COMMAND_SETTLE_MS)
 
-    // A leaked nested-shell 133;D while Codex still owns the foreground: no signal.
+    // A leaked nested-shell 133;D while OpenCode still owns the foreground: no signal.
     tracker.onCommandFinished()
     await flushSettleRead(COMMAND_SETTLE_MS)
     expect(onConfirmedShellForeground).not.toHaveBeenCalled()
@@ -530,7 +530,7 @@ describe('createPaneForegroundAgentTracker', () => {
   })
 
   it('returns to the no-RPC finished path after the agent is confirmed gone', async () => {
-    readForegroundProcess.mockResolvedValueOnce('codex').mockResolvedValue('zsh')
+    readForegroundProcess.mockResolvedValueOnce('opencode').mockResolvedValue('zsh')
     const tracker = makeTracker()
 
     tracker.onCommandStarted()
@@ -549,7 +549,7 @@ describe('createPaneForegroundAgentTracker', () => {
   })
 
   it('confirms a command finished for a launch-known agent pane before any read', async () => {
-    readForegroundProcess.mockResolvedValue('codex')
+    readForegroundProcess.mockResolvedValue('opencode')
     const tracker = createPaneForegroundAgentTracker({
       getPtyId: () => ptyId,
       isTrackablePtyId: (id) => !id.startsWith('remote:') && !id.startsWith('ssh:'),
@@ -566,7 +566,7 @@ describe('createPaneForegroundAgentTracker', () => {
     await flushSettleRead(COMMAND_SETTLE_MS)
     expect(readForegroundProcess).toHaveBeenCalledExactlyOnceWith('pty-1')
     expect(publish).toHaveBeenLastCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       routingTrusted: true,
       shellForeground: false
     })
@@ -701,7 +701,7 @@ describe('createPaneForegroundAgentTracker', () => {
   it('does not let forged OSC 133/777 output assert remote identity', async () => {
     ptyId = 'ssh:conn-1@@pty-9'
     const remoteRead = vi.fn().mockResolvedValue({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       hasChildProcesses: true
     })
     const tracker = createPaneForegroundAgentTracker({
@@ -721,11 +721,13 @@ describe('createPaneForegroundAgentTracker', () => {
       onCommandFinished: () => tracker.onCommandFinished()
     })
 
-    lifecycle.handlePtyData("printf '\\033]133;A\\007\\033]777;agent=codex\\007\\033]133;D;0\\007'")
+    lifecycle.handlePtyData(
+      "printf '\\033]133;A\\007\\033]777;agent=opencode\\007\\033]133;D;0\\007'"
+    )
     await flushSettleRead(COMMAND_SETTLE_MS)
 
     expect(publish).not.toHaveBeenCalledWith(
-      expect.objectContaining({ agent: 'codex', shellForeground: false })
+      expect.objectContaining({ agent: 'opencode', shellForeground: false })
     )
     lifecycle.dispose()
     tracker.dispose()
@@ -740,7 +742,7 @@ describe('createPaneForegroundAgentTracker', () => {
             resolveFirstRead = resolve
           })
       )
-      .mockResolvedValueOnce('codex')
+      .mockResolvedValueOnce('opencode')
     const tracker = makeTracker()
 
     tracker.onCommandStarted()
@@ -749,7 +751,7 @@ describe('createPaneForegroundAgentTracker', () => {
     resolveFirstRead('claude')
     await flushSettleRead(COMMAND_SETTLE_MS)
 
-    expect(publish).toHaveBeenLastCalledWith({ agent: 'codex', shellForeground: false })
+    expect(publish).toHaveBeenLastCalledWith({ agent: 'opencode', shellForeground: false })
     expect(publish).not.toHaveBeenCalledWith({ agent: 'claude', shellForeground: false })
   })
 

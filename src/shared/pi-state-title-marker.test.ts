@@ -7,11 +7,10 @@ import {
   PI_STATE_MARKERS
 } from './pi-state-title-marker'
 
-// Why: OMP 17.2.12 swapped its animated braille frames for static markers on WSL/ConPTY
-// (#13890, upstream #8014). Every case below was idle before the marker table existed.
-describe('Pi/OMP native state-title markers', () => {
+// Why: Pi-compatible TUIs use static markers instead of braille frames on WSL/ConPTY (#13890).
+describe('Pi native state-title markers', () => {
   it.each([
-    // bare 17.2.12+ titles
+    // bare marker titles
     ['π : my-project', 'working'],
     ['π > my-project', 'idle'],
     ['π ! my-project', 'permission'],
@@ -35,8 +34,7 @@ describe('Pi/OMP native state-title markers', () => {
   })
 
   it.each([
-    // Why: the legacy no-space form is OMP's disabled title, not a working marker. It has
-    // always classified idle and must keep doing so on hosts still running 17.2.11.
+    // Why: the legacy no-space form is a disabled title, not a working marker; it stays idle.
     ['π: my-project', 'idle'],
     ['π - my-project', 'idle'],
     ['⠋ π - my-project', 'working']

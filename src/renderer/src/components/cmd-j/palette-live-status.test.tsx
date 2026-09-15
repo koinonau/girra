@@ -146,7 +146,7 @@ describe('palette live status', () => {
       const staleAt = Date.now() - AGENT_STATUS_STALE_AFTER_MS - 1
       useAppStore.setState((s) => ({
         tabsByWorktree: {
-          'wt-a': [{ ...makeTerminalTab('term-a', 'wt-a'), title: 'Codex - action required' }]
+          'wt-a': [{ ...makeTerminalTab('term-a', 'wt-a'), title: 'Pi - action required' }]
         },
         agentStatusByPaneKey: {
           [makePaneKey('term-a', LEAF)]: makeAgentEntry('term-a', 'done', {
@@ -168,7 +168,7 @@ describe('palette live status', () => {
                   id: 'recent',
                   worktreeId: 'wt-a',
                   unifiedTabId: null,
-                  terminalTab: { id: 'term-a', title: 'Codex - action required' },
+                  terminalTab: { id: 'term-a', title: 'Pi - action required' },
                   worktreeLastActivityAt: 0
                 }}
                 fallback={<span data-fallback="true" />}
@@ -213,7 +213,7 @@ describe('palette live status', () => {
         }
       },
       runtimePaneTitlesByTabId: {
-        'term-a': { 1: 'Codex - action required', 2: 'shell' }
+        'term-a': { 1: 'Pi - action required', 2: 'shell' }
       }
     })
 
@@ -222,7 +222,7 @@ describe('palette live status', () => {
 
     await act(async () => {
       useAppStore.setState({
-        runtimePaneTitlesByTabId: { 'term-a': { 2: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { 'term-a': { 2: 'Pi - action required' } }
       })
     })
     expect(dotLabels()).toEqual(['Needs permission'])
@@ -230,7 +230,7 @@ describe('palette live status', () => {
     await act(async () => {
       useAppStore.setState({
         runtimePaneTitlesByTabId: {
-          'term-a': { 1: 'Codex - action required', 2: '⠹ codex working' }
+          'term-a': { 1: 'Pi - action required', 2: '⠹ OpenCode working' }
         }
       })
     })

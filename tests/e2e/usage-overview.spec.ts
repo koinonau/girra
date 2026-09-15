@@ -28,13 +28,12 @@ test.describe('usage overview', () => {
     await expect(orcaPage.getByRole('heading', { name: 'Usage Overview' })).toBeVisible()
     await expect(orcaPage.getByRole('heading', { name: 'Providers' })).toBeVisible()
     await expect(orcaPage.getByRole('button', { name: 'Enable Claude' })).toBeVisible()
-    await expect(orcaPage.getByRole('button', { name: 'Enable Codex' })).toBeVisible()
     await expect(orcaPage.getByRole('button', { name: 'Enable OpenCode' })).toBeVisible()
 
     await providerDropdown.click()
-    await orcaPage.getByRole('menuitem', { name: 'Codex', exact: true }).click()
-    await expect(orcaPage.getByRole('heading', { name: 'Codex Usage Tracking' })).toBeVisible()
-    await expect(providerDropdown).toHaveAttribute('aria-label', 'Usage analytics provider: Codex')
+    await orcaPage.getByRole('menuitem', { name: 'Claude', exact: true }).click()
+    await expect(orcaPage.getByRole('heading', { name: 'Claude Usage Tracking' })).toBeVisible()
+    await expect(providerDropdown).toHaveAttribute('aria-label', 'Usage analytics provider: Claude')
 
     await providerDropdown.click()
     await orcaPage.getByRole('menuitem', { name: 'OpenCode', exact: true }).click()

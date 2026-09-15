@@ -45,7 +45,7 @@ function entry(
     prompt: 'previous prompt',
     updatedAt,
     stateStartedAt: updatedAt,
-    agentType: 'codex',
+    agentType: 'opencode',
     stateHistory: []
   }
 }
@@ -189,7 +189,7 @@ describe('running agent send targets', () => {
             ptyIdsByLeafId: { [LEFT_LEAF_ID]: 'pty-left' }
           }
         },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'OpenCode - action required' } }
       }),
       WORKTREE_ID,
       NOW
@@ -241,7 +241,7 @@ describe('running agent send targets', () => {
         agentStatusByPaneKey: {
           [stalePaneKey]: entry(stalePaneKey, 'done', NOW - 31 * 60 * 1000)
         },
-        tabsByWorktree: { [WORKTREE_ID]: [{ ...tab(TAB_ID), title: 'Codex' }] },
+        tabsByWorktree: { [WORKTREE_ID]: [{ ...tab(TAB_ID), title: 'OpenCode' }] },
         terminalLayoutsByTabId: {
           [TAB_ID]: {
             root: { type: 'leaf', leafId: RIGHT_LEAF_ID },
@@ -279,7 +279,7 @@ describe('running agent send targets', () => {
             ptyIdsByLeafId: { [RIGHT_LEAF_ID]: 'pty-right' }
           }
         },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'OpenCode ready' } }
       }),
       WORKTREE_ID,
       stalePaneKey,
@@ -309,7 +309,7 @@ describe('running agent send targets', () => {
             ptyIdsByLeafId: { [RIGHT_LEAF_ID]: 'pty-right' }
           }
         },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'OpenCode ready' } }
       }),
       WORKTREE_ID,
       paneKey,
@@ -370,7 +370,7 @@ describe('running agent send targets', () => {
             ptyIdsByLeafId: { [RIGHT_LEAF_ID]: 'pty-right' }
           }
         },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'OpenCode - action required' } }
       }),
       WORKTREE_ID,
       stalePaneKey,
@@ -403,7 +403,7 @@ describe('running agent send targets', () => {
             ptyIdsByLeafId: { [LEFT_LEAF_ID]: 'pty-left' }
           }
         },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 2: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 2: 'OpenCode - action required' } }
       }),
       WORKTREE_ID,
       paneKey,

@@ -111,7 +111,7 @@ describe('aiVault.resolveSessionTitles handler', () => {
     resolveAiVaultSessionTitlesInWorker.mockResolvedValue({ titles: [] })
     const dispatcher = makeDispatcher()
     const requests = [
-      { agent: 'codex', sessionId: 'retired' },
+      { agent: 'opencode', sessionId: 'other-agent' },
       { agent: 'claude', sessionId: 'session-1' }
     ]
 

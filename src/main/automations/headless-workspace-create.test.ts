@@ -21,7 +21,7 @@ const automation: Automation = {
   name: 'Nightly review',
   prompt: 'Review changes',
   precheck: null,
-  agentId: 'codex',
+  agentId: 'opencode',
   runContext: {
     kind: 'workspace-run',
     projectId: 'project-1',
@@ -70,8 +70,8 @@ describe('headless automation workspace create args', () => {
       baseBranch: 'origin/main',
       setupDecision: 'skip',
       activate: false,
-      createdWithAgent: 'codex',
-      startupAgent: 'codex',
+      createdWithAgent: 'opencode',
+      startupAgent: 'opencode',
       startupPrompt: 'Review changes',
       automationProvenance: {
         kind: 'created-by-automation',

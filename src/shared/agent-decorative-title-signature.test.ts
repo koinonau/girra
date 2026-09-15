@@ -16,8 +16,8 @@ describe('agent decorative title signatures', () => {
   it('treats spinner-only frame changes as the same decorative title', () => {
     expect(
       isDecorativeAgentTitleFrameChange(
-        `${BRAILLE_SPINNER_FRAME_A} Codex is thinking`,
-        `${BRAILLE_SPINNER_FRAME_B}  Codex\tis\nthinking`
+        `${BRAILLE_SPINNER_FRAME_A} OpenCode is thinking`,
+        `${BRAILLE_SPINNER_FRAME_B}  OpenCode\tis\nthinking`
       )
     ).toBe(true)
   })
@@ -28,10 +28,10 @@ describe('agent decorative title signatures', () => {
 
   it('folds title whitespace without full whitespace replacement', () => {
     const replace = vi.spyOn(String.prototype, 'replace')
-    const title = ` \t${BRAILLE_SPINNER_FRAME_A}\t Codex   is\nthinking ${' pasted text '.repeat(40)}`
+    const title = ` \t${BRAILLE_SPINNER_FRAME_A}\t OpenCode   is\nthinking ${' pasted text '.repeat(40)}`
 
     expect(getDecorativeAgentTitleSignature(title)).toBe(
-      `working:Codex is thinking ${'pasted text '.repeat(40).trimEnd()}`
+      `working:OpenCode is thinking ${'pasted text '.repeat(40).trimEnd()}`
     )
     expect(
       replace.mock.calls.filter(
@@ -42,7 +42,7 @@ describe('agent decorative title signatures', () => {
 
   it('does not normalize oversized title text on the hot path', () => {
     const replace = vi.spyOn(String.prototype, 'replace')
-    const title = `${BRAILLE_SPINNER_FRAME_A} Codex is thinking ${'x'.repeat(
+    const title = `${BRAILLE_SPINNER_FRAME_A} OpenCode is thinking ${'x'.repeat(
       DECORATIVE_AGENT_TITLE_SIGNATURE_SOURCE_SCAN_LIMIT + 1
     )}`
 

@@ -73,7 +73,7 @@ describe('getDeleteWorktreeToastCopy', () => {
     expect(
       toastCopyForRemovalError(
         'feature/foo',
-        'Refusing to remove worktree with running agent sessions: repo-1::/w — still live: 2 agent sessions (claude, codex). Retry with force delete (--force) to remove it anyway.'
+        'Refusing to remove worktree with running agent sessions: repo-1::/w — still live: 2 agent sessions (claude, opencode). Retry with force delete (--force) to remove it anyway.'
       )
     ).toEqual({
       title: 'Failed to delete workspace feature/foo',

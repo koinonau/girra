@@ -5,7 +5,7 @@ description: Configure Claude Code and other CLI agent harnesses to run GLM-5.2 
 
 import { Callout } from '@/components/docs/prose'
 
-GLM-5.2 works in Orca through the agent harness you already use. Configure GLM-5.2 in Claude Code, OpenCode, Cline, Kilo Code, Roo Code, Droid, OpenClaw, or another CLI agent, then launch that agent from Orca's picker.
+GLM-5.2 works in Orca through the agent harness you already use. Configure GLM-5.2 in Claude Code, OpenCode, or another CLI agent, then launch that agent from Orca's picker.
 
 Orca supplies the isolated worktree, terminal panes, browser tab, review flow, and session management. Your [Z.ai CodePlan subscription](https://z.ai/subscribe) and agent config supply the model access.
 
@@ -45,7 +45,7 @@ Use the `[1m]` suffix when you want GLM-5.2's 1M context variant, and keep `CLAU
 
 For coding tasks, Z.ai recommends setting Claude Code effort to `max` with `/effort`. Claude Code's lower effort settings map to GLM-5.2 high effort, while `xhigh`, `max`, and `ultracode` map to GLM-5.2 max effort.
 
-## OpenCode, Cline, Kilo Code, Roo Code, and Droid
+## OpenCode
 
 For agent harnesses that expose an OpenAI-compatible provider:
 
@@ -58,58 +58,5 @@ For agent harnesses that expose an OpenAI-compatible provider:
 1. Disable image support unless the harness specifically documents image support for this provider path.
 
 After saving, launch the harness from Orca's agent picker. Orca will run the same configured CLI in the selected worktree.
-
-## OpenClaw
-
-If OpenClaw cannot select GLM-5.2 directly from its provider model list, add the model manually in `~/.openclaw/openclaw.json`.
-
-Add `glm-5.2` to `models.providers.zai.models`:
-
-```json
-{
-  "id": "glm-5.2",
-  "name": "GLM-5.2",
-  "reasoning": true,
-  "input": ["text"],
-  "cost": {
-    "input": 0,
-    "output": 0,
-    "cacheRead": 0,
-    "cacheWrite": 0
-  },
-  "contextWindow": 1000000,
-  "maxTokens": 131072
-}
-```
-
-Then set the default primary model:
-
-```json
-{
-  "model": {
-    "primary": "zai/glm-5.2",
-    "fallbacks": ["zai/glm-4.7"]
-  }
-}
-```
-
-And add the model under `agents.defaults.models`:
-
-```json
-{
-  "models": {
-    "zai/glm-5.2": { "alias": "GLM" },
-    "zai/glm-4.7": {}
-  }
-}
-```
-
-Restart the OpenClaw gateway:
-
-```bash
-openclaw gateway restart
-```
-
-Then launch OpenClaw from Orca or run `openclaw tui` in an Orca terminal to confirm GLM-5.2 is active.
 
 The key rule is simple: configure GLM-5.2 wherever the harness stores provider/model settings, then let Orca launch that harness in the right worktree.

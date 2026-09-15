@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phases 5b and 5c are merged, and Phase 5d (Codex and dropped agents out of structured sessions, native chat, AI Vault and resume, with `src/main/codex` deleted) is in its pull request.
+As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phases 5b to 5d are merged, and Phase 5e (the agent roster shrunk to Claude Code, OpenCode and Pi) is in its pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -23,7 +23,8 @@ As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version ha
 - Phase 5a merged in [#15](https://github.com/koinonau/girra/pull/15): Codex accounts, managed homes, reset credits, rate limits, usage, the CLI lock, the per-pane account registry and stale-pane restart. 254 files deleted, 58,851 lines removed.
 - Phase 5b merged in [#19](https://github.com/koinonau/girra/pull/19): Codex out of the PTY and shell environment, hooks, trust, startup, the agent-hooks CLI and RPC, and renderer terminal special cases. 179 files deleted, 41,801 lines removed.
 - Phase 5c merged in [#20](https://github.com/koinonau/girra/pull/20): OMP and Prime Agent out of Pi, and the dropped agents' title, keyboard, readiness and output-scraping special cases. 73 files deleted, 19,596 lines removed.
-- Phase 5d removes Codex and the dropped agents from structured sessions, main and renderer native chat, AI Vault scanning and search, and session resume, and deletes what remained of `src/main/codex`: 252 files deleted, 55,947 lines removed and 4,675 added, measured with `git diff --shortstat origin/main` (2026-09-16). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 5d merged in [#21](https://github.com/koinonau/girra/pull/21): Codex and dropped agents out of structured sessions, native chat, AI Vault and resume, and `src/main/codex` deleted. 252 files deleted, 55,947 lines removed.
+- Phase 5e shrinks `TuiAgent` and every registry to `claude`, `claude-agent-teams`, `opencode` and `pi`, deletes the agent trust preset system, the `codex-cli/command.ts` shim, the Codex-only e2e specs, the dropped agents' icons and docs pages, and dead code left by 5b to 5d, and retargets about 1,000 test files: 71 files deleted, 20,787 lines removed and 7,632 added, measured with `git diff --shortstat origin/main` (2026-09-16). Its pull request: `gh pr list --repo koinonau/girra`.
 - Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
 
 ## Files
@@ -211,6 +212,15 @@ After Phase 5d, on 2026-09-16:
 | `pnpm lint` | 1, then 0 | 19 s | Six type-aware `restrict-template-expressions` warnings where narrowed provider types became `never` in runtime guards; fixed with `String(...)`. Then clean, 113 reliability gates, `DIRECT_IMPORTER_PIN` 143 |
 | `pnpm build` | 0 | 26 s | Main 5,004 modules, renderer 11,992 |
 
+After Phase 5e, on 2026-09-16 (run with `/opt/homebrew/bin` first on `PATH` and `DEVELOPER_DIR=/Library/Developer/CommandLineTools`, see Traps):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 2 s | No errors |
+| `pnpm test` | 1 | 575 s | Files: 5 failed, 7,736 passed, 56 skipped of 7,797. Tests: 6 failed, 70,805 passed, 320 skipped of 71,131. Four known failures, plus `preflight-agent-detection-no-subprocess`, whose guardrail expected 20 probe commands; lowered to 3 and passing. `skill-recipe-shell` passed, because Homebrew bash 5 was first on `PATH` |
+| `pnpm lint` | 1, then 0 | 6 s | Five `import/no-duplicates` warnings where the shim swap left two imports from one module; merged. Then clean, 113 reliability gates |
+| `pnpm build` | 0 | 107 s | Renderer 11,963 modules |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -297,6 +307,9 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: remove the plugin kill-list's remote fetch, though the tree ticks it with a `[STRIP]` PHONE-HOME tag, because the selection drops phone-home. The plugin system and marketplace stay; nothing blocks a plugin now.
 - 2026-09-15: delete `src/main/codex` files as soon as kept code stops reaching them, measured by an import walk from non-test files outside the directory, rather than waiting for the phase that owns the directory. A pull request must typecheck, and those files broke once hook types narrowed.
 - 2026-09-15: the SSH relay's hook installer ignores agents it does not know instead of failing the whole install, so an older desktop asking for Codex hooks still gets Claude's.
+- 2026-09-16: Phase 5e normalizes stored agent ids on load: `defaultTuiAgent` becomes `null` (auto-pick) unless `'blank'` or a kept agent; `commitMessageAi.agentId` and `sourceControlAi.agentId` become `null` unless a kept agent or custom; automations naming a dropped agent load disabled, show "Agent no longer available", and cannot be re-enabled until another agent is chosen. `worktree.create` `startupAgent`, `terminal.create` `launchAgent` and session tab agents turn an unknown id into `undefined`; explicit agent-session, automation and worker-start requests naming one are rejected. A `worktree.create` with a startup prompt and a retired agent is rejected rather than dropping the prompt.
+- 2026-09-16: Phase 5e also drops the Hermes skill home (Hermes automations stay), adds no `@pi` orchestration group, keeps the Codex scratch-repo heuristic and `AGENT_PROCESS_NAMES`, and deletes the skill plugin-cache freshness scan, whose only input was the Codex plugin cache.
+- 2026-09-16: deferred after 5e: the Windows input-record paste chain past its removed config field; the locale script brand lists and four stale Korean key overrides; collapsing the Pi title identity group; the SSH background `startupCommandDelivery: 'shell-ready'` chain, still reachable from paired, mobile and CLI clients; the PowerShell execution-policy bypass in `windows-powershell-hook-launcher.ts`, which may protect nothing now that no managed `.ps1` hook remains.
 - 2026-09-16: Phase 5d keeps `AiVaultSession.codexHome: null` on the wire and the strict `ui.set` `codex` ids, but removes the Phase 5a Codex slots from `AccountsSnapshot` and `RateLimitState`, since girra does not pair with Orca. `aiVault.prepareSessionResume` and the Kimi and OMP resume capabilities are gone; creating or attaching a Codex structured session is rejected. The AI Vault search index and parse cache bump their schema versions and rebuild.
 - 2026-09-16: known gaps after 5d. Copying an AI Vault resume command no longer refuses a session a structured chat owns (the terminal-send guards still block the paste). The deleted Codex rewind and integration tests covered concurrent rewind refusal, outcome-unknown rewind blocking sends, provider-exit reacquire and capability-less host refusal; no Claude test covers those yet.
 - 2026-09-15: dropping OMP and title special cases changes hand-started CLIs: OMP started by hand in a Pi pane reports as Pi, and dropped CLIs started by hand get no title-based status. The renderer GPU gate now follows only the user setting, WebGL capability and context loss, since the Gemini fallback went.
@@ -357,6 +370,8 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-14 | Words in file names mislead: most files named `artifact` are build, terminal or test artifacts, not the published artifacts feature | None; a subagent traced imports first | Decide from imports, never from names |
 | 2026-09-14 | Editors and shell prompts poll git, so a commit or `git rm` can hit `.git/index.lock` | Two failed commits | Retry once; the lock clears within a second |
 | 2026-09-14 | A subagent reported `pnpm tc` clean while one test file still failed to compile | One typecheck error found at verification | Rerun `pnpm tc` yourself before committing a subagent's work |
+| 2026-09-16 | After a restart, macOS required the Xcode licence again, so `/usr/bin/git` and `/usr/bin/python3` exit 69 and a scripted edit through them silently changes nothing | Two agents re-ran edits; one `git rm` did nothing until redone | Put `/opt/homebrew/bin` first on `PATH` and set `DEVELOPER_DIR=/Library/Developer/CommandLineTools` for native builds until the user runs `sudo xcodebuild -license accept` |
+| 2026-09-16 | Running `pnpm exec` in a temporary worktree whose `node_modules` symlinks to the main repo runs postinstall, which wipes node-pty's native build in the shared `node_modules` | PTY tests failed spuriously until a rebuild | Never share `node_modules` into a temporary worktree; rebuild with `node config/scripts/ensure-native-runtime.mjs --runtime=node` |
 | 2026-09-15 | The build plan omitted feature-tree drops that live outside its deletion table (feature wall, tours, onboarding) and misread `UsagePage.tsx` as a real dashboard | Caught only when Phase 6 was mapped | Diff the tree's unticked entries against the plan's phases before calling the plan complete |
 | 2026-09-15 | A subagent ran `pnpm format` across the repository and reformatted files other agents and the lead were editing | Eight format-only files restored; mixed edits left to re-read | Tell subagents to format only the files they changed |
 | 2026-09-14 | Feature share and line share differ: 103 of 535 features is 19%, but their code is 12% of source lines | "A fifth of the codebase" in the plan and an ADR draft | Measure lines before quoting a code proportion |

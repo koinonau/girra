@@ -192,7 +192,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
     store.getState().setAgentStatus('tab-1:leaf-1', {
       state: 'working',
       prompt: 'keep running',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     await expect(
@@ -684,7 +684,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
     store.getState().setAgentStatus('tab-1:leaf-1', {
       state: 'working',
       prompt: 'still live',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     await expect(

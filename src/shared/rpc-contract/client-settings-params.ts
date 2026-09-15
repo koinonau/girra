@@ -44,14 +44,14 @@ export const NativeChatSessionOptionsMutation = z.discriminatedUnion('type', [
   z
     .object({
       type: z.literal('apply-picks'),
-      agent: z.enum(['claude', 'codex', 'gemini', 'cursor', 'grok']),
+      agent: z.enum(['claude']),
       picks: z.array(NativeChatSessionOptionPick).min(1).max(8)
     })
     .strict(),
   z
     .object({
       type: z.literal('clear-model-if-missing'),
-      agent: z.enum(['claude', 'codex', 'gemini', 'cursor', 'grok']),
+      agent: z.enum(['claude']),
       availableModelIds: z.array(z.string().trim().min(1).max(512)).min(1).max(256)
     })
     .strict()

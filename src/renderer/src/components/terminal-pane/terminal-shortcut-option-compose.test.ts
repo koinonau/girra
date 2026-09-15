@@ -39,7 +39,7 @@ describe('Option-composed characters in kitty keyboard panes', () => {
     )
 
   // Turkish-Q composes '@' on Option+Q and '$' on Option+4. Reporting them as
-  // alt+q / alt+4 makes Codex's '@' references and '$' skills untypable (#14024).
+  // alt+q / alt+4 makes '@' file references and '$' untypable in agent TUIs (#14024).
   it('types the layout-composed ASCII character instead of reporting a chord', () => {
     expect(resolveKitty(event({ key: '@', code: 'KeyQ', altKey: true }))).toEqual({
       type: 'sendInput',

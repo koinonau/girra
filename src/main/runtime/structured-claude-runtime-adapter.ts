@@ -2,7 +2,7 @@ import { proveClaudeTranscriptBranch } from '../claude/claude-transcript-branch-
 import type { AgentSessionRecord } from '../../shared/agent-session-record'
 import type { AgentSessionBackgroundTaskState } from '../../shared/agent-session-wire'
 import { join } from 'node:path'
-import { resolveClaudeCommand } from '../codex-cli/command'
+import { resolveClaudeCommand } from '../../shared/node-cli-command-resolution'
 import type { ClaudeStructuredAuthPolicy } from '../claude-accounts/claude-structured-auth-policy'
 import { createClaudeStructuredLaunchResolver } from '../claude/claude-structured-launch-resolution'
 import {

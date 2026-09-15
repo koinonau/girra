@@ -71,8 +71,8 @@ describe('registerFilesystemHandlers', () => {
     discoverCommitMessageModelsLocalMock.mockResolvedValue({
       success: true,
       capability: {
-        id: 'codex',
-        label: 'Codex',
+        id: 'opencode',
+        label: 'OpenCode',
         modelSource: 'dynamic',
         defaultModelId: 'gpt-5.5',
         models: [{ id: 'gpt-5.5', label: 'GPT-5.5' }]
@@ -84,18 +84,18 @@ describe('registerFilesystemHandlers', () => {
       ...store,
       getSettings: () => ({
         workspaceDir: WORKSPACE_DIR,
-        agentCmdOverrides: { codex: 'npx codex' }
+        agentCmdOverrides: { opencode: 'npx opencode-ai' }
       })
     }
 
     registerFilesystemHandlers(storeWithOverride as never)
 
-    await handlers.get('git:discoverCommitMessageModels')!(null, { agentId: 'codex' })
+    await handlers.get('git:discoverCommitMessageModels')!(null, { agentId: 'opencode' })
 
     expect(discoverCommitMessageModelsLocalMock).toHaveBeenCalledWith(
-      'codex',
+      'opencode',
       undefined,
-      'npx codex'
+      'npx opencode-ai'
     )
   })
 
@@ -209,8 +209,8 @@ describe('registerFilesystemHandlers', () => {
       discoverCommitMessageModelsLocalMock.mockResolvedValue({
         success: true,
         capability: {
-          id: 'codex',
-          label: 'Codex',
+          id: 'opencode',
+          label: 'OpenCode',
           modelSource: 'dynamic',
           defaultModelId: 'gpt-5.5',
           models: [{ id: 'gpt-5.5', label: 'GPT-5.5' }]
@@ -238,7 +238,7 @@ describe('registerFilesystemHandlers', () => {
         ],
         getSettings: () => ({
           workspaceDir: WORKSPACE_DIR,
-          agentCmdOverrides: { codex: 'npx codex' },
+          agentCmdOverrides: { opencode: 'npx opencode-ai' },
           localWindowsRuntimeDefault: { kind: 'windows-host' }
         })
       }
@@ -246,14 +246,14 @@ describe('registerFilesystemHandlers', () => {
       registerFilesystemHandlers(wslStore as never, {})
 
       await handlers.get('git:discoverCommitMessageModels')!(null, {
-        agentId: 'codex',
+        agentId: 'opencode',
         worktreePath: WORKTREE_FEATURE_PATH
       })
 
       expect(discoverCommitMessageModelsLocalMock).toHaveBeenCalledWith(
-        'codex',
+        'opencode',
         undefined,
-        'npx codex',
+        'npx opencode-ai',
         { cwd: WORKTREE_FEATURE_PATH, wslDistro: 'Ubuntu' }
       )
     })
@@ -263,8 +263,8 @@ describe('registerFilesystemHandlers', () => {
     discoverCommitMessageModelsRemoteMock.mockResolvedValue({
       success: true,
       capability: {
-        id: 'cursor',
-        label: 'Cursor',
+        id: 'pi',
+        label: 'Pi',
         modelSource: 'dynamic',
         defaultModelId: 'auto',
         models: [{ id: 'auto', label: 'Auto' }]
@@ -278,32 +278,32 @@ describe('registerFilesystemHandlers', () => {
       ...store,
       getSettings: () => ({
         workspaceDir: WORKSPACE_DIR,
-        agentCmdOverrides: { cursor: 'npx cursor-agent' }
+        agentCmdOverrides: { pi: 'npx pi' }
       })
     }
 
     registerFilesystemHandlers(storeWithOverride as never)
 
     await handlers.get('git:discoverCommitMessageModels')!(null, {
-      agentId: 'cursor',
+      agentId: 'pi',
       worktreePath: '/remote/repo',
       connectionId: 'conn-1'
     })
 
     expect(discoverCommitMessageModelsRemoteMock).toHaveBeenCalledWith(
-      'cursor',
+      'pi',
       '/remote/repo',
       expect.any(Function),
-      'npx cursor-agent'
+      'npx pi'
     )
     const execute = discoverCommitMessageModelsRemoteMock.mock.calls[0]?.[2] as (
       plan: unknown,
       cwd: string,
       timeoutMs: number
     ) => Promise<unknown>
-    await execute({ binary: 'cursor-agent', args: ['--list-models'] }, '/remote/repo', 60_000)
+    await execute({ binary: 'pi', args: ['--list-models'] }, '/remote/repo', 60_000)
     expect(executeCommitMessagePlan).toHaveBeenCalledWith(
-      { binary: 'cursor-agent', args: ['--list-models'] },
+      { binary: 'pi', args: ['--list-models'] },
       '/remote/repo',
       60_000
     )

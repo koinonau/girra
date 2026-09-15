@@ -209,7 +209,7 @@ describe('OrcaRuntimeService', () => {
             id: 'host-tab',
             ptyId: null,
             worktreeId: renamedWorktreeId,
-            title: 'Codex',
+            title: 'Claude',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -232,7 +232,7 @@ describe('OrcaRuntimeService', () => {
           worktreeId: TEST_WORKTREE_ID,
           state: 'working',
           prompt: 'continue after rename',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 100
@@ -266,7 +266,7 @@ describe('OrcaRuntimeService', () => {
       connectionId: null,
       // Same agent as the OSC turn below: the store resolves pane identity itself, and a
       // cross-agent flip inside the inheritance window is a different rule's subject.
-      payload: { state: 'working', prompt: 'earlier hook row', agentType: 'codex' }
+      payload: { state: 'working', prompt: 'earlier hook row', agentType: 'claude' }
     })
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, {
@@ -274,7 +274,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: leafId,
           layout: null
         }
@@ -291,7 +291,7 @@ describe('OrcaRuntimeService', () => {
     })
     runtime.onPtyData(
       'pty-1',
-      '\x1b]9999;{"state":"working","prompt":"fresh OSC row","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"fresh OSC row","agentType":"claude"}\x07',
       321
     )
 
@@ -300,7 +300,7 @@ describe('OrcaRuntimeService', () => {
 
     expect(summary).toMatchObject({ hasHostSidebarActivity: true, status: 'working' })
     expect(summary?.agents).toEqual([
-      expect.objectContaining({ paneKey, prompt: 'fresh OSC row', agentType: 'codex' })
+      expect.objectContaining({ paneKey, prompt: 'fresh OSC row', agentType: 'claude' })
     ])
   })
 
@@ -321,7 +321,7 @@ describe('OrcaRuntimeService', () => {
             tabId: 'tab-1',
             state,
             prompt: 'mobile parity',
-            agentType: 'codex',
+            agentType: 'claude',
             connectionId: null,
             receivedAt: now + updatedAtOffset,
             stateStartedAt: now - 100
@@ -336,7 +336,7 @@ describe('OrcaRuntimeService', () => {
           {
             tabId: 'tab-1',
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex',
+            title: 'Claude',
             activeLeafId: '33333333-3333-4333-8333-333333333333',
             layout: null
           }
@@ -399,7 +399,7 @@ describe('OrcaRuntimeService', () => {
             id: 'headless-tab',
             ptyId: null,
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex',
+            title: 'Claude',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -417,7 +417,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'headless-tab',
           state: 'done',
           prompt: 'finished while headless',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 60_000
@@ -444,7 +444,7 @@ describe('OrcaRuntimeService', () => {
             id: 'open-tab',
             ptyId: null,
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex',
+            title: 'Claude',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -461,7 +461,7 @@ describe('OrcaRuntimeService', () => {
           worktreeId: TEST_WORKTREE_ID,
           state: 'done',
           prompt: 'stale legacy pane',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 60_000
@@ -471,7 +471,7 @@ describe('OrcaRuntimeService', () => {
           worktreeId: TEST_WORKTREE_ID,
           state: 'working',
           prompt: 'live legacy pane',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 100
@@ -504,7 +504,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'daemon-tab',
           state: 'working',
           prompt: 'long-running daemon agent',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 100
@@ -542,7 +542,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'daemon-tab',
           state: 'working',
           prompt: 'sibling pane agent',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 100
@@ -583,7 +583,7 @@ describe('OrcaRuntimeService', () => {
     })
     runtime.onPtyData(
       'osc-pty',
-      '\x1b]9999;{"state":"working","prompt":"osc reporter","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"osc reporter","agentType":"claude"}\x07',
       1
     )
     const pty = runtime['ptysById'].get('osc-pty')!
@@ -613,7 +613,7 @@ describe('OrcaRuntimeService', () => {
     })
     runtime.onPtyData(
       'race-pty',
-      '\x1b]9999;{"state":"working","prompt":"osc ping","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"osc ping","agentType":"claude"}\x07',
       1
     )
     statusWiring.statusStore.ingestTerminalStatus({
@@ -621,7 +621,7 @@ describe('OrcaRuntimeService', () => {
       tabId: 'race-tab',
       worktreeId: TEST_WORKTREE_ID,
       connectionId: null,
-      payload: { state: 'working', prompt: 'hook-fresh agent', agentType: 'codex' }
+      payload: { state: 'working', prompt: 'hook-fresh agent', agentType: 'claude' }
     })
     const pty = runtime['ptysById'].get('race-pty')!
     pty.tabId = null

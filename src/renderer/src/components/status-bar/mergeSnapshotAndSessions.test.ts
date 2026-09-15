@@ -183,7 +183,7 @@ describe('mergeSnapshotAndSessions', () => {
       {
         id: 'pty-agent',
         cwd: '/Users/me/Triton',
-        title: 'codex',
+        title: 'opencode',
         agentOwnership: 'present' as const
       }
     ]

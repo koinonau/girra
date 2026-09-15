@@ -104,7 +104,7 @@ describe('writeStartupCommandWhenShellReady', () => {
     Object.defineProperty(process, 'platform', { value: 'darwin' })
     const proc = createMockProc()
     const ready = Promise.resolve()
-    writeStartupCommandWhenShellReady(ready, proc, 'codex', () => {})
+    writeStartupCommandWhenShellReady(ready, proc, 'opencode', () => {})
 
     await ready
     vi.advanceTimersByTime(50)
@@ -115,14 +115,14 @@ describe('writeStartupCommandWhenShellReady', () => {
     vi.advanceTimersByTime(150)
     await Promise.resolve()
 
-    expect(proc._writes).toEqual(['codex\n'])
+    expect(proc._writes).toEqual(['opencode\n'])
   })
 
   it('uses the short settle delay when marker scan already observed post-marker bytes', async () => {
     Object.defineProperty(process, 'platform', { value: 'darwin' })
     const proc = createMockProc()
     const ready = Promise.resolve({ postMarkerBytesObserved: true })
-    writeStartupCommandWhenShellReady(ready, proc, 'codex', () => {})
+    writeStartupCommandWhenShellReady(ready, proc, 'opencode', () => {})
 
     await ready
     vi.advanceTimersByTime(29)
@@ -131,7 +131,7 @@ describe('writeStartupCommandWhenShellReady', () => {
 
     vi.advanceTimersByTime(1)
     await Promise.resolve()
-    expect(proc._writes).toEqual(['codex\n'])
+    expect(proc._writes).toEqual(['opencode\n'])
   })
 
   // Why: multiline startup commands must be bracketed-paste wrapped (ESC[200~ … ESC[201~) so shells insert them literally instead of treating each LF as Enter.

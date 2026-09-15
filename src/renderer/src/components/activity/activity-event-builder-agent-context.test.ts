@@ -36,7 +36,7 @@ describe('activity event agent contexts', () => {
       worktreeId: 'wt-1',
       executionHostId: 'local',
       contentType: 'agent-session',
-      label: 'Codex chat',
+      label: 'OpenCode chat',
       customLabel: null,
       color: null,
       sortOrder: 0,
@@ -52,7 +52,7 @@ describe('activity event agent contexts', () => {
     expect(result.liveAgentByPaneKey[PANE_KEY]).toMatchObject({
       state: 'working',
       worktree: { id: 'wt-1' },
-      tab: { id: 'tab-1', ptyId: null, title: 'Codex chat' }
+      tab: { id: 'tab-1', ptyId: null, title: 'OpenCode chat' }
     })
   })
 
@@ -92,7 +92,7 @@ describe('activity event agent contexts', () => {
       worktreeId: 'wt-1',
       executionHostId: 'runtime:env-1',
       contentType: 'agent-session',
-      label: 'Remote Codex chat',
+      label: 'Remote OpenCode chat',
       customLabel: null,
       color: null,
       sortOrder: 0,

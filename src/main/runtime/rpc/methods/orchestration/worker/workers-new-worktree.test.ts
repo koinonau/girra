@@ -52,7 +52,7 @@ describe('orchestration new-worktree workers', () => {
     } as never)
     vi.spyOn(runtime, 'createTerminal')
     vi.spyOn(runtime, 'listTerminals').mockResolvedValue({
-      terminals: [{ handle: 'term_worker', title: 'Codex' }],
+      terminals: [{ handle: 'term_worker', title: 'Claude Code' }],
       totalCount: 1,
       truncated: false
     } as never)
@@ -94,7 +94,7 @@ describe('orchestration new-worktree workers', () => {
       from: 'term_coord',
       worktree: 'new-child',
       name: 'new-worker',
-      agent: 'codex',
+      agent: 'claude',
       ...overrides
     })
     const result = await method.handler(params, { runtime })
@@ -139,7 +139,7 @@ describe('orchestration new-worktree workers', () => {
 
     expect(runtime.createManagedWorktree).toHaveBeenCalledWith(
       expect.objectContaining({
-        startupAgent: 'codex',
+        startupAgent: 'claude',
         awaitTerminalProvisioning: true,
         observeSetupCompletion: true,
         lineage: expect.objectContaining({ noParent: true, parentWorktree: undefined })
@@ -210,7 +210,7 @@ describe('orchestration new-worktree workers', () => {
           from: 'term_coord',
           worktree: 'new-child',
           name: 'folder-worker',
-          agent: 'codex'
+          agent: 'claude'
         }),
         { runtime }
       )
@@ -300,7 +300,7 @@ describe('orchestration new-worktree workers', () => {
   it('records a later setup failure without gating a start-immediately worker', async () => {
     mockCreatedWorktree({
       terminals: [
-        { handle: 'term_worker', title: 'Codex' },
+        { handle: 'term_worker', title: 'Claude Code' },
         { handle: 'term_setup', title: 'Setup' }
       ]
     })
@@ -346,7 +346,7 @@ describe('orchestration new-worktree workers', () => {
     mockCreatedWorktree({
       setupTerminalHandle: 'term_actual_setup',
       terminals: [
-        { handle: 'term_worker', title: 'Codex' },
+        { handle: 'term_worker', title: 'Claude Code' },
         { handle: 'term_configured_setup', title: 'Setup' },
         { handle: 'term_actual_setup', title: 'PowerShell' }
       ]
@@ -545,7 +545,7 @@ describe('orchestration new-worktree workers', () => {
         from: 'term_coord',
         worktree: 'new-child',
         name: 'atomic-worker',
-        agent: 'codex'
+        agent: 'claude'
       }
     }
 
@@ -612,7 +612,7 @@ describe('orchestration new-worktree workers', () => {
         from: 'term_coord',
         worktree: 'new-child',
         name: 'recover-input-worker',
-        agent: 'codex'
+        agent: 'claude'
       }
     }
 

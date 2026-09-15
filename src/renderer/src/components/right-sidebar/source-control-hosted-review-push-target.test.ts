@@ -318,7 +318,7 @@ describe('resolveHostedReviewActionUpstreamStatus with a same-repo upstream', ()
     // ignored and Push was wrongly disabled as "target unavailable".
     const realUpstream = {
       hasUpstream: true,
-      upstreamName: 'origin/fix-f1-codex-wsl-path-trust',
+      upstreamName: 'origin/fix-f1-opencode-wsl-path-trust',
       ahead: 1,
       behind: 0
     }
@@ -330,7 +330,7 @@ describe('resolveHostedReviewActionUpstreamStatus with a same-repo upstream', ()
     expect(hasResolvable).toBe(true)
     const canUseHostedReviewPushTarget = hasUsableHostedReviewPushTarget({
       hasResolvableHostedReviewPushTargetLink: hasResolvable,
-      branchName: 'fix-f1-codex-wsl-path-trust',
+      branchName: 'fix-f1-opencode-wsl-path-trust',
       upstreamStatus: realUpstream
     })
     expect(canUseHostedReviewPushTarget).toBe(true)

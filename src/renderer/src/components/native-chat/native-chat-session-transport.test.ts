@@ -113,7 +113,7 @@ describe('getNativeChatSessionTransport — selection', () => {
     )
     const transport = getNativeChatSessionTransport(ENV)
 
-    await expect(transport.readSession('codex', 'sess-1')).resolves.toEqual({
+    await expect(transport.readSession('claude', 'sess-1')).resolves.toEqual({
       messages: [message('interrupted')],
       lifecycle
     })

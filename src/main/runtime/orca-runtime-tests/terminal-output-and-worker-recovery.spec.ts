@@ -33,7 +33,7 @@ describe('OrcaRuntimeService', () => {
     const runtime = new OrcaRuntimeService(store)
     syncSinglePty(runtime)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex work', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude work', 100)
     runtime.onPtyData('pty-1', 'ing\x07Visible\n', 101)
 
     const pty = (
@@ -41,20 +41,20 @@ describe('OrcaRuntimeService', () => {
         ptysById: Map<string, { lastOscTitle: string | null; lastAgentStatus: string | null }>
       }
     ).ptysById.get('pty-1')
-    expect(pty?.lastOscTitle).toBe('Codex working')
+    expect(pty?.lastOscTitle).toBe('Claude working')
     expect(pty?.lastAgentStatus).toBe('working')
 
     const [terminal] = (await runtime.listTerminals()).terminals
     const read = await runtime.readTerminal(terminal.handle)
     expect(read.tail.join('\n')).toContain('Visible')
-    expect(read.tail.join('\n')).not.toContain('Codex working')
+    expect(read.tail.join('\n')).not.toContain('Claude working')
   })
 
   it('detects ST-terminated OSC titles split before the final backslash', async () => {
     const runtime = new OrcaRuntimeService(store)
     syncSinglePty(runtime)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x1b', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x1b', 100)
     runtime.onPtyData('pty-1', '\\Visible\n', 101)
 
     const pty = (
@@ -62,7 +62,7 @@ describe('OrcaRuntimeService', () => {
         ptysById: Map<string, { lastOscTitle: string | null; lastAgentStatus: string | null }>
       }
     ).ptysById.get('pty-1')
-    expect(pty?.lastOscTitle).toBe('Codex working')
+    expect(pty?.lastOscTitle).toBe('Claude working')
     expect(pty?.lastAgentStatus).toBe('working')
   })
 
@@ -70,15 +70,15 @@ describe('OrcaRuntimeService', () => {
     const runtime = new OrcaRuntimeService(store)
     syncSinglePty(runtime)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07\x1b', 100)
-    runtime.onPtyData('pty-1', ']0;Codex done\x07Visible\n', 101)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07\x1b', 100)
+    runtime.onPtyData('pty-1', ']0;Claude done\x07Visible\n', 101)
 
     const pty = (
       runtime as unknown as {
         ptysById: Map<string, { lastOscTitle: string | null; lastAgentStatus: string | null }>
       }
     ).ptysById.get('pty-1')
-    expect(pty?.lastOscTitle).toBe('Codex done')
+    expect(pty?.lastOscTitle).toBe('Claude done')
     expect(pty?.lastAgentStatus).toBe('idle')
   })
 
@@ -196,7 +196,7 @@ describe('OrcaRuntimeService', () => {
     })
     events.length = 0
 
-    const payload = '\x1b]9999;{"state":"working","prompt":"same","agentType":"codex"}\x07'
+    const payload = '\x1b]9999;{"state":"working","prompt":"same","agentType":"claude"}\x07'
     runtime.onPtyData('hook-ping-pty', payload, 100)
     runtime.onPtyData('hook-ping-pty', payload, 101)
     runtime.onPtyData('hook-ping-pty', payload, 102)
@@ -229,7 +229,7 @@ describe('OrcaRuntimeService', () => {
 
     runtime.onPtyData(
       'hook-exit-pty',
-      '\x1b]9999;{"state":"working","prompt":"long task","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"long task","agentType":"claude"}\x07',
       100
     )
     // Agent exits without a hook done event and the shell takes the title back; the stuck-spinner guard (#1437) must win over the retained hook row.
@@ -415,8 +415,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       db.setActiveCoordinatorRun({ coordinator_handle: 'term_other' })
       db.insertMessage({ from: 'term_sender', to: terminal.handle, subject: 'hello' })
 
@@ -456,8 +456,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       db.setActiveCoordinatorRun({ coordinator_handle: terminal.handle })
       db.insertMessage({
         from: 'term_sender',
@@ -504,8 +504,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       db.insertMessage({ from: 'term_sender', to: terminal.handle, subject: 'hello' })
 
       runtime.deliverPendingMessagesForHandle(terminal.handle)

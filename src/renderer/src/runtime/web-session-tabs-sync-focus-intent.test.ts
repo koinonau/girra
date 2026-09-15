@@ -38,7 +38,7 @@ describe('applyWebSessionTabsSnapshot', () => {
       groupId: 'host-group-1',
       worktreeId: WT,
       contentType: 'terminal',
-      label: 'codex [working]',
+      label: 'opencode [working]',
       customLabel: null,
       color: null,
       sortOrder: 0,
@@ -72,7 +72,7 @@ describe('applyWebSessionTabsSnapshot', () => {
             id: agentTabId,
             ptyId: 'remote:web-env-1@@terminal-1',
             worktreeId: WT,
-            title: 'codex [working]',
+            title: 'opencode [working]',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -109,7 +109,7 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: `host-tab-1::${LEAF_ID}`,
-          title: 'codex [thinking]',
+          title: 'opencode [thinking]',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           isActive: true,
@@ -484,7 +484,7 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: `host-tab-1::${LEAF_ID}`,
-          title: 'codex',
+          title: 'opencode',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           parentLayout: currentLayout,
@@ -589,7 +589,7 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: `host-tab-1::${LEAF_ID}`,
-          title: 'codex',
+          title: 'opencode',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           isActive: false,
@@ -650,7 +650,7 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: `host-tab-1::${LEAF_ID}`,
-          title: 'codex [thinking]',
+          title: 'opencode [thinking]',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           parentLayout: {

@@ -611,14 +611,16 @@ describe('searchOpenTabs result fields', () => {
 
   it('copies a confident occupant agent onto workspace results', () => {
     const results = search({
-      query: 'grok',
-      workspaceTabs: [makeWorkspaceTab({ id: 'tab-1', title: 'grok', occupantAgent: 'grok' })]
+      query: 'opencode',
+      workspaceTabs: [
+        makeWorkspaceTab({ id: 'tab-1', title: 'opencode', occupantAgent: 'opencode' })
+      ]
     })
 
     expect(results[0]).toMatchObject({
       source: 'workspace',
       contentType: 'terminal',
-      occupantAgent: 'grok'
+      occupantAgent: 'opencode'
     })
   })
 

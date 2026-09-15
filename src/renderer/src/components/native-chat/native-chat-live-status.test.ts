@@ -147,7 +147,7 @@ describe('mergeNativeChatLiveSession', () => {
     const session = mergeNativeChatLiveSession({
       messages: [assistant('a-1', 'done')],
       sessionId: 'sess',
-      agent: 'grok',
+      agent: 'opencode',
       hookState: 'working',
       stateStartedAt: 1
     })

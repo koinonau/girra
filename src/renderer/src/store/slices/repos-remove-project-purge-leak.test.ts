@@ -53,7 +53,7 @@ function seedTwoProjects(store: ReturnType<typeof createTestStore>): void {
     everActivatedWorktreeIds: new Set([W1, W2]),
     localDetectedAgentIdsByContext: {
       'repo-1:windows-host': ['claude'],
-      'repo-2:windows-host': ['codex']
+      'repo-2:windows-host': ['opencode']
     }
   })
 }
@@ -88,6 +88,6 @@ describe('removeProject purges per-worktree state (leak regression)', () => {
     expect(s.browserTabsByWorktree[W2]).toBeDefined()
     expect(s.gitStatusHugeByWorktree[W2]).toEqual({ limit: 2000 })
     expect(s.everActivatedWorktreeIds.has(W2)).toBe(true)
-    expect(s.localDetectedAgentIdsByContext['repo-2:windows-host']).toEqual(['codex'])
+    expect(s.localDetectedAgentIdsByContext['repo-2:windows-host']).toEqual(['opencode'])
   })
 })

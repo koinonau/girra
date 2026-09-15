@@ -2,7 +2,7 @@ import type { ElectronAPI } from '@electron-toolkit/preload'
 import type { ClaudeAccountsApi, MinimaxCredentialsApi } from './api/agent-account-api'
 import type { HooksApi } from './api/agent-hook-api'
 import type { SkillsApi } from './api/agent-skill-api'
-import type { AgentAwakeApi, AgentStatusApi, AgentTrustApi } from './api/agent-status-api'
+import type { AgentAwakeApi, AgentStatusApi } from './api/agent-status-api'
 import type { ClaudeUsageApi, OpenCodeUsageApi, RateLimitsApi } from './api/agent-usage-api'
 import type { AiVaultApi } from './api/ai-vault-api'
 import type { AppApi, E2EApi, PlatformApi } from './api/app-api'
@@ -78,7 +78,6 @@ export type PreloadApi = {
   keybindings: KeybindingsApi
   claudeAccounts: ClaudeAccountsApi
   cli: CliApi
-  agentTrust: AgentTrustApi
   preflight: PreflightApi
   notifications: NotificationsApi
   dashboard: DashboardApi

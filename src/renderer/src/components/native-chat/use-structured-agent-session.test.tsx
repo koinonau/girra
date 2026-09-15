@@ -143,7 +143,7 @@ describe('useStructuredAgentSession working state', () => {
         fence: 3,
         payloadFingerprint: 'fingerprint-1',
         dispatchState: 'accepted',
-        providerItemId: 'codex:thread-1:turn-1',
+        providerItemId: 'claude:thread-1:turn-1',
         reason: null,
         submittedAt: 1,
         resolvedAt: 2

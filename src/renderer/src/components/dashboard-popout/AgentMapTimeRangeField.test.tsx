@@ -62,7 +62,7 @@ const clientXForStop = (stop: number): number => (stop / AGENT_MAP_TIME_MAX_INDE
 function card(overrides: Partial<DashboardCard> & { paneKey: string }): DashboardCard {
   return {
     ptyId: overrides.paneKey,
-    agentType: 'codex',
+    agentType: 'opencode',
     bucket: 'working',
     dotState: 'working',
     task: 'Pack the map',

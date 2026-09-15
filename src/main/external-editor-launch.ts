@@ -3,7 +3,7 @@ import { existsSync } from 'node:fs'
 import { posix, win32 } from 'node:path'
 import { parseWslUncPath } from '../shared/wsl-paths'
 import { isVsCodeLauncherExecutable } from '../shared/vscode-remote-ssh-launcher'
-import { resolveCliCommand } from './codex-cli/command'
+import { resolveCliCommand } from '../shared/node-cli-command-resolution'
 import {
   getLauncherBaseName,
   hasMatchingOuterQuotes,

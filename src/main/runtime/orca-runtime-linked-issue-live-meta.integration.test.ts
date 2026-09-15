@@ -36,7 +36,7 @@ vi.mock('../text-generation/commit-message-text-generation', async () => ({
 
 const REPO_ID = 'repo-1'
 const STAGED_CONTEXT = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
-const PARAMS = { agentId: 'codex', model: 'gpt-5.4-mini' }
+const PARAMS = { agentId: 'opencode', model: 'gpt-5.4-mini' }
 
 const tempDirs: string[] = []
 

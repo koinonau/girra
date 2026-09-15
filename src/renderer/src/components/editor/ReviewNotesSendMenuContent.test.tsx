@@ -350,7 +350,7 @@ describe('ReviewNotesSendMenuContent', () => {
       tabsByWorktree: {
         'wt-1': [
           tab(TAB_A, { title: 'Terminal 1' }),
-          tab(TAB_B, { title: 'Codex', launchAgent: 'codex' })
+          tab(TAB_B, { title: 'OpenCode', launchAgent: 'opencode' })
         ]
       },
       terminalLayoutsByTabId: {
@@ -371,8 +371,8 @@ describe('ReviewNotesSendMenuContent', () => {
         paneKey: makePaneKey(TAB_B, LEAF_B),
         tabId: TAB_B,
         leafId: LEAF_B,
-        agentType: 'codex',
-        tabTitle: 'Codex',
+        agentType: 'opencode',
+        tabTitle: 'OpenCode',
         status: 'eligible'
       }
     ]
@@ -383,7 +383,7 @@ describe('ReviewNotesSendMenuContent', () => {
     expect(items).toHaveLength(2)
     expect(items.every((item) => item.props.disabled === false)).toBe(true)
     expect(collectText(items[0])).toContain('Claude')
-    expect(collectText(items[1])).toContain('Codex')
+    expect(collectText(items[1])).toContain('OpenCode')
   })
 
   it('orders send targets by the current worktree agent rows and shows status timing', () => {
@@ -394,7 +394,7 @@ describe('ReviewNotesSendMenuContent', () => {
         paneKey: paneKeyB,
         tabId: TAB_B,
         title: 'Second session',
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: harness.now - 120_000
       }),
       agentRow({
@@ -427,7 +427,7 @@ describe('ReviewNotesSendMenuContent', () => {
         paneKey: paneKeyB,
         tabId: TAB_B,
         leafId: LEAF_B,
-        agentType: 'codex',
+        agentType: 'opencode',
         tabTitle: 'Second session',
         status: 'eligible'
       }
@@ -437,7 +437,7 @@ describe('ReviewNotesSendMenuContent', () => {
     const items = findAllByType(tree, 'DropdownMenuItem')
 
     expect(items).toHaveLength(2)
-    expect(collectText(items[0])).toContain('Codex')
+    expect(collectText(items[0])).toContain('OpenCode')
     expect(collectText(items[0])).toContain('Done')
     expect(collectText(items[0])).toContain('2m ago')
     expect(collectText(items[0])).toContain('Second session')
@@ -450,14 +450,14 @@ describe('ReviewNotesSendMenuContent', () => {
       agentRow({
         paneKey,
         tabId: TAB_B,
-        title: 'Codex',
-        agentType: 'codex',
+        title: 'OpenCode',
+        agentType: 'opencode',
         state: 'idle',
         startedAt: harness.now
       })
     ]
     setStore({
-      tabsByWorktree: { 'wt-1': [tab(TAB_B, { title: 'Codex' })] },
+      tabsByWorktree: { 'wt-1': [tab(TAB_B, { title: 'OpenCode' })] },
       terminalLayoutsByTabId: { [TAB_B]: leafLayout(LEAF_B, 'pty-b') },
       ptyIdsByTabId: { [TAB_B]: ['pty-b'] }
     })
@@ -475,14 +475,14 @@ describe('ReviewNotesSendMenuContent', () => {
       agentRow({
         paneKey,
         tabId: TAB_B,
-        title: 'Codex',
-        agentType: 'codex',
+        title: 'OpenCode',
+        agentType: 'opencode',
         state: 'blocked',
         startedAt: harness.now
       })
     ]
     setStore({
-      tabsByWorktree: { 'wt-1': [tab(TAB_B, { title: 'Codex' })] },
+      tabsByWorktree: { 'wt-1': [tab(TAB_B, { title: 'OpenCode' })] },
       terminalLayoutsByTabId: { [TAB_B]: leafLayout(LEAF_B, 'pty-b') },
       ptyIdsByTabId: { [TAB_B]: ['pty-b'] }
     })
@@ -491,8 +491,8 @@ describe('ReviewNotesSendMenuContent', () => {
         paneKey,
         tabId: TAB_B,
         leafId: LEAF_B,
-        agentType: 'codex',
-        tabTitle: 'Codex',
+        agentType: 'opencode',
+        tabTitle: 'OpenCode',
         status: 'disabled',
         disabledReason: 'Agent needs permission'
       }
@@ -515,14 +515,14 @@ describe('ReviewNotesSendMenuContent', () => {
       agentRow({
         paneKey,
         tabId: TAB_B,
-        title: 'Codex',
-        agentType: 'codex',
+        title: 'OpenCode',
+        agentType: 'opencode',
         state: 'done',
         startedAt: harness.now - 60_000
       })
     ]
     setStore({
-      tabsByWorktree: { 'wt-1': [tab(TAB_B, { title: 'Codex' })] },
+      tabsByWorktree: { 'wt-1': [tab(TAB_B, { title: 'OpenCode' })] },
       terminalLayoutsByTabId: { [TAB_B]: leafLayout(LEAF_B, 'pty-b') },
       ptyIdsByTabId: { [TAB_B]: [] }
     })
@@ -566,7 +566,7 @@ describe('ReviewNotesSendMenuContent', () => {
   it('does not render an active agent fallback when the matching derived row is disabled', () => {
     const paneKey = makePaneKey(TAB_A, LEAF_A)
     setStore({
-      tabsByWorktree: { 'wt-1': [tab(TAB_A, { title: 'Codex' })] },
+      tabsByWorktree: { 'wt-1': [tab(TAB_A, { title: 'OpenCode' })] },
       terminalLayoutsByTabId: { [TAB_A]: leafLayout(LEAF_A, 'pty-a') }
     })
     harness.noteTargets = [
@@ -574,8 +574,8 @@ describe('ReviewNotesSendMenuContent', () => {
         paneKey,
         tabId: TAB_A,
         leafId: LEAF_A,
-        agentType: 'codex',
-        tabTitle: 'Codex',
+        agentType: 'opencode',
+        tabTitle: 'OpenCode',
         status: 'disabled',
         disabledReason: 'Agent status is stale'
       }

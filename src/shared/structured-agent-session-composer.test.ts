@@ -20,7 +20,7 @@ describe('structuredSlashCommands', () => {
   it.each(['claude'] as const)(
     'offers %s only commands the host answers or the agent runs',
     async (agent) => {
-      const offered = structuredSlashCommands(['clear', 'compact'], agent)
+      const offered = structuredSlashCommands(['clear', 'compact'])
       expect(offered.length).toBeGreaterThan(0)
       for (const command of offered) {
         const outcome = await dispatchStructuredAgentSessionComposerCommand(`/${command.name}`, {
@@ -31,15 +31,6 @@ describe('structuredSlashCommands', () => {
       }
     }
   )
-
-  it('adds nothing for an agent whose own harness expands its commands', () => {
-    expect(structuredSlashCommands(['clear', 'compact'], 'claude').map((c) => c.name)).toEqual([
-      'model',
-      'effort',
-      'clear',
-      'compact'
-    ])
-  })
 
   it('offers only the commands a chat session can carry out', () => {
     expect(structuredSlashCommands().map((command) => command.name)).toEqual(['model', 'effort'])

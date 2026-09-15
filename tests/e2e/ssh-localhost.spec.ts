@@ -103,7 +103,7 @@ async function focusTerminal(page: Page): Promise<void> {
   })
 }
 
-async function postCodexHook(
+async function postClaudeHook(
   page: Page,
   ptyId: string,
   payload: Record<string, unknown>,
@@ -123,7 +123,7 @@ async function postCodexHook(
       `  hook_payload=${shellQuote(JSON.stringify(payload))}`,
       '  (',
       '    sleep 0.1',
-      '    if curl -sS -X POST "http://127.0.0.1:${ORCA_AGENT_HOOK_PORT}/hook/codex" \\',
+      '    if curl -sS -X POST "http://127.0.0.1:${ORCA_AGENT_HOOK_PORT}/hook/claude" \\',
       '      -H "Content-Type: application/x-www-form-urlencoded" \\',
       '      -H "X-Orca-Agent-Hook-Token: ${ORCA_AGENT_HOOK_TOKEN}" \\',
       '      --data-urlencode "paneKey=${ORCA_PANE_KEY}" \\',
@@ -258,7 +258,7 @@ test.describe('Localhost SSH', () => {
     await waitForTerminalOutput(orcaPage, pluginOverlayMarker, 20_000)
 
     const prompt = `orca ssh e2e prompt ${Date.now()}`
-    await postCodexHook(
+    await postClaudeHook(
       orcaPage,
       ptyId,
       { hook_event_name: 'UserPromptSubmit', prompt },
@@ -276,7 +276,7 @@ test.describe('Localhost SSH', () => {
                 (entry) =>
                   entry.paneKey === paneKey &&
                   entry.prompt === prompt &&
-                  entry.agentType === 'codex' &&
+                  entry.agentType === 'claude' &&
                   entry.state === 'working' &&
                   state?.repos.some((repo) => repo.connectionId === targetId) === true &&
                   Object.values(state?.worktreesByRepo ?? {})
@@ -288,13 +288,13 @@ test.describe('Localhost SSH', () => {
           ),
         {
           timeout: 20_000,
-          message: 'Remote Codex hook status did not reach the renderer agent-status store'
+          message: 'Remote Claude hook status did not reach the renderer agent-status store'
         }
       )
       .toBe(true)
 
     const ctrlPrompt = `orca ssh ctrl-c interrupt ${Date.now()}`
-    await postCodexHook(
+    await postClaudeHook(
       orcaPage,
       ptyId,
       { hook_event_name: 'UserPromptSubmit', prompt: ctrlPrompt },
@@ -339,13 +339,13 @@ test.describe('Localhost SSH', () => {
       eventMatched: true
     })
 
-    await postCodexHook(
+    await postClaudeHook(
       orcaPage,
       ptyId,
       {
         hook_event_name: 'PreToolUse',
-        tool_name: 'exec_command',
-        tool_input: { cmd: '/bin/sleep 90' }
+        tool_name: 'Bash',
+        tool_input: { command: '/bin/sleep 90' }
       },
       'AGENT_HOOK_LATE_WORKING'
     )
@@ -368,7 +368,7 @@ test.describe('Localhost SSH', () => {
       .toEqual({ state: 'working', interrupted: undefined, prompt: ctrlPrompt })
 
     const escapePrompt = `orca ssh escape interrupt ${Date.now()}`
-    await postCodexHook(
+    await postClaudeHook(
       orcaPage,
       ptyId,
       { hook_event_name: 'UserPromptSubmit', prompt: escapePrompt },

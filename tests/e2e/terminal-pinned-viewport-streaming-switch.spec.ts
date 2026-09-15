@@ -19,7 +19,7 @@ import {
 import { nodeTerminalCommand } from './terminal-node-command'
 import { waitForPtyShellEcho } from './terminal-pty-readiness'
 
-// A Codex-like agent: pre-fills scrollback, then keeps streaming — commits a
+// A streaming TUI agent: pre-fills scrollback, then keeps streaming — commits a
 // row and redraws a synchronized-output "Working…" status frame every tick.
 // The stream continues while the pane is hidden, which is what routes the
 // return through the hidden-output snapshot restore.

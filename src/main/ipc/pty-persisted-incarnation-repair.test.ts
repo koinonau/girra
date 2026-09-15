@@ -107,7 +107,7 @@ describe('registerPtyHandlers', () => {
       cols: 80,
       rows: 24,
       cwd: '/tmp/persisted-owner',
-      command: 'codex resume provider-session',
+      command: 'claude --resume provider-session',
       worktreeId,
       tabId,
       leafId,
@@ -307,7 +307,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd,
-        command: 'codex resume exact-dead-provider-session',
+        command: 'claude --resume exact-dead-provider-session',
         worktreeId,
         tabId,
         leafId,
@@ -348,7 +348,7 @@ describe('registerPtyHandlers', () => {
         command: undefined
       })
       expect(providerSpawn.mock.calls[1]?.[0]).toMatchObject({
-        command: 'codex resume exact-dead-provider-session'
+        command: 'claude --resume exact-dead-provider-session'
       })
       expect(store.setWorkspaceSession).toHaveBeenCalledOnce()
       expect(store.flushOrThrow).toHaveBeenCalledOnce()
@@ -449,7 +449,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd,
-        command: 'codex resume unproven-owner-session',
+        command: 'claude --resume unproven-owner-session',
         worktreeId,
         tabId,
         leafId,

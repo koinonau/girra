@@ -304,8 +304,7 @@ describe('Windows managed hook stdin structure', () => {
 
         const missingScript = 'C:\\missing\\orca-hook.cmd'
         // Why: the cmd fast path is intentionally a bare, directly-spawnable .cmd
-        // path (Codex launches it as argv[0], not via cmd.exe), so
-        // it cannot own stdin for a missing script — a cmd-builtin drain would make
+        // path, so it cannot own stdin for a missing script — a cmd-builtin drain would make
         // argv[0] unspawnable and fail every hook (#8430 regression). Only launchers
         // that already require a real interpreter (encoded PowerShell, Git Bash)
         // drain a missing script; the bare path's missing-script behavior is a

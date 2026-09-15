@@ -41,7 +41,6 @@ function createPorts() {
   })
   const ports: StartupArgs['ports'] = {
     canSpawn: true,
-    markTrusted: vi.fn(),
     createTerminal,
     pasteDraft: vi.fn(),
     sendFollowup: vi.fn(),
@@ -54,7 +53,7 @@ function createPorts() {
 describe('startRuntimeLocalWorktreeTerminals default shell seeding', () => {
   it.each([
     ['Blank Terminal', undefined, 1],
-    ['an agent', 'codex' as const, 0]
+    ['an agent', 'claude' as const, 0]
   ])('seeds a background shell for %s selection only', async (_label, agent, expectedCalls) => {
     const { createTerminal, ports } = createPorts()
 

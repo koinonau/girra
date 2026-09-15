@@ -4,7 +4,7 @@ import { isTuiAgent, TUI_AGENT_CONFIG, type TuiAgentConfig } from './tui-agent-c
 /** Why: agent ids persist in automations and settings, so they outlive the build that
  * wrote them — an id a branch build understood reads back as unknown here. Name the id
  * instead of letting a bare `TUI_AGENT_CONFIG[agent].x` lookup fail with the unreadable
- * "Cannot read properties of undefined (reading 'preflightTrust')". */
+ * "Cannot read properties of undefined (reading 'launchCmd')". */
 export function requireTuiAgentConfig(agent: TuiAgent): TuiAgentConfig {
   if (!isTuiAgent(agent)) {
     throw new Error(

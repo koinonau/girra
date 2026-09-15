@@ -85,17 +85,9 @@ export function installPtyInputRecovery(session: ConnectPanePtySession): void {
     ...(session.paneStartup?.resumeProviderSession
       ? { resumeProviderSession: session.paneStartup.resumeProviderSession }
       : {}),
-    ...((session.paneStartup?.initialAgentStatus?.prompt ?? session.paneStartup?.draftPrompt)
-      ? {
-          agentPrompt:
-            session.paneStartup?.initialAgentStatus?.prompt ?? session.paneStartup?.draftPrompt
-        }
+    ...(session.paneStartup?.draftPrompt
+      ? { agentPrompt: session.paneStartup.draftPrompt, agentPromptDelivery: 'draft' as const }
       : {}),
-    ...(session.paneStartup?.initialAgentStatus?.prompt
-      ? { agentPromptDelivery: 'auto-submit' as const }
-      : session.paneStartup?.draftPrompt
-        ? { agentPromptDelivery: 'draft' as const }
-        : {}),
     ...(session.paneStartup?.agentArgsOverride !== undefined
       ? { agentArgsOverride: session.paneStartup.agentArgsOverride }
       : {}),

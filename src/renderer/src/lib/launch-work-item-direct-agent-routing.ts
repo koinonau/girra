@@ -11,7 +11,6 @@ import {
 } from '@/lib/launch-work-item-direct-agent'
 import type { AgentSessionLaunchPlan } from '@/lib/agent-session-launch-plan'
 import { resolveSourceControlLaunchPlatform } from '@/lib/source-control-launch-platform'
-import { preflightAgentTrust } from '@/lib/agent-trust-preflight'
 
 export function buildDirectWorkItemStartup(args: {
   agent: TuiAgent | null
@@ -80,29 +79,9 @@ export async function resolveDirectWorkItemAgent(args: {
   }
 }
 
-/** Why: kept apart from the refusal fallback's preflight because it runs before
- *  launch on the legacy route only; structured chat has no TUI trust menu. */
-export async function markDirectWorkItemAgentTrusted(args: {
-  structuredLaunch: boolean
-  agent: TuiAgent | null
-  workspacePath: string
-  connectionId: string | null
-}): Promise<void> {
-  if (args.structuredLaunch) {
-    return
-  }
-  await preflightAgentTrust({
-    agent: args.agent,
-    workspacePath: args.workspacePath,
-    connectionId: args.connectionId
-  })
-}
-
 export async function settleDirectWorkItemStructuredLaunch(args: {
   plan: AgentSessionLaunchPlan | null
   worktreeId: string
-  workspacePath: string
-  connectionId: string | null
   primaryTabId: string | null
   startupPlan: AgentStartupPlan | null
   launchSource: LaunchSource
@@ -139,11 +118,6 @@ export async function settleDirectWorkItemStructuredLaunch(args: {
   try {
     settlement = await plan.launch({
       legacyFallback: async () => {
-        await preflightAgentTrust({
-          agent,
-          workspacePath: args.workspacePath,
-          connectionId: args.connectionId
-        })
         const activation = activateAndRevealWorktree(args.worktreeId, {
           sidebarRevealBehavior: 'auto',
           createNewTerminalForStartup: true,

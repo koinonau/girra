@@ -158,8 +158,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -200,12 +200,12 @@ describe('connectPanePty', () => {
         [paneKey]: {
           state: 'working',
           prompt: 'finish the task',
-          agentType: 'codex',
+          agentType: 'claude',
           paneKey,
           updatedAt: 1,
           stateStartedAt: 1,
           stateHistory: [],
-          providerSession: { key: 'session_id', id: 'codex-session-1' }
+          providerSession: { key: 'session_id', id: 'claude-session-1' }
         }
       }
     } as StoreState

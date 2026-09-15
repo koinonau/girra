@@ -470,7 +470,7 @@ describe('selectWorktreeAgentActivitySummary', () => {
     expect(summary.hasLiveDone).toBe(false)
   })
 
-  // Reproduces the reported card: a Codex pane parked at its composer, its only agent row `done`
+  // Reproduces the reported card: a Pi pane parked at its composer, its only agent row `done`
   // and ~2h old, and the workspace still painting the amber question icon. `permission` outranks
   // `hasLiveDone` in resolveWorktreeStatus, so the pane's stale self-authored title decided the
   // card. With no fresh evidence the honest answer is `active`, never a question nobody asked.
@@ -478,7 +478,7 @@ describe('selectWorktreeAgentActivitySummary', () => {
     const paneKey = makePaneKey('tab-1', LEAF_ID)
     const entry = makeAgentStatusEntry({ paneKey, state: 'done', worktreeId: 'repo::/wt-1' })
     vi.spyOn(Date, 'now').mockReturnValue(entry.updatedAt + AGENT_STATUS_STALE_AFTER_MS + 1)
-    const tab = { ...makeTab('tab-1', 'repo::/wt-1'), title: 'Codex - action required' }
+    const tab = { ...makeTab('tab-1', 'repo::/wt-1'), title: 'Pi - action required' }
     const state: AgentActivityInput = {
       tabsByWorktree: { 'repo::/wt-1': [tab] },
       agentStatusEpoch: 0,

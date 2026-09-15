@@ -21,8 +21,8 @@ import {
   type SkillRowAction
 } from './SkillRowActions'
 
+// Why: an older remote host can still publish a retired provider tag, which renders raw.
 const providerLabels: Record<SkillProvider, string> = {
-  codex: 'Codex',
   claude: 'Claude',
   'agent-skills': 'Agent Skills'
 }
@@ -206,7 +206,7 @@ export function SkillRow({
                 ·
               </span>
               <span className="hidden sm:inline">
-                {skill.providers.map((provider) => providerLabels[provider]).join(', ')}
+                {skill.providers.map((provider) => providerLabels[provider] ?? provider).join(', ')}
               </span>
               <span aria-hidden>·</span>
               <span className="tabular-nums">{formatUpdatedAt(skill.updatedAt)}</span>

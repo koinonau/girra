@@ -35,7 +35,6 @@ import { localhostWorktreeLabelsApi } from './api/localhost-worktree-labels-brid
 import { keybindingsApi } from './api/keybindings-bridge'
 import { claudeAccountsApi } from './api/claude-accounts-bridge'
 import { cliApi } from './api/cli-bridge'
-import { agentTrustApi } from './api/agent-trust-bridge'
 import { preflightApi } from './api/preflight-bridge'
 import { notificationsApi } from './api/notifications-bridge'
 import { dashboardApi } from './api/dashboard-bridge'
@@ -109,7 +108,6 @@ const api = {
   keybindings: keybindingsApi,
   claudeAccounts: claudeAccountsApi,
   cli: cliApi,
-  agentTrust: agentTrustApi,
   preflight: preflightApi,
   notifications: notificationsApi,
   dashboard: dashboardApi,

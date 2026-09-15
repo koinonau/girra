@@ -2,7 +2,6 @@ import { useRef, useState } from 'react'
 import { useAppStore } from '../../store'
 import { useLinkRoutingPreferenceDialog } from '@/components/link-routing-preference-dialog'
 import { isWindowsUserAgent } from './pane-helpers'
-import type { SessionRestoredBannerReason } from './session-restored-banner-pane-state'
 import { useTerminalPaneStoreActions } from './use-terminal-pane-store-actions'
 import type { TerminalPaneChatController } from './use-terminal-pane-chat-state'
 
@@ -40,9 +39,9 @@ export function useTerminalPaneStoreBindings(controller: TerminalPaneChatControl
   const [shouldMeasureHiddenStartup, setShouldMeasureHiddenStartup] = useState(
     () => startup !== undefined && !isVisible
   )
-  const [sessionRestoredBannerPaneIds, setSessionRestoredBannerPaneIds] = useState<
-    Map<number, SessionRestoredBannerReason>
-  >(() => new Map())
+  const [sessionRestoredBannerPaneIds, setSessionRestoredBannerPaneIds] = useState<Set<number>>(
+    () => new Set()
+  )
   const [setupSplit] = useState(() => useAppStore.getState().pendingSetupSplitByTabId[tabId])
   const [issueCommandSplit] = useState(
     () => useAppStore.getState().pendingIssueCommandSplitByTabId[tabId]

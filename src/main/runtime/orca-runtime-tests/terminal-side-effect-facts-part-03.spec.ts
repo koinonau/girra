@@ -12,7 +12,7 @@ describe('terminal side-effect fact channel', () => {
         data: 'restored scrollback\n',
         cols: 80,
         rows: 24,
-        lastTitle: 'Codex working'
+        lastTitle: 'Claude working'
       })
       runtime.setPtyController({
         write: () => true,
@@ -35,11 +35,11 @@ describe('terminal side-effect fact channel', () => {
       expect(batches.flatMap((batch) => batch.facts)).toEqual([
         {
           kind: 'title',
-          normalizedTitle: 'Codex',
-          rawTitle: 'Codex',
+          normalizedTitle: 'Claude',
+          rawTitle: 'Claude',
           staleWorkingTitleClear: true
         },
-        { kind: 'agent-idle', title: 'Codex', staleWorkingTitleClear: true }
+        { kind: 'agent-idle', title: 'Claude', staleWorkingTitleClear: true }
       ])
     } finally {
       vi.useRealTimers()

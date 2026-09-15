@@ -99,7 +99,6 @@ export type AgentHookStatusRowMutation = {
 }
 export type StatusRowMutationListener = (mutation: AgentHookStatusRowMutation) => void
 export type PaneStatusClearListener = (clear: AgentStatusClearIpcPayload) => void
-export type StatusDropListener = (paneKey: string) => void
 export type PaneKeyAliasPersistenceListener = (entries: LegacyPaneKeyAliasEntry[]) => void
 
 export type PaneKeyAliasEntry = {

@@ -53,28 +53,30 @@ test.describe('AI Vault session delete', () => {
     orcaPage
   }) => {
     const homeDir = await isolatedHome(electronApp)
-    const title = `E2E gemini ${Date.now()}`
-    const dir = path.join(homeDir, '.gemini', 'tmp', 'proj', 'chats')
+    const title = `E2E pi ${Date.now()}`
+    const dir = path.join(homeDir, '.pi', 'agent', 'sessions', '--e2e-project--')
     mkdirSync(dir, { recursive: true })
-    const filePath = path.join(dir, 'session-e2e.json')
+    const filePath = path.join(dir, '2026-07-20T10-00-00-000Z_pi-e2e.jsonl')
     writeFileSync(
       filePath,
-      JSON.stringify({
-        sessionId: 'gemini-e2e',
-        startTime: '2026-07-20T10:00:00.000Z',
-        lastUpdated: '2026-07-20T10:05:00.000Z',
-        messages: [{ type: 'user', content: title, timestamp: '2026-07-20T10:00:00.000Z' }]
-      })
+      jsonl([
+        { type: 'session', id: 'pi-e2e', cwd: dir, timestamp: '2026-07-20T10:00:00.000Z' },
+        {
+          type: 'message',
+          timestamp: '2026-07-20T10:00:01.000Z',
+          message: { role: 'user', content: [{ type: 'text', text: title }] }
+        }
+      ])
     )
 
-    const session = await findSession(orcaPage, 'gemini', title)
-    expect(session, 'seeded gemini session should be listed').toBeTruthy()
+    const session = await findSession(orcaPage, 'pi', title)
+    expect(session, 'seeded pi session should be listed').toBeTruthy()
 
     const result = await deleteSession(orcaPage, session as AiVaultSession)
 
     expect(result.outcome).toBe('deleted')
     expect(existsSync(filePath), 'transcript should be gone from disk').toBe(false)
-    expect(await findSession(orcaPage, 'gemini', title)).toBeFalsy()
+    expect(await findSession(orcaPage, 'pi', title)).toBeFalsy()
   })
 
   test('trashes a claude directory session and its companions but keeps file-history', async ({

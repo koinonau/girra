@@ -286,42 +286,10 @@
     "lib": {
       "agent": {
         "catalog": {
-          "5dff448636": "OpenClaw",
-          "8a9ba743cc": "Hermes",
-          "4e63c7b956": "Rovo Dev",
-          "bee242fe3d": "Qwen Code",
-          "ca73055bd0": "Mistral Vibe",
-          "28810273af": "Kimi",
-          "739a930554": "Droid",
-          "667c104cff": "Cursor",
-          "9e2a9bb87b": "Continue",
-          "6f8056a565": "Command Code",
-          "4238b771b5": "Codebuff",
-          "cbaf0c2e0b": "Cline",
-          "1f8a19e9ad": "Autohand Code",
-          "5e8eff11b3": "Auggie",
-          "9477377a2a": "Charm",
-          "e0247254f2": "Kiro",
-          "918ba4ffed": "Kilocode",
-          "c73c573939": "Amp",
-          "8da11d876c": "Goose",
-          "b32627f09b": "Aider",
-          "691dd11789": "Antigravity",
-          "12e6baa4f7": "Gemini",
-          "09973b4d84": "OMP",
           "302934c5d9": "Pi",
           "e7a4ca5103": "OpenCode",
-          "706b0fe68b": "GitHub Copilot",
-          "0baad2d5d2": "Grok",
-          "760bc6883d": "Codex",
-          "a5fc0cb622": "OpenClaude",
           "bf53f09bf8": "Claude Agent Teams",
-          "0708ed89f1": "Claude",
-          "fc80296033": "Devin",
-          "da41abbdd4": "Ante",
-          "060d152fb5": "Trae",
-          "d443a47995": "Prime Agent",
-          "mimo_code_label": "MiMo Code"
+          "0708ed89f1": "Claude"
         },
         "skill": {
           "cli": {
@@ -2631,7 +2599,7 @@
               "blocked": {
                 "toast": {
                   "97c98f1afe": "設定を開く",
-                  "7cf51f74fd": "SSH、Zellij、tmux、Neovim、fzf、または Grok からコピーするには、ターミナル設定で TUI クリップボードへの書き込みを有効にします。",
+                  "7cf51f74fd": "SSH、Zellij、tmux、Neovim、または fzf からコピーするには、ターミナル設定で TUI クリップボードへの書き込みを有効にします。",
                   "89eaa3e80b": "ターミナルのクリップボードへの書き込みがブロックされました"
                 }
               },
@@ -5376,7 +5344,7 @@
           "1188e56af4": "プロンプトの例をコピーする",
           "b84807f228": "」",
           "59722f31b4": "」",
-          "c5325e91f6": "これらのいずれかを、スキルがインストールされているプロジェクトの Claude Code、Codex、または別の Agent に貼り付けます。",
+          "c5325e91f6": "これらのいずれかを、スキルがインストールされているプロジェクトの Claude Code、OpenCode、または別の Agent に貼り付けます。",
           "2a180694f7": "試してみてください — プロンプトの例",
           "5ec620ccc4": "コピーに失敗しました。",
           "a602d43069": "{{value0}} をコピーしました。"
@@ -6006,7 +5974,7 @@
           "c12b253997": "プロンプトの例をコピーする",
           "d151e25078": "」",
           "b525ff2b12": "」",
-          "4daa95f25a": "これらのいずれかを、Orca CLI スキルがインストールされているプロジェクトの Claude Code、Codex、または別の Agent に貼り付けます。",
+          "4daa95f25a": "これらのいずれかを、Orca CLI スキルがインストールされているプロジェクトの Claude Code、OpenCode、または別の Agent に貼り付けます。",
           "0820b3f84f": "試してみてください — プロンプトの例",
           "1f608e7d60": "プロンプトのコピーに失敗しました。",
           "2b077b5544": "プロンプトをコピーしました。"
@@ -6994,9 +6962,9 @@
           "d23b43c5be": "セットアップスクリプトの場所",
           "34a0dfa06e": "新規ワークスペースの作成時にリポジトリセットアップスクリプトが実行される場所。",
           "21f8da2078": "ワークスペースセットアップスクリプト",
-          "6e6480a7df": "ターミナル内のプログラム (Zellij、tmux、Neovim、fzf、Grok、SSH) をシステムのクリップボードにコピーします。",
+          "6e6480a7df": "ターミナル内のプログラム (Zellij、tmux、Neovim、fzf、SSH) をシステムのクリップボードにコピーします。",
           "3338dcf8c1": "TUI クリップボードへの書き込みを許可する (OSC 52)",
-          "69c64a479c": "Zellij、tmux、Neovim、fzf、および Grok が PTY 経由 (SSH 経由を含む) でシステムクリップボードにコピーできるようにします。",
+          "69c64a479c": "Zellij、tmux、Neovim、および fzf が PTY 経由 (SSH 経由を含む) でシステムクリップボードにコピーできるようにします。",
           "4729c645fc": "ターミナルの選択内容をクリップボードに自動的にコピーします。",
           "902f5dee1f": "選択時にコピー",
           "9129b7e805": "ターミナルペインにマウスを移動すると、クリックしなくてもターミナルペインがアクティブになります。",
@@ -7592,7 +7560,6 @@
                 "3c4e5e5938": "操作レシピ",
                 "ee14a9e9f7": "有効",
                 "82109d627d": "ソース管理",
-                "542e1a00a7": "codex",
                 "f121bec167": "claude",
                 "93e5210da8": "メッセージ",
                 "c33cb1b982": "ai",
@@ -7765,16 +7732,8 @@
             "e4fb4516d0": "星",
             "e0b8c8bc25": "gh CLI を介して GitHub スターでプロジェクトをサポートします。",
             "36a72f0d9e": "GitHub 上のスター Orca",
-            "c61b14be7c": "grok",
-            "5d9ba08673": "copilot",
-            "f472e97440": "aider",
-            "3c30fe2d51": "gemini",
-            "5fdf1dc2d1": "omp",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
-            "27d9b996ba": "codex",
-            "5baf51c4d9": "open claude",
-            "aea7d2cccb": "openclaude",
             "95b63edde7": "claude",
             "41c2f9a025": "デフォルト",
             "8ea37a05bc": "Agent",
@@ -8133,7 +8092,6 @@
             "f5d39af41e": "子 Agent",
             "c766a01978": "渡す",
             "08c65b12a2": "例",
-            "f278fd04db": "codex",
             "32c5098e7b": "claude",
             "21c28ccdf7": "コーディネーター",
             "741dfc03fa": "ワーカー",
@@ -12715,6 +12673,11 @@
               "cc71e252ba": "毎週{{day}} {{time}}",
               "ba20c92073": "カスタムスケジュール",
               "086a5a9fe2": "無効なスケジュール"
+            }
+          },
+          "draft": {
+            "model": {
+              "agentUnavailable": "Agent は利用できなくなりました"
             }
           }
         },

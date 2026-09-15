@@ -22,9 +22,9 @@ vi.mock('@/runtime/runtime-terminal-inspection', () => ({
   isRemoteRuntimePtyId: () => false
 }))
 
-const PTY_ID = 'pty-buffered-codex'
-const CODEX_COMPOSER = '\x1b[?1049h\x1b[1m›\x1b[0m Implement {feature}'
+const PTY_ID = 'pty-buffered-opencode'
 const DECSET_BRACKETED_PASTE = '\x1b[?2004h'
+const OPENCODE_COMPOSER_CURSOR = '\x1b[?25h'
 
 describe('waitForAgentDraftInputReady', () => {
   afterEach(() => {
@@ -36,19 +36,19 @@ describe('waitForAgentDraftInputReady', () => {
 
   it('observes buffered startup bytes without consuming the primary drain', async () => {
     vi.useFakeTimers()
-    bufferPreHandlerPtyData(PTY_ID, CODEX_COMPOSER)
     bufferPreHandlerPtyData(PTY_ID, DECSET_BRACKETED_PASTE)
+    bufferPreHandlerPtyData(PTY_ID, OPENCODE_COMPOSER_CURSOR)
     const primary = vi.fn()
 
     await expect(
-      waitForAgentDraftInputReady(PTY_ID, 20_000, 'codex-composer-prompt', {})
+      waitForAgentDraftInputReady(PTY_ID, 20_000, 'render-cursor-after-bracketed-paste', {})
     ).resolves.toBe(true)
     drainPreHandlerPtyData(PTY_ID, primary)
 
     expect(testState.unsubscribe).toHaveBeenCalledOnce()
     expect(primary.mock.calls).toEqual([
-      [CODEX_COMPOSER, undefined],
-      [DECSET_BRACKETED_PASTE, undefined]
+      [DECSET_BRACKETED_PASTE, undefined],
+      [OPENCODE_COMPOSER_CURSOR, undefined]
     ])
     expect(vi.getTimerCount()).toBe(0)
   })

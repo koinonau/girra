@@ -19,7 +19,7 @@ export type UnhydratedHostMirror = {
  * Why: a `web-terminal-*` tab exists only because a host published it, and its
  * PTY handle arrives one relay round trip later. An empty local handle map is
  * therefore "unverifiable", never "exited" — the incident's replacement
- * `codex resume` forked a session the host still held.
+ * resume forked a session the host still held.
  */
 export function findUnhydratedHostMirrorForPane(
   record: SleepingAgentSessionRecord,

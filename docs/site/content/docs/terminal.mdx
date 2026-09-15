@@ -8,11 +8,11 @@ Orca's terminal is the same xterm.js-based terminal VS Code uses, with a few add
 
 Terminals are just tabs — see [Tabs, panes & split layouts](/docs/model/tabs-panes-splits). Splitting a terminal pane gives you two shells side by side.
 
-Agent terminal tabs show the agent identity plus live state: working, waiting for input, completed, or completed-but-unread. For Claude and Codex, tab titles can also show the **AI Vault conversation name** (custom title / thread name) when Orca can map the pane to that session — manual renames still win.
+Agent terminal tabs show the agent identity plus live state: working, waiting for input, completed, or completed-but-unread. For Claude, tab titles can also show the **AI Vault conversation name** (custom title / thread name) when Orca can map the pane to that session — manual renames still win.
 
 ## TUI clipboard (OSC 52)
 
-Many terminal UIs (Zellij, tmux, Neovim, fzf, Grok) copy via **OSC 52** instead of OS clipboard APIs. Orca allows those writes **by default** so copy-from-remote/TUI works over SSH the same way as locally.
+Many terminal UIs (Zellij, tmux, Neovim, fzf) copy via **OSC 52** instead of OS clipboard APIs. Orca allows those writes **by default** so copy-from-remote/TUI works over SSH the same way as locally.
 
 Toggle: [Settings → Terminal → Allow TUI Clipboard Writes (OSC 52)](/docs/settings).
 
@@ -77,7 +77,7 @@ The floating terminal is a global shell surface that's always one chord away, re
 
 ## Quick Commands
 
-Quick Commands save terminal commands you run often, such as `npm run dev`, `pnpm test`, or a project-specific setup script. They can also save reusable agent prompts for launch-time prompt agents such as Claude and Codex. Create them from **Settings → Quick Commands** or the tab bar's **Add command** button, then run them from the Quick Commands split-button in a worktree tab bar or from the terminal context menu.
+Quick Commands save terminal commands you run often, such as `npm run dev`, `pnpm test`, or a project-specific setup script. They can also save reusable agent prompts for launch-time prompt agents such as Claude and OpenCode. Create them from **Settings → Quick Commands** or the tab bar's **Add command** button, then run them from the Quick Commands split-button in a worktree tab bar or from the terminal context menu.
 
 Each command has a label, command text, and scope. Use **Global** for commands that apply everywhere, or **Project** to show the command only in worktrees for a specific repo. The tab-bar button opens a fresh terminal tab and runs the command; the terminal context menu can insert commands into the current terminal. Use the copy control on a command row (Settings list, tab-bar menu, or [mobile Quick Commands](/docs/mobile#quick-commands)) to put the command body on the clipboard.
 

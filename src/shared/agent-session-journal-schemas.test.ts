@@ -30,7 +30,7 @@ const CANONICAL_BODIES: AgentJournalItemBody[] = [
       {
         type: 'text',
         text: 'hi',
-        providerFrame: { provider: 'codex', kind: 'raw', payload: PAYLOAD }
+        providerFrame: { provider: 'claude', kind: 'raw', payload: PAYLOAD }
       },
       { type: 'tool-call', name: 'Read', input: { path: 'a' } },
       { type: 'tool-result', output: 'ok', isError: false },
@@ -67,7 +67,7 @@ const CANONICAL_BODIES: AgentJournalItemBody[] = [
     kind: 'status',
     text: 'turn',
     turnLifecycle: { turnId: 'turn-1', state: 'running' },
-    providerFrame: { provider: 'codex', kind: 'raw', payload: PAYLOAD }
+    providerFrame: { provider: 'claude', kind: 'raw', payload: PAYLOAD }
   },
   {
     kind: 'status',
@@ -90,7 +90,7 @@ describe('canonical admission', () => {
 
   it('admits a canonical render item and submission', () => {
     const item: AgentJournalRenderItem = {
-      itemId: 'codex:t:turn:0',
+      itemId: 'claude:t:turn:0',
       revision: 1,
       body: CANONICAL_BODIES[0] as AgentJournalItemBody,
       sequence: 1,

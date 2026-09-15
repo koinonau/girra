@@ -82,7 +82,7 @@ describe('formatTerminalSend', () => {
           prompt: {
             requestId: 'prompt-healthy',
             stages: ['input_accepted', 'turn_started'],
-            provider: 'codex',
+            provider: 'claude',
             observation: 'supported',
             processIncarnation: 'inc-1',
             generation: 1,
@@ -93,7 +93,7 @@ describe('formatTerminalSend', () => {
     ).toBe(
       [
         'Prompt prompt-healthy on term_worker: input_accepted -> turn_started.',
-        'provider: codex',
+        'provider: claude',
         'delivery observation: supported'
       ].join('\n')
     )
@@ -119,7 +119,7 @@ describe('formatTerminalSend', () => {
         prompt: {
           requestId: 'prompt-unhealthy',
           stages: ['input_accepted'],
-          provider: 'codex',
+          provider: 'claude',
           observation,
           processIncarnation: 'inc-1',
           generation: 1,
@@ -128,7 +128,7 @@ describe('formatTerminalSend', () => {
       }
     })
 
-    expect(output).toContain(`provider: codex`)
+    expect(output).toContain(`provider: claude`)
     expect(output).toContain(`delivery observation: ${observation}`)
     expect(output).toContain(`warning: delivery was not observed`)
     expect(output).toContain(warning)
@@ -183,8 +183,8 @@ describe('formatTerminalSend', () => {
   })
 })
 
-// Why: an older host still publishes the codex-* tokens for dialogs its matcher never proved were
-// Codex's, so a Gemini/Cursor/Antigravity user reads a Codex label unless the CLI names the neutral one.
+// Why: an older host still publishes legacy agent-specific tokens for agent-neutral dialogs, so the
+// CLI names the neutral one beside them.
 describe('blocked-reason rendering against a mixed-version host', () => {
   function showResult(reason?: RuntimeTerminalWaitBlockedReason): {
     terminal: RuntimeTerminalShow
@@ -200,7 +200,7 @@ describe('blocked-reason rendering against a mixed-version host', () => {
         branch: 'main',
         tabId: 'tab-1',
         leafId: 'leaf-1',
-        title: 'Antigravity',
+        title: 'OpenCode',
         connected: true,
         writable: true,
         lastOutputAt: null,
@@ -234,7 +234,7 @@ describe('blocked-reason rendering against a mixed-version host', () => {
     ['codex-cwd-prompt', 'codex-cwd-prompt (agent-cwd-prompt)'],
     ['codex-hooks-review-prompt', 'codex-hooks-review-prompt (agent-hooks-review-prompt)'],
     ['codex-interactive-prompt', 'codex-interactive-prompt (agent-interactive-prompt)'],
-    // This build published these itself, so there is nothing to reinterpret.
+    // These have no neutral spelling, so there is nothing to reinterpret.
     ['agent-trust-workspace', 'agent-trust-workspace'],
     ['codex-model-migration-prompt', 'codex-model-migration-prompt']
   ] as const)('renders %s as %s on both wait and show', (reason, rendered) => {

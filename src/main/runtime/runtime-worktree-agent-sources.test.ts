@@ -12,7 +12,7 @@ const hookRow: AgentStatusIpcPayload = {
   connectionId: null,
   state: 'working',
   prompt: 'implement',
-  agentType: 'codex',
+  agentType: 'claude',
   stateStartedAt: now,
   receivedAt: now
 }

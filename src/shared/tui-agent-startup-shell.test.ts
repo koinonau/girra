@@ -72,15 +72,15 @@ describe('one Unix startup dialect', () => {
     // any shell the user pastes copied text into — would not have the helper.
     // startup-shell-portability.live-shell.test.ts proves this form works in
     // real sh/bash/zsh/dash/ksh/fish.
-    expect(clearEnvCommand('CODEX_HOME', 'posix')).toBe(
-      `command test -n "$fish_pid" && set --erase -g CODEX_HOME; command test -z "$fish_pid" && unset CODEX_HOME; true`
+    expect(clearEnvCommand('ORCA_PI_PREFILL', 'posix')).toBe(
+      `command test -n "$fish_pid" && set --erase -g ORCA_PI_PREFILL; command test -z "$fish_pid" && unset ORCA_PI_PREFILL; true`
     )
     expect(clearEnvCommand(['A', 'B'], 'posix')).toBe(
       `command test -n "$fish_pid" && set --erase -g A B; command test -z "$fish_pid" && unset A B; true`
     )
-    expect(clearEnvCommand('CODEX_HOME', 'cmd')).toBe('set "CODEX_HOME="')
-    expect(clearEnvCommand('CODEX_HOME', 'powershell')).toBe(
-      'Remove-Item Env:CODEX_HOME -ErrorAction SilentlyContinue'
+    expect(clearEnvCommand('ORCA_PI_PREFILL', 'cmd')).toBe('set "ORCA_PI_PREFILL="')
+    expect(clearEnvCommand('ORCA_PI_PREFILL', 'powershell')).toBe(
+      'Remove-Item Env:ORCA_PI_PREFILL -ErrorAction SilentlyContinue'
     )
   })
 
@@ -116,8 +116,8 @@ describe('one Unix startup dialect', () => {
     expect(commandSeparator('posix')).toBe('; ')
     expect(isPosixStartupShell('posix')).toBe(true)
     expect(isPosixStartupShell('powershell')).toBe(false)
-    expect(buildShellCommandFromArgv(['codex', 'resume', 'a b'], 'posix')).toBe(
-      `'codex' 'resume' 'a b'`
+    expect(buildShellCommandFromArgv(['claude', '--resume', 'a b'], 'posix')).toBe(
+      `'claude' '--resume' 'a b'`
     )
   })
 

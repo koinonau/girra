@@ -270,7 +270,7 @@ describe('SshPtyProvider', () => {
 
   it('forwards the expected incarnation for fenced remote inspection', async () => {
     const inspection = {
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       hasChildProcesses: true,
       foregroundProcessEvidence: { verdict: 'live' }
     }

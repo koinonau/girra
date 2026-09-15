@@ -9,7 +9,7 @@ function delivery(
   return {
     requestId: 'req-1',
     stages: ['input_accepted'],
-    provider: 'codex',
+    provider: 'claude',
     observation: 'supported',
     processIncarnation: 'inc-1',
     generation: 1,

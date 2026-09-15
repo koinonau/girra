@@ -38,7 +38,7 @@ async function seedTwoParentAgents(page: Page, worktreeId: string): Promise<void
     const now = Date.now()
     const specs = [
       { state: 'working' as const, prompt: 'Refactor auth middleware', agentType: 'claude' },
-      { state: 'done' as const, prompt: 'Write unit tests for parser', agentType: 'codex' }
+      { state: 'done' as const, prompt: 'Write unit tests for parser', agentType: 'opencode' }
     ]
     tabs.forEach((tab, index) => {
       const spec = specs[index]!

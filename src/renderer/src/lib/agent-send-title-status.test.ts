@@ -4,8 +4,8 @@ import { detectAgentSendTitleStatus } from './agent-send-title-status'
 describe('detectAgentSendTitleStatus', () => {
   it.each([
     'OC | Native session',
-    'OC | ✦ Gemini CLI',
-    'OC | ✋ review Gemini permission handling',
+    'OC | ✦ Refactor CLI',
+    'OC | ✋ review permission handling',
     'ssh build-host | OC | Native session',
     'user@host: ~/code | OC | Native session',
     '▣ OC | Native session',
@@ -28,8 +28,8 @@ describe('detectAgentSendTitleStatus', () => {
   )
 
   it('preserves non-OpenCode title behavior', () => {
-    expect(detectAgentSendTitleStatus('⠋ Codex')).toBe('working')
-    expect(detectAgentSendTitleStatus('Codex ready')).toBe('idle')
+    expect(detectAgentSendTitleStatus('⠋ Claude Code')).toBe('working')
+    expect(detectAgentSendTitleStatus('Claude Code ready')).toBe('idle')
     expect(detectAgentSendTitleStatus('zsh')).toBeNull()
   })
 })

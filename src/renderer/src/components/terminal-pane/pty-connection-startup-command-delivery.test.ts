@@ -1,11 +1,8 @@
 import type * as React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { TERMINAL_PASTE_DIRECT_MAX_BYTES } from './terminal-paste-coordinator'
-import { makePaneKey } from '../../../../shared/stable-pane-id'
-import { toAppSshPtyId } from '../../../../shared/ssh-pty-id'
 import { flushAsyncTicks, drainPendingTimeouts } from './pty-connection-test-async'
 import {
-  LEAF_1,
   createMockTransport,
   createPane,
   createManager,
@@ -172,51 +169,6 @@ describe('connectPanePty', () => {
     // Even after the debounce, the renderer must not inject the command (main already wrote it via writeStartupCommandWhenShellReady).
     expect(transport.sendInput).not.toHaveBeenCalledWith(
       expect.stringContaining("claude 'say test'")
-    )
-  })
-
-  it('seeds a working status for startup prompts that carry an initial agent status', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    const sshPtyId = toAppSshPtyId('ssh-a', 'pty-claude')
-    const transport = createMockTransport(sshPtyId)
-    transport.getConnectionId.mockReturnValue('ssh-a')
-    transportFactoryQueue.push(transport)
-    mockStoreState = {
-      ...mockStoreState,
-      tabsByWorktree: { 'wt-1': [{ id: 'tab-1', ptyId: null }] },
-      repos: [{ id: 'repo1', connectionId: 'ssh-a' }],
-      sshConnectionStates: new Map([['ssh-a', { status: 'connected' }]])
-    }
-
-    const pane = createPane(1)
-    const manager = createManager(1)
-    const deps = createDeps({
-      startup: {
-        command: "claude 'Fix the status'",
-        initialAgentStatus: { agent: 'claude', prompt: 'Fix the status' }
-      }
-    })
-
-    connectPanePty(pane as never, manager as never, deps as never)
-    await flushAsyncTicks()
-    const onPtySpawn = createdTransportOptions[0]?.onPtySpawn as
-      | ((ptyId: string) => void)
-      | undefined
-    expect(onPtySpawn).toBeTypeOf('function')
-    onPtySpawn?.(sshPtyId)
-
-    expect(mockStoreState.setAgentStatus).toHaveBeenCalledWith(
-      makePaneKey('tab-1', LEAF_1),
-      {
-        state: 'working',
-        prompt: 'Fix the status',
-        agentType: 'claude',
-        // Why: Orca launched this agent, so the seed predates any provider signal (STA-4293).
-        observation: expect.objectContaining({ origin: 'launch', kind: 'transition' })
-      },
-      undefined,
-      undefined,
-      { connectionId: 'ssh-a' }
     )
   })
 

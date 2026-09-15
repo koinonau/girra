@@ -204,7 +204,6 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
     clearAllListenerCaches(this.state)
     this.notifyStatusChangeListeners()
     this.paneStatusClearListeners.clear()
-    this.statusDropListeners.clear()
     this.statusChangeListeners.clear()
     this.statusFreshnessListeners.clear()
     this.providerSessionChangeListeners.clear()

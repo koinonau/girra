@@ -53,7 +53,7 @@ describe('detectWslCommandsOnPath', () => {
   })
 
   it('uses the shared alias- and function-neutral PATH lookup', async () => {
-    await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'codex'])
+    await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'opencode'])
 
     const { script } = lastSpec()
     const lookupScript = buildPosixCommandPathLookupScript(
@@ -71,26 +71,26 @@ describe('detectWslCommandsOnPath', () => {
       code: 0,
       stdout:
         '__ORCA_AGENT_PATH__claude\t/usr/bin/claude\n' +
-        '__ORCA_AGENT_PATH__codex\t/home/user/.local/bin/codex\n',
+        '__ORCA_AGENT_PATH__opencode\t/home/user/.local/bin/opencode\n',
       stderr: '',
       timedOut: false
     })
 
-    const found = await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'codex'])
+    const found = await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'opencode'])
 
-    expect(found).toEqual(new Set(['claude', 'codex']))
+    expect(found).toEqual(new Set(['claude', 'opencode']))
   })
 
   it('ignores commands whose resolved path is not absolute', async () => {
     runWslProcessMock.mockResolvedValue({
       environmentResolved: true,
       code: 0,
-      stdout: '__ORCA_AGENT_PATH__claude\tclaude\n' + '__ORCA_AGENT_PATH__codex\tC:\\spoof\n',
+      stdout: '__ORCA_AGENT_PATH__claude\tclaude\n' + '__ORCA_AGENT_PATH__opencode\tC:\\spoof\n',
       stderr: '',
       timedOut: false
     })
 
-    const found = await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'codex'])
+    const found = await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'opencode'])
 
     expect(found).toEqual(new Set())
   })
@@ -331,7 +331,7 @@ describe('the mount table read, counted against a real shell', () => {
     // The prelude is embedded in the lookup script, which the caller wraps in
     // `for cmd in <every agent>`. An unconditional assignment forked awk once
     // per CLI -- 36 of them inside the distro against a 10s budget.
-    expect(await runWithCountingAwk(['claude', 'codex', 'gemini', 'opencode'])).toBe(1)
+    expect(await runWithCountingAwk(['claude', 'opencode', 'pi'])).toBe(1)
   })
 
   itPosix('still reads it once when only one command is probed', async () => {
@@ -353,7 +353,7 @@ describe('the mount table read, counted against a real shell', () => {
         [guest, 'guest']
       ] as const) {
         mkdirSync(dir, { recursive: true })
-        for (const name of ['claude', 'codex']) {
+        for (const name of ['claude', 'opencode']) {
           writeFileSync(join(dir, name), `#!/bin/sh\necho ${body}\n`)
           chmodSync(join(dir, name), 0o755)
         }
@@ -365,7 +365,7 @@ describe('the mount table read, counted against a real shell', () => {
         stderr: '',
         timedOut: false
       })
-      await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'codex'])
+      await detectWslCommandsOnPath({ distro: 'Ubuntu' }, ['claude', 'opencode'])
       const script = String(runWslProcessMock.mock.calls.at(-1)?.[0].script).replace(
         /_orca_win_mounts=\$\([^)]*\)/,
         `_orca_win_mounts=${join(root, 'winmnt')}`
@@ -377,7 +377,7 @@ describe('the mount table read, counted against a real shell', () => {
       const out = String(execFileSync('/bin/sh', ['-c', script], options))
       // BOTH must resolve behind the mount, not just the first.
       expect(out).toContain(`__ORCA_AGENT_PATH__claude\t${join(guest, 'claude')}`)
-      expect(out).toContain(`__ORCA_AGENT_PATH__codex\t${join(guest, 'codex')}`)
+      expect(out).toContain(`__ORCA_AGENT_PATH__opencode\t${join(guest, 'opencode')}`)
     } finally {
       rmSync(root, { recursive: true, force: true })
     }

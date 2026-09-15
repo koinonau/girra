@@ -275,7 +275,7 @@ describe('createRemoteRuntimePtyTransport', () => {
         worktreeId: 'wt-1',
         tabId: 'tab-1',
         leafId: 'pane:1',
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
 
       const connect = transport.connect({ url: '', callbacks: {} })

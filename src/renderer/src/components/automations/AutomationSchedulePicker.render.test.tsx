@@ -36,7 +36,7 @@ vi.mock('@/components/ui/select', () => ({
 const BASE_DRAFT: AutomationDraft = {
   name: '',
   prompt: '',
-  agentId: 'codex',
+  agentId: 'opencode',
   projectId: '',
   workspaceMode: 'existing',
   workspaceId: '',

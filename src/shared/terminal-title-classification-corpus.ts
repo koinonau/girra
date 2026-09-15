@@ -17,13 +17,13 @@ export const TERMINAL_TITLE_CLASSIFICATION_CORPUS: readonly string[] = [
   'openclaude',
   'openclaude-scratch',
   'claude-scratch',
-  '~/codex/ready',
-  'review-14600-codex',
+  '~/opencode/ready',
+  'review-14600-opencode',
   'timestamp ready',
-  'C:\\tools\\codex\\run',
+  'C:\\tools\\opencode\\run',
   '/usr/local/bin/claude/notes',
   // Windows launcher suffixes.
-  'codex.exe',
+  'opencode.exe',
   'openclaude.cmd',
   'claude.bat working',
   // Claude Code prefixes and identity frames.
@@ -39,19 +39,18 @@ export const TERMINAL_TITLE_CLASSIFICATION_CORPUS: readonly string[] = [
   '"/usr/local/bin/claude" agents',
   // Leading spinner glyphs (braille + quarter circle).
   '\u280b Claude Code',
-  '\u2809 Codex \u2014 refactoring',
+  '\u2809 OpenCode \u2014 refactoring',
   '\u25d0 working',
   '\u280b OpenClaude',
   // Named agents with status words.
-  'codex working',
-  'codex ready',
+  'opencode working',
   'opencode ready',
   // Pi compatible titles.
   '\u03c0 > session - ~/orca',
   '\u03c0 ! blocked-session',
   '\u280b \u03c0 - session - ~/orca',
   // Wrapper/multiplexer prefixes.
-  'zsh | \u280b Codex',
+  'zsh | \u280b OpenCode',
   'tmux | claude - action required',
   'ssh host | opencode ready'
 ]

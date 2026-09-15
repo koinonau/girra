@@ -15,7 +15,7 @@ export function buildTerminalWaitText(
     .map((line) => line.trim())
     .filter(Boolean)
     .join('\n')
-  // Why: the preview is intentionally short, but wait readiness needs the retained tail so ready headers aren't truncated away.
+  // Why: the preview is intentionally short, but blocked-prompt detection needs the retained tail so dialogs aren't truncated away.
   return waitText.length > 0 ? waitText : preview
 }
 

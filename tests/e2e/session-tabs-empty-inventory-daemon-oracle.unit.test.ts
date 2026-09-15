@@ -33,7 +33,7 @@ function createWriterSubprocess(pid: number): WriterSubprocess {
   const write = vi.fn<(data: string) => void>()
   return {
     pid,
-    getForegroundProcess: () => 'codex',
+    getForegroundProcess: () => 'claude',
     write,
     resize: vi.fn(),
     kill: vi.fn(),
@@ -75,7 +75,7 @@ describe('unpublished empty inventory daemon oracle', () => {
       sessionId: 'original-live-session',
       cols: 80,
       rows: 24,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       streamClient: { onData: vi.fn(), onExit: vi.fn() }
     })
     const call = vi.fn(async () => ({
@@ -100,7 +100,7 @@ describe('unpublished empty inventory daemon oracle', () => {
         sessionId: 'replacement-resume-session',
         cols: 80,
         rows: 24,
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         streamClient: { onData: vi.fn(), onExit: vi.fn() }
       })
     })
@@ -175,7 +175,7 @@ describe('unpublished empty inventory daemon oracle', () => {
       sessionId: 'original-live-session',
       cols: 80,
       rows: 24,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       streamClient: { onData: vi.fn(), onExit: vi.fn() }
     })
     // Legacy hosts answer the liveness probe with a scoped zero-terminal census.
@@ -197,7 +197,7 @@ describe('unpublished empty inventory daemon oracle', () => {
         sessionId: 'replacement-resume-session',
         cols: 80,
         rows: 24,
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         streamClient: { onData: vi.fn(), onExit: vi.fn() }
       })
     })

@@ -399,7 +399,7 @@ describe('OrcaRuntimeService', () => {
           {
             tabId,
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex',
+            title: 'Claude',
             activeLeafId: leafId,
             layout: null
           }
@@ -411,7 +411,7 @@ describe('OrcaRuntimeService', () => {
             leafId,
             paneRuntimeId: 1,
             ptyId,
-            paneTitle: 'Codex'
+            paneTitle: 'Claude'
           }
         ]
       })
@@ -446,8 +446,8 @@ describe('OrcaRuntimeService', () => {
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
 
     const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
-      title: 'Codex package-cache cleanup'
+      command: 'claude',
+      title: 'Claude package-cache cleanup'
     })
 
     await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)

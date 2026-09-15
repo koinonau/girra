@@ -170,7 +170,7 @@ describe('connectPanePty', () => {
           prompt: 'hi',
           updatedAt: 1000,
           stateStartedAt: 1000,
-          agentType: 'codex',
+          agentType: 'opencode',
           stateHistory: []
         }
       }
@@ -216,12 +216,12 @@ describe('connectPanePty', () => {
       createManager(1) as never,
       createDeps({
         startup: {
-          command: "codex '--dangerously-bypass-approvals-and-sandbox'",
+          command: "claude '--dangerously-skip-permissions'",
           launchConfig: {
-            agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+            agentArgs: '--dangerously-skip-permissions',
             agentEnv: {}
           },
-          launchAgent: 'codex'
+          launchAgent: 'claude'
         },
         restoredPtyIdByLeafId: {}
       }) as never
@@ -230,10 +230,10 @@ describe('connectPanePty', () => {
     expect(mockStoreState.registerAgentLaunchConfig).toHaveBeenCalledWith(
       paneKey,
       {
-        agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+        agentArgs: '--dangerously-skip-permissions',
         agentEnv: {}
       },
-      expect.objectContaining({ agentType: 'codex' })
+      expect.objectContaining({ agentType: 'claude' })
     )
     capturedDataCallback.current?.('\x1b]133;D;130\x07thebr ~/repo $ ')
     await flushAsyncTicks()

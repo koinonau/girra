@@ -339,9 +339,8 @@ describe('LocalPtyProvider', () => {
       expect(spawnMock).not.toHaveBeenCalled()
     })
 
-    // Why (#16441): the Codex hook install and trust grant moved into
-    // buildSpawnEnv, so the env build is now the long await before node-pty
-    // exists — shutdown must be able to cancel the session id during it.
+    // Why (#16441): agent hook installs run in buildSpawnEnv, so the env build is the long await
+    // before node-pty exists; shutdown must be able to cancel the session id during it.
     it('does not spawn after shutdown cancels a pending spawn during the env build', async () => {
       spawnMock.mockClear()
       let finishEnvBuild!: (env: Record<string, string>) => void

@@ -53,7 +53,7 @@ export function buildContainedLinkedContextBlock(
 }
 
 function formatDraftContextBlock(value: string): string {
-  // Why: Codex keeps the cursor on the final pasted line unless the draft ends
+  // Why: agent composers keep the cursor on the final pasted line unless the draft ends
   // with a newline; leave linked source blocks visually separated for review.
   return `${value.trimEnd()}\n`
 }

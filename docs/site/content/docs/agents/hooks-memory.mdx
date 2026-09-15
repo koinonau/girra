@@ -4,11 +4,11 @@ title: Agent hooks & memory
 
 import { Callout } from '@/components/docs/prose'
 
-Orca plays nicely with the agent hook and memory conventions Claude Code and Codex already use — it reads them, respects them, and gives you a UI for the ones that make sense in an IDE context.
+Orca plays nicely with the agent hook and memory conventions Claude Code already uses — it reads them, respects them, and gives you a UI for the ones that make sense in an IDE context.
 
 ## Per-repo hooks
 
-Orca reads each repo's `.claude/` and `.codex/` configuration. Hooks you already have will run when Orca launches the agent in a worktree of that repo.
+Orca reads each repo's `.claude/` configuration. Hooks you already have will run when Orca launches the agent in a worktree of that repo.
 
 ## Worktree setup hooks
 
@@ -16,7 +16,7 @@ Configure commands to run automatically after a worktree is created — e.g. `pn
 
 ## Memory files
 
-Claude's `CLAUDE.md` and Codex's `AGENTS.md` (at repo root or nested) are left alone — they belong to the agent. Orca surfaces them in the file explorer like any other file so you can edit them inline.
+Claude's `CLAUDE.md` and OpenCode's `AGENTS.md` (at repo root or nested) are left alone — they belong to the agent. Orca surfaces them in the file explorer like any other file so you can edit them inline.
 
 ## Agent status hooks
 

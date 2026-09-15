@@ -430,19 +430,19 @@ describe('Session', () => {
     it('contains live color replies without releasing queued startup input', async () => {
       const reply = '\x1b[?997;1n'
       createSession({ shellReadySupported: true, shellReadyTimeoutMs: 100 })
-      session.write('codex\n')
+      session.write('claude\n')
 
       session.write(reply)
       await vi.advanceTimersByTimeAsync(0)
       expect(subprocess.written).toEqual([reply])
 
       await vi.advanceTimersByTimeAsync(100)
-      expect(subprocess.written).toEqual([reply, 'codex\n'])
+      expect(subprocess.written).toEqual([reply, 'claude\n'])
     })
 
     it('uses the short settle path when marker and prompt bytes arrive together', () => {
       createSession({ shellReadySupported: true })
-      session.write('codex\n')
+      session.write('claude\n')
 
       subprocess.simulateData('\x1b]777;orca-shell-ready\x07\r\nuser@host $ ')
       expect(session.shellState).toBe('ready' satisfies ShellReadyState)
@@ -450,12 +450,12 @@ describe('Session', () => {
       expect(subprocess.written).toEqual([])
 
       vi.advanceTimersByTime(1)
-      expect(subprocess.written).toEqual(['codex\n'])
+      expect(subprocess.written).toEqual(['claude\n'])
     })
 
     it('does not treat bytes before the marker as post-marker prompt output', () => {
       createSession({ shellReadySupported: true })
-      session.write('codex\n')
+      session.write('claude\n')
 
       subprocess.simulateData('last login\r\n\x1b]777;orca-shell-ready\x07')
       expect(session.shellState).toBe('ready' satisfies ShellReadyState)
@@ -464,7 +464,7 @@ describe('Session', () => {
 
       subprocess.simulateData('\r\nuser@host $ ')
       vi.advanceTimersByTime(30)
-      expect(subprocess.written).toEqual(['codex\n'])
+      expect(subprocess.written).toEqual(['claude\n'])
     })
 
     it('strips shell-ready marker bytes before client and pending-output fan-out', () => {
@@ -526,7 +526,7 @@ describe('Session', () => {
       })
 
       subprocess.simulateData('\x1b]777;orca-shell-ready')
-      session.write('codex\n')
+      session.write('claude\n')
       vi.advanceTimersByTime(100)
 
       expect(session.shellState).toBe('timed_out' satisfies ShellReadyState)
@@ -534,7 +534,7 @@ describe('Session', () => {
       expect(session.takePendingOutput(false)?.records).toEqual([
         { kind: 'output', data: '\x1b]777;orca-shell-ready' }
       ])
-      expect(subprocess.written).toEqual(['codex\n'])
+      expect(subprocess.written).toEqual(['claude\n'])
     })
 
     it('releases held marker-prefix bytes when the subprocess exits before readiness', () => {
@@ -569,7 +569,7 @@ describe('Session', () => {
 
     it('keeps held marker-prefix bytes during live take-with-snapshot', () => {
       createSession({ shellReadySupported: true, shellReadyTimeoutMs: 100 })
-      session.write('codex\n')
+      session.write('claude\n')
 
       subprocess.simulateData('\x1b]777;orca-shell-ready')
       const taken = session.takePendingOutput(true)
@@ -580,7 +580,7 @@ describe('Session', () => {
       expect(taken?.drainedRecords).toEqual([])
       expect(taken?.snapshot).toBeTruthy()
       expect(session.shellState).toBe('ready' satisfies ShellReadyState)
-      expect(subprocess.written).toEqual(['codex\n'])
+      expect(subprocess.written).toEqual(['claude\n'])
     })
 
     it('releases held marker-prefix bytes before final take-with-snapshot', () => {
@@ -595,7 +595,7 @@ describe('Session', () => {
 
     it('cancels the post-ready flush gate when force-disposing the subprocess', async () => {
       createSession({ shellReadySupported: true })
-      session.write('codex\n')
+      session.write('claude\n')
 
       subprocess.simulateData('\x1b]777;orca-shell-ready\x07')
       expect(session.shellState).toBe('ready' satisfies ShellReadyState)
@@ -656,16 +656,16 @@ describe('Session', () => {
       expect(subprocess.written).toEqual(['waiting input'])
     })
 
-    it('honors a shorter shell-ready timeout for Codex startup sessions', () => {
+    it('honors a shorter shell-ready timeout for agent startup sessions', () => {
       createSession({ shellReadySupported: true, shellReadyTimeoutMs: 300 })
-      session.write('codex\n')
+      session.write('claude\n')
 
       vi.advanceTimersByTime(299)
       expect(subprocess.written).toEqual([])
 
       vi.advanceTimersByTime(1)
       expect(session.shellState).toBe('timed_out' satisfies ShellReadyState)
-      expect(subprocess.written).toEqual(['codex\n'])
+      expect(subprocess.written).toEqual(['claude\n'])
     })
 
     it('detects marker split across data chunks', () => {

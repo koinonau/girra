@@ -29,9 +29,6 @@ export function createAgentCompletionTitleObserver({
 }: TitleObserverOptions) {
   function titleCompletionAgentIdentity(title: string): string | null {
     const normalized = title.toLowerCase()
-    if (/\bcodex\b/.test(normalized)) {
-      return 'codex'
-    }
     if (/\bclaude\b/.test(normalized)) {
       return 'claude'
     }

@@ -67,7 +67,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL POSIX skill semantics', () => {
   })
 
   it('detects providers from the selected distro', async () => {
-    await expect(detectSkillProvidersInWsl(DISTRO)).resolves.toContain('codex')
+    await expect(detectSkillProvidersInWsl(DISTRO)).resolves.toContain('claude')
   })
 
   it('preserves case and applies owner-private executable modes', async () => {

@@ -193,7 +193,7 @@ describe('agent status retention + prefix sweep', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'worker', agentType: 'codex' },
+        { state: 'working', prompt: 'worker', agentType: 'opencode' },
         undefined,
         undefined,
         {

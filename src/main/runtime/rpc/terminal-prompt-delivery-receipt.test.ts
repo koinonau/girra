@@ -168,7 +168,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('keeps an ambiguous partial write pending and refuses to resend it', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('aider')
+    const harness = await createHarness('opencode')
     harness.runtime.setPtyController({
       spawn: vi.fn().mockResolvedValue({ id: 'unused' }),
       write: (_ptyId, data) => {
@@ -176,7 +176,7 @@ describe('durable terminal prompt delivery receipts', () => {
         return data !== '\r'
       },
       kill: () => true,
-      getForegroundProcess: async () => 'aider'
+      getForegroundProcess: async () => 'opencode'
     })
     const firstPromise = harness.dispatcher.dispatch(
       request(harness.handle, 'partial-retry', 'partial once')
@@ -391,7 +391,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('keeps unsupported providers on raw input with an idempotent accepted stage', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('aider')
+    const harness = await createHarness('opencode')
     const responsePromise = harness.dispatcher.dispatch(
       request(harness.handle, 'unsupported-provider', 'raw fallback')
     )

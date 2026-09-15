@@ -5,9 +5,9 @@ An automation is a scheduled Orca prompt run by a chosen provider against either
 ```text
 ORCA automations list --json
 ORCA automations show <automationId> --json
-ORCA automations create --name "Daily review" --trigger daily --time 09:00 --prompt "Review open changes" --provider codex --repo id:<repoId> --json
+ORCA automations create --name "Daily review" --trigger daily --time 09:00 --prompt "Review open changes" --provider claude --repo id:<repoId> --json
 ORCA automations create --name "Weekday triage" --trigger "0 9 * * 1-5" --prompt "Triage issues" --provider claude --repo path:/abs/repo --disabled --json
-ORCA automations create --name "Inbox digest" --trigger hourly --prompt "Summarize unread mail" --provider codex --workspace active --reuse-session --json
+ORCA automations create --name "Inbox digest" --trigger hourly --prompt "Summarize unread mail" --provider claude --workspace active --reuse-session --json
 ORCA automations edit <automationId> --trigger weekdays --time 09:30 --fresh-session --json
 ORCA automations run <automationId> --json
 ORCA automations runs --id <automationId> --json

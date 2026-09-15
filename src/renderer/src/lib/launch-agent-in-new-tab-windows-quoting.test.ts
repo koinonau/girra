@@ -202,7 +202,7 @@ describe('launchAgentInNewTab Windows shell quoting', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'pi',
       worktreeId: 'wt-1',
       prompt: 'fix the spinner',
       agentArgs: '--model gpt-5',
@@ -212,7 +212,7 @@ describe('launchAgentInNewTab Windows shell quoting', () => {
     expect(mockQueueTabStartupCommand).toHaveBeenCalledWith(
       'tab-1',
       expect.objectContaining({
-        command: 'codex "--model" "gpt-5" "fix the spinner"',
+        command: 'pi "--model" "gpt-5" "fix the spinner"',
         agentArgsOverride: '--model gpt-5'
       })
     )
@@ -297,7 +297,7 @@ describe('launchAgentInNewTab Windows shell quoting', () => {
   // report Windows. This pins single-quote escaping of user-configured default agent args.
   it('escapes a single quote inside default agent args', async () => {
     store.settings.terminalWindowsShell = 'cmd.exe'
-    store.settings.agentDefaultArgs = { codex: '--profile "don\'t"' }
+    store.settings.agentDefaultArgs = { pi: '--profile "don\'t"' }
     store.projects = [
       {
         id: 'repo-1',
@@ -318,7 +318,7 @@ describe('launchAgentInNewTab Windows shell quoting', () => {
     }
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
-    launchAgentInNewTab({ agent: 'codex', worktreeId: 'wt-1' })
+    launchAgentInNewTab({ agent: 'pi', worktreeId: 'wt-1' })
 
     const queued = mockQueueTabStartupCommand.mock.calls.at(-1)?.[1] as { command: string }
     expect(queued.command).toContain(`'don'"'"'t'`)

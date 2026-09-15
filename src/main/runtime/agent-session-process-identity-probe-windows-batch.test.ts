@@ -26,8 +26,8 @@ afterEach(() => {
 describe('Windows owner identity batch probe', () => {
   it('reads Windows start times for a batch from one process-table snapshot', async () => {
     readWindowsProcessIdentityTableFresh.mockResolvedValue([
-      { pid: 4242, ppid: 1, name: 'codex.exe', creationTimeMs: START_TIME },
-      { pid: 4243, ppid: 1, name: 'codex.exe', creationTimeMs: START_TIME + 10 }
+      { pid: 4242, ppid: 1, name: 'claude.exe', creationTimeMs: START_TIME },
+      { pid: 4243, ppid: 1, name: 'claude.exe', creationTimeMs: START_TIME + 10 }
     ])
 
     await expect(readProcessStartTimesMs([4242, 4243, 4242], 'win32')).resolves.toEqual(

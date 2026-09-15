@@ -96,7 +96,7 @@ describe('SSH fresh agent-session create operations', () => {
     await provider.spawn({
       cols: 80,
       rows: 24,
-      command: 'codex',
+      command: 'opencode',
       agentSessionCreateOperationId: 'a'.repeat(43)
     })
 
@@ -112,7 +112,7 @@ describe('SSH fresh agent-session create operations', () => {
         rows: 24,
         cwd: undefined,
         env: { POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD: 'true' },
-        command: 'codex',
+        command: 'opencode',
         agentSessionCreateOperationId: 'a'.repeat(43)
       },
       expect.objectContaining({ beforeResolve: expect.any(Function) })
@@ -126,7 +126,7 @@ describe('SSH fresh agent-session create operations', () => {
       provider.spawn({
         cols: 80,
         rows: 24,
-        command: 'codex',
+        command: 'opencode',
         agentSessionCreateOperationId: 'b'.repeat(43)
       })
     ).rejects.toThrow('execution_owner_unavailable')
@@ -140,7 +140,7 @@ describe('SSH fresh agent-session create operations', () => {
       provider.spawn({
         cols: 80,
         rows: 24,
-        command: 'codex'
+        command: 'opencode'
       })
     ).resolves.toMatchObject({ id: 'ssh:conn-1@@pty-legacy' })
 
@@ -152,7 +152,7 @@ describe('SSH fresh agent-session create operations', () => {
         rows: 24,
         cwd: undefined,
         env: { POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD: 'true' },
-        command: 'codex'
+        command: 'opencode'
       },
       expect.objectContaining({ beforeResolve: expect.any(Function) })
     )
@@ -199,7 +199,7 @@ describe('SSH fresh agent-session create operations', () => {
     const spawn = provider.spawn({
       cols: 80,
       rows: 24,
-      command: 'codex',
+      command: 'opencode',
       agentSessionCreateOperationId: 'd'.repeat(43),
       signal: abort.signal
     })
@@ -223,7 +223,7 @@ describe('SSH fresh agent-session create operations', () => {
       .spawn({
         cols: 80,
         rows: 24,
-        command: 'codex',
+        command: 'opencode',
         agentSessionCreateOperationId: 'c'.repeat(43)
       })
       .catch((error: unknown) => error)

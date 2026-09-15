@@ -220,10 +220,10 @@ test.describe('Terminal Panes', () => {
   test('Set Title stays pane-local during agent title churn', async ({ orcaPage }) => {
     const worktreeId = (await getActiveWorktreeId(orcaPage))!
     const tabId = (await getActiveTabId(orcaPage))!
-    const paneTitle = `Codex pane ${Date.now()}`
+    const paneTitle = `Claude Code pane ${Date.now()}`
     const removeButtonTitle = `Remove button label ${Date.now()}`
     const splitTitle = `Split label ${Date.now()}`
-    const runtimeTitle = '⠋ Codex working'
+    const runtimeTitle = '⠋ Claude Code working'
 
     await setPaneTitleFromTerminalMenu(orcaPage, paneTitle)
     await expect(orcaPage.locator('.pane-title-text', { hasText: paneTitle })).toBeVisible()

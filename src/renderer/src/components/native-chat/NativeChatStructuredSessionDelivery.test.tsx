@@ -229,7 +229,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-1"
         sessionId="session-1"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -265,7 +265,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-retry-head"
         sessionId="session-retry-head"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -298,7 +298,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-quiet-head"
         sessionId="session-quiet-head"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -322,7 +322,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-wedge"
         sessionId="session-wedge"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -354,7 +354,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-probe-flag"
         sessionId="session-probe-flag"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -387,7 +387,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-parked"
         sessionId="session-parked"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -437,7 +437,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-churn"
         sessionId="session-churn"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
     const { rerender } = render(makeView())
@@ -491,7 +491,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-target-switch"
         sessionId="session-target-switch"
         target={target}
-        agent="codex"
+        agent="claude"
       />
     )
     const { rerender } = render(makeView({ kind: 'local' }))
@@ -526,7 +526,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-forced"
         sessionId="session-forced"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -565,7 +565,7 @@ describe('NativeChatStructuredSession delivery', () => {
         tabId="structured-tab-pending"
         sessionId="session-pending"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -595,7 +595,7 @@ describe('NativeChatStructuredSession delivery', () => {
           tabId="structured-tab-budget"
           sessionId="session-budget"
           target={{ kind: 'local' }}
-          agent="codex"
+          agent="claude"
         />
       )
 

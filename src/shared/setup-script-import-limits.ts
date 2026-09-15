@@ -8,7 +8,6 @@ export const SETUP_SCRIPT_IMPORT_MAX_COMMAND_PARTS = 256
 export const SETUP_SCRIPT_IMPORT_MAX_CMUX_COMMANDS = 256
 export const SETUP_SCRIPT_IMPORT_MAX_KEYWORDS = 64
 export const SETUP_SCRIPT_IMPORT_MAX_UNSUPPORTED_FIELDS = 128
-export const SETUP_SCRIPT_IMPORT_MAX_TOML_LINES = 4_096
 
 export function isSetupScriptImportTextWithinLimit(content: string): boolean {
   return isTextWithinLimits(

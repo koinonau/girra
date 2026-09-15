@@ -67,7 +67,7 @@ try {
   writeFileSync(
     path.join(profilePath, 'orca-data.json'),
     JSON.stringify({
-      settings: { agentCmdOverrides: { codex: quoteFixtureAgentCommand(fixtureAgentPath) } }
+      settings: { agentCmdOverrides: { claude: quoteFixtureAgentCommand(fixtureAgentPath) } }
     })
   )
 
@@ -95,7 +95,7 @@ try {
   const freshRequest = {
     clientOperationId: `${Date.now()}-0123456789abcdef0123456789abcdef`,
     worktree,
-    agent: 'codex',
+    agent: 'claude',
     presentation: 'focused'
   }
   const droppedFresh = await callClient(
@@ -140,7 +140,7 @@ try {
   const resumeRequest = {
     kind: 'explicit',
     worktree,
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: 'remote-authority-repro' },
     presentation: 'focused'
   }
@@ -312,11 +312,11 @@ try {
 function installFixtureAgent(targetDir) {
   const nodePath = process.execPath
   if (process.platform === 'win32') {
-    const commandPath = path.join(targetDir, 'codex.cmd')
+    const commandPath = path.join(targetDir, 'claude.cmd')
     writeFileSync(commandPath, `@"${nodePath}" "${fixtureScript}" %*\r\n`)
     return commandPath
   }
-  const commandPath = path.join(targetDir, 'codex')
+  const commandPath = path.join(targetDir, 'claude')
   writeFileSync(
     commandPath,
     `#!/bin/sh\nexec ${shellQuote(nodePath)} ${shellQuote(fixtureScript)} "$@"\n`

@@ -47,10 +47,10 @@ describe('OrcaRuntimeService', () => {
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
 
     const result = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
+      command: 'claude',
       launchConfig: {
-        agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentArgs: '--model sonnet',
+        agentEnv: { AGENT_PROFILE: 'captured' }
       },
       title: 'worker'
     })
@@ -58,7 +58,7 @@ describe('OrcaRuntimeService', () => {
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
         cwd: TEST_WORKTREE_PATH,
-        command: 'codex',
+        command: 'claude',
         commandDelivery: 'provider',
         worktreeId: TEST_WORKTREE_ID,
         preAllocatedHandle: expect.stringMatching(/^term_/)
@@ -82,8 +82,8 @@ describe('OrcaRuntimeService', () => {
       ptyId: 'pty-bg',
       title: 'worker',
       launchConfig: {
-        agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentArgs: '--model sonnet',
+        agentEnv: { AGENT_PROFILE: 'captured' }
       },
       launchToken: spawnedEnv.ORCA_AGENT_LAUNCH_TOKEN,
       activate: false,
@@ -126,9 +126,9 @@ describe('OrcaRuntimeService', () => {
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
 
     const terminal = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
-      launchAgent: 'codex',
-      launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} }
+      command: 'claude',
+      launchAgent: 'claude',
+      launchConfig: { agentCommand: 'claude', agentArgs: '', agentEnv: {} }
     })
     const spawnEnv =
       (spawn.mock.calls[0]?.[0] as { env?: Record<string, string> } | undefined)?.env ?? {}
@@ -139,24 +139,14 @@ describe('OrcaRuntimeService', () => {
     }
 
     expect(runtime.verifyOrchestrationCompatibilityCaller(evidence)).not.toBeNull()
-    expect(
-      runtime.getAgentStatusLaunchConfigForPaneKey(spawnEnv.ORCA_PANE_KEY, {
-        launchToken: spawnEnv.ORCA_AGENT_LAUNCH_TOKEN
-      })
-    ).toBeDefined()
     expect((await runtime.listTerminals()).terminals).toEqual([
-      expect.objectContaining({ handle: terminal.handle, agentIdentity: 'codex' })
+      expect.objectContaining({ handle: terminal.handle, agentIdentity: 'claude' })
     ])
 
     runtime.onPtyData('pty-authority', '\x1b]133;D;0\x07', 100)
 
     expect(retireAuthority).toHaveBeenCalledWith(spawnEnv.ORCA_PANE_KEY)
     expect(runtime.verifyOrchestrationCompatibilityCaller(evidence)).toBeNull()
-    expect(
-      runtime.getAgentStatusLaunchConfigForPaneKey(spawnEnv.ORCA_PANE_KEY, {
-        launchToken: spawnEnv.ORCA_AGENT_LAUNCH_TOKEN
-      })
-    ).toBeUndefined()
     expect((await runtime.listTerminals()).terminals).toEqual([
       expect.not.objectContaining({ agentIdentity: expect.anything() })
     ])

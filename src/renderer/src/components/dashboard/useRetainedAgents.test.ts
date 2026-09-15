@@ -287,7 +287,7 @@ describe('useRetainedAgentsSync', () => {
       repos: [repo],
       worktreesByRepo: { [repo.id]: [worktree] },
       tabsByWorktree: {
-        [worktree.id]: [{ ...row.tab, title: '⠋ Codex is thinking' }]
+        [worktree.id]: [{ ...row.tab, title: '⠋ OC | thinking' }]
       },
       agentStatusByPaneKey: { [paneKey]: row.entry },
       agentStatusEpoch: initialAppState.agentStatusEpoch + 1
@@ -303,7 +303,7 @@ describe('useRetainedAgentsSync', () => {
           [worktree.id]: [
             {
               ...state.tabsByWorktree[worktree.id][0],
-              title: '⠙ Codex is thinking'
+              title: '⠙ OC | thinking'
             }
           ]
         }
@@ -320,7 +320,7 @@ describe('useRetainedAgentsSync', () => {
     })
 
     expect(useAppStore.getState().retainedAgentsByPaneKey[paneKey]?.tab.title).toBe(
-      '⠙ Codex is thinking'
+      '⠙ OC | thinking'
     )
     hook.unmount()
   })

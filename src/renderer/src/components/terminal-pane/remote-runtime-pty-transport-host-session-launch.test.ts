@@ -383,9 +383,9 @@ describe('createRemoteRuntimePtyTransport', () => {
     const { createRemoteRuntimePtyTransport } = await import('./remote-runtime-pty-transport')
     const transport = createRemoteRuntimePtyTransport('env-1', {
       worktreeId: 'repo1::/remote/wt',
-      command: "codex 'fix the race'",
+      command: "opencode 'fix the race'",
       env: { CLIENT_ONLY: 'must-not-cross' },
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       agentPrompt: 'fix the race',
       agentPromptDelivery: 'draft',
       agentLaunchPreferences: { model: 'gpt-5', effort: 'high' },
@@ -401,7 +401,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       params: {
         clientOperationId: expect.stringMatching(/^\d{13}-[0-9a-f]{32}$/),
         worktree: 'id:repo1::/remote/wt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'fix the race',
         promptDelivery: 'draft',
         launchPreferences: { model: 'gpt-5', effort: 'high' },

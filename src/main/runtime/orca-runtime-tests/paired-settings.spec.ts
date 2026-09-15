@@ -14,7 +14,7 @@ describe('OrcaRuntimeService', () => {
         id: 'review',
         label: 'Review',
         action: 'agent-prompt' as const,
-        agent: 'codex' as const,
+        agent: 'opencode' as const,
         prompt: 'Review this diff',
         scope: { type: 'global' as const }
       }
@@ -105,26 +105,22 @@ describe('OrcaRuntimeService', () => {
 
     runtime.updateClientNativeChatSessionOptions({
       type: 'apply-picks',
-      agent: 'codex',
+      agent: 'claude',
       picks: [
-        { modelId: 'gpt-fast', optionId: 'model', value: 'gpt-fast' },
-        { modelId: 'gpt-fast', optionId: 'effort', value: 'low' }
+        { modelId: 'sonnet', optionId: 'model', value: 'sonnet' },
+        { modelId: 'sonnet', optionId: 'effort', value: 'low' }
       ]
     })
     runtime.updateClientNativeChatSessionOptions({
       type: 'apply-picks',
       agent: 'claude',
-      picks: [{ modelId: 'sonnet', optionId: 'model', value: 'sonnet' }]
+      picks: [{ modelId: 'opus', optionId: 'model', value: 'opus' }]
     })
 
     expect(settings.nativeChatSessionOptions).toEqual({
       claude: {
-        model: 'sonnet',
-        valuesByModel: { opus: { effort: 'high' } }
-      },
-      codex: {
-        model: 'gpt-fast',
-        valuesByModel: { 'gpt-fast': { effort: 'low' } }
+        model: 'opus',
+        valuesByModel: { opus: { effort: 'high' }, sonnet: { effort: 'low' } }
       }
     })
     expect(updateSettings).toHaveBeenCalledTimes(2)
@@ -133,7 +129,7 @@ describe('OrcaRuntimeService', () => {
   it('compares retired models against the host record at mutation time', () => {
     let settings = {
       ...store.getSettings(),
-      nativeChatSessionOptions: { grok: { model: 'grok-5' } }
+      nativeChatSessionOptions: { claude: { model: 'opus' } }
     }
     const updateSettings = vi.fn((updates: Partial<typeof settings>) => {
       settings = { ...settings, ...updates }
@@ -146,17 +142,17 @@ describe('OrcaRuntimeService', () => {
 
     runtime.updateClientNativeChatSessionOptions({
       type: 'clear-model-if-missing',
-      agent: 'grok',
-      availableModelIds: ['grok-5']
+      agent: 'claude',
+      availableModelIds: ['opus']
     })
     expect(updateSettings).not.toHaveBeenCalled()
 
     runtime.updateClientNativeChatSessionOptions({
       type: 'clear-model-if-missing',
-      agent: 'grok',
-      availableModelIds: ['grok-4.5']
+      agent: 'claude',
+      availableModelIds: ['sonnet']
     })
-    expect(settings.nativeChatSessionOptions).toEqual({ grok: {} })
+    expect(settings.nativeChatSessionOptions).toEqual({ claude: {} })
   })
 
   it('rejects a concurrent add after the quick command limit is reached', () => {
@@ -266,7 +262,7 @@ describe('OrcaRuntimeService', () => {
     let settings = {
       ...store.getSettings(),
       agentStatusHooksEnabled: true,
-      disabledTuiAgents: ['codex', 'claude']
+      disabledTuiAgents: ['opencode', 'claude']
     }
     const updateSettings = vi.fn((updates: Partial<typeof settings>) => {
       settings = { ...settings, ...updates }
@@ -278,7 +274,7 @@ describe('OrcaRuntimeService', () => {
       updateSettings
     } as never)
 
-    await runtime.updateClientSettings({ disabledTuiAgents: ['claude', 'codex'] })
+    await runtime.updateClientSettings({ disabledTuiAgents: ['claude', 'opencode'] })
     expect(applyAgentStatusHooksEnabledMock).not.toHaveBeenCalled()
 
     await runtime.updateClientSettings({ disabledTuiAgents: ['claude'] })
@@ -297,7 +293,7 @@ describe('OrcaRuntimeService', () => {
     let settings = {
       ...store.getSettings(),
       agentStatusHooksEnabled: true,
-      disabledTuiAgents: ['codex', 'claude']
+      disabledTuiAgents: ['opencode', 'claude']
     }
     const updateSettings = vi.fn((updates: Partial<typeof settings>) => {
       settings = { ...settings, ...updates }

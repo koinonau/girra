@@ -7,8 +7,7 @@ import {
   addSessionRestoredBannerPaneId,
   dismissSessionRestoredBannerPaneIds,
   removeSessionRestoredBannerPaneId,
-  type SessionRestoredBannerDismissEvent,
-  type SessionRestoredBannerReason
+  type SessionRestoredBannerDismissEvent
 } from './session-restored-banner-pane-state'
 import { isTerminalZeroDimensionsDiagnostic } from '../../../../shared/terminal-zero-dimensions-diagnostic'
 import { mapPaneTerminalErrors } from './terminal-error-accumulation'
@@ -89,9 +88,9 @@ export function useTerminalPaneStartupActions(controller: TerminalPaneStoreContr
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
   }, [])
   const showRestoredSessionBanner = useCallback(
-    (paneId: number, reason: SessionRestoredBannerReason = 'restored'): void => {
+    (paneId: number): void => {
       setSessionRestoredBannerPaneIds((previous) => {
-        const next = addSessionRestoredBannerPaneId(previous, paneId, reason)
+        const next = addSessionRestoredBannerPaneId(previous, paneId)
         return next === previous ? previous : next
       })
     },

@@ -134,6 +134,6 @@ export function waitForWorktreeStartupDraft(
     if (replay) {
       observe(replay)
     }
-    hardTimer = setTimeout(() => finish(null), resolveDraftPasteReadyTimeoutMs(agent))
+    hardTimer = setTimeout(() => finish(null), resolveDraftPasteReadyTimeoutMs())
   })
 }

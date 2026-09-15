@@ -16,12 +16,12 @@ import {
 import { FAKE_AGENT_WINDOWS_SHELL } from './helpers/fake-agent-command-override'
 import {
   clearCompletedWorkerLedger,
-  completedWorkerFakeCodexCommand,
+  completedWorkerFakeClaudeCommand,
   completedWorkerLaunchEnv,
   listRuntimeTerminals,
   readCompletedWorkerDispatchCapability,
   readCompletedWorkerLedger,
-  seedCurrentCodexTranscript
+  seedCurrentClaudeTranscript
 } from './helpers/completed-worker-retirement-fixture'
 import { RuntimeClient } from '../../src/cli/runtime-client'
 import type { RuntimeTerminalSummary } from '../../src/shared/runtime-types'
@@ -131,14 +131,14 @@ for (const daemonSessionGone of [false, true]) {
       await first.page.evaluate(
         async ({ agentCommand, terminalWindowsShell }) => {
           await window.__store?.getState().updateSettings({
-            agentCmdOverrides: { codex: agentCommand },
+            agentCmdOverrides: { claude: agentCommand },
             terminalWindowsShell,
             disabledTuiAgents: [],
             terminalHiddenViewParking: false
           })
         },
         {
-          agentCommand: completedWorkerFakeCodexCommand,
+          agentCommand: completedWorkerFakeClaudeCommand,
           terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL
         }
       )
@@ -177,7 +177,7 @@ for (const daemonSessionGone of [false, true]) {
         task: task.result.task.id,
         from: coordinatorHandle,
         worktree: `id:${targetWorktreeId}`,
-        agent: 'codex',
+        agent: 'claude',
         timeoutMs: 30_000
       })
       expect(started.result.state).toBe('ready')
@@ -216,7 +216,7 @@ for (const daemonSessionGone of [false, true]) {
       if (!dispatchCapability) {
         throw new Error('Background worker did not receive its dispatch capability')
       }
-      const transcriptPath = seedCurrentCodexTranscript(
+      const transcriptPath = seedCurrentClaudeTranscript(
         isolatedHome,
         PROVIDER_SESSION_ID,
         targetWorktreePath
@@ -240,14 +240,14 @@ for (const daemonSessionGone of [false, true]) {
             providerSession: { key: 'session_id' as const, id: providerSessionId, transcriptPath },
             launchConfig: {
               agentCommand,
-              agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+              agentArgs: '--dangerously-skip-permissions',
               agentEnv: {}
             }
           }
           for (const agentState of ['working', 'done'] as const) {
             state.setAgentStatus(
               paneKey,
-              { state: agentState, prompt: 'Report completion and stay open', agentType: 'codex' },
+              { state: agentState, prompt: 'Report completion and stay open', agentType: 'claude' },
               'Settled background worker',
               undefined,
               metadata,
@@ -256,7 +256,7 @@ for (const daemonSessionGone of [false, true]) {
           }
         },
         {
-          agentCommand: completedWorkerFakeCodexCommand,
+          agentCommand: completedWorkerFakeClaudeCommand,
           paneKey: workerPaneKey,
           providerSessionId: PROVIDER_SESSION_ID,
           tabId: workerTabId,
@@ -442,8 +442,7 @@ for (const daemonSessionGone of [false, true]) {
       if (daemonSessionGone) {
         expect(newLaunches.length).toBeLessThanOrEqual(1)
         for (const launch of newLaunches) {
-          // Codex's --resume equivalent is the `resume <session-id>` subcommand.
-          expect(launch.args).toContain('resume')
+          expect(launch.args).toContain('--resume')
           expect(launch.args).toContain(PROVIDER_SESSION_ID)
         }
         const listed = await client.call<{

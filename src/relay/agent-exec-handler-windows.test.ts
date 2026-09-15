@@ -35,16 +35,16 @@ describe('AgentExecHandler Windows command spawning', () => {
     process.env.ComSpec = 'C:\\Windows\\System32\\cmd.exe'
     try {
       await withPlatform('win32', async () => {
-        const codexShim = join(tempDir, 'codex.cmd')
-        writeFileSync(codexShim, '@echo off\r\n')
+        const opencodeShim = join(tempDir, 'opencode.cmd')
+        writeFileSync(opencodeShim, '@echo off\r\n')
         const child = createFakeChild()
         spawnMock.mockReturnValue(child as never)
         const handlers = createHandlers()
 
         const pending = handlers.get('agent.execNonInteractive')!(
           {
-            binary: 'codex',
-            args: ['exec', '-s', 'read-only'],
+            binary: 'opencode',
+            args: ['run', '--format', 'default'],
             cwd: 'C:\\repo',
             stdin: 'PROMPT',
             timeoutMs: 5_000,
@@ -61,7 +61,7 @@ describe('AgentExecHandler Windows command spawning', () => {
         })
         expect(spawnMock).toHaveBeenCalledWith(
           'C:\\Windows\\System32\\cmd.exe',
-          ['/d', '/s', '/c', `"${codexShim}" "exec" "-s" "read-only"`],
+          ['/d', '/s', '/c', `"${opencodeShim}" "run" "--format" "default"`],
           {
             cwd: 'C:\\repo',
             env: expect.objectContaining({ PATH: tempDir }),

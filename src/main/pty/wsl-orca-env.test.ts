@@ -34,7 +34,7 @@ describe('addOrcaWslInteropEnv', () => {
 
   it('imports setup-gated startup env into WSL without path translation', () => {
     const env: Record<string, string> = {
-      [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'codex',
+      [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'claude',
       [SETUP_AGENT_SEQUENCE_STARTUP_SCRIPT_ENV]: 'while :; do sleep 1; done'
     }
 

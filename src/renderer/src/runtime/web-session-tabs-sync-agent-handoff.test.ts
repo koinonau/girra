@@ -211,13 +211,13 @@ describe('applyWebSessionTabsSnapshot', () => {
       id: 'provisional-resume',
       ptyId: null,
       worktreeId: WT,
-      title: 'Codex',
-      defaultTitle: 'Codex',
+      title: 'OpenCode',
+      defaultTitle: 'OpenCode',
       customTitle: null,
       color: null,
       sortOrder: 0,
       createdAt: NOW,
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     }
     recordWebAgentSessionHandoff({
       environmentId: ENV,
@@ -231,18 +231,18 @@ describe('applyWebSessionTabsSnapshot', () => {
       makeState({
         tabsByWorktree: { [WT]: [provisionalTab] },
         pendingStartupByTabId: {
-          [provisionalTab.id]: { command: "codex resume 'session-b'" },
-          retained: { command: 'codex' }
+          [provisionalTab.id]: { command: "opencode --session 'session-b'" },
+          retained: { command: 'opencode' }
         },
         automaticAgentResumeClaimsByTabId: {
           [provisionalTab.id]: {
             worktreeId: WT,
-            launchAgent: 'codex',
+            launchAgent: 'opencode',
             providerSession: { key: 'session_id', id: 'session-b' }
           },
           retained: {
             worktreeId: WT,
-            launchAgent: 'codex',
+            launchAgent: 'opencode',
             providerSession: { key: 'session_id', id: 'session-a' }
           }
         }
@@ -251,11 +251,11 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: HOST_SURFACE_ID,
-          title: 'Codex',
+          title: 'OpenCode',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           isActive: true,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           status: 'ready',
           terminal: 'terminal-1'
         }
@@ -264,11 +264,11 @@ describe('applyWebSessionTabsSnapshot', () => {
       NOW
     ) as Partial<WebSessionTabsSyncState>
 
-    expect(patch.pendingStartupByTabId).toEqual({ retained: { command: 'codex' } })
+    expect(patch.pendingStartupByTabId).toEqual({ retained: { command: 'opencode' } })
     expect(patch.automaticAgentResumeClaimsByTabId).toEqual({
       retained: {
         worktreeId: WT,
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         providerSession: { key: 'session_id', id: 'session-a' }
       }
     })
@@ -296,11 +296,11 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: HOST_SURFACE_ID,
-          title: 'Codex',
+          title: 'OpenCode',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           isActive: true,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           status: 'ready',
           terminal: 'terminal-1'
         }

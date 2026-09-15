@@ -56,3 +56,56 @@ describe('retired Codex account settings', () => {
     }
   })
 })
+
+describe('retired agent ids', () => {
+  function normalizeWithSaveFlag(overrides: Record<string, unknown>) {
+    const defaults = getDefaultPersistedState(homedir())
+    const parsed = {
+      ...defaults,
+      settings: { ...defaults.settings, ...overrides } as GlobalSettings
+    } as PersistedState
+    let needsSave = false
+    const markNeedsSave = (): void => {
+      needsSave = true
+    }
+    const terminal = prepareLoadedTerminalSettings(parsed, markNeedsSave)
+    const profile = prepareLoadedProfileSettings(parsed, defaults, markNeedsSave)
+    return { settings: normalizeLoadedGlobalSettings(parsed, terminal, profile), needsSave }
+  }
+
+  it('resets a retired default agent to auto-pick and marks the profile for save', () => {
+    const result = normalizeWithSaveFlag({ defaultTuiAgent: 'codex' })
+    expect(result.settings.defaultTuiAgent).toBeNull()
+    expect(result.needsSave).toBe(true)
+  })
+
+  it('keeps blank and supported default agents', () => {
+    expect(normalizeWithSaveFlag({ defaultTuiAgent: 'blank' }).settings.defaultTuiAgent).toBe(
+      'blank'
+    )
+    expect(normalizeWithSaveFlag({ defaultTuiAgent: 'pi' }).settings.defaultTuiAgent).toBe('pi')
+  })
+
+  it('clears retired source control agents without remapping', () => {
+    const defaults = getDefaultPersistedState(homedir())
+    const result = normalizeWithSaveFlag({
+      sourceControlAi: { ...defaults.settings.sourceControlAi, agentId: 'codex' },
+      commitMessageAi: { ...defaults.settings.commitMessageAi, agentId: 'codex' }
+    })
+    expect(result.settings.sourceControlAi?.agentId).toBeNull()
+    expect(result.settings.commitMessageAi?.agentId).toBeNull()
+    expect(result.needsSave).toBe(true)
+  })
+
+  it('keeps supported and custom source control agents', () => {
+    const defaults = getDefaultPersistedState(homedir())
+    for (const agentId of ['opencode', 'custom']) {
+      const result = normalizeWithSaveFlag({
+        sourceControlAi: { ...defaults.settings.sourceControlAi, agentId },
+        commitMessageAi: { ...defaults.settings.commitMessageAi, agentId }
+      })
+      expect(result.settings.sourceControlAi?.agentId).toBe(agentId)
+      expect(result.settings.commitMessageAi?.agentId).toBe(agentId)
+    }
+  })
+})

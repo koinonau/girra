@@ -127,7 +127,7 @@ describe('active agent note send', () => {
 
   it('offers the active terminal send target for a fresh title-detected agent before hooks report', () => {
     testState.appState.runtimePaneTitlesByTabId = {
-      'tab-1': { 1: 'Codex' }
+      'tab-1': { 1: 'OpenCode' }
     }
 
     expect(getActiveAgentNoteTarget(testState.appState, 'wt-1', NOW)).toEqual({
@@ -138,7 +138,7 @@ describe('active agent note send', () => {
 
   it('offers the active terminal send target for an Orca-launched agent before hooks report', () => {
     testState.appState.tabsByWorktree = {
-      'wt-1': [{ id: 'tab-1', launchAgent: 'codex' }]
+      'wt-1': [{ id: 'tab-1', launchAgent: 'opencode' }]
     }
 
     expect(getActiveAgentNoteTarget(testState.appState, 'wt-1', NOW)).toEqual({
@@ -149,7 +149,7 @@ describe('active agent note send', () => {
 
   it('does not let an old launch marker override a focused shell title', () => {
     testState.appState.tabsByWorktree = {
-      'wt-1': [{ id: 'tab-1', launchAgent: 'codex' }]
+      'wt-1': [{ id: 'tab-1', launchAgent: 'opencode' }]
     }
     testState.appState.runtimePaneTitlesByTabId = {
       'tab-1': { 1: 'zsh' }
@@ -160,7 +160,7 @@ describe('active agent note send', () => {
 
   it('does not offer the active terminal send target for another split pane title', () => {
     testState.appState.runtimePaneTitlesByTabId = {
-      'tab-1': { 1: 'zsh', 2: 'Codex' }
+      'tab-1': { 1: 'zsh', 2: 'OpenCode' }
     }
     testState.appState.terminalLayoutsByTabId = {
       'tab-1': {
@@ -180,7 +180,7 @@ describe('active agent note send', () => {
 
   it('does not treat a lone background split-pane title as the focused pane', () => {
     testState.appState.runtimePaneTitlesByTabId = {
-      'tab-1': { 2: 'Codex' }
+      'tab-1': { 2: 'OpenCode' }
     }
     testState.appState.terminalLayoutsByTabId = {
       'tab-1': {
@@ -245,7 +245,7 @@ function agentStatusEntry(
     prompt: '',
     updatedAt,
     stateStartedAt: updatedAt,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
     stateHistory: [],
     ...overrides

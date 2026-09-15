@@ -1,5 +1,6 @@
 import { mkdirSync, utimesSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { encodeClaudeProjectPath } from '../../src/main/ai-vault/claude-project-dir-encoding'
 
 export type SeededVaultBatch = {
   newestTitle: string
@@ -17,7 +18,12 @@ export function seedVaultTranscriptBatch(args: {
   sessionCount: number
   payloadBytes: number
 }): SeededVaultBatch {
-  const sessionsDir = path.join(args.homePath, '.codex', 'sessions', '2026', '08', '09')
+  const sessionsDir = path.join(
+    args.homePath,
+    '.claude',
+    'projects',
+    encodeClaudeProjectPath(args.cwd)
+  )
   mkdirSync(sessionsDir, { recursive: true })
   const padding = 'x'.repeat(args.payloadBytes)
   const baseTimeMs = Date.now() + args.batch * 10_000
@@ -30,30 +36,21 @@ export function seedVaultTranscriptBatch(args: {
     const timestamp = new Date(baseTimeMs + index).toISOString()
     const content = `${[
       jsonLine({
+        type: 'user',
+        sessionId,
+        cwd: args.cwd,
         timestamp,
-        type: 'session_meta',
-        payload: { id: sessionId, cwd: args.cwd }
+        message: { role: 'user', content: title }
       }),
       jsonLine({
+        type: 'assistant',
+        sessionId,
+        cwd: args.cwd,
         timestamp,
-        type: 'response_item',
-        payload: {
-          type: 'message',
-          role: 'user',
-          content: [{ type: 'text', text: title }]
-        }
-      }),
-      jsonLine({
-        timestamp,
-        type: 'response_item',
-        payload: {
-          type: 'message',
-          role: 'assistant',
-          content: [{ type: 'output_text', text: padding }]
-        }
+        message: { role: 'assistant', content: [{ type: 'text', text: padding }] }
       })
     ].join('\n')}\n`
-    const filePath = path.join(sessionsDir, `rollout-${sessionId}.jsonl`)
+    const filePath = path.join(sessionsDir, `${sessionId}.jsonl`)
     writeFileSync(filePath, content)
     const mtime = new Date(baseTimeMs + index)
     utimesSync(filePath, mtime, mtime)

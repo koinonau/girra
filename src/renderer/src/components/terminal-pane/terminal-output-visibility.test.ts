@@ -8,9 +8,9 @@ import {
 describe('hasTerminalDisplayContent', () => {
   it('treats title and agent-status OSC frames as metadata-only', () => {
     expect(hasTerminalDisplayContent('\x1b]0;Restored title\x07')).toBe(false)
-    expect(hasTerminalDisplayContent('\x1b]9999;{"state":"working","agentType":"codex"}\x07')).toBe(
-      false
-    )
+    expect(
+      hasTerminalDisplayContent('\x1b]9999;{"state":"working","agentType":"opencode"}\x07')
+    ).toBe(false)
   })
 
   it('treats unterminated metadata/control frames as metadata-only', () => {

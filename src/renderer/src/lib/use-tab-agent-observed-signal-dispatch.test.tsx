@@ -49,7 +49,7 @@ function workingAgentStatus(): AgentStatusEntry {
     prompt: '',
     updatedAt: Date.now(),
     stateStartedAt: Date.now(),
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey: PANE_KEY,
     stateHistory: []
   } as AgentStatusEntry
@@ -72,7 +72,7 @@ function publishRuntimeTitle(revision: number): void {
       ({
         tabsByWorktree: {
           ...state.tabsByWorktree,
-          [WORKTREE_ID]: [terminalTab(`⠋ codex ${revision}`)]
+          [WORKTREE_ID]: [terminalTab(`⠋ opencode ${revision}`)]
         }
       }) as never
   )
@@ -98,7 +98,7 @@ describe('useTabAgent observed-signal dispatch', () => {
       agentStatusByPaneKey: { [PANE_KEY]: workingAgentStatus() },
       terminalLayoutsByTabId: { [TAB_ID]: paneLayout('pty-a') },
       ptyIdsByTabId: { [TAB_ID]: ['pty-a'] },
-      tabsByWorktree: { [WORKTREE_ID]: [terminalTab('⠋ codex 0')] }
+      tabsByWorktree: { [WORKTREE_ID]: [terminalTab('⠋ opencode 0')] }
     } as never)
     container = document.createElement('div')
     document.body.appendChild(container)
@@ -123,7 +123,7 @@ describe('useTabAgent observed-signal dispatch', () => {
     // One commit per publication. Re-dispatching the unchanged observed-signal
     // flag doubled this, and put SortableTab's fiber in every #185 stack.
     expect(probeRenders).toBe(TITLE_PUBLICATIONS)
-    expect(latestAgent).toBe('codex')
+    expect(latestAgent).toBe('opencode')
   })
 
   it('still re-arms the observed signal after a pty respawn', () => {
@@ -140,9 +140,9 @@ describe('useTabAgent observed-signal dispatch', () => {
     act(() => {
       useAppStore.setState({
         agentStatusByPaneKey: { [PANE_KEY]: workingAgentStatus() },
-        tabsByWorktree: { [WORKTREE_ID]: [terminalTab('⠋ codex 1')] }
+        tabsByWorktree: { [WORKTREE_ID]: [terminalTab('⠋ opencode 1')] }
       } as never)
     })
-    expect(latestAgent).toBe('codex')
+    expect(latestAgent).toBe('opencode')
   })
 })

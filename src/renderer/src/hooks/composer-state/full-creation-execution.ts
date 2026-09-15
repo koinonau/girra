@@ -100,7 +100,6 @@ export function useFullCreationExecution(input: FullCreationExecutionInput) {
         createDisplayName,
         pendingFirstAgentMessageRename,
         startupPlan,
-        shouldSeedInitialAgentStatus,
         composerTelemetry,
         backendStartup
       } = prepared
@@ -209,8 +208,6 @@ export function useFullCreationExecution(input: FullCreationExecutionInput) {
         startupPlan,
         backendSpawnedStartup,
         agent: tuiAgent,
-        shouldSeedInitialAgentStatus,
-        prompt: submitStartupPrompt,
         telemetry: composerTelemetry
       })
 

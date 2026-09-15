@@ -224,8 +224,8 @@ describe('useIpcEvents agent status snapshot integration', () => {
         {
           paneKey: ORPHAN_PANE_KEY,
           state: 'done' as const,
-          prompt: 'old copilot turn',
-          agentType: 'copilot',
+          prompt: 'old opencode turn',
+          agentType: 'opencode',
           worktreeId: 'wt-1',
           receivedAt: 1_700_000_000_000,
           stateStartedAt: 1_699_999_999_000
@@ -238,7 +238,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       repos: [{ id: 'repo-1', connectionId: null }],
       worktreesByRepo: { 'repo-1': [{ id: 'wt-1', repoId: 'repo-1' }] },
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Copilot' }]
+        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'OpenCode' }]
       },
       terminalLayoutsByTabId: {
         'tab-future': {
@@ -283,7 +283,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
           paneKey: ORPHAN_PANE_KEY,
           state: 'working' as const,
           prompt: 'child task',
-          agentType: 'codex',
+          agentType: 'opencode',
           worktreeId: 'wt-1',
           terminalHandle: 'term-child',
           orchestration: {
@@ -302,7 +302,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       repos: [{ id: 'repo-1', connectionId: null }],
       worktreesByRepo: { 'repo-1': [{ id: 'wt-1', repoId: 'repo-1' }] },
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Codex' }]
+        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'OpenCode' }]
       },
       terminalLayoutsByTabId: {
         'tab-future': {
@@ -342,7 +342,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'working',
         prompt: 'child task',
-        agentType: 'codex',
+        agentType: 'opencode',
         orchestration: expect.objectContaining({ taskId: 'task-child' })
       }),
       undefined,

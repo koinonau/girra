@@ -4,7 +4,6 @@ import {
   getDefaultWorkspaceSession,
   join,
   makePaneKey,
-  markCopilotFolderTrustedMock,
   mkdtemp,
   setPlatform,
   setTerminalViewAttributes,
@@ -188,7 +187,7 @@ describe('OrcaRuntimeService', () => {
       getForegroundProcess: async () => null
     })
 
-    await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { command: 'codex' })
+    await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { command: 'claude' })
 
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -220,7 +219,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-        command: 'codex',
+        command: 'claude',
         presentation: 'background',
         tabId,
         leafId
@@ -354,8 +353,8 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { copilot: '--allow-all-tools' },
-        agentDefaultEnv: { copilot: { COPILOT_PROFILE: 'captured' } }
+        agentDefaultArgs: { opencode: '--print-logs' },
+        agentDefaultEnv: { opencode: { OPENCODE_PROFILE: 'captured' } }
       })
     }
     const runtime = new OrcaRuntimeService(runtimeStore)
@@ -367,23 +366,19 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'copilot',
+      command: 'opencode',
       title: 'worker'
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
       | { command?: string; env?: Record<string, string> }
       | undefined
-    expect(spawnCall?.command).toBe("copilot '--allow-all-tools'")
+    expect(spawnCall?.command).toBe("opencode '--print-logs'")
     expect(spawnCall?.env).toMatchObject({
-      COPILOT_PROFILE: 'captured',
+      OPENCODE_PROFILE: 'captured',
       ORCA_WORKTREE_ID: TEST_WORKTREE_ID
     })
     expect(spawnCall?.env?.ORCA_AGENT_LAUNCH_TOKEN).toMatch(UUID_RE)
-    expect(markCopilotFolderTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
-    expect(markCopilotFolderTrustedMock.mock.invocationCallOrder[0]).toBeLessThan(
-      spawn.mock.invocationCallOrder[0]!
-    )
   })
 
   it('launches the configured agent CLI for a startupAgent id', async () => {

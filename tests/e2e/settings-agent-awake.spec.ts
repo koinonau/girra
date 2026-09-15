@@ -118,7 +118,7 @@ async function readMacosSleepAssertionPids(electronApp: ElectronApplication): Pr
   return result.stdout.trim().split(/\s+/).filter(Boolean).map(Number)
 }
 
-async function postCodexHookEvent(
+async function postClaudeHookEvent(
   electronApp: ElectronApplication,
   options: {
     paneKey: string
@@ -127,7 +127,7 @@ async function postCodexHookEvent(
   }
 ): Promise<void> {
   const endpoint = await readHookEndpoint(electronApp)
-  const response = await fetch(`http://127.0.0.1:${endpoint.port}/hook/codex`, {
+  const response = await fetch(`http://127.0.0.1:${endpoint.port}/hook/claude`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ test.describe('Agent awake setting', () => {
 
     const tabId = 'e2e-awake-tab'
     const paneKey = `${tabId}:${randomUUID()}`
-    await postCodexHookEvent(electronApp, {
+    await postClaudeHookEvent(electronApp, {
       paneKey,
       tabId,
       eventName: 'UserPromptSubmit'
@@ -231,7 +231,7 @@ test.describe('Agent awake setting', () => {
       expect(startedIds.length).toBeGreaterThan(0)
     }
 
-    await postCodexHookEvent(electronApp, {
+    await postClaudeHookEvent(electronApp, {
       paneKey,
       tabId,
       eventName: 'Stop'

@@ -101,7 +101,7 @@ describe('orchestration federation lifecycle settlement', () => {
       }
     } as never)
     vi.spyOn(workerRuntime, 'listTerminals').mockResolvedValue({
-      terminals: [{ handle: 'term_windows_worker', title: 'Codex' }],
+      terminals: [{ handle: 'term_windows_worker', title: 'Claude Code' }],
       totalCount: 1,
       truncated: false
     } as never)

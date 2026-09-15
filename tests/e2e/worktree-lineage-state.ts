@@ -115,8 +115,8 @@ export async function seedWorkspaceAgentStatus(
       const now = Date.now()
       next.setAgentStatus(
         `${tab.id}:${leafId}`,
-        { state: 'working', prompt, agentType: 'codex' },
-        'codex',
+        { state: 'working', prompt, agentType: 'claude' },
+        'claude',
         { updatedAt: now, stateStartedAt: now }
       )
       return prompt

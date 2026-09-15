@@ -71,8 +71,7 @@ export class RuntimeTerminalAgentStatusQuery {
       terminal.titleStatusIsLive &&
       terminal.titleStatus !== null &&
       terminal.titleStatus !== 'permission' &&
-      !isOpenCodeNativeTitle(terminal.title) &&
-      blockedByWaitText !== 'agent-approval-prompt'
+      !isOpenCodeNativeTitle(terminal.title)
     const newestPermissionAt = Math.max(
       explicitStatus?.status === 'permission' ? explicitStatus.updatedAt : -1,
       lifecycle?.status === 'permission' ? lifecycle.updatedAt : -1,
@@ -88,8 +87,8 @@ export class RuntimeTerminalAgentStatusQuery {
     if (
       blockedByWaitText &&
       (!liveTitleClearsBlockedText || lifecycle?.status === terminal.titleStatus) &&
-      (blockedByWaitText === 'agent-approval-prompt' ||
-        (newestPermissionAt >= 0 && newestPermissionAt >= newestClearAt))
+      newestPermissionAt >= 0 &&
+      newestPermissionAt >= newestClearAt
     ) {
       return { handle, isRunningAgent: true, status: 'permission' }
     }

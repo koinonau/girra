@@ -57,7 +57,7 @@ async function makeRuntime(options: { onWrite?: (ptyId: string, data: string) =>
     // A real agent starts working when it receives the submit, and the prompt path now waits for
     // that transition before it reports success. Without it every happy path here reads as stalled.
     if (data === AGENT_PROMPT_SUBMIT) {
-      runtime.onPtyData(ptyId, '\x1b]0;Codex working\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;Claude working\x07', Date.now())
     }
     return true
   })
@@ -357,8 +357,8 @@ describe('lease transition against an in-flight write', () => {
         getCurrentRunForPane: () => ({ id: RUN_ID }),
         getRun: () => ({ id: RUN_ID, coordinator_handle: handle })
       } as never)
-      runtime.onPtyData(PTY_ID, '\x1b]0;Codex working\x07', 1)
-      runtime.onPtyData(PTY_ID, '\x1b]0;Codex done\x07', 2)
+      runtime.onPtyData(PTY_ID, '\x1b]0;Claude working\x07', 1)
+      runtime.onPtyData(PTY_ID, '\x1b]0;Claude done\x07', 2)
       getPendingMailboxPointerMessages.mockClear()
       enforce(agentSessionLeaseFixture({ runtimeFence: 7 }))
       messages = [{ id: 'msg-1', sequence: 1, type: 'status' }]

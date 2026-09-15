@@ -214,7 +214,7 @@ describe('OrcaRuntimeService', () => {
       ]
     })
 
-    runtime.onPtyData(ptyId, '\x1b]9999;{"state":"working","agentType":"codex"}\x07', 123)
+    runtime.onPtyData(ptyId, '\x1b]9999;{"state":"working","agentType":"claude"}\x07', 123)
 
     expect(statuses).toEqual([
       expect.objectContaining({
@@ -222,7 +222,7 @@ describe('OrcaRuntimeService', () => {
         connectionId: 'ssh-restored',
         payload: expect.objectContaining({
           state: 'working',
-          agentType: 'codex'
+          agentType: 'claude'
         })
       })
     ])

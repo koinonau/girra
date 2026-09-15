@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const launchAgentInNewTab = vi.hoisted(() => vi.fn())
 const connectionId = vi.hoisted(() => ({ value: null as string | null }))
@@ -6,15 +6,15 @@ const runtimeEnvironmentId = vi.hoisted(() => ({ value: null as string | null })
 const toast = vi.hoisted(() => ({ error: vi.fn(), success: vi.fn() }))
 const store = vi.hoisted(() => ({
   settings: { disabledTuiAgents: [] as string[] },
-  ensureDetectedAgents: vi.fn(async () => ['claude', 'codex']),
-  ensureRemoteDetectedAgents: vi.fn(async () => ['claude', 'codex']),
-  ensureRuntimeDetectedAgents: vi.fn(async () => ['claude', 'codex'])
+  ensureDetectedAgents: vi.fn(async () => ['claude', 'opencode']),
+  ensureRemoteDetectedAgents: vi.fn(async () => ['claude', 'opencode']),
+  ensureRuntimeDetectedAgents: vi.fn(async () => ['claude', 'opencode'])
 }))
 
 vi.mock('@/store', () => ({ useAppStore: { getState: () => store } }))
 vi.mock('@/lib/launch-agent-in-new-tab', () => ({ launchAgentInNewTab }))
 vi.mock('@/lib/agent-catalog', () => ({
-  getAgentLabel: (agent: string) => (agent === 'codex' ? 'Codex' : 'Claude')
+  getAgentLabel: (agent: string) => (agent === 'opencode' ? 'OpenCode' : 'Claude')
 }))
 vi.mock('@/lib/connection-context', () => ({
   getConnectionIdFromState: () => connectionId.value
@@ -37,19 +37,14 @@ describe('launchAgentSessionContinuation', () => {
     connectionId.value = null
     runtimeEnvironmentId.value = null
     store.settings.disabledTuiAgents = []
-    store.ensureDetectedAgents.mockResolvedValue(['claude', 'codex'])
-    store.ensureRemoteDetectedAgents.mockResolvedValue(['claude', 'codex'])
-    store.ensureRuntimeDetectedAgents.mockResolvedValue(['claude', 'codex'])
+    store.ensureDetectedAgents.mockResolvedValue(['claude', 'opencode'])
+    store.ensureRemoteDetectedAgents.mockResolvedValue(['claude', 'opencode'])
+    store.ensureRuntimeDetectedAgents.mockResolvedValue(['claude', 'opencode'])
     launchAgentInNewTab.mockReturnValue({
       tabId: 'tab-new',
       promptDeliveryResult: Promise.resolve({ delivered: true, failureNotified: false })
     })
-    vi.stubGlobal('window', {
-      api: { agentTrust: { markTrusted: vi.fn(async () => undefined) } }
-    })
   })
-
-  afterEach(() => vi.unstubAllGlobals())
 
   it('launches any detected target Agent in the same workspace and cwd', async () => {
     const { launchAgentSessionContinuation } = await import('./launch-agent-session-continuation')
@@ -60,7 +55,6 @@ describe('launchAgentSessionContinuation', () => {
         prompt: 'continue the unfinished task',
         worktreeId: 'wt-1',
         groupId: 'group-1',
-        workspacePath: '/repo/worktree',
         initialCwd: '/repo/worktree/packages/app',
         launchSource: 'terminal_context_menu'
       })
@@ -82,7 +76,10 @@ describe('launchAgentSessionContinuation', () => {
     const { detectAgentSessionContinuationAgents } =
       await import('./launch-agent-session-continuation')
 
-    await expect(detectAgentSessionContinuationAgents('wt-1')).resolves.toEqual(['claude', 'codex'])
+    await expect(detectAgentSessionContinuationAgents('wt-1')).resolves.toEqual([
+      'claude',
+      'opencode'
+    ])
     expect(store.ensureRemoteDetectedAgents).toHaveBeenCalledWith('ssh-1')
     expect(store.ensureDetectedAgents).not.toHaveBeenCalled()
   })
@@ -102,16 +99,15 @@ describe('launchAgentSessionContinuation', () => {
 
     await expect(
       launchAgentSessionContinuation({
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'continue',
         worktreeId: 'wt-1',
-        workspacePath: '/repo/worktree',
         launchSource: 'sidebar'
       })
     ).resolves.toBe(false)
 
     expect(launchAgentInNewTab).not.toHaveBeenCalled()
-    expect(toast.error).toHaveBeenCalledWith('Codex was not detected on this workspace host.')
+    expect(toast.error).toHaveBeenCalledWith('OpenCode was not detected on this workspace host.')
   })
 
   it('distinguishes prompt delivery failure from terminal launch failure', async () => {
@@ -122,16 +118,15 @@ describe('launchAgentSessionContinuation', () => {
     const { launchAgentSessionContinuation } = await import('./launch-agent-session-continuation')
 
     await launchAgentSessionContinuation({
-      agent: 'codex',
+      agent: 'opencode',
       prompt: 'continue',
       worktreeId: 'wt-1',
-      workspacePath: '/repo/worktree',
       launchSource: 'sidebar'
     })
 
     await vi.waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith(
-        'The new Codex session started, but its context could not be sent.'
+        'The new OpenCode session started, but its context could not be sent.'
       )
     )
   })

@@ -8,7 +8,7 @@ function item(sequence: number, body: AgentJournalItemBody): AgentJournalRenderI
 
 const turnStart = item(1, {
   kind: 'status',
-  text: 'Codex is working…',
+  text: 'Claude is working…',
   turnLifecycle: { turnId: 'turn-1', state: 'running' }
 })
 
@@ -47,7 +47,7 @@ describe('selectStructuredAgentTurnActivity', () => {
         'turn-1'
       )
     ).toEqual({ kind: 'description', text: 'Updating the plan' })
-    // Provider-authored copy is unaffected, so Codex keeps its line.
+    // Provider-authored copy is unaffected, so the provider keeps its line.
     expect(
       selectStructuredAgentTurnActivity([turnStart, reasoning], 'turn-1', {
         turnId: 'turn-1',
@@ -162,9 +162,9 @@ describe('selectStructuredAgentTurnActivity', () => {
   it('ignores diagnostic provider frames and returns nothing after the turn settles', () => {
     const diagnostic = item(2, {
       kind: 'status',
-      text: 'codex · notification:new/event',
+      text: 'claude · notification:new/event',
       providerFrame: {
-        provider: 'codex',
+        provider: 'claude',
         kind: 'notification:new/event',
         payload: {
           head: '{}',

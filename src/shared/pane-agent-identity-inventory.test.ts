@@ -56,6 +56,7 @@ const INVENTORY: readonly InventoryGroup[] = [
         'src/renderer/src/components/agent-session-continuation/AgentSessionContinuationDialog.tsx',
         2
       ],
+      ['src/renderer/src/components/automations/AutomationDetail.tsx', 2],
       ['src/renderer/src/components/automations/AutomationListLocalRow.tsx', 2],
       'src/renderer/src/components/automations/automation-draft-model.ts',
       ['src/renderer/src/components/automations/automation-list-search-rows.ts', 2],
@@ -121,8 +122,8 @@ const INVENTORY: readonly InventoryGroup[] = [
       'src/shared/agent-name-token-match.ts',
       ['src/shared/agent-title-core.ts', 2],
       ['src/shared/agent-title-evidence.ts', 2],
-      ['src/shared/agent-title-identity.ts', 4],
-      ['src/shared/terminal-title-agent-type.ts', 5]
+      ['src/shared/agent-title-identity.ts', 3],
+      ['src/shared/terminal-title-agent-type.ts', 4]
     ]
   },
   {
@@ -232,8 +233,7 @@ const INVENTORY: readonly InventoryGroup[] = [
     helper: 'resolveCompatibleAgentTypeForOwner',
     classification: 'evidence-producer',
     paths: [
-      ['src/renderer/src/components/terminal-pane/pty-connection/direct-ssh-retry-status.ts', 2],
-      ['src/renderer/src/components/terminal-pane/pty-connection/title-spawn-bell.ts', 2]
+      ['src/renderer/src/components/terminal-pane/pty-connection/direct-ssh-retry-status.ts', 2]
     ]
   },
   {

@@ -79,7 +79,7 @@ describe('decorative title fact throttle', () => {
   })
 
   it('propagates a changed working label immediately even while the spinner rotates', () => {
-    // Why: only the spinner glyph is decoration. Grok/Pi-style label churn is real content.
+    // Why: only the spinner glyph is decoration. Pi-style label churn is real content.
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
 

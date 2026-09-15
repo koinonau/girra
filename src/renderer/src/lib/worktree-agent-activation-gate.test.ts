@@ -16,7 +16,7 @@ const DEAD_LEAF_ID = '22222222-2222-4222-8222-222222222222'
 const SIBLING_LEAF_ID = '33333333-3333-4333-8333-333333333333'
 
 function listed(id: string): PtyListedSession {
-  return { id, cwd: '/worktree', title: 'Codex', agentOwnership: 'present' }
+  return { id, cwd: '/worktree', title: 'Claude', agentOwnership: 'present' }
 }
 
 function sleepingRecord(
@@ -53,7 +53,7 @@ function runtimeSnapshot(
       ...ptyIds.map((ptyId, index) => ({
         type: 'terminal' as const,
         id: `${tabId}:${leafId}:${index}`,
-        title: 'Codex',
+        title: 'Claude',
         parentTabId: tabId,
         leafId,
         ptyId,
@@ -64,7 +64,7 @@ function runtimeSnapshot(
       {
         type: 'agent-session' as const,
         id: 'structured-agent-session-live-session',
-        title: 'Codex Chat',
+        title: 'Claude Chat',
         sessionId: 'live-session',
         agent: 'claude' as const,
         isActive: false
@@ -160,7 +160,7 @@ function testDeps(args: {
               groupId: 'group-1',
               worktreeId: WORKTREE_ID,
               contentType: 'agent-session' as const,
-              label: 'Codex',
+              label: 'Claude',
               customLabel: null,
               color: null,
               sortOrder: 0,

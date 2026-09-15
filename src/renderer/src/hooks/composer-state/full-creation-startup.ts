@@ -6,8 +6,6 @@ export function buildFullCreationStartup(args: {
   startupPlan: AgentStartupPlan | null
   backendSpawnedStartup: boolean
   agent: TuiAgent
-  shouldSeedInitialAgentStatus: boolean
-  prompt: string
   telemetry: WorktreeStartupPayload['telemetry']
 }): WorktreeStartupPayload | undefined {
   if (!args.startupPlan || args.backendSpawnedStartup) {
@@ -22,9 +20,6 @@ export function buildFullCreationStartup(args: {
     ...(args.startupPlan.draftPrompt ? { draftPrompt: args.startupPlan.draftPrompt } : {}),
     ...(args.startupPlan.startupCommandDelivery
       ? { startupCommandDelivery: args.startupPlan.startupCommandDelivery }
-      : {}),
-    ...(args.shouldSeedInitialAgentStatus
-      ? { initialAgentStatus: { agent: args.agent, prompt: args.prompt.trim() } }
       : {}),
     telemetry: args.telemetry
   }

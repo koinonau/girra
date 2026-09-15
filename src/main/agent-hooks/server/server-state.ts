@@ -36,7 +36,6 @@ import type {
   ServerAgentStatusListener,
   ServerStatusLineListener,
   StatusChangeListener,
-  StatusDropListener,
   StatusFreshnessListener,
   StatusRowMutationListener
 } from './server-types'
@@ -52,7 +51,6 @@ export abstract class AgentHookServerState {
   protected onClaudeStatusLine: ServerStatusLineListener = null
   protected onPaneStatusCleared: PaneStatusClearListener | null = null
   protected paneStatusClearListeners = new Set<PaneStatusClearListener>()
-  protected statusDropListeners = new Set<StatusDropListener>()
   protected statusChangeListeners = new Set<StatusChangeListener>()
   protected statusFreshnessListeners = new Set<StatusFreshnessListener>()
   protected providerSessionChangeListeners = new Set<ProviderSessionChangeListener>()

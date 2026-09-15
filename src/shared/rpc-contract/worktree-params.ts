@@ -26,13 +26,9 @@ export const OptionalExecutionHostId = z
   })
   .optional()
 
+// Why: older clients may name a retired agent; create the workspace without launching it.
 export const OptionalTuiAgent = z
   .unknown()
-  .superRefine((value, ctx) => {
-    if (value !== undefined && !isTuiAgent(value)) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Unknown TUI agent' })
-    }
-  })
   .transform((value): TuiAgent | undefined => (isTuiAgent(value) ? value : undefined))
   .optional()
 

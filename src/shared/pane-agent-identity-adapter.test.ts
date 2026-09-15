@@ -7,7 +7,7 @@ import {
 } from './pane-agent-identity-adapter'
 
 const freshProof: ForegroundProcessProof = {
-  agent: 'codex',
+  agent: 'pi',
   processIncarnation: 'opaque-pid-token',
   authorityId: 'main:test',
   capturedAgeMs: 50,
@@ -22,7 +22,7 @@ describe('per-pane coverage gate', () => {
     expect(resolveCanonicalPaneAgentIdentity({ completedHookAgent: 'claude' }).coverage).toBe(
       'covered'
     )
-    expect(resolveCanonicalPaneAgentIdentity({ launchAgent: 'codex' }).coverage).toBe('covered')
+    expect(resolveCanonicalPaneAgentIdentity({ launchAgent: 'opencode' }).coverage).toBe('covered')
     expect(resolveCanonicalPaneAgentIdentity({ sleepingSessionAgent: 'pi' }).coverage).toBe(
       'covered'
     )
@@ -33,9 +33,7 @@ describe('per-pane coverage gate', () => {
     expect(
       resolveCanonicalPaneAgentIdentity({ siblingAgent: 'claude', allowSibling: true }).coverage
     ).toBe('uncovered')
-    expect(resolveCanonicalPaneAgentIdentity({ foregroundAgent: 'codex' }).coverage).toBe(
-      'uncovered'
-    )
+    expect(resolveCanonicalPaneAgentIdentity({ foregroundAgent: 'pi' }).coverage).toBe('uncovered')
   })
 
   it('is computed from evidence, never from a platform or remote flag', () => {
@@ -58,22 +56,22 @@ describe('process rung requires a host-stamped proof', () => {
   it('a bare foreground name cannot outrank launch; a proven process can', () => {
     const unproven = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      foregroundAgent: 'codex'
+      foregroundAgent: 'pi'
     })
     expect(unproven).toMatchObject({ agent: 'claude', source: 'launch' })
 
     const proven = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      foregroundAgent: 'codex',
+      foregroundAgent: 'pi',
       processProof: freshProof
     })
-    expect(proven).toMatchObject({ agent: 'codex', source: 'process', coverage: 'covered' })
+    expect(proven).toMatchObject({ agent: 'pi', source: 'process', coverage: 'covered' })
   })
 
   it('an expired proof and a name-mismatched proof both drop the process rung', () => {
     const expired = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      foregroundAgent: 'codex',
+      foregroundAgent: 'pi',
       processProof: { ...freshProof, capturedAgeMs: 10_000 }
     })
     expect(expired).toMatchObject({ agent: 'claude', source: 'launch' })
@@ -103,7 +101,7 @@ describe('uncovered compatibility lane', () => {
 
   it('answers from title evidence marked title-only when no fallback is supplied', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
-      title: 'STA-4011 Linux Codex Commit Messages - opencode'
+      title: 'STA-4011 Linux Claude Commit Messages - opencode'
     })
     expect(identity).toMatchObject({
       agent: 'opencode',
@@ -130,19 +128,19 @@ describe('uncovered compatibility lane', () => {
     ).toMatchObject({ agent: null, source: null, ambiguousAt: 'title' })
     expect(
       resolveCanonicalPaneAgentIdentity({
-        title: 'compare codex with opencode',
-        uncoveredFallback: { agent: 'codex', titleOnly: true }
+        title: 'compare claude with opencode',
+        uncoveredFallback: { agent: 'claude', titleOnly: true }
       })
     ).toMatchObject({ agent: null, source: null, coverage: 'uncovered' })
   })
 
   it('does not label a foreground-only compatibility answer as title-only', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
-      foregroundAgent: 'codex',
-      uncoveredFallback: { agent: 'codex' }
+      foregroundAgent: 'pi',
+      uncoveredFallback: { agent: 'pi' }
     })
     expect(identity).toMatchObject({
-      agent: 'codex',
+      agent: 'pi',
       source: null,
       coverage: 'uncovered',
       titleOnly: false
@@ -154,7 +152,7 @@ describe('canonical ladder inside the covered lane', () => {
   it('keeps title last: a covered launch beats a parsed title', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      title: 'STA-4011 Linux Codex Commit Messages - opencode'
+      title: 'STA-4011 Linux Claude Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'launch', titleOnly: false })
   })
@@ -162,13 +160,13 @@ describe('canonical ladder inside the covered lane', () => {
   it('sibling evidence needs the explicit tab-scope opt-in', () => {
     const withoutOptIn = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      siblingAgent: 'codex'
+      siblingAgent: 'pi'
     })
     expect(withoutOptIn.agent).toBe('claude')
     const optedIn = resolveCanonicalPaneAgentIdentity({
       hookAgent: 'claude',
       hookIsLive: true,
-      siblingAgent: 'codex',
+      siblingAgent: 'pi',
       allowSibling: true
     })
     expect(optedIn).toMatchObject({ agent: 'claude', source: 'live-hook' })
@@ -178,7 +176,7 @@ describe('canonical ladder inside the covered lane', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
       hookAgent: 'claude',
       hookIsLive: false,
-      completedHookAgent: 'codex'
+      completedHookAgent: 'opencode'
     })
     expect(identity).toMatchObject({ agent: null, ambiguousAt: 'completed-hook' })
   })
@@ -194,7 +192,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
       completedHookAgent: 'claude',
       completedHookRun: run1,
       currentRun: run1,
-      title: 'STA-4011 Linux Codex Commit Messages - opencode'
+      title: 'STA-4011 Linux Claude Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'completed-hook' })
   })
@@ -204,7 +202,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
       completedHookAgent: 'claude',
       completedHookRun: run1,
       currentRun: run2,
-      title: 'STA-4011 Linux Codex Commit Messages - opencode'
+      title: 'STA-4011 Linux Claude Commit Messages - opencode'
     })
     expect(identity).toMatchObject({
       agent: 'opencode',
@@ -220,7 +218,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
       completedHookAgent: 'claude',
       completedHookRun: otherAuthority,
       currentRun: run2,
-      title: 'STA-4011 Linux Codex Commit Messages - opencode'
+      title: 'STA-4011 Linux Claude Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'completed-hook' })
   })
@@ -229,7 +227,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
     const identity = resolveCanonicalPaneAgentIdentity({
       completedHookAgent: 'claude',
       currentRun: run2,
-      title: 'STA-4011 Linux Codex Commit Messages - opencode'
+      title: 'STA-4011 Linux Claude Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'completed-hook' })
   })

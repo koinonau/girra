@@ -19,7 +19,7 @@ const FIRST_LEAF_ID = '11111111-1111-4111-8111-111111111111'
 const SECOND_LEAF_ID = '22222222-2222-4222-8222-222222222222'
 const NOW = 10_000
 
-const TAB: Pick<TerminalTab, 'id' | 'title'> = { id: TAB_ID, title: 'Codex' }
+const TAB: Pick<TerminalTab, 'id' | 'title'> = { id: TAB_ID, title: 'OpenCode' }
 
 /** Build a canonical pane-status fixture for one tab leaf. */
 function entry(
@@ -35,7 +35,7 @@ function entry(
     updatedAt: NOW,
     stateStartedAt: NOW,
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'opencode',
     ...overrides
   }
 }
@@ -63,12 +63,13 @@ describe('resolveTerminalTabActivityStatus', () => {
   // row and the tab glyph claimed a question nobody was asking.
   it('does not paint a stale self-authored action-required title as a live question', () => {
     const done = entry(FIRST_LEAF_ID, 'done', {
+      agentType: 'pi',
       updatedAt: NOW - AGENT_STATUS_STALE_AFTER_MS - 1,
       stateStartedAt: NOW - AGENT_STATUS_STALE_AFTER_MS - 1
     })
     expect(
       resolveTerminalTabActivityStatus({
-        tab: { id: TAB_ID, title: 'Codex - action required' },
+        tab: { id: TAB_ID, title: 'Pi - action required' },
         agentStatusByPaneKey: { [done.paneKey]: done },
         ptyIdsByTabId: LIVE_PTY
       })
@@ -90,7 +91,7 @@ describe('resolveTerminalTabActivityStatus', () => {
     'keeps native permission %s titles after hook freshness expires',
     (surface) => {
       const stale = entry(FIRST_LEAF_ID, 'working', {
-        agentType: 'gemini',
+        agentType: 'pi',
         updatedAt: NOW - AGENT_STATUS_STALE_AFTER_MS - 1
       })
       expect(
@@ -184,7 +185,7 @@ describe('resolveTerminalTabActivityStatus', () => {
     vi.setSystemTime(31 * 60 * 1000)
     expect(
       resolveTerminalTabActivityStatus({
-        tab: { id: TAB_ID, title: 'Codex working' },
+        tab: { id: TAB_ID, title: 'OpenCode working' },
         agentStatusByPaneKey: { [stale.paneKey]: stale },
         ptyIdsByTabId: LIVE_PTY
       })
@@ -195,7 +196,7 @@ describe('resolveTerminalTabActivityStatus', () => {
     const restored = entry(FIRST_LEAF_ID, 'working', { restoredUnconfirmed: true })
     expect(
       resolveTerminalTabActivityStatus({
-        tab: { id: TAB_ID, title: 'Codex working' },
+        tab: { id: TAB_ID, title: 'OpenCode working' },
         agentStatusByPaneKey: { [restored.paneKey]: restored },
         ptyIdsByTabId: LIVE_PTY
       })
@@ -208,7 +209,7 @@ describe('resolveTerminalTabActivityStatus', () => {
       resolveTerminalTabActivityStatus({
         tab: TAB,
         agentStatusByPaneKey: { [restored.paneKey]: restored },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'Codex working', 2: 'Claude working' } },
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'OpenCode working', 2: 'Claude working' } },
         ptyIdsByTabId: LIVE_PTY,
         terminalLayout: {
           root: {
@@ -254,8 +255,8 @@ describe('resolveTerminalTabActivityStatus', () => {
   it('does not treat a preserved title on a sleeping tab as activity', () => {
     expect(
       resolveTerminalTabActivityStatus({
-        tab: { id: TAB_ID, title: 'Codex working' },
-        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'Codex working' } },
+        tab: { id: TAB_ID, title: 'OpenCode working' },
+        runtimePaneTitlesByTabId: { [TAB_ID]: { 1: 'OpenCode working' } },
         ptyIdsByTabId: { [TAB_ID]: [] }
       })
     ).toBe('inactive')

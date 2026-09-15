@@ -130,7 +130,7 @@ describe('agentStatus:getSnapshot IPC', () => {
         paneKey: CHILD_PANE_KEY,
         state: 'working',
         prompt: 'native chat row',
-        agentType: 'codex',
+        agentType: 'opencode',
         connectionId: null,
         structuredHost: 'owned',
         receivedAt: 1_700_000_001_000,
@@ -150,7 +150,7 @@ describe('agentStatus:getSnapshot IPC', () => {
         paneKey: PANE_KEY,
         state: 'done',
         prompt: 'parent',
-        agentType: 'codex',
+        agentType: 'opencode',
         connectionId: null,
         receivedAt: 1_700_000_000_000,
         stateStartedAt: 1_699_999_999_000
@@ -159,7 +159,7 @@ describe('agentStatus:getSnapshot IPC', () => {
         paneKey: CHILD_PANE_KEY,
         state: 'done',
         prompt: 'child',
-        agentType: 'codex',
+        agentType: 'opencode',
         connectionId: null,
         receivedAt: 1_700_000_001_000,
         stateStartedAt: 1_700_000_000_500
@@ -221,7 +221,7 @@ describe('agentStatus:inferInterrupt IPC', () => {
       baselineUpdatedAt: 1_000,
       baselineStateStartedAt: 900,
       baselinePrompt: 'long task',
-      baselineAgentType: 'codex',
+      baselineAgentType: 'opencode',
       intent: 'ctrl-c'
     }
 

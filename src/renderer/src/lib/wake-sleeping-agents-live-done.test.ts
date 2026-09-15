@@ -40,7 +40,7 @@ describe('background wake of a finished live checkpoint', () => {
         paneKey: 'tab-done:leaf-1',
         tabId: 'tab-done',
         worktreeId: 'wt-1',
-        agent: 'codex',
+        agent: 'claude',
         providerSession: { key: 'session_id', id: 'finished-session' },
         state: 'done',
         origin: 'live',

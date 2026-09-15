@@ -42,7 +42,7 @@ const NATIVE_ROWS = [
     pid: 200,
     ppid: 100,
     name: 'node.exe',
-    commandLine: 'node C:/Users/dev/AppData/codex/bin/codex.js'
+    commandLine: 'node C:/Users/dev/AppData/opencode/bin/opencode.js'
   }
 ]
 

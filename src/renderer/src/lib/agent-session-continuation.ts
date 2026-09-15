@@ -19,7 +19,6 @@ export type AgentSessionContinuationRequest = {
   source: AgentSessionContinuationSource
   worktreeId: string
   groupId?: string | null
-  workspacePath: string
   initialCwd?: string | null
   launchSource: LaunchSource
 }

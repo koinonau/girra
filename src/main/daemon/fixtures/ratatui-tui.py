@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Simulates a ratatui alt-screen TUI (like Codex) for reattach testing.
+"""Simulates a ratatui alt-screen TUI for reattach testing.
 
 Behavior mimicked:
 - Enters alternate screen buffer

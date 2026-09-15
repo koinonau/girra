@@ -256,11 +256,11 @@ describe('agent completion no-evidence inspection cadence', () => {
     const inspectProcess = vi.fn(async () => processResult(null, false))
     const { coordinator, dispatchCompletion } = createCoordinator(inspectProcess)
 
-    coordinator.observeHookStatus({ state: 'working', prompt: '', agentType: 'codex' })
+    coordinator.observeHookStatus({ state: 'working', prompt: '', agentType: 'opencode' })
     await vi.advanceTimersByTimeAsync(5_000)
     expect(inspectProcess).not.toHaveBeenCalled()
 
-    coordinator.observeHookStatus({ state: 'done', prompt: '', agentType: 'codex' })
+    coordinator.observeHookStatus({ state: 'done', prompt: '', agentType: 'opencode' })
     expect(dispatchCompletion).not.toHaveBeenCalled()
     await vi.advanceTimersByTimeAsync(1_500)
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
@@ -281,11 +281,11 @@ describe('agent completion no-evidence inspection cadence', () => {
   })
 
   it('keeps a recognized agent on the full active cadence on a costly host', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('opencode'))
     const { coordinator } = createCoordinator(inspectProcess)
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(60_000)
 
     // ~60s / 750ms ≈ 78: agent-finish detection must not be relaxed.
@@ -300,7 +300,7 @@ describe('agent completion no-evidence inspection cadence', () => {
     coordinator.startProcessTracking()
     // Idle at the relaxed cadence, then an agent starts and prints output.
     await vi.advanceTimersByTimeAsync(20_000)
-    foregroundProcess = 'codex'
+    foregroundProcess = 'opencode'
     coordinator.observeOutputActivity()
     await vi.advanceTimersByTimeAsync(2_000)
     expect(inspectProcess).toHaveBeenCalled()
@@ -312,7 +312,7 @@ describe('agent completion no-evidence inspection cadence', () => {
     await vi.advanceTimersByTimeAsync(3_000)
     expect(inspectProcess.mock.calls.length).toBeGreaterThan(callsAtExit)
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex', {
+    expect(dispatchCompletion).toHaveBeenCalledWith('opencode', {
       source: 'process-exit',
       quietedHookDone: false,
       terminalIdleConfirmed: true

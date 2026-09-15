@@ -90,7 +90,7 @@ export function writeTerminalOutputImpl(
       if (options.holdForeground) {
         // Why: synchronized-output start/body chunks contain transient cursor moves; holding them prevents Chromium from rasterizing those states.
         if (options.latencySensitive === true) {
-          // Why: Codex composer redraws can split the end marker from the input-triggered frame; keep cursor protection without a human-visible fallback delay on typed chars.
+          // Why: agent composer redraws can split the end marker from the input-triggered frame; keep cursor protection without a human-visible fallback delay on typed chars.
           queued.foregroundHoldSafetyDelayMs = Math.min(
             queued.foregroundHoldSafetyDelayMs,
             LATENCY_SENSITIVE_FOREGROUND_HOLD_SAFETY_DELAY_MS

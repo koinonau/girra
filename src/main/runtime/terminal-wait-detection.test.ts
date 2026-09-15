@@ -1,28 +1,25 @@
 import { describe, expect, it } from 'vitest'
-import {
-  detectTerminalWaitBlockedReason,
-  isKnownReadyPromptPreview
-} from './terminal-wait-detection'
+import { detectTerminalWaitBlockedReason } from './terminal-wait-detection'
 import { buildTerminalWaitText } from './terminal-wait-tail-state'
 
-// Why these shapes: Codex agents working on Orca print `rg` hits from this very detector and its
+// Why these shapes: agents working on Orca print `rg` hits from this very detector and its
 // specs, so quoted prompt wording lands in scrollback while the terminal sits at its input box.
 const QUOTED_DETECTOR_SOURCE_LINE =
   "└   if (hooksindex !== -1 && normalized.includes('press enter to confirm', hooksindex)) {"
 const QUOTED_PERMISSION_FIXTURE_LINE =
   "  └ 236:      'Permission required\\nThis command requires permission\\nAllow once\\nAllow always\\nReject\\n',"
 
-function codexIdleScreen(): string[] {
+function agentIdleScreen(): string[] {
   return [
     '• Done. The detector bounding is in place and the suite passes.',
     '',
-    '› Ask Codex to do anything',
+    '> Try "refactor this function"',
     '',
-    '  gpt-6-astra medium · ~/orca/workspaces/orca/fix-wait-detector-scrollback'
+    '  claude-opus medium · ~/orca/workspaces/orca/fix-wait-detector-scrollback'
   ]
 }
 
-function codexScrollback(quotedLines: string[], trailingLineCount: number): string[] {
+function agentScrollback(quotedLines: string[], trailingLineCount: number): string[] {
   const lines: string[] = [
     '• Explored',
     '  └ Search press enter to confirm in src/main/runtime',
@@ -35,7 +32,7 @@ function codexScrollback(quotedLines: string[], trailingLineCount: number): stri
     ...quotedLines
   ]
   for (let index = 0; index < trailingLineCount; index += 1) {
-    lines.push(`    ${index}: unrelated codex narration about hook wiring and sandbox policy`)
+    lines.push(`    ${index}: unrelated agent narration about hook wiring and sandbox policy`)
   }
   return lines
 }
@@ -45,20 +42,20 @@ function waitTextFor(lines: string[]): string {
 }
 
 describe('detectTerminalWaitBlockedReason scrollback bounding', () => {
-  it('ignores detector source quoted by rg output far above an idle Codex input box', () => {
+  it('ignores detector source quoted by rg output far above an idle agent input box', () => {
     const waitText = waitTextFor([
-      ...codexScrollback([QUOTED_DETECTOR_SOURCE_LINE], 300),
-      ...codexIdleScreen()
+      ...agentScrollback([QUOTED_DETECTOR_SOURCE_LINE], 300),
+      ...agentIdleScreen()
     ])
 
     expect(waitText).toContain('press enter to confirm')
     expect(detectTerminalWaitBlockedReason(waitText)).toBeNull()
   })
 
-  it('ignores a quoted permission fixture in scrollback above an idle Codex input box', () => {
+  it('ignores a quoted permission fixture in scrollback above an idle agent input box', () => {
     const waitText = waitTextFor([
-      ...codexScrollback([QUOTED_PERMISSION_FIXTURE_LINE], 300),
-      ...codexIdleScreen()
+      ...agentScrollback([QUOTED_PERMISSION_FIXTURE_LINE], 300),
+      ...agentIdleScreen()
     ])
 
     expect(waitText.toLowerCase()).toContain('allow once')
@@ -68,27 +65,16 @@ describe('detectTerminalWaitBlockedReason scrollback bounding', () => {
   it('ignores quoted prompt wording just above the live-dialog window', () => {
     // Why 10: with the 3-line idle screen the quoted lines sit 13-14 non-blank lines from the bottom.
     const waitText = waitTextFor([
-      ...codexScrollback([QUOTED_DETECTOR_SOURCE_LINE, QUOTED_PERMISSION_FIXTURE_LINE], 10),
-      ...codexIdleScreen()
+      ...agentScrollback([QUOTED_DETECTOR_SOURCE_LINE, QUOTED_PERMISSION_FIXTURE_LINE], 10),
+      ...agentIdleScreen()
     ])
 
     expect(detectTerminalWaitBlockedReason(waitText)).toBeNull()
   })
-
-  it('does not let quoted scrollback wording veto a Codex ready header', () => {
-    const waitText = waitTextFor([
-      ...codexScrollback([QUOTED_PERMISSION_FIXTURE_LINE], 40),
-      ' >_ OpenAI Codex (v0.153.3)',
-      ' model:       gpt-6-astra medium   /model to change',
-      ' directory:   ~/orca/workspaces/orca/fix-wait-detector-scrollback'
-    ])
-
-    expect(isKnownReadyPromptPreview(waitText)).toBe(true)
-  })
 })
 
 // Real dialog text: terminal-creation-and-readiness-part-07.spec.ts and agent-status-and-waits.spec.ts.
-const LIVE_CODEX_PROMPTS: { name: string; lines: string[]; reason: string }[] = [
+const LIVE_AGENT_PROMPTS: { name: string; lines: string[]; reason: string }[] = [
   {
     name: 'hooks review',
     lines: [
@@ -126,15 +112,6 @@ const LIVE_CODEX_PROMPTS: { name: string; lines: string[]; reason: string }[] = 
     reason: 'agent-cwd-prompt'
   },
   {
-    name: 'model migration',
-    lines: [
-      'Codex just got an upgrade. Introducing gpt-5.1-codex-max.',
-      'We recommend switching from gpt-5-codex to gpt-5.1-codex-max.',
-      'Press enter to continue'
-    ],
-    reason: 'codex-model-migration-prompt'
-  },
-  {
     name: 'grant permissions',
     lines: [
       'Would you like to grant these permissions?',
@@ -158,10 +135,10 @@ const LIVE_CODEX_PROMPTS: { name: string; lines: string[]; reason: string }[] = 
 ]
 
 describe('detectTerminalWaitBlockedReason live prompts', () => {
-  for (const prompt of LIVE_CODEX_PROMPTS) {
+  for (const prompt of LIVE_AGENT_PROMPTS) {
     it(`still blocks on a live ${prompt.name} prompt after long scrollback`, () => {
       const waitText = waitTextFor([
-        ...codexScrollback([QUOTED_DETECTOR_SOURCE_LINE, QUOTED_PERMISSION_FIXTURE_LINE], 300),
+        ...agentScrollback([QUOTED_DETECTOR_SOURCE_LINE, QUOTED_PERMISSION_FIXTURE_LINE], 300),
         ...prompt.lines
       ])
 
@@ -172,11 +149,11 @@ describe('detectTerminalWaitBlockedReason live prompts', () => {
       // Why: the visible-screen probe joins raw rows, so blank rows between dialog lines must not eat the window.
       const spaced = prompt.lines.flatMap((line) => [line, '', ''])
       const screen = [
-        ' >_ OpenAI Codex (v0.153.3)',
+        ' Claude Code v2.1.0',
         '',
         ...spaced,
         '',
-        '  gpt-6-astra medium · ~/orca/workspaces/orca/fix-wait-detector-scrollback',
+        '  claude-opus medium · ~/orca/workspaces/orca/fix-wait-detector-scrollback',
         ''
       ].join('\n')
 
@@ -188,9 +165,8 @@ describe('detectTerminalWaitBlockedReason live prompts', () => {
     const waitText = waitTextFor([
       'Update available! 0.131.0 -> 0.132.0',
       'Press enter to continue',
-      ' >_ OpenAI Codex (v0.132.0)',
-      ' model:       gpt-5.5 high   /model to change',
-      ' directory:   ~/orca/workspaces/orca/cli-debug',
+      ' Claude Code v2.1.0',
+      ' ~/orca/workspaces/orca/cli-debug',
       'Hooks need review',
       'Press enter to confirm'
     ])
@@ -199,10 +175,10 @@ describe('detectTerminalWaitBlockedReason live prompts', () => {
   })
 })
 
-// Why: these matchers never inspect the pane's agent, so a Codex-named reason on a non-Codex screen
-// reaches the user verbatim through the CLI and the worker receipt's "Agent startup blocked:" line.
-describe('detectTerminalWaitBlockedReason on non-Codex agents', () => {
-  const NON_CODEX_PROMPTS: { name: string; lines: string[]; reason: string }[] = [
+// Why: these matchers never inspect the pane's agent, so an agent-named reason would reach the user
+// verbatim through the CLI and the worker receipt's "Agent startup blocked:" line.
+describe('detectTerminalWaitBlockedReason agent-neutral reasons', () => {
+  const AGENT_PROMPTS: { name: string; lines: string[]; reason: string }[] = [
     {
       name: 'an OpenCode workspace trust dialog',
       lines: [
@@ -268,28 +244,9 @@ describe('detectTerminalWaitBlockedReason on non-Codex agents', () => {
     }
   ]
 
-  // Why: the reason was previously picked by looking for 'codex' in 600 chars of scrollback, so any
-  // agent that merely narrated about Codex handed its user a Codex label.
-  it('does not borrow a Codex label from scrollback that only mentions Codex', () => {
-    const waitText = waitTextFor([
-      'OpenCode 1.0.3',
-      'I read src/codex-notes.md for you.',
-      'This action runs outside the sandbox.',
-      'Press enter to confirm or esc to go back'
-    ])
-
-    expect(waitText.toLowerCase()).toContain('codex')
-    expect(detectTerminalWaitBlockedReason(waitText)).toBe('agent-interactive-prompt')
-  })
-
-  for (const prompt of NON_CODEX_PROMPTS) {
+  for (const prompt of AGENT_PROMPTS) {
     it(`reports an agent-neutral reason for ${prompt.name}`, () => {
-      const waitText = waitTextFor(prompt.lines)
-      const reason = detectTerminalWaitBlockedReason(waitText)
-
-      expect(waitText.toLowerCase()).not.toContain('codex')
-      expect(reason).toBe(prompt.reason)
-      expect(reason?.startsWith('codex-')).toBe(false)
+      expect(detectTerminalWaitBlockedReason(waitTextFor(prompt.lines))).toBe(prompt.reason)
     })
   }
 })

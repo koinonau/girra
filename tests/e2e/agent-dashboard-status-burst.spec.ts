@@ -56,8 +56,8 @@ test('keeps the visible Agent Dashboard interactive during a 100-pane status rep
           .getState()
           .setAgentStatus(
             paneKey,
-            { state: 'working', prompt: `Baseline task ${index}`, agentType: 'codex' },
-            'Codex',
+            { state: 'working', prompt: `Baseline task ${index}`, agentType: 'claude' },
+            'Claude',
             { updatedAt: baseTime - 1, stateStartedAt: baseTime - 1 },
             { tabId: tab.id, terminalHandle, worktreeId }
           )
@@ -92,7 +92,7 @@ test('keeps the visible Agent Dashboard interactive during a 100-pane status rep
           ...pane,
           state: 'done',
           prompt: `Completed task ${index}`,
-          agentType: 'codex',
+          agentType: 'claude',
           lastAssistantMessage: `Completed ${index}`,
           receivedAt,
           stateStartedAt: receivedAt

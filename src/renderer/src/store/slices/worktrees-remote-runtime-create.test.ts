@@ -237,17 +237,17 @@ describe('worktree remote runtime mutations', () => {
         undefined,
         undefined,
         undefined,
-        'codex',
+        'opencode',
         undefined,
         undefined,
         undefined,
         undefined,
         undefined,
         {
-          command: "codex 'summarize repo'",
+          command: "opencode 'summarize repo'",
           env: { ORCA_AGENT_MODE: 'direct' },
           launchConfig: {
-            agentCommand: 'codex',
+            agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
             agentEnv: { ORCA_AGENT_MODE: 'direct' }
           }
@@ -262,11 +262,11 @@ describe('worktree remote runtime mutations', () => {
           name: 'agent-startup',
           setupDecision: 'skip',
           displayName: 'Launch agent',
-          createdWithAgent: 'codex',
-          startupCommand: "codex 'summarize repo'",
+          createdWithAgent: 'opencode',
+          startupCommand: "opencode 'summarize repo'",
           startupEnv: { ORCA_AGENT_MODE: 'direct' },
           startupLaunchConfig: {
-            agentCommand: 'codex',
+            agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
             agentEnv: { ORCA_AGENT_MODE: 'direct' }
           },
@@ -295,7 +295,7 @@ describe('worktree remote runtime mutations', () => {
     } as Partial<AppState>)
     const createWorktree = store.getState().createWorktree
     const args: Parameters<typeof createWorktree> = ['repo1', 'task-draft', undefined, 'inherit']
-    args[9] = 'codex'
+    args[9] = 'opencode'
     args[24] = { startupDraft: 'https://github.com/stablyai/orca/issues/12' }
 
     await createWorktree(...args)
@@ -304,7 +304,7 @@ describe('worktree remote runtime mutations', () => {
       expect.objectContaining({
         method: 'worktree.create',
         params: expect.objectContaining({
-          createdWithAgent: 'codex',
+          createdWithAgent: 'opencode',
           startupDraft: 'https://github.com/stablyai/orca/issues/12'
         })
       })

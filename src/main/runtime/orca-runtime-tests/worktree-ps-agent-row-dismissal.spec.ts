@@ -25,7 +25,7 @@ function wiredRuntime(incarnationId?: string): {
       {
         tabId: 'tab-dismiss',
         worktreeId: TEST_WORKTREE_ID,
-        title: 'Codex',
+        title: 'Claude',
         activeLeafId: LEAF_ID,
         layout: null
       }
@@ -53,7 +53,7 @@ function wiredRuntime(incarnationId?: string): {
 function emitWorkingStatus(runtime: OrcaRuntimeService, sequence: number): void {
   runtime.onPtyData(
     'dismiss-pty',
-    '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07',
+    '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"claude"}\x07',
     sequence
   )
 }
@@ -93,7 +93,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
 
       runtime.onPtyData(
         'dismiss-pty',
-        '\x1b]9999;{"state":"done","prompt":"ship it","agentType":"codex"}\x07',
+        '\x1b]9999;{"state":"done","prompt":"ship it","agentType":"claude"}\x07',
         3
       )
       expect(republish).toHaveBeenCalledWith(TEST_WORKTREE_ID)
@@ -149,7 +149,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
         tabId: 'tab-dismiss',
         worktreeId: TEST_WORKTREE_ID,
         providerSession: { key: 'session_id', id: 'provider-session-1' },
-        payload: { state: 'working', prompt: 'ship it', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'ship it', agentType: 'claude' }
       },
       null
     )
@@ -159,7 +159,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
         {
           tabId: 'tab-reminted',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: REMINTED_LEAF_ID,
           layout: null
         }
@@ -188,7 +188,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
               parentTabId: 'tab-reminted',
               leafId: REMINTED_LEAF_ID,
               ptyId: 'dismiss-pty',
-              title: 'Codex',
+              title: 'Claude',
               isActive: true
             }
           ]
@@ -254,7 +254,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
         {
           tabId: 'legacy-tab',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: 'pane:7',
           layout: null
         }
@@ -283,7 +283,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
               parentTabId: 'legacy-tab',
               leafId: 'pane:7',
               ptyId: 'legacy-pty',
-              title: 'Codex',
+              title: 'Claude',
               isActive: true
             }
           ]
@@ -292,7 +292,7 @@ describe('worktree ps follows a dismissal out of the agent-status store', () => 
     })
     runtime.onPtyData(
       'legacy-pty',
-      '\x1b]9999;{"state":"working","prompt":"legacy task","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"legacy task","agentType":"claude"}\x07',
       1
     )
 

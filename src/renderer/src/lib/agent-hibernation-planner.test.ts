@@ -127,7 +127,7 @@ describe('agent sleep planner', () => {
         snapshot({ agentStatusByPaneKey: { [piWithoutTranscript.paneKey]: piWithoutTranscript } })
       )
     ).toEqual([])
-    const unsupported = entry({ agentType: 'amp' })
+    const unsupported = entry({ agentType: 'not-an-agent' })
     expect(
       plannedWorktrees(snapshot({ agentStatusByPaneKey: { [unsupported.paneKey]: unsupported } }))
     ).toEqual([])

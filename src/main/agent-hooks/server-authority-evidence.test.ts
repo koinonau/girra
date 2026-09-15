@@ -26,7 +26,7 @@ describe('AgentHookServer authority evidence', () => {
       tabId: 'tab-authority',
       worktreeId: 'repo::before',
       connectionId: 'ssh-target',
-      payload: { state: 'working', prompt: 'before', agentType: 'codex' },
+      payload: { state: 'working', prompt: 'before', agentType: 'opencode' },
       receivedAt: 100,
       stateStartedAt: 100
     } satisfies AgentHookEventPayload & { receivedAt: number; stateStartedAt: number }
@@ -63,7 +63,7 @@ describe('AgentHookServer authority evidence', () => {
         launchToken: 'launch-after-restart',
         tabId: 'tab-authority',
         worktreeId: 'repo::after',
-        payload: { state: 'working', prompt: 'after', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'after', agentType: 'opencode' }
       },
       'ssh-target'
     )
@@ -121,7 +121,7 @@ describe('AgentHookServer authority evidence', () => {
         launchToken: 'launch-before-restart',
         tabId: 'tab-authority',
         worktreeId: 'repo::current',
-        payload: { state: 'working', prompt: 'current', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'current', agentType: 'opencode' }
       },
       'ssh-target'
     )
@@ -140,7 +140,7 @@ describe('AgentHookServer authority evidence', () => {
         paneKey: SECOND_PANE_KEY,
         launchToken: 'launch-before-restart',
         tabId: 'tab-authority-2',
-        payload: { state: 'working', prompt: 'duplicate', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'duplicate', agentType: 'opencode' }
       },
       'ssh-target'
     )
@@ -191,7 +191,7 @@ describe('AgentHookServer authority evidence', () => {
       tabId: 'tab-authority',
       worktreeId: 'repo::before',
       connectionId: 'ssh-target',
-      payload: { state: 'working', prompt: 'before', agentType: 'codex' },
+      payload: { state: 'working', prompt: 'before', agentType: 'opencode' },
       receivedAt: 100,
       stateStartedAt: 100
     } satisfies AgentHookEventPayload & { receivedAt: number; stateStartedAt: number }
@@ -204,7 +204,7 @@ describe('AgentHookServer authority evidence', () => {
         launchToken,
         tabId: 'tab-authority',
         worktreeId: 'repo::current',
-        payload: { state: 'working', prompt: 'current', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'current', agentType: 'opencode' }
       },
       'ssh-target'
     )

@@ -6,4 +6,4 @@
    5    2    0    -1 I    [kworker/R-sync_wq]
    6    2    0    -1 I    [kworker/R-slub_]
  100    1  100   100 Ss+  /bin/bash -l
- 101  100  101   101 S+   node /opt/codex
+ 101  100  101   101 S+   node /opt/opencode

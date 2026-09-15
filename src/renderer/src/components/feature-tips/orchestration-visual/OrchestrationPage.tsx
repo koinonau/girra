@@ -2,7 +2,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { JSX } from 'react'
 import { ChevronDown, Workflow } from 'lucide-react'
-import { ClaudeIcon, OpenAIIcon } from '@/components/status-bar/icons'
+import { ClaudeIcon } from '@/components/status-bar/icons'
+import { OpenCodeIcon } from '@/lib/agent-icon-glyphs'
 import {
   BUBBLE_FLIGHT_MS,
   BUBBLE_GAP_MS,
@@ -26,7 +27,7 @@ import { translate } from '@/i18n/i18n'
 // dispatches a message to them. This mirrors the "agents arrive when assigned"
 // reading the design wants.
 const INITIAL_CHILD_PENDING: RowPending = {
-  'child-codex': true,
+  'child-opencode': true,
   'child-claude': true
 }
 
@@ -77,11 +78,11 @@ export function OrchestrationPage(props: {
       arrows.innerHTML = ''
       return
     }
-    const codexEl = stage.querySelector('[data-orchestration-card="child"]')
+    const openCodeEl = stage.querySelector('[data-orchestration-card="child"]')
     const claudeEl = stage.querySelector('[data-orchestration-card="child-claude"]')
     const paths: string[] = []
-    if (codexEl instanceof HTMLElement) {
-      paths.push(arrowPathFromCoordTo(coordEl, codexEl, stageRect))
+    if (openCodeEl instanceof HTMLElement) {
+      paths.push(arrowPathFromCoordTo(coordEl, openCodeEl, stageRect))
     }
     if (claudeEl instanceof HTMLElement) {
       paths.push(arrowPathFromCoordTo(coordEl, claudeEl, stageRect))
@@ -332,16 +333,16 @@ export function OrchestrationPage(props: {
                 childPadding
                 rows={[
                   <AgentRow
-                    key="child-codex"
-                    agentKey="child-codex"
-                    icon={<OpenAIIcon size={13} />}
-                    state={rowState['child-codex']}
-                    message={rowMessages['child-codex']}
-                    flashKey={rowFlash['child-codex'] ?? 0}
-                    pending={rowPending['child-codex']}
+                    key="child-opencode"
+                    agentKey="child-opencode"
+                    icon={<OpenCodeIcon size={13} />}
+                    state={rowState['child-opencode']}
+                    message={rowMessages['child-opencode']}
+                    flashKey={rowFlash['child-opencode'] ?? 0}
+                    pending={rowPending['child-opencode']}
                     spawnRow
                     registerRef={(node) => {
-                      rowRefs.current['child-codex'] = node
+                      rowRefs.current['child-opencode'] = node
                     }}
                   />
                 ]}

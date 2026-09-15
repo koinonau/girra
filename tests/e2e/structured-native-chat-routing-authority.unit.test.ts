@@ -52,7 +52,7 @@ const blockers: StructuredNativeChatBlocker[] = [
 
 describe('shared feasibility owns every caller decision', () => {
   it.each(placements)('orchestration cannot override the shared verdict for %j', (placement) => {
-    for (const agent of ['claude', 'codex', 'grok', 'openclaude'] as const) {
+    for (const agent of ['claude', 'claude-agent-teams', 'opencode', 'pi'] as const) {
       for (const customized of [false, true]) {
         const input = {
           params: { agent, ...placement },
@@ -87,7 +87,7 @@ describe('shared feasibility owns every caller decision', () => {
   })
 
   it('renderer presentation cannot override shared feasibility', () => {
-    for (const agent of ['claude', 'codex', 'grok', 'openclaude'] as const) {
+    for (const agent of ['claude', 'claude-agent-teams', 'opencode', 'pi'] as const) {
       for (const executionHostId of ['local', 'ssh:host-1']) {
         for (const promptDelivery of ['auto-submit', 'draft'] as const) {
           const input: AgentLaunchRoutingInput = {

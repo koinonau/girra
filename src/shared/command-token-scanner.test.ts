@@ -19,21 +19,23 @@ function getRegexWhitespaceSplitCalls(split: ReturnType<typeof vi.spyOn>): unkno
 describe('command token scanner', () => {
   it('extracts a first command token across pasted whitespace without regex splitting', () => {
     const split = vi.spyOn(String.prototype, 'split')
-    const command = [' ', String.fromCharCode(160), 'codex\t--resume'].join('')
+    const command = [' ', String.fromCharCode(160), 'opencode\t--resume'].join('')
 
-    expect(getFirstCommandToken(command)).toBe('codex')
+    expect(getFirstCommandToken(command)).toBe('opencode')
     expect(getRegexWhitespaceSplitCalls(split)).toHaveLength(0)
   })
 
   it('preserves quoted command paths with spaces', () => {
-    expect(getFirstCommandToken('"C:\\Program Files\\Orca\\codex.cmd" --resume')).toBe(
-      'C:\\Program Files\\Orca\\codex.cmd'
+    expect(getFirstCommandToken('"C:\\Program Files\\Orca\\opencode.cmd" --resume')).toBe(
+      'C:\\Program Files\\Orca\\opencode.cmd'
     )
   })
 
   it('extracts path basenames without allocating path segment arrays', () => {
-    expect(getCommandTokenPathBasename('C:\\Program Files\\Orca\\codex.cmd')).toBe('codex.cmd')
-    expect(getCommandTokenPathBasename('/usr/local/bin/omp')).toBe('omp')
+    expect(getCommandTokenPathBasename('C:\\Program Files\\Orca\\opencode.cmd')).toBe(
+      'opencode.cmd'
+    )
+    expect(getCommandTokenPathBasename('/usr/local/bin/pi')).toBe('pi')
   })
 
   it('bounds pathological single-token commands', () => {

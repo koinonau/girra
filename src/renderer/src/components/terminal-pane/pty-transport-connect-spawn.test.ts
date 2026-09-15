@@ -100,21 +100,6 @@ describe('createIpcPtyTransport', () => {
     )
   })
 
-  it('forwards automatic resume provenance to the PTY spawn', async () => {
-    const { createIpcPtyTransport } = await import('./pty-transport')
-    const spawn = window.api.pty.spawn as unknown as ReturnType<typeof vi.fn>
-    const resumeProviderSession = {
-      key: 'session_id' as const,
-      id: 'session-a',
-      transcriptPath: '/Users/example/.codex/sessions/2026/07/20/rollout-a.jsonl'
-    }
-    const transport = createIpcPtyTransport({ resumeProviderSession })
-
-    await transport.connect({ url: '', callbacks: {} })
-
-    expect(spawn).toHaveBeenCalledWith(expect.objectContaining({ resumeProviderSession }))
-  })
-
   it('exposes the connection identity captured at transport creation', async () => {
     const { createIpcPtyTransport } = await import('./pty-transport')
 
@@ -245,30 +230,6 @@ describe('createIpcPtyTransport', () => {
       startupCwdFallback: { kind: 'worktree', cwd: '/repo/app' }
     })
     transport.disconnect()
-  })
-
-  it('forwards the declined-resume signal on fresh and cold-restore spawns alike', async () => {
-    const { createIpcPtyTransport } = await import('./pty-transport')
-    const spawn = window.api.pty.spawn as unknown as ReturnType<typeof vi.fn>
-    spawn.mockResolvedValueOnce({ id: 'pty-1', agentResumeUnavailable: true })
-
-    const freshTransport = createIpcPtyTransport({})
-    await expect(freshTransport.connect({ url: '', callbacks: {} })).resolves.toEqual({
-      id: 'pty-1',
-      agentResumeUnavailable: true
-    })
-    freshTransport.disconnect()
-
-    spawn.mockResolvedValueOnce({
-      id: 'pty-2',
-      coldRestore: { scrollback: 'recovered', cwd: '/repo/app' },
-      agentResumeUnavailable: true
-    })
-    const coldTransport = createIpcPtyTransport({})
-    await expect(coldTransport.connect({ url: '', callbacks: {} })).resolves.toEqual(
-      expect.objectContaining({ id: 'pty-2', agentResumeUnavailable: true })
-    )
-    coldTransport.disconnect()
   })
 
   it('passes startup commands through PTY spawn instead of writing them after connect', async () => {

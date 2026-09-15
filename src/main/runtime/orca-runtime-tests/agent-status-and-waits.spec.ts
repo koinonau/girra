@@ -23,7 +23,7 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
+      command: 'claude',
       title: 'worker'
     })
     const spawnedEnv =
@@ -87,8 +87,8 @@ describe('OrcaRuntimeService', () => {
 
     runtime.onPtyData(
       'pty-1',
-      '\x1b]9999;{"state":"working","prompt":"one","agentType":"codex"}\x07' +
-        '\x1b]9999;{"state":"done","prompt":"two","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"one","agentType":"claude"}\x07' +
+        '\x1b]9999;{"state":"done","prompt":"two","agentType":"claude"}\x07',
       123
     )
 
@@ -99,7 +99,7 @@ describe('OrcaRuntimeService', () => {
         ptyId: 'pty-1',
         paneKey: `tab-1:${leafId}`,
         state: 'working',
-        agentType: 'codex',
+        agentType: 'claude',
         err: expect.any(Error)
       })
     )
@@ -268,7 +268,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex working',
+          title: 'Claude working',
           activeLeafId: leafId,
           layout: null
         }
@@ -325,7 +325,7 @@ describe('OrcaRuntimeService', () => {
       ]
     })
     runtime.onPtyData('pty-1', 'Hooks need review. Press enter to confirm\n', 123)
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 124)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 124)
 
     const [terminal] = (await runtime.listTerminals()).terminals
 
@@ -345,7 +345,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'waiting',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -366,7 +366,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex working',
+          title: 'Claude working',
           activeLeafId: leafId,
           layout: null
         }
@@ -400,7 +400,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'waiting',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -456,7 +456,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -477,7 +477,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex working',
+          title: 'Claude working',
           activeLeafId: leafId,
           layout: null
         }
@@ -513,7 +513,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now - 1000,
           stateStartedAt: now - 1000,
@@ -534,7 +534,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex working',
+          title: 'Claude working',
           activeLeafId: leafId,
           layout: null
         }
@@ -570,7 +570,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now,
@@ -591,7 +591,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex working',
+          title: 'Claude working',
           activeLeafId: leafId,
           layout: null
         }

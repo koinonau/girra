@@ -341,7 +341,7 @@ describe('owned orchestration references', () => {
   it('owns local, folder, worktree, SSH, WSL, remote, and mixed-version placement', () => {
     const reference = readReference('placement-and-remote.md')
 
-    expect(reference).toContain('--worktree current --agent codex')
+    expect(reference).toContain('--worktree current --agent claude')
     expect(squash(reference)).toContain(
       'A worktree selector needs the full `<repo-id>::<path>` value Orca returned, passed as `id:<newFullWorktreeId>`; a bare repo id is not a worktree id'
     )
@@ -377,7 +377,7 @@ describe('owned orchestration references', () => {
       'A Delivery therefore always carries the whole FIFO batch whatever its types, and a `check` without `--wait` hands that batch over unfiltered'
     )
     expect(reference).toContain('send --to dispatch:<dispatch_id>')
-    for (const group of ['@all', '@grok', '@cursor', '@worktree:<id>']) {
+    for (const group of ['@all', '@claude', '@opencode', '@worktree:<id>']) {
       expect(reference).toContain(group)
     }
     expect(reference).toContain('Dispatch lifecycle messages never target groups')

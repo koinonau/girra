@@ -17,20 +17,16 @@ import { FAKE_AGENT_PASTE_END_SCANNER_SOURCE } from './helpers/fake-agent-paste-
 const fakeCliDir = mkdtempSync(path.join(os.tmpdir(), 'orca-e2e-settlement-release-'))
 const cliLedgerPath = path.join(fakeCliDir, 'cli.jsonl')
 const cliEntry = path.join(process.cwd(), 'out', 'cli', 'index.js')
-const fakeCodexCommand = buildFakeAgentCommandOverride(
-  path.join(fakeCliDir, process.platform === 'win32' ? 'codex.cmd' : 'codex')
+const fakeClaudeCommand = buildFakeAgentCommandOverride(
+  path.join(fakeCliDir, process.platform === 'win32' ? 'claude.cmd' : 'claude')
 )
-const fakeCodexSource = `
+const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
 const { spawnSync } = require('node:child_process')
-if (process.argv.slice(2).includes('app-server')) {
-  process.stderr.write("error: unrecognized subcommand 'app-server'\\n")
-  process.exit(2)
-}
 let capability = null
 let acknowledged = false
 ${FAKE_AGENT_PASTE_END_SCANNER_SOURCE}
-process.stdout.write('\\u001b]0;Codex Ready\\u0007OpenAI Codex\\nmodel: e2e\\ndirectory: e2e\\n')
+process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 process.stdin.on('data', (chunk) => {
   const input = chunk.toString()
   const pasteEndScan = scanFakeAgentPasteEnd(fakeAgentPasteEndTail, input)
@@ -43,8 +39,8 @@ process.stdin.on('data', (chunk) => {
     fakeAgentMaybeAck(pasteEndScan, input, (mode) => {
       acknowledged = true
       const message = mode === 'bracketed' ? 'ACK' : 'PASTE_PROTOCOL_ERROR'
-      process.stdout.write('\\u001b]0;Codex Working\\u0007' + message + '\\n')
-      setTimeout(() => process.stdout.write('\\u001b]0;Codex Ready\\u0007'), 10)
+      process.stdout.write('\\u001b]0;Claude working\\u0007' + message + '\\n')
+      setTimeout(() => process.stdout.write('\\u001b]0;Claude ready\\u0007'), 10)
     })
   }
   const encoded = input.match(/ORCA_E2E_WORKER_DONE:([A-Za-z0-9+/=]+)/)?.[1]
@@ -78,14 +74,14 @@ setInterval(() => {}, 60_000)
 `
 
 if (process.platform === 'win32') {
-  writeFileSync(path.join(fakeCliDir, 'fake-codex.js'), fakeCodexSource)
+  writeFileSync(path.join(fakeCliDir, 'fake-claude.js'), fakeClaudeSource)
   writeFileSync(
-    path.join(fakeCliDir, 'codex.cmd'),
-    '@echo off\r\nnode "%~dp0\\fake-codex.js" %*\r\n'
+    path.join(fakeCliDir, 'claude.cmd'),
+    '@echo off\r\nnode "%~dp0\\fake-claude.js" %*\r\n'
   )
 } else {
-  const executable = path.join(fakeCliDir, 'codex')
-  writeFileSync(executable, `#!/usr/bin/env node\n${fakeCodexSource}`)
+  const executable = path.join(fakeCliDir, 'claude')
+  writeFileSync(executable, `#!/usr/bin/env node\n${fakeClaudeSource}`)
   chmodSync(executable, 0o755)
 }
 
@@ -147,11 +143,11 @@ test('compiled CLI rejects false completion then reconciles the dead retained wo
   await orcaPage.evaluate(
     async ({ agentCommand, terminalWindowsShell }) => {
       await window.__store?.getState().updateSettings({
-        agentCmdOverrides: { codex: agentCommand },
+        agentCmdOverrides: { claude: agentCommand },
         terminalWindowsShell
       })
     },
-    { agentCommand: fakeCodexCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
+    { agentCommand: fakeClaudeCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
   )
   const worktreeId = await waitForActiveWorktree(orcaPage)
   await ensureTerminalVisible(orcaPage)
@@ -188,7 +184,7 @@ test('compiled CLI rejects false completion then reconciles the dead retained wo
     {
       task: task.result.task.id,
       from: coordinator.result.terminal.handle,
-      agent: 'codex',
+      agent: 'claude',
       timeoutMs: 15_000
     }
   )

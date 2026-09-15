@@ -45,9 +45,7 @@ export class OrcaRuntimeWithPreparePtyExecutionContext extends OrcaRuntimeWithRe
     return options.resetIncarnation === true || !hadExistingContext || previous !== wslDistro
   }
 
-  /** Record the spawn launch command so the per-PTY Command Code detector can
-   *  arm from it (renderer startupCommand parity). Best-effort: a chunk that
-   *  beats this call falls back to the detector's banner arming. */
+  /** Record the spawn launch command; its presence proves the startup command already reached the PTY. */
   noteTerminalSpawnCommand(ptyId: string, command: string | null | undefined): void {
     const trimmed = typeof command === 'string' ? command.trim() : ''
     if (trimmed.length > 0) {

@@ -74,11 +74,11 @@ describe('project-host workspace target resolution', () => {
   })
 
   it('chooses the focused host setup when one project exists on multiple hosts', () => {
-    const repos = [makeRepo('orca-local'), makeRepo('orca-ssh', { connectionId: 'openclaw-2' })]
+    const repos = [makeRepo('orca-local'), makeRepo('orca-ssh', { connectionId: 'devbox-2' })]
     const projects = [makeProject('github:stablyai/orca', ['orca-local', 'orca-ssh'])]
     const projectHostSetups = [
       makeSetup('orca-local', 'github:stablyai/orca', 'local', 'orca-local'),
-      makeSetup('orca-ssh', 'github:stablyai/orca', 'ssh:openclaw-2', 'orca-ssh')
+      makeSetup('orca-ssh', 'github:stablyai/orca', 'ssh:devbox-2', 'orca-ssh')
     ]
 
     expect(
@@ -87,7 +87,7 @@ describe('project-host workspace target resolution', () => {
         projects,
         projectHostSetups,
         projectId: 'github:stablyai/orca',
-        focusedHostScope: 'ssh:openclaw-2'
+        focusedHostScope: 'ssh:devbox-2'
       })
     ).toBe('orca-ssh')
   })
@@ -277,7 +277,7 @@ describe('project-host workspace target resolution', () => {
         projects,
         projectHostSetups,
         projectId: 'github:stablyai/orca',
-        hostId: 'ssh:openclaw-2'
+        hostId: 'ssh:devbox-2'
       })
     ).toEqual({
       status: 'unavailable',

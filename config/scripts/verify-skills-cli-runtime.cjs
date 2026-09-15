@@ -197,7 +197,7 @@ function verifySkillsCliRuntime(outDir, artifactRoot = dirname(outDir), options 
       '--skill',
       'orca-cli',
       '--agent',
-      'codex',
+      'claude-code',
       '--dry-run',
       '--json'
     ])

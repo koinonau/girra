@@ -112,7 +112,7 @@ describe('Store', () => {
             connectionId: null,
             receivedAt: now,
             stateStartedAt: now - 1000,
-            payload: { state: 'blocked', prompt: 'right legacy prompt', agentType: 'codex' }
+            payload: { state: 'blocked', prompt: 'right legacy prompt', agentType: 'claude' }
           }
         }
       }),
@@ -150,7 +150,7 @@ describe('Store', () => {
         expect.objectContaining({
           state: 'blocked',
           prompt: 'right legacy prompt',
-          agentType: 'codex'
+          agentType: 'claude'
         })
       )
     } finally {
@@ -223,7 +223,7 @@ describe('Store', () => {
             connectionId: null,
             receivedAt: now,
             stateStartedAt: now - 1000,
-            payload: { state: 'blocked', prompt: 'right no binding', agentType: 'codex' }
+            payload: { state: 'blocked', prompt: 'right no binding', agentType: 'claude' }
           }
         }
       }),
@@ -261,7 +261,7 @@ describe('Store', () => {
         expect.objectContaining({
           state: 'blocked',
           prompt: 'right no binding',
-          agentType: 'codex'
+          agentType: 'claude'
         })
       )
     } finally {

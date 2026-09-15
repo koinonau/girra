@@ -63,7 +63,7 @@ export function resolveLaunchedAgentExitEvidence(args: {
 
 /**
  * Identity-first precedence: live hook > process > title > completed > sleeping
- * > launch > sibling. Same-group titles (OMP wraps Pi) are not reuse evidence.
+ * > launch > sibling. Same-group titles (wrapper frames) are not reuse evidence.
  */
 export function resolveTabAgentFromSignals(args: {
   hasObservedAgentSignal: boolean
@@ -80,7 +80,7 @@ export function resolveTabAgentFromSignals(args: {
   launchAgent?: TuiAgent
 }): TuiAgent | null {
   const launchAgent = args.launchAgent ?? null
-  // Durable focused-pane owner (launch intent → hook → session); focused-pane-scoped so a sibling can't re-own the focused title (would mislabel a Pi pane as OMP).
+  // Durable focused-pane owner (launch intent → hook → session); focused-pane-scoped so a sibling can't re-own the focused title.
   const ownerRecord = resolvePaneAgentOwnerRecord({
     launchAgent,
     hookAgent: args.hookAgent,
@@ -114,7 +114,7 @@ export function resolveTabAgentFromSignals(args: {
   )
   const sleepingSessionAgent = args.sleepingSessionAgent ?? null
 
-  // Title carries identity only as a reuse override (names a DIFFERENT-group agent) or a legacy standalone id when no hook — same-group titles say nothing (OMP wraps Pi), so the record wins.
+  // Title carries identity only as a reuse override (names a DIFFERENT-group agent) or a legacy standalone id when no hook — same-group titles say nothing (wrapper frames), so the record wins.
   const rawTitleAgent = resolveExplicitTerminalTitleAgentType(args.title)
   const explicitTitleAgent = resolveSignalAgentForLaunchOwner(rawTitleAgent, owner, ownerIsLaunch)
   const priorIdentity = idleFocusedIdentity ?? launchAgent
@@ -124,7 +124,7 @@ export function resolveTabAgentFromSignals(args: {
   const titleClaimsIdentity =
     explicitTitleAgent !== 'claude' || isClaudeIdentityFrameTitle(args.title)
   // Why: native OpenCode titles can reclaim stale launch intent before any observed hook signal.
-  // Raw title group, not the fallback-rewritten agent: inferred Pi owners would otherwise treat an OMP wrapper title as a different identity.
+  // Raw title group, not the fallback-rewritten agent: inferred owners would otherwise treat a same-group wrapper title as a different identity.
   const titleReclaimsReusedPane =
     priorIdentity !== null &&
     explicitTitleAgent !== null &&
@@ -156,7 +156,7 @@ export function resolveTabAgentFromSignals(args: {
     processShellForeground: args.processShellForeground
   })
   const activeLaunchAgent = launchedAgentExited ? null : launchAgent
-  // Why: re-own the foreground process within its title-identity group so OMP's nested pi (shell → omp → pi) can't flip an OMP-owned tab's icon.
+  // Why: re-own the foreground process within its title-identity group so a wrapper's nested child process can't flip the owner's icon.
   const processAgent = resolveSignalAgentForLaunchOwner(args.processAgent, owner, ownerIsLaunch)
   return (
     liveFocusedIdentity ??

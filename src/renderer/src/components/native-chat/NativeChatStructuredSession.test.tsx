@@ -37,7 +37,7 @@ describe('NativeChatStructuredSession', () => {
   it('routes the launch draft and app-menu paste to the structured composer', () => {
     const draft = {
       tabId: 'structured-draft-tab',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       text: 'PR #19423 — review this change',
       createdAt: Date.now()
     }
@@ -49,7 +49,7 @@ describe('NativeChatStructuredSession', () => {
         tabId={draft.tabId}
         sessionId="draft-session"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
     expect(mocks.composerProps?.launchSeed).toEqual({
@@ -70,7 +70,7 @@ describe('NativeChatStructuredSession', () => {
   it('holds the launch draft unresolved until the first journal read settles', () => {
     const draft = {
       tabId: 'structured-idle-tab',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       text: 'PR #19423 — review this change',
       createdAt: Date.now()
     }
@@ -92,7 +92,7 @@ describe('NativeChatStructuredSession', () => {
         tabId={draft.tabId}
         sessionId="idle-session"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
     expect(mocks.composerProps?.launchSeed).toMatchObject({
@@ -108,7 +108,7 @@ describe('NativeChatStructuredSession', () => {
         tabId={draft.tabId}
         sessionId="idle-session"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
     expect(mocks.composerProps?.launchSeed?.launchDraftResolved).toBe(true)
@@ -123,7 +123,7 @@ describe('NativeChatStructuredSession', () => {
         tabId="structured-tab-1"
         sessionId="session-1"
         target={{ kind: 'environment', environmentId: 'env-1' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -133,26 +133,21 @@ describe('NativeChatStructuredSession', () => {
     expect(mocks.fileLinkClick).toHaveBeenCalledWith(event, 'file:///repo/src/a.ts')
   })
 
-  // Turn status and transcript image previews shipped Codex-first. Every
-  // structured session renders through the same list, so neither is agent-gated.
-  it.each(['codex', 'claude'] as const)(
-    'renders the same structured transcript chrome for %s',
-    (agent) => {
-      render(
-        <NativeChatStructuredSession
-          isVisible
-          isFocusedGroup
-          tabId="structured-tab-parity"
-          sessionId="session-parity"
-          target={{ kind: 'local' }}
-          agent={agent}
-        />
-      )
+  it('renders structured transcript chrome for a Claude session', () => {
+    render(
+      <NativeChatStructuredSession
+        isVisible
+        isFocusedGroup
+        tabId="structured-tab-parity"
+        sessionId="session-parity"
+        target={{ kind: 'local' }}
+        agent="claude"
+      />
+    )
 
-      expect(mocks.messageListProps?.showTurnStatus).toBe(true)
-      expect(mocks.messageListProps?.runtimeContext).not.toBeUndefined()
-    }
-  )
+    expect(mocks.messageListProps?.showTurnStatus).toBe(true)
+    expect(mocks.messageListProps?.runtimeContext).not.toBeUndefined()
+  })
 
   // Every background-task test mounts the same local Claude session; only the ids
   // differ. A fresh element per call also matters for the rerenders below: React
@@ -339,7 +334,7 @@ describe('NativeChatStructuredSession', () => {
         tabId="structured-tab-1"
         sessionId="session-1"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
     const dispatchCommand = mocks.composerProps?.structuredTransport?.dispatchCommand as

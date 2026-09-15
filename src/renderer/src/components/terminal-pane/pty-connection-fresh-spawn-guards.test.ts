@@ -341,7 +341,7 @@ describe('connectPanePty', () => {
       tabsByWorktree: {
         ...mockStoreState.tabsByWorktree,
         [FLOATING_TERMINAL_WORKTREE_ID]: [
-          { id: 'tab-floating-agent', ptyId: null, launchAgent: 'codex' }
+          { id: 'tab-floating-agent', ptyId: null, launchAgent: 'opencode' }
         ]
       },
       projects: [{ id: 'repo1', localWindowsRuntimePreference: { kind: 'wsl', distro: 'Ubuntu' } }],
@@ -360,7 +360,7 @@ describe('connectPanePty', () => {
         tabId: 'tab-floating-agent',
         worktreeId: FLOATING_TERMINAL_WORKTREE_ID,
         cwd: 'C:\\Users\\alice',
-        startup: { launchAgent: 'codex' }
+        startup: { launchAgent: 'opencode' }
       }) as never
     )
     await flushAsyncTicks()
@@ -371,7 +371,7 @@ describe('connectPanePty', () => {
       worktreeId: FLOATING_TERMINAL_WORKTREE_ID,
       executionHostId: 'local',
       connectionId: null,
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
     expect(createdTransportOptions[0]?.projectRuntime).toBeUndefined()
   })
@@ -507,8 +507,8 @@ describe('connectPanePty', () => {
     transportFactoryQueue.push(transport)
     const onStartupBound = vi.fn()
     const startup = {
-      command: "codex 'resume' 'codex-session-1'",
-      resumeProviderSession: { key: 'session_id', id: 'codex-session-1' } as const
+      command: "claude '--resume' 'claude-session-1'",
+      resumeProviderSession: { key: 'session_id', id: 'claude-session-1' } as const
     }
 
     connectPanePty(

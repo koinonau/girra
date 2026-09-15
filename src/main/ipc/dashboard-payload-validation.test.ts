@@ -29,7 +29,7 @@ const SNAPSHOT = {
     {
       paneKey: 'tab-1:leaf-1',
       ptyId: 'pty-1',
-      agentType: 'codex',
+      agentType: 'opencode',
       bucket: 'attention',
       dotState: 'waiting',
       task: 'Review the dashboard',
@@ -281,7 +281,7 @@ describe('dashboard payload validation', () => {
     expect(
       isDashboardSnapshot({
         ...SNAPSHOT,
-        launchableAgentsByWorktreeId: { 'worktree-1': ['codex', 'claude'] }
+        launchableAgentsByWorktreeId: { 'worktree-1': ['opencode', 'claude'] }
       })
     ).toBe(true)
     expect(
@@ -292,8 +292,8 @@ describe('dashboard payload validation', () => {
     ).toBe(false)
     expect(isDashboardSnapshot({ ...SNAPSHOT, launchableAgentsByWorktreeId: [] })).toBe(false)
 
-    expect(isDashboardSpawnAgentArgs({ worktreeId: 'worktree-1', agent: 'codex' })).toBe(true)
-    expect(isDashboardSpawnAgentArgs({ worktreeId: '', agent: 'codex' })).toBe(false)
+    expect(isDashboardSpawnAgentArgs({ worktreeId: 'worktree-1', agent: 'opencode' })).toBe(true)
+    expect(isDashboardSpawnAgentArgs({ worktreeId: '', agent: 'opencode' })).toBe(false)
     expect(isDashboardSpawnAgentArgs({ worktreeId: 'worktree-1', agent: 'unknown' })).toBe(false)
   })
 

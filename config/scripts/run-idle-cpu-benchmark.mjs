@@ -286,17 +286,10 @@ async function main() {
     path.join(userDataDir, 'orca-data.json'),
     `${JSON.stringify(makeCompletedOnboardingProfile(), null, 2)}\n`
   )
-  const {
-    ELECTRON_RUN_AS_NODE,
-    CODEX_HOME: _codexHome,
-    ORCA_CODEX_HOME: _orcaCodexHome,
-    ...cleanEnv
-  } = process.env
+  const { ELECTRON_RUN_AS_NODE, ...cleanEnv } = process.env
   void ELECTRON_RUN_AS_NODE
-  void _codexHome
-  void _orcaCodexHome
-  // Why: real-home rollout work would both contaminate idle measurements and
-  // expose the developer Codex profile to this disposable Electron launch.
+  // Why: real-home agent work would both contaminate idle measurements and
+  // expose the developer's agent profiles to this disposable Electron launch.
   const isolatedHome = path.join(userDataDir, 'home')
   mkdirSync(isolatedHome, { recursive: true })
   const app = await electron.launch({

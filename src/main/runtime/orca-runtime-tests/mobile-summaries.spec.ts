@@ -413,7 +413,7 @@ describe('OrcaRuntimeService', () => {
 
     runtime.onPtyData(
       'pty-1',
-      '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex","lastAssistantMessage":"on it"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"claude","lastAssistantMessage":"on it"}\x07',
       321
     )
 
@@ -424,7 +424,7 @@ describe('OrcaRuntimeService', () => {
         paneKey: `tab-1:${leafId}`,
         parentPaneKey: null,
         state: 'working',
-        agentType: 'codex',
+        agentType: 'claude',
         prompt: 'ship it',
         lastAssistantMessage: 'on it',
         interrupted: false,

@@ -44,10 +44,10 @@ describe('runtime mobile session sync key projection reuse', () => {
   it('reuses serialized projections when only runtime pane titles change', () => {
     const base = makeState({
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex working', customTitle: null }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode working', customTitle: null }]
       } as unknown as AppState['tabsByWorktree'],
       runtimePaneTitlesByTabId: {
-        'term-1': { 1: 'Codex working' }
+        'term-1': { 1: 'OpenCode working' }
       } as unknown as AppState['runtimePaneTitlesByTabId'],
       openFiles: [makeOpenMarkdownFile()],
       editorDrafts: { '/repo/README.md': '# draft' }
@@ -56,7 +56,7 @@ describe('runtime mobile session sync key projection reuse', () => {
     const titleTick = makeState({
       ...base,
       runtimePaneTitlesByTabId: {
-        'term-1': { 1: 'Codex spinner frame' }
+        'term-1': { 1: 'OpenCode spinner frame' }
       } as unknown as AppState['runtimePaneTitlesByTabId']
     })
 
@@ -74,7 +74,7 @@ describe('runtime mobile session sync key projection reuse', () => {
   it('only rebuilds the tab projection when a terminal tab title changes', () => {
     const base = makeState({
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex working', customTitle: null }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode working', customTitle: null }]
       } as unknown as AppState['tabsByWorktree'],
       openFiles: [makeOpenMarkdownFile()],
       editorDrafts: { '/repo/README.md': '# draft' }
@@ -83,7 +83,7 @@ describe('runtime mobile session sync key projection reuse', () => {
     const titleTick = makeState({
       ...base,
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex spinner frame', customTitle: null }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode spinner frame', customTitle: null }]
       } as unknown as AppState['tabsByWorktree']
     })
 
@@ -101,7 +101,7 @@ describe('runtime mobile session sync key projection reuse', () => {
   it('does not rebuild serialized projections when only activeTabId changes', () => {
     const base = makeState({
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex working', customTitle: null }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode working', customTitle: null }]
       } as unknown as AppState['tabsByWorktree']
     })
     const baseKey = getRuntimeMobileSessionSyncKey(base)
@@ -132,7 +132,7 @@ describe('runtime mobile session sync key projection reuse', () => {
     }
     const base = makeState({
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex working', customTitle: null }],
+        'wt-1': [{ id: 'term-1', title: 'OpenCode working', customTitle: null }],
         'wt-2': [unchangedTab]
       } as unknown as AppState['tabsByWorktree']
     })
@@ -144,7 +144,7 @@ describe('runtime mobile session sync key projection reuse', () => {
       ...base,
       tabsByWorktree: {
         ...base.tabsByWorktree,
-        'wt-1': [{ id: 'term-1', title: 'Codex spinner frame', customTitle: null }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode spinner frame', customTitle: null }]
       } as unknown as AppState['tabsByWorktree']
     })
 
@@ -165,11 +165,11 @@ describe('mobile session snapshot reuse', () => {
     const draftSpy = (draft as unknown as { charCodeAt: ReturnType<typeof vi.fn> }).charCodeAt
     const base = makeState({
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex working', customTitle: null }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode working', customTitle: null }]
       } as unknown as AppState['tabsByWorktree'],
       tabBarOrderByWorktree: { 'wt-1': ['term-1', '/repo/README.md'] },
       runtimePaneTitlesByTabId: {
-        'term-1': { 1: 'Codex working' }
+        'term-1': { 1: 'OpenCode working' }
       } as unknown as AppState['runtimePaneTitlesByTabId'],
       openFiles: [makeOpenMarkdownFile()],
       editorDrafts: { '/repo/README.md': draft },
@@ -183,7 +183,7 @@ describe('mobile session snapshot reuse', () => {
     buildMobileSessionTabSnapshots({
       ...base,
       runtimePaneTitlesByTabId: {
-        'term-1': { 1: 'Codex spinner frame' }
+        'term-1': { 1: 'OpenCode spinner frame' }
       } as unknown as AppState['runtimePaneTitlesByTabId']
     })
 
@@ -193,7 +193,7 @@ describe('mobile session snapshot reuse', () => {
   it('keeps (publicationEpoch, snapshotVersion) stable for byte-identical worktree content', () => {
     const state = makeState({
       tabsByWorktree: {
-        'wt-stable': [{ id: 'term-1', title: 'Codex working', customTitle: null }]
+        'wt-stable': [{ id: 'term-1', title: 'OpenCode working', customTitle: null }]
       } as unknown as AppState['tabsByWorktree'],
       terminalLayoutsByTabId: {
         'term-1': {
@@ -235,13 +235,13 @@ describe('mobile session snapshot reuse', () => {
       })
 
     const before = new Map(
-      buildMobileSessionTabSnapshots(makeTwoWorktreeState('Codex working')).map((snapshot) => [
+      buildMobileSessionTabSnapshots(makeTwoWorktreeState('OpenCode working')).map((snapshot) => [
         snapshot.worktree,
         snapshot
       ])
     )
     const after = new Map(
-      buildMobileSessionTabSnapshots(makeTwoWorktreeState('Codex done')).map((snapshot) => [
+      buildMobileSessionTabSnapshots(makeTwoWorktreeState('OpenCode done')).map((snapshot) => [
         snapshot.worktree,
         snapshot
       ])

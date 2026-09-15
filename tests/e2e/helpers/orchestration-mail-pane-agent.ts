@@ -26,8 +26,8 @@ import os from 'node:os'
 import path from 'node:path'
 
 /** `detectAgentStatusFromTitle` reads these as agent-name + strong keyword. */
-export const CODEX_IDLE_TITLE = 'Codex done'
-export const CODEX_WORKING_TITLE = 'Codex working'
+export const CLAUDE_IDLE_TITLE = 'Claude done'
+export const CLAUDE_WORKING_TITLE = 'Claude working'
 
 export type AgentLedgerEntry = {
   pid: number

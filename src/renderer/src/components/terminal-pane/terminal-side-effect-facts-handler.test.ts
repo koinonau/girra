@@ -164,7 +164,7 @@ describe('registerTerminalSideEffectFactConsumer', () => {
       batch([
         {
           kind: 'agent-status',
-          payload: { state: 'working', prompt: 'fix it', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'fix it', agentType: 'opencode' }
         },
         { kind: 'title', normalizedTitle: '⠋ Claude', rawTitle: '⠋ Claude' },
         { kind: 'agent-working' },
@@ -175,7 +175,7 @@ describe('registerTerminalSideEffectFactConsumer', () => {
     )
 
     expect(events).toEqual([
-      ['status', 'working', 'codex'],
+      ['status', 'working', 'opencode'],
       ['title', '⠋ Claude', '⠋ Claude'],
       ['working'],
       ['title', '✳ Claude', '✳ Claude'],
@@ -291,21 +291,21 @@ describe('registerTerminalSideEffectFactConsumer', () => {
 
     _dispatchTerminalSideEffectBatchForTest(
       batch([
-        { kind: 'agent-idle', title: 'Codex done' },
+        { kind: 'agent-idle', title: 'OpenCode done' },
         {
           kind: 'title',
-          normalizedTitle: 'Codex',
-          rawTitle: 'Codex',
+          normalizedTitle: 'OpenCode',
+          rawTitle: 'OpenCode',
           staleWorkingTitleClear: true
         },
-        { kind: 'agent-idle', title: 'Codex', staleWorkingTitleClear: true }
+        { kind: 'agent-idle', title: 'OpenCode', staleWorkingTitleClear: true }
       ])
     )
 
     expect(events).toEqual([
-      ['idle', 'Codex done', undefined],
-      ['title', 'Codex', { staleWorkingTitleClear: true }],
-      ['idle', 'Codex', { staleWorkingTitleClear: true }]
+      ['idle', 'OpenCode done', undefined],
+      ['title', 'OpenCode', { staleWorkingTitleClear: true }],
+      ['idle', 'OpenCode', { staleWorkingTitleClear: true }]
     ])
   })
 

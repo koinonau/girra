@@ -157,7 +157,7 @@ function resolveInstallAgentKeys(flags: Map<string, string | boolean>): string[]
       throw new RuntimeClientError(
         'invalid_argument',
         `Invalid --agent value "${unusable}". Pass agent names such as claude-code, ` +
-          'codex, or universal.'
+          'opencode, or universal.'
       )
     }
     return keys

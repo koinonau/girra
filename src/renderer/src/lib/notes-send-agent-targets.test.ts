@@ -46,7 +46,7 @@ function entry(
     prompt: '',
     updatedAt,
     stateStartedAt: updatedAt,
-    agentType: 'codex',
+    agentType: 'pi',
     stateHistory: [],
     ...overrides
   }
@@ -127,7 +127,7 @@ describe('notes send agent targets', () => {
         paneKey,
         tabId: STATUS_TAB_ID,
         leafId: LEAF_A,
-        agentType: 'codex',
+        agentType: 'pi',
         tabTitle: 'Terminal 1',
         status: 'eligible'
       }
@@ -160,9 +160,9 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         agentStatusByPaneKey: { [paneKey]: entry(paneKey, 'working') },
-        tabsByWorktree: { [WORKTREE_ID]: [tab(STATUS_TAB_ID, { title: 'Codex working' })] },
+        tabsByWorktree: { [WORKTREE_ID]: [tab(STATUS_TAB_ID, { title: 'Pi working' })] },
         terminalLayoutsByTabId: { [STATUS_TAB_ID]: leafLayout(LEAF_A, 'pty-a') },
-        runtimePaneTitlesByTabId: { [STATUS_TAB_ID]: { 1: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [STATUS_TAB_ID]: { 1: 'Pi - action required' } }
       }),
       WORKTREE_ID,
       NOW
@@ -181,10 +181,10 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Terminal 2', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Terminal 2', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -195,7 +195,7 @@ describe('notes send agent targets', () => {
         paneKey: makePaneKey(LAUNCH_TAB_ID, LEAF_B),
         tabId: LAUNCH_TAB_ID,
         leafId: LEAF_B,
-        agentType: 'codex',
+        agentType: 'pi',
         tabTitle: 'Terminal 2',
         status: 'eligible'
       }
@@ -209,7 +209,7 @@ describe('notes send agent targets', () => {
           [WORKTREE_ID]: [tab(MANUAL_TAB_ID, { title: 'Terminal 2' })]
         },
         terminalLayoutsByTabId: { [MANUAL_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [MANUAL_TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [MANUAL_TAB_ID]: { 1: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -220,7 +220,7 @@ describe('notes send agent targets', () => {
         paneKey: makePaneKey(MANUAL_TAB_ID, LEAF_B),
         tabId: MANUAL_TAB_ID,
         leafId: LEAF_B,
-        agentType: 'codex',
+        agentType: 'pi',
         tabTitle: 'Terminal 2',
         status: 'eligible'
       }
@@ -250,7 +250,7 @@ describe('notes send agent targets', () => {
           [WORKTREE_ID]: [tab(MANUAL_TAB_ID, { title: 'Terminal 2' })]
         },
         terminalLayoutsByTabId: { [MANUAL_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [MANUAL_TAB_ID]: { 1: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [MANUAL_TAB_ID]: { 1: 'Pi - action required' } }
       }),
       WORKTREE_ID,
       NOW
@@ -259,7 +259,7 @@ describe('notes send agent targets', () => {
     expect(targets).toEqual([
       expect.objectContaining({
         paneKey: makePaneKey(MANUAL_TAB_ID, LEAF_B),
-        agentType: 'codex',
+        agentType: 'pi',
         status: 'disabled',
         disabledReason: 'Agent needs permission'
       })
@@ -270,7 +270,7 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex ready', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi ready', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') }
       }),
@@ -285,10 +285,10 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi' } }
       }),
       WORKTREE_ID,
       NOW
@@ -301,10 +301,10 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Terminal 2', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Terminal 2', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi - action required' } }
       }),
       WORKTREE_ID,
       NOW
@@ -323,9 +323,7 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [
-            tab(LAUNCH_TAB_ID, { title: 'Codex - action required', launchAgent: 'codex' })
-          ]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi - action required', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') }
       }),
@@ -346,7 +344,7 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Terminal 2', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Terminal 2', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
         runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'zsh' } }
@@ -362,10 +360,10 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, null) },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi' } }
       }),
       WORKTREE_ID,
       NOW
@@ -378,11 +376,11 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex ready', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi ready', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
         ptyIdsByTabId: { [LAUNCH_TAB_ID]: [] },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -397,12 +395,12 @@ describe('notes send agent targets', () => {
       state({
         agentStatusByPaneKey: { [paneKey]: entry(paneKey, 'working') },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: {
           [LAUNCH_TAB_ID]: splitLayout(LEAF_B, { [LEAF_A]: 'pty-a', [LEAF_B]: 'pty-b' })
         },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 2: 'Codex' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 2: 'Pi' } }
       }),
       WORKTREE_ID,
       NOW
@@ -422,12 +420,12 @@ describe('notes send agent targets', () => {
       state({
         agentStatusByPaneKey: { [paneKey]: entry(paneKey, 'working') },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(MANUAL_TAB_ID, { title: 'Codex ready' })]
+          [WORKTREE_ID]: [tab(MANUAL_TAB_ID, { title: 'Pi ready' })]
         },
         terminalLayoutsByTabId: {
           [MANUAL_TAB_ID]: splitLayout(LEAF_B, { [LEAF_A]: 'pty-a', [LEAF_B]: 'pty-b' })
         },
-        runtimePaneTitlesByTabId: { [MANUAL_TAB_ID]: { 2: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [MANUAL_TAB_ID]: { 2: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -449,12 +447,10 @@ describe('notes send agent targets', () => {
           [paneKey]: entry(paneKey, 'done', OLD_STATUS_UPDATED_AT)
         },
         tabsByWorktree: {
-          [WORKTREE_ID]: [
-            tab(LAUNCH_TAB_ID, { title: 'Previous Codex session', launchAgent: 'codex' })
-          ]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Previous Pi session', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -465,8 +461,8 @@ describe('notes send agent targets', () => {
         paneKey,
         tabId: LAUNCH_TAB_ID,
         leafId: LEAF_B,
-        agentType: 'codex',
-        tabTitle: 'Previous Codex session',
+        agentType: 'pi',
+        tabTitle: 'Previous Pi session',
         status: 'eligible'
       }
     ])
@@ -482,10 +478,10 @@ describe('notes send agent targets', () => {
           })
         },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex ready', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi ready', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -494,7 +490,7 @@ describe('notes send agent targets', () => {
     expect(targets).toEqual([
       expect.objectContaining({
         paneKey,
-        agentType: 'codex',
+        agentType: 'pi',
         status: 'eligible'
       })
     ])
@@ -508,7 +504,7 @@ describe('notes send agent targets', () => {
           [paneKey]: entry(paneKey, 'done', OLD_STATUS_UPDATED_AT)
         },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') }
       }),
@@ -533,10 +529,10 @@ describe('notes send agent targets', () => {
           [paneKey]: entry(paneKey, 'done', OLD_STATUS_UPDATED_AT)
         },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: { [LAUNCH_TAB_ID]: leafLayout(LEAF_B, 'pty-b') },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex - action required' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi - action required' } }
       }),
       WORKTREE_ID,
       NOW
@@ -560,12 +556,12 @@ describe('notes send agent targets', () => {
           [stalePaneKey]: entry(stalePaneKey, 'done', OLD_STATUS_UPDATED_AT)
         },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex ready', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi ready', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: {
           [LAUNCH_TAB_ID]: splitLayout(LEAF_B, { [LEAF_A]: 'pty-a', [LEAF_B]: 'pty-b' })
         },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 2: 'Codex ready' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 2: 'Pi ready' } }
       }),
       WORKTREE_ID,
       NOW
@@ -592,7 +588,7 @@ describe('notes send agent targets', () => {
           [stalePaneKey]: entry(stalePaneKey, 'done', OLD_STATUS_UPDATED_AT)
         },
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex ready', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi ready', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: {
           [LAUNCH_TAB_ID]: splitLayout(LEAF_B, { [LEAF_A]: 'pty-a', [LEAF_B]: 'pty-b' })
@@ -616,7 +612,7 @@ describe('notes send agent targets', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
         tabsByWorktree: {
-          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Codex', launchAgent: 'codex' })]
+          [WORKTREE_ID]: [tab(LAUNCH_TAB_ID, { title: 'Pi', launchAgent: 'pi' })]
         },
         terminalLayoutsByTabId: {
           [LAUNCH_TAB_ID]: {
@@ -626,7 +622,7 @@ describe('notes send agent targets', () => {
             ptyIdsByLeafId: {}
           }
         },
-        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Codex' } }
+        runtimePaneTitlesByTabId: { [LAUNCH_TAB_ID]: { 1: 'Pi' } }
       }),
       WORKTREE_ID,
       NOW
@@ -638,7 +634,7 @@ describe('notes send agent targets', () => {
   it('recognizes a manual agent tab by its explicit ready tab title when no pane title is set', () => {
     const targets = deriveNotesSendAgentTargets(
       state({
-        tabsByWorktree: { [WORKTREE_ID]: [tab(MANUAL_TAB_ID, { title: 'Codex ready' })] },
+        tabsByWorktree: { [WORKTREE_ID]: [tab(MANUAL_TAB_ID, { title: 'Pi ready' })] },
         terminalLayoutsByTabId: { [MANUAL_TAB_ID]: leafLayout(LEAF_B, 'pty-b') }
       }),
       WORKTREE_ID,
@@ -648,7 +644,7 @@ describe('notes send agent targets', () => {
     expect(targets).toEqual([
       expect.objectContaining({
         paneKey: makePaneKey(MANUAL_TAB_ID, LEAF_B),
-        agentType: 'codex',
+        agentType: 'pi',
         status: 'eligible'
       })
     ])

@@ -45,7 +45,7 @@ export type HooksConfig = {
 // Why: host-level backstop timeout for status hooks, independent of the curl --max-time (#4633).
 export const MANAGED_HOOK_TIMEOUT_SECONDS = 10
 
-// Nested command hook for the Claude-shaped `hooks: [...]` schema (Claude, Codex).
+// Nested command hook for the Claude-shaped `hooks: [...]` schema.
 export function buildManagedCommandHook(
   command: string,
   timeout = MANAGED_HOOK_TIMEOUT_SECONDS
@@ -121,11 +121,6 @@ export function wrapWindowsHookCommand(scriptPath: string): string {
 }
 
 export const WINDOWS_CMD_SAFE_PATH = /^[A-Za-z0-9_.:\\~-]+$/
-
-export function wrapWindowsCmdHookCommand(scriptPath: string): string {
-  // Why: Codex spawns the hook as argv[0], not via cmd.exe, so it must be one spawnable token; a cmd `if exist` launcher isn't (#8430).
-  return WINDOWS_CMD_SAFE_PATH.test(scriptPath) ? scriptPath : wrapWindowsHookCommand(scriptPath)
-}
 
 // Why: PowerShell per-post costs ~300ms startup and mangles UTF-8 via code-page translation; curl.exe (Win10 1803+) avoids both.
 export function buildWindowsAgentHookCurlPostCommand(source: AgentHookSource): string {

@@ -93,7 +93,7 @@ describe('isKnownHarnessInjectedUserTurnText', () => {
   })
 
   it('keeps single-word tag pastes, custom elements, and underscore wrappers', () => {
-    // Grok wraps REAL typed prompts in <user_query> — never classify as noise.
+    // Some harnesses wrap REAL typed prompts in <user_query>; never classify as noise.
     expect(isKnownHarnessInjectedUserTurnText('<user_query>fix the bug</user_query>')).toBe(false)
     expect(isKnownHarnessInjectedUserTurnText('<div class="x">pasted html</div>')).toBe(false)
     expect(

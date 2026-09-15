@@ -29,7 +29,6 @@ export type WorktreeStartupPayload = {
    */
   launchDraftText?: string
   startupCommandDelivery?: StartupCommandDelivery
-  initialAgentStatus?: { agent: TuiAgent; prompt: string }
   sessionOptions?: Record<string, SessionOptionValue>
   telemetry?: AgentLaunchMetadata
 }

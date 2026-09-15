@@ -71,9 +71,7 @@ test.describe('Docker SSH Pi-compatible agent titles', () => {
   test.skip(!RUN_DOCKER_SSH, 'Set ORCA_E2E_SSH_DOCKER=1 to run Docker-backed SSH relay tests.')
   test.skip(process.platform === 'win32', 'Docker SSH relay tests use POSIX ssh tooling.')
 
-  test('classifies OMP and Pi title transitions from a remote terminal', async ({
-    orcaPage
-  }, testInfo) => {
+  test('classifies Pi title transitions from a remote terminal', async ({ orcaPage }, testInfo) => {
     test.slow()
     let target: DockerSshRelayTarget | null = null
     try {
@@ -90,19 +88,19 @@ test.describe('Docker SSH Pi-compatible agent titles', () => {
       await sendToTerminal(orcaPage, ptyId, `printf '${marker}\\n'\r`)
       await waitForTerminalOutput(orcaPage, marker, 20_000, 60_000)
 
-      await emitOscTitle(orcaPage, ptyId, '\u280b OMP')
+      await emitOscTitle(orcaPage, ptyId, '\u280b Pi')
       await expect
         .poll(async () => readTerminalAgentStatus(orcaPage, terminalHandle), {
           timeout: 10_000,
-          message: 'Remote OMP working title did not classify as an agent status'
+          message: 'Remote Pi working title did not classify as an agent status'
         })
         .toMatchObject({ isRunningAgent: true, status: 'working' })
 
-      await emitOscTitle(orcaPage, ptyId, 'OMP ready')
+      await emitOscTitle(orcaPage, ptyId, 'Pi ready')
       await expect
         .poll(async () => readTerminalAgentStatus(orcaPage, terminalHandle), {
           timeout: 10_000,
-          message: 'Remote OMP ready title did not classify as idle'
+          message: 'Remote Pi ready title did not classify as idle'
         })
         .toMatchObject({ isRunningAgent: true, status: 'idle' })
 

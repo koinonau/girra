@@ -85,7 +85,7 @@ export function resolveTabAgentFromSignals(args: {
   launchAgent?: TuiAgent
 }): TuiAgent | null {
   const launchAgent = args.launchAgent ?? null
-  // Durable focused-pane owner (launch intent → hook → session); focused-pane-scoped so a sibling can't re-own the focused title (would mislabel a Pi pane as OMP).
+  // Durable focused-pane owner (launch intent → hook → session); focused-pane-scoped so a sibling can't re-own the focused title.
   const owner = resolvePaneAgentOwner({
     launchAgent,
     hookAgent: args.hookAgent,
@@ -112,7 +112,7 @@ export function resolveTabAgentFromSignals(args: {
   )
   const sleepingSessionAgent = args.sleepingSessionAgent ?? null
 
-  // Title carries identity only as a reuse override (names a DIFFERENT-group agent) or a legacy standalone id when no hook — same-group titles say nothing (OMP wraps Pi), so the record wins.
+  // Title carries identity only as a reuse override (names a DIFFERENT-group agent) or a legacy standalone id when no hook — same-group titles say nothing (wrapper frames), so the record wins.
   const explicitTitleAgent = resolveSignalAgentForLaunchOwner(
     resolveExplicitTerminalTitleAgentType(args.title),
     owner
@@ -154,7 +154,7 @@ export function resolveTabAgentFromSignals(args: {
     processShellForeground: args.processShellForeground
   })
   const activeLaunchAgent = launchedAgentExited ? null : launchAgent
-  // Why: re-own the foreground process within its title-identity group so OMP's nested pi (shell → omp → pi) can't flip an OMP-owned tab's icon.
+  // Why: re-own the foreground process within its title-identity group so a wrapper's nested child process can't flip the owner's icon.
   const processAgent = resolveSignalAgentForLaunchOwner(args.processAgent, owner)
   // Identity-first precedence (see JSDoc): live hook > process > title > completed > sleeping > launch > sibling.
   return (
@@ -176,7 +176,7 @@ export function resolveTabAgentFromSignals(args: {
  * Identity-first precedence:
  *
  * 1. Live focused hook — ground truth while the agent works; never title-overridden.
- * 2. Process identity — recognized foreground process (local only); re-owned within its title-identity group so OMP's nested `pi` (shell → omp → pi) can't flip the icon.
+ * 2. Process identity — recognized foreground process (local only); re-owned within its title-identity group so a wrapper's nested child process can't flip the icon.
  * 3. Title — only a reuse override or legacy standalone identity; native OpenCode titles cannot displace durable ownership.
  * 4. Idle focused identity — the pane's completed hook or sidebar-retained completion; suppressed locally once OSC 133;D proves exit.
  * 5. Sleeping session identity — current provider-session ownership.

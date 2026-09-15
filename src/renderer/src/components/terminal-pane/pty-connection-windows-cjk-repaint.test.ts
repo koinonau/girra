@@ -242,7 +242,7 @@ describe('connectPanePty', () => {
     capturedDataCallback.current?.('\x1b[48')
     expect(refresh).not.toHaveBeenCalled()
 
-    capturedDataCallback.current?.(';2;52;52;52m codex block text \x1b[0m\r\n')
+    capturedDataCallback.current?.(';2;52;52;52m agent block text \x1b[0m\r\n')
 
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
     expect(refresh).toHaveBeenCalledWith(0, 39, true)
@@ -275,7 +275,7 @@ describe('connectPanePty', () => {
     capturedDataCallback.current?.('\x1b')
     expect(refresh).not.toHaveBeenCalled()
 
-    capturedDataCallback.current?.('[48;2;52;52;52m codex block text \x1b[0m\r\n')
+    capturedDataCallback.current?.('[48;2;52;52;52m agent block text \x1b[0m\r\n')
 
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
     expect(refresh).toHaveBeenCalledWith(0, 39, true)
@@ -304,7 +304,7 @@ describe('connectPanePty', () => {
     connectPanePty(pane as never, createManager(1) as never, createDeps() as never)
     await flushAsyncTicks(6)
 
-    capturedDataCallback.current?.('\x1b[2J\x1b[H\x1b[48;2;52;52;52m codex block text \x1b[0m\r\n')
+    capturedDataCallback.current?.('\x1b[2J\x1b[H\x1b[48;2;52;52;52m agent block text \x1b[0m\r\n')
     expect(refresh).toHaveBeenCalledWith(0, 39, true)
 
     refresh.mockClear()

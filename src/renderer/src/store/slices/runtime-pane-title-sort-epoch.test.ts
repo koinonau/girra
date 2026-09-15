@@ -69,14 +69,14 @@ describe('runtimePaneTitle → sortEpoch', () => {
         'wt-bg': [makeTab({ id: 'tab-1', worktreeId: 'wt-bg' })]
       }
     })
-    store.getState().setRuntimePaneTitle('tab-1', 1, '⠋ Codex is thinking')
+    store.getState().setRuntimePaneTitle('tab-1', 1, '⠋ OpenCode is thinking')
     const runtimePaneTitlesByTabId = store.getState().runtimePaneTitlesByTabId
     const sortEpoch = store.getState().sortEpoch
 
-    store.getState().setRuntimePaneTitle('tab-1', 1, '⠙ Codex is thinking')
+    store.getState().setRuntimePaneTitle('tab-1', 1, '⠙ OpenCode is thinking')
 
     expect(store.getState().runtimePaneTitlesByTabId).toBe(runtimePaneTitlesByTabId)
-    expect(store.getState().runtimePaneTitlesByTabId['tab-1']?.[1]).toBe('⠋ Codex is thinking')
+    expect(store.getState().runtimePaneTitlesByTabId['tab-1']?.[1]).toBe('⠋ OpenCode is thinking')
     expect(store.getState().sortEpoch).toBe(sortEpoch)
   })
 
@@ -91,16 +91,16 @@ describe('runtimePaneTitle → sortEpoch', () => {
       },
       activeWorktreeId: 'wt-bg'
     })
-    store.getState().updateTabTitle('tab-1', '⠋ Codex is thinking')
+    store.getState().updateTabTitle('tab-1', '⠋ OpenCode is thinking')
     const tabsByWorktree = store.getState().tabsByWorktree
     const unifiedTabsByWorktree = store.getState().unifiedTabsByWorktree
     const sortEpoch = store.getState().sortEpoch
 
-    store.getState().updateTabTitle('tab-1', '⠙ Codex is thinking')
+    store.getState().updateTabTitle('tab-1', '⠙ OpenCode is thinking')
 
     expect(store.getState().tabsByWorktree).toBe(tabsByWorktree)
     expect(store.getState().unifiedTabsByWorktree).toBe(unifiedTabsByWorktree)
-    expect(store.getState().tabsByWorktree['wt-bg']?.[0]?.title).toBe('⠋ Codex is thinking')
+    expect(store.getState().tabsByWorktree['wt-bg']?.[0]?.title).toBe('⠋ OpenCode is thinking')
     expect(store.getState().sortEpoch).toBe(sortEpoch)
   })
 
@@ -111,12 +111,9 @@ describe('runtimePaneTitle → sortEpoch', () => {
       '⠂ User acknowledgment and confirmation',
       '⠐ User acknowledgment and confirmation'
     ],
-    ['Codex', '⠋ Codex is thinking', '⠙ Codex is thinking'],
     ['OpenCode', '⠋ OpenCode running tests', '⠙ OpenCode running tests'],
-    ['Aider', '⠋ Aider running', '⠙ Aider running'],
-    ['Cursor synthesized title', '⠋ Cursor Agent', '⠙ Cursor Agent'],
-    ['Droid synthesized title', '⠋ Droid', '⠙ Droid'],
-    ['Hermes synthesized title', '⠋ Hermes', '⠙ Hermes']
+    ['OpenCode synthesized title', '⠋ OpenCode', '⠙ OpenCode'],
+    ['Pi synthesized title', '⠋ Pi', '⠙ Pi']
   ])('collapses spinner-only title changes for %s', (_label, firstTitle, nextTitle) => {
     const store = createTestStore()
     seedStore(store, {
@@ -158,11 +155,11 @@ describe('runtimePaneTitle → sortEpoch', () => {
       },
       activeWorktreeId: 'wt-bg'
     })
-    store.getState().updateTabTitle('tab-1', '⠋ Codex is thinking')
+    store.getState().updateTabTitle('tab-1', '⠋ OpenCode is thinking')
 
-    store.getState().updateTabTitle('tab-1', 'Codex ready')
+    store.getState().updateTabTitle('tab-1', 'OpenCode ready')
 
-    expect(store.getState().tabsByWorktree['wt-bg']?.[0]?.title).toBe('Codex ready')
+    expect(store.getState().tabsByWorktree['wt-bg']?.[0]?.title).toBe('OpenCode ready')
   })
 
   it('keeps updating same-agent titles when the status changes', () => {
@@ -191,7 +188,7 @@ describe('runtimePaneTitle → sortEpoch', () => {
     expect(store.getState().sortEpoch).toBeGreaterThan(baseline)
   })
 
-  it('collapses bulk Codex spinner title churn to the first meaningful publication', () => {
+  it('collapses bulk OpenCode spinner title churn to the first meaningful publication', () => {
     const store = createTestStore()
     const tabCount = 20
     const worktrees = Array.from({ length: tabCount }, (_, index) =>
@@ -216,7 +213,7 @@ describe('runtimePaneTitle → sortEpoch', () => {
     for (let tabIndex = 0; tabIndex < tabCount; tabIndex += 1) {
       const tabId = `tab-${tabIndex}`
       for (const frame of frames) {
-        const title = `${frame} Codex is thinking`
+        const title = `${frame} OpenCode is thinking`
         store.getState().updateTabTitle(tabId, title)
         store.getState().setRuntimePaneTitle(tabId, 1, title)
       }
@@ -249,7 +246,7 @@ describe('runtimePaneTitle → sortEpoch', () => {
     store.getState().updateTabTitles(
       worktrees.map((_, index) => ({
         tabId: `tab-${index}`,
-        title: `Codex ready ${index}`
+        title: `OpenCode ready ${index}`
       }))
     )
 
@@ -257,7 +254,7 @@ describe('runtimePaneTitle → sortEpoch', () => {
     expect(publications).toBe(1)
     for (let index = 0; index < tabCount; index += 1) {
       expect(store.getState().tabsByWorktree[`wt-${index}`]?.[0]?.title).toBe(
-        `Codex ready ${index}`
+        `OpenCode ready ${index}`
       )
     }
   })

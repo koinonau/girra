@@ -384,7 +384,7 @@ describe('connectPanePty', () => {
     const pendingReattach = createDeferred<{
       id: string
       sessionExpired: true
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
       launchConfig: { agentCommand: string; agentArgs: string; agentEnv: Record<string, string> }
     }>()
     const transport = createMockTransport(restoredPtyId)
@@ -453,9 +453,9 @@ describe('connectPanePty', () => {
     pendingReattach.resolve({
       id: restoredPtyId,
       sessionExpired: true,
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       launchConfig: {
-        agentCommand: 'codex --profile stale',
+        agentCommand: 'opencode --profile stale',
         agentArgs: '--profile stale',
         agentEnv: {}
       }

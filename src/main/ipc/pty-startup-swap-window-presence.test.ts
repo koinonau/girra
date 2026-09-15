@@ -186,14 +186,14 @@ describe('registerPtyHandlers daemon-swap-window presence', () => {
     installDaemonTestProvider({
       hasPty: (id: string) => id === 'daemon-restored-pty',
       inspectProcess: vi.fn(async () => ({
-        foregroundProcess: 'codex',
+        foregroundProcess: 'claude',
         hasChildProcesses: true
       }))
     })
     barrier.resolve()
 
     await expect(pending).resolves.toEqual({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'claude',
       hasChildProcesses: true
     })
   })
@@ -201,7 +201,7 @@ describe('registerPtyHandlers daemon-swap-window presence', () => {
   it('pty:inspectProcess answers SSH-owned ids from their provider without waiting on the local swap', async () => {
     const barrier = makeDeferred()
     const sshInspect = vi.fn(async () => ({
-      foregroundProcess: 'ssh-codex',
+      foregroundProcess: 'ssh-claude',
       hasChildProcesses: true
     }))
     registerSshPtyProvider('ssh-1', {
@@ -212,7 +212,7 @@ describe('registerPtyHandlers daemon-swap-window presence', () => {
 
     await expect(
       handlers.get('pty:inspectProcess')!(null, { id: 'ssh:ssh-1@@pty-2' })
-    ).resolves.toEqual({ foregroundProcess: 'ssh-codex', hasChildProcesses: true })
+    ).resolves.toEqual({ foregroundProcess: 'ssh-claude', hasChildProcesses: true })
     expect(sshInspect).toHaveBeenCalledWith('ssh:ssh-1@@pty-2')
   })
 

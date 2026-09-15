@@ -13,12 +13,12 @@ import type { RetainedAgentEntry } from '../store/slices/agent-status'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 import { makePaneKey } from '../../../shared/stable-pane-id'
 
-const CODEX_LEAF_ID = '11111111-1111-4111-8111-111111111111'
+const AGENT_LEAF_ID = '11111111-1111-4111-8111-111111111111'
 const OTHER_LEAF_ID = '22222222-2222-4222-8222-222222222222'
 
-// Why: regression coverage for the codex inline-agent row that stayed bold
-// after returning from another workspace (docs/codex-agent-row-bold-stuck.md).
-// The race: codex emits `Stop` (state=done), then its TUI title reverts to a
+// Why: regression coverage for the inline-agent row that stayed bold
+// after returning from another workspace.
+// The race: the agent emits `Stop` (state=done), then its TUI title reverts to a
 // shell label; pty-connection.ts:onAgentExited fires removeAgentStatus before
 // the live `done` row could be auto-acked. The retention sync snapshots the
 // `done` row into retainedAgentsByPaneKey carrying a fresh stateStartedAt.
@@ -30,7 +30,7 @@ const OTHER_LEAF_ID = '22222222-2222-4222-8222-222222222222'
 // document.hasFocus, or the focus/visibilitychange event surface. The hook's
 // gate logic is unchanged by this fix — only the scan body was extended.
 
-describe('computeAutoAckTargets — codex retain race regression', () => {
+describe('computeAutoAckTargets — agent retain race regression', () => {
   afterEach(() => {
     vi.useRealTimers()
   })
@@ -39,38 +39,38 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-05-05T12:00:00.000Z'))
     const store = createTestStore()
-    const activeTabId = 'tab-codex'
-    const paneKey = makePaneKey(activeTabId, CODEX_LEAF_ID)
+    const activeTabId = 'tab-opencode'
+    const paneKey = makePaneKey(activeTabId, AGENT_LEAF_ID)
 
-    // 1. Codex starts working, user acks it (e.g. by clicking the row).
+    // 1. OpenCode starts working, user acks it (e.g. by clicking the row).
     store.getState().setAgentStatus(paneKey, {
       state: 'working',
       prompt: 'sleep 10 then say hi',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.getState().acknowledgeAgents([paneKey])
     const workingAck = store.getState().acknowledgedAgentsByPaneKey[paneKey]
     expect(workingAck).toBeGreaterThan(0)
 
-    // 2. Time advances; codex Stop fires → state=done with a fresh
+    // 2. Time advances; OpenCode Stop fires → state=done with a fresh
     //    stateStartedAt (carry-forward only applies within the same state).
     vi.setSystemTime(new Date('2026-05-05T12:00:10.000Z'))
     store.getState().setAgentStatus(paneKey, {
       state: 'done',
       prompt: 'sleep 10 then say hi',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     const liveDone = store.getState().agentStatusByPaneKey[paneKey]
     expect(liveDone.stateStartedAt).toBeGreaterThan(workingAck)
 
-    // 3. The codex TUI title reverts to a plain shell label, so
+    // 3. The OpenCode TUI title reverts to a plain shell label, so
     //    onAgentExited → removeAgentStatus tears down the live entry AND
     //    wipes the prior ack (per agent-status.ts cleanup contract).
     const retentionSnapshot: RetainedAgentEntry = {
       entry: liveDone,
       worktreeId: 'wt-1',
       tab: makeTab({ id: activeTabId, worktreeId: 'wt-1' }),
-      agentType: 'codex',
+      agentType: 'opencode',
       startedAt: liveDone.stateStartedAt
     }
     store.getState().removeAgentStatus(paneKey)
@@ -83,9 +83,9 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     store.getState().retainAgents([retentionSnapshot])
     expect(store.getState().retainedAgentsByPaneKey[paneKey]).toBeDefined()
 
-    // 5. The user is back on the codex tab. computeAutoAckTargets must see
+    // 5. The user is back on the OpenCode tab. computeAutoAckTargets must see
     //    the retained row and surface it for ack — pre-fix this returned [].
-    const targets = computeAutoAckTargets(store.getState(), activeTabId, CODEX_LEAF_ID)
+    const targets = computeAutoAckTargets(store.getState(), activeTabId, AGENT_LEAF_ID)
     expect(targets).toEqual([paneKey])
   })
 
@@ -93,13 +93,13 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-05-05T12:00:00.000Z'))
     const store = createTestStore()
-    const activeTabId = 'tab-codex'
-    const paneKey = makePaneKey(activeTabId, CODEX_LEAF_ID)
+    const activeTabId = 'tab-opencode'
+    const paneKey = makePaneKey(activeTabId, AGENT_LEAF_ID)
 
     store.getState().setAgentStatus(paneKey, {
       state: 'done',
       prompt: 'p',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     const doneEntry = store.getState().agentStatusByPaneKey[paneKey]
     store.getState().retainAgents([
@@ -107,21 +107,21 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
         entry: doneEntry,
         worktreeId: 'wt-1',
         tab: makeTab({ id: activeTabId, worktreeId: 'wt-1' }),
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: doneEntry.stateStartedAt
       }
     ])
     store.getState().removeAgentStatus(paneKey)
 
     // First scan: the retained row is unvisited.
-    expect(computeAutoAckTargets(store.getState(), activeTabId, CODEX_LEAF_ID)).toEqual([paneKey])
+    expect(computeAutoAckTargets(store.getState(), activeTabId, AGENT_LEAF_ID)).toEqual([paneKey])
 
     // Simulate the ack effect.
     vi.setSystemTime(new Date('2026-05-05T12:00:01.000Z'))
     store.getState().acknowledgeAgents([paneKey])
 
     // Second scan: idempotent — nothing to ack.
-    expect(computeAutoAckTargets(store.getState(), activeTabId, CODEX_LEAF_ID)).toEqual([])
+    expect(computeAutoAckTargets(store.getState(), activeTabId, AGENT_LEAF_ID)).toEqual([])
   })
 
   it('skips retained rows whose paneKey is on a different tab', () => {
@@ -130,7 +130,7 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     store.getState().setAgentStatus(paneKey, {
       state: 'done',
       prompt: 'p',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     const entry = store.getState().agentStatusByPaneKey[paneKey]
     store.getState().retainAgents([
@@ -138,7 +138,7 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
         entry,
         worktreeId: 'wt-1',
         tab: makeTab({ id: 'tab-other', worktreeId: 'wt-1' }),
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: entry.stateStartedAt
       }
     ])
@@ -147,19 +147,19 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     // Active tab differs — the retained row must NOT be acked while the user
     // is looking at a different tab; the bold-until-viewed signal must
     // survive the tab switch.
-    expect(computeAutoAckTargets(store.getState(), 'tab-codex', CODEX_LEAF_ID)).toEqual([])
+    expect(computeAutoAckTargets(store.getState(), 'tab-opencode', AGENT_LEAF_ID)).toEqual([])
   })
 
   it('skips sibling panes in the same terminal tab', () => {
     const store = createTestStore()
     const activeTabId = 'tab-split'
-    const activePaneKey = makePaneKey(activeTabId, CODEX_LEAF_ID)
+    const activePaneKey = makePaneKey(activeTabId, AGENT_LEAF_ID)
     const siblingPaneKey = makePaneKey(activeTabId, OTHER_LEAF_ID)
 
     store.getState().setAgentStatus(activePaneKey, {
       state: 'done',
       prompt: 'visible pane',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.getState().setAgentStatus(siblingPaneKey, {
       state: 'done',
@@ -167,7 +167,7 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
       agentType: 'claude'
     })
 
-    expect(computeAutoAckTargets(store.getState(), activeTabId, CODEX_LEAF_ID)).toEqual([
+    expect(computeAutoAckTargets(store.getState(), activeTabId, AGENT_LEAF_ID)).toEqual([
       activePaneKey
     ])
   })
@@ -176,8 +176,8 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     vi.useFakeTimers()
     vi.setSystemTime(new Date('2026-05-05T12:00:00.000Z'))
     const store = createTestStore()
-    const activeTabId = 'tab-codex'
-    const paneKey = makePaneKey(activeTabId, CODEX_LEAF_ID)
+    const activeTabId = 'tab-opencode'
+    const paneKey = makePaneKey(activeTabId, AGENT_LEAF_ID)
 
     // Construct a (rare) state where retainedAgentsByPaneKey and
     // agentStatusByPaneKey both contain the same paneKey — e.g. the
@@ -187,7 +187,7 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
     store.getState().setAgentStatus(paneKey, {
       state: 'done',
       prompt: 'p1',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     const liveDone = store.getState().agentStatusByPaneKey[paneKey]
     store.getState().retainAgents([
@@ -195,12 +195,12 @@ describe('computeAutoAckTargets — codex retain race regression', () => {
         entry: liveDone,
         worktreeId: 'wt-1',
         tab: makeTab({ id: activeTabId, worktreeId: 'wt-1' }),
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: liveDone.stateStartedAt
       }
     ])
 
-    const targets = computeAutoAckTargets(store.getState(), activeTabId, CODEX_LEAF_ID)
+    const targets = computeAutoAckTargets(store.getState(), activeTabId, AGENT_LEAF_ID)
     // Two pushes, same paneKey — duplicates are intentional and harmless;
     // acknowledgeAgents short-circuits per key.
     expect(targets.length).toBeLessThanOrEqual(2)
@@ -217,7 +217,7 @@ describe('acknowledgeViewedAgentAttention', () => {
       clearTerminalTabUnread: vi.fn(),
       clearTerminalPaneUnread: vi.fn()
     }
-    const paneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const paneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
 
     acknowledgeViewedAgentAttention(actions, {
       activeWorktreeId: 'wt-1',
@@ -258,7 +258,7 @@ describe('acknowledgeViewedAgentAttention', () => {
       clearTerminalTabUnread: vi.fn(),
       clearTerminalPaneUnread: vi.fn()
     }
-    const paneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const paneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
 
     acknowledgeViewedAgentAttention(actions, {
       activeWorktreeId: 'wt-1',
@@ -276,7 +276,7 @@ describe('acknowledgeViewedAgentAttention', () => {
 
 describe('computeViewedAgentCompletionPaneKey', () => {
   it('returns the exact active pane unread marker', () => {
-    const paneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const paneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
 
     expect(
       computeViewedAgentCompletionPaneKey(
@@ -286,7 +286,7 @@ describe('computeViewedAgentCompletionPaneKey', () => {
           }
         },
         'tab-1',
-        CODEX_LEAF_ID
+        AGENT_LEAF_ID
       )
     ).toBe(paneKey)
   })
@@ -302,7 +302,7 @@ describe('computeViewedAgentCompletionPaneKey', () => {
           }
         },
         'tab-1',
-        CODEX_LEAF_ID
+        AGENT_LEAF_ID
       )
     ).toBeNull()
   })
@@ -311,7 +311,7 @@ describe('computeViewedAgentCompletionPaneKey', () => {
 describe('agent completion pane unread store marker', () => {
   it('clears through the normal pane-unread clear path', () => {
     const store = createTestStore()
-    const paneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const paneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
 
     store.getState().markAgentCompletionPaneUnread(paneKey)
     expect(store.getState().unreadAgentCompletionPanes).toEqual({ [paneKey]: true })
@@ -323,7 +323,7 @@ describe('agent completion pane unread store marker', () => {
 
 describe('shouldClearViewedAgentWorktreeUnread', () => {
   it('clears worktree unread when the visible pane owns the only agent source', () => {
-    const paneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const paneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
 
     expect(
       shouldClearViewedAgentWorktreeUnread(
@@ -342,7 +342,7 @@ describe('shouldClearViewedAgentWorktreeUnread', () => {
   })
 
   it('keeps worktree unread when a hidden tab still owns agent attention', () => {
-    const activePaneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const activePaneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
     const hiddenPaneKey = makePaneKey('tab-2', OTHER_LEAF_ID)
 
     expect(
@@ -365,7 +365,7 @@ describe('shouldClearViewedAgentWorktreeUnread', () => {
   })
 
   it('keeps worktree unread when a hidden tab has terminal unread attention', () => {
-    const activePaneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+    const activePaneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
 
     expect(
       shouldClearViewedAgentWorktreeUnread(
@@ -441,7 +441,7 @@ describe('resolveAutoAckTabTargets', () => {
 // hidden panel must never auto-ack (selectFloatingWorkspaceHasUnread → FloatingTerminalToggleButton).
 describe('floating workspace auto-ack against the attention dot', () => {
   const FLOATING_TAB_ID = 'tab-floating'
-  const floatingPaneKey = makePaneKey(FLOATING_TAB_ID, CODEX_LEAF_ID)
+  const floatingPaneKey = makePaneKey(FLOATING_TAB_ID, AGENT_LEAF_ID)
 
   function seedFloatingCompletion(): ReturnType<typeof createTestStore> {
     const store = createTestStore()
@@ -470,7 +470,7 @@ describe('floating workspace auto-ack against the attention dot', () => {
   ): void {
     const state = store.getState()
     for (const target of resolveAutoAckTabTargets(state, { floatingPanelVisible })) {
-      const activePaneKey = computeViewedAgentCompletionPaneKey(state, target.tabId, CODEX_LEAF_ID)
+      const activePaneKey = computeViewedAgentCompletionPaneKey(state, target.tabId, AGENT_LEAF_ID)
       const paneKeysToClear = new Set(activePaneKey ? [activePaneKey] : [])
       acknowledgeViewedAgentAttention(store.getState(), {
         activeWorktreeId: shouldClearViewedAgentWorktreeUnread(store.getState(), {
@@ -506,7 +506,7 @@ describe('floating workspace auto-ack against the attention dot', () => {
 })
 
 describe('computeLapsedManualUnreadProtections', () => {
-  const paneKey = makePaneKey('tab-1', CODEX_LEAF_ID)
+  const paneKey = makePaneKey('tab-1', AGENT_LEAF_ID)
   const otherPaneKey = makePaneKey('tab-1', OTHER_LEAF_ID)
 
   it('keeps an active pane whose status row has not arrived yet (startup race)', () => {

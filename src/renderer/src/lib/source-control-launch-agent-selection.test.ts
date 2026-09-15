@@ -38,11 +38,11 @@ describe('resolveSourceControlLaunchAgentScope', () => {
   it('flags a repo override that pins a different agent than the global default', () => {
     const scope = resolveSourceControlLaunchAgentScope({
       settings: settingsWithGlobalResolveAgent('claude'),
-      repo: repoWithResolveAgent('codex'),
+      repo: repoWithResolveAgent('opencode'),
       actionId: 'resolveConflicts'
     })
     expect(scope).toEqual({
-      effectiveAgentId: 'codex',
+      effectiveAgentId: 'opencode',
       globalAgentId: 'claude',
       overridesGlobalAgent: true
     })
@@ -79,7 +79,7 @@ describe('resolveSourceControlLaunchAgentScope', () => {
     }
     const scope = resolveSourceControlLaunchAgentScope({
       settings,
-      repo: repoWithResolveAgent('codex'),
+      repo: repoWithResolveAgent('opencode'),
       actionId: 'resolveConflicts'
     })
     expect(scope.globalAgentId).toBe('claude')

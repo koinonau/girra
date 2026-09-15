@@ -584,7 +584,7 @@ describe('OrcaRuntimeService', () => {
       })
 
       const create = runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'codex',
+        agent: 'claude',
         activate: true
       })
       await vi.waitFor(() => expect(send).toHaveBeenCalledTimes(1))
@@ -597,11 +597,11 @@ describe('OrcaRuntimeService', () => {
         leafId,
         status: 'ready'
       })
-      // Why: the adopted PTY never launched codex, so the settle must type the
+      // Why: the adopted PTY never launched claude, so the settle must type the
       // launch command (Enter as its own write) instead of succeeding silently.
       expect(write).toHaveBeenCalledTimes(2)
       expect(write.mock.calls[0][0]).toBe('pty-bare')
-      expect(String(write.mock.calls[0][1])).toMatch(/codex/)
+      expect(String(write.mock.calls[0][1])).toMatch(/claude/)
       expect(write.mock.calls[1]).toEqual(['pty-bare', '\r'])
     } finally {
       vi.useRealTimers()

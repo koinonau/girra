@@ -122,9 +122,9 @@ describe('remote agent completion authority', () => {
       isLive: () => true
     })
 
-    runtimeCall.mockResolvedValue(remoteInspectionWithEvidence('codex'))
+    runtimeCall.mockResolvedValue(remoteInspectionWithEvidence('claude'))
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/finished-task')
     await vi.advanceTimersByTimeAsync(0)
     await Promise.resolve()
@@ -149,9 +149,9 @@ describe('remote agent completion authority', () => {
       isLive: () => true
     })
 
-    runtimeCall.mockResolvedValue(remoteInspection('codex'))
+    runtimeCall.mockResolvedValue(remoteInspection('claude'))
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/legacy-host-title')
     await vi.advanceTimersByTimeAsync(0)
     await Promise.resolve()
@@ -176,23 +176,23 @@ describe('remote agent completion authority', () => {
     })
 
     runtimeCall
-      .mockResolvedValueOnce(remoteInspectionWithEvidence('codex', 1))
+      .mockResolvedValueOnce(remoteInspectionWithEvidence('claude', 1))
       .mockResolvedValueOnce(remoteInspectionWithEvidence(null, 2, 'exited'))
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/first-finish')
     await vi.advanceTimersByTimeAsync(0)
     await Promise.resolve()
     await Promise.resolve()
     dispatchCompletion.mockClear()
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/second-finish')
     await vi.advanceTimersByTimeAsync(0)
     await Promise.resolve()
     await Promise.resolve()
 
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex', {
+    expect(dispatchCompletion).toHaveBeenCalledWith('claude', {
       source: 'process-exit',
       quietedHookDone: false,
       terminalIdleConfirmed: true
@@ -223,11 +223,11 @@ describe('remote agent completion authority', () => {
       })
 
     const stopped = createHookCoordinator('tab-remote:leaf-stopped')
-    stopped.observeHookStatus({ state: 'working', prompt: 'stop me', agentType: 'codex' })
+    stopped.observeHookStatus({ state: 'working', prompt: 'stop me', agentType: 'claude' })
     stopped.observeHookStatus({
       state: 'done',
       prompt: 'stop me',
-      agentType: 'codex',
+      agentType: 'claude',
       interrupted: true
     })
     await vi.advanceTimersByTimeAsync(1_500)
@@ -238,8 +238,8 @@ describe('remote agent completion authority', () => {
     tracker.handleChunk('\u001b]133;D;130\u0007')
 
     const succeeded = createHookCoordinator('tab-remote:leaf-succeeded')
-    succeeded.observeHookStatus({ state: 'working', prompt: 'finish me', agentType: 'codex' })
-    succeeded.observeHookStatus({ state: 'done', prompt: 'finish me', agentType: 'codex' })
+    succeeded.observeHookStatus({ state: 'working', prompt: 'finish me', agentType: 'claude' })
+    succeeded.observeHookStatus({ state: 'done', prompt: 'finish me', agentType: 'claude' })
     await vi.advanceTimersByTimeAsync(1_500)
 
     expect(outcomes).toEqual([

@@ -152,12 +152,12 @@ describe('parseWorkspaceSession', () => {
             id: 'tab1',
             ptyId: null,
             worktreeId: 'wt',
-            title: 'codex',
+            title: 'opencode',
             customTitle: null,
             color: null,
             sortOrder: 0,
             createdAt: 1,
-            launchAgent: 'codex'
+            launchAgent: 'opencode'
           }
         ]
       },
@@ -165,7 +165,7 @@ describe('parseWorkspaceSession', () => {
     })
     expect(result.ok).toBe(true)
     if (result.ok) {
-      expect(result.value.tabsByWorktree.wt[0].launchAgent).toBe('codex')
+      expect(result.value.tabsByWorktree.wt[0].launchAgent).toBe('opencode')
     }
   })
 
@@ -297,7 +297,7 @@ describe('parseWorkspaceSession', () => {
             id: 'tab1',
             ptyId: null,
             worktreeId: 'wt',
-            title: 'Codex',
+            title: 'Claude',
             aiVaultTitle: { agent: 'future-agent', sessionId: 'session-1', title: 'Name' },
             customTitle: null,
             color: null,
@@ -315,7 +315,7 @@ describe('parseWorkspaceSession', () => {
             groupId: 'group1',
             worktreeId: 'wt',
             contentType: 'terminal',
-            label: 'Codex',
+            label: 'Claude',
             aiVaultTitle: 'malformed',
             customLabel: null,
             color: null,

@@ -102,7 +102,7 @@ type ExecResult = {
 
 /**
  * Non-interactive subprocess exec on the remote host. Used by the AI commit
- * message generator to spawn agent CLIs (claude, codex, …) with the staged
+ * message generator to spawn agent CLIs (claude, opencode, …) with the staged
  * diff piped via stdin and the output captured to stdout. Distinct from
  * `pty.spawn` because we want no terminal allocation, no escape sequences,
  * and a clean exit code instead of an interactive session.

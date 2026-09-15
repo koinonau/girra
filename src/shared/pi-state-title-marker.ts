@@ -1,11 +1,11 @@
 import type { AgentStatus } from './agent-title-core'
 
 /**
- * Markers Pi/OMP write between the `π` prefix and their label to encode turn state
+ * Markers Pi writes between the `π` prefix and their label to encode turn state
  * (`π : cwd` working, `π > cwd` idle, `π ! cwd` needs input).
  *
- * Kept as a table because upstream re-punctuates this channel between releases: OMP
- * 17.2.12 replaced its animated braille frames with these static markers on WSL/ConPTY,
+ * Kept as a table because upstream re-punctuates this channel between releases: a Pi-compatible
+ * release replaced its animated braille frames with these static markers on WSL/ConPTY,
  * where the console host cannot repaint fast enough to animate (#13890, #8014). Every
  * consumer — status detection, the display-title normalizer, and the stale-title clear —
  * reads this one table, so teaching Orca a later protocol is a row, not a reparse.
@@ -41,7 +41,7 @@ type PiStateTitleMatch = {
 }
 
 /**
- * Leftmost marker wins: everything after it is Pi/OMP's own label, which legally contains
+ * Leftmost marker wins: everything after it is Pi's own label, which legally contains
  * the wrapper separator and marker-shaped punctuation of its own (`π > release | π : note`).
  */
 function matchPiStateTitle(title: string): PiStateTitleMatch | null {
@@ -55,7 +55,7 @@ function matchPiStateTitle(title: string): PiStateTitleMatch | null {
   }
 }
 
-/** Status a Pi/OMP native state title asserts, or null when the title carries no marker. */
+/** Status a Pi native state title asserts, or null when the title carries no marker. */
 export function getPiStateTitleStatus(title: string): AgentStatus | null {
   const match = matchPiStateTitle(title)
   return match ? PI_STATE_MARKER_STATUS[match.marker] : null

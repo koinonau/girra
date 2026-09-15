@@ -32,9 +32,7 @@ describe('isGroupAddress', () => {
     expect(isGroupAddress('@all')).toBe(true)
     expect(isGroupAddress('@idle')).toBe(true)
     expect(isGroupAddress('@claude')).toBe(true)
-    expect(isGroupAddress('@droid')).toBe(true)
-    expect(isGroupAddress('@grok')).toBe(true)
-    expect(isGroupAddress('@cursor')).toBe(true)
+    expect(isGroupAddress('@opencode')).toBe(true)
     expect(isGroupAddress('@worktree:wt_1')).toBe(true)
   })
 
@@ -108,28 +106,23 @@ describe('resolveGroupAddress', () => {
       const terminals = [
         makeSummary('term_a', { agentIdentity: 'claude' }),
         makeSummary('term_b', { agentIdentity: 'claude' }),
-        makeSummary('term_c', { agentIdentity: 'codex' })
+        makeSummary('term_c', { agentIdentity: 'opencode' })
       ]
       expect(resolveGroupAddress('@claude', 'term_a', terminals, noStatus)).toEqual(['term_b'])
     })
 
-    it.each([
-      ['@codex', 'codex'],
-      ['@openclaude', 'openclaude'],
-      ['@mimo', 'mimo-code'],
-      ['@gemini', 'gemini'],
-      ['@droid', 'droid'],
-      ['@grok', 'grok'],
-      ['@cursor', 'cursor'],
-      ['@opencode', 'opencode']
-    ])('routes %s to its agent id', (group, agentIdentity) => {
+    it('routes @opencode to its agent id', () => {
       const terminals = [
         makeSummary('sender'),
-        makeSummary('target', { agentIdentity: agentIdentity as never }),
+        makeSummary('target', { agentIdentity: 'opencode' }),
         makeSummary('other', { agentIdentity: 'claude' })
       ]
-      const expected = agentIdentity === 'claude' ? ['target', 'other'] : ['target']
-      expect(resolveGroupAddress(group, 'sender', terminals, noStatus)).toEqual(expected)
+      expect(resolveGroupAddress('@opencode', 'sender', terminals, noStatus)).toEqual(['target'])
+    })
+
+    it('has no @pi group', () => {
+      const terminals = [makeSummary('sender'), makeSummary('target', { agentIdentity: 'pi' })]
+      expect(resolveGroupAddress('@pi', 'sender', terminals, noStatus)).toEqual([])
     })
 
     it('is case-insensitive for the group address', () => {
@@ -139,47 +132,37 @@ describe('resolveGroupAddress', () => {
 
     it('excludes the sender even when the sender is that agent', () => {
       const terminals = [
-        makeSummary('sender', { agentIdentity: 'grok' }),
-        makeSummary('target', { agentIdentity: 'grok' })
+        makeSummary('sender', { agentIdentity: 'opencode' }),
+        makeSummary('target', { agentIdentity: 'opencode' })
       ]
-      expect(resolveGroupAddress('@grok', 'sender', terminals, noStatus)).toEqual(['target'])
+      expect(resolveGroupAddress('@opencode', 'sender', terminals, noStatus)).toEqual(['target'])
     })
 
     describe('a task title can no longer redirect a message', () => {
-      // The bug. Recorded titles of this exact shape exist: a Grok pane named
-      // "Switch Claude and Codex off the load balancer… - grok" received both @claude and @codex.
-      it('does not route @claude to a Codex pane whose task text names Claude', () => {
+      // The bug: a pane whose task title named another agent received that agent's messages.
+      it('does not route @claude to an OpenCode pane whose task text names Claude', () => {
         const terminals = [
           makeSummary('sender'),
-          makeSummary('codex_pane', {
-            agentIdentity: 'codex',
+          makeSummary('opencode_pane', {
+            agentIdentity: 'opencode',
             title: 'Review the Claude session-history fix'
           })
         ]
         expect(resolveGroupAddress('@claude', 'sender', terminals, noStatus)).toEqual([])
       })
 
-      it('does not route @codex to a Grok pane whose task text names Codex', () => {
-        const terminals = [
-          makeSummary('sender'),
-          makeSummary('grok_pane', {
-            agentIdentity: 'grok',
-            title: 'Switch Claude and Codex off the load balancer… - grok'
-          })
-        ]
-        expect(resolveGroupAddress('@codex', 'sender', terminals, noStatus)).toEqual([])
-        expect(resolveGroupAddress('@grok', 'sender', terminals, noStatus)).toEqual(['grok_pane'])
-      })
-
-      it('does not route @cursor to a pane merely discussing a text cursor', () => {
+      it('does not route @opencode to a Claude pane whose task text names OpenCode', () => {
         const terminals = [
           makeSummary('sender'),
           makeSummary('claude_pane', {
             agentIdentity: 'claude',
-            title: 'fix the text cursor blink'
+            title: 'Switch Claude and OpenCode off the load balancer'
           })
         ]
-        expect(resolveGroupAddress('@cursor', 'sender', terminals, noStatus)).toEqual([])
+        expect(resolveGroupAddress('@opencode', 'sender', terminals, noStatus)).toEqual([])
+        expect(resolveGroupAddress('@claude', 'sender', terminals, noStatus)).toEqual([
+          'claude_pane'
+        ])
       })
     })
 

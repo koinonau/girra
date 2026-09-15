@@ -251,8 +251,6 @@ export async function launchWorkItemDirect(args: LaunchWorkItemDirectArgs): Prom
   const structuredResult = await settleDirectWorkItemStructuredLaunch({
     plan,
     worktreeId,
-    workspacePath: worktreePath,
-    connectionId: repoConnectionId,
     primaryTabId,
     startupPlan,
     launchSource

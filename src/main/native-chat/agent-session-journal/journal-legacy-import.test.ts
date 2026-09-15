@@ -521,7 +521,7 @@ describe('import failures', () => {
     const journal = await open(CLAUDE_SESSION)
     const result = await importLegacyTranscriptIntoJournal({
       journal,
-      agent: 'gemini',
+      agent: 'opencode',
       sessionId: CLAUDE_SESSION,
       fence: 1,
       options: { filePath: join(root, 'claude.jsonl') }

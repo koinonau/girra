@@ -183,7 +183,7 @@ describe('connectPanePty', () => {
     expect(terminalInputHandler).toBeTypeOf('function')
     terminalInputHandler?.('a')
 
-    const redraw = `\x1b[2J\x1b[H${'codex composer redraw '.repeat(200)}`
+    const redraw = `\x1b[2J\x1b[H${'agent composer redraw '.repeat(200)}`
     capturedDataCallback.current?.(redraw)
 
     expect(pane.terminal.write).toHaveBeenCalledWith(redraw, expect.any(Function))
@@ -209,7 +209,7 @@ describe('connectPanePty', () => {
     expect(terminalInputHandler).toBeTypeOf('function')
     terminalInputHandler?.('a')
 
-    const redraw = `\x1b[2J\x1b[H${'codex large composer redraw '.repeat(1_200)}`
+    const redraw = `\x1b[2J\x1b[H${'agent large composer redraw '.repeat(1_200)}`
     expect(redraw.length).toBeGreaterThan(16 * 1024)
     expect(redraw.length).toBeLessThan(128 * 1024)
     capturedDataCallback.current?.(redraw)
@@ -428,7 +428,7 @@ describe('connectPanePty', () => {
       await flushAsyncTicks(6)
 
       vi.useFakeTimers()
-      const repaintBody = 'codex spinner '.repeat(200)
+      const repaintBody = 'agent spinner '.repeat(200)
       capturedDataCallback.current?.(`\x1b[?2026h${repaintBody}`)
       vi.advanceTimersByTime(300)
       pane.terminal.write.mockClear()

@@ -95,7 +95,6 @@ describe('prepareAgentSessionContinuationFromPane', () => {
     expect(request).toMatchObject({
       worktreeId: 'wt-1',
       groupId: 'group-1',
-      workspacePath: '/repo/worktree',
       initialCwd: '/repo/worktree/packages/app',
       source: {
         sourceAgent: 'claude',

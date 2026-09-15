@@ -15,7 +15,7 @@ function agentRow(paneKey: string, state: string, now: number): unknown {
     tab: { id: 'tab-1', title: 'Terminal' },
     state,
     startedAt: now,
-    agentType: 'codex',
+    agentType: 'opencode',
     entry: {
       prompt: state === 'working' ? 'Busy' : 'Ready',
       state,
@@ -33,7 +33,7 @@ function storeAgent(paneKey: string, state: string, prompt: string, now: number)
     prompt,
     updatedAt: now,
     stateStartedAt: now,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
     stateHistory: []
   }
@@ -174,7 +174,7 @@ describe('WorktreeCardAgents send targets', () => {
       ...targetStoreState(now),
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          2: 'Codex - action required'
+          2: 'OpenCode - action required'
         }
       },
       agentSendPopoverTargetMode: activeTargetMode()

@@ -128,7 +128,7 @@ describe('migrateWorktreeIdentity', () => {
           paneKey: 'tab1:leaf',
           tabId: 'tab1',
           worktreeId: OLD,
-          agent: 'codex',
+          agent: 'opencode',
           providerSession: { key: 'session_id', id: 'session-1' },
           prompt: 'Do work',
           state: 'done',

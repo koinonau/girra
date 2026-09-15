@@ -48,7 +48,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-1"
         sessionId="session-1"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -80,7 +80,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-wedge"
         sessionId="session-wedge"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -112,7 +112,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-probe-flag"
         sessionId="session-probe-flag"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -145,7 +145,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-parked"
         sessionId="session-parked"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -195,7 +195,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-churn"
         sessionId="session-churn"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
     const { rerender } = render(makeView())
@@ -249,7 +249,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-target-switch"
         sessionId="session-target-switch"
         target={target}
-        agent="codex"
+        agent="claude"
       />
     )
     const { rerender } = render(makeView({ kind: 'local' }))
@@ -284,7 +284,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-forced"
         sessionId="session-forced"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -323,7 +323,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
         tabId="structured-tab-pending"
         sessionId="session-pending"
         target={{ kind: 'local' }}
-        agent="codex"
+        agent="claude"
       />
     )
 
@@ -353,7 +353,7 @@ describe('NativeChatStructuredSession transport-unconfirmed sends', () => {
           tabId="structured-tab-budget"
           sessionId="session-budget"
           target={{ kind: 'local' }}
-          agent="codex"
+          agent="claude"
         />
       )
 

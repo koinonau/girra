@@ -137,7 +137,7 @@ describe('resumeTerminalVisibility reveal repaint', () => {
   })
 
   it('routes a heavy reveal through fitAllRevealedPanes, not the sync fit', () => {
-    // Regression: the sync reveal fit applied a transient one-column DOM↔WebGL grid, garbling grok on restore.
+    // Regression: the sync reveal fit applied a transient one-column DOM↔WebGL grid, garbling inline TUIs on restore.
     const manager = createManager()
     resumeTerminalVisibility(resumeArgs(manager, false))
 

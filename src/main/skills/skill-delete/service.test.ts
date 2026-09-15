@@ -87,7 +87,7 @@ describe('deleteSkills', () => {
 
   it('removes an alias-file symlink but keeps a directory that holds anything else', async () => {
     const { home, stateDirectory, file } = await fixture()
-    const aliasDirectory = join(home, '.codex', 'skills', 'demo')
+    const aliasDirectory = join(home, '.config', 'opencode', 'skills', 'demo')
     await mkdir(aliasDirectory, { recursive: true })
     await symlink(file, join(aliasDirectory, 'SKILL.md'))
     await writeFile(join(aliasDirectory, 'notes.md'), 'kept')
@@ -101,7 +101,7 @@ describe('deleteSkills', () => {
 
   it('removes an emptied alias-file directory', async () => {
     const { home, stateDirectory, file } = await fixture()
-    const aliasDirectory = join(home, '.codex', 'skills', 'demo')
+    const aliasDirectory = join(home, '.config', 'opencode', 'skills', 'demo')
     await mkdir(aliasDirectory, { recursive: true })
     await symlink(file, join(aliasDirectory, 'SKILL.md'))
 

@@ -30,7 +30,7 @@ describe('orchestration mailbox pointer submit', () => {
       writable: true,
       lastAgentStatus: 'idle' as const,
       lastAgentStatusObservedLive: true,
-      lastOscTitle: 'Codex done'
+      lastOscTitle: 'Claude done'
     }
     const expectedTarget = {
       leaf,
@@ -131,7 +131,7 @@ describe('orchestration mailbox pointer submit', () => {
       writable: true,
       lastAgentStatus: 'idle' as const,
       lastAgentStatusObservedLive: true,
-      lastOscTitle: 'Codex done'
+      lastOscTitle: 'Claude done'
     }
     const state = new OrchestrationMailboxPointerState()
     const flight = state.beginFlight(ptyId)
@@ -201,7 +201,7 @@ describe('orchestration mailbox pointer submit', () => {
       writable: true,
       lastAgentStatus: 'idle' as const,
       lastAgentStatusObservedLive: true,
-      lastOscTitle: 'Codex done'
+      lastOscTitle: 'Claude done'
     }
     const expectedTarget = {
       leaf,
@@ -343,7 +343,7 @@ describe('orchestration mailbox pointer submit', () => {
       writable: true,
       lastAgentStatus: 'idle' as const,
       lastAgentStatusObservedLive: true,
-      lastOscTitle: 'Codex done'
+      lastOscTitle: 'Claude done'
     }
     const expectedTarget = {
       leaf,
@@ -399,7 +399,7 @@ describe('orchestration mailbox pointer submit', () => {
       writable: true,
       lastAgentStatus: 'idle' as const,
       lastAgentStatusObservedLive: true,
-      lastOscTitle: 'Codex done'
+      lastOscTitle: 'Claude done'
     }
     const expectedTarget = {
       leaf,
@@ -458,7 +458,7 @@ describe('orchestration mailbox pointer submit', () => {
       writable: true,
       lastAgentStatus: 'idle' as const,
       lastAgentStatusObservedLive: true,
-      lastOscTitle: 'Codex done'
+      lastOscTitle: 'Claude done'
     }
     const target = {
       leaf,

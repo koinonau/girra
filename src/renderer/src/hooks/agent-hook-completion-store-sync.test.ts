@@ -81,7 +81,7 @@ describe('agent hook completion store sync', () => {
     const titleOnly = createState({
       ...previous,
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-1', ptyId: 'pty-1', title: 'Codex working' }]
+        'wt-1': [{ id: 'tab-1', ptyId: 'pty-1', title: 'OpenCode working' }]
       }
     })
     expect(shouldSyncAgentHookCompletionForStoreUpdate(titleOnly, previous)).toBe(false)

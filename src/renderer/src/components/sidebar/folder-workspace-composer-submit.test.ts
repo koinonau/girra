@@ -71,19 +71,11 @@ function makeFolderWorkspace(overrides: Partial<FolderWorkspace> = {}): FolderWo
 describe('submitFolderWorkspaceCreate', () => {
   beforeEach(() => {
     mocks.activateAndRevealFolderWorkspace.mockReturnValue({ primaryTabId: 'tab-1' })
-    Object.assign(window, {
-      api: {
-        agentTrust: {
-          markTrusted: vi.fn().mockResolvedValue(undefined)
-        }
-      }
-    })
   })
 
   afterEach(() => {
     mocks.activateAndRevealFolderWorkspace.mockReset()
     mocks.ensureAgentStartupInTerminal.mockReset()
-    Reflect.deleteProperty(window, 'api')
     vi.restoreAllMocks()
   })
 
@@ -135,7 +127,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem: null,
       note: 'Fix the flaky checkout flow',
-      quickAgent: 'codex',
+      quickAgent: 'opencode',
       autoRenameBranchFromWork: true,
       agentCmdOverrides: {},
       agentArgs: '--model gpt-5.4',
@@ -151,7 +143,7 @@ describe('submitFolderWorkspaceCreate', () => {
       name: 'Platform workspace',
       connectionId: null,
       linkedTask: null,
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       pendingFirstAgentMessageRename: true
     })
     expect(mocks.activateAndRevealFolderWorkspace).toHaveBeenCalledWith(
@@ -159,7 +151,7 @@ describe('submitFolderWorkspaceCreate', () => {
       expect.objectContaining({
         runtimeEnvironmentId: 'env-1',
         startup: expect.objectContaining({
-          command: expect.stringContaining('codex'),
+          command: expect.stringContaining('opencode'),
           env: { ORCA_AGENT_PROFILE: 'review' },
           telemetry: expect.objectContaining({
             launch_source: 'new_workspace_composer'
@@ -182,7 +174,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem: null,
       note: 'Fix the flaky checkout flow',
-      quickAgent: 'codex',
+      quickAgent: 'opencode',
       autoRenameBranchFromWork: true,
       agentCmdOverrides: {},
       createFolderWorkspace,
@@ -194,7 +186,7 @@ describe('submitFolderWorkspaceCreate', () => {
       name: 'Checkout polish',
       connectionId: null,
       linkedTask: null,
-      createdWithAgent: 'codex'
+      createdWithAgent: 'opencode'
     })
   })
 
@@ -215,7 +207,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem,
       note: 'Use the issue context',
-      quickAgent: 'codex',
+      quickAgent: 'opencode',
       autoRenameBranchFromWork: true,
       agentCmdOverrides: {},
       createFolderWorkspace,
@@ -227,7 +219,7 @@ describe('submitFolderWorkspaceCreate', () => {
       name: 'Restore checkout polish',
       connectionId: null,
       linkedTask: linkedWorkItem,
-      createdWithAgent: 'codex'
+      createdWithAgent: 'opencode'
     })
   })
 
@@ -277,7 +269,7 @@ describe('submitFolderWorkspaceCreate', () => {
     })
   })
 
-  it('keeps linked Codex context out of submitted startup and pastes it as a draft', async () => {
+  it('keeps linked OpenCode context out of submitted startup and pastes it as a draft', async () => {
     const createFolderWorkspace = vi.fn(async () => makeFolderWorkspace())
     const linkedWorkItem = {
       provider: 'github' as const,
@@ -294,7 +286,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem,
       note: 'Review this before starting',
-      quickAgent: 'codex',
+      quickAgent: 'opencode',
       autoRenameBranchFromWork: true,
       agentCmdOverrides: {},
       launchSource: 'new_workspace_composer',
@@ -307,36 +299,36 @@ describe('submitFolderWorkspaceCreate', () => {
       name: 'Restore linked quick-create',
       connectionId: null,
       linkedTask: linkedWorkItem,
-      createdWithAgent: 'codex'
+      createdWithAgent: 'opencode'
     })
     const startup = mocks.activateAndRevealFolderWorkspace.mock.calls[0]?.[1]?.startup
-    expect(startup?.command).toBe('codex')
+    expect(startup?.command).toBe('opencode')
     expect(startup?.command).not.toContain(linkedWorkItem.url)
     expect(startup?.command).not.toContain('Review this before starting')
     expect(mocks.ensureAgentStartupInTerminal).toHaveBeenCalledWith({
       worktreeId: folderWorkspaceKey('folder-workspace-1'),
       primaryTabId: 'tab-1',
       startup: expect.objectContaining({
-        agent: 'codex',
-        launchCommand: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
         followupPrompt: null,
         draftPrompt: `Review this before starting\n\n${linkedWorkItem.url}`
       })
     })
   })
 
-  it('pre-marks remote linked folder workspaces trusted before draft paste', async () => {
+  it('pastes the linked draft for remote folder workspaces', async () => {
     const createFolderWorkspace = vi.fn(async () =>
       makeFolderWorkspace({
         connectionId: 'ssh-1',
-        folderPath: '/home/alice/platform/Trust remote folder draft'
+        folderPath: '/home/alice/platform/Remote folder draft'
       })
     )
     const linkedWorkItem = {
       provider: 'github' as const,
       type: 'pr' as const,
       number: 92,
-      title: 'Trust remote folder draft',
+      title: 'Remote folder draft',
       url: 'https://github.com/stablyai/orca/pull/92',
       repoId: 'repo-1'
     }
@@ -352,7 +344,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem,
       note: '',
-      quickAgent: 'copilot',
+      quickAgent: 'opencode',
       autoRenameBranchFromWork: false,
       agentCmdOverrides: {},
       isRemote: true,
@@ -360,16 +352,11 @@ describe('submitFolderWorkspaceCreate', () => {
       onOpenChange: vi.fn()
     })
 
-    expect(window.api.agentTrust?.markTrusted).toHaveBeenCalledWith({
-      preset: 'copilot',
-      workspacePath: '/home/alice/platform/Trust remote folder draft',
-      connectionId: 'ssh-1'
-    })
     expect(mocks.ensureAgentStartupInTerminal).toHaveBeenCalledWith(
       expect.objectContaining({
         worktreeId: folderWorkspaceKey('folder-workspace-1'),
         startup: expect.objectContaining({
-          agent: 'copilot',
+          agent: 'opencode',
           draftPrompt: linkedWorkItem.url
         })
       })
@@ -381,11 +368,11 @@ describe('submitFolderWorkspaceCreate', () => {
 
     await submitFolderWorkspaceCreate({
       projectGroup: makeProjectGroup(),
-      name: 'Aider followup',
+      name: 'Agent Teams followup',
       lastAutoName: '',
       linkedWorkItem: null,
       note: 'Fix the failing folder prompt flow',
-      quickAgent: 'aider',
+      quickAgent: 'claude-agent-teams',
       autoRenameBranchFromWork: false,
       agentCmdOverrides: {},
       createFolderWorkspace,
@@ -393,13 +380,13 @@ describe('submitFolderWorkspaceCreate', () => {
     })
 
     const startup = mocks.activateAndRevealFolderWorkspace.mock.calls[0]?.[1]?.startup
-    expect(startup?.command).toBe('aider')
+    expect(startup?.command).toContain('claude-teams')
     expect(mocks.ensureAgentStartupInTerminal).toHaveBeenCalledWith({
       worktreeId: folderWorkspaceKey('folder-workspace-1'),
       primaryTabId: 'tab-1',
       startup: expect.objectContaining({
-        agent: 'aider',
-        launchCommand: 'aider',
+        agent: 'claude-agent-teams',
+        launchCommand: expect.stringContaining('claude-teams'),
         followupPrompt: 'Fix the failing folder prompt flow'
       })
     })
@@ -544,7 +531,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem: null,
       note: '   ',
-      quickAgent: 'codex',
+      quickAgent: 'opencode',
       autoRenameBranchFromWork: true,
       agentCmdOverrides: {},
       createFolderWorkspace,
@@ -556,7 +543,7 @@ describe('submitFolderWorkspaceCreate', () => {
       name: 'Platform workspace',
       connectionId: null,
       linkedTask: null,
-      createdWithAgent: 'codex'
+      createdWithAgent: 'opencode'
     })
   })
 
@@ -704,16 +691,12 @@ describe('submitFolderWorkspaceCreate native-chat launch draft', () => {
   beforeEach(() => {
     mocks.activateAndRevealFolderWorkspace.mockReturnValue({ primaryTabId: 'tab-1' })
     useAppStore.setState({ nativeChatLaunchDraftByTabId: {} })
-    Object.assign(window, {
-      api: { agentTrust: { markTrusted: vi.fn().mockResolvedValue(undefined) } }
-    })
   })
 
   afterEach(() => {
     mocks.activateAndRevealFolderWorkspace.mockReset()
     mocks.ensureAgentStartupInTerminal.mockReset()
     useAppStore.setState({ nativeChatLaunchDraftByTabId: {} })
-    Reflect.deleteProperty(window, 'api')
     vi.restoreAllMocks()
   })
 
@@ -771,16 +754,12 @@ describe('folder-workspace draft: seeded set == chat-opening set', () => {
   beforeEach(() => {
     mocks.activateAndRevealFolderWorkspace.mockReturnValue({ primaryTabId: 'tab-1' })
     useAppStore.setState({ nativeChatLaunchDraftByTabId: {} })
-    Object.assign(window, {
-      api: { agentTrust: { markTrusted: vi.fn().mockResolvedValue(undefined) } }
-    })
   })
 
   afterEach(() => {
     mocks.activateAndRevealFolderWorkspace.mockReset()
     mocks.ensureAgentStartupInTerminal.mockReset()
     useAppStore.setState({ nativeChatLaunchDraftByTabId: {} })
-    Reflect.deleteProperty(window, 'api')
     vi.restoreAllMocks()
   })
 

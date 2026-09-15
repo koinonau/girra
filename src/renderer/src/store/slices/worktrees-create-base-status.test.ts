@@ -120,7 +120,7 @@ describe('createWorktree base status merge', () => {
       path: '/path/wt1',
       linkedIssue: 123,
       linkedPR: 456,
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       linkedLinearIssue: 'ENG-123',
       workspaceStatus: 'in-review',
       pendingFirstAgentMessageRename: true
@@ -139,7 +139,7 @@ describe('createWorktree base status merge', () => {
         123,
         456,
         undefined,
-        'codex',
+        'opencode',
         'ENG-123',
         undefined,
         'in-review',
@@ -155,7 +155,7 @@ describe('createWorktree base status merge', () => {
         name: 'feature',
         linkedIssue: 123,
         linkedPR: 456,
-        createdWithAgent: 'codex',
+        createdWithAgent: 'opencode',
         linkedLinearIssue: 'ENG-123',
         workspaceStatus: 'in-review',
         pendingFirstAgentMessageRename: true
@@ -164,7 +164,7 @@ describe('createWorktree base status merge', () => {
     expect(store.getState().worktreesByRepo.repo1[0]).toMatchObject({
       linkedIssue: 123,
       linkedPR: 456,
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       linkedLinearIssue: 'ENG-123',
       workspaceStatus: 'in-review',
       pendingFirstAgentMessageRename: true

@@ -60,7 +60,7 @@ const SUBMISSIONS: AgentJournalSubmission[] = [
     fence: 1,
     payloadFingerprint: 'fp',
     dispatchState: 'accepted',
-    providerItemId: 'codex:thread:t1:0',
+    providerItemId: 'claude:thread:t1:0',
     reason: null,
     submittedAt: 1,
     resolvedAt: 2
@@ -84,7 +84,7 @@ describe('useStructuredAgentTurnTiming', () => {
           state: 'completed',
           startedAt: HOST_START,
           completedAt: HOST_START + 197_900,
-          userItemId: 'codex:thread:t1:0'
+          userItemId: 'claude:thread:t1:0'
         },
         HOST_START + 5
       ),

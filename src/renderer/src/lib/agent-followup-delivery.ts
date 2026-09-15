@@ -45,8 +45,8 @@ async function waitForAgentForeground(
       if (isExpectedAgentProcess(foreground, expectedProcess)) {
         return true
       }
-      // Why: interpreter-wrapped agents (aider, mistral-vibe are pip console
-      // scripts) surface a python/node foreground comm, so the exact-name check
+      // Why: interpreter-wrapped agents (npm or pip console scripts) surface a
+      // python/node foreground comm, so the exact-name check
       // never matches — locally when the ps-table resolver can't pin the child,
       // and over SSH when the relay falls back to the bare interpreter name. If
       // the foreground is a known agent wrapper (not a shell) with a live

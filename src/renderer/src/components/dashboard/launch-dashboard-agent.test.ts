@@ -34,11 +34,11 @@ describe('launchDashboardAgent', () => {
   })
 
   it('activates a folder or git workspace on its execution host before launching', () => {
-    expect(launchDashboardAgent({ worktreeId: 'folder:docs', agent: 'codex' })).toBe(true)
+    expect(launchDashboardAgent({ worktreeId: 'folder:docs', agent: 'opencode' })).toBe(true)
     expect(mocks.getKnownWorktreeById).toHaveBeenCalledWith('folder:docs', 'ssh:docs')
     expect(mocks.setActiveWorktree).toHaveBeenCalledWith('folder:docs', 'ssh:docs')
     expect(mocks.launchAgentInNewTab).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       worktreeId: 'folder:docs',
       launchSource: 'unknown'
     })

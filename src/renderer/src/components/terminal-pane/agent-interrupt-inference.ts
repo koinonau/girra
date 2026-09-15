@@ -48,10 +48,7 @@ function requiresDoubleEscapeForAgent(
 function shouldFlushInterruptImmediately(
   baseline: Pick<CapturedInterruptBaseline, 'agentType' | 'intent'>
 ): boolean {
-  return (
-    requiresDoubleEscapeForAgent(baseline.agentType, baseline.intent) ||
-    (baseline.agentType === 'codex' && baseline.intent === 'plain-escape')
-  )
+  return requiresDoubleEscapeForAgent(baseline.agentType, baseline.intent)
 }
 
 function canInferInterrupt(entry: AgentStatusEntry, intent: AgentInterruptInputIntent): boolean {

@@ -7,7 +7,7 @@ describe('listBoundAgentTabActions', () => {
       listBoundAgentTabActions(
         {
           'tab.newAgent.claude': ['Mod+Alt+Shift+C'],
-          'tab.newAgent.codex': [],
+          'tab.newAgent.opencode': [],
           'tab.newTerminal': ['Mod+T']
         },
         []
@@ -20,11 +20,11 @@ describe('listBoundAgentTabActions', () => {
       listBoundAgentTabActions(
         {
           'tab.newAgent.claude': ['Mod+Alt+Shift+C'],
-          'tab.newAgent.codex': ['Mod+Alt+Shift+X']
+          'tab.newAgent.opencode': ['Mod+Alt+Shift+X']
         },
         ['claude']
       )
-    ).toEqual([{ agent: 'codex', actionId: 'tab.newAgent.codex' }])
+    ).toEqual([{ agent: 'opencode', actionId: 'tab.newAgent.opencode' }])
   })
 
   it('returns nothing without overrides', () => {
@@ -37,11 +37,11 @@ describe('resolveDefaultAgentForNewTab', () => {
   it('prefers the configured default agent when detected and enabled', () => {
     expect(
       resolveDefaultAgentForNewTab({
-        defaultTuiAgent: 'codex',
-        detectedAgentIds: ['claude', 'codex'],
+        defaultTuiAgent: 'opencode',
+        detectedAgentIds: ['claude', 'opencode'],
         disabledTuiAgents: []
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('falls back to the auto-pick order when the default is blank', () => {
@@ -50,7 +50,7 @@ describe('resolveDefaultAgentForNewTab', () => {
     expect(
       resolveDefaultAgentForNewTab({
         defaultTuiAgent: 'blank',
-        detectedAgentIds: ['codex', 'claude'],
+        detectedAgentIds: ['opencode', 'claude'],
         disabledTuiAgents: []
       })
     ).toBe('claude')

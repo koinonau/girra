@@ -1,16 +1,9 @@
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
 import type { PaneForegroundAgentEntry } from '../../store/slices/pane-foreground-agent'
 import { resolveProtectedMultilinePasteOptionsForPane } from './terminal-agent-paste-bracketing'
-import { pasteTerminalText } from './terminal-bracketed-paste'
-import {
-  executeTerminalPastePlan,
-  planTerminalPaste,
-  type TerminalPasteTarget,
-  type TerminalPasteTextOptions
-} from './terminal-paste-coordinator'
-import { resolveTerminalPasteRuntime } from './terminal-paste-runtime'
+import type { TerminalPasteTextOptions } from './terminal-paste-coordinator'
 
 const TAB_ID = 'tab-1'
 const AGENT_LEAF = '11111111-1111-4111-8111-111111111111'
@@ -24,7 +17,7 @@ function agentEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusEntry
     updatedAt: 0,
     stateStartedAt: 0,
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey: AGENT_PANE_KEY,
     ...overrides
   }
@@ -36,7 +29,7 @@ function foregroundEntry(
   return { agent: null, shellForeground: false, ...overrides }
 }
 
-const CODEX_ON_AGENT_LEAF = { [AGENT_PANE_KEY]: agentEntry() }
+const OPENCODE_ON_AGENT_LEAF = { [AGENT_PANE_KEY]: agentEntry() }
 
 function decide(
   args: Partial<Parameters<typeof resolveProtectedMultilinePasteOptionsForPane>[0]> = {}
@@ -44,7 +37,7 @@ function decide(
   return resolveProtectedMultilinePasteOptionsForPane({
     isWindowsClient: false,
     hostPlatform: 'linux',
-    agentStatusByPaneKey: CODEX_ON_AGENT_LEAF,
+    agentStatusByPaneKey: OPENCODE_ON_AGENT_LEAF,
     paneForegroundAgentByPaneKey: {},
     tabId: TAB_ID,
     leafId: AGENT_LEAF,
@@ -88,7 +81,7 @@ describe('resolveProtectedMultilinePasteOptionsForPane', () => {
       decide({
         agentStatusByPaneKey: {},
         paneForegroundAgentByPaneKey: {
-          [AGENT_PANE_KEY]: foregroundEntry({ agent: 'codex', shellForeground: false })
+          [AGENT_PANE_KEY]: foregroundEntry({ agent: 'opencode', shellForeground: false })
         }
       })
     ).toEqual({ forceBracketedPasteForMultiline: true })
@@ -140,13 +133,7 @@ describe('resolveProtectedMultilinePasteOptionsForPane', () => {
     ).toEqual({ forceBracketedPasteForMultiline: true })
   })
 
-  it('uses modified Enter for an agent that reads Windows input records', () => {
-    expect(decide({ hostPlatform: 'win32' })).toEqual({
-      windowsInputRecordNewline: 'alt-enter'
-    })
-  })
-
-  it('does not change unverified Windows agent paste protocols', () => {
+  it('brackets agent pastes on a Windows host', () => {
     expect(
       decide({
         hostPlatform: 'win32',
@@ -155,63 +142,5 @@ describe('resolveProtectedMultilinePasteOptionsForPane', () => {
         }
       })
     ).toEqual({ forceBracketedPasteForMultiline: true })
-  })
-})
-
-describe('leading-newline paste into a remote agent pane', () => {
-  // Regression: a mac client on a remote Windows host pasted a block starting with "\n".
-  // ConPTY never forwarded DECSET 2004, so xterm rewrote the newline to CR and codex
-  // submitted the draft parked in its composer.
-  const PASTED = '\nRemember: At the end of the day, we want the best possible code.'
-
-  function remoteWindowsTarget(): TerminalPasteTarget {
-    return {
-      kind: 'terminal',
-      paneId: 1,
-      leafId: AGENT_LEAF,
-      ptyId: 'remote:host-abc/pty-1',
-      runtime: resolveTerminalPasteRuntime({
-        platform: 'win32',
-        ptyId: 'remote:host-abc/pty-1',
-        isWindowsConpty: false
-      })
-    }
-  }
-
-  it('encodes the leading newline as modified Enter instead of submit', async () => {
-    const terminal = {
-      modes: { bracketedPasteMode: false },
-      options: { ignoreBracketedPasteMode: false },
-      input: vi.fn(),
-      paste: vi.fn()
-    }
-    const plan = planTerminalPaste({
-      text: PASTED,
-      source: 'keyboard',
-      target: remoteWindowsTarget(),
-      terminalBracketedPasteMode: false,
-      ...decide({ hostPlatform: 'win32' })
-    })
-    await executeTerminalPastePlan(plan, {
-      pasteText: (text, options) => pasteTerminalText(terminal, text, options)
-    })
-
-    expect(plan.payload.lineCount).toBe(2)
-    expect(plan.mode).toBe('windows-input-record')
-    expect(plan.bracketed).toBe(false)
-    expect(terminal.input).toHaveBeenCalledWith(`\x1b\r${PASTED.slice(1)}`)
-    expect(terminal.paste).not.toHaveBeenCalled()
-  })
-
-  it('a single-line paste stays on the direct path', () => {
-    const plan = planTerminalPaste({
-      text: 'no newline here',
-      source: 'keyboard',
-      target: remoteWindowsTarget(),
-      terminalBracketedPasteMode: false,
-      ...decide({ hostPlatform: 'win32' })
-    })
-
-    expect(plan.mode).toBe('direct')
   })
 })

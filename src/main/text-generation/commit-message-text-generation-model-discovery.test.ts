@@ -42,17 +42,6 @@ beforeEach(() => {
 })
 
 describe('discoverCommitMessageModelsLocal', () => {
-  it('returns static catalog models without spawning for static agents', async () => {
-    const result = await discoverCommitMessageModelsLocal('amp', undefined)
-
-    expect(result).toMatchObject({
-      success: true,
-      catalogOrigin: 'spec',
-      defaultModelId: 'smart'
-    })
-    expect(spawnMock).not.toHaveBeenCalled()
-  })
-
   it('discovers dynamic models through the agent CLI', async () => {
     const listeners = new Map<string, (value: unknown) => void>()
     const child = {
@@ -65,22 +54,19 @@ describe('discoverCommitMessageModelsLocal', () => {
     }
     spawnMock.mockReturnValue(child as never)
 
-    const pending = discoverCommitMessageModelsLocal('cursor', undefined)
+    const pending = discoverCommitMessageModelsLocal('opencode', undefined)
 
-    listeners.get('stdout:data')?.(Buffer.from('auto - Auto\ngpt-5.2 - GPT-5.2\n'))
+    listeners.get('stdout:data')?.(Buffer.from('opencode/deepseek-v4-flash-free\nopenai/gpt-5.2\n'))
     listeners.get('close')?.(0)
 
     await expect(pending).resolves.toMatchObject({
       success: true,
-      defaultModelId: 'auto',
-      models: [
-        { id: 'auto', label: 'Auto' },
-        { id: 'gpt-5.2', label: 'GPT-5.2' }
-      ]
+      defaultModelId: 'opencode/deepseek-v4-flash-free',
+      models: [{ id: 'opencode/deepseek-v4-flash-free' }, { id: 'openai/gpt-5.2' }]
     })
     expect(spawnMock).toHaveBeenCalledWith(
-      'cursor-agent',
-      ['--list-models'],
+      'opencode',
+      ['models'],
       expect.objectContaining({ windowsHide: true })
     )
   })
@@ -185,25 +171,25 @@ describe('discoverCommitMessageModelsLocal', () => {
     }
     spawnMock.mockReturnValue(child as never)
 
-    const pending = discoverCommitMessageModelsLocal('cursor', undefined, 'npx cursor-agent')
+    const pending = discoverCommitMessageModelsLocal('opencode', undefined, 'npx opencode-ai')
 
-    listeners.get('stdout:data')?.(Buffer.from('auto - Auto\n'))
+    listeners.get('stdout:data')?.(Buffer.from('opencode/deepseek-v4-flash-free\n'))
     listeners.get('close')?.(0)
 
     await expect(pending).resolves.toMatchObject({
       success: true,
-      defaultModelId: 'auto'
+      defaultModelId: 'opencode/deepseek-v4-flash-free'
     })
     if (process.platform === 'win32') {
       expect(spawnMock).toHaveBeenCalledWith(
         expect.stringMatching(/cmd\.exe$/i),
-        ['/d', '/c', expect.stringMatching(/npx\.cmd$/i), 'cursor-agent', '--list-models'],
+        ['/d', '/c', expect.stringMatching(/npx\.cmd$/i), 'opencode-ai', 'models'],
         expect.objectContaining({ windowsHide: true })
       )
     } else {
       expect(spawnMock).toHaveBeenCalledWith(
         'npx',
-        ['cursor-agent', '--list-models'],
+        ['opencode-ai', 'models'],
         expect.objectContaining({ windowsHide: true })
       )
     }
@@ -222,17 +208,17 @@ describe('discoverCommitMessageModelsLocal', () => {
       }
       spawnMock.mockReturnValue(child as never)
 
-      const pending = discoverCommitMessageModelsLocal('cursor', undefined, undefined, {
+      const pending = discoverCommitMessageModelsLocal('opencode', undefined, undefined, {
         cwd: 'C:\\repo',
         wslDistro: 'Ubuntu'
       })
 
-      listeners.get('stdout:data')?.(Buffer.from('auto - Auto\n'))
+      listeners.get('stdout:data')?.(Buffer.from('opencode/deepseek-v4-flash-free\n'))
       listeners.get('close')?.(0)
 
       await expect(pending).resolves.toMatchObject({
         success: true,
-        defaultModelId: 'auto'
+        defaultModelId: 'opencode/deepseek-v4-flash-free'
       })
       expect(spawnMock).toHaveBeenCalledWith(
         'wsl.exe',
@@ -249,8 +235,8 @@ describe('discoverCommitMessageModelsLocal', () => {
       const shellCommand = spawnMock.mock.calls[0]?.[1]?.[5] as string
       expect(shellCommand).toContain('getent passwd')
       expect(shellCommand).toContain('/mnt/c/repo')
-      expect(shellCommand).toContain("'cursor-agent'")
-      expect(shellCommand).toContain('--list-models')
+      expect(shellCommand).toContain("'opencode'")
+      expect(shellCommand).toContain('models')
     })
   })
 
@@ -297,7 +283,7 @@ describe('discoverCommitMessageModelsLocal', () => {
         [
           'provider        model                   context  max-out  thinking  images',
           'github-copilot  gpt-5.4-mini            400K     128K     yes       yes',
-          'openai-codex    gpt-5.5                 272K     128K     yes       yes'
+          'openai          gpt-5.5                 272K     128K     yes       yes'
         ].join('\n')
       )
     )
@@ -306,7 +292,7 @@ describe('discoverCommitMessageModelsLocal', () => {
     await expect(pending).resolves.toMatchObject({
       success: true,
       defaultModelId: 'github-copilot/gpt-5.4-mini',
-      models: [{ id: 'github-copilot/gpt-5.4-mini' }, { id: 'openai-codex/gpt-5.5' }]
+      models: [{ id: 'github-copilot/gpt-5.4-mini' }, { id: 'openai/gpt-5.5' }]
     })
   })
 
@@ -316,10 +302,10 @@ describe('discoverCommitMessageModelsLocal', () => {
     spawnMock.mockReturnValue(child as never)
 
     try {
-      const pending = discoverCommitMessageModelsLocal('cursor', undefined)
+      const pending = discoverCommitMessageModelsLocal('opencode', undefined)
       const assertion = expect(pending).resolves.toMatchObject({
         success: false,
-        error: 'Cursor model discovery timed out after 60s.'
+        error: 'OpenCode model discovery timed out after 60s.'
       })
 
       await vi.advanceTimersByTimeAsync(60_000)
@@ -339,13 +325,13 @@ describe('discoverCommitMessageModelsLocal', () => {
     const child = createMockDiscoveryChild()
     spawnMock.mockReturnValue(child as never)
 
-    const pending = discoverCommitMessageModelsLocal('cursor', undefined)
+    const pending = discoverCommitMessageModelsLocal('opencode', undefined)
 
     child.stdout.emit('data', Buffer.alloc(4 * 1024 * 1024 + 1))
 
     await expect(pending).resolves.toMatchObject({
       success: false,
-      error: 'Cursor returned too much model data.'
+      error: 'OpenCode returned too much model data.'
     })
     await expectChildTerminated(child)
     expect(child.stdout.listenerCount('data')).toBe(0)
@@ -360,14 +346,14 @@ describe('generateCommitMessageFromContext', () => {
     const execute = vi.fn(async (plan, cwd, timeoutMs) => {
       expect(plan).toEqual({
         binary: 'npx',
-        args: ['cursor-agent', '--list-models'],
+        args: ['opencode-ai', 'models'],
         stdinPayload: null,
-        label: 'Cursor'
+        label: 'OpenCode'
       })
       expect(cwd).toBe('/remote/repo')
       expect(timeoutMs).toBe(60_000)
       return {
-        stdout: 'auto - Auto\ngpt-5.2 - GPT-5.2\n',
+        stdout: 'opencode/deepseek-v4-flash-free\nopenai/gpt-5.2\n',
         stderr: '',
         exitCode: 0,
         timedOut: false
@@ -375,19 +361,16 @@ describe('generateCommitMessageFromContext', () => {
     })
 
     const result = await discoverCommitMessageModelsRemote(
-      'cursor',
+      'opencode',
       '/remote/repo',
       execute,
-      'npx cursor-agent'
+      'npx opencode-ai'
     )
 
     expect(result).toMatchObject({
       success: true,
-      defaultModelId: 'auto',
-      models: [
-        { id: 'auto', label: 'Auto' },
-        { id: 'gpt-5.2', label: 'GPT-5.2' }
-      ]
+      defaultModelId: 'opencode/deepseek-v4-flash-free',
+      models: [{ id: 'opencode/deepseek-v4-flash-free' }, { id: 'openai/gpt-5.2' }]
     })
   })
 
@@ -397,18 +380,18 @@ describe('generateCommitMessageFromContext', () => {
       { code: SSH_MUX_REQUEST_TIMEOUT_CODE }
     )
     const result = await discoverCommitMessageModelsRemote(
-      'cursor',
+      'opencode',
       '/remote/repo',
       async () => {
         throw transportTimeout
       },
-      'npx cursor-agent'
+      'npx opencode-ai'
     )
 
     expect(result).toEqual({
       success: false,
       error:
-        'Cursor model discovery took longer than 60s and may still be running on the remote host.'
+        'OpenCode model discovery took longer than 60s and may still be running on the remote host.'
     })
   })
 
@@ -417,33 +400,37 @@ describe('generateCommitMessageFromContext', () => {
     // deadline, so this branch sees CONNECTION_LOST. Reporting "could not be reached" for it
     // asserts absence the client never observed (docs/reference/ssh-execution-boundary.md).
     const result = await discoverCommitMessageModelsRemote(
-      'cursor',
+      'opencode',
       '/remote/repo',
       async () => {
         throw createSshDisposalError('connection_lost')
       },
-      'npx cursor-agent'
+      'npx opencode-ai'
     )
 
     expect(result).toEqual({
       success: false,
       error:
-        'Cursor model discovery took longer than 60s and may still be running on the remote host.'
+        'OpenCode model discovery took longer than 60s and may still be running on the remote host.'
     })
   })
 
   it('reports remote model discovery spawn failures with remote install guidance', async () => {
-    const result = await discoverCommitMessageModelsRemote('cursor', '/remote/repo', async () => ({
-      stdout: '',
-      stderr: '',
-      exitCode: null,
-      timedOut: false,
-      spawnError: 'ENOENT'
-    }))
+    const result = await discoverCommitMessageModelsRemote(
+      'opencode',
+      '/remote/repo',
+      async () => ({
+        stdout: '',
+        stderr: '',
+        exitCode: null,
+        timedOut: false,
+        spawnError: 'ENOENT'
+      })
+    )
 
     expect(result).toEqual({
       success: false,
-      error: 'cursor-agent not found on the remote PATH. Install Cursor there.'
+      error: 'opencode not found on the remote PATH. Install OpenCode there.'
     })
   })
 })

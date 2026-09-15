@@ -23,9 +23,9 @@ describe('client UI RPC methods', () => {
   it('returns the runtime host agent settings needed by mobile create flows', async () => {
     const settings = {
       worktreeVisibilityDefaults: { external: 'show' as const },
-      defaultTuiAgent: 'codex',
+      defaultTuiAgent: 'pi',
       disabledTuiAgents: ['claude'],
-      agentCmdOverrides: { codex: 'codex --profile work' },
+      agentCmdOverrides: { opencode: 'opencode --profile work' },
       defaultTaskSource: 'gitlab',
       defaultTaskViewPreset: 'my-prs',
       visibleTaskProviders: ['github', 'gitlab'],
@@ -125,7 +125,7 @@ describe('client UI RPC methods', () => {
             custom: { team: 'hide', 'bad id': 'show' }
           }
         },
-        defaultTuiAgent: 'codex',
+        defaultTuiAgent: 'pi',
         disabledTuiAgents: ['claude', 'not-real', 'claude'],
         defaultTaskSource: 'linear',
         visibleTaskProviders: ['github', 'linear'],
@@ -150,7 +150,7 @@ describe('client UI RPC methods', () => {
           custom: { team: 'hide' }
         }
       },
-      defaultTuiAgent: 'codex',
+      defaultTuiAgent: 'pi',
       disabledTuiAgents: ['claude'],
       defaultTaskSource: 'linear',
       visibleTaskProviders: ['github', 'linear'],
@@ -204,7 +204,7 @@ describe('client UI RPC methods', () => {
         id: 'review',
         label: 'Review',
         action: 'agent-prompt' as const,
-        agent: 'codex' as const,
+        agent: 'opencode' as const,
         prompt: 'Review this diff',
         scope: { type: 'global' as const }
       }
@@ -225,7 +225,7 @@ describe('client UI RPC methods', () => {
             id: ' review ',
             label: ' Review ',
             action: 'agent-prompt',
-            agent: 'codex',
+            agent: 'opencode',
             prompt: 'Review this diff\n',
             scope: { type: 'global' }
           }
@@ -273,7 +273,7 @@ describe('client UI RPC methods', () => {
           id: 'unsupported-agent',
           label: 'Unsupported agent',
           action: 'agent-prompt',
-          agent: 'aider',
+          agent: 'retired-agent',
           prompt: 'Review this diff'
         }
       },
@@ -324,7 +324,7 @@ describe('client UI RPC methods', () => {
           id: 'oversized-prompt',
           label: 'Oversized prompt',
           action: 'agent-prompt',
-          agent: 'codex',
+          agent: 'opencode',
           prompt: 'x'.repeat(MAX_QUICK_COMMAND_AGENT_PROMPT_LENGTH + 1)
         }
       },

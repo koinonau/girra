@@ -20,7 +20,7 @@ describe('OrchestrationDb worker Dispatch state', () => {
       creator: { kind: 'system' },
       maxDepth: Number.MAX_SAFE_INTEGER,
       taskId: task.id,
-      startOptions: { topology: 'current', agent: 'codex' }
+      startOptions: { topology: 'current', agent: 'claude' }
     })
     expect(started).toMatchObject({
       dispatch: { status: 'pending' },
@@ -119,7 +119,7 @@ describe('OrchestrationDb worker Dispatch state', () => {
       creator: { kind: 'system' },
       maxDepth: Number.MAX_SAFE_INTEGER,
       taskId: task.id,
-      startOptions: { topology: 'current', agent: 'codex' }
+      startOptions: { topology: 'current', agent: 'claude' }
     })
     d.prepareStartingWorkerAuthority({
       dispatchId: started.dispatch.id,

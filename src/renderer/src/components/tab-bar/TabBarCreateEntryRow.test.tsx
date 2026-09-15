@@ -111,7 +111,7 @@ describe('EntryActionRow', () => {
         executionHostId: 'local',
         source: 'workspace',
         id: 'open-tab:workspace:tab-1',
-        title: 'grok',
+        title: 'opencode',
         matchedText: null,
         worktreeId: 'wt',
         contentType: 'terminal',
@@ -119,11 +119,11 @@ describe('EntryActionRow', () => {
         entityId: 'term-1',
         groupId: 'g',
         relativePath: null,
-        occupantAgent: 'grok'
+        occupantAgent: 'opencode'
       }
     })
 
-    expect(container.querySelector('[data-agent-icon="grok"]')).toBeTruthy()
+    expect(container.querySelector('[data-agent-icon="opencode"]')).toBeTruthy()
     expect(container.textContent).toContain('Switch to tab')
   })
 
@@ -134,7 +134,7 @@ describe('EntryActionRow', () => {
         executionHostId: 'local',
         source: 'workspace',
         id: 'open-tab:workspace:tab-1',
-        title: 'grok',
+        title: 'opencode',
         matchedText: null,
         worktreeId: 'wt',
         contentType: 'terminal',

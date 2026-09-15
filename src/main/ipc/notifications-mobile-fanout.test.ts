@@ -61,7 +61,7 @@ describe('registerNotificationHandlers', () => {
           source: 'agent-task-complete',
           worktreeId: 'repo::wt1',
           worktreeLabel: 'feat/notis',
-          agentType: 'hermes',
+          agentType: 'pi',
           agentState: 'done',
           agentPrompt: 'Summarize the diff',
           agentLastAssistantMessage: 'The diff updates notification formatting.'
@@ -73,7 +73,7 @@ describe('registerNotificationHandlers', () => {
       type: 'notification',
       emittedAt: expect.any(Number),
       source: 'agent-task-complete',
-      title: 'feat/notis - Hermes finished',
+      title: 'feat/notis - Pi finished',
       body: 'The diff updates notification formatting.',
       worktreeId: 'repo::wt1',
       agentState: 'done'

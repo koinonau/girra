@@ -100,7 +100,7 @@ describe('generateCommitMessageFromContext', () => {
       {
         kind: 'local',
         cwd: '/repo',
-        env: { ...process.env, CODEX_HOME: '/managed/codex-home' }
+        env: { ...process.env, CLAUDE_CONFIG_DIR: '/managed/claude-config' }
       }
     )
 
@@ -115,7 +115,7 @@ describe('generateCommitMessageFromContext', () => {
       'orca-test-agent-nope',
       [],
       expect.objectContaining({
-        env: expect.objectContaining({ CODEX_HOME: '/managed/codex-home' })
+        env: expect.objectContaining({ CLAUDE_CONFIG_DIR: '/managed/claude-config' })
       })
     )
   })
@@ -149,7 +149,7 @@ describe('generateCommitMessageFromContext', () => {
           kind: 'local',
           cwd: 'C:\\repo',
           wslDistro: 'Ubuntu 24.04',
-          env: { ...process.env, CODEX_HOME: '/home/tester/.codex' }
+          env: { ...process.env, CLAUDE_CONFIG_DIR: '/home/tester/.claude' }
         }
       )
 
@@ -170,7 +170,7 @@ describe('generateCommitMessageFromContext', () => {
           // asserted below), so the Windows-side cwd never decides where the agent runs.
           cwd: expect.any(String),
           windowsHide: true,
-          env: expect.objectContaining({ CODEX_HOME: '/home/tester/.codex' })
+          env: expect.objectContaining({ CLAUDE_CONFIG_DIR: '/home/tester/.claude' })
         })
       )
       const spawnEnv = spawnMock.mock.calls[0]?.[2]?.env as NodeJS.ProcessEnv

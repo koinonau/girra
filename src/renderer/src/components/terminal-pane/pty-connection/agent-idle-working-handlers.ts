@@ -45,7 +45,7 @@ export function installAgentIdleWorkingHandlers(session: ConnectPanePtySession):
     // Why: title reversion alone is not process death. The process/PTY tracker
     // owns removing agent rows when the TUI actually exits.
   }
-  // Why: inject ORCA_PANE_KEY so global Claude/Codex hooks can attribute their
+  // Why: inject ORCA_PANE_KEY so global agent hooks can attribute their
   // callbacks to the correct Orca pane without resolving worktrees from cwd.
   // The key matches the `${tabId}:${leafId}` composite used for cacheTimerByKey
   // and agentStatusByPaneKey. Treat it as opaque outside Orca.

@@ -320,8 +320,8 @@ describe('git RPC methods', () => {
     await dispatcher.dispatch(
       makeRequest('git.discoverCommitMessageModels', {
         worktree: 'id:wt-1',
-        agentId: 'cursor',
-        agentCmdOverrides: { cursor: 'cursor-agent' }
+        agentId: 'pi',
+        agentCmdOverrides: { pi: 'npx pi' }
       })
     )
     await dispatcher.dispatch(
@@ -352,8 +352,8 @@ describe('git RPC methods', () => {
 
     expect(runtime.commitRuntimeGit).toHaveBeenCalledWith('id:wt-1', 'feat: test')
     expect(runtime.generateRuntimeCommitMessage).toHaveBeenCalledWith('id:wt-1')
-    expect(runtime.discoverRuntimeCommitMessageModels).toHaveBeenCalledWith('id:wt-1', 'cursor', {
-      agentCmdOverrides: { cursor: 'cursor-agent' }
+    expect(runtime.discoverRuntimeCommitMessageModels).toHaveBeenCalledWith('id:wt-1', 'pi', {
+      agentCmdOverrides: { pi: 'npx pi' }
     })
     expect(runtime.cancelRuntimeGenerateCommitMessage).toHaveBeenCalledWith('id:wt-1')
     expect(runtime.abortRuntimeGitMerge).toHaveBeenCalledWith('id:wt-1')
@@ -532,22 +532,22 @@ describe('git RPC methods', () => {
   it('forwards commit-message settings to the runtime', async () => {
     const commitMessageAi = {
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.3-codex-spark' },
-      selectedModelByAgentByHost: { 'ssh:conn-1': { cursor: 'remote-model' } },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'openai/gpt-5.4' },
+      selectedModelByAgentByHost: { 'ssh:conn-1': { pi: 'remote-model' } },
       discoveredModelsByAgent: {
-        cursor: [{ id: 'local-model', label: 'Local Model' }]
+        pi: [{ id: 'local-model', label: 'Local Model' }]
       },
       discoveredModelsByAgentByHost: {
         'ssh:conn-1': {
-          cursor: [{ id: 'remote-model', label: 'Remote Model' }]
+          pi: [{ id: 'remote-model', label: 'Remote Model' }]
         }
       },
-      selectedThinkingByModel: { 'gpt-5.3-codex-spark': 'medium' },
+      selectedThinkingByModel: { 'openai/gpt-5.4': 'medium' },
       customPrompt: '',
       customAgentCommand: ''
     }
-    const agentCmdOverrides = { codex: 'codex --profile work' }
+    const agentCmdOverrides = { opencode: 'opencode --profile work' }
     const runtime = {
       getRuntimeId: () => 'test-runtime',
       generateRuntimeCommitMessage: vi.fn().mockResolvedValue({ success: true, message: 'test' })
@@ -572,7 +572,7 @@ describe('git RPC methods', () => {
 
   it('forwards one-shot commit-message params to the runtime', async () => {
     const sourceControlAiResolvedParams = {
-      agentId: 'codex',
+      agentId: 'opencode',
       model: 'gpt-5.5',
       thinkingLevel: 'high',
       customPrompt: 'Use Conventional Commits.'
@@ -597,7 +597,7 @@ describe('git RPC methods', () => {
 
   it('forwards one-shot pull-request generation params to the runtime', async () => {
     const sourceControlAiResolvedParams = {
-      agentId: 'codex',
+      agentId: 'opencode',
       model: 'gpt-5.5',
       thinkingLevel: 'high',
       commandInputTemplate: '{basePrompt}\n\nUse release-note style.'
@@ -649,7 +649,7 @@ describe('git RPC methods', () => {
         worktree: 'id:wt-1',
         commitMessageAi: {
           enabled: true,
-          agentId: 'codex'
+          agentId: 'opencode'
         }
       })
     )

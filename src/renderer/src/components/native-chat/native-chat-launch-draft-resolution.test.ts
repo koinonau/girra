@@ -36,7 +36,7 @@ describe('launchDraftResolvedByTranscript', () => {
     expect(launchDraftResolvedByTranscript({ createdAt: SEEDED_AT }, [])).toBe(false)
   })
 
-  it('resolves on undated user turns (Grok omits row timestamps)', () => {
+  it('resolves on undated user turns', () => {
     const undated = { ...userMessage('u1', 'submitted in the TUI'), timestamp: null }
     expect(launchDraftResolvedByTranscript({ createdAt: SEEDED_AT }, [undated])).toBe(true)
   })

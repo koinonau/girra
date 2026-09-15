@@ -280,11 +280,7 @@ export function createReattachPayloadHandlers(
       const preparedStartup = ctx.coldRestoreStartup ?? session.buildColdRestoreAgentResumeStartup()
       const didPrepareResume = session.applyColdRestoreAgentResumeStartup(preparedStartup)
       if (didPrepareResume) {
-        if (ctx.connectResult.agentResumeUnavailable) {
-          // Why: main dropped the resume argv, so this pane is a NEW session —
-          // the plain restored banner would claim the old one came back.
-          session.showSessionRestoredBanner('resume-unavailable')
-        } else if (preparedStartup?.hasSleepingRecord) {
+        if (preparedStartup?.hasSleepingRecord) {
           session.showSessionRestoredBanner()
         }
         session.clearSleepingRecordAfterColdRestoreSpawn(preparedStartup)

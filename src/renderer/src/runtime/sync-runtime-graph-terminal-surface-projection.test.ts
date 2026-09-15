@@ -117,7 +117,7 @@ describe('buildMobileSessionTabSnapshots', () => {
     const leafId = '11111111-1111-4111-8111-111111111111'
     const state = makeState({
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Terminal 1', launchAgent: 'codex' }]
+        'wt-1': [{ id: 'term-1', title: 'Terminal 1', launchAgent: 'opencode' }]
       } as unknown as AppState['tabsByWorktree'],
       terminalLayoutsByTabId: {
         'term-1': {
@@ -157,12 +157,12 @@ describe('buildMobileSessionTabSnapshots', () => {
           'wt-1': [
             {
               id: 'term-1',
-              title: 'Codex working',
+              title: 'OpenCode working',
               customTitle: null,
-              launchAgent: 'codex',
+              launchAgent: 'opencode',
               generatedTitle: 'Inspect the image',
               aiVaultTitle: {
-                agent: 'codex',
+                agent: 'opencode',
                 sessionId: 'session-1',
                 title: '[Image #1] Inspect the image'
               }
@@ -182,19 +182,19 @@ describe('buildMobileSessionTabSnapshots', () => {
           }
         } as AppState['terminalLayoutsByTabId'],
         runtimePaneTitlesByTabId: {
-          'term-1': { 1: 'Codex working', 2: 'zsh' }
+          'term-1': { 1: 'OpenCode working', 2: 'zsh' }
         },
         agentStatusByPaneKey: {
           [`term-1:${agentLeafId}`]: makeAgentStatusEntry({
             paneKey: `term-1:${agentLeafId}`,
-            agentType: 'codex',
-            terminalTitle: 'Codex working'
+            agentType: 'opencode',
+            terminalTitle: 'OpenCode working'
           })
         },
         nativeChatLaunchDraftByTabId: {
           'term-1': {
             tabId: 'term-1',
-            agent: 'codex',
+            agent: 'opencode',
             text: 'inspect this image',
             createdAt: 1
           }
@@ -206,8 +206,8 @@ describe('buildMobileSessionTabSnapshots', () => {
       const shellLeaf = tabs.find((tab) => tab.type === 'terminal' && tab.leafId === shellLeafId)
 
       expect(agentLeaf).toMatchObject({
-        title: 'Codex working',
-        agentStatus: { agentType: 'codex' }
+        title: 'OpenCode working',
+        agentStatus: { agentType: 'opencode' }
       })
       expect(shellLeaf).toMatchObject({ title: 'zsh' })
       expect(shellLeaf).not.toHaveProperty('agentStatus')
@@ -235,11 +235,11 @@ describe('buildMobileSessionTabSnapshots', () => {
           'wt-1': [
             {
               id: 'term-collapse',
-              title: 'Codex ready',
+              title: 'OpenCode ready',
               customTitle: null,
-              launchAgent: 'codex',
+              launchAgent: 'opencode',
               aiVaultTitle: {
-                agent: 'codex',
+                agent: 'opencode',
                 sessionId: 'session-collapse',
                 title: 'Inspect mobile routing'
               }
@@ -256,19 +256,19 @@ describe('buildMobileSessionTabSnapshots', () => {
         nativeChatLaunchDraftByTabId: {
           'term-collapse': {
             tabId: 'term-collapse',
-            agent: 'codex',
+            agent: 'opencode',
             text: 'inspect mobile routing',
             createdAt: 2
           }
         },
-        runtimePaneTitlesByTabId: { 'term-collapse': { 1: 'Codex live title' } }
+        runtimePaneTitlesByTabId: { 'term-collapse': { 1: 'OpenCode live title' } }
       })
 
       expect(buildMobileSessionTabSnapshots(state)[0]?.tabs).toEqual([
         expect.objectContaining({
           leafId: agentLeafId,
           title: 'Inspect mobile routing',
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           launchDraft: 'inspect mobile routing'
         })
       ])
@@ -296,7 +296,7 @@ describe('buildMobileSessionTabSnapshots', () => {
               id: 'term-reorder',
               title: '[Image #1] Wrong scope',
               customTitle: null,
-              launchAgent: 'codex'
+              launchAgent: 'opencode'
             }
           ]
         } as unknown as AppState['tabsByWorktree'],
@@ -313,12 +313,12 @@ describe('buildMobileSessionTabSnapshots', () => {
           }
         } as AppState['terminalLayoutsByTabId'],
         runtimePaneTitlesByTabId: {
-          'term-reorder': { 1: 'Codex working', 2: 'fish' }
+          'term-reorder': { 1: 'OpenCode working', 2: 'fish' }
         },
         agentStatusByPaneKey: {
           [`term-reorder:${agentLeafId}`]: makeAgentStatusEntry({
             paneKey: `term-reorder:${agentLeafId}`,
-            terminalTitle: 'Codex working'
+            terminalTitle: 'OpenCode working'
           })
         }
       })
@@ -326,10 +326,10 @@ describe('buildMobileSessionTabSnapshots', () => {
       const tabs = buildMobileSessionTabSnapshots(state)[0]?.tabs ?? []
       expect(tabs).toMatchObject([
         { leafId: shellLeafId, title: 'fish', isActive: true },
-        { leafId: agentLeafId, title: 'Codex working', isActive: false }
+        { leafId: agentLeafId, title: 'OpenCode working', isActive: false }
       ])
       expect(tabs[0]).not.toHaveProperty('agentStatus')
-      expect(tabs[1]).toHaveProperty('agentStatus.agentType', 'codex')
+      expect(tabs[1]).toHaveProperty('agentStatus.agentType', 'opencode')
     } finally {
       surface.unregister()
     }
@@ -342,9 +342,9 @@ describe('buildMobileSessionTabSnapshots', () => {
         'wt-1': [
           {
             id: 'term-pending-status',
-            title: 'Codex ready',
+            title: 'OpenCode ready',
             customTitle: null,
-            launchAgent: 'codex',
+            launchAgent: 'opencode',
             generatedTitle: 'Prepare the release'
           }
         ]
@@ -364,7 +364,7 @@ describe('buildMobileSessionTabSnapshots', () => {
       expect.objectContaining({
         leafId,
         title: 'Prepare the release',
-        launchAgent: 'codex'
+        launchAgent: 'opencode'
       })
     ])
   })
@@ -375,7 +375,7 @@ describe('buildMobileSessionTabSnapshots', () => {
     const state = makeState({
       tabBarOrderByWorktree: { 'wt-1': ['term-1'] },
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'codex [working]', customTitle: null, ptyId: 'pty-1' }]
+        'wt-1': [{ id: 'term-1', title: 'opencode [working]', customTitle: null, ptyId: 'pty-1' }]
       } as unknown as AppState['tabsByWorktree'],
       terminalLayoutsByTabId: {
         'term-1': {
@@ -391,9 +391,9 @@ describe('buildMobileSessionTabSnapshots', () => {
           prompt: 'fix parity',
           updatedAt: 1_700_000_000_000,
           stateStartedAt: 1_699_999_999_000,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey,
-          terminalTitle: 'codex [working]',
+          terminalTitle: 'opencode [working]',
           stateHistory: []
         }
       }
@@ -406,7 +406,7 @@ describe('buildMobileSessionTabSnapshots', () => {
         agentStatus: {
           state: 'working',
           prompt: 'fix parity',
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey
         }
       }
@@ -462,7 +462,7 @@ describe('buildMobileSessionTabSnapshots', () => {
         'wt-1': [
           {
             id: 'term-1',
-            title: 'Codex working',
+            title: 'OpenCode working',
             generatedTitle: 'Fix remote tabs',
             customTitle: null,
             ptyId: 'pty-1'
@@ -481,7 +481,7 @@ describe('buildMobileSessionTabSnapshots', () => {
 
     expect(buildMobileSessionTabSnapshots(base)[0]?.tabs[0]).toMatchObject({
       type: 'terminal',
-      title: 'Codex working'
+      title: 'OpenCode working'
     })
     expect(
       buildMobileSessionTabSnapshots({

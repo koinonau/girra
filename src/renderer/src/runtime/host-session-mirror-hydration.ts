@@ -4,7 +4,7 @@ import { getRuntimeEnvironmentConnectionGeneration } from '@/store/slices/runtim
  * Tells "the host reported no PTY" apart from "the host has not answered yet"
  * for mirrored `web-terminal-*` panes, whose PTY handle lands a round trip
  * after the tab. Reading that gap as pane death relaunched agents the host was
- * still running (codex `-32600 already has an active writer`).
+ * still running.
  *
  * The two granularities are NOT interchangeable: a full inventory speaks for
  * every worktree because absence from it is itself a verdict, while a

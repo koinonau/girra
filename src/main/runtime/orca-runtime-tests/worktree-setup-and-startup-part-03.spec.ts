@@ -344,8 +344,8 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        defaultTuiAgent: 'codex' as const,
-        agentCmdOverrides: { codex: 'codex --profile work' }
+        defaultTuiAgent: 'opencode' as const,
+        agentCmdOverrides: { opencode: 'opencode --profile work' }
       }),
       getAllWorktreeMeta: () => metaById,
       getWorktreeMeta: (worktreeId: string) => metaById[worktreeId],
@@ -404,24 +404,23 @@ describe('OrcaRuntimeService', () => {
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
         cwd: '/tmp/workspaces/runtime-startup-draft',
-        command: "codex --profile work '--dangerously-bypass-approvals-and-sandbox'",
+        command: 'opencode --profile work',
         worktreeId: result.worktree.id
       })
     )
-    expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'codex' })
+    expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'opencode' })
 
     runtime.onPtyData('pty-startup-draft', '\x1b[?2004h', Date.now())
-    await vi.advanceTimersByTimeAsync(10_000)
+    await vi.advanceTimersByTimeAsync(1_000)
     expect(write).not.toHaveBeenCalled()
 
-    runtime.onPtyData('pty-startup-draft', '›', Date.now())
-    await Promise.resolve()
-    await Promise.resolve()
-
-    expect(write).toHaveBeenCalledWith('pty-startup-draft', `\x1b[200~${draftUrl}\x1b[201~`)
+    runtime.onPtyData('pty-startup-draft', '\x1b[?25h', Date.now())
+    await vi.waitFor(() => {
+      expect(write).toHaveBeenCalledWith('pty-startup-draft', `\x1b[200~${draftUrl}\x1b[201~`)
+    })
   })
 
-  it('keeps the 8s main-runtime startup readiness budget for non-Codex agents', async () => {
+  it('keeps the 8s main-runtime startup readiness budget for startup drafts', async () => {
     vi.useFakeTimers()
     onTestFinished(() => {
       vi.useRealTimers()
@@ -493,7 +492,7 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        disabledTuiAgents: ['codex' as const]
+        disabledTuiAgents: ['claude' as const]
       })
     }
     const runtime = new OrcaRuntimeService(runtimeStore as never)
@@ -509,8 +508,8 @@ describe('OrcaRuntimeService', () => {
       runtime.createManagedWorktree({
         repoSelector: TEST_REPO_ID,
         name: 'disabled-startup',
-        startup: { command: 'codex' },
-        createdWithAgent: 'codex'
+        startup: { command: 'claude' },
+        createdWithAgent: 'claude'
       })
     ).rejects.toThrow('Selected agent is disabled. Choose an enabled agent before creating.')
 
@@ -572,17 +571,17 @@ describe('OrcaRuntimeService', () => {
     const result = await runtime.createManagedWorktree({
       repoSelector: TEST_REPO_ID,
       name: 'runtime-cli-agent-startup',
-      startupAgent: 'codex',
+      startupAgent: 'claude',
       startupPrompt: 'hi'
     })
 
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
         cwd: '/tmp/workspaces/runtime-cli-agent-startup',
-        command: "codex '--dangerously-bypass-approvals-and-sandbox' 'hi'",
+        command: "claude '--dangerously-skip-permissions' 'hi'",
         worktreeId: result.worktree.id
       })
     )
-    expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'codex' })
+    expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'claude' })
   })
 })

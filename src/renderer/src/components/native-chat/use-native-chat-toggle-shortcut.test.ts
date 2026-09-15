@@ -20,11 +20,11 @@ describe('resolveNativeChatToggleShortcutDetectedAgent', () => {
         terminalTabId: 'tab-1',
         terminalLayout: splitLayout,
         agentStatusByPaneKey: {
-          'tab-1:leaf-1': { agentType: 'gemini' },
-          'tab-1:leaf-2': { agentType: 'codex' }
+          'tab-1:leaf-1': { agentType: 'pi' },
+          'tab-1:leaf-2': { agentType: 'opencode' }
         }
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('keeps an unsupported active leaf authoritative over a supported sibling', () => {
@@ -34,10 +34,10 @@ describe('resolveNativeChatToggleShortcutDetectedAgent', () => {
         terminalLayout: splitLayout,
         agentStatusByPaneKey: {
           'tab-1:leaf-1': { agentType: 'claude' },
-          'tab-1:leaf-2': { agentType: 'grok' }
+          'tab-1:leaf-2': { agentType: 'opencode' }
         }
       })
-    ).toBe('grok')
+    ).toBe('opencode')
   })
 
   it('falls back to the tab entry before a leaf is known', () => {
@@ -45,7 +45,7 @@ describe('resolveNativeChatToggleShortcutDetectedAgent', () => {
       resolveNativeChatToggleShortcutDetectedAgent({
         terminalTabId: 'tab-1',
         agentStatusByPaneKey: {
-          'tab-2:leaf-1': { agentType: 'codex' },
+          'tab-2:leaf-1': { agentType: 'opencode' },
           'tab-1:leaf-1': { agentType: 'claude' }
         }
       })
@@ -76,10 +76,10 @@ describe('resolveNativeChatToggleShortcutDetectedAgent', () => {
         },
         agentStatusByPaneKey: {
           'tab-1:closed-leaf': { agentType: 'claude' },
-          'tab-1:leaf-2': { agentType: 'codex' }
+          'tab-1:leaf-2': { agentType: 'opencode' }
         }
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('rejects a stale active leaf instead of reading its retained status', () => {
@@ -93,7 +93,7 @@ describe('resolveNativeChatToggleShortcutDetectedAgent', () => {
         },
         agentStatusByPaneKey: {
           'tab-1:closed-leaf': { agentType: 'claude' },
-          'tab-1:leaf-2': { agentType: 'codex' }
+          'tab-1:leaf-2': { agentType: 'opencode' }
         }
       })
     ).toBeNull()

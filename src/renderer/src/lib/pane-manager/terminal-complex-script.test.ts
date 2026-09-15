@@ -58,8 +58,8 @@ describe('terminalOutputPrefersRenderRefresh', () => {
   })
 
   it('detects ASCII ANSI background SGR output before the non-ASCII fast path', () => {
-    expect(terminalOutputPrefersRenderRefresh('\x1b[48;2;12;34;56m codex input \x1b[0m')).toBe(true)
-    expect(terminalOutputPrefersRenderRefresh('\x1b[48:2::12:34:56m codex input \x1b[0m')).toBe(
+    expect(terminalOutputPrefersRenderRefresh('\x1b[48;2;12;34;56m agent input \x1b[0m')).toBe(true)
+    expect(terminalOutputPrefersRenderRefresh('\x1b[48:2::12:34:56m agent input \x1b[0m')).toBe(
       true
     )
     expect(terminalOutputPrefersRenderRefresh('\x1b[44m selected block \x1b[0m')).toBe(true)
@@ -195,7 +195,7 @@ describe('terminalRewriteOutputPrefersRenderRefresh', () => {
     expect(terminalRewriteOutputPrefersRenderRefresh('progress 10%\b\b20%')).toBe(true)
   })
 
-  it('still detects split Codex-style rewrites through the erase-line chunk', () => {
+  it('still detects split spinner rewrites through the erase-line chunk', () => {
     expect(terminalRewriteOutputPrefersRenderRefresh('\r')).toBe(false)
     expect(terminalRewriteOutputPrefersRenderRefresh('\x1b[2K• Working')).toBe(true)
   })

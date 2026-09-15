@@ -16,9 +16,9 @@ function scanIssue(
   reason: SkillFreshnessScanIssueReason
 ): SkillFreshnessInventory['scanIssues'][number] {
   return {
-    rootId: 'codex-plugin-cache',
-    sourceLabel: 'Codex plugin cache',
-    path: '/home/.codex/plugins/cache',
+    rootId: 'claude-plugin-cache',
+    sourceLabel: 'Claude plugin cache',
+    path: '/home/.claude/plugins/cache',
     reason,
     errorCode: reason === 'io-error' ? 'EACCES' : null
   }
@@ -53,7 +53,7 @@ function pluginCachePlacement(
   return {
     ...placement(status, 9),
     topology: 'plugin-cache',
-    unresolvedPath: `/home/.codex/plugins/cache/openai-bundled/${SKILL_NAME}`
+    unresolvedPath: `/home/.claude/plugins/cache/orca/${SKILL_NAME}`
   }
 }
 

@@ -60,7 +60,7 @@ const HOOK_PROGRESS_SILENCER = "$ProgressPreference='SilentlyContinue'; "
  *
  * Equivalent by construction: the switch sets the Process scope too, and both
  * lose to a Group Policy scope. `-EncodedCommand` itself is never policy-gated,
- * so this always gets to run; it is what lets the managed `.ps1` hooks (Copilot)
+ * so this always gets to run; it is what lets a managed `.ps1` hook
  * execute under a Restricted or AllSigned machine policy.
  *
  * try/catch as well as `-ErrorAction SilentlyContinue`: under a MachinePolicy or

@@ -3,7 +3,6 @@ import { isBracketedPasteSafeShell } from '../../shared/startup-command-submissi
 import { PtyStartupIngress, type PtyIngressEmission } from '../../shared/pty-startup-ingress'
 import { resolvePtyOwnerBackend } from '../../shared/pty-owner-backend'
 import { resolveProcessExitCause } from '../../shared/terminal-exit-cause'
-import { POSIX_SHELL_STARTUP_COMMAND_ENV } from '../pty/posix-shell-startup-command'
 import { getAgentForegroundContextPaths } from './agent-foreground-context-paths'
 import { getSpawnedShellName } from './local-pty-launch-helpers'
 import type { LocalPtyLaunchPlan } from './local-pty-launch-plan'
@@ -155,14 +154,7 @@ export function activateLocalPtySession(args: {
   }
   ptyDisposables.set(id, disposables)
 
-  const startupCommandDeliveredByWrapper =
-    spawn.command !== undefined &&
-    plan.shellReadyLaunch?.env[POSIX_SHELL_STARTUP_COMMAND_ENV] === spawn.command
-  if (
-    spawn.command &&
-    !plan.startupCommandDeliveredInShellArgs &&
-    !startupCommandDeliveredByWrapper
-  ) {
+  if (spawn.command && !plan.startupCommandDeliveredInShellArgs) {
     // Why: shells with bracketed paste armed take a multiline startup prompt literally; others use raw submit.
     const spawnedShellName = getSpawnedShellName(plan.shellPath).toLowerCase()
     const bracketedPasteSafe =

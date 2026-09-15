@@ -35,7 +35,7 @@ describe('handle identity', () => {
   it('rejects unknown and retired persisted provider names', () => {
     expect(isAgentSessionHandleProvider('codex')).toBe(false)
     expect(isAgentSessionHandleProvider('claude')).toBe(true)
-    expect(isAgentSessionHandleProvider('gemini')).toBe(false)
+    expect(isAgentSessionHandleProvider('opencode')).toBe(false)
     expect(isAgentSessionHandleProvider(undefined)).toBe(false)
   })
 
@@ -53,7 +53,7 @@ describe('handle identity', () => {
     expect(isAgentSessionProviderHandle({ ...CLAUDE, leafUuid: null })).toBe(true)
     expect(isAgentSessionProviderHandle({ ...CLAUDE, leafUuid: '' })).toBe(false)
     expect(isAgentSessionProviderHandle({ provider: 'claude', sessionId: '' })).toBe(false)
-    expect(isAgentSessionProviderHandle({ provider: 'gemini', sessionId: 'x' })).toBe(false)
+    expect(isAgentSessionProviderHandle({ provider: 'opencode', sessionId: 'x' })).toBe(false)
     expect(isAgentSessionProviderHandle({ ...CLAUDE, sessionId: ' sess-1 ' })).toBe(false)
   })
 

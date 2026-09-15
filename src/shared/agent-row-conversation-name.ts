@@ -19,7 +19,7 @@ export type ConversationNameTab = Pick<
   'customTitle' | 'quickCommandLabel' | 'aiVaultTitle' | 'generatedTitle' | 'title' | 'defaultTitle'
 >
 
-// Why: synthetic status titles ("Codex ready", "Cursor - action required") are
+// Why: synthetic status titles ("OpenCode ready", "Pi - action required") are
 // state, not names. Precomputed once; the profile table is a module constant.
 const SYNTHETIC_STATUS_TITLES_LOWER: ReadonlySet<string> = new Set(
   Object.values(SYNTHETIC_AGENT_TITLE_PROFILES).flatMap((profile) => [
@@ -34,8 +34,7 @@ const SYNTHETIC_STATUS_TITLES_LOWER: ReadonlySet<string> = new Set(
 const FALLBACK_TAB_TITLE_LOWER = 'agent'
 
 const AGENT_IDENTITY_ALIASES_LOWER: Readonly<Record<string, readonly string[]>> = {
-  claude: ['claude code'],
-  gemini: ['gemini cli']
+  claude: ['claude code']
 }
 
 const STATUS_WITH_CONTEXT_RE = /^(?:ready|idle|done)(?:\s+\([^)]*\))?$/i

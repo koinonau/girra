@@ -100,7 +100,7 @@ describe('orchestration while Structured Chat owns an agent session', () => {
       write: admittedWrite,
       writeWithSettlement: settledWriteStub(admittedWrite),
       kill: vi.fn(() => true),
-      getForegroundProcess: vi.fn(async () => 'codex'),
+      getForegroundProcess: vi.fn(async () => 'claude'),
       listProcesses: vi.fn(async () => []),
       hasPty: vi.fn(() => true)
     } as never)
@@ -109,7 +109,7 @@ describe('orchestration while Structured Chat owns an agent session', () => {
         tabId: terminal.tabId,
         leafId: terminal.leafId,
         incarnationId: `${terminal.ptyId}-incarnation`,
-        agentLaunchAuthority: { launchToken: `${terminal.ptyId}-launch`, launchAgent: 'codex' }
+        agentLaunchAuthority: { launchToken: `${terminal.ptyId}-launch`, launchAgent: 'claude' }
       })
       runtime.registerPreAllocatedHandleForPty(terminal.ptyId, terminal.handle)
     }
@@ -118,7 +118,7 @@ describe('orchestration while Structured Chat owns an agent session', () => {
       tabs: [COORDINATOR, WORKER, PLAIN].map((terminal) => ({
         tabId: terminal.tabId,
         worktreeId: WORKTREE_ID,
-        title: 'Codex',
+        title: 'Claude',
         activeLeafId: terminal.leafId,
         layout: null
       })),
@@ -129,13 +129,13 @@ describe('orchestration while Structured Chat owns an agent session', () => {
         paneRuntimeId: index + 1,
         ptyId: terminal.ptyId,
         paneTitle: null,
-        title: 'Codex'
+        title: 'Claude'
       }))
     })
     await runtime.listTerminals()
     for (const terminal of [COORDINATOR, WORKER, PLAIN]) {
-      runtime.onPtyData(terminal.ptyId, '\x1b]0;Codex working\x07', 1)
-      runtime.onPtyData(terminal.ptyId, '\x1b]0;Codex done\x07', 2)
+      runtime.onPtyData(terminal.ptyId, '\x1b]0;Claude working\x07', 1)
+      runtime.onPtyData(terminal.ptyId, '\x1b]0;Claude done\x07', 2)
     }
     operationSequence = 0
     await establishOwner('native', 'spawn-native', null)

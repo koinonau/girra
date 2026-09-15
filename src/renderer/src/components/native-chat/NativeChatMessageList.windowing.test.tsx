@@ -214,7 +214,7 @@ function session(messages: NativeChatMessage[]): NativeChatLiveSession {
     messages,
     status: 'ready',
     sessionId: 'session-1',
-    agent: 'codex',
+    agent: 'claude',
     hasMore: false,
     loadingEarlier: false,
     loadEarlier: vi.fn(),

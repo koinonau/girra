@@ -11,7 +11,6 @@ const mockToast = {
   success: vi.fn()
 }
 const mockWriteClipboardText = vi.fn(async () => undefined)
-const mockMarkTrusted = vi.fn(async () => undefined)
 const LEAF_ID = '11111111-1111-4111-8111-111111111111'
 
 const store = {
@@ -101,14 +100,10 @@ describe('forkAgentSessionFromPane', () => {
       pasteDraftAfterLaunch: true
     })
     mockWriteClipboardText.mockResolvedValue(undefined)
-    mockMarkTrusted.mockResolvedValue(undefined)
     vi.stubGlobal('window', {
       api: {
         ui: {
           writeTerminalClipboardText: mockWriteClipboardText
-        },
-        agentTrust: {
-          markTrusted: mockMarkTrusted
         },
         platform: {
           get: () => ({ platform: 'win32' })
@@ -119,7 +114,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('creates a top-level workspace fork with a draft agent tab when the source agent is known', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
     }
     const { forkAgentSessionFromPane } = await import('./terminal-agent-session-fork')
 
@@ -140,12 +135,12 @@ describe('forkAgentSessionFromPane', () => {
       undefined,
       undefined,
       undefined,
-      'codex'
+      'opencode'
     )
 
     expect(mockLaunchAgentInNewTab).toHaveBeenCalledWith(
       expect.objectContaining({
-        agent: 'codex',
+        agent: 'opencode',
         worktreeId: 'wt-fork',
         prompt: expect.stringContaining('User: compare OAuth options'),
         promptDelivery: 'draft',
@@ -162,7 +157,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('waits for a structured settlement before announcing the fork and seeds no shell', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
     }
     let settle!: (settlement: unknown) => void
     mockLaunchAgentInNewTab.mockReturnValue({
@@ -196,7 +191,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('announces the fork when a refused structured launch fell back to a terminal tab', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
     }
     mockLaunchAgentInNewTab.mockReturnValue({
       tabId: null,
@@ -220,7 +215,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('copies context when the refusal fallback opened no terminal tab', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
     }
     mockLaunchAgentInNewTab.mockReturnValue({
       tabId: null,
@@ -251,7 +246,7 @@ describe('forkAgentSessionFromPane', () => {
     'closes the dialog without a success toast on a %s structured settlement',
     async (_kind, settlement, copiesContext) => {
       store.agentStatusByPaneKey = {
-        [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+        [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
       }
       mockLaunchAgentInNewTab.mockReturnValue({
         tabId: null,
@@ -279,39 +274,10 @@ describe('forkAgentSessionFromPane', () => {
     }
   )
 
-  it('pre-marks trust for the created fork workspace before launching a trusted agent', async () => {
-    store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'copilot' }
-    }
-    mockCreateWorktree.mockResolvedValueOnce({
-      worktree: {
-        id: 'wt-fork',
-        path: '/repo/worktrees/auth-feature-fork'
-      }
-    })
-    const { forkAgentSessionFromPane } = await import('./terminal-agent-session-fork')
-
-    await forkAgentSessionFromPane({
-      pane: makePane('User: compare OAuth options'),
-      tabId: 'tab-1',
-      worktreeId: 'wt-1',
-      groupId: null
-    })
-
-    expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'copilot',
-      workspacePath: '/repo/worktrees/auth-feature-fork'
-    })
-    expect(mockMarkTrusted.mock.invocationCallOrder[0]).toBeLessThan(
-      mockLaunchAgentInNewTab.mock.invocationCallOrder[0]
-    )
-    expect(mockLaunchAgentInNewTab).toHaveBeenCalled()
-  })
-
-  it('uses remote trust and Linux startup quoting for SSH workspaces', async () => {
+  it('uses Linux startup quoting for SSH workspaces', async () => {
     store.repos = [{ id: 'repo-1', kind: 'git', connectionId: 'ssh-1' }]
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'copilot' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
     }
     mockCreateWorktree.mockResolvedValueOnce({
       worktree: {
@@ -328,14 +294,9 @@ describe('forkAgentSessionFromPane', () => {
       groupId: null
     })
 
-    expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'copilot',
-      workspacePath: '/home/u/repo/auth-feature-fork',
-      connectionId: 'ssh-1'
-    })
     expect(mockLaunchAgentInNewTab).toHaveBeenCalledWith(
       expect.objectContaining({
-        agent: 'copilot',
+        agent: 'opencode',
         worktreeId: 'wt-fork',
         launchPlatform: 'linux'
       })
@@ -403,40 +364,6 @@ describe('forkAgentSessionFromPane', () => {
         launchPlatform: 'linux'
       })
     )
-  })
-
-  it('still launches the forked agent when trust preflight fails', async () => {
-    store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'copilot' }
-    }
-    mockCreateWorktree.mockResolvedValueOnce({
-      worktree: {
-        id: 'wt-fork',
-        path: '/repo/worktrees/auth-feature-fork'
-      }
-    })
-    mockMarkTrusted.mockRejectedValueOnce(new Error('trust write failed'))
-    const { forkAgentSessionFromPane } = await import('./terminal-agent-session-fork')
-
-    await forkAgentSessionFromPane({
-      pane: makePane('User: continue after trust failure'),
-      tabId: 'tab-1',
-      worktreeId: 'wt-1',
-      groupId: null
-    })
-
-    expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'copilot',
-      workspacePath: '/repo/worktrees/auth-feature-fork'
-    })
-    expect(mockLaunchAgentInNewTab).toHaveBeenCalledWith(
-      expect.objectContaining({
-        agent: 'copilot',
-        worktreeId: 'wt-fork',
-        prompt: expect.stringContaining('User: continue after trust failure')
-      })
-    )
-    expect(mockToast.error).not.toHaveBeenCalledWith('trust write failed')
   })
 
   it('creates a top-level workspace fork and copies context when the source agent cannot be resolved', async () => {
@@ -592,7 +519,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('copies context when the detected agent cannot queue a startup plan', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'opencode' }
     }
     mockLaunchAgentInNewTab.mockReturnValueOnce(null)
     const pane = makePane('Assistant: current implementation notes')

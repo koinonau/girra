@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { EventEmitter } from 'node:events'
 import { getCmdExePath } from '../../shared/windows-batch-spawn'
 import { createService, restorePlatform, setPlatform } from './claude-account-service-test-harness'
+import type * as NodeCliCommandResolution from '../../shared/node-cli-command-resolution'
 
 vi.mock('electron', () => ({
   app: {
@@ -9,7 +10,8 @@ vi.mock('electron', () => ({
   }
 }))
 
-vi.mock('../codex-cli/command', () => ({
+vi.mock('../../shared/node-cli-command-resolution', async (importOriginal) => ({
+  ...(await importOriginal<typeof NodeCliCommandResolution>()),
   resolveClaudeCommand: vi.fn(() => 'C:\\Tools\\claude.cmd')
 }))
 

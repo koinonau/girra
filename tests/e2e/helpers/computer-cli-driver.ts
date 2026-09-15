@@ -179,7 +179,7 @@ async function createComputerE2ERuntimeEnv(): Promise<NodeJS.ProcessEnv> {
   return {
     ...isolation.env,
     // Why: the Node CLI and the Electron child must resolve the same runtime
-    // metadata while the E2E boundary owns their home and Codex paths.
+    // metadata while the E2E boundary owns their home and agent config paths.
     ORCA_DEV_USER_DATA_PATH: userDataDir
   }
 }

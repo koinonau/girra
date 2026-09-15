@@ -741,11 +741,11 @@ describe('DaemonPtyAdapter (IPtyProvider)', () => {
       GET_FOREGROUND_PROCESS_PROTOCOL_VERSION,
       COMPLETION_PROCESS_INSPECTION_PROTOCOL_VERSION - 1
     ])('composes protocol %s inspection from getForegroundProcess', async (protocolVersion) => {
-      const request = vi.fn(async () => ({ foregroundProcess: 'codex' }))
+      const request = vi.fn(async () => ({ foregroundProcess: 'opencode' }))
       const legacy = createInspectionAdapter(protocolVersion, request)
 
       expect(await legacy.inspectProcess('sess-a')).toEqual({
-        foregroundProcess: 'codex',
+        foregroundProcess: 'opencode',
         hasChildProcesses: true
       })
       expect(request).toHaveBeenCalledWith('getForegroundProcess', { sessionId: 'sess-a' })
@@ -800,7 +800,10 @@ describe('DaemonPtyAdapter (IPtyProvider)', () => {
     it.each([COMPLETION_PROCESS_INSPECTION_PROTOCOL_VERSION, PROTOCOL_VERSION])(
       'delegates protocol %s inspection to inspectProcess',
       async (protocolVersion) => {
-        const request = vi.fn(async () => ({ foregroundProcess: 'codex', hasChildProcesses: true }))
+        const request = vi.fn(async () => ({
+          foregroundProcess: 'opencode',
+          hasChildProcesses: true
+        }))
         const current = createInspectionAdapter(protocolVersion, request)
 
         await current.inspectProcess('sess-a')

@@ -12,12 +12,12 @@ function settings(): GlobalSettings {
   const base = getDefaultSettings('/tmp')
   return {
     ...base,
-    defaultTuiAgent: 'codex',
+    defaultTuiAgent: 'opencode',
     sourceControlAi: {
       ...base.sourceControlAi!,
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: {}
     }
   }
@@ -160,7 +160,7 @@ describe('source-control AI recipe saves', () => {
       ...currentSettings.sourceControlAi!,
       actions: {
         pullRequest: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--old-model'
         }
@@ -194,7 +194,7 @@ describe('source-control AI recipe saves', () => {
       ...currentSettings.sourceControlAi!,
       actions: {
         pullRequest: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--global-model'
         }

@@ -180,7 +180,7 @@ describe('Claude TUI resume launch', () => {
     await expect(
       build({
         record: record({
-          accountHome: { variable: 'CODEX_HOME', path: '/wrong' }
+          accountHome: { variable: 'OPENCODE_CONFIG_DIR', path: '/wrong' }
         } as unknown as Partial<AgentSessionRecord>),
         spawnToken: 'spawn'
       })

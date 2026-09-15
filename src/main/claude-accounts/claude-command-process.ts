@@ -1,10 +1,12 @@
 import { spawnProcess } from '../../shared/child-process/run-process'
-import { withCliRuntimeOnPath } from '../../shared/node-cli-command-resolution'
+import {
+  resolveClaudeCommand,
+  withCliRuntimeOnPath
+} from '../../shared/node-cli-command-resolution'
 import {
   buildWindowsHostInteractiveLoginSpawn,
   type WindowsHostInteractiveLoginSpawn
 } from '../../shared/windows-interactive-login-spawn'
-import { resolveClaudeCommand } from '../codex-cli/command'
 import { buildWindowsCommandInvocation } from './windows-command-invocation'
 import { terminateClaudeProcess } from './claude-login-process-termination'
 

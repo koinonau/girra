@@ -611,7 +611,7 @@ describe('AutomationService', () => {
     expect(store.listAutomationRuns(automation.id).some((entry) => entry.id === run.id)).toBe(false)
   })
 
-  it.each(['gemini', 'codex'] as const)(
+  it.each(['opencode', 'pi'] as const)(
     'records unsupported usage cleanly for completed %s runs without a local usage store',
     async (agentId) => {
       vi.setSystemTime(new Date('2026-05-13T10:00:00'))

@@ -73,7 +73,7 @@ describe('nativeChatLaunchAgentForLeaf', () => {
 
     expect(
       nativeChatLaunchAgentForLeaf({
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         launchAgentLeafId: 'agent-leaf',
         leafId: 'agent-leaf',
         leafIds
@@ -81,7 +81,7 @@ describe('nativeChatLaunchAgentForLeaf', () => {
     ).toBeNull()
     expect(
       nativeChatLaunchAgentForLeaf({
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         launchAgentLeafId: 'agent-leaf',
         leafId: 'shell-leaf',
         leafIds
@@ -92,7 +92,7 @@ describe('nativeChatLaunchAgentForLeaf', () => {
   it('does not transfer the launch hint when the original leaf closes', () => {
     expect(
       nativeChatLaunchAgentForLeaf({
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         launchAgentLeafId: 'closed-agent-leaf',
         leafId: 'remaining-shell-leaf',
         leafIds: ['remaining-shell-leaf']
@@ -205,7 +205,7 @@ describe('resolveNativeChatLeafRoute', () => {
         chatLeafStillMounted: false,
         activeLeafIsEligible: false,
         chatLeafHasConfirmedAgentExit: true,
-        structuredSessionId: 'codex_thread-1'
+        structuredSessionId: 'claude_thread-1'
       })
     ).toEqual({ chatLeafId: 'adopted-agent', exitChat: false })
   })
@@ -218,7 +218,7 @@ describe('resolveNativeChatLeafRoute', () => {
         activeLeafId: 'adopted-agent',
         chatLeafStillMounted: true,
         activeLeafIsEligible: false,
-        structuredSessionId: 'codex_thread-1'
+        structuredSessionId: 'claude_thread-1'
       })
     ).toEqual({ chatLeafId: 'adopted-agent', exitChat: false })
   })

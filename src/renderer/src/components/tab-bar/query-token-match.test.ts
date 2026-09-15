@@ -7,7 +7,7 @@ describe('query token match', () => {
   })
 
   it('tokenizes on non-alphanumeric boundaries', () => {
-    expect(tokenizeMatchValue('GitHub Copilot-cli')).toEqual(['github', 'copilot', 'cli'])
+    expect(tokenizeMatchValue('Claude Code-cli')).toEqual(['claude', 'code', 'cli'])
   })
 
   it('ranks exact tokens above prefixes above substrings', () => {

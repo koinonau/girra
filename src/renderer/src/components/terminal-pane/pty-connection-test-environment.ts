@@ -16,10 +16,10 @@ export function buildAgentStatusModuleMock(
       if (/Claude (working|done)/.test(title)) {
         return /working/.test(title) ? 'working' : 'idle'
       }
-      if (/Codex( working)?/.test(title)) {
+      if (/OpenCode( working)?/.test(title)) {
         return /working/.test(title) ? 'working' : 'idle'
       }
-      if (/^\s*(?:[\u2800-\u28ff]\s+)?(?:Pi|OMP)(?: ready| idle)?\s*$/i.test(title)) {
+      if (/^\s*(?:[\u2800-\u28ff]\s+)?Pi(?: ready| idle)?\s*$/i.test(title)) {
         return /[\u2800-\u28ff]/u.test(title) ? 'working' : 'idle'
       }
       return null

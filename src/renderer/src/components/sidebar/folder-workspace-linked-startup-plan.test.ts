@@ -4,7 +4,7 @@ import { buildFolderWorkspaceLinkedStartupPlan } from './folder-workspace-compos
 describe('buildFolderWorkspaceLinkedStartupPlan', () => {
   it('uses cmd quoting for configured arguments on local Windows', () => {
     const plan = buildFolderWorkspaceLinkedStartupPlan({
-      agent: 'hermes',
+      agent: 'opencode',
       linkedWorkItem: {
         provider: 'github',
         type: 'issue',
@@ -21,6 +21,6 @@ describe('buildFolderWorkspaceLinkedStartupPlan', () => {
       isRemote: false
     })
 
-    expect(plan?.launchCommand).toBe('hermes --tui "--provider" "value with space"')
+    expect(plan?.launchCommand).toBe('opencode "--provider" "value with space"')
   })
 })

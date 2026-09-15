@@ -168,7 +168,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected onAgentBecameIdle to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* Claude done')
 
     expect(pane.terminal.write).toHaveBeenCalledWith(
       RESET_TERMINAL_CURSOR_STYLE,
@@ -198,7 +198,7 @@ describe('connectPanePty', () => {
         throw new Error('Expected onAgentBecameIdle to be registered')
       }
 
-      idleHandler('* Codex done')
+      idleHandler('* Claude done')
 
       expect(pane.terminal.write).toHaveBeenCalledWith(
         `${RESET_TERMINAL_CURSOR_STYLE}${RESET_KITTY_KEYBOARD_PROTOCOL}`,
@@ -236,7 +236,7 @@ describe('connectPanePty', () => {
         throw new Error('Expected onAgentBecameIdle to be registered')
       }
 
-      idleHandler('* Codex done')
+      idleHandler('* Claude done')
 
       expect(pane.terminal.write).toHaveBeenCalledWith(
         RESET_TERMINAL_CURSOR_STYLE,
@@ -297,7 +297,7 @@ describe('connectPanePty', () => {
         if (!idleHandler) {
           throw new Error('Expected onAgentBecameIdle to be registered')
         }
-        idleHandler('* Codex done')
+        idleHandler('* Claude done')
 
         expect(pane.terminal.write).toHaveBeenCalledWith(
           RESET_TERMINAL_CURSOR_STYLE,
@@ -333,7 +333,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: Date.now(),
         stateStartedAt: Date.now(),
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: []
       }
@@ -345,7 +345,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: Date.now(),
         stateStartedAt: Date.now(),
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: []
       }
@@ -377,7 +377,7 @@ describe('connectPanePty', () => {
         prompt: 'first turn',
         updatedAt: firstDoneAt,
         stateStartedAt: firstDoneAt,
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: [{ state: 'working', prompt: 'first turn', startedAt: firstDoneAt - 5_000 }]
       }
@@ -396,7 +396,7 @@ describe('connectPanePty', () => {
         prompt: 'second turn',
         updatedAt: secondDoneAt,
         stateStartedAt: secondDoneAt,
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: [
           { state: 'working', prompt: 'first turn', startedAt: firstDoneAt - 5_000 },
@@ -431,7 +431,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: startedAt,
         stateStartedAt: startedAt,
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: []
       }
@@ -448,7 +448,7 @@ describe('connectPanePty', () => {
         prompt: 'follow-up',
         updatedAt: startedAt + 8_000,
         stateStartedAt: startedAt + 8_000,
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: [
           { state: 'working', prompt: 'ship it', startedAt },
@@ -488,7 +488,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: doneAt,
         stateStartedAt: doneAt,
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: []
       }
@@ -500,7 +500,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: doneAt + 1_000,
         stateStartedAt: doneAt,
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: []
       }
@@ -563,7 +563,7 @@ describe('connectPanePty', () => {
     }
   )
 
-  it('keeps focus reports enabled for native Windows Cursor completion', async () => {
+  it('keeps focus reports enabled for native Windows OpenCode completion', async () => {
     const restoreUserAgent = temporarilySetNavigatorUserAgent(
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
     )
@@ -583,7 +583,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: Date.now(),
         stateStartedAt: Date.now(),
-        agentType: 'cursor',
+        agentType: 'opencode',
         paneKey,
         stateHistory: []
       }
@@ -624,7 +624,7 @@ describe('connectPanePty', () => {
         prompt: 'ship it',
         updatedAt: Date.now(),
         stateStartedAt: Date.now(),
-        agentType: 'codex',
+        agentType: 'claude',
         paneKey,
         stateHistory: []
       }

@@ -37,19 +37,19 @@ describe('terminal side-effect fact channel', () => {
     runtime.syncWindowGraph(HEADLESS_RUNTIME_WINDOW_ID, { tabs: [], leaves: [] })
     const unsubscribe = runtime.onClientEvent((event) => events.push(event))
 
-    runtime.onPtyData('pty-remote', '\x1b]0;Codex working\x07\x07', 100)
+    runtime.onPtyData('pty-remote', '\x1b]0;Claude working\x07\x07', 100)
 
     expect(events).toEqual([
       {
         type: 'terminalSideEffects',
         batch: {
           ptyId: 'pty-remote',
-          seq: 19,
+          seq: 20,
           facts: [
             {
               kind: 'title',
-              normalizedTitle: 'Codex working',
-              rawTitle: 'Codex working'
+              normalizedTitle: 'Claude working',
+              rawTitle: 'Claude working'
             },
             { kind: 'agent-working' },
             { kind: 'bell' }
@@ -135,7 +135,7 @@ describe('terminal side-effect fact channel', () => {
       consumesTerminalSideEffects: false
     })
 
-    runtime.onPtyData('pty-remote', '\x1b]0;Codex working\x07', 100)
+    runtime.onPtyData('pty-remote', '\x1b]0;Claude working\x07', 100)
     runtime.notifyBranchRenamed(TEST_REPO_ID)
 
     expect(desktopEvents.map((event) => event.type)).toEqual([
@@ -168,7 +168,7 @@ describe('terminal side-effect fact channel', () => {
       })
       const unsubscribeDesktop = runtime.onClientEvent(() => {})
 
-      runtime.onPtyData(ptyId, '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;Claude working\x07', 100)
       runtime.onPtyData(ptyId, 'output without a title\r\n', 101)
       // The phone is still subscribed: disposing trackers on this edge would cancel
       // its armed stale-working-title timer and strand a 'working' spinner (#1437).
@@ -177,7 +177,7 @@ describe('terminal side-effect fact channel', () => {
       await vi.advanceTimersByTimeAsync(3_000)
 
       expect(trackerEntries.has(ptyId)).toBe(true)
-      expect((await runtime.listTerminals()).terminals[0]).toMatchObject({ title: 'Codex' })
+      expect((await runtime.listTerminals()).terminals[0]).toMatchObject({ title: 'Claude' })
       expect(mobileEvents.some((event) => event.type === 'terminalSideEffects')).toBe(false)
     } finally {
       vi.useRealTimers()
@@ -194,7 +194,7 @@ describe('terminal side-effect fact channel', () => {
     })
     const unsubscribeLate = runtime.onClientEvent((event) => lateEvents.push(event))
 
-    runtime.onPtyData('pty-remote', '\x1b]0;Codex working\x07', 100)
+    runtime.onPtyData('pty-remote', '\x1b]0;Claude working\x07', 100)
 
     expect(lateEvents).toEqual([])
   })
@@ -203,7 +203,7 @@ describe('terminal side-effect fact channel', () => {
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    const chunk = '\x1b]0;Codex working\x07response\x1b]0;Codex done\x07\x07'
+    const chunk = '\x1b]0;Claude working\x07response\x1b]0;Claude done\x07\x07'
     runtime.onPtyData('pty-1', chunk, 100)
 
     expect(batches).toHaveLength(1)
@@ -216,10 +216,10 @@ describe('terminal side-effect fact channel', () => {
     })
     expect(batches[0].replay).toBeUndefined()
     expect(batches[0].facts).toEqual([
-      { kind: 'title', normalizedTitle: 'Codex working', rawTitle: 'Codex working' },
+      { kind: 'title', normalizedTitle: 'Claude working', rawTitle: 'Claude working' },
       { kind: 'agent-working' },
-      { kind: 'title', normalizedTitle: 'Codex done', rawTitle: 'Codex done' },
-      { kind: 'agent-idle', title: 'Codex done' },
+      { kind: 'title', normalizedTitle: 'Claude done', rawTitle: 'Claude done' },
+      { kind: 'agent-idle', title: 'Claude done' },
       { kind: 'bell' }
     ])
   })
@@ -228,8 +228,8 @@ describe('terminal side-effect fact channel', () => {
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-    runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
 
     expect(batches.map((batch) => batch.facts[0]?.kind)).toEqual(['title', 'title'])
     expect(batches[0].seq).toBeLessThan(batches[1].seq)
@@ -243,13 +243,13 @@ describe('terminal side-effect fact channel', () => {
     runtime.onPtyData('pty-1', 'plain output\r\n', 100)
     runtime.onPtyData('pty-1', '\x1b]7;file://host', 101)
     runtime.onPtyData('pty-1', '/tmp\x07', 102)
-    runtime.onPtyData('pty-1', '\x1b]9999;{"state":"working","agentType":"codex"}\x07', 103)
+    runtime.onPtyData('pty-1', '\x1b]9999;{"state":"working","agentType":"claude"}\x07', 103)
 
     expect(batches).toHaveLength(1)
     expect(batches[0].facts).toEqual([
       {
         kind: 'agent-status',
-        payload: expect.objectContaining({ state: 'working', agentType: 'codex' })
+        payload: expect.objectContaining({ state: 'working', agentType: 'claude' })
       }
     ])
   })
@@ -260,7 +260,7 @@ describe('terminal side-effect fact channel', () => {
       const { runtime, batches } = createSideEffectRuntime()
       syncSinglePty(runtime)
 
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
       runtime.onPtyData('pty-1', 'output without a title\r\n', 101)
       batches.length = 0
 
@@ -270,11 +270,11 @@ describe('terminal side-effect fact channel', () => {
       expect(batches.flatMap((batch) => batch.facts)).toEqual([
         {
           kind: 'title',
-          normalizedTitle: 'Codex',
-          rawTitle: 'Codex',
+          normalizedTitle: 'Claude',
+          rawTitle: 'Claude',
           staleWorkingTitleClear: true
         },
-        { kind: 'agent-idle', title: 'Codex', staleWorkingTitleClear: true }
+        { kind: 'agent-idle', title: 'Claude', staleWorkingTitleClear: true }
       ])
     } finally {
       vi.useRealTimers()
@@ -333,12 +333,12 @@ describe('terminal side-effect fact channel', () => {
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Codex ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
     runtime.onPtyData('pty-1', '\x1b]0;⠋ bichir\x07', 100)
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Codex ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
     batches.length = 0
 
-    const getForegroundProcess = vi.fn().mockResolvedValueOnce('codex')
+    const getForegroundProcess = vi.fn().mockResolvedValueOnce('claude')
     runtime.setPtyController({
       write: () => true,
       kill: () => true,
@@ -386,11 +386,11 @@ describe('terminal side-effect fact channel', () => {
       getForegroundProcess
     })
 
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Codex ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
     runtime.onPtyData('pty-1', '\x1b]0;bichir\x07', 100)
     expect(getForegroundProcess).toHaveBeenCalledOnce()
 
-    resolveStaleRead('codex')
+    resolveStaleRead('claude')
 
     await vi.waitFor(() => expect(getForegroundProcess).toHaveBeenCalledTimes(2))
     await vi.waitFor(() =>
@@ -401,7 +401,7 @@ describe('terminal side-effect fact channel', () => {
   it('treats synchronous foreground read failures as unavailable', async () => {
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Codex ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
     const getForegroundProcess = vi.fn(() => {
       throw new TypeError('getForegroundProcess is unavailable')
     })

@@ -4,6 +4,7 @@ import {
   normalizeProjectRows
 } from '../../../shared/project-catalog-row-normalization'
 import type { WorkspaceSessionState } from '../../../shared/workspace-session-state-types'
+import { isTuiAgent } from '../../../shared/tui-agent-config'
 import { parseWorkspaceSessionSalvaging } from '../../../shared/workspace-session-salvage'
 import {
   backfillAutomationRunNumbers,
@@ -54,6 +55,23 @@ export function normalizeLoadedHostSessions(
     markNeedsSave()
   }
   return partitions
+}
+
+export function normalizeLoadedAutomations(
+  parsed: PersistedState,
+  markNeedsSave: () => void
+): PersistedState['automations'] {
+  if (!Array.isArray(parsed.automations)) {
+    return []
+  }
+  return parsed.automations.map((automation) => {
+    if (!automation.enabled || isTuiAgent(automation.agentId)) {
+      return automation
+    }
+    // Why: a retired agent would fail every scheduled run; pause it rather than remap to another agent.
+    markNeedsSave()
+    return { ...automation, enabled: false }
+  })
 }
 
 export function normalizeLoadedAutomationRuns(

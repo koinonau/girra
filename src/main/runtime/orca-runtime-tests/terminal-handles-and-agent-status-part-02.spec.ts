@@ -238,7 +238,7 @@ describe('OrcaRuntimeService', () => {
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'codex'
+      getForegroundProcess: async () => 'opencode'
     })
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
@@ -256,7 +256,7 @@ describe('OrcaRuntimeService', () => {
     const getForegroundProcess = vi
       .fn()
       .mockResolvedValueOnce('node')
-      .mockResolvedValueOnce('codex')
+      .mockResolvedValueOnce('opencode')
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
@@ -281,7 +281,7 @@ describe('OrcaRuntimeService', () => {
     const getForegroundProcess = vi
       .fn()
       .mockResolvedValueOnce('node')
-      .mockResolvedValueOnce('codex')
+      .mockResolvedValueOnce('opencode')
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
@@ -325,7 +325,7 @@ describe('OrcaRuntimeService', () => {
     runtime.setPtyController({
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'gemini'
+      getForegroundProcess: async () => 'opencode'
     })
     syncSinglePty(runtime, 'pty-1', { paneTitle: 'bash' })
     const [terminal] = (await runtime.listTerminals()).terminals
@@ -334,7 +334,7 @@ describe('OrcaRuntimeService', () => {
     await expect(runtime.isTerminalRunningSettledPromptAgent(terminal.handle)).resolves.toBe(false)
   })
 
-  it('keeps stale Codex launch identity on legacy delivery after the shell returns', async () => {
+  it('keeps stale Claude launch identity on legacy delivery after the shell returns', async () => {
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
@@ -343,9 +343,9 @@ describe('OrcaRuntimeService', () => {
       getForegroundProcess: async () => 'zsh'
     })
     const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
-      title: 'Codex working',
-      launchAgent: 'codex'
+      command: 'claude',
+      title: 'Claude working',
+      launchAgent: 'claude'
     })
 
     await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)
@@ -353,7 +353,7 @@ describe('OrcaRuntimeService', () => {
   })
 
   it('waits for delayed wrapper foreground cache enrichment', async () => {
-    const getForegroundProcess = vi.fn(async () => (Date.now() >= 4_000 ? 'codex' : 'node'))
+    const getForegroundProcess = vi.fn(async () => (Date.now() >= 4_000 ? 'opencode' : 'node'))
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
@@ -436,7 +436,7 @@ describe('OrcaRuntimeService', () => {
     const getForegroundProcess = vi
       .fn()
       .mockResolvedValueOnce('node')
-      .mockResolvedValueOnce('codex')
+      .mockResolvedValueOnce('opencode')
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
       write: () => true,
@@ -481,7 +481,7 @@ describe('OrcaRuntimeService', () => {
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'codex'
+      getForegroundProcess: async () => 'opencode'
     })
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
@@ -491,30 +491,6 @@ describe('OrcaRuntimeService', () => {
     })
 
     syncSinglePty(runtime, 'pty-bg', { paneTitle: 'claude agents' })
-
-    await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)
-  })
-
-  it('keeps ready prompt evidence when an adopted pane title is neutral', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    runtime.attachWindow(1)
-    runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
-      title: 'Codex working'
-    })
-    syncSinglePty(runtime, 'pty-bg', { paneTitle: 'bash' })
-    runtime.onPtyData(
-      'pty-bg',
-      ['OpenAI Codex', 'Model: gpt-5.4', 'Directory: /tmp/worktree-a'].join('\n'),
-      100
-    )
 
     await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)
   })

@@ -56,7 +56,7 @@ describe('sendNativeChatMessage', () => {
 
   it('does not fire Enter before the proven 500ms gap (busy-agent safety)', () => {
     sendNativeChatMessage(SETTINGS, PTY, 'hi')
-    // A short gap would fire Enter while a busy Codex has not yet landed the
+    // A short gap would fire Enter while a busy agent has not yet landed the
     // paste, submitting an empty box — so nothing must happen before 500ms.
     vi.advanceTimersByTime(NATIVE_CHAT_SUBMIT_DELAY_MS - 1)
     expect(sendRuntimePtyInput).toHaveBeenCalledTimes(2)

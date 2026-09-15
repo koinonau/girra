@@ -96,13 +96,13 @@ describe('registerWorktreeHandlers', () => {
     const result = await handlers['hooks:createIssueCommandRunner'](null, {
       repoId: 'repo-1',
       worktreePath: '/workspace/improve-dashboard',
-      command: 'codex exec "long command"'
+      command: 'claude -p "long command"'
     })
 
     expect(createIssueCommandRunnerScriptMock).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'repo-1' }),
       '/workspace/improve-dashboard',
-      'codex exec "long command"',
+      'claude -p "long command"',
       {},
       // Why: issue runners take the resolved setup shell; it is undefined off Windows.
       undefined

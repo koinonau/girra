@@ -501,7 +501,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-coordinator',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'OpenCode',
           activeLeafId: coordinatorLeafId,
           layout: null
         }

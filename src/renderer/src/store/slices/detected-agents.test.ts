@@ -92,7 +92,7 @@ describe('createDetectedAgentsSlice WSL context', () => {
     clearRuntimeCompatibilityCacheForTests()
     detectAgents.mockReset().mockResolvedValue(['claude'])
     refreshAgents.mockReset().mockResolvedValue({
-      agents: ['codex'],
+      agents: ['opencode'],
       addedPathSegments: [],
       shellHydrationOk: true
     })
@@ -153,15 +153,15 @@ describe('createDetectedAgentsSlice WSL context', () => {
 
     expect(detectAgents).toHaveBeenCalledTimes(1)
     expect(store.getState().isDetectingAgents).toBe(true)
-    resolveDetection(['codex'])
-    await expect(Promise.all([floating, ordinary])).resolves.toEqual([['codex'], ['codex']])
-    expect(store.getState().detectedAgentIds).toEqual(['codex'])
+    resolveDetection(['opencode'])
+    await expect(Promise.all([floating, ordinary])).resolves.toEqual([['opencode'], ['opencode']])
+    expect(store.getState().detectedAgentIds).toEqual(['opencode'])
     expect(store.getState().isDetectingAgents).toBe(false)
   })
 
   it('restores the legacy inventory when returning to a cached local context', async () => {
     detectAgents.mockImplementation(async (context) =>
-      context?.projectRuntime?.runtime.kind === 'wsl' ? ['claude'] : ['codex']
+      context?.projectRuntime?.runtime.kind === 'wsl' ? ['claude'] : ['opencode']
     )
     const store = createTestStore({
       repos: [makeRepo({ id: 'repo-1', path: '\\\\wsl.localhost\\Ubuntu\\home\\alice\\repo' })],
@@ -182,14 +182,14 @@ describe('createDetectedAgentsSlice WSL context', () => {
   it('retries a local context after a transient detection failure', async () => {
     detectAgents
       .mockRejectedValueOnce(new Error('cold-start timeout'))
-      .mockResolvedValueOnce(['codex'])
+      .mockResolvedValueOnce(['opencode'])
     const store = createTestStore()
 
     await expect(store.getState().ensureDetectedAgents()).resolves.toEqual([])
-    await expect(store.getState().ensureDetectedAgents()).resolves.toEqual(['codex'])
+    await expect(store.getState().ensureDetectedAgents()).resolves.toEqual(['opencode'])
 
     expect(detectAgents).toHaveBeenCalledTimes(2)
-    expect(store.getState().detectedAgentIds).toEqual(['codex'])
+    expect(store.getState().detectedAgentIds).toEqual(['opencode'])
   })
 
   it('refreshes local agents inside the active WSL repo distro when no worktree is selected', async () => {
@@ -199,7 +199,7 @@ describe('createDetectedAgentsSlice WSL context', () => {
       activeWorktreeId: null
     })
 
-    await expect(store.getState().refreshDetectedAgents()).resolves.toEqual(['codex'])
+    await expect(store.getState().refreshDetectedAgents()).resolves.toEqual(['opencode'])
 
     expect(refreshAgents).toHaveBeenCalledWith({
       wslDistro: 'Debian',
@@ -480,7 +480,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
     clearRuntimeCompatibilityCacheForTests()
     detectAgents.mockReset().mockResolvedValue(['claude'])
     refreshAgents.mockReset().mockResolvedValue({
-      agents: ['codex'],
+      agents: ['opencode'],
       addedPathSegments: [],
       shellHydrationOk: true
     })
@@ -498,7 +498,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
               runtimeProtocolVersion: RUNTIME_PROTOCOL_VERSION,
               minCompatibleRuntimeClientVersion: MIN_COMPATIBLE_RUNTIME_CLIENT_VERSION
             }
-          : ['codex']
+          : ['opencode']
       return Promise.resolve({
         id: method,
         ok: true,
@@ -551,9 +551,9 @@ describe('createDetectedAgentsSlice remote detection', () => {
     expect(detectRemoteAgents).toHaveBeenCalledTimes(1)
     expect(store.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['claude'])
 
-    resolveRemote(['codex'])
-    await expect(first).resolves.toEqual(['codex'])
-    expect(store.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['codex'])
+    resolveRemote(['opencode'])
+    await expect(first).resolves.toEqual(['opencode'])
+    expect(store.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['opencode'])
   })
 
   it('does not restore an SSH cache entry after it is cleared mid-detection', async () => {
@@ -584,11 +584,11 @@ describe('createDetectedAgentsSlice remote detection', () => {
     expect(store.getState().remoteDetectedAgentIds['ssh-1']).toEqual([])
     expect(detectRemoteAgents).toHaveBeenCalledTimes(1)
 
-    detectRemoteAgents.mockResolvedValueOnce(['kilo'])
+    detectRemoteAgents.mockResolvedValueOnce(['pi'])
 
-    await expect(store.getState().ensureRemoteDetectedAgents('ssh-1')).resolves.toEqual(['kilo'])
+    await expect(store.getState().ensureRemoteDetectedAgents('ssh-1')).resolves.toEqual(['pi'])
     expect(detectRemoteAgents).toHaveBeenCalledTimes(2)
-    expect(store.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['kilo'])
+    expect(store.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['pi'])
   })
 
   it('detects runtime environment agents through the owning runtime', async () => {
@@ -598,12 +598,14 @@ describe('createDetectedAgentsSlice remote detection', () => {
     const second = store.getState().ensureRuntimeDetectedAgents('env-1')
 
     expect(_getRuntimeDetectPromiseCountForTest()).toBe(1)
-    await expect(first).resolves.toEqual(['codex'])
-    await expect(second).resolves.toEqual(['codex'])
-    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['codex'])
+    await expect(first).resolves.toEqual(['opencode'])
+    await expect(second).resolves.toEqual(['opencode'])
+    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['opencode'])
     expect(_getRuntimeDetectPromiseCountForTest()).toBe(0)
 
-    await expect(store.getState().ensureRuntimeDetectedAgents('env-1')).resolves.toEqual(['codex'])
+    await expect(store.getState().ensureRuntimeDetectedAgents('env-1')).resolves.toEqual([
+      'opencode'
+    ])
     expect(runtimeEnvironmentCall).toHaveBeenCalledTimes(2)
     expect(runtimeEnvironmentCall).toHaveBeenNthCalledWith(1, {
       selector: 'env-1',
@@ -640,7 +642,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
         }
       } else {
         detectCalls += 1
-        result = detectCalls === 1 ? [] : ['kilo']
+        result = detectCalls === 1 ? [] : ['pi']
       }
       return Promise.resolve({
         id: method,
@@ -653,8 +655,8 @@ describe('createDetectedAgentsSlice remote detection', () => {
     await expect(store.getState().ensureRuntimeDetectedAgents('env-1')).resolves.toEqual([])
     expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual([])
 
-    await expect(store.getState().ensureRuntimeDetectedAgents('env-1')).resolves.toEqual(['kilo'])
-    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['kilo'])
+    await expect(store.getState().ensureRuntimeDetectedAgents('env-1')).resolves.toEqual(['pi'])
+    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['pi'])
     expect(detectCalls).toBe(2)
   })
 
@@ -675,12 +677,12 @@ describe('createDetectedAgentsSlice remote detection', () => {
         }
       } else if (method === 'preflight.refreshAgents') {
         result = {
-          agents: ['claude', 'gemini'],
+          agents: ['claude', 'pi'],
           addedPathSegments: [],
           shellHydrationOk: true
         }
       } else {
-        result = ['codex']
+        result = ['opencode']
       }
       return Promise.resolve({
         id: method,
@@ -694,9 +696,9 @@ describe('createDetectedAgentsSlice remote detection', () => {
     const second = store.getState().refreshRuntimeDetectedAgents('env-1')
 
     expect(store.getState().isRefreshingRuntimeAgents['env-1']).toBe(true)
-    await expect(first).resolves.toEqual(['claude', 'gemini'])
-    await expect(second).resolves.toEqual(['claude', 'gemini'])
-    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['claude', 'gemini'])
+    await expect(first).resolves.toEqual(['claude', 'pi'])
+    await expect(second).resolves.toEqual(['claude', 'pi'])
+    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['claude', 'pi'])
     expect(store.getState().isRefreshingRuntimeAgents['env-1']).toBe(false)
     expect(
       runtimeEnvironmentCall.mock.calls.filter(
@@ -760,13 +762,13 @@ describe('createDetectedAgentsSlice remote detection', () => {
       id: 'preflight.refreshAgents',
       ok: true,
       result: {
-        agents: ['kilo'],
+        agents: ['pi'],
         addedPathSegments: [],
         shellHydrationOk: true
       },
       _meta: { runtimeId: 'remote-runtime' }
     })
-    await expect(refresh).resolves.toEqual(['kilo'])
+    await expect(refresh).resolves.toEqual(['pi'])
 
     resolveDetect({
       id: 'preflight.detectAgents',
@@ -776,7 +778,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
     })
     await expect(detect).resolves.toEqual(['claude'])
 
-    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['kilo'])
+    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['pi'])
     expect(store.getState().isDetectingRuntimeAgents['env-1']).toBe(false)
     expect(store.getState().isRefreshingRuntimeAgents['env-1']).toBe(false)
     expect(
@@ -809,7 +811,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
               runtimeProtocolVersion: RUNTIME_PROTOCOL_VERSION,
               minCompatibleRuntimeClientVersion: MIN_COMPATIBLE_RUNTIME_CLIENT_VERSION
             }
-          : ['kilo']
+          : ['pi']
       return Promise.resolve({
         id: method,
         ok: true,
@@ -818,8 +820,8 @@ describe('createDetectedAgentsSlice remote detection', () => {
       })
     })
 
-    await expect(store.getState().refreshRuntimeDetectedAgents('env-1')).resolves.toEqual(['kilo'])
-    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['kilo'])
+    await expect(store.getState().refreshRuntimeDetectedAgents('env-1')).resolves.toEqual(['pi'])
+    expect(store.getState().runtimeDetectedAgentIds['env-1']).toEqual(['pi'])
     expect(store.getState().isRefreshingRuntimeAgents['env-1']).toBe(false)
   })
 
@@ -855,7 +857,7 @@ describe('createDetectedAgentsSlice remote detection', () => {
       return Promise.resolve({
         id: method,
         ok: true,
-        result: ['codex'],
+        result: ['opencode'],
         _meta: { runtimeId: 'remote-runtime' }
       })
     })

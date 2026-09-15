@@ -23,7 +23,7 @@ function resolveActiveLeafId(
 
 /**
  * Returns paneKeys to ack for the active tab/leaf; exported for the
- * codex-row-bold regression test (docs/codex-agent-row-bold-stuck.md).
+ * agent-row-bold regression tests.
  *
  * Why: split tabs host multiple agent panes, so match exact `${tabId}:${leafId}` — a tab-prefix match would ack undisplayed siblings.
  */
@@ -197,7 +197,7 @@ export function acknowledgeViewedAgentAttention(
 }
 
 // Auto-ack an agent row as "seen" when the user is already on its tab, so the dashboard/Dock don't stay bold for an event they watched happen.
-// Scans live + retained maps: Codex's title-revert (pty-connection.ts:onAgentExited) migrates `done` rows to retained mid-race — see docs/codex-agent-row-bold-stuck.md.
+// Scans live + retained maps: an agent's title-revert (pty-connection.ts:onAgentExited) migrates `done` rows to retained mid-race.
 export function useAutoAckViewedAgent(floatingPanelVisible: boolean): void {
   // Why a ref: the scan loop is mounted once, but panel visibility is React-local state that never
   // reaches the store, and re-subscribing on every open/close would drop the accumulated diff refs.

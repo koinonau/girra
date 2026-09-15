@@ -78,7 +78,7 @@ const folderProjectGroup = {
 const card: DashboardCard = {
   paneKey: 'pane-1',
   ptyId: 'pty-1',
-  agentType: 'codex',
+  agentType: 'opencode',
   bucket: 'working',
   dotState: 'working',
   task: 'Build map',

@@ -83,7 +83,7 @@ describe('getFolderSourceRepos', () => {
 describe('getFolderWorkspacePrimaryActionLabel', () => {
   it('uses a stable workspace creation label independent of quick agent selection', () => {
     const label = (getFolderWorkspacePrimaryActionLabel as (...args: unknown[]) => string)({
-      id: 'codex'
+      id: 'opencode'
     })
 
     expect(label).toBe('Create workspace')

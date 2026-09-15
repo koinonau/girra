@@ -21,8 +21,8 @@ describe('planSourceControlCommitMessageGeneration', () => {
   it('rejects command templates that render empty input', () => {
     expect(
       planSourceControlCommitMessageGeneration({
-        agentId: 'codex',
-        model: 'gpt-5.5',
+        agentId: 'claude',
+        model: 'sonnet',
         commandInputTemplate: ''
       })
     ).toEqual({ ok: false, error: 'Command input is empty.' })
@@ -30,24 +30,24 @@ describe('planSourceControlCommitMessageGeneration', () => {
 
   it('plans known agents and includes renderer-only caveats', () => {
     const result = planSourceControlCommitMessageGeneration({
-      agentId: 'codex',
-      model: 'gpt-5.5',
+      agentId: 'claude',
+      model: 'sonnet',
       thinkingLevel: 'low'
     })
 
-    expect(result.ok && result.commandLabel).toContain('codex exec')
+    expect(result.ok && result.commandLabel).toContain('claude -p')
     expect(result.ok && result.delivery).toContain('stdin')
     expect(result.ok && result.caveat).toContain('Windows .cmd')
   })
 
   it('plans pull-request generation with pull-request variables', () => {
     const result = planSourceControlTextGeneration('pullRequest', {
-      agentId: 'codex',
-      model: 'gpt-5.5',
+      agentId: 'claude',
+      model: 'sonnet',
       commandInputTemplate: '{basePrompt}\n\nReview {changedFiles}'
     })
 
-    expect(result.ok && result.commandLabel).toContain('codex exec')
+    expect(result.ok && result.commandLabel).toContain('claude -p')
   })
 
   it('expands linkedIssue when validating commit and pull-request recipes', () => {
@@ -90,12 +90,12 @@ describe('planSourceControlCommitMessageGeneration', () => {
 
   it('shows per-action CLI arguments in dry-run command labels', () => {
     const result = planSourceControlTextGeneration('pullRequest', {
-      agentId: 'codex',
-      model: 'gpt-5.5',
-      agentArgs: '--model gpt-5.4',
+      agentId: 'claude',
+      model: 'sonnet',
+      agentArgs: '--model opus',
       commandInputTemplate: '{basePrompt}'
     })
 
-    expect(result.ok && result.commandLabel).toContain('--model gpt-5.4')
+    expect(result.ok && result.commandLabel).toContain('--model opus')
   })
 })

@@ -76,7 +76,7 @@ describe('registerFilesystemHandlers', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
     resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
     getStagedCommitContextMock.mockResolvedValue(context)
     generateCommitMessageFromContextMock.mockResolvedValue({
@@ -108,7 +108,7 @@ describe('registerFilesystemHandlers', () => {
       stagedPatch: '+hello'
     }
     const sourceControlAiResolvedParams = {
-      agentId: 'codex' as const,
+      agentId: 'opencode' as const,
       model: 'gpt-5.5',
       thinkingLevel: 'high',
       customPrompt: 'Use Conventional Commits.'
@@ -146,7 +146,7 @@ describe('registerFilesystemHandlers', () => {
         stagedSummary: 'M\tREADME.md',
         stagedPatch: '+hello'
       }
-      const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
+      const params = { agentId: 'opencode', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
       resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
       getStagedCommitContextMock.mockResolvedValue(context)
       generateCommitMessageFromContextMock.mockResolvedValue({
@@ -205,7 +205,7 @@ describe('registerFilesystemHandlers', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     const worktreeId = `repo-1::${WORKTREE_FEATURE_PATH}`
     resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
     getStagedCommitContextMock.mockResolvedValue(context)
@@ -238,7 +238,7 @@ describe('registerFilesystemHandlers', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     const instanceId = `repo-1::${WORKTREE_FEATURE_PATH}::workspace:${'0'.repeat(8)}-0000-0000-0000-${'0'.repeat(12)}`
     resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
     getStagedCommitContextMock.mockResolvedValue(context)
@@ -270,7 +270,7 @@ describe('registerFilesystemHandlers', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     const getWorktreeMeta = vi.fn(() => ({ linkedIssue: 123 }))
     resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })
     getStagedCommitContextMock.mockResolvedValue(context)
@@ -477,7 +477,7 @@ describe('registerFilesystemHandlers', () => {
   it('does not call the generator when no staged changes exist', async () => {
     resolveCommitMessageSettingsMock.mockReturnValue({
       ok: true,
-      params: { agentId: 'codex', model: 'gpt-5.4-mini' }
+      params: { agentId: 'opencode', model: 'gpt-5.4-mini' }
     })
     getStagedCommitContextMock.mockResolvedValue(null)
 
@@ -495,7 +495,7 @@ describe('registerFilesystemHandlers', () => {
   it('sanitizes local staged-context read failures before returning to the renderer', async () => {
     resolveCommitMessageSettingsMock.mockReturnValue({
       ok: true,
-      params: { agentId: 'codex', model: 'gpt-5.4-mini' }
+      params: { agentId: 'opencode', model: 'gpt-5.4-mini' }
     })
     getStagedCommitContextMock.mockRejectedValue(new Error('fatal: /secret/repo failed'))
 
@@ -513,7 +513,7 @@ describe('registerFilesystemHandlers', () => {
   it('sanitizes SSH staged-context read failures before returning to the renderer', async () => {
     resolveCommitMessageSettingsMock.mockReturnValue({
       ok: true,
-      params: { agentId: 'codex', model: 'gpt-5.4-mini' }
+      params: { agentId: 'opencode', model: 'gpt-5.4-mini' }
     })
     getSshGitProviderMock.mockReturnValue({
       getStagedCommitContext: vi.fn().mockRejectedValue(new Error('fatal: /remote/secret failed'))

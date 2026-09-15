@@ -42,7 +42,7 @@ export function BrowserUseExamples(): React.JSX.Element {
       <p className="mt-1 text-xs text-muted-foreground">
         {translate(
           'auto.components.settings.BrowserUseExamples.c5325e91f6',
-          'Paste any of these into Claude Code, Codex, or another agent in a project where the skill is installed.'
+          'Paste any of these into Claude Code, OpenCode, or another agent in a project where the skill is installed.'
         )}
       </p>
       <ul className="mt-3 space-y-2">

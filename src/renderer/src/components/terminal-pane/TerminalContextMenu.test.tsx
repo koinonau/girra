@@ -285,7 +285,7 @@ describe('TerminalContextMenu', () => {
       id: 'review',
       label: 'Remote review',
       action: 'agent-prompt' as const,
-      agent: 'codex' as const,
+      agent: 'opencode' as const,
       prompt: 'Review this change',
       scope: { type: 'global' as const }
     }

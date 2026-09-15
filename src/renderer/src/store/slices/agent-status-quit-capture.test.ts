@@ -36,7 +36,7 @@ describe('captureAllSleepingAgentSessions', () => {
       'tab-1:leaf-1',
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       { agentType: 'claude', launchToken: 'launch-token-1', tabId: 'tab-1', leafId: 'leaf-1' }
     )
@@ -96,7 +96,7 @@ describe('captureAllSleepingAgentSessions', () => {
       'tab-1:leaf-1',
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       {
         agentType: 'claude',
@@ -108,7 +108,7 @@ describe('captureAllSleepingAgentSessions', () => {
     expect(store.getState().agentStatusByPaneKey['tab-1:leaf-1']).not.toHaveProperty('launchConfig')
     expect(store.getState().sleepingAgentSessionsByPaneKey['tab-1:leaf-1']?.launchConfig).toEqual({
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'captured' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
     })
   })
 
@@ -121,9 +121,9 @@ describe('captureAllSleepingAgentSessions', () => {
     } as Partial<AppState>)
     const launchToken = 'launch-token-1'
     const launchConfig = {
-      agentCommand: "codex '--model' 'gpt-5'",
+      agentCommand: "claude '--model' 'sonnet'",
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'captured' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
     }
     const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
 
@@ -181,9 +181,9 @@ describe('captureAllSleepingAgentSessions', () => {
     } as Partial<AppState>)
     const launchToken = 'launch-token-1'
     const launchConfig = {
-      agentCommand: "codex '--model' 'gpt-5'",
+      agentCommand: "claude '--model' 'sonnet'",
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'captured' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
     }
     const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
 
@@ -311,9 +311,9 @@ describe('captureAllSleepingAgentSessions', () => {
     } as Partial<AppState>)
     const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
     const launchConfig = {
-      agentCommand: "codex '--model' 'gpt-5'",
+      agentCommand: "claude '--model' 'sonnet'",
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'captured' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
     }
     store.setState({
       sleepingAgentSessionsByPaneKey: {
@@ -373,7 +373,7 @@ describe('captureAllSleepingAgentSessions', () => {
       'tab-1:leaf-1',
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       {
         agentType: 'claude',
@@ -432,7 +432,7 @@ describe('captureAllSleepingAgentSessions', () => {
       'tab-1:leaf-1',
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       { agentType: 'claude', tabId: 'tab-1', leafId: 'leaf-1' }
     )
@@ -456,7 +456,7 @@ describe('captureAllSleepingAgentSessions', () => {
     const store = createTestStore()
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', {
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'captured' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
     })
 
     store.getState().clearAgentLaunchConfig('tab-1:leaf-1')
@@ -470,7 +470,7 @@ describe('captureAllSleepingAgentSessions', () => {
       'tab-1:leaf-1',
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       { agentType: 'claude', launchToken: 'launch-token-1', tabId: 'tab-1', leafId: 'leaf-1' }
     )
@@ -491,7 +491,7 @@ describe('captureAllSleepingAgentSessions', () => {
       'tab-1:leaf-1',
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       { agentType: 'claude', tabId: 'tab-1', leafId: 'leaf-1' }
     )
@@ -532,11 +532,11 @@ describe('captureAllSleepingAgentSessions', () => {
       )
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', {
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'first' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'first' }
     })
     store.getState().registerAgentLaunchConfig('tab-2:leaf-2', {
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'second' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'second' }
     })
 
     store.getState().clearSleepingAgentSessionsByWorktree('wt-1')
@@ -546,7 +546,7 @@ describe('captureAllSleepingAgentSessions', () => {
     expect(store.getState().sleepingAgentSessionsByPaneKey['tab-2:leaf-2']).toBeDefined()
     expect(store.getState().agentLaunchConfigByPaneKey['tab-2:leaf-2']?.launchConfig).toEqual({
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'second' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'second' }
     })
   })
 
@@ -630,11 +630,11 @@ describe('captureAllSleepingAgentSessions', () => {
       )
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', {
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'first' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'first' }
     })
     store.getState().registerAgentLaunchConfig('tab-2:leaf-2', {
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'second' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'second' }
     })
 
     store.getState().pruneSleepingAgentSessions(new Set(['wt-2']))
@@ -644,7 +644,7 @@ describe('captureAllSleepingAgentSessions', () => {
     expect(store.getState().sleepingAgentSessionsByPaneKey['tab-2:leaf-2']).toBeDefined()
     expect(store.getState().agentLaunchConfigByPaneKey['tab-2:leaf-2']?.launchConfig).toEqual({
       agentArgs: '--model gpt-5',
-      agentEnv: { CODEX_PROFILE: 'second' }
+      agentEnv: { CLAUDE_CONFIG_DIR: 'second' }
     })
   })
 
@@ -689,10 +689,10 @@ describe('captureAllSleepingAgentSessions', () => {
   // Why: a finished resumable-agent turn leaves the TUI alive at its prompt, so the persisted
   // recovery anchor must survive `done` without relabeling completed work as pending — else
   // logout→relaunch cold-restores to a bare shell instead of `--resume` (#9454).
-  // Covers claude (the reported agent) and codex; previously this was Pi-only.
+  // Covers claude (the reported agent) and opencode; previously this was Pi-only.
   it.each([
     ['claude', 'Claude'],
-    ['claude', 'Claude']
+    ['opencode', 'OpenCode']
   ] as const)(
     'retains the recovery anchor when a finished %s session stays resumable (#9454)',
     (agentType, title) => {
@@ -749,7 +749,7 @@ describe('captureAllSleepingAgentSessions', () => {
         launchToken,
         launchConfig: {
           agentArgs: '--model gpt-5',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
         }
       }
     )

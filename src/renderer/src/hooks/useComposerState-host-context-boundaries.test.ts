@@ -661,7 +661,7 @@ describe('useComposerState host-context boundaries', () => {
     const fullStartupPlan = sourceBetween(
       COMPOSER_SOURCE.fullSubmitPreparation,
       'const startupPlan = buildAgentStartupPlan({',
-      'const shouldSeedInitialAgentStatus ='
+      'const composerTelemetry: AgentLaunchMetadata ='
     )
     expect(fullStartupPlan).toContain('platform: selectedRepoAgentLaunchPlatform')
     expect(fullStartupPlan).not.toContain('platform: CLIENT_PLATFORM')
@@ -732,9 +732,7 @@ describe('useComposerState host-context boundaries', () => {
     expect(fullSubmit).toMatch(
       /submitShouldRunIssueAutomation[\s\S]*canUseIssueCommandForLinkedItemProvider\(submitLinkedWorkItemProvider\)/
     )
-    expect(fullSubmit).toContain('prompt: submitStartupPrompt')
-    expect(fullSubmit).toContain('const shouldSeedInitialAgentStatus =')
-    expect(fullSubmit).toContain('...(args.shouldSeedInitialAgentStatus')
+    expect(fullSubmit).toContain('prompt: startupPlan?.draftPrompt ?? submitStartupPrompt')
 
     const quickSubmit =
       COMPOSER_SOURCE.quickSubmitPreparation +

@@ -426,14 +426,14 @@ describe('session tab RPC methods', () => {
         targetGroupId: 'group-left',
         command: 'zsh',
         cwd: '/repo/packages/app',
-        env: { CODEX_PROFILE: 'captured' },
-        envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+        env: { OPENCODE_PROFILE: 'captured' },
+        envToDelete: ['OPENCODE_CONFIG', 'ORCA_OPENCODE_CONFIG'],
         launchToken: 'launch-token-123',
         launchConfig: {
           agentArgs: '--model gpt-5',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentEnv: { OPENCODE_PROFILE: 'captured' }
         },
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         viewMode: 'chat',
         activate: true
       })
@@ -445,16 +445,16 @@ describe('session tab RPC methods', () => {
       targetGroupId: 'group-left',
       command: 'zsh',
       cwd: '/repo/packages/app',
-      env: { CODEX_PROFILE: 'captured' },
-      envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+      env: { OPENCODE_PROFILE: 'captured' },
+      envToDelete: ['OPENCODE_CONFIG', 'ORCA_OPENCODE_CONFIG'],
       startupCommandDelivery: undefined,
       agent: undefined,
       launchToken: 'launch-token-123',
       launchConfig: {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { OPENCODE_PROFILE: 'captured' }
       },
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       viewMode: 'chat',
       activate: true,
       select: undefined,
@@ -520,7 +520,7 @@ describe('session tab RPC methods', () => {
     const response = await dispatcher.dispatch(
       makeRequest('session.tabs.createTerminal', {
         worktree: 'id:wt-1',
-        agent: 'codex',
+        agent: 'claude',
         agentPrompt: 'Review this diff'
       })
     )
@@ -532,7 +532,7 @@ describe('session tab RPC methods', () => {
       command: undefined,
       cwd: undefined,
       startupCommandDelivery: undefined,
-      agent: 'codex',
+      agent: 'claude',
       agentPrompt: 'Review this diff',
       activate: undefined,
       select: undefined,
@@ -587,7 +587,7 @@ describe('session tab RPC methods', () => {
     const response = await dispatcher.dispatch(
       makeRequest('session.tabs.createTerminal', {
         worktree: 'id:wt-1',
-        command: "codex 'linked issue context'",
+        command: "claude 'linked issue context'",
         startupCommandDelivery: 'shell-ready'
       })
     )
@@ -596,7 +596,7 @@ describe('session tab RPC methods', () => {
     expect(runtime.createMobileSessionTerminal).toHaveBeenCalledWith('id:wt-1', {
       afterTabId: undefined,
       targetGroupId: undefined,
-      command: "codex 'linked issue context'",
+      command: "claude 'linked issue context'",
       startupCommandDelivery: 'shell-ready',
       agent: undefined,
       activate: undefined,
@@ -606,25 +606,29 @@ describe('session tab RPC methods', () => {
     })
   })
 
-  it('rejects unknown agent presets without creating a terminal', async () => {
+  it('creates a plain terminal when an older client names a retired agent', async () => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',
-      createMobileSessionTerminal: vi.fn()
+      createMobileSessionTerminal: vi.fn().mockResolvedValue({
+        tab: { type: 'terminal', id: 'tab-1::leaf-1' },
+        publicationEpoch: 'epoch-1',
+        snapshotVersion: 1
+      })
     } as unknown as OrcaRuntimeService
     const dispatcher = new RpcDispatcher({ runtime, methods: SESSION_TAB_METHODS })
 
     const response = await dispatcher.dispatch(
       makeRequest('session.tabs.createTerminal', {
         worktree: 'id:wt-1',
-        agent: 'not-real'
+        agent: 'not-real',
+        launchAgent: 'not-real'
       })
     )
 
-    expect(response.ok).toBe(false)
-    expect(response).toMatchObject({
-      error: { code: 'invalid_argument', message: 'Unknown agent preset' }
-    })
-    expect(runtime.createMobileSessionTerminal).not.toHaveBeenCalled()
+    expect(response.ok).toBe(true)
+    const [, options] = vi.mocked(runtime.createMobileSessionTerminal).mock.calls[0]
+    expect(options?.agent).toBeUndefined()
+    expect(options?.launchAgent).toBeUndefined()
   })
 
   it('streams all known session tab snapshots and later updates', async () => {

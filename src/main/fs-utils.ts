@@ -193,7 +193,7 @@ function publishFileWithoutOverwrite(sourcePath: string, targetPath: string): bo
 }
 
 // Why: on Windows, file replacement and backup-copy operations can fail with
-// EPERM/EACCES/EBUSY if another process (antivirus, Claude CLI, Codex CLI)
+// EPERM/EACCES/EBUSY if another process (antivirus, an agent CLI)
 // holds the target file open. A short retry avoids transient failures without
 // masking real permission errors. Total backoff (~750ms) covers typical AV
 // scan windows seen in issue #1507.

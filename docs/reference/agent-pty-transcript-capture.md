@@ -101,25 +101,14 @@ text is tested on something no pane ever sees.
 `src/main/runtime/agent-transcript-pane-test-harness.ts` builds the pane;
 `src/main/runtime/terminal-interactive-wait-visibility.test.ts` is its consumer.
 
-## Worked example: the Antigravity captures
+## Capture practice
 
-The six committed `antigravity-*.txt` fixtures were recorded this way on macOS against
-`agy` 1.1.25. Two points generalise:
-
-- **Reach a state without mutating the operator's config.** The ready-screen captures ran in a
-  directory the CLI already trusted, so no trust answer was written. Where a dialog could only be
-  reached by signing the operator out or deleting their settings, it was left uncaptured and
-  recorded as such rather than forced.
-- **An environment variable is a legitimate capture knob** where a setting is not.
-  `AGY_CLI_HIDE_ACCOUNT_INFO=1` produced a second ready screen with no account row, which is
-  evidence no amount of reasoning about the first screen could have supplied. It changes nothing
-  on disk.
-
-## Known gap in the existing captures
-
-The three `cursor-agent-*.txt` fixtures contain **no escape bytes and no carriage returns**.
-Whatever produced them went through a renderer and a clipboard, so they preserve wording and
-box-drawing glyphs but not the caret, the cursor moves, the repaints, or whether the CLI uses the
-alternate screen buffer. They are good enough for the wording-based rules built on them and are
-not evidence for anything else. New captures made with this recorder keep those bytes; the
-Antigravity scaffold asserts their presence so a pasted screen cannot pass as a capture.
+- **Reach a state without mutating the operator's config.** Capture ready screens in a directory
+  the CLI already trusts, so no trust answer is written. Where a dialog can only be reached by
+  signing the operator out or deleting their settings, leave it uncaptured and record that rather
+  than forcing it.
+- **An environment variable is a legitimate capture knob** where a setting is not. A variable that
+  hides part of a screen yields a second capture as evidence, and it changes nothing on disk.
+- **Keep the bytes.** A screen pasted through a renderer and a clipboard keeps wording and
+  box-drawing glyphs but loses the caret, cursor moves, repaints and alternate-screen use. It is
+  evidence for wording rules only.

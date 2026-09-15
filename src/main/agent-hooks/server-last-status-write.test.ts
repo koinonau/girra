@@ -99,7 +99,7 @@ describe('Last-status persistence', () => {
             payload: {
               state: 'working',
               prompt: 'legacy worker',
-              agentType: 'codex'
+              agentType: 'opencode'
             }
           }
         }
@@ -159,7 +159,7 @@ describe('Last-status persistence', () => {
             payload: {
               state: 'working',
               prompt: 'retained SSH worker',
-              agentType: 'codex'
+              agentType: 'opencode'
             }
           }
         }

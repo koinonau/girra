@@ -264,7 +264,7 @@ describe('terminal replay state reset', () => {
 
       await writeTerminal(term, POST_REPLAY_LIVE_AGENT_REATTACH_RESET)
 
-      // Why: live TUIs such as cursor-agent can rely on focus events to repaint
+      // Why: live TUIs can rely on focus events to repaint
       // their own hidden-cursor input caret after renderer reattach.
       expect(readSendFocus(term)).toBe(true)
     } finally {

@@ -25,17 +25,17 @@ describe('resolvePaneAgentIdentity', () => {
       'lets %s outrank a conflicting title',
       (source) => {
         const result = resolve([
-          { source: 'title', agent: 'codex' },
-          { source, agent: 'grok' }
+          { source: 'title', agent: 'opencode' },
+          { source, agent: 'pi' }
         ])
-        expect(result.agent).toBe('grok')
+        expect(result.agent).toBe('pi')
         expect(result.source).toBe(source)
       }
     )
 
     it('uses the title only when nothing else is eligible', () => {
-      expect(resolve([{ source: 'title', agent: 'codex' }])).toMatchObject({
-        agent: 'codex',
+      expect(resolve([{ source: 'title', agent: 'opencode' }])).toMatchObject({
+        agent: 'opencode',
         source: 'title'
       })
     })
@@ -45,7 +45,7 @@ describe('resolvePaneAgentIdentity', () => {
       // parsed beats a fact Orca owns. That inversion cannot be expressed here.
       const result = resolve([
         { source: 'launch', agent: 'claude' },
-        { source: 'title', agent: 'gemini' }
+        { source: 'title', agent: 'pi' }
       ])
       expect(result.agent).toBe('claude')
     })
@@ -55,7 +55,7 @@ describe('resolvePaneAgentIdentity', () => {
     // Both shapes are `completed hook = A, title = B`. Ordering alone cannot tell them apart.
     const shape = (hookRun: number, titleRun: number): PaneAgentEvidence[] => [
       { source: 'completed-hook', agent: 'claude', run: { authorityId: H, incarnation: hookRun } },
-      { source: 'title', agent: 'codex', run: { authorityId: H, incarnation: titleRun } }
+      { source: 'title', agent: 'opencode', run: { authorityId: H, incarnation: titleRun } }
     ]
 
     it('keeps the completed hook when both belong to the current run', () => {
@@ -75,7 +75,7 @@ describe('resolvePaneAgentIdentity', () => {
         evidence: shape(7, 8),
         currentRun: { authorityId: H, incarnation: 8 }
       })
-      expect(result).toMatchObject({ agent: 'codex', source: 'title' })
+      expect(result).toMatchObject({ agent: 'opencode', source: 'title' })
       expect(result.supersededSources).toEqual(['completed-hook'])
     })
 
@@ -97,9 +97,9 @@ describe('resolvePaneAgentIdentity', () => {
     it('keeps a run-key-less completed row from hijacking launch evidence', () => {
       const result = resolve([
         { source: 'completed-hook', agent: 'claude' },
-        { source: 'launch', agent: 'codex' }
+        { source: 'launch', agent: 'opencode' }
       ])
-      expect(result).toMatchObject({ agent: 'codex', source: 'launch' })
+      expect(result).toMatchObject({ agent: 'opencode', source: 'launch' })
     })
 
     it('treats evidence with no run id as eligible', () => {
@@ -123,20 +123,20 @@ describe('resolvePaneAgentIdentity', () => {
 
   describe('siblings are tab-scoped', () => {
     it('ignores a sibling by default', () => {
-      expect(resolve([{ source: 'sibling', agent: 'codex' }]).agent).toBeNull()
+      expect(resolve([{ source: 'sibling', agent: 'opencode' }]).agent).toBeNull()
     })
 
     it('accepts a sibling when the caller opts in', () => {
-      expect(resolve([{ source: 'sibling', agent: 'codex' }], { allowSibling: true }).agent).toBe(
-        'codex'
-      )
+      expect(
+        resolve([{ source: 'sibling', agent: 'opencode' }], { allowSibling: true }).agent
+      ).toBe('opencode')
     })
 
     it('still ranks a sibling above a title', () => {
       const result = resolve(
         [
-          { source: 'title', agent: 'grok' },
-          { source: 'sibling', agent: 'codex' }
+          { source: 'title', agent: 'pi' },
+          { source: 'sibling', agent: 'opencode' }
         ],
         { allowSibling: true }
       )
@@ -153,7 +153,7 @@ describe('resolvePaneAgentIdentity', () => {
       const result = resolvePaneAgentIdentity({
         evidence: [
           { source: 'live-hook', agent: 'claude', run: { authorityId: H, incarnation: 1 } },
-          { source: 'title', agent: 'codex', run: { authorityId: H, incarnation: 1 } }
+          { source: 'title', agent: 'opencode', run: { authorityId: H, incarnation: 1 } }
         ],
         currentRun: { authorityId: H, incarnation: 2 }
       })
@@ -167,7 +167,7 @@ describe('resolvePaneAgentIdentity', () => {
       resolve([
         {
           source: 'future-source' as PaneAgentEvidence['source'],
-          agent: 'codex'
+          agent: 'opencode'
         }
       ])
     ).toThrow('Unknown pane-agent evidence source')
@@ -176,8 +176,8 @@ describe('resolvePaneAgentIdentity', () => {
   describe('input order does not decide the answer', () => {
     it('resolves the same regardless of how evidence is listed', () => {
       const evidence: PaneAgentEvidence[] = [
-        { source: 'title', agent: 'codex' },
-        { source: 'launch', agent: 'grok' },
+        { source: 'title', agent: 'opencode' },
+        { source: 'launch', agent: 'pi' },
         { source: 'live-hook', agent: 'claude' }
       ]
       const forward = resolve([...evidence])
@@ -194,7 +194,7 @@ describe('resolvePaneAgentIdentity', () => {
     it('returns null when two live hooks name different agents', () => {
       const result = resolve([
         { source: 'live-hook', agent: 'claude' },
-        { source: 'live-hook', agent: 'codex' }
+        { source: 'live-hook', agent: 'opencode' }
       ])
       expect(result.agent).toBeNull()
       expect(result.ambiguousAt).toBe('live-hook')
@@ -203,7 +203,7 @@ describe('resolvePaneAgentIdentity', () => {
     it('gives the same answer in either order', () => {
       const a: PaneAgentEvidence[] = [
         { source: 'live-hook', agent: 'claude' },
-        { source: 'live-hook', agent: 'codex' }
+        { source: 'live-hook', agent: 'opencode' }
       ]
       expect(resolve(a)).toEqual(resolve(a.toReversed()))
     })
@@ -222,8 +222,8 @@ describe('resolvePaneAgentIdentity', () => {
       // than saying nothing.
       const result = resolve([
         { source: 'live-hook', agent: 'claude' },
-        { source: 'live-hook', agent: 'codex' },
-        { source: 'title', agent: 'grok' }
+        { source: 'live-hook', agent: 'opencode' },
+        { source: 'title', agent: 'pi' }
       ])
       expect(result.agent).toBeNull()
     })
@@ -253,11 +253,11 @@ describe('resolvePaneAgentIdentity', () => {
       // kept rather than being read as either current or stale.
       const result = resolvePaneAgentIdentity({
         evidence: [
-          { source: 'launch', agent: 'codex', run: { authorityId: 'host-b', incarnation: 1 } }
+          { source: 'launch', agent: 'opencode', run: { authorityId: 'host-b', incarnation: 1 } }
         ],
         currentRun: { authorityId: 'host-a', incarnation: 1 }
       })
-      expect(result).toMatchObject({ agent: 'codex', source: 'launch' })
+      expect(result).toMatchObject({ agent: 'opencode', source: 'launch' })
     })
 
     it('supersedes only within the same authority', () => {
@@ -276,12 +276,12 @@ describe('resolvePaneAgentIdentity', () => {
     // Review finding: title remained available to consumers that AUTHORIZE A WRITE. Ranking it
     // last makes misuse unlikely; dropping it makes misuse impossible.
     it('ignores a title entirely below the floor', () => {
-      const result = resolve([{ source: 'title', agent: 'codex' }], { minimumSource: 'launch' })
+      const result = resolve([{ source: 'title', agent: 'opencode' }], { minimumSource: 'launch' })
       expect(result.agent).toBeNull()
     })
 
     it('ignores a sibling below the floor even when opted in', () => {
-      const result = resolve([{ source: 'sibling', agent: 'codex' }], {
+      const result = resolve([{ source: 'sibling', agent: 'opencode' }], {
         allowSibling: true,
         minimumSource: 'launch'
       })
@@ -292,7 +292,7 @@ describe('resolvePaneAgentIdentity', () => {
       const result = resolve(
         [
           { source: 'launch', agent: 'claude' },
-          { source: 'title', agent: 'codex' }
+          { source: 'title', agent: 'opencode' }
         ],
         { minimumSource: 'launch' }
       )
@@ -300,7 +300,7 @@ describe('resolvePaneAgentIdentity', () => {
     })
 
     it('leaves display consumers unrestricted when no floor is given', () => {
-      expect(resolve([{ source: 'title', agent: 'codex' }]).agent).toBe('codex')
+      expect(resolve([{ source: 'title', agent: 'opencode' }]).agent).toBe('opencode')
     })
   })
 })

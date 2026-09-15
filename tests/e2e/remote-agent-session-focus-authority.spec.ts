@@ -186,7 +186,7 @@ async function launchAgent(
         worktreeId: args.worktreeId,
         environmentId: args.environmentId,
         agentSessionKind: args.kind,
-        agent: 'codex',
+        agent: 'claude',
         command: fixtureCommand,
         activate: args.activate,
         ...(args.providerSessionId
@@ -252,7 +252,7 @@ test('headed paired host keeps structured agent focus viewer-local @headful', as
   const override = fixtureCommand(fixtureScript)
   await orcaPage.evaluate(async (agentCommand) => {
     const settings = await window.api.settings.set({
-      agentCmdOverrides: { codex: agentCommand }
+      agentCmdOverrides: { claude: agentCommand }
     })
     window.__store?.setState({ settings })
   }, override)

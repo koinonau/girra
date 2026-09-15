@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 // A structured chat is a view on a terminal tab, so closing the tab is an unmount and nothing else.
-// If that unmount does not reach main, the codex app-server behind the chat has no other way to
+// If that unmount does not reach main, the provider child behind the chat has no other way to
 // learn the chat is gone.
 
 import { renderHook, waitFor } from '@testing-library/react'

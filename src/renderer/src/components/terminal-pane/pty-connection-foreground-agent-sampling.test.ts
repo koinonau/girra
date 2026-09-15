@@ -225,7 +225,7 @@ describe('connectPanePty', () => {
       vi.useFakeTimers()
       const { connectPanePty } = await import('./pty-connection')
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-fresh-visible-no-sample'
       transportFactoryQueue.push(createMockTransport(ptyId))
       mockStoreState = {
@@ -257,7 +257,7 @@ describe('connectPanePty', () => {
     it('samples exactly one visible restored PTY with no stronger identity signal', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-restored-visible-sample'
 
       const { cacheKey } = await connectRestoredPaneForForegroundSampling({ ptyId })
@@ -267,7 +267,7 @@ describe('connectPanePty', () => {
 
       expect(foregroundReadCallsFor(ptyId)).toEqual([[ptyId]])
       expect(mockStoreState.setPaneForegroundAgent).toHaveBeenCalledWith(cacheKey, {
-        agent: 'codex',
+        agent: 'opencode',
         shellForeground: false
       })
     })
@@ -275,7 +275,7 @@ describe('connectPanePty', () => {
     it('does not sample hidden restored PTYs', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-hidden-restored-no-sample'
 
       await connectRestoredPaneForForegroundSampling({
@@ -463,7 +463,7 @@ describe('connectPanePty', () => {
     it('samples once when an identityless hidden pane resumes visible', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const isVisibleRef = { current: false }
       const ptyId = 'pty-hidden-then-visible-sample'
       const { binding } = await connectRestoredPaneForForegroundSampling({ ptyId, isVisibleRef })
@@ -648,12 +648,12 @@ describe('connectPanePty', () => {
     it('does not sample when a live hook row already supplies pane identity', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-hook-identity-no-sample'
       const tabId = `tab-${ptyId}`
       mockStoreState.agentStatusByPaneKey[makePaneKey(tabId, LEAF_1)] = {
         state: 'working',
-        agentType: 'codex'
+        agentType: 'opencode'
       }
 
       await connectRestoredPaneForForegroundSampling({ ptyId, tabId })
@@ -665,11 +665,11 @@ describe('connectPanePty', () => {
     it('does not sample when process identity is already known', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-process-identity-no-sample'
       const tabId = `tab-${ptyId}`
       mockStoreState.paneForegroundAgentByPaneKey[makePaneKey(tabId, LEAF_1)] = {
-        agent: 'codex',
+        agent: 'opencode',
         routingTrusted: true,
         shellForeground: false
       }
@@ -683,7 +683,7 @@ describe('connectPanePty', () => {
     it('does not re-sample once 133;D proved the pane is at a shell prompt', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-shell-foreground-no-sample'
       const tabId = `tab-${ptyId}`
       mockStoreState.paneForegroundAgentByPaneKey[makePaneKey(tabId, LEAF_1)] = {
@@ -700,11 +700,11 @@ describe('connectPanePty', () => {
     it('does not re-sample a shell-confirmed pane from stale launch metadata', async () => {
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'pty-shell-foreground-launch-agent-sample'
       const tabId = `tab-${ptyId}`
       mockStoreState.tabsByWorktree = {
-        'wt-1': [{ id: tabId, ptyId, launchAgent: 'codex' }]
+        'wt-1': [{ id: tabId, ptyId, launchAgent: 'opencode' }]
       }
       mockStoreState.paneForegroundAgentByPaneKey[makePaneKey(tabId, LEAF_1)] = {
         agent: null,
@@ -726,8 +726,8 @@ describe('connectPanePty', () => {
       vi.useFakeTimers()
       const { connectPanePty } = await import('./pty-connection')
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
-      const ptyId = 'pty-reattach-idle-codex-leaked-d'
+      getForegroundProcess.mockResolvedValue('opencode')
+      const ptyId = 'pty-reattach-idle-opencode-leaked-d'
       const tabId = `tab-${ptyId}`
       const dataCallbackRef: { current: ((data: string) => void) | null } = { current: null }
       const transport = createMockTransport(ptyId)
@@ -812,7 +812,7 @@ describe('connectPanePty', () => {
       // Why: foreground reads are local-only (expensive RPCs); keep remote/SSH panes off the recovery probe.
       vi.useFakeTimers()
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const ptyId = 'remote:web-env-1@@pty-remote-idle-agent'
 
       await connectRestoredPaneForForegroundSampling({ ptyId, tabId: 'tab-remote-idle-agent' })

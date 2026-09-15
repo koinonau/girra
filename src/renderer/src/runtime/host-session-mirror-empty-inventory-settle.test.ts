@@ -4,7 +4,7 @@
  * fired the environment-wide "the host has spoken" verdict with no host
  * evidence behind it. A live relay/SSH-paired host answers exactly that until
  * its renderer's first mirror publish, so the drained resume sweep forked
- * `codex resume` / `claude --resume` onto a PTY the host was still running.
+ * `claude --resume` onto a PTY the host was still running.
  *
  * All three states are pinned here because the naive floor
  * (`settles.length > 0`) trades the duplicate session for the opposite defect:

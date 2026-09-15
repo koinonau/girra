@@ -37,7 +37,7 @@ describe('federation attach-start prompt budget', () => {
           worktree: 'new-top-level',
           repo: 'remote-repo',
           name: 'oversized-remote-worker',
-          agent: 'codex'
+          agent: 'claude'
         }),
         {
           runtime,

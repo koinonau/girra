@@ -73,24 +73,24 @@ beforeEach(() => {
 
 describe('buildCommandLookupSpec', () => {
   it('uses where.exe on native Windows SSH hosts', () => {
-    expect(buildCommandLookupSpec('codex', 'win32')).toEqual({
+    expect(buildCommandLookupSpec('opencode', 'win32')).toEqual({
       file: 'where.exe',
-      args: ['codex'],
+      args: ['opencode'],
       windowsHide: true
     })
   })
 
   it('falls back to sh for POSIX probes without a configured shell', () => {
-    expect(buildCommandLookupSpec('codex', 'linux', {}, null)).toEqual({
+    expect(buildCommandLookupSpec('opencode', 'linux', {}, null)).toEqual({
       file: '/bin/sh',
-      args: lookupArgs('codex')
+      args: lookupArgs('opencode')
     })
   })
 
   it('uses the configured remote shell for POSIX probes', () => {
-    expect(buildCommandLookupSpec('codex', 'linux', { SHELL: '/bin/zsh' }, '/bin/zsh')).toEqual({
+    expect(buildCommandLookupSpec('opencode', 'linux', { SHELL: '/bin/zsh' }, '/bin/zsh')).toEqual({
       file: '/bin/zsh',
-      args: lookupArgs('codex', '-ilc')
+      args: lookupArgs('opencode', '-ilc')
     })
   })
 
@@ -106,72 +106,83 @@ describe('buildCommandLookupSpec', () => {
 
 describe('buildCommandLookupSpecs', () => {
   it('falls back to inherited PATH after a trusted configured POSIX shell', () => {
-    expect(buildCommandLookupSpecs('codex', 'linux', { SHELL: '/bin/zsh' }, '/bin/zsh')).toEqual([
-      { file: '/bin/zsh', args: lookupArgs('codex', '-ilc') },
-      { file: '/bin/sh', args: lookupArgs('codex') }
-    ])
+    expect(buildCommandLookupSpecs('opencode', 'linux', { SHELL: '/bin/zsh' }, '/bin/zsh')).toEqual(
+      [
+        { file: '/bin/zsh', args: lookupArgs('opencode', '-ilc') },
+        { file: '/bin/sh', args: lookupArgs('opencode') }
+      ]
+    )
   })
 
   it('allows a custom shell path only when the account login shell matches', () => {
     expect(
       buildCommandLookupSpecs(
-        'codex',
+        'opencode',
         'darwin',
         { SHELL: '/opt/homebrew/bin/zsh' },
         '/opt/homebrew/bin/zsh'
       )
     ).toEqual([
-      { file: '/opt/homebrew/bin/zsh', args: lookupArgs('codex', '-ilc') },
-      { file: '/bin/sh', args: lookupArgs('codex') }
+      { file: '/opt/homebrew/bin/zsh', args: lookupArgs('opencode', '-ilc') },
+      { file: '/bin/sh', args: lookupArgs('opencode') }
     ])
   })
 
   it('allows conservative system shell paths when account lookup is unavailable', () => {
-    expect(buildCommandLookupSpecs('codex', 'linux', { SHELL: '/usr/bin/bash' }, null)[0]).toEqual({
+    expect(
+      buildCommandLookupSpecs('opencode', 'linux', { SHELL: '/usr/bin/bash' }, null)[0]
+    ).toEqual({
       file: '/usr/bin/bash',
-      args: lookupArgs('codex', '-ilc')
+      args: lookupArgs('opencode', '-ilc')
     })
   })
 
   it('uses fish syntax for trusted fish shells', () => {
-    expect(buildCommandLookupSpecs('codex', 'linux', { SHELL: '/usr/bin/fish' }, null)[0]).toEqual({
+    expect(
+      buildCommandLookupSpecs('opencode', 'linux', { SHELL: '/usr/bin/fish' }, null)[0]
+    ).toEqual({
       file: '/usr/bin/fish',
-      args: fishLookupArgs("'codex'")
+      args: fishLookupArgs("'opencode'")
     })
   })
 
   it('ignores untrusted temp shell paths even when the basename is supported', () => {
-    expect(buildCommandLookupSpecs('codex', 'linux', { SHELL: '/tmp/zsh' }, '/bin/bash')).toEqual([
-      { file: '/bin/sh', args: lookupArgs('codex') }
-    ])
+    expect(
+      buildCommandLookupSpecs('opencode', 'linux', { SHELL: '/tmp/zsh' }, '/bin/bash')
+    ).toEqual([{ file: '/bin/sh', args: lookupArgs('opencode') }])
   })
 
   it('ignores untrusted home-bin shell paths even when the basename is supported', () => {
     expect(
-      buildCommandLookupSpecs('codex', 'linux', { SHELL: '/home/test/bin/bash' }, '/bin/bash')
-    ).toEqual([{ file: '/bin/sh', args: lookupArgs('codex') }])
+      buildCommandLookupSpecs('opencode', 'linux', { SHELL: '/home/test/bin/bash' }, '/bin/bash')
+    ).toEqual([{ file: '/bin/sh', args: lookupArgs('opencode') }])
   })
 })
 
 describe('isCommandOnPathForRelay', () => {
   it('falls back to inherited PATH when shell startup returns no absolute command path', async () => {
     execFileAsyncMock
-      .mockResolvedValueOnce({ stdout: 'welcome\ncodex is a function\n' })
-      .mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/codex\n' })
+      .mockResolvedValueOnce({ stdout: 'welcome\nopencode is a function\n' })
+      .mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/opencode\n' })
 
     await expect(
-      isCommandOnPathForRelay('codex', {
+      isCommandOnPathForRelay('opencode', {
         platform: 'linux',
         env: { SHELL: '/bin/zsh', PATH: '/usr/bin' },
         accountLoginShell: '/bin/zsh'
       })
     ).resolves.toBe(true)
-    expect(execFileAsyncMock).toHaveBeenNthCalledWith(1, '/bin/zsh', lookupArgs('codex', '-ilc'), {
-      encoding: 'utf-8',
-      env: expect.objectContaining({ SHELL: '/bin/zsh' }),
-      timeout: 5000
-    })
-    expect(execFileAsyncMock).toHaveBeenNthCalledWith(2, '/bin/sh', lookupArgs('codex'), {
+    expect(execFileAsyncMock).toHaveBeenNthCalledWith(
+      1,
+      '/bin/zsh',
+      lookupArgs('opencode', '-ilc'),
+      {
+        encoding: 'utf-8',
+        env: expect.objectContaining({ SHELL: '/bin/zsh' }),
+        timeout: 5000
+      }
+    )
+    expect(execFileAsyncMock).toHaveBeenNthCalledWith(2, '/bin/sh', lookupArgs('opencode'), {
       encoding: 'utf-8',
       env: expect.objectContaining({ SHELL: '/bin/zsh' }),
       timeout: 5000
@@ -181,10 +192,10 @@ describe('isCommandOnPathForRelay', () => {
   it('falls back to inherited PATH when shell startup fails', async () => {
     execFileAsyncMock
       .mockRejectedValueOnce(new Error('startup failed'))
-      .mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/codex\n' })
+      .mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/opencode\n' })
 
     await expect(
-      isCommandOnPathForRelay('codex', {
+      isCommandOnPathForRelay('opencode', {
         platform: 'linux',
         env: { SHELL: '/bin/bash', PATH: '/usr/bin' },
         accountLoginShell: '/bin/bash'
@@ -194,17 +205,17 @@ describe('isCommandOnPathForRelay', () => {
   })
 
   it('does not execute an untrusted configured shell before inherited PATH lookup', async () => {
-    execFileAsyncMock.mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/codex\n' })
+    execFileAsyncMock.mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/opencode\n' })
 
     await expect(
-      isCommandOnPathForRelay('codex', {
+      isCommandOnPathForRelay('opencode', {
         platform: 'linux',
         env: { SHELL: '/tmp/zsh', PATH: '/usr/bin' },
         accountLoginShell: '/bin/bash'
       })
     ).resolves.toBe(true)
     expect(execFileAsyncMock).toHaveBeenCalledTimes(1)
-    expect(execFileAsyncMock).toHaveBeenCalledWith('/bin/sh', lookupArgs('codex'), {
+    expect(execFileAsyncMock).toHaveBeenCalledWith('/bin/sh', lookupArgs('opencode'), {
       encoding: 'utf-8',
       env: expect.objectContaining({ SHELL: '/tmp/zsh' }),
       timeout: 5000
@@ -214,9 +225,9 @@ describe('isCommandOnPathForRelay', () => {
 
 describe('hasAbsoluteCommandPath', () => {
   it('ignores banners and shell function output', () => {
-    expect(hasAbsoluteCommandPath('/tmp/not-the-agent\ncodex is a shell function\n', 'linux')).toBe(
-      false
-    )
+    expect(
+      hasAbsoluteCommandPath('/tmp/not-the-agent\nopencode is a shell function\n', 'linux')
+    ).toBe(false)
   })
 
   it('ignores unmarked POSIX absolute paths from shell startup output', () => {
@@ -225,13 +236,16 @@ describe('hasAbsoluteCommandPath', () => {
 
   it('recognizes a sentinel-marked command path amid shell startup and exit output', () => {
     expect(
-      hasAbsoluteCommandPath('welcome\n__ORCA_AGENT_PATH__/opt/bin/codex\nlogout-banner\n', 'linux')
+      hasAbsoluteCommandPath(
+        'welcome\n__ORCA_AGENT_PATH__/opt/bin/opencode\nlogout-banner\n',
+        'linux'
+      )
     ).toBe(true)
   })
 
   it('recognizes Windows absolute command paths', () => {
     expect(
-      hasAbsoluteCommandPath('C:\\Users\\alice\\AppData\\Roaming\\npm\\codex.cmd\r\n', 'win32')
+      hasAbsoluteCommandPath('C:\\Users\\alice\\AppData\\Roaming\\npm\\opencode.cmd\r\n', 'win32')
     ).toBe(true)
   })
 })

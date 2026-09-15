@@ -16,7 +16,7 @@ import type {
 const turnItem: AgentJournalItemBody = { kind: 'turn', turnId: 'turn-1', state: 'running' }
 const legacyTurnRow: AgentJournalItemBody = {
   kind: 'status',
-  text: 'Codex is working…',
+  text: 'Claude is working…',
   turnLifecycle: { turnId: 'turn-1', state: 'running' }
 }
 const reasoningRow: AgentJournalItemBody = {
@@ -48,7 +48,7 @@ const session: NativeChatLiveSession = {
   ],
   status: 'ready',
   sessionId: 'session-1',
-  agent: 'codex',
+  agent: 'claude',
   hasMore: false,
   loadingEarlier: false,
   loadEarlier: vi.fn(),
@@ -57,7 +57,7 @@ const session: NativeChatLiveSession = {
 
 // The live turn renders exactly one indicator row; a settled turn keeps its own.
 describe('NativeChatMessageList turn indicator', () => {
-  it('keeps a reduced-motion-safe spinner on the live row of a no-tool Codex turn', () => {
+  it('keeps a reduced-motion-safe spinner on the live row of a no-tool turn', () => {
     render(
       <NativeChatMessageList
         session={{

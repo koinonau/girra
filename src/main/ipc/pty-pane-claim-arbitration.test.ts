@@ -338,7 +338,7 @@ describe('registerPtyHandlers', () => {
           id: 'pty-claimed-admission',
           incarnationId,
           cwd: '/tmp/worktree',
-          title: 'Codex'
+          title: 'Claude Code'
         })
       }
       return { id: 'pty-claimed-admission', incarnationId }

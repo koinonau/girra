@@ -2,7 +2,7 @@ import type { RuntimeTerminalWaitBlockedReason } from './runtime-terminal-contra
 
 // Why: hosts older than the agent-neutral spellings still publish the codex-* tokens for dialogs
 // their matcher never proved were Codex's, so a paired client renders the neutral equivalent
-// instead of showing a Codex label to a Gemini/Cursor/Antigravity user.
+// instead of showing a Codex label to another agent's user.
 // Why a Map: the reason arrives off the wire unvalidated, and a plain object would answer
 // 'constructor' or 'toString' from Object.prototype and print a function to the user.
 // Why one-directional: nothing consumes an agent-* -> codex-* mapping. A new host's agent-* token

@@ -45,7 +45,7 @@ vi.mock('@/runtime/remote-runtime-terminal-multiplexer', () => ({
   getRemoteRuntimeTerminalMultiplexer: () => ({ subscribeTerminal: mockSubscribeTerminal })
 }))
 
-const DONE_STATUS_OSC = '\x1b]9999;{"state":"done","prompt":"ok","agentType":"codex"}\x07'
+const DONE_STATUS_OSC = '\x1b]9999;{"state":"done","prompt":"ok","agentType":"claude"}\x07'
 const LEAF_ID = '11111111-1111-4111-8111-111111111111'
 const PANE_KEY = `tab-1:${LEAF_ID}`
 
@@ -86,7 +86,7 @@ describe('observeExistingAutomationSession', () => {
 
     expect(state.setAgentStatus).not.toHaveBeenCalled()
     expect(onAgentStatus).toHaveBeenCalledWith(
-      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'codex' })
+      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'claude' })
     )
   })
 
@@ -113,7 +113,7 @@ describe('observeExistingAutomationSession', () => {
 
     expect(state.setAgentStatus).toHaveBeenCalledWith(
       PANE_KEY,
-      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'codex' }),
+      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'claude' }),
       undefined,
       undefined,
       { connectionId: null }
@@ -146,7 +146,7 @@ describe('observeExistingAutomationSession', () => {
 
     expect(state.setAgentStatus).toHaveBeenCalledWith(
       PANE_KEY,
-      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'codex' }),
+      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'claude' }),
       undefined,
       undefined,
       { connectionId: null }

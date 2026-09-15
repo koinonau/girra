@@ -102,7 +102,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd: '/tmp',
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         terminalColorQueryReplies: {
           foreground: '#eeeeee',
           background: '#111111'
@@ -189,7 +189,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd: '/tmp',
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         terminalColorQueryReplies: {
           foreground: '#eeeeee',
           background: '#111111'
@@ -367,7 +367,7 @@ describe('registerPtyHandlers', () => {
       })
       mainWindow.webContents.send.mockClear()
 
-      const redraw = `\x1b[2J\x1b[H${'codex composer redraw '.repeat(80)}`
+      const redraw = `\x1b[2J\x1b[H${'claude composer redraw '.repeat(80)}`
       mockProc.emitData(redraw)
 
       expect(mainWindow.webContents.send).toHaveBeenCalledWith('pty:data', {

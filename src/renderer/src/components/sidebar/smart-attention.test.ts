@@ -55,7 +55,7 @@ function makeEntry(overrides: Partial<AgentStatusEntry> & { paneKey: string }): 
     prompt: overrides.prompt ?? '',
     updatedAt: overrides.updatedAt ?? NOW - 30_000,
     stateStartedAt: overrides.stateStartedAt ?? overrides.updatedAt ?? NOW - 30_000,
-    agentType: overrides.agentType ?? 'codex',
+    agentType: overrides.agentType ?? 'opencode',
     paneKey: overrides.paneKey,
     worktreeId: overrides.worktreeId,
     tabId: overrides.tabId,

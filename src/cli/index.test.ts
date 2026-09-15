@@ -218,7 +218,16 @@ describe('unknown command surfaces a suggestion', () => {
     )
 
     await main(
-      ['orchestration', 'worker-start', '--task', 't1', '--worktree', 'repo-1', '--agent', 'codex'],
+      [
+        'orchestration',
+        'worker-start',
+        '--task',
+        't1',
+        '--worktree',
+        'repo-1',
+        '--agent',
+        'claude'
+      ],
       '/tmp/repo'
     )
 
@@ -354,7 +363,7 @@ describe('orca root help', () => {
       '`worktree create --agent` creates a new checkout with an agent.'
     )
     expect(logSpy.mock.calls[0][0]).toContain(
-      'orca terminal create --worktree active --command "codex"'
+      'orca terminal create --worktree active --command "claude"'
     )
     expect(logSpy.mock.calls[0][0]).toContain(
       'orchestration worker-start Start a supervised worker locally or on a connected Orca server'
@@ -553,7 +562,7 @@ describe('orca root help', () => {
 
     expect(String(logSpy.mock.calls[0][0])).toContain('This creates a new checkout.')
     expect(String(logSpy.mock.calls[0][0])).toContain(
-      'orca terminal create --worktree active --command "codex"'
+      'orca terminal create --worktree active --command "claude"'
     )
 
     logSpy.mockClear()
@@ -562,7 +571,7 @@ describe('orca root help', () => {
     const terminalHelp = String(logSpy.mock.calls[0][0])
     expect(terminalHelp).toContain('Use this, not worktree create')
     expect(terminalHelp).toContain(
-      'orca terminal create --worktree active --command "codex" --json'
+      'orca terminal create --worktree active --command "claude" --json'
     )
     expect(callMock).not.toHaveBeenCalled()
   })

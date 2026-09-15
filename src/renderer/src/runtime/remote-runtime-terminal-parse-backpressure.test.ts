@@ -56,7 +56,7 @@ describe('remote terminal renderer backpressure', () => {
       })
     }
     const stream = await getRemoteRuntimeTerminalMultiplexer('windows-test').subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: {
         onData: (data) => {
@@ -227,7 +227,7 @@ describe('remote terminal renderer backpressure', () => {
       await import('./remote-runtime-terminal-multiplexer')
     const multiplexer = getRemoteRuntimeTerminalMultiplexer('windows-test')
     const stream = await multiplexer.subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: { onData: vi.fn(), onSnapshot: vi.fn() }
     })
@@ -260,7 +260,7 @@ describe('remote terminal renderer backpressure', () => {
       await import('./remote-runtime-terminal-multiplexer')
     const onData = vi.fn()
     const stream = await getRemoteRuntimeTerminalMultiplexer('windows-test').subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: { onData, onSnapshot: vi.fn() }
     })
@@ -292,7 +292,7 @@ describe('remote terminal renderer backpressure', () => {
       await import('./remote-runtime-terminal-multiplexer')
     const onData = vi.fn()
     const stream = await getRemoteRuntimeTerminalMultiplexer('windows-test').subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: { onData, onSnapshot: vi.fn() }
     })
@@ -328,7 +328,7 @@ describe('remote terminal renderer backpressure', () => {
       await import('../lib/pane-manager/terminal-delivery-credit')
     const parsedCredits: (() => void)[] = []
     const stream = await getRemoteRuntimeTerminalMultiplexer('windows-test').subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: {
         onData: () => {
@@ -360,7 +360,7 @@ describe('remote terminal renderer backpressure', () => {
     const { getRemoteRuntimeTerminalMultiplexer } =
       await import('./remote-runtime-terminal-multiplexer')
     const stream = await getRemoteRuntimeTerminalMultiplexer('windows-test').subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: {
         onData: () => {
@@ -392,7 +392,7 @@ describe('remote terminal renderer backpressure', () => {
       await import('../lib/pane-manager/terminal-delivery-credit')
     const parseCredits: (() => void)[] = []
     const stream = await getRemoteRuntimeTerminalMultiplexer('windows-test').subscribeTerminal({
-      terminal: 'term-codex',
+      terminal: 'term-opencode',
       client: { id: 'mac-viewer', type: 'desktop' },
       callbacks: {
         onData: () => {

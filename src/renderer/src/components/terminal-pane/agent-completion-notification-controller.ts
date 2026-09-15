@@ -86,7 +86,7 @@ export function createAgentCompletionNotificationController({
   }
 
   function doneShouldUseQuietWindow(payload: AgentCompletionStatusSnapshot): boolean {
-    // Why: Pi/OMP emit milestone 'done' while still working, so route it through the quiet window so later work can cancel it.
+    // Why: Pi emits milestone 'done' while still working, so route it through the quiet window so later work can cancel it.
     return (
       state.workingStatusObserved || isPiCompatibleAgentType(hookCompletionAgentIdentity(payload))
     )

@@ -69,7 +69,7 @@ function hookStatus(state: ParsedAgentStatusPayload['state']): ParsedAgentStatus
   return {
     state,
     prompt: 'implement notifications',
-    agentType: 'codex',
+    agentType: 'opencode',
     lastAssistantMessage: state === 'done' ? 'Done.' : undefined
   }
 }
@@ -146,7 +146,7 @@ describe('agent hook completion notifications', () => {
         paneKey,
         agentStatusSnapshot: expect.objectContaining({
           state: 'done',
-          agentType: 'codex',
+          agentType: 'opencode',
           prompt: 'implement notifications',
           lastAssistantMessage: 'Done.'
         })
@@ -176,7 +176,7 @@ describe('agent hook completion notifications', () => {
 
     expect(dispatchAgentHookTerminalLifecycle).toHaveBeenCalledWith(
       paneKey,
-      expect.objectContaining({ state: 'done', agentType: 'codex' })
+      expect.objectContaining({ state: 'done', agentType: 'opencode' })
     )
     expect(dispatchTerminalNotification).toHaveBeenCalledTimes(1)
 
@@ -240,7 +240,7 @@ describe('agent hook completion notifications', () => {
         paneKey,
         agentStatusSnapshot: expect.objectContaining({
           state: 'done',
-          agentType: 'codex',
+          agentType: 'opencode',
           prompt: 'implement notifications',
           lastAssistantMessage: 'Done.'
         })
@@ -279,7 +279,7 @@ describe('agent hook completion notifications', () => {
         paneKey,
         agentStatusSnapshot: expect.objectContaining({
           state: 'done',
-          agentType: 'codex',
+          agentType: 'opencode',
           prompt: 'implement notifications',
           lastAssistantMessage: 'Done.'
         })
@@ -321,7 +321,7 @@ describe('agent hook completion notifications', () => {
         paneKey,
         agentStatusSnapshot: expect.objectContaining({
           state: 'done',
-          agentType: 'codex',
+          agentType: 'opencode',
           prompt: 'implement notifications',
           lastAssistantMessage: 'Done.'
         })
@@ -475,7 +475,7 @@ describe('agent hook completion notifications', () => {
     expect(dispatchTerminalNotification).not.toHaveBeenCalled()
   })
 
-  it('does not notify on each Cursor shell tool hook during a working turn', async () => {
+  it('does not notify on each OpenCode shell tool hook during a working turn', async () => {
     const { observeAgentHookCompletionForNotification } =
       await import('./agent-hook-completion-notifications')
 
@@ -485,7 +485,7 @@ describe('agent hook completion notifications', () => {
       payload: {
         state: 'working',
         prompt: 'fix the bug',
-        agentType: 'cursor'
+        agentType: 'opencode'
       }
     })
     observeAgentHookCompletionForNotification({
@@ -494,7 +494,7 @@ describe('agent hook completion notifications', () => {
       payload: {
         state: 'working',
         prompt: 'fix the bug',
-        agentType: 'cursor',
+        agentType: 'opencode',
         toolName: 'Shell',
         toolInput: 'pnpm test'
       }
@@ -505,7 +505,7 @@ describe('agent hook completion notifications', () => {
       payload: {
         state: 'working',
         prompt: 'fix the bug',
-        agentType: 'cursor',
+        agentType: 'opencode',
         toolName: 'Read',
         toolInput: '/repo/src/app.ts'
       }
@@ -604,7 +604,7 @@ describe('agent hook completion notifications', () => {
     expect(dispatchTerminalNotification).toHaveBeenCalledTimes(1)
     expect(dispatchAgentHookTerminalLifecycle).toHaveBeenCalledWith(
       paneKey,
-      expect.objectContaining({ state: 'done', agentType: 'codex' })
+      expect.objectContaining({ state: 'done', agentType: 'opencode' })
     )
     expect(dispatchTerminalNotification).toHaveBeenCalledWith(
       'wt-1',
@@ -613,7 +613,7 @@ describe('agent hook completion notifications', () => {
         paneKey,
         agentStatusSnapshot: expect.objectContaining({
           state: 'done',
-          agentType: 'codex',
+          agentType: 'opencode',
           prompt: 'implement notifications',
           lastAssistantMessage: 'Done.'
         })

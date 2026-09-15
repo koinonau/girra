@@ -249,19 +249,17 @@ describe('OpenCode native title tab identity', () => {
         isRemote: false,
         title: 'OC | Greeting',
         hookAgent: null,
-        processAgent: 'codex',
+        processAgent: 'pi',
         sleepingSessionAgent: 'claude',
         launchAgent: 'claude'
       })
-    ).toBe('codex')
+    ).toBe('pi')
 
     for (const title of [
       'OpenCode ready',
       'oc | Greeting',
       '⠋ Fix foo | OC | Greeting',
-      '✦ Gemini CLI',
-      '⠋ Codex',
-      'Cursor Agent',
+      '✳ Claude Code',
       'Pi ready'
     ]) {
       expect(

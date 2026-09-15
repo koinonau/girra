@@ -12,7 +12,7 @@ export const WINDOWS_PROCESS_TREE_KILL_TIMEOUT_MS = 5_000
  * their own handle cleanup via killRoot.
  *
  * Most main-process taskkills run through here; the families that keep their own
- * spawn (account-login teardowns, codex app-server deadline, git-command abort,
+ * spawn (account-login teardowns, git-command abort,
  * notebook and precheck timeouts) share the same gate, so the refusal and the
  * breadcrumb live in `admitSelfInitiatedTreeKill` rather than in this function.
  */

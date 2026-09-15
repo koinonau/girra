@@ -357,7 +357,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-bg',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex ready',
+          title: 'Claude ready',
           activeLeafId: 'pane-bg',
           layout: null
         }
@@ -405,12 +405,12 @@ describe('OrcaRuntimeService', () => {
     })
   })
 
-  it('does not treat a Codex launch title as tui-idle readiness', async () => {
+  it('does not treat a Claude launch title as tui-idle readiness', async () => {
     vi.useFakeTimers()
     try {
       const runtime = new OrcaRuntimeService(store)
       const serializeProviderBuffer = vi.fn().mockResolvedValue({
-        data: 'OpenAI Codex\r\nmodel: gpt-5.5\r\ndirectory: /repo\r\n',
+        data: 'Claude Code v2.1.0\r\n/repo\r\n',
         cols: 80,
         rows: 24,
         seq: 1
@@ -430,7 +430,7 @@ describe('OrcaRuntimeService', () => {
           {
             tabId: 'tab-bg',
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex YOLO',
+            title: 'Claude YOLO',
             activeLeafId: 'pane-bg',
             layout: null
           }
@@ -460,77 +460,5 @@ describe('OrcaRuntimeService', () => {
     } finally {
       vi.useRealTimers()
     }
-  })
-
-  it('resolves tui-idle from a Codex ready prompt preview', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`)
-    runtime.onPtyData(
-      'pty-bg',
-      [
-        ' >_ OpenAI Codex (v0.131.0)\n',
-        ' model:       gpt-5.5 high   /model to change\n',
-        ' directory:   ~/orca/workspaces/orca/cli-debug\n'
-      ].join(''),
-      Date.now()
-    )
-
-    await expect(
-      runtime.waitForTerminal(handle, { condition: 'tui-idle', timeoutMs: 1_000 })
-    ).resolves.toMatchObject({
-      handle,
-      condition: 'tui-idle',
-      status: 'running'
-    })
-  })
-
-  it('resolves live-leaf tui-idle from a Codex ready prompt preview', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.attachWindow(1)
-    runtime.syncWindowGraph(1, {
-      tabs: [
-        {
-          tabId: 'tab-1',
-          worktreeId: TEST_WORKTREE_ID,
-          title: 'Terminal',
-          activeLeafId: 'pane:1',
-          layout: null
-        }
-      ],
-      leaves: [
-        {
-          tabId: 'tab-1',
-          worktreeId: TEST_WORKTREE_ID,
-          leafId: 'pane:1',
-          paneRuntimeId: 1,
-          ptyId: 'pty-1',
-          paneTitle: null
-        }
-      ]
-    })
-    runtime.onPtyData(
-      'pty-1',
-      [
-        ' >_ OpenAI Codex (v0.132.0)\n',
-        ' model:       gpt-5.5 high   /model to change\n',
-        ' directory:   ~/orca/workspaces/orca/cli-debug\n'
-      ].join(''),
-      Date.now()
-    )
-    const [terminal] = (await runtime.listTerminals()).terminals
-
-    await expect(
-      runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle', timeoutMs: 1_000 })
-    ).resolves.toMatchObject({
-      handle: terminal.handle,
-      condition: 'tui-idle',
-      status: 'running'
-    })
   })
 })

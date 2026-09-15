@@ -33,7 +33,6 @@ const EMPTY_TERMINAL_LAYOUTS: Record<string, TerminalLayoutSnapshot | undefined>
 
 const TITLE_AGENT_LABEL_TO_TYPE: Record<string, AgentType> = {
   'Claude Code': 'claude',
-  Codex: 'codex',
   OpenCode: 'opencode',
   Pi: 'pi'
 }
@@ -128,7 +127,7 @@ function buildTitleDerivedAgentRow(args: {
   runtimeAgentOrchestrationByPaneKey?: Record<string, AgentStatusOrchestrationContext>
 }): DashboardAgentRow | null {
   // Why launchAgent, not ownerAgentType: this only rewrites a title within its own identity
-  // group (OMP wraps Pi and emits Pi frames), which stays correct in a split. Pane ownership
+  // group (Pi's compatible title rewrite), which stays correct in a split. Pane ownership
   // is a separate, stricter question — it decides identity, so it uses ownerAgentType below.
   const title = normalizeCompatibleAgentTitleForOwner(args.title, args.tab.launchAgent, {
     ownerIsLaunch: Boolean(args.tab.launchAgent)
@@ -151,7 +150,7 @@ function buildTitleDerivedAgentRow(args: {
     ? 'claude'
     : resolveTitleDerivedAgentType(title, label, args.ownerAgentType)
   // Why: a status frame proves activity, not identity, so the resolver drops it.
-  // Hook-less agents over SSH (Codex, #8711; OpenCode's '. '/'* ' frames, #8940)
+  // Hook-less agents over SSH (OpenCode's '. '/'* ' frames, #8940)
   // surface only decorated task titles; fall back to the pane's known owner instead
   // of hiding the pane. Safe because the `!status || !label` gate above already
   // rejects plain shell titles — this path must never manufacture a row from one.

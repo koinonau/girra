@@ -589,7 +589,7 @@ describe('registerWorktreeHandlers', () => {
     const result = (await handlers['worktrees:create'](null, {
       repoId: 'repo-folder',
       name: 'folder-session',
-      createdWithAgent: 'codex'
+      createdWithAgent: 'opencode'
     })) as { worktree: { id: string } }
 
     expect(addWorktreeMock).not.toHaveBeenCalled()
@@ -600,7 +600,7 @@ describe('registerWorktreeHandlers', () => {
         path: '/workspace/folder',
         displayName: 'folder-session',
         instanceId: expect.stringMatching(/^[0-9a-f-]{36}$/),
-        createdWithAgent: 'codex'
+        createdWithAgent: 'opencode'
       })
     )
     expect(mainWindow.webContents.send).toHaveBeenCalledWith('worktrees:changed', {

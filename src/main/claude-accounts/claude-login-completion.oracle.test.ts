@@ -1,6 +1,7 @@
 import { EventEmitter } from 'node:events'
 import { PassThrough } from 'node:stream'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type * as NodeCliCommandResolution from '../../shared/node-cli-command-resolution'
 
 const processMocks = vi.hoisted(() => ({
   spawn: vi.fn()
@@ -15,7 +16,8 @@ vi.mock('electron', () => ({
   app: { getPath: () => 'C:\\orca-review-11407' }
 }))
 
-vi.mock('../codex-cli/command', () => ({
+vi.mock('../../shared/node-cli-command-resolution', async (importOriginal) => ({
+  ...(await importOriginal<typeof NodeCliCommandResolution>()),
   resolveClaudeCommand: () => 'claude.exe'
 }))
 

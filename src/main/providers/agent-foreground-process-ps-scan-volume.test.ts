@@ -28,13 +28,13 @@ const TICKS = Math.floor((WINDOW_SECONDS * 1000) / ACTIVE_POLL_INTERVAL_MS)
 const shellPid = (pane: number): number => 100 + pane * 1000
 
 // A real `ps` returns the whole system, so one shared snapshot must contain
-// every pane's shell + foreground codex child. Each pane resolves its own
+// every pane's shell + foreground opencode child. Each pane resolves its own
 // agent from the single scan.
 const PS_OUTPUT = Array.from({ length: PANE_COUNT }, (_, pane) => {
   const shell = shellPid(pane)
   return [
     `${shell} 99 Ss   bash -i`,
-    `${shell + 1} ${shell} S+   node /Users/dev/.nvm/versions/node/bin/codex`
+    `${shell + 1} ${shell} S+   node /Users/dev/.nvm/versions/node/bin/opencode`
   ].join('\n')
 }).join('\n')
 
@@ -80,7 +80,7 @@ describe('#6288 agent foreground inspection ps-scan volume', () => {
         )
       )
       // Caching must not change the answer: every pane still resolves the agent.
-      expect(resolved.every((name) => name === 'codex')).toBe(true)
+      expect(resolved.every((name) => name === 'opencode')).toBe(true)
     }
 
     const totalInspections = PANE_COUNT * TICKS

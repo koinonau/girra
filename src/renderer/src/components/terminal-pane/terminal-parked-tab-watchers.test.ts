@@ -71,7 +71,7 @@ vi.mock('../terminal/terminal-tab-actions', () => ({
 type MockStoreState = {
   tabsByWorktree: Record<
     string,
-    { id: string; launchAgent?: 'claude' | 'codex'; ptyId: string | null }[]
+    { id: string; launchAgent?: 'claude' | 'opencode'; ptyId: string | null }[]
   >
   terminalLayoutsByTabId: Record<
     string,
@@ -652,10 +652,10 @@ describe('terminal-parked-tab-watchers', () => {
 
     it('retires launch/title hints when the launch-owning parked leaf exits', () => {
       mockStoreState.tabsByWorktree = {
-        [WORKTREE_ID]: [{ id: TAB_ID, launchAgent: 'codex', ptyId: PTY_ID }]
+        [WORKTREE_ID]: [{ id: TAB_ID, launchAgent: 'opencode', ptyId: PTY_ID }]
       }
       mockStoreState.runtimePaneTitlesByTabId = {
-        [TAB_ID]: { 1: 'Codex', 2: 'PowerShell' }
+        [TAB_ID]: { 1: 'OpenCode', 2: 'PowerShell' }
       }
       capturePanes([
         { ptyId: PTY_ID, paneId: 1, leafId: LEAF_ID, drivesTabTitle: true },

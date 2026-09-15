@@ -160,10 +160,10 @@ const STATES: readonly AgentStatusState[] = ['working', 'blocked', 'waiting', 'd
 // Mixes iconable agents with ones agentTypeToIconAgent rejects.
 const AGENT_TYPES: readonly (AgentType | undefined)[] = [
   'claude',
-  'codex',
-  'gemini',
+  'opencode',
+  'claude-agent-teams',
   'pi',
-  'omp',
+  'stale-dropped-agent',
   'unknown',
   'some-custom-agent',
   undefined
@@ -312,11 +312,11 @@ describe('tab agent status index parity with the pre-index full-map scan', () =>
 
   it('returns the first done sibling in insertion order when siblings run different agents', () => {
     const map = {
-      [`tab-1:${leafId(0)}`]: statusEntry(`tab-1:${leafId(0)}`, 'done', 'codex'),
+      [`tab-1:${leafId(0)}`]: statusEntry(`tab-1:${leafId(0)}`, 'done', 'opencode'),
       [`tab-1:${leafId(1)}`]: statusEntry(`tab-1:${leafId(1)}`, 'done', 'claude'),
-      [`tab-1:${leafId(2)}`]: statusEntry(`tab-1:${leafId(2)}`, 'done', 'gemini')
+      [`tab-1:${leafId(2)}`]: statusEntry(`tab-1:${leafId(2)}`, 'done', 'pi')
     }
-    expect(resolveSiblingCompletedTabAgent(map, layoutOf(leafId(2)), 'tab-1')).toBe('codex')
+    expect(resolveSiblingCompletedTabAgent(map, layoutOf(leafId(2)), 'tab-1')).toBe('opencode')
     expect(resolveSiblingCompletedTabAgent(map, layoutOf(leafId(0)), 'tab-1')).toBe('claude')
     // Fresh identity, reversed insertion order → first match flips.
     const reversed = Object.fromEntries(Object.entries(map).toReversed())
@@ -327,7 +327,7 @@ describe('tab agent status index parity with the pre-index full-map scan', () =>
     const map = {
       [`tab-1:${leafId(0)}`]: statusEntry(`tab-1:${leafId(0)}`, 'done', 'unknown'),
       [`tab-1:${leafId(1)}`]: statusEntry(`tab-1:${leafId(1)}`, 'done', 'claude'),
-      [`tab-2:${leafId(2)}`]: statusEntry(`tab-2:${leafId(2)}`, 'done', 'codex')
+      [`tab-2:${leafId(2)}`]: statusEntry(`tab-2:${leafId(2)}`, 'done', 'opencode')
     }
     expect(resolveSiblingCompletedTabAgent(map, layoutOf(leafId(1)), 'tab-1')).toBeNull()
     expect(resolveSiblingCompletedTabAgent(map, layoutOf(leafId(0)), 'tab-1')).toBe('claude')
@@ -349,8 +349,8 @@ describe('tab agent status index parity with the pre-index full-map scan', () =>
     const paneKey = `tab-1:${leafId(0)}`
     const before = { [paneKey]: statusEntry(paneKey, 'done', 'claude') }
     expect(resolveFocusedCompletedTabAgent(before, undefined, 'tab-1')).toBe('claude')
-    const after = { [paneKey]: statusEntry(paneKey, 'done', 'codex') }
-    expect(resolveFocusedCompletedTabAgent(after, undefined, 'tab-1')).toBe('codex')
+    const after = { [paneKey]: statusEntry(paneKey, 'done', 'opencode') }
+    expect(resolveFocusedCompletedTabAgent(after, undefined, 'tab-1')).toBe('opencode')
     expect(resolveFocusedCompletedTabAgent(before, undefined, 'tab-1')).toBe('claude')
   })
 
@@ -359,11 +359,11 @@ describe('tab agent status index parity with the pre-index full-map scan', () =>
     const secondPaneKey = `tab-2:${leafId(1)}`
     const status = countEntryScans({
       [firstPaneKey]: statusEntry(firstPaneKey, 'working', 'claude'),
-      [secondPaneKey]: statusEntry(secondPaneKey, 'done', 'codex')
+      [secondPaneKey]: statusEntry(secondPaneKey, 'done', 'opencode')
     })
     const retained = countEntryScans({
       [firstPaneKey]: retainedEntry(firstPaneKey, 'claude'),
-      [secondPaneKey]: retainedEntry(secondPaneKey, 'codex')
+      [secondPaneKey]: retainedEntry(secondPaneKey, 'opencode')
     })
 
     for (const tabId of ['tab-1', 'tab-2', 'tab-absent']) {

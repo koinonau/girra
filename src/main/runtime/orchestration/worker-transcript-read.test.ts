@@ -130,7 +130,7 @@ describe('worker transcript reads', () => {
 
     await expect(
       readWorkerTranscript({
-        agent: 'gemini',
+        agent: 'opencode',
         sessionId: 'session-other',
         transcriptPath,
         limit: 2

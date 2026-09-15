@@ -83,7 +83,7 @@ export function buildRuntimeMobileAgentStatus(
       return {}
     }
   }
-  // Why: a retained OMP hook stays stable while wrapper foreground reads can report Pi.
+  // Why: launch and retained hook identity outrank foreground reads, which can name a wrapper process.
   const ownerRecord = resolvePaneAgentOwnerRecord({
     launchAgent: tab.launchAgent ?? pty?.launchAgent ?? null,
     hookAgent: retained?.payload.agentType ?? hookRow.agentType

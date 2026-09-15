@@ -19,17 +19,35 @@ import type {
 } from './source-control-ai-types'
 import type { GlobalSettings } from './global-settings-types'
 
+const OPENAI_THINKING = {
+  thinkingLevels: [
+    { id: 'low', label: 'Low' },
+    { id: 'medium', label: 'Medium' },
+    { id: 'high', label: 'High' },
+    { id: 'xhigh', label: 'Extra High' }
+  ],
+  defaultThinkingLevel: 'low'
+}
+
+// Why: OpenCode's seed catalog has two ids, so the precedence cases pick among discovered models.
+const DISCOVERED_OPENCODE_MODELS = ['gpt-5.5', 'gpt-5.4', 'gpt-5.4-mini', 'gpt-5.2'].map((id) => ({
+  id,
+  label: id,
+  ...OPENAI_THINKING
+}))
+
 function settings(): GlobalSettings {
   const base = getDefaultSettings('/tmp')
   return {
     ...base,
-    defaultTuiAgent: 'codex' as const,
+    defaultTuiAgent: 'opencode' as const,
     sourceControlAi: {
       ...base.sourceControlAi!,
       enabled: true,
-      agentId: 'codex' as const,
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      agentId: 'opencode' as const,
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: { 'gpt-5.5': 'medium', 'gpt-5.4': 'high' },
+      discoveredModelsByAgent: { opencode: DISCOVERED_OPENCODE_MODELS },
       instructionsByOperation: {
         commitMessage: 'Global commit style',
         pullRequest: 'Global PR style',
@@ -184,7 +202,7 @@ describe('source-control AI resolution', () => {
 
   it('treats a normalized null agent as default instead of using stale legacy agent', () => {
     const base = settings()
-    base.defaultTuiAgent = 'codex'
+    base.defaultTuiAgent = 'opencode'
     base.commitMessageAi = {
       ...base.commitMessageAi!,
       agentId: 'claude',
@@ -194,7 +212,7 @@ describe('source-control AI resolution', () => {
     base.sourceControlAi = {
       ...base.sourceControlAi!,
       agentId: null,
-      selectedModelByAgent: { codex: 'gpt-5.4' }
+      selectedModelByAgent: { opencode: 'gpt-5.4' }
     }
 
     const result = resolveSourceControlAiForOperation({
@@ -203,14 +221,14 @@ describe('source-control AI resolution', () => {
       operation: 'commitMessage',
       discoveryHostKey: 'local'
     })
-    expect(result.ok && result.value.params.agentId).toBe('codex')
+    expect(result.ok && result.value.params.agentId).toBe('opencode')
     expect(result.ok && result.value.params.model).toBe('gpt-5.4')
   })
 
   it('lets a global operation model override win over the global default', () => {
     const base = settings()
     base.sourceControlAi!.modelOverridesByOperation = {
-      pullRequest: { selectedModelByAgent: { codex: 'gpt-5.4' } }
+      pullRequest: { selectedModelByAgent: { opencode: 'gpt-5.4' } }
     }
     const result = resolveSourceControlAiForOperation({
       settings: base,
@@ -224,14 +242,14 @@ describe('source-control AI resolution', () => {
   it('lets a repo operation model override win over global operation override', () => {
     const base = settings()
     base.sourceControlAi!.modelOverridesByOperation = {
-      commitMessage: { selectedModelByAgent: { codex: 'gpt-5.4' } }
+      commitMessage: { selectedModelByAgent: { opencode: 'gpt-5.4' } }
     }
     const result = resolveSourceControlAiForOperation({
       settings: base,
       repo: {
         sourceControlAi: {
           modelOverridesByOperation: {
-            commitMessage: { selectedModelByAgent: { codex: 'gpt-5.4-mini' } }
+            commitMessage: { selectedModelByAgent: { opencode: 'gpt-5.4-mini' } }
           }
         }
       },
@@ -275,7 +293,7 @@ describe('source-control AI resolution', () => {
       resolve('commitMessage', {
         modelOverridesByOperation: {
           commitMessage: {
-            selectedModelByAgent: { codex: 'gpt-5.4' },
+            selectedModelByAgent: { opencode: 'gpt-5.4' },
             selectedThinkingByModel: { 'gpt-5.4': 'xhigh' }
           }
         }
@@ -367,8 +385,8 @@ describe('source-control AI resolution', () => {
   it('maps legacy custom prompt to released split instructions', () => {
     const migrated = sourceControlAiSettingsFromLegacy({
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: {},
       customPrompt: 'Legacy commit prompt',
       customAgentCommand: ''
@@ -398,7 +416,7 @@ describe('source-control AI resolution', () => {
     expect(merged).toMatchObject({
       enabled: false,
       agentId: 'claude',
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: { 'gpt-5.5': 'medium', 'gpt-5.4': 'high' },
       customAgentCommand: 'claude',
       instructionsByOperation: {
@@ -418,8 +436,8 @@ describe('source-control AI resolution', () => {
       undefined,
       {
         enabled: true,
-        agentId: 'codex',
-        selectedModelByAgent: { codex: 'gpt-5.5' },
+        agentId: 'opencode',
+        selectedModelByAgent: { opencode: 'gpt-5.5' },
         selectedThinkingByModel: {},
         customPrompt: 'Legacy PR prompt',
         customAgentCommand: ''
@@ -433,10 +451,10 @@ describe('source-control AI resolution', () => {
   it('projects commit-message operation model overrides into legacy settings', () => {
     const legacy = projectSourceControlAiToLegacyCommitMessageAi({
       ...settings().sourceControlAi!,
-      selectedModelByAgent: { codex: 'gpt-5.5', claude: 'sonnet' },
+      selectedModelByAgent: { opencode: 'gpt-5.5', claude: 'sonnet' },
       selectedModelByAgentByHost: {
-        local: { codex: 'gpt-5.5' },
-        'ssh:conn-1': { codex: 'gpt-5.5', claude: 'sonnet' }
+        local: { opencode: 'gpt-5.5' },
+        'ssh:conn-1': { opencode: 'gpt-5.5', claude: 'sonnet' }
       },
       selectedThinkingByModel: {
         'gpt-5.4': 'high',
@@ -444,10 +462,10 @@ describe('source-control AI resolution', () => {
       },
       modelOverridesByOperation: {
         commitMessage: {
-          selectedModelByAgent: { codex: 'gpt-5.4' },
+          selectedModelByAgent: { opencode: 'gpt-5.4' },
           selectedModelByAgentByHost: {
-            local: { codex: 'gpt-5.4' },
-            'ssh:conn-1': { codex: 'gpt-5.4-mini' }
+            local: { opencode: 'gpt-5.4' },
+            'ssh:conn-1': { opencode: 'gpt-5.4-mini' }
           },
           selectedThinkingByModel: {
             'gpt-5.4': 'xhigh',
@@ -455,19 +473,19 @@ describe('source-control AI resolution', () => {
           }
         },
         pullRequest: {
-          selectedModelByAgent: { codex: 'gpt-5.2' },
+          selectedModelByAgent: { opencode: 'gpt-5.2' },
           selectedThinkingByModel: { 'gpt-5.2': 'low' }
         }
       }
     })
 
     expect(legacy.selectedModelByAgent).toMatchObject({
-      codex: 'gpt-5.4',
+      opencode: 'gpt-5.4',
       claude: 'sonnet'
     })
     expect(legacy.selectedModelByAgentByHost).toMatchObject({
-      local: { codex: 'gpt-5.4' },
-      'ssh:conn-1': { codex: 'gpt-5.4-mini', claude: 'sonnet' }
+      local: { opencode: 'gpt-5.4' },
+      'ssh:conn-1': { opencode: 'gpt-5.4-mini', claude: 'sonnet' }
     })
     expect(legacy.selectedThinkingByModel).toMatchObject({
       'gpt-5.4': 'xhigh',
@@ -480,11 +498,11 @@ describe('source-control AI resolution', () => {
   it('merges projected legacy commit-message models without changing PR defaults', () => {
     const source = {
       ...settings().sourceControlAi!,
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: { 'gpt-5.5': 'medium' },
       modelOverridesByOperation: {
         commitMessage: {
-          selectedModelByAgent: { codex: 'gpt-5.4' },
+          selectedModelByAgent: { opencode: 'gpt-5.4' },
           selectedThinkingByModel: { 'gpt-5.4': 'high' }
         }
       }
@@ -492,8 +510,8 @@ describe('source-control AI resolution', () => {
     const legacy = projectSourceControlAiToLegacyCommitMessageAi(source)
     const merged = mergeLegacyCommitMessageAiIntoSourceControlAi(source, legacy)
 
-    expect(merged.selectedModelByAgent.codex).toBe('gpt-5.5')
-    expect(merged.modelOverridesByOperation?.commitMessage?.selectedModelByAgent?.codex).toBe(
+    expect(merged.selectedModelByAgent.opencode).toBe('gpt-5.5')
+    expect(merged.modelOverridesByOperation?.commitMessage?.selectedModelByAgent?.opencode).toBe(
       'gpt-5.4'
     )
 
@@ -520,23 +538,23 @@ describe('source-control AI resolution', () => {
   it('does not synthesize a commit-message override from projected global defaults', () => {
     const source = {
       ...settings().sourceControlAi!,
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: { 'gpt-5.5': 'medium' },
       modelOverridesByOperation: undefined
     }
     const legacy = projectSourceControlAiToLegacyCommitMessageAi(source)
     const merged = mergeLegacyCommitMessageAiIntoSourceControlAi(source, legacy)
 
-    expect(merged.selectedModelByAgent.codex).toBe('gpt-5.5')
+    expect(merged.selectedModelByAgent.opencode).toBe('gpt-5.5')
     expect(merged.modelOverridesByOperation?.commitMessage).toBeUndefined()
   })
 
   it('merges only rollback legacy model deltas into commit-message overrides', () => {
     const source = {
       ...settings().sourceControlAi!,
-      selectedModelByAgent: { codex: 'gpt-5.5', claude: 'sonnet' },
+      selectedModelByAgent: { opencode: 'gpt-5.5', claude: 'sonnet' },
       selectedModelByAgentByHost: {
-        local: { codex: 'gpt-5.5', claude: 'sonnet' }
+        local: { opencode: 'gpt-5.5', claude: 'sonnet' }
       },
       selectedThinkingByModel: {
         'gpt-5.5': 'medium',
@@ -547,39 +565,39 @@ describe('source-control AI resolution', () => {
     const legacy = projectSourceControlAiToLegacyCommitMessageAi(source)
     legacy.selectedModelByAgent = {
       ...legacy.selectedModelByAgent,
-      codex: 'gpt-5.4'
+      opencode: 'gpt-5.4'
     }
     legacy.selectedModelByAgentByHost = {
       ...legacy.selectedModelByAgentByHost,
       local: {
         ...legacy.selectedModelByAgentByHost?.local,
-        codex: 'gpt-5.4'
+        opencode: 'gpt-5.4'
       }
     }
 
     const merged = mergeLegacyCommitMessageAiIntoSourceControlAi(source, legacy)
 
-    expect(merged.selectedModelByAgent).toEqual({ codex: 'gpt-5.5', claude: 'sonnet' })
+    expect(merged.selectedModelByAgent).toEqual({ opencode: 'gpt-5.5', claude: 'sonnet' })
     expect(merged.modelOverridesByOperation?.commitMessage).toEqual({
-      selectedModelByAgent: { codex: 'gpt-5.4' },
-      selectedModelByAgentByHost: { local: { codex: 'gpt-5.4' } }
+      selectedModelByAgent: { opencode: 'gpt-5.4' },
+      selectedModelByAgentByHost: { local: { opencode: 'gpt-5.4' } }
     })
   })
 
   it('removes projected commit-message overrides cleared by legacy settings', () => {
     const source = {
       ...settings().sourceControlAi!,
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: { 'gpt-5.5': 'medium' },
       modelOverridesByOperation: {
         commitMessage: {
-          selectedModelByAgent: { codex: 'gpt-5.4' },
+          selectedModelByAgent: { opencode: 'gpt-5.4' },
           selectedThinkingByModel: { 'gpt-5.4': 'high' }
         }
       }
     }
     const legacy = projectSourceControlAiToLegacyCommitMessageAi(source)
-    delete legacy.selectedModelByAgent.codex
+    delete legacy.selectedModelByAgent.opencode
     delete legacy.selectedThinkingByModel['gpt-5.4']
 
     const merged = mergeLegacyCommitMessageAiIntoSourceControlAi(source, legacy)
@@ -591,32 +609,32 @@ describe('source-control AI resolution', () => {
     const localChoice = selectSourceControlAiModelChoiceForHost(
       undefined,
       'local',
-      'codex',
+      'opencode',
       'gpt-5.4'
     )
     expect(localChoice).toEqual({
-      selectedModelByAgent: { codex: 'gpt-5.4' },
-      selectedModelByAgentByHost: { local: { codex: 'gpt-5.4' } }
+      selectedModelByAgent: { opencode: 'gpt-5.4' },
+      selectedModelByAgentByHost: { local: { opencode: 'gpt-5.4' } }
     })
 
     const remoteChoice = selectSourceControlAiModelChoiceForHost(
       localChoice,
       'ssh:conn-1',
-      'codex',
+      'opencode',
       'remote-model'
     )
-    expect(readSourceControlAiModelChoiceForHost(remoteChoice, 'local', 'codex')).toBe('gpt-5.4')
-    expect(readSourceControlAiModelChoiceForHost(remoteChoice, 'ssh:conn-1', 'codex')).toBe(
+    expect(readSourceControlAiModelChoiceForHost(remoteChoice, 'local', 'opencode')).toBe('gpt-5.4')
+    expect(readSourceControlAiModelChoiceForHost(remoteChoice, 'ssh:conn-1', 'opencode')).toBe(
       'remote-model'
     )
     expect(
-      readSourceControlAiModelChoiceForHost(remoteChoice, 'ssh:conn-2', 'codex')
+      readSourceControlAiModelChoiceForHost(remoteChoice, 'ssh:conn-2', 'opencode')
     ).toBeUndefined()
     expect(
       readSourceControlAiModelChoiceForHost(
-        { selectedModelByAgent: { codex: 'global-model' } },
+        { selectedModelByAgent: { opencode: 'global-model' } },
         'local',
-        'codex'
+        'opencode'
       )
     ).toBe('global-model')
   })
@@ -624,20 +642,20 @@ describe('source-control AI resolution', () => {
   it('clears only the selected host model override when inheriting', () => {
     const cleared = clearSourceControlAiModelChoiceForHost(
       {
-        selectedModelByAgent: { codex: 'local-model' },
+        selectedModelByAgent: { opencode: 'local-model' },
         selectedModelByAgentByHost: {
-          local: { codex: 'local-model' },
-          'ssh:conn-1': { codex: 'remote-model' }
+          local: { opencode: 'local-model' },
+          'ssh:conn-1': { opencode: 'remote-model' }
         },
         selectedThinkingByModel: { 'remote-model': 'high' }
       },
       'local',
-      'codex'
+      'opencode'
     )
 
     expect(cleared).toEqual({
       selectedModelByAgentByHost: {
-        'ssh:conn-1': { codex: 'remote-model' }
+        'ssh:conn-1': { opencode: 'remote-model' }
       },
       selectedThinkingByModel: { 'remote-model': 'high' }
     })
@@ -648,15 +666,15 @@ describe('source-control AI resolution', () => {
       modelOverridesByOperation: {
         commitMessage: {
           selectedModelByAgent: {
-            codex: 'gpt-5.4',
+            opencode: 'gpt-5.4',
             claude: 42,
             constructor: 'polluted'
           },
           selectedModelByAgentByHost: {
-            local: { codex: 'gpt-5.4' },
-            'ssh:conn-1': { codex: 'remote-model', claude: false },
+            local: { opencode: 'gpt-5.4' },
+            'ssh:conn-1': { opencode: 'remote-model', claude: false },
             malformed: 'not-a-record',
-            prototype: { codex: 'polluted' }
+            prototype: { opencode: 'polluted' }
           },
           selectedThinkingByModel: {
             'gpt-5.4': 'xhigh',
@@ -669,10 +687,10 @@ describe('source-control AI resolution', () => {
           selectedModelByAgent: []
         },
         branchName: {
-          selectedModelByAgent: { codex: 'gpt-5.4' }
+          selectedModelByAgent: { opencode: 'gpt-5.4' }
         },
         unknown: {
-          selectedModelByAgent: { codex: 'ignored' }
+          selectedModelByAgent: { opencode: 'ignored' }
         }
       },
       instructionsByOperation: {
@@ -692,10 +710,10 @@ describe('source-control AI resolution', () => {
     expect(normalized).toEqual({
       modelOverridesByOperation: {
         commitMessage: {
-          selectedModelByAgent: { codex: 'gpt-5.4' },
+          selectedModelByAgent: { opencode: 'gpt-5.4' },
           selectedModelByAgentByHost: {
-            local: { codex: 'gpt-5.4' },
-            'ssh:conn-1': { codex: 'remote-model' }
+            local: { opencode: 'gpt-5.4' },
+            'ssh:conn-1': { opencode: 'remote-model' }
           },
           selectedThinkingByModel: {
             'gpt-5.4': 'xhigh',
@@ -703,7 +721,7 @@ describe('source-control AI resolution', () => {
           }
         },
         branchName: {
-          selectedModelByAgent: { codex: 'gpt-5.4' }
+          selectedModelByAgent: { opencode: 'gpt-5.4' }
         }
       },
       instructionsByOperation: {

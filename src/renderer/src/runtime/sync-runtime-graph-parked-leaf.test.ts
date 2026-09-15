@@ -233,13 +233,13 @@ describe('syncRuntimeGraph cold-parked tabs', () => {
     installParkedWatcher(PARKED_PTY, 7)
     setRuntimeGraphStoreStateGetter(() => ({
       ...parkedState(),
-      runtimePaneTitlesByTabId: { [TAB_ID]: { 7: 'codex [working]' } }
+      runtimePaneTitlesByTabId: { [TAB_ID]: { 7: 'opencode [working]' } }
     }))
 
     const graph = await captureGraph({ seedState: false })
 
     expect(graph.leaves).toContainEqual(
-      expect.objectContaining({ leafId: LEAF, paneTitle: 'codex [working]' })
+      expect.objectContaining({ leafId: LEAF, paneTitle: 'opencode [working]' })
     )
   })
 

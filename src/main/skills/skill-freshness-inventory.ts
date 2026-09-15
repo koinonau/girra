@@ -17,7 +17,6 @@ import {
   observeSkillFreshnessInstallation,
   type CandidateLstat
 } from './skill-freshness-placement-observation'
-import { scanKnownPluginSkillCandidates } from './skill-plugin-cache-scan'
 import { convergableSkillNames } from './skill-update-convergence'
 import { matchesUpdaterLock, readGloballyUpdatableSkillLocks } from './skill-update-registration'
 
@@ -65,7 +64,6 @@ export async function inventorySkillFreshness(args: {
     loadSkillBundleArtifacts(args.resourceRoot),
     readGloballyUpdatableSkillLocks({ homeDir: args.homeDir, stateHome: args.stateHome })
   ])
-  const currentByName = new Map(artifacts.manifest.skills.map((skill) => [skill.name, skill]))
   const discoveryArgs = {
     homeDir: args.homeDir,
     cwd: args.cwd,
@@ -78,7 +76,6 @@ export async function inventorySkillFreshness(args: {
   const homeRoots = roots.filter((root) => root.sourceKind === 'home')
   const allRepoRoots = roots.filter((root) => root.sourceKind === 'repo')
   const { scanned: repoRoots, omitted: omittedRepoRoots } = boundRepositorySkillRoots(allRepoRoots)
-  const pluginRoots = roots.filter((root) => root.sourceKind === 'plugin')
   const canonicalRootPath = homeRoots.find((root) => root.id === 'home-agents')?.path
   if (!canonicalRootPath) {
     throw new Error('Missing canonical agent skills root')
@@ -141,39 +138,8 @@ export async function inventorySkillFreshness(args: {
               }
             })
         )
-  const pluginScans = await Promise.all(
-    pluginRoots.map(async (root) => ({
-      root,
-      scan: await scanKnownPluginSkillCandidates(root.path, new Set(currentByName.keys()))
-    }))
-  )
-  const pluginTasks = pluginScans.flatMap(({ root, scan }) =>
-    scan.candidates.flatMap((candidate) => {
-      const current = currentByName.get(candidate.name)
-      return current
-        ? [
-            () =>
-              classifyUnsupportedSkillCandidate({
-                root,
-                current,
-                currentAppVersion: args.currentAppVersion,
-                artifacts,
-                unresolvedPath: candidate.path,
-                candidateLstat
-              })
-          ]
-        : []
-    })
-  )
-  const scanIssues = pluginScans.flatMap(({ root, scan }) =>
-    scan.issues.map((issue) => ({
-      rootId: root.id,
-      sourceLabel: root.label,
-      ...issue
-    }))
-  )
   const unsupportedInstallations = (
-    await runSkillCandidateTasks([...repoTasks, ...omittedRepoTasks, ...pluginTasks])
+    await runSkillCandidateTasks([...repoTasks, ...omittedRepoTasks])
   ).filter((installation): installation is SkillFreshnessInstallation => installation !== null)
   const installations = dedupeSkillFreshnessPlacements([
     ...homeInstallations,
@@ -193,7 +159,7 @@ export async function inventorySkillFreshness(args: {
       installations,
       convergableSkillNames(installations, globalSkillLocks, artifacts.knownSnapshots)
     ),
-    scanIssues,
+    scanIssues: [],
     scannedAt: Date.now()
   }
 }

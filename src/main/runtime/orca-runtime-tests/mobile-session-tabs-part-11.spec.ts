@@ -631,7 +631,7 @@ describe('OrcaRuntimeService', () => {
       getSettings: () => ({
         ...store.getSettings(),
         disabledTuiAgents: [],
-        agentCmdOverrides: { codex: 'codex' },
+        agentCmdOverrides: { claude: 'claude' },
         agentDefaultArgs: {}
       })
     } as never)
@@ -644,14 +644,14 @@ describe('OrcaRuntimeService', () => {
     runtime.syncWindowGraph(0, { tabs: [], leaves: [] })
 
     await runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-      agent: 'codex',
+      agent: 'claude',
       agentPrompt: 'Review this diff'
     })
 
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
-        command: expect.stringMatching(/^codex .*'Review this diff'$/),
-        launchAgent: 'codex',
+        command: expect.stringMatching(/^claude .*'Review this diff'$/),
+        launchAgent: 'claude',
         cwd: TEST_WORKTREE_PATH
       })
     )

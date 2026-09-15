@@ -390,7 +390,7 @@ describe('createIssueCommandRunnerScript', () => {
       const result = createIssueCommandRunnerScript(
         makeRepo(),
         '/test/repo-feature',
-        'codex exec "long command"\nclaude -p "review it"'
+        'opencode run "long command"\nclaude -p "review it"'
       )
 
       expect(result).toEqual({
@@ -402,7 +402,7 @@ describe('createIssueCommandRunnerScript', () => {
       })
       expect(vi.mocked(fs.writeFileSync)).toHaveBeenCalledWith(
         '/test/repo/.git/worktrees/feature/orca/issue-command-runner.sh',
-        '#!/usr/bin/env bash\nset -e\ncodex exec "long command"\nclaude -p "review it"\n',
+        '#!/usr/bin/env bash\nset -e\nopencode run "long command"\nclaude -p "review it"\n',
         'utf-8'
       )
       expect(vi.mocked(fs.chmodSync)).toHaveBeenCalledWith(
@@ -431,7 +431,7 @@ describe('createIssueCommandRunnerScript', () => {
       const result = createIssueCommandRunnerScript(
         makeRepo(),
         'C:\\repo\\feature',
-        'codex exec "long command"',
+        'opencode run "long command"',
         { wslDistro: 'Ubuntu' }
       )
 

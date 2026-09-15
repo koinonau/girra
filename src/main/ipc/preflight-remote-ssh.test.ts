@@ -121,7 +121,7 @@ describe('preflight', () => {
   })
 
   it('sends aliased detection commands through the SSH remote preflight path', async () => {
-    const request = vi.fn().mockResolvedValue({ agents: ['openclaude'] })
+    const request = vi.fn().mockResolvedValue({ agents: ['opencode'] })
     getActiveMultiplexerMock.mockReturnValue({
       isDisposed: () => false,
       request
@@ -131,12 +131,12 @@ describe('preflight', () => {
 
     await expect(
       handlers['preflight:detectRemoteAgents'](undefined, { connectionId: 'ssh-1' })
-    ).resolves.toEqual(['openclaude'])
+    ).resolves.toEqual(['opencode'])
     expect(request).toHaveBeenCalledWith('preflight.detectAgents', {
       commands: expect.arrayContaining([
-        { id: 'openclaude', cmd: 'openclaude' },
-        { id: 'mistral-vibe', cmd: 'vibe' },
-        { id: 'mistral-vibe', cmd: 'mistral-vibe' }
+        { id: 'opencode', cmd: 'opencode' },
+        expect.objectContaining({ id: 'claude-agent-teams', cmd: 'orca' }),
+        expect.objectContaining({ id: 'claude-agent-teams', cmd: 'orca-dev' })
       ])
     })
   })

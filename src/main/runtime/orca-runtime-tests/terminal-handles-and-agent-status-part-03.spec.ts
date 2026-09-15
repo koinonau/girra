@@ -10,7 +10,7 @@ describe('OrcaRuntimeService', () => {
       spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'codex',
+      getForegroundProcess: async () => 'opencode',
       listProcesses: async () => [{ id: 'pty-bg', cwd: TEST_WORKTREE_PATH, title: 'zsh' }]
     })
     runtime.attachWindow(1)
@@ -79,55 +79,7 @@ describe('OrcaRuntimeService', () => {
     await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(false)
   })
 
-  it('recognizes ready prompt evidence even with a stale Claude agents title', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => 'claude'
-    })
-    runtime.attachWindow(1)
-    runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'claude agents',
-      title: 'claude agents'
-    })
-
-    runtime.onPtyData(
-      'pty-bg',
-      ['OpenAI Codex', 'Model: gpt-5.4', 'Directory: /tmp/worktree-a'].join('\n'),
-      100
-    )
-
-    await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)
-  })
-
-  it('recognizes runtime-created Codex PTY handles from the ready prompt', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    runtime.attachWindow(1)
-    runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
-      title: 'worker'
-    })
-
-    runtime.onPtyData(
-      'pty-bg',
-      ['OpenAI Codex', 'Model: gpt-5.4', 'Directory: /tmp/worktree-a'].join('\n'),
-      100
-    )
-
-    await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)
-  })
-
-  it('does not classify agent-named workspace paths or titles without the ready prompt', async () => {
+  it('does not classify agent-named workspace paths or titles', async () => {
     const runtime = new OrcaRuntimeService(store)
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, {

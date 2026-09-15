@@ -54,7 +54,7 @@ function session(items: AgentJournalRenderItem[]): NativeChatLiveSession {
     messages: projectStructuredItemsToNativeChat(items),
     status: 'ready',
     sessionId: 'session',
-    agent: 'codex',
+    agent: 'claude',
     hasMore: false,
     loadingEarlier: false,
     loadEarlier: vi.fn(),

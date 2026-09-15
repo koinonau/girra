@@ -177,7 +177,7 @@ describe('selectLiveAgentStatusEntriesForWorktree', () => {
       groupId: 'group-1',
       contentType: 'agent-session',
       entityId: 'session-1',
-      label: 'Codex Chat',
+      label: 'OpenCode Chat',
       customLabel: null,
       color: null,
       sortOrder: 0,

@@ -58,17 +58,6 @@ export const getActionDescriptions = createLocalizedCatalog(
 
 const FALLBACK_AGENT_ARGS_PLACEHOLDER = '--model sonnet'
 
-const AGENT_ARGS_PLACEHOLDER_OVERRIDES: Partial<Record<TuiAgent, string>> = {
-  // Why: Source Control AI action prompts are short, reviewable tasks; the
-  // mini Codex model is a better default hint than the frontier model.
-  codex: '--model gpt-5.4-mini',
-  copilot: '--model gpt-5.4-mini'
-}
-
-const MODEL_FLAG_BY_AGENT: Partial<Record<TuiAgent, string>> = {
-  amp: '--mode'
-}
-
 export function getSourceControlAgentArgsPlaceholder(
   agentId: TuiAgent | CustomAgentId | null | undefined
 ): string {
@@ -80,17 +69,12 @@ export function getSourceControlAgentArgsPlaceholder(
     return '--flag value'
   }
 
-  const override = AGENT_ARGS_PLACEHOLDER_OVERRIDES[agentId]
-  if (override) {
-    return override
-  }
-
   const capability = getCommitMessageAgentCapability(agentId)
   if (!capability) {
     return '--model <model>'
   }
 
-  return `${MODEL_FLAG_BY_AGENT[agentId] ?? '--model'} ${capability.defaultModelId}`
+  return `--model ${capability.defaultModelId}`
 }
 
 // Why: text-generation actions can only run agents that produce a single

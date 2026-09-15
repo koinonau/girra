@@ -67,10 +67,10 @@ resolver #1
 })
 
 describe('withMacTailscaleDnsHintForDiagnostic', () => {
-  it('adds a Tailscale DNS hint for the Codex lookup failure from the issue', () => {
+  it('adds a Tailscale DNS hint for the agent lookup failure from the issue', () => {
     const diagnostic = parseMacTailscaleDnsDiagnostic(MAGIC_DNS_ONLY_SCUTIL)
     const result = withMacTailscaleDnsHintForDiagnostic(
-      'Codex failed. Check the agent CLI configuration and try again.',
+      'Claude failed. Check the agent CLI configuration and try again.',
       'stream disconnected before completion: failed to lookup address information: nodename nor servname provided, or not known',
       diagnostic
     )
@@ -81,7 +81,7 @@ describe('withMacTailscaleDnsHintForDiagnostic', () => {
 
   it('leaves unrelated failures unchanged even under MagicDNS-only DNS', () => {
     const diagnostic = parseMacTailscaleDnsDiagnostic(MAGIC_DNS_ONLY_SCUTIL)
-    const message = 'Codex failed. Check the agent CLI configuration and try again.'
+    const message = 'Claude failed. Check the agent CLI configuration and try again.'
 
     expect(withMacTailscaleDnsHintForDiagnostic(message, 'permission denied', diagnostic)).toBe(
       message
@@ -102,7 +102,7 @@ describe('withMacTailscaleDnsHint', () => {
     Object.defineProperty(process, 'platform', { configurable: true, value: 'darwin' })
     vi.mocked(execFileSync).mockReturnValue(MAGIC_DNS_ONLY_SCUTIL)
 
-    const result = withMacTailscaleDnsHint('Codex failed.', 'dns lookup failed')
+    const result = withMacTailscaleDnsHint('Claude failed.', 'dns lookup failed')
 
     expect(result).toContain('Tailscale MagicDNS (100.100.100.100)')
     expect(execFileSync).toHaveBeenCalledWith(

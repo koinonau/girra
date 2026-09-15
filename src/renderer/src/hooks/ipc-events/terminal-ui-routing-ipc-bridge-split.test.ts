@@ -66,7 +66,7 @@ describe('runtime terminal split IPC routing', () => {
       paneRuntimeId: 41,
       sourceLeafId: '11111111-1111-4111-8111-111111111111',
       direction: 'horizontal',
-      command: 'codex'
+      command: 'opencode'
     })
 
     expect(received).toEqual([])
@@ -89,7 +89,7 @@ describe('runtime terminal split IPC routing', () => {
         tabId: 'tab-parked',
         sourceLeafId: '11111111-1111-4111-8111-111111111111',
         direction: 'horizontal',
-        command: 'codex'
+        command: 'opencode'
       })
     ])
     expect(vi.getTimerCount()).toBe(1)

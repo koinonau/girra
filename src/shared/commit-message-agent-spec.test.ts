@@ -12,15 +12,7 @@ import {
   listCommitMessageAgentIds,
   resolveCommitMessageAgentChoice
 } from './commit-message-agent-spec'
-import {
-  COMMIT_MESSAGE_MODEL_JSON_STRUCTURE_LIMITS,
-  parseAntigravityModels,
-  parseClaudeModels,
-  parseCodexModels,
-  parseCursorModels,
-  parseLineModels,
-  parsePiModels
-} from './commit-message-model-parsers'
+import { parseClaudeModels, parseLineModels, parsePiModels } from './commit-message-model-parsers'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -29,92 +21,12 @@ afterEach(() => {
 describe('COMMIT_MESSAGE_AGENT_SPECS', () => {
   it('exposes the installed local agents as commit-message agents', () => {
     const ids = listCommitMessageAgentIds().sort()
-    expect(ids).toEqual([
-      'amp',
-      'antigravity',
-      'claude',
-      'codex',
-      'copilot',
-      'cursor',
-      'kimi',
-      'opencode',
-      'pi'
-    ])
+    expect(ids).toEqual(['claude', 'opencode', 'pi'])
   })
 
   it('uses the strongest available defaults for core agents', () => {
     expect(COMMIT_MESSAGE_AGENT_SPECS.claude?.defaultModelId).toBe('sonnet')
-    expect(COMMIT_MESSAGE_AGENT_SPECS.codex?.defaultModelId).toBe('gpt-5.5')
     expect(COMMIT_MESSAGE_AGENT_SPECS.pi?.defaultModelId).toBe('github-copilot/gpt-5.4-mini')
-  })
-
-  it('uses --prompt (not Claude --print) for Kimi non-interactive generation', () => {
-    // Why: kimi-code 0.31+ rejects --print; non-interactive mode is --prompt/-p (#11669).
-    const spec = COMMIT_MESSAGE_AGENT_SPECS.kimi
-    expect(spec).toBeDefined()
-    expect(spec!.promptDelivery).toBe('argv')
-    const args = spec!.buildArgs({
-      prompt: 'Name a branch for adding login',
-      model: 'kimi-code/kimi-for-coding',
-      thinkingLevel: 'on'
-    })
-    expect(args).toContain('--prompt')
-    expect(args).not.toContain('--print')
-    // Why: with argv delivery the prompt is the value of --prompt.
-    const promptIndex = args.indexOf('--prompt')
-    expect(promptIndex).toBeGreaterThanOrEqual(0)
-    expect(args[promptIndex + 1]).toBe('Name a branch for adding login')
-    expect(args).toContain('--quiet')
-    expect(args).toContain('--thinking')
-    expect(args).toEqual(expect.arrayContaining(['--model', 'kimi-code/kimi-for-coding']))
-  })
-
-  it('uses the provider-qualified Kimi model id accepted by the CLI', () => {
-    expect(COMMIT_MESSAGE_AGENT_SPECS.kimi?.models.map((m) => m.id)).toEqual([
-      'default',
-      'kimi-code/kimi-for-coding'
-    ])
-  })
-
-  it('maps Kimi thinking off and omission to distinct argv', () => {
-    const spec = COMMIT_MESSAGE_AGENT_SPECS.kimi!
-    const offArgs = spec.buildArgs({ prompt: 'PROMPT', model: 'default', thinkingLevel: 'off' })
-    const defaultArgs = spec.buildArgs({ prompt: 'PROMPT', model: 'default' })
-
-    expect(offArgs).toContain('--no-thinking')
-    expect(offArgs).not.toContain('--thinking')
-    expect(defaultArgs).not.toContain('--thinking')
-    expect(defaultArgs).not.toContain('--no-thinking')
-  })
-
-  it('omits Kimi --model for the config default and an empty model', () => {
-    const spec = COMMIT_MESSAGE_AGENT_SPECS.kimi!
-
-    for (const model of ['default', '']) {
-      expect(spec.buildArgs({ prompt: 'PROMPT', model })).not.toContain('--model')
-    }
-  })
-
-  it('lists Copilot hosted CLI models even when account policy filters the picker', () => {
-    expect(COMMIT_MESSAGE_AGENT_SPECS.copilot?.defaultModelId).toBe('gpt-5.4')
-    expect(COMMIT_MESSAGE_AGENT_SPECS.copilot?.models.map((m) => m.id)).toEqual([
-      'auto',
-      'claude-haiku-4.5',
-      'claude-sonnet-4.5',
-      'claude-sonnet-4.6',
-      'claude-opus-4.5',
-      'claude-opus-4.6',
-      'claude-opus-4.6-fast',
-      'claude-opus-4.7',
-      'gpt-4.1',
-      'gpt-5-mini',
-      'gpt-5.2',
-      'gpt-5.2-codex',
-      'gpt-5.3-codex',
-      'gpt-5.4',
-      'gpt-5.4-mini',
-      'gpt-5.5'
-    ])
   })
 
   it('defaults the agent picker to Claude', () => {
@@ -122,9 +34,9 @@ describe('COMMIT_MESSAGE_AGENT_SPECS', () => {
   })
 
   it('treats disabled default agents as unavailable for implicit Source Control AI choices', () => {
-    expect(resolveCommitMessageAgentChoice(null, 'codex', ['codex'])).toBe('claude')
+    expect(resolveCommitMessageAgentChoice(null, 'opencode', ['opencode'])).toBe('claude')
     expect(resolveCommitMessageAgentChoice(null, null, ['claude'])).toBeNull()
-    expect(resolveCommitMessageAgentChoice('codex', null, ['codex'])).toBe('codex')
+    expect(resolveCommitMessageAgentChoice('opencode', null, ['opencode'])).toBe('opencode')
   })
 
   it('gives every model with thinking levels a valid default', () => {
@@ -141,8 +53,8 @@ describe('COMMIT_MESSAGE_AGENT_SPECS', () => {
     }
   })
 
-  it('exposes thinking levels on the Spark variant (it accepts model_reasoning_effort)', () => {
-    const spark = getCommitMessageModel('codex', 'gpt-5.3-codex-spark')
+  it('exposes OpenAI thinking levels on a discovered gpt-*-codex model id', () => {
+    const spark = getCommitMessageModel('opencode', 'openai/gpt-5.3-codex-spark')
     expect(spark).toBeDefined()
     expect(spark?.thinkingLevels?.map((l) => l.id)).toEqual(['low', 'medium', 'high', 'xhigh'])
     expect(spark?.defaultThinkingLevel).toBe('low')
@@ -158,7 +70,7 @@ describe('COMMIT_MESSAGE_AGENT_SPECS', () => {
   it('identifies the custom sentinel via isCustomAgentId', () => {
     expect(isCustomAgentId(CUSTOM_AGENT_ID)).toBe(true)
     expect(isCustomAgentId('claude')).toBe(false)
-    expect(isCustomAgentId('codex')).toBe(false)
+    expect(isCustomAgentId('opencode')).toBe(false)
     expect(isCustomAgentId(null)).toBe(false)
     expect(isCustomAgentId(undefined)).toBe(false)
   })
@@ -167,31 +79,21 @@ describe('COMMIT_MESSAGE_AGENT_SPECS', () => {
     expect(listCommitMessageAgentIds()).not.toContain(CUSTOM_AGENT_ID)
   })
 
-  it('orders Codex models by version descending to match the official picker', () => {
-    const ids = COMMIT_MESSAGE_AGENT_SPECS.codex?.models.map((m) => m.id)
-    expect(ids).toEqual([
-      'gpt-5.5',
-      'gpt-5.4',
-      'gpt-5.4-mini',
-      'gpt-5.3-codex',
-      'gpt-5.3-codex-spark',
-      'gpt-5.2'
-    ])
-  })
-
   it('exposes UI capabilities without spawn details', () => {
     const capabilities = listCommitMessageAgentCapabilities()
     expect(capabilities.map((capability) => capability.id)).toContain('opencode')
-    const codex = getCommitMessageAgentCapability('codex')
-    expect(codex).toMatchObject({
-      id: 'codex',
-      label: 'Codex',
+    const opencode = getCommitMessageAgentCapability('opencode')
+    expect(opencode).toMatchObject({
+      id: 'opencode',
+      label: 'OpenCode',
       modelSource: 'dynamic',
-      defaultModelId: 'gpt-5.5'
+      defaultModelId: 'opencode/deepseek-v4-flash-free'
     })
-    expect(codex).not.toHaveProperty('binary')
-    expect(codex).not.toHaveProperty('buildArgs')
-    expect(getCommitMessageModelCapability('codex', 'gpt-5.4-mini')?.thinkingLevels).toBeDefined()
+    expect(opencode).not.toHaveProperty('binary')
+    expect(opencode).not.toHaveProperty('buildArgs')
+    expect(
+      getCommitMessageModelCapability('opencode', 'opencode/gpt-5.4-mini')?.thinkingLevels
+    ).toBeDefined()
   })
 })
 
@@ -312,44 +214,6 @@ describe('model discovery parsers', () => {
     expect(discovery?.stdinPayload?.endsWith('\n')).toBe(true)
   })
 
-  it('parses Codex model JSON', () => {
-    expect(
-      parseCodexModels(
-        JSON.stringify({
-          models: [
-            {
-              slug: 'gpt-5.5',
-              display_name: 'GPT-5.5',
-              default_reasoning_level: 'low',
-              supported_reasoning_levels: [{ effort: 'low' }, { effort: 'high' }]
-            }
-          ]
-        })
-      )
-    ).toEqual([
-      {
-        id: 'gpt-5.5',
-        label: 'GPT-5.5',
-        thinkingLevels: [
-          { id: 'low', label: 'Low' },
-          { id: 'high', label: 'High' }
-        ],
-        defaultThinkingLevel: 'low'
-      }
-    ])
-  })
-
-  it('rejects excessive Codex model nesting before JSON.parse', () => {
-    const parseSpy = vi.spyOn(JSON, 'parse')
-    const depth = COMMIT_MESSAGE_MODEL_JSON_STRUCTURE_LIMITS.nestingDepth + 1
-    try {
-      expect(parseCodexModels(`${'['.repeat(depth)}0${']'.repeat(depth)}`)).toEqual([])
-      expect(parseSpy).not.toHaveBeenCalled()
-    } finally {
-      parseSpy.mockRestore()
-    }
-  })
-
   it('parses one-model-per-line output', () => {
     expect(parseLineModels('opencode/gpt-5.4-mini\n\nopenai/gpt-5.5\n').map((m) => m.id)).toEqual([
       'opencode/gpt-5.4-mini',
@@ -384,53 +248,14 @@ describe('model discovery parsers', () => {
     ])
   })
 
-  it('parses Cursor model output', () => {
-    expect(parseCursorModels('auto - Auto\ngpt-5.2 - GPT-5.2\n')).toEqual([
-      { id: 'auto', label: 'Auto' },
-      {
-        id: 'gpt-5.2',
-        label: 'GPT-5.2',
-        thinkingLevels: [
-          { id: 'low', label: 'Low' },
-          { id: 'medium', label: 'Medium' },
-          { id: 'high', label: 'High' },
-          { id: 'xhigh', label: 'Extra High' }
-        ],
-        defaultThinkingLevel: 'low'
-      }
-    ])
-  })
-
-  it('parses Antigravity model output', () => {
-    const output = [
-      'Gemini 3.5 Flash (Medium)',
-      'Gemini 3.5 Flash (High)',
-      'Gemini 3.5 Flash (Low)',
-      'Gemini 3.1 Pro (Low)',
-      'Gemini 3.1 Pro (High)',
-      'Claude Sonnet 4.6 (Thinking)',
-      'Claude Opus 4.6 (Thinking)',
-      'GPT-OSS 120B (Medium)'
-    ].join('\n')
-
-    expect(parseAntigravityModels(output)).toEqual([
-      { id: 'Gemini 3.5 Flash (Medium)', label: 'Gemini 3.5 Flash (Medium)' },
-      { id: 'Gemini 3.5 Flash (High)', label: 'Gemini 3.5 Flash (High)' },
-      { id: 'Gemini 3.5 Flash (Low)', label: 'Gemini 3.5 Flash (Low)' },
-      { id: 'Gemini 3.1 Pro (Low)', label: 'Gemini 3.1 Pro (Low)' },
-      { id: 'Gemini 3.1 Pro (High)', label: 'Gemini 3.1 Pro (High)' },
-      { id: 'Claude Sonnet 4.6 (Thinking)', label: 'Claude Sonnet 4.6 (Thinking)' },
-      { id: 'Claude Opus 4.6 (Thinking)', label: 'Claude Opus 4.6 (Thinking)' },
-      { id: 'GPT-OSS 120B (Medium)', label: 'GPT-OSS 120B (Medium)' }
-    ])
-  })
-
   it('parses CRLF-heavy dynamic model outputs without full line-array splitting', () => {
     const splitSpy = vi.spyOn(String.prototype, 'split')
     const noise = 'ignored model with spaces\r\n'.repeat(10_000)
     const blankNoise = '\r\n'.repeat(10_000)
 
-    expect(parseLineModels(`${noise}opencode/gpt-5.4-mini\r\nopenai/gpt-5.5\r\n`)).toEqual([
+    expect(
+      parseLineModels(`${noise}${blankNoise}opencode/gpt-5.4-mini\r\nopenai/gpt-5.5\r\n`)
+    ).toEqual([
       {
         id: 'opencode/gpt-5.4-mini',
         label: 'Opencode GPT 5.4 Mini',
@@ -459,10 +284,6 @@ describe('model discovery parsers', () => {
         `${noise}provider model context max-out thinking images\r\ngithub-copilot gpt-5.4-mini 400K 128K yes yes\r\n`
       )[0]?.id
     ).toBe('github-copilot/gpt-5.4-mini')
-    expect(parseCursorModels(`${noise}auto - Auto\r\ngpt-5.2 - GPT-5.2\r\n`)).toHaveLength(2)
-    expect(parseAntigravityModels(`${blankNoise}Gemini 3.5 Flash (Medium)\r\n`)).toEqual([
-      { id: 'Gemini 3.5 Flash (Medium)', label: 'Gemini 3.5 Flash (Medium)' }
-    ])
 
     const usedFullLineSplit = splitSpy.mock.calls.some(
       ([separator]) =>
@@ -474,45 +295,6 @@ describe('model discovery parsers', () => {
     )
     expect(usedFullLineSplit).toBe(false)
     expect(usedWhitespaceFieldSplit).toBe(false)
-  })
-})
-
-describe('buildArgs (Codex)', () => {
-  const spec = getCommitMessageAgentSpec('codex')!
-
-  it('runs `codex exec` without passing the prompt via argv', () => {
-    const args = spec.buildArgs({
-      prompt: 'PROMPT',
-      model: 'gpt-5.4-mini'
-    })
-    expect(args[0]).toBe('exec')
-    expect(args).toEqual([
-      'exec',
-      '--ephemeral',
-      '--skip-git-repo-check',
-      '-s',
-      'read-only',
-      '--model',
-      'gpt-5.4-mini'
-    ])
-    expect(args).toContain('--model')
-    expect(args).not.toContain('PROMPT')
-    expect(spec.promptDelivery).toBe('stdin')
-  })
-
-  it('emits -c model_reasoning_effort=<level> when thinking level is supplied', () => {
-    const args = spec.buildArgs({
-      prompt: 'PROMPT',
-      model: 'gpt-5.4',
-      thinkingLevel: 'medium'
-    })
-    expect(args).toContain('-c')
-    expect(args).toContain('model_reasoning_effort=medium')
-  })
-
-  it('omits the -c flag when no thinking level is supplied', () => {
-    const args = spec.buildArgs({ prompt: 'PROMPT', model: 'gpt-5.4-mini' })
-    expect(args).not.toContain('-c')
   })
 })
 
@@ -567,47 +349,5 @@ describe('buildArgs (OpenCode)', () => {
     })
 
     expect(args).not.toContain('--variant')
-  })
-})
-
-describe('buildArgs (Antigravity)', () => {
-  const spec = getCommitMessageAgentSpec('antigravity')!
-
-  it('runs agy with the prompt attached to --print, then --sandbox and --model flags', () => {
-    const args = spec.buildArgs({
-      prompt: 'real commit prompt',
-      model: 'Gemini 3.5 Flash (Medium)'
-    })
-    expect(args).toEqual([
-      '--print=real commit prompt',
-      '--sandbox',
-      '--model',
-      'Gemini 3.5 Flash (Medium)'
-    ])
-    expect(spec.promptDelivery).toBe('argv')
-  })
-
-  it('binds a leading-dash prompt to --print instead of letting it parse as an option', () => {
-    const args = spec.buildArgs({ prompt: '-fix: something', model: 'Gemini 3.5 Flash (Medium)' })
-    expect(args[0]).toBe('--print=-fix: something')
-  })
-
-  // Why: pins argv construction only. Real agy 1.2.1 separately rejects a --print value
-  // that exactly matches a registered flag name (its own heuristic, independent of this
-  // fix) — verified `agy --print=--sandbox` still errors there. Real prompts are never
-  // literally a bare flag name, so this doesn't affect actual generation.
-  it('still glues a prompt that collides with a flag name onto --print', () => {
-    const args = spec.buildArgs({ prompt: '--sandbox', model: 'Gemini 3.5 Flash (Medium)' })
-    expect(args[0]).toBe('--print=--sandbox')
-  })
-
-  it('uses dynamic model discovery via agy models', () => {
-    expect(spec.modelSource).toBe('dynamic')
-    expect(spec.modelDiscovery?.binary).toBe('agy')
-    expect(spec.modelDiscovery?.args).toEqual(['models'])
-  })
-
-  it('uses Gemini 3.5 Flash (Medium) as default model', () => {
-    expect(COMMIT_MESSAGE_AGENT_SPECS.antigravity?.defaultModelId).toBe('Gemini 3.5 Flash (Medium)')
   })
 })

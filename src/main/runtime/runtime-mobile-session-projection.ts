@@ -161,7 +161,7 @@ export function projectRuntimeMobileSessionTabs(
     // Renderer omission is authoritative: PTY launch provenance outlives agent exit.
     const launchAgent = tab.launchAgent ?? null
     const launchOwnerAgent = launchAgent ?? liveLeafPty?.launchAgent ?? pty?.launchAgent ?? null
-    // Why: a retained OMP hook stays stable while wrapper foreground reads can report Pi.
+    // Why: launch and retained hook identity outrank foreground reads, which can name a wrapper process.
     const ownerRecord = resolvePaneAgentOwnerRecord({
       launchAgent: launchOwnerAgent,
       hookAgent:

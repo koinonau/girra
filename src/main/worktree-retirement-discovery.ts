@@ -123,10 +123,9 @@ async function uncRouteIsReachable(path: string): Promise<boolean> {
  *  directory is gone, and reissuing the name would hand the next occupant that conversation.
  *  CLAUDE_CONFIG_DIR relocates the whole state root, buckets included.
  *
- *  Codex is deliberately not scanned: it records the cwd inside
- *  `sessions/YYYY/MM/DD/rollout-*.jsonl` rather than in a directory name, so seeding from it would
- *  mean parsing user conversation files. Names spent only under Codex before this feature shipped
- *  stay issuable; every name spent after it is recorded at create time regardless of agent. */
+ *  Other agents are not scanned: they keep no per-cwd directory, so names spent only under them
+ *  before this feature shipped stay issuable; every name spent after it is recorded at create time
+ *  regardless of agent. */
 function getClaudeProjectsDir(home: string, env: NodeJS.ProcessEnv): string {
   const override = env.CLAUDE_CONFIG_DIR?.trim()
   return override ? join(override, 'projects') : join(home, '.claude', 'projects')

@@ -157,7 +157,7 @@ export function createMobileRpcSurfaceRuntime() {
     linearTeamLabels,
     linearTeamMembers,
     linearAddIssueComment,
-    getClientSettings: vi.fn(() => ({ defaultTuiAgent: 'codex', agentCmdOverrides: {} })),
+    getClientSettings: vi.fn(() => ({ defaultTuiAgent: 'claude', agentCmdOverrides: {} })),
     updateClientSettings: vi.fn(() => ({ defaultTaskSource: 'linear' }))
   }
   return {

@@ -281,7 +281,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-        command: 'codex',
+        command: 'claude',
         rendererBacked: true
       })
     ).resolves.toMatchObject({
@@ -290,7 +290,7 @@ describe('OrcaRuntimeService', () => {
     })
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
-        command: "codex '--dangerously-bypass-approvals-and-sandbox'",
+        command: "claude '--dangerously-skip-permissions'",
         cwd: TEST_WORKTREE_PATH,
         worktreeId: TEST_WORKTREE_ID
       })
@@ -362,7 +362,7 @@ describe('OrcaRuntimeService', () => {
     // Paired desktop `+` button: clients send presentation:'focused', not focus.
     await expect(
       runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-        command: 'codex',
+        command: 'claude',
         presentation: 'focused'
       })
     ).resolves.toMatchObject({
@@ -389,7 +389,7 @@ describe('OrcaRuntimeService', () => {
       runtime.createAgentSession({
         clientOperationId: `${Date.now()}-0123456789abcdef0123456789abcdef`,
         worktree: `path:${TEST_WORKTREE_PATH}`,
-        agent: 'codex',
+        agent: 'claude',
         prompt: 'hello',
         presentation: 'focused'
       })
@@ -539,7 +539,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createTerminal(`id:${TEST_WORKTREE_ID}`, {
-        command: 'codex',
+        command: 'claude',
         rendererBacked: true,
         title: 'Renderer Terminal'
       })
@@ -555,7 +555,7 @@ describe('OrcaRuntimeService', () => {
       expect.objectContaining({
         requestId: expect.any(String),
         worktreeId: TEST_WORKTREE_ID,
-        command: "codex '--dangerously-bypass-approvals-and-sandbox'",
+        command: "claude '--dangerously-skip-permissions'",
         title: 'Renderer Terminal'
       })
     )

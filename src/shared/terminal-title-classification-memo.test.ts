@@ -17,7 +17,7 @@ const classifierCalls = vi.mocked(AgentNameTokenMatchModule.titleHasAgentName)
 
 // Titles a real sidebar holds steady while unrelated agent-status writes churn.
 const UNCHANGED_TITLES = [
-  'codex working',
+  'opencode working',
   'opencode-blinker',
   'zsh',
   '✳ Claude Code',
@@ -67,10 +67,10 @@ describe('terminal title classification memo', () => {
   })
 
   it('reclassifies as soon as the title changes', () => {
-    expect(getAgentLabel('codex ready')).toBe('Codex')
+    expect(getAgentLabel('claude ready')).toBe('Claude Code')
     expect(getAgentLabel('opencode ready')).toBe('OpenCode')
-    expect(detectAgentStatusFromTitle('codex ready')).toBe('idle')
-    expect(detectAgentStatusFromTitle('codex working')).toBe('working')
+    expect(detectAgentStatusFromTitle('opencode ready')).toBe('idle')
+    expect(detectAgentStatusFromTitle('opencode working')).toBe('working')
   })
 
   it('caches null and false verdicts, not just truthy ones', () => {

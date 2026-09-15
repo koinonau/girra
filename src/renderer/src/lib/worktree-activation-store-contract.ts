@@ -43,7 +43,6 @@ export type WorktreeActivationStore = Partial<WorktreeRuntimeOwnerState> & {
       launchToken?: string
       launchAgent?: TuiAgent
       draftPrompt?: string
-      initialAgentStatus?: { agent: TuiAgent; prompt: string }
       showSessionRestoredBanner?: boolean
       telemetry?: AgentLaunchMetadata
     }

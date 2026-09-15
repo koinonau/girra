@@ -36,10 +36,10 @@ const spawnLedgerPath = path.join(fakeCliDir, 'spawn.jsonl')
 const interruptionLedgerPath = path.join(fakeCliDir, 'interruption.jsonl')
 const authorityLedgerPath = path.join(fakeCliDir, 'authority.jsonl')
 const lifecycleLedgerPath = path.join(fakeCliDir, 'lifecycle.jsonl')
-const fakeCodexCommand = buildFakeAgentCommandOverride(
-  path.join(fakeCliDir, process.platform === 'win32' ? 'codex.cmd' : 'codex')
+const fakeClaudeCommand = buildFakeAgentCommandOverride(
+  path.join(fakeCliDir, process.platform === 'win32' ? 'claude.cmd' : 'claude')
 )
-const fakeCodexSource = `
+const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
 const { spawnSync } = require('node:child_process')
 function appendLedger(envName, event) {
@@ -55,7 +55,7 @@ async function emitAuthorityHook(hookEventName) {
   const launchToken = process.env.ORCA_AGENT_LAUNCH_TOKEN
   if (!port || !token || !launchToken || !process.env.ORCA_PANE_KEY) return
   try {
-    const response = await fetch('http://127.0.0.1:' + port + '/hook/codex', {
+    const response = await fetch('http://127.0.0.1:' + port + '/hook/claude', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -70,6 +70,8 @@ async function emitAuthorityHook(hookEventName) {
         launchToken,
         payload: {
           hook_event_name: hookEventName,
+          // Why: Claude drops a SessionStart whose source is not an idle boundary.
+          ...(hookEventName === 'SessionStart' ? { source: 'startup' } : {}),
           prompt: 'Respond ACK and remain idle'
         }
       })
@@ -86,12 +88,10 @@ async function emitAuthorityHook(hookEventName) {
     })
   }
 }
-if (process.argv.slice(2).includes('app-server')) {
-  process.stderr.write("error: unrecognized subcommand 'app-server'\\n")
-  process.exit(2)
-}
+// Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
+if (require('node:path').basename(process.cwd()) === 'rate-limit-pty-cwd') process.exit(0)
 appendLedger('ORCA_E2E_SPAWN_LEDGER', { event: 'spawn', argv: process.argv.slice(2) })
-process.stdout.write('\\u001b]0;Codex Ready\\u0007OpenAI Codex\\nmodel: e2e\\ndirectory: e2e\\n')
+process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 const sessionStartHook = emitAuthorityHook('SessionStart')
 let acknowledged = false
 let lifecycleSent = false
@@ -111,8 +111,8 @@ process.stdin.on('data', (chunk) => {
       acknowledged = true
       void sessionStartHook.then(() => emitAuthorityHook('UserPromptSubmit'))
       const message = mode === 'bracketed' ? 'ACK' : 'PASTE_PROTOCOL_ERROR'
-      process.stdout.write('\\u001b]0;Codex Working\\u0007' + message + '\\n')
-      setTimeout(() => process.stdout.write('\\u001b]0;Codex Ready\\u0007'), 10)
+      process.stdout.write('\\u001b]0;Claude working\\u0007' + message + '\\n')
+      setTimeout(() => process.stdout.write('\\u001b]0;Claude ready\\u0007'), 10)
     })
   }
   const legacyCompletion = input.match(/ORCA_E2E_RUN_LEGACY_DONE:([A-Za-z0-9+/=]+)/)
@@ -167,14 +167,14 @@ setInterval(() => {}, 60_000)
 `
 
 if (process.platform === 'win32') {
-  writeFileSync(path.join(fakeCliDir, 'fake-codex.js'), fakeCodexSource)
+  writeFileSync(path.join(fakeCliDir, 'fake-claude.js'), fakeClaudeSource)
   writeFileSync(
-    path.join(fakeCliDir, 'codex.cmd'),
-    '@echo off\r\nnode "%~dp0\\fake-codex.js" %*\r\n'
+    path.join(fakeCliDir, 'claude.cmd'),
+    '@echo off\r\nnode "%~dp0\\fake-claude.js" %*\r\n'
   )
 } else {
-  const executable = path.join(fakeCliDir, 'codex')
-  writeFileSync(executable, `#!/usr/bin/env node\n${fakeCodexSource}`)
+  const executable = path.join(fakeCliDir, 'claude')
+  writeFileSync(executable, `#!/usr/bin/env node\n${fakeClaudeSource}`)
   chmodSync(executable, 0o755)
 }
 
@@ -442,11 +442,11 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
       await first.page.evaluate(
         async ({ agentCommand, terminalWindowsShell }) => {
           await window.__store?.getState().updateSettings({
-            agentCmdOverrides: { codex: agentCommand },
+            agentCmdOverrides: { claude: agentCommand },
             terminalWindowsShell
           })
         },
-        { agentCommand: fakeCodexCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
+        { agentCommand: fakeClaudeCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
       )
       await ensureTerminalVisible(first.page)
       const coordinatorTabId = await getActiveTabId(first.page)
@@ -486,7 +486,7 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
       }>('orchestration.workerStart', {
         task: task.result.task.id,
         from: coordinator.result.terminal.handle,
-        agent: 'codex',
+        agent: 'claude',
         timeoutMs: 15_000
       })
       const workerHandle = started.result.effects.find(
@@ -496,11 +496,11 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
 
       let worker = (
         await firstClient.call<RuntimeTerminalListResult>('terminal.list')
-      ).result.terminals.find((terminal) => terminal.title === 'Codex Ready')
+      ).result.terminals.find((terminal) => terminal.title === 'Claude ready')
       await expect
         .poll(async () => {
           const listed = await firstClient.call<RuntimeTerminalListResult>('terminal.list')
-          worker = listed.result.terminals.find((terminal) => terminal.title === 'Codex Ready')
+          worker = listed.result.terminals.find((terminal) => terminal.title === 'Claude ready')
           return worker?.ptyId ?? null
         })
         .toBeTruthy()
@@ -558,7 +558,7 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
           })
         ])
 
-      const transcriptPath = session.seedCodexResumeRollout(PROVIDER_SESSION_ID, repoPath)
+      const transcriptPath = session.seedClaudeResumeTranscript(PROVIDER_SESSION_ID, repoPath)
       await first.page.evaluate(
         ({
           agentCommand,
@@ -570,8 +570,8 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
         }) => {
           window.__store?.getState().setAgentStatus(
             paneKey,
-            { state: 'working', prompt: 'Respond ACK and remain idle', agentType: 'codex' },
-            'Codex Ready',
+            { state: 'working', prompt: 'Respond ACK and remain idle', agentType: 'claude' },
+            'Claude ready',
             undefined,
             { tabId, worktreeId: workerWorktreeId, terminalHandle },
             {
@@ -581,11 +581,11 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
                 transcriptPath: transcript
               },
               launchConfig: {
-                // Why not bare 'codex': resume prefers the captured command over
+                // Why not bare 'claude': resume prefers the captured command over
                 // agentCmdOverrides, so a bare name would resolve the machine's real
-                // Codex off PATH and unpin the adoption leg this spec exercises.
+                // Claude off PATH and unpin the adoption leg this spec exercises.
                 agentCommand,
-                agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+                agentArgs: '--dangerously-skip-permissions',
                 agentEnv: {}
               }
             }
@@ -593,7 +593,7 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
           window.__store?.getState().captureAllSleepingAgentSessions('quit')
         },
         {
-          agentCommand: fakeCodexCommand,
+          agentCommand: fakeClaudeCommand,
           paneKey: workerPaneKey,
           tabId: worker!.tabId,
           worktreeId: worker!.worktreeId,

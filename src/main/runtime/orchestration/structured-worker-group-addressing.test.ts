@@ -135,7 +135,7 @@ describe('group addressing and structured workers', () => {
     // The same trap that already cost this branch once: settlement tombstones the lifecycle item
     // rather than rewriting it, so a long tool-calling turn pushes it arbitrarily far from the
     // tail and any page-sized read reports a BUSY worker as idle — then `@idle` broadcasts into a
-    // running turn, which Codex refuses outright and Claude queues behind.
+    // running turn, which Claude queues behind.
     registerWorker()
     installHost({ items: [runningTurn(), ...transcript(500)] })
     expect(structuredWorkerAgentStatus(SESSION_ID)).toBe('working')

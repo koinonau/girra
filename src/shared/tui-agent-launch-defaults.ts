@@ -3,8 +3,7 @@ import { YOLO_TUI_AGENT_ARGS, YOLO_TUI_AGENT_ENV } from './tui-agent-permissions
 import type { TuiAgent } from './tui-agent'
 
 const UNSUPPORTED_TUI_AGENT_ARGS: Partial<Record<TuiAgent, readonly string[]>> = {
-  opencode: ['--dangerously-skip-permissions'],
-  kilo: ['--dangerously-skip-permissions']
+  opencode: ['--dangerously-skip-permissions']
 }
 
 export const DEFAULT_TUI_AGENT_ARGS: Partial<Record<TuiAgent, string>> = YOLO_TUI_AGENT_ARGS

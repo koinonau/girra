@@ -124,7 +124,7 @@ describe('registerPtyHandlers', () => {
       cols: 80,
       rows: 24,
       cwd,
-      command: 'codex resume proven-absent-session',
+      command: 'claude --resume proven-absent-session',
       worktreeId,
       tabId,
       leafId,
@@ -138,7 +138,7 @@ describe('registerPtyHandlers', () => {
     expect(mounted).toMatchObject({ id: 'pty-fresh-proven' })
     expect(providerSpawn).toHaveBeenCalledTimes(2)
     expect(providerSpawn.mock.calls[1]?.[0]).toMatchObject({
-      command: 'codex resume proven-absent-session'
+      command: 'claude --resume proven-absent-session'
     })
     // The registry that owns the PTY answered, so this exit is confirmed — but the code stays the
     // -1 sentinel; a synthesized zero would be indistinguishable from a clean shell exit.
@@ -241,7 +241,7 @@ describe('registerPtyHandlers', () => {
       cols: 80,
       rows: 24,
       cwd,
-      command: 'codex resume probe-blip-session',
+      command: 'claude --resume probe-blip-session',
       worktreeId,
       tabId,
       leafId,
@@ -372,7 +372,7 @@ describe('registerPtyHandlers', () => {
       cols: 80,
       rows: 24,
       cwd,
-      command: 'codex resume already-retired-session',
+      command: 'claude --resume already-retired-session',
       worktreeId,
       tabId,
       leafId,
@@ -387,7 +387,7 @@ describe('registerPtyHandlers', () => {
     expect(mounted).toMatchObject({ id: 'pty-fresh-already-retired' })
     expect(providerSpawn).toHaveBeenCalledTimes(2)
     expect(providerSpawn.mock.calls[1]?.[0]).toMatchObject({
-      command: 'codex resume already-retired-session'
+      command: 'claude --resume already-retired-session'
     })
     expect(runtime.onPtyExit).toHaveBeenCalledWith('pty-already-retired-owner', -1, undefined, {
       hostExitConfirmed: true

@@ -56,7 +56,7 @@ describe('notice rows', () => {
       text: 'Check the configuration',
       tone: 'warning',
       providerFrame: {
-        provider: 'codex',
+        provider: 'claude',
         kind: 'notification:warning',
         payload: {
           head: '{"message":"Check the configuration"}',

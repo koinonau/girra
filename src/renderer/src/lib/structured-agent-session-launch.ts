@@ -103,7 +103,7 @@ export function useStructuredAgentLaunchStatus(
   )
 }
 
-// Why keyed by agent too: one worktree can hold a Claude and a Codex launch at once, and a shared
+// Why keyed by agent too: one worktree can hold launches for two agents at once, and a shared
 // key would hand the second caller the first agent's intent.
 //
 // Why keyed by the adopted conversation as well: a joining caller is handed the EXISTING intent and

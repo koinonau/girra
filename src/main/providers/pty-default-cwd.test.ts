@@ -68,10 +68,10 @@ describe('pty default cwd safety', () => {
   })
 
   it('requires automatic agent startup commands to provide a non-root cwd', () => {
-    expect(() => assertSafeAgentStartupCwd(undefined, 'codex')).toThrow(
+    expect(() => assertSafeAgentStartupCwd(undefined, 'opencode')).toThrow(
       /requires a non-root workspace/
     )
     expect(() => assertSafeAgentStartupCwd('/', 'claude')).toThrow(/requires a non-root workspace/)
-    expect(() => assertSafeAgentStartupCwd('/repo', 'codex')).not.toThrow()
+    expect(() => assertSafeAgentStartupCwd('/repo', 'opencode')).not.toThrow()
   })
 })

@@ -29,10 +29,10 @@ const PROVIDER_SESSION_ID = 'e2e-missing-legacy-worker'
 const fakeCliDir = mkdtempSync(path.join(os.tmpdir(), 'orca-e2e-missing-legacy-worker-'))
 const spawnLedgerPath = path.join(fakeCliDir, 'spawn.jsonl')
 const interruptionLedgerPath = path.join(fakeCliDir, 'interruption.jsonl')
-const fakeCodexCommand = buildFakeAgentCommandOverride(
-  path.join(fakeCliDir, process.platform === 'win32' ? 'codex.cmd' : 'codex')
+const fakeClaudeCommand = buildFakeAgentCommandOverride(
+  path.join(fakeCliDir, process.platform === 'win32' ? 'claude.cmd' : 'claude')
 )
-const fakeCodexSource = `
+const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
 function appendLedger(envName, event) {
   const ledgerPath = process.env[envName]
@@ -41,12 +41,10 @@ function appendLedger(envName, event) {
     appendFileSync(ledgerPath, JSON.stringify({ pid: process.pid, ...event }) + '\\n')
   } catch {}
 }
-if (process.argv.slice(2).includes('app-server')) {
-  process.stderr.write("error: unrecognized subcommand 'app-server'\\n")
-  process.exit(2)
-}
+// Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
+if (require('node:path').basename(process.cwd()) === 'rate-limit-pty-cwd') process.exit(0)
 appendLedger('ORCA_E2E_SPAWN_LEDGER', { event: 'spawn' })
-process.stdout.write('\\u001b]0;Codex Ready\\u0007OpenAI Codex\\nmodel: e2e\\ndirectory: e2e\\n')
+process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 let acknowledged = false
 ${FAKE_AGENT_PASTE_END_SCANNER_SOURCE}
 process.stdin.on('data', (chunk) => {
@@ -63,8 +61,8 @@ process.stdin.on('data', (chunk) => {
     fakeAgentMaybeAck(pasteEndScan, input, (mode) => {
       acknowledged = true
       const message = mode === 'bracketed' ? 'ACK' : 'PASTE_PROTOCOL_ERROR'
-      process.stdout.write('\\u001b]0;Codex Working\\u0007' + message + '\\n')
-      setTimeout(() => process.stdout.write('\\u001b]0;Codex Ready\\u0007'), 10)
+      process.stdout.write('\\u001b]0;Claude working\\u0007' + message + '\\n')
+      setTimeout(() => process.stdout.write('\\u001b]0;Claude ready\\u0007'), 10)
     })
   }
 })
@@ -80,14 +78,14 @@ setInterval(() => {}, 60_000)
 `
 
 if (process.platform === 'win32') {
-  writeFileSync(path.join(fakeCliDir, 'fake-codex.js'), fakeCodexSource)
+  writeFileSync(path.join(fakeCliDir, 'fake-claude.js'), fakeClaudeSource)
   writeFileSync(
-    path.join(fakeCliDir, 'codex.cmd'),
-    '@echo off\r\nnode "%~dp0\\fake-codex.js" %*\r\n'
+    path.join(fakeCliDir, 'claude.cmd'),
+    '@echo off\r\nnode "%~dp0\\fake-claude.js" %*\r\n'
   )
 } else {
-  const executable = path.join(fakeCliDir, 'codex')
-  writeFileSync(executable, `#!/usr/bin/env node\n${fakeCodexSource}`)
+  const executable = path.join(fakeCliDir, 'claude')
+  writeFileSync(executable, `#!/usr/bin/env node\n${fakeClaudeSource}`)
   chmodSync(executable, 0o755)
 }
 
@@ -222,11 +220,11 @@ test('a missing legacy worker cannot spawn a replacement during restart recovery
     await first.page.evaluate(
       async ({ agentCommand, terminalWindowsShell }) => {
         await window.__store?.getState().updateSettings({
-          agentCmdOverrides: { codex: agentCommand },
+          agentCmdOverrides: { claude: agentCommand },
           terminalWindowsShell
         })
       },
-      { agentCommand: fakeCodexCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
+      { agentCommand: fakeClaudeCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
     )
     await ensureTerminalVisible(first.page)
     await getActiveTabId(first.page)
@@ -260,17 +258,17 @@ test('a missing legacy worker cannot spawn a replacement during restart recovery
     await firstClient.call('orchestration.workerStart', {
       task: task.result.task.id,
       from: coordinator.result.terminal.handle,
-      agent: 'codex',
+      agent: 'claude',
       timeoutMs: 15_000
     })
 
     let worker = (
       await firstClient.call<RuntimeTerminalListResult>('terminal.list')
-    ).result.terminals.find((terminal) => terminal.title === 'Codex Ready')
+    ).result.terminals.find((terminal) => terminal.title === 'Claude ready')
     await expect
       .poll(async () => {
         const listed = await firstClient.call<RuntimeTerminalListResult>('terminal.list')
-        worker = listed.result.terminals.find((terminal) => terminal.title === 'Codex Ready')
+        worker = listed.result.terminals.find((terminal) => terminal.title === 'Claude ready')
         return worker?.ptyId ?? null
       })
       .toBeTruthy()
@@ -291,13 +289,13 @@ test('a missing legacy worker cannot spawn a replacement during restart recovery
     await expect.poll(() => readLedger(spawnLedgerPath)).toHaveLength(1)
     const [initialSpawn] = readLedger(spawnLedgerPath)
 
-    const transcriptPath = session.seedCodexResumeRollout(PROVIDER_SESSION_ID, repoPath)
+    const transcriptPath = session.seedClaudeResumeTranscript(PROVIDER_SESSION_ID, repoPath)
     await first.page.evaluate(
       ({ agentCommand, paneKey, tabId, workerWorktreeId, terminalHandle, transcript }) => {
         window.__store?.getState().setAgentStatus(
           paneKey,
-          { state: 'working', prompt: 'Respond ACK and remain idle', agentType: 'codex' },
-          'Codex Ready',
+          { state: 'working', prompt: 'Respond ACK and remain idle', agentType: 'claude' },
+          'Claude ready',
           undefined,
           { tabId, worktreeId: workerWorktreeId, terminalHandle },
           {
@@ -307,11 +305,11 @@ test('a missing legacy worker cannot spawn a replacement during restart recovery
               transcriptPath: transcript
             },
             launchConfig: {
-              // Why not bare 'codex': resume prefers the captured command over
+              // Why not bare 'claude': resume prefers the captured command over
               // agentCmdOverrides, so a bare name would resolve the machine's real
-              // Codex off PATH and unpin the adoption leg this spec exercises.
+              // Claude off PATH and unpin the adoption leg this spec exercises.
               agentCommand,
-              agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+              agentArgs: '--dangerously-skip-permissions',
               agentEnv: {}
             }
           }
@@ -319,7 +317,7 @@ test('a missing legacy worker cannot spawn a replacement during restart recovery
         window.__store?.getState().captureAllSleepingAgentSessions('quit')
       },
       {
-        agentCommand: fakeCodexCommand,
+        agentCommand: fakeClaudeCommand,
         paneKey: workerPaneKey,
         tabId: worker!.tabId,
         workerWorktreeId: worker!.worktreeId,
@@ -348,7 +346,7 @@ test('a missing legacy worker cannot spawn a replacement during restart recovery
       .poll(async () => {
         const listed = await secondClient.call<RuntimeTerminalListResult>('terminal.list')
         return listed.result.terminals.filter(
-          (terminal) => terminal.ptyId === worker!.ptyId || terminal.title === 'Codex Ready'
+          (terminal) => terminal.ptyId === worker!.ptyId || terminal.title === 'Claude ready'
         )
       })
       .toEqual([])

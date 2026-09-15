@@ -310,7 +310,7 @@ describe('connectPanePty', () => {
       pane as never,
       manager as never,
       createDeps({
-        startup: { command: 'codex', waitForSetupSplitDirection: 'vertical' }
+        startup: { command: 'opencode', waitForSetupSplitDirection: 'vertical' }
       }) as never
     )
 
@@ -332,7 +332,7 @@ describe('connectPanePty', () => {
       runNextFrame()
     }
 
-    expect(createdTransportOptions[0]?.command).toBe('codex')
+    expect(createdTransportOptions[0]?.command).toBe('opencode')
     expect(transport.connect).toHaveBeenCalledWith(expect.objectContaining({ cols: 120, rows: 50 }))
   })
 
@@ -416,7 +416,7 @@ describe('connectPanePty', () => {
       mainPane as never,
       manager as never,
       createDeps({
-        startup: { command: 'codex', waitForSetupSplitDirection: 'vertical' },
+        startup: { command: 'opencode', waitForSetupSplitDirection: 'vertical' },
         paneTransportsRef: sharedTransportsRef,
         updateTabPtyId: updateStoreTabPtyId
       }) as never
@@ -454,7 +454,7 @@ describe('connectPanePty', () => {
     expect(mainTransport.connect).toHaveBeenCalledWith(
       expect.not.objectContaining({ sessionId: expect.any(String) })
     )
-    expect(createdTransportOptions[0]?.command).toBe('codex')
+    expect(createdTransportOptions[0]?.command).toBe('opencode')
     expect(createdTransportOptions[1]?.command).toBe('bash setup-runner.sh')
     expect(mainPtyId).toBe('pty-main')
     expect(setupPtyId).toBe('pty-setup')
@@ -569,7 +569,7 @@ describe('connectPanePty', () => {
     }) as typeof pane.terminal.onData)
     const { parseCallbacks, writes } = captureCallbackTerminalWrites(pane)
     const deps = createDeps({
-      startup: { command: 'codex resume provider-session' }
+      startup: { command: 'claude --resume provider-session' }
     })
 
     connectPanePty(pane as never, createManager(1) as never, deps as never)
@@ -590,7 +590,7 @@ describe('connectPanePty', () => {
     expect(writes.join('').indexOf('ORIGINAL-LIVE-SSH-OUTPUT')).toBeLessThan(
       writes.join('').indexOf('NEWER-LIVE-SSH-OUTPUT')
     )
-    expect(transport.sendInput).not.toHaveBeenCalledWith('codex resume provider-session\r')
+    expect(transport.sendInput).not.toHaveBeenCalledWith('claude --resume provider-session\r')
     expect(transport.sendInput).toHaveBeenCalledWith('AFTER_ADOPTION_REPLAY\r')
     expect(deps.syncPanePtyLayoutBinding).toHaveBeenCalledWith(1, stablePtyId)
   })

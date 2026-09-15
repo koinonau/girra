@@ -21,7 +21,7 @@ import {
 
 export type UsageEventAggregationOptions<TEvent, TMetric> = {
   metric: UsageMetricFold<TEvent, TMetric>
-  /** Codex and OpenCode clone differently today; keep each provider's strategy explicit. */
+  /** Providers clone sessions differently; keep each provider's strategy explicit. */
   cloneSessionForMerge(session: UsageSession<TMetric>): UsageSession<TMetric>
 }
 

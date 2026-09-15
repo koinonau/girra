@@ -321,7 +321,7 @@ describe('TabsSlice', () => {
               groupId,
               worktreeId: WT,
               contentType: 'agent-session',
-              label: 'Codex Chat',
+              label: 'Claude Chat',
               customLabel: null,
               color: null,
               sortOrder: 1,

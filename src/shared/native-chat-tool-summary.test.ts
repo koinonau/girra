@@ -140,8 +140,8 @@ describe('describeToolInput', () => {
   })
 
   it('labels a classified search row by its term, not the command that ran it', () => {
-    // Codex `commandActions` rows are the only input carrying both keys: the
-    // search term identifies the row, the raw command stays for the detail view.
+    // A classified shell row carries both keys: the search term identifies the
+    // row, the raw command stays for the detail view.
     const search = { command: 'rg -n --no-heading beta .', cwd: '/repo', query: 'beta', path: '.' }
 
     expect(describeToolInput(search)).toBe('beta')
@@ -159,14 +159,14 @@ describe('describeToolInput', () => {
   })
 
   it('leaves a command-only input labelled by its command', () => {
-    // Bash and Codex's unclassified shell rows carry no search key at all.
+    // Bash and unclassified shell rows carry no search key at all.
     expect(describeToolInput({ command: 'pnpm test', description: 'Run tests' })).toBe('pnpm test')
     expect(briefToolArg({ command: 'pnpm test' })).toBe('pnpm test')
     expect(describeToolInput({ cmd: 'git status --short' })).toBe('git status --short')
   })
 })
 
-describe('Codex JSON-string tool arguments', () => {
+describe('JSON-string tool arguments', () => {
   it('normalizes them for labels, details, file links and run summaries', () => {
     expect(describeToolInput('{"cmd":"git status --short"}')).toBe('git status --short')
     expect(formatToolInput('{"cmd":"git status --short"}')).toBe(

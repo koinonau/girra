@@ -202,7 +202,7 @@ describe('runtime terminal owner routing', () => {
     runtimeCall.mockResolvedValue({
       ok: true,
       result: {
-        process: { foregroundProcess: 'codex', hasChildProcesses: true }
+        process: { foregroundProcess: 'opencode', hasChildProcesses: true }
       },
       _meta: { runtimeId: 'runtime-1' }
     })
@@ -222,13 +222,13 @@ describe('runtime terminal owner routing', () => {
 
   it('uses strict main-process inspection for a direct SSH PTY', async () => {
     localInspect.mockResolvedValue({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       hasChildProcesses: true,
-      foregroundProcessEvidence: liveEvidence('pty-1', 'codex')
+      foregroundProcessEvidence: liveEvidence('pty-1', 'opencode')
     })
 
     await expect(inspectRuntimeTerminalProcess(null, 'ssh:host@@pty-1')).resolves.toMatchObject({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       hasChildProcesses: true
     })
     expect(localInspect).toHaveBeenCalledExactlyOnceWith('ssh:host@@pty-1')

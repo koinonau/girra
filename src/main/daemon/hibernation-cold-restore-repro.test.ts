@@ -51,7 +51,7 @@ describe('agent hibernation cold-restore (alt-screen TUI)', () => {
     const manager = new HistoryManager(dir)
     const reader = new HistoryReader(dir)
     const em = new HeadlessEmulator({ cols: 80, rows: 24 })
-    // Why: in alt-screen (Claude/Codex TUIs) the serialized snapshot is the TUI buffer and scrollbackAnsi is empty.
+    // Why: in alt-screen (Claude and other TUIs) the serialized snapshot is the TUI buffer and scrollbackAnsi is empty.
     em.writeSync(ALT_SCREEN_ON)
     em.writeSync('\x1b[2J\x1b[H Claude Code — Opus 4.8\r\n > ')
     expect(em.isAlternateScreen).toBe(true)

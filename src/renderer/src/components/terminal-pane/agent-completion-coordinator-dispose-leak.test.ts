@@ -45,13 +45,13 @@ function driveCompletion(
   coordinator.observeHookStatus({
     state: 'working',
     prompt: '',
-    agentType: 'codex',
+    agentType: 'opencode',
     stateStartedAt: 1000
   } as AgentCompletionStatusSnapshot)
   coordinator.observeHookStatus({
     state: 'done',
     prompt: '',
-    agentType: 'codex',
+    agentType: 'opencode',
     stateStartedAt: 2000
   } as AgentCompletionStatusSnapshot)
   vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)

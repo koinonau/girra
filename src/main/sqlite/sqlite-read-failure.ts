@@ -8,8 +8,8 @@ const SQLITE_BUSY = 5
 const SQLITE_LOCKED = 6
 const SQLITE_CANTOPEN = 14
 
-// Shared with the Codex index-heal pass, which only ever sees a relayed message
-// string (app-server RPC drops `errcode`), so message matching is not optional.
+// Relayed errors arrive as message strings (RPC drops `errcode`), so message
+// matching is not optional.
 const CONTENTION_MESSAGE = /SQLITE_(?:BUSY|LOCKED)|database (?:is )?(?:busy|locked)/i
 
 function primaryErrcode(error: unknown): number | null {

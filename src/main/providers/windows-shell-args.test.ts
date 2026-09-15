@@ -59,9 +59,9 @@ describe('resolveWindowsShellLaunchArgs', () => {
       'C:\\Users\\alice',
       'C:\\Users\\alice',
       undefined,
-      'codex --no-alt-screen'
+      'opencode --no-alt-screen'
     )
-    expect(result.shellArgs).toEqual(['/K', 'chcp 65001 > nul & codex --no-alt-screen'])
+    expect(result.shellArgs).toEqual(['/K', 'chcp 65001 > nul & opencode --no-alt-screen'])
     expect(result.startupCommandDeliveredInShellArgs).toBe(true)
   })
 
@@ -85,7 +85,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
       'C:\\Users\\alice',
       'C:\\Users\\alice',
       undefined,
-      `codex ${'x'.repeat(7000)}`
+      `opencode ${'x'.repeat(7000)}`
     )
     expect(result.shellArgs).toEqual(['/K', 'chcp 65001 > nul'])
     expect(result.startupCommandDeliveredInShellArgs).toBeUndefined()
@@ -159,14 +159,14 @@ describe('resolveWindowsShellLaunchArgs', () => {
       'C:\\Users\\alice',
       'C:\\Users\\alice',
       undefined,
-      "& 'codex' '--no-alt-screen'"
+      "& 'opencode' '--no-alt-screen'"
     )
     expect(result.startupCommandDeliveredInShellArgs).toBe(true)
 
     const command = decodePowerShellCommand(result)
     expect(command).toContain('function Global:prompt')
     expect(command).toContain(expectedPowerShellRestoreCwdCommand("'C:\\Users\\alice'"))
-    expect(command.trimEnd().endsWith("& 'codex' '--no-alt-screen'")).toBe(true)
+    expect(command.trimEnd().endsWith("& 'opencode' '--no-alt-screen'")).toBe(true)
   })
 
   it('preserves complex PowerShell startup command text through EncodedCommand', () => {
@@ -239,7 +239,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
       'C:\\Users\\alice',
       'C:\\Users\\alice',
       undefined,
-      'codex --no-alt-screen'
+      'opencode --no-alt-screen'
     )
 
     expect(result.shellArgs[1]).toContain('chcp.com 65001')
@@ -264,7 +264,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
       'C:\\Users\\alice\\code',
       'C:\\Users\\alice',
       undefined,
-      'codex'
+      'opencode'
     )
     expect(result.shellArgs).toEqual(expectedWslArgs('/mnt/c/Users/alice/code'))
     expect(result.startupCommandDeliveredInShellArgs).toBeUndefined()
@@ -292,7 +292,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
       '/c/Users/alice/project',
       'C:\\Users\\alice',
       undefined,
-      'codex'
+      'opencode'
     )
 
     expect(result.shellArgs).toEqual(expectedWslArgs('/mnt/c/Users/alice/project'))

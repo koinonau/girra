@@ -8,10 +8,7 @@ export const GOLDEN_STUB_READY_MARKER = 'GOLDEN_STUB_AGENT_READY'
 export const GOLDEN_STUB_EXIT_MARKER = 'GOLDEN_STUB_AGENT_EXITED'
 
 /** Agents exposed by the fixture directory for tab-bar detection. */
-export const GOLDEN_STUB_AGENTS = [
-  { id: 'codex', menuItemName: /^Codex(?:\s|$)/i },
-  { id: 'claude', menuItemName: /^Claude(?:\s|$)/i }
-] as const
+export const GOLDEN_STUB_AGENTS = [{ id: 'claude', menuItemName: /^Claude(?:\s|$)/i }] as const
 
 const fixtureDir = path.join(process.cwd(), 'tests', 'e2e', 'fixtures', 'golden-stub-agent')
 
@@ -25,13 +22,13 @@ export function getGoldenStubAgentLaunchEnv(): NodeJS.ProcessEnv {
 export async function configureGoldenStubAgent(
   page: Page,
   options: {
-    agent?: (typeof GOLDEN_STUB_AGENTS)[number]['id'] | 'grok'
+    agent?: (typeof GOLDEN_STUB_AGENTS)[number]['id']
     agentArgs?: string
     /** Windows default shell the launch command must survive; ignored elsewhere. */
     windowsShell?: BuiltInWindowsTerminalShell
   } = {}
 ): Promise<void> {
-  const agent = options.agent ?? 'codex'
+  const agent = options.agent ?? 'claude'
   await page.evaluate(
     async ({ agent, agentArgs, windowsShell }) => {
       const store = window.__store
@@ -51,7 +48,7 @@ export async function configureGoldenStubAgent(
 
 export async function launchGoldenStubAgentFromNewTab(
   page: Page,
-  menuItemName: RegExp = /^Codex(?:\s|$)/i
+  menuItemName: RegExp = /^Claude(?:\s|$)/i
 ): Promise<void> {
   await page.getByRole('button', { name: 'New tab' }).click({ force: true })
   const launchOption = page.getByRole('menuitem', { name: menuItemName }).first()

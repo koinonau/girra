@@ -154,10 +154,10 @@ describe('connectPanePty', () => {
     transportFactoryQueue.push(transport)
     const paneKey = makePaneKey('tab-1', LEAF_1)
     const launchConfig = {
-      agentCommand: "codex '--model' 'gpt-5' '--reasoning-effort' 'high'",
-      agentArgs: '--model gpt-5 --reasoning-effort high',
+      agentCommand: "claude '--model' 'opus' '--effort' 'high'",
+      agentArgs: '--model opus --effort high',
       agentEnv: {
-        CODEX_PROFILE: 'captured',
+        CLAUDE_PROFILE: 'captured',
         ORCA_PANE_KEY: 'wrong-pane',
         ORCA_TAB_ID: 'wrong-tab',
         ORCA_WORKTREE_ID: 'wrong-worktree',
@@ -173,7 +173,7 @@ describe('connectPanePty', () => {
         ...mockStoreState.settings,
         agentCmdOverrides: {},
         agentDefaultArgs: { claude: '--model changed' },
-        agentDefaultEnv: { claude: { CODEX_PROFILE: 'changed' } }
+        agentDefaultEnv: { claude: { CLAUDE_PROFILE: 'changed' } }
       },
       agentStatusByPaneKey: {},
       sleepingAgentSessionsByPaneKey: {
@@ -214,10 +214,9 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command:
-          "codex '--model' 'gpt-5' '--reasoning-effort' 'high' '--resume' 'claude-session-1'",
+        command: "claude '--model' 'opus' '--effort' 'high' '--resume' 'claude-session-1'",
         env: expect.objectContaining({
-          CODEX_PROFILE: 'captured',
+          CLAUDE_PROFILE: 'captured',
           ORCA_PANE_KEY: paneKey,
           ORCA_TAB_ID: 'tab-1',
           ORCA_WORKTREE_ID: 'wt-1',
@@ -341,8 +340,8 @@ describe('connectPanePty', () => {
     transportFactoryQueue.push(transport)
     const paneKey = makePaneKey('tab-1', LEAF_1)
     const launchConfig = {
-      agentCommand: "codex '--model' 'gpt-5-mini'",
-      agentArgs: '--model gpt-5-mini',
+      agentCommand: "claude '--model' 'sonnet'",
+      agentArgs: '--model sonnet',
       agentEnv: {}
     }
     mockStoreState = {
@@ -385,7 +384,7 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
         sessionId: 'lost-pty',
-        command: "codex '--model' 'gpt-5-mini' '--resume' 'claude-session-1'",
+        command: "claude '--model' 'sonnet' '--resume' 'claude-session-1'",
         env: expect.objectContaining({
           ORCA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
         })
@@ -512,7 +511,7 @@ describe('connectPanePty', () => {
       agentLaunchConfigByPaneKey: {
         [paneKey]: {
           launchConfig: {
-            agentCommand: "codex '--model' 'stale'",
+            agentCommand: "claude '--model' 'stale'",
             agentArgs: '--model stale',
             agentEnv: {}
           }
@@ -531,9 +530,9 @@ describe('connectPanePty', () => {
           capturedAt: 1,
           updatedAt: 1,
           launchConfig: {
-            agentCommand: "codex '--model' 'sleeping-stale'",
+            agentCommand: "claude '--model' 'sleeping-stale'",
             agentArgs: '--model sleeping-stale',
-            agentEnv: { CODEX_PROFILE: 'sleeping-stale' }
+            agentEnv: { CLAUDE_PROFILE: 'sleeping-stale' }
           }
         }
       }
@@ -648,7 +647,7 @@ describe('connectPanePty', () => {
       expect.any(Function)
     )
     expect(deps.onShowSessionRestoredBanner).toHaveBeenCalledTimes(1)
-    expect(deps.onShowSessionRestoredBanner).toHaveBeenCalledWith(2, 'restored')
+    expect(deps.onShowSessionRestoredBanner).toHaveBeenCalledWith(2)
     expect(mockStoreState.clearSleepingAgentSession).toHaveBeenCalledWith(paneKey)
   })
 })

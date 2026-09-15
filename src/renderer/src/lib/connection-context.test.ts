@@ -578,13 +578,13 @@ describe('getConnectionIdFromState', () => {
 
   it('never hands a worktree the SSH connection of a different host', () => {
     // Why (#11163): two SSH hosts, one shared repo id. The worktree names `ssh:m4air`; the only
-    // indexed row belongs to `openclaw`. An id-only fallback after the host lookup misses answers
-    // with the wrong host's connection — "Reconnect openclaw" on an m4air pane, and file reads
+    // indexed row belongs to `devbox`. An id-only fallback after the host lookup misses answers
+    // with the wrong host's connection — "Reconnect devbox" on an m4air pane, and file reads
     // routed to a machine that never held the path.
     const state: ConnectionContextState = {
       folderWorkspaces: [],
       projectGroups: [],
-      repos: [makeRepo({ id: 'repo-shared', connectionId: 'openclaw' })],
+      repos: [makeRepo({ id: 'repo-shared', connectionId: 'devbox' })],
       worktreesByRepo: {
         'repo-shared': [
           makeWorktree({
@@ -600,12 +600,12 @@ describe('getConnectionIdFromState', () => {
   })
 
   it('never hands a runtime-hosted worktree a client-owned SSH connection', () => {
-    // The row is on `ssh:openclaw`, not on the runtime host, so it says nothing about this
+    // The row is on `ssh:devbox`, not on the runtime host, so it says nothing about this
     // worktree. This is the cross-host case, not the nested-SSH one below.
     const state: ConnectionContextState = {
       folderWorkspaces: [],
       projectGroups: [],
-      repos: [makeRepo({ id: 'repo-shared', connectionId: 'openclaw' })],
+      repos: [makeRepo({ id: 'repo-shared', connectionId: 'devbox' })],
       worktreesByRepo: {
         'repo-shared': [
           makeWorktree({
@@ -654,7 +654,7 @@ describe('getConnectionIdFromState', () => {
       folderWorkspaces: [],
       projectGroups: [],
       repos: [
-        makeRepo({ id: 'repo-shared', connectionId: 'openclaw' }),
+        makeRepo({ id: 'repo-shared', connectionId: 'devbox' }),
         makeRepo({ id: 'repo-shared', connectionId: 'm4air', path: '/srv/repo' })
       ],
       worktreesByRepo: {

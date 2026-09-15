@@ -69,7 +69,7 @@ On headless hosts (SSH, containers, CI, `orca serve`) with no Settings UI, use t
 ```bash
 orca skills install                                      # list installable names
 orca skills install --skill orca-cli --skill orchestration
-orca skills install --skill orca-cli --agent claude-code,codex
+orca skills install --skill orca-cli --agent claude-code
 orca skills install --all --dry-run
 orca skills update --all
 orca skills update --skill orca-cli --dry-run
@@ -161,7 +161,7 @@ Use when setting up or debugging per-workspace environment recipes in `orca.yaml
 
 ## Discovery sources
 
-Orca's skill UI scans installed skill homes for Claude, Codex, Agent Skills, and **OMP** (`~/.omp/agent/skills`), so skills placed there show up without a manual symlink.
+Orca's skill UI scans installed skill homes for Claude, OpenCode, Pi, and Agent Skills, so skills placed there show up without a manual symlink.
 
 ## Add your own skills
 

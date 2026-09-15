@@ -10,12 +10,12 @@ function makeTerminal(selection: string) {
 
 describe('copyTerminalSelection', () => {
   it('writes selected terminal text to the clipboard', async () => {
-    const terminal = makeTerminal('copilot answer')
+    const terminal = makeTerminal('agent answer')
     const writeClipboardText = vi.fn<(text: string) => Promise<void>>().mockResolvedValue()
 
     await expect(copyTerminalSelection({ terminal, writeClipboardText })).resolves.toBe(true)
 
-    expect(writeClipboardText).toHaveBeenCalledWith('copilot answer')
+    expect(writeClipboardText).toHaveBeenCalledWith('agent answer')
     expect(terminal.clearSelection).not.toHaveBeenCalled()
   })
 
@@ -30,7 +30,7 @@ describe('copyTerminalSelection', () => {
   })
 
   it('clears xterm selection only after the clipboard write succeeds', async () => {
-    const terminal = makeTerminal('copilot answer')
+    const terminal = makeTerminal('agent answer')
     const writeClipboardText = vi
       .fn<(text: string) => Promise<void>>()
       .mockRejectedValue(new Error('clipboard unchanged'))
@@ -43,7 +43,7 @@ describe('copyTerminalSelection', () => {
   })
 
   it('clears the xterm selection after a successful write when requested', async () => {
-    const terminal = makeTerminal('copilot answer')
+    const terminal = makeTerminal('agent answer')
     const writeClipboardText = vi.fn<(text: string) => Promise<void>>().mockResolvedValue()
 
     await expect(

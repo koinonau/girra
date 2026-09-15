@@ -75,7 +75,7 @@ describe('resolveNativeChatFileLinkContext', () => {
       groupId: 'group-1',
       contentType: 'agent-session',
       entityId: 'session-1',
-      label: 'Codex Chat',
+      label: 'Claude Chat',
       customLabel: null,
       color: null,
       sortOrder: 0,

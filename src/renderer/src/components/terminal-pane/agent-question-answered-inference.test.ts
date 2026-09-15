@@ -161,7 +161,7 @@ describe('agent question-answered inference', () => {
       undefined,
       makeWaitingQuestionEntry({ state: 'working' }),
       makeWaitingQuestionEntry({ toolName: 'Bash' }),
-      makeWaitingQuestionEntry({ agentType: 'codex' }),
+      makeWaitingQuestionEntry({ agentType: 'opencode' }),
       // Why: a stale wait past the freshness horizon no longer renders amber,
       // so a keystroke must not synthesize activity for it.
       makeWaitingQuestionEntry({ updatedAt: -100_000_000, stateStartedAt: -100_000_000 })

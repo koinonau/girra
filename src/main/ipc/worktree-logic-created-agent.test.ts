@@ -23,10 +23,10 @@ describe('mergeWorktree creation agent metadata', () => {
         isPinned: false,
         sortOrder: 0,
         lastActivityAt: 0,
-        createdWithAgent: 'codex'
+        createdWithAgent: 'opencode'
       }
     )
 
-    expect(result.createdWithAgent).toBe('codex')
+    expect(result.createdWithAgent).toBe('opencode')
   })
 })

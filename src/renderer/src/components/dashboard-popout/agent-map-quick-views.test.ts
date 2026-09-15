@@ -10,7 +10,7 @@ function card(overrides: Partial<DashboardCard> = {}): DashboardCard {
   return {
     paneKey: 'pane-1',
     ptyId: null,
-    agentType: 'codex',
+    agentType: 'opencode',
     bucket: 'working',
     dotState: 'working',
     task: '',
@@ -30,7 +30,7 @@ function card(overrides: Partial<DashboardCard> = {}): DashboardCard {
   }
 }
 
-const TYPES = ['claude', 'codex']
+const TYPES = ['claude', 'opencode']
 
 function visible(cards: DashboardCard[], view: Parameters<typeof applyAgentMapQuickView>[0]) {
   const state = applyAgentMapQuickView(view, TYPES)

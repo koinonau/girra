@@ -230,8 +230,8 @@ describe('ensureWorktreeHasInitialTerminal', () => {
       store,
       'wt-1',
       {
-        command: 'codex',
-        launchAgent: 'codex'
+        command: 'opencode',
+        launchAgent: 'opencode'
       },
       undefined,
       undefined
@@ -239,11 +239,11 @@ describe('ensureWorktreeHasInitialTerminal', () => {
 
     expect(store.createTab).toHaveBeenCalledWith('wt-1', undefined, undefined, {
       pendingActivationSpawn: true,
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
     expect(store.queueTabStartupCommand).toHaveBeenCalledWith('tab-1', {
-      command: 'codex',
-      launchAgent: 'codex'
+      command: 'opencode',
+      launchAgent: 'opencode'
     })
   })
 })

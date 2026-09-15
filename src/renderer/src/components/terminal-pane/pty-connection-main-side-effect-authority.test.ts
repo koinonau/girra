@@ -222,12 +222,12 @@ describe('connectPanePty', () => {
         ptyId: 'pty-fact-1',
         seq: 10,
         facts: [
-          { kind: 'title', normalizedTitle: 'Codex working', rawTitle: 'Codex working' },
+          { kind: 'title', normalizedTitle: 'Claude working', rawTitle: 'Claude working' },
           { kind: 'bell' }
         ]
       })
 
-      expect(deps.setRuntimePaneTitle).toHaveBeenCalledWith('tab-1', 1, 'Codex working')
+      expect(deps.setRuntimePaneTitle).toHaveBeenCalledWith('tab-1', 1, 'Claude working')
       expect(deps.markWorktreeUnread).toHaveBeenCalledTimes(1)
       expect(deps.markTerminalTabUnread).toHaveBeenCalledWith('tab-1')
       expect(deps.dispatchNotification).not.toHaveBeenCalled()
@@ -284,7 +284,7 @@ describe('connectPanePty', () => {
         ptyId: 'pty-fact-genuine',
         seq: 1,
         facts: [
-          { kind: 'title', normalizedTitle: '⠋ Codex working', rawTitle: '⠋ Codex working' },
+          { kind: 'title', normalizedTitle: '⠋ Claude working', rawTitle: '⠋ Claude working' },
           { kind: 'agent-working' }
         ]
       })
@@ -292,8 +292,8 @@ describe('connectPanePty', () => {
         ptyId: 'pty-fact-genuine',
         seq: 2,
         facts: [
-          { kind: 'title', normalizedTitle: '* Codex done', rawTitle: '* Codex done' },
-          { kind: 'agent-idle', title: '* Codex done' }
+          { kind: 'title', normalizedTitle: '* Claude done', rawTitle: '* Claude done' },
+          { kind: 'agent-idle', title: '* Claude done' }
         ]
       })
       vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS)
@@ -320,7 +320,7 @@ describe('connectPanePty', () => {
         ptyId: 'pty-fact-stale',
         seq: 1,
         facts: [
-          { kind: 'title', normalizedTitle: '⠋ Codex working', rawTitle: '⠋ Codex working' },
+          { kind: 'title', normalizedTitle: '⠋ Claude working', rawTitle: '⠋ Claude working' },
           { kind: 'agent-working' }
         ]
       })
@@ -331,16 +331,16 @@ describe('connectPanePty', () => {
         facts: [
           {
             kind: 'title',
-            normalizedTitle: 'Codex',
-            rawTitle: 'Codex',
+            normalizedTitle: 'Claude',
+            rawTitle: 'Claude',
             staleWorkingTitleClear: true
           },
-          { kind: 'agent-idle', title: 'Codex', staleWorkingTitleClear: true }
+          { kind: 'agent-idle', title: 'Claude', staleWorkingTitleClear: true }
         ]
       })
 
       // The cleared title still lands; the cache timer is cleared.
-      expect(deps.setRuntimePaneTitle).toHaveBeenLastCalledWith('tab-1', 1, 'Codex')
+      expect(deps.setRuntimePaneTitle).toHaveBeenLastCalledWith('tab-1', 1, 'Claude')
       expect(deps.setCacheTimerStartedAt).toHaveBeenLastCalledWith(
         makePaneKey('tab-1', LEAF_1),
         null
@@ -366,7 +366,7 @@ describe('connectPanePty', () => {
           prompt: 'hi',
           updatedAt: 1000,
           stateStartedAt: 1000,
-          agentType: 'codex',
+          agentType: 'claude',
           stateHistory: []
         }
       }
@@ -430,7 +430,7 @@ describe('connectPanePty', () => {
           prompt: 'hi',
           updatedAt: 1000,
           stateStartedAt: 1000,
-          agentType: 'codex',
+          agentType: 'claude',
           stateHistory: []
         }
       }

@@ -2,10 +2,7 @@ import { ipcRenderer } from 'electron'
 import type { AgentSessionPtyWriteRefusal } from '../../shared/agent-session-pty-write-admission'
 import type { ProjectExecutionRuntimeResolution } from '../../shared/project-execution-runtime'
 import type { StartupCommandDelivery } from '../../shared/startup-command-delivery'
-import type {
-  AgentProviderSessionMetadata,
-  SleepingAgentLaunchConfig
-} from '../../shared/agent-session-resume'
+import type { SleepingAgentLaunchConfig } from '../../shared/agent-session-resume'
 import type { TuiAgent } from '../../shared/tui-agent'
 import type { PtyListedSession, PtySessionListScope } from '../../shared/pty-listed-session'
 import type {
@@ -29,7 +26,6 @@ export const ptySessionControlApi = {
     command?: string
     commandDelivery?: 'renderer' | 'provider'
     launchConfig?: SleepingAgentLaunchConfig
-    resumeProviderSession?: AgentProviderSessionMetadata
     launchToken?: string
     launchAgent?: TuiAgent
     startupCommandDelivery?: StartupCommandDelivery
@@ -66,7 +62,6 @@ export const ptySessionControlApi = {
     sessionExpired?: boolean
     coldRestore?: { scrollback: string; cwd: string; cols?: number; rows?: number }
     startupCwdFallback?: { kind: 'worktree'; cwd: string }
-    agentResumeUnavailable?: true
     /** Host verdict on the shell-ready marker; absent when the execution host predates the field. */
     shellReadyArmed?: boolean
   }> => ipcRenderer.invoke('pty:spawn', opts),

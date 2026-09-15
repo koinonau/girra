@@ -285,17 +285,17 @@ describe('TabBarCreateEntry tab results', () => {
   })
 
   it('orders tab rows above menu actions, agents and file entries', () => {
-    entryOptionsMock.options = [existingFileOption('src/gem.ts')]
-    tabSearchMock.resultsByQuery['gem'] = [terminalResult({ title: 'gem tab' })]
+    entryOptionsMock.options = [existingFileOption('src/open.ts')]
+    tabSearchMock.resultsByQuery['open'] = [terminalResult({ title: 'open tab' })]
     const menuOptions: TabCreateMenuOption[] = [
-      { id: 'new-browser', kind: 'new-browser', keywords: ['gem'], label: 'New Browser Tab' }
+      { id: 'new-browser', kind: 'new-browser', keywords: ['open'], label: 'New Browser Tab' }
     ]
     const agentOptions: TabAgentLaunchOption[] = [
-      { agent: 'gemini', aliases: ['gemini'], label: 'Gemini' }
+      { agent: 'opencode', aliases: ['opencode'], label: 'OpenCode' }
     ]
     renderEntry({ agentOptions, menuOptions })
 
-    setQuery('gem')
+    setQuery('open')
 
     const rows = rowTexts()
     expect(rows[0]).toContain('Switch to tab')

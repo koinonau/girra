@@ -10,7 +10,7 @@ import {
 describe('agent session resume metadata', () => {
   it('keeps only the launch roster resumable', () => {
     expect(['claude', 'opencode', 'pi'].every(isResumableTuiAgent)).toBe(true)
-    expect(['codex', 'omp', 'kimi', 'prime-agent'].some(isResumableTuiAgent)).toBe(false)
+    expect(['claude-agent-teams', 'retired-agent', ''].some(isResumableTuiAgent)).toBe(false)
   })
 
   it.each([

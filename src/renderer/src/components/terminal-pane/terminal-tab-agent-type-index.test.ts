@@ -12,12 +12,12 @@ describe('createTerminalTabAgentTypeSelector', () => {
     const select = createTerminalTabAgentTypeSelector({ onEntryVisited })
     const state = {
       'tab-1:leaf-a': entry('claude'),
-      'tab-1:leaf-b': entry('codex'),
-      'tab-2:leaf-c': entry('grok')
+      'tab-1:leaf-b': entry('opencode'),
+      'tab-2:leaf-c': entry('pi')
     }
 
-    expect(select(state, 'tab-1')).toEqual({ 'leaf-a': 'claude', 'leaf-b': 'codex' })
-    expect(select(state, 'tab-2')).toEqual({ 'leaf-c': 'grok' })
+    expect(select(state, 'tab-1')).toEqual({ 'leaf-a': 'claude', 'leaf-b': 'opencode' })
+    expect(select(state, 'tab-2')).toEqual({ 'leaf-c': 'pi' })
     for (let index = 0; index < 100; index += 1) {
       select(state, `hidden-tab-${index}`)
     }
@@ -29,13 +29,13 @@ describe('createTerminalTabAgentTypeSelector', () => {
     const select = createTerminalTabAgentTypeSelector()
     const working = {
       'tab-1:leaf-a': entry('claude', 'working'),
-      'tab-2:leaf-b': entry('codex', 'working')
+      'tab-2:leaf-b': entry('opencode', 'working')
     }
     const firstTab = select(working, 'tab-1')
     const secondTab = select(working, 'tab-2')
     const done = {
       'tab-1:leaf-a': entry('claude', 'done'),
-      'tab-2:leaf-b': entry('codex', 'done')
+      'tab-2:leaf-b': entry('opencode', 'done')
     }
 
     expect(select(done, 'tab-1')).toBe(firstTab)
@@ -46,25 +46,25 @@ describe('createTerminalTabAgentTypeSelector', () => {
     const select = createTerminalTabAgentTypeSelector()
     const before = {
       'tab-1:leaf-a': entry('claude'),
-      'tab-2:leaf-b': entry('codex')
+      'tab-2:leaf-b': entry('opencode')
     }
     const firstTab = select(before, 'tab-1')
     const secondTab = select(before, 'tab-2')
     const after = {
       ...before,
-      'tab-2:leaf-b': entry('grok')
+      'tab-2:leaf-b': entry('pi')
     }
 
     expect(select(after, 'tab-1')).toBe(firstTab)
     expect(select(after, 'tab-2')).not.toBe(secondTab)
-    expect(select(after, 'tab-2')).toEqual({ 'leaf-b': 'grok' })
+    expect(select(after, 'tab-2')).toEqual({ 'leaf-b': 'pi' })
   })
 
   it('ignores missing agent types and keys without a tab prefix', () => {
     const select = createTerminalTabAgentTypeSelector()
     const state = {
       malformed: entry('claude'),
-      ':leaf-a': entry('codex'),
+      ':leaf-a': entry('opencode'),
       'tab-1:leaf-a': entry(undefined)
     }
 
@@ -76,13 +76,13 @@ describe('createTerminalTabAgentTypeSelector', () => {
     const select = createTerminalTabAgentTypeSelector()
     const foreground = {
       'tab-1:leaf-a': {
-        agent: 'codex' as const,
+        agent: 'opencode' as const,
         shellForeground: false,
         routingTrusted: true
       }
     }
 
-    expect(select({}, 'tab-1', foreground)).toEqual({ 'leaf-a': 'codex' })
+    expect(select({}, 'tab-1', foreground)).toEqual({ 'leaf-a': 'opencode' })
     expect(select({ 'tab-1:leaf-a': entry('claude') }, 'tab-1', foreground)).toEqual({
       'leaf-a': 'claude'
     })

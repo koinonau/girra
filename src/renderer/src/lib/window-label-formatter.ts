@@ -36,7 +36,7 @@ export function formatWindowLabel(windowMinutes: number): string {
  *
  * Why: the popup already shows remaining time via formatResetCountdown
  * ("Resets in 2h 33m"). The chip used fixed windowMinutes labels ("5h"),
- * so the same Codex session looked out of sync (#8378). Prefer remaining
+ * so the same session looked out of sync (#8378). Prefer remaining
  * duration when resetsAt is known; fall back to the fixed window size only
  * when no reset timestamp is available.
  */

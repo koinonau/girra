@@ -6,7 +6,6 @@ import { isAgentSessionHandleProvider } from '../../../shared/agent-session-prov
 import { adoptAgentSessionLaunchVerdict } from '@/lib/agent-session-launch-plan'
 import type { AgentLaunchRoute } from '@/lib/agent-launch-routing'
 import { activateStructuredAgentSessionById } from '@/lib/structured-agent-session-tab-activation'
-import { preflightAgentTrust } from '@/lib/agent-trust-preflight'
 import type { WorktreeCreationRequest } from '@/lib/pending-worktree-creation'
 import type { WorktreeStartupPayload } from '@/lib/worktree-startup-payload'
 import { closeStructuredAgentSession } from '@/runtime/structured-agent-session-close'
@@ -48,7 +47,7 @@ async function retireCancelledStructuredSession(
   }).catch(() => undefined)
 }
 
-/** What quick create did before structured chat: rename flag, trust preflight, then a terminal. */
+/** What quick create did before structured chat: rename flag, then a terminal. */
 async function openLegacyWorktreeSurface(
   args: LaunchStructuredWorktreeSessionArgs,
   isCancelled: () => boolean
@@ -64,23 +63,6 @@ async function openLegacyWorktreeSurface(
       .getState()
       .updateWorktreeMeta(args.worktreeId, { pendingFirstAgentMessageRename: true })
       .catch(() => undefined)
-  }
-  if (isCancelled()) {
-    return unchanged
-  }
-  const worktree = useAppStore
-    .getState()
-    .allWorktrees?.()
-    .find((candidate) => candidate.id === args.worktreeId)
-  if (args.request.agent && worktree?.path) {
-    const repoConnectionId = useAppStore
-      .getState()
-      .repos.find((repo) => repo.id === args.request.repoId)?.connectionId
-    await preflightAgentTrust({
-      agent: args.request.agent,
-      workspacePath: worktree.path,
-      connectionId: repoConnectionId
-    })
   }
   if (isCancelled()) {
     return unchanged

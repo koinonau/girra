@@ -38,7 +38,7 @@ describe('OrcaRuntimeService', () => {
     })
     runtime.onPtyData(
       'ssh-osc-pty',
-      '\x1b]9999;{"state":"working","prompt":"remote osc agent","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"remote osc agent","agentType":"claude"}\x07',
       1
     )
     runtime['recordPtyWorktree']('ssh-osc-pty', TEST_WORKTREE_ID, { connected: false })
@@ -63,7 +63,7 @@ describe('OrcaRuntimeService', () => {
           worktreeId: TEST_WORKTREE_ID,
           state: 'working',
           prompt: 'unattributable pane',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now - 100
@@ -88,7 +88,7 @@ describe('OrcaRuntimeService', () => {
             id: 'open-wsl-tab',
             ptyId: null,
             worktreeId: TEST_WORKTREE_ID,
-            title: 'Codex',
+            title: 'Claude',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -106,7 +106,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'open-wsl-tab',
           state: 'working',
           prompt: 'live in WSL',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'wsl:Ubuntu',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -135,7 +135,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'closed-wsl-tab',
           state: 'done',
           prompt: 'finished in WSL',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'wsl:Ubuntu',
           receivedAt: now,
           stateStartedAt: now - 60_000
@@ -191,7 +191,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'remote-tab',
           state: 'working',
           prompt: 'remote agent without local tab records',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-6072',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -265,7 +265,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'remote-tab',
           state: 'working',
           prompt: 'remote agent without a PTY',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-1',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -290,7 +290,7 @@ describe('OrcaRuntimeService', () => {
         agents: expect.arrayContaining([
           expect.objectContaining({
             prompt: 'remote agent without a PTY',
-            agentType: 'codex'
+            agentType: 'claude'
           })
         ])
       })
@@ -358,7 +358,7 @@ describe('OrcaRuntimeService', () => {
             tabId: 'relative-tab',
             state: 'working',
             prompt: 'relative path agent',
-            agentType: 'codex',
+            agentType: 'claude',
             connectionId: 'ssh-relative',
             receivedAt: now,
             stateStartedAt: now - 100
@@ -431,7 +431,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'pair-aware-tab',
           state: 'working' as const,
           prompt: `pair-aware agent ${index}`,
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-pair-aware-scale',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -489,7 +489,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'malformed-tab',
           state: 'working' as const,
           prompt: `missing agent ${index}`,
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-malformed-scale',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -540,7 +540,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'repeated-miss-tab',
           state: 'working' as const,
           prompt: `repeated missing agent ${index}`,
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-repeated-miss',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -604,7 +604,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'truncated-tab',
           state: 'working',
           prompt: 'live beyond the default limit',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-truncated',
           receivedAt: now,
           stateStartedAt: now - 100

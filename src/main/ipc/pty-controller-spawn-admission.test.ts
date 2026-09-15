@@ -102,7 +102,7 @@ describe('registerPtyHandlers', () => {
     }[] = []
     const physicalSpawn = vi.fn(async () => {
       const result = { id: 'pty-local-claim', incarnationId: 'incarnation-local-claim' }
-      sessions.push({ ...result, cwd: '/tmp/worktree', title: 'Codex' })
+      sessions.push({ ...result, cwd: '/tmp/worktree', title: 'Claude Code' })
       return result
     })
     const provider = createAgentClaimProvider({
@@ -292,7 +292,7 @@ describe('registerPtyHandlers', () => {
           id: owner.ptyId,
           incarnationId: 'incarnation-recovered',
           cwd: '/tmp/recovered-worktree',
-          title: 'Codex',
+          title: 'Claude Code',
           agentSessionOwners: [owner]
         }
       ],
@@ -335,7 +335,7 @@ describe('registerPtyHandlers', () => {
           id: owner.ptyId,
           incarnationId,
           cwd: '/tmp/recovered-worktree',
-          title: 'Codex',
+          title: 'Claude Code',
           agentSessionOwners: [owner]
         }
       ],
@@ -350,7 +350,7 @@ describe('registerPtyHandlers', () => {
           id: owner.ptyId,
           incarnationId,
           cwd: '/tmp/recovered-worktree',
-          title: 'Codex',
+          title: 'Claude Code',
           agentSessionOwners: [owner]
         }
       ]
@@ -401,7 +401,7 @@ describe('registerPtyHandlers', () => {
         {
           id: owner.ptyId,
           cwd: '/tmp/recovered-worktree',
-          title: 'Codex',
+          title: 'Claude Code',
           agentSessionOwners: [owner]
         }
       ]

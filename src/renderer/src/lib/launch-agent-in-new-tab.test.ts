@@ -177,12 +177,12 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'opencode',
       worktreeId: 'wt-1'
     })
 
     expect(mockCreateTab).toHaveBeenCalledWith('wt-1', undefined, undefined, {
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
   })
   it('keeps Floating Workspace authority on native Windows beside an active WSL project', async () => {
@@ -195,7 +195,7 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'opencode',
       worktreeId: FLOATING_TERMINAL_WORKTREE_ID,
       launchPlatform: 'win32'
     })
@@ -207,7 +207,7 @@ describe('launchAgentInNewTab', () => {
       FLOATING_TERMINAL_WORKTREE_ID,
       undefined,
       undefined,
-      { launchAgent: 'codex' }
+      { launchAgent: 'opencode' }
     )
   })
 
@@ -310,13 +310,13 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'opencode',
       worktreeId: 'wt-1',
       quickCommandLabel: 'Review'
     })
 
     expect(mockCreateTab).toHaveBeenCalledWith('wt-1', undefined, undefined, {
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       quickCommandLabel: 'Review'
     })
   })
@@ -324,23 +324,23 @@ describe('launchAgentInNewTab', () => {
   it('does not inject native-chat model preferences into terminal Quick Commands', async () => {
     store.settings = {
       agentCmdOverrides: {},
-      agentDefaultArgs: { codex: '--profile team' },
+      agentDefaultArgs: { claude: '--profile team' },
       agentDefaultEnv: {},
       activeRuntimeEnvironmentId: null,
       experimentalNativeChat: true,
       experimentalStructuredNativeChat: true,
       openAgentTabsInChatByDefault: false,
       nativeChatSessionOptions: {
-        codex: {
-          model: 'gpt-5.2-codex',
-          valuesByModel: { 'gpt-5.2-codex': { effort: 'medium' } }
+        claude: {
+          model: 'opus',
+          valuesByModel: { opus: { effort: 'medium' } }
         }
       }
     }
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'Review this diff',
       launchSource: 'quick_command',
@@ -349,8 +349,8 @@ describe('launchAgentInNewTab', () => {
 
     const launch = mockQueueTabStartupCommand.mock.calls[0]?.[1]
     expect(launch.command).toContain("'--profile' 'team'")
-    expect(launch.command).not.toContain("'-m'")
-    expect(launch.command).not.toContain('model_reasoning_effort=')
+    expect(launch.command).not.toContain("'--model'")
+    expect(launch.command).not.toContain("'--effort'")
     expect(launch.sessionOptions).toBeUndefined()
   })
 
@@ -475,14 +475,14 @@ describe('launchAgentInNewTab', () => {
     }
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
-    launchAgentInNewTab({ agent: 'codex', worktreeId: 'wt-1' })
+    launchAgentInNewTab({ agent: 'opencode', worktreeId: 'wt-1' })
 
     expect(mockCreateWebRuntimeSessionTerminal).toHaveBeenCalledWith(
       expect.objectContaining({
         worktreeId: 'wt-1',
         environmentId: 'web-runtime',
         agentSessionKind: 'fresh',
-        agent: 'codex',
+        agent: 'opencode',
         viewMode: 'terminal'
       })
     )
@@ -684,7 +684,7 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'opencode',
       worktreeId: 'wt-1',
       prompt: 'large generated prompt',
       agentArgs: '--model gpt-5.5',
@@ -694,7 +694,7 @@ describe('launchAgentInNewTab', () => {
     expect(mockQueueTabStartupCommand).toHaveBeenCalledWith(
       'tab-1',
       expect.objectContaining({
-        command: "codex '--model' 'gpt-5.5'"
+        command: "opencode '--model' 'gpt-5.5'"
       })
     )
   })

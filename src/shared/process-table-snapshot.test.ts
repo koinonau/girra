@@ -304,7 +304,9 @@ describe('shared process-table capture', () => {
     // Why: an unread group index costs two maps plus a per-row array on every
     // capture, on the exact path this reader exists to make cheap.
     const index = buildProcessTableIndex(
-      parseStrictProcessTableRows('100 1 100 101 Ss /bin/zsh\n101 100 101 101 S+ node /opt/codex')
+      parseStrictProcessTableRows(
+        '100 1 100 101 Ss /bin/zsh\n101 100 101 101 S+ node /opt/opencode'
+      )
     )
 
     expect(Object.keys(index).sort()).toEqual(['byPid', 'childrenByPpid', 'rows', 'stats'])
@@ -324,7 +326,7 @@ describe('shared process-table capture', () => {
 describe('parseProcessTableRows', () => {
   it('parses pid/ppid/stat and keeps the full command (including spaces)', () => {
     const rows = parseProcessTableRows(
-      ['501 1 S /bin/zsh', '600 501 S+ node /path/bin/codex --flag'].join('\n')
+      ['501 1 S /bin/zsh', '600 501 S+ node /path/bin/opencode --flag'].join('\n')
     )
     expect(rows).toEqual([
       { pid: 501, ppid: 1, stat: 'S', command: '/bin/zsh' },
@@ -332,7 +334,7 @@ describe('parseProcessTableRows', () => {
         pid: 600,
         ppid: 501,
         stat: 'S+',
-        command: 'node /path/bin/codex --flag'
+        command: 'node /path/bin/opencode --flag'
       }
     ])
   })
@@ -398,7 +400,7 @@ describe('parseStrictProcessTableRows', () => {
         pgid: 101,
         tpgid: 101,
         stat: 'S+',
-        command: 'node /opt/codex'
+        command: 'node /opt/opencode'
       }
     ])
   })
@@ -406,7 +408,7 @@ describe('parseStrictProcessTableRows', () => {
   it('extracts pgid/tpgid across CRLF framing while retaining command spacing', () => {
     expect(
       parseStrictProcessTableRows(
-        ' PID PPID PGID TPGID STAT COMMAND\r\n 100 1 100 101 Ss /bin/zsh -l\r\n 101 100 101 101 S+ node /opt/codex --flag  value\r\n'
+        ' PID PPID PGID TPGID STAT COMMAND\r\n 100 1 100 101 Ss /bin/zsh -l\r\n 101 100 101 101 S+ node /opt/opencode --flag  value\r\n'
       )
     ).toEqual([
       {
@@ -423,7 +425,7 @@ describe('parseStrictProcessTableRows', () => {
         pgid: 101,
         tpgid: 101,
         stat: 'S+',
-        command: 'node /opt/codex --flag  value'
+        command: 'node /opt/opencode --flag  value'
       }
     ])
   })
@@ -474,7 +476,7 @@ describe('parseStrictProcessTableRows', () => {
 describe('getProcessTableIndex', () => {
   it('reuses one index for the same snapshot identity', () => {
     const rows = parseProcessTableRows(
-      ['100 1 Ss bash', '101 100 S node codex', '102 100 S vim'].join('\n')
+      ['100 1 Ss bash', '101 100 S node opencode', '102 100 S vim'].join('\n')
     )
 
     const first = getProcessTableIndex(rows)

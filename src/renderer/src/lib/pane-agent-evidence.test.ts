@@ -50,7 +50,7 @@ describe('isExplicitAgentStatusFresh', () => {
 
 describe('classifyTitleActivity', () => {
   it('classifies working, permission, idle, and unclassifiable titles', () => {
-    expect(classifyTitleActivity('codex working')).toBe('working')
+    expect(classifyTitleActivity('opencode working')).toBe('working')
     expect(classifyTitleActivity('Claude - action required')).toBe('permission')
     expect(classifyTitleActivity('✳ Claude Code ready')).toBe('idle')
     expect(classifyTitleActivity('vim')).toBe(null)

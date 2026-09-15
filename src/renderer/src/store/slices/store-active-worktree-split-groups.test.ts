@@ -407,12 +407,12 @@ describe('setActiveWorktree', () => {
         [orphanId]: makeLayout()
       },
       pendingStartupByTabId: {
-        [orphanId]: { command: 'codex' }
+        [orphanId]: { command: 'opencode' }
       },
       automaticAgentResumeClaimsByTabId: {
         [orphanId]: {
           worktreeId: wt,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           providerSession: { key: 'session_id', id: 'sess-1' }
         }
       },

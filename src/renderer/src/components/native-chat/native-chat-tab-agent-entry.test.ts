@@ -66,7 +66,7 @@ describe('findTabAgentEntry (#19 selector)', () => {
       providerSession: { key: 'session_id', id: 'sess-abc' }
     })
     const map: Record<string, AgentStatusEntry> = {
-      'tab-0:other': entry({ paneKey: 'tab-0:other', agentType: 'codex' }),
+      'tab-0:other': entry({ paneKey: 'tab-0:other', agentType: 'opencode' }),
       [paneKey]: target
     }
 

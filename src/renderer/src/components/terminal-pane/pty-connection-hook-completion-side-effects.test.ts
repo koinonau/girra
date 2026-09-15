@@ -383,7 +383,7 @@ describe('connectPanePty', () => {
       'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
     )
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-crashed-codex')
+    const transport = createMockTransport('pty-crashed-opencode')
     transportFactoryQueue.push(transport)
     vi.useFakeTimers()
 
@@ -391,7 +391,7 @@ describe('connectPanePty', () => {
       const paneKey = makePaneKey('tab-1', LEAF_1)
       const crashedTurnStartedAt = Date.now()
       const initialAgentType =
-        hookUpdateBeforeDispatch === 'same-turn-known-agent' ? 'unknown' : 'codex'
+        hookUpdateBeforeDispatch === 'same-turn-known-agent' ? 'unknown' : 'opencode'
       mockStoreState.agentStatusByPaneKey[paneKey] = {
         state: 'working',
         prompt: 'crash before done hook',
@@ -402,7 +402,7 @@ describe('connectPanePty', () => {
         stateHistory: []
       }
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('codex')
+      getForegroundProcess.mockResolvedValue('opencode')
       const pane = createPane(1)
       const manager = createManager(1)
       const deps = createDeps()
@@ -416,7 +416,7 @@ describe('connectPanePty', () => {
         throw new Error('Expected onTitleChange to be registered')
       }
 
-      titleHandler('Codex working', 'Codex working')
+      titleHandler('OpenCode working', 'OpenCode working')
       await vi.advanceTimersByTimeAsync(2_500)
       getForegroundProcess.mockResolvedValue(null)
       await vi.advanceTimersByTimeAsync(1_800)
@@ -430,7 +430,7 @@ describe('connectPanePty', () => {
           updatedAt: Date.now(),
           stateStartedAt:
             hookUpdateBeforeDispatch === 'new-turn' ? Date.now() : crashedTurnStartedAt,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey,
           stateHistory: []
         }
@@ -440,7 +440,7 @@ describe('connectPanePty', () => {
 
       const expectedNotification = {
         source: 'agent-task-complete',
-        terminalTitle: 'codex',
+        terminalTitle: 'opencode',
         paneKey,
         agentCompletionSource: 'process-exit'
       }
@@ -466,11 +466,11 @@ describe('connectPanePty', () => {
 
   it('drops an exited agent completion when a replacement agent hook row is active', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-replaced-codex')
+    const transport = createMockTransport('pty-replaced-opencode')
     transportFactoryQueue.push(transport)
     vi.useFakeTimers()
     const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-    getForegroundProcess.mockResolvedValue('codex')
+    getForegroundProcess.mockResolvedValue('opencode')
     const paneKey = makePaneKey('tab-1', LEAF_1)
     const pane = createPane(1)
     const manager = createManager(1)
@@ -485,7 +485,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected onTitleChange to be registered')
     }
 
-    titleHandler('Codex working', 'Codex working')
+    titleHandler('OpenCode working', 'OpenCode working')
     await vi.advanceTimersByTimeAsync(2_500)
     mockStoreState.agentStatusByPaneKey[paneKey] = {
       state: 'working',
@@ -531,7 +531,7 @@ describe('connectPanePty', () => {
 
   it('drops confirmed idle exit when a different hook owner appears between null samples', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-replaced-codex')
+    const transport = createMockTransport('pty-replaced-opencode')
     transportFactoryQueue.push(transport)
     vi.useFakeTimers()
     // Why: pin the ±10% poll jitter to nominal so the 2nd null sample can't confirm exit before the replacement owner is set.
@@ -547,7 +547,7 @@ describe('connectPanePty', () => {
       })
       getForegroundProcess.mockImplementation(async () => {
         if (!idleMode) {
-          return 'codex'
+          return 'opencode'
         }
         nullSamplesStarted += 1
         if (nullSamplesStarted >= 2) {
@@ -572,7 +572,7 @@ describe('connectPanePty', () => {
         throw new Error('Expected title and idle handlers to be registered')
       }
 
-      titleHandler('Codex working', 'Codex working')
+      titleHandler('OpenCode working', 'OpenCode working')
       await vi.advanceTimersByTimeAsync(2_500)
       idleMode = true
       for (let attempts = 0; nullSamplesStarted < 1; attempts += 1) {
@@ -616,11 +616,11 @@ describe('connectPanePty', () => {
   it('preserves replacement-agent title side effects through the process replacement veto', async () => {
     const { dispatchAgentHookTerminalLifecycle } = await import('./agent-hook-terminal-lifecycle')
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-replaced-codex')
+    const transport = createMockTransport('pty-replaced-opencode')
     transportFactoryQueue.push(transport)
     vi.useFakeTimers()
     const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-    getForegroundProcess.mockResolvedValue('codex')
+    getForegroundProcess.mockResolvedValue('opencode')
     const paneKey = makePaneKey('tab-1', LEAF_1)
     const pane = createPane(1)
     const manager = createManager(1)
@@ -638,7 +638,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected title and idle handlers to be registered')
     }
 
-    titleHandler('Codex working', 'Codex working')
+    titleHandler('OpenCode working', 'OpenCode working')
     await vi.advanceTimersByTimeAsync(2_500)
     mockStoreState.agentStatusByPaneKey[paneKey] = {
       state: 'working',

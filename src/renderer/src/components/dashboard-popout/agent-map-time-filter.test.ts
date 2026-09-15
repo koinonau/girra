@@ -16,7 +16,7 @@ function card(overrides: Partial<DashboardCard> = {}): DashboardCard {
   return {
     paneKey: 'pane-1',
     ptyId: null,
-    agentType: 'codex',
+    agentType: 'opencode',
     bucket: 'working',
     dotState: 'working',
     task: '',

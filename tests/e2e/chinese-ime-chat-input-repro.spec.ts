@@ -81,9 +81,8 @@ function stripTerminalControls(value: string): string {
   return output
 }
 
-const CODEX_READY_RE = /Ask Codex|OpenAI/i
-const CODEX_TRUST_PROMPT_RE = /Do you trust|trust this folder|Trust this/i
-const CODEX_UPDATE_PROMPT_RE = /update available|install update|Skip for now/i
+const CLAUDE_READY_RE = /\? for shortcuts|Try [“"]/i
+const CLAUDE_TRUST_PROMPT_RE = /Do you trust|trust this folder|Trust this/i
 const LINUX_IME_POLICY_USER_AGENT =
   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/146 Safari/537.36'
 const WINDOWS_IME_POLICY_USER_AGENT =
@@ -479,20 +478,14 @@ async function waitForCleanTerminalText(
     .toBe(true)
 }
 
-async function dismissCodexPromptsIfPresent(page: Page): Promise<void> {
+async function dismissClaudePromptsIfPresent(page: Page): Promise<void> {
   const deadline = Date.now() + 20_000
   while (Date.now() < deadline) {
     const content = stripTerminalControls(await getTerminalContent(page, 20_000))
-    if (CODEX_READY_RE.test(content) && !CODEX_TRUST_PROMPT_RE.test(content)) {
+    if (CLAUDE_READY_RE.test(content) && !CLAUDE_TRUST_PROMPT_RE.test(content)) {
       return
     }
-    if (CODEX_TRUST_PROMPT_RE.test(content)) {
-      await page.keyboard.press('Enter')
-      await page.waitForTimeout(300)
-      continue
-    }
-    if (CODEX_UPDATE_PROMPT_RE.test(content)) {
-      await page.keyboard.type('3')
+    if (CLAUDE_TRUST_PROMPT_RE.test(content)) {
       await page.keyboard.press('Enter')
       await page.waitForTimeout(300)
       continue
@@ -501,14 +494,10 @@ async function dismissCodexPromptsIfPresent(page: Page): Promise<void> {
   }
 }
 
-async function launchCodexTui(page: Page, ptyId: string): Promise<void> {
-  await sendToTerminal(
-    page,
-    ptyId,
-    'codex --dangerously-bypass-approvals-and-sandbox --dangerously-bypass-hook-trust\r'
-  )
-  await dismissCodexPromptsIfPresent(page)
-  await waitForCleanTerminalText(page, CODEX_READY_RE, 'Codex TUI did not become ready')
+async function launchClaudeTui(page: Page, ptyId: string): Promise<void> {
+  await sendToTerminal(page, ptyId, 'claude\r')
+  await dismissClaudePromptsIfPresent(page)
+  await waitForCleanTerminalText(page, CLAUDE_READY_RE, 'Claude Code TUI did not become ready')
   await focusActiveTerminalInput(page)
 }
 
@@ -773,12 +762,12 @@ test.describe('Chinese IME terminal chat input repro', () => {
     }
   })
 
-  test('keeps composed Chinese text stable in the real Codex TUI input @real-codex-ime', async ({
+  test('keeps composed Chinese text stable in the real Claude Code TUI input @real-claude-ime', async ({
     orcaPage
   }, testInfo) => {
     test.skip(
-      process.env.ORCA_E2E_REAL_CODEX_IME !== '1',
-      'Set ORCA_E2E_REAL_CODEX_IME=1 to exercise the locally installed Codex TUI'
+      process.env.ORCA_E2E_REAL_CLAUDE_IME !== '1',
+      'Set ORCA_E2E_REAL_CLAUDE_IME=1 to exercise the locally installed Claude Code TUI'
     )
 
     await waitForSessionReady(orcaPage)
@@ -790,13 +779,17 @@ test.describe('Chinese IME terminal chat input repro', () => {
     const session = await orcaPage.context().newCDPSession(orcaPage)
 
     try {
-      await launchCodexTui(orcaPage, ptyId)
+      await launchClaudeTui(orcaPage, ptyId)
       await installImeEventProbe(orcaPage)
 
       await dispatchImeProcessKey(session, 'KeyN')
       await composeAndCommitChineseText(session, orcaPage, ['n', 'ni', '你', '你好'], '你好')
-      await waitForCleanTerminalText(orcaPage, /你好/, 'Codex input did not show composed Chinese')
-      await attachImeEvidence(orcaPage, testInfo, 'codex-after-compose-hello', {
+      await waitForCleanTerminalText(
+        orcaPage,
+        /你好/,
+        'Claude Code input did not show composed Chinese'
+      )
+      await attachImeEvidence(orcaPage, testInfo, 'claude-after-compose-hello', {
         cleanTerminal: stripTerminalControls(await getTerminalContent(orcaPage, 20_000))
       })
 
@@ -805,7 +798,7 @@ test.describe('Chinese IME terminal chat input repro', () => {
       await waitForCleanTerminalText(
         orcaPage,
         /你好中/,
-        'Codex input did not keep previously composed text before middle-edit checks'
+        'Claude Code input did not keep previously composed text before middle-edit checks'
       )
 
       await orcaPage.keyboard.press('ArrowLeft')
@@ -814,28 +807,28 @@ test.describe('Chinese IME terminal chat input repro', () => {
       await waitForCleanTerminalText(
         orcaPage,
         /你好中/,
-        'Backspace during Codex composition removed committed Chinese text'
+        'Backspace during Claude Code composition removed committed Chinese text'
       )
       await setImeComposition(session, '')
       await commitImeText(session, '')
 
-      await attachImeEvidence(orcaPage, testInfo, 'codex-after-composition-backspace', {
+      await attachImeEvidence(orcaPage, testInfo, 'claude-after-composition-backspace', {
         cleanTerminal: stripTerminalControls(await getTerminalContent(orcaPage, 20_000))
       })
 
       const cleanTerminal = stripTerminalControls(await getTerminalContent(orcaPage, 20_000))
       expect(
         cleanTerminal,
-        'Codex should keep committed Chinese text when Backspace cancels an IME preedit'
+        'Claude Code should keep committed Chinese text when Backspace cancels an IME preedit'
       ).toContain('你好中')
       expect(cleanTerminal).not.toMatch(/\bn(?:i)?你好/)
       expect(cleanTerminal).not.toMatch(/\bz(?:h)?中/)
     } finally {
-      await attachImeEvidence(orcaPage, testInfo, 'codex-final-ime-evidence', {
+      await attachImeEvidence(orcaPage, testInfo, 'claude-final-ime-evidence', {
         cleanTerminal: stripTerminalControls(await getTerminalContent(orcaPage, 20_000))
       }).catch(() => undefined)
       await session.detach().catch(() => undefined)
-      await sendToTerminal(orcaPage, ptyId, '\x03/quit\r').catch(() => undefined)
+      await sendToTerminal(orcaPage, ptyId, '\x03/exit\r').catch(() => undefined)
     }
   })
 })

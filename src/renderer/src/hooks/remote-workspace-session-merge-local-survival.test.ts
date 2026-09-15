@@ -143,23 +143,23 @@ describe('direct-SSH reconnect merge: local state the host has not seen', () => 
   })
 
   it('does not show one agent twice when the host re-lists its session under a new tab id', () => {
-    // The reported duplicate grok. One launch, but the host carries the session under a new tab id
+    // The reported duplicate OpenCode tab. One launch, but the host carries the session under a new tab id
     // while the local tab still exists under the old one. Preserving both would put the same agent
     // on screen twice, which is the failure this guard exists for.
-    const localGrok = terminalTab('grok-old')
-    const hostGrok = terminalTab('grok-new')
+    const localOpenCode = terminalTab('opencode-old')
+    const hostOpenCode = terminalTab('opencode-new')
     const current = sessionState({
-      tabsByWorktree: { [WORKTREE]: [localGrok] },
-      remoteSessionIdsByTabId: { 'grok-old': 'session-grok' }
+      tabsByWorktree: { [WORKTREE]: [localOpenCode] },
+      remoteSessionIdsByTabId: { 'opencode-old': 'session-opencode' }
     })
     const remote = sessionState({
-      tabsByWorktree: { [WORKTREE]: [hostGrok] },
-      remoteSessionIdsByTabId: { 'grok-new': 'session-grok' }
+      tabsByWorktree: { [WORKTREE]: [hostOpenCode] },
+      remoteSessionIdsByTabId: { 'opencode-new': 'session-opencode' }
     })
 
-    const merged = merge(current, remote, { [WORKTREE]: [localGrok] })
+    const merged = merge(current, remote, { [WORKTREE]: [localOpenCode] })
 
-    expect(merged.tabsByWorktree[WORKTREE].map((tab) => tab.id)).toEqual(['grok-new'])
+    expect(merged.tabsByWorktree[WORKTREE].map((tab) => tab.id)).toEqual(['opencode-new'])
   })
 
   it('still keeps a host-unknown tab that carries no session id', () => {
@@ -168,11 +168,11 @@ describe('direct-SSH reconnect merge: local state the host has not seen', () => 
     const agent = terminalTab('agent')
     const current = sessionState({
       tabsByWorktree: { [WORKTREE]: [agent, setup] },
-      remoteSessionIdsByTabId: { agent: 'session-grok' }
+      remoteSessionIdsByTabId: { agent: 'session-opencode' }
     })
     const remote = sessionState({
       tabsByWorktree: { [WORKTREE]: [agent] },
-      remoteSessionIdsByTabId: { agent: 'session-grok' }
+      remoteSessionIdsByTabId: { agent: 'session-opencode' }
     })
 
     const merged = merge(current, remote, { [WORKTREE]: [agent, setup] })

@@ -146,7 +146,7 @@ export class OrcaRuntimeWithResolveWorktreeRemovalTarget extends OrcaRuntimeWith
     workspace: TerminalWorkspaceLaunchScope,
     opts: TerminalCreateOptions
   ): Promise<TerminalCreateOptions> {
-    // Why: raw shell commands like `codex exec` must remain user-authored shell.
+    // Why: raw shell commands like `claude -p` must remain user-authored shell.
     // Only unmanaged, repo-backed, bare agent launches get Settings defaults.
     const callerSuppliedLaunch =
       opts.env ||
@@ -219,8 +219,6 @@ export class OrcaRuntimeWithResolveWorktreeRemovalTarget extends OrcaRuntimeWith
       }
       return opts
     }
-
-    await this.markWorkspaceTrustedForAgent(agent, workspace.connectionId, workspace.path)
 
     return {
       ...opts,

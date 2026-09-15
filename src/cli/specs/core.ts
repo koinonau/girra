@@ -111,7 +111,7 @@ export const CORE_COMMAND_SPECS: CommandSpec[] = [
       'activate'
     ],
     notes: [
-      'This creates a new checkout. For a fresh agent in an existing worktree, use `orca terminal create --worktree active --command "codex"` instead.',
+      'This creates a new checkout. For a fresh agent in an existing worktree, use `orca terminal create --worktree active --command "claude"` instead.',
       'By default, Orca records the new worktree as a child of the caller context when it can infer one from the Orca terminal or current directory.',
       'If --repo is omitted, Orca infers the repo from the current Orca-managed worktree.',
       'Use --project with --host to create on a ready project host setup without spelling the backing repo id.',
@@ -127,11 +127,11 @@ export const CORE_COMMAND_SPECS: CommandSpec[] = [
       'Passing --run-hooks is kept as a legacy alias for --setup run and reveals the worktree.'
     ],
     examples: [
-      'orca worktree create --name agent-task --agent codex --prompt "hi" --json',
+      'orca worktree create --name agent-task --agent claude --prompt "hi" --json',
       'orca worktree create --repo id:<repoId> --name related-task --json',
       'orca worktree create --project github:stablyai/orca --host runtime:03ef704c-b180-4b10-998d-e28fbd5de9a3 --name benchmark --json',
       'orca worktree create --repo id:<repoId> --name linear-task --linear-issue https://linear.app/stably/issue/STA-335/test-issue --json',
-      'orca worktree create --repo id:<repoId> --name agent-task --agent codex --prompt "hi" --json',
+      'orca worktree create --repo id:<repoId> --name agent-task --agent claude --prompt "hi" --json',
       'orca worktree create --repo id:<repoId> --name folder-child --parent-worktree folder:<folderId> --json',
       'orca worktree create --repo id:<repoId> --name related-task --parent-worktree active --json',
       'orca worktree create --repo id:<repoId> --name independent-task --no-parent --json'
@@ -255,7 +255,7 @@ export const CORE_COMMAND_SPECS: CommandSpec[] = [
     ],
     examples: [
       'orca terminal create --json',
-      'orca terminal create --worktree active --command "codex" --json',
+      'orca terminal create --worktree active --command "claude" --json',
       'orca terminal create --worktree path:/projects/myapp --title "RUNNER" --command "opencode"',
       'orca terminal create --worktree path:/projects/myapp --command "opencode" --focus'
     ]
@@ -290,7 +290,7 @@ export const CORE_COMMAND_SPECS: CommandSpec[] = [
     allowedFlags: [...GLOBAL_FLAGS, 'terminal', 'direction', 'command'],
     examples: [
       'orca terminal split --terminal term_abc123 --direction horizontal --json',
-      'orca terminal split --terminal term_abc123 --command "codex"'
+      'orca terminal split --terminal term_abc123 --command "claude"'
     ]
   }
 ]

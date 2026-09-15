@@ -20,6 +20,7 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:
 import { createServer } from 'node:net'
 import os from 'node:os'
 import path from 'node:path'
+import { encodeClaudeProjectPath } from '../../../src/main/ai-vault/claude-project-dir-encoding'
 import { getE2EExistingUserProfile } from './e2e-existing-user-profile'
 import { getOrcaElectronLaunchArgs } from './electron-launch-args'
 import { retryTransientMainEvaluate } from './electron-main-evaluate-retry'
@@ -49,7 +50,7 @@ type LaunchOptions = {
 
 type RestartSession = {
   userDataDir: string
-  seedCodexResumeRollout: (sessionId: string, cwd: string) => string
+  seedClaudeResumeTranscript: (sessionId: string, cwd: string) => string
   launch: (options?: LaunchOptions) => Promise<LaunchedOrca>
   /** Gracefully close a launch, letting beforeunload flush session state. */
   close: (app: ElectronApplication) => Promise<void>
@@ -150,23 +151,23 @@ export function createRestartSession(
     `${JSON.stringify(getE2EExistingUserProfile(), null, 2)}\n`
   )
 
-  const seedCodexResumeRollout = (sessionId: string, cwd: string): string => {
-    const sessionsDir = path.join(
+  const seedClaudeResumeTranscript = (sessionId: string, cwd: string): string => {
+    const projectDir = path.join(
       homeIsolation.isolatedHome,
-      '.codex',
-      'sessions',
-      '2026',
-      '07',
-      '28'
+      '.claude',
+      'projects',
+      encodeClaudeProjectPath(cwd)
     )
-    mkdirSync(sessionsDir, { recursive: true })
-    const transcriptPath = path.join(sessionsDir, `rollout-2026-07-28T00-00-00-${sessionId}.jsonl`)
+    mkdirSync(projectDir, { recursive: true })
+    const transcriptPath = path.join(projectDir, `${sessionId}.jsonl`)
     writeFileSync(
       transcriptPath,
       `${JSON.stringify({
+        type: 'user',
+        sessionId,
+        cwd,
         timestamp: '2026-07-28T00:00:00.000Z',
-        type: 'session_meta',
-        payload: { id: sessionId, cwd }
+        message: { role: 'user', content: 'finish the task' }
       })}\n`
     )
     return transcriptPath
@@ -218,7 +219,7 @@ export function createRestartSession(
     }
   }
 
-  return { userDataDir, seedCodexResumeRollout, launch, close, dispose }
+  return { userDataDir, seedClaudeResumeTranscript, launch, close, dispose }
 }
 
 /**

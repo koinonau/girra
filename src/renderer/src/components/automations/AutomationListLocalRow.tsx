@@ -42,6 +42,7 @@ import { AutomationListLastRunCell } from './AutomationListLastRunCell'
 import { formatAutomationDateTimeWithRelative } from './automation-page-parts'
 import { getAutomationTargetAvailability } from './automation-target-availability'
 import { getAgentLabel } from './automation-draft-model'
+import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import type { AutomationListRow } from './automation-list-row-identity'
 import {
   formatAutomationCost,
@@ -171,6 +172,8 @@ export function AutomationListLocalRow({
       : getLocalExecutionHostLabel())
   const agentTooltipLabel = `${agentLabel} · ${hostLabel} · ${automationUsageText(row.usageSummary ?? undefined)}`
   const canRunNow = automationRunAvailability.canRunNow && allows(row, 'run')
+  // Why: an automation whose agent was dropped stays paused until edited to a known agent.
+  const canToggle = allows(row, 'toggle') && (automation.enabled || isTuiAgent(automation.agentId))
   const lastRun = lastRunByAutomationId.get(automation.id)
   // Without a fetched run, the row's projected summary carries the newest
   // retained run's status — the list never downloads run history for this.
@@ -196,7 +199,7 @@ export function AutomationListLocalRow({
         onSelect={() => onEdit(row)}
       />
       <MenuItem
-        disabled={!allows(row, 'toggle')}
+        disabled={!canToggle}
         icon={automation.enabled ? <Pause className="size-3.5" /> : <Play className="size-3.5" />}
         label={
           automation.enabled
@@ -311,7 +314,7 @@ export function AutomationListLocalRow({
                 <Pencil className="size-3.5" />
                 {translate('auto.components.automations.AutomationsPage.f4612e3f78', 'Edit')}
               </DropdownMenuItem>
-              <DropdownMenuItem disabled={!allows(row, 'toggle')} onSelect={() => onToggle(row)}>
+              <DropdownMenuItem disabled={!canToggle} onSelect={() => onToggle(row)}>
                 {automation.enabled ? (
                   <Pause className="size-3.5" />
                 ) : (

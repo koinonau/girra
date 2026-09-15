@@ -28,8 +28,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       write.mockClear()
 
@@ -90,8 +90,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       write.mockClear()
 
@@ -145,7 +145,7 @@ describe('OrcaRuntimeService', () => {
             {
               tabId: 'tab-1',
               worktreeId: TEST_WORKTREE_ID,
-              title: 'Codex',
+              title: 'Claude',
               activeLeafId: leafId,
               layout: null
             }
@@ -165,8 +165,8 @@ describe('OrcaRuntimeService', () => {
       syncUuidLeaf()
 
       const [terminal] = (await runtime.listTerminals()).terminals
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       write.mockClear()
 
@@ -228,8 +228,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       write.mockClear()
 
@@ -275,8 +275,8 @@ describe('OrcaRuntimeService', () => {
       syncSinglePty(runtime)
 
       const [terminal] = (await runtime.listTerminals()).terminals
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       write.mockClear()
 
@@ -303,7 +303,7 @@ describe('OrcaRuntimeService', () => {
       // The replacement's first live idle frame re-authorizes delivery — with no
       // working frame, since exit keeps lastAgentStatus 'idle' for `ps` and the
       // replacement can come up straight at an idle prompt (no transition).
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 200)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 200)
       expect(write).toHaveBeenCalledWith(
         'pty-1',
         expect.stringContaining('You have 1 orchestration message')
@@ -333,8 +333,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
 
       // Why: a `check --wait --types worker_done` waiter never returns a status
@@ -388,8 +388,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       const message = db.insertMessage({
         from: 'sender',
@@ -429,8 +429,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       db.insertMessage({ from: 'sender', to: terminal.handle, subject: 'once only' })
 
@@ -477,8 +477,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       const first = db.insertMessage({ from: 'sender', to: terminal.handle, subject: 'first' })
       runtime.notifyMessageArrived(terminal.handle, 'status')
@@ -535,8 +535,8 @@ describe('OrcaRuntimeService', () => {
 
     const [terminal] = (await runtime.listTerminals()).terminals
     bindSinglePtyRun(db, terminal.handle)
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-    runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
     await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
     db.insertMessage({ from: 'sender', to: terminal.handle, subject: 'after wait' })
 

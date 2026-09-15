@@ -70,7 +70,7 @@ describe('setTabLayout PTY ownership', () => {
     store.getState().setAgentStatus(removedPaneKey, {
       state: 'working',
       prompt: 'before repair',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     store.getState().setTabLayout('tab-1', {
@@ -95,7 +95,7 @@ describe('setTabLayout PTY ownership', () => {
     store.getState().setAgentStatus(removedPaneKey, {
       state: 'working',
       prompt: 'after repair',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     expect(store.getState().agentStatusByPaneKey[retainedPaneKey]?.prompt).toBe('after repair')
   })
@@ -113,7 +113,7 @@ describe('setTabLayout PTY ownership', () => {
     store.getState().setAgentStatus(removedPaneKey, {
       state: 'working',
       prompt: 'before hydration',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     store.getState().hydrateWorkspaceSession({

@@ -137,16 +137,13 @@ describe('AgentHookServer ingestStructuredStatus', () => {
   it('drops the row without sending the renderer a clear for a pane it does not write', () => {
     const server = new AgentHookServer()
     const cleared: unknown[] = []
-    const dropped: string[] = []
     server.setPaneStatusClearListener((clear) => cleared.push(clear))
-    server.subscribeStatusDrop((paneKey) => dropped.push(paneKey))
 
     server.ingestStructuredStatus(summary())
     server.dropStructuredStatus(SESSION)
 
     expect(server.getStatusSnapshot()).toEqual([])
     expect(cleared).toEqual([])
-    expect(dropped).toEqual([STRUCTURED_PANE])
   })
 
   it('schedules no persist for a structured row, while a hook row still does', () => {

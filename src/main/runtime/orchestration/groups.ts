@@ -7,17 +7,7 @@ import type { OrchestrationAddressableAgent } from './structured-worker-group-ad
 // candidates: the sender's Run for every group but `@worktree:<id>`, which names one
 // workspace explicitly. There is no host-wide candidate set.
 
-const AGENT_NAME_GROUPS = [
-  'claude',
-  'openclaude',
-  'codex',
-  'opencode',
-  'mimo',
-  'gemini',
-  'droid',
-  'grok',
-  'cursor'
-] as const
+const AGENT_NAME_GROUPS = ['claude', 'opencode'] as const
 
 type AgentNameGroup = (typeof AGENT_NAME_GROUPS)[number]
 
@@ -28,14 +18,7 @@ export function isGroupAddress(to: string): boolean {
 /** Group name to the agent id the host publishes for a pane. */
 const GROUP_AGENT_IDS: Record<AgentNameGroup, TuiAgent> = {
   claude: 'claude',
-  openclaude: 'openclaude',
-  codex: 'codex',
-  opencode: 'opencode',
-  mimo: 'mimo-code',
-  gemini: 'gemini',
-  droid: 'droid',
-  grok: 'grok',
-  cursor: 'cursor'
+  opencode: 'opencode'
 }
 
 /**
@@ -44,9 +27,8 @@ const GROUP_AGENT_IDS: Record<AgentNameGroup, TuiAgent> = {
  * Why the host's resolved identity and not the title: a terminal title is a decoration channel
  * that routinely contains other agents' names, because people describe agent work in their task
  * titles. Matching `@claude` against the title delivered the message to any pane whose task text
- * happened to say "claude" — a Codex pane reviewing a Claude PR received Claude's instructions.
- * Recorded titles like "Switch Claude and Codex off the load balancer… - grok" are the ordinary
- * case, not a contrived one.
+ * happened to say "claude", so an OpenCode pane reviewing a Claude PR received Claude's
+ * instructions. Task titles naming other agents are the ordinary case, not a contrived one.
  *
  * Why an absent identity means NO: `agentIdentity` is absent when the host predates the field or
  * had no evidence beyond the title. Delivery is an action, so unknown fails closed. Not
@@ -93,7 +75,7 @@ export function resolveGroupAddress(
       .map((t) => t.handle)
   }
 
-  // Why: agent-name groups (@claude, @droid, etc.) resolve against the identity the HOST
+  // Why: agent-name groups (@claude, @opencode) resolve against the identity the HOST
   // published for each pane, so the sender can address every instance of an agent without
   // knowing their handles — and without a task title being able to redirect the message.
   const agentName = group.slice(1) // remove @

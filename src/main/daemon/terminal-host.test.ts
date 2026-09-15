@@ -321,7 +321,7 @@ describe('TerminalHost', () => {
         sessionId: 'session-1',
         cols: 80,
         rows: 24,
-        command: 'codex --no-alt-screen',
+        command: 'opencode --print-logs',
         streamClient: { onData: vi.fn(), onExit: vi.fn() }
       })
 

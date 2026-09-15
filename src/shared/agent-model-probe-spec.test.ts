@@ -12,6 +12,6 @@ describe('getAgentModelProbeSpec', () => {
   })
 
   it('is undefined for an agent outside the commit-message registry', () => {
-    expect(getAgentModelProbeSpec('aider')).toBeUndefined()
+    expect(getAgentModelProbeSpec('claude-agent-teams')).toBeUndefined()
   })
 })

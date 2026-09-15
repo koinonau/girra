@@ -207,7 +207,7 @@ function assemblePtyIpcSpawnHostEnv(ctx: PtyIpcSpawnState): void {
       )
       promoteAgentTeamsShimPath(ctx.env, ctx.requestedAgentTeamsPath)
     } catch (err) {
-      // Why: buildPtyHostEnv has fs side-effects (Pi/OMP install); clear per-PTY state on throw, but only minted ids — caller ids may name existing PTYs.
+      // Why: buildPtyHostEnv has fs side-effects (Pi install); clear per-PTY state on throw, but only minted ids — caller ids may name existing PTYs.
       if (ctx.isMintedSessionId) {
         clearProviderPtyState(sessionIdForEnv)
       }

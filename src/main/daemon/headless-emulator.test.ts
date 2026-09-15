@@ -107,7 +107,7 @@ describe('HeadlessEmulator', () => {
         '\x1b[2J\x1b[H',
         '\x1b[?25l',
         '\x1b[2;36m╭────────────────────────────╮\x1b[0m\r\n',
-        '\x1b[2;36m│ Codex rich restore 🟢 ███░ │\x1b[0m\r\n',
+        '\x1b[2;36m│ Agent rich restore 🟢 ███░ │\x1b[0m\r\n',
         '\x1b[2;36m│ status streaming           │\x1b[0m\r\n',
         '\x1b[2;36m╰────────────────────────────╯\x1b[0m',
         '\x1b[6;4H\x1b[?25h',
@@ -123,7 +123,7 @@ describe('HeadlessEmulator', () => {
 
       const snapshot = emulator.getSnapshot()
       expect(snapshot.modes.alternateScreen).toBe(true)
-      expect(snapshot.snapshotAnsi).toContain('Codex rich restore')
+      expect(snapshot.snapshotAnsi).toContain('Agent rich restore')
       expect(snapshot.snapshotAnsi).toContain('🟢')
       expect(snapshot.snapshotAnsi).toContain('███░')
       expect(snapshot.snapshotAnsi).toContain('╭')
@@ -134,7 +134,7 @@ describe('HeadlessEmulator', () => {
         await replay.write(snapshot.rehydrateSequences + snapshot.snapshotAnsi)
         const replayed = replay.getSnapshot()
         expect(replayed.modes.alternateScreen).toBe(true)
-        expect(replayed.snapshotAnsi).toContain('Codex rich restore')
+        expect(replayed.snapshotAnsi).toContain('Agent rich restore')
         expect(replayed.snapshotAnsi).toContain('🟢')
         expect(replayed.snapshotAnsi).toContain('███░')
       } finally {
@@ -285,26 +285,26 @@ describe('HeadlessEmulator', () => {
     it('captures the latest OSC window title in snapshots', async () => {
       emulator = new HeadlessEmulator({ cols: 80, rows: 24 })
 
-      await emulator.write('\x1b]0;Codex working\x07hello')
+      await emulator.write('\x1b]0;OpenCode working\x07hello')
 
-      expect(emulator.getSnapshot().lastTitle).toBe('Codex working')
+      expect(emulator.getSnapshot().lastTitle).toBe('OpenCode working')
     })
 
     it('uses the last OSC title when a chunk contains multiple title updates', async () => {
       emulator = new HeadlessEmulator({ cols: 80, rows: 24 })
 
-      await emulator.write('\x1b]0;Codex working\x07output\x1b]2;Codex idle\x1b\\')
+      await emulator.write('\x1b]0;OpenCode working\x07output\x1b]2;OpenCode idle\x1b\\')
 
-      expect(emulator.getSnapshot().lastTitle).toBe('Codex idle')
+      expect(emulator.getSnapshot().lastTitle).toBe('OpenCode idle')
     })
 
     it('tracks OSC titles across split PTY chunks', async () => {
       emulator = new HeadlessEmulator({ cols: 80, rows: 24 })
 
-      await emulator.write('\x1b]0;Codex work')
+      await emulator.write('\x1b]0;OpenCode work')
       await emulator.write('ing\x07')
 
-      expect(emulator.getSnapshot().lastTitle).toBe('Codex working')
+      expect(emulator.getSnapshot().lastTitle).toBe('OpenCode working')
     })
 
     it('adopts title metadata seeded from an external serializer', () => {
@@ -677,7 +677,7 @@ describe('HeadlessEmulator', () => {
 
     it('records kitty flags without pushing them into renderer rehydration', async () => {
       emulator = new HeadlessEmulator({ cols: 80, rows: 24 })
-      // OMP/pi negotiate progressive enhancement with a level-1 push.
+      // Pi negotiates progressive enhancement with a level-1 push.
       await emulator.write('\x1b[>1u')
 
       const snapshot = emulator.getSnapshot()

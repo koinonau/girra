@@ -70,7 +70,7 @@ export type Tab = {
   isPinned?: boolean // pinned tabs survive "close others"
   /** Provider backing a structured agent-session tab. */
   agentSessionAgent?: AgentType
-  /** Structured session adopted from this terminal's Codex TUI. */
+  /** Structured session adopted from this terminal's agent TUI. */
   structuredSessionId?: string
   /** Why: per-tab rendering mode for coding-agent terminals. `'chat'` shows the
    *  native chat view as an overlay while the live terminal stays mounted

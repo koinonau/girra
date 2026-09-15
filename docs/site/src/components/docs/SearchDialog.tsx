@@ -85,7 +85,7 @@ const POPULAR_SEARCHES: {
     breadcrumb: ['Working with Agents', 'Agent hooks & memory'],
     title: 'Agent hooks & memory',
     description:
-      "Orca reads each repo's .claude/ and .codex/ config, runs your hooks on worktree create, and surfaces CLAUDE.md / AGENTS.md inline.",
+      "Orca reads each repo's .claude/ config, runs your hooks on worktree create, and surfaces CLAUDE.md / AGENTS.md inline.",
     url: '/docs/agents/hooks-memory'
   },
   {

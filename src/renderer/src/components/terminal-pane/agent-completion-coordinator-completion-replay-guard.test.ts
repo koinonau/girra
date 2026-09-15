@@ -22,13 +22,13 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'first task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_000_000
     })
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'first task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_000_000
     })
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
@@ -37,7 +37,7 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'second task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_010_000
     })
 
@@ -58,7 +58,7 @@ describe('agent completion coordinator', () => {
     const completion = {
       state: 'done' as const,
       prompt: 'same task',
-      agentType: 'codex' as const,
+      agentType: 'opencode' as const,
       stateStartedAt: 1_700_000_000_000
     }
     coordinator.observeHookStatus(completion)
@@ -82,7 +82,7 @@ describe('agent completion coordinator', () => {
     const completedTurn = {
       state: 'done' as const,
       prompt: 'same task',
-      agentType: 'codex' as const,
+      agentType: 'opencode' as const,
       stateStartedAt: 1_700_000_000_000
     }
     coordinator.observeHookStatus(completedTurn)
@@ -91,7 +91,7 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: 'next task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_010_000
     })
     vi.advanceTimersByTime(5_000)
@@ -103,7 +103,7 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'next task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_020_000
     })
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
@@ -125,13 +125,13 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: 'same task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_000_000
     })
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'same task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_010_000
     })
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
@@ -140,17 +140,17 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: 'next task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_020_000
     })
-    coordinator.observeClassifiedTitleCompletion('Codex done')
+    coordinator.observeClassifiedTitleCompletion('OpenCode done')
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'next task',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_030_000
     })
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
@@ -170,7 +170,7 @@ describe('agent completion coordinator', () => {
     })
 
     firstCoordinator.observeTitleWorking()
-    firstCoordinator.observeClassifiedTitleCompletion('Codex done')
+    firstCoordinator.observeClassifiedTitleCompletion('OpenCode done')
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
     firstCoordinator.dispose()
 
@@ -183,11 +183,11 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    remountedCoordinator.observeClassifiedTitleCompletion('Codex done')
+    remountedCoordinator.observeClassifiedTitleCompletion('OpenCode done')
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
     remountedCoordinator.observeTitleWorking()
-    remountedCoordinator.observeClassifiedTitleCompletion('Codex done')
+    remountedCoordinator.observeClassifiedTitleCompletion('OpenCode done')
     expect(dispatchCompletion).toHaveBeenCalledTimes(2)
   })
 
@@ -205,13 +205,13 @@ describe('agent completion coordinator', () => {
     firstCoordinator.observeHookStatus({
       state: 'working',
       prompt: 'ship it',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_000_000
     })
     firstCoordinator.observeHookStatus({
       state: 'done',
       prompt: 'ship it',
-      agentType: 'codex',
+      agentType: 'opencode',
       stateStartedAt: 1_700_000_010_000
     })
     vi.advanceTimersByTime(5_000)
@@ -227,11 +227,11 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    remountedCoordinator.observeClassifiedTitleCompletion('Codex done')
+    remountedCoordinator.observeClassifiedTitleCompletion('OpenCode done')
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
     remountedCoordinator.observeTitleWorking()
-    remountedCoordinator.observeClassifiedTitleCompletion('Codex done')
+    remountedCoordinator.observeClassifiedTitleCompletion('OpenCode done')
     expect(dispatchCompletion).toHaveBeenCalledTimes(2)
   })
 })

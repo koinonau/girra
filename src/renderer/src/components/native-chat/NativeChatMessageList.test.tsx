@@ -32,7 +32,7 @@ const session: NativeChatLiveSession = {
   ],
   status: 'ready',
   sessionId: 'session-1',
-  agent: 'codex',
+  agent: 'claude',
   hasMore: false,
   loadingEarlier: false,
   loadEarlier: vi.fn(),
@@ -140,7 +140,7 @@ describe('NativeChatMessageList spawn-group roster', () => {
     { id: 'b', label: 'search', state: 'failed' }
   ]
 
-  /** The exact two-block row `codexSubagentGroupBody` writes: the structured
+  /** The exact two-block row `claudeSubagentGroupBody` writes: the structured
    *  block plus the plain-text twin a client without the block type reads. */
   function rosterMessage(agents: NativeChatSubagentEntry[], at: number): NativeChatMessage {
     return {

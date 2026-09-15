@@ -24,12 +24,12 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: 'run the goal',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'run the goal',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     expect(coordinator.hasPendingHookDoneCompletion()).toBe(true)
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS - 1)
@@ -38,7 +38,7 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: 'run the goal',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     expect(coordinator.hasPendingHookDoneCompletion()).toBe(false)
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
@@ -47,20 +47,20 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'run the goal',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
     expect(dispatchCompletion).toHaveBeenCalledWith(
-      'codex',
+      'opencode',
       expect.objectContaining({
         source: 'hook',
         quietedHookDone: true,
         agentStatus: expect.objectContaining({
           state: 'done',
           prompt: 'run the goal',
-          agentType: 'codex'
+          agentType: 'opencode'
         })
       })
     )
@@ -80,12 +80,12 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: 'run the goal',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'run the goal',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     expect(coordinator.hasPendingHookDoneCompletion()).toBe(true)
 
@@ -96,36 +96,28 @@ describe('agent completion coordinator', () => {
     expect(dispatchCompletion).not.toHaveBeenCalled()
   })
 
-  it.each([
-    'claude',
-    'codex',
-    'gemini',
-    'opencode',
-    'cursor',
-    'droid',
-    'grok',
-    'devin',
-    'copilot',
-    'hermes'
-  ])('recognizes %s hook agent ids even when the binary name differs', (agentType) => {
-    const dispatchCompletion = vi.fn()
-    const coordinator = createAgentCompletionCoordinator({
-      paneKey: 'tab-1:leaf-1',
-      getPtyId: () => 'pty-1',
-      getSettings: () => null,
-      inspectProcess: vi.fn(),
-      dispatchCompletion,
-      isLive: () => true
-    })
+  it.each(['claude', 'claude-agent-teams', 'opencode'])(
+    'recognizes %s hook agent ids even when the binary name differs',
+    (agentType) => {
+      const dispatchCompletion = vi.fn()
+      const coordinator = createAgentCompletionCoordinator({
+        paneKey: 'tab-1:leaf-1',
+        getPtyId: () => 'pty-1',
+        getSettings: () => null,
+        inspectProcess: vi.fn(),
+        dispatchCompletion,
+        isLive: () => true
+      })
 
-    coordinator.observeHookStatus({
-      state: 'done',
-      prompt: '',
-      agentType
-    })
+      coordinator.observeHookStatus({
+        state: 'done',
+        prompt: '',
+        agentType
+      })
 
-    expect(dispatchCompletion).toHaveBeenCalledWith(agentType)
-  })
+      expect(dispatchCompletion).toHaveBeenCalledWith(agentType)
+    }
+  )
 
   it.each(['pi'])(
     'defers a %s milestone done without prior working through the quiet window',
@@ -140,7 +132,7 @@ describe('agent completion coordinator', () => {
         isLive: () => true
       })
 
-      // Pi/OMP emit agent_end ('done') between milestones with no prior 'working';
+      // Pi emits agent_end ('done') between milestones with no prior 'working';
       // the done must wait out the quiet window instead of firing immediately.
       coordinator.observeHookStatus({
         state: 'done',
@@ -191,7 +183,7 @@ describe('agent completion coordinator', () => {
     expect(dispatchCompletion).not.toHaveBeenCalled()
   })
 
-  it('still dispatches a Codex done-without-prior-working immediately', () => {
+  it('still dispatches a Claude done-without-prior-working immediately', () => {
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -202,11 +194,11 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    // Codex only emits 'done' at turn end, so it must keep its immediate dispatch.
+    // Claude only emits 'done' at turn end, so it must keep its immediate dispatch.
     coordinator.observeHookStatus({
       state: 'done',
       prompt: 'fix the bug',
-      agentType: 'codex'
+      agentType: 'claude'
     })
 
     expect(coordinator.hasPendingHookDoneCompletion()).toBe(false)
@@ -253,7 +245,7 @@ describe('agent completion coordinator', () => {
     )
   })
 
-  it('notifies once after a Cursor tool-heavy turn, not on each shell hook', () => {
+  it('notifies once after an OpenCode tool-heavy turn, not on each shell hook', () => {
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -266,7 +258,7 @@ describe('agent completion coordinator', () => {
 
     const turn = {
       prompt: 'fix the bug',
-      agentType: 'cursor' as const
+      agentType: 'opencode' as const
     }
 
     coordinator.observeHookStatus({ state: 'working', ...turn })

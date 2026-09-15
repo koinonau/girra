@@ -26,7 +26,7 @@ function card(overrides: Partial<DashboardCard> = {}): DashboardCard {
   return {
     paneKey: 'pane-1',
     ptyId: 'pty-1',
-    agentType: 'codex',
+    agentType: 'opencode',
     bucket: 'working',
     dotState: 'working',
     task: 'Ship it',
@@ -51,7 +51,7 @@ describe('buildDashboardWorktreeLaunchOptions', () => {
     )
 
     const options = buildDashboardWorktreeLaunchOptions(
-      state({ detectedAgentIds: ['codex'] }),
+      state({ detectedAgentIds: ['opencode'] }),
       cards
     )
 
@@ -61,16 +61,16 @@ describe('buildDashboardWorktreeLaunchOptions', () => {
   it('combines local detection with proven providers, honoring defaults and disabled agents', () => {
     const options = buildDashboardWorktreeLaunchOptions(
       state({
-        detectedAgentIds: ['claude', 'codex'],
+        detectedAgentIds: ['claude', 'opencode'],
         settings: {
-          defaultTuiAgent: 'codex',
+          defaultTuiAgent: 'opencode',
           disabledTuiAgents: ['claude']
         } as LaunchState['settings']
       }),
-      [card(), card({ paneKey: 'pane-2', agentType: 'gemini' })]
+      [card(), card({ paneKey: 'pane-2', agentType: 'pi' })]
     )
 
-    expect(options).toEqual({ 'worktree-1': ['codex', 'gemini'] })
+    expect(options).toEqual({ 'worktree-1': ['opencode', 'pi'] })
   })
 
   it('publishes detected launch choices for workspaces without cards', () => {
@@ -84,12 +84,12 @@ describe('buildDashboardWorktreeLaunchOptions', () => {
       workspaceKind: 'worktree'
     }
     const options = buildDashboardWorktreeLaunchOptions(
-      state({ detectedAgentIds: ['claude', 'codex'] }),
+      state({ detectedAgentIds: ['claude', 'opencode'] }),
       [],
       [workspace]
     )
 
-    expect(options).toEqual({ 'empty-worktree': ['claude', 'codex'] })
+    expect(options).toEqual({ 'empty-worktree': ['claude', 'opencode'] })
   })
 
   it('uses each git workspace execution host instead of local detection', () => {
@@ -118,16 +118,16 @@ describe('buildDashboardWorktreeLaunchOptions', () => {
           'repo-runtime': [{ id: 'runtime-worktree', repoId: 'repo-runtime' }]
         } as unknown as LaunchState['worktreesByRepo'],
         detectedAgentIds: ['claude'],
-        remoteDetectedAgentIds: { 'ssh-1': ['grok'] },
-        runtimeDetectedAgentIds: { 'hub-1': ['aider'] }
+        remoteDetectedAgentIds: { 'ssh-1': ['pi'] },
+        runtimeDetectedAgentIds: { 'hub-1': ['opencode'] }
       }),
       [
-        card({ repoId: 'repo-ssh', worktreeId: 'ssh-worktree', agentType: 'grok' }),
-        card({ repoId: 'repo-runtime', worktreeId: 'runtime-worktree', agentType: 'aider' })
+        card({ repoId: 'repo-ssh', worktreeId: 'ssh-worktree', agentType: 'pi' }),
+        card({ repoId: 'repo-runtime', worktreeId: 'runtime-worktree', agentType: 'opencode' })
       ]
     )
 
-    expect(options).toEqual({ 'ssh-worktree': ['grok'], 'runtime-worktree': ['aider'] })
+    expect(options).toEqual({ 'ssh-worktree': ['pi'], 'runtime-worktree': ['opencode'] })
   })
 
   it('resolves folder workspace detection through its project host', () => {
@@ -142,11 +142,11 @@ describe('buildDashboardWorktreeLaunchOptions', () => {
           } as FolderWorkspace
         ],
         projectGroups: [{ id: 'group-1' } as ProjectGroup],
-        remoteDetectedAgentIds: { 'ssh-folder': ['goose'] }
+        remoteDetectedAgentIds: { 'ssh-folder': ['pi'] }
       }),
       [card({ repoId: 'folder-workspace:group-1', worktreeId })]
     )
 
-    expect(options).toEqual({ [worktreeId]: ['codex', 'goose'] })
+    expect(options).toEqual({ [worktreeId]: ['opencode', 'pi'] })
   })
 })

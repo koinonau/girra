@@ -141,7 +141,7 @@ describe('registerPtyHandlers', () => {
           id: 'runtime-reattach',
           incarnationId,
           isReattach: true,
-          launchAgent: 'codex'
+          launchAgent: 'claude'
         } as never)
         const runtime = {
           setPtyController: vi.fn(),
@@ -180,7 +180,7 @@ describe('registerPtyHandlers', () => {
             tabId: 'tab-runtime-reattach',
             leafId,
             incarnationId,
-            providerReattachLaunchIdentity: { incarnationId, launchAgent: 'codex' }
+            providerReattachLaunchIdentity: { incarnationId, launchAgent: 'claude' }
           },
           false
         )

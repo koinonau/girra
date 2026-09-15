@@ -3,7 +3,6 @@ import { RUNTIME_NAVIGATION_TARGETS } from '../runtime-navigation'
 import { TAB_ACTIVATION_INTENTS } from '../tab-activation-intent'
 import { OptionalBoolean } from './rpc-param-primitives'
 import { sleepingAgentLaunchConfigSchema } from '../workspace-session-sleeping-agents'
-import type { TuiAgent } from '../tui-agent'
 import { isTuiAgent } from '../tui-agent-config'
 import { MAX_QUICK_COMMAND_AGENT_PROMPT_LENGTH } from '../terminal-quick-commands'
 
@@ -142,10 +141,10 @@ export const CreateTerminalTab = WorktreeTabSelector.extend({
   startupCommandDelivery: z.enum(['fast', 'shell-ready']).optional(),
   launchConfig: sleepingAgentLaunchConfigSchema,
   launchToken: z.string().min(1).max(128).optional(),
+  // Why: older clients may name a retired agent; open a plain terminal instead of rejecting the tab.
   agent: z
-    .custom<TuiAgent>(isTuiAgent, {
-      message: 'Unknown agent preset'
-    })
+    .unknown()
+    .transform((value) => (isTuiAgent(value) ? value : undefined))
     .optional(),
   // Why: agent prompts must be quoted and injected for the host shell (native,
   // WSL, or SSH) instead of pasted from the mobile client before the TUI is ready.
@@ -157,9 +156,8 @@ export const CreateTerminalTab = WorktreeTabSelector.extend({
   // Why: `agent` is the legacy preset field; `launchAgent` is the launch-plan
   // identity used when preserving resume config across runtime boundaries.
   launchAgent: z
-    .custom<TuiAgent>(isTuiAgent, {
-      message: 'Unknown launch agent'
-    })
+    .unknown()
+    .transform((value) => (isTuiAgent(value) ? value : undefined))
     .optional(),
   viewMode: z.enum(['terminal', 'chat']).optional(),
   activate: z.boolean().optional(),

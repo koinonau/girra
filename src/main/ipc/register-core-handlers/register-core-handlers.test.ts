@@ -29,7 +29,6 @@ const {
   registerEphemeralVmHandlersMock,
   registerAiVaultHandlersMock,
   registerAgentHookHandlersMock,
-  registerAgentTrustHandlersMock,
   registerClaudeAccountHandlersMock,
   registerMiniMaxCredentialsHandlersMock,
   registerClipboardHandlersMock,
@@ -86,7 +85,6 @@ const {
   registerEphemeralVmHandlersMock: vi.fn(),
   registerAiVaultHandlersMock: vi.fn(),
   registerAgentHookHandlersMock: vi.fn(),
-  registerAgentTrustHandlersMock: vi.fn(),
   registerClaudeAccountHandlersMock: vi.fn(),
   registerMiniMaxCredentialsHandlersMock: vi.fn(),
   registerClipboardHandlersMock: vi.fn(),
@@ -275,10 +273,6 @@ vi.mock('../agent-hooks', () => ({
   registerAgentHookHandlers: registerAgentHookHandlersMock
 }))
 
-vi.mock('../agent-trust', () => ({
-  registerAgentTrustHandlers: registerAgentTrustHandlersMock
-}))
-
 vi.mock('../claude-accounts', () => ({
   registerClaudeAccountHandlers: registerClaudeAccountHandlersMock
 }))
@@ -367,7 +361,6 @@ describe('registerCoreHandlers', () => {
     registerEphemeralVmHandlersMock.mockReset()
     registerAiVaultHandlersMock.mockReset()
     registerAgentHookHandlersMock.mockReset()
-    registerAgentTrustHandlersMock.mockReset()
     registerClaudeAccountHandlersMock.mockReset()
     registerMiniMaxCredentialsHandlersMock.mockReset()
     registerClipboardHandlersMock.mockReset()

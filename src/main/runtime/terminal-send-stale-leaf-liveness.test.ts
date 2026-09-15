@@ -72,7 +72,7 @@ function publishLeafGraph(runtime: OrcaRuntimeService, leafPtyId: string): void 
       {
         tabId: 'tab-1',
         worktreeId: WORKTREE_ID,
-        title: 'Codex',
+        title: 'Claude',
         activeLeafId: LEAF_ID,
         layout: null
       }
@@ -476,8 +476,8 @@ describe('push-on-idle orchestration delivery absence gate', () => {
     runtime.setOrchestrationDb(stub.db as never)
     // Title transitions mark the leaf idle; without a hasPty answering true the
     // provider never knew this id, modeling a leaf restored from a prior process.
-    runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Codex working\x07', 100)
-    runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Codex done\x07', 101)
+    runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Claude working\x07', 100)
+    runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Claude done\x07', 101)
     return { runtime, handle, write, stub }
   }
 
@@ -511,7 +511,7 @@ describe('push-on-idle orchestration delivery absence gate', () => {
 
     // The replacement's own live idle frame releases the row — through a fresh
     // probe, since this leaf's pty is still unknown to the provider.
-    runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Codex done\x07', 200)
+    runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Claude done\x07', 200)
     resolveProbe(null)
     await new Promise((resolve) => setTimeout(resolve, 0))
     await new Promise((resolve) => setTimeout(resolve, 0))
@@ -772,8 +772,8 @@ describe('push-on-idle orchestration delivery absence gate', () => {
           ([, data]) => typeof data === 'string' && data.includes('orchestration check')
         )
       ).toHaveLength(1)
-      runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Codex working\x07', 200)
-      runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Codex done\x07', 201)
+      runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Claude working\x07', 200)
+      runtime.onPtyData(STALE_PTY_ID, '\x1b]0;Claude done\x07', 201)
       const payloadWrites = write.mock.calls.filter(
         ([, data]) => typeof data === 'string' && data.includes('orchestration check')
       )

@@ -68,7 +68,7 @@ function makeRandom(seed: number): () => number {
   }
 }
 
-const COMMANDS = ['claude', 'codex', 'opencode', 'bash -lc build', 'node server.js']
+const COMMANDS = ['claude', 'pi', 'opencode', 'bash -lc build', 'node server.js']
 
 /** A random process table: some rows reparented, some parents missing, some cycles. */
 function makeTable(random: () => number, size: number): ForegroundProcessCandidate[] {
@@ -133,7 +133,7 @@ it('picks the same foreground agent as the unmemoized lineage walk', () => {
 it('terminates on a ppid cycle that never reaches the outer agent', () => {
   const cycle: ForegroundProcessCandidate[] = [
     { pid: 1, ppid: 0, depth: 0, stat: 'S+', command: 'claude' },
-    { pid: 2, ppid: 3, depth: 1, stat: 'S+', command: 'codex' },
+    { pid: 2, ppid: 3, depth: 1, stat: 'S+', command: 'opencode' },
     { pid: 3, ppid: 2, depth: 2, stat: 'S+', command: 'bash -lc build' }
   ]
   expect(selectForegroundProcessCandidate(cycle)).toBeNull()
@@ -152,7 +152,7 @@ it('reflects a reparent, a spawn and an exit on the next capture', () => {
     ppid: 10,
     depth: 1,
     stat: 'S+',
-    command: 'codex'
+    command: 'pi'
   }
   // Nested lineage: the outer agent wins.
   expect(selectForegroundProcessCandidate([shell, helper])?.candidate.pid).toBe(10)

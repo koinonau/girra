@@ -18,7 +18,6 @@ import type { PtyTransportRecoveryState } from './pty-transport-types'
 import type { ReplayingPanesRef } from './replay-guard'
 import type { TerminalLinkActionRequester } from './terminal-link-action-request'
 import type { TerminalLinkRoutingPreferenceRequester } from './terminal-url-link-hit-testing'
-import type { SessionRestoredBannerReason } from './session-restored-banner-pane-state'
 
 export type TerminalPaneStartup = Exclude<PtyPaneStartup, null>
 
@@ -96,7 +95,7 @@ export type UseTerminalPaneLifecycleDeps = {
   clearWorktreeUnread: (worktreeId: string) => void
   clearTerminalTabUnread: (tabId: string) => void
   clearTerminalPaneUnread: (paneKey: string) => void
-  onShowSessionRestoredBanner: (paneId: number, reason?: SessionRestoredBannerReason) => void
+  onShowSessionRestoredBanner: (paneId: number) => void
   dispatchNotification: (event: {
     source: 'terminal-bell' | 'agent-task-complete'
     terminalTitle?: string

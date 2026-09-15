@@ -74,7 +74,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
         connectionId: 'ssh-1',
         state: 'working',
         prompt: 'PreToolUse: Bash',
-        agentType: 'codex',
+        agentType: 'opencode',
         toolName: 'Bash',
         toolInput: 'pnpm test',
         terminalHandle: 'term-future',
@@ -108,7 +108,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'working',
         prompt: 'PreToolUse: Bash',
-        agentType: 'codex',
+        agentType: 'opencode',
         toolName: 'Bash',
         toolInput: 'pnpm test'
       }),
@@ -181,7 +181,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
         connectionId: 'ssh-1',
         state: 'done',
         prompt: 'remote completion',
-        agentType: 'codex',
+        agentType: 'pi',
         lastAssistantMessage: 'queued completion',
         terminalHandle: 'term-future',
         receivedAt: 1_700_000_000_000,
@@ -213,7 +213,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'done',
         prompt: 'remote completion',
-        agentType: 'codex',
+        agentType: 'pi',
         lastAssistantMessage: 'queued completion'
       }),
       'SSH Tab',
@@ -278,7 +278,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
         connectionId: 'ssh-stale',
         state: 'done',
         prompt: 'remote completion',
-        agentType: 'codex',
+        agentType: 'pi',
         terminalHandle: 'term-future',
         receivedAt: 1_700_000_000_000,
         stateStartedAt: 1_699_999_999_000
@@ -490,7 +490,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'working',
       prompt: 'remote p',
-      agentType: 'codex',
+      agentType: 'opencode',
       worktreeId: 'wt-1',
       connectionId: 'ssh-1',
       receivedAt: 1_700_000_000_000,

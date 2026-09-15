@@ -6,7 +6,7 @@ export const WAIT_BLOCKED_CHECK_MIN_INTERVAL_MS = 50
 
 // Why: chunks that could complete an actionable prompt bypass the throttle so blocked stamps stay immediate; scanned over the new chunk + short carry, never the whole window.
 export const WAIT_BLOCKED_KEYWORD_PATTERN =
-  /press enter|press t to trust|do you trust|trust this|trusted workspace|permission required|requires permission|allow once|allow always|update available|choose working directory|codex just got an upgrade|hooks need review/
+  /press enter|press t to trust|do you trust|trust this|trusted workspace|permission required|requires permission|allow once|allow always|update available|choose working directory|hooks need review/
 
 export const WAIT_BLOCKED_KEYWORD_CARRY_CHARS = 31
 

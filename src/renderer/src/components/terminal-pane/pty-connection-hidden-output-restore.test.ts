@@ -138,7 +138,7 @@ describe('connectPanePty', () => {
     await restoreTerminalTestGlobals()
   })
 
-  it('does not apply stale background Codex query chunks after hidden snapshot restore', async () => {
+  it('does not apply stale background OpenCode query chunks after hidden snapshot restore', async () => {
     // Fire-all like a real event target: both the pane resync and stale-visibility trust handlers listen for visibilitychange.
     const visibilityChangeListeners: (() => void)[] = []
     const visibilityChangeHandler = {
@@ -201,7 +201,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const binding = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)
@@ -245,7 +245,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('restores hidden Codex output after a suppressed exit revives the same ptyId with a restarted seq counter', async () => {
+  it('restores hidden OpenCode output after a suppressed exit revives the same ptyId with a restarted seq counter', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: {
@@ -289,7 +289,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' },
+      startup: { command: 'opencode' },
       consumeSuppressedPtyExit: vi.fn(() => true)
     })
     const binding = connectPanePty(pane as never, manager as never, deps as never)
@@ -336,7 +336,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('restores hidden Codex output when the pty seq counter restarts without an observed exit', async () => {
+  it('restores hidden OpenCode output when the pty seq counter restarts without an observed exit', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: {
@@ -367,7 +367,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: true },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const binding = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)

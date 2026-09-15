@@ -113,47 +113,51 @@ describe('getAgentRowConversationName', () => {
       getAgentRowConversationName(makeTab({ title: '✳ Fix patient intake flow' }), 'claude', false)
     ).toBe('Fix patient intake flow')
     expect(
-      getAgentRowConversationName(makeTab({ title: '⠋ Refactor replay guard' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: '⠋ Refactor replay guard' }), 'opencode', false)
     ).toBe('Refactor replay guard')
   })
 
   it('rejects spinner+cwd titles instead of surfacing paths as names', () => {
     expect(
-      getAgentRowConversationName(makeTab({ title: '⠋ ~/orca/workspaces' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: '⠋ ~/orca/workspaces' }), 'opencode', false)
     ).toBeNull()
     expect(
-      getAgentRowConversationName(makeTab({ title: '/Users/dev/repo' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: '/Users/dev/repo' }), 'opencode', false)
     ).toBeNull()
     expect(
-      getAgentRowConversationName(makeTab({ title: 'C:\\repos\\orca' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: 'C:\\repos\\orca' }), 'opencode', false)
     ).toBeNull()
     expect(
-      getAgentRowConversationName(makeTab({ title: 'orca/workspaces' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: 'orca/workspaces' }), 'opencode', false)
     ).toBeNull()
     expect(
       getAgentRowConversationName(
         makeTab({ title: '\\\\wsl.localhost\\Ubuntu\\home\\dev\\orca' }),
-        'codex',
+        'opencode',
         false
       )
     ).toBeNull()
     expect(
-      getAgentRowConversationName(makeTab({ title: 'repos\\orca' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: 'repos\\orca' }), 'opencode', false)
     ).toBeNull()
   })
 
   it('accepts multi-word titles that merely contain a slash', () => {
     expect(
-      getAgentRowConversationName(makeTab({ title: 'Fix a/b toggle in settings' }), 'codex', false)
+      getAgentRowConversationName(
+        makeTab({ title: 'Fix a/b toggle in settings' }),
+        'opencode',
+        false
+      )
     ).toBe('Fix a/b toggle in settings')
   })
 
   it('rejects synthetic status titles', () => {
     expect(
-      getAgentRowConversationName(makeTab({ title: 'Codex ready' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: 'OpenCode ready' }), 'opencode', false)
     ).toBeNull()
     expect(
-      getAgentRowConversationName(makeTab({ title: 'Codex - action required' }), 'codex', false)
+      getAgentRowConversationName(makeTab({ title: 'Pi - action required' }), 'pi', false)
     ).toBeNull()
     expect(getAgentRowConversationName(makeTab({ title: 'Pi ready' }), 'pi', false)).toBeNull()
   })

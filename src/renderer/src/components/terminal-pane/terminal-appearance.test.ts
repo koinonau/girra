@@ -228,7 +228,7 @@ describe('applyTerminalAppearance theme assignment', () => {
   })
 
   it('applies the mild dark-background contrast floor on dark themes', () => {
-    // #10104: a floor of 3 rescues near-background body text (e.g. Antigravity's #262b30 on #1e242a)
+    // #10104: a floor of 3 rescues near-background body text (e.g. #262b30 on #1e242a)
     // without the 4.5-floor over-brightening of vibrant ANSI colors that #7934 fixed.
     const pane = makePane(1)
     const settings = getDefaultSettings('/tmp')

@@ -81,7 +81,7 @@ export function registryEntryMatchesStatus(args: {
     identity.launchToken !== undefined &&
     (args.launchToken === undefined || identity.launchToken !== args.launchToken)
   ) {
-    // Why: a missing/mismatched launch token is stale proof even if a later manual/mixed Codex run reused the provider session id.
+    // Why: a missing/mismatched launch token is stale proof even if a later manual/mixed run reused the provider session id.
     return false
   }
   if (identity.providerSession !== undefined) {

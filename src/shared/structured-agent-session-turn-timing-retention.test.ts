@@ -10,7 +10,7 @@ import { selectStructuredAgentSettledTurns } from './structured-agent-session-tu
 function submission(index: number): AgentJournalSubmission {
   return {
     clientMessageId: `user-${index}`,
-    providerItemId: `codex:thread:turn-${index}:0`,
+    providerItemId: `claude:session:turn-${index}:0`,
     fence: 1,
     payloadFingerprint: 'fingerprint',
     dispatchState: 'accepted',
@@ -30,7 +30,7 @@ function turnItems(index: number): AgentJournalRenderItem[] {
       body: { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'hello' }] }
     },
     {
-      itemId: `legacy:codex:session:turn-${index}`,
+      itemId: `legacy:claude:session:turn-${index}`,
       revision: 2,
       sequence: index * 2 + 2,
       observedAt: 1_000,

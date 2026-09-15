@@ -24,7 +24,7 @@ function selectThroughRuntime(statusConnectionId: string | null): unknown {
         paneKey: PANE_KEY,
         connectionId: statusConnectionId,
         launchToken: 'launch-1',
-        agentType: 'codex',
+        agentType: 'claude',
         receivedAt: 500,
         providerSession: { key: 'session_id', id: 's1', transcriptPath: '/t.jsonl' }
       }
@@ -38,14 +38,14 @@ function selectThroughRuntime(statusConnectionId: string | null): unknown {
 describe('exact worker provider session wiring', () => {
   it('selects a local hook status for a local pane', () => {
     expect(selectThroughRuntime(null)).toMatchObject({
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { id: 's1' }
     })
   })
 
   it('selects the WSL-relayed hook status for the same local pane', () => {
     expect(selectThroughRuntime(wslHookRelayConnectionId('Ubuntu'))).toMatchObject({
-      agent: 'codex',
+      agent: 'claude',
       wslDistro: 'Ubuntu',
       providerSession: { id: 's1' }
     })

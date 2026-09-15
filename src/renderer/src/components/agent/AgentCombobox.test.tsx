@@ -3,9 +3,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { TuiAgent } from '../../../../shared/tui-agent'
 import { AGENT_CATALOG, AgentIcon } from '@/lib/agent-catalog'
-import { AGENT_FAVICON_ASSETS } from '@/lib/agent-favicon-assets'
 import AgentCombobox from './AgentCombobox'
 
 afterEach(cleanup)
@@ -16,7 +14,7 @@ describe('AgentCombobox', () => {
     render(
       <AgentCombobox
         agents={AGENT_CATALOG}
-        value="codex"
+        value="opencode"
         onValueChange={vi.fn()}
         defaultAgent="claude"
         onSetDefault={onSetDefault}
@@ -28,7 +26,7 @@ describe('AgentCombobox', () => {
 
     expect(trigger.getAttribute('aria-expanded')).toBe('false')
     fireEvent.click(screen.getByRole('menuitem', { name: 'Set as default' }))
-    expect(onSetDefault).toHaveBeenCalledWith('codex')
+    expect(onSetDefault).toHaveBeenCalledWith('opencode')
   })
 
   it('maps the closed Blank Terminal selection to the blank default preference', () => {
@@ -38,7 +36,7 @@ describe('AgentCombobox', () => {
         agents={AGENT_CATALOG}
         value={null}
         onValueChange={vi.fn()}
-        defaultAgent="codex"
+        defaultAgent="opencode"
         onSetDefault={onSetDefault}
       />
     )
@@ -73,9 +71,9 @@ describe('AgentCombobox', () => {
     render(
       <AgentCombobox
         agents={AGENT_CATALOG}
-        value="codex"
+        value="opencode"
         onValueChange={vi.fn()}
-        defaultAgent="codex"
+        defaultAgent="opencode"
         onSetDefault={onSetDefault}
       />
     )
@@ -93,9 +91,9 @@ describe('AgentCombobox', () => {
     render(
       <AgentCombobox
         agents={AGENT_CATALOG}
-        value="codex"
+        value="opencode"
         onValueChange={vi.fn()}
-        defaultAgent="codex"
+        defaultAgent="opencode"
         onSetDefault={onSetDefault}
       />
     )
@@ -107,17 +105,17 @@ describe('AgentCombobox', () => {
     expect(onSetDefault).toHaveBeenCalledWith('claude')
   })
 
-  it('keeps enough trigger width for GitHub Copilot when callers pass min-w-0', () => {
+  it('keeps enough trigger width for Claude Agent Teams when callers pass min-w-0', () => {
     const markup = renderToStaticMarkup(
       <AgentCombobox
         agents={AGENT_CATALOG}
-        value="copilot"
+        value="claude-agent-teams"
         onValueChange={vi.fn()}
         triggerClassName="h-9 w-full min-w-0"
       />
     )
 
-    expect(markup).toContain('GitHub Copilot')
+    expect(markup).toContain('Claude Agent Teams')
     expect(markup).toContain('!min-w-[260px]')
     expect(markup).toContain('flex-1')
   })
@@ -126,14 +124,14 @@ describe('AgentCombobox', () => {
     const markup = renderToStaticMarkup(
       <AgentCombobox
         agents={AGENT_CATALOG}
-        value="codex"
+        value="opencode"
         onValueChange={vi.fn()}
         allowNarrowTrigger
         triggerClassName="h-9 w-full min-w-0"
       />
     )
 
-    expect(markup).toContain('Codex')
+    expect(markup).toContain('OpenCode')
     expect(markup).not.toContain('!min-w-[260px]')
     expect(markup).toContain('min-w-0 w-full')
     expect(markup).toContain('leading-none')
@@ -177,15 +175,6 @@ describe('AgentCombobox', () => {
     expect(markup).not.toContain('Blank Terminal')
   })
 
-  it('uses the bundled OpenClaude favicon crop instead of Claude or GitHub artwork', () => {
-    const markup = renderToStaticMarkup(<AgentIcon agent="openclaude" />)
-
-    expect(markup).toContain('/resources/openclaude-logo.png')
-    expect(markup).toContain('<img')
-    expect(markup).not.toContain('https://github.com/Gitlawb.png')
-    expect(markup).not.toContain('<svg')
-  })
-
   it('uses the official OpenCode SVG mark instead of a remote favicon', () => {
     const markup = renderToStaticMarkup(<AgentIcon agent="opencode" />)
 
@@ -196,13 +185,11 @@ describe('AgentCombobox', () => {
     expect(markup).not.toContain('<img')
   })
 
-  it('renders bundled favicons for favicon-domain agents instead of the remote Google service', () => {
-    // Why: previously loaded from Google's favicon service (#8451). Iterate the
-    // full asset map so missing files/key mismatches fail the test.
-    for (const agent of Object.keys(AGENT_FAVICON_ASSETS) as TuiAgent[]) {
-      const markup = renderToStaticMarkup(<AgentIcon agent={agent} />)
-      expect(markup).toContain(`/shared/agent-icons/${agent}.png`)
-      expect(markup).not.toContain('https://www.google.com/s2/favicons')
-    }
+  it('renders a letter glyph for a stale id from a dropped agent', () => {
+    const markup = renderToStaticMarkup(<AgentIcon agent={'retired-agent' as never} />)
+
+    expect(markup).toContain('<svg')
+    expect(markup).toContain('>R</text>')
+    expect(markup).not.toContain('<img')
   })
 })

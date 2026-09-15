@@ -12,12 +12,12 @@ function settings(): GlobalSettings {
   const base = getDefaultSettings('/tmp')
   return {
     ...base,
-    defaultTuiAgent: 'codex' as const,
+    defaultTuiAgent: 'opencode' as const,
     sourceControlAi: {
       ...base.sourceControlAi!,
       enabled: true,
-      agentId: 'codex' as const,
-      selectedModelByAgent: { codex: 'gpt-5.5' },
+      agentId: 'opencode' as const,
+      selectedModelByAgent: { opencode: 'gpt-5.5' },
       selectedThinkingByModel: { 'gpt-5.5': 'medium', 'gpt-5.4': 'high' },
       instructionsByOperation: {
         commitMessage: 'Global commit style',
@@ -61,11 +61,11 @@ describe('source-control AI action recipes', () => {
 
   it('treats an explicit action null agent as the default agent, not the global legacy agent', () => {
     const base = settings()
-    base.defaultTuiAgent = 'codex'
+    base.defaultTuiAgent = 'opencode'
     base.sourceControlAi = {
       ...base.sourceControlAi!,
       agentId: 'claude',
-      selectedModelByAgent: { codex: 'gpt-5.5', claude: 'sonnet' },
+      selectedModelByAgent: { opencode: 'opencode/gpt-5.4-mini', claude: 'sonnet' },
       actions: {
         ...base.sourceControlAi!.actions,
         commitMessage: { agentId: null, commandInputTemplate: '{basePrompt}' }
@@ -78,17 +78,17 @@ describe('source-control AI action recipes', () => {
       operation: 'commitMessage',
       discoveryHostKey: 'local'
     })
-    expect(result.ok && result.value.params.agentId).toBe('codex')
-    expect(result.ok && result.value.params.model).toBe('gpt-5.5')
+    expect(result.ok && result.value.params.agentId).toBe('opencode')
+    expect(result.ok && result.value.params.model).toBe('opencode/gpt-5.4-mini')
   })
 
   it('treats a repo action null agent as the default agent, not the global action agent', () => {
     const base = settings()
-    base.defaultTuiAgent = 'codex'
+    base.defaultTuiAgent = 'opencode'
     base.sourceControlAi = {
       ...base.sourceControlAi!,
       agentId: 'claude',
-      selectedModelByAgent: { codex: 'gpt-5.5', claude: 'sonnet' }
+      selectedModelByAgent: { opencode: 'gpt-5.5', claude: 'sonnet' }
     }
     const result = resolveSourceControlAiForOperation({
       settings: base,
@@ -106,7 +106,7 @@ describe('source-control AI action recipes', () => {
       discoveryHostKey: 'local'
     })
 
-    expect(result.ok && result.value.params.agentId).toBe('codex')
+    expect(result.ok && result.value.params.agentId).toBe('opencode')
   })
 
   it('resolves launch action recipes from repo overrides over global defaults', () => {
@@ -130,7 +130,7 @@ describe('source-control AI action recipes', () => {
           sourceControlAi: {
             actionOverrides: {
               fixChecks: {
-                agentId: 'codex',
+                agentId: 'opencode',
                 commandInputTemplate: '  {basePrompt}\n\nrepo  ',
                 agentArgs: '  --model gpt-5.5  '
               }
@@ -140,7 +140,7 @@ describe('source-control AI action recipes', () => {
         actionId: 'fixChecks'
       })
     ).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: '{basePrompt}\n\nrepo',
       agentArgs: '--model gpt-5.5'
     })
@@ -257,7 +257,7 @@ describe('source-control AI action recipes', () => {
       actions: {
         ...settings().sourceControlAi!.actions,
         commitMessage: {
-          agentId: 'codex' as const,
+          agentId: 'opencode' as const,
           commandInputTemplate: 'use $best-commit-msg to write a commit'
         },
         branchName: {
@@ -271,7 +271,7 @@ describe('source-control AI action recipes', () => {
     const merged = mergeLegacyCommitMessageAiIntoSourceControlAi(source, legacy)
 
     expect(merged.actions?.commitMessage).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: 'use $best-commit-msg to write a commit'
     })
     expect(merged.actions?.branchName).toEqual({
@@ -287,7 +287,7 @@ describe('source-control AI action recipes', () => {
       actions: {
         ...settings().sourceControlAi!.actions,
         commitMessage: {
-          agentId: 'codex' as const,
+          agentId: 'opencode' as const,
           commandInputTemplate: 'use $best-commit-msg to write a commit'
         },
         branchName: {
@@ -305,7 +305,7 @@ describe('source-control AI action recipes', () => {
 
     expect(merged.enabled).toBe(false)
     expect(merged.actions?.commitMessage).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: 'use $best-commit-msg to write a commit'
     })
     expect(merged.actions?.branchName).toEqual({
@@ -325,7 +325,7 @@ describe('source-control AI action recipes', () => {
       actions: {
         ...settings().sourceControlAi!.actions,
         commitMessage: {
-          agentId: 'codex' as const,
+          agentId: 'opencode' as const,
           commandInputTemplate: '{basePrompt}\n\nold shared prompt'
         },
         branchName: {
@@ -342,7 +342,7 @@ describe('source-control AI action recipes', () => {
     const merged = mergeLegacyCommitMessageAiIntoSourceControlAi(source, legacy)
 
     expect(merged.actions?.commitMessage).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: '{basePrompt}\n\nrollback changed commit prompt'
     })
     expect(merged.instructionsByOperation.branchName).toBe('old shared prompt')
@@ -355,12 +355,12 @@ describe('source-control AI action recipes', () => {
   it('lets rollback custom-agent changes clear a commit action agent override', () => {
     const source = {
       ...settings().sourceControlAi!,
-      agentId: 'codex' as const,
+      agentId: 'opencode' as const,
       customAgentCommand: '',
       actions: {
         ...settings().sourceControlAi!.actions,
         commitMessage: {
-          agentId: 'codex' as const,
+          agentId: 'opencode' as const,
           commandInputTemplate: 'use $best-commit-msg to write a commit'
         }
       }
@@ -411,7 +411,7 @@ describe('source-control AI action recipes', () => {
       actions: {
         ...base.sourceControlAi!.actions,
         commitMessage: {
-          agentId: 'aider',
+          agentId: 'claude-agent-teams',
           commandInputTemplate: '{basePrompt}'
         }
       }
@@ -427,7 +427,7 @@ describe('source-control AI action recipes', () => {
     ).toEqual({
       ok: false,
       error:
-        'Agent "aider" does not support Source Control AI commit messages. Supported agents: Claude, Codex, OpenCode, Pi, Amp, Cursor, Kimi, GitHub Copilot, Antigravity, or Custom command.'
+        'Agent "claude-agent-teams" does not support Source Control AI commit messages. Supported agents: Claude, OpenCode, Pi, or Custom command.'
     })
   })
 })

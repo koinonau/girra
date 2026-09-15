@@ -87,8 +87,7 @@ export function installSleepingRecordAccess(session: ConnectPanePtySession): voi
   session.launchToken = session.paneStartup?.launchConfig
     ? (session.paneStartup.launchToken ?? createBrowserUuid())
     : undefined
-  session.startupDraftAgent =
-    session.paneStartup?.launchAgent ?? session.paneStartup?.initialAgentStatus?.agent
+  session.startupDraftAgent = session.paneStartup?.launchAgent
   session.startupDraftAgentConfig = session.startupDraftAgent
     ? TUI_AGENT_CONFIG[session.startupDraftAgent]
     : null
@@ -111,7 +110,7 @@ export function installSleepingRecordAccess(session: ConnectPanePtySession): voi
     }
     // Why: launch-bound draft paste needs a launch token; all current
     // draftPrompt startup callers pair it with launchConfig so this can safely
-    // fence off delayed sidecar delivery before Codex's first composer frame.
+    // fence off delayed sidecar delivery before the agent's first composer frame.
     session.startupDraftDeliveryClaimed = beginAgentStartupDeliveryAttempt({
       worktreeId: session.deps.worktreeId,
       tabId: session.deps.tabId,
@@ -140,7 +139,7 @@ export function installSleepingRecordAccess(session: ConnectPanePtySession): voi
     useAppStore
       .getState()
       .registerAgentLaunchConfig(session.cacheKey, session.paneStartup.launchConfig, {
-        agentType: session.paneStartup.launchAgent ?? session.paneStartup.initialAgentStatus?.agent,
+        agentType: session.paneStartup.launchAgent,
         ...(session.launchToken ? { launchToken: session.launchToken } : {}),
         tabId: session.deps.tabId,
         leafId: session.pane.leafId
@@ -169,11 +168,7 @@ export function installSleepingRecordAccess(session: ConnectPanePtySession): voi
       effectiveLaunchConfig.agentCommand
     )?.agent
     useAppStore.getState().registerAgentLaunchConfig(session.cacheKey, effectiveLaunchConfig, {
-      agentType:
-        metadata?.launchAgent ??
-        session.paneStartup?.launchAgent ??
-        session.paneStartup?.initialAgentStatus?.agent ??
-        persistedLaunchAgent,
+      agentType: metadata?.launchAgent ?? session.paneStartup?.launchAgent ?? persistedLaunchAgent,
       ...((metadata?.launchToken ?? session.launchToken)
         ? { launchToken: metadata?.launchToken ?? session.launchToken }
         : {}),

@@ -15,10 +15,10 @@ import type { TuiAgent } from './tui-agent'
  * outright for action consumers, reasoning that a title must never authorize a write. That
  * conflated the parser with the raw substring match it replaced: `collectAgentTitleEvidence`
  * returns null on exactly the shapes that caused misdelivery — "Review the Claude session-history
- * fix" on a Codex pane yields nothing, and "Switch Claude and Codex off the load balancer… - grok"
- * yields grok from its owner suffix. Refusing it instead cost real panes their identity: an agent
+ * fix" on an OpenCode pane yields nothing, and "Switch Claude and OpenCode off the load balancer… - pi"
+ * yields pi from its owner suffix. Refusing it instead cost real panes their identity: an agent
  * a user started by hand inside an Orca WSL terminal has no launch record, no readable foreground
- * process (the Windows host sees `wsl.exe`), and — until managed Codex hooks install there — no
+ * process (the Windows host sees `wsl.exe`), and, until managed hooks install there, no
  * hook either, leaving a title that names it unambiguously as the only thing left.
  *
  * Returns undefined when nothing is known, and absence is published as absence. A caller that

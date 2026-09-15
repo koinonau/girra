@@ -109,7 +109,7 @@ describe('shouldShowNativeChatTypingIndicator', () => {
 describe('with rows projected from the structured journal', () => {
   function toolCallItem(sequence: number): AgentJournalRenderItem {
     return {
-      itemId: `codex:thread-1:turn-1:${sequence}`,
+      itemId: `claude:thread-1:turn-1:${sequence}`,
       revision: 1,
       sequence,
       observedAt: 1_800_000_000_000,
@@ -124,7 +124,7 @@ describe('with rows projected from the structured journal', () => {
 
   function assistantTextItem(sequence: number): AgentJournalRenderItem {
     return {
-      itemId: `codex:thread-1:turn-1:${sequence}`,
+      itemId: `claude:thread-1:turn-1:${sequence}`,
       revision: 1,
       sequence,
       observedAt: 1_800_000_000_000,

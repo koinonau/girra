@@ -100,10 +100,10 @@ describe('hasInstalledAgentSkill', () => {
             id: 'skill-2',
             name: 'orca-cli',
             sourceKind: 'plugin',
-            sourceLabel: 'Codex plugin cache',
-            rootPath: '/Users/test/.codex/plugins/cache',
-            directoryPath: '/Users/test/.codex/plugins/cache/vendor/orca-cli',
-            skillFilePath: '/Users/test/.codex/plugins/cache/vendor/orca-cli/SKILL.md'
+            sourceLabel: 'Claude plugin cache',
+            rootPath: '/Users/test/.claude/plugins/cache',
+            directoryPath: '/Users/test/.claude/plugins/cache/vendor/orca-cli',
+            skillFilePath: '/Users/test/.claude/plugins/cache/vendor/orca-cli/SKILL.md'
           })
         ],
         'orca-cli',

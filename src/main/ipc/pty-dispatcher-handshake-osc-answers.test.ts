@@ -233,7 +233,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd: '/tmp',
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         terminalColorQueryReplies: {
           foreground: '#eeeeee',
           background: '#111111'
@@ -273,7 +273,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd: '/tmp',
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         terminalColorQueryReplies: {
           foreground: '#eeeeee',
           background: '#111111'
@@ -342,7 +342,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd: '/tmp',
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         terminalColorQueryReplies: {
           foreground: '#eeeeee',
           background: '#111111'

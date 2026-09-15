@@ -177,7 +177,7 @@ describe('keybindings', () => {
         'darwin',
         {
           'tab.newAgent.claude': ['Mod+Alt+Shift+K'],
-          'tab.newAgent.codex': ['Mod+Alt+Shift+K']
+          'tab.newAgent.opencode': ['Mod+Alt+Shift+K']
         },
         { ignoredActionIds: [agentTabActionId('claude')] }
       )

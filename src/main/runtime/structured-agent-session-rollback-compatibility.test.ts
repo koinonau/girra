@@ -19,7 +19,7 @@ function structuredTab() {
     groupId: 'group-1',
     worktreeId: WORKSPACE,
     contentType: 'agent-session' as const,
-    label: 'Codex Chat',
+    label: 'Claude Chat',
     customLabel: null,
     color: null,
     sortOrder: 0,

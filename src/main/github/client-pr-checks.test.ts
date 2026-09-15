@@ -473,7 +473,7 @@ describe('getPRChecks', () => {
       .mockRejectedValueOnce(new Error('GraphQL rollup failed'))
       .mockRejectedValueOnce(
         Object.assign(new Error('Command failed: gh pr checks 42'), {
-          stderr: "no checks reported on the 'codex/keybindings-toml' branch\n",
+          stderr: "no checks reported on the 'feature/keybindings-toml' branch\n",
           stdout: ''
         })
       )

@@ -64,7 +64,7 @@ export const SKILL_COMMAND_SPECS: CommandSpec[] = [
       'orca skills install',
       'orca skills install --skill orca-cli --skill orchestration',
       'orca skills install --skill orca-cli --local',
-      'orca skills install --skill orca-cli --agent claude-code,codex',
+      'orca skills install --skill orca-cli --agent claude-code,opencode',
       'orca skills install --all --dry-run'
     ]
   },

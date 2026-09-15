@@ -53,7 +53,7 @@ describe('getWorktreeStatus', () => {
       )
     ).toBe('permission')
     expect(
-      getWorktreeStatus([makeTerminalTab('codex working')], [{ id: 'browser-1' }], livePtyIds)
+      getWorktreeStatus([makeTerminalTab('opencode working')], [{ id: 'browser-1' }], livePtyIds)
     ).toBe('working')
   })
 })

@@ -15,7 +15,7 @@ export function detectExplicitIdleStatusFromTitle(title: string): AgentStatus | 
   if (status !== 'idle') {
     return null
   }
-  // Why: launch titles like "Codex YOLO" contain an agent name but aren't readiness signals; terminal.wait needs explicit idle evidence.
+  // Why: launch titles like "Claude YOLO" contain an agent name but aren't readiness signals; terminal.wait needs explicit idle evidence.
   if (
     EXPLICIT_IDLE_TITLE_RE.test(title) ||
     // Why: unblock hookless remote waits; guarded writes corroborate this marker.
@@ -29,19 +29,6 @@ export function detectExplicitIdleStatusFromTitle(title: string): AgentStatus | 
   return null
 }
 
-export function isKnownReadyPromptPreview(preview: string): boolean {
-  const normalized = preview.toLowerCase()
-  const readyIndex = findCodexReadyPromptIndex(normalized)
-  if (readyIndex === null) {
-    return false
-  }
-  const blockedSignal = findTerminalWaitBlockedSignal(normalized)
-  if (blockedSignal !== null && blockedSignal.index > readyIndex) {
-    return false
-  }
-  return true
-}
-
 export function detectTerminalWaitBlockedReason(
   preview: string
 ): RuntimeTerminalWaitBlockedReason | null {
@@ -49,37 +36,15 @@ export function detectTerminalWaitBlockedReason(
   return findActionableTerminalWaitBlockedSignal(normalized)?.reason ?? null
 }
 
-export function findActionableTerminalWaitBlockedSignal(
-  normalized: string
-): { reason: RuntimeTerminalWaitBlockedReason; index: number } | null {
-  const blockedSignal = findTerminalWaitBlockedSignal(normalized)
-  if (blockedSignal === null) {
-    return null
-  }
-  const readyIndex = findCodexReadyPromptIndex(normalized)
-  // Why: a ready header after the modal means it was dismissed, so the signal is no longer actionable.
-  return readyIndex !== null && readyIndex > blockedSignal.index ? null : blockedSignal
-}
-
-function findCodexReadyPromptIndex(normalized: string): number | null {
-  const headerIndex = normalized.lastIndexOf('openai codex')
-  if (headerIndex === -1) {
-    return null
-  }
-  const readySegment = normalized.slice(headerIndex)
-  // Why: Codex prints permissions only in YOLO mode; the stable ready header is OpenAI Codex + model + directory.
-  return readySegment.includes('model:') && readySegment.includes('directory:') ? headerIndex : null
-}
-
 export const TERMINAL_WAIT_BLOCKED_SENTINEL_RE =
-  /update available|choose working directory to|codex just got an upgrade|hooks need review|do you trust|trust this|trusted workspace|press enter to (?:confirm|continue|view|insert)|press t to trust|permission required|requires permission|allow once|allow always/i
+  /update available|choose working directory to|hooks need review|do you trust|trust this|trusted workspace|press enter to (?:confirm|continue|view|insert)|press t to trust|permission required|requires permission|allow once|allow always/i
 
 // Why bounded: answered dialogs and quoted prompt wording (agents grep this file and its specs) stay in the
-// retained tail; only a dialog owning the screen bottom is live. Real Codex dialogs (trust, hooks review,
+// retained tail; only a dialog owning the screen bottom is live. Real agent dialogs (trust, hooks review,
 // update, exec approval) are 4-8 lines; the slack covers a wrapped command or a longer hook list.
 const LIVE_PROMPT_TAIL_LINES = 12
 
-function findTerminalWaitBlockedSignal(
+export function findActionableTerminalWaitBlockedSignal(
   fullTail: string
 ): { reason: RuntimeTerminalWaitBlockedReason; index: number } | null {
   const windowStart = startOfLastNonBlankLines(fullTail, LIVE_PROMPT_TAIL_LINES)
@@ -89,7 +54,7 @@ function findTerminalWaitBlockedSignal(
     return null
   }
   const signal = findBlockedSignalInLiveWindow(normalized)
-  // Why: callers compare this index against ready-header indexes found over the full tail.
+  // Why: callers compare this index against earlier signals found over the full tail.
   return signal === null ? null : { reason: signal.reason, index: signal.index + windowStart }
 }
 
@@ -105,16 +70,9 @@ function findBlockedSignalInLiveWindow(
   if (cwdIndex !== -1 && normalized.includes('press enter to continue', cwdIndex)) {
     candidates.push({ reason: 'agent-cwd-prompt', index: cwdIndex })
   }
-  const modelMigrationIndex = normalized.lastIndexOf('codex just got an upgrade')
-  if (
-    modelMigrationIndex !== -1 &&
-    normalized.includes('press enter to continue', modelMigrationIndex)
-  ) {
-    candidates.push({ reason: 'codex-model-migration-prompt', index: modelMigrationIndex })
-  }
   const hooksIndex = normalized.lastIndexOf('hooks need review')
   if (hooksIndex !== -1 && normalized.includes('press enter to confirm', hooksIndex)) {
-    // Why neutral: this matcher never inspects the agent -- 'hooks need review' is not Codex-only wording.
+    // Why neutral: this matcher never inspects the agent.
     candidates.push({ reason: 'agent-hooks-review-prompt', index: hooksIndex })
   }
   const trustIndex = Math.max(
@@ -144,11 +102,7 @@ function findBlockedSignalInLiveWindow(
     interactivePromptIndex === -1
       ? ''
       : normalized.slice(Math.max(0, interactivePromptIndex - 600), interactivePromptIndex + 200)
-  // Why 'codex' only widens detection and never names the reason: the sole Codex evidence here is
-  // that word somewhere in 600 chars of scrollback, which an agent narrating about Codex satisfies
-  // on any pane -- enough to suspect a dialog, not enough to label a non-Codex user's pane.
   const hasInteractiveDialogContext =
-    interactivePromptContext.includes('codex') ||
     interactivePromptContext.includes('permission') ||
     interactivePromptContext.includes('sandbox') ||
     interactivePromptContext.includes('trust') ||
@@ -172,12 +126,8 @@ function findBlockedSignalInLiveWindow(
       permissionSegment.includes(choice)
     ).length
     if (decisionCount >= 2) {
-      // Why neutral: an approval dialog with named choices identifies no agent; older hosts publish
-      // 'codex-interactive-prompt' here and clients alias the two. Rule 1 additive member --
-      // remote-wire-compatibility.md names RuntimeTerminalWaitBlockedReason as Rule 1 because no
-      // consumer switches exhaustively on it.
-      // Why alias rather than drop the old spelling: preserve the existing remote receipt value for
-      // mixed-version clients -- an older host still publishes codex-* on this path.
+      // Why neutral: an approval dialog with named choices identifies no agent. Older hosts publish
+      // the legacy agent-specific spelling here and clients alias the two (remote-wire Rule 1).
       candidates.push({ reason: 'agent-interactive-prompt', index: permissionPromptIndex })
     }
   }

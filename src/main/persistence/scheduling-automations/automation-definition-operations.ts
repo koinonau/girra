@@ -7,6 +7,7 @@ import type {
 } from '../../../shared/automations-types'
 import type { PersistedState } from '../../../shared/persisted-state-types'
 import { normalizeAutomationPrecheck } from '../../../shared/automation-precheck'
+import { isTuiAgent } from '../../../shared/tui-agent-config'
 import { nextAutomationOccurrenceAfter } from '../../../shared/automation-schedule-occurrences'
 import {
   applyAutomationExecutionTarget,
@@ -142,6 +143,13 @@ export function updateAutomation(
   })
   if (options?.destination) {
     assertAutomationDestination(options.destination, projectionContext)
+  }
+  const nextAgentId = updates.agentId ?? current.agentId
+  if ((updates.enabled ?? current.enabled) && !isTuiAgent(nextAgentId)) {
+    // Why: load pauses automations whose agent was retired; enabling needs a supported agent first.
+    throw new Error(
+      `Agent "${String(nextAgentId)}" is no longer available. Choose another agent before enabling this automation.`
+    )
   }
   // Why: the renderer forwards a Partial verbatim, so `{ enabled: undefined }` survives structuredClone
   // and would blank the stored value in the spread below. Explicit clears go through the `null` branches.

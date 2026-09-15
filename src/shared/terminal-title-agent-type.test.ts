@@ -11,7 +11,7 @@ import {
 describe('resolveExplicitTerminalTitleAgentType', () => {
   it('maps explicit product-name titles to their TuiAgent id', () => {
     expect(resolveExplicitTerminalTitleAgentType('✳ Claude Code')).toBe('claude')
-    expect(resolveExplicitTerminalTitleAgentType('⠋ Codex')).toBe('codex')
+    expect(resolveExplicitTerminalTitleAgentType('⠋ OpenCode')).toBe('opencode')
     expect(resolveExplicitTerminalTitleAgentType('OpenCode ready')).toBe('opencode')
     expect(resolveExplicitTerminalTitleAgentType('Pi')).toBe('pi')
   })
@@ -20,15 +20,15 @@ describe('resolveExplicitTerminalTitleAgentType', () => {
     expect(resolveExplicitTerminalTitleAgentType('✳ investigating startup')).toBeNull()
     expect(resolveExplicitTerminalTitleAgentType('⠸ investigating startup')).toBeNull()
     expect(resolveExplicitTerminalTitleAgentType('. Compare Opencode Vs Orca')).toBeNull()
-    expect(resolveExplicitTerminalTitleAgentType('* Review Codex behavior')).toBeNull()
+    expect(resolveExplicitTerminalTitleAgentType('* Review OpenCode behavior')).toBeNull()
   })
 
   it('resolves OpenCode native abbreviated session titles before task-text identities', () => {
     expect(resolveExplicitTerminalTitleAgentType('OC | Understand about the plugin')).toBe(
       'opencode'
     )
-    expect(resolveExplicitTerminalTitleAgentType('OC | Compare Codex and Claude')).toBe('opencode')
-    expect(getSharedAgentLabel('OC | Compare Codex and Claude')).toBe('OpenCode')
+    expect(resolveExplicitTerminalTitleAgentType('OC | Compare Pi and Claude')).toBe('opencode')
+    expect(getSharedAgentLabel('OC | Compare Pi and Claude')).toBe('OpenCode')
     expect(resolveExplicitTerminalTitleAgentType('tmux | OC | ses_123')).toBe('opencode')
     expect(resolveExplicitTerminalTitleAgentType('OC|compact-session')).toBeNull()
     expect(resolveExplicitTerminalTitleAgentType('oc | Understand about the plugin')).toBeNull()
@@ -39,11 +39,10 @@ describe('resolveExplicitTerminalTitleAgentType', () => {
     expect(resolveExplicitTerminalTitleAgentType('⠋ Fix foo | OC | bar')).toBeNull()
   })
 
-  // Why: adversarial coverage — native OC must not steal Claude/Codex/Pi identity,
+  // Why: adversarial coverage — native OC must not steal Claude/Pi identity,
   // and those agents must keep resolving when titled normally.
   it('keeps other agents classified correctly alongside OpenCode native titles', () => {
     expect(resolveExplicitTerminalTitleAgentType('✳ Claude Code')).toBe('claude')
-    expect(resolveExplicitTerminalTitleAgentType('⠋ Codex')).toBe('codex')
     expect(resolveExplicitTerminalTitleAgentType('Pi ready')).toBe('pi')
     expect(resolveExplicitTerminalTitleAgentType('OpenCode ready')).toBe('opencode')
     expect(resolveTerminalTitleAgentType('OC | ⠋ implementing the feature')).toBe('opencode')
@@ -106,7 +105,7 @@ describe('resolveTerminalTitleAgentType', () => {
     expect(resolveTerminalTitleAgentType('⠋ preserve cursor visibility across replays')).toBe(
       'claude'
     )
-    expect(resolveTerminalTitleAgentType('⠋ Codex: fix cursor offsets')).toBe('codex')
+    expect(resolveTerminalTitleAgentType('⠋ OpenCode: fix cursor offsets')).toBe('opencode')
   })
 })
 

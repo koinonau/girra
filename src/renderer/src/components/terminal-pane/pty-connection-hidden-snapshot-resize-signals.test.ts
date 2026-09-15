@@ -313,7 +313,7 @@ describe('connectPanePty', () => {
       typeof vi.fn
     >
     const signalPty = window.api.pty.signal as unknown as ReturnType<typeof vi.fn>
-    const staleHiddenTuiFrame = '\x1b[2Khidden-width codex composer\r\n'
+    const staleHiddenTuiFrame = '\x1b[2Khidden-width agent composer\r\n'
 
     const pane = createPane(1)
     pane.terminal.cols = 133

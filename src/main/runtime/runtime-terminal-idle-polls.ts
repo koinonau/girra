@@ -2,8 +2,7 @@ import { isShellProcess, type AgentStatus } from '../../shared/agent-detection'
 import type { RuntimeTerminalWait } from '../../shared/runtime-types'
 import {
   detectExplicitIdleStatusFromTitle,
-  detectTerminalWaitBlockedReason,
-  isKnownReadyPromptPreview
+  detectTerminalWaitBlockedReason
 } from './terminal-wait-detection'
 import {
   buildPtyTerminalWaitBlockedResult,
@@ -106,11 +105,6 @@ export class RuntimeTerminalIdlePolls {
         )
         return
       }
-      if (isKnownReadyPromptPreview(waitText)) {
-        this.stop(entry)
-        this.deps.resolve(waiter, buildTerminalWaitResult(waiter.handle, 'tui-idle', leaf))
-        return
-      }
       if (leaf.lastAgentStatus === null && leaf.ptyId && !entry.foregroundPollInFlight) {
         const foregroundRead = this.deps.getForegroundProcess(leaf.ptyId)
         if (!foregroundRead) {
@@ -159,10 +153,7 @@ export class RuntimeTerminalIdlePolls {
         )
         return
       }
-      if (
-        this.deps.getAdoptedPtyIdleStatus(pty) === 'idle' ||
-        isKnownReadyPromptPreview(waitText)
-      ) {
+      if (this.deps.getAdoptedPtyIdleStatus(pty) === 'idle') {
         this.stop(entry)
         this.deps.resolve(waiter, buildPtyTerminalWaitResult(waiter.handle, 'tui-idle', pty))
         return

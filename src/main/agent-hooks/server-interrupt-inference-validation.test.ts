@@ -21,7 +21,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'long task', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'long task', agentType: 'pi' }
         },
         'conn-1'
       )
@@ -31,7 +31,7 @@ describe('AgentHookServer listener replay', () => {
           baselineUpdatedAt: 1_000,
           baselineStateStartedAt: 1_000,
           baselinePrompt: 'long task',
-          baselineAgentType: 'codex',
+          baselineAgentType: 'pi',
           intent: 'ctrl-c'
         },
         {
@@ -39,7 +39,7 @@ describe('AgentHookServer listener replay', () => {
           baselineUpdatedAt: 1_000,
           baselineStateStartedAt: 1_000,
           baselinePrompt: 'long task',
-          baselineAgentType: 'codex',
+          baselineAgentType: 'pi',
           intent: 'sigint'
         },
         {
@@ -47,7 +47,7 @@ describe('AgentHookServer listener replay', () => {
           baselineUpdatedAt: '1_000',
           baselineStateStartedAt: 1_000,
           baselinePrompt: 'long task',
-          baselineAgentType: 'codex',
+          baselineAgentType: 'pi',
           intent: 'ctrl-c'
         },
         {
@@ -55,7 +55,7 @@ describe('AgentHookServer listener replay', () => {
           baselineUpdatedAt: 1_000,
           baselineStateStartedAt: 1_000,
           baselinePrompt: 123,
-          baselineAgentType: 'codex',
+          baselineAgentType: 'pi',
           intent: 'ctrl-c'
         }
       ]
@@ -72,7 +72,7 @@ describe('AgentHookServer listener replay', () => {
         expect.objectContaining({
           state: 'working',
           prompt: 'long task',
-          agentType: 'codex'
+          agentType: 'pi'
         })
       ])
     } finally {
@@ -262,7 +262,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'waiting', prompt: 'permission', agentType: 'codex' }
+          payload: { state: 'waiting', prompt: 'permission', agentType: 'pi' }
         },
         'conn-1'
       )
@@ -273,7 +273,7 @@ describe('AgentHookServer listener replay', () => {
           baselineUpdatedAt: waiting.receivedAt,
           baselineStateStartedAt: waiting.stateStartedAt,
           baselinePrompt: 'permission',
-          baselineAgentType: 'codex',
+          baselineAgentType: 'pi',
           intent: 'plain-escape'
         })
       ).toBe(false)
@@ -283,7 +283,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: FRESH_PANE,
           tabId: 'tab-fresh',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'old task', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'old task', agentType: 'pi' }
         },
         'conn-1'
       )
@@ -295,7 +295,7 @@ describe('AgentHookServer listener replay', () => {
           baselineUpdatedAt: stale.receivedAt,
           baselineStateStartedAt: stale.stateStartedAt,
           baselinePrompt: 'old task',
-          baselineAgentType: 'codex',
+          baselineAgentType: 'pi',
           intent: 'plain-escape'
         })
       ).toBe(false)

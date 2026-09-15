@@ -63,7 +63,7 @@ export function selectStructuredAgentTurnTimings(
 ): ReadonlyMap<string, StructuredAgentTurnTiming | null> {
   const itemIds = new Set(items.map((item) => item.itemId))
   const aliases = new Map<string, string>()
-  // Codex folds a send issued mid-turn into the running turn under the SAME provider
+  // A provider may fold a send issued mid-turn into the running turn under the SAME provider
   // key, so the earliest submission that names a key is the prompt that opened the turn.
   for (const submission of submissions) {
     if (submission.providerItemId && !aliases.has(submission.providerItemId)) {

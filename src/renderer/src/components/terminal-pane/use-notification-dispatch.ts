@@ -40,8 +40,8 @@ function hasFreshActiveHookStatus(
   snapshot: Pick<AgentStatusEntry, 'state' | 'updatedAt' | 'agentType'> | undefined,
   explicitTitleAgentType: string | null
 ): boolean {
-  // Why: pick-a-winner ownership would treat a Pi idle title as a different
-  // agent than a live OMP hook. Same-group titles are wrapper frames, not reuse.
+  // Why: pick-a-winner ownership would treat a same-group idle title as a different
+  // agent than the live hook. Same-group titles are wrapper frames, not reuse.
   const titleNamesDifferentKnownAgent =
     explicitTitleAgentType &&
     snapshot?.agentType &&

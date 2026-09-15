@@ -51,7 +51,7 @@ describe('setAgentStatus freshness requests on rejected frames', () => {
     // A nested child hook inherits ORCA_PANE_KEY, so its `done` is dropped while the parent works.
     const { requestFreshness, actions } = setup(existingEntry())
 
-    actions.setAgentStatus(PANE_KEY, payload({ agentType: 'codex' }), undefined, {
+    actions.setAgentStatus(PANE_KEY, payload({ agentType: 'opencode' }), undefined, {
       updatedAt: NOW + 1
     })
 

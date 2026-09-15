@@ -152,8 +152,8 @@ describe('agent session RPC methods', () => {
       request('terminal.ensureAgentSession', {
         kind: 'explicit',
         worktree: 'id:worktree-1',
-        agent: 'antigravity',
-        providerSession: { key: 'session_id', id: 'provider-session-1' }
+        agent: 'claude',
+        providerSession: { key: 'conversation_id', id: 'provider-session-1' }
       })
     )
 
@@ -172,15 +172,15 @@ describe('agent session RPC methods', () => {
       request('terminal.createAgentSession', {
         clientOperationId: '1752883200000-0123456789abcdef0123456789abcdef',
         worktree: 'id:worktree-1',
-        agent: 'codex',
-        command: 'codex resume provider-session-1'
+        agent: 'opencode',
+        command: 'opencode --session provider-session-1'
       })
     )
     const malformed = await dispatcher.dispatch(
       request('terminal.createAgentSession', {
         clientOperationId: 'not-time-sortable',
         worktree: 'id:worktree-1',
-        agent: 'codex'
+        agent: 'opencode'
       })
     )
 
@@ -213,8 +213,8 @@ describe('agent session RPC methods', () => {
     const response = await dispatcher.dispatch(
       request('terminal.create', {
         worktree: 'id:worktree-1',
-        command: 'codex resume provider-session-1',
-        launchAgent: 'codex'
+        command: 'opencode --session provider-session-1',
+        launchAgent: 'opencode'
       })
     )
 
@@ -227,10 +227,10 @@ describe('agent session RPC methods', () => {
       expect.any(Function)
     )
     expect(createTerminal).toHaveBeenCalledWith('id:worktree-1', {
-      command: 'codex resume provider-session-1',
+      command: 'opencode --session provider-session-1',
       startupCommandDelivery: undefined,
       env: undefined,
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       title: undefined,
       focus: false,
       rendererBacked: false,
@@ -254,7 +254,7 @@ describe('agent session RPC methods', () => {
       request('terminal.createAgentSession', {
         clientOperationId: `${now + AGENT_SESSION_OPERATION_FUTURE_SKEW_MS + 1}-0123456789abcdef0123456789abcdef`,
         worktree: 'id:worktree-1',
-        agent: 'codex'
+        agent: 'opencode'
       })
     )
     dateNow.mockRestore()
@@ -278,7 +278,7 @@ describe('agent session RPC methods', () => {
       request('terminal.createAgentSession', {
         clientOperationId: '1752883200000-0123456789abcdef0123456789abcdef',
         worktree: 'id:worktree-1',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Fix the race',
         promptDelivery: 'draft',
         agentArgs: '--profile review',
@@ -295,7 +295,7 @@ describe('agent session RPC methods', () => {
       {
         clientOperationId: '1752883200000-0123456789abcdef0123456789abcdef',
         worktree: 'id:worktree-1',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Fix the race',
         promptDelivery: 'draft',
         agentArgs: '--profile review',
@@ -338,7 +338,7 @@ describe('agent session RPC methods', () => {
       request('terminal.createAgentSession', {
         clientOperationId: '1752883200000-0123456789abcdef0123456789abcdef',
         worktree: 'id:worktree-1',
-        agent: 'codex',
+        agent: 'opencode',
         agentArgs: 'a'.repeat(16 * 1024 + 1)
       })
     )

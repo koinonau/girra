@@ -307,7 +307,7 @@ describe('hydrateWorkspaceSession', () => {
     // Why: pendingActivationSpawn keeps the mount's reattach/respawn from counting as activity and bouncing the worktree up Recent.
     expect(s.tabsByWorktree[validWt][0].pendingActivationSpawn).toBe(true)
 
-    // Marked ever-activated so a later click doesn't retag and suppress a real codex-restart/new-pane bump.
+    // Marked ever-activated so a later click doesn't retag and suppress a real agent-restart/new-pane bump.
     expect(s.everActivatedWorktreeIds.has(validWt)).toBe(true)
   })
 })

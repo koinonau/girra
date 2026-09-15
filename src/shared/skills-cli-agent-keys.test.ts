@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { TUI_AGENT_CONFIG } from './tui-agent-config'
+import type { TuiAgent } from './tui-agent'
 import {
   SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT,
   isSkillsCliAgentKeyShaped,
@@ -106,32 +107,28 @@ describe('skills CLI agent keys', () => {
     )
   })
 
-  it("follows Orca's own evidence for the two non-obvious mappings", () => {
-    // Why: src/shared/native-chat-agent-profiles.ts states OpenClaude reads
-    // Claude-owned roots, so it is not unmappable.
-    expect(SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT.openclaude).toBe('claude-code')
-    // Why: Orca detects trae via `traecli`, which tui-agent-config calls an alias
-    // only TRAE CN ships, so the CN directory is the right target.
-    expect(SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT.trae).toBe('trae-cn')
+  it('maps both Claude launch modes onto the Claude Code key', () => {
+    expect(SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT.claude).toBe('claude-code')
+    expect(SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT['claude-agent-teams']).toBe('claude-code')
   })
 
   it('rejects values the skills CLI would drop, and allows the explicit wildcard', () => {
     for (const bad of ['-y', '--copy', '', ' ', 'a b', 'a,b']) {
       expect(isSkillsCliAgentKeyShaped(bad), bad).toBe(false)
     }
-    for (const good of ['claude-code', 'universal', 'trae-cn', 'inference-sh', '*']) {
+    for (const good of ['claude-code', 'universal', 'qoder-cn', 'inference-sh', '*']) {
       expect(isSkillsCliAgentKeyShaped(good), good).toBe(true)
     }
   })
 
   it('always includes the shared directory and drops unmappable agents', () => {
-    expect(toSkillsCliAgentKeys(['claude', 'rovo'])).toEqual([
+    expect(toSkillsCliAgentKeys(['claude', 'claude-agent-teams', 'pi'])).toEqual([
       'claude-code',
-      'rovodev',
+      'pi',
       'universal'
     ])
-    // Why: `omp` has no skills-CLI equivalent, so it must not reach the argv.
-    expect(toSkillsCliAgentKeys(['omp'])).toEqual(['universal'])
+    // Why: a stale detected id from an older build has no key and must not reach the argv.
+    expect(toSkillsCliAgentKeys(['retired-agent' as TuiAgent])).toEqual(['universal'])
     expect(toSkillsCliAgentKeys([])).toEqual(['universal'])
   })
 })

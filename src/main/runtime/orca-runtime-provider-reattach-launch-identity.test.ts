@@ -39,14 +39,14 @@ describe('provider reattach launch identity', () => {
       incarnationId: INCARNATION_ID,
       providerReattachLaunchIdentity: {
         incarnationId: INCARNATION_ID,
-        launchAgent: 'codex'
+        launchAgent: 'claude'
       }
     })
 
     expect(getPty(runtime, 'pty-reattach')).toMatchObject({
       incarnationId: INCARNATION_ID,
       paneKey: PANE_KEY,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       launchToken: null,
       launchIncarnationId: null
     })
@@ -61,7 +61,7 @@ describe('provider reattach launch identity', () => {
       incarnationId: INCARNATION_ID,
       providerReattachLaunchIdentity: {
         incarnationId: 'stale-provider-incarnation',
-        launchAgent: 'codex'
+        launchAgent: 'claude'
       }
     })
 
@@ -83,7 +83,7 @@ describe('provider reattach launch identity', () => {
       incarnationId: INCARNATION_ID,
       providerReattachLaunchIdentity: {
         incarnationId: INCARNATION_ID,
-        launchAgent: 'codex'
+        launchAgent: 'claude'
       }
     })
     runtime.emitDaemonPtyTransientFact('pty-finished-reattach', {

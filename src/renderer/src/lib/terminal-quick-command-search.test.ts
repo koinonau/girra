@@ -17,9 +17,9 @@ const commands: TerminalQuickCommand[] = [
   },
   {
     id: 'review',
-    label: 'codex-code-review',
+    label: 'opencode-code-review',
     action: 'agent-prompt',
-    agent: 'codex',
+    agent: 'opencode',
     prompt: 'Review all code changes'
   },
   {
@@ -44,7 +44,7 @@ describe('terminal quick command search', () => {
     expect(searchTerminalQuickCommands(commands, 'dev').map((command) => command.id)).toEqual([
       'dev'
     ])
-    expect(searchTerminalQuickCommands(commands, 'codex').map((command) => command.id)).toEqual([
+    expect(searchTerminalQuickCommands(commands, 'opencode').map((command) => command.id)).toEqual([
       'review'
     ])
     expect(
@@ -79,8 +79,8 @@ describe('terminal quick command search', () => {
     expect(
       getTerminalQuickCommandPickerValue({
         preferredCommandId: 'dev',
-        filteredCommands: searchTerminalQuickCommands(commands, 'codex'),
-        rawQuery: 'codex'
+        filteredCommands: searchTerminalQuickCommands(commands, 'opencode'),
+        rawQuery: 'opencode'
       })
     ).toBe('review')
   })

@@ -11,14 +11,14 @@ describe('agent availability settings', () => {
     expect(
       buildAgentAvailabilitySettingsUpdate(
         {
-          defaultTuiAgent: 'codex',
+          defaultTuiAgent: 'opencode',
           disabledTuiAgents: ['claude', 'claude', 'unknown-agent'] as never[]
         },
-        'codex',
+        'opencode',
         false
       )
     ).toEqual({
-      disabledTuiAgents: ['claude', 'codex'],
+      disabledTuiAgents: ['claude', 'opencode'],
       defaultTuiAgent: null
     })
   })
@@ -51,11 +51,11 @@ describe('agent availability settings', () => {
       getSettings: () => latest,
       fallbackSettings: settings,
       updateSettings,
-      agentId: 'codex',
+      agentId: 'opencode',
       enabled: false
     })
 
     expect(updateSettings).toHaveBeenCalledTimes(2)
-    expect(updateSettings.mock.calls[1][0]).toMatchObject({ disabledTuiAgents: ['codex'] })
+    expect(updateSettings.mock.calls[1][0]).toMatchObject({ disabledTuiAgents: ['opencode'] })
   })
 })

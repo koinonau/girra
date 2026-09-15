@@ -19,7 +19,7 @@ const NOW = 2_000_000_000
 const CARD: DashboardCard = {
   paneKey: 'pane-1',
   ptyId: 'pty-1',
-  agentType: 'codex',
+  agentType: 'opencode',
   bucket: 'working',
   dotState: 'working',
   task: 'Measure map',

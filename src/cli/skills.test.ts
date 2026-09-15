@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os'
 import { EventEmitter } from 'node:events'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { delimiter, join } from 'node:path'
-import type * as CodexCliCommandModule from '../shared/node-cli-command-resolution'
+import type * as NodeCliCommandResolution from '../shared/node-cli-command-resolution'
 import { WINDOWS_BATCH_UNSAFE_CHARACTERS_LABEL } from '../shared/windows-batch-spawn'
 
 const {
@@ -28,7 +28,7 @@ vi.mock('../shared/local-agent-install-dir-detection', () => ({
 
 // Why: override only the npx lookup so the real Windows .cmd rail still runs.
 vi.mock('../shared/node-cli-command-resolution', async (importOriginal) => ({
-  ...(await importOriginal<typeof CodexCliCommandModule>()),
+  ...(await importOriginal<typeof NodeCliCommandResolution>()),
   resolveCliCommand: resolveCliCommandMock
 }))
 
@@ -778,7 +778,7 @@ describe('orca skills CLI', () => {
     vi.spyOn(process.stderr, 'write').mockImplementation(() => true)
 
     const resultPromise = main(
-      ['skills', 'install', '--skill', 'alpha', '--agent', 'codex, claude-code ,codex'],
+      ['skills', 'install', '--skill', 'alpha', '--agent', 'opencode, claude-code ,opencode'],
       '/tmp/repo'
     )
     await vi.waitFor(() => expect(spawnMock).toHaveBeenCalled())
@@ -788,20 +788,20 @@ describe('orca skills CLI', () => {
     const argv = spawnMock.mock.calls[0]?.[1] ?? []
     const agents = argv.filter((_: string, i: number) => argv[i - 1] === '--agent')
     // Why: trimmed and de-duplicated, and detection is not consulted at all.
-    expect(agents).toEqual(['codex', 'claude-code'])
+    expect(agents).toEqual(['opencode', 'claude-code'])
     expect(detectCommandsMock).not.toHaveBeenCalled()
   })
 
   it('maps detected agents onto the skills CLI namespace, not Orca ids', async () => {
     const stdoutSpy = vi.spyOn(process.stdout, 'write').mockImplementation(() => true)
-    detectCommandsMock.mockReturnValue(new Set<string>(['claude', 'cursor-agent', 'rovo']))
+    detectCommandsMock.mockReturnValue(new Set<string>(['claude', 'opencode']))
 
     await main(['skills', 'install', '--skill', 'alpha', '--dry-run'], '/tmp/repo')
 
     // Why: `skills add` exits 1 on an unknown --agent, and the ids differ —
-    // Orca's `claude` is `claude-code` and its `rovo` is `rovodev`.
+    // Orca's `claude` is `claude-code`.
     expect(stdoutText(stdoutSpy)).toContain(
-      '--agent claude-code --agent cursor --agent rovodev --agent universal'
+      '--agent claude-code --agent opencode --agent universal'
     )
   })
 

@@ -101,7 +101,7 @@ describe('applyWebSessionTabsSnapshot', () => {
             prompt: 'first task',
             updatedAt: NOW,
             stateStartedAt: NOW,
-            agentType: 'codex',
+            agentType: 'opencode',
             paneKey: HOST_SURFACE_ID,
             stateHistory: []
           }
@@ -151,7 +151,7 @@ describe('applyWebSessionTabsSnapshot', () => {
               prompt: 'replacement question',
               updatedAt: NOW + 1,
               stateStartedAt: NOW + 1,
-              agentType: 'codex',
+              agentType: 'opencode',
               paneKey: `host-tab-3::${THIRD_LEAF_ID}`,
               stateHistory: []
             }
@@ -190,24 +190,24 @@ describe('applyWebSessionTabsSnapshot', () => {
       id: 'host-tab-1',
       ptyId: null,
       worktreeId: WT,
-      title: 'Codex',
-      defaultTitle: 'Codex',
+      title: 'OpenCode',
+      defaultTitle: 'OpenCode',
       customTitle: null,
       color: null,
       sortOrder: 0,
       createdAt: NOW,
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     }
     const initial = makeState({
       activeWorktreeId: null,
       tabsByWorktree: { [WT]: [provisionalTab] },
       pendingStartupByTabId: {
-        [provisionalTab.id]: { command: 'codex' }
+        [provisionalTab.id]: { command: 'opencode' }
       },
       automaticAgentResumeClaimsByTabId: {
         [provisionalTab.id]: {
           worktreeId: WT,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           providerSession: { key: 'session_id', id: 'session-a' }
         }
       }

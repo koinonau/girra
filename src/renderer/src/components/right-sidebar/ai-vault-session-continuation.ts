@@ -29,7 +29,6 @@ export function prepareAiVaultSessionContinuation(args: {
       lastAssistantMessage: latestAssistantPreview(session)
     },
     worktreeId: targetWorktreeId,
-    workspacePath: targetWorkspacePath,
     // Why: sessions can outlive their worktree selection, but continuation should preserve their recorded cwd.
     initialCwd: session.cwd || targetWorkspacePath,
     launchSource: 'sidebar'

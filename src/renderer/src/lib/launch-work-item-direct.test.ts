@@ -131,9 +131,6 @@ import { pickTuiAgent } from '../../../shared/tui-agent-selection'
 const mockApi = {
   worktrees: {
     resolvePrBase: mocks.resolvePrBase
-  },
-  agentTrust: {
-    markTrusted: vi.fn()
   }
 }
 
@@ -144,9 +141,6 @@ describe('launchWorkItemDirect', () => {
       api: {
         worktrees: {
           resolvePrBase: mocks.resolvePrBase
-        },
-        agentTrust: {
-          markTrusted: mockApi.agentTrust.markTrusted
         }
       }
     })
@@ -157,8 +151,8 @@ describe('launchWorkItemDirect', () => {
       branchNameOverride: 'feature/fix',
       pushTarget: { remoteName: 'origin', branchName: 'feature/fix' }
     })
-    mocks.ensureDetectedAgents.mockResolvedValue(['codex'])
-    mocks.ensureRemoteDetectedAgents.mockResolvedValue(['codex'])
+    mocks.ensureDetectedAgents.mockResolvedValue(['opencode'])
+    mocks.ensureRemoteDetectedAgents.mockResolvedValue(['opencode'])
     mocks.getConnectionId.mockReturnValue(null)
     mocks.createWorktree.mockResolvedValue({
       worktree: { id: 'repo-1::/repo/worktree', path: '/repo/worktree' },
@@ -190,7 +184,7 @@ describe('launchWorkItemDirect', () => {
       ],
       worktreesByRepo: {},
       settings: {
-        defaultTuiAgent: 'codex',
+        defaultTuiAgent: 'opencode',
         disabledTuiAgents: [],
         agentCmdOverrides: {}
       },
@@ -205,7 +199,6 @@ describe('launchWorkItemDirect', () => {
     } as typeof mocks.store
     // @ts-expect-error -- test shim
     globalThis.window = { api: mockApi }
-    mockApi.agentTrust.markTrusted.mockResolvedValue(undefined)
   })
 
   it('rejects invalid per-launch CLI arguments before creating a workspace', async () => {
@@ -585,7 +578,7 @@ describe('launchWorkItemDirect', () => {
     expect(mocks.seedNativeChatLaunchDraft).not.toHaveBeenCalled()
   })
 
-  it('uses remote cursor-agent detection and paste launch without trust preflight for SSH repos', async () => {
+  it('uses remote OpenCode detection and paste launch for SSH repos', async () => {
     mocks.store.repos = [
       {
         id: 'repo-ssh',
@@ -596,14 +589,14 @@ describe('launchWorkItemDirect', () => {
         connectionId: 'ssh-1'
       }
     ] as AppState['repos']
-    mocks.store.settings = { defaultTuiAgent: 'cursor' } as AppState['settings']
-    mocks.store.ensureRemoteDetectedAgents.mockResolvedValue(['cursor'])
-    vi.mocked(pickTuiAgent).mockReturnValueOnce('cursor')
+    mocks.store.settings = { defaultTuiAgent: 'opencode' } as AppState['settings']
+    mocks.store.ensureRemoteDetectedAgents.mockResolvedValue(['opencode'])
+    vi.mocked(pickTuiAgent).mockReturnValueOnce('opencode')
     vi.mocked(buildAgentDraftLaunchPlan).mockReturnValueOnce(null)
     vi.mocked(buildAgentStartupPlan).mockReturnValueOnce({
-      agent: 'cursor',
-      launchCommand: 'cursor-agent',
-      expectedProcess: 'cursor-agent',
+      agent: 'opencode',
+      launchCommand: 'opencode',
+      expectedProcess: 'opencode',
       followupPrompt: null,
       launchConfig: { agentArgs: '', agentEnv: {} }
     })
@@ -618,29 +611,28 @@ describe('launchWorkItemDirect', () => {
       item: {
         type: 'issue',
         number: 77,
-        title: 'Fix cursor direct launch',
+        title: 'Fix OpenCode direct launch',
         url: 'https://github.com/acme/repo/issues/77'
       }
     })
 
     expect(mocks.store.ensureDetectedAgents).not.toHaveBeenCalled()
     expect(mocks.store.ensureRemoteDetectedAgents).toHaveBeenCalledWith('ssh-1')
-    expect(mockApi.agentTrust.markTrusted).not.toHaveBeenCalled()
     expect(buildAgentDraftLaunchPlan).toHaveBeenCalledWith({
-      agent: 'cursor',
+      agent: 'opencode',
       draft: 'https://github.com/acme/repo/issues/77',
       cmdOverrides: {},
-      agentArgs: '--yolo',
+      agentArgs: '',
       agentEnv: {},
       sessionOptions: undefined,
       platform: 'linux',
       isRemote: true
     })
     expect(buildAgentStartupPlan).toHaveBeenCalledWith({
-      agent: 'cursor',
+      agent: 'opencode',
       prompt: '',
       cmdOverrides: {},
-      agentArgs: '--yolo',
+      agentArgs: '',
       agentEnv: {},
       sessionOptions: undefined,
       platform: 'linux',
@@ -659,10 +651,10 @@ describe('launchWorkItemDirect', () => {
   })
 
   it('does not launch a disabled saved agent even when another agent is available', async () => {
-    mocks.ensureDetectedAgents.mockResolvedValue(['codex', 'claude'])
+    mocks.ensureDetectedAgents.mockResolvedValue(['opencode', 'claude'])
     mocks.store.settings = {
       defaultTuiAgent: 'claude',
-      disabledTuiAgents: ['codex'],
+      disabledTuiAgents: ['opencode'],
       agentCmdOverrides: {}
     }
     const { launchWorkItemDirect } = await import('./launch-work-item-direct')
@@ -679,7 +671,7 @@ describe('launchWorkItemDirect', () => {
         repoId: 'repo-1',
         openModalFallback: mocks.openModalFallback,
         launchSource: 'task_page',
-        agentOverride: 'codex',
+        agentOverride: 'opencode',
         promptDelivery: 'submit-after-ready'
       })
     ).resolves.toBe(false)
@@ -812,14 +804,14 @@ describe('launchWorkItemDirect', () => {
         repoId: 'repo-1',
         openModalFallback: mocks.openModalFallback,
         launchSource: 'task_page',
-        agentOverride: 'codex',
+        agentOverride: 'opencode',
         promptDelivery: 'submit-after-ready'
       })
     ).resolves.toBe(true)
 
     expect(buildAgentStartupPlan).toHaveBeenCalledWith(
       expect.objectContaining({
-        agent: 'codex',
+        agent: 'opencode',
         platform: 'linux'
       })
     )

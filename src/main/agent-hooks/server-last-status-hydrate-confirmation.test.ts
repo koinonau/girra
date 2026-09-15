@@ -229,7 +229,7 @@ describe('Last-status persistence', () => {
         paneKey: PANE,
         tabId: 'tab-1',
         worktreeId: 'wt-1',
-        payload: { state: 'working', prompt: 'long task', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'long task', agentType: 'pi' }
       },
       'conn-1'
     )
@@ -246,7 +246,7 @@ describe('Last-status persistence', () => {
         baselineUpdatedAt: baseline.receivedAt,
         baselineStateStartedAt: baseline.stateStartedAt,
         baselinePrompt: 'long task',
-        baselineAgentType: 'codex',
+        baselineAgentType: 'pi',
         intent: 'plain-escape'
       })
       // Why: synthesizing `done` onto a never-confirmed `working` would fabricate a transition from stale disk state.
@@ -288,7 +288,7 @@ describe('Last-status persistence', () => {
       const clearListener = vi.fn()
       server.setPaneStatusClearListener(clearListener)
       server.ingestRemote(
-        { paneKey: PANE, payload: { state: 'working', agentType: 'codex' } },
+        { paneKey: PANE, payload: { state: 'working', agentType: 'pi' } },
         'ssh-a'
       )
 

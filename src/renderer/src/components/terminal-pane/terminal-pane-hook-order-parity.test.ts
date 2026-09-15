@@ -18,7 +18,7 @@ const TERMINAL_PANE_HOOK_SOURCE_PATTERN =
 // paused notice that read it (207 hooks, still 8 useMemo).
 // Then host-authoritative layout removal added two `useRef`s in reconciliation
 // (last host layout leaf set, retired leaf set) (209 hooks, still 8 useMemo).
-// Then Codex stale-pane restart removal dropped two hooks (207 hooks, still 8 useMemo).
+// Then stale-pane restart removal dropped two hooks (207 hooks, still 8 useMemo).
 const PRE_REFACTOR_HOOK_ORDER_SHA256 =
   '13bcceaefc156315ddf5440a8fb63a5a0e19dbf5be21697c7367ecefce87536c'
 

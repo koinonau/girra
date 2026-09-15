@@ -2,6 +2,7 @@ import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
 import path from 'node:path'
 import type { ElectronApplication, Page } from '@stablyai/playwright-test'
+import { encodeClaudeProjectPath } from '../../src/main/ai-vault/claude-project-dir-encoding'
 import { expect, test } from './helpers/orca-app'
 
 const ANCHOR_TOKEN = 'E2E_LIVE_LOG_STABLE_ANCHOR'
@@ -140,30 +141,26 @@ async function seedSyntheticSession(
   electronApp: ElectronApplication,
   cwd: string
 ): Promise<{ filePath: string; initialLength: number; title: string }> {
-  const userData = await electronApp.evaluate(({ app }) => app.getPath('userData'))
+  const home = await electronApp.evaluate(({ app }) => app.getPath('home'))
   const title = `Synthetic live log ${Date.now()}`
   const sessionId = `e2e-live-log-${Date.now()}`
-  const sessionsDir = path.join(
-    userData,
-    'codex-runtime-home',
-    'home',
-    'sessions',
-    '2026',
-    '07',
-    '12'
-  )
-  mkdirSync(sessionsDir, { recursive: true })
-  const filePath = path.join(sessionsDir, `rollout-${sessionId}.jsonl`)
+  const projectDir = path.join(home, '.claude', 'projects', encodeClaudeProjectPath(cwd))
+  mkdirSync(projectDir, { recursive: true })
+  const filePath = path.join(projectDir, `${sessionId}.jsonl`)
   const records = [
     JSON.stringify({
+      type: 'user',
+      sessionId,
+      cwd,
       timestamp: '2026-07-12T12:00:00.000Z',
-      type: 'session_meta',
-      payload: { id: sessionId, cwd }
+      message: { role: 'user', content: title }
     }),
     JSON.stringify({
+      type: 'assistant',
+      sessionId,
+      cwd,
       timestamp: '2026-07-12T12:00:01.000Z',
-      type: 'response_item',
-      payload: { type: 'message', role: 'user', content: [{ type: 'text', text: title }] }
+      message: { role: 'assistant', content: [{ type: 'text', text: 'Acknowledged.' }] }
     }),
     JSON.stringify({ type: 'synthetic', text: 'x'.repeat(INITIAL_PAYLOAD_BYTES / 2) }),
     JSON.stringify({ type: 'anchor', text: ANCHOR_TOKEN }),

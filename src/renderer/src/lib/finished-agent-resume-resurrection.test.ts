@@ -29,7 +29,7 @@ afterEach(() => {
   useAppStore.setState(initialAppStoreState, true)
 })
 
-/** A local codex pane with a live PTY, mid-turn. */
+/** A local agent pane with a live PTY, mid-turn. */
 function seedLiveLocalCodexPane(): void {
   useAppStore.setState({
     activeWorktreeId: WORKTREE_ID,
@@ -101,7 +101,7 @@ describe('a finished local agent', () => {
     reportTurnFinished()
 
     const record = useAppStore.getState().sleepingAgentSessionsByPaneKey[PANE_KEY]
-    expect(record, 'a finished codex turn leaves a resume record').toBeDefined()
+    expect(record, 'a finished agent turn leaves a resume record').toBeDefined()
     expect(record?.state, 'the done turn stays done').toBe('done')
     expect(record?.origin).toBe('live')
     // The identity a cold restore needs survives; only the turn text is dropped.

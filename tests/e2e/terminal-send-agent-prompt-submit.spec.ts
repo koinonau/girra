@@ -15,26 +15,26 @@ const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'orca-terminal-send-agent
 const fixtureReport = path.join(fixtureRoot, 'report.json')
 const fixtureMarker = `ORCA_TERMINAL_SEND_E2E_${process.pid}`
 const fixtureScript = path.join(process.cwd(), 'tests', 'tools', 'repro-terminal-send-submit.mjs')
-const fakeCodex = path.join(fixtureRoot, process.platform === 'win32' ? 'codex.cmd' : 'codex')
-const fakeCodexCommand = buildFakeAgentCommandOverride(fakeCodex)
+const fakeClaude = path.join(fixtureRoot, process.platform === 'win32' ? 'claude.cmd' : 'claude')
+const fakeClaudeCommand = buildFakeAgentCommandOverride(fakeClaude)
 const swallowedEnterFixtureTimeoutMs = SWALLOWED_ENTER_FIXTURE_TIMEOUT_MS
 
 writeFileSync(
-  fakeCodex,
+  fakeClaude,
   process.platform === 'win32'
     ? `@echo off\r\n"${process.execPath}" "${fixtureScript}" --fake-agent --report "%ORCA_FAKE_AGENT_REPORT%" --marker "%ORCA_FAKE_AGENT_MARKER%" --allow-unframed-paste %*\r\n`
     : `#!/usr/bin/env sh\n"${process.execPath}" "${fixtureScript}" --fake-agent --report "$ORCA_FAKE_AGENT_REPORT" --marker "$ORCA_FAKE_AGENT_MARKER" "$@"\n`,
   'utf8'
 )
 if (process.platform !== 'win32') {
-  chmodSync(fakeCodex, 0o755)
+  chmodSync(fakeClaude, 0o755)
 }
 
 test.afterAll(() => {
   rmSync(fixtureRoot, { recursive: true, force: true })
 })
 
-async function createFakeCodexTerminal(
+async function createFakeClaudeTerminal(
   userDataDir: string,
   testRepoPath: string,
   args: string[] = []
@@ -61,8 +61,8 @@ async function createFakeCodexTerminal(
   rmSync(fixtureReport, { force: true })
   const created = await client.call<{ terminal: { handle: string } }>('terminal.create', {
     worktree: `id:${worktree.id}`,
-    command: [fakeCodexCommand, ...args].join(' '),
-    launchAgent: 'codex',
+    command: [fakeClaudeCommand, ...args].join(' '),
+    launchAgent: 'claude',
     env: {
       ORCA_FAKE_AGENT_REPORT: fixtureReport,
       ORCA_FAKE_AGENT_MARKER: fixtureMarker
@@ -80,7 +80,7 @@ async function createFakeCodexTerminal(
       },
       { timeout: 30_000 }
     )
-    .toBe('codex')
+    .toBe('claude')
   return handle
 }
 
@@ -92,7 +92,7 @@ test('CLI text plus Enter waits for a slow agent composer before submitting', as
   test.setTimeout(110_000)
   await waitForSessionReady(orcaPage)
   const userDataDir = await electronApp.evaluate(({ app }) => app.getPath('userData'))
-  const terminal = await createFakeCodexTerminal(userDataDir, testRepoPath)
+  const terminal = await createFakeClaudeTerminal(userDataDir, testRepoPath)
   const repoRoot = process.cwd()
   let stdout = ''
   try {
@@ -143,7 +143,7 @@ test('CLI reports a swallowed Enter as accepted without submitting a second Ente
   test.setTimeout(110_000)
   await waitForSessionReady(orcaPage)
   const userDataDir = await electronApp.evaluate(({ app }) => app.getPath('userData'))
-  const terminal = await createFakeCodexTerminal(userDataDir, testRepoPath, [
+  const terminal = await createFakeClaudeTerminal(userDataDir, testRepoPath, [
     '--swallow-first-enter',
     '--timeout-ms',
     String(swallowedEnterFixtureTimeoutMs)
@@ -204,7 +204,7 @@ test('CLI does not write prompt bytes into an active permission dialog', async (
   test.setTimeout(110_000)
   await waitForSessionReady(orcaPage)
   const userDataDir = await electronApp.evaluate(({ app }) => app.getPath('userData'))
-  const terminal = await createFakeCodexTerminal(userDataDir, testRepoPath, [
+  const terminal = await createFakeClaudeTerminal(userDataDir, testRepoPath, [
     '--permission-before-send'
   ])
   const repoRoot = process.cwd()

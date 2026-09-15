@@ -40,8 +40,11 @@ describe('resolveStableForegroundProcess', () => {
   })
 
   it('prefers the remembered agent even when a degraded scan returns null', () => {
-    const result = resolveStableForegroundProcess({ available: false, processName: null }, 'codex')
-    expect(result.processName).toBe('codex')
-    expect(result.lastRecognizedAgent).toBe('codex')
+    const result = resolveStableForegroundProcess(
+      { available: false, processName: null },
+      'opencode'
+    )
+    expect(result.processName).toBe('opencode')
+    expect(result.lastRecognizedAgent).toBe('opencode')
   })
 })

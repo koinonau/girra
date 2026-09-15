@@ -56,11 +56,11 @@ function seedWorktreeWithTabs(
 ): void {
   const chatTab = makeUnifiedTab({
     id: 'chat-1',
-    entityId: 'codex-session-1',
+    entityId: 'opencode-session-1',
     groupId: GROUP,
     worktreeId,
     contentType: 'agent-session',
-    label: 'Codex Chat'
+    label: 'OpenCode Chat'
   })
   const unifiedByTabId = new Map(
     args.terminalIds.map((terminalId) => [

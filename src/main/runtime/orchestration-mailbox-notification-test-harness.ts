@@ -114,7 +114,7 @@ export function createRuntime(
       tabId: TAB_ID,
       leafId: LEAF_ID,
       incarnationId: 'mailbox-incarnation',
-      agentLaunchAuthority: { launchToken: LAUNCH_TOKEN, launchAgent: 'codex' }
+      agentLaunchAuthority: { launchToken: LAUNCH_TOKEN, launchAgent: 'claude' }
     },
     options.isWsl
   )
@@ -125,7 +125,7 @@ export function createRuntime(
       {
         tabId: TAB_ID,
         worktreeId: WORKTREE_ID,
-        title: 'Codex',
+        title: 'Claude',
         activeLeafId: LEAF_ID,
         layout: null
       }
@@ -152,7 +152,7 @@ export function registerSecondPane(
     tabId: SECOND_TAB_ID,
     leafId,
     incarnationId: 'mailbox-second-incarnation',
-    agentLaunchAuthority: { launchToken: SECOND_LAUNCH_TOKEN, launchAgent: 'codex' }
+    agentLaunchAuthority: { launchToken: SECOND_LAUNCH_TOKEN, launchAgent: 'claude' }
   })
   runtime.registerPreAllocatedHandleForPty(SECOND_PTY_ID, SECOND_TERMINAL_HANDLE)
   runtime.syncWindowGraph(1, {
@@ -162,7 +162,7 @@ export function registerSecondPane(
             {
               tabId: TAB_ID,
               worktreeId: WORKTREE_ID,
-              title: 'Codex',
+              title: 'Claude',
               activeLeafId: LEAF_ID,
               layout: null
             }
@@ -171,7 +171,7 @@ export function registerSecondPane(
       {
         tabId: SECOND_TAB_ID,
         worktreeId: WORKTREE_ID,
-        title: 'Codex',
+        title: 'Claude',
         activeLeafId: leafId,
         layout: null
       }
@@ -201,8 +201,8 @@ export function registerSecondPane(
 
 export async function driveToLiveIdle(runtime: OrcaRuntimeService): Promise<void> {
   await runtime.listTerminals()
-  const working = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Codex working\x07', 1)
-  const done = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Codex done\x07', 2)
+  const working = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Claude working\x07', 1)
+  const done = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Claude done\x07', 2)
   await Promise.all([working.completion, done.completion])
 }
 

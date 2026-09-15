@@ -7,8 +7,7 @@ const RESTRICTED_ENV_KEYS = new Set([
   'USERPROFILE',
   'HOMEDRIVE',
   'HOMEPATH',
-  'CODEX_HOME',
-  'ORCA_CODEX_HOME',
+  'CLAUDE_CONFIG_DIR',
   'ORCA_E2E_USER_DATA_DIR',
   'ORCA_E2E_HOME_DIR',
   'ZDOTDIR',
@@ -52,7 +51,7 @@ function assertOverlayDoesNotReplaceIsolation(
   }
 }
 
-function stripAmbientHomeAndCodexEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+function stripAmbientHomeAndAgentEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   return Object.fromEntries(
     Object.entries(env).filter(([key]) => !RESTRICTED_ENV_KEYS.has(key.toUpperCase()))
   )
@@ -74,8 +73,8 @@ export function createElectronHomeIsolation({
   // short names). Git canonicalizes worktree paths, so a non-canonical HOME
   // makes freshly created worktrees invisible to Orca's listing comparisons.
   const isolatedHome = realpathSync.native(requestedIsolatedHome)
-  // Why: a bad fixture path must fail before Electron can resolve a real Codex
-  // home; userData isolation alone does not change app.getPath('home').
+  // Why: a bad fixture path must fail before Electron can resolve a real Claude
+  // config; userData isolation alone does not change app.getPath('home').
   if (areSameHomePath(isolatedHome, realHome)) {
     throw new Error('Refusing to launch E2E with the developer home as its isolated HOME')
   }
@@ -84,7 +83,7 @@ export function createElectronHomeIsolation({
     isolatedHome,
     realHome,
     env: {
-      ...stripAmbientHomeAndCodexEnv(inheritedEnv),
+      ...stripAmbientHomeAndAgentEnv(inheritedEnv),
       ...launchEnv,
       ...extraEnv,
       HOME: isolatedHome,

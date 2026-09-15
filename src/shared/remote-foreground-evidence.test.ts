@@ -7,7 +7,7 @@ import {
 
 const live = {
   verdict: 'live' as const,
-  processName: 'codex',
+  processName: 'opencode',
   authorityGeneration: 'host-a',
   observationEpoch: 4,
   capturedAgeMs: 5,

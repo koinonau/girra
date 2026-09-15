@@ -259,7 +259,7 @@ describe('buildSourceControlManualReviewUrl', () => {
     expect(
       buildSourceControlManualReviewUrl({
         baseRef: 'refs/remotes/origin/main',
-        branchName: 'codex-runtime-home-refactor-design',
+        branchName: 'opencode-runtime-home-refactor-design',
         repoRemoteName: 'origin',
         repoRemoteUrl: 'git@github.com:stablyai/orca.git',
         upstreamName: null

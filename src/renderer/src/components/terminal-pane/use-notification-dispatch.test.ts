@@ -62,12 +62,12 @@ function makeAgentStatus(
   const now = Date.now()
   return {
     state: 'done',
-    prompt: 'codex-hook-notify',
+    prompt: 'opencode-hook-notify',
     updatedAt: now,
     stateStartedAt: now,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
-    terminalTitle: 'codex',
+    terminalTitle: 'opencode',
     stateHistory: [],
     lastAssistantMessage: 'Done.',
     ...overrides
@@ -162,7 +162,7 @@ describe('dispatchTerminalNotification', () => {
   it('uses a live pane key when marking inactive worktree attention', () => {
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -178,11 +178,11 @@ describe('dispatchTerminalNotification', () => {
         paneKey,
         repoLabel: 'orca',
         worktreeLabel: 'master',
-        terminalTitle: 'codex',
+        terminalTitle: 'opencode',
         isActiveWorktree: false,
-        agentType: 'codex',
+        agentType: 'opencode',
         agentState: 'done',
-        agentPrompt: 'codex-hook-notify',
+        agentPrompt: 'opencode-hook-notify',
         agentLastAssistantMessage: 'Done.'
       })
     )
@@ -289,7 +289,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -310,7 +310,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -331,7 +331,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -346,7 +346,7 @@ describe('dispatchTerminalNotification', () => {
     mockState.settings.notifications = { ...mockState.settings.notifications, enabled: false }
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -362,7 +362,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -391,7 +391,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey: hiddenPaneKey
     })
 
@@ -422,7 +422,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey: siblingPaneKey
     })
 
@@ -439,7 +439,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -457,7 +457,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -472,7 +472,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey: stalePaneKey
     })
 
@@ -487,7 +487,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -496,9 +496,9 @@ describe('dispatchTerminalNotification', () => {
         source: 'agent-task-complete',
         worktreeId: 'wt-primary',
         paneKey,
-        agentType: 'codex',
+        agentType: 'opencode',
         agentState: 'done',
-        agentPrompt: 'codex-hook-notify',
+        agentPrompt: 'opencode-hook-notify',
         agentLastAssistantMessage: 'Done.'
       })
     )
@@ -514,12 +514,12 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey,
       agentStatusSnapshot: {
         state: 'done',
-        prompt: 'codex-hook-notify',
-        agentType: 'codex',
+        prompt: 'opencode-hook-notify',
+        agentType: 'opencode',
         lastAssistantMessage: 'Done.',
         stateStartedAt
       }
@@ -535,9 +535,9 @@ describe('dispatchTerminalNotification', () => {
         }),
         worktreeId: 'wt-primary',
         paneKey,
-        agentType: 'codex',
+        agentType: 'opencode',
         agentState: 'done',
-        agentPrompt: 'codex-hook-notify',
+        agentPrompt: 'opencode-hook-notify',
         agentLastAssistantMessage: 'Done.'
       })
     )
@@ -549,8 +549,8 @@ describe('dispatchTerminalNotification', () => {
   it('does not let fresh active status suppress a completion from another named agent', () => {
     mockState.agentStatusByPaneKey[paneKey] = makeAgentStatus(paneKey, {
       state: 'working',
-      agentType: 'codex',
-      terminalTitle: 'Codex',
+      agentType: 'opencode',
+      terminalTitle: 'OpenCode',
       lastAssistantMessage: undefined
     })
 
@@ -582,9 +582,9 @@ describe('dispatchTerminalNotification', () => {
       paneKey,
       agentStatusSnapshot: {
         state: 'done',
-        prompt: 'codex prompt',
-        agentType: 'codex',
-        lastAssistantMessage: 'Codex done.',
+        prompt: 'opencode prompt',
+        agentType: 'opencode',
+        lastAssistantMessage: 'OpenCode done.',
         stateStartedAt: Date.now()
       }
     })
@@ -632,22 +632,22 @@ describe('dispatchTerminalNotification', () => {
 
   it('keeps a fresh agent snapshot when the terminal title matches the stored agent', () => {
     mockState.agentStatusByPaneKey[paneKey] = makeAgentStatus(paneKey, {
-      agentType: 'codex',
-      terminalTitle: 'Codex',
-      lastAssistantMessage: 'Codex done.'
+      agentType: 'opencode',
+      terminalTitle: 'OpenCode',
+      lastAssistantMessage: 'OpenCode done.'
     })
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: '⠋ Codex',
+      terminalTitle: '⠋ OpenCode',
       paneKey
     })
 
     const dispatchArgs = getLastNotificationDispatchArg()
     expect(dispatchArgs).toEqual(
       expect.objectContaining({
-        agentType: 'codex',
-        agentLastAssistantMessage: 'Codex done.'
+        agentType: 'opencode',
+        agentLastAssistantMessage: 'OpenCode done.'
       })
     )
   })
@@ -685,7 +685,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey,
       agentCompletionSource: 'process-exit'
     })
@@ -695,7 +695,7 @@ describe('dispatchTerminalNotification', () => {
         source: 'agent-task-complete',
         worktreeId: 'wt-primary',
         paneKey,
-        terminalTitle: 'codex'
+        terminalTitle: 'opencode'
       })
     )
     expect(mockState.markWorktreeUnread).toHaveBeenCalledWith('wt-primary')
@@ -761,12 +761,12 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey,
       agentStatusSnapshot: {
         state: 'done',
         prompt: 'previous prompt',
-        agentType: 'codex',
+        agentType: 'opencode',
         lastAssistantMessage: 'Done.',
         stateStartedAt: previousDoneStartedAt
       }
@@ -786,12 +786,12 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey,
       agentStatusSnapshot: {
         state: 'done',
-        prompt: 'codex-hook-notify',
-        agentType: 'codex',
+        prompt: 'opencode-hook-notify',
+        agentType: 'opencode',
         lastAssistantMessage: 'Done.'
       }
     })
@@ -807,7 +807,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'terminal-bell',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -828,7 +828,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'terminal-bell',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 
@@ -847,7 +847,7 @@ describe('dispatchTerminalNotification', () => {
 
     dispatchTerminalNotification('wt-primary', {
       source: 'agent-task-complete',
-      terminalTitle: 'codex',
+      terminalTitle: 'opencode',
       paneKey
     })
 

@@ -41,7 +41,7 @@ function expectActiveBufferParity(source: ParityTerminal, restored: ParityTermin
 }
 
 describe('terminal snapshot color parity', () => {
-  it('preserves Codex truecolor backgrounds, BCE rows, and default trailing cells', async () => {
+  it('preserves diff truecolor backgrounds, BCE rows, and default trailing cells', async () => {
     const source = createRendererParityTerminal({ cols: 24, rows: 6 })
     let restored: ParityTerminal | undefined
     try {
