@@ -265,6 +265,9 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: after 5a, Codex launches run on the user's own `~/.codex` (`prepareCodexRuntimeHomeForLaunch` returns null after the trust preset and real-home hook install). Known gaps until 5b to 5d: Windows has no Codex status hook install path, because the real-home lane still needs the shell probe; and resuming a legacy session from the shared mirror fails when the real-home lane is off.
 - 2026-09-15: the index heal CI job and its contract tests went with the orphaned index heal module.
 - 2026-09-15: remove the plugin kill-list's remote fetch, though the tree ticks it with a `[STRIP]` PHONE-HOME tag, because the selection drops phone-home. The plugin system and marketplace stay; nothing blocks a plugin now.
+- 2026-09-15 (user): the launch roster keeps only Claude Code (with its Agent Teams launch mode), OpenCode and Pi. Codex and every other agent go, including OMP and Prime Agent, which share Pi's hooks.
+- 2026-09-15 (user): keep MiniMax usage and credentials, although the tree unticks the usage fetch.
+- 2026-09-15 (user): the app is named Girra, and the CLI binary is `girra`. `.orca/`, `ORCA_*` and the `orca://` scheme are not part of that decision and stay for now. The Help menu, Support section and share card are left as they are.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -274,15 +277,11 @@ All 2026-09-13 unless dated otherwise.
 ## Open Decisions
 
 - **Web renderer and pairing.** The feature tree keeps "Web UI served over the network", "Headless serve mode", "Cross-device session tab sync" and "Paired-runtime remote browser host", but drops "Web/mobile companion renderer" (`src/renderer/src/web`) and the mobile pairing items: end-to-end encryption, device tokens, QR pairing. The code does not split that way. Serve mode serves the web client built from `src/renderer/src/web`, and `src/main/runtime/runtime-rpc/` imports `device-registry.ts` and `e2ee-keypair.ts` for every remote client. Keep both, and drop only mobile-specific surfaces; or drop the web UI and remote serving with them. Phase 3a already removed the mobile pairing page, QR pairing, push and the cloud relay. Still in place: `orca serve --mobile-pairing`, the mobile session tab runtime, the mobile RPC allowlist and mobile-scope devices in the registry.
-- **Launch roster.** The tree unticks only the hook integrations for Amp, Antigravity, Command Code, Cursor, Devin, Droid, Gemini, Copilot, Grok, Hermes, Kimi, MiMo and OpenClaude, but the selection summary reads "drop 13 minor agent CLIs". Keep them launchable without live status: no more work. Or remove them from the roster: a read-only map estimated about 140 more files deleted and 450 to 530 edited, across catalogs, icons, session options, AI Vault scanners, session resume, native chat decoders and locales (2026-09-15). Sixteen other launchable agents (aider, goose, cline and more) never had hooks.
-- **MiniMax usage.** The tree unticks "MiniMax usage fetch" but ticks "MiniMax credential storage", and the credentials exist only to feed that fetch (`src/main/rate-limits/minimax`, `src/main/minimax`). Keep both, or delete both with the MiniMax account section and status bar item.
 - **Remote skill install.** Since skill sharing left, nothing calls the host-side skill install RPC (`skills.install`, uploads) or the SSH relay skill handler. Delete them, or add a local package source that uses them.
 - **Workflows.** Which of the 36 to keep before Actions is re-enabled. Until then, no change has CI.
-- **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it.
-- **Product name and bundle id.** Renaming `productName` (`Orca`) and `BASE_APP_NAME` renames the macOS safe-storage key, so stored encrypted secrets must be re-entered, and may move the user-data directory. Renaming `appId` (`com.stablyai.orca`) resets macOS privacy grants, changes the Windows notification identity, installs beside Orca instead of upgrading it, and must change in about 12 files at once, including a trust check in the Computer Use Swift helper. Prompt text such as "Orca would like to access…" is only right after the rename. Recommendation: rename both in one change, since girra has no installed users to disturb.
-- **"Orca CLI" in prose, and the star and support links.** About 55 strings per locale say "Orca CLI" while the binary stays `orca`; "Girra CLI" reads oddly beside `orca …` commands until the CLI binary decision lands. The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL.
-- **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug.
-- **CLI binary.** Rename `orca` if both apps will run side by side.
+- **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it. Left for now (user, 2026-09-15).
+- **Star and support links.** The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL. Left for now (user, 2026-09-15).
+- **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug. Not part of the 2026-09-15 rename; they stay until decided.
 
 ## Traps
 
