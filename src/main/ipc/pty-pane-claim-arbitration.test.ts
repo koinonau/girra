@@ -38,9 +38,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const {
@@ -121,14 +118,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnController = controller as unknown as RuntimeSpawnController
     const leafId = '11111111-1111-4111-8111-111111111111'
     await spawnController.spawn({
@@ -199,14 +189,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
     const error = vi.spyOn(console, 'error').mockImplementation(() => {})
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const leafId = '22222222-2222-4222-8222-222222222222'
     const expectedSourceBinding = {
       worktreeId: 'wt-1',
@@ -273,7 +256,7 @@ describe('registerPtyHandlers', () => {
       authoritativeOwnerListings: false
     })
     setLocalPtyProvider(provider as never)
-    registerPtyHandlers(mainWindow as never, runtime, undefined, undefined, undefined, {
+    registerPtyHandlers(mainWindow as never, runtime, undefined, undefined, {
       persistPtyBinding
     } as never)
     const controller = (
@@ -457,14 +440,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnController = controller as unknown as RuntimeSpawnController
     const leafId = '22222222-2222-4222-8222-222222222222'
     const paneKey = makePaneKey('tab-race', leafId)

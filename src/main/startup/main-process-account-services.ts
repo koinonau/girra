@@ -3,19 +3,14 @@ import { RateLimitService } from '../rate-limits/service'
 import { ClaudeRuntimeAuthService } from '../claude-accounts/runtime-auth-service'
 import { ClaudeAccountService } from '../claude-accounts/service'
 import { KeybindingService } from '../keybindings/keybinding-service'
-import { startCodexStateDbBackfillRecoveryInBackground } from '../codex/codex-state-db-backfill-recovery'
-import { getOrcaManagedCodexHomePath } from '../codex/codex-home-paths'
 import { getInitialClaudeRateLimitTarget } from '../rate-limits/claude-rate-limit-target'
 import { readMiniMaxSessionCookie } from '../minimax/minimax-cookie-store'
 import { readMiniMaxApiKey } from '../minimax/minimax-api-key-store'
 import { createAccountRuntimeTargetSettingsSync } from '../rate-limits/account-runtime-target-sync'
 import { normalizeClaudeRuntimeSelection } from '../claude-accounts/runtime-selection'
-import { isAgentStatusHooksEnabled } from '../agent-hooks/managed-agent-hook-controls'
 import { agentHookServer } from '../agent-hooks/server'
-import { setSystemCodexHomeHookSweepSuppressed } from '../codex/hook-service'
 import { browserManager } from '../browser/browser-manager'
 import { mainProcessState as state } from './main-process-state'
-import { isHostCodexRealHome } from './codex-launch-preparation'
 
 export function initializeMainProcessAccountServices(): void {
   const store = state.store
@@ -23,12 +18,6 @@ export function initializeMainProcessAccountServices(): void {
     throw new Error('Usage stores must be initialized before account services')
   }
   state.rateLimits = new RateLimitService()
-  void startCodexStateDbBackfillRecoveryInBackground(getOrcaManagedCodexHomePath())
-  // Why: while the real-home lane owns ~/.codex/hooks.json, the legacy system-home sweep would
-  // delete the entry the real-home installer just appended; hooks off or an incapable lane re-arms it.
-  setSystemCodexHomeHookSweepSuppressed(
-    () => isHostCodexRealHome() && isAgentStatusHooksEnabled(state.store?.getSettings())
-  )
   state.claudeRuntimeAuth = new ClaudeRuntimeAuthService(store)
   state.claudeAccounts = new ClaudeAccountService(store, state.rateLimits, state.claudeRuntimeAuth)
   state.rateLimits.setClaudeFetchTarget(getInitialClaudeRateLimitTarget(store.getSettings()))

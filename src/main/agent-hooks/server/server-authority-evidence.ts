@@ -6,9 +6,9 @@ import type {
   AgentHookAuthorityEvidence,
   EnrichedAgentHookEventPayload
 } from './server-types'
-import { AgentHookServerStatusRetries } from './server-status-retries'
+import { AgentHookServerStatusUpdate } from './server-status-update'
 
-export abstract class AgentHookServerAuthorityEvidence extends AgentHookServerStatusRetries {
+export abstract class AgentHookServerAuthorityEvidence extends AgentHookServerStatusUpdate {
   attestCompatibilityAuthority(candidate: {
     paneKey: string
     launchTokenHash: string

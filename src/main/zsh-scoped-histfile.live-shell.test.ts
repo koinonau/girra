@@ -194,7 +194,7 @@ describe.skipIf(process.platform === 'win32')(
         // what zsh defaults to is platform-specific. macOS /etc/zshrc assigns
         // HISTFILE, so it is always set there; a stock Ubuntu zsh leaves it EMPTY.
         // The contract is that Orca's wrapper does not change it either way.
-        const overlayEnv = { ORCA_CODEX_HOME: join(home, 'codex') }
+        const overlayEnv = { ORCA_OPENCODE_CONFIG_DIR: join(home, 'opencode') }
         const features = selectShellStartupFeatures({
           shellPath: ZSH_PATH,
           env: { HOME: home, ...overlayEnv },
@@ -257,11 +257,11 @@ describe.skipIf(process.platform === 'win32')('the deferred hook delivers every 
     withHome(
       {
         ...USER_FILES,
-        '.zshrc': 'export CODEX_HOME=/user/codex\nexport PATH=/user/bin:$PATH\n'
+        '.zshrc': 'export OPENCODE_CONFIG_DIR=/user/opencode\nexport PATH=/user/bin:$PATH\n'
       },
       async (home) => {
         const overlayEnv = {
-          ORCA_CODEX_HOME: '/orca/codex',
+          ORCA_OPENCODE_CONFIG_DIR: '/orca/opencode',
           ORCA_AGENT_TEAMS_SHIM_DIR: '/orca/shim'
         }
         const features = selectShellStartupFeatures({
@@ -281,12 +281,12 @@ describe.skipIf(process.platform === 'win32')('the deferred hook delivers every 
             ...launch.env,
             ORCA_ORIG_ZDOTDIR: home
           },
-          report: ['CODEX_HOME', 'PATH']
+          report: ['OPENCODE_CONFIG_DIR', 'PATH']
         })
 
         // The point of running last: the user's .zshrc set both of these after
         // the spawn env did, and Orca's values still win.
-        expect(values.CODEX_HOME).toBe('/orca/codex')
+        expect(values.OPENCODE_CONFIG_DIR).toBe('/orca/opencode')
         expect(values.PATH.startsWith('/orca/shim:')).toBe(true)
       }
     )

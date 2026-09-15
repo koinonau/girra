@@ -3,7 +3,7 @@ import type { PreloadApi } from '../api-types'
 
 export const agentTrustApi = {
   markTrusted: (args: {
-    preset: 'copilot' | 'codex'
+    preset: 'copilot'
     workspacePath: string
     connectionId?: string
   }): Promise<void> => ipcRenderer.invoke('agentTrust:markTrusted', args)

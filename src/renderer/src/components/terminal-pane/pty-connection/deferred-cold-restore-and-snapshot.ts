@@ -210,7 +210,7 @@ export function bindDeferredColdRestoreAndSnapshot(session: ConnectPanePtySessio
   session.foregroundRewriteChunkEndedWithCarriageReturn = false
   session.foregroundRewriteCsiScanTail = ''
   session.mode2031ReplyScanState = INITIAL_MODE_2031_REPLY_SCAN_STATE
-  session.shouldSnapshotHiddenCodexOutput = shouldKeepHiddenStartupRendererQueriesLive(
+  session.shouldSnapshotHiddenAgentOutput = shouldKeepHiddenStartupRendererQueriesLive(
     session.paneStartup
   )
   session.hiddenStartupRendererQueryPending = ''

@@ -17,7 +17,6 @@ import type { ConnectPanePtySession } from './connect-pane-pty-session'
 
 export function installAgentIdleWorkingHandlers(session: ConnectPanePtySession): void {
   session.onAgentBecameWorking = (): void => {
-    session.suppressNativeWindowsIdleCodexFocusReports = false
     session.clearSuppressedTitleSideEffects()
     if (session.syncAgentTaskCompleteTrackingEnabled()) {
       session.requiresFreshWorkingForAgentTaskCompleteNotification = false

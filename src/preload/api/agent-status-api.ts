@@ -50,7 +50,7 @@ export type AgentStatusApi = {
 
 export type AgentTrustApi = {
   markTrusted: (args: {
-    preset: 'copilot' | 'codex'
+    preset: 'copilot'
     workspacePath: string
     connectionId?: string
   }) => Promise<void>

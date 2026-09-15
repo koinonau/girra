@@ -38,9 +38,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow, mainWindowIpcEvent } = setupPtyIpcSuite()
@@ -314,14 +311,7 @@ describe('registerPtyHandlers', () => {
       getDefaultShell: vi.fn(),
       getProfiles: vi.fn()
     } as never)
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
     await handlers.get('pty:kill')!(null, { id: 'ssh:ssh-1@@relay-pty' })
 
@@ -357,14 +347,7 @@ describe('registerPtyHandlers', () => {
       getProfiles: vi.fn()
     } as never)
     const store = { markSshRemotePtyLease: vi.fn(), clearSshRemotePtyKillIntent: vi.fn() }
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
 
     await handlers.get('pty:kill')!(null, { id: 'ssh:ssh-1@@relay-pty' })
 
@@ -402,14 +385,7 @@ describe('registerPtyHandlers', () => {
       getProfiles: vi.fn()
     }
     registerSshPtyProvider('ssh-1', provider as never)
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, store as never)
     await handlers.get('pty:spawn')!(null, {
       cols: 80,
       rows: 24,

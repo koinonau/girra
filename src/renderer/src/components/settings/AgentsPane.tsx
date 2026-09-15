@@ -8,7 +8,6 @@ import { useAppStore } from '@/store'
 import { AgentAwakeSetting } from './AgentAwakeSetting'
 import { AgentCacheTimerSection } from './AgentCacheTimerSection'
 import { AgentRuntimeSetting } from './AgentRuntimeSetting'
-import { buildCodexSessionSourceHomeControl } from './codex-session-source-home-control'
 import {
   getAgentGeneratedTabTitlesDescription,
   getAgentGeneratedTabTitlesTitle
@@ -228,11 +227,7 @@ export function AgentsPane({
     onSaveArgs: (value) =>
       updateSettings({ agentDefaultArgs: { ...agentDefaultArgs, [agent.id]: value } }),
     onSaveEnv: (value) =>
-      updateSettings({ agentDefaultEnv: { ...agentDefaultEnv, [agent.id]: value } }),
-    sessionSourceHome:
-      isDetected && agent.id === 'codex'
-        ? buildCodexSessionSourceHomeControl(settings, updateSettings)
-        : undefined
+      updateSettings({ agentDefaultEnv: { ...agentDefaultEnv, [agent.id]: value } })
   })
 
   return (

@@ -38,9 +38,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 const SCOPED_PTY_ID = 'ssh:ssh-1@@pty-7'
 
@@ -83,14 +80,7 @@ describe('undelivered SSH stops', () => {
     runtime: ReturnType<typeof installController>['runtime']
   } {
     const { runtime } = installController(handlers as never)
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
       kill: (ptyId: string) => boolean
       stopAndWait: (ptyId: string, opts?: { keepHistory?: boolean }) => Promise<boolean>

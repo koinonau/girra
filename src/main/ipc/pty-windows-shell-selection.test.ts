@@ -41,9 +41,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -180,7 +177,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'powershell.exe'
@@ -199,7 +195,6 @@ describe('registerPtyHandlers', () => {
 
       registerPtyHandlers(
         mainWindow as never,
-        undefined,
         undefined,
         () =>
           ({
@@ -234,7 +229,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'powershell.exe',
@@ -268,7 +262,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'powershell.exe'
@@ -299,7 +292,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'powershell.exe',
@@ -321,7 +313,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'powershell.exe',
@@ -342,7 +333,6 @@ describe('registerPtyHandlers', () => {
 
       registerPtyHandlers(
         mainWindow as never,
-        undefined,
         undefined,
         () =>
           ({
@@ -366,7 +356,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'powershell.exe',
@@ -389,7 +378,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        undefined,
         () =>
           ({
             terminalWindowsShell: 'cmd.exe',
@@ -411,7 +399,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        () => 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home',
         () =>
           ({
             terminalWindowsShell: 'wsl.exe',
@@ -420,10 +407,7 @@ describe('registerPtyHandlers', () => {
       )
       await handlers.get('pty:spawn')!(null, { cols: 80, rows: 24 })
 
-      const spawnOptions = spawnMock.mock.calls.at(-1)?.[2] as { env: Record<string, string> }
       expect(spawnMock).toHaveBeenCalledWith('wsl.exe', expect.any(Array), expect.any(Object))
-      expect(spawnOptions.env.CODEX_HOME).toBeUndefined()
-      expect(spawnOptions.env.ORCA_CODEX_HOME).toBeUndefined()
     })
     it('keeps shellOverride priority for one-off tabs', async () => {
       process.env.COMSPEC = 'C:\\Windows\\system32\\cmd.exe'
@@ -432,7 +416,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         undefined,
-        () => 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home',
         () =>
           ({
             terminalWindowsShell: 'powershell.exe',
@@ -445,10 +428,7 @@ describe('registerPtyHandlers', () => {
         shellOverride: 'wsl.exe'
       })
 
-      const spawnOptions = spawnMock.mock.calls.at(-1)?.[2] as { env: Record<string, string> }
       expect(spawnMock).toHaveBeenCalledWith('wsl.exe', expect.any(Array), expect.any(Object))
-      expect(spawnOptions.env.CODEX_HOME).toBeUndefined()
-      expect(spawnOptions.env.ORCA_CODEX_HOME).toBeUndefined()
     })
   })
 })

@@ -281,7 +281,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('pre-marks trust for the created fork workspace before launching a trusted agent', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'copilot' }
     }
     mockCreateWorktree.mockResolvedValueOnce({
       worktree: {
@@ -299,7 +299,7 @@ describe('forkAgentSessionFromPane', () => {
     })
 
     expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
+      preset: 'copilot',
       workspacePath: '/repo/worktrees/auth-feature-fork'
     })
     expect(mockMarkTrusted.mock.invocationCallOrder[0]).toBeLessThan(
@@ -311,7 +311,7 @@ describe('forkAgentSessionFromPane', () => {
   it('uses remote trust and Linux startup quoting for SSH workspaces', async () => {
     store.repos = [{ id: 'repo-1', kind: 'git', connectionId: 'ssh-1' }]
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'copilot' }
     }
     mockCreateWorktree.mockResolvedValueOnce({
       worktree: {
@@ -329,13 +329,13 @@ describe('forkAgentSessionFromPane', () => {
     })
 
     expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
+      preset: 'copilot',
       workspacePath: '/home/u/repo/auth-feature-fork',
       connectionId: 'ssh-1'
     })
     expect(mockLaunchAgentInNewTab).toHaveBeenCalledWith(
       expect.objectContaining({
-        agent: 'codex',
+        agent: 'copilot',
         worktreeId: 'wt-fork',
         launchPlatform: 'linux'
       })
@@ -407,7 +407,7 @@ describe('forkAgentSessionFromPane', () => {
 
   it('still launches the forked agent when trust preflight fails', async () => {
     store.agentStatusByPaneKey = {
-      [`tab-1:${LEAF_ID}`]: { agentType: 'codex' }
+      [`tab-1:${LEAF_ID}`]: { agentType: 'copilot' }
     }
     mockCreateWorktree.mockResolvedValueOnce({
       worktree: {
@@ -426,12 +426,12 @@ describe('forkAgentSessionFromPane', () => {
     })
 
     expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
+      preset: 'copilot',
       workspacePath: '/repo/worktrees/auth-feature-fork'
     })
     expect(mockLaunchAgentInNewTab).toHaveBeenCalledWith(
       expect.objectContaining({
-        agent: 'codex',
+        agent: 'copilot',
         worktreeId: 'wt-fork',
         prompt: expect.stringContaining('User: continue after trust failure')
       })

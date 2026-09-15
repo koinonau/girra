@@ -15,7 +15,6 @@ const PANE = makePaneKey('tab-hooks', '11111111-1111-4111-8112-111111111111')
 const MOVED_PANE = makePaneKey('tab-hooks', '22222222-2222-4222-8222-222222222222')
 const ROUTES = {
   '/hook/claude': 'claude',
-  '/hook/codex': 'codex',
   '/hook/opencode': 'opencode',
   '/hook/pi': 'pi',
   '/hook/omp': 'omp',
@@ -44,6 +43,7 @@ describe('agent hook extraction boundaries', () => {
       expect(resolveHookSource(pathname.toUpperCase())).toBeNull()
     }
     expect(resolveHookSource('/hook/unknown')).toBeNull()
+    expect(resolveHookSource('/hook/codex')).toBeNull()
   })
 
   it('preserves thin provider lifecycle branches and source attribution', () => {
@@ -70,7 +70,7 @@ describe('agent hook extraction boundaries', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
     const rejected = normalizeHookPayload(
       orderState,
-      'codex',
+      'opencode',
       {
         paneKey: PANE,
         tabId: 'wrong-tab',
@@ -105,10 +105,7 @@ describe('agent hook extraction boundaries', () => {
       state.lastToolByPaneKey,
       state.lastStatusByPaneKey,
       state.claudeSubagentRosterByPaneKey,
-      state.claudeLeadStateByPaneKey,
-      state.codexSubagentRosterByPaneKey,
-      state.codexSubagentTranscriptByPaneKey,
-      state.codexLeadStateByPaneKey
+      state.claudeLeadStateByPaneKey
     ]
     for (const map of paneMaps) {
       const cache = map as Map<string, unknown>
@@ -159,7 +156,6 @@ describe('agent hook extraction boundaries', () => {
       cache.set(sibling, 'sibling')
     }
     state.claudeLeadStateByPaneKey.set(PANE, { state: 'working' })
-    state.codexLeadStateByPaneKey.set(PANE, { state: 'working' })
 
     clearPaneCacheState(state, PANE)
 
@@ -170,7 +166,6 @@ describe('agent hook extraction boundaries', () => {
       expect(cache.get(sibling)).toBe('sibling')
     }
     expect(state.claudeLeadStateByPaneKey.has(PANE)).toBe(false)
-    expect(state.codexLeadStateByPaneKey.has(PANE)).toBe(false)
   })
 
   it('preserves cache mutation from a provider reset that emits no row', () => {
@@ -198,7 +193,6 @@ describe('agent hook extraction boundaries', () => {
     state.warnedEnvs.add('development->production')
     state.lastPromptByPaneKey.set(PANE, 'prompt')
     state.claudeRunningNonAgentTaskPaneKeys.add(PANE)
-    state.codexLeadStateByPaneKey.set(PANE, { state: 'working' })
 
     clearAllListenerCaches(state)
 
@@ -206,6 +200,5 @@ describe('agent hook extraction boundaries', () => {
     expect(state.warnedEnvs.size).toBe(0)
     expect(state.lastPromptByPaneKey.size).toBe(0)
     expect(state.claudeRunningNonAgentTaskPaneKeys.size).toBe(0)
-    expect(state.codexLeadStateByPaneKey.size).toBe(0)
   })
 })

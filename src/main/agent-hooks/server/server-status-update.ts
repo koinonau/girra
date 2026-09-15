@@ -1,8 +1,4 @@
 import {
-  reconcileRemoteCodexState,
-  markCodexLeadTurnInterrupted
-} from '../../../shared/agent-hook-listener/providers/codex-state'
-import {
   resolveAgentStatusIdentity,
   shouldSuppressInheritedTerminalStatus
 } from '../../../shared/agent-status-identity'
@@ -70,48 +66,9 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
       this.emitEnrichedStatus(enriched)
       return enriched
     }
-    const stateReconciledPayload =
-      terminalOwnedPayload.connectionId &&
-      terminalOwnedPayload.payload.agentType === 'codex' &&
-      terminalOwnedPayload.hookEventName
-        ? {
-            ...terminalOwnedPayload,
-            payload: reconcileRemoteCodexState(
-              this.state,
-              terminalOwnedPayload.paneKey,
-              terminalOwnedPayload.hookEventName,
-              terminalOwnedPayload.toolAgentId,
-              terminalOwnedPayload.payload,
-              previous?.payload
-            )
-          }
-        : terminalOwnedPayload
-    const previousCodexRoot =
-      stateReconciledPayload.payload.agentType === 'codex' &&
-      stateReconciledPayload.toolAgentId &&
-      previous?.payload.agentType === 'codex'
-        ? previous
-        : undefined
-    const preservedProviderSession = !stateReconciledPayload.providerSession
-      ? previousCodexRoot?.providerSession
-      : undefined
-    const preservedRootModel = !stateReconciledPayload.payload.model
-      ? previousCodexRoot?.payload.model
-      : undefined
-    // Why: an SSH relay restart forgets root-only fields; child hooks must not erase durable resume/model identity.
-    const rootContextPreservingPayload =
-      preservedProviderSession || preservedRootModel
-        ? {
-            ...stateReconciledPayload,
-            ...(preservedProviderSession ? { providerSession: preservedProviderSession } : {}),
-            payload: preservedRootModel
-              ? { ...stateReconciledPayload.payload, model: preservedRootModel }
-              : stateReconciledPayload.payload
-          }
-        : stateReconciledPayload
     const boundaryReconciledPrevious = invalidateClaudeChildOnlyBoundary(
       previous,
-      rootContextPreservingPayload
+      terminalOwnedPayload
     )
     if (boundaryReconciledPrevious !== previous) {
       previous = boundaryReconciledPrevious
@@ -129,25 +86,25 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
             restoredUnconfirmed: previous.restoredUnconfirmed
           }
         : undefined,
-      incoming: rootContextPreservingPayload.payload.agentType,
+      incoming: terminalOwnedPayload.payload.agentType,
       now
     })
     if (
       previous &&
       shouldSuppressInheritedTerminalStatus({
         inheritedFromActivePane: identity.inheritedFromActivePane,
-        incomingState: rootContextPreservingPayload.payload.state
+        incomingState: terminalOwnedPayload.payload.state
       })
     ) {
       this.commitStatusRowMutation(rowBefore, previous)
       return previous
     }
     const identityResolvedPayload =
-      identity.agentType === rootContextPreservingPayload.payload.agentType
-        ? rootContextPreservingPayload
+      identity.agentType === terminalOwnedPayload.payload.agentType
+        ? terminalOwnedPayload
         : {
-            ...rootContextPreservingPayload,
-            payload: { ...rootContextPreservingPayload.payload, agentType: identity.agentType }
+            ...terminalOwnedPayload,
+            payload: { ...terminalOwnedPayload.payload, agentType: identity.agentType }
           }
     const effectivePayload = attachClaudePermissionToolUseId(previous, identityResolvedPayload)
     const boundaryAwarePayload = attachClaudeChildOnlyBoundary(previous, effectivePayload)
@@ -178,9 +135,6 @@ export abstract class AgentHookServerStatusUpdate extends AgentHookServerStatusA
         (effectivePayload.hasExplicitPrompt !== true &&
           Date.now() - previous.receivedAt <= INTERRUPTED_DONE_LATE_WORKING_SUPPRESSION_MS))
     ) {
-      if (effectivePayload.payload.agentType === 'codex') {
-        markCodexLeadTurnInterrupted(this.state, effectivePayload.paneKey)
-      }
       this.commitStatusRowMutation(rowBefore, previous)
       return previous
     }

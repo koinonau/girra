@@ -4,13 +4,14 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6, 7a and the ADRs are merged.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6, 7a and the ADRs are merged; Phase 5b is in review.
 
-1. **Phase 5b onward, the rest of Codex and the launch roster.** Unblocked: the user dropped Codex and every agent except Claude Code, OpenCode and Pi (2026-09-15). Map both with read-only subagents, then split into pull requests.
-2. **Phase 7b, Girra identity.** Unblocked once the roster removal lands: rename the app to Girra and the CLI binary to `girra`, then sweep displayed text. `.orca/`, `ORCA_*`, `orca://`, the Help menu, Support section and share card stay. The build plan's Phase 7 records the measured scope and the traps.
-3. **Web renderer and pairing.** Resolve the feature-tree conflict recorded in `handover.md`. Needs the user.
-4. **Workflows.** Choose which of the 36 remaining workflows survive before GitHub Actions is re-enabled. Needs the user.
-5. **Remote skill install.** Delete the orphaned host-side install RPC, or keep it for a local package source. Needs the user.
+1. **Phase 5c, Pi-family and terminal leaves of the roster.** Remove OMP and Prime Agent from Pi's hooks and overlays, and the title detection, keyboard and output-scraping special cases for dropped agents, without shrinking `TuiAgent` yet.
+2. **Phase 5d, structured sessions, native chat and AI Vault.** Remove Codex and the dropped agents from them, keep `AiVaultSession.codexHome: null` on the wire, then delete what remains of `src/main/codex` in one step.
+3. **Phase 5e, roster registries.** Shrink `TuiAgent` and every registry to Claude Code (with Agent Teams), OpenCode and Pi; normalize stored agent ids (default agent to auto-pick, stale automations disabled); relax `startupAgent` and `launchAgent` schemas; renderer catalog, icons, locales, docs and skill guides.
+4. **Remote serving cleanup and kothar install.** Remove the mobile leftovers; delete remote skill install; add the Skills page "Install kothar" action (see `handover.md`).
+5. **Phase 7b, Girra identity.** Rename the app to Girra and the CLI to `girra`, then sweep displayed text. The build plan's Phase 7 records the scope and traps.
+6. **Workflows.** Prune to the kept set, add the signed macOS build, then re-enable Actions once the user has added the secrets.
 
 ## Backlog
 

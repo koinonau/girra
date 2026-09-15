@@ -32,9 +32,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow, recoveredAgentClaim } = setupPtyIpcSuite()
@@ -184,13 +181,7 @@ describe('registerPtyHandlers', () => {
           releaseAuth = resolve
         })
     )
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      prepareClaudeAuth
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, prepareClaudeAuth)
     const tabId = 'tab-mid-preflight-runtime'
     const leafId = '55555555-5555-4555-8555-555555555555'
     const paneKey = makePaneKey(tabId, leafId)
@@ -317,14 +308,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const leafId = '33333333-3333-4333-8333-333333333333'
     const paneKey = makePaneKey('tab-race', leafId)
     const rendererSpawn = handlers.get('pty:spawn')!(null, {
@@ -511,7 +495,6 @@ describe('registerPtyHandlers', () => {
       registerPtyHandlers(
         mainWindow as never,
         runtime as never,
-        undefined,
         undefined,
         prepareClaudeAuth,
         store as never

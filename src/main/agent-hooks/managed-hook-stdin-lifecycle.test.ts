@@ -16,7 +16,7 @@ let previousUserDataPath: string | undefined
 beforeEach(() => {
   previousUserDataPath = process.env.ORCA_USER_DATA_PATH
   isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-stdin-user-data-'))
-  // Why: Orca-managed Codex hooks resolve through ORCA_USER_DATA_PATH before
+  // Why: Orca-managed hook paths can resolve through ORCA_USER_DATA_PATH before
   // the mocked home; an inherited live path would let this test rewrite them.
   process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
 })
@@ -50,7 +50,6 @@ vi.mock('os', async (importOriginal) => {
 
 import { ClaudeHookService } from '../claude/hook-service'
 import { getRemoteManagedCommand } from '../claude/hook-settings'
-import { CodexHookService } from '../codex/hook-service'
 import { wrapPosixHookCommand, wrapWindowsHookCommand } from './installer-utils'
 import {
   POSIX_HOOK_STDIN_READER,
@@ -87,16 +86,11 @@ const REMOTE_INSTALLERS = [
   {
     agent: 'claude',
     install: (sftp: SFTPWrapper) => new ClaudeHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'codex',
-    install: (sftp: SFTPWrapper) => new CodexHookService().installRemote(sftp, REMOTE_HOME)
   }
 ] as const
 
 const LOCAL_INSTALLERS = [
-  { agent: 'claude', install: () => new ClaudeHookService().install() },
-  { agent: 'codex', install: () => new CodexHookService().install() }
+  { agent: 'claude', install: () => new ClaudeHookService().install() }
 ] as const
 
 type HookRun = {
@@ -179,9 +173,8 @@ async function generatePosixScripts(): Promise<Map<string, string>> {
   return scripts
 }
 
-// Why: the Codex installer awaits an app-server trust-grant session, so the
-// override has to stay pinned across the await instead of being restored by a
-// synchronous `finally` while the install is still running.
+// Why: installers may be async, so the override has to stay pinned across the
+// await instead of being restored by a synchronous `finally` mid-install.
 async function withPlatform<T>(platform: NodeJS.Platform, run: () => T | Promise<T>): Promise<T> {
   const original = Object.getOwnPropertyDescriptor(process, 'platform')
   Object.defineProperty(process, 'platform', { configurable: true, value: platform })
@@ -207,7 +200,7 @@ describe('Windows managed hook stdin structure', () => {
       })
       const hooksDir = join(home, '.orca', 'agent-hooks')
       const mainBatchScripts = readdirSync(hooksDir).filter((name) => name.endsWith('-hook.cmd'))
-      expect(mainBatchScripts).toHaveLength(2)
+      expect(mainBatchScripts).toHaveLength(1)
       for (const fileName of mainBatchScripts) {
         const script = readFileSync(join(hooksDir, fileName), 'utf8')
         // Why: missing-env path must not touch more.com — hang class from #11549.
@@ -291,7 +284,7 @@ describe('Windows managed hook stdin structure', () => {
         }
         const hooksDir = join(home, '.orca', 'agent-hooks')
         const mainScripts = readdirSync(hooksDir).filter((name) => name.endsWith('-hook.cmd'))
-        expect(mainScripts).toHaveLength(2)
+        expect(mainScripts).toHaveLength(1)
         for (const fileName of mainScripts) {
           const scriptPath = join(hooksDir, fileName)
           const result = await runHookProcess(

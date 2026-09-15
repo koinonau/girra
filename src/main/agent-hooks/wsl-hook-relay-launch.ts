@@ -132,8 +132,7 @@ export function spawnWslRelayProcess(
   // Why: --exec bypasses the distro's default login shell — a bare `--`
   // routes through it (a fish/nushell chsh could mangle the command) and
   // triggers wsl.exe's `$`-preprocessing of Windows argv. --exec passes argv
-  // verbatim (same form as the Codex WSL login spawn), so `$HOME` reaches
-  // sh unescaped and expands guest-side.
+  // verbatim, so `$HOME` reaches sh unescaped and expands guest-side.
   const command = `exec sh "${guestRelayDirExpr(version)}/launch.sh"`
   return spawn('wsl.exe', ['-d', distro, '--exec', 'sh', '-c', command], {
     env,

@@ -1,8 +1,6 @@
-import { shouldUseShellReadyStartupDelivery } from '../../../shared/codex-startup-delivery'
 import { win32 as pathWin32 } from 'node:path'
 import { isWindowsGitBashShellPath, resolveWindowsGitBashShellPath } from '../../git-bash'
 import { isPwshAvailable } from '../../pwsh'
-import { isHostCodexHomeForWsl, isWslCodexHomeForHost } from '../../pty/codex-home-wsl-env'
 import { addOrcaWslInteropEnv } from '../../pty/wsl-orca-env'
 import {
   POWERLEVEL10K_WIZARD_DISABLE_ENV,
@@ -21,13 +19,9 @@ import {
   buildWindowsPowerShellSpawnAttempts,
   type WindowsShellSpawnAttempt
 } from '../../providers/windows-shell-fallback-chain'
-import {
-  ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE_ENV,
-  resolveWindowsShellLaunchArgs
-} from '../../providers/windows-shell-args'
+import { resolveWindowsShellLaunchArgs } from '../../providers/windows-shell-args'
 import { resolveUnixShellPath } from '../../providers/local-pty-utils'
 import { selectShellStartupFeatures } from '../../shell-startup-features'
-import { parseWslPath } from '../../wsl'
 import { addWslEnvKeys } from '../../wsl-env'
 import {
   recognizeAgentProcessFromCommandLine,
@@ -96,12 +90,6 @@ export function createPtyShellLaunchPlan(
           }) ?? shellPath)
         : shellPath
     }
-    if (
-      pathWin32.basename(shellPath).toLowerCase() === 'cmd.exe' &&
-      env.ORCA_CODEX_LAUNCH_PREFLIGHT
-    ) {
-      env[ORCA_CODEX_LAUNCH_PREFLIGHT_CMD_QUOTE_ENV] = '"'
-    }
     windowsFallbackAttempts = buildWindowsPowerShellSpawnAttempts({
       shellPath,
       cwd: spawnCwd,
@@ -122,8 +110,7 @@ export function createPtyShellLaunchPlan(
         spawnCwd,
         resolveSafePtyDefaultCwd(),
         resolvedWslContext,
-        opts.command,
-        env.ORCA_CODEX_LAUNCH_PREFLIGHT
+        opts.command
       )
       shellArgs = resolved.shellArgs
       spawnCwd = resolved.effectiveCwd
@@ -133,50 +120,13 @@ export function createPtyShellLaunchPlan(
     if (isWindowsGitBashShellPath(shellPath)) {
       env.CHERE_INVOKING ??= '1'
     }
-    const codexHomeWslInfo = env.CODEX_HOME ? parseWslPath(env.CODEX_HOME) : null
     if (pathWin32.basename(shellPath).toLowerCase() === 'wsl.exe') {
-      if (codexHomeWslInfo) {
-        const launchWslDistro = resolvedWslContext?.distro
-        if (launchWslDistro && launchWslDistro !== codexHomeWslInfo.distro) {
-          delete env.CODEX_HOME
-          delete env.ORCA_CODEX_HOME
-        } else {
-          env.CODEX_HOME = codexHomeWslInfo.linuxPath
-          env.ORCA_CODEX_HOME = codexHomeWslInfo.linuxPath
-          addWslEnvKeys(env, ['CODEX_HOME', 'ORCA_CODEX_HOME'])
-          if (!launchWslDistro) {
-            const resolved = resolveWindowsShellLaunchArgs(
-              shellPath,
-              requestedCwd,
-              resolveSafePtyDefaultCwd(),
-              { distro: codexHomeWslInfo.distro },
-              opts.command,
-              env.ORCA_CODEX_LAUNCH_PREFLIGHT
-            )
-            shellArgs = resolved.shellArgs
-            spawnCwd = resolved.effectiveCwd
-            validationCwd = resolved.validationCwd
-            startupCommandDeliveredInShellArgs =
-              resolved.startupCommandDeliveredInShellArgs === true
-          }
-        }
-      } else if (isHostCodexHomeForWsl(env.CODEX_HOME)) {
-        delete env.CODEX_HOME
-        delete env.ORCA_CODEX_HOME
-      } else if (env.CODEX_HOME) {
-        addWslEnvKeys(env, ['CODEX_HOME', 'ORCA_CODEX_HOME'])
-      }
       if (env.CLAUDE_CONFIG_DIR) {
         addWslEnvKeys(env, ['CLAUDE_CONFIG_DIR'])
       }
       if (env[ORCA_HERMES_STARTUP_QUERY_ENV] !== undefined) {
         addWslEnvKeys(env, [ORCA_HERMES_STARTUP_QUERY_ENV])
       }
-    } else if (codexHomeWslInfo || isWslCodexHomeForHost(env.CODEX_HOME)) {
-      delete env.CODEX_HOME
-      delete env.ORCA_CODEX_HOME
-    }
-    if (pathWin32.basename(shellPath).toLowerCase() === 'wsl.exe') {
       addOrcaWslInteropEnv(env)
     }
   } else {
@@ -189,14 +139,7 @@ export function createPtyShellLaunchPlan(
         `[daemon/pty] Preferred shell "${preferredShellPath}" is unavailable, fell back to "${shellPath}"`
       )
     }
-    const waitsForShellReady =
-      Boolean(opts.command) &&
-      (startupAgentRecognition?.agent !== 'codex' ||
-        shouldUseShellReadyStartupDelivery({
-          command: opts.command,
-          startupCommandDelivery: opts.startupCommandDelivery,
-          shellPath
-        }))
+    const waitsForShellReady = Boolean(opts.command)
     delete env.ORCA_SHELL_FEATURES
     const shellLaunch = getShellLaunchConfig(
       shellPath,

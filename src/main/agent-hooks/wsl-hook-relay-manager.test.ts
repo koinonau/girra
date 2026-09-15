@@ -147,8 +147,6 @@ describe('WslHookRelayManager', () => {
   // hosts — installHooks is mocked here, so the fs bridge only ever serves
   // the wslfs.home request and never touches the real filesystem.
   const home = '/home/wsl-test-user'
-  const codexHome =
-    '\\\\wsl.localhost\\Ubuntu\\home\\wsl-test-user\\.local\\share\\orca\\codex-runtime-home\\home'
   const opencodeOverlayDir = `${home}/.orca-relay/opencode-overlays/deadbeefcafe`
   let harnesses: GuestHarness[]
 
@@ -182,7 +180,7 @@ describe('WslHookRelayManager', () => {
   function guestTransport(
     options: { registerInstallPlugins?: boolean; detectedAgents?: string[] } = {}
   ): MultiplexerTransport {
-    const { registerInstallPlugins = true, detectedAgents = ['codex'] } = options
+    const { registerInstallPlugins = true, detectedAgents = ['claude'] } = options
     const harness = createGuestHarness()
     harnesses.push(harness)
     registerWslHookFsHandlers(harness.guestDispatcher, home)
@@ -231,13 +229,6 @@ describe('WslHookRelayManager', () => {
       waitForSentinel: vi.fn(async () => guestTransport()),
       ingest: vi.fn(),
       installHooks: vi.fn(async () => []),
-      installCodex: vi.fn(async () => ({
-        agent: 'codex' as const,
-        state: 'installed' as const,
-        configPath: `${home}/.local/share/orca/codex-runtime-home/home/hooks.json`,
-        managedHooksPresent: true,
-        detail: null
-      })),
       managedHookSettings: () => null,
       pluginSources: () => ({ opencodePluginSource: '// opencode plugin source' }),
       warn: vi.fn(),
@@ -249,14 +240,12 @@ describe('WslHookRelayManager', () => {
 
   it('starts one relay per distro, installs hooks, exposes the guest endpoint path, and forwards envelopes', async () => {
     const { manager, deps } = createManager({})
-    manager.ensureForDistro('Ubuntu', codexHome)
-    manager.ensureForDistro('Ubuntu', codexHome)
+    manager.ensureForDistro('Ubuntu')
+    manager.ensureForDistro('Ubuntu')
     await vi.waitFor(() => expect(deps.installHooks).toHaveBeenCalledTimes(1))
     expect(deps.spawnRelay).toHaveBeenCalledTimes(1)
-    expect(deps.installCodex).toHaveBeenCalledWith(codexHome, 'Ubuntu')
-    // Codex is owned by the canonical runtime-host writer, not the relay adapter.
     expect(deps.installHooks).toHaveBeenCalledWith(expect.anything(), home, {
-      agents: []
+      agents: ['claude']
     })
 
     expect(manager.getGuestEndpointFilePath('Ubuntu')).toBe(
@@ -281,23 +270,9 @@ describe('WslHookRelayManager', () => {
     manager.disposeAll()
   })
 
-  it('reinstalls into a newly resolved runtime home without restarting the relay', async () => {
-    const { manager, deps } = createManager({})
-    manager.ensureForDistro('Ubuntu', codexHome)
-    await vi.waitFor(() => expect(deps.installCodex).toHaveBeenCalledTimes(1))
-    const nextHome = codexHome.replace('codex-runtime-home', 'codex-accounts\\account-2')
-
-    manager.ensureForDistro('ubuntu', nextHome)
-    await vi.waitFor(() => expect(deps.installCodex).toHaveBeenCalledTimes(2))
-
-    expect(deps.installCodex).toHaveBeenLastCalledWith(nextHome, 'Ubuntu')
-    expect(deps.spawnRelay).toHaveBeenCalledTimes(1)
-    manager.disposeAll()
-  })
-
   it('ships the OpenCode plugin to the guest and exposes the overlay dir', async () => {
     const { manager } = createManager({})
-    manager.ensureForDistro('Ubuntu', codexHome)
+    manager.ensureForDistro('Ubuntu')
     await vi.waitFor(() => expect(manager.getOpenCodeOverlayDir('Ubuntu')).toBe(opencodeOverlayDir))
     manager.disposeAll()
   })
@@ -420,7 +395,7 @@ describe('WslHookRelayManager', () => {
   it('stops live relays and refuses to revive them once agent status hooks are switched off', async () => {
     const settings = { agentStatusHooksEnabled: true }
     const { manager, deps } = createManager({ managedHookSettings: () => settings })
-    manager.ensureForDistro('Ubuntu', codexHome)
+    manager.ensureForDistro('Ubuntu')
     await vi.waitFor(() => expect(deps.installHooks).toHaveBeenCalledTimes(1))
 
     settings.agentStatusHooksEnabled = false
@@ -437,8 +412,7 @@ describe('WslHookRelayManager', () => {
     settings.agentStatusHooksEnabled = true
     manager.resumeStoppedRelays()
     await vi.waitFor(() => expect(deps.spawnRelay).toHaveBeenCalledTimes(2))
-    await vi.waitFor(() => expect(deps.installCodex).toHaveBeenCalledTimes(2))
-    expect(deps.installCodex).toHaveBeenLastCalledWith(codexHome, 'Ubuntu')
+    await vi.waitFor(() => expect(deps.installHooks).toHaveBeenCalledTimes(2))
     manager.disposeAll()
   })
 

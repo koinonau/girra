@@ -115,12 +115,6 @@ export function mergePtyEnvDeletions(
   return Array.from(new Set([...(existingKeys ?? []), ...additionalKeyGroups.flat()]))
 }
 
-export function removeCodexHomeDeletionRequests(keys: string[] | undefined): string[] | undefined {
-  // Why: resume provenance is launch-authoritative; late deletions must not fall back to the current account.
-  const filtered = keys?.filter((key) => key !== 'CODEX_HOME' && key !== 'ORCA_CODEX_HOME')
-  return filtered?.length ? filtered : undefined
-}
-
 export function getInheritedAgentHookEnvKeysToDelete(
   spawnEnv: Record<string, string> | undefined
 ): string[] {

@@ -78,11 +78,11 @@ describe('describeHookTransportInterference', () => {
   it('names the cause and the consequence so the log line is actionable', () => {
     const message = describeHookTransportInterference({
       count: 3,
-      source: 'codex',
+      source: 'opencode',
       bytesRead: 10,
       contentLength: 900
     })
-    expect(message).toContain('/hook/codex')
+    expect(message).toContain('/hook/opencode')
     expect(message).toContain('10/900 bytes')
     expect(message).toContain('security software')
     // Why: the client's own --max-time can truncate too; a single-cause message would misdiagnose a stall.

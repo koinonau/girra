@@ -7,7 +7,6 @@ export function createPtyIpcProcessEnvScope() {
   const savedPiAgentDir = process.env.PI_CODING_AGENT_DIR
   const savedOrcaPiAgentDir = process.env.ORCA_PI_CODING_AGENT_DIR
   const savedOrcaPiSourceAgentDir = process.env.ORCA_PI_SOURCE_AGENT_DIR
-  const savedOrcaCodexHome = process.env.ORCA_CODEX_HOME
   const savedOrcaOmpAgentDir = process.env.ORCA_OMP_CODING_AGENT_DIR
   const savedOrcaOmpSourceAgentDir = process.env.ORCA_OMP_SOURCE_AGENT_DIR
   const savedOrcaOmpStatusExtension = process.env.ORCA_OMP_STATUS_EXTENSION
@@ -35,7 +34,6 @@ export function createPtyIpcProcessEnvScope() {
     delete process.env.PI_CODING_AGENT_DIR
     delete process.env.ORCA_PI_SOURCE_AGENT_DIR
     delete process.env.ORCA_PI_CODING_AGENT_DIR
-    delete process.env.ORCA_CODEX_HOME
     delete process.env.ORCA_OMP_SOURCE_AGENT_DIR
     delete process.env.ORCA_OMP_CODING_AGENT_DIR
     delete process.env.ORCA_OMP_STATUS_EXTENSION
@@ -87,11 +85,6 @@ export function createPtyIpcProcessEnvScope() {
       delete process.env.ORCA_PI_SOURCE_AGENT_DIR
     } else {
       process.env.ORCA_PI_SOURCE_AGENT_DIR = savedOrcaPiSourceAgentDir
-    }
-    if (savedOrcaCodexHome === undefined) {
-      delete process.env.ORCA_CODEX_HOME
-    } else {
-      process.env.ORCA_CODEX_HOME = savedOrcaCodexHome
     }
     if (savedOrcaOmpAgentDir !== undefined) {
       process.env.ORCA_OMP_CODING_AGENT_DIR = savedOrcaOmpAgentDir

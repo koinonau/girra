@@ -189,7 +189,7 @@ describe('AgentHookServer ingestRemote', () => {
           tabId: 'tab-1',
           worktreeId: 'wt-1',
           hasExplicitPrompt: true,
-          payload: { state: 'working', prompt: 'parent codex', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'parent opencode', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -217,7 +217,7 @@ describe('AgentHookServer ingestRemote', () => {
           paneKey: PANE,
           state: 'working',
           prompt: 'nested claude',
-          agentType: 'codex',
+          agentType: 'opencode',
           toolName: 'Read',
           toolInput: '00-review-context.md',
           receivedAt: 1_100
@@ -227,7 +227,7 @@ describe('AgentHookServer ingestRemote', () => {
         expect.objectContaining({
           payload: expect.objectContaining({
             prompt: 'nested claude',
-            agentType: 'codex'
+            agentType: 'opencode'
           })
         })
       )
@@ -249,7 +249,7 @@ describe('AgentHookServer ingestRemote', () => {
           tabId: 'tab-1',
           worktreeId: 'wt-1',
           hasExplicitPrompt: true,
-          payload: { state: 'working', prompt: 'parent codex', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'parent opencode', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -278,8 +278,8 @@ describe('AgentHookServer ingestRemote', () => {
       expect(snapshot[0]).toMatchObject({
         paneKey: PANE,
         state: 'working',
-        prompt: 'parent codex',
-        agentType: 'codex',
+        prompt: 'parent opencode',
+        agentType: 'opencode',
         receivedAt: 1_000,
         stateStartedAt: 1_000
       })
@@ -291,8 +291,8 @@ describe('AgentHookServer ingestRemote', () => {
         expect.objectContaining({
           payload: expect.objectContaining({
             state: 'working',
-            prompt: 'parent codex',
-            agentType: 'codex'
+            prompt: 'parent opencode',
+            agentType: 'opencode'
           })
         })
       )
@@ -311,7 +311,7 @@ describe('AgentHookServer ingestRemote', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'done', prompt: 'parent codex', agentType: 'codex' }
+          payload: { state: 'done', prompt: 'parent opencode', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -350,7 +350,7 @@ describe('AgentHookServer ingestRemote', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'old codex turn', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'old opencode turn', agentType: 'opencode' }
         },
         'conn-1'
       )

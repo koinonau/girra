@@ -4,7 +4,7 @@ import {
   getDefaultWorkspaceSession,
   join,
   makePaneKey,
-  markCodexProjectTrustedMock,
+  markCopilotFolderTrustedMock,
   mkdtemp,
   setPlatform,
   setTerminalViewAttributes,
@@ -355,8 +355,8 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--dangerously-bypass-approvals-and-sandbox' },
-        agentDefaultEnv: { codex: { CODEX_PROFILE: 'captured' } }
+        agentDefaultArgs: { copilot: '--allow-all-tools' },
+        agentDefaultEnv: { copilot: { COPILOT_PROFILE: 'captured' } }
       })
     }
     const runtime = new OrcaRuntimeService(runtimeStore)
@@ -368,21 +368,21 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
+      command: 'copilot',
       title: 'worker'
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
       | { command?: string; env?: Record<string, string> }
       | undefined
-    expect(spawnCall?.command).toBe("codex '--dangerously-bypass-approvals-and-sandbox'")
+    expect(spawnCall?.command).toBe("copilot '--allow-all-tools'")
     expect(spawnCall?.env).toMatchObject({
-      CODEX_PROFILE: 'captured',
+      COPILOT_PROFILE: 'captured',
       ORCA_WORKTREE_ID: TEST_WORKTREE_ID
     })
     expect(spawnCall?.env?.ORCA_AGENT_LAUNCH_TOKEN).toMatch(UUID_RE)
-    expect(markCodexProjectTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
-    expect(markCodexProjectTrustedMock.mock.invocationCallOrder[0]).toBeLessThan(
+    expect(markCopilotFolderTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
+    expect(markCopilotFolderTrustedMock.mock.invocationCallOrder[0]).toBeLessThan(
       spawn.mock.invocationCallOrder[0]!
     )
   })

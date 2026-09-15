@@ -209,7 +209,6 @@ export function installCommandInferredPaneAgent(session: ConnectPanePtySession):
     ) {
       session.deps.setCacheTimerStartedAt(session.cacheKey, Date.now())
     }
-    session.setFocusReportSuppressionForAgentCompletion(title, agentType)
     session.queueAgentIdleTerminalModeReset()
   }
   session.preserveSuppressedTitleSideEffects = (
@@ -221,7 +220,6 @@ export function installCommandInferredPaneAgent(session: ConnectPanePtySession):
       agentType: activeHookStatus.agentType
     }
     if (activeHookStatus.state === 'waiting' || activeHookStatus.state === 'blocked') {
-      session.suppressNativeWindowsIdleCodexFocusReports = false
       session.queueAgentIdleTerminalModeReset()
     }
   }
@@ -250,7 +248,6 @@ export function installCommandInferredPaneAgent(session: ConnectPanePtySession):
       return
     }
     if (payload.state === 'waiting' || payload.state === 'blocked') {
-      session.suppressNativeWindowsIdleCodexFocusReports = false
       session.queueAgentIdleTerminalModeReset()
     }
   }

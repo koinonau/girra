@@ -1,9 +1,6 @@
 import type { AgentHookInstallStatus, AgentHookTarget } from '../../shared/agent-hook-types'
 import { claudeHookService } from '../claude/hook-service'
-import { codexHookService } from '../codex/hook-service'
 
-// Why (#16441): Codex's installer awaits a codex app-server trust-grant session
-// instead of blocking the main thread on spawnSync; the shared loop already awaits.
 export type ManagedAgentHookInstaller = readonly [
   AgentHookTarget,
   () => AgentHookInstallStatus | Promise<AgentHookInstallStatus>
@@ -16,8 +13,7 @@ export type ManagedAgentHookRemover = readonly [
 export type ManagedAgentHookStatusReader = readonly [AgentHookTarget, () => AgentHookInstallStatus]
 
 export const MANAGED_AGENT_HOOK_INSTALLERS: readonly ManagedAgentHookInstaller[] = [
-  ['claude', () => claudeHookService.install()],
-  ['codex', () => codexHookService.install()]
+  ['claude', () => claudeHookService.install()]
 ]
 
 // Why: covers the shared launcher/statusline scripts under ~/.orca/agent-hooks — the files a
@@ -25,16 +21,13 @@ export const MANAGED_AGENT_HOOK_INSTALLERS: readonly ManagedAgentHookInstaller[]
 // test in managed-hook-script-refresh.test.ts: a new installer that writes a launcher without
 // adding a refresher here fails that test.
 export const MANAGED_AGENT_HOOK_SCRIPT_REFRESHERS: readonly ManagedAgentHookScriptRefresher[] = [
-  ['claude', () => claudeHookService.refreshManagedScripts()],
-  ['codex', () => codexHookService.refreshManagedScripts()]
+  ['claude', () => claudeHookService.refreshManagedScripts()]
 ]
 
 export const MANAGED_AGENT_HOOK_REMOVERS: readonly ManagedAgentHookRemover[] = [
-  ['claude', () => claudeHookService.remove()],
-  ['codex', () => codexHookService.remove()]
+  ['claude', () => claudeHookService.remove()]
 ]
 
 export const MANAGED_AGENT_HOOK_STATUS_READERS: readonly ManagedAgentHookStatusReader[] = [
-  ['claude', () => claudeHookService.getStatus()],
-  ['codex', () => codexHookService.getStatus()]
+  ['claude', () => claudeHookService.getStatus()]
 ]

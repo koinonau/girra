@@ -51,14 +51,12 @@ export function buildLocalPtySpawnEnvironment(args: {
   if (!getOptions().buildSpawnEnv) {
     return spawnEnv
   }
-  // Why (#16441): building the env now awaits Codex hook installs and trust
-  // grants, so shutdown must be able to cancel this session id here too.
+  // Why: building the env can await async overlay installs, so shutdown must be able to cancel this session id here too.
   return awaitCancelableLocalPtySpawn(
     id,
     getOptions().buildSpawnEnv!(id, spawnEnv, {
       command: spawn.command,
       launchAgent: spawn.launchAgent,
-      codexHomePathOverride: spawn.codexHomePathOverride,
       cwd: plan.cwd,
       shellPath: plan.shellPath,
       isWsl: plan.isWslShell,

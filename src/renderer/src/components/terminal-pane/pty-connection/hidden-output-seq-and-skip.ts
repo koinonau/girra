@@ -95,7 +95,7 @@ export function bindHiddenOutputSeqAndSkip(session: ConnectPanePtySession): void
     const ptyId = session.transport.getPtyId()
     if (
       foreground ||
-      (!session.shouldSnapshotHiddenCodexOutput && session.remoteOutputGatedPtyId !== ptyId) ||
+      (!session.shouldSnapshotHiddenAgentOutput && session.remoteOutputGatedPtyId !== ptyId) ||
       !session.canUseHiddenOutputSnapshot(ptyId)
     ) {
       return false
@@ -111,7 +111,7 @@ export function bindHiddenOutputSeqAndSkip(session: ConnectPanePtySession): void
     )
     session.hiddenStartupRendererQueryPending = extracted.pending
     if (extracted.oscColorQueryData) {
-      // Why: Codex's startup palette probe has a 100ms budget; answer hidden color queries immediately so scheduling/remote-input debounce (#7329) can't miss it.
+      // Why: agent startup palette probes have a 100ms budget; answer hidden color queries immediately so scheduling/remote-input debounce (#7329) can't miss it.
       sendTerminalOscColorQueryReplies(
         extracted.oscColorQueryData,
         session.pane.terminal,

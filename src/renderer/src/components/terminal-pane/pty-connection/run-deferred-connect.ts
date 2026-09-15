@@ -2,7 +2,6 @@ import { createTerminalZeroDimensionsMessage } from '../../../../../shared/termi
 import { isWorktreeRemovalFenceError } from '../../../../../shared/worktree/removal-fence-error'
 import { safeFit } from '@/lib/pane-manager/pane-tree-ops'
 import { useAppStore } from '@/store'
-import { createCodexBackfillErrorDetector } from '../codex-backfill-error-detector'
 import { hasWorktreeSleepIntent, onWorktreeSleepIntentCleared } from '@/lib/worktree-sleep-intent'
 
 import { isRemoteRuntimePtyId } from './paired-parked-terminal-restore'
@@ -156,10 +155,6 @@ export function installRunDeferredConnect(session: ConnectPanePtySession): void 
       }
       session.deps.onPtyErrorRef?.current?.(session.pane.id, message)
     }
-    session.codexBackfillErrorDetector =
-      session.paneStartup?.launchAgent === 'codex' || session.tab?.launchAgent === 'codex'
-        ? createCodexBackfillErrorDetector()
-        : null
 
     // Why: shared registration so both fresh-spawn and reattach paths install
     // the same SerializeAddon-backed serializer plus the onTitleChange wrapper

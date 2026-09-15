@@ -35,11 +35,7 @@ export function normalizeHookPayload(
     readFirstString(record, ['hook_event_name', 'hookEventName', 'hook_type', 'hookType']) ??
     hookPayloadRecord.hook_event_name ??
     hookPayloadRecord.hookEventName
-  // Codex child hooks expose the child's session_id on the parent's pane.
-  const providerSession =
-    source === 'codex' && readString(hookPayloadRecord, 'agent_id')
-      ? null
-      : extractAgentProviderSession(source, hookPayloadRecord)
+  const providerSession = extractAgentProviderSession(source, hookPayloadRecord)
   const providerPromptId =
     source === 'claude' ? normalizeClaudePromptId(hookPayloadRecord.prompt_id) : undefined
   const compactTrigger =

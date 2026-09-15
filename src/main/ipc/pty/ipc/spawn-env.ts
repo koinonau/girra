@@ -4,6 +4,8 @@ import {
   parseLegacyNumericPaneKey
 } from '../../../../shared/stable-pane-id'
 import { isRemoteAgentHooksEnabled } from '../../../../shared/agent-hook-relay'
+import { getAppEnvironment } from '../../../../shared/app-environment'
+import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import { isOpaqueRemintedPaneKey } from '../../../../shared/pane-key-alias'
 import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
 import { isClaudeAuthSwitchInProgress } from '../../../claude-accounts/live-pty-gate'
@@ -12,14 +14,24 @@ import {
   CLAUDE_AUTH_SWITCH_IN_PROGRESS_MESSAGE,
   hasClaudeAuthEnvConflict
 } from '../../../claude-accounts/environment'
+import { isAgentStatusHooksEnabled } from '../../../agent-hooks/managed-agent-hook-controls'
+import { isSafePtySessionId } from '../../../daemon/pty-session-id'
 import { LocalPtyProvider } from '../../../providers/local-pty-provider'
 import { resolvePathEnvKey } from '../../../pty/windows-environment-path'
+import { stampWslOrchestrationCompatibilityHost } from '../../../pty/wsl-orca-env'
+import { isNativeWindowsLocalPtySpawn } from '../../../runtime/terminal-model-query-authority'
+import {
+  getAccountSelectionTargetForPty,
+  isWslShellOrCwd
+} from '../host-env/account-selection-target'
+import { buildPtyHostEnv } from '../host-env/assembly'
 import { routesFreshSpawnsToLocalProvider } from '../host-env/fresh-spawn-routing'
+import { promoteAgentTeamsShimPath } from '../host-env/path'
 import { stripRemotePaneEnvWhenHooksDisabled } from '../provider/liveness'
+import { clearProviderPtyState } from '../provider/state-cleanup'
 import { parseValidPaneKey } from '../pane/key-state'
 import { shouldRefreshNativeClaudeAgentTeamsEnv } from '../pane/launch-authority'
 import type { PtyIpcSpawnState } from './spawn-state'
-import { assemblePtyIpcSpawnCodexEnv } from './spawn-env-codex'
 
 export async function assemblePtyIpcSpawnEnv(ctx: PtyIpcSpawnState): Promise<void> {
   const args = ctx.args
@@ -142,5 +154,65 @@ export async function assemblePtyIpcSpawnEnv(ctx: PtyIpcSpawnState): Promise<voi
   ctx.reservationPaneKey = ctx.metadataPaneKey ?? ctx.validatedPaneKey
   ctx.validatedLeafId = ctx.verifiedLeafId ?? ctx.metadataLeafId
   ctx.spawnTiming.mark('pane_env')
-  await assemblePtyIpcSpawnCodexEnv(ctx)
+  assemblePtyIpcSpawnHostEnv(ctx)
+}
+
+function assemblePtyIpcSpawnHostEnv(ctx: PtyIpcSpawnState): void {
+  const args = ctx.args
+  ctx.effectiveShellOverride = ctx.terminalRuntimeOptions.shellOverride
+  ctx.nativeWindowsConptySpawn = isNativeWindowsLocalPtySpawn({
+    connectionId: args.connectionId,
+    cwd: args.cwd,
+    shellOverride: ctx.effectiveShellOverride
+  })
+  const accountSelectionTarget = getAccountSelectionTargetForPty(
+    ctx.effectiveShellOverride,
+    ctx.cwd,
+    ctx.expectedWslDistro
+  )
+  ctx.launchCommand = ctx.preAdoptedStablePane ? undefined : args.command
+  ctx.env = ctx.baseEnv
+  const ptySettings = ctx.isDaemonHostSpawn ? ctx.deps.getSettings?.() : undefined
+  if (ctx.isDaemonHostSpawn && !ctx.preAdoptedStablePane) {
+    if (ctx.effectiveSessionId === undefined) {
+      // Should be unreachable: effectiveSessionId is a string when isDaemonHostSpawn; defense-in-depth.
+      throw new Error('Invariant violation: daemon spawn without sessionId')
+    }
+    const sessionIdForEnv = ctx.effectiveSessionId
+    // Why: this id reaches filesystem paths; reject traversal/separators so a crafted IPC payload can't escape the expected roots.
+    if (!isSafePtySessionId(sessionIdForEnv, getAppEnvironment().getPath('userData'))) {
+      throw new Error('Invalid PTY session id')
+    }
+    // Why: clone before mutating so injections don't leak back into args.env (renderer may reuse it).
+    ctx.env = { ...ctx.baseEnv }
+    try {
+      buildPtyHostEnv(sessionIdForEnv, ctx.env, {
+        isPackaged: getAppEnvironment().isPackaged(),
+        resourcesPath: process.resourcesPath,
+        userDataPath: getAppEnvironment().getPath('userData'),
+        launchCommand: ctx.launchCommand,
+        launchAgent: isTuiAgent(args.launchAgent) ? args.launchAgent : undefined,
+        isWsl: isWslShellOrCwd(ctx.effectiveShellOverride, ctx.cwd),
+        wslDistro: accountSelectionTarget.runtime === 'wsl' ? ctx.expectedWslDistro : null,
+        agentStatusHooksEnabled: isAgentStatusHooksEnabled(ptySettings),
+        networkProxySettings: ptySettings,
+        routeBrowserOpensToClient: ctx.deps.runtime?.shouldRelayTerminalBrowserOpens?.(),
+        deferGitConfigGuardToDaemon:
+          ctx.provider.supportsGitCredentialGuardHost?.(ctx.effectiveSessionId) === true
+      })
+      stampWslOrchestrationCompatibilityHost(
+        ctx.env,
+        ctx.deps.runtime?.getOrchestrationCompatibilityHostId?.(),
+        accountSelectionTarget.runtime === 'wsl' ? ctx.expectedWslDistro : null
+      )
+      promoteAgentTeamsShimPath(ctx.env, ctx.requestedAgentTeamsPath)
+    } catch (err) {
+      // Why: buildPtyHostEnv has fs side-effects (Pi/OMP install); clear per-PTY state on throw, but only minted ids — caller ids may name existing PTYs.
+      if (ctx.isMintedSessionId) {
+        clearProviderPtyState(sessionIdForEnv)
+      }
+      throw err
+    }
+  }
+  ctx.spawnTiming.mark('host_env')
 }

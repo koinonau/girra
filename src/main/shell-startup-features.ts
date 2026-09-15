@@ -28,7 +28,6 @@ export type ShellStartupFeature = (typeof SHELL_STARTUP_FEATURES)[number]
 const OVERLAY_ENV_KEYS = [
   'ORCA_OPENCODE_CONFIG_DIR',
   'ORCA_OMP_STATUS_EXTENSION',
-  'ORCA_CODEX_HOME',
   'ORCA_AGENT_TEAMS_SHIM_DIR',
   'ORCA_REMOTE_CLI_BIN_DIR'
 ] as const

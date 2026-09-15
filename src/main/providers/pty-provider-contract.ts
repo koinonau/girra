@@ -1,6 +1,6 @@
 import type { TuiAgent } from '../../shared/tui-agent'
 import type { PtyStartupIngressIntent } from '../../shared/pty-startup-ingress'
-import type { StartupCommandDelivery } from '../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../shared/startup-command-delivery'
 import type { TerminalOscLinkRange } from '../../shared/terminal-osc-link-ranges'
 import type { PtyBackgroundStreamEvent, PtyDataEvent } from './pty-provider-events'
 import type { PtySpawnResult } from './pty-spawn-result'
@@ -51,8 +51,6 @@ export type PtySpawnOptions = {
   prevalidatedCwd?: string
   env?: Record<string, string>
   envToDelete?: string[]
-  /** Main-validated home provenance for an automatic Codex session resume. */
-  codexHomePathOverride?: { value: string | null }
   command?: string
   commandDelivery?: 'renderer' | 'provider'
   startupCommandDelivery?: StartupCommandDelivery

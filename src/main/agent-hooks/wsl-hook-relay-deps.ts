@@ -9,8 +9,6 @@ import { agentHookServer } from './server'
 import type { ManagedHookDetectionSettings } from './managed-hook-detection-commands'
 import { installRemoteManagedAgentHooks } from './remote-managed-hook-installers'
 import { getOpenCodePluginSource } from '../opencode/hook-service'
-import { codexHookService } from '../codex/hook-service'
-import type { AgentHookInstallStatus } from '../../shared/agent-hook-types'
 import type { PluginSources } from '../../relay/plugin-overlay'
 import {
   isWslDistroRunning,
@@ -41,10 +39,9 @@ export const RUNNING_TEARDOWN_COOLDOWN_MS = 10_000
 // connect-then-crash loop must keep escalating its cooldown, not sit at the
 // running-teardown base forever.
 export const STABLE_UPTIME_MS = 2 * 60_000
-// Why: re-running the (byte-equality idempotent) installers picks up configs
-// that appear after first install — e.g. Codex's runtime-home config.toml is
-// seeded by the launch path, so its hook-trust entries can only be written
-// once that file exists. The one-shot timer covers single-spawn sessions.
+// Why: re-running the (byte-equality idempotent) installers picks up agent CLIs
+// and configs that appear after first install. The one-shot timer covers
+// single-spawn sessions.
 export const REINSTALL_MIN_INTERVAL_MS = 30_000
 export const REINSTALL_ONE_SHOT_DELAY_MS = 60_000
 
@@ -63,7 +60,6 @@ export type WslHookRelayManagerDeps = {
   waitForSentinel: typeof waitForWslRelaySentinel
   ingest: (envelope: Record<string, unknown>, connectionId: string) => void
   installHooks: typeof installRemoteManagedAgentHooks
-  installCodex: (runtimeHomePath: string, distro: string) => Promise<AgentHookInstallStatus | null>
   managedHookSettings: () => ManagedHookDetectionSettings
   /** Plugin source strings shipped to the guest relay so an Orca update needn't redeploy the relay bundle. */
   pluginSources: () => PluginSources
@@ -105,11 +101,6 @@ export const defaultWslHookRelayDeps: WslHookRelayManagerDeps = {
       connectionId
     ),
   installHooks: installRemoteManagedAgentHooks,
-  installCodex: (runtimeHomePath, distro) =>
-    codexHookService.installForRuntimeHomeSerialized(runtimeHomePath, {
-      runtime: 'wsl',
-      wslDistro: distro
-    }),
   managedHookSettings: () => null,
   // Why: only OpenCode is in scope for WSL now; the payload shape stays identical to SSH so Pi/OMP are additive later.
   pluginSources: () => ({ opencodePluginSource: getOpenCodePluginSource() }),

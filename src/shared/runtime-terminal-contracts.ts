@@ -3,7 +3,7 @@ import type {
   AgentProviderSessionMetadata,
   SleepingAgentLaunchConfig
 } from './agent-session-resume'
-import type { StartupCommandDelivery } from './codex-startup-delivery'
+import type { StartupCommandDelivery } from './startup-command-delivery'
 import type { ExecutionHostId } from './execution-host'
 import type { PtyIncarnationId } from './pty-incarnation'
 import type { RuntimeListingHostScope } from './runtime-listing-host-scope'

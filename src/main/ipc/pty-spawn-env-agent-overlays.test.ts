@@ -1,13 +1,11 @@
 import { describe, expect, it, vi } from 'vitest'
 import {
   readFileSyncMock,
-  spawnMock,
   openCodeBuildPtyEnvMock,
   piBuildPtyEnvMock
 } from './pty-ipc-mock-registry'
 import { posixOnlyIt } from './pty-ipc-test-constants'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
-import type { TuiAgent } from '../../shared/tui-agent'
 import { SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV } from '../../shared/setup-agent-sequencing'
 
 vi.mock('electron', () => import('./pty-ipc-mock-registry').then((m) => m.electronModuleMock()))
@@ -38,41 +36,11 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { spawnAndGetEnv } = setupPtyIpcSuite()
 
   describe('spawn environment', () => {
-    it('prepares Codex launch state for the workspace before spawning an interactive tab', async () => {
-      const workspacePath = '/repo/worktrees/new-feature'
-      const resolveHome = vi.fn(
-        (
-          _target?: { runtime?: 'host' | 'wsl'; wslDistro?: string | null },
-          _launchEnv?: NodeJS.ProcessEnv,
-          _launchContext?: { workspacePath?: string; launchAgent?: TuiAgent }
-        ) => null
-      )
-
-      await spawnAndGetEnv(
-        undefined,
-        undefined,
-        resolveHome,
-        undefined,
-        'codex',
-        'codex',
-        workspacePath,
-        `repo-id::${workspacePath}`
-      )
-
-      expect(resolveHome.mock.calls[0]?.[0]).toEqual({ runtime: 'host' })
-      expect(resolveHome.mock.calls[0]?.[2]).toEqual({ workspacePath, launchAgent: 'codex' })
-      expect(resolveHome.mock.invocationCallOrder[0]).toBeLessThan(
-        spawnMock.mock.invocationCallOrder[0]!
-      )
-    })
     it('injects the OpenCode hook env into Orca terminal PTYs', async () => {
       // Why: clear any ambient OPENCODE_CONFIG_DIR so the mock's value is used
       const env = await spawnAndGetEnv(undefined, { OPENCODE_CONFIG_DIR: undefined })
@@ -116,7 +84,6 @@ describe('registerPtyHandlers', () => {
           ORCA_OPENCODE_SOURCE_CONFIG_DIR: '/tmp/user-opencode-config'
         },
         undefined,
-        undefined,
         () => ({ agentStatusHooksEnabled: false })
       )
 
@@ -131,7 +98,6 @@ describe('registerPtyHandlers', () => {
           OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
           ORCA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay'
         },
-        undefined,
         undefined,
         () => ({ agentStatusHooksEnabled: false })
       )
@@ -200,7 +166,6 @@ describe('registerPtyHandlers', () => {
         undefined,
         undefined,
         undefined,
-        undefined,
         'codex "ask about pi"',
         'codex'
       )
@@ -212,14 +177,7 @@ describe('registerPtyHandlers', () => {
       expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
     })
     it('materializes Pi home for an explicit Pi launch through a custom command', async () => {
-      const env = await spawnAndGetEnv(
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        'custom-pi-wrapper',
-        'pi'
-      )
+      const env = await spawnAndGetEnv(undefined, undefined, undefined, 'custom-pi-wrapper', 'pi')
 
       expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, 'pi', {
         materializeDefaultHome: true
@@ -231,7 +189,6 @@ describe('registerPtyHandlers', () => {
       const env = await spawnAndGetEnv(
         undefined,
         { PI_CODING_AGENT_DIR: '/tmp/user-omp-agent' },
-        undefined,
         undefined,
         'omp'
       )
@@ -259,7 +216,6 @@ describe('registerPtyHandlers', () => {
           PRIME_AGENT_CODING_AGENT_DIR: '/tmp/user-prime-agent'
         },
         undefined,
-        undefined,
         'prime-agent'
       )
 
@@ -282,7 +238,6 @@ describe('registerPtyHandlers', () => {
           PI_CODING_AGENT_DIR: '/tmp/user-omp-agent',
           [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'omp --resume'
         },
-        undefined,
         undefined,
         undefined,
         'powershell wait-wrapper'

@@ -166,11 +166,7 @@ export abstract class AgentHookServerCleanup extends AgentHookServerAuthorityFen
       if (deleted) {
         statusChanged = true
         this.commitStatusRowMutation(deleted, undefined)
-        if (deleted.payload.agentType === 'codex') {
-          // Why: a replacement remote process may reuse the pane; don't merge it with the lost connection's children.
-          this.state.codexSubagentRosterByPaneKey.delete(paneKey)
-          this.state.codexLeadStateByPaneKey.delete(paneKey)
-        } else if (deleted.payload.agentType === 'claude') {
+        if (deleted.payload.agentType === 'claude') {
           this.state.claudeSubagentRosterByPaneKey.delete(paneKey)
           this.state.claudeLeadStateByPaneKey.delete(paneKey)
           this.state.claudeRunningNonAgentTaskPaneKeys.delete(paneKey)
@@ -214,7 +210,6 @@ export abstract class AgentHookServerCleanup extends AgentHookServerAuthorityFen
       this.hydratedLaunchTokenHashByPaneKey.delete(resolvedPaneKey)
       this.persistedAuthorityCommitmentsByPaneKey.delete(resolvedPaneKey)
     }
-    this.clearCodexSubagentPoll(resolvedPaneKey)
     this.runtimeObservedStatusPaneKeys.delete(resolvedPaneKey)
     this.currentAuthorityObservations.delete(resolvedPaneKey)
     return existing

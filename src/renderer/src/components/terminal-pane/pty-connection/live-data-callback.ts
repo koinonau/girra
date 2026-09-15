@@ -64,10 +64,6 @@ export function bindLiveDataCallback(session: ConnectPanePtySession): void {
       session.commandLifecycle.handlePtyData(data)
     }
     session.commandCodeOutputStatusDetector?.observe(data)
-    const codexBackfillNotice = session.codexBackfillErrorDetector?.observe(data)
-    if (codexBackfillNotice) {
-      session.reportError(codexBackfillNotice)
-    }
     // Why: split panes have visible-but-inactive panes the user watches; throttle only when the pane or whole document is hidden.
     const foreground =
       shouldWritePtyOutputForeground(session.deps.isVisibleRef.current) && meta?.background !== true
@@ -99,7 +95,7 @@ export function bindLiveDataCallback(session: ConnectPanePtySession): void {
       data = reconciliation.data
       meta = reconciliation.meta
     }
-    // Why: a hidden Codex query can split just before visibility flips; hand xterm the completed query while other bytes still follow restore.
+    // Why: a hidden agent query can split just before visibility flips; hand xterm the completed query while other bytes still follow restore.
     const pendingForegroundQuery = foreground
       ? session.takeHiddenStartupRendererQueryPendingForForeground(data)
       : null

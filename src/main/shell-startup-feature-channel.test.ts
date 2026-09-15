@@ -80,7 +80,7 @@ describe('shell startup feature selection', () => {
     expect(
       selectShellStartupFeatures({
         shellPath: '/bin/zsh',
-        env: { ORCA_CODEX_HOME: '/tmp/codex' },
+        env: { ORCA_OPENCODE_CONFIG_DIR: '/tmp/opencode' },
         ...PLAIN_PANE
       })
     ).toContain('markers')

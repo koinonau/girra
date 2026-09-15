@@ -1,6 +1,6 @@
 import type { TuiAgent } from '../../../shared/tui-agent'
 import type { WorktreeStartupLaunch } from '../../../shared/worktree/launch-types'
-import type { StartupCommandDelivery } from '../../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../../shared/startup-command-delivery'
 import type {
   AgentProviderSessionMetadata,
   SleepingAgentLaunchConfig

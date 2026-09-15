@@ -33,9 +33,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -105,14 +102,7 @@ describe('registerPtyHandlers', () => {
       persistPtyBinding: vi.fn(() => true)
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnArgs = {
       cols: 80,
       rows: 24,
@@ -306,7 +296,6 @@ describe('registerPtyHandlers', () => {
         runtime as never,
         undefined,
         undefined,
-        undefined,
         store as never
       )
       if (folderMissing) {
@@ -453,14 +442,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
 
     await expect(
       handlers.get('pty:spawn')!(null, {

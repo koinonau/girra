@@ -5742,9 +5742,6 @@
           "agentPermissionsYolo": "Yolo",
           "agentPermissionsManual": "Manuel",
           "3f1bdf3cb4": "Le texte d'environnement est trop volumineux pour être analysé sans risque.",
-          "codexSessionSource": "Home Codex d'où importer",
-          "codexSessionSourceInfo": "À propos de l'import de l'historique Codex",
-          "codexSessionSourceTooltip": "Orca exécute Codex dans un home isolé. Pointez ceci vers votre home Codex existant pour en importer l'historique de sessions. Si vide, ~/.codex est utilisé.",
           "storedDefaultUndetected": "Enregistré par défaut, mais non détecté actuellement",
           "noAgentsDetected": "Aucun agent détecté. Si un agent est installé, la détection a peut-être expiré."
         },
@@ -7907,7 +7904,6 @@
             "5963143e00": "paramètres",
             "042c551bc5": "config",
             "f412abbba5": "claude",
-            "5ded38b843": "codex",
             "be7ea3553b": "onglet",
             "6956646a1e": "titre",
             "32836788b0": "titre généré",

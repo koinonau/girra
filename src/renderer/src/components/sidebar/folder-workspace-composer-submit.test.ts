@@ -313,10 +313,6 @@ describe('submitFolderWorkspaceCreate', () => {
     expect(startup?.command).toBe('codex')
     expect(startup?.command).not.toContain(linkedWorkItem.url)
     expect(startup?.command).not.toContain('Review this before starting')
-    expect(window.api.agentTrust?.markTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
-      workspacePath: '/repo/platform/hi'
-    })
     expect(mocks.ensureAgentStartupInTerminal).toHaveBeenCalledWith({
       worktreeId: folderWorkspaceKey('folder-workspace-1'),
       primaryTabId: 'tab-1',
@@ -329,7 +325,7 @@ describe('submitFolderWorkspaceCreate', () => {
     })
   })
 
-  it('pre-marks remote linked Codex folder workspaces trusted before draft paste', async () => {
+  it('pre-marks remote linked folder workspaces trusted before draft paste', async () => {
     const createFolderWorkspace = vi.fn(async () =>
       makeFolderWorkspace({
         connectionId: 'ssh-1',
@@ -356,7 +352,7 @@ describe('submitFolderWorkspaceCreate', () => {
       lastAutoName: '',
       linkedWorkItem,
       note: '',
-      quickAgent: 'codex',
+      quickAgent: 'copilot',
       autoRenameBranchFromWork: false,
       agentCmdOverrides: {},
       isRemote: true,
@@ -365,7 +361,7 @@ describe('submitFolderWorkspaceCreate', () => {
     })
 
     expect(window.api.agentTrust?.markTrusted).toHaveBeenCalledWith({
-      preset: 'codex',
+      preset: 'copilot',
       workspacePath: '/home/alice/platform/Trust remote folder draft',
       connectionId: 'ssh-1'
     })
@@ -373,7 +369,7 @@ describe('submitFolderWorkspaceCreate', () => {
       expect.objectContaining({
         worktreeId: folderWorkspaceKey('folder-workspace-1'),
         startup: expect.objectContaining({
-          agent: 'codex',
+          agent: 'copilot',
           draftPrompt: linkedWorkItem.url
         })
       })

@@ -58,7 +58,7 @@ export function normalizeClaudeEvent(
       return null
     }
     // Why: a new process owns the pane; stale children/tasks/crons must not gate the
-    // fresh session's idle row back up to 'working' (same reset Codex does on SessionStart).
+    // fresh session's idle row back up to 'working'.
     state.claudeSubagentRosterByPaneKey.delete(paneKey)
     state.claudeRunningNonAgentTaskPaneKeys.delete(paneKey)
     state.claudeActiveSessionCronPaneKeys.delete(paneKey)

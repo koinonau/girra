@@ -8,12 +8,7 @@ export {
 } from './pty/provider/ownership-state'
 export { getPtyIdForPaneKey, registerPaneKeyTeardownListener } from './pty/pane/key-state'
 export { hasPendingRendererSerializerForPaneKey } from './pty/pane/serializer-state'
-export type {
-  BuildPtyHostEnvOptions,
-  CodexHomeLaunchContext,
-  GetSelectedCodexHomePath,
-  PrepareCodexSessionResume
-} from './pty/host-env/types'
+export type { BuildPtyHostEnvOptions } from './pty/host-env/types'
 export { buildPtyHostEnv } from './pty/host-env/assembly'
 export {
   registerSshPtyProvider,

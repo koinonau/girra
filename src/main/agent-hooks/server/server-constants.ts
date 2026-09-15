@@ -1,6 +1,5 @@
 // Why: co-located with the endpoint file in userData/agent-hooks/ so hook-server cross-restart artifacts stay together.
 export const LAST_STATUS_FILE_NAME = 'last-status.json'
-export const CODEX_SUBAGENT_POLL_MS = 1_000
 export const INTERRUPTED_DONE_LATE_WORKING_SUPPRESSION_MS = 15_000
 
 // Why: starts at 2 — pre-merge v1 lacked receivedAt/stateStartedAt (never shipped); a mismatched version hydrates empty (treated as corrupt).

@@ -2,14 +2,12 @@ import { describe, expect, it, vi } from 'vitest'
 import type { Repo } from '../../shared/repo-types'
 
 const mocks = vi.hoisted(() => ({
-  markCodexProjectTrusted: vi.fn(),
   markCopilotFolderTrusted: vi.fn(),
   detectRemoteAgents: vi.fn(),
   detectInstalledAgentsWithShellPathHydration: vi.fn()
 }))
 
 vi.mock('../agent-trust-presets', () => ({
-  markCodexProjectTrusted: mocks.markCodexProjectTrusted,
   markCopilotFolderTrusted: mocks.markCopilotFolderTrusted
 }))
 
@@ -114,28 +112,16 @@ describe('buildWorktreeStartupForDraft agent detection', () => {
 })
 
 describe('markLocalWorktreeTrusted', () => {
-  it('waits for the Codex trust write before resolving', async () => {
-    let finish!: () => void
-    mocks.markCodexProjectTrusted.mockReturnValue(
-      new Promise<void>((resolve) => {
-        finish = resolve
-      })
-    )
-    let settled = false
-    const marking = markLocalWorktreeTrusted('codex', '/workspace/app').then(() => {
-      settled = true
-    })
-
-    await Promise.resolve()
-    expect(settled).toBe(false)
-    finish()
-    await marking
-    expect(mocks.markCodexProjectTrusted).toHaveBeenCalledWith('/workspace/app')
+  it('marks a trust-gated agent workspace trusted', async () => {
+    await markLocalWorktreeTrusted('copilot', '/workspace/app')
+    expect(mocks.markCopilotFolderTrusted).toHaveBeenCalledWith('/workspace/app')
   })
 
-  it('contains a rejected Codex trust write', async () => {
-    mocks.markCodexProjectTrusted.mockRejectedValueOnce(new Error('write failed'))
+  it('contains a failed trust write', async () => {
+    mocks.markCopilotFolderTrusted.mockImplementationOnce(() => {
+      throw new Error('write failed')
+    })
 
-    await expect(markLocalWorktreeTrusted('codex', '/workspace/app')).resolves.toBeUndefined()
+    await expect(markLocalWorktreeTrusted('copilot', '/workspace/app')).resolves.toBeUndefined()
   })
 })

@@ -122,13 +122,13 @@ describe('OrcaRuntimeService', () => {
     expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'claude' })
   })
 
-  it('pre-marks remote Codex workspaces trusted before pasting startup drafts', async () => {
-    detectRemoteAgentsMock.mockResolvedValue(['codex'])
+  it('pre-marks remote Copilot workspaces trusted before pasting startup drafts', async () => {
+    detectRemoteAgentsMock.mockResolvedValue(['copilot'])
     muxRequestMock.mockResolvedValue({ resolvedPath: '/home/dev' })
     const created = {
-      path: '/remote/mobile-codex-draft',
+      path: '/remote/mobile-copilot-draft',
       head: 'def',
-      branch: 'refs/heads/mobile-codex-draft',
+      branch: 'refs/heads/mobile-copilot-draft',
       isBare: false,
       isMainWorktree: false
     }
@@ -155,7 +155,7 @@ describe('OrcaRuntimeService', () => {
       }),
       getSettings: () => ({
         ...store.getSettings(),
-        defaultTuiAgent: 'codex' as const,
+        defaultTuiAgent: 'copilot' as const,
         agentCmdOverrides: {}
       }),
       getAllWorktreeMeta: () => metaById,
@@ -188,7 +188,7 @@ describe('OrcaRuntimeService', () => {
       listWorktrees: vi.fn().mockResolvedValue([created])
     }
     const fsProvider = {
-      realpath: vi.fn().mockResolvedValue('/remote/mobile-codex-draft'),
+      realpath: vi.fn().mockResolvedValue('/remote/mobile-copilot-draft'),
       readFile: vi.fn().mockRejectedValue(new Error('missing config')),
       createDir: vi.fn().mockResolvedValue(undefined),
       writeFile: vi.fn().mockResolvedValue(undefined)
@@ -196,7 +196,7 @@ describe('OrcaRuntimeService', () => {
     registerSshGitProvider('ssh-1', gitProvider as never)
     registerSshFilesystemProvider('ssh-1', fsProvider as never)
     const runtime = new OrcaRuntimeService(remoteStore as never)
-    const spawn = vi.fn().mockResolvedValue({ id: 'pty-remote-codex-draft' })
+    const spawn = vi.fn().mockResolvedValue({ id: 'pty-remote-copilot-draft' })
     runtime.setPtyController({
       spawn,
       write: () => true,
@@ -207,25 +207,21 @@ describe('OrcaRuntimeService', () => {
     try {
       const result = await runtime.createManagedWorktree({
         repoSelector: TEST_REPO_ID,
-        name: 'mobile-codex-draft',
+        name: 'mobile-copilot-draft',
         startupDraft: 'https://github.com/stablyai/orca/issues/789'
       })
 
       expect(detectRemoteAgentsMock).not.toHaveBeenCalled()
       expect(muxRequestMock).toHaveBeenCalledWith('session.resolveHome', { path: '~' })
-      expect(fsProvider.createDir).toHaveBeenCalledWith('/home/dev/.codex')
+      expect(fsProvider.createDir).toHaveBeenCalledWith('/home/dev/.copilot')
       expect(fsProvider.writeFile).toHaveBeenCalledWith(
-        '/home/dev/.codex/config.toml',
-        expect.stringContaining('[projects."/remote/mobile-codex-draft"]')
-      )
-      expect(fsProvider.writeFile).toHaveBeenCalledWith(
-        '/home/dev/.codex/config.toml',
-        expect.stringContaining('trust_level = "trusted"')
+        '/home/dev/.copilot/config.json',
+        expect.stringContaining('/remote/mobile-copilot-draft')
       )
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
-          cwd: '/remote/mobile-codex-draft',
-          command: "codex '--dangerously-bypass-approvals-and-sandbox'",
+          cwd: '/remote/mobile-copilot-draft',
+          command: "copilot '--yolo'",
           connectionId: 'ssh-1',
           worktreeId: result.worktree.id
         })
@@ -233,19 +229,19 @@ describe('OrcaRuntimeService', () => {
       expect(fsProvider.writeFile.mock.invocationCallOrder[0]).toBeLessThan(
         spawn.mock.invocationCallOrder[0]!
       )
-      expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'codex' })
+      expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'copilot' })
     } finally {
       unregisterSshFilesystemProvider('ssh-1')
       unregisterSshGitProvider('ssh-1')
     }
   })
 
-  it('pre-marks remote Codex workspaces trusted before explicit startup commands', async () => {
+  it('pre-marks remote Copilot workspaces trusted before explicit startup commands', async () => {
     muxRequestMock.mockResolvedValue({ resolvedPath: '/home/dev' })
     const created = {
-      path: '/remote/mobile-codex-command',
+      path: '/remote/mobile-copilot-command',
       head: 'def',
-      branch: 'refs/heads/mobile-codex-command',
+      branch: 'refs/heads/mobile-copilot-command',
       isBare: false,
       isMainWorktree: false
     }
@@ -301,7 +297,7 @@ describe('OrcaRuntimeService', () => {
       listWorktrees: vi.fn().mockResolvedValue([created])
     }
     const fsProvider = {
-      realpath: vi.fn().mockResolvedValue('/remote/mobile-codex-command'),
+      realpath: vi.fn().mockResolvedValue('/remote/mobile-copilot-command'),
       readFile: vi.fn().mockRejectedValue(new Error('missing config')),
       createDir: vi.fn().mockResolvedValue(undefined),
       writeFile: vi.fn().mockResolvedValue(undefined)
@@ -309,7 +305,7 @@ describe('OrcaRuntimeService', () => {
     registerSshGitProvider('ssh-1', gitProvider as never)
     registerSshFilesystemProvider('ssh-1', fsProvider as never)
     const runtime = new OrcaRuntimeService(remoteStore as never)
-    const spawn = vi.fn().mockResolvedValue({ id: 'pty-remote-codex-command' })
+    const spawn = vi.fn().mockResolvedValue({ id: 'pty-remote-copilot-command' })
     runtime.setPtyController({
       spawn,
       write: () => true,
@@ -320,25 +316,21 @@ describe('OrcaRuntimeService', () => {
     try {
       const result = await runtime.createManagedWorktree({
         repoSelector: TEST_REPO_ID,
-        name: 'mobile-codex-command',
-        startup: { command: 'codex' },
-        createdWithAgent: 'codex'
+        name: 'mobile-copilot-command',
+        startup: { command: 'copilot' },
+        createdWithAgent: 'copilot'
       })
 
       expect(detectRemoteAgentsMock).not.toHaveBeenCalled()
       expect(muxRequestMock).toHaveBeenCalledWith('session.resolveHome', { path: '~' })
       expect(fsProvider.writeFile).toHaveBeenCalledWith(
-        '/home/dev/.codex/config.toml',
-        expect.stringContaining('[projects."/remote/mobile-codex-command"]')
-      )
-      expect(fsProvider.writeFile).toHaveBeenCalledWith(
-        '/home/dev/.codex/config.toml',
-        expect.stringContaining('trust_level = "trusted"')
+        '/home/dev/.copilot/config.json',
+        expect.stringContaining('/remote/mobile-copilot-command')
       )
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
-          cwd: '/remote/mobile-codex-command',
-          command: 'codex',
+          cwd: '/remote/mobile-copilot-command',
+          command: 'copilot',
           connectionId: 'ssh-1',
           worktreeId: result.worktree.id
         })
@@ -346,7 +338,7 @@ describe('OrcaRuntimeService', () => {
       expect(fsProvider.writeFile.mock.invocationCallOrder[0]).toBeLessThan(
         spawn.mock.invocationCallOrder[0]!
       )
-      expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'codex' })
+      expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'copilot' })
     } finally {
       unregisterSshFilesystemProvider('ssh-1')
       unregisterSshGitProvider('ssh-1')

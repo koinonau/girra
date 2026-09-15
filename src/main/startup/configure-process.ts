@@ -2,7 +2,7 @@ import { app } from 'electron'
 import { existsSync, mkdirSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join, resolve } from 'node:path'
-import { getVersionManagerBinPaths } from '../codex-cli/command'
+import { getVersionManagerBinPaths } from '../../shared/node-cli-command-resolution'
 import { getMainE2EConfig } from '../e2e-config'
 import { DISABLED_CHROMIUM_FEATURES } from './disabled-chromium-features'
 import { readHttp1CompatibilityMarker } from './http1-compatibility-marker'
@@ -201,7 +201,7 @@ export function configureDevUserDataPath(isDev: boolean): void {
       throw new Error('Refusing to start E2E outside its disposable home boundary')
     }
     // Why: on macOS Electron resolves app.getPath('home') from the native user
-    // database, not HOME. Set it explicitly before any Codex paths are built.
+    // database, not HOME. Set it explicitly before any home-derived paths are built.
     mkdirSync(e2eHomeDir, { recursive: true, mode: 0o700 })
     app.setPath('home', e2eHomeDir)
     app.setPath('userData', e2eConfig.userDataDir)
@@ -236,7 +236,7 @@ export function configureOrcaUserDataPathEnv(): void {
 
 export function shouldInstallManagedHooks(isDev: boolean): boolean {
   void isDev
-  // Why: managed hooks now target Orca-owned Codex homes, not ~/.codex, so keep install on for all agents until each gets its own seam.
+  // Why: keep install on for dev runs too until each agent gets its own dev seam.
   return true
 }
 

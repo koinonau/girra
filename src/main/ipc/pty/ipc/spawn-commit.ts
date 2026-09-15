@@ -4,7 +4,7 @@ import { markClaudePtySpawned } from '../../../claude-accounts/live-pty-gate'
 import { registerPty } from '../../../memory/pty-registry'
 import type { PtySpawnResult } from '../../../providers/types'
 import { clearMigrationUnsupportedPtysForPaneKey } from '../../../agent-hooks/migration-unsupported-pty-state'
-import { shouldSkipCodexHomeEnvForWindowsShell } from '../host-env/codex-home'
+import { isWslShellOrCwd } from '../host-env/account-selection-target'
 import { rememberPaneKeyForPty } from '../pane/key-state'
 import { resolvePaneSpawnReservation } from '../pane/spawn-reservation'
 import { seedTerminalRestoreRecordsFromSpawnResult } from '../pane/agent-session-owners'
@@ -109,9 +109,7 @@ export async function commitPtyIpcSpawn(ctx: PtyIpcSpawnState): Promise<PtySpawn
             ...(providerReattachLaunchIdentity ? { providerReattachLaunchIdentity } : {})
           }
         : undefined,
-      !args.connectionId
-        ? shouldSkipCodexHomeEnvForWindowsShell(ctx.effectiveShellOverride, ctx.cwd)
-        : undefined
+      !args.connectionId ? isWslShellOrCwd(ctx.effectiveShellOverride, ctx.cwd) : undefined
     )
     ctx.pendingRegistrationPtyId = null
   } else if (ctx.pendingRegistrationPtyId) {
@@ -204,11 +202,6 @@ export async function commitPtyIpcSpawn(ctx: PtyIpcSpawnState): Promise<PtySpawn
     // Why: a daemon-retry race can surface isReattach even for a minted session id, and a reattach must never claim its cwd was remapped.
     ...(ctx.startupCwdFallback && !ctx.result.isReattach
       ? { startupCwdFallback: ctx.startupCwdFallback }
-      : {}),
-    // Why: the pane asked to resume and got a fresh session instead; only the
-    // renderer can say so, and a reattach never ran this launch command.
-    ...(ctx.codexResumeLaunch.notifyResumeUnavailable && !ctx.result.isReattach
-      ? { agentResumeUnavailable: true as const }
       : {})
   }
   // Why: renderer tab state cannot reliably infer background and reattached PTYs in the daemon inventory.

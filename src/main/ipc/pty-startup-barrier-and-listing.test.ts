@@ -38,9 +38,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow, installDaemonTestProvider, installObservableDaemonTestProvider } =
@@ -59,15 +56,9 @@ describe('registerPtyHandlers', () => {
       registerPreAllocatedHandleForPty: vi.fn()
     }
     try {
-      registerPtyHandlers(
-        mainWindow as never,
-        runtime as never,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        { awaitLocalPtyStartup: () => Promise.resolve() }
-      )
+      registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, undefined, {
+        awaitLocalPtyStartup: () => Promise.resolve()
+      })
       const pendingSpawn = handlers.get('pty:spawn')!(null, {
         cols: 80,
         rows: 24,
@@ -102,17 +93,9 @@ describe('registerPtyHandlers', () => {
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
     }
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        awaitLocalPtyStartup: () => barrier.promise
-      }
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, undefined, {
+      awaitLocalPtyStartup: () => barrier.promise
+    })
     const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
       spawn: (args: { cols: number; rows: number; env?: Record<string, string> }) => Promise<{
         id: string
@@ -159,15 +142,9 @@ describe('registerPtyHandlers', () => {
       getDefaultShell: vi.fn(),
       getProfiles: vi.fn()
     } as never)
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { awaitLocalPtyStartup }
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, undefined, {
+      awaitLocalPtyStartup
+    })
 
     await expect(
       handlers.get('pty:spawn')!(null, {
@@ -294,15 +271,9 @@ describe('registerPtyHandlers', () => {
   it('waits for local provider startup before resolving snapshot capability', async () => {
     const barrier = makeDeferred()
     const awaitLocalPtyProviderStartup = vi.fn(() => barrier.promise)
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { awaitLocalPtyProviderStartup }
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, undefined, {
+      awaitLocalPtyProviderStartup
+    })
     const pending = Promise.resolve(
       handlers.get('pty:getAuthoritativeBufferSnapshotCapabilities')?.(null, {
         ids: ['restored-local-pty']
@@ -327,15 +298,9 @@ describe('registerPtyHandlers', () => {
     registerSshPtyProvider('ssh-1', {
       canProvideAuthoritativeBufferSnapshot: () => false
     } as never)
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { awaitLocalPtyProviderStartup }
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, undefined, {
+      awaitLocalPtyProviderStartup
+    })
 
     const result = await handlers.get('pty:getAuthoritativeBufferSnapshotCapabilities')?.(null, {
       ids: ['remote:environment@@pty-1', 'ssh:ssh-1@@pty-2']

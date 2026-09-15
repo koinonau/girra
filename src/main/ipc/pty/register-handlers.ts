@@ -11,7 +11,7 @@ import {
 } from '../pty-hidden-delivery-gate'
 import { localProvider } from './provider/registry'
 import { finishPtyShutdown } from './provider/liveness'
-import type { GetSelectedCodexHomePath, PrepareClaudeAuth } from './host-env/types'
+import type { PrepareClaudeAuth } from './host-env/types'
 import { installPtyInspectIpcHandlers } from './ipc/inspect'
 import { installPtyKillIpcHandler } from './ipc/renderer-kill'
 import { installPtyWriteIpcHandlers } from './ipc/write'
@@ -52,19 +52,11 @@ import { installPtySerializeBufferIpc } from './ipc/serialize-buffer'
 import { installPtyResizeVisibilityIpc } from './ipc/resize-visibility'
 import { adoptStablePane } from './pane/adopt-stable'
 import { getPtyIpc } from '../pty-host-bindings'
-import {
-  noCodexResumeLaunch,
-  prepareCodexResumeHome,
-  reconcileSharedRuntimeResumeHome,
-  resolveCodexResumeLaunch,
-  stripSequencedStartupResumeArgv
-} from './host-env/codex-resume'
 import { ensureLinuxTerminalOrcaCliShimDir } from '../../cli/linux-terminal-orca-cli-shim'
 
 export function registerPtyHandlers(
   mainWindow: BrowserWindow,
   runtime?: OrcaRuntimeService,
-  getSelectedCodexHomePath?: GetSelectedCodexHomePath,
   getSettings?: () => GlobalSettings,
   prepareClaudeAuth?: PrepareClaudeAuth,
   store?: Store,
@@ -145,7 +137,6 @@ export function registerPtyHandlers(
   configureLocalPtyProvider({
     runtime,
     getSettings,
-    getSelectedCodexHomePath,
     trustedTerminalHandleEnv: session.trustedTerminalHandleEnv
   })
   installSessionSshOutputIntake(session)
@@ -197,10 +188,6 @@ export function registerPtyHandlers(
     cwd: string | undefined,
     missingDirFallback?: TerminalStartupCwdMissingDirFallback
   ): string | undefined => resolvePtySpawnStartupCwdImpl(store, worktreeId, cwd, missingDirFallback)
-  const prepareCodexResumeHomeBound = (
-    args: Parameters<typeof prepareCodexResumeHome>[1]
-  ): ReturnType<typeof prepareCodexResumeHome> =>
-    prepareCodexResumeHome(options?.prepareCodexSessionResume, args)
   const adoptStablePaneBound = (args: Parameters<typeof adoptStablePane>[2]) =>
     adoptStablePane(runtime, store, args)
 
@@ -211,11 +198,6 @@ export function registerPtyHandlers(
     adoptStablePane: adoptStablePaneBound,
     getLocalPtyStartupPromise,
     getLocalPtyProviderStartupPromise,
-    prepareCodexResumeHome: prepareCodexResumeHomeBound,
-    resolveCodexResumeLaunch,
-    noCodexResumeLaunch,
-    reconcileSharedRuntimeResumeHome,
-    stripSequencedStartupResumeArgv,
     assertFolderWorkspacePtyPathUsable,
     resolvePtySpawnStartupCwd,
     requestSerializedBuffer: session.requestSerializedBuffer,
@@ -226,9 +208,7 @@ export function registerPtyHandlers(
     sendPtySpawnedToRenderer: session.sendPtySpawnedToRenderer,
     finishPtyShutdown,
     getSettings,
-    getSelectedCodexHomePath,
     prepareClaudeAuth,
-    options,
     trustedTerminalHandleEnv: session.trustedTerminalHandleEnv,
     retiredRejectedPtyIds: session.retiredRejectedPtyIds,
     reversibleStopOwnersByPtyId: session.reversibleStopOwnersByPtyId,
@@ -240,19 +220,12 @@ export function registerPtyHandlers(
     runtime,
     store,
     getSettings,
-    getSelectedCodexHomePath,
     prepareClaudeAuth,
-    options,
     getLocalPtyStartupPromise,
     adoptStablePane: adoptStablePaneBound,
     assertFolderWorkspacePtyPathUsable,
     resolvePtySpawnStartupCwd,
     localStartupCwdDirectoryExists,
-    prepareCodexResumeHome: prepareCodexResumeHomeBound,
-    noCodexResumeLaunch,
-    resolveCodexResumeLaunch,
-    reconcileSharedRuntimeResumeHome,
-    stripSequencedStartupResumeArgv,
     transitionSpawnHiddenRendererPtyDeliveryState:
       session.transitionSpawnHiddenRendererPtyDeliveryState,
     trustedTerminalHandleEnv: session.trustedTerminalHandleEnv,

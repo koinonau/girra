@@ -1,4 +1,4 @@
-import type { StartupCommandDelivery } from '../codex-startup-delivery'
+import type { StartupCommandDelivery } from '../startup-command-delivery'
 import type { AgentKind } from '../agent-kind'
 import type { SleepingAgentLaunchConfig } from '../agent-session-resume'
 import type { SetupRunnerShell } from '../setup-runner-command'

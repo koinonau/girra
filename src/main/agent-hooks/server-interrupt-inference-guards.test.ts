@@ -11,85 +11,6 @@ afterEach(() => {
 })
 
 describe('AgentHookServer listener replay', () => {
-  it('keeps Codex lead state terminal after an inferred interrupt', () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(1_000)
-    try {
-      const server = new AgentHookServer()
-      const listener = vi.fn()
-      server.setListener(listener)
-      server.ingestRemote(
-        {
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          providerSession: { key: 'session_id', id: 'codex-interrupt-session-1' },
-          hookEventName: 'UserPromptSubmit',
-          payload: {
-            state: 'working',
-            prompt: 'long task',
-            agentType: 'codex',
-            model: 'gpt-5.6-sol'
-          }
-        },
-        'conn-1'
-      )
-      const baseline = server.getStatusSnapshot()[0]
-
-      vi.setSystemTime(1_500)
-      const applied = server.inferInterrupt({
-        paneKey: PANE,
-        baselineUpdatedAt: baseline.receivedAt,
-        baselineStateStartedAt: baseline.stateStartedAt,
-        baselinePrompt: 'long task',
-        baselineAgentType: 'codex',
-        intent: 'plain-escape'
-      })
-
-      expect(applied).toBe(true)
-      expect(server.getStatusSnapshot()).toEqual([
-        expect.objectContaining({
-          paneKey: PANE,
-          state: 'done',
-          prompt: 'long task',
-          agentType: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-interrupt-session-1' },
-          interrupted: true,
-          receivedAt: 1_500,
-          stateStartedAt: 1_500
-        })
-      ])
-      expect(listener).toHaveBeenLastCalledWith(
-        expect.objectContaining({
-          paneKey: PANE,
-          providerSession: { key: 'session_id', id: 'codex-interrupt-session-1' },
-          payload: expect.objectContaining({ state: 'done', interrupted: true })
-        })
-      )
-
-      vi.setSystemTime(17_000)
-      server.ingestRemote(
-        {
-          paneKey: PANE,
-          tabId: 'tab-1',
-          worktreeId: 'wt-1',
-          hookEventName: 'SubagentStop',
-          toolAgentId: 'delayed-child',
-          payload: { state: 'done', prompt: 'long task', agentType: 'codex' }
-        },
-        'conn-1'
-      )
-
-      expect(server.getStatusSnapshot()[0]).toMatchObject({
-        state: 'done',
-        model: 'gpt-5.6-sol',
-        prompt: 'long task'
-      })
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
   it('does not infer an interrupt while a subagent child is still working', () => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)
@@ -472,7 +393,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'first task', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'first task', agentType: 'claude' }
         },
         'conn-1'
       )
@@ -482,7 +403,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'second task', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'second task', agentType: 'claude' }
         },
         'conn-1'
       )
@@ -492,7 +413,7 @@ describe('AgentHookServer listener replay', () => {
         baselineUpdatedAt: baseline.receivedAt,
         baselineStateStartedAt: baseline.stateStartedAt,
         baselinePrompt: 'first task',
-        baselineAgentType: 'codex',
+        baselineAgentType: 'claude',
         intent: 'plain-escape'
       })
 
@@ -501,7 +422,7 @@ describe('AgentHookServer listener replay', () => {
         expect.objectContaining({
           state: 'working',
           prompt: 'second task',
-          agentType: 'codex'
+          agentType: 'claude'
         })
       ])
     } finally {

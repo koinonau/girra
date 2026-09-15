@@ -6,14 +6,9 @@ import { isTerminalLeafId } from '../../../../shared/stable-pane-id'
 import { getAppPtyId, getProvider, getRelayPtyId } from '../provider/registry'
 import { buildPtyHostEnv } from '../host-env/assembly'
 import {
-  CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE,
-  getCompatibleSelectedCodexHomePath,
-  getCodexSelectionTargetForPty,
-  shouldSkipCodexHomeEnvForWindowsShell,
-  shouldStripInheritedOrcaCodexHome,
-  isCodexStatusHooksEnabled,
-  codexHomePathsEqual
-} from '../host-env/codex-home'
+  getAccountSelectionTargetForPty,
+  isWslShellOrCwd
+} from '../host-env/account-selection-target'
 import { promoteAgentTeamsShimPath } from '../host-env/path'
 import {
   isClaudeLaunchCommand,
@@ -39,7 +34,6 @@ import { resolveLocalWindowsTerminalRuntimeOptions } from '../../../../shared/lo
 import { resolveLocalProjectRuntimeForWorktreeId } from '../../../local-project-runtime-resolution'
 import { resolvePathEnvKey } from '../../../pty/windows-environment-path'
 import { stampWslOrchestrationCompatibilityHost } from '../../../pty/wsl-orca-env'
-import { ensureCodexStateDbBackfillRecoveryStarted } from '../../../codex/codex-state-db-backfill-recovery'
 import { clearProviderPtyState } from '../provider/state-cleanup'
 import type { RuntimePtySpawnState } from './spawn-state'
 
@@ -111,31 +105,15 @@ export async function prepareRuntimePtySpawn(
         terminalWindowsWslDistro: ctx.terminalRuntimeOptions.terminalWindowsWslDistro
       })?.distro ?? null)
     : null
-  ctx.codexSelectionTarget = getCodexSelectionTargetForPty(
+  const accountSelectionTarget = getAccountSelectionTargetForPty(
     ctx.daemonShellOverride,
     ctx.cwd,
     ctx.expectedWslDistro
   )
-  const codexResumePreparation = ctx.preAdoptedStablePane
-    ? null
-    : ctx.deps.prepareCodexResumeHome({
-        connectionId: args.connectionId,
-        launchAgent: args.launchAgent,
-        providerSession: args.resumeProviderSession,
-        target: ctx.codexSelectionTarget,
-        launchEnv: args.env,
-        workspacePath: ctx.cwd
-      })
-  const codexResumeLaunch = codexResumePreparation
-    ? await ctx.deps.resolveCodexResumeLaunch(args.command, codexResumePreparation)
-    : ctx.deps.noCodexResumeLaunch(ctx.preAdoptedStablePane ? undefined : args.command)
-  const codexResumeHome = codexResumeLaunch.codexResumeHome
-  // Why: the drop still applies here, but this controller's result has no field for
-  // notifyResumeUnavailable — runtime/relay panes start fresh without the notice.
-  ctx.launchCommand = codexResumeLaunch.command
+  ctx.launchCommand = ctx.preAdoptedStablePane ? undefined : args.command
   ctx.claudeAuth =
     ctx.isClaudeLaunch && ctx.deps.prepareClaudeAuth
-      ? await ctx.deps.prepareClaudeAuth(ctx.codexSelectionTarget)
+      ? await ctx.deps.prepareClaudeAuth(accountSelectionTarget)
       : null
   if (ctx.isClaudeLaunch && isClaudeAuthSwitchInProgress()) {
     throw new Error(CLAUDE_AUTH_SWITCH_IN_PROGRESS_MESSAGE)
@@ -169,58 +147,10 @@ export async function prepareRuntimePtySpawn(
   ctx.requestedAgentTeamsPath = ctx.env?.ORCA_AGENT_TEAMS_TEAM_ID
     ? ctx.env[resolvePathEnvKey(ctx.env, process.platform)]
     : undefined
-  ctx.env = ctx.deps.stripSequencedStartupResumeArgv(ctx.env, codexResumeLaunch)
   if (args.preAllocatedHandle) {
     ctx.env = { ...ctx.env, ORCA_TERMINAL_HANDLE: args.preAllocatedHandle }
   }
-  const selectLaunchCodexHome = async (): Promise<string | null> =>
-    (await ctx.deps.getSelectedCodexHomePath?.(ctx.codexSelectionTarget, ctx.env, {
-      workspacePath: ctx.cwd,
-      launchAgent: isTuiAgent(args.launchAgent) ? args.launchAgent : undefined
-    })) ?? null
-  ctx.selectedCodexHomePath =
-    !ctx.preAdoptedStablePane && !args.connectionId
-      ? getCompatibleSelectedCodexHomePath(
-          ctx.codexSelectionTarget,
-          codexResumeHome
-            ? await ctx.deps.reconcileSharedRuntimeResumeHome(codexResumeHome, async () =>
-                getCompatibleSelectedCodexHomePath(
-                  ctx.codexSelectionTarget,
-                  await selectLaunchCodexHome()
-                )
-              )
-            : await selectLaunchCodexHome()
-        )
-      : null
-  if (
-    !ctx.preAdoptedStablePane &&
-    args.launchAgent === 'codex' &&
-    ctx.callerRequestedSessionId === undefined &&
-    codexResumeHome &&
-    !codexHomePathsEqual(ctx.selectedCodexHomePath, codexResumeHome.codexHomePath)
-  ) {
-    // Why: a resume must never run under a home other than the one that owns its rollout.
-    throw new Error(CODEX_RESUME_AUTH_UNAVAILABLE_MESSAGE)
-  }
-  if (args.launchAgent === 'codex' && ctx.selectedCodexHomePath) {
-    await ensureCodexStateDbBackfillRecoveryStarted(ctx.selectedCodexHomePath)
-  }
-  ctx.codexResumeHomeSelected = Boolean(
-    codexResumeHome && codexHomePathsEqual(ctx.selectedCodexHomePath, codexResumeHome.codexHomePath)
-  )
-  ctx.skipCodexHomeEnv =
-    ctx.isDaemonHostSpawn &&
-    shouldSkipCodexHomeEnvForWindowsShell(ctx.daemonShellOverride, ctx.cwd) &&
-    !ctx.selectedCodexHomePath
   const ptySettings = ctx.isDaemonHostSpawn ? ctx.deps.getSettings?.() : undefined
-  ctx.stripInheritedOrcaCodexHome =
-    ctx.isDaemonHostSpawn &&
-    shouldStripInheritedOrcaCodexHome({
-      target: ctx.codexSelectionTarget,
-      selectedCodexHomePath: ctx.selectedCodexHomePath,
-      skipCodexHomeEnv: ctx.skipCodexHomeEnv,
-      settings: ptySettings
-    })
   if (ctx.isDaemonHostSpawn && ctx.sessionId && !ctx.preAdoptedStablePane) {
     if (!isSafePtySessionId(ctx.sessionId, getAppEnvironment().getPath('userData'))) {
       throw new Error('Invalid PTY session id')
@@ -230,15 +160,11 @@ export async function prepareRuntimePtySpawn(
         isPackaged: getAppEnvironment().isPackaged(),
         resourcesPath: process.resourcesPath,
         userDataPath: getAppEnvironment().getPath('userData'),
-        selectedCodexHomePath: ctx.selectedCodexHomePath,
-        skipCodexHomeEnv: ctx.skipCodexHomeEnv,
-        stripInheritedOrcaCodexHome: ctx.stripInheritedOrcaCodexHome,
         launchCommand: ctx.launchCommand,
         launchAgent: isTuiAgent(args.launchAgent) ? args.launchAgent : undefined,
-        isWsl: shouldSkipCodexHomeEnvForWindowsShell(ctx.daemonShellOverride, ctx.cwd),
-        wslDistro: ctx.codexSelectionTarget.runtime === 'wsl' ? ctx.expectedWslDistro : null,
+        isWsl: isWslShellOrCwd(ctx.daemonShellOverride, ctx.cwd),
+        wslDistro: accountSelectionTarget.runtime === 'wsl' ? ctx.expectedWslDistro : null,
         agentStatusHooksEnabled: isAgentStatusHooksEnabled(ptySettings),
-        codexStatusHooksEnabled: isCodexStatusHooksEnabled(ptySettings),
         networkProxySettings: ptySettings,
         routeBrowserOpensToClient: ctx.deps.runtime?.shouldRelayTerminalBrowserOpens?.(),
         deferGitConfigGuardToDaemon:
@@ -247,7 +173,7 @@ export async function prepareRuntimePtySpawn(
       stampWslOrchestrationCompatibilityHost(
         ctx.env,
         ctx.deps.runtime?.getOrchestrationCompatibilityHostId?.(),
-        ctx.codexSelectionTarget.runtime === 'wsl' ? ctx.expectedWslDistro : null
+        accountSelectionTarget.runtime === 'wsl' ? ctx.expectedWslDistro : null
       )
       promoteAgentTeamsShimPath(ctx.env, ctx.requestedAgentTeamsPath)
     } catch (error) {

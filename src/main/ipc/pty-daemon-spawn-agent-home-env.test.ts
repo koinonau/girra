@@ -6,7 +6,6 @@ import {
   createDaemonActiveProviderFixtures
 } from './pty-ipc-daemon-provider-fixtures'
 import { delimiter, join } from 'node:path'
-import type { TuiAgent } from '../../shared/tui-agent'
 import { LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS } from '../pty/legacy-terminal-shim-dir'
 import { wslHookRelayManager } from '../agent-hooks/wsl-hook-relay-manager'
 import { registerPtyHandlers } from './pty'
@@ -39,9 +38,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -54,135 +50,8 @@ describe('registerPtyHandlers', () => {
         daemonSpawnAndGetOptions,
         daemonSpawnAndGetEnv
       } = createDaemonActiveProviderFixtures({ handlers, mainWindow })
-
-      // Why: under the daemon, LocalPtyProvider.buildSpawnEnv never runs, so host-local env injection must happen in the pty:spawn handler instead.
-      it('overrides an unmarked custom home for an authoritative daemon resume', async () => {
-        const daemonSpawn = setupDaemonAdapter()
-        const selectedHome = vi.fn(() => '/managed/current/home')
-        const systemHome = '/Users/example/.codex'
-        handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          undefined,
-          selectedHome,
-          undefined,
-          undefined,
-          undefined,
-          {
-            prepareCodexSessionResume: async () => ({
-              outcome: 'resume' as const,
-              codexHomePath: systemHome
-            })
-          }
-        )
-
-        await handlers.get('pty:spawn')!(null, {
-          cols: 80,
-          rows: 24,
-          command: 'codex resume session-a',
-          env: { CODEX_HOME: '/custom/codex', REMOVE_ME: 'stale' },
-          envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME', 'REMOVE_ME'],
-          launchAgent: 'codex',
-          resumeProviderSession: {
-            key: 'session_id',
-            id: 'session-a',
-            transcriptPath: `${systemHome}/sessions/2026/07/20/rollout-a.jsonl`
-          }
-        })
-
-        const env = daemonSpawn.mock.calls.at(-1)![0].env
-        expect(selectedHome).not.toHaveBeenCalled()
-        expect(env.CODEX_HOME).toBe(systemHome)
-        expect(env.ORCA_CODEX_HOME).toBe(systemHome)
-        expect(env.REMOVE_ME).toBeUndefined()
-      })
-      it('keeps the authoritative home for runtime-created daemon resumes', async () => {
-        type RuntimeSpawnController = {
-          spawn(args: {
-            cols: number
-            rows: number
-            command: string
-            env: Record<string, string>
-            envToDelete: string[]
-            launchAgent: 'codex'
-            resumeProviderSession: {
-              key: 'session_id'
-              id: string
-              transcriptPath: string
-            }
-          }): Promise<{ id: string }>
-        }
-        const daemonSpawn = setupDaemonAdapter()
-        const runtime = {
-          setPtyController: vi.fn(),
-          registerPty: vi.fn(),
-          noteTerminalSpawnCommand: vi.fn(),
-          onPtySpawned: vi.fn(),
-          onPtyExit: vi.fn(),
-          onPtyData: vi.fn()
-        }
-        const systemHome = '/Users/example/.codex'
-        handlers.clear()
-        registerPtyHandlers(
-          mainWindow as never,
-          runtime as never,
-          undefined,
-          undefined,
-          undefined,
-          undefined,
-          {
-            prepareCodexSessionResume: async () => ({
-              outcome: 'resume' as const,
-              codexHomePath: systemHome
-            })
-          }
-        )
-        const controller = runtime.setPtyController.mock.calls[0]?.[0] as RuntimeSpawnController
-
-        await controller.spawn({
-          cols: 80,
-          rows: 24,
-          command: 'codex resume session-a',
-          env: { CODEX_HOME: '/custom/codex', REMOVE_ME: 'stale' },
-          envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME', 'REMOVE_ME'],
-          launchAgent: 'codex',
-          resumeProviderSession: {
-            key: 'session_id',
-            id: 'session-a',
-            transcriptPath: `${systemHome}/sessions/2026/07/20/rollout-a.jsonl`
-          }
-        })
-
-        const spawnOptions = daemonSpawn.mock.calls.at(-1)?.[0] as DaemonSpawnCall
-        expect(spawnOptions.env.CODEX_HOME).toBe(systemHome)
-        expect(spawnOptions.env.ORCA_CODEX_HOME).toBe(systemHome)
-        expect(spawnOptions.env.REMOVE_ME).toBeUndefined()
-        expect(spawnOptions.envToDelete ?? []).not.toContain('CODEX_HOME')
-        expect(spawnOptions.envToDelete ?? []).not.toContain('ORCA_CODEX_HOME')
-        expect(spawnOptions.envToDelete).toContain('REMOVE_ME')
-      })
-      it('prepares Codex project trust before a daemon-backed interactive launch', async () => {
-        const workspacePath = '/repo/worktrees/new-feature'
-        const resolveHome = vi.fn(
-          (
-            _target?: { runtime?: 'host' | 'wsl'; wslDistro?: string | null },
-            _launchEnv?: NodeJS.ProcessEnv,
-            _launchContext?: { workspacePath?: string; launchAgent?: TuiAgent }
-          ) => null
-        )
-
-        await daemonSpawnAndGetOptions({}, resolveHome, undefined, undefined, {
-          cwd: workspacePath,
-          worktreeId: `repo-id::${workspacePath}`,
-          command: 'codex',
-          launchAgent: 'codex'
-        })
-
-        expect(resolveHome.mock.calls[0]?.[0]).toEqual({ runtime: 'host' })
-        expect(resolveHome.mock.calls[0]?.[2]).toEqual({ workspacePath, launchAgent: 'codex' })
-      })
       it('injects explicit proxy settings on the daemon path', async () => {
-        const env = await daemonSpawnAndGetEnv({}, undefined, () => ({
+        const env = await daemonSpawnAndGetEnv({}, () => ({
           httpProxyUrl: 'http://proxy.example:8080',
           httpProxyBypassRules: 'localhost;*.internal'
         }))
@@ -191,71 +60,9 @@ describe('registerPtyHandlers', () => {
         expect(env.HTTPS_PROXY).toBe('http://proxy.example:8080')
         expect(env.NO_PROXY).toBe('localhost,*.internal')
       })
-      it('skips host Codex home when a daemon-backed Windows spawn targets a WSL cwd', async () => {
-        const originalPlatform = process.platform
-        Object.defineProperty(process, 'platform', {
-          configurable: true,
-          value: 'win32'
-        })
-        try {
-          const spawnOptions = await daemonSpawnAndGetOptions(
-            {},
-            () => 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home',
-            undefined,
-            {
-              CODEX_HOME: 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home',
-              ORCA_CODEX_HOME: 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home'
-            },
-            {
-              cwd: '\\\\wsl.localhost\\Ubuntu\\home\\test\\repo',
-              worktreeId: 'repo-1::\\\\wsl.localhost\\Ubuntu\\home\\test\\repo'
-            }
-          )
-          const { env } = spawnOptions
-          expect(env.CODEX_HOME).toBeUndefined()
-          expect(env.ORCA_CODEX_HOME).toBeUndefined()
-          expect(spawnOptions.envToDelete).toEqual(
-            expect.arrayContaining(['CODEX_HOME', 'ORCA_CODEX_HOME'])
-          )
-        } finally {
-          Object.defineProperty(process, 'platform', {
-            configurable: true,
-            value: originalPlatform
-          })
-        }
-      })
-      it('skips host Codex home when a daemon-backed Windows spawn uses a WSL shell override', async () => {
-        const originalPlatform = process.platform
-        Object.defineProperty(process, 'platform', {
-          configurable: true,
-          value: 'win32'
-        })
-        try {
-          const spawnOptions = await daemonSpawnAndGetOptions(
-            {},
-            () => 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home',
-            undefined,
-            {
-              CODEX_HOME: 'C:\\Users\\test\\.codex',
-              ORCA_CODEX_HOME: 'C:\\Users\\test\\AppData\\Roaming\\Orca\\codex-runtime-home\\home'
-            },
-            { shellOverride: 'wsl.exe' }
-          )
-          expect(spawnOptions.env.CODEX_HOME).toBeUndefined()
-          expect(spawnOptions.env.ORCA_CODEX_HOME).toBeUndefined()
-          expect(spawnOptions.envToDelete).toEqual(
-            expect.arrayContaining(['CODEX_HOME', 'ORCA_CODEX_HOME'])
-          )
-        } finally {
-          Object.defineProperty(process, 'platform', {
-            configurable: true,
-            value: originalPlatform
-          })
-        }
-      })
       it('drops OPENCODE_CONFIG_DIR for a WSL daemon spawn until the guest overlay is known', async () => {
         await withWin32Platform(async () => {
-          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, undefined, {
+          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
             shellOverride: 'wsl.exe'
           })
           // Why: relay not connected yet → never cross the Windows overlay path into WSL.
@@ -273,7 +80,6 @@ describe('registerPtyHandlers', () => {
             },
             undefined,
             undefined,
-            undefined,
             { shellOverride: 'wsl.exe', command: 'prime-agent', launchAgent: 'prime-agent' }
           )
 
@@ -286,7 +92,7 @@ describe('registerPtyHandlers', () => {
       })
       it('does not prepare a Prime extension for a typed launch in a bare WSL shell', async () => {
         await withWin32Platform(async () => {
-          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, undefined, {
+          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
             shellOverride: 'wsl.exe'
           })
 
@@ -306,7 +112,6 @@ describe('registerPtyHandlers', () => {
               { ORCA_OPENCODE_SOURCE_CONFIG_DIR: '/home/jin/.config/opencode' },
               undefined,
               undefined,
-              undefined,
               { shellOverride: 'wsl.exe' }
             )
             expect(env.OPENCODE_CONFIG_DIR).toBe(guestDir)
@@ -318,41 +123,11 @@ describe('registerPtyHandlers', () => {
           spy.mockRestore()
         }
       })
-      it('strips the daemon-inherited Orca-owned CODEX_HOME for real-home routing', async () => {
-        const spawnOptions = await daemonSpawnAndGetOptions(
-          {},
-          () => null,
-          () => ({ codexSystemDefaultRealHomeEnabled: true }) as never,
-          { CODEX_HOME: '/managed/home', ORCA_CODEX_HOME: '/managed/home' }
-        )
-        expect(spawnOptions.env.CODEX_HOME).toBeUndefined()
-        expect(spawnOptions.env.ORCA_CODEX_HOME).toBeUndefined()
-        expect(spawnOptions.envToDelete).toEqual(expect.arrayContaining(['ORCA_CODEX_HOME']))
-        // The daemon compares its own merged values before deleting CODEX_HOME.
-        expect(spawnOptions.envToDelete).not.toContain('CODEX_HOME')
-      })
-      it('preserves a daemon-inherited user CODEX_HOME for real-home routing', async () => {
-        const spawnOptions = await daemonSpawnAndGetOptions(
-          {},
-          () => null,
-          () => ({ codexSystemDefaultRealHomeEnabled: true }) as never,
-          { CODEX_HOME: '/home/me/.config/codex', ORCA_CODEX_HOME: undefined }
-        )
-        expect(spawnOptions.envToDelete).toEqual(expect.arrayContaining(['ORCA_CODEX_HOME']))
-        expect(spawnOptions.envToDelete).not.toEqual(expect.arrayContaining(['CODEX_HOME']))
-      })
-      it('does not strip the daemon-inherited CODEX_HOME when the flag is OFF', async () => {
-        const spawnOptions = await daemonSpawnAndGetOptions({}, () => null, undefined, {
-          CODEX_HOME: '/managed/home',
-          ORCA_CODEX_HOME: '/managed/home'
-        })
-        expect(spawnOptions.envToDelete ?? []).not.toEqual(expect.arrayContaining(['CODEX_HOME']))
-      })
       it('strips inherited Claude child-session stamps from daemon spawns', async () => {
         // Why: a daemon forked from inside a Claude Code session inherits these
         // stamps and would mark every terminal as a nested Claude child, which
         // silently disables transcript persistence for real user sessions.
-        const spawnOptions = await daemonSpawnAndGetOptions(undefined, undefined, undefined, {
+        const spawnOptions = await daemonSpawnAndGetOptions(undefined, undefined, {
           CLAUDE_CODE_CHILD_SESSION: '1',
           CLAUDE_CODE_SESSION_ID: '85935aed-98a7-4094-89a8-85c75e1a5a95',
           CLAUDE_CODE_BRIDGE_SESSION_ID: 'session_01UCkWN5nDXNyD1V7cfamCxa'
@@ -370,7 +145,6 @@ describe('registerPtyHandlers', () => {
         // nested Claude child passes the stamp in args.env and must keep it.
         const spawnOptions = await daemonSpawnAndGetOptions(
           { CLAUDE_CODE_CHILD_SESSION: '1' },
-          undefined,
           undefined,
           { CLAUDE_CODE_CHILD_SESSION: '1' }
         )
@@ -426,7 +200,7 @@ describe('registerPtyHandlers', () => {
         expect(env.ORCA_AGENT_HOOK_TOKEN).toBe('agent-token')
       })
       it('deletes stale Claude scoped settings env from daemon-hosted PTYs', async () => {
-        const spawnOptions = await daemonSpawnAndGetOptions({}, undefined, undefined, {
+        const spawnOptions = await daemonSpawnAndGetOptions({}, undefined, {
           ORCA_CLAUDE_AGENT_STATUS_SETTINGS:
             '/tmp/orca/agent-hooks/claude-agent-status-settings.json'
         })

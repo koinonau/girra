@@ -4,7 +4,7 @@ import { requireTuiAgentConfig } from './require-tui-agent-config'
 
 describe('requireTuiAgentConfig', () => {
   it('returns the config for a known agent', () => {
-    expect(requireTuiAgentConfig('codex').preflightTrust).toBe('codex')
+    expect(requireTuiAgentConfig('copilot').preflightTrust).toBe('copilot')
   })
 
   it('names the unknown id instead of throwing a property-of-undefined error', () => {

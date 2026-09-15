@@ -6,8 +6,6 @@ import { cn } from '@/lib/utils'
 import { translate } from '@/i18n/i18n'
 import { Button } from '../ui/button'
 import { SettingsBadge, SettingsSegmentedControl } from './SettingsFormControls'
-import type { AgentSessionSourceHomeControl } from './codex-session-source-home-control'
-import { AgentSessionSourceHomeInput } from './codex-session-source-home-control'
 import { stringifyAgentDefaultEnvDraft } from './agent-default-env-draft'
 import {
   AgentCommandOverrideInput,
@@ -73,7 +71,6 @@ export type AgentCatalogRowProps = {
   onSaveOverride: (value: string) => void
   onSaveArgs: (value: string) => void
   onSaveEnv: (value: Record<string, string>) => void
-  sessionSourceHome?: AgentSessionSourceHomeControl
 }
 
 export function AgentCatalogRow({
@@ -93,8 +90,7 @@ export function AgentCatalogRow({
   onSetEnabled,
   onSaveOverride,
   onSaveArgs,
-  onSaveEnv,
-  sessionSourceHome
+  onSaveEnv
 }: AgentCatalogRowProps): React.JSX.Element {
   const envSummary = stringifyAgentDefaultEnvDraft(envOverride)
   const defaultEnvSummary = stringifyAgentDefaultEnvDraft(defaultEnv)
@@ -223,16 +219,6 @@ export function AgentCatalogRow({
                 defaultEnv={defaultEnv}
                 envOverride={envOverride}
                 onSaveEnv={onSaveEnv}
-              />
-            </div>
-          )}
-          {sessionSourceHome && (
-            <div className="mt-2">
-              <AgentSessionSourceHomeInput
-                key={`${agentId}:${sessionSourceHome.runtimeLabel}:${sessionSourceHome.value}`}
-                runtimeLabel={sessionSourceHome.runtimeLabel}
-                value={sessionSourceHome.value}
-                onSave={sessionSourceHome.onSave}
               />
             </div>
           )}

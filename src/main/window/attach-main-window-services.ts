@@ -12,11 +12,7 @@ import { setRepoRemoteClientNotifier } from '../ipc/repos/repos-changed-notifica
 import { setWorktreeCatalogRemoteClientNotifier } from '../ipc/watched-worktree-catalog-notification'
 import { registerWorktreeHandlers } from '../ipc/worktrees'
 import { registerWorkspaceCleanupHandlers } from '../ipc/workspace-cleanup'
-import {
-  registerPtyHandlers,
-  type GetSelectedCodexHomePath,
-  type PrepareCodexSessionResume
-} from '../ipc/pty'
+import { registerPtyHandlers } from '../ipc/pty'
 import { registerDaemonManagementHandlers } from '../ipc/pty-management'
 import { registerSshHandlers } from '../ipc/ssh'
 import { registerRemoteWorkspaceHandlers } from '../ipc/remote-workspace'
@@ -45,12 +41,10 @@ export function attachMainWindowServices(
   mainWindow: BrowserWindow,
   store: Store,
   runtime: OrcaRuntimeService,
-  getSelectedCodexHomePath?: GetSelectedCodexHomePath,
   prepareClaudeAuth?: (
     target?: ClaudeAccountSelectionTarget
   ) => Promise<ClaudeRuntimeAuthPreparation>,
   options?: {
-    prepareCodexSessionResume?: PrepareCodexSessionResume
     awaitLocalPtyStartup?: () => Promise<void>
     awaitLocalPtyProviderStartup?: () => Promise<void>
     onBeforeRendererReload?: (args: { webContentsId: number; ignoreCache: boolean }) => void
@@ -74,20 +68,11 @@ export function attachMainWindowServices(
   // marker poll to upgrade them without a restart (#11477).
   startFolderRepoGitUpgradeWatch(store, mainWindow)
   registerWorkspaceCleanupHandlers(store)
-  registerPtyHandlers(
-    mainWindow,
-    runtime,
-    getSelectedCodexHomePath,
-    () => store.getSettings(),
-    prepareClaudeAuth,
-    store,
-    {
-      prepareCodexSessionResume: options?.prepareCodexSessionResume,
-      awaitLocalPtyStartup: options?.awaitLocalPtyStartup,
-      awaitLocalPtyProviderStartup: options?.awaitLocalPtyProviderStartup,
-      isRecoveryReloadInFlight: options?.isRecoveryReloadInFlight
-    }
-  )
+  registerPtyHandlers(mainWindow, runtime, () => store.getSettings(), prepareClaudeAuth, store, {
+    awaitLocalPtyStartup: options?.awaitLocalPtyStartup,
+    awaitLocalPtyProviderStartup: options?.awaitLocalPtyProviderStartup,
+    isRecoveryReloadInFlight: options?.isRecoveryReloadInFlight
+  })
   // Why: register after registerPtyHandlers so pty:management:* IPC re-installs on macOS re-activation (docs/daemon-staleness-ux.md §Phase 1).
   registerDaemonManagementHandlers()
   // Why: don't enumerate repo paths in background GC — `git worktree list` can touch protected macOS folders and trigger access prompts.

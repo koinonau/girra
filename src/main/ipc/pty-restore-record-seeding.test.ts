@@ -50,9 +50,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -384,7 +381,7 @@ describe('registerPtyHandlers', () => {
       listProcesses: vi.fn(async () => [{ id: ptyId, cwd: '/tmp/restore-records' }]),
       getForegroundProcess: vi.fn(async () => null)
     } as never)
-    registerPtyHandlers(mainWindow as never, runtime, undefined, undefined, undefined, {
+    registerPtyHandlers(mainWindow as never, runtime, undefined, undefined, {
       persistPtyBinding: vi.fn()
     } as never)
 

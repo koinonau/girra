@@ -33,9 +33,7 @@ function getRelayZshWrapperSpec(): ZshStartupHookSpec {
       '# Why: remote startup files can re-export user defaults after relay spawn.',
     restores: {
       agentTeamsPath: false,
-      remoteCliBinDir: true,
-      codexHome: false,
-      codexLaunchPreflight: false
+      remoteCliBinDir: true
     }
   }
 }

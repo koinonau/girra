@@ -1,7 +1,7 @@
 import { ipcRenderer } from 'electron'
 import type { AgentSessionPtyWriteRefusal } from '../../shared/agent-session-pty-write-admission'
 import type { ProjectExecutionRuntimeResolution } from '../../shared/project-execution-runtime'
-import type { StartupCommandDelivery } from '../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../shared/startup-command-delivery'
 import type {
   AgentProviderSessionMetadata,
   SleepingAgentLaunchConfig

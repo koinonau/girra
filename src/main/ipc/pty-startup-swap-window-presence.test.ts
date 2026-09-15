@@ -32,9 +32,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 // During the cold-start daemon swap the installed local provider is still the plain
 // in-process LocalPtyProvider; it does not own daemon-restored PTY ids, so its
@@ -50,15 +47,9 @@ describe('registerPtyHandlers daemon-swap-window presence', () => {
     barrier: Promise<void>,
     runtime?: Record<string, unknown>
   ): void => {
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      { awaitLocalPtyProviderStartup: () => barrier }
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, undefined, {
+      awaitLocalPtyProviderStartup: () => barrier
+    })
   }
 
   const installRuntimeControllerWithBarrier = (

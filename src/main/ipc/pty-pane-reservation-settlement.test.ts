@@ -41,9 +41,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -142,7 +139,6 @@ describe('registerPtyHandlers', () => {
         runtime as never,
         undefined,
         undefined,
-        undefined,
         store as never
       )
       const mounted = await handlers.get('pty:spawn')!(null, {
@@ -236,14 +232,7 @@ describe('registerPtyHandlers', () => {
       }))
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
 
     await expect(
       handlers.get('pty:spawn')!(null, {
@@ -395,14 +384,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnController = controller as unknown as RuntimeSpawnController
     const leafId = '55555555-5555-4555-8555-555555555555'
     const paneKey = makePaneKey('tab-runtime-reservation', leafId)
@@ -492,14 +474,7 @@ describe('registerPtyHandlers', () => {
       onPtyData: vi.fn()
     }
 
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      store as never
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, store as never)
     const spawnController = controller as unknown as RuntimeSpawnController
     const leafId = '11111111-1111-4111-8111-111111111111'
     await spawnController.spawn({

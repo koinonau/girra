@@ -161,13 +161,6 @@ export abstract class AgentHookServerState {
     mutationBefore?: EnrichedAgentHookEventPayload
   ): EnrichedAgentHookEventPayload
   protected abstract emitEnrichedStatus(enriched: EnrichedAgentHookEventPayload): void
-  protected abstract clearCodexSubagentPoll(paneKey: string): void
-  protected abstract clearAllCodexSubagentPolls(): void
-  protected abstract scheduleCodexSubagentPoll(
-    source: AgentHookSource,
-    body: unknown,
-    original: EnrichedAgentHookEventPayload
-  ): void
   protected abstract getPersistedPaneKeyAliases(): LegacyPaneKeyAliasEntry[]
   protected abstract notifyPaneKeyAliasPersistenceListener(): void
   protected abstract boundPaneKeyAliases(): void

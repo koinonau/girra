@@ -37,14 +37,11 @@ try {
     return runtime
   })
 
-  const summary = await runtimes[0].installManagedHooks({ agents: ['codex', 'claude'] })
-  assert.deepEqual(summary, { installers: 2, errors: 0 })
+  const summary = await runtimes[0].installManagedHooks({ agents: ['claude'] })
+  assert.deepEqual(summary, { installers: 1, errors: 0 })
 
-  const codexHooks = await readFile(join(home, '.codex', 'hooks.json'), 'utf8')
   const claudeSettings = await readFile(join(home, '.claude', 'settings.json'), 'utf8')
-  assert.match(codexHooks, /\.orca\/agent-hooks\/codex-hook\.sh/)
   assert.match(claudeSettings, /\.orca\/agent-hooks\/claude-hook\.sh/)
-  await access(join(home, '.orca', 'agent-hooks', 'codex-hook.sh'), constants.X_OK)
   await access(join(home, '.orca', 'agent-hooks', 'claude-hook.sh'), constants.X_OK)
 } finally {
   if (originalHome === undefined) {

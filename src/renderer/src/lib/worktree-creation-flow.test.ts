@@ -597,7 +597,7 @@ describe('staged background worktree creation', () => {
 
     const started = continueBackgroundWorktreeCreation(
       'creation-1',
-      makeRequest({ agent: 'codex' }),
+      makeRequest({ agent: 'copilot' }),
       { revealCreationSurface: false }
     )
 

@@ -1,4 +1,4 @@
-import { detectAgentStatusFromTitle, isClaudeAgent } from '@/lib/agent-status'
+import { isClaudeAgent } from '@/lib/agent-status'
 import { useAppStore } from '@/store'
 import { isFreshNonDoneAgentStatus } from '../../../../../shared/agent-status-types'
 import type {
@@ -172,9 +172,6 @@ export function installAgentTaskCompleteNotify(session: ConnectPanePtySession): 
     const settings = currentState.settings
     if (isClaudeAgent(title) && (settings === null || settings.promptCacheTimerEnabled)) {
       session.deps.setCacheTimerStartedAt(session.cacheKey, Date.now())
-    }
-    if (detectAgentStatusFromTitle(title) === 'idle') {
-      session.setFocusReportSuppressionForAgentCompletion(title, activeHookStatus?.agentType)
     }
     if (session.syncAgentTaskCompleteTrackingEnabled()) {
       session.agentCompletionCoordinator.observeClassifiedTitleCompletion(title)

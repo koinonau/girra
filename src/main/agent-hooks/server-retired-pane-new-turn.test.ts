@@ -11,7 +11,6 @@ afterEach(() => vi.restoreAllMocks())
 /** Each source's own new-turn boundary, as `isNewTurnEvent` classifies it. */
 const NEW_TURN_EVENT: Record<AgentHookSource, string> = {
   claude: 'SessionStart',
-  codex: 'SessionStart',
   pi: 'before_agent_start',
   omp: 'before_agent_start',
   'prime-agent': 'before_agent_start',
@@ -80,6 +79,6 @@ describe("retired pane un-retires on each provider's own new-turn event", () => 
 
   it('leaves the pane retired for a non-boundary event on a revivable source', () => {
     // Why: guards the inverse — the gate must not open on any event that merely mentions a session.
-    expect(reviveRetiredPane('codex', 'Stop')).toBe(false)
+    expect(reviveRetiredPane('claude', 'Stop')).toBe(false)
   })
 })

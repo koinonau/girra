@@ -64,6 +64,7 @@ type RetiredGlobalSettings = {
   activeCodexManagedAccountId?: unknown
   activeCodexManagedAccountIdsByRuntime?: unknown
   skipCodexRateLimitResetConfirm?: unknown
+  codexSessionSourceHome?: unknown
 }
 
 export function stripRetiredGlobalSettings(
@@ -78,6 +79,8 @@ export function stripRetiredGlobalSettings(
     activeCodexManagedAccountId: _retiredCodexActiveAccount,
     activeCodexManagedAccountIdsByRuntime: _retiredCodexActiveAccountsByRuntime,
     skipCodexRateLimitResetConfirm: _retiredCodexResetConfirm,
+    // Why: Codex terminal launches were removed, so its history import home has no reader.
+    codexSessionSourceHome: _retiredCodexSessionSourceHome,
     ...rest
   } = (settings ?? {}) as Partial<GlobalSettings> & RetiredGlobalSettings
   void _legacyScrollbackBytes
@@ -87,6 +90,7 @@ export function stripRetiredGlobalSettings(
   void _retiredCodexActiveAccount
   void _retiredCodexActiveAccountsByRuntime
   void _retiredCodexResetConfirm
+  void _retiredCodexSessionSourceHome
   return rest
 }
 

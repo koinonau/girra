@@ -6012,9 +6012,6 @@
           "agentPermissionsYolo": "Yolo",
           "agentPermissionsManual": "Manual",
           "3f1bdf3cb4": "Environment text is too large to parse safely.",
-          "codexSessionSource": "Codex home to import from",
-          "codexSessionSourceInfo": "About importing Codex history",
-          "codexSessionSourceTooltip": "Orca runs Codex in an isolated home. Point this at your existing Codex home to import that session history. Empty uses ~/.codex.",
           "storedDefaultUndetected": "Saved as your default, but not detected right now",
           "noAgentsDetected": "No agents detected. If one is installed, the probe may have timed out."
         },
@@ -8208,7 +8205,6 @@
             "5963143e00": "settings",
             "042c551bc5": "config",
             "f412abbba5": "claude",
-            "5ded38b843": "codex",
             "be7ea3553b": "tab",
             "6956646a1e": "title",
             "32836788b0": "generated title",

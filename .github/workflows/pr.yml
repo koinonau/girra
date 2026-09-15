@@ -490,7 +490,6 @@ jobs:
             src/main/daemon/node-pty-fd-leak.test.ts \
             src/main/providers/local-pty-shell-ready-zsh-launch-environment.test.ts \
             src/main/providers/__tests__/shell-ready-framework-example.test.ts \
-            src/main/pty/codex-shell-launch-preflight.test.ts \
             src/main/pty/omp-shell-wrapper-alias-safety.test.ts \
             src/main/pty/omp-shell-wrapper.node-pty.test.ts \
             src/main/shell-startup-feature-channel.test.ts \
@@ -776,7 +775,6 @@ jobs:
           src/shared/secure-file-fsync-flags.test.ts
           src/shared/secure-path-windows-acl.win32.test.ts
           src/main/runtime/unreadable-secret-store-preservation.win32.test.ts
-          src/main/ipc/pty-spawn-env-codex-resume-provenance.test.ts
           src/relay/windows-port-scan.win32.test.ts
 
       # Why the :parallel variant: identical to build:release except the three

@@ -98,26 +98,8 @@ if [[ -n "${ORCA_OMP_STATUS_EXTENSION:-}" ]]; then
   function omp { __orca_omp "$@"; }
 fi
 
-# Why: Codex must keep using Orca's runtime CODEX_HOME after profile scripts.
-[[ -n "${ORCA_CODEX_HOME:-}" ]] && export CODEX_HOME="${ORCA_CODEX_HOME}"
-# Why: a typed alias expands inside the shell, after pane launch prep.
-# Why unalias inside the substitution: an alias named codex makes command -v
-# report the alias text, and the subshell leaves the user's own alias intact.
-# Why || : twice — zsh alone aborts inside the substitution, but every shell's
-# assignment adopts its exit status, so an absent codex trips set -e in bash too.
-__orca_codex_binary="$(unalias codex 2>/dev/null || :; command -v codex 2>/dev/null || :)"
-if [[ -n "${ORCA_CODEX_LAUNCH_PREFLIGHT:-}" && -x "${ORCA_CODEX_LAUNCH_PREFLIGHT}" && -n "${__orca_codex_binary:-}" && -x "${__orca_codex_binary}" ]]; then
-  # Why the function reserved word: it suppresses alias expansion of the name,
-  # which otherwise rewrites this header at parse time and aborts the whole file.
-  function codex {
-    "${ORCA_CODEX_LAUNCH_PREFLIGHT}" agent hooks prepare-codex >/dev/null 2>&1 || :
-    command codex "$@"
-  }
-fi
-unset __orca_codex_binary
-
 # Why: emit OSC 133 C/D so terminal-command-lifecycle can drop stale agent
-# status when the foreground command (e.g. an interrupted Claude/Codex CLI)
+# status when the foreground command (e.g. an interrupted Claude CLI)
 # exits — mirrors the zsh wrapper. Without this, bash users (default on most
 # Linux distros) keep a stuck 'working' spinner for up to 30 min after the
 # CLI exits without sending a Stop/SessionEnd hook.

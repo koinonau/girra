@@ -1,23 +1,13 @@
 import type { TuiAgent } from '../../../../shared/tui-agent'
-import type {
-  AgentProviderSessionMetadata,
-  SleepingAgentLaunchConfig
-} from '../../../../shared/agent-session-resume'
+import type { SleepingAgentLaunchConfig } from '../../../../shared/agent-session-resume'
 import type { ProjectExecutionRuntimeResolution } from '../../../../shared/project-execution-runtime'
-import type { StartupCommandDelivery } from '../../../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../../../shared/startup-command-delivery'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { TerminalStartupCwdMissingDirFallback } from '../../../../shared/terminal-startup-cwd'
 import type { OrcaRuntimeService } from '../../../runtime/orca-runtime'
 import type { Store } from '../../../persistence'
 import type { PtySpawnResult } from '../../../providers/types'
-import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
-import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
-import type {
-  GetSelectedCodexHomePath,
-  PrepareClaudeAuth,
-  PrepareCodexSessionResume
-} from '../host-env/types'
-import type { CodexResumeLaunch, PreparedCodexResumeHome } from '../host-env/codex-resume'
+import type { PrepareClaudeAuth } from '../host-env/types'
 import type { StablePaneOwner } from '../pane/stable-owner'
 
 export type PtySpawnIpcArgs = {
@@ -31,7 +21,6 @@ export type PtySpawnIpcArgs = {
   command?: string
   commandDelivery?: 'renderer' | 'provider'
   launchConfig?: SleepingAgentLaunchConfig
-  resumeProviderSession?: AgentProviderSessionMetadata
   launchToken?: unknown
   launchAgent?: TuiAgent
   startupCommandDelivery?: StartupCommandDelivery
@@ -79,11 +68,7 @@ export type PtySpawnIpcDeps = {
   runtime?: OrcaRuntimeService
   store?: Store
   getSettings?: () => GlobalSettings
-  getSelectedCodexHomePath?: GetSelectedCodexHomePath
   prepareClaudeAuth?: PrepareClaudeAuth
-  options?: {
-    prepareCodexSessionResume?: PrepareCodexSessionResume
-  }
   getLocalPtyStartupPromise: (connectionId?: string | null) => Promise<void> | undefined
   adoptStablePane: (args: AdoptStablePaneArgs) => Promise<AdoptStablePaneResult | null>
   assertFolderWorkspacePtyPathUsable: (worktreeId: string | undefined) => Promise<void> | void
@@ -93,27 +78,6 @@ export type PtySpawnIpcDeps = {
     missingDirFallback?: TerminalStartupCwdMissingDirFallback
   ) => string | undefined
   localStartupCwdDirectoryExists: (path: string) => boolean
-  prepareCodexResumeHome: (args: {
-    connectionId?: string | null
-    launchAgent?: TuiAgent
-    providerSession?: AgentProviderSessionMetadata
-    target: AccountSelectionTarget
-    launchEnv?: NodeJS.ProcessEnv
-    workspacePath?: string
-  }) => PreparedCodexResumeHome | null
-  noCodexResumeLaunch: (command: string | undefined) => CodexResumeLaunch
-  resolveCodexResumeLaunch: (
-    command: string | undefined,
-    prepared: PreparedCodexResumeHome
-  ) => Promise<CodexResumeLaunch>
-  reconcileSharedRuntimeResumeHome: (
-    resumeHome: Extract<CodexSessionResumePreparation, { outcome: 'resume' }>,
-    resolveCurrent: () => string | null | Promise<string | null>
-  ) => Promise<string>
-  stripSequencedStartupResumeArgv: <T extends Record<string, string> | undefined>(
-    env: T,
-    launch: CodexResumeLaunch
-  ) => T
   transitionSpawnHiddenRendererPtyDeliveryState: (id: string, hidden: boolean) => void
   trustedTerminalHandleEnv: Set<string>
   sendPtySpawnedToRenderer: (id: string) => void

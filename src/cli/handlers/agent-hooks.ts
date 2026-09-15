@@ -15,7 +15,6 @@ import { getDefaultPersistedState } from '../../shared/constants'
 import { normalizeDisabledTuiAgents } from '../../shared/tui-agent-selection'
 import type { GlobalSettings } from '../../shared/global-settings-types'
 import type { PersistedState } from '../../shared/persisted-state-types'
-import { prepareManagedCodexHomeBeforeShellLaunch } from '../../main/codex/managed-home-shell-preflight'
 
 type AgentHookCommandResult = {
   enabled: boolean
@@ -23,9 +22,6 @@ type AgentHookCommandResult = {
   appliedBy: 'runtime' | 'offline'
   statuses: AgentHookInstallStatus[]
 }
-
-// Covers managed-home verification, WSL identity, trust grant, and bounded app-server reap.
-const WSL_CODEX_PREPARE_TIMEOUT_MS = 50_000
 
 function getDataPath(): string {
   const userDataPath = getDefaultUserDataPath()
@@ -101,26 +97,6 @@ function readHookSettingsFromDisk(): Pick<
     agentStatusHooksEnabled: state.settings?.agentStatusHooksEnabled !== false,
     disabledTuiAgents: normalizeDisabledTuiAgents(state.settings?.disabledTuiAgents)
   }
-}
-
-async function readHookSettings(
-  client: RuntimeClient
-): Promise<Pick<GlobalSettings, 'agentStatusHooksEnabled' | 'disabledTuiAgents'>> {
-  try {
-    const response = await client.call<{
-      settings?: Pick<GlobalSettings, 'agentStatusHooksEnabled' | 'disabledTuiAgents'>
-    }>('settings.get', undefined, { timeoutMs: 1_000 })
-    const settings = response.result.settings
-    if (settings && typeof settings.agentStatusHooksEnabled === 'boolean') {
-      return {
-        agentStatusHooksEnabled: settings.agentStatusHooksEnabled,
-        disabledTuiAgents: normalizeDisabledTuiAgents(settings.disabledTuiAgents)
-      }
-    }
-  } catch {
-    // The active profile on disk is the offline fallback.
-  }
-  return readHookSettingsFromDisk()
 }
 
 function updateEnabledOnDisk(enabled: boolean): {
@@ -207,30 +183,6 @@ async function setAgentHooksEnabled(
 }
 
 export const AGENT_HOOK_HANDLERS: Record<string, CommandHandler> = {
-  'agent hooks prepare-codex': async ({ client }) => {
-    if (process.env.WSL_DISTRO_NAME?.trim()) {
-      try {
-        await client.call(
-          'agentHooks.prepareCodexForWslPane',
-          {
-            codexHome: process.env.CODEX_HOME ?? '',
-            orcaCodexHome: process.env.ORCA_CODEX_HOME ?? '',
-            wslDistro: process.env.WSL_DISTRO_NAME
-          },
-          { timeoutMs: WSL_CODEX_PREPARE_TIMEOUT_MS }
-        )
-      } catch {
-        // Best effort: old or unavailable runtimes must not block Codex launch.
-      }
-      return
-    }
-    const settings = await readHookSettings(client)
-    await prepareManagedCodexHomeBeforeShellLaunch({
-      userDataPath: getDefaultUserDataPath(),
-      hooksEnabled:
-        settings.agentStatusHooksEnabled && !settings.disabledTuiAgents.includes('codex')
-    })
-  },
   'agent hooks status': async ({ json }) => {
     const { getManagedAgentHookStatuses } =
       await import('../../main/agent-hooks/managed-agent-hook-controls.js')

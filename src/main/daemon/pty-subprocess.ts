@@ -11,7 +11,7 @@ import {
   runPtySpawnHealthProbe
 } from './pty-subprocess/spawn-preflight'
 import { createDaemonPtySubprocessHandle } from './pty-subprocess/subprocess-handle'
-import type { StartupCommandDelivery } from '../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../shared/startup-command-delivery'
 import type { TuiAgent } from '../../shared/tui-agent'
 
 const PTY_SPAWN_HEALTH_RETRY_ATTEMPTS = 2

@@ -41,8 +41,7 @@ export function createAgentCompletionCoordinator(
     lastAttentionToken: null as string | null,
     pendingHookDoneTimer: null as ReturnType<typeof setTimeout> | null,
     pendingHookDoneTitle: null as string | null,
-    pendingHookDonePayload: null as AgentCompletionStatusSnapshot | null,
-    pendingCodexAttentionTimer: null as ReturnType<typeof setTimeout> | null
+    pendingHookDonePayload: null as AgentCompletionStatusSnapshot | null
   }
   // Why: output/title activity can arrive before async PTY bind; only re-arm cadence after bind starts process tracking.
   const processState = {
@@ -84,10 +83,6 @@ export function createAgentCompletionCoordinator(
 
   function clearPendingHookDone(): void {
     notification.clearPendingHookDone()
-  }
-
-  function clearPendingCodexAttention(): void {
-    notification.clearPendingCodexAttention()
   }
 
   function dispatchCompletion(
@@ -168,7 +163,6 @@ export function createAgentCompletionCoordinator(
     establishAgentEvidence,
     clearAgentRunEvidence,
     hasPendingHookDone: () => completionState.pendingHookDoneTimer !== null,
-    hasPendingCodexAttention: () => completionState.pendingCodexAttentionTimer !== null,
     dispatchCompletion
   })
 
@@ -242,8 +236,6 @@ export function createAgentCompletionCoordinator(
     ) {
       return false
     }
-    // Why: cancel debounced attention when a Codex resume surfaces as a working title (else false banner #8387); placed after the replay guard so a stale post-completion replay can't drop it.
-    clearPendingCodexAttention()
     completionState.workingStatusObserved = true
     completionState.requiresFreshWorking = false
     if (!hasUnconsumedStampedTail()) {
@@ -272,7 +264,6 @@ export function createAgentCompletionCoordinator(
     establishAgentEvidence,
     recordPaneActivity,
     clearPendingHookDone,
-    clearPendingCodexAttention,
     dispatchAttention,
     dispatchCompletion: (source, title, override) =>
       dispatchCompletion(
@@ -300,7 +291,6 @@ export function createAgentCompletionCoordinator(
     processState,
     identityScope,
     clearPendingHookDone,
-    clearPendingCodexAttention,
     dropPendingTitle,
     clearWorkingBoundary,
     incrementGeneration: () => processMonitor.incrementGeneration(),

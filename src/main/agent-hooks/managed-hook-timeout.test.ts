@@ -16,7 +16,6 @@ vi.mock('electron', () => ({
 }))
 
 import { MANAGED_HOOK_TIMEOUT_SECONDS } from './installer-utils'
-import { CodexHookService } from '../codex/hook-service'
 import { ClaudeHookService } from '../claude/hook-service'
 import { createAgentHookMemorySftp as createFakeSftp } from './agent-hook-memory-sftp.test-fixture'
 
@@ -28,11 +27,6 @@ const JSON_INSTALLERS = [
     agent: 'claude',
     configPath: `${REMOTE_HOME}/.claude/settings.json`,
     install: (sftp: SFTPWrapper) => new ClaudeHookService().installRemote(sftp, REMOTE_HOME)
-  },
-  {
-    agent: 'codex',
-    configPath: `${REMOTE_HOME}/.codex/hooks.json`,
-    install: (sftp: SFTPWrapper) => new CodexHookService().installRemote(sftp, REMOTE_HOME)
   }
 ] as const
 
@@ -173,11 +167,11 @@ describe('managed agent hook timeouts', () => {
       async () => {
         // Reuse a real generated POSIX wrapper rather than re-deriving the script.
         const { sftp, fs } = createFakeSftp()
-        await new CodexHookService().installRemote(sftp, REMOTE_HOME)
-        const wrapperBody = fs.files.get(`${REMOTE_HOME}/.orca/agent-hooks/codex-hook.sh`)!
+        await new ClaudeHookService().installRemote(sftp, REMOTE_HOME)
+        const wrapperBody = fs.files.get(`${REMOTE_HOME}/.orca/agent-hooks/claude-hook.sh`)!
 
         tempDir = mkdtempSync(join(tmpdir(), 'orca-hook-timeout-'))
-        const scriptPath = join(tempDir, 'codex-hook.sh')
+        const scriptPath = join(tempDir, 'claude-hook.sh')
         writeFileSync(scriptPath, wrapperBody, 'utf8')
         chmodSync(scriptPath, 0o755)
 

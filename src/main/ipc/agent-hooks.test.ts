@@ -67,9 +67,6 @@ vi.mock('../agent-hooks/migration-unsupported-pty-state', () => ({
 vi.mock('../claude/hook-service', () => ({
   claudeHookService: { getStatus: vi.fn(() => ({ agent: 'claude', state: 'absent' })) }
 }))
-vi.mock('../codex/hook-service', () => ({
-  codexHookService: { getStatus: vi.fn(() => ({ agent: 'codex', state: 'absent' })) }
-}))
 
 beforeEach(() => {
   dropStatusEntry.mockReset()

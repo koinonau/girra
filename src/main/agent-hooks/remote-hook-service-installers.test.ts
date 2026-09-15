@@ -7,7 +7,6 @@ vi.mock('electron', () => ({
   }
 }))
 
-import { CodexHookService, codexHookService } from '../codex/hook-service'
 import { ClaudeHookService, claudeHookService } from '../claude/hook-service'
 import { MANAGED_AGENT_HOOK_INSTALLERS } from './managed-agent-hook-controls'
 import {
@@ -118,10 +117,6 @@ describe('remote hook service installers', () => {
         {
           path: '/home/dev/.orca/agent-hooks/claude-hook.sh',
           install: (sftp: SFTPWrapper) => new ClaudeHookService().installRemote(sftp, '/home/dev')
-        },
-        {
-          path: '/home/dev/.orca/agent-hooks/codex-hook.sh',
-          install: (sftp: SFTPWrapper) => new CodexHookService().installRemote(sftp, '/home/dev')
         }
       ]
 
@@ -141,107 +136,13 @@ describe('remote hook service installers', () => {
     }
   })
 
-  it('installs remote Codex hooks with matching trust entries', async () => {
-    const { sftp, fs } = createFakeSftp({
-      '/home/dev/.codex/hooks.json': `${JSON.stringify({
-        hooks: {},
-        _managed: {
-          'external-manager': {
-            Stop: [0]
-          }
-        }
-      })}\n`
-    })
-
-    const status = await new CodexHookService().installRemote(sftp, '/home/dev/')
-
-    expect(status.state).toBe('installed')
-    expect(status.configPath).toBe('/home/dev/.codex/hooks.json')
-    const hooks = JSON.parse(fs.files.get('/home/dev/.codex/hooks.json')!) as {
-      hooks: Record<string, { hooks: { command: string }[] }[]>
-      _managed?: unknown
-    }
-    expect(hooks._managed).toEqual({ 'external-manager': { Stop: [0] } })
-    for (const eventName of [
-      'SessionStart',
-      'UserPromptSubmit',
-      'PreToolUse',
-      'PermissionRequest',
-      'PostToolUse',
-      'Stop'
-    ]) {
-      const command = hooks.hooks[eventName]?.[0]?.hooks?.[0]?.command
-      expect(command).toContain('/home/dev/.orca/agent-hooks/codex-hook.sh')
-      expect(command).toMatch(/^if \[ -f /)
-    }
-    expect(fs.files.get('/home/dev/.orca/agent-hooks/codex-hook.sh')).toContain('#!/bin/sh')
-    expect(fs.modes.get('/home/dev/.orca/agent-hooks/codex-hook.sh')).toBe(0o755)
-    const toml = fs.files.get('/home/dev/.codex/config.toml')
-    expect(toml).toContain('/home/dev/.codex/hooks.json:permission_request:0:0')
-    expect(toml).toContain('trusted_hash = "sha256:')
-  })
-
-  it('reports Codex trust-write failures without rolling back installed hooks', async () => {
-    const { sftp, fs } = createFakeSftp()
-    fs.failRenameTo.add('/home/dev/.codex/config.toml')
-
-    const status = await new CodexHookService().installRemote(sftp, '/home/dev')
-
-    expect(status.state).toBe('error')
-    expect(status.managedHooksPresent).toBe(true)
-    expect(status.detail).toContain('trust entries could not be written')
-    expect(fs.files.get('/home/dev/.codex/hooks.json')).toContain('codex-hook.sh')
-    expect(fs.files.get('/home/dev/.orca/agent-hooks/codex-hook.sh')).toContain('#!/bin/sh')
-  })
-
-  it('installs Codex hooks into an explicit redirected CODEX_HOME', async () => {
-    const runtimeHome = '/home/dev/.local/share/orca/codex-runtime-home/home'
-    const { sftp, fs } = createFakeSftp({
-      [`${runtimeHome}/config.toml`]: 'model = "gpt-5.2-codex"\n'
-    })
-
-    const status = await new CodexHookService().installRemote(sftp, '/home/dev', {
-      codexHomeDir: runtimeHome,
-      deferTrustUntilConfigToml: true
-    })
-
-    expect(status.state).toBe('installed')
-    expect(status.configPath).toBe(`${runtimeHome}/hooks.json`)
-    expect(fs.files.has('/home/dev/.codex/hooks.json')).toBe(false)
-    const hooks = JSON.parse(fs.files.get(`${runtimeHome}/hooks.json`)!) as {
-      hooks: Record<string, { hooks: { command: string }[] }[]>
-    }
-    expect(hooks.hooks.Stop?.[0]?.hooks?.[0]?.command).toContain(
-      '/home/dev/.local/share/orca/codex-runtime-home/home/.orca/agent-hooks/codex-hook.sh'
-    )
-    expect(fs.files.get(`${runtimeHome}/config.toml`)).toContain(
-      `${runtimeHome}/hooks.json:stop:0:0`
-    )
-  })
-
-  it('defers redirected Codex trust writes until config.toml exists', async () => {
-    const runtimeHome = '/home/dev/.local/share/orca/codex-runtime-home/home'
-    const { sftp, fs } = createFakeSftp()
-
-    const status = await new CodexHookService().installRemote(sftp, '/home/dev', {
-      codexHomeDir: runtimeHome,
-      deferTrustUntilConfigToml: true
-    })
-
-    expect(status.state).toBe('installed')
-    expect(status.detail).toContain('deferred')
-    expect(fs.files.get(`${runtimeHome}/hooks.json`)).toContain('codex-hook.sh')
-    expect(fs.files.has(`${runtimeHome}/config.toml`)).toBe(false)
-  })
-
   // Why: agents once shipped a working installRemote without being registered in
   // REMOTE_MANAGED_HOOK_INSTALLERS, so their status silently never appeared over SSH (issue #7253). Guard the whole bug class, not one agent:
   // every locally-managed hook service that implements installRemote MUST be
   // wired into the remote installer.
   it('registers every managed agent that implements installRemote in the remote installer (issue #7253)', () => {
     const servicesByAgent = new Map<string, { installRemote?: unknown }>([
-      ['claude', claudeHookService],
-      ['codex', codexHookService]
+      ['claude', claudeHookService]
     ])
 
     // Guard against a service silently missing from the map above as new agents land.
@@ -263,14 +164,11 @@ describe('remote hook service installers', () => {
     const { sftp, fs } = createFakeSftp()
 
     const results = await installRemoteManagedAgentHooks(sftp, '/home/dev', {
-      agents: ['codex']
+      agents: ['claude']
     })
 
-    expect(results.map((result) => result.agent)).toEqual(['codex'])
-    const paths = [...fs.files.keys(), ...fs.dirs]
-    for (const unusedHome of ['.claude']) {
-      expect(paths.some((path) => path.includes(`/home/dev/${unusedHome}`))).toBe(false)
-    }
+    expect(results.map((result) => result.agent)).toEqual(['claude'])
+    expect(fs.files.has('/home/dev/.claude/settings.json')).toBe(true)
   })
 
   it('fails closed when the agent allowlist is omitted or empty (issue #11641)', async () => {
@@ -286,21 +184,10 @@ describe('remote hook service installers', () => {
     expect([...fs.dirs]).toEqual(['/'])
   })
 
-  it('stops before the next installer when its relay request is cancelled', async () => {
+  it('does not start an installer once its relay request is cancelled', async () => {
     const controller = new AbortController()
-    const claudeInstall = vi
-      .spyOn(claudeHookService, 'installRemote')
-      .mockImplementation(async () => {
-        controller.abort()
-        return {
-          agent: 'claude',
-          state: 'installed',
-          configPath: '/home/dev/.claude/settings.json',
-          managedHooksPresent: true,
-          detail: null
-        }
-      })
-    const codexInstall = vi.spyOn(codexHookService, 'installRemote')
+    controller.abort()
+    const claudeInstall = vi.spyOn(claudeHookService, 'installRemote')
     try {
       const { sftp } = createFakeSftp()
 
@@ -310,11 +197,9 @@ describe('remote hook service installers', () => {
           agents: REMOTE_MANAGED_HOOK_INSTALLER_AGENTS
         })
       ).rejects.toMatchObject({ name: 'AbortError' })
-      expect(claudeInstall).toHaveBeenCalledTimes(1)
-      expect(codexInstall).not.toHaveBeenCalled()
+      expect(claudeInstall).not.toHaveBeenCalled()
     } finally {
       claudeInstall.mockRestore()
-      codexInstall.mockRestore()
     }
   })
 })

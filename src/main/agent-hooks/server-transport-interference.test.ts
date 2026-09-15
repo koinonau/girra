@@ -107,9 +107,9 @@ describe('AgentHookServer transport interference', () => {
     await postTruncatedHook(port, token)
     expect(reports).toEqual([])
 
-    await postTruncatedHook(port, token, { pathname: '/hook/codex' })
+    await postTruncatedHook(port, token, { pathname: '/hook/opencode' })
     expect(reports).toEqual([
-      { count: 3, source: 'codex', bytesRead: expect.any(Number), contentLength: 100_000 }
+      { count: 3, source: 'opencode', bytesRead: expect.any(Number), contentLength: 100_000 }
     ])
     expect(warn.mock.calls.flat().join(' ')).toContain('security software')
 

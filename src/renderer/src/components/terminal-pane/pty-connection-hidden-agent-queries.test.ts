@@ -144,7 +144,7 @@ describe('connectPanePty', () => {
     await restoreTerminalTestGlobals()
   })
 
-  it('keeps hidden Codex redraw floods off the live xterm path', async () => {
+  it('keeps hidden agent redraw floods off the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -161,18 +161,18 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
 
     vi.useFakeTimers()
     try {
-      const hiddenCodexRedraw = `\x1b[?2026h\x1b[2J\x1b[H${'codex redraw '.repeat(8_000)}`
-      capturedDataCallback.current?.(hiddenCodexRedraw)
+      const hiddenAgentRedraw = `\x1b[?2026h\x1b[2J\x1b[H${'agent redraw '.repeat(8_000)}`
+      capturedDataCallback.current?.(hiddenAgentRedraw)
       vi.advanceTimersByTime(50)
 
-      expect(pane.terminal.write).not.toHaveBeenCalledWith(hiddenCodexRedraw)
+      expect(pane.terminal.write).not.toHaveBeenCalledWith(hiddenAgentRedraw)
       expect(window.api.pty.getMainBufferSnapshot).not.toHaveBeenCalled()
     } finally {
       vi.useRealTimers()
@@ -181,7 +181,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps hidden Codex terminal query chunks on the live xterm path', async () => {
+  it('keeps hidden agent terminal query chunks on the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -198,7 +198,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -210,7 +210,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps only coalesced hidden Codex terminal queries on the live xterm path', async () => {
+  it('keeps only coalesced hidden agent terminal queries on the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -227,12 +227,12 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
 
-    const coalescedChunk = `\x1b[c\x1b[?2026h\x1b[2J\x1b[H${'codex redraw '.repeat(8_000)}`
+    const coalescedChunk = `\x1b[c\x1b[?2026h\x1b[2J\x1b[H${'agent redraw '.repeat(8_000)}`
     capturedDataCallback.current?.(coalescedChunk)
 
     expect(pane.terminal.write).toHaveBeenCalledWith('\x1b[c', expect.any(Function))
@@ -258,13 +258,13 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
 
     const queryBurst = '\x1b[c\x1b]11;?\x1b\\\x1b[>q\x1b[14t\x1b[16t'
-    const coalescedChunk = `${queryBurst}\x1b[?2026h${'codex redraw '.repeat(8_000)}`
+    const coalescedChunk = `${queryBurst}\x1b[?2026h${'agent redraw '.repeat(8_000)}`
     capturedDataCallback.current?.(coalescedChunk)
 
     expect(transport.sendInput).toHaveBeenCalledWith('\x1b]11;rgb:1111/1111/1111\x1b\\')
@@ -277,7 +277,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('answers adjacent hidden Codex OSC color queries directly', async () => {
+  it('answers adjacent hidden agent OSC color queries directly', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -294,7 +294,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -313,7 +313,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps split hidden Codex terminal queries on the live xterm path', async () => {
+  it('keeps split hidden agent terminal queries on the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -330,24 +330,24 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
 
     capturedDataCallback.current?.('\x1b[')
-    capturedDataCallback.current?.(`c\x1b[?2026h${'codex redraw '.repeat(8_000)}`)
+    capturedDataCallback.current?.(`c\x1b[?2026h${'agent redraw '.repeat(8_000)}`)
 
     expect(pane.terminal.write).toHaveBeenCalledWith('\x1b[c', expect.any(Function))
     expect(pane.terminal.write).not.toHaveBeenCalledWith(
-      `c\x1b[?2026h${'codex redraw '.repeat(8_000)}`,
+      `c\x1b[?2026h${'agent redraw '.repeat(8_000)}`,
       expect.any(Function)
     )
 
     binding.dispose()
   })
 
-  it('keeps hidden Codex terminal queries split after ESC on the live xterm path', async () => {
+  it('keeps hidden agent terminal queries split after ESC on the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -364,24 +364,24 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     await flushAsyncTicks(6)
 
     capturedDataCallback.current?.('\x1b')
-    capturedDataCallback.current?.(`[c\x1b[?2026h${'codex redraw '.repeat(8_000)}`)
+    capturedDataCallback.current?.(`[c\x1b[?2026h${'agent redraw '.repeat(8_000)}`)
 
     expect(pane.terminal.write).toHaveBeenCalledWith('\x1b[c', expect.any(Function))
     expect(pane.terminal.write).not.toHaveBeenCalledWith(
-      `[c\x1b[?2026h${'codex redraw '.repeat(8_000)}`,
+      `[c\x1b[?2026h${'agent redraw '.repeat(8_000)}`,
       expect.any(Function)
     )
 
     binding.dispose()
   })
 
-  it('flushes pending hidden Codex query prefixes when the pane becomes visible', async () => {
+  it('flushes pending hidden agent query prefixes when the pane becomes visible', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -399,7 +399,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     try {
@@ -415,7 +415,7 @@ describe('connectPanePty', () => {
     }
   })
 
-  it('keeps split hidden-to-visible Codex stateful queries behind snapshot restore', async () => {
+  it('keeps split hidden-to-visible agent stateful queries behind snapshot restore', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -441,7 +441,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     try {
@@ -485,9 +485,9 @@ describe('connectPanePty', () => {
     mockStoreState.agentStatusByPaneKey[paneKey] = {
       state: 'working',
       prompt: '',
-      agentType: 'codex',
+      agentType: 'claude',
       paneKey,
-      terminalTitle: 'codex',
+      terminalTitle: 'claude',
       updatedAt: now,
       stateStartedAt: now,
       stateHistory: []
@@ -501,7 +501,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     try {
@@ -554,9 +554,9 @@ describe('connectPanePty', () => {
     mockStoreState.agentStatusByPaneKey[paneKey] = {
       state: 'working',
       prompt: '',
-      agentType: 'codex',
+      agentType: 'claude',
       paneKey,
-      terminalTitle: 'codex',
+      terminalTitle: 'claude',
       updatedAt: now,
       stateStartedAt: now,
       stateHistory: []
@@ -567,7 +567,7 @@ describe('connectPanePty', () => {
     const binding = connectPanePty(
       pane as never,
       createManager(1) as never,
-      createDeps({ isVisibleRef, startup: { command: 'codex' } }) as never
+      createDeps({ isVisibleRef, startup: { command: 'claude' } }) as never
     )
     try {
       await flushAsyncTicks(6)
@@ -616,7 +616,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     try {
@@ -671,7 +671,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'claude' }
       }) as never
     )
     try {
@@ -722,7 +722,7 @@ describe('connectPanePty', () => {
     const binding = connectPanePty(
       pane as never,
       manager as never,
-      createDeps({ isVisibleRef, startup: { command: 'codex' } }) as never
+      createDeps({ isVisibleRef, startup: { command: 'claude' } }) as never
     )
     try {
       await flushAsyncTicks(6)

@@ -42,13 +42,15 @@ describe('retired Codex account settings', () => {
       codexManagedAccounts: [{ id: 'account-1', managedHomePath: '/data/codex-accounts/a/home' }],
       activeCodexManagedAccountId: 'account-1',
       activeCodexManagedAccountIdsByRuntime: { host: 'account-1', wsl: {} },
-      skipCodexRateLimitResetConfirm: true
+      skipCodexRateLimitResetConfirm: true,
+      codexSessionSourceHome: { host: '/custom/codex' }
     })
     for (const key of [
       'codexManagedAccounts',
       'activeCodexManagedAccountId',
       'activeCodexManagedAccountIdsByRuntime',
-      'skipCodexRateLimitResetConfirm'
+      'skipCodexRateLimitResetConfirm',
+      'codexSessionSourceHome'
     ]) {
       expect(key in normalized).toBe(false)
     }

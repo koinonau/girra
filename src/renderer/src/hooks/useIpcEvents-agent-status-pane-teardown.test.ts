@@ -1,7 +1,6 @@
 import type * as ReactModule from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { AgentStatusClearIpcPayload } from '../../../shared/agent-status-types'
-import { YOLO_TUI_AGENT_ARGS } from '../../../shared/tui-agent-permissions'
 import {
   buildStoreState,
   expectWorktreeRouting,
@@ -92,85 +91,6 @@ describe('useIpcEvents agent status snapshot integration', () => {
     expect(setAgentStatus).not.toHaveBeenCalled()
     expect(updateTabTitle).not.toHaveBeenCalled()
     expect(observeAgentHookCompletionForNotification).not.toHaveBeenCalled()
-  })
-
-  it('keeps auto-approved Codex done statuses on the completion path', async () => {
-    const setAgentStatus = vi.fn()
-    const observeAgentHookCompletionForNotification = vi.fn()
-    const getAgentLaunchConfigForStatusMetadata = vi.fn((metadata: { launchToken?: string }) =>
-      metadata.launchToken === 'launch-yolo'
-        ? { agentArgs: YOLO_TUI_AGENT_ARGS.codex ?? '', agentEnv: {} }
-        : undefined
-    )
-    const onSetListenerRef: { current: ((data: AgentStatusSetData) => void) | null } = {
-      current: null
-    }
-
-    const storeState: StoreLike = buildStoreState({
-      setAgentStatus,
-      getAgentLaunchConfigForStatusMetadata,
-      workspaceSessionReady: true,
-      settings: { terminalFontSize: 13, notifications: { enabled: true, agentTaskComplete: true } },
-      tabsByWorktree: {
-        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Codex' }]
-      },
-      terminalLayoutsByTabId: {}
-    })
-
-    stubReactSyncEffect()
-    vi.doMock('../store', () => ({
-      useAppStore: {
-        subscribe: vi.fn(() => () => {}),
-        getState: () => storeState
-      }
-    }))
-    vi.doMock('./agent-hook-completion-notifications', () => ({
-      observeAgentHookCompletionForNotification,
-      resetAgentHookCompletionNotificationCoordinators: vi.fn(),
-      syncAgentHookCompletionNotificationsForStoreUpdate: vi.fn()
-    }))
-    stubAuxiliaryModules()
-    vi.stubGlobal(
-      'window',
-      buildWindowApi({
-        onSet: (cb) => {
-          onSetListenerRef.current = cb
-          return () => {}
-        }
-      })
-    )
-
-    const { useIpcEvents } = await import('./useIpcEvents')
-
-    useIpcEvents()
-    await Promise.resolve()
-
-    if (typeof onSetListenerRef.current !== 'function') {
-      throw new Error('Expected agentStatus.onSet listener to be registered')
-    }
-
-    onSetListenerRef.current({
-      paneKey: FUTURE_PANE_KEY,
-      tabId: 'tab-future',
-      worktreeId: 'wt-1',
-      state: 'done',
-      prompt: 'auto-approved task',
-      agentType: 'codex',
-      launchToken: 'launch-yolo',
-      lastAssistantMessage: 'Done.',
-      receivedAt: 1_700_000_000_500,
-      stateStartedAt: 1_699_999_999_500
-    })
-
-    expect(setAgentStatus).toHaveBeenCalledTimes(1)
-    expect(observeAgentHookCompletionForNotification).toHaveBeenCalledTimes(1)
-    expect(observeAgentHookCompletionForNotification).toHaveBeenCalledWith(
-      expect.objectContaining({
-        paneKey: FUTURE_PANE_KEY,
-        worktreeId: 'wt-1',
-        payload: expect.objectContaining({ state: 'done', agentType: 'codex' })
-      })
-    )
   })
 
   it('drops late push events for a recently closed terminal tab', async () => {

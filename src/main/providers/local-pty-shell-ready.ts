@@ -10,7 +10,6 @@ import {
   getPowerShellOsc133Bootstrap,
   isPowerShellExecutableName
 } from '../powershell-osc133-bootstrap'
-import { getFishCodexShellLaunchPreflight } from '../pty/codex-shell-launch-preflight'
 import { POSIX_SHELL_STARTUP_COMMAND_ENV } from '../pty/posix-shell-startup-command'
 import { getFishShellReadyInitCommand } from '../shell-templates'
 import {
@@ -52,7 +51,7 @@ function wrapperTreeUsable(): boolean {
 }
 
 /** Args that point bash at Orca's rcfile, or null when it is not usable. */
-export function getBashWrapperLaunchArgs(): string[] | null {
+function getBashWrapperLaunchArgs(): string[] | null {
   return shellReadyWrappersExist()
     ? ['--rcfile', `${getShellReadyWrapperRoot()}/bash/rcfile`]
     : null
@@ -138,11 +137,11 @@ export function getShellLaunchConfig(
       args: [
         '-l',
         '-C',
-        `${getFishShellReadyInitCommand(
+        getFishShellReadyInitCommand(
           SHELL_READY_MARKER_ESCAPED,
           features.includes('ready'),
           startupCommand !== undefined
-        )}\n${getFishCodexShellLaunchPreflight()}`
+        )
       ],
       env:
         startupCommand !== undefined ? { [POSIX_SHELL_STARTUP_COMMAND_ENV]: startupCommand } : {},

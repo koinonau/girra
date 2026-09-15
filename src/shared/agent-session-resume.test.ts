@@ -30,7 +30,6 @@ describe('agent session resume metadata', () => {
 
   it.each([
     ['claude', { session_id: 'claude-session' }, { key: 'session_id', id: 'claude-session' }],
-    ['codex', { session_id: 'codex-session' }, { key: 'session_id', id: 'codex-session' }],
     ['opencode', { sessionID: 'opencode-session' }, { key: 'session_id', id: 'opencode-session' }],
     [
       'pi',
@@ -81,7 +80,7 @@ describe('agent session resume metadata', () => {
   it('rejects unsafe ids', () => {
     expect(normalizeAgentProviderSession({ key: 'session_id', id: 'bad\nid' })).toBeNull()
     expect(normalizeAgentProviderSession({ key: 'session_id', id: '--last' })).toBeNull()
-    expect(extractAgentProviderSession('codex', { session_id: '--last' })).toBeNull()
+    expect(extractAgentProviderSession('claude', { session_id: '--last' })).toBeNull()
     expect(normalizeAgentProviderSession({ key: 'session_id', id: 'ok' })).toEqual({
       key: 'session_id',
       id: 'ok'
@@ -110,7 +109,7 @@ describe('agent session resume metadata', () => {
     expect(getAgentResumeArgv('devin', { key: 'conversation_id', id: 'x' })).toBeNull()
   })
 
-  it('captures the hook transcript_path for native-chat agents (claude/codex)', () => {
+  it('captures the hook transcript_path for claude', () => {
     expect(
       extractAgentProviderSession('claude', {
         session_id: 'cs',
@@ -122,7 +121,7 @@ describe('agent session resume metadata', () => {
       transcriptPath: '/home/u/.claude/projects/slug/real.jsonl'
     })
     expect(
-      extractAgentProviderSession('codex', { session_id: 'xs', transcriptPath: '/x/r.jsonl' })
+      extractAgentProviderSession('claude', { session_id: 'xs', transcriptPath: '/x/r.jsonl' })
     ).toEqual({ key: 'session_id', id: 'xs', transcriptPath: '/x/r.jsonl' })
   })
 

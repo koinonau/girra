@@ -1,5 +1,4 @@
 import type { AgentTrustPreset } from './agent-trust-presets'
-import { upsertProjectTrustLevelInContent } from './codex/config-toml-trust'
 import { getActiveMultiplexer } from './ssh/ssh-target-registry'
 import { getSshFilesystemProvider } from './providers/ssh-filesystem-dispatch'
 import type { IFilesystemProvider } from './providers/types'
@@ -20,9 +19,7 @@ export async function markRemoteAgentWorkspaceTrusted(args: {
   }
 
   const workspacePath = await canonicalizeRemoteWorkspacePath(fsProvider, args.workspacePath)
-  if (args.preset === 'codex') {
-    await markRemoteCodexProjectTrusted(fsProvider, home, workspacePath)
-  } else if (args.preset === 'copilot') {
+  if (args.preset === 'copilot') {
     await markRemoteCopilotFolderTrusted(fsProvider, home, workspacePath)
   }
 }
@@ -71,26 +68,6 @@ async function readRemoteTextFile(
   } catch {
     return ''
   }
-}
-
-async function markRemoteCodexProjectTrusted(
-  fsProvider: IFilesystemProvider,
-  remoteHome: string,
-  workspacePath: string
-): Promise<void> {
-  const codexDir = `${remoteHome}/.codex`
-  const configPath = `${codexDir}/config.toml`
-  const existing = await readRemoteTextFile(fsProvider, configPath)
-  const updated = upsertProjectTrustLevelInContent(existing, workspacePath, 'trusted', {
-    // Why: workspacePath was resolved by the remote filesystem provider; local
-    // realpath would canonicalize the wrong machine on SSH.
-    alreadyCanonical: true
-  })
-  if (updated === existing) {
-    return
-  }
-  await fsProvider.createDir(codexDir)
-  await fsProvider.writeFile(configPath, updated)
 }
 
 async function markRemoteCopilotFolderTrusted(

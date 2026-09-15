@@ -8,7 +8,7 @@ import {
 import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
 import type { SleepingAgentLaunchConfig } from '../../../shared/agent-session-resume'
 import type { LaunchSource } from '../../../shared/worktree/launch-types'
-import type { StartupCommandDelivery } from '../../../shared/codex-startup-delivery'
+import type { StartupCommandDelivery } from '../../../shared/startup-command-delivery'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import {
   resolveTuiAgentLaunchArgs,

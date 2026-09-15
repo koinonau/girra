@@ -6,7 +6,6 @@ import {
   getPowerShellOsc133Bootstrap,
   isPowerShellExecutableName
 } from '../powershell-osc133-bootstrap'
-import { getFishCodexShellLaunchPreflight } from '../pty/codex-shell-launch-preflight'
 import { getFishShellReadyInitCommand } from '../shell-templates'
 import {
   encodeShellStartupFeatures,
@@ -181,11 +180,7 @@ export function getShellLaunchConfig(
   // selection is baked into the init command, so fish needs no feature env var.
   if (shellName === 'fish' && features.includes('ready')) {
     return {
-      args: [
-        '-l',
-        '-C',
-        `${getFishShellReadyInitCommand(SHELL_READY_MARKER)}\n${getFishCodexShellLaunchPreflight()}`
-      ],
+      args: ['-l', '-C', getFishShellReadyInitCommand(SHELL_READY_MARKER)],
       env: {},
       supportsReadyMarker: true
     }

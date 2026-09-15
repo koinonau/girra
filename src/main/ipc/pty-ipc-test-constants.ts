@@ -1,7 +1,6 @@
 import { it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import { join, posix } from 'node:path'
-import { getBundledLauncherPath } from '../cli/bundled-cli-launcher-path'
+import { posix } from 'node:path'
 import { resolveWindowsShellLaunchArgs } from '../providers/windows-shell-args'
 
 /** The narrow slice of vitest's test API these suites use; keeps `it`/`it.skip` interchangeable. */
@@ -14,9 +13,6 @@ export type PlatformGatedTest = (
 export const isWindowsHost = process.platform === 'win32'
 export const posixOnlyIt: PlatformGatedTest = isWindowsHost ? it.skip : it
 export const TEST_MANAGED_ROOT = isWindowsHost ? 'C:\\managed' : '/managed'
-export const BUNDLED_RESOURCES_PATH = join('/tmp', 'orca-bundled-resources')
-// Why: this suite forces darwin before every test, including on Linux CI.
-export const BUNDLED_CLI_PATH = getBundledLauncherPath('darwin', BUNDLED_RESOURCES_PATH) as string
 // Why: bare shells no longer mkdir ~/.omp; OMP status lives under userData (#10196).
 export const expectedOmpStatusExtension = posix.join(
   '/tmp/orca-user-data',
@@ -36,10 +32,6 @@ export function powerShellOsc133ArgsForCwd(cwd: string = DEFAULT_WINDOWS_PTY_CWD
   return resolveWindowsShellLaunchArgs(RESOLVED_WINDOWS_POWERSHELL, cwd, cwd).shellArgs
 }
 export const POWERSHELL_OSC133_ARGS = powerShellOsc133ArgsForCwd()
-export const TEST_CODEX_HOME =
-  process.platform === 'win32'
-    ? 'C:\\Users\\test\\AppData\\Roaming\\orca\\codex-runtime-home\\home'
-    : '/tmp/orca-codex-home'
 
 /** What node-pty's onData/onExit registrations hand back. */
 export type MockDisposable = { dispose: Mock }

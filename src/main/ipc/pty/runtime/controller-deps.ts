@@ -3,17 +3,8 @@ import type { OrcaRuntimeService } from '../../../runtime/orca-runtime'
 import type { Store } from '../../../persistence'
 import type { IPtyProvider } from '../../../providers/types'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
-import type { TuiAgent } from '../../../../shared/tui-agent'
-import type { AgentProviderSessionMetadata } from '../../../../shared/agent-session-resume'
 import type { TerminalStartupCwdMissingDirFallback } from '../../../../shared/terminal-startup-cwd'
-import type { AccountSelectionTarget } from '../../../../shared/account-selection-target'
-import type { CodexSessionResumePreparation } from '../../../codex/codex-session-resume-home'
-import type {
-  GetSelectedCodexHomePath,
-  PrepareClaudeAuth,
-  PrepareCodexSessionResume
-} from '../host-env/types'
-import type { CodexResumeLaunch, PreparedCodexResumeHome } from '../host-env/codex-resume'
+import type { PrepareClaudeAuth } from '../host-env/types'
 import type { StablePaneOwner } from '../pane/stable-owner'
 import type { AdoptStablePaneArgs, AdoptStablePaneResult } from '../ipc/spawn-types'
 import type { finishPtyShutdown } from '../provider/liveness'
@@ -24,27 +15,6 @@ export type PtyRuntimeControllerDeps = {
   adoptStablePane: (args: AdoptStablePaneArgs) => Promise<AdoptStablePaneResult | null>
   getLocalPtyStartupPromise: (connectionId?: string | null) => Promise<void> | undefined
   getLocalPtyProviderStartupPromise: (connectionId?: string | null) => Promise<void> | undefined
-  prepareCodexResumeHome: (args: {
-    connectionId?: string | null
-    launchAgent?: TuiAgent
-    providerSession?: AgentProviderSessionMetadata
-    target: AccountSelectionTarget
-    launchEnv?: NodeJS.ProcessEnv
-    workspacePath?: string
-  }) => PreparedCodexResumeHome | null
-  resolveCodexResumeLaunch: (
-    command: string | undefined,
-    prepared: PreparedCodexResumeHome
-  ) => Promise<CodexResumeLaunch>
-  noCodexResumeLaunch: (command: string | undefined) => CodexResumeLaunch
-  reconcileSharedRuntimeResumeHome: (
-    resumeHome: Extract<CodexSessionResumePreparation, { outcome: 'resume' }>,
-    resolveCurrent: () => string | null | Promise<string | null>
-  ) => Promise<string>
-  stripSequencedStartupResumeArgv: <T extends Record<string, string> | undefined>(
-    env: T,
-    launch: CodexResumeLaunch
-  ) => T
   assertFolderWorkspacePtyPathUsable: (worktreeId: string | undefined) => Promise<void> | void
   resolvePtySpawnStartupCwd: (
     worktreeId: string | undefined,
@@ -73,11 +43,7 @@ export type PtyRuntimeControllerDeps = {
   sendPtySpawnedToRenderer: (id: string) => void
   finishPtyShutdown: typeof finishPtyShutdown
   getSettings?: () => GlobalSettings | undefined
-  getSelectedCodexHomePath?: GetSelectedCodexHomePath
   prepareClaudeAuth?: PrepareClaudeAuth
-  options?: {
-    prepareCodexSessionResume?: PrepareCodexSessionResume
-  }
   trustedTerminalHandleEnv: Set<string>
   retiredRejectedPtyIds: Map<string, NodeJS.Timeout>
   reversibleStopOwnersByPtyId: Map<string, number>

@@ -189,7 +189,7 @@ function captureAgentStatuses(events: CapturedStatus[]): void {
 
 function makeEnvelope(overrides: Partial<AgentHookRelayEnvelope> = {}): AgentHookRelayEnvelope {
   return {
-    source: 'codex',
+    source: 'claude',
     paneKey: `tab-ssh:${SSH_LEAF_ID}`,
     tabId: 'tab-ssh',
     worktreeId: 'wt-ssh',
@@ -199,7 +199,7 @@ function makeEnvelope(overrides: Partial<AgentHookRelayEnvelope> = {}): AgentHoo
     payload: {
       state: 'working',
       prompt: 'remote prompt',
-      agentType: 'codex'
+      agentType: 'claude'
     },
     ...overrides
   }
@@ -284,7 +284,7 @@ describe('SshRelaySession agent hooks over a fake relay transport', () => {
       payload: {
         state: 'working',
         prompt: 'remote prompt',
-        agentType: 'codex',
+        agentType: 'claude',
         toolName: undefined
       }
     })
@@ -484,7 +484,7 @@ describe('SshRelaySession agent hooks over a fake relay transport', () => {
     await session.establish({} as SshConnection)
 
     relay.notifyAgentHook({
-      source: 'codex',
+      source: 'claude',
       paneKey: `tab-bad:${BAD_LEAF_ID}`,
       connectionId: null,
       env: REMOTE_AGENT_HOOK_ENV,
@@ -492,7 +492,7 @@ describe('SshRelaySession agent hooks over a fake relay transport', () => {
       payload: {
         state: 'not-a-real-state',
         prompt: 'should not be cached',
-        agentType: 'codex'
+        agentType: 'claude'
       }
     })
 

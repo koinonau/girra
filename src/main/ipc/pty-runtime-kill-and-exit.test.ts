@@ -41,9 +41,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow, installDaemonTestProvider, installObservableDaemonTestProvider } =
@@ -329,17 +326,9 @@ describe('registerPtyHandlers', () => {
   })
   it('waits for the desktop startup barrier before renderer local spawns resolve the provider', async () => {
     const barrier = makeDeferred()
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        awaitLocalPtyStartup: () => barrier.promise
-      }
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, undefined, {
+      awaitLocalPtyStartup: () => barrier.promise
+    })
 
     const pendingSpawn = handlers.get('pty:spawn')!(null, {
       cols: 80,
@@ -363,18 +352,10 @@ describe('registerPtyHandlers', () => {
     const awaitLocalPtyStartup = vi.fn(() => new Promise<void>(() => {}))
     const awaitLocalPtyProviderStartup = vi.fn(() => barrier.promise)
     const fallbackShutdown = vi.spyOn(getLocalPtyProvider(), 'shutdown')
-    registerPtyHandlers(
-      mainWindow as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        awaitLocalPtyStartup,
-        awaitLocalPtyProviderStartup
-      }
-    )
+    registerPtyHandlers(mainWindow as never, undefined, undefined, undefined, undefined, {
+      awaitLocalPtyStartup,
+      awaitLocalPtyProviderStartup
+    })
 
     const daemonSessionId = 'wt-1@@11111111-1111-1111-1111-111111111111'
     const pendingKill = handlers.get('pty:kill')!(null, { id: daemonSessionId }) as Promise<void>
@@ -399,17 +380,9 @@ describe('registerPtyHandlers', () => {
     const awaitLocalPtyProviderStartup = vi.fn(() => barrier.promise)
     const fallbackShutdown = vi.spyOn(getLocalPtyProvider(), 'shutdown')
     const runtime = { setPtyController: vi.fn(), onPtyExit: vi.fn() }
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        awaitLocalPtyProviderStartup
-      }
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, undefined, {
+      awaitLocalPtyProviderStartup
+    })
     const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
       kill: (ptyId: string) => boolean
     }
@@ -432,17 +405,9 @@ describe('registerPtyHandlers', () => {
     const awaitLocalPtyProviderStartup = vi.fn(() => barrier.promise)
     const fallbackShutdown = vi.spyOn(getLocalPtyProvider(), 'shutdown')
     const runtime = { setPtyController: vi.fn(), onPtyExit: vi.fn() }
-    registerPtyHandlers(
-      mainWindow as never,
-      runtime as never,
-      undefined,
-      undefined,
-      undefined,
-      undefined,
-      {
-        awaitLocalPtyProviderStartup
-      }
-    )
+    registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, undefined, {
+      awaitLocalPtyProviderStartup
+    })
     const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
       stopAndWait: (ptyId: string) => Promise<boolean>
     }
@@ -477,17 +442,9 @@ describe('registerPtyHandlers', () => {
     }
 
     try {
-      registerPtyHandlers(
-        mainWindow as never,
-        runtime as never,
-        undefined,
-        undefined,
-        undefined,
-        undefined,
-        {
-          awaitLocalPtyStartup: () => barrier.promise
-        }
-      )
+      registerPtyHandlers(mainWindow as never, runtime as never, undefined, undefined, undefined, {
+        awaitLocalPtyStartup: () => barrier.promise
+      })
 
       const pendingSpawn = handlers.get('pty:spawn')!(null, {
         cols: 80,

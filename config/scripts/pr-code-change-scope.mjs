@@ -199,7 +199,6 @@ const WINDOWS_PACKAGE_TESTS = [
   'src/shared/secure-file-fsync-flags.test.ts',
   'src/shared/secure-path-windows-acl.win32.test.ts',
   'src/main/runtime/unreadable-secret-store-preservation.win32.test.ts',
-  'src/main/ipc/pty-spawn-env-codex-resume-provenance.test.ts',
   'src/relay/windows-port-scan.win32.test.ts'
 ]
 

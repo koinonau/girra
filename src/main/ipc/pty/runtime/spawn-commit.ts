@@ -2,7 +2,7 @@ import { isValidTerminalTabId } from '../../../../shared/terminal-tab-id'
 import { ptyOwnership, ptyIncarnationById, deletePtyOwnership } from '../provider/ownership-state'
 import { ptySizes } from '../delivery/visibility-state'
 import { commitRuntimePtySize } from './spawn-commit-pty-size'
-import { shouldSkipCodexHomeEnvForWindowsShell } from '../host-env/codex-home'
+import { isWslShellOrCwd } from '../host-env/account-selection-target'
 import { markClaudePtySpawned } from '../../../claude-accounts/live-pty-gate'
 import { registerPty } from '../../../memory/pty-registry'
 import { rememberPaneKeyForPty } from '../pane/key-state'
@@ -179,9 +179,7 @@ export async function commitRuntimePtySpawn(ctx: RuntimePtySpawnState) {
             ...(providerReattachLaunchIdentity ? { providerReattachLaunchIdentity } : {})
           }
         : undefined,
-      !args.connectionId
-        ? shouldSkipCodexHomeEnvForWindowsShell(ctx.daemonShellOverride, ctx.cwd)
-        : undefined
+      !args.connectionId ? isWslShellOrCwd(ctx.daemonShellOverride, ctx.cwd) : undefined
     )
   } else {
     // Why: non-worktree PTYs have no later surface-registration phase to clear admission intent.

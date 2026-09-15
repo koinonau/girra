@@ -22,7 +22,7 @@ export function shouldActivateDesktopForSecondInstance(argv: readonly string[] =
 /**
  * Why: Orca writes two canonical discovery files into `<userData>/`:
  * `orca-runtime.json` (RPC endpoint + authToken for the bundled CLI) and
- * `agent-hooks/endpoint.env` (hook port + token for cursor-agent/claude/codex
+ * `agent-hooks/endpoint.env` (hook port + token for cursor-agent/claude
  * scripts). Without a single-instance lock, every AppImage/.app double-click
  * boots a fresh Electron main that clobbers both files. When the most recent
  * instance quits, metadata points at a dead pid and `orca status` reports

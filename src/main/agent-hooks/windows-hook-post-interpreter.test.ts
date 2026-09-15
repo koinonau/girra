@@ -30,17 +30,14 @@ vi.mock('os', async (importOriginal) => {
 })
 
 import { ClaudeHookService } from '../claude/hook-service'
-import { CodexHookService } from '../codex/hook-service'
 
 // Why: only agents whose managed Windows script is a .cmd batch file.
 const BATCH_SCRIPT_INSTALLERS = [
-  { agent: 'claude', install: () => new ClaudeHookService().install() },
-  { agent: 'codex', install: () => new CodexHookService().install() }
+  { agent: 'claude', install: () => new ClaudeHookService().install() }
 ] as const
 
-// Why: the Codex installer awaits an app-server trust-grant session, so the
-// override has to stay pinned across the await instead of being restored by a
-// synchronous `finally` while the install is still running.
+// Why: installers may be async, so the override has to stay pinned across the
+// await instead of being restored by a synchronous `finally` mid-install.
 async function withPlatform<T>(platform: NodeJS.Platform, run: () => T | Promise<T>): Promise<T> {
   const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform')
   Object.defineProperty(process, 'platform', { configurable: true, value: platform })
@@ -59,7 +56,7 @@ describe('Windows managed hook post interpreter', () => {
   beforeEach(() => {
     previousUserDataPath = process.env.ORCA_USER_DATA_PATH
     isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-interpreter-user-data-'))
-    // Why: Orca-managed Codex hooks resolve through ORCA_USER_DATA_PATH before the mocked
+    // Why: Orca-managed hook paths can resolve through ORCA_USER_DATA_PATH before the mocked
     // home; an inherited live path would let this test rewrite the developer's own hooks.
     process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
     home = mkdtempSync(join(tmpdir(), 'orca-hook-interpreter-'))

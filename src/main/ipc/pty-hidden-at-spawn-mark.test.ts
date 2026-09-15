@@ -37,9 +37,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const {
@@ -273,7 +270,7 @@ describe('registerPtyHandlers', () => {
       spawnMock.mockReturnValue(mockProc.proc)
 
       try {
-        registerPtyHandlers(mainWindow as never, undefined, undefined, (() => settings) as never)
+        registerPtyHandlers(mainWindow as never, undefined, (() => settings) as never)
         const spawnResult = (await handlers.get('pty:spawn')!(null, {
           cols: 80,
           rows: 24,

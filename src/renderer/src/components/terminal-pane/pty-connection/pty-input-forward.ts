@@ -19,7 +19,6 @@ import {
 } from '@/lib/pane-manager/pane-pty-resize-hold'
 
 import { FOREGROUND_GRID_DRIFT_CHECK_MIN_MS } from './foreground-output-budgets'
-import { TERMINAL_FOCUS_IN_SEQUENCE, TERMINAL_FOCUS_OUT_SEQUENCE } from './foreground-output-scan'
 import { isRemoteRuntimePtyId } from './paired-parked-terminal-restore'
 
 import type { ConnectPanePtySession } from './connect-pane-pty-session'
@@ -48,15 +47,6 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
     // explicit Take back action owns restoring desktop input and dimensions.
     if (currentPtyId && isPtyLocked(currentPtyId)) {
       session.clearPendingTerminalInputIntent()
-      return
-    }
-    if (
-      session.isNativeWindowsConpty &&
-      session.suppressNativeWindowsIdleCodexFocusReports &&
-      (data === TERMINAL_FOCUS_IN_SEQUENCE || data === TERMINAL_FOCUS_OUT_SEQUENCE)
-    ) {
-      // Why: Codex can leave focus reporting armed after a Windows turn, but
-      // disabling the mode would permanently silence focus events on resume.
       return
     }
     // Why: xterm answers CPR/DSR/DA queries natively through this same onData

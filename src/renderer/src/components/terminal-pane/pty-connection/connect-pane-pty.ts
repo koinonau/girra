@@ -8,8 +8,6 @@ import { RESET_TERMINAL_CURSOR_STYLE } from '../../../../../shared/terminal-mode
 import { writeTerminalOutput } from '@/lib/pane-manager/pane-terminal-output-scheduler'
 import { createTerminalStructuralReplayCoordinator } from '@/lib/pane-manager/terminal-structural-replay-coordinator'
 import { makePaneKey } from '../../../../../shared/stable-pane-id'
-import type { AgentType } from '../../../../../shared/agent-status-types'
-import { resolveCommittedTitleAgentType } from '@/lib/pane-agent-evidence'
 
 import { shouldWritePtyOutputForeground } from './foreground-output-scan'
 import { exposeE2eTerminalPtyOutputDebug } from './e2e-terminal-pty-harness'
@@ -118,15 +116,6 @@ export function connectPanePty(
   // exists. Start with the shared scheduler, then switch to the PTY writer
   // below so hidden-tab resets keep backlog-recovery callbacks and byte order.
   session.idleAgentTerminalModeReset = RESET_TERMINAL_CURSOR_STYLE
-  session.suppressNativeWindowsIdleCodexFocusReports = false
-  session.setFocusReportSuppressionForAgentCompletion = (
-    title: string | undefined,
-    agentType: AgentType | undefined
-  ): void => {
-    const titleAgentType = resolveCommittedTitleAgentType(title ?? '')
-    session.suppressNativeWindowsIdleCodexFocusReports =
-      agentType && agentType !== 'unknown' ? agentType === 'codex' : titleAgentType === 'codex'
-  }
   session.queueAgentIdleTerminalModeReset = (): void => {
     if (session.disposed) {
       return

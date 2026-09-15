@@ -37,9 +37,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const { handlers, mainWindow } = setupPtyIpcSuite()
@@ -307,7 +304,6 @@ describe('registerPtyHandlers', () => {
           runtime as never,
           undefined,
           undefined,
-          undefined,
           store as never
         )
         const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
@@ -356,7 +352,6 @@ describe('registerPtyHandlers', () => {
           runtime as never,
           undefined,
           undefined,
-          undefined,
           store as never
         )
         const controller = runtime.setPtyController.mock.calls[0]?.[0] as {
@@ -385,7 +380,6 @@ describe('registerPtyHandlers', () => {
         registerPtyHandlers(
           mainWindow as never,
           runtime as never,
-          undefined,
           undefined,
           undefined,
           store as never
@@ -441,7 +435,6 @@ describe('registerPtyHandlers', () => {
         registerPtyHandlers(
           mainWindow as never,
           runtime as never,
-          undefined,
           undefined,
           undefined,
           store as never

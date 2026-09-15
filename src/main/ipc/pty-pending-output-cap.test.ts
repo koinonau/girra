@@ -32,9 +32,6 @@ vi.mock('../memory/pty-registry', () =>
 vi.mock('../agent-hooks/migration-unsupported-pty-state', () =>
   import('./pty-ipc-mock-registry').then((m) => m.migrationUnsupportedPtyModuleMock())
 )
-vi.mock('../codex/codex-state-db-backfill-recovery', () =>
-  import('./pty-ipc-mock-registry').then((m) => m.codexBackfillRecoveryModuleMock())
-)
 
 describe('registerPtyHandlers', () => {
   const {
@@ -156,7 +153,7 @@ describe('registerPtyHandlers', () => {
 
     try {
       // 50k-row scrollback ⇒ 6 MB pending cap instead of the 2 MB floor.
-      registerPtyHandlers(mainWindow as never, undefined, undefined, (() => ({
+      registerPtyHandlers(mainWindow as never, undefined, (() => ({
         terminalScrollbackRows: 50_000
       })) as never)
       await handlers.get('pty:spawn')!(null, { cols: 80, rows: 24, cwd: '/tmp' })

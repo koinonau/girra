@@ -183,11 +183,10 @@ export function extractAgentProviderSession(
   payload: Record<string, unknown>
 ): AgentProviderSessionMetadata | null {
   switch (source) {
-    // Native-chat agents: also capture the hook's authoritative transcript_path,
+    // Claude: also capture the hook's authoritative transcript_path,
     // since recent Claude Code names the transcript file with a UUID that differs
     // from the hook session_id (so the id-based glob no longer finds it).
-    case 'claude':
-    case 'codex': {
+    case 'claude': {
       const id = readSessionId(payload, ['session_id'])
       return id ? withTranscriptPath({ key: 'session_id', id }, payload) : null
     }
