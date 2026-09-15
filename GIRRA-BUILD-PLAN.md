@@ -70,9 +70,13 @@ Split into pull requests. Phase 4a took the hook integrations (94 files, 20,455 
 
 Last, when you know the codebase. 125 files reference it, `src/shared` carries Codex-shaped types, and the rate-limit and AI Vault code branch on provider. Budget more time here than for phases 1 to 4 combined.
 
+Measured 2026-09-15: 1,086 production and 1,465 test files mention Codex. `src/main/codex-accounts/runtime-home-service*` is the hub most other Codex code imports. Sub-phases, in order: 5a accounts, managed homes, reset credits, rate-limit probing, usage, CLI lock and per-pane account registry; 5b hooks, trust, config.toml sync and the shell-launch preflight (the tree still ticks the preflight); 5c session backfill, migration, index heal and state-DB recovery; 5d app-server runtime, structured sessions, rewind, subagents, native chat and AI Vault scanners; 5e launch roster entries, after the roster decision.
+
 ### Phase 6. Relocation
 
 Move `Unified usage dashboard` out of `components/feature-wall/`. You cut the marketing directory but kept the dashboard, and it is the only real feature in there.
+
+Done 2026-09-15, differently: `UsagePage.tsx` was a marketing animation, so it went with the feature wall, contextual tours and first-run onboarding, which no earlier phase had covered (189 files deleted, 27,662 lines removed). The setup guide checklist and feature tips visuals moved out.
 
 ### Phase 7. Strip the Orca identity
 

@@ -5,13 +5,11 @@ import {
 } from '../../../../shared/feature-tips'
 import type { CliInstallStatus } from '../../../../shared/cli-install-types'
 import type { FeatureInteractionState } from '../../../../shared/feature-interactions'
-import type { OnboardingState } from '../../../../shared/onboarding-state-types'
-import { shouldShowOnboarding } from '../onboarding/should-show-onboarding'
 
 export type FeatureTipsAppOpenDecision =
   | { kind: 'open'; tipId: FeatureTipId }
   | { kind: 'skip' }
-  | { kind: 'suppress-for-onboarding' }
+  | { kind: 'suppress-for-first-run' }
 
 export function isCliFeatureTipCompleted(status: CliInstallStatus): boolean {
   // Why: unsupported launch modes cannot complete setup, but an installed
@@ -24,24 +22,27 @@ export function getFeatureTipsAppOpenDecision(args: {
   cliInstalled: boolean | null
   featureTipsSeenIds: readonly FeatureTipId[]
   featureInteractions: FeatureInteractionState
-  onboarding: OnboardingState | null
   persistedUIReady: boolean
+  workspaceSessionReady: boolean
+  hasProjects: boolean
   promptedThisSession: boolean
-  suppressedByOnboardingThisSession: boolean
+  suppressedForFirstRunThisSession: boolean
 }): FeatureTipsAppOpenDecision {
-  if (args.onboarding !== null && shouldShowOnboarding(args.onboarding)) {
-    return { kind: 'suppress-for-onboarding' }
-  }
-
   if (
     args.promptedThisSession ||
-    args.suppressedByOnboardingThisSession ||
+    args.suppressedForFirstRunThisSession ||
     !args.persistedUIReady ||
-    args.onboarding === null ||
-    args.activeModal !== 'none' ||
-    args.cliInstalled === null ||
-    shouldShowOnboarding(args.onboarding)
+    !args.workspaceSessionReady
   ) {
+    return { kind: 'skip' }
+  }
+
+  // Why: a profile with no projects is on its first run; let it add one without an education modal.
+  if (!args.hasProjects) {
+    return { kind: 'suppress-for-first-run' }
+  }
+
+  if (args.activeModal !== 'none' || args.cliInstalled === null) {
     return { kind: 'skip' }
   }
 

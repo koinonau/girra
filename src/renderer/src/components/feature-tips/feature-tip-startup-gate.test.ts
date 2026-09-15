@@ -1,17 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { getDefaultOnboardingState } from '../../../../shared/constants'
 import type { CliInstallStatus } from '../../../../shared/cli-install-types'
-import type { OnboardingState } from '../../../../shared/onboarding-state-types'
 import { getFeatureTipsAppOpenDecision, isCliFeatureTipCompleted } from './feature-tip-startup-gate'
-
-const existingUserOnboarding: OnboardingState = {
-  ...getDefaultOnboardingState(),
-  closedAt: Date.parse('2026-05-17T00:00:00.000Z'),
-  outcome: 'completed',
-  lastCompletedStep: 4
-}
-
-const firstTimeOnboarding: OnboardingState = getDefaultOnboardingState()
 
 function makeCliStatus(overrides: Partial<CliInstallStatus> = {}): CliInstallStatus {
   return {
@@ -39,40 +28,75 @@ describe('feature tip startup gate', () => {
         cliInstalled: false,
         featureTipsSeenIds: [],
         featureInteractions: {},
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'open', tipId: 'orca-cli' })
   })
 
-  it('suppresses feature tips for first-time users while onboarding is showing', () => {
+  it('does not open a second tip in the same session', () => {
     expect(
       getFeatureTipsAppOpenDecision({
         activeModal: 'none',
         cliInstalled: false,
         featureTipsSeenIds: [],
         featureInteractions: {},
-        onboarding: firstTimeOnboarding,
         persistedUIReady: true,
-        promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        workspaceSessionReady: true,
+        hasProjects: true,
+        promptedThisSession: true,
+        suppressedForFirstRunThisSession: false
       })
-    ).toEqual({ kind: 'suppress-for-onboarding' })
+    ).toEqual({ kind: 'skip' })
   })
 
-  it('does not open later in the same session after onboarding suppressed it', () => {
+  it('suppresses tips for the session when a first-run profile has no projects', () => {
     expect(
       getFeatureTipsAppOpenDecision({
         activeModal: 'none',
         cliInstalled: false,
         featureTipsSeenIds: [],
         featureInteractions: {},
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: false,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: true
+        suppressedForFirstRunThisSession: false
+      })
+    ).toEqual({ kind: 'suppress-for-first-run' })
+  })
+
+  it('does not open after first-run suppression even once a project exists', () => {
+    expect(
+      getFeatureTipsAppOpenDecision({
+        activeModal: 'none',
+        cliInstalled: false,
+        featureTipsSeenIds: [],
+        featureInteractions: {},
+        persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
+        promptedThisSession: false,
+        suppressedForFirstRunThisSession: true
+      })
+    ).toEqual({ kind: 'skip' })
+  })
+
+  it('waits for the workspace session before judging first run', () => {
+    expect(
+      getFeatureTipsAppOpenDecision({
+        activeModal: 'none',
+        cliInstalled: false,
+        featureTipsSeenIds: [],
+        featureInteractions: {},
+        persistedUIReady: true,
+        workspaceSessionReady: false,
+        hasProjects: false,
+        promptedThisSession: false,
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -84,10 +108,11 @@ describe('feature tip startup gate', () => {
         cliInstalled: true,
         featureTipsSeenIds: ['orca-cli'],
         featureInteractions: {},
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'open', tipId: 'cmd-j-palette' })
   })
@@ -99,10 +124,11 @@ describe('feature tip startup gate', () => {
         cliInstalled: false,
         featureTipsSeenIds: ['orca-cli', 'cmd-j-palette'],
         featureInteractions: {},
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -114,10 +140,11 @@ describe('feature tip startup gate', () => {
         cliInstalled: true,
         featureTipsSeenIds: ['cmd-j-palette'],
         featureInteractions: {},
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -129,10 +156,11 @@ describe('feature tip startup gate', () => {
         cliInstalled: null,
         featureTipsSeenIds: [],
         featureInteractions: {},
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'skip' })
   })
@@ -146,10 +174,11 @@ describe('feature tip startup gate', () => {
         featureInteractions: {
           'cmd-j': { firstInteractedAt: 100, interactionCount: 1 }
         },
-        onboarding: existingUserOnboarding,
         persistedUIReady: true,
+        workspaceSessionReady: true,
+        hasProjects: true,
         promptedThisSession: false,
-        suppressedByOnboardingThisSession: false
+        suppressedForFirstRunThisSession: false
       })
     ).toEqual({ kind: 'open', tipId: 'cmd-j-palette' })
   })

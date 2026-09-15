@@ -1,10 +1,10 @@
 import { useEffect, useState, type JSX } from 'react'
-import { AgentsOrchestrationVisual } from '@/components/feature-wall/AgentsOrchestrationVisual'
+import { OrchestrationPage } from './orchestration-visual/OrchestrationPage'
 import {
   ORCHESTRATION_CLI_COMMAND_LOOP_MS,
   ORCHESTRATION_CLI_COMMAND_TIMINGS_MS
-} from '@/components/feature-wall/agents-orchestration/orchestration-types'
-import { usePrefersReducedMotion } from '@/components/feature-wall/feature-wall-modal-helpers'
+} from './orchestration-visual/orchestration-types'
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion'
 import { translate } from '@/i18n/i18n'
 
 const CLI_AGENT_COMMANDS = [
@@ -34,7 +34,7 @@ export function CliFeatureTipVisual(): JSX.Element {
       timeouts.push(window.setTimeout(() => !cancelled && fn(), ms))
     }
 
-    // Why: terminal lines mirror the orchestration tour beat timings so the
+    // Why: terminal lines mirror the orchestration visual beat timings so the
     // shell shows each command as the parent agent runs it.
     const runOnce = (): void => {
       setAnimatedVisibleCommandCount(0)
@@ -92,15 +92,15 @@ export function CliFeatureTipVisual(): JSX.Element {
       </div>
 
       <div className="cli-tip-orchestration-frame relative mt-5 flex h-[17rem] items-center justify-center overflow-hidden rounded-lg border border-border/70 bg-background/80 px-5 shadow-xs">
-        <div className="origin-center">
-          <AgentsOrchestrationVisual
-            activeStepId="orchestration"
+        <div
+          className="relative origin-center overflow-hidden text-foreground"
+          style={{ width: 350, height: 252 }}
+        >
+          <OrchestrationPage
             reducedMotion={reducedMotion}
-            widthPx={350}
-            heightPx={252}
-            orchestrationCreatedChildCount={Math.min(visibleCommandCount, 2)}
-            orchestrationLoopMs={ORCHESTRATION_CLI_COMMAND_LOOP_MS}
-            orchestrationShowResponseBeats={false}
+            controlledCreatedChildCount={Math.min(visibleCommandCount, 2)}
+            loopMs={ORCHESTRATION_CLI_COMMAND_LOOP_MS}
+            showResponseBeats={false}
           />
         </div>
       </div>

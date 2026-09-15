@@ -273,8 +273,8 @@ describe('renderer startup runtime routing', () => {
   it('does not eagerly import idle optional overlay surfaces on startup', () => {
     const source = readSource(ROOT_SURFACES_PATH)
 
-    expect(source).toContain("import('../components/contextual-tours/ContextualTourOverlay').then")
-    expect(source).not.toContain("from '../components/contextual-tours/ContextualTourOverlay'")
+    expect(source).toContain("lazy(() => import('../components/pet/PetOverlay'))")
+    expect(source).not.toContain("from '../components/pet/PetOverlay'")
   })
 
   it('loads the SSH passphrase dialog only when a credential request is queued', () => {

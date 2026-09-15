@@ -11,7 +11,6 @@ const BASE_LOCALE_KEY_OVERRIDES = {
   'auto.components.TaskPage.bb63046423': { ja: '{{value0}} に割り当て済み' },
   // Bare "Cursor" terminal/theme settings = on-screen カーソル, not the Cursor product.
   'auto.components.settings.TerminalWindowSection.c9e1fdf42f': { ja: 'カーソル' },
-  'auto.components.onboarding.ThemeStep.ab2a583a97': { ja: 'カーソル' },
   // File-row "Duplicate" is the action, and it sits beside "Copy" (复制) in the same menu; keyed
   // because the skills-dialog chip shares the English string but reads as a noun.
   'auto.components.right.sidebar.FileExplorerRow.0fec99bfd7': { zh: '创建副本' },
@@ -35,7 +34,6 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     zh: '打开工作树面板',
     ja: 'ワークツリーパレットを開く'
   },
-  'menu.exploreOrca': { ko: 'Orca 둘러보기', zh: '探索 Orca', ja: 'Orca を探索' },
   'worktreeJumpPalette.matchLabel.issue': { ko: '이슈', zh: '议题', ja: 'Issue' },
   'worktreeJumpPalette.matchLabel.comment': { ko: '댓글', zh: '评论', ja: 'コメント' },
   'auto.hooks.useSettingsNavigationMetadata.13241992bd': {
@@ -416,11 +414,6 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     ko: '감지된 에이전트 없음',
     zh: '未检测到代理',
     ja: 'Agent が検出されません'
-  },
-  'auto.components.onboarding.OnboardingFlow.04ae28d8ca': {
-    ko: '몇 시간 내내 보고 싶은 테마를 선택하세요.',
-    zh: '选择你想盯着看几个小时的主题。',
-    ja: '何時間も眺めていたくなるテーマを選んでください。'
   },
   'auto.components.GitLabItemDialog.e089f62594': {
     ko: 'MR !{{value0}}을(를) 병합했습니다.',

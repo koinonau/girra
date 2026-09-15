@@ -196,7 +196,6 @@ export function BrowserPageToolbar({
           browserPageId={browserPageId}
           viewportPresetId={viewportPresetId}
           onDestroyWebview={() => destroyPersistentWebview(browserPageId)}
-          isActive={isActive}
         />
       }
     />

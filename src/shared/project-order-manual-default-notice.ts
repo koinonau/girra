@@ -18,12 +18,12 @@ export function resolveProjectOrderManualDefaultNoticeDismissed(args: {
 
 export function isExistingPersistedProfile(args: {
   repoCount: number
-  onboardingClosedAt: number | null | undefined
+  onboardingClosed: boolean
   ui: unknown
 }): boolean {
   return (
     args.repoCount > 0 ||
-    args.onboardingClosedAt != null ||
+    args.onboardingClosed ||
     (args.ui != null && typeof args.ui === 'object' && Object.keys(args.ui).length > 0)
   )
 }

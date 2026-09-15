@@ -2,7 +2,6 @@ import { vi } from 'vitest'
 import type { Mock } from 'vitest'
 import { consumeFloatingTerminalOpenMaximizedIntent } from '@/lib/floating-terminal'
 import { clearFloatingPanelReclaimIntent } from '@/lib/floating-workspace-focus-reclaim'
-import type { useContextualTour } from '@/components/contextual-tours/use-contextual-tour'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../../shared/constants'
 import type { CliInstallStatus } from '../../../../shared/cli-install-types'
 import type { MarkdownDocument } from '../../../../shared/filesystem-entry-types'
@@ -63,7 +62,7 @@ export type FloatingTerminalPanelMocks = {
   setTabCustomTitle: Mock<FloatingPanelStoreState['setTabCustomTitle']>
   setTabPaneExpanded: Mock<FloatingPanelStoreState['setTabPaneExpanded']>
   shouldDeferParkedPtyExitTabClose: Mock<(tabId: string, ptyId: string) => boolean>
-  useContextualTour: Mock<typeof useContextualTour>
+  recordFeatureInteraction: Mock<FloatingPanelStoreState['recordFeatureInteraction']>
 }
 
 export const mocks: FloatingTerminalPanelMocks = {
@@ -109,7 +108,7 @@ export const mocks: FloatingTerminalPanelMocks = {
   setTabCustomTitle: vi.fn(),
   setTabPaneExpanded: vi.fn(),
   shouldDeferParkedPtyExitTabClose: vi.fn(),
-  useContextualTour: vi.fn()
+  recordFeatureInteraction: vi.fn(() => Promise.resolve())
 }
 
 export const saveDialogBox = {
@@ -139,6 +138,8 @@ function resetStore(tabs: TerminalTab[] = []): void {
     createBrowserTab: mocks.createBrowserTab,
     closeTab: mocks.closeTab,
     markFileDirty: mocks.markFileDirty,
+    persistedUIReady: true,
+    recordFeatureInteraction: mocks.recordFeatureInteraction,
     makePreviewFilePermanent: mocks.makePreviewFilePermanent,
     openFile: mocks.openFile,
     pinFile: mocks.pinFile,

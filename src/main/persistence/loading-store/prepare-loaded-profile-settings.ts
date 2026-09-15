@@ -17,10 +17,9 @@ import { normalizeTerminalCursorStyleDefault } from '../../../shared/terminal-cu
 import { normalizeTerminalLineHeight } from '../../../shared/terminal-line-height-settings'
 import { migrateAgentYoloDefaults } from '../applying-settings/terminal-settings-migrations'
 import {
-  normalizeLoadedOnboardingState,
   normalizeNotificationSettings,
   persistedNotificationSettingsRepaired
-} from '../applying-settings/onboarding-normalization'
+} from '../applying-settings/notification-normalization'
 
 export type PreparedLoadedProfileSettings = {
   migratedExperimentalActivity: GlobalSettings['experimentalActivity']
@@ -51,7 +50,6 @@ export type PreparedLoadedProfileSettings = {
   mobilePairingCustomAddresses: GlobalSettings['mobilePairingCustomAddresses']
   normalizedNotifications: GlobalSettings['notifications']
   normalizedSourceControlGroupOrder: GlobalSettings['sourceControlGroupOrder']
-  normalizedOnboarding: PersistedState['onboarding']
   normalizedProjectGroups: ProjectGroup[]
 }
 
@@ -172,13 +170,6 @@ export function prepareLoadedProfileSettings(
   if (!autoRenameBranchFromWorkDefaultedOn) {
     markNeedsSave()
   }
-  const normalizedOnboarding = normalizeLoadedOnboardingState(
-    parsed.onboarding,
-    defaults.onboarding
-  )
-  if (!parsed.onboarding) {
-    markNeedsSave()
-  }
   const normalizedProjectGroups = normalizeProjectGroups(parsed.projectGroups)
   const loadedCompactWorktreeCards =
     parsed.settings?.compactWorktreeCards ??
@@ -249,7 +240,6 @@ export function prepareLoadedProfileSettings(
     mobilePairingCustomAddresses,
     normalizedNotifications,
     normalizedSourceControlGroupOrder,
-    normalizedOnboarding,
     normalizedProjectGroups
   }
 }

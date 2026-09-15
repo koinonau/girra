@@ -9,10 +9,10 @@ import {
   ContextMenuTrigger
 } from '@/components/ui/context-menu'
 import {
-  getFirstIncompleteFeatureWallSetupStepId,
-  type FeatureWallSetupStepId
-} from '../../../../shared/feature-wall-setup-steps'
-import type { FeatureWallSetupProgress } from '../feature-wall/feature-wall-setup-progress'
+  getFirstIncompleteSetupGuideStepId,
+  type SetupGuideStepId
+} from '../../../../shared/setup-guide-steps'
+import type { SetupGuideProgress } from '../setup-guide/setup-guide-progress'
 import { SetupGuideProgressRing } from '../setup-guide/SetupGuideProgressRing'
 import { useSetupGuideProgress } from '../setup-guide/use-setup-guide-progress'
 import { translate } from '@/i18n/i18n'
@@ -34,7 +34,7 @@ export function getSetupGuideSidebarEntryReady(
   return persistedUIReady && setupProgressReady
 }
 
-function isSetupGuideSidebarComplete(progress: FeatureWallSetupProgress): boolean {
+function isSetupGuideSidebarComplete(progress: SetupGuideProgress): boolean {
   return progress.coreDoneCount >= progress.coreTotal
 }
 
@@ -54,7 +54,7 @@ export function SetupGuideSidebarEntry(): React.JSX.Element | null {
     setupComplete,
     dismissed: setupGuideSidebarDismissed
   })
-  const lastVisibleProgressRef = React.useRef<FeatureWallSetupProgress | null>(null)
+  const lastVisibleProgressRef = React.useRef<SetupGuideProgress | null>(null)
   if (showSetupGuideEntry) {
     lastVisibleProgressRef.current = setupProgress
   }
@@ -72,8 +72,9 @@ export function SetupGuideSidebarEntry(): React.JSX.Element | null {
   if (!renderedProgress) {
     return null
   }
-  const firstUnfinishedSetupStepId: FeatureWallSetupStepId =
-    getFirstIncompleteFeatureWallSetupStepId(renderedProgress.stepDone)
+  const firstUnfinishedSetupStepId: SetupGuideStepId = getFirstIncompleteSetupGuideStepId(
+    renderedProgress.stepDone
+  )
 
   return (
     <ContextMenu>

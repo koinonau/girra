@@ -78,10 +78,6 @@ vi.mock('@/components/ui/button', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createButtonModule()
 })
 
-vi.mock('@/components/contextual-tours/use-contextual-tour', async () => {
-  return (await import('./floating-terminal-panel-test-module-mocks')).createContextualTourModule()
-})
-
 vi.mock('@/components/ui/dialog', async () => {
   return (await import('./floating-terminal-panel-component-stubs')).createDialogModule()
 })
@@ -182,54 +178,20 @@ describe('FloatingTerminalPanel close behavior', () => {
     expect(mocks.createTab).not.toHaveBeenCalled()
   })
 
-  it('requests the floating workspace tour only when the panel is open', async () => {
-    const persisted = Promise.resolve()
+  it('records the floating workspace interaction only while the panel is open and UI is hydrated', async () => {
+    await renderPanel(false)
+    runEffects()
+    expect(mocks.recordFeatureInteraction).not.toHaveBeenCalled()
 
-    await renderPanel(false, vi.fn(), {
-      persisted,
-      recordFeatureInteractionForTour: false
-    })
+    storeBox.state = { ...(storeBox.state as FloatingPanelStoreState), persistedUIReady: false }
+    await renderPanel(true)
+    runEffects()
+    expect(mocks.recordFeatureInteraction).not.toHaveBeenCalled()
 
-    expect(mocks.useContextualTour).toHaveBeenLastCalledWith(
-      'floating-workspace',
-      false,
-      'floating_workspace_visible',
-      {
-        recordFeatureInteraction: false,
-        featureInteractionPersisted: persisted
-      }
-    )
-
-    await renderPanel(true, vi.fn(), {
-      persisted,
-      recordFeatureInteractionForTour: false
-    })
-
-    expect(mocks.useContextualTour).toHaveBeenLastCalledWith(
-      'floating-workspace',
-      true,
-      'floating_workspace_visible',
-      {
-        recordFeatureInteraction: false,
-        featureInteractionPersisted: persisted
-      }
-    )
-  })
-
-  it('records the floating workspace tour interaction when the open snapshot deferred persistence', async () => {
-    await renderPanel(true, vi.fn(), {
-      recordFeatureInteractionForTour: true
-    })
-
-    expect(mocks.useContextualTour).toHaveBeenLastCalledWith(
-      'floating-workspace',
-      true,
-      'floating_workspace_visible',
-      {
-        recordFeatureInteraction: true,
-        featureInteractionPersisted: undefined
-      }
-    )
+    storeBox.state = { ...(storeBox.state as FloatingPanelStoreState), persistedUIReady: true }
+    await renderPanel(true)
+    runEffects()
+    expect(mocks.recordFeatureInteraction).toHaveBeenCalledWith('floating-workspace')
   })
 
   it('targets the empty-state actions without co-mounting the surface fallback', async () => {

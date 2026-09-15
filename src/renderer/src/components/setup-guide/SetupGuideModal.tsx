@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState, type JSX } from 'react'
 import { EyeOff } from 'lucide-react'
 import {
-  FEATURE_WALL_SETUP_STEP_IDS,
-  getFirstIncompleteFeatureWallSetupStepId,
-  getFeatureWallSetupSteps
-} from '../../../../shared/feature-wall-setup-steps'
-import type { FeatureWallSetupStepId } from '../../../../shared/feature-wall-setup-steps'
+  getFirstIncompleteSetupGuideStepId,
+  getSetupGuideSteps,
+  isSetupGuideStepId
+} from '../../../../shared/setup-guide-steps'
+import type { SetupGuideStepId } from '../../../../shared/setup-guide-steps'
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useAppStore } from '@/store'
-import { FeatureWallSetupChecklist } from '../feature-wall/FeatureWallSetupChecklist'
+import { SetupGuideChecklist } from './SetupGuideChecklist'
 import { SetupGuideProgressRing } from './SetupGuideProgressRing'
 import { useSetupGuideProgress } from './use-setup-guide-progress'
 import { translate } from '@/i18n/i18n'
@@ -51,7 +51,7 @@ function SetupGuideModalContent({
   const modalData = useAppStore((s) => s.modalData)
   const closeModal = useAppStore((s) => s.closeModal)
   const setSetupGuideSidebarDismissed = useAppStore((s) => s.setSetupGuideSidebarDismissed)
-  const setupSteps = useMemo(() => getFeatureWallSetupSteps(), [])
+  const setupSteps = useMemo(() => getSetupGuideSteps(), [])
   const [userSelectedStep, setUserSelectedStep] = useState(false)
   const [orchestrationSkillInstalled, setOrchestrationSkillInstalled] = useState(false)
   const [browserUseSkillInstalled, setBrowserUseSkillInstalled] = useState(false)
@@ -63,12 +63,10 @@ function SetupGuideModalContent({
     orchestrationSkillInstalled,
     browserUseSkillInstalled
   )
-  const [activeStepId, setActiveStepId] = useState<FeatureWallSetupStepId>(() =>
-    getFirstIncompleteFeatureWallSetupStepId(progress.stepDone)
+  const [activeStepId, setActiveStepId] = useState<SetupGuideStepId>(() =>
+    getFirstIncompleteSetupGuideStepId(progress.stepDone)
   )
-  const requestedStepId = isFeatureWallSetupStepId(modalData.setupStepId)
-    ? modalData.setupStepId
-    : null
+  const requestedStepId = isSetupGuideStepId(modalData.setupStepId) ? modalData.setupStepId : null
   const activeStep = setupSteps.find((step) => step.id === activeStepId) ?? setupSteps[0] ?? null
 
   useEffect(() => {
@@ -87,7 +85,7 @@ function SetupGuideModalContent({
     if (!open || userSelectedStep || requestedStepId !== null) {
       return
     }
-    setActiveStepId(getFirstIncompleteFeatureWallSetupStepId(progress.stepDone))
+    setActiveStepId(getFirstIncompleteSetupGuideStepId(progress.stepDone))
   }, [open, progress.stepDone, requestedStepId, userSelectedStep])
 
   useEffect(() => {
@@ -100,13 +98,13 @@ function SetupGuideModalContent({
     ) {
       return
     }
-    const nextUnfinishedCoreStepId = getFirstIncompleteFeatureWallSetupStepId(progress.stepDone)
+    const nextUnfinishedCoreStepId = getFirstIncompleteSetupGuideStepId(progress.stepDone)
     if (nextUnfinishedCoreStepId !== activeStep.id) {
       setActiveStepId(nextUnfinishedCoreStepId)
     }
   }, [activeStep, open, progress.stepDone, requestedStepId, userSelectedStep])
 
-  const handleSelectStep = (id: FeatureWallSetupStepId): void => {
+  const handleSelectStep = (id: SetupGuideStepId): void => {
     setUserSelectedStep(true)
     setActiveStepId(id)
   }
@@ -173,7 +171,7 @@ function SetupGuideModalContent({
           </DialogDescription>
         </DialogHeader>
         <div className="min-h-0 overflow-hidden px-7 py-6">
-          <FeatureWallSetupChecklist
+          <SetupGuideChecklist
             activeStep={activeStep}
             progress={progress}
             onSelectStep={handleSelectStep}
@@ -183,12 +181,5 @@ function SetupGuideModalContent({
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
-
-function isFeatureWallSetupStepId(value: unknown): value is FeatureWallSetupStepId {
-  return (
-    typeof value === 'string' &&
-    FEATURE_WALL_SETUP_STEP_IDS.includes(value as FeatureWallSetupStepId)
   )
 }

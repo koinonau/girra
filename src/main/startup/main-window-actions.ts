@@ -108,14 +108,6 @@ export function createSystemTrayDeferred(
   }
 }
 
-export function sendOpenFeatureTour(targetWindow?: BrowserWindow | null): void {
-  const webContents =
-    targetWindow && !targetWindow.isDestroyed()
-      ? targetWindow.webContents
-      : state.mainWindow?.webContents
-  webContents?.send('ui:openFeatureTour')
-}
-
 export function sendOpenSetupGuide(targetWindow?: BrowserWindow | null): void {
   const webContents =
     targetWindow && !targetWindow.isDestroyed()

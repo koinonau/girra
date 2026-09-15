@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { FeatureWallSetupProgress } from '../feature-wall/feature-wall-setup-progress'
+import type { SetupGuideProgress } from '../setup-guide/setup-guide-progress'
 import { useSettingsSetupGuideProgress } from './settings-setup-guide-progress'
 
 const mocks = vi.hoisted(() => ({
@@ -11,7 +11,7 @@ vi.mock('../setup-guide/use-setup-guide-progress', () => ({
   useSetupGuideProgress: mocks.useSetupGuideProgress
 }))
 
-function makeProgress(): FeatureWallSetupProgress {
+function makeProgress(): SetupGuideProgress {
   return {
     ready: true,
     stepDone: {

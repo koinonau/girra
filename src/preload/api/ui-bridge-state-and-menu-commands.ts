@@ -34,11 +34,6 @@ export const uiStateAndMenuCommandsApi = {
     ipcRenderer.on('ui:openSetupGuide', listener)
     return () => ipcRenderer.removeListener('ui:openSetupGuide', listener)
   },
-  onOpenFeatureTour: (callback: () => void): (() => void) => {
-    const listener = (_event: Electron.IpcRendererEvent) => callback()
-    ipcRenderer.on('ui:openFeatureTour', listener)
-    return () => ipcRenderer.removeListener('ui:openFeatureTour', listener)
-  },
   onToggleLeftSidebar: (callback: () => void): (() => void) => {
     const listener = (_event: Electron.IpcRendererEvent) => callback()
     ipcRenderer.on('ui:toggleLeftSidebar', listener)

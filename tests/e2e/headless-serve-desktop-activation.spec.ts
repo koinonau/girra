@@ -5,7 +5,7 @@ import path from 'node:path'
 import { _electron as electron, type ElectronApplication } from '@stablyai/playwright-test'
 import { test, expect, forwardElectronProcessLogs } from './helpers/orca-app'
 import { TEST_REPO_PATH_FILE } from './global-setup'
-import { getE2ECompletedOnboardingProfile } from './helpers/e2e-completed-onboarding-profile'
+import { getE2EExistingUserProfile } from './helpers/e2e-existing-user-profile'
 import { getOrcaElectronLaunchArgs } from './helpers/electron-launch-args'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from './helpers/electron-process-shutdown'
 import {
@@ -134,7 +134,7 @@ test('promotes the headless owner without replacing its daemon terminal', async 
 
   writeFileSync(
     path.join(userDataDir, 'orca-data.json'),
-    `${JSON.stringify(getE2ECompletedOnboardingProfile(), null, 2)}\n`
+    `${JSON.stringify(getE2EExistingUserProfile(), null, 2)}\n`
   )
 
   try {

@@ -14,7 +14,6 @@ export type LaunchSource =
   | 'new_workspace_composer'
   | 'workspace_jump_palette'
   | 'shortcut'
-  | 'onboarding'
   | 'diff_notes_send'
   | 'notes_send'
   | 'conflict_resolution'

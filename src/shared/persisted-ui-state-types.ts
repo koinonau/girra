@@ -1,6 +1,5 @@
 import type { WorkspaceCleanupUIState } from './workspace-cleanup'
 import type { FeatureTipId } from './feature-tips'
-import type { ContextualTourId } from './contextual-tours'
 import type { FeatureInteractionState } from './feature-interactions'
 import type { UsagePercentageDisplay } from './usage-percentage-display'
 import type { StatusBarUsageMode } from './status-bar-usage-mode'
@@ -199,8 +198,4 @@ export type PersistedUIState = {
   featureTipsSeenIds?: FeatureTipId[]
   /** Feature ids the user has actually used; education surfaces skip teaching already-discovered features. */
   featureInteractions?: FeatureInteractionState
-  /** Contextual tours already surfaced; unknown ids ignored on hydration for downgrade/upgrade forward-compat. */
-  contextualToursSeenIds?: ContextualTourId[]
-  /** Whether this profile may receive automatic contextual tours; missing = renderer hasn't classified the profile yet. */
-  contextualToursAutoEligible?: boolean
 }

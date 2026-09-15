@@ -24,7 +24,6 @@ export function getNextDefaultOnAppearanceSettingValue(current: boolean | undefi
 type RegisterAppMenuOptions = {
   onOpenSettings: () => void
   onOpenSetupGuide: (window?: Electron.BaseWindow | null) => void
-  onOpenFeatureTour: (window?: Electron.BaseWindow | null) => void
   onBeforeReload?: (options: { ignoreCache: boolean; webContentsId: number }) => void
   onZoomIn: () => void
   onZoomOut: () => void
@@ -43,7 +42,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   const {
     onOpenSettings,
     onOpenSetupGuide,
-    onOpenFeatureTour,
     onBeforeReload,
     onZoomIn,
     onZoomOut,
@@ -85,11 +83,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   const settingsItem: Electron.MenuItemConstructorOptions = {
     label: `${translateMain('menu.settings', 'Settings')}\t${shortcutLabel('app.settings')}`,
     click: () => onOpenSettings()
-  }
-
-  const featureTourItem: Electron.MenuItemConstructorOptions = {
-    label: translateMain('menu.exploreOrca', 'Explore Orca'),
-    click: (_menuItem, window) => onOpenFeatureTour(window)
   }
 
   const setupGuideItem: Electron.MenuItemConstructorOptions = {
@@ -275,7 +268,6 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   const helpMenu: Electron.MenuItemConstructorOptions = {
     label: translateMain('menu.help', 'Help'),
     submenu: [
-      featureTourItem,
       setupGuideItem,
       ...(isMac
         ? []

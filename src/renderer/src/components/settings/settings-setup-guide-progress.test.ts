@@ -1,15 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import {
-  FEATURE_WALL_SETUP_STEPS,
-  type FeatureWallSetupStepId
-} from '../../../../shared/feature-wall-setup-steps'
+import { SETUP_GUIDE_STEPS, type SetupGuideStepId } from '../../../../shared/setup-guide-steps'
 import { getSettingsSetupGuideProgress } from './settings-setup-guide-progress'
 
 describe('settings setup guide progress', () => {
-  function makePreBrowserDoneStepState(): Partial<Record<FeatureWallSetupStepId, boolean>> {
+  function makePreBrowserDoneStepState(): Partial<Record<SetupGuideStepId, boolean>> {
     return Object.fromEntries(
-      FEATURE_WALL_SETUP_STEPS.map((step) => [step.id, step.id !== 'browser'])
-    ) as Partial<Record<FeatureWallSetupStepId, boolean>>
+      SETUP_GUIDE_STEPS.map((step) => [step.id, step.id !== 'browser'])
+    ) as Partial<Record<SetupGuideStepId, boolean>>
   }
 
   it('tracks the full setup checklist total', () => {
@@ -21,7 +18,7 @@ describe('settings setup guide progress', () => {
     expect(progress).toEqual({
       ready: true,
       doneCount: 0,
-      total: FEATURE_WALL_SETUP_STEPS.length,
+      total: SETUP_GUIDE_STEPS.length,
       firstIncompleteStepId: 'notifications'
     })
   })
@@ -32,12 +29,12 @@ describe('settings setup guide progress', () => {
       notifications: true,
       'default-agent': true,
       'task-sources': true
-    } satisfies Partial<Record<FeatureWallSetupStepId, boolean>>
+    } satisfies Partial<Record<SetupGuideStepId, boolean>>
 
     expect(getSettingsSetupGuideProgress({ ready: true, stepDone })).toEqual({
       ready: true,
       doneCount: 4,
-      total: FEATURE_WALL_SETUP_STEPS.length,
+      total: SETUP_GUIDE_STEPS.length,
       firstIncompleteStepId: 'agent-capabilities'
     })
   })
@@ -50,21 +47,22 @@ describe('settings setup guide progress', () => {
       })
     ).toEqual({
       ready: true,
-      doneCount: FEATURE_WALL_SETUP_STEPS.length - 1,
-      total: FEATURE_WALL_SETUP_STEPS.length,
+      doneCount: SETUP_GUIDE_STEPS.length - 1,
+      total: SETUP_GUIDE_STEPS.length,
       firstIncompleteStepId: 'browser'
     })
   })
 
   it('marks Settings complete when every setup guide step is done', () => {
-    const stepDone = Object.fromEntries(
-      FEATURE_WALL_SETUP_STEPS.map((step) => [step.id, true])
-    ) as Record<FeatureWallSetupStepId, boolean>
+    const stepDone = Object.fromEntries(SETUP_GUIDE_STEPS.map((step) => [step.id, true])) as Record<
+      SetupGuideStepId,
+      boolean
+    >
 
     expect(getSettingsSetupGuideProgress({ ready: true, stepDone })).toEqual({
       ready: true,
-      doneCount: FEATURE_WALL_SETUP_STEPS.length,
-      total: FEATURE_WALL_SETUP_STEPS.length,
+      doneCount: SETUP_GUIDE_STEPS.length,
+      total: SETUP_GUIDE_STEPS.length,
       firstIncompleteStepId: null
     })
   })

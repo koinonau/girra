@@ -7,7 +7,7 @@ import { normalizeTerminalCustomThemes } from '../../../shared/terminal-custom-t
 import { projectSourceControlAiToLegacyCommitMessageAi } from '../../../shared/source-control-ai'
 import { normalizeUiLanguage } from '../../../shared/ui-language'
 import { stripRetiredGlobalSettings } from '../applying-settings/terminal-settings-migrations'
-import { readLegacySidekickFlag } from '../applying-settings/onboarding-normalization'
+import { readLegacySidekickFlag } from '../applying-settings/retired-persisted-fields'
 import type { PersistedState } from '../../../shared/persisted-state-types'
 import type { PreparedLoadedTerminalSettings } from './prepare-loaded-terminal-settings'
 import type { PreparedLoadedProfileSettings } from './prepare-loaded-profile-settings'

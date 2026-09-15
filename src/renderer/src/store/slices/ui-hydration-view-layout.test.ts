@@ -492,7 +492,6 @@ describe('createUISlice hydratePersistedUI', () => {
     const store = createUIStore()
     const persistedUI = makePersistedUI({
       featureTipsSeenIds: ['orca-cli'],
-      contextualToursSeenIds: ['tasks'],
       showDotfilesByWorktree: { 'repo-1::/repo': false },
       collapsedGroups: ['repo:one'],
       workspaceHostOrder: ['local'],
@@ -505,7 +504,6 @@ describe('createUISlice hydratePersistedUI', () => {
     const references = {
       acknowledgedAgentsByPaneKey: before.acknowledgedAgentsByPaneKey,
       featureTipsSeenIds: before.featureTipsSeenIds,
-      contextualToursSeenIds: before.contextualToursSeenIds,
       workspaceHostOrder: before.workspaceHostOrder,
       showDotfilesByWorktree: before.showDotfilesByWorktree,
       collapsedGroups: before.collapsedGroups,
@@ -517,7 +515,6 @@ describe('createUISlice hydratePersistedUI', () => {
 
     expect(after.acknowledgedAgentsByPaneKey).toBe(references.acknowledgedAgentsByPaneKey)
     expect(after.featureTipsSeenIds).toBe(references.featureTipsSeenIds)
-    expect(after.contextualToursSeenIds).toBe(references.contextualToursSeenIds)
     expect(after.workspaceHostOrder).toBe(references.workspaceHostOrder)
     expect(after.showDotfilesByWorktree).toBe(references.showDotfilesByWorktree)
     expect(after.collapsedGroups).toBe(references.collapsedGroups)

@@ -528,46 +528,6 @@ describe('web UI preload API', () => {
     }
   )
 
-  it('union-merges local contextual tour seen ids when ui.get returns stale host state', async () => {
-    vi.doMock('./web-runtime-client', () => ({
-      WebRuntimeClient: class {
-        call(method: string): Promise<RuntimeRpcResponse<unknown>> {
-          return Promise.resolve({
-            id: method,
-            ok: true,
-            result: {
-              ui: {
-                contextualToursSeenIds: ['browser', 'unknown']
-              }
-            },
-            _meta: { runtimeId: 'runtime-1' }
-          })
-        }
-
-        close(): void {}
-      }
-    }))
-
-    const globals = installBrowserGlobals('Linux')
-    writeStoredRuntimeEnvironment(globals.storage)
-    globals.storage.setItem(
-      'orca.web.ui.v1',
-      JSON.stringify({
-        contextualToursSeenIds: ['tasks', 'browser']
-      })
-    )
-    const { installWebPreloadApi } = await import('./web-preload-api')
-    installWebPreloadApi()
-
-    const ui = await globals.window.api.ui.get()
-    const stored = JSON.parse(globals.storage.getItem('orca.web.ui.v1') ?? '{}') as {
-      contextualToursSeenIds?: string[]
-    }
-
-    expect(ui.contextualToursSeenIds).toEqual(['tasks', 'browser'])
-    expect(stored.contextualToursSeenIds).toEqual(['tasks', 'browser'])
-  })
-
   it('keeps the local OSC 52 notice armed when ui.get returns an unmigrated host', async () => {
     vi.doMock('./web-runtime-client', () => ({
       WebRuntimeClient: class {
@@ -630,46 +590,6 @@ describe('web UI preload API', () => {
 
     const ui = await globals.window.api.ui.recordFeatureInteraction('tasks')
     expect(ui.osc52ClipboardDefaultOnNoticePending).toBe(true)
-  })
-
-  it('union-merges local contextual tour seen ids when recordFeatureInteraction returns stale host state', async () => {
-    vi.doMock('./web-runtime-client', () => ({
-      WebRuntimeClient: class {
-        call(method: string): Promise<RuntimeRpcResponse<unknown>> {
-          return Promise.resolve({
-            id: method,
-            ok: true,
-            result: {
-              ui: {
-                contextualToursSeenIds: ['browser']
-              }
-            },
-            _meta: { runtimeId: 'runtime-1' }
-          })
-        }
-
-        close(): void {}
-      }
-    }))
-
-    const globals = installBrowserGlobals('Linux')
-    writeStoredRuntimeEnvironment(globals.storage)
-    globals.storage.setItem(
-      'orca.web.ui.v1',
-      JSON.stringify({
-        contextualToursSeenIds: ['tasks']
-      })
-    )
-    const { installWebPreloadApi } = await import('./web-preload-api')
-    installWebPreloadApi()
-
-    const ui = await globals.window.api.ui.recordFeatureInteraction('tasks')
-    const stored = JSON.parse(globals.storage.getItem('orca.web.ui.v1') ?? '{}') as {
-      contextualToursSeenIds?: string[]
-    }
-
-    expect(ui.contextualToursSeenIds).toEqual(['tasks', 'browser'])
-    expect(stored.contextualToursSeenIds).toEqual(['tasks', 'browser'])
   })
 
   it('proxies host skill discovery and computer-use permission APIs for paired web clients', async () => {

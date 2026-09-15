@@ -2,7 +2,6 @@ import { useAppStore } from '@/store'
 import { activateAndRevealWorktree } from '@/lib/worktree-activation'
 import type { DetectedWorktreeListResult, Worktree } from '../../../../shared/worktree/types'
 import { relativePathInsideRoot } from '../../../../shared/cross-platform-path'
-import { markOnboardingProjectAdded } from '@/lib/onboarding-project-checklist'
 import { finalizeImportedRepoAfterSkip } from './add-repo-skip-finalization'
 import { parseExecutionHostId, type ExecutionHostId } from '../../../../shared/execution-host'
 
@@ -182,7 +181,7 @@ export async function openProjectDefaultCheckout({
       finalizeImportedRepoAfterSkip(useAppStore.getState(), repoId)
       return
     }
-    // Why: the onboarding handoff should land on the default checkout even
+    // Why: the add-project handoff should land on the default checkout even
     // when the user normally hides default-branch workspaces in the sidebar.
     const state = useAppStore.getState()
     if (state.hideDefaultBranchWorkspace) {
@@ -216,7 +215,6 @@ export async function finishProjectAddWithDefaultCheckout({
   setHideDefaultBranchWorkspace: (value: boolean) => void
   executionHostId?: ExecutionHostId
 }): Promise<void> {
-  await markOnboardingProjectAdded('addedRepo')
   closeModal()
   await openProjectDefaultCheckout({
     repoId,

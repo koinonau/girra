@@ -10,7 +10,7 @@ const prefersReducedMotionMock = vi.hoisted(() => vi.fn(() => false))
 const shortcutMock = vi.hoisted(() => vi.fn(() => ({ keys: ['⌘', 'J'], doubleTap: false })))
 const formatShortcutMock = vi.hoisted(() => vi.fn(() => [{ keys: ['⌘', 'J'], doubleTap: false }]))
 
-vi.mock('@/components/feature-wall/feature-wall-modal-helpers', () => ({
+vi.mock('@/hooks/usePrefersReducedMotion', () => ({
   usePrefersReducedMotion: prefersReducedMotionMock
 }))
 

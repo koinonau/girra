@@ -12,10 +12,6 @@ const updateCapableCallers = new Map<string, readonly string[]>([
     ['ORCHESTRATION_SKILL_UPDATE_COMMAND', 'installedCommand={orchestrationUpdateCommand}']
   ],
   [
-    'src/renderer/src/components/settings/OrchestrationSetupCard.tsx',
-    ['ORCHESTRATION_SKILL_UPDATE_COMMAND', 'installedCommand={updateCommand}']
-  ],
-  [
     'src/renderer/src/components/floating-terminal/FloatingTerminalOrchestrationDialog.tsx',
     ['ORCHESTRATION_SKILL_UPDATE_COMMAND', 'installedCommand={updateCommand}']
   ],
@@ -64,10 +60,6 @@ const updateCapableCallers = new Map<string, readonly string[]>([
   [
     'src/renderer/src/components/settings/BrowserUseSkillStep.tsx',
     ['installedCommand={installedCommand}']
-  ],
-  [
-    'src/renderer/src/components/feature-wall/BrowserUseSkillSetupCard.tsx',
-    ['ORCA_CLI_SKILL_UPDATE_COMMAND', 'installedCommand={updateCommand}']
   ],
   [
     // Why: the single-skill update command selection moved into

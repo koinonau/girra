@@ -310,87 +310,33 @@ describe('ClientHostedBrowserPagePane', () => {
     })
   })
 
-  it('requests the one-time intro tour on the first active client-hosted page', async () => {
-    const { useAppStore } = await import('@/store')
+  it('records the client-hosted browser interaction only once the page is active', async () => {
     const prior = {
       persistedUIReady: useAppStore.getState().persistedUIReady,
-      contextualToursSeenIds: useAppStore.getState().contextualToursSeenIds,
-      activeContextualTourId: useAppStore.getState().activeContextualTourId
+      recordFeatureInteraction: useAppStore.getState().recordFeatureInteraction
     }
-    useAppStore.setState({
-      persistedUIReady: true,
-      contextualToursSeenIds: [],
-      activeContextualTourId: null
-    })
+    const recordFeatureInteraction = vi.fn(async () => {})
+    useAppStore.setState({ persistedUIReady: true, recordFeatureInteraction })
     const { webview } = createWebview()
     mocks.attach.mockReturnValue(retainedAttachment(webview))
+    const renderPane = (isActive: boolean) => (
+      <ClientHostedBrowserPagePane
+        browserTab={page()}
+        workspaceId="workspace-a"
+        chromeShortcutScope="focused"
+        runtimeEnvironmentId="environment-a"
+        worktreeId="worktree-a"
+        placement={PLACEMENT}
+        isActive={isActive}
+        onUpdatePageState={vi.fn()}
+        onSetUrl={vi.fn()}
+      />
+    )
     try {
-      render(
-        <ClientHostedBrowserPagePane
-          browserTab={page()}
-          workspaceId="workspace-a"
-          chromeShortcutScope="focused"
-          runtimeEnvironmentId="environment-a"
-          worktreeId="worktree-a"
-          placement={PLACEMENT}
-          isActive={true}
-          onUpdatePageState={vi.fn()}
-          onSetUrl={vi.fn()}
-        />
-      )
-      // Why: happy-dom rects are zero-sized and the tour gate requires a measurable target.
-      const target = document.querySelector<HTMLElement>(
-        '[data-contextual-tour-target="client-hosted-browser-controls"]'
-      )
-      expect(target).not.toBeNull()
-      target!.getBoundingClientRect = () => new DOMRect(0, 0, 400, 32)
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 0))
-      })
-      expect(useAppStore.getState().activeContextualTourId).toBe('client-hosted-browser')
-    } finally {
-      useAppStore.setState(prior)
-    }
-  })
-
-  it('never re-requests the intro tour once it has been seen', async () => {
-    const { useAppStore } = await import('@/store')
-    const prior = {
-      persistedUIReady: useAppStore.getState().persistedUIReady,
-      contextualToursSeenIds: useAppStore.getState().contextualToursSeenIds,
-      activeContextualTourId: useAppStore.getState().activeContextualTourId
-    }
-    useAppStore.setState({
-      persistedUIReady: true,
-      contextualToursSeenIds: ['client-hosted-browser'],
-      activeContextualTourId: null
-    })
-    const { webview } = createWebview()
-    mocks.attach.mockReturnValue(retainedAttachment(webview))
-    try {
-      render(
-        <ClientHostedBrowserPagePane
-          browserTab={page()}
-          workspaceId="workspace-a"
-          chromeShortcutScope="focused"
-          runtimeEnvironmentId="environment-a"
-          worktreeId="worktree-a"
-          placement={PLACEMENT}
-          isActive={true}
-          onUpdatePageState={vi.fn()}
-          onSetUrl={vi.fn()}
-        />
-      )
-      // Why: same measurable target as the positive case — only seenIds differs.
-      const target = document.querySelector<HTMLElement>(
-        '[data-contextual-tour-target="client-hosted-browser-controls"]'
-      )
-      expect(target).not.toBeNull()
-      target!.getBoundingClientRect = () => new DOMRect(0, 0, 400, 32)
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 0))
-      })
-      expect(useAppStore.getState().activeContextualTourId).toBeNull()
+      const view = render(renderPane(false))
+      expect(recordFeatureInteraction).not.toHaveBeenCalled()
+      view.rerender(renderPane(true))
+      expect(recordFeatureInteraction).toHaveBeenCalledWith('client-hosted-browser')
     } finally {
       useAppStore.setState(prior)
     }

@@ -233,6 +233,7 @@ export const UiUpdateFields = z
     workspaceCleanup: WorkspaceCleanup.optional(),
     featureTipsSeenIds: FeatureTipIds.optional(),
     featureInteractions: FeatureInteractions.optional(),
+    // Retired with contextual tours: accepted so old clients' payloads still validate, then ignored.
     contextualToursSeenIds: StringArray.optional(),
     contextualToursAutoEligible: z.boolean().optional()
   })

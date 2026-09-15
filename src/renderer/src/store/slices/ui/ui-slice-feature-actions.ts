@@ -1,12 +1,8 @@
-import type { UISlice, UISliceGet, UISliceSet } from './ui-slice-contract'
-import {
-  mergeFeatureInteractionState,
-  mergeContextualTourSeenIds
-} from './ui-slice-hydration-values'
-import { getContextualTourProgressionForFeatureInteraction } from './ui-slice-contextual-tour-progression'
+import type { UISlice, UISliceSet } from './ui-slice-contract'
+import { mergeFeatureInteractionState } from './ui-slice-hydration-values'
 import type { FeatureInteractionState } from '../../../../../shared/feature-interactions'
 
-export function createUiFeatureActions(set: UISliceSet, get: UISliceGet): Partial<UISlice> {
+export function createUiFeatureActions(set: UISliceSet): Partial<UISlice> {
   return {
     featureTipsSeenIds: [],
     markFeatureTipsSeen: (ids) =>
@@ -31,14 +27,11 @@ export function createUiFeatureActions(set: UISliceSet, get: UISliceGet): Partia
       }),
     featureInteractions: {},
     recordFeatureInteraction: (id) => {
-      let tourProgression: ReturnType<typeof getContextualTourProgressionForFeatureInteraction> =
-        null
       let persistPromise = Promise.resolve()
       set((s) => {
         if (!s.persistedUIReady) {
           return s
         }
-        tourProgression = getContextualTourProgressionForFeatureInteraction(s, id)
         const existing = s.featureInteractions[id]
         const next: FeatureInteractionState = {
           ...s.featureInteractions,
@@ -55,31 +48,14 @@ export function createUiFeatureActions(set: UISliceSet, get: UISliceGet): Partia
                   featureInteractions: mergeFeatureInteractionState(
                     current.featureInteractions,
                     ui.featureInteractions
-                  ),
-                  contextualToursSeenIds: mergeContextualTourSeenIds(
-                    current.contextualToursSeenIds,
-                    ui.contextualToursSeenIds
                   )
                 }))
               })
             : window.api.ui.set({ featureInteractions: next })
           persistPromise = persist.catch(console.error)
         }
-        if (tourProgression === 'reveal-sidebar-and-advance') {
-          // Why: split can fire from keyboard/menu with the sidebar closed, but the next tour target lives in the sidebar.
-          return {
-            featureInteractions: next,
-            sidebarOpen: true,
-            activeContextualTourStepIndex: s.activeContextualTourStepIndex + 1
-          }
-        }
         return { featureInteractions: next }
       })
-      if (tourProgression === 'complete') {
-        get().completeContextualTour()
-      } else if (tourProgression === 'advance') {
-        get().advanceContextualTour()
-      }
       return persistPromise
     }
   }

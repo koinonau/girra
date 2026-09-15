@@ -5,7 +5,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { _electron as electron, type ElectronApplication } from '@stablyai/playwright-test'
 import { RuntimeClient } from '../../../src/cli/runtime/client'
-import { getE2ECompletedOnboardingProfile } from './e2e-completed-onboarding-profile'
+import { getE2EExistingUserProfile } from './e2e-existing-user-profile'
 import { getOrcaElectronLaunchArgs } from './electron-launch-args'
 import { cleanupE2EDaemons, closeElectronAppForE2E } from './electron-process-shutdown'
 import {
@@ -96,7 +96,7 @@ export async function launchHeadlessPairedRuntimeHost(
       : null
     writeFileSync(
       path.join(userDataDir, 'orca-data.json'),
-      `${JSON.stringify(getE2ECompletedOnboardingProfile(), null, 2)}\n`
+      `${JSON.stringify(getE2EExistingUserProfile(), null, 2)}\n`
     )
     const { ELECTRON_RUN_AS_NODE: _unused, ...cleanEnv } = process.env
     void _unused

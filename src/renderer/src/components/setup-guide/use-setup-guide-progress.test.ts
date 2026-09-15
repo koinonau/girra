@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import {
-  FEATURE_WALL_SETUP_STEPS,
-  type FeatureWallSetupStepId
-} from '../../../../shared/feature-wall-setup-steps'
-import type { FeatureWallSetupProgress } from '../feature-wall/feature-wall-setup-progress'
+import { SETUP_GUIDE_STEPS, type SetupGuideStepId } from '../../../../shared/setup-guide-steps'
+import type { SetupGuideProgress } from './setup-guide-progress'
 import {
   getSetupGuideBrowserMilestoneAwareProgress,
   shouldMarkBrowserMilestoneLegacyComplete
@@ -17,13 +14,13 @@ import {
   settleSetupScriptProbe
 } from './setup-guide-progress-readiness'
 
-function makePreBrowserDoneStepState(): Partial<Record<FeatureWallSetupStepId, boolean>> {
+function makePreBrowserDoneStepState(): Partial<Record<SetupGuideStepId, boolean>> {
   return Object.fromEntries(
-    FEATURE_WALL_SETUP_STEPS.map((step) => [step.id, step.id !== 'browser'])
-  ) as Partial<Record<FeatureWallSetupStepId, boolean>>
+    SETUP_GUIDE_STEPS.map((step) => [step.id, step.id !== 'browser'])
+  ) as Partial<Record<SetupGuideStepId, boolean>>
 }
 
-function makeProgress(overrides: Partial<FeatureWallSetupProgress> = {}): FeatureWallSetupProgress {
+function makeProgress(overrides: Partial<SetupGuideProgress> = {}): SetupGuideProgress {
   return {
     ready: true,
     stepDone: {
@@ -37,7 +34,7 @@ function makeProgress(overrides: Partial<FeatureWallSetupProgress> = {}): Featur
       'setup-script': false
     },
     coreDoneCount: 0,
-    coreTotal: FEATURE_WALL_SETUP_STEPS.length,
+    coreTotal: SETUP_GUIDE_STEPS.length,
     ...overrides
   }
 }
@@ -88,21 +85,21 @@ describe('browser milestone legacy setup guide progress', () => {
   it('keeps legacy-complete setup guide progress complete across all surfaces', () => {
     const progress = getSetupGuideBrowserMilestoneAwareProgress(
       makeProgress({
-        stepDone: makePreBrowserDoneStepState() as Record<FeatureWallSetupStepId, boolean>,
-        coreDoneCount: FEATURE_WALL_SETUP_STEPS.length - 1
+        stepDone: makePreBrowserDoneStepState() as Record<SetupGuideStepId, boolean>,
+        coreDoneCount: SETUP_GUIDE_STEPS.length - 1
       }),
       true
     )
 
-    expect(progress.coreDoneCount).toBe(FEATURE_WALL_SETUP_STEPS.length)
+    expect(progress.coreDoneCount).toBe(SETUP_GUIDE_STEPS.length)
     expect(progress.stepDone.browser).toBe(true)
     expect(Object.values(progress.stepDone).every(Boolean)).toBe(true)
   })
 
   it('leaves fresh setup guide progress unchanged when browser is incomplete', () => {
     const original = makeProgress({
-      stepDone: makePreBrowserDoneStepState() as Record<FeatureWallSetupStepId, boolean>,
-      coreDoneCount: FEATURE_WALL_SETUP_STEPS.length - 1
+      stepDone: makePreBrowserDoneStepState() as Record<SetupGuideStepId, boolean>,
+      coreDoneCount: SETUP_GUIDE_STEPS.length - 1
     })
 
     expect(getSetupGuideBrowserMilestoneAwareProgress(original, false)).toBe(original)

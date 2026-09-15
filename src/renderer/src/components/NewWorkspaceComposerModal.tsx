@@ -44,8 +44,6 @@ type ComposerModalData = {
   initialBaseBranch?: string
   initialWorkspaceStatus?: WorkspaceStatus
   enableIssueAutomation?: boolean
-  contextualTourSource?: string
-  setupGuideTourRequestId?: string
 }
 
 export default function NewWorkspaceComposerModal(): React.JSX.Element | null {
@@ -283,7 +281,6 @@ function QuickTabBody({
         </DialogDescription>
       </DialogHeader>
       <NewWorkspaceComposerCard
-        contextualTourSource={modalData.contextualTourSource}
         // Why: the scroll container clips children (overflow-y-auto forces overflow-x to auto),
         // while Orca's standard field focus ring paints 3px outside the control and the ghost
         // "Advanced" disclosure pulls its padded hover highlight ~8px left to align its label with

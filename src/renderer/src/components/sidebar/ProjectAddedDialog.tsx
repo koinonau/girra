@@ -6,7 +6,6 @@ import { finishProjectAddWithDefaultCheckout } from './project-added-default-che
 
 type ProjectAddedModalData = {
   repoId?: string
-  projectId?: string
 }
 
 export default function ProjectAddedDialog(): null {
@@ -20,14 +19,7 @@ export default function ProjectAddedDialog(): null {
   const handoffRunRef = useRef(0)
   const pendingRepoHydrationRef = useRef<string | null>(null)
 
-  // Why: older onboarding builds wrote `projectId`; accepting both prevents a
-  // stale project-added modal from blocking follow-up contextual tours.
-  const repoId =
-    typeof modalData?.repoId === 'string'
-      ? modalData.repoId
-      : typeof modalData?.projectId === 'string'
-        ? modalData.projectId
-        : ''
+  const repoId = typeof modalData?.repoId === 'string' ? modalData.repoId : ''
   const repo = repos.find((candidate) => candidate.id === repoId) ?? null
 
   useEffect(() => {
