@@ -4,7 +4,7 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6 and the ADRs are merged; Phase 7a is in review. Every item below waits on the user.
+Measured 2026-09-15. No tracker exists, so these come from the build plan's phases. Phases 0 to 4, 5a, 6, 7a and the ADRs are merged. Every item below waits on the user.
 
 1. **Phase 5b to 5d, remaining Codex integrations.** Blocked on the launch roster decision, which sets whether Codex stays launchable and so how much of hooks, trust, the shell-launch preflight, backfill, the app-server runtime, native chat and AI Vault goes. See the build plan's Phase 5 for the order.
 2. **Phase 7b, Orca identity strip.** Waits on the product name, CLI binary and "Orca CLI" prose decisions in `handover.md`, because much of the text is only correct once they land. The build plan's Phase 7 records the measured scope and the traps.
