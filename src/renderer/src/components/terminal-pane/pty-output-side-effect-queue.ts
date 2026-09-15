@@ -7,7 +7,7 @@ export const MAX_EVICTED_AGENT_STATUS_PAYLOAD_CARRY = 16
 export type PendingPtySideEffect = {
   payloads: ProcessedAgentStatusChunk['payloads']
   titles: string[]
-  titleScanEffect: 'none' | 'stale-probe' | 'ignored-cursor-native'
+  titleScanEffect: 'none' | 'stale-probe'
   containsBell: boolean
   suppressAttentionEvents: boolean
 }
@@ -23,7 +23,6 @@ export type PtyOutputSideEffectQueue = {
   flush: () => void
   pause: () => void
   clear: () => void
-  isDrained: () => boolean
   pendingWorkingTitleCount: () => number
 }
 
@@ -144,7 +143,6 @@ export function createPtyOutputSideEffectQueue({
       pendingIndex = 0
       pendingWorkingTitles = 0
     },
-    isDrained: () => pendingIndex >= pendingEffects.length,
     pendingWorkingTitleCount: () => pendingWorkingTitles
   }
 }

@@ -135,8 +135,7 @@ describe('agent status observation provenance', () => {
   // non-boundaries — exactly the defect PR #14626 fixed one instance of.
   it.each([
     { source: 'claude', hookEventName: 'UserPromptSubmit', agentType: 'claude' },
-    { source: 'pi', hookEventName: 'before_agent_start', agentType: 'pi' },
-    { source: 'omp', hookEventName: 'before_agent_start', agentType: 'omp' }
+    { source: 'pi', hookEventName: 'before_agent_start', agentType: 'pi' }
   ])(
     'stamps boundary for $source $hookEventName even though it is not a gate literal',
     ({ source, hookEventName, agentType }) => {

@@ -24,11 +24,6 @@ export type TerminalSideEffectFact =
   /** Carries the parsed link so the renderer store consumer never re-parses
    *  the URL (parse drift would break the per-PTY dedupe contract). */
   | { kind: 'pr-link'; link: TerminalGitHubPRLink }
-  /** Command Code output scrape (that CLI lacks hooks). Working seeds the
-   *  agent-status row immediately; done is a hint the renderer settle-checks
-   *  against its live status row before completing the turn. */
-  | { kind: 'command-code-working'; prompt: string }
-  | { kind: 'command-code-done'; prompt: string }
   /** DECSET 2031 color-scheme subscribe observed in the byte stream. Emitted
    *  so hidden-delivery-gated views (whose bytes never arrive) can still record
    *  the subscription and push later theme flips; subscribing is never answered. */
@@ -44,9 +39,7 @@ export type TerminalSideEffectBatch = {
    *  their title state was current at, so the handler can drop a replay title
    *  older than the last live title fact it applied. */
   seq: number
-  /** Facts from one chunk, in byte order: agent status, titles, then bell.
-   *  Command Code scrape facts trail the chunk's parser facts — their policy
-   *  (status-row seeding) never interacts with title/bell ordering. */
+  /** Facts from one chunk, in byte order: agent status, titles, then bell. */
   facts: TerminalSideEffectFact[]
   /** True for (re)attach snapshots. Replay batches restore title state only —
    *  attention facts (bell, agent transitions) never replay. */

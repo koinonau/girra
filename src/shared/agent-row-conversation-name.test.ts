@@ -155,9 +155,7 @@ describe('getAgentRowConversationName', () => {
     expect(
       getAgentRowConversationName(makeTab({ title: 'Codex - action required' }), 'codex', false)
     ).toBeNull()
-    expect(
-      getAgentRowConversationName(makeTab({ title: 'Cursor Agent' }), 'cursor', false)
-    ).toBeNull()
+    expect(getAgentRowConversationName(makeTab({ title: 'Pi ready' }), 'pi', false)).toBeNull()
   })
 
   it('rejects identity-echo, management, and placeholder titles', () => {
@@ -171,12 +169,6 @@ describe('getAgentRowConversationName', () => {
         'claude',
         false
       )
-    ).toBeNull()
-    expect(
-      getAgentRowConversationName(makeTab({ title: '✦ Gemini CLI' }), 'gemini', false)
-    ).toBeNull()
-    expect(
-      getAgentRowConversationName(makeTab({ title: '◇ Ready (orca)' }), 'gemini', false)
     ).toBeNull()
     expect(
       getAgentRowConversationName(makeTab({ title: 'claude agents' }), 'claude', false)

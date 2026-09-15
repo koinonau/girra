@@ -203,10 +203,10 @@ describe('shared agent-hook-listener', () => {
   it('routes pathnames to a known source or null', () => {
     expect(resolveHookSource('/hook/claude')).toBe('claude')
     expect(resolveHookSource('/hook/pi')).toBe('pi')
-    expect(resolveHookSource('/hook/omp')).toBe('omp')
-    expect(resolveHookSource('/hook/prime-agent')).toBe('prime-agent')
     // Installed scripts for removed integrations still post here; they must drop.
     expect(resolveHookSource('/hook/grok')).toBeNull()
+    expect(resolveHookSource('/hook/omp')).toBeNull()
+    expect(resolveHookSource('/hook/prime-agent')).toBeNull()
     expect(resolveHookSource('/hook/unknown')).toBeNull()
     expect(resolveHookSource('/')).toBeNull()
   })

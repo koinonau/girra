@@ -12,13 +12,8 @@ export type SyntheticAgentTitleProfile = {
 
 export const SYNTHETIC_AGENT_TITLE_AGENTS = [
   'codex',
-  'cursor',
   'opencode',
-  'pi',
-  'omp',
-  'droid',
-  'hermes',
-  'devin'
+  'pi'
 ] as const satisfies readonly TuiAgent[]
 
 export const SYNTHETIC_AGENT_TITLE_PROFILES: Record<string, SyntheticAgentTitleProfile> = {
@@ -29,11 +24,6 @@ export const SYNTHETIC_AGENT_TITLE_PROFILES: Record<string, SyntheticAgentTitleP
     // Why: Codex emits working OSC titles but can miss the final frame.
     // Only synthesize terminal states so native spinner behavior stays intact.
     synthesizeWorkingTitle: false
-  },
-  cursor: {
-    workingLabel: 'Cursor Agent',
-    permissionLabel: 'Cursor - action required',
-    idleLabel: 'Cursor ready'
   },
   opencode: {
     workingLabel: 'OpenCode',
@@ -51,30 +41,6 @@ export const SYNTHETIC_AGENT_TITLE_PROFILES: Record<string, SyntheticAgentTitleP
     // over it replaced the session label and fought its frames at 80ms. Terminal states still
     // synthesize: they carry the pane's agent identity downstream, and Pi is quiet at rest.
     synthesizeWorkingTitle: false
-  },
-  omp: {
-    workingLabel: 'OMP',
-    permissionLabel: 'OMP - action required',
-    idleLabel: 'OMP ready',
-    titleIdentityGroup: 'pi-compatible',
-    // Why: on an Orca-hosted pane it is Orca's own injected titlebar extension writing the
-    // working title (src/main/pi/titlebar-extension-source.ts). See pi above.
-    synthesizeWorkingTitle: false
-  },
-  droid: {
-    workingLabel: 'Droid',
-    permissionLabel: 'Droid - action required',
-    idleLabel: 'Droid ready'
-  },
-  hermes: {
-    workingLabel: 'Hermes',
-    permissionLabel: 'Hermes - action required',
-    idleLabel: 'Hermes ready'
-  },
-  devin: {
-    workingLabel: 'Devin',
-    permissionLabel: 'Devin - action required',
-    idleLabel: 'Devin ready'
   }
 }
 

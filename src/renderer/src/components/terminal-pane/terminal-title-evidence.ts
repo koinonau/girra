@@ -38,10 +38,6 @@ export type ResolvePaneTitleDecisionInput = {
   displayOwnerAgentType: AgentType | null | undefined
   /** True when displayOwnerAgentType is user-selected launch ownership. */
   displayOwnerIsLaunch?: boolean
-  /** Owner used for the renderer veto — must be pane-scoped and current so a
-   *  sibling/reused pane's launch identity cannot keep GPU for a genuine
-   *  Gemini pane. */
-  rendererOwnerAgentType: AgentType | null | undefined
   userGpuMode: TerminalGpuAccelerationMode
   webglUnavailable?: boolean
   inContextLossContainment?: boolean
@@ -54,8 +50,6 @@ export function resolvePaneTitleDecision(input: ResolvePaneTitleDecisionInput): 
     input.displayOwnerIsLaunch === true
   )
   const rendererPolicy = resolvePaneRendererPolicy({
-    rawTitle: input.rawTitle,
-    ownerAgentType: input.rendererOwnerAgentType,
     userGpuMode: input.userGpuMode,
     webglUnavailable: input.webglUnavailable,
     inContextLossContainment: input.inContextLossContainment

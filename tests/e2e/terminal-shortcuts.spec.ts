@@ -37,7 +37,7 @@ import {
 
 async function setActivePaneForegroundAgent(
   page: Page,
-  agent: 'droid' | 'antigravity' | null
+  agent: 'pi' | 'opencode' | null
 ): Promise<string> {
   return page.evaluate((agent) => {
     const state = window.__store?.getState()
@@ -59,7 +59,7 @@ async function setActivePaneForegroundAgent(
       shellForeground: false,
       // The shortcut only emits CSI-u for a process identity confirmed to
       // belong to this PTY; keep the fixture aligned with that trust gate.
-      routingTrusted: agent === 'droid'
+      routingTrusted: agent === 'pi'
     })
     return paneKey
   }, agent)
@@ -493,17 +493,17 @@ test.describe('Terminal Shortcuts', () => {
     await pressAndExpectWrite(orcaPage, electronApp, 'Shift+Enter', '\x1b\r')
   })
 
-  test('Droid gets CSI-u Shift+Enter on Windows without changing Antigravity', async ({
+  test('Pi gets CSI-u Shift+Enter on Windows without changing OpenCode', async ({
     orcaPage,
     electronApp
   }) => {
     test.skip(process.platform !== 'win32', 'Windows ConPTY encoding contract')
     await installMainProcessPtyWriteSpy(electronApp)
     await waitForActivePanePtyId(orcaPage)
-    const paneKey = await setActivePaneForegroundAgent(orcaPage, 'droid')
+    const paneKey = await setActivePaneForegroundAgent(orcaPage, 'pi')
     try {
       await pressAndExpectWrite(orcaPage, electronApp, 'Shift+Enter', '\x1b[13;2u', 2)
-      await setActivePaneForegroundAgent(orcaPage, 'antigravity')
+      await setActivePaneForegroundAgent(orcaPage, 'opencode')
       await pressAndExpectWrite(orcaPage, electronApp, 'Shift+Enter', '\x1b\r')
     } finally {
       await orcaPage.evaluate(
@@ -526,7 +526,7 @@ test.describe('Terminal Shortcuts', () => {
     await pressAndExpectWrite(orcaPage, electronApp, 'Control+Alt+;', '\x1b;')
   })
 
-  test('Ctrl+Enter protects local ConPTY shells without breaking trusted TUI chords', async ({
+  test('Ctrl+Enter protects local ConPTY shells without breaking query-only TUI chords', async ({
     orcaPage,
     electronApp
   }) => {
@@ -535,20 +535,10 @@ test.describe('Terminal Shortcuts', () => {
 
     if (process.platform === 'win32') {
       await pressAndExpectWrite(orcaPage, electronApp, 'Control+Enter', '\r')
-      const paneKey = await setActivePaneForegroundAgent(orcaPage, 'droid')
-      try {
-        // Droid queries CSI-u without activating live flags; trusted process evidence preserves cue/queue.
-        await pressAndExpectWrite(orcaPage, electronApp, 'Control+Enter', '\x1b[13;5u')
-      } finally {
-        await orcaPage.evaluate(
-          (key) => window.__store?.getState().clearPaneForegroundAgent(key),
-          paneKey
-        )
-      }
       return
     }
 
-    // Preserve the established query-only Droid/Grok contract outside local ConPTY.
+    // Preserve the established query-only CSI-u contract outside local ConPTY.
     await pressAndExpectWrite(orcaPage, electronApp, 'Control+Enter', '\x1b[13;5u')
   })
 

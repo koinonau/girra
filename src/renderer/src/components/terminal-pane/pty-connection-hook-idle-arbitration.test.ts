@@ -343,41 +343,4 @@ describe('connectPanePty', () => {
       expect.any(Function)
     )
   })
-
-  it('ignores a Pi idle title while compatible OMP hook status is active', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport()
-    transportFactoryQueue.push(transport)
-    const paneKey = makePaneKey('tab-1', LEAF_1)
-    mockStoreState.agentStatusByPaneKey[paneKey] = {
-      state: 'working',
-      prompt: 'OMP is still working',
-      updatedAt: Date.now() - 60_000,
-      stateStartedAt: Date.now() - 60_000,
-      agentType: 'omp',
-      paneKey,
-      stateHistory: []
-    }
-
-    const pane = createPane(1)
-    const manager = createManager(1)
-    const deps = createDeps()
-
-    connectPanePty(pane as never, manager as never, deps as never)
-
-    const idleHandler = createdTransportOptions[0]?.onAgentBecameIdle as
-      | ((title: string) => void)
-      | undefined
-    if (!idleHandler) {
-      throw new Error('Expected onAgentBecameIdle to be registered')
-    }
-
-    idleHandler('Pi ready')
-
-    expect(deps.dispatchNotification).not.toHaveBeenCalled()
-    expect(pane.terminal.write).not.toHaveBeenCalledWith(
-      RESET_TERMINAL_CURSOR_STYLE,
-      expect.any(Function)
-    )
-  })
 })

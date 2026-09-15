@@ -235,7 +235,6 @@ describe('AgentTerminalPreview clipboard routes', () => {
           localWindowsConpty: false,
           windowsShiftEnterEncoding: 'alt-enter',
           windowsInputRecordPasteNewline: 'alt-enter',
-          ctrlEnterCsiU: false,
           kittyKeyboardAdvertised: false
         }}
       />

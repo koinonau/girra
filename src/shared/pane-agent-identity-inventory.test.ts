@@ -119,16 +119,11 @@ const INVENTORY: readonly InventoryGroup[] = [
     paths: [
       'src/shared/agent-detection.ts',
       'src/shared/agent-name-token-match.ts',
-      ['src/shared/agent-title-core.ts', 4],
+      ['src/shared/agent-title-core.ts', 2],
       ['src/shared/agent-title-evidence.ts', 2],
-      ['src/shared/agent-title-identity.ts', 11],
-      ['src/shared/terminal-title-agent-type.ts', 14]
+      ['src/shared/agent-title-identity.ts', 4],
+      ['src/shared/terminal-title-agent-type.ts', 5]
     ]
-  },
-  {
-    helper: 'titleHasAgentName',
-    classification: 'evidence-producer',
-    paths: [['src/renderer/src/hooks/ipc-events/agent-status-routing.ts', 2]]
   },
   {
     helper: 'buildAgentNameRe',
@@ -167,7 +162,6 @@ const INVENTORY: readonly InventoryGroup[] = [
     classification: 'action-consumer',
     paths: [
       ['src/renderer/src/components/tab-bar/native-chat-tab-agent-evidence.ts', 3],
-      ['src/renderer/src/components/terminal-pane/terminal-ctrl-enter.ts', 2],
       ['src/renderer/src/components/terminal-pane/terminal-windows-shift-enter.ts', 2],
       ['src/renderer/src/components/terminal-pane/use-notification-dispatch.ts', 2]
     ]
@@ -196,11 +190,6 @@ const INVENTORY: readonly InventoryGroup[] = [
     helper: 'resolvePaneAgentOwner',
     classification: 'parser-implementation',
     paths: ['src/shared/pane-agent-owner.ts']
-  },
-  {
-    helper: 'resolvePaneAgentOwner',
-    classification: 'evidence-producer',
-    paths: [['src/renderer/src/components/terminal-pane/parked-terminal-command-status.ts', 2]]
   },
   {
     helper: 'resolvePaneAgentOwner',
@@ -325,13 +314,12 @@ const INVENTORY: readonly InventoryGroup[] = [
     helper: 'detectAgentStatusFromTitle',
     classification: 'parser-implementation',
     paths: [
-      ['src/renderer/src/components/terminal-pane/title-agent-identity.ts', 2],
       'src/renderer/src/lib/agent-status.ts',
       ['src/renderer/src/lib/pane-agent-evidence.ts', 3],
       ['src/shared/agent-decorative-title-signature.ts', 2],
       'src/shared/agent-detection.ts',
       ['src/shared/agent-title-owner.ts', 2],
-      ['src/shared/agent-title-status.ts', 6]
+      ['src/shared/agent-title-status.ts', 5]
     ]
   },
   {
@@ -384,11 +372,6 @@ const DIRECT_SINGLE_SOURCE_SURFACES: readonly {
   marker: string
 }[] = [
   {
-    path: 'src/renderer/src/components/terminal-pane/terminal-renderer-policy.ts',
-    classification: 'identity-consumer',
-    marker: 'resolveGeminiCompatFallback'
-  },
-  {
     path: 'src/renderer/src/components/terminal-pane/terminal-title-evidence.ts',
     classification: 'identity-consumer',
     marker: 'resolvePaneTitleDecision'
@@ -397,11 +380,6 @@ const DIRECT_SINGLE_SOURCE_SURFACES: readonly {
     path: 'src/renderer/src/components/terminal/terminal-close-copy-kind.ts',
     classification: 'identity-consumer',
     marker: 'resolveLeafCloseCopyKind'
-  },
-  {
-    path: 'src/main/runtime/orchestration/mailbox-pointer-stage.ts',
-    classification: 'action-consumer',
-    marker: 'isCursorAgentTitle'
   },
   {
     path: 'src/main/providers/local-pty-session-activation.ts',

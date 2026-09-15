@@ -322,7 +322,7 @@ describe('createIpcPtyTransport', () => {
     const spawnMock = vi.fn().mockResolvedValue({
       id: 'pty-reattach',
       isReattach: true,
-      launchAgent: 'droid',
+      launchAgent: 'pi',
       snapshot: 'snapshot data',
       snapshotCols: 132,
       snapshotRows: 43,
@@ -364,7 +364,7 @@ describe('createIpcPtyTransport', () => {
     expect(result).toEqual({
       id: 'pty-reattach',
       isReattach: true,
-      launchAgent: 'droid',
+      launchAgent: 'pi',
       snapshot: 'snapshot data',
       snapshotCols: 132,
       snapshotRows: 43,

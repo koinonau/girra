@@ -154,7 +154,7 @@ describe('agent prompt submission runtime', () => {
     const { runtime, handle, writes } = await createPromptRuntime(() => undefined)
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"working","agentType":"aider"}\x07' +
+      '\x1b]9999;{"state":"working","agentType":"opencode"}\x07' +
         '\x1b]0;Codex waiting for permission\x07',
       Date.now()
     )
@@ -174,7 +174,7 @@ describe('agent prompt submission runtime', () => {
     })
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]0;Codex waiting for permission\x1b]9999;{"state":"working","agentType":"aider"',
+      '\x1b]0;Codex waiting for permission\x1b]9999;{"state":"working","agentType":"opencode"',
       Date.now()
     )
     runtime.onPtyData('pty-prompt', '}\x07\x07', Date.now())
@@ -197,7 +197,7 @@ describe('agent prompt submission runtime', () => {
     runtime.onPtyData('pty-prompt', '\x1b]0;Codex idle\x07', Date.now())
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"waiting","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"waiting","agentType":"opencode"}\x07',
       Date.now()
     )
 
@@ -250,10 +250,10 @@ describe('agent prompt submission runtime', () => {
 
   it.each([
     '\x1b]0;Codex waiting for permission\x07\x1b]0;Codex idle\x07',
-    '\x1b]9999;{"state":"working","agentType":"aider"}\x07' +
+    '\x1b]9999;{"state":"working","agentType":"opencode"}\x07' +
       '\x1b]0;Codex waiting for permission\x07',
     '\x1b]0;Codex waiting for permission\x07' +
-      '\x1b]9999;{"state":"working","agentType":"aider"}\x07'
+      '\x1b]9999;{"state":"working","agentType":"opencode"}\x07'
   ])('does not send Enter after coalesced permission activity', async (output) => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createPromptRuntime((runtime, data) => {
@@ -318,7 +318,7 @@ describe('agent prompt submission runtime', () => {
     const { runtime, handle, writes } = await createPromptRuntime(() => undefined)
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"done","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"done","agentType":"opencode"}\x07',
       Date.now()
     )
     runtime.onPtyData('pty-prompt', '\x1b]0;Codex waiting for permission\x07', Date.now())
@@ -341,7 +341,7 @@ describe('agent prompt submission runtime', () => {
           terminalHandle: handle,
           state: 'done',
           prompt: '',
-          agentType: 'aider',
+          agentType: 'opencode',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now()
@@ -362,7 +362,7 @@ describe('agent prompt submission runtime', () => {
     })
     handle = (
       await runtime.createTerminal(`path:${AGENT_PROMPT_TEST_WORKTREE_PATH}`, {
-        launchAgent: 'aider'
+        launchAgent: 'opencode'
       })
     ).handle
     runtime.onPtyData(
@@ -389,7 +389,7 @@ describe('agent prompt submission runtime', () => {
     })
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"done","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"done","agentType":"opencode"}\x07',
       Date.now()
     )
 
@@ -408,7 +408,7 @@ describe('agent prompt submission runtime', () => {
     vi.setSystemTime(2_000)
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"working","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"working","agentType":"opencode"}\x07',
       Date.now()
     )
 
@@ -432,7 +432,7 @@ describe('agent prompt submission runtime', () => {
     })
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"working","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"working","agentType":"opencode"}\x07',
       Date.now()
     )
 
@@ -452,7 +452,7 @@ describe('agent prompt submission runtime', () => {
     }, 'codex')
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"working","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"working","agentType":"opencode"}\x07',
       Date.now()
     )
 
@@ -470,13 +470,10 @@ describe('agent prompt submission runtime', () => {
 
   // Why: hook rows reach the runtime through this provider, which has no window and no OSC title —
   // the same path a headless `orca serve` host and a minimized desktop window take.
-  async function createHookOnlyPromptRuntime(
-    hook: {
-      state: 'done' | 'working'
-      stateStartedAt: number
-    },
-    launchAgent: 'kimi' | 'codex' = 'kimi'
-  ): Promise<{
+  async function createHookOnlyPromptRuntime(hook: {
+    state: 'done' | 'working'
+    stateStartedAt: number
+  }): Promise<{
     runtime: OrcaRuntimeService
     handle: string
     writes: string[]
@@ -490,7 +487,7 @@ describe('agent prompt submission runtime', () => {
           terminalHandle: handle,
           state: hook.state,
           prompt: '',
-          agentType: launchAgent,
+          agentType: 'codex',
           connectionId: null,
           // Why: every hook ping refreshes receivedAt, including same-state tool pings.
           receivedAt: Date.now(),
@@ -509,7 +506,7 @@ describe('agent prompt submission runtime', () => {
     })
     handle = (
       await runtime.createTerminal(`path:${AGENT_PROMPT_TEST_WORKTREE_PATH}`, {
-        launchAgent
+        launchAgent: 'codex'
       })
     ).handle
     return { runtime, handle, writes }
@@ -564,7 +561,7 @@ describe('agent prompt submission runtime', () => {
     vi.useFakeTimers()
     vi.setSystemTime(1_000)
     const hook = { state: 'working' as const, stateStartedAt: 1_000 }
-    const { runtime, handle, writes } = await createHookOnlyPromptRuntime(hook, 'codex')
+    const { runtime, handle, writes } = await createHookOnlyPromptRuntime(hook)
 
     const firstPromise = runtime.sendTerminalAgentPrompt(handle, 'first prompt', {
       acceptQueued: true,
@@ -642,7 +639,7 @@ describe('agent prompt submission runtime', () => {
     )
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"waiting","agentType":"aider"}\x07',
+      '\x1b]9999;{"state":"waiting","agentType":"opencode"}\x07',
       Date.now()
     )
     runtime.synchronizePtyOutputSequenceFromProvider(

@@ -4,15 +4,8 @@ import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
 
 import { resolvePositiveTerminalDimensions } from '../terminal-snapshot-replay-paint'
 
-import {
-  CURSOR_SHOW_SEQUENCE,
-  TERMINAL_FOCUS_IN_SEQUENCE,
-  FOCUS_REPORTING_DISABLE_SEQUENCE
-} from './foreground-output-scan'
-import {
-  parsedViewportShowsParkedCursorAgentScreen,
-  terminalHasFocusReportingEnabled
-} from './cursor-agent-reattach-screen'
+import { TERMINAL_FOCUS_IN_SEQUENCE } from './foreground-output-scan'
+import { terminalHasFocusReportingEnabled } from './terminal-focus-mode'
 
 import type { ConnectPanePtySession } from './connect-pane-pty-session'
 
@@ -21,7 +14,6 @@ export function bindReplayDataDrain(session: ConnectPanePtySession): void {
     expectedPtyId: string | null = session.transport.getPtyId(),
     expectedStreamGeneration = session.transportStreamGeneration
   ): void => {
-    const scheduledGeneration = session.reattachReplayPayloadSignalGeneration
     void waitForTerminalOutputParsed(session.pane.terminal).then(() => {
       const currentPtyId = session.transport.getPtyId()
       if (
@@ -31,30 +23,8 @@ export function bindReplayDataDrain(session: ConnectPanePtySession): void {
       ) {
         return
       }
-      // Why: a newer replay frame owns the judgment; its own post-parse
-      // callback will re-evaluate against its own viewport.
-      if (scheduledGeneration !== session.reattachReplayPayloadSignalGeneration) {
-        return
-      }
-      // Why: the replay-byte signal also matches a dead run's screen — in
-      // scrollback or still painted above a fresh shell prompt. The parsed
-      // viewport is the ground truth; unless it shows a parked-cursor
-      // cursor-agent screen and no status/title corroborates, downgrade to
-      // the plain-shell behavior (drop focus reporting, skip focus-in).
-      if (
-        !session.hasLiveAgentReattachStatusOrTitleSignal() &&
-        session.reattachReplayPayloadHasCursorAgentSignal
-      ) {
-        if (parsedViewportShowsParkedCursorAgentScreen(session.pane.terminal) === false) {
-          session.reattachReplayPayloadHasCursorAgentSignal = false
-          // Why: the live-agent reset preserved the payload's ?25l; a plain
-          // shell never re-shows the cursor itself.
-          session.writeReplayData(`${CURSOR_SHOW_SEQUENCE}${FOCUS_REPORTING_DISABLE_SEQUENCE}`)
-          return
-        }
-      }
-      // Why: a live TUI such as cursor-agent parks the real terminal cursor off
-      // its own input caret and moves it back only on a focus-in. Reattach
+      // Why: a live TUI can park the real terminal cursor off
+      // its own input caret and move it back only on a focus-in. Reattach
       // reuses the same live PTY and the xterm textarea already holds DOM
       // focus, so xterm never emits the focus-in the agent needs and the parked
       // cursor anchors the IME/caret to the wrong cell. Gated on ?1004h so a
@@ -142,11 +112,6 @@ export function bindReplayDataDrain(session: ConnectPanePtySession): void {
           session.suppressStructuralReplayPtyResize = false
         }
         replayedAtSourceGrid = true
-      }
-      if (clearBeforeReplay || data.length > 0) {
-        // Why: an empty clearing frame is still an authoritative repaint and
-        // must clear a stale agent signal from an earlier payload.
-        session.rememberReattachPayloadAgentSignal(data, { fullScreenReplay: clearBeforeReplay })
       }
       // Why: replayed application bytes carry the live TUI's kitty keyboard
       // negotiation; the mirror must re-arm from them after a reload. Replay

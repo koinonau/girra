@@ -72,37 +72,31 @@ describe('controlled title fixtures (always run)', () => {
   const FIXTURES: readonly { name: string; title: string; expected: TuiAgent | null }[] = [
     {
       name: 'mandatory adversarial owner suffix beats the agent names in task text',
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok',
-      expected: 'grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode',
+      expected: 'opencode'
     },
     {
       name: 'task text mentioning other agents is not identity',
-      title: 'Compare Antigravity with Gemini 3.7 Flash',
+      title: 'Compare Codex with Claude Code',
       expected: null
     },
     {
       name: 'owner suffix still answers over mentioned agents',
-      title: 'Compare Antigravity with Gemini 3.7 Flash… - grok',
-      expected: 'grok'
+      title: 'Compare Codex with Claude Code… - opencode',
+      expected: 'opencode'
     },
     { name: 'Claude status sigil is a vendor marker', title: '✳', expected: 'claude' },
     { name: 'Claude management screen is not identity', title: 'claude agents', expected: null },
     { name: 'a shell title names no agent', title: 'zsh', expected: null },
     { name: 'a default worktree-ish title names no agent', title: 'my-claude-fix', expected: null },
     {
-      name: 'conflicting vendor markers resolve to nothing',
-      title: '✳ | ✦ two sigils',
-      expected: null
-    },
-    {
       name: 'conflicting anchored names resolve to nothing',
-      title: 'OC | something… - grok',
+      title: 'OC | something… - pi',
       expected: null
     },
     { name: 'a bare Pi title anchors as Pi', title: 'pi', expected: 'pi' },
-    { name: 'an OMP status title anchors as OMP', title: 'omp ready', expected: 'omp' },
     {
-      // Wrapper-frame π/OMP separators are handled by the synthetic-title path, not this
+      // Wrapper-frame π separators are handled by the synthetic-title path, not this
       // evidence parser; pinned so a parser change here is a deliberate decision.
       name: 'a π wrapper frame is declined by the evidence parser',
       title: 'π : ready',

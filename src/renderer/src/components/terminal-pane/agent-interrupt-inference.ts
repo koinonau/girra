@@ -42,7 +42,7 @@ function requiresDoubleEscapeForAgent(
   agentType: AgentStatusEntry['agentType'],
   intent: AgentInterruptInputIntent
 ): boolean {
-  return (agentType === 'opencode' || agentType === 'copilot') && intent === 'plain-escape'
+  return agentType === 'opencode' && intent === 'plain-escape'
 }
 
 function shouldFlushInterruptImmediately(
@@ -50,16 +50,8 @@ function shouldFlushInterruptImmediately(
 ): boolean {
   return (
     requiresDoubleEscapeForAgent(baseline.agentType, baseline.intent) ||
-    baseline.agentType === 'gemini' ||
     (baseline.agentType === 'codex' && baseline.intent === 'plain-escape')
   )
-}
-
-function shouldIgnoreInterruptIntent(
-  agentType: AgentStatusEntry['agentType'],
-  intent: AgentInterruptInputIntent
-): boolean {
-  return agentType === 'droid' && intent === 'ctrl-c'
 }
 
 function canInferInterrupt(entry: AgentStatusEntry, intent: AgentInterruptInputIntent): boolean {
@@ -231,10 +223,6 @@ export function createAgentInterruptInference({
       }
       let baseline = captureBaseline(entry, intent)
       if (!baseline) {
-        clearPending()
-        return
-      }
-      if (shouldIgnoreInterruptIntent(baseline.agentType, intent)) {
         clearPending()
         return
       }

@@ -89,9 +89,7 @@ export function resolveTerminalShortcutAction(
   // Why: keybindings follow the client OS, but byte protocols follow the PTY host — they differ for macOS clients on Windows runtimes.
   isWindowsTerminalHost: () => boolean = () => isWindows,
   // Why: gates the tab.close pane-close alias — under terminal-first a remapped tab.close yields to the shell (terminal.closePane, scope terminal, still closes).
-  terminalShortcutPolicy: TerminalShortcutPolicy = 'orca-first',
-  // Why: query-only Droid/Grok consumers need CSI-u even when the live kitty flags remain inactive.
-  hasCtrlEnterCsiUAuthority?: () => boolean
+  terminalShortcutPolicy: TerminalShortcutPolicy = 'orca-first'
 ): TerminalShortcutAction | null {
   const platform: NodeJS.Platform = isMac ? 'darwin' : isWindows ? 'win32' : 'linux'
 
@@ -170,7 +168,7 @@ export function resolveTerminalShortcutAction(
     event.shiftKey &&
     event.key === 'Enter'
   ) {
-    // Why: negotiated KKP is authoritative everywhere; trusted pane evidence also preserves Droid's Windows encoding without KKP.
+    // Why: negotiated KKP is authoritative everywhere; trusted pane evidence also preserves a csi-u agent's Windows encoding without KKP.
     const windowsHost = isWindowsTerminalHost()
     const hasTrustedWindowsCsiU = windowsHost && getWindowsShiftEnterEncoding?.() === 'csi-u'
     // Why: CSI-u is application input, not universal; without trusted Windows evidence, require active KKP negotiation.
@@ -186,11 +184,8 @@ export function resolveTerminalShortcutAction(
     event.key === 'Enter'
   ) {
     const localWindowsConpty = isLocalWindowsConptyPane?.() === true
-    // Why: preserve query-only TUI chords elsewhere; local ConPTY shells require negotiation or trusted consumer evidence (#12329).
-    const canSendCsiU =
-      !localWindowsConpty ||
-      (getKittyKeyboardFlagsActivePane?.() ?? 0) > 0 ||
-      hasCtrlEnterCsiUAuthority?.() === true
+    // Why: preserve query-only TUI chords elsewhere; local ConPTY shells require negotiation (#12329).
+    const canSendCsiU = !localWindowsConpty || (getKittyKeyboardFlagsActivePane?.() ?? 0) > 0
     return {
       type: 'sendInput',
       data: canSendCsiU ? '\x1b[13;5u' : '\r'

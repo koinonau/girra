@@ -8,54 +8,45 @@ import { resolvePrompt, resolveToolState } from '../prompt-fields'
 import { extractToolFields, isNewTurnEvent } from '../provider-event-routing'
 import { readString } from '../tool-input-preview'
 
-export function normalizePiCompatibleEvent(
+export function normalizePiEvent(
   state: HookListenerState,
-  agentType: 'pi' | 'omp' | 'prime-agent',
   eventName: unknown,
   promptText: string,
   paneKey: string,
   hookPayload: Record<string, unknown>
 ): ParsedAgentStatusPayload | null {
-  if (agentType !== 'omp' && eventName === 'session_start') {
+  if (eventName === 'session_start') {
     // Why: Pi's session_start fires on TUI open/resume; discard stale turn details, no working row before user activity.
     clearPaneTurnCacheState(state, paneKey)
     // Why: a custom modal can switch sessions before its promise resolves.
-    if (agentType !== 'pi' || hookPayload.ui_prompt_active !== true) {
+    if (hookPayload.ui_prompt_active !== true) {
       return null
     }
   }
 
   // Why: gate on the event's own tool_name so a stale cached question can't re-enter blocked.
-  const toolName = readString(hookPayload, 'tool_name')
-  const isPiCompatibleAsk =
-    ((agentType === 'pi' && isAskUserQuestionTool(toolName)) ||
-      (agentType === 'omp' && toolName === 'ask')) &&
+  const isPiAsk =
+    isAskUserQuestionTool(readString(hookPayload, 'tool_name')) &&
     (eventName === 'tool_call' || eventName === 'tool_execution_start')
-  const isOmpApprovalRequest = agentType === 'omp' && eventName === 'tool_approval_requested'
-  const isOmpApprovalResolution = agentType === 'omp' && eventName === 'tool_approval_resolved'
-  const isPiUiPrompt =
-    agentType === 'pi' && (eventName === 'ui_prompt_start' || hookPayload.ui_prompt_active === true)
-  const isPiUiPromptEnd = agentType === 'pi' && eventName === 'ui_prompt_end'
+  const isPiUiPrompt = eventName === 'ui_prompt_start' || hookPayload.ui_prompt_active === true
 
-  let stateName =
-    isPiCompatibleAsk || isOmpApprovalRequest
-      ? 'blocked'
-      : isOmpApprovalResolution ||
-          eventName === 'before_agent_start' ||
-          eventName === 'agent_start' ||
-          eventName === 'tool_call' ||
-          eventName === 'tool_execution_start' ||
-          eventName === 'tool_execution_end' ||
-          eventName === 'message_end'
-        ? 'working'
-        : eventName === 'agent_end'
-          ? 'done'
-          : null
+  let stateName = isPiAsk
+    ? 'blocked'
+    : eventName === 'before_agent_start' ||
+        eventName === 'agent_start' ||
+        eventName === 'tool_call' ||
+        eventName === 'tool_execution_start' ||
+        eventName === 'tool_execution_end' ||
+        eventName === 'message_end'
+      ? 'working'
+      : eventName === 'agent_end'
+        ? 'done'
+        : null
 
   if (isPiUiPrompt) {
     // Why: waiting uses the same orange question icon as Claude input prompts.
     stateName = 'waiting'
-  } else if (isPiUiPromptEnd) {
+  } else if (eventName === 'ui_prompt_end') {
     stateName = hookPayload.is_idle === true ? 'done' : 'working'
   }
 
@@ -66,16 +57,18 @@ export function normalizePiCompatibleEvent(
   const snapshot = resolveToolState(
     state,
     paneKey,
-    extractToolFields(agentType, eventName, hookPayload),
-    { resetOnNewTurn: isNewTurnEvent(agentType, eventName) }
+    extractToolFields('pi', eventName, hookPayload),
+    {
+      resetOnNewTurn: isNewTurnEvent('pi', eventName)
+    }
   )
 
   return normalizeAgentStatusPayload({
     state: stateName,
     prompt: resolvePrompt(state, paneKey, promptText, {
-      resetOnNewTurn: isNewTurnEvent(agentType, eventName)
+      resetOnNewTurn: isNewTurnEvent('pi', eventName)
     }),
-    agentType,
+    agentType: 'pi',
     toolName: snapshot.toolName,
     toolInput: snapshot.toolInput,
     interactivePrompt: snapshot.interactivePrompt,

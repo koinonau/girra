@@ -602,7 +602,7 @@ describe('PR E2E gate contract', () => {
       'src/renderer/src/components/terminal-pane/terminal-ime-native-text-forwarder.ts',
       'src/renderer/src/components/terminal-pane/terminal-ios-hangul-preedit.ts',
       'src/renderer/src/components/terminal-pane/xterm-bypass-policy.ts',
-      'src/renderer/src/lib/pane-manager/terminal-ime-anchor.ts',
+      'src/renderer/src/lib/pane-manager/terminal-ime-candidate-anchor.ts',
       'src/shared/terminal-unicode-provider.ts',
       // The xterm fork owns the helper textarea the IME attaches to; no file here says "ime".
       'config/patches/@xterm__xterm@6.1.0-beta.287.patch',
@@ -626,7 +626,7 @@ describe('PR E2E gate contract', () => {
       'src/main/terminal/pty-manager.ts',
       'docs/STYLEGUIDE.md',
       'src/renderer/src/components/terminal-pane/terminal-ime-composition-route.test.ts',
-      'src/renderer/src/lib/pane-manager/terminal-ime-anchor.test.ts'
+      'src/renderer/src/lib/pane-manager/terminal-ime-candidate-anchor.test.ts'
     ]) {
       expect(hasNativeImeSourceChange([file]), file).toBe(false)
     }

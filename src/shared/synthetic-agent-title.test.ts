@@ -6,7 +6,7 @@ import {
 } from './synthetic-agent-title'
 
 describe('synthetic agent titles', () => {
-  it.each(['Codex - action required', ' Pi - action required ', 'OMP - action required'])(
+  it.each(['Codex - action required', ' Pi - action required '])(
     'recognizes the generated permission label %s',
     (title) => {
       expect(isSyntheticAgentPermissionTitle(title)).toBe(true)
@@ -14,7 +14,6 @@ describe('synthetic agent titles', () => {
   )
 
   it.each([
-    '✋ Gemini CLI',
     'π ! approve command',
     'OpenCode - action required',
     'Codex ready',
@@ -39,19 +38,6 @@ describe('synthetic agent titles', () => {
     expect(shouldDriveSyntheticAgentTitleFromHook('opencode', 'working')).toBe(false)
     expect(shouldDriveSyntheticAgentTitleFromHook('opencode', 'done')).toBe(false)
     expect(shouldDriveSyntheticAgentTitleFromHook('opencode', 'waiting')).toBe(false)
-  })
-
-  it('provides Devin titles for hook-driven status updates', () => {
-    expect(getSyntheticAgentTerminalTitle('devin', 'done')).toBe('Devin ready')
-    expect(getSyntheticAgentTerminalTitle('devin', 'waiting')).toBe('Devin - action required')
-    expect(shouldDriveSyntheticAgentTitleFromHook('devin', 'working')).toBe(true)
-  })
-
-  it('provides Pi-compatible OMP titles for hook-driven status updates', () => {
-    expect(getSyntheticAgentTerminalTitle('omp', 'done')).toBe('OMP ready')
-    expect(getSyntheticAgentTerminalTitle('omp', 'waiting')).toBe('OMP - action required')
-    // Why: the native π working title carries session name/cwd; synthesizing would clobber it.
-    expect(shouldDriveSyntheticAgentTitleFromHook('omp', 'working')).toBe(false)
   })
 
   it('provides Pi titles for hook-driven status updates', () => {

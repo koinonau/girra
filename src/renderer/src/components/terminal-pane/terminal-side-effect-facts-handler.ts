@@ -81,10 +81,6 @@ export type TerminalSideEffectFactConsumerCallbacks = {
    *  (stale agent-status row drop + interrupt-inference coordination). */
   onCommandFinished?: (bestEffortExitCode: number | null) => void
   onPrLink?: (link: TerminalGitHubPRLink) => void
-  /** Command Code output scrape (no hooks): working seeds the status row;
-   *  done is settle-checked by the pane policy before completing the turn. */
-  onCommandCodeWorking?: (prompt: string) => void
-  onCommandCodeDone?: (prompt: string) => void
   /** DECSET 2031 subscribe observed by main's tracker. Registered only by
    *  hidden-delivery-gated consumers (their bytes never arrive); it records the
    *  subscription for later theme-flip pushes, it does not answer. */
@@ -138,12 +134,6 @@ function applyLiveFact(entry: ConsumerEntry, fact: TerminalSideEffectFact, seq: 
     case 'pr-link':
       entry.callbacks.onPrLink?.(fact.link)
       return
-    case 'command-code-working':
-      entry.callbacks.onCommandCodeWorking?.(fact.prompt)
-      return
-    case 'command-code-done':
-      entry.callbacks.onCommandCodeDone?.(fact.prompt)
-      return
     case '2031-subscribe':
       entry.callbacks.onMode2031Subscribe?.()
       return
@@ -174,7 +164,7 @@ function applyBatchToConsumer(entry: ConsumerEntry, batch: TerminalSideEffectBat
 
 // Why: a reveal remount unregisters the parked watcher synchronously, but the
 // replacement pane registers only after its deferred rAF + async reattach
-// resolves — and replay is title-only, so a bell or a command-code 'done'
+// resolves — and replay is title-only, so a bell or a command-finished fact
 // dropped in that window is lost for good. Only a PTY that just lost its
 // consumer buffers (never-consumed PTYs still drop, per the module contract),
 // bounded in time, batches, and PTYs so an abandoned handoff retains nothing.

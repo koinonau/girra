@@ -1,5 +1,4 @@
 import { recognizeAgentProcessFromCommandLine } from '../../shared/agent-process-recognition'
-import { resolveOuterWrapperForegroundProcess } from '../../shared/foreground-wrapper-agent'
 import type { ProcessTableRow } from '../../shared/process-table-snapshot'
 import {
   getFreshProcessTableSnapshot,
@@ -187,10 +186,5 @@ export function resolveAgentForegroundProcessFromPs(
   // helper is filtered from selection but must remain traversable.
   const ancestryCandidates = shellRow ? [{ ...shellRow, depth: 0 }, ...candidates] : candidates
   const selected = selectForegroundProcessCandidate(foregroundCandidates, ancestryCandidates)
-  if (selected) {
-    // Why: return the outer wrapper (omp) rather than the deeper wrapped child
-    // (pi) of a shell→omp→pi tree — see resolveOuterWrapperForegroundProcess.
-    return resolveOuterWrapperForegroundProcess(selected.recognized, selected.candidate, candidates)
-  }
-  return null
+  return selected?.recognized.processName ?? null
 }

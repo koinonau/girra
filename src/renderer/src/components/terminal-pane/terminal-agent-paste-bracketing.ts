@@ -19,8 +19,8 @@ import type { TerminalPasteTextOptions } from './terminal-paste-model'
  * A verified Windows input-record agent cannot receive paste frames; for that explicit
  * capability, use the same modified-Enter newline contract as Shift+Enter.
  *
- * Why this diverges from terminal-ctrl-enter / terminal-windows-shift-enter, which veto
- * on shellForeground/routingRevoked and require routingTrusted: those resolvers decide
+ * Why this diverges from terminal-windows-shift-enter, which vetoes
+ * on shellForeground/routingRevoked and requires routingTrusted: that resolver decides
  * where to ROUTE input bytes, so a forged identity misdelivers keystrokes. This one only
  * decides how to encode a user-requested paste, whose ESC bytes are sanitized downstream.
  */

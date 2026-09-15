@@ -6,10 +6,7 @@ import {
   getSyntheticAgentTitleProfile,
   shouldDriveSyntheticAgentTitleFromHook
 } from '../../shared/synthetic-agent-title'
-import {
-  driveSyntheticTitleFromHook,
-  stopAllSyntheticTitleSpinners
-} from './synthetic-title-runtime'
+import { driveSyntheticTitleFromHook } from './synthetic-title-runtime'
 import { mainProcessState as state } from './main-process-state'
 
 export type MainWindowAgentStatusOptions = {
@@ -127,6 +124,4 @@ export function clearMainWindowAgentStatusListeners(): void {
   agentHookServer.setListener(null)
   agentHookServer.setPaneStatusClearListener(null)
   setMigrationUnsupportedPtyListener(null)
-  // Why: stop the spinner timer here — it would fire into destroyed webContents, and per-pane teardown may never run for restored-but-untorn panes.
-  stopAllSyntheticTitleSpinners()
 }

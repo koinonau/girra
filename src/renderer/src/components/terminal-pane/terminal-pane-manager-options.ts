@@ -15,7 +15,6 @@ import {
 import { buildFontFamily } from './layout-serialization'
 import { buildWindowsPtyCompatibilityOptions } from '@/lib/pane-manager/windows-pty-compatibility'
 import { buildTerminalKeyboardProtocolOptions } from '@/lib/pane-manager/terminal-keyboard-protocol'
-import { resolvePaneKeyboardProtocolAgent } from './terminal-keyboard-protocol-pane-agent'
 import { getConnectionId } from '@/lib/connection-context'
 import { getExecutionHostIdForWorktree } from '@/lib/worktree-runtime-owner'
 import { scheduleRuntimeGraphSync } from '@/runtime/sync-runtime-graph'
@@ -34,7 +33,7 @@ import type { TerminalPaneManagerOptionsContext } from './terminal-pane-mount-co
 export function createTerminalPaneManagerOptions(
   context: TerminalPaneManagerOptionsContext
 ): PaneManagerOptions {
-  const { deps, ptyDeps } = context
+  const { deps } = context
   const {
     tabId,
     worktreeId,
@@ -121,18 +120,13 @@ export function createTerminalPaneManagerOptions(
         (candidate) => candidate.id === tabId
       )
       const platformInfo = window.api.platform?.get?.()
-      const knownTuiAgent = resolvePaneKeyboardProtocolAgent(
-        ptyDeps.startup,
-        currentTab?.launchAgent
-      )
       const ptyBackendContext = {
         userAgent: navigator.userAgent,
         osRelease: platformInfo?.osRelease,
         connectionId: getConnectionId(worktreeId),
         cwd: context.startupCwd,
         shellOverride: currentTab?.shellOverride,
-        executionHostId: getExecutionHostIdForWorktree(storeState, worktreeId),
-        tuiAgent: knownTuiAgent
+        executionHostId: getExecutionHostIdForWorktree(storeState, worktreeId)
       }
       return {
         ...buildWindowsPtyCompatibilityOptions(ptyBackendContext),

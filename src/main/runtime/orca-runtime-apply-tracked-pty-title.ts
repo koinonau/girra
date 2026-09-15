@@ -1,6 +1,5 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { OrcaRuntimeWithGetUnpersistedTrackedTitleForPty } from './orca-runtime-get-unpersisted-tracked-title-for-pty'
-import type { TerminalTitleFactMeta } from '../../shared/terminal-output-side-effects'
 import { detectAgentStatusFromTitle } from '../../shared/agent-detection'
 import { terminalTitleBlocksExplicitAgentStatus } from './runtime-worktree-status-projection'
 
@@ -10,21 +9,14 @@ export class OrcaRuntimeWithApplyTrackedPtyTitle extends OrcaRuntimeWithGetUnper
   protected applyTrackedPtyTitle(
     ptyId: string,
     rawTitle: string,
-    normalizedTitle: string,
-    meta?: TerminalTitleFactMeta
+    normalizedTitle: string
   ): boolean {
     // Why: status is detected from the RAW title (mirrors the renderer tracker),
     // so working/idle transitions are unaffected by normalization; the records
-    // store the NORMALIZED title so rotating Grok/Pi/Gemini frames collapse to
+    // store the NORMALIZED title so rotating Pi frames collapse to
     // one stable stored label (#7880) instead of churning `ps`/mobile tabs.
-    //
-    // Why the identity-only case: the bare cursor-agent literal identifies the pane without
-    // asserting activity, so it records NO title/status evidence — only the tracker keeps it,
-    // for display (#10258). Nulling the status here rather than trusting the detector keeps
-    // that contract local, since every activity-gated effect below is keyed on status.
-    const identityOnlyTitle = this.isLiveCursorNativeTitle(rawTitle, meta)
-    const recordedTitle = identityOnlyTitle ? null : normalizedTitle
-    const agentStatus = identityOnlyTitle ? null : detectAgentStatusFromTitle(rawTitle)
+    const recordedTitle = normalizedTitle
+    const agentStatus = detectAgentStatusFromTitle(rawTitle)
     this.recordAgentPromptLifecycleState(ptyId, agentStatus)
     let ptyRecordChanged = false
     const pty = this.ptysById.get(ptyId)
@@ -32,9 +24,9 @@ export class OrcaRuntimeWithApplyTrackedPtyTitle extends OrcaRuntimeWithGetUnper
       const prevStatus = pty.lastAgentStatus
       const prevTitle = pty.lastOscTitle
       const observedAt = this.nextTitleObservationSequence()
-      const observedAtEpochMs = identityOnlyTitle ? null : Date.now()
+      const observedAtEpochMs = Date.now()
       pty.lastOscTitle = recordedTitle
-      pty.lastOscTitleAt = identityOnlyTitle ? null : observedAt
+      pty.lastOscTitleAt = observedAt
       pty.lastOscTitleEpochMs = observedAtEpochMs
       pty.lastAgentStatus = agentStatus
       pty.lastAgentStatusObservedLive = true
@@ -45,18 +37,12 @@ export class OrcaRuntimeWithApplyTrackedPtyTitle extends OrcaRuntimeWithGetUnper
         pty.lastAgentStatusStartedAtEpochMs = observedAtEpochMs
       }
       if (
-        identityOnlyTitle ||
         terminalTitleBlocksExplicitAgentStatus(recordedTitle) ||
         (prevStatus !== null && agentStatus !== null && prevStatus !== agentStatus)
       ) {
-        pty.lastAgentStatusRichInvalidatedAtEpochMs = observedAtEpochMs ?? Date.now()
+        pty.lastAgentStatusRichInvalidatedAtEpochMs = observedAtEpochMs
       }
-      if (identityOnlyTitle) {
-        pty.managementTitle = null
-        pty.managementTitleAt = null
-      } else {
-        this.setPtyManagementTitleFromObservedTitle(pty, normalizedTitle, observedAt)
-      }
+      this.setPtyManagementTitleFromObservedTitle(pty, normalizedTitle, observedAt)
       ptyRecordChanged = prevTitle !== recordedTitle || prevStatus !== agentStatus
       if (agentStatus === 'idle' && prevStatus !== 'idle') {
         this.resolvePtyTuiIdleWaiters(pty, ptyId)
@@ -96,7 +82,7 @@ export class OrcaRuntimeWithApplyTrackedPtyTitle extends OrcaRuntimeWithGetUnper
       const prevStatus = leaf.lastAgentStatus
       const prevObservedLive = leaf.lastAgentStatusObservedLive
       leaf.lastOscTitle = recordedTitle
-      leaf.lastOscTitleAt = identityOnlyTitle ? null : this.nextTitleObservationSequence()
+      leaf.lastOscTitleAt = this.nextTitleObservationSequence()
       // Why: when a new OSC title doesn't classify as an agent state (e.g.
       // bare shell title after the agent exits), clear lastAgentStatus so
       // it is no longer sticky. Tui-idle waiters that needed the previous
@@ -190,11 +176,8 @@ export class OrcaRuntimeWithApplyTrackedPtyTitle extends OrcaRuntimeWithGetUnper
       return
     }
     this.terminalSideEffectConsumerAvailable = nextAvailable
-    for (const [ptyId, entry] of this.ptyTitleTrackersByPtyId) {
+    for (const entry of this.ptyTitleTrackersByPtyId.values()) {
       entry.tracker.setTransientSideEffectScanningEnabled(nextAvailable)
-      entry.commandCodeDetector = nextAvailable
-        ? this.createTerminalSideEffectCommandCodeDetector(ptyId)
-        : null
     }
   }
 }

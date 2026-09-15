@@ -694,11 +694,11 @@ describe('PtyHandler', () => {
 
     await dispatcher.callRequest('pty.spawn', {
       command: 'powershell wait-wrapper',
-      env: { [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'omp --resume' }
+      env: { [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'pi --resume' }
     })
 
     const spawnEnv = mockPtySpawn.mock.calls[0][2] as { env: Record<string, string> }
-    expect(spawnEnv.env.SEEN_LAUNCH_COMMAND_HINT).toBe('omp --resume')
+    expect(spawnEnv.env.SEEN_LAUNCH_COMMAND_HINT).toBe('pi --resume')
   })
 
   it.skipIf(process.platform === 'win32')(
@@ -719,8 +719,7 @@ describe('PtyHandler', () => {
 
         handler.addEnvAugmenter(() => ({
           OPENCODE_CONFIG_DIR: '/remote/overlay/opencode',
-          ORCA_OPENCODE_CONFIG_DIR: '/remote/overlay/opencode',
-          ORCA_OMP_STATUS_EXTENSION: '/remote/.omp/agent/extensions/orca-agent-status.ts'
+          ORCA_OPENCODE_CONFIG_DIR: '/remote/overlay/opencode'
         }))
 
         await dispatcher.callRequest('pty.spawn', { env: { HOME: homeDir } })
@@ -753,7 +752,6 @@ describe('PtyHandler', () => {
         'export OPENCODE_CONFIG_DIR="${ORCA_OPENCODE_CONFIG_DIR}"'
       )
       expect(readFileSync(rcfile, 'utf8')).not.toContain('ORCA_PI_CODING_AGENT_DIR')
-      expect(readFileSync(rcfile, 'utf8')).toContain('command omp --extension')
 
       rmSync(homeDir, { recursive: true, force: true })
     }

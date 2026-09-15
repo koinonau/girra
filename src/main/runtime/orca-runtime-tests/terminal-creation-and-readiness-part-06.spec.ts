@@ -3,8 +3,6 @@ import { OrcaRuntimeService } from '../orca-runtime-test-mocks.spec'
 import {
   TEST_WORKTREE_ID,
   TEST_WORKTREE_PATH,
-  antigravityPromptBeforeModelReadyScreen,
-  antigravityReadyScreen,
   store,
   syncSinglePty
 } from '../orca-runtime-test-fixtures.spec'
@@ -492,99 +490,7 @@ describe('OrcaRuntimeService', () => {
     })
   })
 
-  it('resolves tui-idle from an Antigravity ready prompt preview', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`)
-    runtime.onPtyData('pty-bg', antigravityReadyScreen('Gemini 4 Experimental (High)'), Date.now())
-
-    await expect(
-      runtime.waitForTerminal(handle, { condition: 'tui-idle', timeoutMs: 1_000 })
-    ).resolves.toMatchObject({
-      handle,
-      condition: 'tui-idle',
-      status: 'running'
-    })
-  })
-
-  it('resolves Antigravity ready prompts with newline-heavy pasted tails without splitting', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`)
-    let pastedTail = ''
-    for (let index = 0; index < 90; index += 1) {
-      pastedTail += `${'pasted text '.repeat(25)}${index}\n`
-    }
-    const splitSpy = vi.spyOn(String.prototype, 'split')
-
-    runtime.onPtyData(
-      'pty-bg',
-      [
-        'Antigravity CLI 1.0.3\n',
-        'user@example.com (Antigravity Business)\n',
-        pastedTail,
-        'Gemini 4 Experimental (High)\n',
-        '~/orca/workspaces/orca/agy-dispatch-issue\n',
-        '>'
-      ].join(''),
-      Date.now()
-    )
-
-    await expect(
-      runtime.waitForTerminal(handle, { condition: 'tui-idle', timeoutMs: 1_000 })
-    ).resolves.toMatchObject({
-      handle,
-      condition: 'tui-idle',
-      satisfied: true,
-      status: 'running'
-    })
-    const splitReadyTail = splitSpy.mock.contexts.some((context) => {
-      const value = typeof context === 'string' ? context : String(context)
-      return value.includes('antigravity cli') && value.includes('pasted text pasted text')
-    })
-    expect(splitReadyTail).toBe(false)
-  })
-
-  it('resolves tui-idle from an Antigravity prompt before the model line', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-bg' }),
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`)
-    runtime.onPtyData(
-      'pty-bg',
-      [
-        'Do you trust this workspace directory?\n',
-        'Press t to trust\n',
-        antigravityPromptBeforeModelReadyScreen('Gemini 3.5 Flash (High)')
-      ].join(''),
-      Date.now()
-    )
-
-    await expect(
-      runtime.waitForTerminal(handle, { condition: 'tui-idle', timeoutMs: 1_000 })
-    ).resolves.toMatchObject({
-      handle,
-      condition: 'tui-idle',
-      satisfied: true,
-      status: 'running'
-    })
-  })
-
-  it('resolves live-leaf tui-idle from an Antigravity ready prompt preview', async () => {
+  it('resolves live-leaf tui-idle from a Codex ready prompt preview', async () => {
     const runtime = new OrcaRuntimeService(store)
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, {
@@ -608,7 +514,15 @@ describe('OrcaRuntimeService', () => {
         }
       ]
     })
-    runtime.onPtyData('pty-1', antigravityReadyScreen(), Date.now())
+    runtime.onPtyData(
+      'pty-1',
+      [
+        ' >_ OpenAI Codex (v0.132.0)\n',
+        ' model:       gpt-5.5 high   /model to change\n',
+        ' directory:   ~/orca/workspaces/orca/cli-debug\n'
+      ].join(''),
+      Date.now()
+    )
     const [terminal] = (await runtime.listTerminals()).terminals
 
     await expect(

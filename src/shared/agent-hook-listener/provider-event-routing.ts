@@ -18,8 +18,6 @@ export function isNewTurnEvent(source: AgentHookSource, eventName: unknown): boo
     case 'opencode':
       return eventName === 'SessionStart'
     case 'pi':
-    case 'omp':
-    case 'prime-agent':
       return eventName === 'before_agent_start'
   }
 }
@@ -58,8 +56,6 @@ export function extractToolFields(
     case 'opencode':
       return extractOpenCodeToolFields(eventName, hookPayload)
     case 'pi':
-    case 'omp':
-    case 'prime-agent':
-      return extractPiToolFields(eventName, hookPayload, source)
+      return extractPiToolFields(eventName, hookPayload)
   }
 }

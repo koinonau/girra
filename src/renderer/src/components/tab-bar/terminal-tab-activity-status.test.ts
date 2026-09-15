@@ -95,10 +95,11 @@ describe('resolveTerminalTabActivityStatus', () => {
       })
       expect(
         resolveTerminalTabActivityStatus({
-          tab: { id: TAB_ID, title: '✋ Gemini CLI' },
+          tab: { id: TAB_ID, title: 'Claude - action required' },
           agentStatusByPaneKey: { [stale.paneKey]: stale },
           ptyIdsByTabId: LIVE_PTY,
-          runtimePaneTitlesByTabId: surface === 'pane' ? { [TAB_ID]: { 1: '✋ Gemini CLI' } } : {}
+          runtimePaneTitlesByTabId:
+            surface === 'pane' ? { [TAB_ID]: { 1: 'Claude - action required' } } : {}
         })
       ).toBe('permission')
     }

@@ -30,7 +30,7 @@ const DECORATIVE_FRAMES = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧
 
 type RuntimeInternals = {
   mobileSessionTabsByWorktree: Map<string, RuntimeMobileSessionTabsSnapshot>
-  ptysById: Map<string, { launchAgent: 'grok-build' | 'pi' | null }>
+  ptysById: Map<string, { launchAgent: 'pi' | null }>
   ptyForegroundAgent: { hasDelayedSnapshot: (ptyId: string) => boolean }
   resetTrackedTerminalStateForProviderGeneration: (ptyId: string) => void
 }
@@ -99,7 +99,7 @@ function seedWorktree(runtime: OrcaRuntimeService, index: number): string {
         parentTabId: tabId,
         leafId,
         ptyId,
-        title: 'Cursor Agent',
+        title: 'Claude Code',
         parentLayout: {
           root: { type: 'leaf', leafId },
           activeLeafId: leafId,
@@ -183,7 +183,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     })
 
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;⠋ Claude Code\x07', Date.now())
     }
     vi.advanceTimersByTime(50)
     expect(counters.hostPublications).toBe(WORKTREE_COUNT)
@@ -194,7 +194,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     for (let cycle = 0; cycle < 4; cycle += 1) {
       for (const frame of DECORATIVE_FRAMES) {
         for (const ptyId of ptyIds) {
-          runtime.onPtyData(ptyId, `\x1b]0;${frame} Cursor Agent\x07`, Date.now())
+          runtime.onPtyData(ptyId, `\x1b]0;${frame} Claude Code\x07`, Date.now())
         }
         vi.advanceTimersByTime(30)
       }
@@ -211,38 +211,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     for (const ptyId of ptyIds) {
       expect(evidence.rawChunksByPty.get(ptyId)).toEqual(
         Array.from({ length: 4 }, () =>
-          DECORATIVE_FRAMES.map((frame) => `\x1b]0;${frame} Cursor Agent\x07`)
-        ).flat()
-      )
-    }
-    expect(evidence.publishedByWorktree.size).toBe(0)
-
-    resetCounters(counters)
-    resetEvidence(evidence)
-    for (let cycle = 0; cycle < 4; cycle += 1) {
-      for (const frame of DECORATIVE_FRAMES) {
-        for (const ptyId of ptyIds) {
-          runtime.onPtyData(ptyId, '\x1b]0;Cursor Agent\x07', Date.now())
-          runtime.onPtyData(ptyId, `\x1b]0;${frame} Cursor Agent\x07`, Date.now())
-        }
-        vi.advanceTimersByTime(30)
-      }
-    }
-    vi.advanceTimersByTime(50)
-    expect(counters).toEqual({
-      hostPublications: 0,
-      serializedBytes: 0,
-      rendererApplyCalls: 0,
-      rendererStoreMutations: 0,
-      rawTerminalChunks: WORKTREE_COUNT * DECORATIVE_FRAMES.length * 8
-    })
-    for (const ptyId of ptyIds) {
-      expect(evidence.rawChunksByPty.get(ptyId)).toEqual(
-        Array.from({ length: 4 }, () =>
-          DECORATIVE_FRAMES.flatMap((frame) => [
-            '\x1b]0;Cursor Agent\x07',
-            `\x1b]0;${frame} Cursor Agent\x07`
-          ])
+          DECORATIVE_FRAMES.map((frame) => `\x1b]0;${frame} Claude Code\x07`)
         ).flat()
       )
     }
@@ -251,7 +220,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     resetCounters(counters)
     resetEvidence(evidence)
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;Cursor ready\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;Claude ready\x07', Date.now())
     }
     vi.advanceTimersByTime(50)
     expect(counters.hostPublications).toBe(WORKTREE_COUNT)
@@ -268,16 +237,16 @@ describe('real PTY decorative session-tabs fanout', () => {
         parentTabId: `host-tab-${index}`,
         leafId: `00000000-0000-4000-8000-${index.toString().padStart(12, '0')}`,
         ptyId: `pty-${index}`,
-        title: 'Cursor ready'
+        title: 'Claude ready'
       })
       expect(terminal?.type === 'terminal' ? terminal.agentStatus?.state : undefined).toBe('done')
       expect(viewerState.tabsByWorktree[worktreeId]).toEqual([
-        expect.objectContaining({ title: 'Cursor ready', worktreeId })
+        expect.objectContaining({ title: 'Claude ready', worktreeId })
       ])
       expect(
         detectAgentStatusFromTitle(viewerState.tabsByWorktree[worktreeId]?.[0]?.title ?? '')
       ).toBe('idle')
-      expect(evidence.rawChunksByPty.get(`pty-${index}`)).toEqual(['\x1b]0;Cursor ready\x07'])
+      expect(evidence.rawChunksByPty.get(`pty-${index}`)).toEqual(['\x1b]0;Claude ready\x07'])
     }
 
     resetCounters(counters)
@@ -358,7 +327,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     })
 
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;⠋ Claude Code\x07', Date.now())
     }
     vi.advanceTimersByTime(50)
     const initialStateStartedAtByWorktree = new Map(
@@ -368,7 +337,7 @@ describe('real PTY decorative session-tabs fanout', () => {
 
     vi.advanceTimersByTime(SESSION_TABS_AGENT_STATUS_HEARTBEAT_INTERVAL_MS - 51)
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;⠙ Cursor Agent\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;⠙ Claude Code\x07', Date.now())
     }
     vi.advanceTimersByTime(50)
     expect(publications).toEqual([])
@@ -376,7 +345,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     vi.advanceTimersByTime(1)
     const heartbeatStartedAt = Date.now()
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;⠹ Cursor Agent\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;⠹ Claude Code\x07', Date.now())
     }
     vi.advanceTimersByTime(SESSION_TABS_AGENT_STATUS_HEARTBEAT_SPACING_MS * WORKTREE_COUNT + 50)
 
@@ -399,7 +368,7 @@ describe('real PTY decorative session-tabs fanout', () => {
 
     vi.advanceTimersByTime(SESSION_TABS_AGENT_STATUS_HEARTBEAT_INTERVAL_MS)
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;⠸ Cursor Agent\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;⠸ Claude Code\x07', Date.now())
     }
     vi.advanceTimersByTime(SESSION_TABS_AGENT_STATUS_HEARTBEAT_SPACING_MS * WORKTREE_COUNT + 50)
     expect(publications).toHaveLength(WORKTREE_COUNT)
@@ -417,7 +386,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     publications.length = 0
     const completionAt = Date.now()
     for (const ptyId of ptyIds) {
-      runtime.onPtyData(ptyId, '\x1b]0;Cursor ready\x07', Date.now())
+      runtime.onPtyData(ptyId, '\x1b]0;Claude ready\x07', Date.now())
     }
     vi.advanceTimersByTime(50)
     expect(publications).toHaveLength(WORKTREE_COUNT)
@@ -432,12 +401,6 @@ describe('real PTY decorative session-tabs fanout', () => {
       heartbeatTitles: ['⠋ π - project', '⠙ π - project'],
       // Why: the π brand swaps for the owner label in place; session text survives.
       expectedTitle: '⠋ Pi - project'
-    },
-    {
-      agent: 'grok-build' as const,
-      firstTitle: '⠋ - Waiting for response… - grok',
-      heartbeatTitles: ['⠴ - Thinking - grok', '⠦ - Sleep 2s then echo hello… - grok'],
-      expectedTitle: '⠋ Grok'
     }
   ])('renews exact and normalized $agent frames beyond the viewer stale boundary', (testCase) => {
     const runtime = new OrcaRuntimeService()
@@ -535,7 +498,7 @@ describe('real PTY decorative session-tabs fanout', () => {
       prompt: 'previous task',
       updatedAt: Date.now(),
       stateStartedAt: Date.now(),
-      agentType: 'cursor',
+      agentType: 'claude',
       paneKey: seededTab.id,
       stateHistory: []
     }
@@ -544,12 +507,12 @@ describe('real PTY decorative session-tabs fanout', () => {
       publications.push(structuredClone(snapshot))
     })
 
-    runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', Date.now())
+    runtime.onPtyData(ptyId, '\x1b]0;⠋ Claude Code\x07', Date.now())
     vi.advanceTimersByTime(50)
     publications.length = 0
     vi.advanceTimersByTime(1)
     const permissionAt = Date.now()
-    runtime.onPtyData(ptyId, '\x1b]0;Cursor Agent waiting\x07', permissionAt)
+    runtime.onPtyData(ptyId, '\x1b]0;Claude Code waiting\x07', permissionAt)
     vi.advanceTimersByTime(50)
 
     const terminal = publications.at(-1)?.tabs[0]
@@ -576,7 +539,7 @@ describe('real PTY decorative session-tabs fanout', () => {
       prompt: 'first task',
       updatedAt: Date.now(),
       stateStartedAt: Date.now(),
-      agentType: 'cursor',
+      agentType: 'claude',
       paneKey: seededTab.id,
       stateHistory: []
     }
@@ -585,7 +548,7 @@ describe('real PTY decorative session-tabs fanout', () => {
       publications.push(structuredClone(snapshot))
     })
 
-    runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', Date.now())
+    runtime.onPtyData(ptyId, '\x1b]0;⠋ Claude Code\x07', Date.now())
     vi.advanceTimersByTime(50)
     vi.advanceTimersByTime(1)
     runtime.onPtyData(ptyId, '\x1b]0;bash\x07', Date.now())
@@ -597,7 +560,7 @@ describe('real PTY decorative session-tabs fanout', () => {
       prompt: 'first task',
       updatedAt: doneAt,
       stateStartedAt: doneAt,
-      agentType: 'cursor',
+      agentType: 'claude',
       paneKey: seededTab.id,
       stateHistory: []
     }
@@ -605,7 +568,7 @@ describe('real PTY decorative session-tabs fanout', () => {
 
     vi.advanceTimersByTime(1)
     const nextWorkingAt = Date.now()
-    runtime.onPtyData(ptyId, '\x1b]0;⠙ Cursor Agent\x07', nextWorkingAt)
+    runtime.onPtyData(ptyId, '\x1b]0;⠙ Claude Code\x07', nextWorkingAt)
     vi.advanceTimersByTime(50)
 
     const terminal = publications.at(-1)?.tabs[0]

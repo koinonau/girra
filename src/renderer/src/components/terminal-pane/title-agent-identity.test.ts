@@ -2,13 +2,15 @@ import { describe, expect, it } from 'vitest'
 import { titleHasExplicitAgentIdentity } from './title-agent-identity'
 
 describe('titleHasExplicitAgentIdentity', () => {
-  it('recognizes Devin executable titles through the shared token matcher', () => {
-    expect(titleHasExplicitAgentIdentity('devin.exe ready')).toBe(true)
-    expect(titleHasExplicitAgentIdentity('devin.cmd working')).toBe(true)
+  it('recognizes executable titles through the shared token matcher', () => {
+    expect(titleHasExplicitAgentIdentity('codex.exe ready')).toBe(true)
+    expect(titleHasExplicitAgentIdentity('opencode.cmd working')).toBe(true)
+    expect(titleHasExplicitAgentIdentity('pi.cmd working')).toBe(true)
   })
 
-  it('rejects Devin path and compound fragments', () => {
-    expect(titleHasExplicitAgentIdentity('C:\\work\\devin.exe\\ready')).toBe(false)
-    expect(titleHasExplicitAgentIdentity('devin-fixtures ready')).toBe(false)
+  it('rejects path and compound fragments', () => {
+    expect(titleHasExplicitAgentIdentity('C:\\work\\codex.exe\\ready')).toBe(false)
+    expect(titleHasExplicitAgentIdentity('opencode-fixtures ready')).toBe(false)
+    expect(titleHasExplicitAgentIdentity('pi-fixtures ready')).toBe(false)
   })
 })

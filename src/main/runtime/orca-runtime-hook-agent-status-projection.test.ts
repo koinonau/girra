@@ -453,19 +453,6 @@ describe('headless hook agent-status projection (#11761)', () => {
     statusWiring.statusStore.stop()
   })
 
-  it('does not carry a hook question across an identity-only owner title', async () => {
-    const runtime = await createRuntimeWithHookRows([hookRow()])
-    const internals = runtime as unknown as {
-      ptysById: Map<string, { title: string | null }>
-    }
-    internals.ptysById.get(PTY_ID)!.title = 'bash'
-    observePaneTitle(runtime, 'Cursor Agent')
-
-    const result = await runtime.listMobileSessionTabs(`id:${WORKTREE_ID}`)
-    const tab = result.tabs[0]
-    expect(tab?.type === 'terminal' && tab.agentStatus).not.toHaveProperty('interactivePrompt')
-  })
-
   // The title path is refreshed live; an older hook `done` must not erase it.
   it('keeps the title-derived working state when the hook row predates the title', async () => {
     const now = Date.now()

@@ -5,7 +5,7 @@ import type { HookListenerState } from './listener-state'
 import type { ExtractedPromptText } from './prompt-fields'
 import { normalizeClaudeEvent } from './providers/claude-events'
 import { normalizeOpenCodeFamilyEvent } from './providers/opencode-family-events'
-import { normalizePiCompatibleEvent } from './providers/pi-family-events'
+import { normalizePiEvent } from './providers/pi-family-events'
 
 export type ProviderDispatchResult = {
   payload: ParsedAgentStatusPayload | null
@@ -39,16 +39,7 @@ export function normalizeProviderEvent(input: {
       break
     }
     case 'pi':
-    case 'omp':
-    case 'prime-agent':
-      payload = normalizePiCompatibleEvent(
-        state,
-        source,
-        eventName,
-        promptText,
-        paneKey,
-        hookPayload
-      )
+      payload = normalizePiEvent(state, eventName, promptText, paneKey, hookPayload)
       break
   }
 

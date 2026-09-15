@@ -79,19 +79,6 @@ export function isAgentStatusFresh(
   )
 }
 
-export function isMirroredCommandCodeTurnBump(
-  existing: AgentStatusEntry | undefined,
-  entry: AgentStatusEntry
-): boolean {
-  return (
-    existing?.agentType === 'command-code' &&
-    entry.agentType === 'command-code' &&
-    existing.state === 'working' &&
-    entry.state === 'working' &&
-    entry.stateStartedAt > existing.stateStartedAt
-  )
-}
-
 export function sanitizeRecentTabIds(recent: string[] | undefined, tabOrder: string[]): string[] {
   if (!recent || recent.length === 0) {
     return []

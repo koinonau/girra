@@ -487,13 +487,8 @@ describe('registerPtyHandlers', () => {
         'ORCA_CLI_COMMAND/u',
         'ORCA_AGENT_HOOK_PORT/u',
         'ORCA_AGENT_HOOK_TOKEN/u',
-        // Why: bare WSL shells no longer create ~/.omp; only status extension is exported (#10196).
-        'ORCA_OMP_STATUS_EXTENSION/p',
         'POWERLEVEL9K_DISABLE_CONFIGURATION_WIZARD'
       ])
-    )
-    expect(env.WSLENV?.split(':')).not.toEqual(
-      expect.arrayContaining(['ORCA_OMP_SOURCE_AGENT_DIR/p'])
     )
   })
   it('forces managed ORCA_USER_DATA_PATH for WSL spawns even when the caller provides a stale root', async () => {

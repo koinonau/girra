@@ -127,7 +127,7 @@ describe('agent completion coordinator', () => {
     expect(dispatchCompletion).toHaveBeenCalledWith(agentType)
   })
 
-  it.each(['pi', 'omp'])(
+  it.each(['pi'])(
     'defers a %s milestone done without prior working through the quiet window',
     (agentType) => {
       const dispatchCompletion = vi.fn()

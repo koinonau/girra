@@ -14,7 +14,7 @@ import { parseArgs, resolveSpawn } from './capture-agent-pty-transcript.mjs'
 
 describe('pty transcript secret scan', () => {
   it('finds the account row of a ready screen', () => {
-    const findings = scanTranscriptForSecrets('Antigravity CLI 1.1.17\njin.woo@acme.dev (Business)')
+    const findings = scanTranscriptForSecrets('Claude Code v2.1.234\njin.woo@acme.dev (Claude Max)')
     expect(findings).toHaveLength(1)
     expect(findings[0]).toMatchObject({ kind: 'email', line: 2, column: 1 })
   })
@@ -37,9 +37,9 @@ describe('pty transcript secret scan', () => {
     expect(findings.some((finding) => finding.kind === 'local-username')).toBe(true)
   })
 
-  it('finds the resumable conversation id agy prints on exit', () => {
+  it('finds the resumable session id an agent prints on exit', () => {
     const findings = scanTranscriptForSecrets(
-      'Resume with -c (or command below):\nagy --conversation=26dc1986-9eec-456a-a534-d93e5c1076c2'
+      'Resume this session with:\nclaude --resume 26dc1986-9eec-456a-a534-d93e5c1076c2'
     )
     expect(findings).toHaveLength(1)
     expect(findings[0].kind).toBe('uuid')
@@ -49,7 +49,7 @@ describe('pty transcript secret scan', () => {
   })
 
   it('reports a clean transcript as clean', () => {
-    const findings = scanTranscriptForSecrets('Antigravity CLI 1.1.17\nSonnet 4.6 (High)\n> ')
+    const findings = scanTranscriptForSecrets('Claude Code v2.1.234\nSonnet 4.6 (High)\n> ')
     expect(findings).toEqual([])
     expect(formatFindings('fixture', findings)).toContain('clean')
   })
@@ -69,7 +69,7 @@ describe('redaction', () => {
   it('replaces every finding with the same number of characters', () => {
     // Why length matters: the fixture's value is its exact wrapping. A shorter
     // replacement reflows the screen and invalidates the capture.
-    const text = 'Antigravity CLI 1.1.17\njin.woo@acme.dev (Antigravity Business)\n> '
+    const text = 'Claude Code v2.1.234\njin.woo@acme.dev (Claude Max)\n> '
     const { text: redacted, redacted: count } = redactTranscript(text)
     expect(count).toBe(1)
     expect(redacted).toHaveLength(text.length)
@@ -94,9 +94,12 @@ describe('committed transcripts', () => {
   const fixtureDir = join(import.meta.dirname, '..', '..', 'src', 'main', 'runtime', '__fixtures__')
   const transcripts = readdirSync(fixtureDir).filter((entry) => entry.endsWith('.txt'))
 
-  it.each(transcripts)('%s carries no account identifier or credential', (name) => {
-    const findings = scanTranscriptForSecrets(readFileSync(join(fixtureDir, name), 'utf8'))
-    expect(formatFindings(name, findings)).toContain('clean')
+  // Why one case, not it.each: an empty fixture directory must still pass rather than fail as an empty suite.
+  it('carry no account identifier or credential', () => {
+    for (const name of transcripts) {
+      const findings = scanTranscriptForSecrets(readFileSync(join(fixtureDir, name), 'utf8'))
+      expect(formatFindings(name, findings)).toContain('clean')
+    }
   })
 })
 
@@ -104,17 +107,17 @@ describe('capture argv', () => {
   it('splits recorder options from the agent command', () => {
     const { options, command } = parseArgs([
       '--name',
-      'antigravity-ready-personal-non-gemini',
+      'claude-ready-personal',
       '--cols',
       '120',
       '--',
-      'agy',
+      'claude',
       '--model',
       'sonnet'
     ])
-    expect(options.name).toBe('antigravity-ready-personal-non-gemini')
+    expect(options.name).toBe('claude-ready-personal')
     expect(options.cols).toBe(120)
-    expect(command).toEqual(['agy', '--model', 'sonnet'])
+    expect(command).toEqual(['claude', '--model', 'sonnet'])
   })
 
   it('collects a multi-file scan list', () => {
@@ -124,10 +127,10 @@ describe('capture argv', () => {
   })
 
   it('routes a Windows shim through cmd.exe, which node-pty cannot spawn directly', () => {
-    expect(resolveSpawn(['agy.cmd', '--model', 'sonnet'])).toEqual(
+    expect(resolveSpawn(['claude.cmd', '--model', 'sonnet'])).toEqual(
       process.platform === 'win32'
-        ? { file: 'cmd.exe', args: ['/c', '"agy.cmd"', '--model', 'sonnet'] }
-        : { file: 'agy.cmd', args: ['--model', 'sonnet'] }
+        ? { file: 'cmd.exe', args: ['/c', '"claude.cmd"', '--model', 'sonnet'] }
+        : { file: 'claude.cmd', args: ['--model', 'sonnet'] }
     )
   })
 })

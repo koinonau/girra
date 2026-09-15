@@ -4,8 +4,6 @@ Orca's readiness and blocked-prompt rules are text rules over what an agent CLI 
 terminal. They are only as good as the screens they were written against. This is how to record
 one, byte for byte, so a rule can be pinned to evidence instead of to a remembered screen.
 
-Related: [`antigravity-readiness-evidence.md`](./antigravity-readiness-evidence.md) names the
-specific Antigravity transcripts that are still missing and what each one decides.
 
 ## The recorder
 
@@ -26,10 +24,9 @@ lines, or normalise anything — the file is what the terminal received.
 - `--duration S` stops unattended after S seconds, for a screen that needs no interaction.
 - `--send "<ms>:<text>"` types into the PTY at a fixed offset, repeatable, with `\r` `\n` `\t` `\e`
   escapes. A dialog capture has to be driven, and an unattended run (CI, or an agent) has no TTY to
-  type into; the keystrokes ride the same PTY a human's would. For example, the committed
-  `antigravity-dialog-model-picker.txt` was recorded with
-  `--duration 24 --send "14000:/model" --send "16000:\r"`, which leaves the picker owning the
-  screen when the capture stops.
+  type into; the keystrokes ride the same PTY a human's would. For example,
+  `--duration 24 --send "14000:/model" --send "16000:\r"` opens a model picker and leaves it owning
+  the screen when the capture stops.
 - `--note "<text>"` records the account type, plan, model and CLI version in the sidecar.
 - `--out <path>` writes outside the fixture directory (use it for a first dry run).
 
@@ -102,8 +99,7 @@ tail retention and title tracking all live in `onPtyData`, and a rule tested on 
 text is tested on something no pane ever sees.
 
 `src/main/runtime/agent-transcript-pane-test-harness.ts` builds the pane;
-`src/main/runtime/terminal-interactive-wait-visibility.test.ts` (cursor-agent) and
-`src/main/runtime/antigravity-readiness-transcripts.test.ts` (Antigravity) are the two consumers.
+`src/main/runtime/terminal-interactive-wait-visibility.test.ts` is its consumer.
 
 ## Worked example: the Antigravity captures
 

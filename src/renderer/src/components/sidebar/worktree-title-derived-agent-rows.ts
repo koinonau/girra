@@ -1,6 +1,5 @@
 import type { DashboardAgentRow } from '@/components/dashboard/useDashboardData'
 import { formatAgentTypeLabel, isClaudeManagementTitle } from '@/lib/agent-status'
-import { isCursorAgentTitle } from '../../../../shared/agent-title-core'
 import { classifyTitleActivity, resolveTitleActivityLabel } from '@/lib/pane-agent-evidence'
 import { tabHasLivePty } from '@/lib/tab-has-live-pty'
 import type {
@@ -34,20 +33,9 @@ const EMPTY_TERMINAL_LAYOUTS: Record<string, TerminalLayoutSnapshot | undefined>
 
 const TITLE_AGENT_LABEL_TO_TYPE: Record<string, AgentType> = {
   'Claude Code': 'claude',
-  OpenClaude: 'openclaude',
   Codex: 'codex',
-  'Gemini CLI': 'gemini',
-  'GitHub Copilot': 'copilot',
-  Grok: 'grok',
-  Devin: 'devin',
-  Antigravity: 'antigravity',
   OpenCode: 'opencode',
-  Aider: 'aider',
-  Cursor: 'cursor',
-  Droid: 'droid',
-  Hermes: 'hermes',
-  Pi: 'pi',
-  OMP: 'omp'
+  Pi: 'pi'
 }
 
 const CLAUDE_AGENT_TOKEN_RE = /(?<![\w./\\-])claude(?![\w./\\-])/i
@@ -149,12 +137,7 @@ function buildTitleDerivedAgentRow(args: {
   // Why: `claude agents` is a live Claude Code Agent Teams surface, but the
   // shared detector keeps it neutral so runtime liveness probes do not treat
   // the management/list screen as active work.
-  // Why (cursor): the native `cursor agent` literal is deliberately status-less so a
-  // redraw cannot stomp hook state — but it still identifies a live pane, so the row
-  // reads idle instead of vanishing (#10258).
-  const status = isClaudeAgentsTitle
-    ? 'idle'
-    : (classifyTitleActivity(title) ?? (isCursorAgentTitle(title) ? 'idle' : null))
+  const status = isClaudeAgentsTitle ? 'idle' : classifyTitleActivity(title)
   const label = isClaudeAgentsTitle ? 'Claude Code' : resolveTitleActivityLabel(title)
   if (!status || !label) {
     return null

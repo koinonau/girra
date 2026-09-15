@@ -1,11 +1,7 @@
 import { collectLeafIdsInOrder } from '@/components/terminal-pane/layout-serialization'
 import { resolveAgentPaneAuthorityKey } from '@/store/slices/agent-pane-authority'
 import type { AppState } from '../../store/types'
-import { titleHasAgentName } from '../../../../shared/agent-detection'
-import type {
-  AgentStatusIpcPayload,
-  ParsedAgentStatusPayload
-} from '../../../../shared/agent-status-types'
+import type { AgentStatusIpcPayload } from '../../../../shared/agent-status-types'
 import { makePaneKey, parsePaneKey } from '../../../../shared/stable-pane-id'
 import { getRepoMapFromState, getWorktreeMapFromState } from '@/store/selectors'
 import type { useAppStore } from '../../store'
@@ -214,19 +210,4 @@ export function resolveWorktreeConnection(
     repoConnectionId: repo?.connectionId ?? null,
     repoConnectionResolved: repo !== undefined
   }
-}
-
-export function resolveHookPayloadAgentType(
-  payload: ParsedAgentStatusPayload,
-  terminalTitle: string | undefined
-): ParsedAgentStatusPayload {
-  if (
-    payload.agentType !== 'claude' ||
-    !terminalTitle ||
-    !titleHasAgentName(terminalTitle, 'openclaude')
-  ) {
-    return payload
-  }
-  // Why: OpenClaude emits Claude-compatible hooks; the title is the last renderer signal to keep it out of Claude-only status paths.
-  return { ...payload, agentType: 'openclaude' }
 }

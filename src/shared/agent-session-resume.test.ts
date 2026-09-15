@@ -35,12 +35,6 @@ describe('agent session resume metadata', () => {
       'pi',
       { session_id: 'pi-session', session_file: '/tmp/pi-session.jsonl' },
       { key: 'session_id', id: 'pi-session', transcriptPath: '/tmp/pi-session.jsonl' }
-    ],
-    ['omp', { session_id: 'omp-session' }, { key: 'session_id', id: 'omp-session' }],
-    [
-      'prime-agent',
-      { session_id: 'prime-session', session_file: '/tmp/prime-session.jsonl' },
-      { key: 'session_id', id: 'prime-session', transcriptPath: '/tmp/prime-session.jsonl' }
     ]
   ] as const)('extracts %s provider session ids', (source, payload, expected) => {
     expect(extractAgentProviderSession(source, payload)).toEqual(expected)

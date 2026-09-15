@@ -49,11 +49,11 @@ describe('terminal side-effect fact channel', () => {
     })
     syncSinglePty(runtime)
 
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Cursor Agent\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Claude Code\x07')
 
     const snapshot = await runtime.serializeTerminalBuffer('pty-1', { scrollbackRows: 10 })
     expect(snapshot?.source).toBe('renderer')
-    expect(snapshot?.lastTitle).toBe('⠋ Cursor Agent')
+    expect(snapshot?.lastTitle).toBe('⠋ Claude Code')
   })
 
   it('falls back to the provider snapshot for a restored PTY with no mounted renderer', async () => {
@@ -518,32 +518,6 @@ describe('terminal side-effect fact channel', () => {
     expect(runtime.getTerminalSideEffectSnapshot('pty-unknown')).toBeNull()
   })
 
-  it('keeps the cursor-agent literal in record-fallback snapshots only without a tracker title', () => {
-    const { runtime } = createSideEffectRuntime()
-    syncSinglePty(runtime)
-
-    runtime.onPtyData('pty-1', 'plain output\n', 100)
-    // Simulate a record title restored by a path that bypassed the tracker.
-    const records = (
-      runtime as unknown as {
-        ptysById: Map<string, { lastOscTitle: string | null }>
-      }
-    ).ptysById
-    records.get('pty-1')!.lastOscTitle = 'Cursor Agent'
-
-    // Why: a hookless Cursor pane has no other identity to restore (#10258).
-    expect(runtime.getTerminalSideEffectSnapshot('pty-1')).toMatchObject({
-      facts: [{ kind: 'title', normalizedTitle: 'Cursor Agent', rawTitle: 'Cursor Agent' }]
-    })
-
-    // A synthesized Cursor title owns the pane; the bare literal must not replay over it.
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Cursor Agent\x07')
-
-    expect(runtime.getTerminalSideEffectSnapshot('pty-1')).toMatchObject({
-      facts: [{ kind: 'title', normalizedTitle: '⠋ Cursor Agent', rawTitle: '⠋ Cursor Agent' }]
-    })
-  })
-
   it('emits the chunk agentStatus events before its side-effect batch', () => {
     // Cross-channel contract order per chunk: status → titles → bell.
     const order: string[] = []
@@ -594,14 +568,14 @@ describe('terminal side-effect fact channel', () => {
 
     runtime.onPtyData('pty-1', '\x1b]0;split ti', 100)
     // An 80ms spinner tick lands between the two halves of the real OSC.
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Cursor Agent\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Claude Code\x07')
     // Continuation: this BEL terminates the real OSC — it is NOT a bell.
     runtime.onPtyData('pty-1', 'tle\x07', 101)
     // A later standalone BEL is a real bell and must not be swallowed.
     runtime.onPtyData('pty-1', 'ready\x07', 102)
 
     expect(batches.flatMap((batch) => batch.facts)).toEqual([
-      { kind: 'title', normalizedTitle: '⠋ Cursor Agent', rawTitle: '⠋ Cursor Agent' },
+      { kind: 'title', normalizedTitle: '⠋ Claude Code', rawTitle: '⠋ Claude Code' },
       { kind: 'agent-working' },
       { kind: 'title', normalizedTitle: 'split title', rawTitle: 'split title' },
       { kind: 'bell' }
@@ -617,12 +591,12 @@ describe('terminal side-effect fact channel', () => {
     )
 
     for (const frame of ['⠋', '⠙', '⠹', '⠸', '⠼']) {
-      runtime.ingestSyntheticTitleFrame('pty-1', `\x1b]0;${frame} Cursor Agent\x07`)
+      runtime.ingestSyntheticTitleFrame('pty-1', `\x1b]0;${frame} Claude Code\x07`)
     }
     // Five ticks with the same de-spinnered title: one snapshot fan-out.
     expect(touchSpy).toHaveBeenCalledTimes(1)
 
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Cursor ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
     expect(touchSpy).toHaveBeenCalledTimes(2)
     // Raw record titles still track every frame for worktree ps/mobile tabs.
     expect(
@@ -631,7 +605,7 @@ describe('terminal side-effect fact channel', () => {
           ptysById: Map<string, { lastOscTitle: string | null }>
         }
       ).ptysById.get('pty-1')?.lastOscTitle
-    ).toBe('Cursor ready')
+    ).toBe('Claude ready')
   })
 
   it('seeds the lazily created tracker from the daemon-snapshot title', async () => {

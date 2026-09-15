@@ -193,7 +193,7 @@ describe('WslHookRelayManager', () => {
     // A guest bundle predating the plugin overlay omits this handler (-32601).
     if (registerInstallPlugins) {
       harness.guestDispatcher.onRequest(AGENT_HOOK_INSTALL_PLUGINS_METHOD, async () => ({
-        installed: { opencode: true, pi: false, omp: false },
+        installed: { opencode: true, pi: false },
         overlayDirs: { opencode: opencodeOverlayDir }
       }))
     }

@@ -21,8 +21,7 @@ export function resolveTerminalKeyboardShortcutAction(
   layoutCharacterForCode: Parameters<typeof resolveTerminalShortcutAction>[8],
   getWindowsShiftEnterEncoding: Parameters<typeof resolveTerminalShortcutAction>[9],
   isWindowsTerminalHost: NonNullable<Parameters<typeof resolveTerminalShortcutAction>[10]>,
-  terminalShortcutPolicy: Parameters<typeof resolveTerminalShortcutAction>[11] = 'orca-first',
-  hasCtrlEnterCsiUAuthority?: Parameters<typeof resolveTerminalShortcutAction>[12]
+  terminalShortcutPolicy: Parameters<typeof resolveTerminalShortcutAction>[11] = 'orca-first'
 ): ReturnType<typeof resolveTerminalShortcutAction> {
   return resolveTerminalShortcutAction(
     event,
@@ -36,8 +35,7 @@ export function resolveTerminalKeyboardShortcutAction(
     layoutCharacterForCode,
     getWindowsShiftEnterEncoding,
     isWindowsTerminalHost,
-    terminalShortcutPolicy,
-    hasCtrlEnterCsiUAuthority
+    terminalShortcutPolicy
   )
 }
 

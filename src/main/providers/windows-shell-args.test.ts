@@ -1,4 +1,4 @@
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs'
+import { existsSync, mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
@@ -106,8 +106,6 @@ describe('resolveWindowsShellLaunchArgs', () => {
     )
     const duplicateStateGuardIndex = command.indexOf('Test-Path variable:global:__OrcaOsc133State')
     const languageModeGuardIndex = command.indexOf('LanguageMode -eq "FullLanguage"')
-    const ompWrapperIndex = command.indexOf('function Global:omp')
-    const ompExtensionIndex = command.indexOf('--extension $env:ORCA_OMP_STATUS_EXTENSION')
     const promptIndex = command.indexOf('function Global:prompt')
     const cwdRestoreIndex = command.indexOf(
       expectedPowerShellRestoreCwdCommand("'C:\\Users\\alice'")
@@ -115,16 +113,12 @@ describe('resolveWindowsShellLaunchArgs', () => {
 
     expect(command).not.toContain('$PROFILE')
     expect(command).not.toContain('ORCA_PI_CODING_AGENT_DIR')
-    expect(command).not.toContain('ORCA_OMP_CODING_AGENT_DIR')
-    expect(command).not.toContain('$env:PI_CODING_AGENT_DIR = $env:ORCA_OMP_SOURCE_AGENT_DIR')
     expect(opencodeRestoreIndex).toBeGreaterThanOrEqual(0)
     expect(opencodeRestoreIndex).toBeLessThan(duplicateStateGuardIndex)
     expect(opencodeRestoreIndex).toBeLessThan(languageModeGuardIndex)
     expect(outputEncodingIndex).toBeGreaterThan(languageModeGuardIndex)
     expect(outputEncodingIndex).toBeGreaterThan(duplicateStateGuardIndex)
-    expect(ompWrapperIndex).toBeGreaterThan(outputEncodingIndex)
-    expect(ompExtensionIndex).toBeGreaterThan(ompWrapperIndex)
-    expect(promptIndex).toBeGreaterThan(ompWrapperIndex)
+    expect(promptIndex).toBeGreaterThan(outputEncodingIndex)
     expect(cwdRestoreIndex).toBeGreaterThan(promptIndex)
     expect(command).toContain('Esc = [char]27')
     expect(command).toContain('Bel = [char]7')
@@ -290,20 +284,6 @@ describe('resolveWindowsShellLaunchArgs', () => {
     expect(result.shellArgs).toEqual(expectedWslArgs('/mnt/c/Users/alice/code'))
     expect(existsSync(join(getShellReadyWrapperRoot(), 'bash', 'rcfile'))).toBe(true)
     expect(existsSync(join(getShellReadyWrapperRoot(), 'zsh', '.zshenv'))).toBe(true)
-
-    // Why: typed OMP keeps its existing shell integration, while typed Prime
-    // commands must reach the user's binary without Orca rewriting argv.
-    const bashRcfile = readFileSync(join(getShellReadyWrapperRoot(), 'bash', 'rcfile'), 'utf8')
-    // Why .zshenv: the omp wrapper is part of the epilogue defined there.
-    const zshEnv = readFileSync(join(getShellReadyWrapperRoot(), 'zsh', '.zshenv'), 'utf8')
-    for (const wrapperFile of [bashRcfile, zshEnv]) {
-      expect(wrapperFile).toContain('command omp --extension "${ORCA_OMP_STATUS_EXTENSION}" "$@"')
-      expect(wrapperFile).toContain('function omp { __orca_omp "$@"; }')
-      expect(wrapperFile).not.toContain('prime-agent()')
-      expect(wrapperFile).not.toContain('__orca_prime_agent')
-      expect(wrapperFile).not.toContain('ORCA_PRIME_AGENT_STATUS_EXTENSION')
-      expect(wrapperFile).not.toContain('command prime-agent --extension')
-    }
   })
 
   it('translates MSYS drive cwd to /mnt/<drive>/... for wsl.exe', () => {

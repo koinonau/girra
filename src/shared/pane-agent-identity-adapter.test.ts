@@ -23,7 +23,7 @@ describe('per-pane coverage gate', () => {
       'covered'
     )
     expect(resolveCanonicalPaneAgentIdentity({ launchAgent: 'codex' }).coverage).toBe('covered')
-    expect(resolveCanonicalPaneAgentIdentity({ sleepingSessionAgent: 'gemini' }).coverage).toBe(
+    expect(resolveCanonicalPaneAgentIdentity({ sleepingSessionAgent: 'pi' }).coverage).toBe(
       'covered'
     )
   })
@@ -80,7 +80,7 @@ describe('process rung requires a host-stamped proof', () => {
 
     const mismatched = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      foregroundAgent: 'gemini',
+      foregroundAgent: 'opencode',
       processProof: freshProof
     })
     expect(mismatched).toMatchObject({ agent: 'claude', source: 'launch' })
@@ -90,11 +90,11 @@ describe('process rung requires a host-stamped proof', () => {
 describe('uncovered compatibility lane', () => {
   it('preserves the caller-provided legacy result verbatim', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
-      title: 'Fix the parser - grok',
-      uncoveredFallback: { agent: 'grok', titleOnly: true }
+      title: 'Fix the parser - opencode',
+      uncoveredFallback: { agent: 'opencode', titleOnly: true }
     })
     expect(identity).toMatchObject({
-      agent: 'grok',
+      agent: 'opencode',
       source: 'title',
       coverage: 'uncovered',
       titleOnly: true
@@ -103,10 +103,10 @@ describe('uncovered compatibility lane', () => {
 
   it('answers from title evidence marked title-only when no fallback is supplied', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode'
     })
     expect(identity).toMatchObject({
-      agent: 'grok',
+      agent: 'opencode',
       source: 'title',
       coverage: 'uncovered',
       titleOnly: true
@@ -115,7 +115,7 @@ describe('uncovered compatibility lane', () => {
 
   it('a legacy null stays null rather than re-deriving from the title', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
-      title: 'anything - grok',
+      title: 'anything - opencode',
       uncoveredFallback: { agent: null }
     })
     expect(identity).toMatchObject({ agent: null, source: null, coverage: 'uncovered' })
@@ -124,13 +124,13 @@ describe('uncovered compatibility lane', () => {
   it('does not let a legacy title fallback bypass the ambiguity fence', () => {
     expect(
       resolveCanonicalPaneAgentIdentity({
-        title: 'OC | something - grok',
+        title: 'OC | something - pi',
         uncoveredFallback: { agent: 'opencode', titleOnly: true }
       })
     ).toMatchObject({ agent: null, source: null, ambiguousAt: 'title' })
     expect(
       resolveCanonicalPaneAgentIdentity({
-        title: 'compare codex with grok',
+        title: 'compare codex with opencode',
         uncoveredFallback: { agent: 'codex', titleOnly: true }
       })
     ).toMatchObject({ agent: null, source: null, coverage: 'uncovered' })
@@ -154,7 +154,7 @@ describe('canonical ladder inside the covered lane', () => {
   it('keeps title last: a covered launch beats a parsed title', () => {
     const identity = resolveCanonicalPaneAgentIdentity({
       launchAgent: 'claude',
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'launch', titleOnly: false })
   })
@@ -194,7 +194,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
       completedHookAgent: 'claude',
       completedHookRun: run1,
       currentRun: run1,
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'completed-hook' })
   })
@@ -204,10 +204,10 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
       completedHookAgent: 'claude',
       completedHookRun: run1,
       currentRun: run2,
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode'
     })
     expect(identity).toMatchObject({
-      agent: 'grok',
+      agent: 'opencode',
       source: 'title',
       coverage: 'uncovered',
       titleOnly: true
@@ -220,7 +220,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
       completedHookAgent: 'claude',
       completedHookRun: otherAuthority,
       currentRun: run2,
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'completed-hook' })
   })
@@ -229,7 +229,7 @@ describe('reclaim-versus-stale-hook discriminator (run keys, not title text)', (
     const identity = resolveCanonicalPaneAgentIdentity({
       completedHookAgent: 'claude',
       currentRun: run2,
-      title: 'STA-4011 Linux Antigravity Commit Messages - grok'
+      title: 'STA-4011 Linux Codex Commit Messages - opencode'
     })
     expect(identity).toMatchObject({ agent: 'claude', source: 'completed-hook' })
   })

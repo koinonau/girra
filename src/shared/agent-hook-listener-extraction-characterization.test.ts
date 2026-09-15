@@ -16,9 +16,7 @@ const MOVED_PANE = makePaneKey('tab-hooks', '22222222-2222-4222-8222-22222222222
 const ROUTES = {
   '/hook/claude': 'claude',
   '/hook/opencode': 'opencode',
-  '/hook/pi': 'pi',
-  '/hook/omp': 'omp',
-  '/hook/prime-agent': 'prime-agent'
+  '/hook/pi': 'pi'
 } as const
 function normalizeProviderState(
   source: (typeof ROUTES)[keyof typeof ROUTES],
@@ -44,14 +42,16 @@ describe('agent hook extraction boundaries', () => {
     }
     expect(resolveHookSource('/hook/unknown')).toBeNull()
     expect(resolveHookSource('/hook/codex')).toBeNull()
+    expect(resolveHookSource('/hook/omp')).toBeNull()
+    expect(resolveHookSource('/hook/prime-agent')).toBeNull()
   })
 
   it('preserves thin provider lifecycle branches and source attribution', () => {
     const cases = [
       ['opencode', 'MessagePart', 'working'],
       ['opencode', 'AskUserQuestion', 'waiting'],
-      ['prime-agent', 'before_agent_start', 'working'],
-      ['prime-agent', 'agent_end', 'done']
+      ['pi', 'before_agent_start', 'working'],
+      ['pi', 'agent_end', 'done']
     ] as const
 
     for (const [source, eventName, expectedState] of cases) {
@@ -60,7 +60,7 @@ describe('agent hook extraction boundaries', () => {
         agentType: source
       })
     }
-    for (const source of ['opencode', 'prime-agent'] as const) {
+    for (const source of ['opencode', 'pi'] as const) {
       expect(normalizeProviderState(source, 'UnknownEvent')).toBeNull()
     }
   })
@@ -176,7 +176,7 @@ describe('agent hook extraction boundaries', () => {
 
     const event = normalizeHookPayload(
       state,
-      'prime-agent',
+      'pi',
       { paneKey: PANE, payload: { hook_event_name: 'session_start' } },
       'production'
     )

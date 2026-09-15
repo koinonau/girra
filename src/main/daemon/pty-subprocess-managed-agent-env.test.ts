@@ -145,34 +145,6 @@ describe('createPtySubprocess', () => {
     expect(lastCall[2].env.ORCA_SHELL_FEATURES).not.toContain('ready')
   })
 
-  it('uses shell wrapper when typed OMP commands need the status extension', async () => {
-    const proc = mockPtyProcess()
-    spawnMock.mockReturnValue(proc)
-    const platform = Object.getOwnPropertyDescriptor(process, 'platform')
-    Object.defineProperty(process, 'platform', { value: 'linux' })
-
-    try {
-      await createPtySubprocess({
-        sessionId: 'test',
-        cols: 80,
-        rows: 24,
-        env: {
-          SHELL: '/bin/zsh',
-          ORCA_OMP_STATUS_EXTENSION: '/tmp/.omp/agent/extensions/orca-agent-status.ts'
-        }
-      })
-    } finally {
-      if (platform) {
-        Object.defineProperty(process, 'platform', platform)
-      }
-    }
-
-    const lastCall = spawnMock.mock.calls.at(-1)!
-    expect(lastCall[1]).toEqual(['-l'])
-    expect(lastCall[2].env.ZDOTDIR).toMatch(ZSH_SHELL_READY_DIR)
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).not.toContain('ready')
-  })
-
   it('uses shell wrapper when Agent Teams shim path must survive shell startup', async () => {
     const proc = mockPtyProcess()
     spawnMock.mockReturnValue(proc)

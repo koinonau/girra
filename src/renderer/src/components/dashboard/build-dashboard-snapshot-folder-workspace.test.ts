@@ -155,7 +155,7 @@ describe('buildDashboardSnapshot folder workspaces', () => {
         id: 'title-tab',
         ptyId: 'pty-title',
         worktreeId: 'local-worktree',
-        title: '✦ Claude Code',
+        title: '⠋ Claude Code',
         customTitle: null,
         color: null,
         sortOrder: 1,
@@ -176,7 +176,7 @@ describe('buildDashboardSnapshot folder workspaces', () => {
     }
     mixedState.ptyIdsByTabId[localTabId] = ['pty-local']
     mixedState.ptyIdsByTabId['title-tab'] = ['pty-title']
-    mixedState.runtimePaneTitlesByTabId['title-tab'] = { 1: '✦ Claude Code' }
+    mixedState.runtimePaneTitlesByTabId['title-tab'] = { 1: '⠋ Claude Code' }
     mixedState.agentStatusByPaneKey[localPaneKey] = {
       paneKey: localPaneKey,
       state: 'done',

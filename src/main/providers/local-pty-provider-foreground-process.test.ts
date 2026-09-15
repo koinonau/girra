@@ -224,7 +224,7 @@ describe('LocalPtyProvider', () => {
 
       const foreground = provider.getForegroundProcess(id)
       exitCb?.({ exitCode: 0 })
-      resolveScan({ available: true, processName: 'droid' })
+      resolveScan({ available: true, processName: 'pi' })
 
       await expect(foreground).resolves.toBeNull()
     })
@@ -537,7 +537,7 @@ describe('LocalPtyProvider', () => {
 
       const confirmation = provider.confirmForegroundProcess(id)
       exitCb?.({ exitCode: 0 })
-      resolveScan({ available: true, processName: 'droid' })
+      resolveScan({ available: true, processName: 'pi' })
 
       await expect(confirmation).resolves.toBeNull()
     })

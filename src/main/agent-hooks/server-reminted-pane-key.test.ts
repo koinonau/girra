@@ -16,7 +16,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe('reminted $$ pane keys on the OMP hook pipeline', () => {
+describe('reminted $$ pane keys on the Pi hook pipeline', () => {
   let userDataPath: string
 
   beforeEach(() => {
@@ -42,7 +42,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           { hook_event_name: 'before_agent_start', prompt: 'finish the reminted pane' },
           { paneKey: REMINTED, launchToken: 'launch-remint' }
         ),
-        '/hook/omp'
+        '/hook/pi'
       )
       const end = await postHookEvent(
         server,
@@ -50,7 +50,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           { hook_event_name: 'agent_end' },
           { paneKey: REMINTED, launchToken: 'launch-remint' }
         ),
-        '/hook/omp'
+        '/hook/pi'
       )
       expect(start.status).toBe(204)
       expect(end.status).toBe(204)
@@ -60,7 +60,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           tabId: 'tab-1',
           state: 'done',
           prompt: 'finish the reminted pane',
-          agentType: 'omp'
+          agentType: 'pi'
         })
       ])
       server.flushStatusPersistSync()
@@ -81,16 +81,16 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
     try {
       await postHookEvent(
         server,
-        buildBody({ hook_event_name: 'before_agent_start', prompt: 'canonical omp' }),
-        '/hook/omp'
+        buildBody({ hook_event_name: 'before_agent_start', prompt: 'canonical pi' }),
+        '/hook/pi'
       )
-      await postHookEvent(server, buildBody({ hook_event_name: 'agent_end' }), '/hook/omp')
+      await postHookEvent(server, buildBody({ hook_event_name: 'agent_end' }), '/hook/pi')
       expect(server.getStatusSnapshot()).toEqual([
         expect.objectContaining({
           paneKey: PANE,
           state: 'done',
-          prompt: 'canonical omp',
-          agentType: 'omp'
+          prompt: 'canonical pi',
+          agentType: 'pi'
         })
       ])
     } finally {
@@ -109,7 +109,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           { hook_event_name: 'before_agent_start', prompt: 'owned turn' },
           { paneKey: REMINTED }
         ),
-        '/hook/omp'
+        '/hook/pi'
       )
       const foreign = await postHookEvent(
         server,
@@ -117,7 +117,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           { hook_event_name: 'agent_end', prompt: 'stolen done' },
           { paneKey: FOREIGN, tabId: 'tab-1' }
         ),
-        '/hook/omp'
+        '/hook/pi'
       )
       expect(foreign.status).toBe(204)
       expect(server.getStatusSnapshot()).toEqual([
@@ -125,7 +125,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           paneKey: PANE,
           state: 'working',
           prompt: 'owned turn',
-          agentType: 'omp'
+          agentType: 'pi'
         })
       ])
     } finally {
@@ -147,7 +147,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           { hook_event_name: 'before_agent_start', prompt: 'owned remint turn' },
           { paneKey: REMINTED, tabId: 'tab-good' }
         ),
-        '/hook/omp'
+        '/hook/pi'
       )
       expect(start.status).toBe(204)
       expect(server.getStatusSnapshot()).toEqual([
@@ -156,7 +156,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           tabId: 'tab-1',
           state: 'working',
           prompt: 'owned remint turn',
-          agentType: 'omp'
+          agentType: 'pi'
         })
       ])
     } finally {
@@ -192,7 +192,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           { hook_event_name: 'before_agent_start', prompt: 'restored remint' },
           { paneKey: REMINTED, tabId: 'tab-good' }
         ),
-        '/hook/omp'
+        '/hook/pi'
       )
       expect(server.getStatusSnapshot()).toEqual([
         expect.objectContaining({
@@ -200,7 +200,7 @@ describe('reminted $$ pane keys on the OMP hook pipeline', () => {
           tabId: 'tab-1',
           state: 'working',
           prompt: 'restored remint',
-          agentType: 'omp'
+          agentType: 'pi'
         })
       ])
     } finally {

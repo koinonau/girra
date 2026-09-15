@@ -20,34 +20,34 @@ describe('syncPaneDetachPtyOwnership agent identity', () => {
       },
       tabsByWorktree: {
         [worktreeId]: [
-          makeTab({ id: sourceTabId, worktreeId, ptyId: 'pty-droid' }),
+          makeTab({ id: sourceTabId, worktreeId, ptyId: 'pty-pi' }),
           makeTab({ id: targetTabId, worktreeId, ptyId: null })
         ]
       },
       ptyIdsByTabId: {
-        [sourceTabId]: ['pty-droid', 'pty-sibling'],
+        [sourceTabId]: ['pty-pi', 'pty-sibling'],
         [targetTabId]: []
       }
     })
     store.getState().setPaneForegroundAgent(sourcePaneKey, {
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
     store
       .getState()
-      .setPaneForegroundAgent(siblingPaneKey, { agent: 'antigravity', shellForeground: false })
+      .setPaneForegroundAgent(siblingPaneKey, { agent: 'opencode', shellForeground: false })
     store
       .getState()
       .registerAgentLaunchConfig(
         sourcePaneKey,
         { agentArgs: '', agentEnv: {} },
-        { agentType: 'droid', tabId: sourceTabId, leafId: detachedLeafId }
+        { agentType: 'pi', tabId: sourceTabId, leafId: detachedLeafId }
       )
     store.getState().setAgentStatus(sourcePaneKey, {
       state: 'working',
       prompt: '',
-      agentType: 'droid'
+      agentType: 'pi'
     })
     store.setState({
       sleepingAgentSessionsByPaneKey: {
@@ -69,7 +69,7 @@ describe('syncPaneDetachPtyOwnership agent identity', () => {
 
     store.getState().syncPaneDetachPtyOwnership({
       detachedLeafId,
-      detachedPtyId: 'pty-droid',
+      detachedPtyId: 'pty-pi',
       sourceLayout: {
         root: { type: 'leaf', leafId: siblingLeafId },
         activeLeafId: siblingLeafId,
@@ -83,13 +83,13 @@ describe('syncPaneDetachPtyOwnership agent identity', () => {
     const state = store.getState()
     expect(state.paneForegroundAgentByPaneKey[sourcePaneKey]).toBeUndefined()
     expect(state.paneForegroundAgentByPaneKey[targetPaneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
     expect(state.agentLaunchConfigByPaneKey[sourcePaneKey]).toBeUndefined()
     expect(state.agentLaunchConfigByPaneKey[targetPaneKey]?.identity).toMatchObject({
-      agentType: 'droid',
+      agentType: 'pi',
       tabId: targetTabId,
       leafId: detachedLeafId
     })
@@ -110,7 +110,7 @@ describe('syncPaneDetachPtyOwnership agent identity', () => {
     // Why: the retention effect only reruns on an epoch bump; a moved live row must trigger it.
     expect(state.agentStatusEpoch).toBeGreaterThan(epochBeforeDetach)
     expect(state.paneForegroundAgentByPaneKey[siblingPaneKey]).toEqual({
-      agent: 'antigravity',
+      agent: 'opencode',
       shellForeground: false
     })
     expect(resolveWindowsShiftEnterEncodingForPane(state, targetPaneKey)).toBe('csi-u')

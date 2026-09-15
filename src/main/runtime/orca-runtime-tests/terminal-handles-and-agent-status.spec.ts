@@ -453,27 +453,6 @@ describe('OrcaRuntimeService', () => {
     await expect(runtime.isTerminalRunningAgent(handle)).resolves.toBe(true)
   })
 
-  it('does not treat a bare Cursor Agent native title as a running agent session', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null
-    })
-    // Why: the native title is identity, not liveness — Cursor never decorates it, so it
-    // reads the same whether cursor-agent is parked or long gone. Sends auto-submit Enter,
-    // so identity alone must not unlock one.
-    syncSinglePty(runtime, 'pty-1', { tabTitle: 'bash', paneTitle: 'Cursor Agent' })
-    const [terminal] = (await runtime.listTerminals()).terminals
-
-    await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(false)
-    await expect(runtime.getTerminalAgentStatus(terminal.handle)).resolves.toEqual({
-      handle: terminal.handle,
-      isRunningAgent: false,
-      status: null
-    })
-  })
-
   it('does not authorize an OpenCode marker left on a shell pane', async () => {
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
@@ -531,84 +510,6 @@ describe('OrcaRuntimeService', () => {
       isRunningAgent: false,
       status: null
     })
-  })
-
-  // Why: a leaf with no PTY is the same no-evidence case as an unreadable foreground —
-  // nothing was even asked, so the bare title is all that is left. The corroborating
-  // foreground here is deliberately unreachable: no ptyId means no read.
-  it('does not treat a bare Cursor title as an agent on a leaf with no pty', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => 'cursor-agent'
-    })
-    syncSinglePty(runtime, null, { tabTitle: 'bash', paneTitle: 'Cursor Agent' })
-    const [terminal] = (await runtime.listTerminals()).terminals
-
-    await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(false)
-  })
-
-  // Why: a renderer can push the bare title straight onto the pane, skipping the stale
-  // clear the other tests drive. Arriving that way it lands on top of a `working` status
-  // the spinner left behind, so the pane looks doubly like an agent — and is still just a
-  // shell. The tab is left untitled so the bare title is the only evidence in play: the
-  // refusal is decided at the foreground, and the stale-status gate is held shut behind it.
-  it('does not let a renderer-pushed bare Cursor title revive stale agent status', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => 'zsh'
-    })
-    syncSinglePty(runtime, 'pty-1', { tabTitle: '' })
-    runtime.onPtyData('pty-1', '\x1b]0;⠋ Cursor Agent\x07', 100)
-    syncSinglePty(runtime, 'pty-1', { tabTitle: '', paneTitle: 'Cursor Agent' })
-    const [terminal] = (await runtime.listTerminals()).terminals
-
-    expect(terminal.title).toBe('Cursor Agent')
-    await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(false)
-  })
-
-  // Why: pins the outer catch, not a reachable state — the production controller
-  // (src/main/ipc/pty.ts) already normalizes provider failures, a dropped SSH channel
-  // included, to null before this sees them. Nothing else here makes the read throw.
-  it('does not treat a bare Cursor title as an agent when the foreground read throws', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.setPtyController({
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => {
-        throw new Error('ssh channel closed')
-      }
-    })
-    syncSinglePty(runtime, 'pty-1', { tabTitle: '', paneTitle: 'Cursor Agent' })
-    const [terminal] = (await runtime.listTerminals()).terminals
-
-    await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(false)
-  })
-
-  // Why: cursor-agent is a node program, so `node` in the foreground plus a Cursor title
-  // looks like corroboration. It is not — the wrapper retry has to resolve a real agent
-  // name, and timing out means it never did.
-  it('does not treat a bare Cursor title as an agent behind a wrapper foreground', async () => {
-    vi.useFakeTimers()
-    try {
-      const runtime = new OrcaRuntimeService(store)
-      runtime.setPtyController({
-        write: () => true,
-        kill: () => true,
-        getForegroundProcess: async () => 'node'
-      })
-      syncSinglePty(runtime, 'pty-1', { tabTitle: '', paneTitle: 'Cursor Agent' })
-      const [terminal] = (await runtime.listTerminals()).terminals
-
-      const running = runtime.isTerminalRunningAgent(terminal.handle)
-      await vi.advanceTimersByTimeAsync(7_000)
-      await expect(running).resolves.toBe(false)
-    } finally {
-      vi.useRealTimers()
-    }
   })
 
   it('does not recognize runtime-created Claude agents management screens as agents', async () => {

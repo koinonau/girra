@@ -63,7 +63,6 @@ export function bindLiveDataCallback(session: ConnectPanePtySession): void {
       }
       session.commandLifecycle.handlePtyData(data)
     }
-    session.commandCodeOutputStatusDetector?.observe(data)
     // Why: split panes have visible-but-inactive panes the user watches; throttle only when the pane or whole document is hidden.
     const foreground =
       shouldWritePtyOutputForeground(session.deps.isVisibleRef.current) && meta?.background !== true

@@ -8,7 +8,7 @@ describe('resolvePublishedPaneAgentIdentity', () => {
     // Minimized from real recorded titles. Each is a pane of one agent whose task text names
     // another; before this, `@<other>` routing delivered to them.
     it.each([
-      ['Switch Claude and Codex off the load balancer… - grok', 'grok'],
+      ['Switch Claude and Codex off the load balancer… - opencode', 'opencode'],
       ['Review the Claude session-history fix', 'codex'],
       ['✳ Fix the text cursor blink', 'claude']
     ])('keeps %j as its launched agent', (title, launchAgent) => {
@@ -39,8 +39,8 @@ describe('resolvePublishedPaneAgentIdentity', () => {
     })
 
     it('reads the owner suffix, not the agents named in the task text', () => {
-      expect(resolve({ title: 'Switch Claude and Codex off the load balancer… - grok' })).toBe(
-        'grok'
+      expect(resolve({ title: 'Switch Claude and Codex off the load balancer… - opencode' })).toBe(
+        'opencode'
       )
     })
 

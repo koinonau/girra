@@ -32,7 +32,7 @@ separate copies of the same row inside the main process alone:
 
 The second copy is a duplicate write: the OSC status parsed in main is
 forwarded to the hook server _and_ retained in the runtime store from the same
-call (`orca-runtime-create-terminal-side-effect-command-code-detector.ts`).
+call (`orca-runtime-emit-terminal-agent-status-events.ts`).
 The third copy is keyed differently and never reaches the hook server at all,
 which is why `worktree ps` grew its own adapter for it in #19217.
 
@@ -278,9 +278,6 @@ writers:
 | remote-runtime OSC parse (bytes never transit local main)         | keep, fenced behind the host's published row once the host is new enough; rule 3 of the wire doc applies |
 | web-session mirror receipt clock                                  | keep; the decay rule needs both clocks from one machine                                                  |
 
-The Command Code done-settle window is renderer policy with no main
-equivalent. PR 2 either moves it into main's detector or leaves it, and says
-which.
 
 ## PR 3: one rollup, one clock
 

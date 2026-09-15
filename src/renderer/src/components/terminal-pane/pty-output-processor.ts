@@ -1,9 +1,4 @@
-import {
-  extractAllOscTitles,
-  isCursorNativeAgentTitle,
-  normalizeTerminalTitle,
-  shouldSuppressCursorNativeTitle
-} from '../../../../shared/agent-detection'
+import { extractAllOscTitles } from '../../../../shared/agent-detection'
 import { createAgentStatusOscProcessor } from '../../../../shared/agent-status-osc'
 import { createBellDetector } from '../../../../shared/terminal-bell-detector'
 import type { PtyDataMeta } from './pty-dispatcher'
@@ -39,25 +34,6 @@ export type ProcessPtyOutputOptions = {
   terminalOwner?: 'shell'
   snapshotCols?: number
   snapshotRows?: number
-}
-
-function removeSuppressedCursorNativeTitles(
-  titles: string[],
-  precedingTitle: string | null
-): boolean {
-  let writeIndex = 0
-  let previousTitle = precedingTitle
-  for (const title of titles) {
-    if (isCursorNativeAgentTitle(title) && shouldSuppressCursorNativeTitle(previousTitle)) {
-      continue
-    }
-    previousTitle = normalizeTerminalTitle(title)
-    titles[writeIndex] = title
-    writeIndex += 1
-  }
-  const removed = writeIndex < titles.length
-  titles.length = writeIndex
-  return removed
 }
 
 export function createPtyOutputProcessor({
@@ -104,10 +80,6 @@ export function createPtyOutputProcessor({
   ): void {
     const scannedForTitles = Boolean(onTitleChange && data.includes('\x1b]'))
     const titles = scannedForTitles ? extractAllOscTitles(data) : []
-    const ignoredCursorNativeTitle = removeSuppressedCursorNativeTitles(
-      titles,
-      sideEffects.isDrained() ? titleObserver.getLastEmittedTitle() : null
-    )
     const deliveredPayloads =
       onAgentStatus && !suppressAttentionEvents && payloads.length > 0 ? payloads : []
     const containsBell = Boolean(
@@ -122,11 +94,9 @@ export function createPtyOutputProcessor({
         sideEffects.pendingWorkingTitleCount() > 0)
     )
     const shouldEmitEmptyTitleScan = scannedForTitles || needsStaleTitleProbe
-    const titleScanEffect: PendingPtySideEffect['titleScanEffect'] = ignoredCursorNativeTitle
-      ? 'ignored-cursor-native'
-      : shouldEmitEmptyTitleScan
-        ? 'stale-probe'
-        : 'none'
+    const titleScanEffect: PendingPtySideEffect['titleScanEffect'] = shouldEmitEmptyTitleScan
+      ? 'stale-probe'
+      : 'none'
     if (!shouldEmitEmptyTitleScan && deliveredPayloads.length === 0 && !containsBell) {
       return
     }

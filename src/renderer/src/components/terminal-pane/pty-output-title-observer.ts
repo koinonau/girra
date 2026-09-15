@@ -2,9 +2,7 @@ import {
   clearWorkingIndicators,
   createAgentStatusTracker,
   detectAgentStatusFromTitle,
-  isCursorNativeAgentTitle,
-  normalizeTerminalTitle,
-  shouldSuppressCursorNativeTitle
+  normalizeTerminalTitle
 } from '../../../../shared/agent-detection'
 import type { IpcPtyTransportOptions } from './pty-transport-types'
 import type { PendingPtySideEffect } from './pty-output-side-effect-queue'
@@ -40,17 +38,13 @@ export function createPtyOutputTitleObserver({
   let lastEmittedTitle: string | null =
     initialAgentTitle !== undefined ? normalizeTerminalTitle(initialAgentTitle) : null
   let staleTitleTimer: ReturnType<typeof setTimeout> | null = null
-  const initialTrackerTitle =
-    initialAgentTitle !== undefined && !isCursorNativeAgentTitle(initialAgentTitle)
-      ? initialAgentTitle
-      : undefined
   const agentTracker =
     onAgentBecameIdle || onAgentBecameWorking || onAgentExited
       ? createAgentStatusTracker(
           (title) => onAgentBecameIdle?.(title),
           onAgentBecameWorking,
           onAgentExited,
-          initialTrackerTitle
+          initialAgentTitle
         )
       : null
 
@@ -94,16 +88,8 @@ export function createPtyOutputTitleObserver({
     if (titles.length > 0) {
       clearStaleTitleTimer()
       for (const title of titles) {
-        if (isCursorNativeAgentTitle(title)) {
-          if (!shouldSuppressCursorNativeTitle(lastEmittedTitle)) {
-            applyObservedTerminalTitle(title, true)
-          }
-          continue
-        }
         applyObservedTerminalTitle(title, suppressAgentTracker)
       }
-    } else if (titleScanEffect === 'ignored-cursor-native') {
-      clearStaleTitleTimer()
     } else if (
       titleScanEffect === 'stale-probe' &&
       !suppressAgentTracker &&

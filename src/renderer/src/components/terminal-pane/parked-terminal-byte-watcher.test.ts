@@ -1,7 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TerminalSideEffectFact } from '../../../../shared/terminal-side-effect-facts'
 import type { ParkedTerminalByteWatcherOptions } from './parked-terminal-byte-watcher'
-import type * as ParkedTerminalCommandStatus from './parked-terminal-command-status'
 
 const PTY_ID = 'pty-parked-1'
 const TAB_ID = 'tab-1'
@@ -35,7 +34,6 @@ type MockStoreState = {
   markTerminalPaneUnread: ReturnType<typeof vi.fn>
   setCacheTimerStartedAt: ReturnType<typeof vi.fn>
   observeTerminalGitHubPullRequestLink: ReturnType<typeof vi.fn>
-  agentStatusByPaneKey: Record<string, { state: string; prompt: string; agentType?: string }>
 }
 
 const dispatchTerminalNotification = vi.fn()
@@ -49,13 +47,9 @@ vi.mock('./use-notification-dispatch', () => ({
 // these tests only prove the watcher wires bytes/facts into the policy.
 const commandStatusPolicy = {
   onCommandFinished: vi.fn(),
-  onCommandCodeWorking: vi.fn(),
-  onCommandCodeDone: vi.fn(),
   dispose: vi.fn()
 }
-// Partial mock: readInFlightCommandCodeTurn stays real so detector seeding reads the store.
-vi.mock('./parked-terminal-command-status', async (importOriginal) => ({
-  ...(await importOriginal<typeof ParkedTerminalCommandStatus>()),
+vi.mock('./parked-terminal-command-status', () => ({
   createParkedTerminalCommandStatusPolicy: vi.fn(() => commandStatusPolicy)
 }))
 
@@ -88,8 +82,7 @@ function createMockStoreState(): MockStoreState {
     markTerminalTabUnread: vi.fn(),
     markTerminalPaneUnread: vi.fn(),
     setCacheTimerStartedAt: vi.fn(),
-    observeTerminalGitHubPullRequestLink: vi.fn(),
-    agentStatusByPaneKey: {}
+    observeTerminalGitHubPullRequestLink: vi.fn()
   }
 }
 
@@ -128,8 +121,6 @@ describe('startParkedTerminalByteWatcher', () => {
     vi.useFakeTimers()
     dispatchTerminalNotification.mockClear()
     commandStatusPolicy.onCommandFinished.mockClear()
-    commandStatusPolicy.onCommandCodeWorking.mockClear()
-    commandStatusPolicy.onCommandCodeDone.mockClear()
     commandStatusPolicy.dispose.mockClear()
     onData = null
     mockStoreState = createMockStoreState()
@@ -171,28 +162,6 @@ describe('startParkedTerminalByteWatcher', () => {
     expect(mockStoreState.updateTabTitle.mock.calls).toEqual([
       [TAB_ID, '⠋ Build feature'],
       [TAB_ID, IDLE_TITLE]
-    ])
-    dispose()
-  })
-
-  // Why: a hookless Cursor pane has no other identity, so the literal reaches the store
-  // once (#10258); its redraw repeats must not stomp a synthesized Cursor title.
-  it('stores the bare cursor-agent native title once, then keeps the synthetic title', async () => {
-    const { dispose } = await startWatcher()
-
-    emit('\x1b]0;Cursor Agent\x07')
-    emit('\x1b]0;Cursor Agent\x07')
-    emit('\x1b]0;⠋ Cursor Agent\x07')
-    emit('\x1b]0;Cursor Agent\x07')
-    flushSideEffects()
-
-    expect(mockStoreState.setRuntimePaneTitle.mock.calls).toEqual([
-      [TAB_ID, PANE_ID, 'Cursor Agent'],
-      [TAB_ID, PANE_ID, '⠋ Cursor Agent']
-    ])
-    expect(mockStoreState.updateTabTitle.mock.calls).toEqual([
-      [TAB_ID, 'Cursor Agent'],
-      [TAB_ID, '⠋ Cursor Agent']
     ])
     dispose()
   })
@@ -403,55 +372,6 @@ describe('startParkedTerminalByteWatcher', () => {
 
     dispose()
     expect(commandStatusPolicy.dispose).toHaveBeenCalledTimes(1)
-  })
-
-  it('feeds Command Code output through the parked byte detector', async () => {
-    const { dispose } = await startWatcher()
-
-    emit('# Command Code v0.27.2\r\n')
-    emit('⌘ Parsing...')
-
-    expect(commandStatusPolicy.onCommandCodeWorking).toHaveBeenCalledTimes(1)
-    dispose()
-  })
-
-  it('feeds a Command Code return to the idle composer through as done', async () => {
-    const { dispose } = await startWatcher()
-
-    emit('# Command Code v0.27.2\r\n')
-    emit('❯ Fix the spinner\r\n')
-    emit('\r\n❯ Ask your question...\r\n')
-
-    expect(commandStatusPolicy.onCommandCodeDone).toHaveBeenCalledWith('Fix the spinner')
-    dispose()
-  })
-
-  it('arms the Command Code scrape from a turn already in flight at park time', async () => {
-    // Why: the banner scrolled away long before the park, so only the live
-    // status row can tell the fresh detector this is a Command Code TUI.
-    mockStoreState.agentStatusByPaneKey = {
-      [PANE_KEY]: { state: 'working', prompt: 'Fix the spinner', agentType: 'command-code' }
-    }
-    const { dispose } = await startWatcher()
-
-    emit('\r\n❯ Ask your question...\r\n')
-
-    expect(commandStatusPolicy.onCommandCodeDone).toHaveBeenCalledWith('Fix the spinner')
-    dispose()
-  })
-
-  it('leaves the scrape unarmed when the parked pane has no in-flight Command Code turn', async () => {
-    mockStoreState.agentStatusByPaneKey = {
-      [PANE_KEY]: { state: 'done', prompt: 'Fix the spinner', agentType: 'command-code' }
-    }
-    const { dispose } = await startWatcher()
-
-    emit('\r\n❯ Ask your question...\r\n')
-    emit('⌘ Parsing...')
-
-    expect(commandStatusPolicy.onCommandCodeDone).not.toHaveBeenCalled()
-    expect(commandStatusPolicy.onCommandCodeWorking).not.toHaveBeenCalled()
-    dispose()
   })
 
   it('fires completion when seeded with a working title and the agent goes idle while parked', async () => {
@@ -686,15 +606,9 @@ describe('startParkedTerminalByteWatcher', () => {
       enableMainAuthority()
       const { dispose } = await startWatcher()
 
-      await dispatchFacts([
-        { kind: 'command-finished', exitCode: 0 },
-        { kind: 'command-code-working', prompt: 'Fix the spinner' },
-        { kind: 'command-code-done', prompt: 'Fix the spinner' }
-      ])
+      await dispatchFacts([{ kind: 'command-finished', exitCode: 0 }])
 
       expect(commandStatusPolicy.onCommandFinished).toHaveBeenCalledWith(0)
-      expect(commandStatusPolicy.onCommandCodeWorking).toHaveBeenCalledWith('Fix the spinner')
-      expect(commandStatusPolicy.onCommandCodeDone).toHaveBeenCalledWith('Fix the spinner')
       dispose()
     })
 

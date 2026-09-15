@@ -27,7 +27,6 @@ import { recordTerminalUserInputForLeaf } from './terminal-input-activity'
 import { useAppStore } from '@/store'
 import { makePaneKey } from '../../../../shared/stable-pane-id'
 import { resolveWindowsShiftEnterEncodingForPane } from './terminal-windows-shift-enter'
-import { hasCtrlEnterCsiUAuthorityForPane } from './terminal-ctrl-enter'
 import { resolveTerminalInputHostPlatform } from './terminal-input-host-platform'
 import { isLocalWindowsConptyPaneForCtrlArrow } from './terminal-ctrl-arrow-conpty'
 import { keyboardEventBelongsToScope } from './terminal-keyboard-scope'
@@ -176,19 +175,6 @@ export function createTerminalKeyboardRuntime(options: RuntimeOptions) {
     const pane = manager?.getActivePane() ?? manager?.getPanes()[0]
     return pane ? (paneKittyKeyboardModesRef?.current.get(pane.id)?.flags ?? 0) : 0
   }
-  const hasActivePaneCtrlEnterCsiUAuthority = (): boolean => {
-    const manager = managerRef.current
-    const pane = manager?.getActivePane() ?? manager?.getPanes()[0]
-    if (!pane) {
-      return false
-    }
-    const state = useAppStore.getState()
-    return hasCtrlEnterCsiUAuthorityForPane(
-      state,
-      makePaneKey(tabId, pane.leafId),
-      isLocalWindowsConptyPane() ? state.runtimePaneTitlesByTabId[tabId]?.[pane.id] : undefined
-    )
-  }
   const resolveShortcutEvent = (
     event: Parameters<typeof resolveTerminalKeyboardShortcutAction>[0]
   ) =>
@@ -204,8 +190,7 @@ export function createTerminalKeyboardRuntime(options: RuntimeOptions) {
       getLayoutCharacterForCode,
       getActivePaneWindowsShiftEnterEncoding,
       isActivePaneWindowsTerminalHost,
-      terminalShortcutPolicy,
-      hasActivePaneCtrlEnterCsiUAuthority
+      terminalShortcutPolicy
     )
   const createCapturedInputSender = (pane: { id: number; leafId: string }, data: string) => {
     const capturedTransport = paneTransportsRef.current.get(pane.id)

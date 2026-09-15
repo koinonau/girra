@@ -1,98 +1,26 @@
 // Why: pi has no settings.json hook surface — its extensibility is the
 // in-process TypeScript extension API (pi.on('agent_start'), 'tool_call',
 // etc.). To get pi panes into the unified agent-hooks pipeline alongside
-// Claude/Codex/Gemini/OpenCode/Cursor, we ship a bundled extension into
-// the selected Pi/OMP extension dir (PiTitlebarExtensionService) that POSTs to
-// /hook/<kind> using the same ORCA_AGENT_HOOK_* + ORCA_PANE_KEY env that every
+// Claude and OpenCode, we ship a bundled extension into
+// the Pi extension dir (PiTitlebarExtensionService) that POSTs to
+// /hook/pi using the same ORCA_AGENT_HOOK_* + ORCA_PANE_KEY env that every
 // PTY already receives from ipc/pty.ts.
 //
 // Each Pi process gets its own paneKey through env. Like the OpenCode plugin,
 // the returned source is a string (loaded by jiti from disk inside the pi process), so we
 // keep the source body in plain JS without TS types and avoid pulling pi or
 // any Orca dep into the pi runtime.
-import type { PiAgentKind } from '../../shared/pi-agent-kind'
 import { getPiAgentStatusHandlerSourceLines } from './agent-status-handler-source'
-import { getPiAgentStatusRuntimeDetectionSourceLines } from './agent-status-runtime-detection-source'
 import { getPiAgentStatusWslCurlSourceLines } from './agent-status-wsl-curl-source'
 
 export const ORCA_PI_AGENT_STATUS_EXTENSION_FILE = 'orca-agent-status.ts'
 
-export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): string {
-  // Why: OMP needs the file only to reject ephemeral sessions; disclose just its resume id.
-  const sessionMetadataSourceLines =
-    kind !== 'omp'
-      ? [
-          'let sessionMetadata: Record<string, unknown> = {}',
-          'let runtimeOmpSessionMetadata: Record<string, unknown> = {}',
-          '',
-          'function updateSessionMetadata(ctx: unknown): void {',
-          '  const sessionManager = (ctx as { sessionManager?: { getSessionId?: () => unknown; getSessionFile?: () => unknown } } | null)?.sessionManager',
-          '  const sessionId = sessionManager?.getSessionId?.()',
-          '  const sessionFile = sessionManager?.getSessionFile?.()',
-          "  sessionMetadata = typeof sessionId === 'string' && sessionId ? {",
-          '    session_id: sessionId,',
-          "    ...(typeof sessionFile === 'string' && sessionFile ? { session_file: sessionFile } : {}),",
-          '  } : {}',
-          '}',
-          '',
-          'function updateRuntimeOmpSessionMetadata(ctx: unknown): void {',
-          '  if (!isOmpRuntime()) return',
-          '  const sessionManager = (ctx as { sessionManager?: { getSessionId?: () => unknown; getSessionFile?: () => unknown } } | null)?.sessionManager',
-          '  const sessionId = sessionManager?.getSessionId?.()',
-          '  const sessionFile = sessionManager?.getSessionFile?.()',
-          "  runtimeOmpSessionMetadata = typeof sessionId === 'string' && sessionId && typeof sessionFile === 'string' && sessionFile ? { session_id: sessionId } : {}",
-          '}',
-          '',
-          'function getPostSessionMetadata(ompRuntime: boolean): Record<string, unknown> {',
-          '  return ompRuntime ? runtimeOmpSessionMetadata : sessionMetadata',
-          '}',
-          '',
-          'function getPersistedSessionMetadata(): Record<string, unknown> {',
-          '  const sessionFile = sessionMetadata.session_file',
-          "  if (typeof sessionFile !== 'string' || !sessionFile) return {}",
-          '  try {',
-          "    const fs = require('fs')",
-          '    // Why: Pi publishes its planned path before creating the transcript;',
-          '    // recheck on every post so the first completed turn becomes resumable.',
-          '    return fs.existsSync(sessionFile) ? sessionMetadata : {}',
-          '  } catch {',
-          '    return {}',
-          '  }',
-          '}',
-          ''
-        ]
-      : [
-          'let sessionMetadata: Record<string, unknown> = {}',
-          '',
-          'function updateSessionMetadata(ctx: unknown): void {',
-          '  const sessionManager = (ctx as { sessionManager?: { getSessionId?: () => unknown; getSessionFile?: () => unknown } } | null)?.sessionManager',
-          '  const sessionId = sessionManager?.getSessionId?.()',
-          '  const sessionFile = sessionManager?.getSessionFile?.()',
-          "  sessionMetadata = typeof sessionId === 'string' && sessionId && typeof sessionFile === 'string' && sessionFile ? { session_id: sessionId } : {}",
-          '}',
-          '',
-          'function updateRuntimeOmpSessionMetadata(ctx: unknown): void {',
-          '  updateSessionMetadata(ctx)',
-          '}',
-          '',
-          'function getPostSessionMetadata(_ompRuntime: boolean): Record<string, unknown> {',
-          '  return sessionMetadata',
-          '}',
-          ''
-        ]
-  // Why: Pi resumes from an existing transcript; OMP resumes directly by session id (#8962).
-  const payloadLine =
-    kind !== 'omp'
-      ? '    payload: { hook_event_name: hookEventName, ...(ompRuntime ? metadata : getPersistedSessionMetadata()), ...extra },'
-      : '    payload: { hook_event_name: hookEventName, ...metadata, ...extra },'
-
+export function getPiAgentStatusExtensionSource(): string {
   // Why: keep this string self-contained — it runs inside the pi process,
   // so it cannot import from Orca's main bundle. fs/http coords come from
   // the same endpoint file the OpenCode plugin reads (process.env is frozen
   // at PTY spawn, so on Orca restart we have to re-read it from disk).
   return [
-    '// Why: no package-specific type import here. Pi and OMP expose the same',
-    '// extension API, but publish their types under different package names.',
     '// Why: warn-once so a recurring parse error on a malformed endpoint',
     '// file does not spam stderr inside the pi TUI on every event.',
     'let warnedBadEndpoint = false',
@@ -101,9 +29,34 @@ export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): strin
     '// Orca receiver from building an unbounded queue of obsolete snapshots.',
     'const HOOK_POST_TIMEOUT_MS = 1000',
     'let activePost = false',
-    ...(kind === 'pi' ? ['let piUiPromptDepth = 0', 'let piTurnInFlight = false'] : []),
-    'let pendingPost: { hookEventName: string; extra: Record<string, unknown>; metadata: Record<string, unknown>; ompRuntime: boolean } | null = null',
-    ...sessionMetadataSourceLines,
+    'let piUiPromptDepth = 0',
+    'let piTurnInFlight = false',
+    'let pendingPost: { hookEventName: string; extra: Record<string, unknown> } | null = null',
+    'let sessionMetadata: Record<string, unknown> = {}',
+    '',
+    'function updateSessionMetadata(ctx: unknown): void {',
+    '  const sessionManager = (ctx as { sessionManager?: { getSessionId?: () => unknown; getSessionFile?: () => unknown } } | null)?.sessionManager',
+    '  const sessionId = sessionManager?.getSessionId?.()',
+    '  const sessionFile = sessionManager?.getSessionFile?.()',
+    "  sessionMetadata = typeof sessionId === 'string' && sessionId ? {",
+    '    session_id: sessionId,',
+    "    ...(typeof sessionFile === 'string' && sessionFile ? { session_file: sessionFile } : {}),",
+    '  } : {}',
+    '}',
+    '',
+    'function getPersistedSessionMetadata(): Record<string, unknown> {',
+    '  const sessionFile = sessionMetadata.session_file',
+    "  if (typeof sessionFile !== 'string' || !sessionFile) return {}",
+    '  try {',
+    "    const fs = require('fs')",
+    '    // Why: Pi publishes its planned path before creating the transcript;',
+    '    // recheck on every post so the first completed turn becomes resumable.',
+    '    return fs.existsSync(sessionFile) ? sessionMetadata : {}',
+    '  } catch {',
+    '    return {}',
+    '  }',
+    '}',
+    '',
     '',
     '// Why: re-reading the endpoint file on every event is cheap (small file,',
     '// rare changes) but stat+mtime caching avoids re-parsing on every event',
@@ -159,18 +112,11 @@ export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): strin
     '  }',
     '}',
     '',
-    ...getPiAgentStatusRuntimeDetectionSourceLines(kind),
-    '',
     'function post(hookEventName: string, extra: Record<string, unknown> = {}): void {',
-    '  const ompRuntime = isOmpRuntime()',
     '  pendingPost = {',
     '    hookEventName,',
     // Why: every coalesced snapshot must retain an open modal, not just its start event.
-    kind === 'pi'
-      ? '    extra: { ...extra, ...(!ompRuntime && piUiPromptDepth > 0 ? { ui_prompt_active: true } : {}) },'
-      : '    extra,',
-    '    metadata: getPostSessionMetadata(ompRuntime),',
-    '    ompRuntime,',
+    '    extra: { ...extra, ...(piUiPromptDepth > 0 ? { ui_prompt_active: true } : {}) },',
     '  }',
     '  drainPosts()',
     '}',
@@ -180,7 +126,7 @@ export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): strin
     '  const next = pendingPost',
     '  pendingPost = null',
     '  activePost = true',
-    '  void postOnce(next.hookEventName, next.extra, next.metadata, next.ompRuntime)',
+    '  void postOnce(next.hookEventName, next.extra)',
     '    .catch(() => {})',
     '    .finally(() => {',
     '      activePost = false',
@@ -188,16 +134,11 @@ export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): strin
     '    })',
     '}',
     '',
-    'async function postOnce(',
-    '  hookEventName: string,',
-    '  extra: Record<string, unknown>,',
-    '  metadata: Record<string, unknown>,',
-    '  ompRuntime: boolean',
-    '): Promise<void> {',
+    'async function postOnce(hookEventName: string, extra: Record<string, unknown>): Promise<void> {',
     '  const coords = resolveHookCoords()',
     '  const paneKey = process.env.ORCA_PANE_KEY',
     '  if (!coords.port || !coords.token || !paneKey) return',
-    '  const url = `http://127.0.0.1:${coords.port}${resolveHookPath(ompRuntime)}`',
+    '  const url = `http://127.0.0.1:${coords.port}/hook/pi`',
     '  const body = JSON.stringify({',
     '    paneKey,',
     "    launchToken: process.env.ORCA_AGENT_LAUNCH_TOKEN || '',",
@@ -205,7 +146,7 @@ export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): strin
     "    worktreeId: process.env.ORCA_WORKTREE_ID || '',",
     '    env: coords.env,',
     '    version: coords.version,',
-    payloadLine,
+    '    payload: { hook_event_name: hookEventName, ...getPersistedSessionMetadata(), ...extra },',
     '  })',
     "  const controller = typeof AbortController !== 'undefined' ? new AbortController() : null",
     '  let timeout: ReturnType<typeof setTimeout> | undefined',
@@ -233,13 +174,13 @@ export function getPiAgentStatusExtensionSource(kind: PiAgentKind = 'pi'): strin
     '    // Why: status reporting must never fail the pi run just because Orca',
     '    // is unavailable or the loopback request failed (e.g. Orca restart).',
     '    if (!isWslRuntime()) return',
-    '    postViaWindowsCurl(body, ompRuntime)',
+    '    postViaWindowsCurl(body)',
     '  } finally {',
     '    if (timeout) clearTimeout(timeout)',
     '  }',
     '}',
     '',
     ...getPiAgentStatusWslCurlSourceLines(),
-    ...getPiAgentStatusHandlerSourceLines(kind)
+    ...getPiAgentStatusHandlerSourceLines()
   ].join('\n')
 }

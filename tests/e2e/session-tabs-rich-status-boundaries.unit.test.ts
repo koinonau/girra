@@ -38,7 +38,7 @@ function createHarness(): Harness {
     parentTabId: TAB_ID,
     leafId: LEAF_ID,
     ptyId: PTY_ID,
-    title: 'Cursor Agent',
+    title: 'Claude Code',
     parentLayout: {
       root: { type: 'leaf', leafId: LEAF_ID },
       activeLeafId: LEAF_ID,
@@ -76,14 +76,14 @@ function createHarness(): Harness {
 
 function setRichStatus(
   tab: TerminalTab,
-  args: { agentType?: 'claude' | 'cursor'; prompt: string; at: number }
+  args: { agentType?: 'claude'; prompt: string; at: number }
 ): void {
   tab.agentStatus = {
     state: 'working',
     prompt: args.prompt,
     updatedAt: args.at,
     stateStartedAt: args.at,
-    agentType: args.agentType ?? 'cursor',
+    agentType: args.agentType ?? 'claude',
     paneKey: tab.id,
     stateHistory: []
   }
@@ -107,14 +107,14 @@ describe('session-tabs rich-status boundaries', () => {
     const harness = createHarness()
     const firstWorkingAt = Date.now()
     setRichStatus(harness.tab, { prompt: 'previous task', at: firstWorkingAt })
-    emitTitle(harness, '⠋ Cursor Agent', firstWorkingAt)
+    emitTitle(harness, '⠋ Claude Code', firstWorkingAt)
     vi.advanceTimersByTime(1)
     emitTitle(harness, 'bash')
     harness.publications.length = 0
 
     vi.advanceTimersByTime(1)
     const nextWorkingAt = Date.now()
-    emitTitle(harness, '⠙ Cursor Agent', nextWorkingAt)
+    emitTitle(harness, '⠙ Claude Code', nextWorkingAt)
     expect(latestStatus(harness)).toMatchObject({
       state: 'working',
       prompt: '',
@@ -128,7 +128,7 @@ describe('session-tabs rich-status boundaries', () => {
     const harness = createHarness()
     const workingAt = Date.now()
     setRichStatus(harness.tab, { prompt: 'current task', at: workingAt })
-    emitTitle(harness, '⠋ Cursor Agent', workingAt)
+    emitTitle(harness, '⠋ Claude Code', workingAt)
 
     harness.publications.length = 0
     vi.advanceTimersByTime(1)
@@ -143,7 +143,7 @@ describe('session-tabs rich-status boundaries', () => {
     harness.publications.length = 0
     vi.advanceTimersByTime(1)
     const resumedWorkingAt = Date.now()
-    emitTitle(harness, '⠙ Cursor Agent', resumedWorkingAt)
+    emitTitle(harness, '⠙ Claude Code', resumedWorkingAt)
     expect(latestStatus(harness)).toMatchObject({
       state: 'working',
       prompt: 'current task',
@@ -156,7 +156,7 @@ describe('session-tabs rich-status boundaries', () => {
   it('does not resurrect a task after neutral then shell titles', () => {
     const harness = createHarness()
     setRichStatus(harness.tab, { prompt: 'completed task', at: Date.now() })
-    emitTitle(harness, '⠋ Cursor Agent')
+    emitTitle(harness, '⠋ Claude Code')
     vi.advanceTimersByTime(1)
     emitTitle(harness, 'Terminal')
     vi.advanceTimersByTime(1)
@@ -165,7 +165,7 @@ describe('session-tabs rich-status boundaries', () => {
 
     vi.advanceTimersByTime(1)
     const nextWorkingAt = Date.now()
-    emitTitle(harness, '⠙ Cursor Agent', nextWorkingAt)
+    emitTitle(harness, '⠙ Claude Code', nextWorkingAt)
     expect(latestStatus(harness)).toMatchObject({
       state: 'working',
       prompt: '',
@@ -184,17 +184,17 @@ describe('session-tabs rich-status boundaries', () => {
       interactivePrompt: '{"question":"previous question"}',
       updatedAt: firstWorkingAt,
       stateStartedAt: firstWorkingAt,
-      agentType: 'cursor',
+      agentType: 'claude',
       paneKey: harness.tab.id,
       stateHistory: []
     }
-    emitTitle(harness, 'Cursor Agent needs confirmation', firstWorkingAt)
+    emitTitle(harness, 'Claude Code needs confirmation', firstWorkingAt)
     vi.advanceTimersByTime(1)
     emitTitle(harness, 'bash')
     harness.publications.length = 0
 
     vi.advanceTimersByTime(1)
-    emitTitle(harness, '⠋ Cursor Agent')
+    emitTitle(harness, '⠋ Claude Code')
     expect(latestStatus(harness)).toMatchObject({ state: 'working', prompt: '' })
     expect(latestStatus(harness)).not.toHaveProperty('interactivePrompt')
     harness.unsubscribe()
@@ -209,7 +209,7 @@ describe('session-tabs rich-status boundaries', () => {
       interactivePrompt: '{"question":"current question"}',
       updatedAt: questionAt,
       stateStartedAt: questionAt,
-      agentType: 'cursor',
+      agentType: 'claude',
       paneKey: harness.tab.id,
       stateHistory: []
     }
@@ -222,7 +222,7 @@ describe('session-tabs rich-status boundaries', () => {
 
     harness.publications.length = 0
     vi.advanceTimersByTime(1)
-    emitTitle(harness, '⠋ Cursor Agent')
+    emitTitle(harness, '⠋ Claude Code')
     expect(latestStatus(harness)).toMatchObject({ state: 'working', prompt: '' })
     expect(latestStatus(harness)).not.toHaveProperty('interactivePrompt')
     harness.unsubscribe()
@@ -236,7 +236,7 @@ describe('session-tabs rich-status boundaries', () => {
     })
     harness.runtime.onPtyData(
       PTY_ID,
-      '\x1b]9999;{"state":"waiting","prompt":"current question","interactivePrompt":"question-payload","agentType":"cursor"}\x07',
+      '\x1b]9999;{"state":"waiting","prompt":"current question","interactivePrompt":"question-payload","agentType":"claude"}\x07',
       Date.now()
     )
 
@@ -248,30 +248,9 @@ describe('session-tabs rich-status boundaries', () => {
 
     harness.publications.length = 0
     vi.advanceTimersByTime(1)
-    emitTitle(harness, '⠋ Cursor Agent')
+    emitTitle(harness, '⠋ Claude Code')
     expect(latestStatus(harness)).toMatchObject({ state: 'working', prompt: '' })
     expect(latestStatus(harness)).not.toHaveProperty('interactivePrompt')
-    harness.unsubscribe()
-  })
-
-  it('does not resurrect retained status after an identity-only owner change', () => {
-    const harness = createHarness()
-    harness.runtime.registerPty(PTY_ID, WORKTREE_ID, null, {
-      tabId: harness.tab.parentTabId,
-      leafId: harness.tab.leafId
-    })
-    harness.runtime.onPtyData(
-      PTY_ID,
-      '\x1b]9999;{"state":"working","prompt":"retained task","agentType":"codex"}\x07',
-      Date.now()
-    )
-    vi.advanceTimersByTime(50)
-    emitTitle(harness, '⠋ Codex working')
-    harness.publications.length = 0
-
-    vi.advanceTimersByTime(1)
-    emitTitle(harness, 'Cursor Agent')
-    expect(latestStatus(harness)).toMatchObject({ state: 'done', prompt: '' })
     harness.unsubscribe()
   })
 
@@ -279,40 +258,20 @@ describe('session-tabs rich-status boundaries', () => {
     const harness = createHarness()
     const firstWorkingAt = Date.now()
     setRichStatus(harness.tab, { prompt: 'previous provider task', at: firstWorkingAt })
-    emitTitle(harness, '⠋ Cursor Agent', firstWorkingAt)
+    emitTitle(harness, '⠋ Claude Code', firstWorkingAt)
     harness.tab.agentStatus!.updatedAt = Date.now()
     harness.internals.resetTrackedTerminalStateForProviderGeneration(PTY_ID)
     harness.publications.length = 0
 
     vi.advanceTimersByTime(1)
     const replacementWorkingAt = Date.now()
-    emitTitle(harness, '⠙ Cursor Agent', replacementWorkingAt)
+    emitTitle(harness, '⠙ Claude Code', replacementWorkingAt)
     expect(latestStatus(harness)).toMatchObject({
       state: 'working',
       prompt: '',
       updatedAt: replacementWorkingAt,
       stateStartedAt: replacementWorkingAt
     })
-    harness.unsubscribe()
-  })
-
-  it('keeps invalidation across an identity-only owner change', () => {
-    const harness = createHarness()
-    setRichStatus(harness.tab, {
-      prompt: 'previous owner task',
-      at: Date.now(),
-      agentType: 'claude'
-    })
-    emitTitle(harness, '⠋ Claude working')
-    harness.publications.length = 0
-
-    vi.advanceTimersByTime(1)
-    const identityChangeAt = Date.now()
-    emitTitle(harness, 'Cursor Agent', identityChangeAt)
-    expect(harness.internals.ptysById.get(PTY_ID)?.lastAgentStatusRichInvalidatedAtEpochMs).toBe(
-      identityChangeAt
-    )
-    expect(latestStatus(harness)).toBeUndefined()
     harness.unsubscribe()
   })
 })

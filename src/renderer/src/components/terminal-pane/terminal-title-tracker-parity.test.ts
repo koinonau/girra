@@ -8,7 +8,6 @@
 // event sequences match.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { createAgentStatusOscProcessor } from '../../../../shared/agent-status-osc'
-import { createCommandCodeOutputStatusDetector } from '../../../../shared/command-code-output-status'
 import { createTerminalGitHubPRLinkDetector } from '../../../../shared/terminal-github-pr-link-detector'
 import { createTerminalTitleTracker } from '../../../../shared/terminal-output-side-effects'
 import { createPtyOutputProcessor } from './pty-transport'
@@ -28,20 +27,16 @@ type TitleFactEvent =
 type TitleFactPath = {
   events: TitleFactEvent[]
   feed: (chunk: string) => void
-  flush: () => void
 }
 
-// Why deferDrain: flushing per chunk hides schedule-vs-drain divergence, because the renderer
-// decides what to queue against a `lastEmittedTitle` that only later chunks advance.
-function createRendererPath(initialTitle?: string, deferDrain = false): TitleFactPath {
+function createRendererPath(): TitleFactPath {
   const events: TitleFactEvent[] = []
   const processor = createPtyOutputProcessor({
     onTitleChange: (normalized, raw) => events.push({ kind: 'title', normalized, raw }),
     onAgentBecameWorking: () => events.push({ kind: 'became-working' }),
     onAgentBecameIdle: (title) => events.push({ kind: 'became-idle', title }),
     onAgentExited: () => events.push({ kind: 'agent-exited' }),
-    onBell: () => events.push({ kind: 'bell' }),
-    initialAgentTitle: initialTitle
+    onBell: () => events.push({ kind: 'bell' })
   })
   const callbacks = { onData: () => {} }
   return {
@@ -51,36 +46,28 @@ function createRendererPath(initialTitle?: string, deferDrain = false): TitleFac
       // Why: the renderer defers side effects behind a setTimeout(0) drain to
       // protect xterm paint. Flush synchronously so both paths observe each
       // chunk at the same fake-timer instant.
-      if (!deferDrain) {
-        processor.flushPendingSideEffects()
-      }
-    },
-    flush: () => processor.flushPendingSideEffects()
+      processor.flushPendingSideEffects()
+    }
   }
 }
 
-function createMainPath(initialTitle?: string): TitleFactPath {
+function createMainPath(): TitleFactPath {
   const events: TitleFactEvent[] = []
   // Why: mirrors OrcaRuntimeService.onPtyData — the per-PTY OSC 9999
   // processor strips status payloads before the title tracker sees the chunk.
   const processAgentStatusChunk = createAgentStatusOscProcessor()
-  const tracker = createTerminalTitleTracker(
-    {
-      onTitle: (normalized, raw) => events.push({ kind: 'title', normalized, raw }),
-      onAgentBecameWorking: () => events.push({ kind: 'became-working' }),
-      onAgentBecameIdle: (title) => events.push({ kind: 'became-idle', title }),
-      onAgentExited: () => events.push({ kind: 'agent-exited' }),
-      onBell: () => events.push({ kind: 'bell' })
-    },
-    initialTitle !== undefined ? { initialTitle } : undefined
-  )
+  const tracker = createTerminalTitleTracker({
+    onTitle: (normalized, raw) => events.push({ kind: 'title', normalized, raw }),
+    onAgentBecameWorking: () => events.push({ kind: 'became-working' }),
+    onAgentBecameIdle: (title) => events.push({ kind: 'became-idle', title }),
+    onAgentExited: () => events.push({ kind: 'agent-exited' }),
+    onBell: () => events.push({ kind: 'bell' })
+  })
   return {
     events,
     feed(chunk: string): void {
       tracker.handleChunk(processAgentStatusChunk(chunk).cleanData)
-    },
-    // Why: main applies every title inline, so there is nothing to defer.
-    flush: () => {}
+    }
   }
 }
 
@@ -151,107 +138,6 @@ describe('main title tracker parity with the renderer transport processor', () =
 
     expect(paths.main.events).toEqual(paths.renderer.events)
     expect(paths.main.events).toContainEqual({ kind: 'became-idle', title: 'Codex done' })
-  })
-
-  // Why: #10258 — a hookless Cursor pane's only identity is the bare literal, so both
-  // paths must emit it once (never as an agent state) before the repeats are dropped.
-  it('emits the bare cursor-agent native title once in both paths', () => {
-    feedBoth(paths, `${ESC}]0;Cursor Agent${BEL}`)
-    feedBoth(paths, `${ESC}]0;Cursor Agent${BEL}`)
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events).toEqual([
-      { kind: 'title', normalized: 'Cursor Agent', raw: 'Cursor Agent' }
-    ])
-  })
-
-  it('lets a synthesized Cursor title follow the native literal in both paths', () => {
-    feedBoth(paths, `${ESC}]0;Cursor Agent${BEL}`)
-    feedBoth(paths, `${ESC}]0;⠋ Cursor Agent${BEL}`)
-    feedBoth(paths, `${ESC}]0;Cursor Agent${BEL}`)
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events.map((event) => event.kind)).toEqual([
-      'title',
-      'title',
-      'became-working'
-    ])
-  })
-
-  it('keeps a restored native Cursor title identity-only before synthesized work', () => {
-    const restoredPaths = {
-      renderer: createRendererPath('Cursor Agent'),
-      main: createMainPath('Cursor Agent')
-    }
-
-    feedBoth(restoredPaths, `${ESC}]0;Cursor Agent${BEL}`)
-    expect(restoredPaths.main.events).toEqual([])
-
-    feedBoth(restoredPaths, `${ESC}]0;⠋ Cursor Agent${BEL}`)
-
-    expect(restoredPaths.main.events).toEqual(restoredPaths.renderer.events)
-    expect(restoredPaths.main.events).toEqual([
-      { kind: 'title', normalized: '⠋ Cursor Agent', raw: '⠋ Cursor Agent' },
-      { kind: 'became-working' }
-    ])
-  })
-
-  it('keeps native/synthesized Cursor title order inside one coalesced chunk', () => {
-    feedBoth(
-      paths,
-      `${ESC}]0;Cursor Agent${BEL}${ESC}]0;⠋ Cursor Agent${BEL}${ESC}]0;Cursor Agent${BEL}`
-    )
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events).toEqual([
-      { kind: 'title', normalized: 'Cursor Agent', raw: 'Cursor Agent' },
-      { kind: 'title', normalized: '⠋ Cursor Agent', raw: '⠋ Cursor Agent' },
-      { kind: 'became-working' }
-    ])
-  })
-
-  it('drops the bare cursor-agent native title in both paths', () => {
-    feedBoth(paths, `${ESC}]0;⠋ Cursor Agent${BEL}`)
-    feedBoth(paths, `${ESC}]0;Cursor Agent${BEL}`)
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    const titles = paths.main.events.filter((event) => event.kind === 'title')
-    expect(titles).toEqual([{ kind: 'title', normalized: '⠋ Cursor Agent', raw: '⠋ Cursor Agent' }])
-  })
-
-  // Why: once the shell prompt repaints the title, the literal is again the pane's only Cursor
-  // identity — dropping it there would leave a re-entered cursor-agent with no row (#10258).
-  it('re-emits the native literal after a non-Cursor title took the pane', () => {
-    feedBoth(paths, `${ESC}]0;Cursor Agent${BEL}`)
-    feedBoth(paths, `${ESC}]0;zsh${BEL}${ESC}]0;Cursor Agent${BEL}`)
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events.filter((event) => event.kind === 'title')).toEqual([
-      { kind: 'title', normalized: 'Cursor Agent', raw: 'Cursor Agent' },
-      { kind: 'title', normalized: 'zsh', raw: 'zsh' },
-      { kind: 'title', normalized: 'Cursor Agent', raw: 'Cursor Agent' }
-    ])
-  })
-
-  // Why one flush: the renderer prunes titles when the chunk is scheduled but only advances its
-  // emitted-title memory on drain, so chunks that drain together must not decide against a
-  // predecessor that is already stale.
-  it('re-emits the native literal across chunks that drain together', () => {
-    const deferred = {
-      renderer: createRendererPath(undefined, true),
-      main: createMainPath()
-    }
-
-    feedBoth(deferred, `${ESC}]0;Cursor Agent${BEL}`)
-    // Why drain here: it leaves the renderer's emitted-title memory on the literal, which is
-    // exactly the stale predecessor the next two chunks must not be judged against.
-    deferred.renderer.flush()
-    feedBoth(deferred, `${ESC}]0;zsh${BEL}`)
-    feedBoth(deferred, `${ESC}]0;Cursor Agent${BEL}`)
-    deferred.renderer.flush()
-
-    expect(deferred.main.events).toEqual(deferred.renderer.events)
-    expect(deferred.main.events.filter((event) => event.kind === 'title')).toHaveLength(3)
   })
 
   it('clears a stale working title after the 3s timeout in both paths', () => {
@@ -409,98 +295,6 @@ describe('main tracker parity with renderer 133;D and PR-link byte parsers', () 
       paths,
       `${ESC}]9999;{"state":"done","prompt":"https://github.com/acme/orca/pull/9"}${BEL}\r\n`
     )
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events).toEqual([])
-  })
-})
-
-// Why: slice 4 moves the Command Code output scrape into main for local/SSH
-// PTYs. The renderer byte path observes raw transport data; main observes the
-// OSC 9999-stripped cleanData. Both must derive identical working/done
-// sequences from the same chunk boundaries, or flipping the kill switch
-// changes Command Code status rows.
-type CommandCodeFactEvent = ['working' | 'done', string]
-
-type CommandCodeFactPath = {
-  events: CommandCodeFactEvent[]
-  feed: (chunk: string) => void
-}
-
-function createCommandCodePath(options: { stripStatusPayloads: boolean }): CommandCodeFactPath {
-  const events: CommandCodeFactEvent[] = []
-  const processAgentStatusChunk = createAgentStatusOscProcessor()
-  const detector = createCommandCodeOutputStatusDetector({
-    startupCommand: null,
-    onWorking: (prompt) => events.push(['working', prompt]),
-    onDone: (prompt) => events.push(['done', prompt])
-  })
-  return {
-    events,
-    feed(chunk: string): void {
-      detector.observe(
-        options.stripStatusPayloads ? processAgentStatusChunk(chunk).cleanData : chunk
-      )
-    }
-  }
-}
-
-describe('main Command Code scrape parity with the renderer byte detector', () => {
-  let paths: { renderer: CommandCodeFactPath; main: CommandCodeFactPath }
-
-  beforeEach(() => {
-    paths = {
-      renderer: createCommandCodePath({ stripStatusPayloads: false }),
-      main: createCommandCodePath({ stripStatusPayloads: true })
-    }
-  })
-
-  it('derives identical working facts after the banner arms across chunks', () => {
-    feedBoth(paths, '# Command')
-    feedBoth(paths, ' Code v0.27.3\r\n')
-    feedBoth(paths, '❯ Fix the spinner\r\n\x1b[35m✻ Thinking...\x1b[0m')
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events).toEqual([['working', 'Fix the spinner']])
-  })
-
-  it('derives identical done facts for a no-tool turn in both paths', () => {
-    feedBoth(paths, '# Command Code v0.27.3\r\n')
-    feedBoth(paths, '❯ say hi\r\n✻ Thinking...')
-    feedBoth(paths, '\r\n:: Hi!\r\n❯ Ask your question...')
-
-    expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events).toEqual([
-      ['working', 'say hi'],
-      ['done', 'say hi']
-    ])
-  })
-
-  it('recovers prompt capture from interleaved OSC 9999 payloads (main improvement)', () => {
-    // Deliberate divergence, not drift: the renderer's raw byte path lets an
-    // OSC 9999 payload leak partial text into the scrape window (its ANSI
-    // strip consumes only the ESC] introducer), which breaks the prompt-echo
-    // line match. Main feeds the OSC 9999-stripped cleanData, so the prompt
-    // (and therefore the done settle hint) survives an adjacent payload.
-    const payloadThenPrompt = [
-      '# Command Code v0.27.3\r\n',
-      `${ESC}]9999;{"state":"working","agentType":"command-code"}${BEL}`,
-      '❯ say hi\r\n✻ Thinking...',
-      '\r\n:: Hi!\r\n❯ Ask your question...'
-    ]
-    for (const chunk of payloadThenPrompt) {
-      feedBoth(paths, chunk)
-    }
-
-    expect(paths.renderer.events).toEqual([['working', '']])
-    expect(paths.main.events).toEqual([
-      ['working', 'say hi'],
-      ['done', 'say hi']
-    ])
-  })
-
-  it('stays silent without the Command Code banner in both paths', () => {
-    feedBoth(paths, '❯ Fix the spinner\r\nThinking about unrelated shell output...')
 
     expect(paths.main.events).toEqual(paths.renderer.events)
     expect(paths.main.events).toEqual([])

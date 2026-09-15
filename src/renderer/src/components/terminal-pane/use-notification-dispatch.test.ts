@@ -731,28 +731,6 @@ describe('dispatchTerminalNotification', () => {
     }
   )
 
-  it('drops a Pi title completion while compatible OMP hook status is active', () => {
-    mockState.agentStatusByPaneKey[paneKey] = makeAgentStatus(paneKey, {
-      state: 'working',
-      agentType: 'omp',
-      updatedAt: Date.now() - 60_000,
-      stateStartedAt: Date.now() - 60_000,
-      lastAssistantMessage: undefined
-    })
-
-    dispatchTerminalNotification('wt-primary', {
-      source: 'agent-task-complete',
-      terminalTitle: 'Pi ready',
-      paneKey
-    })
-
-    expect(window.api.notifications.dispatch).not.toHaveBeenCalled()
-    expect(mockState.markWorktreeUnread).not.toHaveBeenCalled()
-    expect(mockState.markAgentCompletionPaneUnread).not.toHaveBeenCalled()
-    expect(mockState.markTerminalTabUnread).not.toHaveBeenCalled()
-    expect(mockState.markTerminalPaneUnread).not.toHaveBeenCalled()
-  })
-
   it('allows title-only completion after active hook status becomes stale', () => {
     mockState.agentStatusByPaneKey[paneKey] = makeAgentStatus(paneKey, {
       state: 'working',

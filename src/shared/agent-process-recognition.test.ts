@@ -25,10 +25,10 @@ describe('agent process recognition', () => {
     expect(isExpectedAgentProcess('/usr/local/bin/openclaude', 'claude')).toBe(false)
   })
 
-  it('recognizes the Droid foreground process on Windows', () => {
-    expect(recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Roaming\npm\droid.cmd`)).toEqual({
-      agent: 'droid',
-      processName: 'droid'
+  it('recognizes the Pi foreground process on Windows', () => {
+    expect(recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Roaming\npm\pi.cmd`)).toEqual({
+      agent: 'pi',
+      processName: 'pi'
     })
   })
 
@@ -66,68 +66,38 @@ describe('agent process recognition', () => {
     })
   })
 
-  it('recognizes Command Code without classifying Windows cmd.exe as an agent', () => {
-    expect(recognizeAgentProcess('command-code')).toEqual({
-      agent: 'command-code',
-      processName: 'command-code'
+  it('recognizes OpenCode without classifying Windows cmd.exe as an agent', () => {
+    expect(recognizeAgentProcess('opencode')).toEqual({
+      agent: 'opencode',
+      processName: 'opencode'
     })
     expect(
-      recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Roaming\npm\command-code.cmd`)
+      recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Roaming\npm\opencode.cmd`)
     ).toEqual({
-      agent: 'command-code',
-      processName: 'command-code'
+      agent: 'opencode',
+      processName: 'opencode'
     })
-    expect(isRecognizedAgentType('command-code')).toBe(true)
+    expect(isRecognizedAgentType('opencode')).toBe(true)
     expect(isRecognizedAgentType('cmd.exe')).toBe(false)
     expect(recognizeAgentProcess('cmd.exe')).toBeNull()
   })
 
-  it('recognizes Ante without classifying ante-prefixed path fragments as the agent', () => {
-    expect(recognizeAgentProcess('ante')).toEqual({
-      agent: 'ante',
-      processName: 'ante'
+  it('recognizes Pi without classifying pi-prefixed path fragments as the agent', () => {
+    expect(recognizeAgentProcess('pi')).toEqual({
+      agent: 'pi',
+      processName: 'pi'
     })
-    expect(recognizeAgentProcess('/Users/dev/.ante/bin/ante')).toEqual({
-      agent: 'ante',
-      processName: 'ante'
+    expect(recognizeAgentProcess('/Users/dev/.pi/bin/pi')).toEqual({
+      agent: 'pi',
+      processName: 'pi'
     })
-    expect(isExpectedAgentProcess('/Users/dev/.ante/bin/ante', 'ante')).toBe(true)
-    expect(isRecognizedAgentType('ante')).toBe(true)
-    // Why: 'ante' is a common token in directory and binary names; only the
+    expect(isExpectedAgentProcess('/Users/dev/.pi/bin/pi', 'pi')).toBe(true)
+    expect(isRecognizedAgentType('pi')).toBe(true)
+    // Why: 'pi' is a common token in directory and binary names; only the
     // exact normalized basename may classify as the agent.
-    expect(recognizeAgentProcess('ante-obsidian')).toBeNull()
-    expect(recognizeAgentProcess('antechamber')).toBeNull()
-    expect(isExpectedAgentProcess('ante-obsidian', 'ante')).toBe(false)
-  })
-
-  it('does not recognize Ante headless one-shot commands as interactive agents', () => {
-    expect(recognizeAgentProcessFromCommandLine('ante -p "summarize this diff"')).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('ante -psummarize')).toBeNull()
-    expect(
-      recognizeAgentProcessFromCommandLine('ante --prompt "review this for security issues"')
-    ).toBeNull()
-    expect(
-      recognizeAgentProcessFromCommandLine('ante --prompt=review --output-format minimal')
-    ).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('ante --resume ses_123')).toEqual({
-      agent: 'ante',
-      processName: 'ante'
-    })
-  })
-
-  it('does not recognize wrapped Ante headless one-shot commands as interactive agents', () => {
-    expect(
-      recognizeAgentProcessFromCommandLine('node /Users/dev/.ante/bin/ante --prompt "review"')
-    ).toBeNull()
-    expect(
-      recognizeAgentProcessFromCommandLine(
-        String.raw`node C:\Users\dev\.ante\bin\ante.cmd -p review`
-      )
-    ).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('node /Users/dev/.ante/bin/ante')).toEqual({
-      agent: 'ante',
-      processName: 'ante'
-    })
+    expect(recognizeAgentProcess('pi-mono')).toBeNull()
+    expect(recognizeAgentProcess('pipenv')).toBeNull()
+    expect(isExpectedAgentProcess('pi-mono', 'pi')).toBe(false)
   })
 
   it('recognizes Trae by its traecli binary, not the ambiguous trae-cli name', () => {
@@ -144,26 +114,6 @@ describe('agent process recognition', () => {
     // Why: `trae-cli` and `trae-agent` both name the unrelated open-source bytedance/trae-agent.
     expect(recognizeAgentProcess('trae-cli')).toBeNull()
     expect(recognizeAgentProcess('trae-agent')).toBeNull()
-  })
-
-  it('does not recognize Trae headless one-shot commands as interactive agents', () => {
-    expect(recognizeAgentProcessFromCommandLine('traecli -p "summarize this diff"')).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('traecli --print "review this"')).toBeNull()
-    expect(
-      recognizeAgentProcessFromCommandLine('traecli --output-format json "review this"')
-    ).toBeNull()
-    expect(
-      recognizeAgentProcessFromCommandLine('traecli --output-format=stream-json review')
-    ).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('traecli --resume AUTO')).toEqual({
-      agent: 'trae',
-      processName: 'traecli'
-    })
-    // Why: past `--` nothing is a flag, so this is the interactive pane Orca itself launches.
-    expect(recognizeAgentProcessFromCommandLine('traecli -- "--print the release notes"')).toEqual({
-      agent: 'trae',
-      processName: 'traecli'
-    })
   })
 
   it('recognizes Mistral Vibe by its installed executable and legacy alias', () => {
@@ -209,27 +159,29 @@ describe('agent process recognition', () => {
       recognizeAgentProcessFromCommandLine('node /Users/dev/.nvm/versions/node/bin/codex')
     ).toEqual({ agent: 'codex', processName: 'codex' })
     expect(
-      recognizeAgentProcessFromCommandLine('node /Users/dev/.nvm/versions/node/bin/gemini')
-    ).toEqual({ agent: 'gemini', processName: 'gemini' })
-    expect(recognizeAgentProcessFromCommandLine('python3 /opt/homebrew/bin/hermes --tui')).toEqual({
-      agent: 'hermes',
-      processName: 'hermes'
+      recognizeAgentProcessFromCommandLine('node /Users/dev/.nvm/versions/node/bin/opencode')
+    ).toEqual({ agent: 'opencode', processName: 'opencode' })
+    expect(
+      recognizeAgentProcessFromCommandLine('python3 /opt/homebrew/bin/claude --resume')
+    ).toEqual({
+      agent: 'claude',
+      processName: 'claude'
     })
     expect(
-      recognizeAgentProcessFromCommandLine('python3.12 /opt/homebrew/bin/hermes --tui')
+      recognizeAgentProcessFromCommandLine('python3.12 /opt/homebrew/bin/claude --resume')
     ).toEqual({
-      agent: 'hermes',
-      processName: 'hermes'
+      agent: 'claude',
+      processName: 'claude'
     })
-    expect(recognizeAgentProcessFromCommandLine('python -m aider')).toEqual({
-      agent: 'aider',
-      processName: 'aider'
+    expect(recognizeAgentProcessFromCommandLine('python -m opencode')).toEqual({
+      agent: 'opencode',
+      processName: 'opencode'
     })
     expect(
       recognizeAgentProcessFromCommandLine(
-        String.raw`python C:\Users\dev\AppData\Roaming\Python\Python312\Scripts\aider.py`
+        String.raw`python C:\Users\dev\AppData\Roaming\Python\Python312\Scripts\opencode.py`
       )
-    ).toEqual({ agent: 'aider', processName: 'aider' })
+    ).toEqual({ agent: 'opencode', processName: 'opencode' })
     expect(
       recognizeAgentProcessFromCommandLine(
         String.raw`node C:\Users\dev\AppData\Roaming\npm\codex.cmd`
@@ -240,11 +192,6 @@ describe('agent process recognition', () => {
         String.raw`node C:\Users\dev\AppData\Roaming\npm\node_modules\@openai\codex\bin\codex.js`
       )
     ).toEqual({ agent: 'codex', processName: 'codex' })
-    expect(
-      recognizeAgentProcessFromCommandLine(
-        String.raw`node C:\Users\dev\AppData\Roaming\npm\node_modules\@google\gemini-cli\bundle\gemini.mjs`
-      )
-    ).toEqual({ agent: 'gemini', processName: 'gemini' })
   })
 
   it.each(['earendil-works', 'mariozechner'])('recognizes the @%s Pi npm entrypoint', (scope) => {
@@ -253,61 +200,6 @@ describe('agent process recognition', () => {
         String.raw`node.exe C:\Users\dev\AppData\Roaming\npm\node_modules\@${scope}\pi-coding-agent\dist\cli.js`
       )
     ).toEqual({ agent: 'pi', processName: 'pi' })
-  })
-
-  it('recognizes Prime Agent by its binary and npm entrypoint', () => {
-    expect(recognizeAgentProcess('prime-agent')).toEqual({
-      agent: 'prime-agent',
-      processName: 'prime-agent'
-    })
-    expect(recognizeAgentProcess('/opt/homebrew/bin/prime-agent')).toEqual({
-      agent: 'prime-agent',
-      processName: 'prime-agent'
-    })
-    expect(
-      recognizeAgentProcessFromCommandLine(
-        'node /opt/homebrew/lib/node_modules/prime-agent/dist/bundle/cli.js'
-      )
-    ).toEqual({ agent: 'prime-agent', processName: 'prime-agent' })
-    expect(
-      recognizeAgentProcessFromCommandLine(
-        String.raw`node.exe C:\Users\dev\AppData\Roaming\npm\node_modules\prime-agent\dist\bundle\cli.js`
-      )
-    ).toEqual({ agent: 'prime-agent', processName: 'prime-agent' })
-  })
-
-  it('does not recognize Prime Agent headless one-shot commands as interactive agents', () => {
-    expect(recognizeAgentProcessFromCommandLine('prime-agent -p "summarize this diff"')).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('prime-agent --print "review this"')).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('prime-agent --resume abc123')).toEqual({
-      agent: 'prime-agent',
-      processName: 'prime-agent'
-    })
-    // Why: past `--` nothing is a flag, so this is the interactive pane Orca itself launches.
-    expect(
-      recognizeAgentProcessFromCommandLine('prime-agent -- "--print the release notes"')
-    ).toEqual({ agent: 'prime-agent', processName: 'prime-agent' })
-  })
-
-  it('does not recognize Prime Agent non-interactive --mode runs as interactive agents', () => {
-    for (const mode of ['json', 'rpc', 'acp', 'daemon']) {
-      expect(recognizeAgentProcessFromCommandLine(`prime-agent --mode ${mode}`)).toBeNull()
-    }
-    // Why: `text` is the interactive TUI mode Orca hosts.
-    expect(recognizeAgentProcessFromCommandLine('prime-agent --mode text')).toEqual({
-      agent: 'prime-agent',
-      processName: 'prime-agent'
-    })
-    // Why: the CLI only parses `--mode <value>` as separate tokens, so `--mode=json`
-    // is ignored by it and still starts the interactive mode.
-    expect(recognizeAgentProcessFromCommandLine('prime-agent --mode=json')).toEqual({
-      agent: 'prime-agent',
-      processName: 'prime-agent'
-    })
-    expect(recognizeAgentProcessFromCommandLine('prime-agent -- --mode rpc')).toEqual({
-      agent: 'prime-agent',
-      processName: 'prime-agent'
-    })
   })
 
   it('recognizes only the agent subcommand of the generic Orca CLI', () => {
@@ -324,28 +216,10 @@ describe('agent process recognition', () => {
     expect(recognizeAgentProcessFromCommandLine('node /usr/local/bin/orca status')).toBeNull()
   })
 
-  it('recognizes the versioned Cursor Node wrapper without accepting generic agent processes', () => {
-    const cursorEntrypoint = String.raw`C:\Users\dev\AppData\Local\cursor-agent\versions\2026.07.09-a3815c0\index.js`
-
-    expect(recognizeAgentProcessFromCommandLine(`node.exe ${cursorEntrypoint}`)).toEqual({
-      agent: 'cursor',
-      processName: 'cursor-agent'
-    })
-    expect(
-      recognizeAgentProcessFromCommandLine(`node.exe ${cursorEntrypoint} worker-server`)
-    ).toEqual({ agent: 'cursor', processName: 'cursor-agent' })
-    expect(
-      recognizeAgentProcessFromCommandLine(String.raw`node.exe C:\repo\cursor-agent\index.js`)
-    ).toBeNull()
-    expect(
-      recognizeAgentProcessFromCommandLine(String.raw`C:\Users\dev\.grok\bin\agent.exe`)
-    ).toBeNull()
-  })
-
   it('does not classify prompt text as a wrapped agent command', () => {
     expect(
       recognizeAgentProcessFromCommandLine(
-        'node /tmp/not-an-agent.js "compare opencode vs orca in Gemini CLI"'
+        'node /tmp/not-an-agent.js "compare opencode vs orca in Claude Code"'
       )
     ).toBeNull()
     expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\tmp\not-an-agent.js`)).toBeNull()
@@ -355,14 +229,14 @@ describe('agent process recognition', () => {
       )
     ).toBeNull()
     expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\repo\codex.js`)).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\repo\gemini.mjs`)).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\repo\opencode.mjs`)).toBeNull()
     expect(
       recognizeAgentProcessFromCommandLine(
         String.raw`node C:\repo\node_modules\@example\pi-coding-agent\dist\cli.js`
       )
     ).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine(String.raw`python C:\repo\aider.py`)).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('python -m not_aider')).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine(String.raw`python C:\repo\opencode.py`)).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine('python -m not_opencode')).toBeNull()
   })
 
   it('identifies only foreground processes that can wrap agent entrypoints', () => {
@@ -387,12 +261,5 @@ describe('agent process recognition', () => {
       )
     ).toEqual(agy)
     expect(recognizeAgentProcessFromCommandLine('agy --dangerously-skip-permissions')).toEqual(agy)
-  })
-
-  it('recognizes versioned Grok process names observed from the installed CLI', () => {
-    expect(recognizeAgentProcess('grok-0.2.51')).toEqual({
-      agent: 'grok',
-      processName: 'grok-0.2.51'
-    })
   })
 })

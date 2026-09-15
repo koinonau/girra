@@ -13,7 +13,6 @@ const MAC_ARGS = {
   paneKey: 'tab-1:00000000-0000-4000-8000-000000000001',
   cwd: '/Users/dev/repo',
   shellOverride: undefined,
-  launchAgent: undefined,
   clientPlatform: 'darwin' as NodeJS.Platform,
   userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
   osRelease: undefined
@@ -56,7 +55,6 @@ describe('resolveDashboardCardTerminalInput', () => {
       hostPlatform: 'darwin',
       localWindowsConpty: false,
       windowsShiftEnterEncoding: 'alt-enter',
-      ctrlEnterCsiU: false,
       kittyKeyboardAdvertised: true
     })
   })
@@ -68,30 +66,7 @@ describe('resolveDashboardCardTerminalInput', () => {
     expect(profile.osRelease).toBe('10.0.22631')
   })
 
-  it('keeps the kitty advertisement on ConPTY for an agent that needs CSI-u', () => {
-    const profile = resolveDashboardCardTerminalInput(stateWith(), {
-      ...WINDOWS_ARGS,
-      launchAgent: 'grok'
-    })
-    expect(profile.localWindowsConpty).toBe(true)
-    expect(profile.kittyKeyboardAdvertised).toBe(true)
-  })
-
-  it('relays trusted Ctrl+Enter authority without coupling it to Shift+Enter', () => {
-    const droid = resolveDashboardCardTerminalInput(
-      stateWith({
-        paneForegroundAgentByPaneKey: {
-          [WINDOWS_ARGS.paneKey]: {
-            agent: 'droid',
-            routingTrusted: true,
-            shellForeground: false
-          }
-        }
-      }),
-      WINDOWS_ARGS
-    )
-    expect(droid.ctrlEnterCsiU).toBe(true)
-
+  it('relays trusted Pi Shift+Enter encoding for a local Windows pane', () => {
     const pi = resolveDashboardCardTerminalInput(
       stateWith({
         paneForegroundAgentByPaneKey: {
@@ -105,7 +80,6 @@ describe('resolveDashboardCardTerminalInput', () => {
       WINDOWS_ARGS
     )
     expect(pi.windowsShiftEnterEncoding).toBe('csi-u')
-    expect(pi.ctrlEnterCsiU).toBe(false)
   })
 
   // Why: the pty runs Linux inside WSL, so byte protocols must follow it and
@@ -215,7 +189,6 @@ describe('resolveDashboardCardTerminalInput', () => {
       hostPlatform: 'darwin',
       localWindowsConpty: false,
       windowsShiftEnterEncoding: 'alt-enter',
-      ctrlEnterCsiU: false,
       kittyKeyboardAdvertised: true
     })
   })

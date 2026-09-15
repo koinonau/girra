@@ -4,7 +4,6 @@ import {
   clearWorkingIndicators,
   createAgentStatusTracker,
   getAgentLabel,
-  isGeminiTerminalTitle,
   isClaudeAgent,
   isClaudeManagementTitle,
   normalizeTerminalTitle,
@@ -25,27 +24,6 @@ describe('detectAgentStatusFromTitle', () => {
     expect(detectAgentStatusFromTitle('vim myfile.ts')).toBeNull()
   })
 
-  // --- Gemini symbols ---
-  it('detects Gemini permission symbol ✋', () => {
-    expect(detectAgentStatusFromTitle('✋ Gemini CLI')).toBe('permission')
-  })
-
-  it('detects Gemini working symbol ✦', () => {
-    expect(detectAgentStatusFromTitle('✦ Gemini CLI')).toBe('working')
-  })
-
-  it('detects Gemini idle symbol ◇', () => {
-    expect(detectAgentStatusFromTitle('◇ Gemini CLI')).toBe('idle')
-  })
-
-  it('detects Gemini silent working symbol ⏲', () => {
-    expect(detectAgentStatusFromTitle('⏲  Working… (my-project)')).toBe('working')
-  })
-
-  it('Gemini permission takes precedence over working', () => {
-    expect(detectAgentStatusFromTitle('✋✦ Gemini CLI')).toBe('permission')
-  })
-
   // --- Braille spinner characters ---
   it('detects braille spinner ⠋ as working', () => {
     expect(detectAgentStatusFromTitle('⠋ Codex is thinking')).toBe('working')
@@ -56,7 +34,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects braille spinner ⠹ as working', () => {
-    expect(detectAgentStatusFromTitle('⠹ aider running')).toBe('working')
+    expect(detectAgentStatusFromTitle('⠹ opencode running')).toBe('working')
   })
 
   it('detects braille spinner ⠸ as working', () => {
@@ -89,7 +67,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects "waiting" keyword with agent name', () => {
-    expect(detectAgentStatusFromTitle('gemini waiting for input')).toBe('permission')
+    expect(detectAgentStatusFromTitle('opencode waiting for input')).toBe('permission')
   })
 
   it('detects "ready" keyword as idle', () => {
@@ -101,7 +79,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects "done" keyword as idle', () => {
-    expect(detectAgentStatusFromTitle('aider done')).toBe('idle')
+    expect(detectAgentStatusFromTitle('opencode done')).toBe('idle')
   })
 
   it('detects "working" keyword as working', () => {
@@ -109,7 +87,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects "thinking" keyword as working', () => {
-    expect(detectAgentStatusFromTitle('gemini thinking')).toBe('working')
+    expect(detectAgentStatusFromTitle('codex thinking')).toBe('working')
   })
 
   it('detects "running" keyword as working', () => {
@@ -152,19 +130,13 @@ describe('detectAgentStatusFromTitle', () => {
     expect(detectAgentStatusFromTitle('codex')).toBe('idle')
   })
 
-  it('returns idle for bare agent name "aider"', () => {
-    expect(detectAgentStatusFromTitle('aider')).toBe('idle')
-  })
-
   it('returns idle for bare agent name "opencode"', () => {
     expect(detectAgentStatusFromTitle('opencode')).toBe('idle')
   })
 
-  it('classifies OpenClaude titles without falling through to Claude naming', () => {
-    expect(detectAgentStatusFromTitle('OpenClaude ready')).toBe('idle')
-    expect(detectAgentStatusFromTitle('OpenClaude running')).toBe('working')
-    expect(detectAgentStatusFromTitle('OpenClaude - action required')).toBe('permission')
-    expect(detectAgentStatusFromTitle('⠋ OpenClaude')).toBe('working')
+  it('does not read OpenClaude titles as Claude activity', () => {
+    expect(detectAgentStatusFromTitle('OpenClaude ready')).toBeNull()
+    expect(detectAgentStatusFromTitle('OpenClaude - action required')).toBeNull()
   })
 
   it('excludes the exact Claude agents management title', () => {
@@ -188,53 +160,6 @@ describe('detectAgentStatusFromTitle', () => {
     expect(detectAgentStatusFromTitle('π - session-name - my-project')).toBe('idle')
   })
 
-  // --- Cursor (cursor-agent) synthesized titles ---
-  // Why: cursor-agent's native title stays "Cursor Agent" all turn, so Orca synthesizes decorated titles for the spinner/unread pipeline.
-  it('treats the bare "Cursor Agent" native title as a no-op (not idle)', () => {
-    // Why: if the native title classified as idle, cursor's per-turn re-emissions would stomp the spinner off mid-turn.
-    expect(detectAgentStatusFromTitle('Cursor Agent')).toBeNull()
-    expect(detectAgentStatusFromTitle('cursor agent')).toBeNull()
-    expect(detectAgentStatusFromTitle('  Cursor Agent  ')).toBeNull()
-  })
-
-  it('classifies synthesized "⠋ Cursor Agent" working title as working', () => {
-    expect(detectAgentStatusFromTitle('⠋ Cursor Agent')).toBe('working')
-  })
-
-  it('classifies synthesized "Cursor ready" idle title as idle', () => {
-    expect(detectAgentStatusFromTitle('Cursor ready')).toBe('idle')
-  })
-
-  it('classifies synthesized "Cursor - action required" title as permission', () => {
-    expect(detectAgentStatusFromTitle('Cursor - action required')).toBe('permission')
-  })
-
-  it('classifies synthesized Droid titles', () => {
-    expect(detectAgentStatusFromTitle('⠋ Droid')).toBe('working')
-    expect(detectAgentStatusFromTitle('Droid ready')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Droid - action required')).toBe('permission')
-    expect(detectAgentStatusFromTitle('Droid working')).toBe('working')
-  })
-
-  it('classifies synthesized Hermes titles', () => {
-    expect(detectAgentStatusFromTitle('⠋ Hermes')).toBe('working')
-    expect(detectAgentStatusFromTitle('Hermes ready')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Hermes - action required')).toBe('permission')
-    expect(detectAgentStatusFromTitle('Hermes working')).toBe('working')
-  })
-
-  it('classifies synthesized Devin titles', () => {
-    expect(detectAgentStatusFromTitle('⠋ Devin')).toBe('working')
-    expect(detectAgentStatusFromTitle('Devin ready')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Devin - action required')).toBe('permission')
-    expect(detectAgentStatusFromTitle('Devin working')).toBe('working')
-  })
-
-  it('does not treat Factory Droid native needs-input titles as completion', () => {
-    expect(detectAgentStatusFromTitle('Factory Droid needs input')).toBeNull()
-    expect(detectAgentStatusFromTitle('Factory Droid needs your input')).toBeNull()
-  })
-
   // --- Case insensitivity ---
   it('is case-insensitive for agent names', () => {
     expect(detectAgentStatusFromTitle('CLAUDE')).toBe('idle')
@@ -255,18 +180,6 @@ describe('detectAgentStatusFromTitle', () => {
     expect(detectAgentStatusFromTitle('clamp working')).toBeNull()
     expect(detectAgentStatusFromTitle('example permission needed')).toBeNull()
   })
-
-  it('does not treat Android terminal titles as Droid agent titles', () => {
-    expect(detectAgentStatusFromTitle('android')).toBeNull()
-    expect(detectAgentStatusFromTitle('android emulator ready')).toBeNull()
-    expect(detectAgentStatusFromTitle('android build working')).toBeNull()
-    expect(detectAgentStatusFromTitle('android permission check')).toBeNull()
-  })
-
-  it('does not treat path fragments containing Hermes as agent activity', () => {
-    expect(detectAgentStatusFromTitle('~/hermes/working')).not.toBe('working')
-    expect(detectAgentStatusFromTitle('C:\\hermes\\ready')).toBeNull()
-  })
 })
 
 // Why: regression guard — a path fragment like `~/codex/working` must never classify as 'working' (path separators aren't word boundaries).
@@ -279,29 +192,29 @@ describe('detectAgentStatusFromTitle path-separator rejection', () => {
 
   test('rejects working keywords adjacent to Windows path separators', () => {
     expect(detectAgentStatusFromTitle('C:\\codex\\working')).not.toBe('working')
-    expect(detectAgentStatusFromTitle('C:\\aider\\thinking')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('C:\\opencode\\thinking')).not.toBe('working')
   })
 
   test('rejects working keywords adjacent to `.` separators', () => {
     expect(detectAgentStatusFromTitle('codex.working')).not.toBe('working')
-    expect(detectAgentStatusFromTitle('aider.thinking')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('opencode.thinking')).not.toBe('working')
   })
 
   test('still accepts legitimate idle/working titles separated by whitespace', () => {
     expect(detectAgentStatusFromTitle('Codex done')).toBe('idle')
     expect(detectAgentStatusFromTitle('OpenCode ready')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Aider idle')).toBe('idle')
+    expect(detectAgentStatusFromTitle('Claude idle')).toBe('idle')
     expect(detectAgentStatusFromTitle('Codex working')).toBe('working')
-    expect(detectAgentStatusFromTitle('Aider thinking')).toBe('working')
+    expect(detectAgentStatusFromTitle('OpenCode thinking')).toBe('working')
   })
 
   // Why: block path separators only on the LEFT of the keyword; blocking the right would regress titles ending in `.`/`!`/`?`.
   test('still accepts keywords followed by trailing punctuation', () => {
     expect(detectAgentStatusFromTitle('Codex done.')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Aider idle!')).toBe('idle')
+    expect(detectAgentStatusFromTitle('Claude idle!')).toBe('idle')
     expect(detectAgentStatusFromTitle('OpenCode ready?')).toBe('idle')
     expect(detectAgentStatusFromTitle('Codex working.')).toBe('working')
-    expect(detectAgentStatusFromTitle('Aider thinking...')).toBe('working')
+    expect(detectAgentStatusFromTitle('OpenCode thinking...')).toBe('working')
   })
 })
 
@@ -315,17 +228,6 @@ describe('clearWorkingIndicators', () => {
   it('strips braille spinner characters and working keywords', () => {
     const cleared = clearWorkingIndicators('⠋ Codex is thinking')
     expect(cleared).toBe('Codex is')
-    expect(detectAgentStatusFromTitle(cleared)).not.toBe('working')
-  })
-
-  it('strips Gemini working symbol', () => {
-    const cleared = clearWorkingIndicators('✦ Gemini CLI')
-    expect(cleared).toBe('Gemini CLI')
-    expect(detectAgentStatusFromTitle(cleared)).not.toBe('working')
-  })
-
-  it('strips Gemini silent working symbol ⏲', () => {
-    const cleared = clearWorkingIndicators('⏲  Working… (my-project)')
     expect(detectAgentStatusFromTitle(cleared)).not.toBe('working')
   })
 
@@ -349,50 +251,9 @@ describe('clearWorkingIndicators', () => {
 })
 
 describe('normalizeTerminalTitle', () => {
-  it('collapses Gemini working titles to a stable label', () => {
-    expect(normalizeTerminalTitle('✦  Typing prompt... (workspace)')).toBe('✦ Gemini CLI')
-    expect(normalizeTerminalTitle('⏲  Working… (workspace)')).toBe('✦ Gemini CLI')
-  })
-
-  it('collapses Gemini idle and permission titles to stable labels', () => {
-    expect(normalizeTerminalTitle('◇  Ready (workspace)')).toBe('◇ Gemini CLI')
-    expect(normalizeTerminalTitle('✋  Action Required (workspace)')).toBe('✋ Gemini CLI')
-  })
-
-  it('leaves non-Gemini titles unchanged', () => {
+  it('leaves non-Pi titles unchanged', () => {
     expect(normalizeTerminalTitle('⠂ Claude Code')).toBe('⠂ Claude Code')
     expect(normalizeTerminalTitle('bash')).toBe('bash')
-  })
-
-  it('collapses Grok rotating working titles to one stable label', () => {
-    // Grok interpolates a rotating phrase between spinner and name, so each frame differs; all must fold to one label.
-    expect(normalizeTerminalTitle('⠋ - Waiting for response… - grok')).toBe('⠋ Grok')
-    expect(normalizeTerminalTitle('⠴ - Thinking - grok')).toBe('⠋ Grok')
-    expect(normalizeTerminalTitle('⠙ - Responding - grok')).toBe('⠋ Grok')
-    expect(normalizeTerminalTitle('⠦ - Sleep 2s then echo hello-from-grok… - grok')).toBe('⠋ Grok')
-    expect(
-      normalizeTerminalTitle('⠹ - Waiting for response… - Execute Shell Command sleep 2 - grok')
-    ).toBe('⠋ Grok')
-    // Idempotent: re-normalizing our own collapsed label stays stable.
-    expect(normalizeTerminalTitle('⠋ Grok')).toBe('⠋ Grok')
-  })
-
-  it('leaves Grok idle and session titles unchanged', () => {
-    // No spinner → not a working frame; the meaningful final title still shows.
-    expect(normalizeTerminalTitle('grok')).toBe('grok')
-    expect(normalizeTerminalTitle('Fix the auth bug - grok')).toBe('Fix the auth bug - grok')
-    // Names "grok" mid-title but ends with another agent → not a Grok frame.
-    expect(normalizeTerminalTitle('⠋ debugging grok - claude')).toBe('⠋ debugging grok - claude')
-    // Only the Grok frame shape "spinner - phrase - grok" is the rotating-frame signal; task text ending in "grok" must not collapse.
-    expect(normalizeTerminalTitle('⠋ wire up grok')).toBe('⠋ wire up grok')
-    expect(normalizeTerminalTitle('⠋ Codex is thinking about grok')).toBe(
-      '⠋ Codex is thinking about grok'
-    )
-    expect(normalizeTerminalTitle('⠋ support for Grok')).toBe('⠋ support for Grok')
-    // Trailing " - grok" alone is not enough without the post-spinner delimiter.
-    expect(normalizeTerminalTitle('⠋ fix the flaky suite - grok')).toBe(
-      '⠋ fix the flaky suite - grok'
-    )
   })
 
   it('preserves Pi titles and canonicalizes only the spinner frame', () => {
@@ -406,41 +267,6 @@ describe('normalizeTerminalTitle', () => {
     expect(normalizeTerminalTitle('π:')).toBe('π:')
     expect(normalizeTerminalTitle('π ')).toBe('π ')
   })
-
-  it('does not route Pi titles whose cwd mentions Gemini into Gemini normalization', () => {
-    expect(normalizeTerminalTitle('⠋ π - gemini')).toBe('⠋ π - gemini')
-    expect(normalizeTerminalTitle('π - gemini')).toBe('π - gemini')
-    expect(normalizeTerminalTitle('⠋ π: gemini')).toBe('⠋ π: gemini')
-    expect(normalizeTerminalTitle('π: gemini')).toBe('π: gemini')
-    expect(normalizeTerminalTitle('⠋ π gemini')).toBe('⠋ π gemini')
-    expect(normalizeTerminalTitle('π gemini')).toBe('π gemini')
-    expect(normalizeTerminalTitle('⠋ π - gemini-project')).toBe('⠋ π - gemini-project')
-    expect(normalizeTerminalTitle('π - gemini-project')).toBe('π - gemini-project')
-  })
-})
-
-describe('isGeminiTerminalTitle', () => {
-  it('detects Gemini titles by symbol or name', () => {
-    expect(isGeminiTerminalTitle('✦  Typing prompt... (workspace)')).toBe(true)
-    expect(isGeminiTerminalTitle('◇  Ready (workspace)')).toBe(true)
-    expect(isGeminiTerminalTitle('gemini waiting for input')).toBe(true)
-  })
-
-  it('does not match other terminal titles', () => {
-    expect(isGeminiTerminalTitle('⠂ Claude Code')).toBe(false)
-    expect(isGeminiTerminalTitle('⠋ π - gemini')).toBe(false)
-    expect(isGeminiTerminalTitle('π - gemini')).toBe(false)
-    expect(isGeminiTerminalTitle('⠋ π: gemini')).toBe(false)
-    expect(isGeminiTerminalTitle('π: gemini')).toBe(false)
-    expect(isGeminiTerminalTitle('⠋ π gemini')).toBe(false)
-    expect(isGeminiTerminalTitle('π gemini')).toBe(false)
-    expect(isGeminiTerminalTitle('π -')).toBe(false)
-    expect(isGeminiTerminalTitle('π:')).toBe(false)
-    expect(isGeminiTerminalTitle('π ')).toBe(false)
-    expect(isGeminiTerminalTitle('⠋ π - gemini-project')).toBe(false)
-    expect(isGeminiTerminalTitle('/tmp/gemini/working')).toBe(false)
-    expect(isGeminiTerminalTitle('bash')).toBe(false)
-  })
 })
 
 describe('getAgentLabel', () => {
@@ -449,40 +275,20 @@ describe('getAgentLabel', () => {
   })
 
   it('treats Claude Code prefixed task titles as Claude even when they mention another CLI', () => {
-    expect(getAgentLabel('✳ Gemini CLI')).toBe('Claude Code')
+    expect(getAgentLabel('✳ OpenCode ready')).toBe('Claude Code')
     expect(getAgentLabel('. Compare Opencode Vs Orca')).toBe('Claude Code')
     expect(getAgentLabel('* Review Codex behavior')).toBe('Claude Code')
   })
 
   it('labels supported agent families consistently', () => {
-    expect(getAgentLabel('✦ Gemini CLI')).toBe('Gemini CLI')
     expect(getAgentLabel('⠂ Claude Code')).toBe('Claude Code')
     expect(getAgentLabel('⠋ Codex is thinking')).toBe('Codex')
-    expect(getAgentLabel('OpenClaude running')).toBe('OpenClaude')
-    expect(getAgentLabel('⠋ OpenClaude')).toBe('OpenClaude')
-    expect(getAgentLabel('Antigravity running')).toBe('Antigravity')
-    expect(getAgentLabel('agy working')).toBe('Antigravity')
-    expect(getAgentLabel('Grok running')).toBe('Grok')
-    expect(getAgentLabel('⠋ Droid')).toBe('Droid')
-    expect(getAgentLabel('Droid ready')).toBe('Droid')
-    expect(getAgentLabel('⠋ Hermes')).toBe('Hermes')
-    expect(getAgentLabel('Hermes ready')).toBe('Hermes')
-    expect(getAgentLabel('⠋ Devin')).toBe('Devin')
-    expect(getAgentLabel('Devin ready')).toBe('Devin')
+    expect(getAgentLabel('OpenCode running')).toBe('OpenCode')
+    expect(getAgentLabel('⠋ OpenClaude')).toBeNull()
   })
 
   it('does not label the Claude agents management title', () => {
     expect(getAgentLabel('claude agents')).toBeNull()
-  })
-
-  it('labels GitHub Copilot CLI', () => {
-    expect(getAgentLabel('copilot working')).toBe('GitHub Copilot')
-    expect(getAgentLabel('copilot idle')).toBe('GitHub Copilot')
-    expect(getAgentLabel('GitHub Copilot CLI')).toBe('GitHub Copilot')
-  })
-
-  it('does not label Android titles as Droid', () => {
-    expect(getAgentLabel('android emulator ready')).toBeNull()
   })
 
   // Why: substring matching mislabeled cwd/worktree name fragments (e.g. "opencode-blinker") as agents; token-match to reject them.
@@ -491,26 +297,18 @@ describe('getAgentLabel', () => {
     expect(getAgentLabel('claude-scratch')).toBeNull()
     expect(getAgentLabel('~/projects/codex-scratch')).toBeNull()
     expect(getAgentLabel('~/cursor-rules')).toBeNull()
-    expect(getAgentLabel('grok-fixtures')).toBeNull()
-    expect(getAgentLabel('devin-fixtures')).toBeNull()
-    expect(getAgentLabel('aider-config')).toBeNull()
+    expect(getAgentLabel('pi-fixtures')).toBeNull()
   })
 
   it('still labels real agent titles that contain the name as a token', () => {
     expect(getAgentLabel('OpenCode ready')).toBe('OpenCode')
     expect(getAgentLabel('claude.exe')).toBe('Claude Code')
-    expect(getAgentLabel('openclaude.cmd')).toBe('OpenClaude')
     expect(getAgentLabel('⠋ Codex')).toBe('Codex')
-    expect(getAgentLabel('Aider idle')).toBe('Aider')
-    expect(getAgentLabel('Devin working')).toBe('Devin')
+    expect(getAgentLabel('opencode.cmd working')).toBe('OpenCode')
   })
 
-  // Why: "cursor" is ordinary editor vocabulary, so a bare token isn't Cursor identity; match Cursor's closed title set only.
-  it('labels Cursor by identity, not a bare "cursor" token in another agent title', () => {
-    expect(getAgentLabel('Cursor Agent')).toBe('Cursor')
-    expect(getAgentLabel('⠋ Cursor Agent')).toBe('Cursor')
-    expect(getAgentLabel('Cursor ready')).toBe('Cursor')
-    expect(getAgentLabel('Cursor - action required')).toBe('Cursor')
+  // Why: "cursor" is ordinary editor vocabulary, so a bare token is not agent identity.
+  it('does not label a bare "cursor" token in another agent title', () => {
     expect(getAgentLabel('⠋ preserve cursor visibility across replays')).toBe('Claude Code')
     expect(getAgentLabel('⠋ Codex: fix cursor offsets')).toBe('Codex')
     expect(getAgentLabel('Terminal Cursor and Orca slows down')).toBeNull()
@@ -524,10 +322,9 @@ describe('isClaudeAgent', () => {
     expect(isClaudeAgent('OpenClaude ready')).toBe(false)
   })
 
-  // Why: a Claude title merely mentioning a text cursor is still Claude; only Cursor's own identity titles are excluded.
-  it('counts cursor-mentioning Claude braille titles as Claude, excludes real Cursor', () => {
+  // Why: a Claude title merely mentioning a text cursor is still Claude.
+  it('counts cursor-mentioning Claude braille titles as Claude', () => {
     expect(isClaudeAgent('⠋ preserve cursor visibility across replays')).toBe(true)
-    expect(isClaudeAgent('⠋ Cursor Agent')).toBe(false)
   })
 
   it('does not classify non-prefix Claude mentions as Claude agent titles', () => {
@@ -579,39 +376,6 @@ describe('createAgentStatusTracker', () => {
     expect(onBecameIdle).toHaveBeenCalledTimes(1)
   })
 
-  // --- Gemini CLI: real title patterns from source code ---
-  it('fires on Gemini CLI working → idle (real title patterns)', () => {
-    const onBecameIdle = vi.fn()
-    const tracker = createAgentStatusTracker(onBecameIdle)
-
-    tracker.handleTitle('◇  Ready (my-project)') // startup idle
-    expect(onBecameIdle).not.toHaveBeenCalled()
-
-    tracker.handleTitle('✦  Implementing feature (my-project)') // working
-    expect(onBecameIdle).not.toHaveBeenCalled()
-
-    tracker.handleTitle('◇  Ready (my-project)') // done → idle
-    expect(onBecameIdle).toHaveBeenCalledTimes(1)
-  })
-
-  it('fires on Gemini CLI working → permission', () => {
-    const onBecameIdle = vi.fn()
-    const tracker = createAgentStatusTracker(onBecameIdle)
-
-    tracker.handleTitle('✦  Working… (my-project)') // working
-    tracker.handleTitle('✋  Action Required (my-project)') // permission
-    expect(onBecameIdle).toHaveBeenCalledTimes(1)
-  })
-
-  it('fires on Gemini CLI silent working → idle', () => {
-    const onBecameIdle = vi.fn()
-    const tracker = createAgentStatusTracker(onBecameIdle)
-
-    tracker.handleTitle('⏲  Working… (my-project)') // silent working
-    tracker.handleTitle('◇  Ready (my-project)') // idle
-    expect(onBecameIdle).toHaveBeenCalledTimes(1)
-  })
-
   // --- Codex: braille spinner working, bare name idle ---
   it('fires on Codex working → idle', () => {
     const onBecameIdle = vi.fn()
@@ -622,24 +386,6 @@ describe('createAgentStatusTracker', () => {
     expect(onBecameIdle).toHaveBeenCalledTimes(1)
   })
 
-  // Why: cursor's native "Cursor Agent" re-emissions between synthesized working frames must not fire onBecameIdle before the done frame.
-  it('fires on Cursor working → idle across native "Cursor Agent" re-emissions', () => {
-    const onBecameIdle = vi.fn()
-    const tracker = createAgentStatusTracker(onBecameIdle)
-
-    tracker.handleTitle('⠋ Cursor Agent') // synthesized working
-    expect(onBecameIdle).not.toHaveBeenCalled()
-
-    tracker.handleTitle('Cursor Agent') // cursor's native re-emission — no-op
-    expect(onBecameIdle).not.toHaveBeenCalled()
-
-    tracker.handleTitle('Cursor Agent') // more native re-emissions
-    expect(onBecameIdle).not.toHaveBeenCalled()
-
-    tracker.handleTitle('Cursor ready') // synthesized done → idle
-    expect(onBecameIdle).toHaveBeenCalledTimes(1)
-  })
-
   it('fires on Pi working → idle', () => {
     const onBecameIdle = vi.fn()
     const tracker = createAgentStatusTracker(onBecameIdle)
@@ -647,15 +393,6 @@ describe('createAgentStatusTracker', () => {
     tracker.handleTitle('⠋ π - my-project')
     tracker.handleTitle('π - my-project')
     expect(onBecameIdle).toHaveBeenCalledTimes(1)
-  })
-
-  it('does not fire when Factory Droid reports needs input during a working turn', () => {
-    const onBecameIdle = vi.fn()
-    const tracker = createAgentStatusTracker(onBecameIdle)
-
-    tracker.handleTitle('⠋ Droid')
-    tracker.handleTitle('Factory Droid needs input')
-    expect(onBecameIdle).not.toHaveBeenCalled()
   })
 
   // --- Multiple cycles ---
@@ -728,28 +465,6 @@ describe('createAgentStatusTracker', () => {
       `data${oscTitle('⠂ Claude Code')}stuff`,
       `response text${oscTitle('⠐ Fix the login bug')}more`,
       `final output${oscTitle('✳ Fix the login bug')}done`
-    ]
-
-    for (const chunk of chunks) {
-      const title = extractLastOscTitle(chunk)
-      if (title !== null) {
-        tracker.handleTitle(title)
-      }
-    }
-
-    expect(onBecameIdle).toHaveBeenCalledTimes(1)
-  })
-
-  it('end-to-end: extracts OSC title and detects Gemini transition', () => {
-    const onBecameIdle = vi.fn()
-    const tracker = createAgentStatusTracker(onBecameIdle)
-
-    const oscTitle = (title: string): string => `\x1b]0;${title}\x07`
-
-    const chunks = [
-      oscTitle('◇  Ready (workspace)'),
-      oscTitle('✦  Analyzing code (workspace)'),
-      oscTitle('◇  Ready (workspace)')
     ]
 
     for (const chunk of chunks) {

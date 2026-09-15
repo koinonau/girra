@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { toAppSshPtyId } from '../../../shared/ssh-pty-id'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../../shared/constants'
 
 const mockCreateTab = vi.fn()
@@ -14,8 +13,6 @@ const mockSeedNativeChatLaunchDraft = vi.fn()
 const mockMarkNativeChatLaunchPromptFailed = vi.fn()
 const mockToastMessage = vi.fn()
 const mockWaitForAgentReady = vi.fn()
-
-const LEAF_ID = '11111111-1111-4111-8111-111111111111'
 
 const store = {
   activeRepoId: 'repo-1',
@@ -570,27 +567,6 @@ describe('launchAgentInNewTab', () => {
     expect(mockSetActiveTabType).not.toHaveBeenCalled()
   })
 
-  it('queues initial working status for Command Code argv prompt launches', async () => {
-    const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
-
-    launchAgentInNewTab({
-      agent: 'command-code',
-      worktreeId: 'wt-1',
-      prompt: 'fix the spinner'
-    })
-
-    expect(mockQueueTabStartupCommand).toHaveBeenCalledWith(
-      'tab-1',
-      expect.objectContaining({
-        command: "command-code --trust '--yolo' 'fix the spinner'",
-        initialAgentStatus: {
-          agent: 'command-code',
-          prompt: 'fix the spinner'
-        }
-      })
-    )
-  })
-
   it('falls back to post-ready draft paste when a Windows inline draft would be too large', async () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
     const prompt = 'x'.repeat(25_000)
@@ -647,100 +623,12 @@ describe('launchAgentInNewTab', () => {
     }
   })
 
-  it('seeds working after Command Code submit-after-ready prompt delivery', async () => {
-    store.repos = [{ id: 'repo-1', connectionId: 'ssh-a', path: '/repo' }]
-    const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
-
-    const result = launchAgentInNewTab({
-      agent: 'command-code',
-      worktreeId: 'wt-1',
-      prompt: 'large generated prompt',
-      promptDelivery: 'submit-after-ready'
-    })
-    store.terminalLayoutsByTabId = {
-      'tab-1': {
-        activeLeafId: LEAF_ID,
-        ptyIdsByLeafId: { [LEAF_ID]: toAppSshPtyId('ssh-a', 'pty-1') }
-      }
-    }
-    store.ptyIdsByTabId = { 'tab-1': [toAppSshPtyId('ssh-a', 'pty-1')] }
-    await expect(result?.promptDeliveryResult).resolves.toEqual({
-      delivered: true,
-      failureNotified: false
-    })
-    await Promise.resolve()
-    await Promise.resolve()
-
-    expect(mockQueueTabStartupCommand).toHaveBeenCalledWith(
-      'tab-1',
-      expect.objectContaining({
-        command: "command-code --trust '--yolo'"
-      })
-    )
-    expect(mockPasteDraftWhenAgentReady).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tabId: 'tab-1',
-        content: 'large generated prompt',
-        agent: 'command-code',
-        submit: true,
-        forcePaste: true
-      })
-    )
-    expect(mockSetAgentStatus).toHaveBeenCalledWith(
-      `tab-1:${LEAF_ID}`,
-      {
-        state: 'working',
-        prompt: 'large generated prompt',
-        agentType: 'command-code',
-        // Why: seeded from Orca's own prompt delivery, not a provider hook (STA-4293).
-        observation: expect.objectContaining({ origin: 'process', kind: 'transition' })
-      },
-      undefined,
-      undefined,
-      { connectionId: 'ssh-a' }
-    )
-  })
-
-  it('does not recreate SSH status when clear arrives before disconnect state', async () => {
-    let finishDelivery: ((delivered: boolean) => void) | undefined
-    mockPasteDraftWhenAgentReady.mockReturnValue(
-      new Promise<boolean>((resolve) => {
-        finishDelivery = resolve
-      })
-    )
-    store.repos = [{ id: 'repo-1', connectionId: 'ssh-a', path: '/repo' }]
-    const ptyId = toAppSshPtyId('ssh-a', 'pty-1')
-    const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
-
-    const result = launchAgentInNewTab({
-      agent: 'command-code',
-      worktreeId: 'wt-1',
-      prompt: 'pending prompt',
-      promptDelivery: 'submit-after-ready'
-    })
-    store.terminalLayoutsByTabId = {
-      'tab-1': { activeLeafId: LEAF_ID, ptyIdsByLeafId: { [LEAF_ID]: ptyId } }
-    }
-    store.ptyIdsByTabId = { 'tab-1': [ptyId] }
-
-    // Why: explicit disconnect sends the transient clear before its state
-    // event, while the old connection can still appear connected and bound.
-    store.transientClearedAgentStatusConnectionIds = { 'ssh-a': true }
-    finishDelivery?.(true)
-    await expect(result?.promptDeliveryResult).resolves.toEqual({
-      delivered: true,
-      failureNotified: false
-    })
-
-    expect(mockSetAgentStatus).not.toHaveBeenCalled()
-  })
-
   it('reports failed submit-after-ready delivery', async () => {
     mockPasteDraftWhenAgentReady.mockResolvedValue(false)
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'command-code',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'large generated prompt',
       promptDelivery: 'submit-after-ready'
@@ -761,7 +649,7 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'command-code',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'large generated prompt',
       promptDelivery: 'submit-after-ready'
@@ -786,7 +674,7 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'command-code',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'large generated prompt',
       promptDelivery: 'submit-after-ready'
@@ -809,7 +697,7 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'command-code',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'large generated prompt',
       promptDelivery: 'submit-after-ready'
@@ -832,7 +720,7 @@ describe('launchAgentInNewTab', () => {
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'command-code',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'large generated prompt',
       promptDelivery: 'submit-after-ready'

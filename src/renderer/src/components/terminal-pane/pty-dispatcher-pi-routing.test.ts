@@ -181,49 +181,6 @@ describe('dispatcher → transport → onTitleChange for Pi spinner', () => {
     transport.disconnect()
   })
 
-  // Why: regression for cursor's "solid after 500ms" bug — cursor re-emits its bare native title mid-turn; it must not overwrite the synthesized spinner frame.
-  it('drops cursor-agent native "Cursor Agent" title so it cannot overwrite the synthesized spinner', async () => {
-    const { createIpcPtyTransport } = await import('./pty-transport')
-    const onTitleChange = vi.fn()
-
-    const transport = createIpcPtyTransport({ onTitleChange })
-    await transport.connect({ url: '', callbacks: {} })
-
-    // Realistic interleave: synthesized working frame, cursor's bare native title, next spinner frame, etc.
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;⠋ Cursor Agent${BEL}` })
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;Cursor Agent${BEL}` })
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;⠙ Cursor Agent${BEL}` })
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;Cursor Agent${BEL}` })
-    await flushPtySideEffects()
-
-    const seenTitles = onTitleChange.mock.calls.map((c) => c[0])
-    expect(seenTitles).not.toContain('Cursor Agent')
-    expect(seenTitles).toContain('⠋ Cursor Agent')
-    expect(seenTitles).toContain('⠙ Cursor Agent')
-
-    transport.disconnect()
-  })
-
-  it('still surfaces the synthesized "Cursor ready" idle title after working', async () => {
-    // Why: the bare-title drop must not also catch the decorated "Cursor ready" done frame Orca synthesizes on the stop hook.
-    const { createIpcPtyTransport } = await import('./pty-transport')
-    const onTitleChange = vi.fn()
-
-    const transport = createIpcPtyTransport({ onTitleChange })
-    await transport.connect({ url: '', callbacks: {} })
-
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;⠋ Cursor Agent${BEL}` })
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;Cursor Agent${BEL}` })
-    dispatcherCallback?.({ id: 'pty-pi', data: `${ESC}]0;Cursor ready${BEL}${BEL}` })
-    await flushPtySideEffects()
-
-    const seenTitles = onTitleChange.mock.calls.map((c) => c[0])
-    expect(seenTitles).toContain('⠋ Cursor Agent')
-    expect(seenTitles).toContain('Cursor ready')
-
-    transport.disconnect()
-  })
-
   it('surfaces synthesized "Codex ready" idle titles after Codex spinner titles', async () => {
     const { createIpcPtyTransport } = await import('./pty-transport')
     const onTitleChange = vi.fn()

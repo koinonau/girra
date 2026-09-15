@@ -4,7 +4,6 @@ import ts from 'typescript-api'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { detectAgentStatusFromTitle } from '../../shared/agent-detection'
-import type { PiAgentKind } from '../../shared/pi-agent-kind'
 import { getPiTitlebarExtensionSource } from './titlebar-extension-source'
 
 const BRAILLE_RE = /[⠀-⣿]/
@@ -23,7 +22,7 @@ type Harness = {
 }
 
 const CWD = '/repo/orca-app'
-const SESSION = 'omp-session'
+const SESSION = 'pi-session'
 const IDLE_TITLE = `π - ${SESSION} - orca-app`
 const PROMPT_TITLE = `π ! ${SESSION} - orca-app`
 
@@ -31,8 +30,6 @@ function createHarness(
   options: {
     paneKey?: string
     isIdle?: () => boolean
-    kind?: PiAgentKind
-    processTitle?: string
     cwdImpl?: () => string
     sessionNameImpl?: () => string
     setTitle?: (title: string) => void
@@ -66,7 +63,7 @@ function createHarness(
     process: {
       env: { ORCA_PANE_KEY: options.paneKey ?? 'pane-1', ...options.env },
       pid: options.env?.ORCA_PI_TITLE_MARKER_OWNED === undefined ? 111 : 222,
-      title: options.processTitle ?? 'pi',
+      title: 'pi',
       argv: ['node', 'pi'],
       cwd: options.cwdImpl ?? (() => CWD)
     },
@@ -80,7 +77,7 @@ function createHarness(
   } as Record<string, unknown>
   context.globalThis = options.globals ?? context
 
-  const output = ts.transpileModule(getPiTitlebarExtensionSource(options.kind ?? 'pi'), {
+  const output = ts.transpileModule(getPiTitlebarExtensionSource(), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 }
   }).outputText
   runInNewContext(output, context)
@@ -228,16 +225,6 @@ describe('getPiTitlebarExtensionSource', () => {
     expect(transferTitles[0]).toMatch(BRAILLE_RE)
   })
 
-  it('keeps spinning across a non-terminal OMP agent_end', async () => {
-    const harness = createHarness()
-
-    await harness.callHook('agent_start')
-    await harness.callHook('agent_end', { willContinue: true })
-
-    expect(vi.getTimerCount()).toBe(1)
-    expect(harness.lastTitle()).toMatch(BRAILLE_RE)
-  })
-
   it('waits for modern runtimes to become idle after agent_end', async () => {
     let idle = false
     const harness = createHarness({ isIdle: () => idle })
@@ -354,10 +341,6 @@ describe('getPiTitlebarExtensionSource', () => {
     await harness.callHook('agent_start')
     await vi.advanceTimersByTimeAsync(80)
     expect(harness.lastTitle()).toMatch(BRAILLE_RE)
-  })
-
-  it('leaves the marker to OMP approval events instead of painting it', () => {
-    expect(createHarness({ kind: 'omp' }).handlers.ui_prompt_start).toBeUndefined()
   })
 
   it('still caps idle maintenance while a dialog holds the title', async () => {
@@ -583,13 +566,6 @@ describe('getPiTitlebarExtensionSource', () => {
     await vi.advanceTimersByTimeAsync(1000)
     expect(harness.titles).not.toContain(PROMPT_TITLE)
     expect(harness.lastTitle()).toMatch(BRAILLE_RE)
-  })
-
-  it('leaves an OMP runtime to its own approval events', () => {
-    const harness = createHarness({ processTitle: 'omp' })
-
-    expect(harness.handlers.ui_prompt_start).toBeDefined()
-    expect(() => harness.handlers.ui_prompt_start?.({}, undefined)).not.toThrow()
   })
 
   it.each(['getter', 'title'] as const)(

@@ -322,7 +322,7 @@ describePosix('local PTY shell-ready launch config', () => {
     expect(zshenv).toContain('__orca_deferred_init')
   })
 
-  it('writes wrappers without restoring Pi/OMP homes after user startup files', async () => {
+  it('writes wrappers without restoring Pi homes after user startup files', async () => {
     const { getShellReadyLaunchConfig } = await importFreshLocalPtyShellReady()
 
     getShellReadyLaunchConfig('/bin/zsh')
@@ -335,7 +335,6 @@ describePosix('local PTY shell-ready launch config', () => {
     const restoreLine =
       '[[ -n "${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${ORCA_OPENCODE_CONFIG_DIR}"'
     const agentTeamsPathRestoreLine = '[[ -n "${ORCA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0'
-    const ompWrapperLine = 'command omp --extension "${ORCA_OMP_STATUS_EXTENSION}" "$@"'
     expect(zshrc).toContain(restoreLine)
     expect(zlogin).toContain(restoreLine)
     expect(bashRc).toContain(restoreLine)
@@ -345,18 +344,8 @@ describePosix('local PTY shell-ready launch config', () => {
     expect(zshrc).toContain(agentTeamsPathRestoreLine)
     expect(zlogin).toContain(agentTeamsPathRestoreLine)
     expect(bashRc).toContain(agentTeamsPathRestoreLine)
-    expect(zshrc).not.toContain('ORCA_OMP_CODING_AGENT_DIR')
-    expect(zlogin).not.toContain('ORCA_OMP_CODING_AGENT_DIR')
-    expect(bashRc).not.toContain('ORCA_OMP_CODING_AGENT_DIR')
-    expect(zshrc).toContain(ompWrapperLine)
-    expect(zlogin).toContain(ompWrapperLine)
-    expect(bashRc).toContain(ompWrapperLine)
     for (const wrapperFile of [zshrc, zlogin, bashRc]) {
       expect(wrapperFile).not.toContain('CODEX_HOME')
-      expect(wrapperFile).not.toContain('prime-agent()')
-      expect(wrapperFile).not.toContain('__orca_prime_agent')
-      expect(wrapperFile).not.toContain('ORCA_PRIME_AGENT_STATUS_EXTENSION')
-      expect(wrapperFile).not.toContain('command prime-agent --extension')
     }
   })
 

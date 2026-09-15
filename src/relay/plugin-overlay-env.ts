@@ -1,9 +1,4 @@
 import { readSessionShellStartupEnvVar } from '../main/pty/shell-startup-env'
-import {
-  PRIMARY_AGENT_DIR_ENV_BY_KIND,
-  SOURCE_AGENT_DIR_ENV_BY_KIND,
-  type PiAgentKind
-} from '../shared/pi-agent-kind'
 
 function firstNonEmpty(...values: (string | undefined)[]): string | undefined {
   return values.find((value) => typeof value === 'string' && value.length > 0)
@@ -32,38 +27,22 @@ export function resolveOpenCodeSourceConfigDir(
 
 export function resolvePiSourceAgentDir(
   env: Record<string, string>,
-  shell: string | undefined,
-  kind: PiAgentKind
+  shell: string | undefined
 ): string | undefined {
-  const sourceKey = SOURCE_AGENT_DIR_ENV_BY_KIND[kind]
-  const primaryKey = PRIMARY_AGENT_DIR_ENV_BY_KIND[kind]
-
-  const sourceDir = firstNonEmpty(env[sourceKey])
+  const sourceDir = firstNonEmpty(env.ORCA_PI_SOURCE_AGENT_DIR)
   if (sourceDir) {
     return sourceDir
   }
 
-  const startupDir = readStartupEnv(primaryKey, env, shell)
+  const startupDir = readStartupEnv('PI_CODING_AGENT_DIR', env, shell)
   if (startupDir) {
     return startupDir
   }
 
-  if (kind === 'prime-agent') {
-    return firstNonEmpty(env[primaryKey])
-  }
-
-  const overlayKey = kind === 'omp' ? 'ORCA_OMP_CODING_AGENT_DIR' : 'ORCA_PI_CODING_AGENT_DIR'
-  const otherOverlayKey = kind === 'omp' ? 'ORCA_PI_CODING_AGENT_DIR' : 'ORCA_OMP_CODING_AGENT_DIR'
-
-  // Why: a mismatched Orca overlay shadow means this shell inherited the other
-  // Pi-compatible agent's PTY overlay. Do not remirror that overlay into this
-  // launch; let plugin-overlay default to the selected kind's own home dir.
-  if (
-    env[primaryKey] &&
-    env[primaryKey] !== env[overlayKey] &&
-    env[primaryKey] !== env[otherOverlayKey]
-  ) {
-    return env[primaryKey]
+  // Why: a matching Orca overlay shadow means this shell inherited an old PTY
+  // overlay. Do not remirror it; let plugin-overlay default to ~/.pi/agent.
+  if (env.PI_CODING_AGENT_DIR && env.PI_CODING_AGENT_DIR !== env.ORCA_PI_CODING_AGENT_DIR) {
+    return env.PI_CODING_AGENT_DIR
   }
   return undefined
 }

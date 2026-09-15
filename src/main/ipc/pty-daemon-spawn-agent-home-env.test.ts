@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from 'vitest'
-import { piBuildPtyEnvMock } from './pty-ipc-mock-registry'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
 import {
   type DaemonSpawnCall,
@@ -69,38 +68,6 @@ describe('registerPtyHandlers', () => {
           expect(env.OPENCODE_CONFIG_DIR).toBeUndefined()
           expect(env.ORCA_OPENCODE_CONFIG_DIR).toBeUndefined()
           expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
-        })
-      })
-      it('does not install or inject a Prime extension for an explicit WSL launch', async () => {
-        await withWin32Platform(async () => {
-          const env = await daemonSpawnAndGetEnv(
-            {
-              PRIME_AGENT_CODING_AGENT_DIR: 'C:\\Users\\test\\.prime\\agent',
-              ORCA_PRIME_AGENT_STATUS_EXTENSION: 'C:\\stale\\orca-agent-status.ts'
-            },
-            undefined,
-            undefined,
-            { shellOverride: 'wsl.exe', command: 'prime-agent', launchAgent: 'prime-agent' }
-          )
-
-          expect(piBuildPtyEnvMock).not.toHaveBeenCalled()
-          expect(env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR).toBeUndefined()
-          expect(env.ORCA_PRIME_AGENT_STATUS_EXTENSION).toBeUndefined()
-          expect(env.ORCA_WSL_HOOK_INSTANCE).toBeUndefined()
-          expect(env.PRIME_AGENT_CODING_AGENT_DIR).toBe('C:\\Users\\test\\.prime\\agent')
-        })
-      })
-      it('does not prepare a Prime extension for a typed launch in a bare WSL shell', async () => {
-        await withWin32Platform(async () => {
-          const env = await daemonSpawnAndGetEnv({}, undefined, undefined, {
-            shellOverride: 'wsl.exe'
-          })
-
-          expect(piBuildPtyEnvMock.mock.calls.some(([, , kind]) => kind === 'prime-agent')).toBe(
-            false
-          )
-          expect(env.ORCA_PRIME_AGENT_STATUS_EXTENSION).toBeUndefined()
-          expect(env.PRIME_AGENT_CODING_AGENT_DIR).toBeUndefined()
         })
       })
       it('points OPENCODE_CONFIG_DIR at the guest overlay when the WSL relay reports it', async () => {

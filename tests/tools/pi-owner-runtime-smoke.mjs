@@ -68,57 +68,44 @@ try {
   `
   )
   const results = []
-  for (const kind of ['pi', 'omp', 'prime-agent']) {
-    const ownerKey =
-      kind === 'prime-agent' ? 'ORCA_PRIME_AGENT_STATUS_OWNED' : 'ORCA_PI_STATUS_OWNED'
-    for (const scenario of ['baseline-dead', 'fixed-dead', 'fixed-live']) {
-      let source = getPiAgentStatusExtensionSource(kind)
-      if (scenario === 'baseline-dead') {
-        const guard = 'if (ownerPid && ownerPid !== selfPid && isStatusOwnerAlive(ownerPid)) return'
-        assert.ok(
-          source.includes(guard),
-          'Baseline mutation must replace the actual ownership guard'
-        )
-        source = source.replace(guard, 'if (ownerPid && ownerPid !== selfPid) return')
-      }
-      const extension = join(scratch, `${kind}-${scenario}.ts`)
-      await writeFile(extension, source)
-      const before = received.length
-      const owner = scenario === 'fixed-live' ? process.pid : deadPid
-      const child = await runProcess({
-        program: process.execPath,
-        args: [worker, extension, ownerKey],
-        cwd: scratch,
-        env: {
-          ...process.env,
-          ORCA_BACKGROUND_LAUNCH: '1',
-          ORCA_PANE_KEY: 'owner-proof',
-          ORCA_AGENT_HOOK_PORT: String(server.address().port),
-          ORCA_AGENT_HOOK_TOKEN: 'isolated-proof-token',
-          ORCA_AGENT_HOOK_ENV: 'proof',
-          ORCA_AGENT_HOOK_ENDPOINT: '',
-          ORCA_PI_STATUS_OWNED: '',
-          ORCA_PRIME_AGENT_STATUS_OWNED: '',
-          PRIME_AGENT_INTERNAL_DAEMON_WORKER: kind === 'prime-agent' ? '1' : '',
-          [ownerKey]: String(owner)
-        },
-        timeoutMs: 15000
-      })
-      assert.equal(child.code, 0, child.stderr)
-      const observation = JSON.parse(child.stdout.trim().split('\n').at(-1))
-      const shouldReport = scenario === 'fixed-dead'
-      assert.equal(
-        received.length - before,
-        shouldReport ? 1 : 0,
-        `${kind}/${scenario}: HTTP delivery`
-      )
-      assert.equal(observation.owner, String(shouldReport ? observation.pid : owner))
-      assert.equal(observation.handlers > 0, shouldReport)
-      if (shouldReport) {
-        assert.equal(received.at(-1).payload.hook_event_name, 'agent_start')
-      }
-      results.push({ kind, scenario, posts: received.length - before, ...observation })
+  const ownerKey = 'ORCA_PI_STATUS_OWNED'
+  for (const scenario of ['baseline-dead', 'fixed-dead', 'fixed-live']) {
+    let source = getPiAgentStatusExtensionSource()
+    if (scenario === 'baseline-dead') {
+      const guard = 'if (ownerPid && ownerPid !== selfPid && isStatusOwnerAlive(ownerPid)) return'
+      assert.ok(source.includes(guard), 'Baseline mutation must replace the actual ownership guard')
+      source = source.replace(guard, 'if (ownerPid && ownerPid !== selfPid) return')
     }
+    const extension = join(scratch, `pi-${scenario}.ts`)
+    await writeFile(extension, source)
+    const before = received.length
+    const owner = scenario === 'fixed-live' ? process.pid : deadPid
+    const child = await runProcess({
+      program: process.execPath,
+      args: [worker, extension, ownerKey],
+      cwd: scratch,
+      env: {
+        ...process.env,
+        ORCA_BACKGROUND_LAUNCH: '1',
+        ORCA_PANE_KEY: 'owner-proof',
+        ORCA_AGENT_HOOK_PORT: String(server.address().port),
+        ORCA_AGENT_HOOK_TOKEN: 'isolated-proof-token',
+        ORCA_AGENT_HOOK_ENV: 'proof',
+        ORCA_AGENT_HOOK_ENDPOINT: '',
+        [ownerKey]: String(owner)
+      },
+      timeoutMs: 15000
+    })
+    assert.equal(child.code, 0, child.stderr)
+    const observation = JSON.parse(child.stdout.trim().split('\n').at(-1))
+    const shouldReport = scenario === 'fixed-dead'
+    assert.equal(received.length - before, shouldReport ? 1 : 0, `pi/${scenario}: HTTP delivery`)
+    assert.equal(observation.owner, String(shouldReport ? observation.pid : owner))
+    assert.equal(observation.handlers > 0, shouldReport)
+    if (shouldReport) {
+      assert.equal(received.at(-1).payload.hook_event_name, 'agent_start')
+    }
+    results.push({ scenario, posts: received.length - before, ...observation })
   }
   console.log(JSON.stringify({ platform: process.platform, results }, null, 2))
 } finally {

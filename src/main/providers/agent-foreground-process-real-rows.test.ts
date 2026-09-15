@@ -12,26 +12,24 @@ type CapturedRun = {
 }
 
 describe('real foreground process captures', () => {
-  it('resolves all six agents, including omp over its deeper vendor helpers', () => {
+  it('resolves the captured agents that still have a launch profile', () => {
     const captured = JSON.parse(
       gunzipSync(readFileSync(join(__dirname, '__fixtures__', 'real-agent-rows.json.gz'))).toString(
         'utf8'
       )
     ) as CapturedRun[]
 
-    expect(captured).toHaveLength(6)
     expect(
-      captured.map(({ agent, shellPid, rows }) => ({
-        agent,
-        processName: resolveAgentForegroundProcessFromPs(rows, shellPid)
-      }))
+      captured
+        .filter(({ agent }) => ['claude', 'codex', 'opencode'].includes(agent))
+        .map(({ agent, shellPid, rows }) => ({
+          agent,
+          processName: resolveAgentForegroundProcessFromPs(rows, shellPid)
+        }))
     ).toEqual([
       { agent: 'claude', processName: 'claude' },
       { agent: 'codex', processName: 'codex' },
-      { agent: 'opencode', processName: 'opencode' },
-      { agent: 'gemini', processName: 'gemini' },
-      { agent: 'grok', processName: 'grok' },
-      { agent: 'omp', processName: 'omp' }
+      { agent: 'opencode', processName: 'opencode' }
     ])
   })
 })

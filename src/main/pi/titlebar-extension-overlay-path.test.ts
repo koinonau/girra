@@ -18,9 +18,8 @@ const PATH_SHAPED_PTY_ID = [
   'feature@@a1b2c3d4'
 ].join(sep)
 
-function legacyOverlayPath(kind: 'pi' | 'omp', ptyId: string): string {
-  const rootDir = kind === 'pi' ? 'pi-agent-overlays' : 'omp-agent-overlays'
-  return join(userDataDir, rootDir, ptyId)
+function legacyOverlayPath(ptyId: string): string {
+  return join(userDataDir, 'pi-agent-overlays', ptyId)
 }
 
 describe('PiTitlebarExtensionService legacy overlay paths', () => {
@@ -37,7 +36,6 @@ describe('PiTitlebarExtensionService legacy overlay paths', () => {
 
   afterEach(() => {
     rmSync(join(userDataDir, 'pi-agent-overlays'), { recursive: true, force: true })
-    rmSync(join(userDataDir, 'omp-agent-overlays'), { recursive: true, force: true })
   })
 
   it('does not redirect path-shaped PTY ids into active Pi homes', () => {
@@ -45,7 +43,7 @@ describe('PiTitlebarExtensionService legacy overlay paths', () => {
     const svc = new PiTitlebarExtensionService()
 
     try {
-      const env = svc.buildPtyEnv(PATH_SHAPED_PTY_ID, piHome, 'pi')
+      const env = svc.buildPtyEnv(PATH_SHAPED_PTY_ID, piHome)
 
       expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
       expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe(piHome)
@@ -61,7 +59,7 @@ describe('PiTitlebarExtensionService legacy overlay paths', () => {
   })
 
   it('clears legacy raw path-shaped daemon overlays during teardown', () => {
-    const legacyOverlayDir = legacyOverlayPath('pi', PATH_SHAPED_PTY_ID)
+    const legacyOverlayDir = legacyOverlayPath(PATH_SHAPED_PTY_ID)
     mkdirSync(legacyOverlayDir, { recursive: true })
     writeFileSync(join(legacyOverlayDir, 'stale.txt'), 'stale overlay')
 

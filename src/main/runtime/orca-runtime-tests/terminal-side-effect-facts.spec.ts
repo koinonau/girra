@@ -13,30 +13,22 @@ import { DECORATIVE_TITLE_FACT_HEARTBEAT_MS } from '../decorative-title-fact-emi
 describe('terminal side-effect fact channel', () => {
   it('defers desktop-only output scanners until a headless runtime is promoted', () => {
     const { runtime, batches } = createSideEffectRuntime()
-    const trackerEntries = (
-      runtime as unknown as {
-        ptyTitleTrackersByPtyId: Map<string, { commandCodeDetector: unknown }>
-      }
-    ).ptyTitleTrackersByPtyId
     runtime.syncWindowGraph(HEADLESS_RUNTIME_WINDOW_ID, { tabs: [], leaves: [] })
 
     runtime.onPtyData('pty-1', '\x07', 100)
 
     expect(batches).toEqual([])
-    expect(trackerEntries.get('pty-1')?.commandCodeDetector).toBeNull()
 
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
     runtime.onPtyData('pty-1', '\x07', 101)
 
     expect(batches.flatMap((batch) => batch.facts)).toEqual([{ kind: 'bell' }])
-    expect(trackerEntries.get('pty-1')?.commandCodeDetector).not.toBeNull()
 
     runtime.markGraphUnavailable(1)
     runtime.onPtyData('pty-1', '\x07', 102)
 
     expect(batches).toHaveLength(1)
-    expect(trackerEntries.get('pty-1')?.commandCodeDetector).toBeNull()
   })
 
   it('forwards facts over the shared client-event stream without a desktop renderer', () => {
@@ -88,21 +80,21 @@ describe('terminal side-effect fact channel', () => {
         vi.setSystemTime(new Date(Date.now() + DECORATIVE_TITLE_FACT_HEARTBEAT_MS))
       }
       for (const ptyId of ptyIds) {
-        runtime.ingestSyntheticTitleFrame(ptyId, `\x1b]0;${frames[0]} Cursor Agent\x07`)
+        runtime.ingestSyntheticTitleFrame(ptyId, `\x1b]0;${frames[0]} Claude Code\x07`)
       }
       firstClientEvents.length = 0
 
       for (const frame of frames.slice(1)) {
         stepPastHeartbeat()
         for (const ptyId of ptyIds) {
-          runtime.ingestSyntheticTitleFrame(ptyId, `\x1b]0;${frame} Cursor Agent\x07`)
+          runtime.ingestSyntheticTitleFrame(ptyId, `\x1b]0;${frame} Claude Code\x07`)
         }
       }
 
       expect(firstClientEvents).toEqual([])
       expect(batches).toHaveLength(ptyIds.length * frames.length)
 
-      const bellChunk = `\x1b]0;${frames.at(-1)} Cursor Agent\x07\x07`
+      const bellChunk = `\x1b]0;${frames.at(-1)} Claude Code\x07\x07`
       runtime.onPtyData(ptyIds[0], bellChunk, 1)
       expect(firstClientEvents).toEqual([
         expect.objectContaining({
@@ -116,7 +108,7 @@ describe('terminal side-effect fact channel', () => {
       runtime.onClientEvent((event) => secondClientEvents.push(event))
       stepPastHeartbeat()
       for (const ptyId of ptyIds) {
-        runtime.ingestSyntheticTitleFrame(ptyId, `\x1b]0;${frames[0]} Cursor Agent\x07`)
+        runtime.ingestSyntheticTitleFrame(ptyId, `\x1b]0;${frames[0]} Claude Code\x07`)
       }
 
       expect(firstClientEvents).toEqual([])
@@ -124,7 +116,7 @@ describe('terminal side-effect fact channel', () => {
 
       // A real title change is never throttled — no clock step needed.
       for (const ptyId of ptyIds) {
-        runtime.ingestSyntheticTitleFrame(ptyId, '\x1b]0;Cursor ready\x07')
+        runtime.ingestSyntheticTitleFrame(ptyId, '\x1b]0;Claude ready\x07')
       }
       expect(firstClientEvents).toHaveLength(ptyIds.length)
       expect(secondClientEvents).toHaveLength(ptyIds.length * 2)
@@ -161,7 +153,7 @@ describe('terminal side-effect fact channel', () => {
       const mobileEvents: RuntimeClientEvent[] = []
       const trackerEntries = (
         runtime as unknown as {
-          ptyTitleTrackersByPtyId: Map<string, { commandCodeDetector: unknown }>
+          ptyTitleTrackersByPtyId: Map<string, unknown>
         }
       ).ptyTitleTrackersByPtyId
       runtime.setPtyController({
@@ -185,7 +177,6 @@ describe('terminal side-effect fact channel', () => {
       await vi.advanceTimersByTimeAsync(3_000)
 
       expect(trackerEntries.has(ptyId)).toBe(true)
-      expect(trackerEntries.get(ptyId)?.commandCodeDetector).toBeNull()
       expect((await runtime.listTerminals()).terminals[0]).toMatchObject({ title: 'Codex' })
       expect(mobileEvents.some((event) => event.type === 'terminalSideEffects')).toBe(false)
     } finally {
@@ -294,11 +285,11 @@ describe('terminal side-effect fact channel', () => {
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Cursor Agent\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;⠋ Claude Code\x07')
 
     expect(batches).toHaveLength(1)
     expect(batches[0].facts).toEqual([
-      { kind: 'title', normalizedTitle: '⠋ Cursor Agent', rawTitle: '⠋ Cursor Agent' },
+      { kind: 'title', normalizedTitle: '⠋ Claude Code', rawTitle: '⠋ Claude Code' },
       // Synthesized spinner classifies as working — agent facts derive from synthetic frames the same as from real bytes.
       { kind: 'agent-working' }
     ])
@@ -306,74 +297,7 @@ describe('terminal side-effect fact channel', () => {
     expect(runtime.getPtyOutputSequence('pty-1')).toBe(0)
   })
 
-  it('emits live Cursor identity without storing it as liveness evidence', async () => {
-    const { runtime, batches } = createSideEffectRuntime()
-    syncSinglePty(runtime)
-
-    runtime.onPtyData('pty-1', '\x1b]0;Cursor Agent\x07', 100)
-
-    expect(batches.flatMap((batch) => batch.facts)).toEqual([
-      { kind: 'title', normalizedTitle: 'Cursor Agent', rawTitle: 'Cursor Agent' }
-    ])
-    expect((await runtime.listTerminals()).terminals[0].title).not.toBe('Cursor Agent')
-    expect(runtime.getTerminalSideEffectSnapshot('pty-1')).toMatchObject({
-      facts: [{ kind: 'title', normalizedTitle: 'Cursor Agent', rawTitle: 'Cursor Agent' }]
-    })
-  })
-
-  it('keeps live Cursor identity in mobile titles without making it agent liveness', async () => {
-    const runtime = new OrcaRuntimeService(store)
-    runtime.attachWindow(1)
-    runtime.syncWindowGraph(1, {
-      tabs: [
-        {
-          tabId: 'tab-1',
-          worktreeId: TEST_WORKTREE_ID,
-          title: 'Terminal 1',
-          activeLeafId: 'pane:1',
-          layout: null
-        }
-      ],
-      leaves: [
-        {
-          tabId: 'tab-1',
-          worktreeId: TEST_WORKTREE_ID,
-          leafId: 'pane:1',
-          paneRuntimeId: 1,
-          ptyId: 'pty-1'
-        }
-      ],
-      mobileSessionTabs: [
-        {
-          worktree: TEST_WORKTREE_ID,
-          publicationEpoch: 'epoch-cursor',
-          snapshotVersion: 1,
-          activeGroupId: null,
-          activeTabId: 'tab-1::pane:1',
-          activeTabType: 'terminal',
-          tabs: [
-            {
-              type: 'terminal',
-              id: 'tab-1::pane:1',
-              parentTabId: 'tab-1',
-              leafId: 'pane:1',
-              ptyId: 'pty-1',
-              title: 'Terminal 1',
-              isActive: true
-            }
-          ]
-        }
-      ]
-    })
-
-    runtime.onPtyData('pty-1', '\x1b]0;Cursor Agent\x07', 100)
-
-    const terminal = (await runtime.listMobileSessionTabs(`id:${TEST_WORKTREE_ID}`)).tabs[0]
-    expect(terminal).toMatchObject({ type: 'terminal', title: 'Cursor Agent' })
-    expect(terminal).not.toHaveProperty('agentStatus')
-  })
-
-  it('lets an explicit terminal rename override cached Cursor identity and restores it after clearing', async () => {
+  it('lets an explicit terminal rename override the cached OSC title and restores it after clearing', async () => {
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
       spawn: vi.fn().mockResolvedValue({ id: 'pty-1' }),
@@ -383,7 +307,7 @@ describe('terminal side-effect fact channel', () => {
     })
     const created = await runtime.createTerminal(`id:${TEST_WORKTREE_ID}`)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Cursor Agent\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Build feature\x07', 100)
     const mobileTerminal = (
       await runtime.listMobileSessionTabs(`id:${TEST_WORKTREE_ID}`)
     ).tabs.find((tab) => tab.type === 'terminal')
@@ -392,16 +316,16 @@ describe('terminal side-effect fact channel', () => {
     }
     expect(mobileTerminal.terminal).toBe(created.handle)
 
-    await runtime.renameTerminal(mobileTerminal.terminal, 'Pinned Cursor')
+    await runtime.renameTerminal(mobileTerminal.terminal, 'Pinned title')
     expect((await runtime.listMobileSessionTabs(`id:${TEST_WORKTREE_ID}`)).tabs[0]).toMatchObject({
       type: 'terminal',
-      title: 'Pinned Cursor'
+      title: 'Pinned title'
     })
 
     await runtime.renameTerminal(mobileTerminal.terminal, null)
     expect((await runtime.listMobileSessionTabs(`id:${TEST_WORKTREE_ID}`)).tabs[0]).toMatchObject({
       type: 'terminal',
-      title: 'Cursor Agent'
+      title: 'Build feature'
     })
   })
 
@@ -646,7 +570,7 @@ describe('terminal side-effect fact channel', () => {
     const { runtime, batches } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Cursor needs your input\x07\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude needs your input\x07\x07')
 
     expect(batches[0].facts.at(0)).toMatchObject({ kind: 'title' })
     expect(batches[0].facts.at(-1)).toEqual({ kind: 'bell' })

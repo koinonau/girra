@@ -24,7 +24,6 @@ import {
 import {
   agentStatusEntryEqual,
   isAgentStatusFresh,
-  isMirroredCommandCodeTurnBump,
   writableWebSessionTabsRecord
 } from './state-equality-core'
 
@@ -208,8 +207,7 @@ export function buildMirroredAgentStatusPatch(
       !isAgentStatusFresh(existing, now) ||
       entryFreshnessChanged ||
       entryAttributionChanged ||
-      doneAttentionChanged ||
-      isMirroredCommandCodeTurnBump(existing, entry)
+      doneAttentionChanged
     aggregateRelevantChange =
       aggregateRelevantChange || entrySortRelevantChange || workingModeChanged
     sortRelevantChange = sortRelevantChange || entrySortRelevantChange

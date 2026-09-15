@@ -93,7 +93,6 @@ export type RuntimePtyTitleTrackerEntry = {
   lastTitleFactAtMs: number | null
   chunkTouchedSessionTabs: boolean
   pendingFacts: TerminalSideEffectFact[]
-  commandCodeDetector: { observe: (data: string) => boolean } | null
 }
 
 export type RuntimeHeadlessTerminal = {

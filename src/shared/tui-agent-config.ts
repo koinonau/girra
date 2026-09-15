@@ -6,14 +6,12 @@ export type AgentPromptInjectionMode =
   | 'flag-prompt'
   | 'flag-prompt-interactive'
   | 'flag-interactive'
-  | 'hermes-query'
   | 'stdin-after-start'
 
 export type DraftPasteReadySignal =
   | 'render-quiet-after-bracketed-paste'
   | 'codex-composer-prompt'
   | 'render-cursor-after-bracketed-paste'
-  | 'grok-composer-prompt'
 
 export type TuiAgentDetectionRuntime = NodeJS.Platform | 'wsl'
 
@@ -48,8 +46,6 @@ export type TuiAgentConfig = {
   windowsShiftEnterEncoding?: 'csi-u'
   /** Paste newlines for TUIs that read Windows console input records instead of VT paste frames. */
   windowsInputRecordPasteNewline?: 'alt-enter' | 'csi-u'
-  /** Ctrl+Enter encoding for agents that consume CSI-u without active kitty flags. */
-  ctrlEnterEncoding?: 'csi-u'
 }
 
 /** Authoring form: `launchCmd` and `expectedProcess` default to `detectCmd` (true for most agents). */
@@ -226,8 +222,7 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
     detectCmd: 'droid',
     promptInjectionMode: 'argv',
     // Why: Droid decodes CSI-u on Windows; the legacy Esc+CR fallback reads as Enter and submits instead of newline.
-    windowsShiftEnterEncoding: 'csi-u',
-    ctrlEnterEncoding: 'csi-u'
+    windowsShiftEnterEncoding: 'csi-u'
   },
   kimi: {
     // Why: the `kimi` launcher runs as `kimi-code`, so foreground-process recognition never
@@ -255,8 +250,7 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
     detectCmd: 'hermes',
     // Why: bare `hermes` opens the classic REPL; `--tui` starts the full-screen agent UI Orca hosts.
     launchCmd: 'hermes --tui',
-    // Why: Hermes delivers the prompt via its startup-query contract, submitting only after the composer is ready.
-    promptInjectionMode: 'hermes-query'
+    promptInjectionMode: 'stdin-after-start'
   },
   openclaw: {
     detectCmd: 'openclaw',
@@ -274,12 +268,7 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
     // Why: argv (grok takes a positional prompt) so multi-line/special-char text isn't mangled as raw PTY keystrokes.
     promptInjectionMode: 'argv',
     // Why: separator so prompts like `help`/`--version` aren't parsed as Grok CLI syntax.
-    argvPromptSeparator: '--',
-    // Why: grok shimmers its startup logo until the session opens, so the quiet
-    // window never settles and launch drafts waited out the full 8s hard
-    // timeout; its composer glyph lands ~0.6s in.
-    draftPasteReadySignal: 'grok-composer-prompt',
-    ctrlEnterEncoding: 'csi-u'
+    argvPromptSeparator: '--'
   },
   devin: {
     detectCmd: 'devin',

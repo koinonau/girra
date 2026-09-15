@@ -9,10 +9,8 @@ const originalDocument = globalThis.document
 export function buildAgentStatusModuleMock(
   actual: Record<string, unknown>
 ): Record<string, unknown> {
-  const isGeminiTerminalTitle = actual.isGeminiTerminalTitle as (title: string) => boolean
   return {
     ...actual,
-    isGeminiTerminalTitle: vi.fn((title: string) => isGeminiTerminalTitle(title)),
     isClaudeAgent: vi.fn(() => false),
     detectAgentStatusFromTitle: vi.fn((title: string) => {
       if (/Claude (working|done)/.test(title)) {

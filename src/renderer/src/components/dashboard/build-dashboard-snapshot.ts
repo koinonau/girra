@@ -193,7 +193,6 @@ export function buildDashboardSnapshot(
               paneKey: routingPaneKey,
               cwd: row.tab.startupCwd ?? worktree.path,
               shellOverride: row.tab.shellOverride,
-              launchAgent: row.tab.launchAgent,
               clientPlatform: clientHost.platform,
               userAgent: clientHost.userAgent,
               osRelease: clientHost.osRelease

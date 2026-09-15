@@ -1,12 +1,7 @@
 import {
-  AGY_AGENT_NAME_RE,
   CLAUDE_IDLE,
-  DROID_AGENT_NAME_RE,
-  HERMES_AGENT_NAME_RE,
   containsAgentSpinnerGlyph,
   isClaudeManagementTitle,
-  isCursorAgentTitle,
-  isGeminiTerminalTitle,
   isPiAgentTitle,
   titleHasAgentName
 } from './agent-title-core'
@@ -33,9 +28,8 @@ function computeIsClaudeAgent(title: string): boolean {
     return true
   }
   if (containsAgentSpinnerGlyph(title)) {
-    // Why: named non-Claude agents carry braille spinners too. Gate Cursor by its
-    // identity title, not the token, so a Claude title mentioning a cursor stays Claude.
-    return !isCursorAgentTitle(title) && !lower.includes('openclaude')
+    // Why: OpenClaude titles carry the same spinner frames but are not Claude.
+    return !lower.includes('openclaude')
   }
 
   const trimmedTitle = title.trimStart()
@@ -67,9 +61,6 @@ function computeAgentLabel(title: string): string | null {
   ) {
     return 'Claude Code'
   }
-  if (isGeminiTerminalTitle(title)) {
-    return 'Gemini CLI'
-  }
   // Why: Pi-compatible synthetic titles can carry braille spinners, which the
   // generic agent-title heuristics would otherwise claim first.
   const piCompatibleSyntheticAgentLabel = getPiCompatibleSyntheticAgentLabel(title)
@@ -83,40 +74,8 @@ function computeAgentLabel(title: string): string | null {
   if (titleHasAgentName(title, 'codex')) {
     return 'Codex'
   }
-  if (titleHasAgentName(title, 'openclaude')) {
-    return 'OpenClaude'
-  }
-  if (titleHasAgentName(title, 'copilot')) {
-    return 'GitHub Copilot'
-  }
-  if (titleHasAgentName(title, 'grok')) {
-    return 'Grok'
-  }
-  if (titleHasAgentName(title, 'devin')) {
-    return 'Devin'
-  }
-  if (titleHasAgentName(title, 'antigravity') || AGY_AGENT_NAME_RE.test(title)) {
-    return 'Antigravity'
-  }
   if (titleHasAgentName(title, 'opencode')) {
     return 'OpenCode'
-  }
-  if (titleHasAgentName(title, 'mimo')) {
-    return 'MiMo Code'
-  }
-  if (titleHasAgentName(title, 'aider')) {
-    return 'Aider'
-  }
-  // Why: `cursor` is ordinary editor vocabulary, not identity. Match Cursor's closed
-  // title set (mirrors @cursor routing), before `isClaudeAgent` claims the braille frame.
-  if (isCursorAgentTitle(title)) {
-    return 'Cursor'
-  }
-  if (DROID_AGENT_NAME_RE.test(title)) {
-    return 'Droid'
-  }
-  if (HERMES_AGENT_NAME_RE.test(title)) {
-    return 'Hermes'
   }
   if (isClaudeAgent(title)) {
     return 'Claude Code'

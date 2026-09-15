@@ -39,7 +39,6 @@ import type { RuntimeTerminalListResult } from '../../src/shared/runtime-types'
 import {
   CODEX_IDLE_TITLE,
   CODEX_WORKING_TITLE,
-  CURSOR_IDLE_TITLE,
   createMailPaneAgent,
   type MailPaneAgent
 } from './helpers/orchestration-mail-pane-agent'
@@ -625,27 +624,6 @@ test.describe('orchestration push-on-idle mail delivery', () => {
 
     await expectPointed(pane)
     await expectSubmitted(pane)
-  })
-
-  test('writes the pointer but never Enter for a Cursor agent pane', async ({
-    orcaPage,
-    electronApp
-  }) => {
-    test.setTimeout(180_000)
-    const { client, openAgentPane } = await setUpMailFixture(orcaPage, electronApp)
-    const pane = await openAgentPane()
-    // Cursor treats injected PTY text as editable prompt content, so submitting
-    // has to stay under user control there too.
-    pane.agent.setTitle(CURSOR_IDLE_TITLE)
-    await waitForObservedTitle(client, pane.handle, CURSOR_IDLE_TITLE)
-    const mailbox = await createRunMailbox(client, pane, 'Cursor no-submit')
-
-    const subject = 'Cursor no-submit'
-    await sendMail(client, mailbox, { subject })
-
-    await expectPointed(pane)
-    await orcaPage.waitForTimeout(2_000)
-    expectNotSubmitted(pane)
   })
 })
 

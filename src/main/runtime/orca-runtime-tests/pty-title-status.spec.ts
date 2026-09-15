@@ -96,62 +96,6 @@ describe('OrcaRuntimeService', () => {
     })
   })
 
-  it('ignores the bare cursor-agent native title so synthesized spinner state survives', async () => {
-    const ptyId = `${TEST_REPO_ID}::/tmp/worktree-a@@pty-bg`
-    const runtime = createRuntime()
-    runtime.setPtyController({
-      write: () => true,
-      kill: () => true,
-      getForegroundProcess: async () => null,
-      listProcesses: async () => [{ id: ptyId, cwd: '/tmp/worktree-a', title: 'shell' }]
-    })
-    runtime.attachWindow(1)
-    runtime.markGraphReady(1)
-
-    runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', 100)
-    // cursor-agent re-emits its bare native title on internal redraws while still working; it must not stomp the synthesized working title.
-    runtime.onPtyData(ptyId, '\x1b]0;Cursor Agent\x07', 101)
-
-    expect((await runtime.listTerminals()).terminals[0]).toMatchObject({
-      title: '⠋ Cursor Agent'
-    })
-  })
-
-  // Why: this pins the mechanism the refusals below exist for. cursor-agent emits only the
-  // bare native title, and the tracker drops it on sight — so a pane can never hold it
-  // because Cursor said so *now*. The one route into main's records is the stale-working
-  // clear stripping the spinner off Orca's synthesized title after 3s of quiet output, and
-  // that fires whether Cursor parked idle or exited and the shell took the pane back. That
-  // is exactly why the title cannot tell a live pane from a dead one.
-  it('only records the bare Cursor native title via the stale-working clear', async () => {
-    vi.useFakeTimers()
-    try {
-      const ptyId = `${TEST_REPO_ID}::/tmp/worktree-a@@pty-bg`
-      const runtime = createRuntime()
-      runtime.setPtyController({
-        write: () => true,
-        kill: () => true,
-        getForegroundProcess: async () => null,
-        listProcesses: async () => [{ id: ptyId, cwd: '/tmp/worktree-a', title: 'shell' }]
-      })
-      runtime.attachWindow(1)
-      runtime.markGraphReady(1)
-
-      // Live from cursor-agent: dropped, never recorded.
-      runtime.onPtyData(ptyId, '\x1b]0;Cursor Agent\x07', 100)
-      expect((await runtime.listTerminals()).terminals[0].title).not.toBe('Cursor Agent')
-
-      // Orca's synthesized spinner, then quiet output: the clear strips it to the bare title.
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', 101)
-      runtime.onPtyData(ptyId, 'agent finished; shell prompt returns\r\n', 102)
-      await vi.advanceTimersByTimeAsync(3_000)
-
-      expect((await runtime.listTerminals()).terminals[0].title).toBe('Cursor Agent')
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
   // Why: this pane reads no foreground and the next reads a live shell, yet both hold the
   // same bare title the stale-working clear left behind. Neither read makes that title
   // liveness, so both must refuse.

@@ -169,7 +169,6 @@ export type DashboardCardTerminalInput = {
   /** Newline encoding for Windows TUIs that consume console input records. */
   windowsInputRecordPasteNewline?: 'alt-enter' | 'csi-u'
   /** Trusted query-only consumer accepts Ctrl+Enter CSI-u without active flags. */
-  ctrlEnterCsiU: boolean
   /** False withholds the kitty (CSI-u) advertisement, as ConPTY panes do. */
   kittyKeyboardAdvertised: boolean
 }

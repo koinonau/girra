@@ -51,7 +51,7 @@ describe('buildTitleDerivedAgentRows', () => {
       retained: [],
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: 'Antigravity',
+          1: 'OpenCode ready',
           2: '⠋ Codex'
         }
       },
@@ -61,32 +61,12 @@ describe('buildTitleDerivedAgentRows', () => {
     })
 
     expect(rows.map((row) => [row.agentType, row.state, row.entry.lastAssistantMessage])).toEqual([
-      ['antigravity', 'idle', 'Idle'],
+      ['opencode', 'idle', 'Idle'],
       ['codex', 'working', 'Running']
     ])
     expect(rows.map((row) => row.paneKey)).toEqual([
       makePaneKey('tab-1', LEAF_ID_1),
       makePaneKey('tab-1', LEAF_ID_2)
-    ])
-  })
-
-  it('normalizes Pi-compatible title-derived rows to the launched OMP owner', () => {
-    const rows = buildWorktreeAgentRows({
-      tabs: [makeTab('tab-1', { launchAgent: 'omp' })],
-      entries: [],
-      retained: [],
-      runtimePaneTitlesByTabId: {
-        'tab-1': {
-          1: '\u280b π: tmp'
-        }
-      },
-      ptyIdsByTabId: { 'tab-1': ['pty-omp'] },
-      terminalLayoutsByTabId: { 'tab-1': makeSingleLayout(LEAF_ID_1) },
-      now: 2000
-    })
-
-    expect(rows.map((row) => [row.agentType, row.state, row.entry.terminalTitle])).toEqual([
-      ['omp', 'working', '\u280b OMP: tmp']
     ])
   })
 
@@ -271,37 +251,6 @@ describe('buildTitleDerivedAgentRows', () => {
     })
 
     expect(rows).toHaveLength(0)
-  })
-
-  // #10258: Cursor's native title is deliberately status-less, which used to hide the pane.
-  it('adds an idle Cursor row for the bare native cursor-agent title', () => {
-    const rows = buildWorktreeAgentRows({
-      tabs: [makeTab('tab-1', { launchAgent: 'cursor', title: 'Cursor Agent' })],
-      entries: [],
-      retained: [],
-      runtimePaneTitlesByTabId: { 'tab-1': { 1: 'Cursor Agent' } },
-      ptyIdsByTabId: { 'tab-1': ['pty-cursor'] },
-      terminalLayoutsByTabId: { 'tab-1': makeSingleLayout(LEAF_ID_1) },
-      now: 2000
-    })
-
-    expect(rows.map((row) => [row.agentType, row.state, row.entry.lastAssistantMessage])).toEqual([
-      ['cursor', 'idle', 'Idle']
-    ])
-  })
-
-  it('keeps the Cursor row running while a synthesized spinner title is painted', () => {
-    const rows = buildWorktreeAgentRows({
-      tabs: [makeTab('tab-1', { launchAgent: 'cursor' })],
-      entries: [],
-      retained: [],
-      runtimePaneTitlesByTabId: { 'tab-1': { 1: '⠋ Cursor Agent' } },
-      ptyIdsByTabId: { 'tab-1': ['pty-cursor'] },
-      terminalLayoutsByTabId: { 'tab-1': makeSingleLayout(LEAF_ID_1) },
-      now: 2000
-    })
-
-    expect(rows.map((row) => [row.agentType, row.state])).toEqual([['cursor', 'working']])
   })
 
   // #8940: an OpenCode pane's own task text must not hand the row to Claude Code.

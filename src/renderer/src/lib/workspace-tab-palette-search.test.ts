@@ -617,29 +617,29 @@ describe('workspace-tab-palette-search', () => {
     expect(searchWorkspaceTabs(buildEntries(), query)).toEqual([])
   })
 
-  it('stamps grok occupancy from the idle OSC title the sidebar already shows', () => {
+  it('stamps opencode occupancy from the idle OSC title the sidebar already shows', () => {
     const titledOnly = buildEntries({
-      tabsByWorktree: { 'wt-1': [makeTerminalTab({ title: 'grok' })] },
-      unifiedTabsByWorktree: { 'wt-1': [makeUnifiedTab({ label: 'grok' })] }
+      tabsByWorktree: { 'wt-1': [makeTerminalTab({ title: 'opencode' })] },
+      unifiedTabsByWorktree: { 'wt-1': [makeUnifiedTab({ label: 'opencode' })] }
     })
-    expect(titledOnly[0]?.occupantAgent).toBe('grok')
-    expect(searchWorkspaceTabs(titledOnly, 'grok')[0]?.occupantAgent).toBe('grok')
+    expect(titledOnly[0]?.occupantAgent).toBe('opencode')
+    expect(searchWorkspaceTabs(titledOnly, 'opencode')[0]?.occupantAgent).toBe('opencode')
   })
 
   it('stamps occupancy from the live unified label when the terminal record title is stale', () => {
     const staleRecord = buildEntries({
       tabsByWorktree: { 'wt-1': [makeTerminalTab({ title: 'Terminal 1' })] },
-      unifiedTabsByWorktree: { 'wt-1': [makeUnifiedTab({ label: 'grok' })] }
+      unifiedTabsByWorktree: { 'wt-1': [makeUnifiedTab({ label: 'opencode' })] }
     })
-    expect(staleRecord[0]?.title).toBe('grok')
-    expect(staleRecord[0]?.occupantAgent).toBe('grok')
+    expect(staleRecord[0]?.title).toBe('opencode')
+    expect(staleRecord[0]?.occupantAgent).toBe('opencode')
   })
 
-  it('does not stamp grok occupancy from a hyphenated filename-style title', () => {
+  it('does not stamp opencode occupancy from a hyphenated filename-style title', () => {
     const hyphenated = buildEntries({
-      tabsByWorktree: { 'wt-1': [makeTerminalTab({ title: 'session-scanner-grok-parser' })] },
+      tabsByWorktree: { 'wt-1': [makeTerminalTab({ title: 'session-scanner-opencode-parser' })] },
       unifiedTabsByWorktree: {
-        'wt-1': [makeUnifiedTab({ label: 'session-scanner-grok-parser' })]
+        'wt-1': [makeUnifiedTab({ label: 'session-scanner-opencode-parser' })]
       }
     })
     expect(hyphenated[0]?.occupantAgent).toBeNull()

@@ -229,9 +229,6 @@ export function installSessionReconcileDispose(session: ConnectPanePtySession): 
       session.pendingTerminalInputWrite = null
       session.interruptInference.dispose()
       session.clearTitleOnlyInterruptTimer()
-      // Why release, not cancel: the pending settle belongs to the turn, not to
-      // this pane — a park mid-settle hands it to the parked watcher instead.
-      session.releaseCommandCodeDoneSettleExecutor()
       if (session.shiftEnterReconfirmTimer !== null) {
         clearTimeout(session.shiftEnterReconfirmTimer)
         session.shiftEnterReconfirmTimer = null

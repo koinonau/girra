@@ -211,31 +211,9 @@ export function createPtyIpcSuiteEnvironment(): PtyIpcSuiteEnvironment {
       (
         _ptyId: string,
         existingAgentDir?: string,
-        kind?: string,
         options?: { materializeDefaultHome?: boolean }
       ) => {
         const materializeDefaultHome = options?.materializeDefaultHome !== false
-        if (kind === 'omp') {
-          // Why: bare shells no longer create ~/.omp; only a userData status path is set (#10196).
-          if (!existingAgentDir && !materializeDefaultHome) {
-            return {
-              ORCA_OMP_STATUS_EXTENSION:
-                '/tmp/orca-user-data/omp-managed-status-extension/orca-agent-status.ts'
-            }
-          }
-          return {
-            ORCA_OMP_SOURCE_AGENT_DIR: existingAgentDir ?? '/tmp/default-omp-agent',
-            ORCA_OMP_STATUS_EXTENSION: `${existingAgentDir ?? '/tmp/default-omp-agent'}/extensions/orca-agent-status.ts`
-          }
-        }
-        if (kind === 'prime-agent') {
-          if (!existingAgentDir && !materializeDefaultHome) {
-            return {}
-          }
-          return {
-            ORCA_PRIME_AGENT_SOURCE_AGENT_DIR: existingAgentDir ?? '/tmp/default-prime-agent'
-          }
-        }
         if (!existingAgentDir && !materializeDefaultHome) {
           return {}
         }

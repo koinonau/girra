@@ -12,24 +12,10 @@
 // Why: for OSC-title detection only. Intentionally narrower than the full set
 // of launchable agents because short names like "amp" would classify ordinary
 // shell titles like "timestamp ready" as agent activity.
-export const AGENT_NAMES = [
-  'claude',
-  'openclaude',
-  'codex',
-  'copilot',
-  'cursor',
-  'gemini',
-  'antigravity',
-  'opencode',
-  'mimo',
-  'openclaw',
-  'aider',
-  'grok',
-  'devin'
-]
+export const AGENT_NAMES = ['claude', 'codex', 'opencode']
 
 // Why: Windows agent titles can surface launcher process names such as
-// `openclaude.exe`; still reject arbitrary dotted path fragments.
+// `claude.exe`; still reject arbitrary dotted path fragments.
 const WINDOWS_EXECUTABLE_SUFFIX_RE = String.raw`(?:\.(?:exe|cmd|bat|ps1))`
 
 export function buildAgentNameRe(name: string): RegExp {
@@ -57,12 +43,3 @@ export function titleHasAgentName(title: string, name: string): boolean {
 export function titleHasAnyLegacyAgentName(title: string): boolean {
   return ANY_LEGACY_AGENT_NAME_RE.test(title)
 }
-
-// Why: `android` contains `droid`; like the legacy names above, Droid must be
-// token-matched so Android terminal titles do not become agent status.
-export const DROID_AGENT_NAME_RE = /(?<![\w./\\-])droid(?![\w./\\-])/i
-
-// Why: Hermes/agy are safe to token-match but unsafe as substrings because
-// cwd/path titles like `~/hermes/working` would otherwise count as activity.
-export const HERMES_AGENT_NAME_RE = /(?<![\w./\\-])hermes(?![\w./\\-])/i
-export const AGY_AGENT_NAME_RE = /(?<![\w./\\-])agy(?![\w./\\-])/i

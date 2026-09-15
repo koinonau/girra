@@ -90,7 +90,7 @@ describe('registerPtyHandlers', () => {
         expect(sessionId).toEqual(expect.any(String))
         expect((sessionId ?? '').length).toBeGreaterThan(0)
         expect(spawnOpts.isNewSession).toBe(true)
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(sessionId, undefined, 'pi', {
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(sessionId, undefined, {
           materializeDefaultHome: false
         })
       })
@@ -106,7 +106,7 @@ describe('registerPtyHandlers', () => {
         })
         expect(daemonSpawn.mock.calls.at(-1)![0].sessionId).toBe('user-session-42')
         expect(daemonSpawn.mock.calls.at(-1)![0].isNewSession).toBeUndefined()
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith('user-session-42', undefined, 'pi', {
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith('user-session-42', undefined, {
           materializeDefaultHome: false
         })
       })
@@ -123,7 +123,7 @@ describe('registerPtyHandlers', () => {
         })
         const sessionId = daemonSpawn.mock.calls.at(-1)![0].sessionId ?? ''
         expect(sessionId).toMatch(/^wt-alpha@@[0-9a-f]{8}$/)
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(sessionId, undefined, 'pi', {
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(sessionId, undefined, {
           materializeDefaultHome: false
         })
       })
@@ -198,12 +198,9 @@ describe('registerPtyHandlers', () => {
         const env = await daemonSpawnAndGetEnv({}, undefined, {
           PI_CODING_AGENT_DIR: '/ambient/pi/agent'
         })
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-          expect.any(String),
-          '/ambient/pi/agent',
-          'pi',
-          { materializeDefaultHome: false }
-        )
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/ambient/pi/agent', {
+          materializeDefaultHome: false
+        })
         expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
         expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
         expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/ambient/pi/agent')

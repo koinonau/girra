@@ -1,4 +1,3 @@
-import { isCommandCodeNewTurnWhileWorking } from '../../../shared/command-code-turn-boundary'
 import { isNewTurnEvent } from '../../../shared/agent-hook-listener/provider-event-routing'
 import type { AgentHookEventPayload } from '../../../shared/agent-hook-listener/listener-event'
 import type {
@@ -22,20 +21,8 @@ export abstract class AgentHookServerStatusApplication extends AgentHookServerSt
     const previous = this.state.lastStatusByPaneKey.get(payload.paneKey) as
       | EnrichedAgentHookEventPayload
       | undefined
-    const commandCodeNewTurn =
-      previous !== undefined &&
-      isCommandCodeNewTurnWhileWorking({
-        agentType: payload.payload.agentType,
-        previousState: previous.payload.state,
-        incomingState: payload.payload.state,
-        previousPrompt: previous.payload.prompt,
-        incomingPrompt: payload.payload.prompt,
-        hasExplicitPrompt: payload.hasExplicitPrompt,
-        previousPromptInteractionKey: previous.promptInteractionKey,
-        incomingPromptInteractionKey: payload.promptInteractionKey
-      })
     const stateStartedAt =
-      previous && previous.payload.state === payload.payload.state && !commandCodeNewTurn
+      previous && previous.payload.state === payload.payload.state
         ? previous.stateStartedAt
         : (observedAt ?? now)
     // Why: `stateStartedAt` tracks the current state, while `receivedAt` tracks every arrival.

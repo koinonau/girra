@@ -14,10 +14,6 @@ import { PS_MAX_BUFFER_BYTES, type ProcessTableRow } from '../shared/process-tab
 import { getProcessTableSnapshot } from '../shared/process-table-snapshot-reader'
 import { selectForegroundProcessCandidate } from '../shared/foreground-process-selection'
 import {
-  resolveOuterWrapperForegroundProcess,
-  shouldInspectOuterWrapperForegroundProcess
-} from '../shared/foreground-wrapper-agent'
-import {
   resolveWindowsAgentForegroundProcess,
   shouldInspectWindowsAgentForeground
 } from '../main/providers/windows-agent-foreground-process'
@@ -244,12 +240,7 @@ function getForegroundProcessNameFromProcessTable(
   }
   const ancestryCandidates = root ? [{ ...root, depth: 0 }, ...candidates] : candidates
   const selected = selectForegroundProcessCandidate(inspectionCandidates, ancestryCandidates)
-  if (selected) {
-    // Why: return the outer wrapper (omp) rather than a deeper recognized helper
-    // in the same process lineage.
-    return resolveOuterWrapperForegroundProcess(selected.recognized, selected.candidate, candidates)
-  }
-  return null
+  return selected?.recognized.processName ?? null
 }
 
 /**
@@ -262,20 +253,6 @@ export async function getForegroundProcessName(
   if (fallbackProcess) {
     const fallbackRecognition = recognizeAgentProcess(fallbackProcess)
     if (fallbackRecognition) {
-      // Why: node-pty can report OMP's wrapped Pi; enrich only that ambiguous
-      // fallback so authoritative OMP reads keep the zero-subprocess fast path.
-      if (shouldInspectOuterWrapperForegroundProcess(fallbackRecognition)) {
-        if (process.platform === 'win32') {
-          return (
-            (await resolveWindowsAgentForegroundProcess(pid, fallbackProcess, {})) ??
-            fallbackRecognition.processName
-          )
-        }
-        return (
-          (await getRecognizedForegroundDescendant(pid, fallbackProcess)) ??
-          fallbackRecognition.processName
-        )
-      }
       return fallbackRecognition.processName
     }
     if (process.platform === 'win32') {
