@@ -6,12 +6,27 @@ import { fireEvent } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { GlobalSettings } from '../../../../shared/global-settings-types'
 import type { DiscoveredSkill, SkillDiscoveryResult } from '../../../../shared/skills'
+import type { Repo } from '../../../../shared/repo-types'
+import type { Worktree } from '../../../../shared/worktree/types'
+import { KOTHAR_INSTALL_WIZARD_COMMAND } from '../../../../shared/agent-feature-install-commands'
+import { runQuickCommandInNewTab } from '@/lib/run-quick-command-in-new-tab'
+import { activateAndRevealWorkspace } from '@/lib/worktree-activation'
 import { createCompatibleRuntimeStatusResponseIfNeeded } from '@/runtime/runtime-compatibility-test-fixture'
 import { clearRuntimeCompatibilityCacheForTests } from '@/runtime/runtime-rpc-client'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { ConfirmationDialogProvider } from '@/components/confirmation-dialog'
 import { useAppStore } from '@/store'
 import SkillsPage from './SkillsPage'
+
+vi.mock('@/components/inline-command-terminal/InlineCommandTerminal', () => ({
+  InlineCommandTerminal: ({ command }: { command: string }) => (
+    <div data-inline-command-terminal={command} />
+  )
+}))
+vi.mock('@/lib/run-quick-command-in-new-tab', () => ({ runQuickCommandInNewTab: vi.fn() }))
+vi.mock('@/lib/worktree-activation', () => ({
+  activateAndRevealWorkspace: vi.fn(() => ({ primaryTabId: null }))
+}))
 
 ;(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
@@ -114,17 +129,21 @@ function buttonStartingWith(prefix: string): HTMLButtonElement {
   return button
 }
 
-async function startDeleteSelection(): Promise<void> {
+async function chooseMoreAction(label: string): Promise<void> {
   await act(async () => {
     fireEvent.pointerDown(buttonNamed('More actions'), { button: 0, ctrlKey: false })
   })
   const item = [...document.querySelectorAll('[role="menuitem"]')].find(
-    (candidate) => candidate.textContent?.trim() === 'Delete skills…'
+    (candidate) => candidate.textContent?.trim() === label
   )
   if (!(item instanceof HTMLElement)) {
-    throw new Error('Missing Delete skills menu item')
+    throw new Error(`Missing menu item: ${label}`)
   }
   await act(async () => fireEvent.click(item))
+}
+
+async function startDeleteSelection(): Promise<void> {
+  await chooseMoreAction('Delete skills…')
 }
 
 function skillRow(name: string): HTMLElement {
@@ -162,8 +181,13 @@ afterEach(async () => {
   useAppStore.setState({
     settings: null,
     runtimeEnvironments: [],
-    runtimeEnvironmentCatalogSettled: false
+    runtimeEnvironmentCatalogSettled: false,
+    repos: [],
+    worktreesByRepo: {},
+    sshConnectionStates: new Map(),
+    sshTargetLabels: new Map()
   })
+  vi.clearAllMocks()
   vi.restoreAllMocks()
   Reflect.deleteProperty(window, 'api')
 })
@@ -412,6 +436,55 @@ describe('SkillsPage', () => {
 
     expect(renderedSkillNames()).toEqual(['plugin-skill'])
     expect(container?.textContent).toContain('1 result')
+  })
+
+  it('opens the kothar installer terminal with the exact wizard command', async () => {
+    const discover = vi.fn().mockResolvedValue(discoveryResult(['alpha']))
+    Object.defineProperty(window, 'api', {
+      configurable: true,
+      value: { skills: skillsApi(discover), runtimeEnvironments: { call: vi.fn() } }
+    })
+
+    await renderPage()
+    await flushMicrotasks()
+    await chooseMoreAction('Install kothar…')
+
+    const terminal = container?.querySelector('[data-inline-command-terminal]')
+    expect(terminal?.getAttribute('data-inline-command-terminal')).toBe(
+      KOTHAR_INSTALL_WIZARD_COMMAND
+    )
+  })
+
+  it('runs the kothar installer in a workspace on the chosen SSH host', async () => {
+    const discover = vi.fn().mockResolvedValue(discoveryResult(['alpha']))
+    Object.defineProperty(window, 'api', {
+      configurable: true,
+      value: { skills: skillsApi(discover), runtimeEnvironments: { call: vi.fn() } }
+    })
+    const worktreeId = 'repo-ssh::/home/dev/app'
+    useAppStore.setState({
+      repos: [
+        { id: 'repo-ssh', path: '/home/dev/app', connectionId: 'ssh-1', displayName: 'app' } as Repo
+      ],
+      worktreesByRepo: {
+        'repo-ssh': [{ id: worktreeId, repoId: 'repo-ssh', isArchived: false } as Worktree]
+      },
+      sshConnectionStates: new Map([
+        ['ssh-1', { targetId: 'ssh-1', status: 'connected', error: null, reconnectAttempt: 0 }]
+      ]),
+      sshTargetLabels: new Map([['ssh-1', 'devbox']])
+    })
+
+    await renderPage()
+    await flushMicrotasks()
+    await chooseMoreAction('Install kothar on devbox…')
+
+    expect(activateAndRevealWorkspace).toHaveBeenCalledWith(worktreeId)
+    expect(runQuickCommandInNewTab).toHaveBeenCalledWith({
+      command: expect.objectContaining({ command: KOTHAR_INSTALL_WIZARD_COMMAND }),
+      worktreeId
+    })
+    expect(container?.querySelector('[data-inline-command-terminal]')).toBeNull()
   })
 
   it('drops stale selections when a refreshed scan no longer contains the skill', async () => {

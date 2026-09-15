@@ -34,22 +34,12 @@ describe('verifyRemotePairingRuntimeStatus', () => {
     expect(
       verifyRemotePairingRuntimeStatus(runtimeStatus({ capabilities: 'runtime.status.compat.v1' }))
     ).toMatchObject({ ok: false, kind: 'connection-interrupted' })
-    expect(verifyRemotePairingRuntimeStatus(runtimeStatus({ deviceScope: 'admin' }))).toMatchObject(
-      {
-        ok: false,
-        kind: 'connection-interrupted'
-      }
-    )
-  })
-
-  it('rejects mobile-only access grants', () => {
     expect(
-      verifyRemotePairingRuntimeStatus(
-        runtimeStatus({
-          deviceScope: 'mobile'
-        })
-      )
-    ).toMatchObject({ ok: false, kind: 'access-link-invalid' })
+      verifyRemotePairingRuntimeStatus(runtimeStatus({ deviceScope: 'mobile' }))
+    ).toMatchObject({
+      ok: false,
+      kind: 'connection-interrupted'
+    })
   })
 
   it('rejects incompatible hosts', () => {

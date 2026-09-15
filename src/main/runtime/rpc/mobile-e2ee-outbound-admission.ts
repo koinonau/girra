@@ -31,16 +31,6 @@ export function isMobileE2EEBinaryPayloadWithinLimit(value: Uint8Array<ArrayBuff
   return Number.isFinite(mobileE2EEBinaryPayloadAdmissionBytes(value))
 }
 
-export function isMobileE2EEOutboundItemWithinLimit(
-  item:
-    | { kind: 'text'; plaintext: string }
-    | { kind: 'binary'; plaintext: Uint8Array<ArrayBufferLike> }
-): boolean {
-  return item.kind === 'text'
-    ? isMobileE2EETextPayloadWithinLimit(item.plaintext)
-    : isMobileE2EEBinaryPayloadWithinLimit(item.plaintext)
-}
-
 export function createLegacyMobileE2EETextReplyQueue(args: {
   ws: WebSocket
   isKeyed: () => boolean

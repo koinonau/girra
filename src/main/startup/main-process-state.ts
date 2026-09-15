@@ -99,7 +99,6 @@ export const mainProcessState = {
   desktopActivationGate: null as ReturnType<typeof createServeDesktopActivationGate> | null,
   windowsShellPathHydration: null as ReturnType<typeof createWindowsShellPathHydration> | null,
   shellPathReady: Promise.resolve(),
-  skillTransactionRecovery: Promise.resolve() as Promise<unknown>,
   serveOptions: null as ServeOptions | null,
   desktopWindow: null as BrowserWindow | null,
   agentBrowserBridge: null as AgentBrowserBridge | null,

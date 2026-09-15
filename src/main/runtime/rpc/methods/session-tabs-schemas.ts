@@ -4,7 +4,6 @@ export {
   CloseTab,
   CreateTerminalTab,
   MoveTab,
-  SaveMarkdownTab,
   SessionTabsUnsubscribe,
   SetTabProps,
   TerminalPaneLayoutNodeSchema,

@@ -10,8 +10,6 @@ import type { CreateWorktreeResult } from '../../shared/worktree/create-types'
 import type { WorktreeStartupLaunch } from '../../shared/worktree/launch-types'
 import type {
   RuntimeBrowserDriverState,
-  RuntimeMarkdownReadTabResult,
-  RuntimeMarkdownSaveTabResult,
   RuntimeMobileSessionTabMove,
   RuntimeTerminalDriverState,
   RuntimeTerminalPresentation
@@ -107,13 +105,6 @@ export type RuntimeNotifier = {
     staged: boolean,
     runtimeEnvironmentId?: string | null
   ): void
-  readMobileMarkdownTab?(worktreeId: string, tabId: string): Promise<RuntimeMarkdownReadTabResult>
-  saveMobileMarkdownTab?(
-    worktreeId: string,
-    tabId: string,
-    baseVersion: string,
-    content: string
-  ): Promise<RuntimeMarkdownSaveTabResult>
   closeTerminal(tabId: string, paneRuntimeId?: number): void
   closeTerminalTab?(
     tabId: string,

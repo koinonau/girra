@@ -42,9 +42,7 @@ function hasValidRuntimeStatusShape(status: Record<string, unknown>): boolean {
       isNonNegativeSafeInteger(status.authoritativeWindowId)) &&
     isNonNegativeSafeInteger(status.liveTabCount) &&
     isNonNegativeSafeInteger(status.liveLeafCount) &&
-    (status.deviceScope === undefined ||
-      status.deviceScope === 'mobile' ||
-      status.deviceScope === 'runtime') &&
+    (status.deviceScope === undefined || status.deviceScope === 'runtime') &&
     (status.capabilities === undefined ||
       (Array.isArray(status.capabilities) &&
         status.capabilities.every((capability) => typeof capability === 'string')))
@@ -62,13 +60,6 @@ export function verifyRemotePairingRuntimeStatus(
     }
   }
   const status = value as Partial<RuntimeStatus> & Record<string, unknown>
-  if (status.deviceScope === 'mobile') {
-    return {
-      ok: false,
-      kind: 'access-link-invalid',
-      message: 'This link grants mobile-only access. Generate a link for another Orca client.'
-    }
-  }
   const versionFields = [
     status.runtimeProtocolVersion,
     status.protocolVersion,

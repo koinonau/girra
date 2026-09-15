@@ -35,6 +35,12 @@ import {
 } from './skill-delete-selection'
 import { SkillDeleteResultBand } from './SkillDeleteResultBand'
 import { useSkillDeleteFlow } from './use-skill-delete-flow'
+import { KotharInstallTerminal } from './KotharInstallTerminal'
+import {
+  openKotharInstallOnSshHost,
+  useKotharInstallDisabledReason,
+  useKotharSshInstallTargets
+} from './use-kothar-install-targets'
 
 const EMPTY_SKILLS: DiscoveredSkill[] = []
 const NO_FILTERS: SkillsFilterState = {
@@ -53,6 +59,9 @@ export default function SkillsPage(): React.JSX.Element {
   const [selecting, setSelecting] = useState(false)
   const [selectedSkillIds, setSelectedSkillIds] = useState<Set<string>>(() => new Set())
   const [filters, setFilters] = useState<SkillsFilterState>(NO_FILTERS)
+  const [kotharInstallOpen, setKotharInstallOpen] = useState(false)
+  const kotharInstall = useKotharInstallDisabledReason(runtimeTarget)
+  const sshInstallTargets = useKotharSshInstallTargets()
   const mountedRef = useMountedRef()
   const scanGenerationRef = useRef(0)
 
@@ -114,13 +123,17 @@ export default function SkillsPage(): React.JSX.Element {
     setSelectedSkillIds(new Set())
   }, [])
 
-  const deleteFlow = useSkillDeleteFlow(runtimeTarget, hostLabel, () => {
-    exitSelection()
-    // Why an explicit refresh instead of firing the change event: this page
-    // would then run a second, non-refresh scan of the host it just refreshed.
-    // Other subscribers (settings badges, pickers) still hear the event.
+  // Why an explicit refresh instead of firing the change event: this page
+  // would then run a second, non-refresh scan of the host it just refreshed.
+  // Other subscribers (settings badges, pickers) still hear the event.
+  const refreshAfterSkillChange = useCallback((): void => {
     void loadSkills(true)
     window.dispatchEvent(new Event(INSTALLED_AGENT_SKILLS_REFRESHED_EVENT))
+  }, [loadSkills])
+
+  const deleteFlow = useSkillDeleteFlow(runtimeTarget, hostLabel, () => {
+    exitSelection()
+    refreshAfterSkillChange()
   })
 
   useSkillsPageKeyboardNavigation({
@@ -168,8 +181,19 @@ export default function SkillsPage(): React.JSX.Element {
             setSelecting(true)
             setSelectedSkillIds(new Set())
           }}
+          installKotharDisabled={kotharInstall.disabled}
+          installKotharDisabledReason={kotharInstall.reason}
+          onInstallKothar={() => setKotharInstallOpen(true)}
+          sshInstallTargets={sshInstallTargets}
+          onInstallKotharOnSshHost={openKotharInstallOnSshHost}
         />
       )}
+      {kotharInstallOpen ? (
+        <KotharInstallTerminal
+          onCommandFinished={refreshAfterSkillChange}
+          onClose={() => setKotharInstallOpen(false)}
+        />
+      ) : null}
       <SkillsFilterToolbar
         filters={filters}
         agentOptions={agentOptions}

@@ -40,7 +40,7 @@ describe('OrcaRuntimeService', () => {
     expect(status.minCompatibleRuntimeClientVersion).toBe(status.minCompatibleMobileVersion)
     expect(status.capabilities).toContain('terminal.binary-stream.v1')
     expect(status.capabilities).toContain('workspace-ports.v1')
-    expect(status.capabilities).toContain('mobile.tasks.v1')
+    expect(status.capabilities).not.toContain('mobile.tasks.v1')
     expect(status.capabilities).toContain('terminal.quick-commands.v1')
     expect(status.capabilities).toContain('worktree.create-idempotency.v1')
     expect(status.worktreeCreateIdempotency).toEqual({ dedupeTtlMs: 60_000 })

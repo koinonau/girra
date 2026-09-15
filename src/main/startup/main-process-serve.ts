@@ -17,21 +17,6 @@ export function getBundledWebClientRoot(): string | undefined {
   return roots.find((root) => existsSync(join(root, 'web-index.html')))
 }
 
-async function renderTerminalPairingQr(pairingUrl: string): Promise<string | null> {
-  // Why dynamic: qrcode is only reachable from mobile pairing, so launch should
-  // not parse it for the majority who never pair a device.
-  const QRCode = await import('qrcode')
-  try {
-    return await QRCode.toString(pairingUrl, { type: 'terminal', small: true })
-  } catch {
-    try {
-      return await QRCode.toString(pairingUrl, { type: 'utf8' })
-    } catch {
-      return null
-    }
-  }
-}
-
 export async function printServeReady(options: ServeOptions): Promise<void> {
   const runtime = state.runtime
   const runtimeRpc = state.runtimeRpc
@@ -61,13 +46,9 @@ export async function printServeReady(options: ServeOptions): Promise<void> {
       } as const)
     : runtimeRpc.createPairingOffer({
         address: options.pairingAddress,
-        name: `${options.mobilePairing ? 'Mobile' : 'CLI'} ${new Date().toLocaleDateString()}`,
-        scope: options.mobilePairing ? 'mobile' : 'runtime'
+        name: `CLI ${new Date().toLocaleDateString()}`,
+        scope: 'runtime'
       })
-  const pairingQr =
-    pairing.available && options.mobilePairing
-      ? await renderTerminalPairingQr(pairing.pairingUrl)
-      : null
   await state.serveReadinessPublisher.publish(
     {
       runtimeId: runtime.getRuntimeId(),
@@ -82,8 +63,8 @@ export async function printServeReady(options: ServeOptions): Promise<void> {
             endpoint: pairing.endpoint,
             deviceId: pairing.deviceId,
             webClientUrl: pairing.webClientUrl,
-            scope: options.mobilePairing ? 'mobile' : 'runtime',
-            qr: pairingQr
+            scope: 'runtime',
+            qr: null
           }
         : pairing
     },

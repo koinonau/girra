@@ -218,11 +218,3 @@ export const MoveTab = z.discriminatedUnion('kind', [
     })
     .strict()
 ])
-
-export const SaveMarkdownTab = ActivateTab.extend({
-  baseVersion: z
-    .unknown()
-    .transform((v) => (typeof v === 'string' ? v : ''))
-    .pipe(z.string().min(1, 'Missing base version')),
-  content: z.string()
-})

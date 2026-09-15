@@ -15,7 +15,7 @@ This page is the map. Deep dives live on the linked pages.
 | ---------------------------------------- | ---------------------------------------------- | --------------------------------- | --------------------------------------------- |
 | **Local**                                | Your desktop                                   | You                               | Day-to-day coding, fast iteration             |
 | **SSH target**                           | A remote host you connect to over SSH          | You (or your team)                | Dev boxes, GPU hosts, always-on VPS           |
-| **Remote Orca Server**                   | A machine running Orca desktop or `orca serve` | You (or your team)                | Persistent shared runtime, mobile, automation |
+| **Remote Orca Server**                   | A machine running Orca desktop or `orca serve` | You (or your team)                | Persistent shared runtime, web, automation    |
 | **Cloud VM / per-workspace environment** | A disposable VM/sandbox per workspace          | Your cloud account (BYO provider) | Isolated, ephemeral agent compute             |
 
 Orca does **not** sell managed VPS hosting. Remote modes always use machines and cloud accounts you control.
@@ -42,12 +42,12 @@ SSH worktrees can open in VS Code Remote-SSH, download remote folders when SFTP 
 
 ## 3. Remote Orca Servers
 
-Keep Orca running on a machine you control—an old laptop, Mac mini, home server, cloud VPS, or team box. Pair your laptop, browser client, or phone to that runtime. The **server** owns projects, worktrees, terminals, and agent processes; clients are the UI.
+Keep Orca running on a machine you control—an old laptop, Mac mini, home server, cloud VPS, or team box. Pair your laptop or browser client to that runtime. The **server** owns projects, worktrees, terminals, and agent processes; clients are the UI.
 
 **Good fit when:**
 
 - You want agents to keep running after your laptop sleeps
-- Mobile should reconnect to the same sessions
+- Several clients should reconnect to the same sessions
 - Automation or a backend should start sessions on a stable host
 
 **Easiest setup:** install Orca and Tailscale on both computers. On the server, open **Settings → Remote Orca Servers → Advertise this app as a server → New Link**, choose its Tailscale address, and generate an access link. On the client, choose **Add Server** and paste that link.
@@ -66,7 +66,7 @@ Full detail: [Remote Orca Servers](/docs/remote-servers).
 | ------------- | -------------------------------------------------- | -------------------------------------------------------------- |
 | Runtime owner | Laptop Orca                                        | Remote machine (Orca desktop or `orca serve`)                  |
 | Disconnect    | Agents keep running on the host; laptop reattaches | Full session state lives on the server                         |
-| Multi-client  | One laptop drives the host                         | Laptop, web, mobile, and automation can share the same runtime |
+| Multi-client  | One laptop drives the host                         | Laptop, web, and automation can share the same runtime         |
 | Typical setup | Import SSH config, pick **Run on**                 | Share the server app or run `orca serve`, then pair with a URL |
 
 ## 4. Cloud VMs (per-workspace environments)
@@ -114,7 +114,7 @@ Recipes only show up for workspace create once the `environmentRecipes` entry is
 
 - **Stay local** if the laptop is fast enough and agents are short-lived.
 - **SSH** if you already have a VPS or dev box and want agents there without installing a second Orca runtime.
-- **Remote Orca Server** if you want one always-on Orca runtime for mobile, browser, and automation.
+- **Remote Orca Server** if you want one always-on Orca runtime for desktop, browser, and automation clients.
 - **Cloud VM / per-workspace environments** if each task should get a fresh, recipe-defined sandbox that dies with the worktree.
 
 You can mix modes in one install: local worktrees for quick edits, SSH for a GPU box, and a recipe for CI-like isolation.
@@ -124,5 +124,4 @@ You can mix modes in one install: local worktrees for quick edits, SSH for a GPU
 - [SSH worktrees](/docs/ssh)
 - [Remote Orca Servers](/docs/remote-servers)
 - [Worktrees](/docs/model/worktrees)
-- [Mobile](/docs/mobile)
 - [Settings reference](/docs/settings)

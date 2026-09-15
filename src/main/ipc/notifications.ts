@@ -8,7 +8,6 @@ import type {
   NotificationDispatchResult,
   NotificationPermissionStatusResult
 } from '../../shared/notification-settings-types'
-import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import { buildNotificationOptions } from './notification-options'
 import { readNotificationAuthorizationStatus } from './notification-authorization-status'
 import { setTrayAttention } from '../tray/system-tray'
@@ -26,11 +25,10 @@ import {
   resetNotificationPermissionEvidence
 } from './notification-permission-probe'
 
-export function registerNotificationHandlers(store: Store, runtime?: OrcaRuntimeService): void {
+export function registerNotificationHandlers(store: Store): void {
   ipcMain.removeHandler('notifications:getDesktopAwayState')
   ipcMain.handle('notifications:getDesktopAwayState', () => readDesktopAwayState(powerMonitor))
   const recentDesktopNotifications = new Map<string, number>()
-  const recentMobileNotifications = new Map<string, number>()
   resetNotificationPermissionEvidence()
 
   ipcMain.removeHandler('notifications:openSystemSettings')
@@ -101,7 +99,6 @@ export function registerNotificationHandlers(store: Store, runtime?: OrcaRuntime
         entry.release()
         dismissed += 1
       }
-      runtime?.dismissMobileNotification(id)
     }
     return { dismissed }
   })
@@ -128,32 +125,6 @@ export function registerNotificationHandlers(store: Store, runtime?: OrcaRuntime
         (args.source !== 'terminal-bell' || settings.terminalBell)
 
       const notificationOptions = buildNotificationOptions(args)
-
-      // Why: desktop focus only means this computer sees the worktree; the paired phone may still need the alert.
-      if (runtime && args.source !== 'test') {
-        const dedupeKey = args.worktreeId ?? args.worktreeLabel ?? 'global'
-        if (
-          reserveNotificationCooldown(
-            recentMobileNotifications,
-            JSON.stringify([desktopAllowed, args.source, args.agentState, dedupeKey]),
-            Date.now()
-          )
-        ) {
-          runtime.dispatchMobileNotification({
-            type: 'notification',
-            emittedAt: Date.now(),
-            source: args.source,
-            ...(!desktopAllowed ? { desktopAllowed: false } : {}),
-            title: notificationOptions.title,
-            body: notificationOptions.body,
-            worktreeId: args.worktreeId,
-            ...(args.notificationId ? { notificationId: args.notificationId } : {}),
-            // Why: background push needs the agent's real state to pick "needs input"
-            // vs "finished" — and to stay silent while the agent is still working.
-            ...(args.agentState ? { agentState: args.agentState } : {})
-          })
-        }
-      }
 
       if (!desktopAllowed) {
         return { delivered: false, reason: settings.enabled ? 'source-disabled' : 'disabled' }

@@ -55,15 +55,6 @@ describe('browser client host placement preparation', () => {
     expect(harness.startHost).not.toHaveBeenCalled()
   })
 
-  it('keeps a mobile-scoped pairing on the server even when capabilities are advertised', async () => {
-    const harness = createHarness({
-      status: runtimeStatus({ deviceScope: 'mobile' })
-    })
-
-    await expect(harness.prepare()).resolves.toEqual({ kind: 'server' })
-    expect(harness.startHost).not.toHaveBeenCalled()
-  })
-
   it('surfaces a capable host start failure without falling back to server placement', async () => {
     const harness = createHarness()
     harness.startHost.mockRejectedValueOnce(new Error('attach failed'))

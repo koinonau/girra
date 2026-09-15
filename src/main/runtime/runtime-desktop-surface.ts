@@ -11,13 +11,12 @@ import type { BrowserWindow, IpcMainEvent } from 'electron'
  *
  * Defaults are inert rather than throwing, for the same reason as the PTY bindings: a
  * host with no desktop legitimately has nothing here, and that is not a downgrade.
- * Where absence IS user-visible — a notification that would have been shown — the
- * runtime already routes to paired clients, which is the better destination anyway.
+ * Where absence IS user-visible, a notification that would have been shown, the caller
+ * gets `false` back and reports it.
  */
 
 export type RuntimeDesktopSurface = {
   /** Show a native notification. Returns false when the host cannot, so callers can say so. */
-  isAwayForMobileNotifications?(): boolean | undefined
   showNotification(input: { title: string; body: string }): boolean
   /** The renderer window with this id, or null when there is no desktop. */
   findWindowById(id: number): BrowserWindow | null

@@ -321,8 +321,7 @@
         "7a566540de": "Pairing URL or code",
         "cb4d287238": "Server name",
         "3affe7de3a": "Paste a pairing URL from an Orca server that this browser can reach.",
-        "e3bcd082ac": "Connect to Orca",
-        "mobileScopeRejected": "This QR code grants limited (mobile) access. To use the full web app, open the browser access link from Settings → Runtime Environments → Share this Orca server → New Link."
+        "e3bcd082ac": "Connect to Orca"
       },
       "webPreloadApi": {
         "aiVaultUnavailableForHost": "Agent Session History is not available for this execution host.",
@@ -441,8 +440,6 @@
           "78e08cd877": "Git could not safely delete branch \"{{value0}}\", so Orca kept it to avoid losing local commits.",
           "3b57982bf6": "Git could not safely delete branch \"{{value0}}\" after deleting workspace \"{{value1}}\", so Orca kept it to avoid losing local commits.",
           "81f13f48d2": "Git could not safely delete branch \"{{value0}}\" after deleting worktree \"{{value1}}\", so Orca kept it to avoid losing local commits.",
-          "runtimeScopeForbiddenTitle": "This connection has limited (mobile) access",
-          "runtimeScopeForbiddenDescription": "Workspaces are unavailable on a mobile-scope pairing. Reconnect using the browser access link from Settings → Runtime Environments → Share this Orca server.",
           "a17f4d2e93": "Could not update this workspace.",
           "preservedBranchCleanupHostAmbiguous": "Multiple preserved branch cleanups are pending for \"{{value0}}\"; specify the host.",
           "metadata": {
@@ -537,7 +534,6 @@
       },
       "remotePairingCopy": {
         "invalidInput": "Enter an Orca access link or bare pairing code.",
-        "mobileOnly": "This link grants mobile-only access. Generate a link for another Orca client.",
         "invalidDestination": "This access link contains an invalid destination.",
         "unsupportedDestination": "This access link contains an unsupported destination.",
         "nonConnectableDestination": "This access link contains a non-connectable destination.",
@@ -4062,10 +4058,17 @@
           "closeSkills": "Close skills",
           "closeTooltip": "Close · Esc",
           "moreActions": "More actions",
-          "emptyCopy": "The scanned skill folders are empty. Install a shared bundle, or refresh after adding a skill.",
           "retry": "Retry",
           "deleteSkills": "Delete skills…",
-          "emptyCopyRefresh": "The scanned skill folders are empty. Refresh after adding a skill."
+          "installKothar": "Install kothar…",
+          "installKotharOnHost": "Install kothar on {{value0}}…",
+          "installKotharTitle": "Install kothar",
+          "installKotharAria": "kothar installer terminal",
+          "installKotharDescription": "Press Enter to run the kothar installer. The kothar repository is private, so the installer walks you through GitHub access.",
+          "installKotharWindowsUnsupported": "The kothar installer needs macOS or Linux.",
+          "installKotharNeedsWorkspace": "Open a repository or folder on this host first.",
+          "closeInstallKothar": "Close installer",
+          "emptyCopyKothar": "The scanned skill folders are empty. Install kothar from More actions, or refresh after adding a skill."
         },
         "SkillFreshnessNudge": {
           "titleOne": "An installed Orca skill is out of date",
@@ -4166,123 +4169,8 @@
           "checking": "Checking...",
           "checkFailed": "Check failed"
         },
-        "SkillShareDialog": {
-          "peopleRequired": "Select at least one teammate.",
-          "readyDescription": "Recipients authenticate with Orca before they can inspect or install it.",
-          "newVersionDescription": "Review the exact files, then publish an immutable version to the existing Cloud package.",
-          "description": "Review the exact files, choose who can access them, then publish an immutable version.",
-          "readyDescriptionV2": "Anyone with this unlisted link can inspect and install the skills.",
-          "descriptionV2": "Review the exact files, then publish an immutable version behind an unlisted link."
-        },
         "SkillCard": {
           "01c5a16e01": "Select {{value0}}"
-        },
-        "SkillCloudManagementActions": {
-          "ed753624c0": "Delete Cloud package",
-          "640bc6b92e": "Confirm package deletion",
-          "6b6adf68c1": "Delete selected Cloud version",
-          "bbec37d8f8": "Confirm version deletion",
-          "7a80285dad": "Unshare",
-          "0ac5c175fd": "Confirm unshare",
-          "9e6bd31487": "No active share links.",
-          "c7f2b69122": "Unsharing blocks future installs. Copies already installed on any machine remain there.",
-          "8cac3b9362": "Active links",
-          "cc8e4ef6ba": "Save access",
-          "eb603f7888": "outside the current roster will be preserved.",
-          "3d346ddce8": "existing recipient",
-          "2b8c569ea7": "Current organization",
-          "2552c12fea": "Access",
-          "505cd6105c": "Cloud sharing controls",
-          "linkCopied": "Share link copied",
-          "activeLinkBearerDescription": "Anyone with an active link can inspect and install the skills. Revoking blocks future access but leaves installed copies unchanged.",
-          "copyLink": "Copy link"
-        },
-        "SkillInstallDialog": {
-          "4a00d133c5": "Orca verifies access and package identity before changing the selected machine."
-        },
-        "SkillInstallManagementDialog": {
-          "e91af0079f": "Remove",
-          "470d8d2476": "Confirm remove",
-          "c1d03ee50d": "Cancel installation",
-          "561e49ccd1": "Install selected version",
-          "2ae587d39c": "Retry incomplete coverage",
-          "f7c5075e77": "Discard changes and remove",
-          "e1884c812e": "Discard changes and install version",
-          "070654c6d1": "Orca will preserve them unless you explicitly discard the local changes.",
-          "74b70892ea": "Local files were modified",
-          "86ed219b55": "Choose a version",
-          "9c04bd0120": "Installed version",
-          "1c9e7f420a": "Installed bundle skills",
-          "34c2ef9e71": "Install {{count}} skills",
-          "a0cab67c2f": "Remove {{count}} skills",
-          "f970d8088d": "Confirm remove {{count}} skills",
-          "installAnotherMachine": "Install on another machine"
-        },
-        "SkillInstallReviewContent": {
-          "98ed90e523": "A skill contains instructions and may include scripts. Treat it as code from its author.",
-          "f72ee4022a": "SHA-256",
-          "3d8421ca2f": "executable",
-          "87137bcb8d": "scripts",
-          "fab8fce842": "files",
-          "8f9833d509": "Immutable version",
-          "27672470d9": "Opening the link does not install anything. Review the immutable version first."
-        },
-        "SkillShareReviewContent": {
-          "e3caf6baeb": "Revoking this link blocks future access. It does not remove copies already installed on recipients’ machines.",
-          "ad940367a5": "Validating and publishing…",
-          "4895d3e0ee": "No teammates are available.",
-          "8188f5d765": "can access the link.",
-          "fe204e06f0": "the organization",
-          "0cd4b3e396": "Everyone currently in",
-          "f25429e266": "Selected people",
-          "0a49d901ab": "Organization",
-          "6817a7f6f8": "Skill access",
-          "266527d295": "Publishing as {{value0}}{{value1}}.",
-          "78d863235c": "Access",
-          "77f636eac3": "executable",
-          "8edd32622f": "scripts",
-          "3121f44358": "files",
-          "01c5a17e01": "{{value0}} skills",
-          "01c5a17e02": "Review included skills",
-          "01c5a17e03": "{{value0}} files · {{value1}}",
-          "unlistedLinkTitle": "Unlisted link",
-          "unlistedPublishingAs": "Publishing as {{value0}}. Anyone with the link can inspect and install these skills.",
-          "unlistedLinkDetails": "The link is not searchable or listed publicly. Revoke it to block future access; installed copies remain."
-        },
-        "SkillBundleInstallFlow": {
-          "01c5a13e04": "Retry {{value0}} skills",
-          "01c5a13e05": "Install {{value0}} skills"
-        },
-        "SkillBundleInstallOutcome": {
-          "01c5a12e05": "Failed",
-          "01c5a12e06": "Cancelled"
-        },
-        "SkillBundleInstallReview": {
-          "01c5a11e01": "Immutable version",
-          "01c5a11e02": "{{value0}} skills",
-          "01c5a11e03": "{{value0}} files",
-          "01c5a11e04": "{{value0}} scripts",
-          "01c5a11e05": "{{value0}} executable",
-          "01c5a11e06": "SHA-256",
-          "01c5a11e0a": "Skills contain instructions and may include scripts. Treat them as code from their author.",
-          "01c5a11e0b": "Skills to install",
-          "01c5a11e0c": "Choose any subset from this bundle.",
-          "01c5a11e0e": "No description",
-          "01c5a11e0f": "{{value0}} files · {{value1}} scripts",
-          "01c5a11e10": "{{value0}} executable",
-          "01c5a11e14": "{{value0}} new",
-          "01c5a11e15": "{{value0}} unchanged",
-          "01c5a11e16": "{{value0}} updates",
-          "01c5a11e17": "{{value0}} conflicts"
-        },
-        "SkillShareSelectionControls": {
-          "01c5a15e05": "Share {{value0}} skills",
-          "01c5a15e01": "Cancel sharing",
-          "01c5a15e03": "{{value0}} selected",
-          "01c5a15e04": "Select all results"
-        },
-        "SkillManagedInstallList": {
-          "86c76cb262": "{{count}} skill bundle"
         },
         "SkillRow": {
           "updatedUnknown": "No date",
@@ -4295,10 +4183,6 @@
           "viewDetails": "View details",
           "deleteSkill": "Delete…",
           "notDeletable": "Not deletable"
-        },
-        "SkillSelectionBar": {
-          "selectAll": "Select all {{count}} eligible",
-          "clear": "Clear"
         },
         "SkillsList": {
           "listLabel": "Skills"
@@ -4338,22 +4222,6 @@
           "local": "This machine",
           "remote": "Connected runtime"
         },
-        "share": {
-          "readyDescription": "Copy the link to share it.",
-          "newVersionDescription": "Publishes an immutable version to the existing package.",
-          "description": "Publishes an immutable version behind an unlisted link.",
-          "accessSummary": "Anyone with the link can install this. It is not listed anywhere, and revoking it blocks new installs — not copies already installed. Publishing as {{value0}}.",
-          "accessSummaryShort": "Unlisted link — anyone with it can install this. Publishing as {{value0}}."
-        },
-        "install": {
-          "agentsCanonical": "Always installed for {{value0}}, which read {{value1}}.",
-          "agentsNoneChosen": "No extra agents",
-          "agentsSummary": "Also: {{value0}}",
-          "bundleDestinationSummary": "{{value0}} new · {{value1}} already installed · {{value2}} need a decision",
-          "trustNote": "Skills are instructions and code from their author. Install what you trust.",
-          "agentAlways": "Always",
-          "agentsCanonicalNote": "{{value0}} read {{value1}}, which every install writes."
-        },
         "filter": {
           "allAgents": "All agents",
           "sharedAgent": "Shared (.agents)"
@@ -4369,14 +4237,6 @@
           "agents": "Agents",
           "updated": "Updated",
           "copy": "Copy"
-        },
-        "SkillsSharedLinksHeader": {
-          "back": "Back to skills",
-          "backTooltip": "Back to skills · Esc",
-          "unlisted": "Unlisted — only people with a link can open it."
-        },
-        "managedInstall": {
-          "sendToMachine": "Send to another machine"
         },
         "SkillDelete": {
           "dismissResults": "Dismiss",
@@ -6864,29 +6724,6 @@
           "0a452d4d3b": "{{value0}} emulator devices detected.",
           "f62a1bb759": "Orca will auto-select an emulator device after devices are detected.",
           "b2fd62ea75": "Default device for new emulator tabs and agent attach commands. Auto-select prefers an already running device."
-        },
-        "MobileNetworkInterfaceSection": {
-          "63d5e4ae1e": "Regenerate the QR code and scan it from the Orca mobile app.",
-          "87985ba6f5": "In this Network Interface menu, choose the Tailscale address, usually a 100.x.y.z IP.",
-          "1f7c26d36a": "Sign in to the same tailnet on both devices.",
-          "668016be7a": "on your computer and phone.",
-          "1dc87a7fbc": "Tailscale",
-          "51d29927eb": "Install",
-          "9fc5d203ff": "Orca Mobile connects directly to this computer. To use it away from the same LAN, put your computer and phone on the same private overlay network, then generate the QR code with that network address selected.",
-          "39fad211d9": "Connect outside your Wi-Fi with a tailnet",
-          "a9db5d771d": "Refresh network interfaces",
-          "d536b5e20d": "Choose which network address to advertise in the QR code. Use your LAN address for same-network pairing, or an overlay network address (Tailscale, ZeroTier) for cross-network access.",
-          "406a35121c": "Network Interface",
-          "c541f67790": "Generate QR Code",
-          "1e64659126": "Regenerate"
-        },
-        "MobilePane": {
-          "relayDegradedNotice": "Relay couldn’t be reached — this code only works on your LAN or Tailscale. Regenerate to try again."
-        },
-        "MobileSettingsPane": {
-          "9a3c280e49": "GitHub Releases",
-          "b0088412a1": "or the Android APK from",
-          "c8491c17ef": "Control Orca from your phone by scanning a QR code. Beta / early preview - expect bugs and breaking changes. Get the iOS app from the"
         },
         "NotificationsPane": {
           "906b4afebf": "Send Test Notification",
@@ -10148,27 +9985,6 @@
           "567633ff50": "Right-click pastes the clipboard into the terminal. Control-click to open the context menu.",
           "c64497148a": "Right-click pastes the clipboard. Control-click opens the context menu."
         },
-        "MobileRelayStatusSection": {
-          "registered": "Registered",
-          "connecting": "Connecting",
-          "reconnecting": "Reconnecting",
-          "offline": "Offline",
-          "title": "Orca Relay",
-          "automatic": "Connect from anywhere when a phone is paired",
-          "signInPrompt": "Sign in on this desktop to connect from anywhere",
-          "directStillAvailable": "LAN and Tailscale connections remain available.",
-          "directNeedsNoAccount": "LAN and Tailscale pairing still work without an account.",
-          "signIn": "Sign in",
-          "unavailable": "Unavailable",
-          "standby": "Standby — no relay devices"
-        },
-        "MobileRelayBetaAvailability": {
-          "about": "About the Orca Relay beta",
-          "beta": "Beta",
-          "availability": "Available on",
-          "testFlight": "TestFlight",
-          "androidApk": "Android APK"
-        },
         "SkillUsageExampleDialog": {
           "copiedPrompt": "Copied example prompt.",
           "copyFailed": "Failed to copy prompt.",
@@ -10605,9 +10421,6 @@
           "on": "On",
           "auto": "Agent",
           "off": "Off"
-        },
-        "shareSkills": {
-          "refreshLinks": "Refresh"
         },
         "bitbucket": {
           "credentials": {
@@ -12379,36 +12192,6 @@
             "listLabel": "Run targets",
             "label": "Run on",
             "browse": "Browse run targets"
-          }
-        }
-      },
-      "mobile": {
-        "MobileHero": {
-          "bb0074ce11": "Pairing QR code",
-          "ca85e595a7": "No interfaces found",
-          "79d2f480da": "Network interface to advertise",
-          "7af266b80d": "Install QR code",
-          "relayDegradedNotice": "Relay couldn’t be reached — this code only works on your LAN or Tailscale."
-        },
-        "MobilePage": {
-          "1b4509a8a1": "paired",
-          "c5909374cf": "intro"
-        },
-        "MobilePageToolbar": {
-          "a4f8c2d91e": "Hide from sidebar",
-          "b7e3d1c84a": "Show in sidebar"
-        },
-        "mobile": {
-          "platform": {
-            "copy": {
-              "2a532d6fd7": "Scan with your Android camera to download the latest APK from GitHub Releases.",
-              "432db52b73": "Scan with your iPhone camera to open the App Store."
-            }
-          }
-        },
-        "slides": {
-          "WorktreeListSlide": {
-            "c5ad56786d": "spinner"
           }
         }
       },

@@ -96,11 +96,9 @@ export const CORE_HANDLERS: Record<string, CommandHandler> = {
     const projectRootValue = flags.get('project-root')
     const projectRoot = typeof projectRootValue === 'string' ? projectRootValue : null
     const noPairing = flags.get('no-pairing') === true
-    const mobilePairing = flags.get('mobile-pairing') === true
     const recipeJson = flags.get('recipe-json') === true
     const validationError = getServeOptionValidationError({
       noPairing,
-      mobilePairing,
       recipeJson,
       projectRoot
     })
@@ -114,7 +112,6 @@ export const CORE_HANDLERS: Record<string, CommandHandler> = {
       port,
       pairingAddress: typeof pairingAddressValue === 'string' ? pairingAddressValue : null,
       noPairing,
-      mobilePairing,
       recipeJson,
       projectRoot
     })

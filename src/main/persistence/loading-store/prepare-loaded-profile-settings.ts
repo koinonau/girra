@@ -4,11 +4,6 @@ import type { ProjectGroup } from '../../../shared/project-group-types'
 import { deriveGlobalWindowsRuntimeDefaultFromLegacySettings } from '../../../shared/project-execution-runtime'
 import { normalizeTaskProviderSettings } from '../../../shared/task-providers'
 import { normalizeAutoRenameBranchFromWorkDefaultOn } from '../../../shared/auto-rename-branch-from-work-settings'
-import {
-  addMobilePairingCustomAddress,
-  normalizeMobilePairingCustomAddress,
-  normalizeMobilePairingCustomAddresses
-} from '../../../shared/mobile-pairing-custom-address'
 import { normalizeSourceControlGroupOrder } from '../../../shared/source-control-group-order'
 import { normalizeProjectGroups } from '../../../shared/project-groups'
 import { normalizeDisabledTuiAgents } from '../../../shared/tui-agent-selection'
@@ -48,8 +43,6 @@ export type PreparedLoadedProfileSettings = {
   migratedWindowsRuntimeDefault: GlobalSettings['localWindowsRuntimeDefault']
   migratedLocalAccountRuntime: GlobalSettings['localAccountRuntime']
   loadedCompactWorktreeCards: boolean
-  mobilePairingCustomAddress: GlobalSettings['mobilePairingCustomAddress']
-  mobilePairingCustomAddresses: GlobalSettings['mobilePairingCustomAddresses']
   normalizedNotifications: GlobalSettings['notifications']
   normalizedSourceControlGroupOrder: GlobalSettings['sourceControlGroupOrder']
   normalizedProjectGroups: ProjectGroup[]
@@ -183,34 +176,6 @@ export function prepareLoadedProfileSettings(
     parsed.settings?.compactWorktreeCards ??
     parsed.settings?.experimentalCompactWorktreeCards ??
     defaults.settings.compactWorktreeCards
-  const mobilePairingCustomAddress = normalizeMobilePairingCustomAddress(
-    parsed.settings?.mobilePairingCustomAddress
-  )
-  const rawMobilePairingCustomAddresses = parsed.settings?.mobilePairingCustomAddresses
-  const mobilePairingCustomAddresses = mobilePairingCustomAddress
-    ? addMobilePairingCustomAddress(
-        normalizeMobilePairingCustomAddresses(rawMobilePairingCustomAddresses),
-        mobilePairingCustomAddress
-      )
-    : normalizeMobilePairingCustomAddresses(rawMobilePairingCustomAddresses)
-  if (
-    parsed.settings?.mobilePairingCustomAddress !== undefined &&
-    parsed.settings.mobilePairingCustomAddress !== mobilePairingCustomAddress
-  ) {
-    markNeedsSave()
-  }
-  const customAddressesMatch =
-    Array.isArray(rawMobilePairingCustomAddresses) &&
-    rawMobilePairingCustomAddresses.length === mobilePairingCustomAddresses.length &&
-    rawMobilePairingCustomAddresses.every(
-      (address, index) => address === mobilePairingCustomAddresses[index]
-    )
-  if (
-    (rawMobilePairingCustomAddresses !== undefined || mobilePairingCustomAddress !== null) &&
-    !customAddressesMatch
-  ) {
-    markNeedsSave()
-  }
   const normalizedNotifications = normalizeNotificationSettings(parsed.settings?.notifications)
   // Why: a type-flipped notification field is repaired in memory only; without a dirty mark the
   // bad value stays on disk and the repair reruns on every launch.
@@ -245,8 +210,6 @@ export function prepareLoadedProfileSettings(
     migratedWindowsRuntimeDefault,
     migratedLocalAccountRuntime,
     loadedCompactWorktreeCards,
-    mobilePairingCustomAddress,
-    mobilePairingCustomAddresses,
     normalizedNotifications,
     normalizedSourceControlGroupOrder,
     normalizedProjectGroups

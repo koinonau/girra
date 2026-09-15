@@ -137,8 +137,7 @@
         "7a566540de": "ペアリング URL またはコード",
         "cb4d287238": "サーバー名",
         "3affe7de3a": "このブラウザが到達できる Orca サーバーからペアリング URL を貼り付けます。",
-        "e3bcd082ac": "Orca に接続",
-        "mobileScopeRejected": "この QR コードでは、モバイル向けの制限付きアクセスのみ利用できます。完全版の Web アプリを使用するには、[設定] → [リモート Orca サーバー] → [この Orca サーバーを共有する] → [新規リンク] から、ブラウザ用アクセスリンクを開いてください。"
+        "e3bcd082ac": "Orca に接続"
       },
       "webPreloadApi": {
         "aiVaultUnavailableForHost": "この実行ホストでは Agent セッション履歴を使用できません。",
@@ -249,8 +248,6 @@
           "78e08cd877": "Git はブランチ\"{{value0}}\"を安全に削除できなかったため、Orca はローカルコミットを失わないように保持しました。",
           "3b57982bf6": "ワークスペース\"{{value1}}\"を削除した後、Git はブランチ\"{{value0}}\"を安全に削除できなかったため、Orca はローカルコミットを失わないように保持しました。",
           "81f13f48d2": "ワークツリー\"{{value1}}\"を削除した後、Git はブランチ\"{{value0}}\"を安全に削除できなかったため、Orca はローカルコミットを失わないように保持しました。",
-          "runtimeScopeForbiddenTitle": "この接続は制限付き（モバイル）アクセスです",
-          "runtimeScopeForbiddenDescription": "モバイル向けペアリングではワークスペースを使用できません。[設定] → [リモート Orca サーバー] → [この Orca サーバーを共有する] から、ブラウザ用リンクで再接続してください。",
           "createdWithoutParentNesting": "「{{value0}}」の配下にネストせずに作成しました",
           "createdWithoutParentNestingUnnamed": "選択した親ワークツリーの配下にネストせずに作成しました",
           "createdWithoutParentNestingDetail": "親ワークスペースは利用できなくなりました。ワークスペースメニューから設定できます。"
@@ -308,7 +305,6 @@
       },
       "remotePairingCopy": {
         "invalidInput": "Orca のアクセスリンクまたはペアリングコードを入力してください。",
-        "mobileOnly": "このリンクはモバイル専用アクセスを許可します。別の Orca クライアント用のリンクを生成してください。",
         "invalidDestination": "このアクセスリンクには無効な接続先が含まれています。",
         "unsupportedDestination": "このアクセスリンクには未対応の接続先が含まれています。",
         "nonConnectableDestination": "このアクセスリンクには接続できない接続先が含まれています。",
@@ -3598,7 +3594,6 @@
           "closeSkills": "スキルを閉じる",
           "closeTooltip": "閉じる · Esc",
           "moreActions": "その他の操作",
-          "emptyCopy": "スキャンしたスキルフォルダーは空です。共有バンドルをインストールするか、スキルを追加後に更新してください。",
           "retry": "再試行",
           "deleteSkills": "スキルを削除…"
         },
@@ -5998,29 +5993,6 @@
           "0a452d4d3b": "{{value0}} エミュレータデバイスが検出されました。",
           "f62a1bb759": "Orca は、デバイスが検出された後、エミュレータデバイスを自動選択します。",
           "b2fd62ea75": "新規エミュレータタブと Agent 接続コマンドのデフォルトデバイス。自動選択では、すでに実行中のデバイスが優先されます。"
-        },
-        "MobileNetworkInterfaceSection": {
-          "63d5e4ae1e": "QR コードを再生成し、Orca モバイルアプリからスキャンします。",
-          "87985ba6f5": "このネットワークインターフェースメニューで、Tailscale アドレス (通常は 100.x.y.z IP) を選択します。",
-          "1f7c26d36a": "両方のデバイスで同じテールネットにサインインします。",
-          "668016be7a": "コンピュータとスマートフォンで。",
-          "1dc87a7fbc": "Tailscale",
-          "51d29927eb": "インストール",
-          "9fc5d203ff": "Orca Mobile はこのコンピュータに直接接続します。同じ LAN から離れた場所で使用するには、コンピュータとスマートフォンを同じプライベートオーバーレイネットワーク上に配置し、そのネットワークアドレスを選択して QR コードを生成します。",
-          "39fad211d9": "テールネットを使用して Wi-Fi の外部に接続する",
-          "a9db5d771d": "ネットワークインターフェースを更新",
-          "d536b5e20d": "QR コードでアドバタイズするネットワークアドレスを選択します。同一ネットワークペアリングには LAN アドレスを使用し、クロスネットワークアクセスにはオーバーレイネットワークアドレス (Tailscale、ZeroTier) を使用します。",
-          "406a35121c": "ネットワークインターフェース",
-          "c541f67790": "QRコードの生成",
-          "1e64659126": "再生する"
-        },
-        "MobilePane": {
-          "relayDegradedNotice": "Relay に接続できませんでした — このコードは LAN または Tailscale でのみ動作します。再生成してからお試しください。"
-        },
-        "MobileSettingsPane": {
-          "9a3c280e49": "GitHub リリース",
-          "b0088412a1": "または Android APK から",
-          "c8491c17ef": "QR コードをスキャンしてスマートフォンから Orca を制御します。ベータ/早期プレビュー - バグや重大な変更が予想されます。 iOS アプリを次の場所から入手します。"
         },
         "NotificationsPane": {
           "906b4afebf": "テスト通知を送信する",
@@ -9091,27 +9063,6 @@
           "567633ff50": "右クリックで、クリップボードの内容をターミナルに貼り付けます。Control キーを押しながらクリックすると、コンテキストメニューが開きます。",
           "c64497148a": "右クリックで、クリップボードの内容を貼り付けます。Control キーを押しながらクリックすると、コンテキストメニューが開きます。"
         },
-        "MobileRelayStatusSection": {
-          "registered": "登録済み",
-          "connecting": "接続中",
-          "reconnecting": "再接続中",
-          "offline": "オフライン",
-          "title": "Orca Relay",
-          "automatic": "スマートフォンをペアリングすると、どこからでも接続できます",
-          "signInPrompt": "どこからでも接続するには、このデスクトップでサインインしてください",
-          "directStillAvailable": "LAN と Tailscale の接続は引き続き利用できます。",
-          "directNeedsNoAccount": "LAN と Tailscale のペアリングは、アカウントがなくても利用できます。",
-          "signIn": "サインイン",
-          "unavailable": "利用不可",
-          "standby": "待機中 — リレー対象のデバイスがありません"
-        },
-        "MobileRelayBetaAvailability": {
-          "about": "Orca Relay ベータについて",
-          "beta": "ベータ",
-          "availability": "で利用可能",
-          "testFlight": "TestFlight",
-          "androidApk": "Android APK"
-        },
         "SkillUsageExampleDialog": {
           "copiedPrompt": "プロンプトの例をコピーしました。",
           "copyFailed": "プロンプトのコピーに失敗しました。",
@@ -11011,36 +10962,6 @@
             "listLabel": "実行ターゲット",
             "label": "実行先",
             "browse": "実行ターゲットを参照"
-          }
-        }
-      },
-      "mobile": {
-        "MobileHero": {
-          "bb0074ce11": "ペアリング用QRコード",
-          "ca85e595a7": "インターフェースが見つかりません",
-          "79d2f480da": "アドバタイズするネットワークインターフェース",
-          "7af266b80d": "QRコードをインストールする",
-          "relayDegradedNotice": "Relay に接続できませんでした — このコードは LAN または Tailscale でのみ動作します。"
-        },
-        "MobilePage": {
-          "1b4509a8a1": "ペアになった",
-          "c5909374cf": "イントロ"
-        },
-        "MobilePageToolbar": {
-          "a4f8c2d91e": "サイドバーから非表示",
-          "b7e3d1c84a": "サイドバーに表示"
-        },
-        "mobile": {
-          "platform": {
-            "copy": {
-              "2a532d6fd7": "Android カメラでスキャンして、GitHub リリースから最新の APK をダウンロードします。",
-              "432db52b73": "iPhone のカメラでスキャンして App Store を開きます。"
-            }
-          }
-        },
-        "slides": {
-          "WorktreeListSlide": {
-            "c5ad56786d": "スピナー"
           }
         }
       },

@@ -3,6 +3,7 @@ import { PLUGIN_WORKSPACE_TERMINAL_LIMIT } from '../../shared/plugins/plugin-hos
 import type { PluginHostServices } from './plugin-host-methods'
 import { PluginSecretsStore } from './plugin-secrets-store'
 import { PluginKvStore } from './plugin-storage-store'
+import { getRuntimeDesktopSurface } from '../runtime/runtime-desktop-surface'
 import {
   describeAgentSessionPtyWriteRefusal,
   isAgentSessionPtyWriteRefusedError
@@ -25,11 +26,6 @@ export type PluginRuntimeDelegate = {
     handle: string,
     action: { text?: string; enter?: boolean }
   ): Promise<{ accepted: boolean }>
-  dispatchPluginNotification(input: {
-    pluginId: string
-    title: string
-    body?: string
-  }): Promise<{ delivered: boolean }>
 }
 
 export function bindPluginHostServices(input: {
@@ -75,7 +71,18 @@ export function bindPluginHostServices(input: {
         throw error
       }
     },
-    dispatchPluginNotification: (notification) => delegate.dispatchPluginNotification(notification),
+    dispatchPluginNotification: async ({ pluginId, title, body }) => {
+      try {
+        return {
+          delivered: getRuntimeDesktopSurface().showNotification({
+            title: `${pluginId}: ${title}`,
+            body: body ?? ''
+          })
+        }
+      } catch {
+        return { delivered: false }
+      }
+    },
     storage: {
       get: (key, itemKey) => new PluginKvStore(pluginsDataDir, key, 'storage.json').get(itemKey),
       set: (key, itemKey, value) =>

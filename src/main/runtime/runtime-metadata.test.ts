@@ -227,6 +227,7 @@ describe('runtime metadata', () => {
             deviceId: 'device-1',
             name: 'phone',
             token: 'token',
+            scope: 'runtime',
             pairedAt: 1,
             lastSeenAt: 0
           }
@@ -243,7 +244,7 @@ describe('runtime metadata', () => {
 
       expect(new DeviceRegistry(userDataPath).getDevice('device-1')).toMatchObject({
         token: 'token',
-        scope: 'mobile'
+        scope: 'runtime'
       })
       expect(loadOrCreateE2EEKeypair(userDataPath).publicKeyB64).toBe(keyMaterial)
       expect(listEnvironments(userDataPath)[0]?.id).toBe(environment.id)

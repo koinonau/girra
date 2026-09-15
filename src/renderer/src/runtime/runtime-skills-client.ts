@@ -87,9 +87,7 @@ async function assertSkillDeleteSupported(runtimeTarget: RuntimeClientTarget): P
       SKILL_DELETE_UPDATE_REQUIRED_MESSAGE
     )
   } catch (error) {
-    // A capability change racing the gate has no main-process hook to reuse:
-    // `recordSkillCapabilityAbsence` imports the main tracer and its capability
-    // parameter is a closed union over main-side capabilities.
+    // A capability change racing the gate has no renderer tracer to record it.
     console.warn('[skills] delete capability absent at call time', error)
     throw error
   }

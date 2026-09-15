@@ -3,7 +3,6 @@ import { getServeFlagTypoError, getServeOptionValidationError } from './serve-op
 
 const validOptions = {
   noPairing: false,
-  mobilePairing: false,
   recipeJson: false,
   projectRoot: null
 }
@@ -14,14 +13,9 @@ describe('getServeOptionValidationError', () => {
   })
 
   it.each([
-    [{ noPairing: true, mobilePairing: true }, /either --mobile-pairing or --no-pairing/i],
     [
       { recipeJson: true, noPairing: true, projectRoot: '/tmp/repo' },
       /requires runtime pairing.*--no-pairing/i
-    ],
-    [
-      { recipeJson: true, mobilePairing: true, projectRoot: '/tmp/repo' },
-      /requires runtime pairing.*--mobile-pairing/i
     ],
     [{ recipeJson: true }, /requires --project-root/i]
   ])('rejects incompatible options', (override, expected) => {
@@ -45,11 +39,11 @@ describe('getServeFlagTypoError', () => {
     ).toBeNull()
   })
 
-  it.each(['--no-pair', '--no-pairng', '--no-paring', '--mobile-pairng'])(
+  it.each(['--no-pair', '--no-pairng', '--no-paring'])(
     'suggests the intended pairing flag for %s',
     (flag) => {
       expect(getServeFlagTypoError(['/opt/orca/orca-ide', '--serve', flag])).toMatch(
-        /Unknown flag .*Did you mean --(?:no-pairing|mobile-pairing)\?/i
+        /Unknown flag .*Did you mean --no-pairing\?/i
       )
     }
   )

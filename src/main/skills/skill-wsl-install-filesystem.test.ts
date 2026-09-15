@@ -1,14 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { SkillPackageManifestV1 } from '../../shared/skill-package-manifest'
 
 const { runWslProcessMock } = vi.hoisted(() => ({ runWslProcessMock: vi.fn() }))
 
 vi.mock('../wsl/wsl-runner', () => ({ runWslProcess: runWslProcessMock }))
 
-import {
-  createWslSkillInstallFilesystem,
-  WslSkillInstallFilesystem
-} from './skill-wsl-install-filesystem'
+import { WslSkillInstallFilesystem } from './skill-wsl-install-filesystem'
 
 const WSL_ROOT = '\\\\wsl.localhost\\Ubuntu-24.04\\home\\jin\\.agents\\skills'
 
@@ -23,51 +19,6 @@ beforeEach(() => {
 })
 
 describe('WslSkillInstallFilesystem', () => {
-  it('allows the global provider destination inside the selected distro', async () => {
-    const home = '\\\\wsl.localhost\\Ubuntu-24.04\\home\\jin'
-    const filesystem = createWslSkillInstallFilesystem({
-      distro: 'Ubuntu-24.04',
-      homeDirectory: home
-    })
-
-    await filesystem.createAlias(
-      `${home}\\.agents\\skills\\private-skill`,
-      `${home}\\.claude\\skills\\private-skill`
-    )
-
-    expect(runWslProcessMock).toHaveBeenCalledTimes(1)
-  })
-
-  it('applies and verifies manifest modes through bounded guest argv batches', async () => {
-    const filesystem = new WslSkillInstallFilesystem('Ubuntu-24.04', [WSL_ROOT])
-    const manifest = {
-      files: [
-        { path: 'SKILL.md', executable: false },
-        { path: 'scripts/run.sh', executable: true }
-      ]
-    } as SkillPackageManifestV1
-    await filesystem.prepareExtractedSkill(`${WSL_ROOT}\\.orca-skill-extract-1\\skill`, manifest)
-
-    expect(runWslProcessMock).toHaveBeenCalledTimes(2)
-    const calls = runWslProcessMock.mock.calls.map(([spec]) => spec.args as string[])
-    expect(calls[0]).toEqual(
-      expect.arrayContaining([
-        '600',
-        '/home/jin/.agents/skills/.orca-skill-extract-1/skill/SKILL.md',
-        '700',
-        '/home/jin/.agents/skills/.orca-skill-extract-1/skill/scripts/run.sh'
-      ])
-    )
-    expect(calls[1]).toEqual(
-      expect.arrayContaining([
-        '600',
-        '/home/jin/.agents/skills/.orca-skill-extract-1/skill/SKILL.md',
-        '700',
-        '/home/jin/.agents/skills/.orca-skill-extract-1/skill/scripts/run.sh'
-      ])
-    )
-  })
-
   it('maps Windows workspace roots into the selected distro and rejects escapes', async () => {
     const filesystem = new WslSkillInstallFilesystem('Ubuntu-24.04', [
       'C:\\Users\\jin\\repo\\.agents\\skills'
@@ -86,25 +37,6 @@ describe('WslSkillInstallFilesystem', () => {
       'skill-install-wsl-path-outside-root'
     )
     expect(runWslProcessMock).toHaveBeenCalledOnce()
-  })
-
-  it('uses manifest mode provenance for Windows-backed WSL paths', async () => {
-    const filesystem = new WslSkillInstallFilesystem('Ubuntu-24.04', [
-      'C:\\Users\\jin\\repo\\.agents\\skills'
-    ])
-    const manifest = {
-      files: [
-        { path: 'SKILL.md', executable: false },
-        { path: 'scripts/run.sh', executable: true }
-      ]
-    } as SkillPackageManifestV1
-
-    await filesystem.prepareExtractedSkill(
-      'C:\\Users\\jin\\repo\\.agents\\skills\\.orca-skill-extract-1\\skill',
-      manifest
-    )
-
-    expect(runWslProcessMock).not.toHaveBeenCalled()
   })
 
   it('rejects a path from another distro before spawning wsl.exe', async () => {

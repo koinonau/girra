@@ -135,7 +135,6 @@ Wrapper flags:
 Forwarded examples:
   node config/scripts/serve-headless-fresh-profile-pairing.mjs --port 6768
   node config/scripts/serve-headless-fresh-profile-pairing.mjs --pairing-address 100.64.1.20
-  node config/scripts/serve-headless-fresh-profile-pairing.mjs --mobile-pairing
 
 Environment:
   ORCA_HEADLESS_PAIRING_ADDRESS=<host|host:port|ws://...>  Override the auto pairing address.

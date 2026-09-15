@@ -67,9 +67,6 @@ export function getCleanupRequest(
   if (subscription.method === 'accounts.subscribe' && subscription.remoteSubscriptionId) {
     return cleanupBySubscriptionId('accounts.unsubscribe', subscription.remoteSubscriptionId)
   }
-  if (subscription.method === 'notifications.subscribe' && subscription.remoteSubscriptionId) {
-    return cleanupBySubscriptionId('notifications.unsubscribe', subscription.remoteSubscriptionId)
-  }
   if (
     subscription.method === 'runtime.clientEvents.subscribe' &&
     subscription.remoteSubscriptionId

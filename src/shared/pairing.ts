@@ -16,7 +16,7 @@ export const PairingOfferSchema = z.object({
   deviceToken: z.string().min(1).max(PAIRING_DEVICE_TOKEN_MAX_CHARACTERS),
   publicKeyB64: z.string().min(1).max(PAIRING_PUBLIC_KEY_MAX_CHARACTERS),
   pairedDeviceId: z.string().min(1).max(128).optional(),
-  scope: z.enum(['mobile', 'runtime']).optional()
+  scope: z.literal('runtime').optional()
 })
 export type PairingOffer = z.infer<typeof PairingOfferSchema>
 

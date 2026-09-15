@@ -57,6 +57,17 @@ describe('retired Codex account settings', () => {
   })
 })
 
+describe('retired mobile pairing address settings', () => {
+  it('drops the custom address keys so they stop round-tripping', () => {
+    const normalized = normalizeLegacyProfile({
+      mobilePairingCustomAddress: '100.64.1.20:6768',
+      mobilePairingCustomAddresses: ['100.64.1.20:6768']
+    })
+    expect('mobilePairingCustomAddress' in normalized).toBe(false)
+    expect('mobilePairingCustomAddresses' in normalized).toBe(false)
+  })
+})
+
 describe('retired agent ids', () => {
   function normalizeWithSaveFlag(overrides: Record<string, unknown>) {
     const defaults = getDefaultPersistedState(homedir())

@@ -1,12 +1,9 @@
-import { app } from 'electron'
-import { join } from 'node:path'
 import { AgentAwakeService } from '../agent-awake-service'
 import { normalizeComputerAwakeMode } from '../../shared/computer-awake-mode'
 import { registerSystemResumeBroadcast } from '../system-resume-broadcast'
 import { agentHookServer } from '../agent-hooks/server'
 import { installHookStatusSessionTabsRepublish } from '../agent-hooks/hook-status-session-tabs-republish'
 import { initObservability } from '../observability'
-import { recoverPendingSkillTransactions } from '../skills/skill-transaction-startup-recovery'
 import { StatsCollector } from '../stats/collector'
 import { AgentSessionTransitionRecorder } from '../stats/agent-session-transition-recorder'
 import { ClaudeUsageStore } from '../claude-usage/store'
@@ -51,27 +48,6 @@ export function initializeMainProcessObservers(): void {
   // Why: observability must initialize before any IPC handler or runtime span exists so the
   // tracer's sink is ready for the first span. It applies its own consent and CI gates.
   initObservability()
-  state.skillTransactionRecovery = recoverPendingSkillTransactions(
-    join(app.getPath('userData'), 'skill-installs')
-  )
-  void state.skillTransactionRecovery
-    .then((report) => {
-      const result = report as {
-        scanned: number
-        recovered: number
-        failures: { code: string }[]
-        truncated: boolean
-      }
-      if (result.scanned || result.failures.length || result.truncated) {
-        console.info('[skills] startup transaction recovery:', {
-          scanned: result.scanned,
-          recovered: result.recovered,
-          failures: result.failures.map((failure) => failure.code),
-          truncated: result.truncated
-        })
-      }
-    })
-    .catch((error) => console.warn('[skills] startup transaction recovery failed:', error))
   state.stats = new StatsCollector()
   // Agent-session stats come from hook status transitions, the same truth the
   // sidebar and dashboard read — never from OSC terminal titles, which miss

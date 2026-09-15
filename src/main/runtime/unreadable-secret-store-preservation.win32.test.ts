@@ -134,7 +134,7 @@ describeOnWindows('a secure store that exists but cannot be read', () => {
         deviceId: 'device-1',
         name: 'Phone',
         token: 'bearer-token-that-must-survive',
-        scope: 'mobile',
+        scope: 'runtime',
         pairedAt: 1,
         lastSeenAt: 2
       }
@@ -144,7 +144,7 @@ describeOnWindows('a secure store that exists but cannot be read', () => {
 
     const registry = new DeviceRegistry(dir)
     // Any mutator reaches save(); it must refuse rather than write the empty list it loaded.
-    expect(() => registry.addDevice('Another phone', 'mobile')).toThrow(
+    expect(() => registry.addDevice('Another phone', 'runtime')).toThrow(
       /Refusing to (regenerate|overwrite)/
     )
 

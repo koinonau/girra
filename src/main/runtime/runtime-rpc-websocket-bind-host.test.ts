@@ -67,7 +67,7 @@ describe('OrcaRuntimeRpcServer WebSocket bind host (STA-2370)', () => {
       expect(wsTransportOf(server)?.resolvedHost).toBe('127.0.0.1')
 
       await server.ensureNetworkExposure()
-      const offer = server.createPairingOffer({ address: '100.64.1.20', scope: 'mobile' })
+      const offer = server.createPairingOffer({ address: '100.64.1.20', scope: 'runtime' })
       expect(offer.available).toBe(true)
 
       expect(wsTransportOf(server)?.resolvedHost).toBe('0.0.0.0')
@@ -103,7 +103,7 @@ describe('OrcaRuntimeRpcServer WebSocket bind host (STA-2370)', () => {
     // Why: a device that has actually connected (lastSeenAt > 0) may reconnect, so the listener must be
     // reachable at startup without waiting for a new pairing action.
     const registry = new DeviceRegistry(userDataPath)
-    const device = registry.getOrCreatePendingDevice('Paired phone', 'mobile')
+    const device = registry.getOrCreatePendingDevice('Paired phone', 'runtime')
     registry.updateLastSeen(device.deviceId)
 
     const server = new OrcaRuntimeRpcServer({
@@ -133,7 +133,7 @@ describe('OrcaRuntimeRpcServer WebSocket bind host (STA-2370)', () => {
     // the listener must stay loopback — this distinguishes the reconnect widen from a blanket any-device
     // widen (a revert to listDevices().length > 0 would wrongly expose the LAN here).
     const registry = new DeviceRegistry(userDataPath)
-    registry.getOrCreatePendingDevice('Pending phone', 'mobile')
+    registry.getOrCreatePendingDevice('Pending phone', 'runtime')
 
     const server = new OrcaRuntimeRpcServer({
       runtime: new OrcaRuntimeService(),
@@ -189,7 +189,7 @@ describe('OrcaRuntimeRpcServer WebSocket bind host (STA-2370)', () => {
       deviceId: 'legacy-device',
       name: 'Legacy phone',
       token: 'legacy-token',
-      scope: 'mobile',
+      scope: 'runtime',
       pairedAt: Date.now(),
       lastSeenAt: Date.now()
     }
@@ -316,7 +316,7 @@ describe('OrcaRuntimeRpcServer WebSocket bind host (STA-2370)', () => {
       expect(wsTransportOf(server)?.resolvedHost).toBe('127.0.0.1')
 
       await server.ensureNetworkExposure()
-      const offer = server.createPairingOffer({ address: '100.64.1.20', scope: 'mobile' })
+      const offer = server.createPairingOffer({ address: '100.64.1.20', scope: 'runtime' })
       expect(offer.available).toBe(true)
       expect(wsTransportOf(server)?.resolvedHost).toBe('0.0.0.0')
 
@@ -438,7 +438,7 @@ describe('OrcaRuntimeRpcServer WebSocket bind host (STA-2370)', () => {
       })
 
       await server.ensureNetworkExposure()
-      const offer = server.createPairingOffer({ address: '100.64.1.20', scope: 'mobile' })
+      const offer = server.createPairingOffer({ address: '100.64.1.20', scope: 'runtime' })
       expect(injected).toBe(true)
       // Why: only metadata persistence failed; the wide bind succeeded, so pairing is available and the wide
       // listener is tracked (not orphaned) — bound to all interfaces, exactly one WebSocket transport.

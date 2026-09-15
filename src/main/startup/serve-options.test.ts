@@ -11,7 +11,6 @@ describe('getServeOptions', () => {
       wsPort: 6768,
       pairingAddress: null,
       noPairing: true,
-      mobilePairing: false,
       recipeJson: false,
       projectRoot: null
     })
@@ -75,10 +74,6 @@ describe('getServeOptions', () => {
       getServeOptions(['/AppRun', '--serve', '--no-pairing=false', '--serve-no-pairing']).noPairing
     ).toBe(true)
     expect(
-      getServeOptions(['/AppRun', '--serve', '--serve-mobile-pairing', '--mobile-pairing=0'])
-        .mobilePairing
-    ).toBe(false)
-    expect(
       getServeOptions(['/AppRun', '--serve', '--serve-recipe-json', '--recipe-json=false'])
         .recipeJson
     ).toBe(false)
@@ -97,10 +92,12 @@ describe('getServeOptions', () => {
     const argv = normalizeServeModeArgv([
       '/opt/orca/orca-ide',
       'serve',
-      '--no-pairing',
-      '--mobile-pairing'
+      '--recipe-json',
+      '--project-root',
+      '/tmp/repo',
+      '--no-pairing'
     ])
-    expect(() => getServeOptions(argv)).toThrow(/either --mobile-pairing or --no-pairing/i)
+    expect(() => getServeOptions(argv)).toThrow(/requires runtime pairing.*--no-pairing/i)
   })
 
   it('rejects recipe JSON without runtime pairing and a project root', () => {
@@ -141,7 +138,6 @@ describe('getServeOptions', () => {
       json: false,
       pairingAddress: null,
       noPairing: false,
-      mobilePairing: false,
       recipeJson: false,
       projectRoot: null
     })

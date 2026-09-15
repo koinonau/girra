@@ -1,6 +1,4 @@
-// Why: pure compat evaluators shared between desktop tests, renderer runtime
-// switching, and the mobile mirror. All version numbers are passed in to keep
-// the logic dependency-free and easy to duplicate in Expo.
+// Why: pure compat evaluators shared by the main process, renderer and CLI; version numbers are passed in.
 
 export type RuntimeCompatVerdict =
   | {
@@ -61,49 +59,4 @@ export function describeRuntimeCompatBlock(verdict: RuntimeCompatVerdict): strin
     return `This Orca client is too old for the selected server. Update Orca on this machine. Client protocol ${verdict.clientProtocolVersion}, server requires client protocol ${verdict.requiredClientProtocolVersion}.`
   }
   return `The selected Orca server is too old for this client. Update Orca on the server. Server protocol ${verdict.serverProtocolVersion}, client requires server protocol ${verdict.requiredServerProtocolVersion}.`
-}
-
-export type CompatVerdict =
-  | { kind: 'ok' }
-  | {
-      kind: 'blocked'
-      reason: 'mobile-too-old' | 'desktop-too-old'
-      desktopVersion: number
-      requiredMobileVersion?: number
-      requiredDesktopVersion?: number
-    }
-
-export function evaluateCompat(input: {
-  mobileProtocolVersion: number
-  minCompatibleDesktopVersion: number
-  desktopProtocolVersion: number | undefined
-  desktopMinCompatibleMobileVersion: number | undefined
-}): CompatVerdict {
-  // Why: absent fields → 0 lets mobile keep talking to pre-PR desktops.
-  // Bumping minCompatibleDesktopVersion above 0 will fence those older
-  // desktops alongside any explicitly-version-0 desktop, which is the
-  // intended kill-switch behavior.
-  const desktopVersion = input.desktopProtocolVersion ?? 0
-  const requiredMobile = input.desktopMinCompatibleMobileVersion ?? 0
-
-  // Why: mobile-too-old precedence — if desktop says "I refuse this
-  // mobile build" (kill switch), that wins over any local mobile
-  // judgment about desktop's age.
-  if (input.mobileProtocolVersion < requiredMobile) {
-    return {
-      kind: 'blocked',
-      reason: 'mobile-too-old',
-      desktopVersion,
-      requiredMobileVersion: requiredMobile
-    }
-  }
-  if (desktopVersion < input.minCompatibleDesktopVersion) {
-    return {
-      kind: 'blocked',
-      reason: 'desktop-too-old',
-      desktopVersion,
-      requiredDesktopVersion: input.minCompatibleDesktopVersion
-    }
-  }
-  return { kind: 'ok' }
 }

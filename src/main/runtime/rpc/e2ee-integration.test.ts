@@ -46,7 +46,7 @@ describe('E2EE integration (simulated mobile ↔ desktop)', () => {
       serverSecretKey: serverKeys.secretKey,
       resolveAuthenticatedDevice: (token) =>
         token === 'device-abc'
-          ? { deviceId: 'device-abc', deviceToken: token, scope: 'mobile' }
+          ? { deviceId: 'device-abc', deviceToken: token, scope: 'runtime' }
           : null,
       onReady,
       onError
@@ -123,7 +123,7 @@ describe('E2EE integration (simulated mobile ↔ desktop)', () => {
       serverSecretKey: serverKeys.secretKey,
       resolveAuthenticatedDevice: (token) =>
         token === 'device-abc'
-          ? { deviceId: 'device-abc', deviceToken: token, scope: 'mobile' }
+          ? { deviceId: 'device-abc', deviceToken: token, scope: 'runtime' }
           : null,
       onReady,
       onError

@@ -18,11 +18,7 @@ import { installRuntimeGitCommandSurface } from './runtime-git-command-surface'
 import { installRuntimeRepositoryCommandSurface } from './runtime-repository-command-surface'
 import { installRuntimeReviewCommandSurface } from './runtime-review-command-surface'
 import { installRuntimeServiceCommandSurface } from './runtime-service-command-surface'
-import {
-  RuntimeSkillCommands,
-  installRuntimeSkillCommandSurface
-} from './runtime-skill-command-surface'
-import { getAppEnvironment } from '../../shared/app-environment'
+import { resolveSkillDiscoveryProviderRoots } from './runtime-skill-discovery-provider-roots'
 import { RuntimeClientSettingsController } from './runtime-client-settings'
 import { RuntimeAutomationController } from './runtime-automation-controller'
 import { RuntimeOrchestrationFederation } from './runtime-orchestration-federation'
@@ -71,7 +67,6 @@ export class OrcaRuntimeWithStateFields extends OrcaRuntimeWithLinearCommands {
       buildAgentHookPtyEnv?: () => Record<string, string>
       getDesktopWindowStatus?: () => RuntimeDesktopWindowStatus
       agentSessionClaimSigner?: AgentSessionClaimSigner
-      skillTransactionRecovery?: Promise<unknown>
       orchestrationEnvironmentTransport?: OrchestrationEnvironmentTransport
     }
   ) {
@@ -113,37 +108,14 @@ export class OrcaRuntimeWithStateFields extends OrcaRuntimeWithLinearCommands {
       clientEvents: this.clientEvents,
       nativeChatDraftResolutions: this.nativeChatDraftResolutions,
       subscriptions: this.subscriptions,
-      mobileNotifications: this.mobileNotifications,
       accounts: this.accounts,
       browserDrivers: this.browserDrivers,
       messageWaiters: this.messageWaiters
     })
-    this.skillCommands = new RuntimeSkillCommands({
-      getRuntimeId: () => this.runtimeId,
-      getUserDataPath: () => getAppEnvironment().getPath('userData'),
-      isPackaged: () => getAppEnvironment().isPackaged(),
-      getSettings: () => this.store?.getSettings?.() ?? {},
-      listRepos: () => this.listRepos(),
-      listFolderWorkspaces: () =>
-        (this.store?.getFolderWorkspaces?.() ?? []).map((workspace) => ({
-          id: workspace.id,
-          folderPath: workspace.folderPath,
-          connectionId: workspace.connectionId,
-          executionHostId: workspace.executionHostId
-        })),
-      listResolvedWorktrees: () => this.listResolvedWorktrees(),
-      showManagedWorktree: (selector) => this.showManagedWorktree(selector),
-      resolveProjectRuntimeForWorktree: (worktreeId) =>
-        this.resolveProjectRuntimeForWorktree(worktreeId),
-      getSshProvider: (connectionId) => this.getSshProviderFn?.(connectionId),
-      getClaudeConfigDirectory: (target) => this.accounts.getClaudeConfigDirectory(target),
-      skillTransactionRecovery: (deps?.skillTransactionRecovery ?? Promise.resolve()).catch(
-        (error) => {
-          console.warn('[skills] startup transaction recovery failed:', error)
-        }
+    runtime.resolveSkillDiscoveryProviderRoots = (target) =>
+      resolveSkillDiscoveryProviderRoots(target, (config) =>
+        this.accounts.getClaudeConfigDirectory(config)
       )
-    })
-    installRuntimeSkillCommandSurface(runtime, this.skillCommands)
     Object.assign(this, this.edgeCommands.surface)
     // Why: keep cache-boundary test seams live while the fetch owner holds the mutable maps.
     void this.canonicalFetchKeyCache

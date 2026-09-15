@@ -99,7 +99,6 @@ const EXPECTED_DIRECT_CALLBACK_METHODS = [
 ] as const
 
 const EXPECTED_CALLBACK_REGISTRATION_SEQUENCE = [
-  'ui.onMobileMarkdownRequest',
   'automations.onChanged',
   'runtimeEnvironments.onStatusChanged',
   'repos.onChanged',
@@ -348,10 +347,7 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
     const firstCleanup = installAppLifetimeIpcEvents(recordCleanupPhase)
     await Promise.resolve()
     await Promise.resolve()
-    const directCallbackMethods = [...listeners.keys()]
-      .filter((method) => method !== 'ui.onMobileMarkdownRequest')
-      .sort()
-    expect(directCallbackMethods).toEqual(EXPECTED_DIRECT_CALLBACK_METHODS)
+    expect([...listeners.keys()].sort()).toEqual(EXPECTED_DIRECT_CALLBACK_METHODS)
     expect([...listeners.keys()].sort()).toEqual(
       [...EXPECTED_CALLBACK_REGISTRATION_SEQUENCE].sort()
     )
@@ -364,11 +360,10 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
           )
       )
     ).toEqual([
-      'ui.onMobileMarkdownRequest',
       'automations.onChanged',
       'runtimeEnvironments.onStatusChanged',
       'runtimeEnvironments.subscribe',
-      ...EXPECTED_CALLBACK_REGISTRATION_SEQUENCE.slice(3)
+      ...EXPECTED_CALLBACK_REGISTRATION_SEQUENCE.slice(2)
     ])
     const groupOrder = (names: readonly string[]): string[] =>
       registrationOrder.filter((entry) => names.includes(entry))
@@ -443,7 +438,7 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
       'agentStore.unsubscribe'
     ])
     expect(cleanupOrder.indexOf('runtimeEnvironment.unsubscribe')).toBeGreaterThan(
-      cleanupOrder.indexOf('ipc.ui.onMobileMarkdownRequest')
+      cleanupOrder.indexOf('ipc.runtimeEnvironments.onStatusChanged')
     )
     expect(cleanupOrder.indexOf('runtimeEnvironment.unsubscribe')).toBeLessThan(
       cleanupOrder.indexOf('ipc.repos.onChanged')

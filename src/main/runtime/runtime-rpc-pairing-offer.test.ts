@@ -1,9 +1,10 @@
-import { mkdirSync, mkdtempSync } from 'node:fs'
+import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { describe, expect, it, vi } from 'vitest'
 import { OrcaRuntimeService } from './orca-runtime'
 import { OrcaRuntimeRpcServer } from './runtime-rpc'
+import { DeviceRegistry } from './device-registry'
 import { parsePairingCode } from '../../shared/pairing'
 import { DEVICE_REGISTRY_FILENAME, E2EE_KEYPAIR_FILENAME } from './mobile-pairing-files'
 
@@ -241,37 +242,24 @@ describe('OrcaRuntimeRpcServer', () => {
     }
   })
 
-  it('creates mobile-scoped pairing offers for headless mobile pairing', async () => {
+  it('drops mobile-scope and scopeless devices when the registry loads', () => {
     const userDataPath = mkdtempSync(join(tmpdir(), 'orca-runtime-rpc-'))
-    const runtime = new OrcaRuntimeService()
-    const server = new OrcaRuntimeRpcServer({
-      runtime,
-      userDataPath,
-      enableWebSocket: true,
-      wsPort: 0,
-      webClientRoot: userDataPath
+    const device = (deviceId: string, scope?: string) => ({
+      deviceId,
+      name: deviceId,
+      token: `${deviceId}-token`,
+      ...(scope ? { scope } : {}),
+      pairedAt: 1,
+      lastSeenAt: 2
     })
+    writeFileSync(
+      join(userDataPath, DEVICE_REGISTRY_FILENAME),
+      JSON.stringify([device('phone', 'mobile'), device('legacy'), device('browser', 'runtime')])
+    )
 
-    await server.start()
+    const registry = new DeviceRegistry(userDataPath)
 
-    try {
-      const offer = server.createPairingOffer({
-        address: '100.64.1.20',
-        name: 'Mobile test',
-        scope: 'mobile'
-      })
-      expect(offer.available).toBe(true)
-      if (!offer.available) {
-        throw new Error('WebSocket pairing unavailable')
-      }
-
-      expect(server.getDeviceRegistry()?.getDevice(offer.deviceId)?.scope).toBe('mobile')
-      expect(offer.webClientUrl).toBeNull()
-      const parsed = parsePairingCode(offer.pairingUrl)
-      expect(parsed?.endpoint).toBe(offer.endpoint)
-      expect(parsed?.endpoint).toContain('100.64.1.20')
-    } finally {
-      await server.stop()
-    }
+    expect(registry.listDevices().map((entry) => entry.deviceId)).toEqual(['browser'])
+    expect(registry.validateToken('phone-token')).toBeNull()
   })
 })

@@ -26,10 +26,6 @@ import { applyPRBotAuthorOverride } from '../../shared/pr-bot-author-overrides'
 import { resolveEnvironment } from '../../shared/runtime-environment-store'
 import { haveSameDisabledTuiAgents } from '../../shared/tui-agent-selection'
 import {
-  normalizeMobilePairingCustomAddress,
-  normalizeMobilePairingCustomAddresses
-} from '../../shared/mobile-pairing-custom-address'
-import {
   computerAwakeSettingsForMode,
   normalizeComputerAwakeMode
 } from '../../shared/computer-awake-mode'
@@ -164,16 +160,6 @@ export function registerSettingsHandlers(
     }
     if ('uiLanguage' in args) {
       sanitizedArgs.uiLanguage = normalizeUiLanguage(args.uiLanguage)
-    }
-    if ('mobilePairingCustomAddress' in args) {
-      sanitizedArgs.mobilePairingCustomAddress = normalizeMobilePairingCustomAddress(
-        args.mobilePairingCustomAddress
-      )
-    }
-    if ('mobilePairingCustomAddresses' in args) {
-      sanitizedArgs.mobilePairingCustomAddresses = normalizeMobilePairingCustomAddresses(
-        args.mobilePairingCustomAddresses
-      )
     }
     if (args.theme) {
       nativeTheme.themeSource = args.theme
