@@ -174,8 +174,8 @@ async function hostSupportsCreate(intent: StructuredAgentSessionLaunchIntent): P
 /**
  * Only the host that will execute the session can answer whether it supports creating one there —
  * on Windows that means reading the provider child's process start time, which a client cannot
- * observe. Both providers ask: the host classifies per agent, and Codex inherits the
- * unresolvable-selector retry above along with the probe.
+ * observe. The host classifies per agent, and every agent inherits the unresolvable-selector
+ * retry above along with the probe.
  */
 async function requireHostCreateSupport(intent: StructuredAgentSessionLaunchIntent): Promise<void> {
   if (!(await hostSupportsCreate(intent))) {

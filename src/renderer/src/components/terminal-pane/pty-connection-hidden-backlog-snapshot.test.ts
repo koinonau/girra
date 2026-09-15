@@ -742,7 +742,7 @@ describe('connectPanePty', () => {
       pendingDeliveryStartSeq: number
     }>()
     getMainBufferSnapshot.mockReturnValue(snapshot.promise)
-    const hidden = 'hidden-codex-output\r\n'
+    const hidden = 'hidden-opencode-output\r\n'
     const coveredLive = 'LIVE_DUP_LINE\r\n'
     const afterAbandon = 'AFTER_ABANDON\r\n'
 
@@ -750,7 +750,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       isVisibleRef: { current: false },
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const disposable = connectPanePty(pane as never, manager as never, deps as never)
     await flushAsyncTicks(6)

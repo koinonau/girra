@@ -70,7 +70,7 @@ type TestStore = ReturnType<typeof createTestStore>
 type PaneSpec = {
   hostTabId: string
   leafId: string
-  agentType: 'claude' | 'omp'
+  agentType: 'claude' | 'pi'
   /** Which writer publishes this pane's agent status. */
   statusSource: 'host-hook' | 'client-bytes'
   /** Host-resolved surface title. */
@@ -82,7 +82,7 @@ function leafUuid(n: number): string {
 }
 
 /**
- * Six OMP/Claude panes matching the report. Host-hook panes model an agent the
+ * Six Pi/Claude panes matching the report's mix. Host-hook panes model an agent the
  * host tracks itself; client-bytes panes model the OSC-only panes whose status
  * only this renderer ever parses (the host publishes no agentStatus for them).
  */
@@ -90,28 +90,28 @@ const PANES: PaneSpec[] = [
   {
     hostTabId: 'host-tab-1',
     leafId: leafUuid(1),
-    agentType: 'omp',
+    agentType: 'pi',
     statusSource: 'host-hook',
-    title: 'OMP'
+    title: 'Pi'
   },
   {
     hostTabId: 'host-tab-2',
     leafId: leafUuid(2),
-    agentType: 'omp',
+    agentType: 'pi',
     statusSource: 'host-hook',
-    title: 'OMP'
+    title: 'Pi'
   },
   {
     hostTabId: 'host-tab-3',
     leafId: leafUuid(3),
-    agentType: 'omp',
+    agentType: 'pi',
     statusSource: 'client-bytes',
     title: 'Terminal'
   },
   {
     hostTabId: 'host-tab-4',
     leafId: leafUuid(4),
-    agentType: 'omp',
+    agentType: 'pi',
     statusSource: 'client-bytes',
     title: 'Terminal'
   },

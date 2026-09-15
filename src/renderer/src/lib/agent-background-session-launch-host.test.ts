@@ -72,7 +72,7 @@ describe('resolveAgentBackgroundLaunchHost', () => {
   })
 
   // Why two hosts: a single-SSH fixture passes even when the route is read off another host's
-  // row, which is the shape of the `ssh:m4air` -> openclaw leak.
+  // row, which is the shape of the `ssh:m4air` -> devbox leak.
   it('routes both spellings of SSH ownership to their own host', () => {
     const legacy = resolveAgentBackgroundLaunchHost({
       store: makeFolderHostState({ connectionId: null, folderPath: '/project' }) as never,
@@ -92,7 +92,7 @@ describe('resolveAgentBackgroundLaunchHost', () => {
       repo: {
         id: 'repo-1',
         connectionId: null,
-        executionHostId: 'ssh:openclaw',
+        executionHostId: 'ssh:devbox',
         path: '/srv/repo'
       } as never
     })
@@ -103,9 +103,9 @@ describe('resolveAgentBackgroundLaunchHost', () => {
       expectedConnectionId: 'm4air'
     })
     expect(unified).toMatchObject({
-      connectionId: 'openclaw',
+      connectionId: 'devbox',
       isRemote: true,
-      expectedConnectionId: 'openclaw'
+      expectedConnectionId: 'devbox'
     })
   })
 

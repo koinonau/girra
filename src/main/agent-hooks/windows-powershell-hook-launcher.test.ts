@@ -51,7 +51,7 @@ describe('windows PowerShell hook launcher', () => {
   })
 
   it('keeps the execution-policy bypass, in the payload where AV cannot read it', () => {
-    // Why it must survive somewhere: Copilot's managed hook is a .ps1, which a
+    // Why it must survive somewhere: a managed .ps1 hook is what a
     // Restricted or AllSigned machine policy refuses to run without a bypass.
     // Process scope is exactly what the switch used to set.
     expect(decodePayload(wrapWindowsPowerShellEncodedCommand('exit 0'))).toContain(

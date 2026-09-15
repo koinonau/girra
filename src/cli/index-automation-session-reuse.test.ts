@@ -86,7 +86,7 @@ describe('orca cli worktree awareness', () => {
         '--prompt',
         'Review open changes',
         '--provider',
-        'codex',
+        'claude',
         '--workspace',
         'current',
         '--reuse-session',

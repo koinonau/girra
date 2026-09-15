@@ -6,14 +6,19 @@ describe('admitProviderReattachLaunchIdentity', () => {
     expect(
       admitProviderReattachLaunchIdentity({
         isReattach: true,
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         incarnationId: 'provider-incarnation'
       })
-    ).toEqual({ launchAgent: 'codex', incarnationId: 'provider-incarnation' })
+    ).toEqual({ launchAgent: 'claude', incarnationId: 'provider-incarnation' })
   })
 
   it.each([
-    { label: 'fresh spawn', isReattach: false, launchAgent: 'codex', incarnationId: 'incarnation' },
+    {
+      label: 'fresh spawn',
+      isReattach: false,
+      launchAgent: 'claude',
+      incarnationId: 'incarnation'
+    },
     {
       label: 'invalid agent',
       isReattach: true,
@@ -23,13 +28,13 @@ describe('admitProviderReattachLaunchIdentity', () => {
     {
       label: 'missing incarnation',
       isReattach: true,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       incarnationId: undefined
     },
     {
       label: 'oversized incarnation',
       isReattach: true,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       incarnationId: 'x'.repeat(129)
     }
   ])('rejects $label metadata', ({ isReattach, launchAgent, incarnationId }) => {

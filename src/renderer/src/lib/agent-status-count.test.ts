@@ -61,7 +61,7 @@ describe('countWorkingAgents', () => {
             makeTab({ id: 'tab-1', title: '⠂ Claude Code' }),
             makeTab({ id: 'tab-2', title: '⠋ OpenCode' })
           ],
-          'wt-2': [makeTab({ id: 'tab-3', worktreeId: 'wt-2', title: '⠋ Codex is thinking' })]
+          'wt-2': [makeTab({ id: 'tab-3', worktreeId: 'wt-2', title: '⠋ OpenCode is thinking' })]
         },
         runtimePaneTitlesByTabId: {},
         ptyIdsByTabId: livePtyMap('tab-1', 'tab-2', 'tab-3'),

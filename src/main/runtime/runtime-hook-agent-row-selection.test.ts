@@ -21,7 +21,7 @@ function row(overrides: Partial<AgentStatusIpcPayload> = {}): AgentStatusIpcPayl
     terminalHandle: HANDLE,
     state: 'working',
     prompt: 'ship it',
-    agentType: 'codex',
+    agentType: 'claude',
     receivedAt: now,
     stateStartedAt: now - 500,
     ...overrides

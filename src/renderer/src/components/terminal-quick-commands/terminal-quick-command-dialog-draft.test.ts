@@ -38,7 +38,7 @@ describe('terminal quick command dialog draft transitions', () => {
       id: 'qc-1',
       label: 'Review',
       action: 'agent-prompt',
-      agent: 'codex',
+      agent: 'opencode',
       prompt: 'Review the diff',
       scope: { type: 'repo', repoId: 'repo-1' }
     }
@@ -73,7 +73,7 @@ describe('terminal quick command dialog draft transitions', () => {
     const editedAgent: TerminalQuickCommand = {
       ...toAgent.draft,
       action: 'agent-prompt',
-      agent: 'codex',
+      agent: 'opencode',
       prompt: 'Investigate failures'
     }
     const backToTerminal = switchTerminalQuickCommandDialogAction(
@@ -100,7 +100,7 @@ describe('terminal quick command dialog draft transitions', () => {
     })
     expect(backToAgent.draft).toMatchObject({
       action: 'agent-prompt',
-      agent: 'codex',
+      agent: 'opencode',
       prompt: 'Investigate failures'
     })
 

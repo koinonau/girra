@@ -37,18 +37,14 @@ type TerminalIdentity = Pick<
 const PROVIDER_SESSION_ID = '019fc155-00e1-7102-99a9-e7c72e532a8e'
 
 const fakeCliDir = mkdtempSync(path.join(os.tmpdir(), 'orca-live-mount-cli-'))
-const spawnLedgerPath = path.join(fakeCliDir, 'codex-spawn.jsonl')
+const spawnLedgerPath = path.join(fakeCliDir, 'claude-spawn.jsonl')
 const setupLedgerPath = path.join(fakeCliDir, 'setup-spawn.jsonl')
 const canaryLedgerPath = path.join(fakeCliDir, 'canary-spawn.jsonl')
 const signalLedgerPath = path.join(fakeCliDir, 'terminal-signals.jsonl')
-const fakeCodexSource = `
+const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
 const args = process.argv.slice(2)
-if (args.includes('app-server')) {
-  process.stderr.write("error: unrecognized subcommand 'app-server'\\n")
-  process.exit(2)
-}
-appendFileSync(process.env.ORCA_E2E_CODEX_SPAWN_LEDGER, JSON.stringify({ args, pid: process.pid }) + '\\n')
+appendFileSync(process.env.ORCA_E2E_CLAUDE_SPAWN_LEDGER, JSON.stringify({ args, pid: process.pid }) + '\\n')
 process.stdout.write('LIVE_AGENT_READY:' + process.pid + '\\n')
 let inputBuffer = ''
 process.stdin.on('data', (chunk) => {
@@ -63,26 +59,26 @@ setInterval(() => {}, 60_000)
 `
 
 if (process.platform === 'win32') {
-  writeFileSync(path.join(fakeCliDir, 'fake-codex.js'), fakeCodexSource)
+  writeFileSync(path.join(fakeCliDir, 'fake-claude.js'), fakeClaudeSource)
   writeFileSync(
-    path.join(fakeCliDir, 'codex.cmd'),
-    '@echo off\r\nnode "%~dp0\\fake-codex.js" %*\r\n'
+    path.join(fakeCliDir, 'claude.cmd'),
+    '@echo off\r\nnode "%~dp0\\fake-claude.js" %*\r\n'
   )
 } else {
-  const executable = path.join(fakeCliDir, 'codex')
-  writeFileSync(executable, `#!/usr/bin/env node\n${fakeCodexSource}`)
+  const executable = path.join(fakeCliDir, 'claude')
+  writeFileSync(executable, `#!/usr/bin/env node\n${fakeClaudeSource}`)
   chmodSync(executable, 0o755)
 }
 
-const fakeCodexCommand = buildFakeAgentCommandOverride(
-  path.join(fakeCliDir, process.platform === 'win32' ? 'codex.cmd' : 'codex')
+const fakeClaudeCommand = buildFakeAgentCommandOverride(
+  path.join(fakeCliDir, process.platform === 'win32' ? 'claude.cmd' : 'claude')
 )
 
 const test = base.extend({
   launchEnv: [
     {
       PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`,
-      ORCA_E2E_CODEX_SPAWN_LEDGER: spawnLedgerPath,
+      ORCA_E2E_CLAUDE_SPAWN_LEDGER: spawnLedgerPath,
       ORCA_E2E_SETUP_LEDGER: setupLedgerPath,
       ORCA_E2E_CANARY_LEDGER: canaryLedgerPath,
       ORCA_E2E_SIGNAL_LEDGER: signalLedgerPath
@@ -197,12 +193,12 @@ async function seedAgentRecoveryMetadata(
       state.registerAgentLaunchConfig(
         paneKey,
         {
-          agentCommand: 'codex',
-          agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+          agentCommand: 'claude',
+          agentArgs: '--dangerously-skip-permissions',
           agentEnv: {}
         },
         {
-          agentType: 'codex',
+          agentType: 'claude',
           launchToken,
           tabId: agent.tabId,
           leafId: agent.leafId,
@@ -212,8 +208,8 @@ async function seedAgentRecoveryMetadata(
       )
       state.setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'keep running', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'keep running', agentType: 'claude' },
+        'Claude',
         undefined,
         { tabId: agent.tabId, worktreeId, terminalHandle: agent.handle },
         { providerSession, launchToken }
@@ -254,7 +250,7 @@ async function seedAgentRecoveryMetadata(
         worktreeId,
         origin: 'live',
         providerSessionId: PROVIDER_SESSION_ID,
-        agentCommand: 'codex'
+        agentCommand: 'claude'
       },
       expected: { paneKey, providerSessionId: PROVIDER_SESSION_ID, worktreeId }
     })
@@ -555,7 +551,7 @@ test('adopts runtime-owned agent and Setup PTYs on first mount', async ({
             hookSettings: { ...repo.hookSettings, setupAgentStartupPolicy: 'start-immediately' }
           })
           await window.__store?.getState().updateSettings({
-            agentCmdOverrides: { codex: command },
+            agentCmdOverrides: { claude: command },
             terminalWindowsShell: windowsShell,
             disabledTuiAgents: [],
             setupScriptLaunchMode: 'new-tab',
@@ -563,7 +559,7 @@ test('adopts runtime-owned agent and Setup PTYs on first mount', async ({
           })
           return true
         },
-        { repoId, command: fakeCodexCommand, windowsShell: FAKE_AGENT_WINDOWS_SHELL }
+        { repoId, command: fakeClaudeCommand, windowsShell: FAKE_AGENT_WINDOWS_SHELL }
       )
     )
     .toBe(true)
@@ -574,7 +570,7 @@ test('adopts runtime-owned agent and Setup PTYs on first mount', async ({
     noParent: true,
     activate: false,
     setupDecision: 'run',
-    startupAgent: 'codex',
+    startupAgent: 'claude',
     startupPrompt: 'keep running'
   })
   const worktreeId = created.result.worktree.id

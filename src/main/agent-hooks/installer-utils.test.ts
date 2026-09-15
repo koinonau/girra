@@ -22,7 +22,6 @@ import {
   hookDefinitionHasManagedCommand,
   removeManagedCommands,
   wrapPosixHookCommand,
-  wrapWindowsCmdHookCommand,
   readHooksJsonWithRaw,
   wrapWindowsHookCommand,
   writeManagedScript,
@@ -255,7 +254,7 @@ describe('createManagedCommandMatcher', () => {
   })
 
   it('does not match hooks for a different agent', () => {
-    expect(match('/bin/sh "/path/agent-hooks/codex-hook.sh"')).toBe(false)
+    expect(match('/bin/sh "/path/agent-hooks/pi-hook.sh"')).toBe(false)
   })
 
   it('matches the guarded launcher form so wrapped commands sweep correctly', () => {
@@ -284,14 +283,14 @@ describe('createManagedCommandMatcher', () => {
   })
 
   it('matches PowerShell and POSIX variants across platform switches', () => {
-    const matchPosix = createManagedCommandMatcher('codex-hook.sh')
-    const matchPowerShell = createManagedCommandMatcher('codex-hook.ps1')
+    const matchPosix = createManagedCommandMatcher('claude-hook.sh')
+    const matchPowerShell = createManagedCommandMatcher('claude-hook.ps1')
 
-    expect(matchPosix("& 'C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.ps1'")).toBe(true)
+    expect(matchPosix("& 'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.ps1'")).toBe(true)
     expect(
-      matchPosix(wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.ps1'))
+      matchPosix(wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.ps1'))
     ).toBe(true)
-    expect(matchPowerShell("/bin/sh '/home/alice/.orca/agent-hooks/codex-hook.sh'")).toBe(true)
+    expect(matchPowerShell("/bin/sh '/home/alice/.orca/agent-hooks/claude-hook.sh'")).toBe(true)
   })
 
   it('matches the legacy per-userData script path AND the new shared ~/.orca path', () => {
@@ -305,19 +304,19 @@ describe('createManagedCommandMatcher', () => {
 })
 
 describe('removeManagedCommands', () => {
-  const match = createManagedCommandMatcher('codex-hook.sh')
+  const match = createManagedCommandMatcher('claude-hook.sh')
 
   it('removes managed direct bash/powershell/command fields', () => {
     const cleaned = removeManagedCommands(
       [
         {
           type: 'command',
-          bash: '/bin/sh "/Users/alice/Orca/agent-hooks/codex-hook.sh"',
+          bash: '/bin/sh "/Users/alice/Orca/agent-hooks/claude-hook.sh"',
           timeoutSec: 5
         },
         {
           type: 'command',
-          powershell: "& 'C:\\Users\\alice\\Orca\\agent-hooks\\codex-hook.sh'",
+          powershell: "& 'C:\\Users\\alice\\Orca\\agent-hooks\\claude-hook.sh'",
           timeoutSec: 5
         },
         {
@@ -339,7 +338,7 @@ describe('removeManagedCommands', () => {
           hooks: [
             {
               type: 'command',
-              command: '/bin/sh "/path/agent-hooks/codex-hook.sh"'
+              command: '/bin/sh "/path/agent-hooks/claude-hook.sh"'
             },
             { type: 'command', command: 'echo keep me' }
           ]
@@ -364,7 +363,7 @@ describe('removeManagedCommands', () => {
                 'C:\\Windows\\System32\\cmd.exe',
                 '/d',
                 '/c',
-                'C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.cmd'
+                'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd'
               ]
             },
             { type: 'command', command: 'echo keep me' }
@@ -401,11 +400,11 @@ describe('removeManagedCommands', () => {
 
 describe('hookDefinitionHasManagedCommand', () => {
   it('detects managed commands in direct and nested fields', () => {
-    const match = createManagedCommandMatcher('codex-hook.sh')
+    const match = createManagedCommandMatcher('claude-hook.sh')
 
     expect(
       hookDefinitionHasManagedCommand(
-        { bash: '/bin/sh "/Users/alice/Orca/agent-hooks/codex-hook.sh"' },
+        { bash: '/bin/sh "/Users/alice/Orca/agent-hooks/claude-hook.sh"' },
         match
       )
     ).toBe(true)
@@ -415,7 +414,7 @@ describe('hookDefinitionHasManagedCommand', () => {
           hooks: [
             {
               type: 'command',
-              command: '/bin/sh "/path/agent-hooks/codex-hook.sh"'
+              command: '/bin/sh "/path/agent-hooks/claude-hook.sh"'
             }
           ]
         },
@@ -429,7 +428,7 @@ describe('hookDefinitionHasManagedCommand', () => {
             {
               type: 'command',
               command: 'C:\\Windows\\System32\\conhost.exe',
-              args: ['--headless', 'C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.cmd']
+              args: ['--headless', 'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd']
             }
           ]
         },
@@ -588,11 +587,11 @@ function expectedDecodedWindowsHookCommand(scriptPath: string): string {
 
 describe('wrapWindowsHookCommand', () => {
   it('invokes the .cmd through an encoded PowerShell command', () => {
-    const command = wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.cmd')
+    const command = wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd')
     expect(command).toMatch(qualifiedWindowsPowerShellCommand)
     expect(command).not.toMatch(/^powershell\b/i)
     expect(decodeWindowsHookCommand(command)).toBe(
-      expectedDecodedWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.cmd')
+      expectedDecodedWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd')
     )
   })
 
@@ -600,21 +599,23 @@ describe('wrapWindowsHookCommand', () => {
   // #6078 — the raw path used to be split at the space. The wrapper must keep
   // the whole path inside the encoded command so shells do not split it.
   it('preserves spaces in the script path (user profile with space case)', () => {
-    const cmd = wrapWindowsHookCommand('C:\\Users\\Jorge Silva\\.orca\\agent-hooks\\codex-hook.cmd')
+    const cmd = wrapWindowsHookCommand(
+      'C:\\Users\\Jorge Silva\\.orca\\agent-hooks\\claude-hook.cmd'
+    )
     expect(cmd).toMatch(qualifiedWindowsPowerShellCommand)
     expect(decodeWindowsHookCommand(cmd)).toBe(
       expectedDecodedWindowsHookCommand(
-        'C:\\Users\\Jorge Silva\\.orca\\agent-hooks\\codex-hook.cmd'
+        'C:\\Users\\Jorge Silva\\.orca\\agent-hooks\\claude-hook.cmd'
       )
     )
   })
 
   it('keeps cmd.exe percent expansion and caret escapes out of the command line', () => {
-    const cmd = wrapWindowsHookCommand('C:\\Users\\%ORCA_TEST%\\a^b\\codex-hook.cmd')
+    const cmd = wrapWindowsHookCommand('C:\\Users\\%ORCA_TEST%\\a^b\\claude-hook.cmd')
     expect(cmd).not.toContain('%ORCA_TEST%')
     expect(cmd).not.toContain('^')
     expect(decodeWindowsHookCommand(cmd)).toBe(
-      expectedDecodedWindowsHookCommand('C:\\Users\\%ORCA_TEST%\\a^b\\codex-hook.cmd')
+      expectedDecodedWindowsHookCommand('C:\\Users\\%ORCA_TEST%\\a^b\\claude-hook.cmd')
     )
   })
 
@@ -623,7 +624,7 @@ describe('wrapWindowsHookCommand', () => {
     () => {
       const scriptDir = join(tmpDir, 'home with ^ caret', '.orca', 'agent-hooks')
       mkdirSync(scriptDir, { recursive: true })
-      const scriptPath = join(scriptDir, 'codex-hook.cmd')
+      const scriptPath = join(scriptDir, 'claude-hook.cmd')
       writeFileSync(scriptPath, '@echo off\r\nexit /b 7\r\n', 'utf-8')
 
       const result = spawnSync('cmd.exe', ['/d', '/c', wrapWindowsHookCommand(scriptPath)], {
@@ -633,44 +634,6 @@ describe('wrapWindowsHookCommand', () => {
       expect(result.status).toBe(7)
     }
   )
-})
-
-describe('wrapWindowsCmdHookCommand', () => {
-  it('returns the bare, directly-spawnable path for a cmd-safe managed script', () => {
-    // Why: Codex launches the command as a program (argv[0]),
-    // not via cmd.exe, so the launcher must be a single spawnable token — a bare
-    // .cmd path. A cmd-builtin `if …` launcher has argv[0] = `if`, which is
-    // unspawnable and fails every hook with exit 1 (#8430 regression).
-    const scriptPath = 'C:\\Users\\alice\\.orca\\agent-hooks\\codex-hook.cmd'
-    const command = wrapWindowsCmdHookCommand(scriptPath)
-    expect(command).toBe(scriptPath)
-    expect(command).not.toMatch(/^if\b/)
-    expect(command).not.toMatch(/powershell/i)
-  })
-
-  it.skipIf(process.platform !== 'win32')(
-    'resolves the launcher to a real executable file, not a shell fragment',
-    () => {
-      // Regression guard for #8430: Codex spawns the launcher as
-      // a program (argv[0]), so it must be an existing, launchable file. The broken
-      // `if exist … (call …)` form had argv[0] = `if` — a cmd builtin, not a file —
-      // which is unspawnable and failed every hook. The bare path is the file.
-      // win32-only: the real temp path is cmd-safe only with backslashes; a POSIX
-      // tmpDir has `/`, which routes to the encoded fallback by design.
-      const scriptPath = join(tmpDir, 'codex-hook.cmd')
-      writeFileSync(scriptPath, '@echo off\r\nexit /b 0\r\n', 'utf-8')
-      const command = wrapWindowsCmdHookCommand(scriptPath)
-      expect(command).toBe(scriptPath)
-      expect(existsSync(command)).toBe(true)
-    }
-  )
-
-  it('falls back to the encoded launcher when cmd.exe would split or expand the path', () => {
-    const scriptPath = 'C:\\Users\\Jane Doe\\%ORCA_TEST%\\codex-hook.cmd'
-    const command = wrapWindowsCmdHookCommand(scriptPath)
-    expect(command).toMatch(qualifiedWindowsPowerShellCommand)
-    expect(decodeWindowsHookCommand(command)).toBe(expectedDecodedWindowsHookCommand(scriptPath))
-  })
 })
 
 describe('wrapRuntimeHomeHookCommand', () => {

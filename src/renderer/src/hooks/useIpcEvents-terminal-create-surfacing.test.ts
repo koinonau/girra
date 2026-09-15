@@ -217,12 +217,12 @@ describe('useIpcEvents updater integration', () => {
       requestId: 'req-renderer-backed',
       worktreeId: 'wt-2',
       targetGroupId: 'group-left',
-      title: 'Codex',
-      command: 'codex',
+      title: 'OpenCode',
+      command: 'opencode',
       cwd: '/repo/packages/app',
       launchConfig: {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'request' }
+        agentEnv: { OPENCODE_PROFILE: 'request' }
       },
       launchAgent: 'claude',
       activate: false
@@ -250,21 +250,21 @@ describe('useIpcEvents updater integration', () => {
         detail: { worktreeId: 'wt-2', tabIds: ['tab-new'] }
       })
     )
-    expect(setTabCustomTitle).toHaveBeenCalledWith('tab-new', 'Codex', {
+    expect(setTabCustomTitle).toHaveBeenCalledWith('tab-new', 'OpenCode', {
       recordInteraction: false
     })
     expect(queueTabStartupCommand).toHaveBeenCalledWith('tab-new', {
-      command: 'codex',
+      command: 'opencode',
       launchConfig: {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'request' }
+        agentEnv: { OPENCODE_PROFILE: 'request' }
       },
       launchAgent: 'claude'
     })
     expect(replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'req-renderer-backed',
       tabId: 'tab-new',
-      title: 'Codex'
+      title: 'OpenCode'
     })
 
     createTab.mockClear()
@@ -275,7 +275,7 @@ describe('useIpcEvents updater integration', () => {
       worktreeId: 'wt-2',
       targetGroupId: 'group-left',
       title: 'Runtime Terminal',
-      command: 'codex',
+      command: 'opencode',
       launchAgent: 'claude',
       viewMode: 'terminal',
       activate: true,
@@ -439,8 +439,8 @@ describe('useIpcEvents updater integration', () => {
     requestTerminalCreateListenerRef.current({
       requestId: 'req-renderer-backed-background',
       worktreeId: 'wt-2',
-      title: 'Codex',
-      command: 'codex',
+      title: 'OpenCode',
+      command: 'opencode',
       presentation: 'background'
     })
 
@@ -462,7 +462,7 @@ describe('useIpcEvents updater integration', () => {
     expect(replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'req-renderer-backed-background',
       tabId: 'tab-new',
-      title: 'Codex'
+      title: 'OpenCode'
     })
 
     createTab.mockClear()
@@ -473,7 +473,7 @@ describe('useIpcEvents updater integration', () => {
       leafId: '55555555-5555-4555-8555-555555555555',
       launchConfig: {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'adopted' }
+        agentEnv: { OPENCODE_PROFILE: 'adopted' }
       },
       launchAgent: 'claude'
     })
@@ -493,7 +493,7 @@ describe('useIpcEvents updater integration', () => {
       makePaneKey('tab-new', '55555555-5555-4555-8555-555555555555'),
       {
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'adopted' }
+        agentEnv: { OPENCODE_PROFILE: 'adopted' }
       },
       {
         agentType: 'claude',

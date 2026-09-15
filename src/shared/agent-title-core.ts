@@ -18,7 +18,7 @@ const STRONG_IDLE_KEYWORDS = ['ready', 'idle', 'done'] as const
 const STRONG_WORKING_KEYWORDS = ['working', 'thinking', 'running'] as const
 
 // Why: plain `\b` matches inside hyphenated tokens and cwd paths such as
-// "~/codex/ready"; the left side also blocks path separators for Windows/Unix.
+// "~/opencode/ready"; the left side also blocks path separators for Windows/Unix.
 export const STRONG_IDLE_KEYWORDS_RE = new RegExp(
   `(?<![\\w./\\\\-])(${STRONG_IDLE_KEYWORDS.join('|')})(?![\\w\\-])`,
   'i'

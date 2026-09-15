@@ -34,7 +34,7 @@ describe('generated agent tab titles', () => {
     store.getState().setAgentStatus(makePaneKey(tabId, LEAF_ID), {
       state: 'working',
       prompt: 'Refactor the auth middleware',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBeUndefined()
@@ -49,12 +49,12 @@ describe('generated agent tab titles', () => {
     store.getState().setAgentStatus(makePaneKey(tabId, LEAF_ID), {
       state: 'working',
       prompt: 'Can you please refactor the auth middleware to use JWT tokens?',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.getState().setAgentStatus(makePaneKey(tabId, LEAF_ID), {
       state: 'working',
       prompt: 'Replace this with a later task name',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBe(
@@ -81,7 +81,7 @@ orca orchestration send --to term_parent
 
 === TASK ===
 Implement the detailed worker instructions that should not be the short label`,
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBe(
@@ -122,7 +122,7 @@ Implement the detailed worker instructions that should not be the short label`
     store.getState().setAgentStatus(paneKey, {
       state: 'working',
       prompt: dispatchPrompt,
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.getState().setRuntimeAgentOrchestrationByPaneKey({
       [paneKey]: {
@@ -141,7 +141,7 @@ Implement the detailed worker instructions that should not be the short label`
     store.getState().setAgentStatus(paneKey, {
       state: 'working',
       prompt: 'Refactor the auth middleware to use JWT tokens for session recovery',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBe(
@@ -163,7 +163,7 @@ Your task ID is: task-1
 
 === TASK ===
 Old dispatch task that already finished`,
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.getState().setRuntimeAgentOrchestrationByPaneKey({
       [paneKey]: {
@@ -194,7 +194,7 @@ Old dispatch task that already finished`,
     store.getState().setAgentStatus(paneKey, {
       state: 'working',
       prompt: 'Can you please refactor the auth middleware to use JWT tokens?',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBe(
@@ -218,7 +218,7 @@ Your task ID is: task-a
 
 === TASK ===
 Implement task A worker instructions that should not stick`,
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.getState().setRuntimeAgentOrchestrationByPaneKey({
       [paneKey]: {
@@ -237,7 +237,7 @@ Your task ID is: task-b
 
 === TASK ===
 Implement task B worker instructions for the next dispatch`,
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBe(
@@ -254,7 +254,7 @@ Implement task B worker instructions for the next dispatch`,
     store.getState().setAgentStatus(paneKey, {
       state: 'working',
       prompt: 'Can you please refactor the auth middleware to use JWT tokens?',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     expect(store.getState().tabsByWorktree[WORKTREE_ID][0].generatedTitle).toBe(
       'Refactor the auth middleware to use JWT'
@@ -284,7 +284,7 @@ Implement task B worker instructions for the next dispatch`,
     store.getState().setAgentStatus(makePaneKey(tabId, LEAF_ID), {
       state: 'working',
       prompt,
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     const tab = store.getState().tabsByWorktree[WORKTREE_ID][0]

@@ -4,13 +4,13 @@ import { test, expect } from './helpers/orca-app'
 import { waitForSessionReady } from './helpers/store'
 import { readHookEndpoint } from './helpers/agent-hook-endpoint'
 
-async function postCodexHookEvent(
+async function postClaudeHookEvent(
   electronApp: ElectronApplication,
   paneKey: string,
   eventName: 'UserPromptSubmit' | 'Stop'
 ): Promise<void> {
   const endpoint = await readHookEndpoint(electronApp)
-  const response = await fetch(`http://127.0.0.1:${endpoint.port}/hook/codex`, {
+  const response = await fetch(`http://127.0.0.1:${endpoint.port}/hook/claude`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -55,7 +55,7 @@ test('shows keep-awake mode and Agent activity in the status bar', async ({
   await expect(agentInactiveStatus).toBeVisible()
 
   const paneKey = `e2e-caffeinate-tab:${randomUUID()}`
-  await postCodexHookEvent(electronApp, paneKey, 'UserPromptSubmit')
+  await postClaudeHookEvent(electronApp, paneKey, 'UserPromptSubmit')
   const agentActiveStatus = orcaPage.getByRole('button', {
     name: 'Keep computer awake, Agent · Active'
   })
@@ -67,6 +67,6 @@ test('shows keep-awake mode and Agent activity in the status bar', async ({
     await orcaPage.screenshot({ path: proofPath })
   }
 
-  await postCodexHookEvent(electronApp, paneKey, 'Stop')
+  await postClaudeHookEvent(electronApp, paneKey, 'Stop')
   await expect(agentInactiveStatus).toBeVisible()
 })

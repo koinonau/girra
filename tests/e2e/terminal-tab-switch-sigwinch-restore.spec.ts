@@ -67,7 +67,7 @@ function buildSigwinchResetProbeSnapshot(label: string): string {
 
 async function createAgentMarkedTerminalTab(
   page: Page,
-  agent: 'codex',
+  agent: 'claude',
   command: string
 ): Promise<string> {
   const worktreeId = (await getActiveWorktreeId(page))!
@@ -85,7 +85,7 @@ async function createAgentMarkedTerminalTab(
         command,
         launchAgent: agent,
         telemetry: {
-          agent_kind: agent,
+          agent_kind: 'claude-code',
           launch_source: 'tab_bar_quick_launch',
           request_kind: 'new'
         }
@@ -213,7 +213,7 @@ async function setHiddenSnapshotOverride(
 }
 
 test.describe('Terminal tab switch SIGWINCH restore', () => {
-  test('keeps an alternate-screen Codex viewport after hidden snapshot replay', async ({
+  test('keeps an alternate-screen agent viewport after hidden snapshot replay', async ({
     orcaPage
   }) => {
     await waitForSessionReady(orcaPage)
@@ -224,7 +224,7 @@ test.describe('Terminal tab switch SIGWINCH restore', () => {
     const shellTabId = (await getActiveTabId(orcaPage))!
     const agentTabId = await createAgentMarkedTerminalTab(
       orcaPage,
-      'codex',
+      'claude',
       buildSigwinchResetProbeCommand()
     )
     await waitForActiveTerminalManager(orcaPage, 30_000)
@@ -259,7 +259,7 @@ test.describe('Terminal tab switch SIGWINCH restore', () => {
     await expect
       .poll(async () => (await readHiddenOutputDebug(orcaPage))?.hiddenRendererSkipCount ?? 0, {
         timeout: 5_000,
-        message: 'Codex probe hidden output did not take the skipped renderer path'
+        message: 'Agent probe hidden output did not take the skipped renderer path'
       })
       .toBeGreaterThan(0)
     await setHiddenSnapshotOverride(orcaPage, paneIdentity.ptyId, {

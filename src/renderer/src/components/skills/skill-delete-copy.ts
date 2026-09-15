@@ -59,7 +59,7 @@ function linksLabel(count: number): string {
     : translate('auto.components.skills.count.deleteLinkOther', '{{count}} links', { count })
 }
 
-/** "Removes 12 folders and 5 links across Claude, Codex, Agent Skills."
+/** "Removes 12 folders and 5 links across Claude, Agent Skills."
  *  Null when the plan removes nothing, so the caller states that instead of
  *  rendering "0 folders and 0 links across " with an empty tail. Zero-valued
  *  halves are dropped: a link-only delete must not read "0 folders and 1 links". */

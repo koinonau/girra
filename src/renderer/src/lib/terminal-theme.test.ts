@@ -10,7 +10,7 @@ import {
   resolveEffectiveTerminalAppearance
 } from './terminal-theme'
 
-// Mirrors Codex instruction block gray so the dark selection cannot disappear into it.
+// Mirrors agent TUI instruction block gray so the dark selection cannot disappear into it.
 const INSTRUCTION_BLOCK_BACKGROUND = '#3e4451'
 
 function parseHexColor(color: string): [number, number, number] | null {

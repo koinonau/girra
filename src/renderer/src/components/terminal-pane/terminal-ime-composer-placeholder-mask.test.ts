@@ -10,7 +10,7 @@ import {
   XTERM_COMPOSITION_SESSION_START_EVENT
 } from './terminal-ime-composition-route'
 
-const CODEX_PLACEHOLDER = 'Ask Codex to do anything'
+const CLAUDE_PLACEHOLDER = 'Try “fix the failing test”'
 const openTerminals: Terminal[] = []
 
 function nextEventLoop(): Promise<void> {
@@ -81,12 +81,8 @@ function openTerminal(): Rig {
   }
 }
 
-function codexPlaceholderFrame(): string {
-  return [
-    '\x1b[2J\x1b[H\x1b[1m›\x1b[22m \x1b7',
-    `\x1b[2m${CODEX_PLACEHOLDER}\x1b[22m`,
-    '\r\n\r\n\x1b[2mgpt-5.6 · ~/repo\x1b[22m\x1b8'
-  ].join('')
+function claudePlaceholderFrame(): string {
+  return `\x1b[2J\x1b[H${'─'.repeat(24)}\r\n❯ \x1b7\x1b[2m${CLAUDE_PLACEHOLDER}\x1b[22m\x1b8`
 }
 
 function dispatchSession(rig: Rig, type: string, id: number): void {
@@ -115,15 +111,9 @@ describe('terminal IME composer placeholder mask', () => {
     document.body.replaceChildren()
   })
 
-  it.each([
-    ['Codex', codexPlaceholderFrame()],
-    [
-      'Claude',
-      `\x1b[2J\x1b[H${'─'.repeat(24)}\r\n❯ \x1b7\x1b[2mTry “fix the failing test”\x1b[22m\x1b8`
-    ]
-  ])('owns a structurally verified %s placeholder during composition', async (_agent, frame) => {
+  it('owns a structurally verified Claude placeholder during composition', async () => {
     const rig = openTerminal()
-    await rig.write(frame)
+    await rig.write(claudePlaceholderFrame())
 
     expect(rig.terminal.buffer.active.cursorX).toBe(2)
     rig.compose()
@@ -134,12 +124,8 @@ describe('terminal IME composer placeholder mask', () => {
 
   it.each([
     [
-      'Codex lookalike without a footer',
-      `\x1b[1m›\x1b[22m \x1b7\x1b[2m${CODEX_PLACEHOLDER}\x1b[22m\x1b8`
-    ],
-    [
       'Claude lookalike without a frame',
-      '\x1b[2J\x1b[H❯ \x1b7\x1b[2mTry “fix the failing test”\x1b[22m\x1b8'
+      `\x1b[2J\x1b[H❯ \x1b7\x1b[2m${CLAUDE_PLACEHOLDER}\x1b[22m\x1b8`
     ],
     ['arbitrary all-DIM output', '\x1b[2J\x1b[H\x1b[2mWaiting for input\x1b[22m\x1b[17D']
   ])('leaves an ordinary shell %s visible', async (_case, frame) => {
@@ -151,17 +137,12 @@ describe('terminal IME composer placeholder mask', () => {
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(false)
   })
 
-  it('leaves non-placeholder Codex draft text untouched', async () => {
+  it('leaves non-placeholder Claude draft text untouched', async () => {
     const rig = openTerminal()
-    await rig.write(
-      [
-        '\x1b[2J\x1b[H\x1b[1m›\x1b[22m review\x1b7 this',
-        '\r\n\r\n\x1b[2mgpt-5.6 · ~/repo\x1b[22m\x1b8'
-      ].join('')
-    )
+    await rig.write(`\x1b[2J\x1b[H${'─'.repeat(24)}\r\n❯ review\x1b7 this\x1b8`)
 
     expect(rig.terminal.buffer.active.cursorX).toBe(8)
-    expect(rig.terminal.buffer.active.getLine(0)?.translateToString(true)).toBe('› review this')
+    expect(rig.terminal.buffer.active.getLine(1)?.translateToString(true)).toBe('❯ review this')
     rig.compose()
 
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(false)
@@ -173,11 +154,7 @@ describe('terminal IME composer placeholder mask', () => {
   it('leaves a typed draft visible while its stock placeholder is still rendered', async () => {
     const rig = openTerminal()
     await rig.write(
-      [
-        '\x1b[2J\x1b[H\x1b[1m\u203a\x1b[22m \uc548\ub155\x1b7',
-        `\x1b[2m${CODEX_PLACEHOLDER}\x1b[22m`,
-        '\r\n\r\n\x1b[2mgpt-5.6 \u00b7 ~/repo\x1b[22m\x1b8'
-      ].join('')
+      `\x1b[2J\x1b[H${'─'.repeat(24)}\r\n❯ \uc548\ub155\x1b7\x1b[2m${CLAUDE_PLACEHOLDER}\x1b[22m\x1b8`
     )
 
     expect(rig.terminal.buffer.active.cursorX).toBe(6)
@@ -189,7 +166,7 @@ describe('terminal IME composer placeholder mask', () => {
 
   it('drops a latched owner on blur even when no session end follows', async () => {
     const rig = openTerminal()
-    await rig.write(codexPlaceholderFrame())
+    await rig.write(claudePlaceholderFrame())
     // Synthetic start, and blur dispatched on the terminal element rather than the textarea:
     // a real textarea blur also ends the composition session, so ownership would clear through
     // handleSessionEnd and this would pass whether or not the blur listener does anything.
@@ -200,13 +177,13 @@ describe('terminal IME composer placeholder mask', () => {
 
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(false)
     // The dropped session must not re-acquire ownership on the next repaint either.
-    await rig.writeAwaitingRender(codexPlaceholderFrame())
+    await rig.writeAwaitingRender(claudePlaceholderFrame())
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(false)
   })
 
   it('reclassifies a repaint only while composition is active', async () => {
     const rig = openTerminal()
-    await rig.write(codexPlaceholderFrame())
+    await rig.write(claudePlaceholderFrame())
     rig.compose()
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(true)
 
@@ -217,14 +194,14 @@ describe('terminal IME composer placeholder mask', () => {
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(false)
 
     await rig.writeAwaitingRender(
-      `\x1b[K\x1b[2m${CODEX_PLACEHOLDER}\x1b[22m\x1b[${CODEX_PLACEHOLDER.length}D`
+      `\x1b[K\x1b[2m${CLAUDE_PLACEHOLDER}\x1b[22m\x1b[${CLAUDE_PLACEHOLDER.length}D`
     )
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(true)
   })
 
   it('clears ownership on composition end, blur, and disposal', async () => {
     const rig = openTerminal()
-    await rig.write(codexPlaceholderFrame())
+    await rig.write(claudePlaceholderFrame())
     rig.compose()
     expect(rig.element.classList.contains(TERMINAL_IME_COMPOSER_PLACEHOLDER_CLASS)).toBe(true)
 
@@ -244,7 +221,7 @@ describe('terminal IME composer placeholder mask', () => {
 
   it('keeps the newest session owner when an older session ends first', async () => {
     const rig = openTerminal()
-    await rig.write(codexPlaceholderFrame())
+    await rig.write(claudePlaceholderFrame())
 
     dispatchSession(rig, XTERM_COMPOSITION_SESSION_START_EVENT, 1)
     dispatchSession(rig, XTERM_COMPOSITION_SESSION_START_EVENT, 2)
@@ -257,7 +234,7 @@ describe('terminal IME composer placeholder mask', () => {
 
   it('clears the visible owner on a current end and ignores a late older end', async () => {
     const rig = openTerminal()
-    await rig.write(codexPlaceholderFrame())
+    await rig.write(claudePlaceholderFrame())
 
     dispatchSession(rig, XTERM_COMPOSITION_SESSION_START_EVENT, 11)
     dispatchSession(rig, XTERM_COMPOSITION_SESSION_START_EVENT, 12)
@@ -270,7 +247,7 @@ describe('terminal IME composer placeholder mask', () => {
 
   it('keeps ownership bounded across repeated starts and recovers on the newest end', async () => {
     const rig = openTerminal()
-    await rig.write(codexPlaceholderFrame())
+    await rig.write(claudePlaceholderFrame())
 
     const newestId = 2048
     for (let id = 1; id <= newestId; id += 1) {

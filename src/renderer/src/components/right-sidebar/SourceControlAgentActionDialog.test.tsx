@@ -63,7 +63,7 @@ let root: Root
 let initialState: AppState
 function settingsWithGlobalRecipe(
   recipe: SourceControlActionRecipe | null = {
-    agentId: 'codex',
+    agentId: 'opencode',
     commandInputTemplate: '{basePrompt}',
     agentArgs: ''
   },
@@ -72,12 +72,12 @@ function settingsWithGlobalRecipe(
   const base = getDefaultSettings(path.resolve('tmp'))
   return {
     ...base,
-    defaultTuiAgent: 'codex',
+    defaultTuiAgent: 'opencode',
     disabledTuiAgents,
     sourceControlAi: {
       ...base.sourceControlAi!,
       enabled: true,
-      agentId: 'codex',
+      agentId: 'opencode',
       customAgentCommand: '',
       actions: recipe ? { resolveConflicts: recipe } : {}
     }
@@ -90,7 +90,7 @@ function repoWithSavedRecipe(): Repo {
       enabled: true,
       actionOverrides: {
         resolveConflicts: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: ''
         }
@@ -130,7 +130,7 @@ function renderControlledDialog(
         savedCommandInputTemplate="{basePrompt}"
         savedAgentArgs=""
         launchSource="source_control_recovery"
-        savedAgentId="codex"
+        savedAgentId="opencode"
         onSaveAgentDefault={mocks.onSaveAgentDefault}
         onLaunched={mocks.onLaunched}
         onStart={mocks.onStart}
@@ -165,13 +165,13 @@ describe('SourceControlAgentActionDialog', () => {
     ).IS_REACT_ACT_ENVIRONMENT = true
     initialState = useAppStore.getState()
     vi.clearAllMocks()
-    mocks.ensureDetectedAgents.mockResolvedValue(['codex'])
-    mocks.ensureRemoteDetectedAgents.mockResolvedValue(['codex'])
+    mocks.ensureDetectedAgents.mockResolvedValue(['opencode'])
+    mocks.ensureRemoteDetectedAgents.mockResolvedValue(['opencode'])
     mocks.onStart.mockResolvedValue(true)
     mocks.planSourceControlAgentActionLaunch.mockReturnValue({
       ok: true,
       summary: 'Ready to launch.',
-      commandLabel: 'codex',
+      commandLabel: 'opencode',
       caveat: 'The prompt will be submitted after the agent is ready.'
     })
     container = document.createElement('div')
@@ -193,7 +193,7 @@ describe('SourceControlAgentActionDialog', () => {
     await vi.waitFor(() => expect(mocks.onOpenChange).toHaveBeenCalledWith(false))
     expect(mocks.ensureDetectedAgents).toHaveBeenCalledTimes(1)
     expect(mocks.onStart).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       commandInput: 'Resolve conflicts.',
       agentArgs: ''
     })
@@ -296,7 +296,7 @@ describe('SourceControlAgentActionDialog', () => {
     })
     await vi.waitFor(() => expect(container.textContent).toContain('Launch agent'))
     act(() => {
-      setSavedAgentId('codex')
+      setSavedAgentId('opencode')
     })
     await flushEffects()
     expect(mocks.onStart).not.toHaveBeenCalled()

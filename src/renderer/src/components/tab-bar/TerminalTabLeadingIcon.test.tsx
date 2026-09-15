@@ -9,7 +9,7 @@ function renderStatus(status: TerminalTabActivityStatus): string {
   return renderToStaticMarkup(
     <TooltipProvider>
       <TerminalTabLeadingIcon
-        agent="codex"
+        agent="opencode"
         activityStatus={status}
         shell={undefined}
         showUnreadActivity={false}
@@ -27,7 +27,7 @@ describe('TerminalTabLeadingIcon', () => {
     expect(markup).toContain('data-agent-activity-status="working"')
     expect(markup).toContain('aria-label="Working"')
     expect(markup).toContain('data-agent-spinner')
-    expect(markup).toContain('data-agent-icon="codex"')
+    expect(markup).toContain('data-agent-icon="opencode"')
   })
 
   it('shows completion as an emerald check', () => {
@@ -36,7 +36,7 @@ describe('TerminalTabLeadingIcon', () => {
     expect(markup).toContain('data-agent-activity-status="done"')
     expect(markup).toContain('lucide-circle-check')
     expect(markup).toContain('text-emerald-500')
-    expect(markup).toContain('data-agent-icon="codex"')
+    expect(markup).toContain('data-agent-icon="opencode"')
   })
 
   it('shows a needs-input (permission) state as the shared question glyph', () => {
@@ -52,7 +52,7 @@ describe('TerminalTabLeadingIcon', () => {
     const markup = renderStatus('active')
 
     expect(markup).not.toContain('data-testid="tab-agent-activity-indicator"')
-    expect(markup).toContain('data-agent-icon="codex"')
+    expect(markup).toContain('data-agent-icon="opencode"')
   })
 
   it('falls back to the shell icon when a plain tab is inactive', () => {
@@ -73,7 +73,7 @@ describe('TerminalTabLeadingIcon', () => {
   it('keeps the unread bell in the icon slot after an unvisited completion', () => {
     const markup = renderToStaticMarkup(
       <TerminalTabLeadingIcon
-        agent="codex"
+        agent="opencode"
         activityStatus="done"
         shell={undefined}
         showUnreadActivity={true}
@@ -83,7 +83,7 @@ describe('TerminalTabLeadingIcon', () => {
 
     expect(markup).toContain('data-testid="tab-activity-bell"')
     expect(markup).toContain('aria-label="Unread agent completion"')
-    expect(markup).toContain('data-agent-icon="codex"')
+    expect(markup).toContain('data-agent-icon="opencode"')
     expect(markup).not.toContain('data-testid="tab-agent-activity-indicator"')
   })
 })

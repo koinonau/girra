@@ -61,7 +61,6 @@ const WINDOWS_SHIM_SPAWN_ALLOWLIST = [
   'config/scripts/run-multi-workspace-typing-bench.mjs',
   'config/scripts/run-nested-runtime-ssh-e2e.mjs',
   'config/scripts/run-ssh-client-hosted-browser-drop-reconnect-e2e.mjs',
-  'config/scripts/run-ssh-codex-artifacts-repro-e2e.mjs',
   'config/scripts/run-ssh-docker-e2e.mjs',
   'config/scripts/run-ssh-docker-perf-e2e.mjs',
   'config/scripts/run-ssh-docker-terminal-parking-e2e.mjs',

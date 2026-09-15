@@ -259,7 +259,7 @@ describe('nativeChat.readSession clientKind truncation gating', () => {
       }
 
       const result = await readSessionHandler()(
-        { agent: 'codex', sessionId: 's' },
+        { agent: 'claude', sessionId: 's' },
         ctxWith(clientKind)
       )
       const messages = (result as { messages: NativeChatMessage[] }).messages
@@ -321,7 +321,10 @@ describe('nativeChat.readSession clientKind truncation gating', () => {
       ]
     }
 
-    const result = await readSessionHandler()({ agent: 'codex', sessionId: 's' }, ctxWith('mobile'))
+    const result = await readSessionHandler()(
+      { agent: 'claude', sessionId: 's' },
+      ctxWith('mobile')
+    )
     const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0]
     if (block.type !== 'subagent-group') {
       throw new Error('expected a subagent-group block')

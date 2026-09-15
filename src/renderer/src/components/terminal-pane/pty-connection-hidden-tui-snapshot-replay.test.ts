@@ -156,7 +156,7 @@ describe('connectPanePty', () => {
       '\x1b[2J\x1b[H',
       '\x1b[?25l',
       '\x1b[2;36m╭────────────────────────────╮\x1b[0m\r\n',
-      '\x1b[2;36m│ Codex rich restore 🟢 ███░ │\x1b[0m\r\n',
+      '\x1b[2;36m│ Claude rich restore 🟢 ███░ │\x1b[0m\r\n',
       '\x1b[2;36m│ status streaming           │\x1b[0m\r\n',
       '\x1b[2;36m╰────────────────────────────╯\x1b[0m',
       '\x1b[6;4H\x1b[?25h'

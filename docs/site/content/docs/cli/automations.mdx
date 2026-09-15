@@ -14,7 +14,7 @@ orca automations create \
   --trigger weekdays \
   --time 09:00 \
   --prompt "Triage new issues and summarize blockers" \
-  --provider codex \
+  --provider claude \
   --repo my-repo \
   --disabled \
   --json
@@ -48,7 +48,7 @@ orca automations create \
   --trigger hourly \
   --precheck "gh pr list --json number -q .[0].number" \
   --prompt "Review requested PRs" \
-  --provider codex \
+  --provider claude \
   --repo my-repo \
   --disabled \
   --json
@@ -94,7 +94,7 @@ orca automations create \
   --name "Inbox digest" \
   --trigger hourly \
   --prompt "Summarize unread mail" \
-  --provider codex \
+  --provider claude \
   --workspace active \
   --reuse-session \
   --disabled

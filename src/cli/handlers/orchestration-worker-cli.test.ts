@@ -71,7 +71,7 @@ describe('orchestration worker-start CLI contract', () => {
         ['display-name', 'Release audit'],
         ['comment', 'Supervised from the Mac Run home'],
         ['setup', 'run'],
-        ['agent', 'codex'],
+        ['agent', 'claude'],
         ['timeout-ms', '90000'],
         ['run', 'run_1'],
         ['from', 'term_coord'],
@@ -91,7 +91,7 @@ describe('orchestration worker-start CLI contract', () => {
         displayName: 'Release audit',
         comment: 'Supervised from the Mac Run home',
         setup: 'run',
-        agent: 'codex',
+        agent: 'claude',
         terminal: undefined,
         retryOf: undefined,
         timeoutMs: 90_000,
@@ -179,7 +179,7 @@ describe('orchestration worker-start CLI contract', () => {
     await invokeWorkerStart(
       new Map<string, string | boolean>([
         ['spec', 'Implement atomic start'],
-        ['agent', 'codex'],
+        ['agent', 'claude'],
         ['from', 'term_coord']
       ])
     )
@@ -196,8 +196,8 @@ describe('orchestration worker-start CLI contract', () => {
       invokeWorkerStart(
         new Map<string, string | boolean>([
           ['task', 'task_1'],
-          ['agent', 'codex'],
-          ['model', 'gpt-5.6-sol'],
+          ['agent', 'claude'],
+          ['model', 'claude-sonnet'],
           ['from', 'term_coord']
         ])
       )
@@ -220,7 +220,7 @@ describe('orchestration worker-start CLI contract', () => {
     await invokeWorkerStart(
       new Map<string, string | boolean>([
         ['task', 'task_1'],
-        ['agent', 'codex'],
+        ['agent', 'claude'],
         ['from', 'term_coord']
       ])
     )
@@ -252,7 +252,7 @@ describe('orchestration worker-start CLI contract', () => {
       await invokeWorkerStart(
         new Map<string, string | boolean>([
           ['task', 'task_1'],
-          ['agent', 'codex'],
+          ['agent', 'claude'],
           ['from', 'term_coord']
         ]),
         json
@@ -336,7 +336,7 @@ describe('orchestration worker-start CLI contract', () => {
     await ORCHESTRATION_HANDLERS['orchestration worker-start']({
       flags: new Map<string, string | boolean>([
         ['task', 'task_1'],
-        ['agent', 'codex'],
+        ['agent', 'claude'],
         ['from', 'term_coord']
       ]),
       client: { call: callMock },

@@ -97,7 +97,7 @@ test.describe('Settings skill detection', () => {
       electronApp,
       discoveryResult([
         makeSkill('repo', '/workspace/.agents/skills/orchestration'),
-        makeSkill('plugin', '/Users/test/.codex/plugins/cache/vendor/orchestration')
+        makeSkill('plugin', '/Users/test/.claude/plugins/cache/vendor/orchestration')
       ])
     )
 

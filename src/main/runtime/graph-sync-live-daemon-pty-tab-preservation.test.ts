@@ -108,7 +108,7 @@ function createHarness() {
             id: tabId,
             ptyId,
             worktreeId,
-            title: 'codex',
+            title: 'claude',
             customTitle: null,
             color: null,
             sortOrder: 0,

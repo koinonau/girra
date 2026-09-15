@@ -343,7 +343,7 @@ describe('getForegroundProcessName', () => {
       mockExecFile((_command, args) => {
         if (args[0] === '-axo') {
           return {
-            stdout: ['100 99 Ss   bash -l', '101 100 S+   node /home/dev/.local/bin/codex'].join(
+            stdout: ['100 99 Ss   bash -l', '101 100 S+   node /home/dev/.local/bin/opencode'].join(
               '\n'
             )
           }
@@ -351,7 +351,7 @@ describe('getForegroundProcessName', () => {
         return new Error('unexpected command')
       })
 
-      await expect(getForegroundProcessName(100, 'node')).resolves.toBe('codex')
+      await expect(getForegroundProcessName(100, 'node')).resolves.toBe('opencode')
     })
   })
 
@@ -363,11 +363,11 @@ describe('getForegroundProcessName', () => {
           pid: 101,
           ppid: 100,
           name: 'node.exe',
-          commandLine: 'node C:\\Users\\dev\\AppData\\Roaming\\npm\\codex.cmd'
+          commandLine: 'node C:\\Users\\dev\\AppData\\Roaming\\npm\\opencode.cmd'
         }
       ])
 
-      await expect(getForegroundProcessName(100, 'powershell.exe')).resolves.toBe('codex')
+      await expect(getForegroundProcessName(100, 'powershell.exe')).resolves.toBe('opencode')
     })
   })
 
@@ -378,14 +378,14 @@ describe('getForegroundProcessName', () => {
           return {
             stdout: [
               '100 99 Ss   bash -l',
-              '101 100 S    node /home/dev/.local/bin/node_modules/@openai/codex/bin/codex.js'
+              '101 100 S    node /home/dev/.local/bin/node_modules/opencode-ai/bin/opencode'
             ].join('\n')
           }
         }
         return new Error('unexpected command')
       })
 
-      await expect(getForegroundProcessName(100, 'node')).resolves.toBe('codex')
+      await expect(getForegroundProcessName(100, 'node')).resolves.toBe('opencode')
     })
   })
 
@@ -397,7 +397,7 @@ describe('getForegroundProcessName', () => {
             stdout: [
               '100 99 Ss   bash -l',
               '101 100 S    node /home/dev/project/server.js',
-              '102 100 S    node /home/dev/.local/bin/node_modules/@openai/codex/bin/codex.js'
+              '102 100 S    node /home/dev/.local/bin/node_modules/opencode-ai/bin/opencode'
             ].join('\n')
           }
         }
@@ -415,7 +415,7 @@ describe('getForegroundProcessName', () => {
           return {
             stdout: [
               '100 99 Ss   bash -l',
-              '101 100 T    node /home/dev/.local/bin/codex',
+              '101 100 T    node /home/dev/.local/bin/opencode',
               '102 100 S+   vim notes.txt'
             ].join('\n')
           }
@@ -457,13 +457,13 @@ describe('getForegroundProcessName', () => {
       mockExecFile((_command, args) => {
         if (args[0] === '-axo') {
           return {
-            stdout: ['100 1 Ss bash', '100 1 Ss+ bash', '101 100 S node /opt/codex'].join('\n')
+            stdout: ['100 1 Ss bash', '100 1 Ss+ bash', '101 100 S node /opt/opencode'].join('\n')
           }
         }
         return new Error('unexpected command')
       })
 
-      await expect(getForegroundProcessName(100, 'bash')).resolves.toBe('codex')
+      await expect(getForegroundProcessName(100, 'bash')).resolves.toBe('opencode')
     })
   })
 
@@ -484,7 +484,7 @@ describe('processHasChildren', () => {
   // cost of the answer. `pgrep -P` forks per pane per poll and opens six procfs
   // files per host process to resolve one ppid, so the contract worth pinning is
   // "no fork of its own, and share the foreground lookup's cached table".
-  const PS_TABLE = ['100 1 Ss bash', '101 100 S+ node /opt/codex', '200 1 Ss zsh'].join('\n')
+  const PS_TABLE = ['100 1 Ss bash', '101 100 S+ node /opt/opencode', '200 1 Ss zsh'].join('\n')
 
   it('answers from the shared process table without forking pgrep', async () => {
     await withProcessPlatform('linux', async () => {
@@ -518,7 +518,7 @@ describe('processHasChildren', () => {
         getForegroundProcessName(100, 'bash')
       ])
 
-      expect(answers).toEqual([true, true, false, 'codex'])
+      expect(answers).toEqual([true, true, false, 'opencode'])
       expect(execFileMock).toHaveBeenCalledTimes(1)
     })
   })

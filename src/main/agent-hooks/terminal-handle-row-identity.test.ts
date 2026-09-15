@@ -15,7 +15,7 @@ function ingest(server: AgentHookServer, overrides: Record<string, unknown> = {}
     worktreeId: 'worktree',
     connectionId: null,
     terminalHandle: HANDLE,
-    payload: { state: 'working', prompt: 'ship it', agentType: 'codex' },
+    payload: { state: 'working', prompt: 'ship it', agentType: 'opencode' },
     ...overrides
   })
 }
@@ -51,7 +51,7 @@ describe('the terminal handle a status row is stamped with', () => {
         paneKey: PANE_KEY,
         tabId: 'tab-handle',
         worktreeId: 'other-worktree',
-        payload: { state: 'done', prompt: 'other host', agentType: 'codex' }
+        payload: { state: 'done', prompt: 'other host', agentType: 'opencode' }
       },
       'ssh-b'
     )
@@ -82,7 +82,7 @@ describe('the terminal handle a status row is stamped with', () => {
         tabId: 'tab-handle',
         worktreeId: 'worktree',
         providerSession: { key: 'session_id', id: 'session-1' },
-        payload: { state: 'working', prompt: 'ship it', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'ship it', agentType: 'opencode' }
       },
       null
     )
@@ -133,7 +133,7 @@ describe('the terminal handle a status row is stamped with', () => {
         tabId: 'tab-handle',
         worktreeId,
         providerSession: { key: 'session_id', id: 'wsl-session' },
-        payload: { state: 'working', prompt: 'ship it', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'ship it', agentType: 'opencode' }
       },
       wslHookRelayConnectionId('Ubuntu')
     )
@@ -144,7 +144,7 @@ describe('the terminal handle a status row is stamped with', () => {
         paneKey: PANE_KEY,
         tabId: 'tab-handle',
         worktreeId,
-        payload: { state: 'done', prompt: 'wrong distro', agentType: 'codex' }
+        payload: { state: 'done', prompt: 'wrong distro', agentType: 'opencode' }
       },
       wslHookRelayConnectionId('Debian')
     )
@@ -242,7 +242,7 @@ describe('the terminal handle a status row is stamped with', () => {
         tabId: 'tab-handle',
         worktreeId: 'worktree',
         providerSession: { key: 'session_id', id: 'resume-me' },
-        payload: { state: 'working', prompt: 'ship it', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'ship it', agentType: 'opencode' }
       },
       null
     )

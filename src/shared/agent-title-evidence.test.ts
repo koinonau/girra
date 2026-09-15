@@ -9,19 +9,19 @@ describe('collectAgentTitleEvidence', () => {
     // Minimized from real recorded titles that resolve to the wrong agent on the ordered chain:
     // the pane owner is named by Orca's `- <agent>` suffix, the competitor only by task text.
     it.each([
-      'Switch Claude and Codex off the load balancer… - opencode',
-      'Codex structured chat revalidation… - opencode',
-      '⠸ - Thinking - Codex native-chat work… - opencode',
+      'Switch Claude off the load balancer… - opencode',
+      'Claude structured chat revalidation… - opencode',
+      '⠸ - Thinking - Claude native-chat work… - opencode',
       'Electron QA: check the Claude label… - opencode'
     ])('resolves %j to the suffix owner', (title) => {
       expect(agentFor(title)).toBe('opencode')
     })
 
     it('does not read a hyphenated worktree name as an owner suffix', () => {
-      // `review-14600-codex` is a directory, not an owner declaration. The suffix grammar
+      // `review-14600-opencode` is a directory, not an owner declaration. The suffix grammar
       // requires whitespace before the dash precisely to keep these apart.
-      expect(agentFor('review-14600-codex')).toBeNull()
-      expect(agentFor('codex-split-core')).toBeNull()
+      expect(agentFor('review-14600-opencode')).toBeNull()
+      expect(agentFor('opencode-split-core')).toBeNull()
     })
 
     it.each(['pi', 'claude-agent-teams'] as const)(
@@ -35,11 +35,7 @@ describe('collectAgentTitleEvidence', () => {
   describe('order independence', () => {
     // The defect this replaces is that chain position decides between two names. Swapping the
     // two names in a title must not change the answer.
-    it.each([
-      ['codex', 'opencode'],
-      ['claude', 'codex'],
-      ['claude', 'opencode']
-    ])('gives %s + %s the same answer in both orders', (a, b) => {
+    it.each([['claude', 'opencode']])('gives %s + %s the same answer in both orders', (a, b) => {
       const forward = collectAgentTitleEvidence(`${a} and ${b}`)
       const reverse = collectAgentTitleEvidence(`${b} and ${a}`)
       expect(forward.agent).toBe(reverse.agent)
@@ -51,7 +47,6 @@ describe('collectAgentTitleEvidence', () => {
 
   it.each([
     ['claude', 'claude'],
-    ['codex', 'codex'],
     ['opencode', 'opencode']
   ] as const)('collects the free-text token %s without claiming identity', (token, agent) => {
     expect(collectAgentTitleEvidence(`review the ${token} integration`)).toMatchObject({
@@ -64,15 +59,13 @@ describe('collectAgentTitleEvidence', () => {
   describe('a vendor marker is evidence the agent emitted, not text a human typed', () => {
     it('keeps a Claude pane Claude when its task text names another agent', () => {
       // 13 recorded titles have this shape. The sigil is emitted by Claude; the name is typed.
-      expect(agentFor('✳ Fix Codex false attention notifications on Windows')).toBe('claude')
-      expect(reasonFor('✳ Consolidate Codex subagent sidebar rows')).toBe('vendor-marker')
+      expect(agentFor('✳ Fix OpenCode false attention notifications on Windows')).toBe('claude')
+      expect(reasonFor('✳ Consolidate OpenCode subagent sidebar rows')).toBe('vendor-marker')
     })
 
     it('lets an anchored name outrank a foreign vendor marker', () => {
       expect(agentFor('✳ opencode')).toBe('claude')
       expect(reasonFor('✳ opencode')).toBe('vendor-marker')
-      expect(agentFor('✳ codex')).toBe('claude')
-      expect(reasonFor('✳ codex')).toBe('vendor-marker')
     })
 
     it('keeps an OpenCode envelope OpenCode when its session text names another agent', () => {
@@ -82,11 +75,10 @@ describe('collectAgentTitleEvidence', () => {
 
   describe('a name in free text alone is never identity', () => {
     it.each([
-      '◐ DaemonConnectionLostError with 70 Codex agents',
+      '◐ DaemonConnectionLostError with 70 OpenCode agents',
       'Fix the opencode hook',
       'opencode',
-      '⠋ opencode',
-      '⠋ codex'
+      '⠋ opencode'
     ])('declines %j', (title) => {
       expect(agentFor(title)).toBeNull()
       expect(reasonFor(title)).toBe('free-text-only')
@@ -111,26 +103,25 @@ describe('collectAgentTitleEvidence', () => {
   )
 
   it.each([
-    '~/codex',
+    '~/opencode',
     '/opencode',
     '.\\claude',
-    'C:\\codex',
-    'C:/codex',
-    '~/Codex ready',
-    '.\\Codex ready'
+    'C:\\opencode',
+    'C:/opencode',
+    '~/Pi ready',
+    '.\\Pi ready'
   ])('does not treat the cwd path %s as identity', (title) => {
     expect(agentFor(title)).toBeNull()
   })
 
   it('does not duplicate an anchored token as free text', () => {
-    expect(collectAgentTitleEvidence('codex.exe').freeTextNames).toEqual([])
+    expect(collectAgentTitleEvidence('opencode.exe').freeTextNames).toEqual([])
     expect(collectAgentTitleEvidence('Claude Agent Teams').freeTextNames).toEqual([])
   })
 
   it.each([
-    ['Codex ready', 'codex'],
-    ['Codex - action required', 'codex'],
-    ['Pi ready', 'pi']
+    ['Pi ready', 'pi'],
+    ['Pi - action required', 'pi']
   ] as const)('recognizes Orca-controlled synthetic title %s', (title, agent) => {
     expect(agentFor(title)).toBe(agent)
     expect(reasonFor(title)).toBe('anchored')
@@ -177,7 +168,7 @@ describe('collectAgentTitleEvidence', () => {
     expect(agentFor('zsh | ⠋ Claude Code')).toBe('claude')
     expect(agentFor('ssh | tmux | Claude Code')).toBe('claude')
     expect(agentFor('ssh | tmux | OC | review the parser')).toBe('opencode')
-    expect(agentFor('zsh | Fix the Codex parser')).toBeNull()
+    expect(agentFor('zsh | Fix the OpenCode parser')).toBeNull()
   })
 
   it('bounds wrapper inspection while preserving innermost identity', () => {
@@ -188,10 +179,10 @@ describe('collectAgentTitleEvidence', () => {
   })
 
   it.each([
-    ['codex.exe', 'codex'],
+    ['claude.exe', 'claude'],
     ['claude.cmd', 'claude'],
     ['opencode.ps1', 'opencode'],
-    ['CODEX.EXE', 'codex'],
+    ['CLAUDE.EXE', 'claude'],
     ['OPENCODE.CMD', 'opencode']
   ] as const)('recognizes the bare Windows launcher %s', (title, agent) => {
     expect(agentFor(title)).toBe(agent)
@@ -264,8 +255,8 @@ describe('collectAgentTitleEvidence', () => {
   })
 
   it('requires whitespace before the owner suffix dash', () => {
-    expect(agentFor('task- codex')).toBeNull()
-    expect(reasonFor('task- codex')).toBe('free-text-only')
+    expect(agentFor('task- opencode')).toBeNull()
+    expect(reasonFor('task- opencode')).toBe('free-text-only')
   })
 
   it('terminates when a wrapper title starts with a separator', () => {

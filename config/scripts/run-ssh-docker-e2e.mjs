@@ -60,7 +60,6 @@ const result = spawnSync(
     'tests/e2e/ssh-client-hosted-browser-drop-reconnect.spec.ts',
     'tests/e2e/pty-input-write-queue-ssh.spec.ts',
     'tests/e2e/ssh-ai-vault-session-history.spec.ts',
-    'tests/e2e/ssh-codex-display-artifacts-repro.spec.ts',
     'tests/e2e/ssh-cold-activation-restore.spec.ts',
     'tests/e2e/ssh-cold-hydration-gap-tab-seeding.spec.ts',
     'tests/e2e/ssh-docker-five-pane-input-under-flood.spec.ts',

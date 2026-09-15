@@ -258,7 +258,7 @@ async function seedCompletedSetupExceptCapabilityReadiness(page: Page): Promise<
       settings: {
         ...state.settings,
         activeRuntimeEnvironmentId: null,
-        defaultTuiAgent: 'codex',
+        defaultTuiAgent: 'claude',
         notifications: {
           ...state.settings?.notifications,
           enabled: true,

@@ -162,7 +162,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     try {
@@ -226,7 +226,7 @@ describe('connectPanePty', () => {
     }
   })
 
-  it('keeps split stateful Codex queries live after becoming visible', async () => {
+  it('keeps split stateful OpenCode queries live after becoming visible', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -252,7 +252,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     try {
@@ -270,7 +270,7 @@ describe('connectPanePty', () => {
     }
   })
 
-  it('drops pending hidden Codex query prefixes when the PTY changes', async () => {
+  it('drops pending hidden OpenCode query prefixes when the PTY changes', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -288,7 +288,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef,
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     try {
@@ -308,7 +308,7 @@ describe('connectPanePty', () => {
     }
   })
 
-  it('does not live-render split hidden Codex non-query CSI output', async () => {
+  it('does not live-render split hidden OpenCode non-query CSI output', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -325,7 +325,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -343,7 +343,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('answers split hidden Codex OSC color queries directly', async () => {
+  it('answers split hidden OpenCode OSC color queries directly', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -360,25 +360,25 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
 
     capturedDataCallback.current?.('\x1b]11;?')
-    capturedDataCallback.current?.(`\x1b\\\x1b[?2026h${'codex redraw '.repeat(8_000)}`)
+    capturedDataCallback.current?.(`\x1b\\\x1b[?2026h${'opencode redraw '.repeat(8_000)}`)
 
     expect(transport.sendInput).toHaveBeenCalledWith('\x1b]11;rgb:1111/1111/1111\x1b\\')
     expect(pane.terminal.write).not.toHaveBeenCalledWith('\x1b]11;?\x1b\\', expect.any(Function))
     expect(pane.terminal.write).not.toHaveBeenCalledWith(
-      `\x1b\\\x1b[?2026h${'codex redraw '.repeat(8_000)}`,
+      `\x1b\\\x1b[?2026h${'opencode redraw '.repeat(8_000)}`,
       expect.any(Function)
     )
 
     binding.dispose()
   })
 
-  it('answers hidden Codex OSC color queries split before the prefix directly', async () => {
+  it('answers hidden OpenCode OSC color queries split before the prefix directly', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -395,25 +395,25 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
 
     capturedDataCallback.current?.('\x1b]')
-    capturedDataCallback.current?.(`11;?\x1b\\\x1b[?2026h${'codex redraw '.repeat(8_000)}`)
+    capturedDataCallback.current?.(`11;?\x1b\\\x1b[?2026h${'opencode redraw '.repeat(8_000)}`)
 
     expect(transport.sendInput).toHaveBeenCalledWith('\x1b]11;rgb:1111/1111/1111\x1b\\')
     expect(pane.terminal.write).not.toHaveBeenCalledWith('\x1b]11;?\x1b\\', expect.any(Function))
     expect(pane.terminal.write).not.toHaveBeenCalledWith(
-      `11;?\x1b\\\x1b[?2026h${'codex redraw '.repeat(8_000)}`,
+      `11;?\x1b\\\x1b[?2026h${'opencode redraw '.repeat(8_000)}`,
       expect.any(Function)
     )
 
     binding.dispose()
   })
 
-  it('keeps later hidden Codex stateless terminal queries on the live xterm path', async () => {
+  it('keeps later hidden OpenCode stateless terminal queries on the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -430,7 +430,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -449,7 +449,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('keeps clean hidden Codex stateful cursor-position queries on the live xterm path', async () => {
+  it('keeps clean hidden OpenCode stateful cursor-position queries on the live xterm path', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -466,7 +466,7 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -479,7 +479,7 @@ describe('connectPanePty', () => {
     binding.dispose()
   })
 
-  it('does not answer dirty hidden Codex stateful queries from stale xterm state', async () => {
+  it('does not answer dirty hidden OpenCode stateful queries from stale xterm state', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -496,12 +496,12 @@ describe('connectPanePty', () => {
       manager as never,
       createDeps({
         isVisibleRef: { current: false },
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
 
-    capturedDataCallback.current?.(`\x1b[2J\x1b[H${'codex redraw '.repeat(8_000)}`)
+    capturedDataCallback.current?.(`\x1b[2J\x1b[H${'opencode redraw '.repeat(8_000)}`)
     capturedDataCallback.current?.('\x1b[6n')
 
     expect(window.api.pty.getMainBufferSnapshot).not.toHaveBeenCalled()

@@ -115,7 +115,7 @@ describe('AgentHookServer listener replay', () => {
         paneKey: PANE,
         tabId: 'tab-1',
         worktreeId: 'wt-1',
-        payload: { state: 'working', prompt: 'cached task', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'cached task', agentType: 'opencode' }
       },
       'conn-1'
     )
@@ -307,8 +307,6 @@ describe('AgentHookServer listener replay', () => {
     }
     const listener = vi.fn()
     server.subscribeStatusChanges(listener)
-    const dropped: string[] = []
-    server.subscribeStatusDrop((paneKey) => dropped.push(paneKey))
     const identities = server.getStatusSnapshot().map((entry) => ({
       paneKey: entry.paneKey,
       receivedAt: entry.receivedAt,
@@ -322,7 +320,6 @@ describe('AgentHookServer listener replay', () => {
     ])
 
     expect(evicted.sort()).toEqual([PANE, otherPane].sort())
-    expect(dropped.sort()).toEqual([PANE, otherPane].sort())
     expect(listener).toHaveBeenCalledTimes(1)
     expect(server.getStatusSnapshot()).toEqual([])
   })
@@ -407,7 +404,7 @@ describe('AgentHookServer listener replay', () => {
     }
     server.ingestTerminalStatus({
       paneKey: unstampedPaneKey,
-      payload: { state: 'working', prompt: '', agentType: 'codex' }
+      payload: { state: 'working', prompt: '', agentType: 'opencode' }
     })
     statusListener.mockClear()
     persistSpy.mockClear()
@@ -439,7 +436,7 @@ describe('AgentHookServer listener replay', () => {
       'ssh-a'
     )
     server.ingestRemote(
-      { paneKey: PANE, payload: { state: 'working', agentType: 'codex' } },
+      { paneKey: PANE, payload: { state: 'working', agentType: 'opencode' } },
       'ssh-b'
     )
 

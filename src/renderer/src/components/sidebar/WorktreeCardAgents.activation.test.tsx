@@ -182,7 +182,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId,
-        agentType: 'codex',
+        agentType: 'opencode',
         prompt: 'Structured session',
         worktreeId: 'wt-1'
       })
@@ -211,7 +211,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId,
-        agentType: 'codex',
+        agentType: 'opencode',
         prompt: 'Run automation worker',
         worktreeId: 'wt-1'
       })
@@ -245,7 +245,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId,
-        agentType: 'codex',
+        agentType: 'opencode',
         prompt: 'Show full log',
         worktreeId: 'wt-1'
       })
@@ -311,7 +311,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId,
-        agentType: 'codex',
+        agentType: 'opencode',
         prompt: 'Reveal the real worker',
         worktreeId: 'wt-1'
       })
@@ -342,7 +342,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId: 'worker-tab',
-        agentType: 'codex',
+        agentType: 'opencode',
         prompt: 'Malformed worker',
         worktreeId: 'wt-1'
       })
@@ -396,7 +396,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId,
-        agentType: 'gemini',
+        agentType: 'pi',
         prompt: 'Stale worker',
         worktreeId: 'wt-1'
       })
@@ -421,7 +421,7 @@ describe('WorktreeCardAgents activation', () => {
       mockAgent({
         paneKey,
         tabId,
-        agentType: 'gemini',
+        agentType: 'pi',
         prompt: 'Compact worker',
         worktreeId: 'wt-1'
       })

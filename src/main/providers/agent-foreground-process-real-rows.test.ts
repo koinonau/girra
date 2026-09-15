@@ -21,14 +21,13 @@ describe('real foreground process captures', () => {
 
     expect(
       captured
-        .filter(({ agent }) => ['claude', 'codex', 'opencode'].includes(agent))
+        .filter(({ agent }) => ['claude', 'opencode'].includes(agent))
         .map(({ agent, shellPid, rows }) => ({
           agent,
           processName: resolveAgentForegroundProcessFromPs(rows, shellPid)
         }))
     ).toEqual([
       { agent: 'claude', processName: 'claude' },
-      { agent: 'codex', processName: 'codex' },
       { agent: 'opencode', processName: 'opencode' }
     ])
   })

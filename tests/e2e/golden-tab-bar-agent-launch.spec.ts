@@ -42,7 +42,7 @@ for (const { id, menuItemName } of GOLDEN_STUB_AGENTS) {
     await launchGoldenStubAgentFromNewTab(orcaPage, menuItemName)
 
     const activeTab = orcaPage.locator('[data-testid="sortable-tab"][data-active="true"]')
-    await expect(activeTab).toHaveAttribute('data-tab-title', /Golden Stub Agent|Codex|Claude/i)
+    await expect(activeTab).toHaveAttribute('data-tab-title', /Golden Stub Agent|Claude/i)
     // The marker distinguishes an agent launch from an identical bare-shell tab.
     expect(await getTerminalContent(orcaPage)).toContain(GOLDEN_STUB_READY_MARKER)
   })
@@ -58,7 +58,7 @@ test.describe('Windows runtimes', () => {
     }) => {
       await openWorkspaceTerminal(orcaPage)
       // Each shell family requires different launch-command quoting.
-      await configureGoldenStubAgent(orcaPage, { agent: 'codex', windowsShell: shell })
+      await configureGoldenStubAgent(orcaPage, { agent: 'claude', windowsShell: shell })
       await launchGoldenStubAgentFromNewTab(orcaPage)
 
       expect(await getTerminalContent(orcaPage)).toContain(GOLDEN_STUB_READY_MARKER)
@@ -78,7 +78,7 @@ test.describe('Windows runtimes', () => {
     try {
       // WSL must retarget both agent detection and the PTY.
       await useWslRuntimeForActiveProject(orcaPage, distro!)
-      await configureGoldenStubAgent(orcaPage, { agent: 'codex' })
+      await configureGoldenStubAgent(orcaPage, { agent: 'claude' })
       await launchGoldenStubAgentFromNewTab(orcaPage)
 
       // The distro-only marker proves the agent ran in WSL.

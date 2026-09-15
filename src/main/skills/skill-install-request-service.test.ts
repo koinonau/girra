@@ -66,7 +66,7 @@ async function fixture() {
             headers: { 'content-type': SKILL_PACKAGE_CONTENT_TYPE }
           })
       ) as typeof fetch,
-      detectProviders: async () => ['codex']
+      detectProviders: async () => ['opencode']
     }
   }
 }

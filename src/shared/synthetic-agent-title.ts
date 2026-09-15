@@ -11,20 +11,11 @@ export type SyntheticAgentTitleProfile = {
 }
 
 export const SYNTHETIC_AGENT_TITLE_AGENTS = [
-  'codex',
   'opencode',
   'pi'
 ] as const satisfies readonly TuiAgent[]
 
 export const SYNTHETIC_AGENT_TITLE_PROFILES: Record<string, SyntheticAgentTitleProfile> = {
-  codex: {
-    workingLabel: 'Codex',
-    permissionLabel: 'Codex - action required',
-    idleLabel: 'Codex ready',
-    // Why: Codex emits working OSC titles but can miss the final frame.
-    // Only synthesize terminal states so native spinner behavior stays intact.
-    synthesizeWorkingTitle: false
-  },
   opencode: {
     workingLabel: 'OpenCode',
     permissionLabel: 'OpenCode - action required',

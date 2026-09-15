@@ -12,7 +12,7 @@ describe('orchestration federation effects', () => {
     appendFederationTerminalEffects(
       effects,
       [
-        { handle: 'term_agent', title: 'Codex' },
+        { handle: 'term_agent', title: 'Claude Code' },
         { handle: 'term_configured', title: 'Setup' },
         { handle: 'term_setup', title: 'PowerShell' }
       ],

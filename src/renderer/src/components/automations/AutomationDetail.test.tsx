@@ -73,4 +73,27 @@ describe('AutomationDetail enablement', () => {
     expect(container.textContent).toContain('Enabled')
     expect(notice(container)).toBeNull()
   })
+
+  it('keeps a paused automation whose agent was dropped from resuming', async () => {
+    const container = await render({
+      enabled: false,
+      // Why: a profile saved before the roster shrank still carries the old id.
+      agentId: 'retired-agent' as Automation['agentId']
+    })
+
+    expect(container.textContent).toContain('Agent no longer available')
+    const resume = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="Resume automation"]'
+    )
+    expect(resume?.disabled).toBe(true)
+  })
+
+  it('lets a paused automation with a known agent resume', async () => {
+    const container = await render({ enabled: false, agentId: 'opencode' })
+
+    const resume = container.querySelector<HTMLButtonElement>(
+      'button[aria-label="Resume automation"]'
+    )
+    expect(resume?.disabled).toBe(false)
+  })
 })

@@ -12,18 +12,18 @@ describe('agent hook terminal lifecycle', () => {
     dispatchAgentHookTerminalLifecycle('tab-1:leaf-1', {
       state: 'done',
       prompt: 'finish',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     unregister()
     dispatchAgentHookTerminalLifecycle('tab-1:leaf-1', {
       state: 'working',
       prompt: 'next',
-      agentType: 'codex'
+      agentType: 'claude'
     })
 
     expect(handler).toHaveBeenCalledTimes(1)
     expect(handler).toHaveBeenCalledWith(
-      expect.objectContaining({ state: 'done', agentType: 'codex' })
+      expect.objectContaining({ state: 'done', agentType: 'claude' })
     )
   })
 

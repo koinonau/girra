@@ -30,13 +30,9 @@ export class OrcaRuntimeWithResolveAuthoritativeTerminalWaitPermission extends O
       terminal.titleStatusIsLive &&
       terminal.titleStatus !== null &&
       terminal.titleStatus !== 'permission' &&
-      !isOpenCodeNativeTitle(terminal.title) &&
-      blockedByWaitText !== 'agent-approval-prompt'
+      !isOpenCodeNativeTitle(terminal.title)
     if (liveTitleClearsBlockedText && lifecycle?.status !== terminal.titleStatus) {
       return null
-    }
-    if (blockedByWaitText === 'agent-approval-prompt') {
-      return blockedByWaitText
     }
     const newestPermissionAt = Math.max(
       explicitStatus?.status === 'permission' ? explicitStatus.updatedAt : -1,

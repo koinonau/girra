@@ -107,20 +107,20 @@ describe('Store', () => {
       settings: {
         commitMessageAi: {
           enabled: true,
-          agentId: 'cursor',
-          selectedModelByAgent: { cursor: 'gpt-5.2' },
-          selectedModelByAgentByHost: { 'ssh:conn-1': { cursor: 'remote-model' } },
+          agentId: 'pi',
+          selectedModelByAgent: { pi: 'gpt-5.2' },
+          selectedModelByAgentByHost: { 'ssh:conn-1': { pi: 'remote-model' } },
           discoveredModelsByAgent: {
-            cursor: [{ id: 'gpt-5.2', label: 'GPT 5.2' }]
+            pi: [{ id: 'gpt-5.2', label: 'GPT 5.2' }]
           },
           discoveredModelsByAgentByHost: {
             'ssh:conn-1': {
-              cursor: [{ id: 'remote-model', label: 'Remote Model' }]
+              pi: [{ id: 'remote-model', label: 'Remote Model' }]
             }
           },
           selectedThinkingByModel: { 'gpt-5.2': 'high' },
           customPrompt: 'Use Conventional Commits.',
-          customAgentCommand: 'cursor-agent'
+          customAgentCommand: 'pi'
         }
       },
       ui: {},
@@ -133,19 +133,19 @@ describe('Store', () => {
 
     expect(sourceControlAi).toMatchObject({
       enabled: true,
-      agentId: 'cursor',
-      selectedModelByAgent: { cursor: 'gpt-5.2' },
+      agentId: 'pi',
+      selectedModelByAgent: { pi: 'gpt-5.2' },
       selectedThinkingByModel: { 'gpt-5.2': 'high' },
-      customAgentCommand: 'cursor-agent',
+      customAgentCommand: 'pi',
       instructionsByOperation: {
         commitMessage: 'Use Conventional Commits.',
         pullRequest: '',
         branchName: 'Use Conventional Commits.'
       }
     })
-    expect(sourceControlAi?.selectedModelByAgentByHost?.['ssh:conn-1']?.cursor).toBe('remote-model')
-    expect(sourceControlAi?.discoveredModelsByAgent?.cursor?.[0]?.id).toBe('gpt-5.2')
-    expect(sourceControlAi?.discoveredModelsByAgentByHost?.['ssh:conn-1']?.cursor?.[0]?.id).toBe(
+    expect(sourceControlAi?.selectedModelByAgentByHost?.['ssh:conn-1']?.pi).toBe('remote-model')
+    expect(sourceControlAi?.discoveredModelsByAgent?.pi?.[0]?.id).toBe('gpt-5.2')
+    expect(sourceControlAi?.discoveredModelsByAgentByHost?.['ssh:conn-1']?.pi?.[0]?.id).toBe(
       'remote-model'
     )
     expect(store.getSettings().commitMessageAi?.customPrompt).toBe('Use Conventional Commits.')
@@ -255,13 +255,13 @@ describe('Store', () => {
       settings: {
         sourceControlAi: {
           enabled: true,
-          agentId: 'codex',
-          selectedModelByAgent: { codex: 'source-model' },
+          agentId: 'opencode',
+          selectedModelByAgent: { opencode: 'source-model' },
           selectedModelByAgentByHost: {},
           discoveredModelsByAgent: {},
           discoveredModelsByAgentByHost: {},
           selectedThinkingByModel: { 'source-model': 'medium' },
-          customAgentCommand: 'codex',
+          customAgentCommand: 'opencode',
           instructionsByOperation: {
             commitMessage: 'Source commit prompt',
             pullRequest: 'Preserve PR prompt'
@@ -300,7 +300,7 @@ describe('Store', () => {
     expect(sourceControlAi).toMatchObject({
       enabled: false,
       agentId: 'claude',
-      selectedModelByAgent: { codex: 'source-model' },
+      selectedModelByAgent: { opencode: 'source-model' },
       selectedThinkingByModel: { 'source-model': 'medium' },
       customAgentCommand: 'claude',
       instructionsByOperation: {
@@ -350,7 +350,7 @@ describe('Store', () => {
       settings: {
         sourceControlAi: {
           enabled: true,
-          agentId: 'codex',
+          agentId: 'opencode',
           selectedModelByAgent: {},
           selectedModelByAgentByHost: {},
           discoveredModelsByAgent: {},
@@ -364,7 +364,7 @@ describe('Store', () => {
           },
           actions: {
             commitMessage: {
-              agentId: 'codex',
+              agentId: 'opencode',
               commandInputTemplate: 'use $best-commit-msg to write a commit'
             },
             branchName: {
@@ -376,7 +376,7 @@ describe('Store', () => {
         },
         commitMessageAi: {
           enabled: true,
-          agentId: 'codex',
+          agentId: 'opencode',
           selectedModelByAgent: {},
           selectedModelByAgentByHost: {},
           discoveredModelsByAgent: {},
@@ -394,7 +394,7 @@ describe('Store', () => {
     const store = await createStore()
 
     expect(store.getSettings().sourceControlAi?.actions?.commitMessage).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: 'use $best-commit-msg to write a commit'
     })
     expect(store.getSettings().sourceControlAi?.actions?.branchName).toEqual({
@@ -411,7 +411,7 @@ describe('Store', () => {
       settings: {
         commitMessageAi: {
           enabled: true,
-          agentId: 'codex',
+          agentId: 'opencode',
           selectedModelByAgent: {},
           selectedModelByAgentByHost: {},
           discoveredModelsByAgent: {},

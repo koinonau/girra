@@ -119,7 +119,7 @@ describe('planAgentSessionLaunch', () => {
 
   it('returns null for an agent that cannot hold a structured session even on the structured route', async () => {
     const plan = planAgentSessionLaunch(store, {
-      agent: 'gemini',
+      agent: 'pi',
       workspace: { kind: 'git-worktree', worktreeId: 'wt-1' }
     })
 

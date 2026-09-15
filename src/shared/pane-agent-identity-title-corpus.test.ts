@@ -72,17 +72,17 @@ describe('controlled title fixtures (always run)', () => {
   const FIXTURES: readonly { name: string; title: string; expected: TuiAgent | null }[] = [
     {
       name: 'mandatory adversarial owner suffix beats the agent names in task text',
-      title: 'STA-4011 Linux Codex Commit Messages - opencode',
+      title: 'STA-4011 Linux Claude Commit Messages - opencode',
       expected: 'opencode'
     },
     {
       name: 'task text mentioning other agents is not identity',
-      title: 'Compare Codex with Claude Code',
+      title: 'Compare Pi with Claude Code',
       expected: null
     },
     {
       name: 'owner suffix still answers over mentioned agents',
-      title: 'Compare Codex with Claude Code… - opencode',
+      title: 'Compare Pi with Claude Code… - opencode',
       expected: 'opencode'
     },
     { name: 'Claude status sigil is a vendor marker', title: '✳', expected: 'claude' },

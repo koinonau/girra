@@ -58,7 +58,7 @@ function activeAgent(paneKey: string, worktreeId: string): AgentStatusEntry {
     prompt: 'Implement runtime switch',
     updatedAt: 1,
     stateStartedAt: 1,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
     tabId: paneKey.split(':')[0],
     worktreeId,

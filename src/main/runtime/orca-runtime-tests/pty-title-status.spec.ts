@@ -65,14 +65,14 @@ describe('OrcaRuntimeService', () => {
       title: null
     })
 
-    runtime.onPtyData(ptyId, '\x1b]0;Codex\x07', 123)
+    runtime.onPtyData(ptyId, '\x1b]0;Claude\x07', 123)
 
     expect((await runtime.listTerminals()).terminals[0]).toMatchObject({
-      title: 'Codex'
+      title: 'Claude'
     })
 
     expect((await runtime.listTerminals()).terminals[0]).toMatchObject({
-      title: 'Codex'
+      title: 'Claude'
     })
   })
 
@@ -80,14 +80,14 @@ describe('OrcaRuntimeService', () => {
     // Why: batching can coalesce "task done" + next working title into one chunk; a last-title reader misses the idle and hangs (#1083 class).
     const runtime = createRuntime()
     syncSinglePty(runtime)
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
     const [terminal] = (await runtime.listTerminals()).terminals
     const wait = runtime.waitForTerminal(terminal.handle, {
       condition: 'tui-idle',
       timeoutMs: 1_000
     })
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07\x1b]0;Codex working\x07', 101)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07\x1b]0;Claude working\x07', 101)
 
     await expect(wait).resolves.toMatchObject({
       handle: terminal.handle,
@@ -99,7 +99,7 @@ describe('OrcaRuntimeService', () => {
   // Why: this pane reads no foreground and the next reads a live shell, yet both hold the
   // same bare title the stale-working clear left behind. Neither read makes that title
   // liveness, so both must refuse.
-  it('refuses a bare Cursor title while the foreground read is unavailable', async () => {
+  it('refuses a bare task title while the foreground read is unavailable', async () => {
     vi.useFakeTimers()
     try {
       const ptyId = `${TEST_REPO_ID}::/tmp/worktree-a@@pty-bg`
@@ -113,12 +113,12 @@ describe('OrcaRuntimeService', () => {
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;⠋ Reviewing diff\x07', 100)
       runtime.onPtyData(ptyId, 'streaming output with no title\r\n', 101)
       await vi.advanceTimersByTimeAsync(3_000)
 
       const terminal = (await runtime.listTerminals()).terminals[0]
-      expect(terminal.title).toBe('Cursor Agent')
+      expect(terminal.title).toBe('Reviewing diff')
       await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(false)
       await expect(runtime.getTerminalAgentStatus(terminal.handle)).resolves.toEqual({
         handle: terminal.handle,
@@ -130,7 +130,7 @@ describe('OrcaRuntimeService', () => {
     }
   })
 
-  it('does not treat a bare Cursor title as an agent once the shell owns the foreground', async () => {
+  it('does not treat a bare task title as an agent once the shell owns the foreground', async () => {
     vi.useFakeTimers()
     try {
       const ptyId = `${TEST_REPO_ID}::/tmp/worktree-a@@pty-bg`
@@ -145,15 +145,15 @@ describe('OrcaRuntimeService', () => {
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;⠋ Reviewing diff\x07', 100)
       runtime.onPtyData(ptyId, 'agent exited; back at the shell\r\n', 101)
       await vi.advanceTimersByTimeAsync(3_000)
 
-      // cursor-agent is gone and the user's shell owns the pane, but the title still reads
-      // "Cursor Agent". A guarded send here would auto-submit Enter into that shell.
+      // claude is gone and the user's shell owns the pane, but the title still reads
+      // "Reviewing diff". A guarded send here would auto-submit Enter into that shell.
       foreground = 'zsh'
       const terminal = (await runtime.listTerminals()).terminals[0]
-      expect(terminal.title).toBe('Cursor Agent')
+      expect(terminal.title).toBe('Reviewing diff')
       await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(false)
       await expect(runtime.getTerminalAgentStatus(terminal.handle)).resolves.toEqual({
         handle: terminal.handle,
@@ -166,8 +166,8 @@ describe('OrcaRuntimeService', () => {
   })
 
   // Why: the refusals here must stay scoped to missing evidence. A working foreground read
-  // is what unlocks a live Cursor pane — and is the layer to fix if one is ever refused.
-  it('accepts a bare Cursor title when the foreground read confirms cursor-agent', async () => {
+  // is what unlocks a live Claude pane — and is the layer to fix if one is ever refused.
+  it('accepts a bare task title when the foreground read confirms claude', async () => {
     vi.useFakeTimers()
     try {
       const ptyId = `${TEST_REPO_ID}::/tmp/worktree-a@@pty-bg`
@@ -182,11 +182,11 @@ describe('OrcaRuntimeService', () => {
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;⠋ Reviewing diff\x07', 100)
       runtime.onPtyData(ptyId, 'streaming output with no title\r\n', 101)
       await vi.advanceTimersByTimeAsync(3_000)
 
-      foreground = 'cursor-agent'
+      foreground = 'claude'
       const terminal = (await runtime.listTerminals()).terminals[0]
       await expect(runtime.isTerminalRunningAgent(terminal.handle)).resolves.toBe(true)
     } finally {
@@ -197,7 +197,7 @@ describe('OrcaRuntimeService', () => {
   // Why: pins the type-narrowing branch, not a reachable state — no caller detaches the
   // controller. It is the runtime-owned pty path, which the window-graph leaf tests below
   // never reach, so nothing else would notice it being widened.
-  it('refuses a bare Cursor title on a runtime pty with no controller attached', async () => {
+  it('refuses a bare task title on a runtime pty with no controller attached', async () => {
     vi.useFakeTimers()
     try {
       const ptyId = `${TEST_REPO_ID}::/tmp/worktree-a@@pty-bg`
@@ -205,13 +205,13 @@ describe('OrcaRuntimeService', () => {
       runtime.setPtyController({
         write: () => true,
         kill: () => true,
-        getForegroundProcess: async () => 'cursor-agent',
+        getForegroundProcess: async () => 'claude',
         listProcesses: async () => [{ id: ptyId, cwd: '/tmp/worktree-a', title: 'shell' }]
       })
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyId, '\x1b]0;⠋ Cursor Agent\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;⠋ Reviewing diff\x07', 100)
       runtime.onPtyData(ptyId, 'streaming output with no title\r\n', 101)
       await vi.advanceTimersByTimeAsync(3_000)
 
@@ -237,16 +237,16 @@ describe('OrcaRuntimeService', () => {
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyId, '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;Claude working\x07', 100)
       runtime.onPtyData(ptyId, 'output without a title\r\n', 101)
       expect((await runtime.listTerminals()).terminals[0]).toMatchObject({
-        title: 'Codex working'
+        title: 'Claude working'
       })
 
       await vi.advanceTimersByTimeAsync(3_000)
 
       expect((await runtime.listTerminals()).terminals[0]).toMatchObject({
-        title: 'Codex'
+        title: 'Claude'
       })
     } finally {
       vi.useRealTimers()
@@ -267,7 +267,7 @@ describe('OrcaRuntimeService', () => {
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyId, '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData(ptyId, '\x1b]0;Claude working\x07', 100)
       runtime.onPtyData(ptyId, 'output without a title\r\n', 101)
       runtime.onPtyExit(ptyId, 0)
 
@@ -275,7 +275,7 @@ describe('OrcaRuntimeService', () => {
 
       // The dead session keeps its factual last title; the disposed tracker's stale-title rewrite must not fire into the retained record.
       expect((await runtime.listTerminals()).terminals[0]).toMatchObject({
-        title: 'Codex working'
+        title: 'Claude working'
       })
     } finally {
       vi.useRealTimers()
@@ -300,17 +300,17 @@ describe('OrcaRuntimeService', () => {
       runtime.attachWindow(1)
       runtime.markGraphReady(1)
 
-      runtime.onPtyData(ptyA, '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData(ptyB, '\x1b]0;Aider working\x07', 100)
+      runtime.onPtyData(ptyA, '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData(ptyB, '\x1b]0;OpenCode working\x07', 100)
       // Only A receives title-less output, so only A's stale timer arms.
       runtime.onPtyData(ptyA, 'output without a title\r\n', 101)
 
       await vi.advanceTimersByTimeAsync(3_000)
 
       const { terminals } = await runtime.listTerminals()
-      expect(terminals.find((t) => t.tabId === `pty:${ptyA}`)).toMatchObject({ title: 'Codex' })
+      expect(terminals.find((t) => t.tabId === `pty:${ptyA}`)).toMatchObject({ title: 'Claude' })
       expect(terminals.find((t) => t.tabId === `pty:${ptyB}`)).toMatchObject({
-        title: 'Aider working'
+        title: 'OpenCode working'
       })
     } finally {
       vi.useRealTimers()

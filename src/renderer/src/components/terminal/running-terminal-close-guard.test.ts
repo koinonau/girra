@@ -259,7 +259,7 @@ describe('guardRunningTerminalClose', () => {
       terminalLayoutsByTabId: {
         'tab-1': { ptyIdsByLeafId: { [LEAF_A]: 'pty-a', [LEAF_B]: 'pty-b' } }
       },
-      agentStatusByPaneKey: { [`tab-1:${LEAF_B}`]: { agentType: 'codex' } }
+      agentStatusByPaneKey: { [`tab-1:${LEAF_B}`]: { agentType: 'opencode' } }
     })
 
     guard()

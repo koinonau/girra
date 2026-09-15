@@ -31,7 +31,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('keeps the process-exit backstop after hidden panes gain agent evidence', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('opencode'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
@@ -45,7 +45,7 @@ describe('agent completion coordinator', () => {
     coordinator.startProcessTracking()
     expect(vi.getTimerCount()).toBe(0)
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     // Why: hidden panes poll the backstop at the throttled 3s cadence, not the
     // 2s idle / 750ms active cadence reserved for visible panes.
     vi.advanceTimersByTime(3_000)
@@ -61,7 +61,7 @@ describe('agent completion coordinator', () => {
   // counted ~78 inspections over 60s; post-fix ~20. The assertion fails on the
   // pre-fix code (>25) and passes after, so it locks in the reduction.
   it('throttles a hidden agent pane to the 3s backstop cadence over a 60s window', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('opencode'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
@@ -73,7 +73,7 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(60_000)
 
     const hiddenCalls = inspectProcess.mock.calls.length
@@ -83,7 +83,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('keeps a visible agent pane at full 750ms cadence over a 60s window', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('opencode'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
@@ -95,7 +95,7 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(60_000)
 
     // ~60_000 / 750 ≈ 78; the hidden throttle must not regress visible panes.
@@ -104,7 +104,7 @@ describe('agent completion coordinator', () => {
 
   it('re-arms full cadence immediately when a throttled hidden pane becomes visible', async () => {
     let visible = false
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('opencode'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
@@ -116,7 +116,7 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     // First hidden poll runs and arms the next 3s backstop timer.
     await vi.advanceTimersByTimeAsync(3_000)
     const callsBeforeFlip = inspectProcess.mock.calls.length
@@ -136,7 +136,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('still detects an unannounced process exit while hidden, at the slower cadence', async () => {
-    let foregroundProcess: string | null = 'codex'
+    let foregroundProcess: string | null = 'opencode'
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -149,7 +149,7 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(3_000)
 
     // Agent exits with no completion title/hook — only the poll can notice.
@@ -161,7 +161,7 @@ describe('agent completion coordinator', () => {
     // Second idle sample confirms the exit ~2 hidden polls (~6s) after it happened.
     await vi.advanceTimersByTimeAsync(3_000)
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex', {
+    expect(dispatchCompletion).toHaveBeenCalledWith('opencode', {
       source: 'process-exit',
       quietedHookDone: false,
       terminalIdleConfirmed: true
@@ -169,7 +169,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('clears process evidence after agent exit so later non-agent spinner titles do not notify', async () => {
-    let foregroundProcess: string | null = 'codex'
+    let foregroundProcess: string | null = 'opencode'
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -184,8 +184,8 @@ describe('agent completion coordinator', () => {
     vi.advanceTimersByTime(2_000)
     await flushAsyncTicks()
 
-    coordinator.observeTitle('⠋ codex')
-    coordinator.observeTitle('codex done')
+    coordinator.observeTitle('⠋ opencode')
+    coordinator.observeTitle('opencode done')
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
     foregroundProcess = 'zsh'
@@ -202,7 +202,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('does not dispatch process-exit while an agent terminal still has child processes', async () => {
-    let result = processResult('codex')
+    let result = processResult('opencode')
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -233,7 +233,7 @@ describe('agent completion coordinator', () => {
     await flushAsyncTicks()
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex', {
+    expect(dispatchCompletion).toHaveBeenCalledWith('opencode', {
       source: 'process-exit',
       quietedHookDone: false,
       terminalIdleConfirmed: true
@@ -257,9 +257,9 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeHookStatus({ state: 'working', agentType: 'codex', prompt: 'test' })
+    coordinator.observeHookStatus({ state: 'working', agentType: 'opencode', prompt: 'test' })
     await vi.advanceTimersByTimeAsync(2_000)
-    coordinator.observeHookStatus({ state: 'done', agentType: 'codex', prompt: 'test' })
+    coordinator.observeHookStatus({ state: 'done', agentType: 'opencode', prompt: 'test' })
 
     expect(dispatchCompletion).not.toHaveBeenCalled()
     await vi.advanceTimersByTimeAsync(HOOK_DONE_QUIET_MS)
@@ -283,7 +283,7 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(2_000)
     coordinator.observeClassifiedTitleCompletion('done')
 
@@ -291,7 +291,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('resets exit confirmation across an unavailable inspection', async () => {
-    let result: RuntimeTerminalProcessInspection = processResult('codex')
+    let result: RuntimeTerminalProcessInspection = processResult('opencode')
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -322,7 +322,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('does not mark an agent-to-agent process replacement as terminal idle', async () => {
-    let foregroundProcess = 'codex'
+    let foregroundProcess = 'opencode'
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -334,20 +334,20 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(2_000)
 
     foregroundProcess = 'claude'
     await vi.advanceTimersByTimeAsync(750)
 
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex', {
+    expect(dispatchCompletion).toHaveBeenCalledWith('opencode', {
       source: 'process-exit',
       quietedHookDone: false
     })
   })
 
   it('suppresses replacement completion before coordinator state mutation', async () => {
-    let foregroundProcess = 'codex'
+    let foregroundProcess = 'opencode'
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -360,7 +360,7 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(2_000)
 
     foregroundProcess = 'claude'
@@ -373,7 +373,7 @@ describe('agent completion coordinator', () => {
   })
 
   it('suppresses confirmed process exit when the owner vetoes the exited process', async () => {
-    let foregroundProcess: string | null = 'codex'
+    let foregroundProcess: string | null = 'opencode'
     const dispatchCompletion = vi.fn()
     const shouldSuppressConfirmedProcessExitCompletion = vi.fn(() => true)
     const coordinator = createAgentCompletionCoordinator({
@@ -387,21 +387,21 @@ describe('agent completion coordinator', () => {
     })
 
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('OpenCode working')
     await vi.advanceTimersByTimeAsync(2_000)
 
     foregroundProcess = null
     await vi.advanceTimersByTimeAsync(1_500)
 
     expect(shouldSuppressConfirmedProcessExitCompletion).toHaveBeenCalledWith({
-      agent: 'codex',
-      processName: 'codex'
+      agent: 'opencode',
+      processName: 'opencode'
     })
     expect(dispatchCompletion).not.toHaveBeenCalled()
   })
 
   it('suppresses process-exit backstop after a title completion already notified the turn', async () => {
-    let foregroundProcess: string | null = 'codex'
+    let foregroundProcess: string | null = 'opencode'
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -416,13 +416,13 @@ describe('agent completion coordinator', () => {
     vi.advanceTimersByTime(2_000)
     await flushAsyncTicks()
 
-    coordinator.observeTitle('⠋ codex')
-    coordinator.observeTitle('codex done')
+    coordinator.observeTitle('⠋ opencode')
+    coordinator.observeTitle('opencode done')
     foregroundProcess = null
     vi.advanceTimersByTime(750)
     await flushAsyncTicks()
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex done')
+    expect(dispatchCompletion).toHaveBeenCalledWith('opencode done')
   })
 })

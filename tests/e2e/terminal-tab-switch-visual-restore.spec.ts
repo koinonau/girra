@@ -136,7 +136,7 @@ async function ensureTwoTerminalTabs(
 
 async function createAgentMarkedTerminalTab(
   page: Page,
-  agent: 'codex' | 'opencode',
+  agent: 'claude' | 'opencode',
   command: string
 ): Promise<string> {
   const worktreeId = (await getActiveWorktreeId(page))!
@@ -154,7 +154,7 @@ async function createAgentMarkedTerminalTab(
         command,
         launchAgent: agent,
         telemetry: {
-          agent_kind: agent,
+          agent_kind: agent === 'claude' ? 'claude-code' : agent,
           launch_source: 'tab_bar_quick_launch',
           request_kind: 'new'
         }
@@ -167,8 +167,8 @@ async function createAgentMarkedTerminalTab(
   )
 }
 
-async function createCodexMarkedTerminalTab(page: Page): Promise<string> {
-  return createAgentMarkedTerminalTab(page, 'codex', 'node -e "setInterval(() => {}, 1000)"')
+async function createClaudeMarkedTerminalTab(page: Page): Promise<string> {
+  return createAgentMarkedTerminalTab(page, 'claude', 'node -e "setInterval(() => {}, 1000)"')
 }
 
 async function createOpenCodeMarkedTerminalTab(page: Page): Promise<string> {
@@ -697,7 +697,7 @@ test.describe('Terminal tab switch visual restore', () => {
     await waitForActiveTerminalManager(orcaPage, 30_000)
 
     const shellTabId = (await getActiveTabId(orcaPage))!
-    const agentTabId = await createCodexMarkedTerminalTab(orcaPage)
+    const agentTabId = await createClaudeMarkedTerminalTab(orcaPage)
     await waitForActiveTerminalManager(orcaPage, 30_000)
     await waitForPanePtyIdOnTab(orcaPage, agentTabId)
     const paneIdentity = await readPaneIdentityOnTab(orcaPage, agentTabId)
@@ -721,7 +721,7 @@ test.describe('Terminal tab switch visual restore', () => {
     await expect
       .poll(async () => (await readHiddenOutputDebug(orcaPage))?.hiddenRendererSkipCount ?? 0, {
         timeout: 5_000,
-        message: 'Codex-marked hidden output did not take the skipped renderer path'
+        message: 'Claude-marked hidden output did not take the skipped renderer path'
       })
       .toBeGreaterThan(0)
     await setHiddenSnapshotOverride(orcaPage, paneIdentity.ptyId, {

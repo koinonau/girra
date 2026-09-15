@@ -1,5 +1,5 @@
 import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
-import { isTuiAgent, TUI_AGENT_CONFIG } from '../../../../shared/tui-agent-config'
+import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import { makePaneKey } from '../../../../shared/stable-pane-id'
 import type { PaneForegroundAgentEntry } from '../../store/slices/pane-foreground-agent'
 import type { TerminalPasteTextOptions } from './terminal-paste-model'
@@ -16,8 +16,6 @@ import type { TerminalPasteTextOptions } from './terminal-paste-model'
  * `cat`. So silence cannot be read as "nobody has an opinion".
  *
  * Agent identity disambiguates silence because a TUI agent enables bracketed paste.
- * A verified Windows input-record agent cannot receive paste frames; for that explicit
- * capability, use the same modified-Enter newline contract as Shift+Enter.
  *
  * Why this diverges from terminal-windows-shift-enter, which vetoes
  * on shellForeground/routingRevoked and requires routingTrusted: that resolver decides
@@ -59,7 +57,6 @@ export function resolveProtectedMultilinePasteOptionsForPane({
 
 export function resolveProtectedMultilinePasteOptionsForAgentEvidence({
   isWindowsClient,
-  hostPlatform,
   foregroundAgent,
   entry
 }: {
@@ -81,13 +78,5 @@ export function resolveProtectedMultilinePasteOptionsForAgentEvidence({
   // measured live. An idle agent also sits at `done` past the 30-minute freshness
   // TTL, so neither state nor TTL can gate this either. A false negative sends the
   // user's parked draft; a false positive only changes encoding within this paste.
-  const windowsInputRecordPasteNewline = agent
-    ? TUI_AGENT_CONFIG[agent].windowsInputRecordPasteNewline
-    : undefined
-  if (hostPlatform === 'win32' && windowsInputRecordPasteNewline) {
-    return {
-      windowsInputRecordNewline: windowsInputRecordPasteNewline
-    }
-  }
   return isWindowsClient || agent ? { forceBracketedPasteForMultiline: true } : undefined
 }

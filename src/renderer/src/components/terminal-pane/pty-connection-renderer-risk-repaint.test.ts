@@ -189,7 +189,7 @@ describe('connectPanePty', () => {
     capturedDataCallback.current?.('\x1b[48')
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
 
-    capturedDataCallback.current?.(';2;52;52;52m codex block \x1b[0m\r\n')
+    capturedDataCallback.current?.(';2;52;52;52m tui block \x1b[0m\r\n')
 
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
   })
@@ -215,12 +215,12 @@ describe('connectPanePty', () => {
     capturedDataCallback.current?.('8;2;52')
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
 
-    capturedDataCallback.current?.(';52;52m codex block \x1b[0m\r\n')
+    capturedDataCallback.current?.(';52;52m tui block \x1b[0m\r\n')
 
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
   })
 
-  it('forces a viewport refresh for foreground Codex-style background redraws', async () => {
+  it('forces a viewport refresh for foreground TUI background redraws', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport()
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -244,7 +244,7 @@ describe('connectPanePty', () => {
     connectPanePty(pane as never, manager as never, createDeps() as never)
     await flushAsyncTicks(6)
 
-    capturedDataCallback.current?.('\x1b[2J\x1b[H\x1b[48;2;52;52;52m codex block text \x1b[0m\r\n')
+    capturedDataCallback.current?.('\x1b[2J\x1b[H\x1b[48;2;52;52;52m tui block text \x1b[0m\r\n')
 
     expect(manager.markPaneHasComplexScriptOutput).not.toHaveBeenCalled()
     expect(refresh).toHaveBeenCalledWith(0, 39, true)

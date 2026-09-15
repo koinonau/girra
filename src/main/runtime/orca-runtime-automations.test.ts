@@ -50,7 +50,7 @@ const existingAutomation = {
   name: 'Daily review',
   prompt: 'Review changes',
   precheck: null,
-  agentId: 'codex',
+  agentId: 'claude',
   projectId: 'repo-1',
   executionTargetType: 'local',
   executionTargetId: 'local',
@@ -79,7 +79,7 @@ describe('OrcaRuntimeService automation methods', () => {
       name: 'Daily review',
       prompt: 'Review changes',
       precheck: { command: 'test -f ready', timeoutSeconds: 30 },
-      agentId: 'codex',
+      agentId: 'claude',
       repo: 'repo-1',
       workspaceMode: 'new_per_run',
       setupDecision: 'skip',
@@ -92,7 +92,7 @@ describe('OrcaRuntimeService automation methods', () => {
         name: 'Daily review',
         prompt: 'Review changes',
         precheck: { command: 'test -f ready', timeoutSeconds: 30 },
-        agentId: 'codex',
+        agentId: 'claude',
         projectId: 'repo-1',
         workspaceMode: 'new_per_run',
         workspaceId: null,
@@ -112,7 +112,7 @@ describe('OrcaRuntimeService automation methods', () => {
       runtime.createAutomation({
         name: 'Mismatched review',
         prompt: 'Review changes',
-        agentId: 'codex',
+        agentId: 'claude',
         repo: 'id:repo-1',
         runContext: {
           kind: 'workspace-run',
@@ -144,7 +144,7 @@ describe('OrcaRuntimeService automation methods', () => {
       runtime.createAutomation({
         name: 'Workspace review',
         prompt: 'Review changes',
-        agentId: 'codex',
+        agentId: 'claude',
         workspace: 'id:repo-1::/tmp/orca',
         runContext: {
           kind: 'workspace-run',
@@ -273,7 +273,7 @@ describe('OrcaRuntimeService automation methods', () => {
       runtime.createAutomation({
         name: 'Fresh',
         prompt: 'Run checks',
-        agentId: 'codex',
+        agentId: 'claude',
         repo: 'repo-1',
         workspaceMode: 'new_per_run',
         reuseSession: true,

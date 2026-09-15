@@ -300,10 +300,6 @@ export function resolveCliCommands(
   return resolved
 }
 
-export function resolveCodexCommand(options: ResolveCommandOptions = {}): string {
-  return resolveCliCommand('codex', options)
-}
-
 export function resolveClaudeCommand(options: ResolveCommandOptions = {}): string {
   return resolveCliCommand('claude', options)
 }
@@ -328,7 +324,7 @@ function firstWindowsPathEnvKey(env: NodeJS.ProcessEnv): string {
  * sibling `node`.
  *
  * Why: `resolveCliCommand` falls back to scanning every version-manager install
- * when PATH misses, so it can hand back `~/.nvm/versions/node/v20.x/bin/codex`
+ * when PATH misses, so it can hand back `~/.nvm/versions/node/v20.x/bin/claude`
  * while PATH still leads with v22. The CLI's `#!/usr/bin/env node` shebang then
  * loads a v20-built native module under a v22 ABI and the agent dies on first
  * require (stablyai/orca#10932). Pair the binary with the runtime it was

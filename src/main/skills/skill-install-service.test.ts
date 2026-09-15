@@ -38,7 +38,7 @@ async function fixture(): Promise<{
       scope: 'global',
       homeDirectory: join(root, 'home'),
       orcaStateDirectory: join(root, 'orca-state'),
-      detectedProviders: ['codex', 'claude'],
+      detectedProviders: ['opencode', 'claude'],
       destinationIdentity: 'global:test-host',
       hostIdentity: 'test-host',
       expectedArchiveSha256: archive.archiveSha256,
@@ -56,7 +56,7 @@ afterEach(async () => {
 })
 
 describe('skill install service', () => {
-  it('installs one canonical Codex copy and aliases the other agent home to it', async () => {
+  it('installs one canonical copy and aliases the Claude home to it', async () => {
     const { root, input } = await fixture()
     const result = await installSharedSkill(input)
     const canonical = join(root, 'home', '.agents', 'skills', 'test-skill')
@@ -131,7 +131,7 @@ describe('skill install service', () => {
 
   it('keeps an unchanged canonical install partial when a provider placement is unowned', async () => {
     const { root, input } = await fixture()
-    await installSharedSkill({ ...input, detectedProviders: ['codex'] })
+    await installSharedSkill({ ...input, detectedProviders: ['opencode'] })
     const claude = join(root, 'home', '.claude', 'skills', 'test-skill')
     await mkdir(claude, { recursive: true })
     await writeFile(join(claude, 'SKILL.md'), 'unowned')
@@ -202,7 +202,7 @@ describe('skill install service', () => {
     const updated = await installSharedSkill({
       ...input,
       operationId: 'operation_without_claude',
-      detectedProviders: ['codex']
+      detectedProviders: ['opencode']
     })
 
     expect(updated.status).toBe('unchanged')

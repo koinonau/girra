@@ -5,12 +5,12 @@ import { resolveSourceControlAiForOperation } from './source-control-ai'
 describe('source-control AI policy regressions', () => {
   it('does not apply a local model choice to an SSH execution host', () => {
     const settings = getDefaultSettings('/repo')
-    settings.defaultTuiAgent = 'codex'
+    settings.defaultTuiAgent = 'opencode'
     settings.sourceControlAi = {
       ...settings.sourceControlAi!,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.4' },
-      selectedModelByAgentByHost: { local: { codex: 'gpt-5.4' } }
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'opencode/gpt-5.4-mini' },
+      selectedModelByAgentByHost: { local: { opencode: 'opencode/gpt-5.4-mini' } }
     }
 
     const result = resolveSourceControlAiForOperation({
@@ -21,18 +21,18 @@ describe('source-control AI policy regressions', () => {
 
     expect(result).toMatchObject({
       ok: true,
-      value: { params: { agentId: 'codex', model: 'gpt-5.5' } }
+      value: { params: { agentId: 'opencode', model: 'opencode/deepseek-v4-flash-free' } }
     })
   })
 
   it('keeps repo recipe and host model precedence scoped to one operation', () => {
     const settings = getDefaultSettings('/repo')
-    settings.defaultTuiAgent = 'codex'
-    settings.agentCmdOverrides = { codex: ' managed-codex ' }
+    settings.defaultTuiAgent = 'opencode'
+    settings.agentCmdOverrides = { opencode: ' managed-opencode ' }
     settings.sourceControlAi = {
       ...settings.sourceControlAi!,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.4' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'opencode/deepseek-v4-flash-free' },
       instructionsByOperation: {
         ...settings.sourceControlAi!.instructionsByOperation,
         commitMessage: 'global instruction'
@@ -43,9 +43,9 @@ describe('source-control AI policy regressions', () => {
         modelOverridesByOperation: {
           commitMessage: {
             selectedModelByAgentByHost: {
-              'ssh:build-host': { codex: 'gpt-5.4-mini' }
+              'ssh:build-host': { opencode: 'opencode/gpt-5.4-mini' }
             },
-            selectedThinkingByModel: { 'gpt-5.4-mini': 'xhigh' }
+            selectedThinkingByModel: { 'opencode/gpt-5.4-mini': 'xhigh' }
           }
         },
         instructionsByOperation: { commitMessage: ' repo instruction ' },
@@ -69,13 +69,13 @@ describe('source-control AI policy regressions', () => {
       ok: true,
       value: {
         params: {
-          agentId: 'codex',
-          model: 'gpt-5.4-mini',
+          agentId: 'opencode',
+          model: 'opencode/gpt-5.4-mini',
           thinkingLevel: 'xhigh',
           customPrompt: 'repo instruction',
           commandInputTemplate: '{basePrompt}\n\nRepo policy',
           agentArgs: '--json',
-          agentCommandOverride: 'managed-codex'
+          agentCommandOverride: 'managed-opencode'
         }
       }
     })

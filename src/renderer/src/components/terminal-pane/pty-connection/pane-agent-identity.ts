@@ -41,7 +41,6 @@ export function installPaneAgentIdentity(session: ConnectPanePtySession): void {
     return (
       tab?.launchAgent ??
       session.paneStartup?.launchAgent ??
-      session.paneStartup?.initialAgentStatus?.agent ??
       (isTuiAgent(registeredLaunchAgent) ? registeredLaunchAgent : undefined)
     )
   }
@@ -67,7 +66,7 @@ export function installPaneAgentIdentity(session: ConnectPanePtySession): void {
       isTuiAgent(registeredLaunchAgent)
     )
   }
-  // Why: a plain `codex`/`opencode` sets its OSC title and the shell never repaints
+  // Why: a plain `opencode` sets its OSC title and the shell never repaints
   // it on exit, so a confirmed return-to-shell must clear a title that still
   // names an agent — otherwise the tab reads "opencode" over a bare prompt. Only
   // reset an agent-named title; user/shell-set titles are left untouched.

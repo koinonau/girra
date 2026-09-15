@@ -43,7 +43,7 @@ function status(
     connectionId: null,
     state: 'working',
     prompt: 'secret transcript body',
-    agentType: 'codex',
+    agentType: 'opencode',
     model: 'gpt-test',
     receivedAt,
     stateStartedAt: receivedAt,
@@ -109,7 +109,7 @@ describe('orchestration fleet projection', () => {
       id: '1',
       role: 'worker',
       parent: { taskId: 'task-parent' },
-      provider: { id: 'codex', model: 'gpt-test' },
+      provider: { id: 'opencode', model: 'gpt-test' },
       host: { kind: 'local', id: 'local' },
       workspace: { id: 'workspace-1', kind: 'folder_or_worktree' },
       stage: { activity: 'working' },
@@ -185,7 +185,7 @@ describe('orchestration fleet projection', () => {
       reason: 'stale_status',
       observedAt: 1
     })
-    expect(stale.provider).toEqual({ id: 'codex', model: 'gpt-test' })
+    expect(stale.provider).toEqual({ id: 'opencode', model: 'gpt-test' })
     expect(restored.liveness).toMatchObject({
       verdict: 'unverifiable',
       reason: 'restored_unconfirmed'
@@ -357,7 +357,7 @@ describe('orchestration fleet projection', () => {
       now: 100
     })
 
-    expect(result.workers[0]?.provider).toEqual({ id: 'codex', model: 'gpt-test' })
+    expect(result.workers[0]?.provider).toEqual({ id: 'opencode', model: 'gpt-test' })
     expect(result.workers[0]?.liveness).toMatchObject({ verdict: 'unverifiable' })
   })
 

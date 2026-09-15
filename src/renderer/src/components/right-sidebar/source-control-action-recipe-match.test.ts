@@ -11,10 +11,10 @@ function settings(): GlobalSettings {
     sourceControlAi: {
       ...base.sourceControlAi!,
       enabled: true,
-      agentId: 'codex',
+      agentId: 'opencode',
       actions: {
         resolveConflicts: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model sonnet'
         }
@@ -30,7 +30,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
         actionId: 'resolveConflicts',
         target: { type: 'global' },
         recipe: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model sonnet'
         },
@@ -45,7 +45,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
         actionId: 'resolveConflicts',
         target: { type: 'repo', repoId: 'repo-1' },
         recipe: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model sonnet'
         },
@@ -87,7 +87,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
         actionId: 'resolveConflicts',
         target: { type: 'repo', repoId: 'repo-1' },
         recipe: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: ''
         },
@@ -97,7 +97,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
             enabled: true,
             actionOverrides: {
               resolveConflicts: {
-                agentId: 'codex',
+                agentId: 'opencode',
                 commandInputTemplate: '{basePrompt}',
                 agentArgs: ''
               }
@@ -114,7 +114,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
       ...currentSettings.sourceControlAi!,
       actions: {
         resolveConflicts: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}\n\ncustom global',
           agentArgs: '--model sonnet'
         }
@@ -126,7 +126,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
         actionId: 'resolveConflicts',
         target: { type: 'repo', repoId: 'repo-1' },
         recipe: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}\n\ncustom global',
           agentArgs: '--model sonnet'
         },
@@ -151,7 +151,7 @@ describe('sourceControlActionRecipeMatchesTarget', () => {
         actionId: 'resolveConflicts',
         target: { type: 'repo', repoId: 'repo-1' },
         recipe: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: ''
         },

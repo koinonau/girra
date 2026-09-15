@@ -5,7 +5,7 @@ import {
 
 /**
  * The renderer's sequencer for status rows it writes itself: remote-runtime OSC bytes it
- * parses locally, launch seeds, and Command Code output seeds. Deliberately a SECOND
+ * parses locally and launch seeds. Deliberately a SECOND
  * authority — rows main sequenced arrive already stamped and keep main's id, so the two
  * clocks that today share one `updatedAt` comparison become visible instead of implied.
  *

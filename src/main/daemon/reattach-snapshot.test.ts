@@ -217,7 +217,7 @@ describe('reattach snapshot flow', () => {
     })
   })
 
-  describe('alternate-screen TUI (Codex style)', () => {
+  describe('alternate-screen TUI', () => {
     it('snapshot detects alternate screen mode', async () => {
       const h = createHost()
       await h.createOrAttach({
@@ -227,10 +227,10 @@ describe('reattach snapshot flow', () => {
         streamClient: { onData: vi.fn(), onExit: vi.fn() }
       })
 
-      // Simulate Codex entering alternate screen
+      // Simulate a TUI entering alternate screen
       lastSub.simulateData('\x1b[?1049h')
       lastSub.simulateData('\x1b[?2004h')
-      lastSub.simulateData('\x1b[H\x1b[2JCodex TUI content\r\n> input prompt')
+      lastSub.simulateData('\x1b[H\x1b[2JAgent TUI content\r\n> input prompt')
       await new Promise((r) => setTimeout(r, 50))
 
       const result = await h.createOrAttach({
@@ -254,7 +254,7 @@ describe('reattach snapshot flow', () => {
 
       lastSub.simulateData('\x1b[?1049h')
       lastSub.simulateData('\x1b[?2004h')
-      lastSub.simulateData('\x1b[H\x1b[2JCodex TUI content')
+      lastSub.simulateData('\x1b[H\x1b[2JAgent TUI content')
       await new Promise((r) => setTimeout(r, 50))
 
       const result = await h.createOrAttach({
@@ -271,23 +271,23 @@ describe('reattach snapshot flow', () => {
       // absolute cursor positioning.
       expect(payload.rehydrateSequences).toContain('\x1b[?1049h')
       expect(payload.rehydrateSequences).toContain('\x1b[?2004h')
-      expect(payload.snapshotAnsi).toContain('Codex TUI content')
-      expect(payload.fullPayload).toContain('Codex TUI content')
+      expect(payload.snapshotAnsi).toContain('Agent TUI content')
+      expect(payload.fullPayload).toContain('Agent TUI content')
     })
 
     it('returns to preserved shell history after the reattached TUI exits', async () => {
       const emulator = new HeadlessEmulator({ cols: 80, rows: 10 })
-      await emulator.write('shell output before Codex\r\n$ codex')
-      await emulator.write('\x1b[?1049h\x1b[2J\x1b[HCodex TUI content')
+      await emulator.write('shell output before agent\r\n$ opencode')
+      await emulator.write('\x1b[?1049h\x1b[2J\x1b[HAgent TUI content')
       const payload = buildReattachPayload(emulator.getSnapshot())
       emulator.dispose()
 
       const replay = new HeadlessEmulator({ cols: 80, rows: 10 })
       try {
         await replay.write(payload.fullPayload)
-        expect(replay.getVisibleLines().join('\n')).toContain('Codex TUI content')
+        expect(replay.getVisibleLines().join('\n')).toContain('Agent TUI content')
         await replay.write('\x1b[?1049l')
-        expect(replay.getVisibleLines().join('\n')).toContain('shell output before Codex')
+        expect(replay.getVisibleLines().join('\n')).toContain('shell output before agent')
       } finally {
         replay.dispose()
       }
@@ -314,7 +314,7 @@ describe('reattach snapshot flow', () => {
       })
 
       const payload = buildReattachPayload(result.snapshot!)
-      // Simulate single SIGWINCH repaint (what Codex sends)
+      // Simulate single SIGWINCH repaint (what an alt-screen TUI sends)
       const repaintData = '\x1b[H\x1b[2Jnew TUI content\r\n> new prompt'
       const { content } = await simulateReattachToFreshTerminal(
         payload.fullPayload,
@@ -331,7 +331,7 @@ describe('reattach snapshot flow', () => {
     })
 
     it('double SIGWINCH repaint at same dims does not duplicate content', async () => {
-      const repaint = '\x1b[H\x1b[2Jcodex content\r\n> prompt'
+      const repaint = '\x1b[H\x1b[2Jagent content\r\n> prompt'
       // Simulate receiving two identical repaints (e.g. from resize + explicit SIGWINCH)
       const fresh = new HeadlessEmulator({ cols: 80, rows: 10 })
       await fresh.write('\x1b[?1049h') // enter alternate screen
@@ -342,14 +342,14 @@ describe('reattach snapshot flow', () => {
       fresh.dispose()
 
       // Content should appear exactly once, not duplicated
-      const matches = snapshot.snapshotAnsi.match(/codex content/g)
+      const matches = snapshot.snapshotAnsi.match(/agent content/g)
       expect(matches).toHaveLength(1)
     })
   })
 
-  describe('Ink-style cursor-relative repaint (Codex)', () => {
+  describe('Ink-style cursor-relative repaint', () => {
     it('snapshot + Ink-style repaint overwrites correctly without clear', async () => {
-      // Simulates the reattach flow for an Ink-based TUI (Codex).
+      // Simulates the reattach flow for an Ink-based TUI (Claude Code).
       // Ink repaints by: cursor-up-N → erase-to-end → write new content.
       // The snapshot positions xterm.js cursor where Ink expects it,
       // so the repaint overwrites the snapshot correctly.
@@ -484,7 +484,7 @@ describe('reattach snapshot flow', () => {
     })
   })
 
-  describe('inline-viewport (Codex/ratatui) reattach', () => {
+  describe('inline-viewport (ratatui) reattach', () => {
     it('fullPayload includes inline-viewport content for normal screen', async () => {
       const h = createHost()
       await h.createOrAttach({
@@ -497,7 +497,7 @@ describe('reattach snapshot flow', () => {
       lastSub.simulateData('task output line 1\r\n')
       lastSub.simulateData('task output line 2\r\n')
       lastSub.simulateData('task output line 3\r\n')
-      lastSub.simulateData('╭─ Codex ──────────╮\r\n')
+      lastSub.simulateData('╭─ Agent ──────────╮\r\n')
       lastSub.simulateData('│ Working...       │\r\n')
       lastSub.simulateData('╰──────────────────╯\r\n')
       await new Promise((r) => setTimeout(r, 50))
@@ -513,8 +513,8 @@ describe('reattach snapshot flow', () => {
       const payload = buildReattachPayload(result.snapshot!)
 
       expect(payload.snapshotAnsi).toContain('task output line 1')
-      expect(payload.snapshotAnsi).toContain('Codex')
-      expect(payload.fullPayload).toContain('Codex')
+      expect(payload.snapshotAnsi).toContain('╭─ Agent')
+      expect(payload.fullPayload).toContain('╭─ Agent')
       expect(payload.isAlternateScreen).toBe(false)
     })
 

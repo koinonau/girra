@@ -8,7 +8,6 @@ describe('projectTerminalTailLines', () => {
     const context: TerminalCursorContext = {
       rows: ['────────', '❯ proceed'],
       typedRows: ['────────', '❯'],
-      promptGlyphBoldRows: [false, false],
       rowsBelow: [],
       typedRowsBelow: [],
       beforeCursor: '❯ ',
@@ -34,7 +33,6 @@ describe('projectTerminalTailLines', () => {
     const context: TerminalCursorContext = {
       rows: ['────────', '❯ proceed'],
       typedRows: ['────────', '❯'],
-      promptGlyphBoldRows: [false, false],
       rowsBelow: [' with', ' release'],
       typedRowsBelow: ['', ''],
       rowsBelowWrapped: [true, true],

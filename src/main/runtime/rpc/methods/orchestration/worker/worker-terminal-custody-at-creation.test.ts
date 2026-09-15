@@ -54,7 +54,7 @@ describe('worker terminal custody is recorded at terminal creation', () => {
     const start = h.call('orchestration.workerStart', {
       task: task.id,
       from: 'term_coord',
-      ...(options.terminal ? { terminal: options.terminal } : { agent: 'codex' })
+      ...(options.terminal ? { terminal: options.terminal } : { agent: 'claude' })
     })
     await vi.waitFor(() => expect(h.runtime.waitForTerminal).toHaveBeenCalled())
     return { dispatchId: startingDispatchId(), taskId: task.id, start, finish }
@@ -162,7 +162,7 @@ describe('worker terminal custody is recorded at terminal creation', () => {
     const receipt = (await h.call('orchestration.workerStart', {
       task: task.id,
       from: 'term_coord',
-      agent: 'codex'
+      agent: 'claude'
     })) as { state: string; dispatchId: string; nextCommands?: string[] }
 
     expect(receipt).toMatchObject({ state: 'outcome_unknown' })

@@ -256,7 +256,7 @@ function resumeTerminalVisibilityHeavy(manager: PaneManager, shouldFocus: boolea
   }
   // Why: resumeRendering just re-attached WebGL, whose cell metrics briefly differ
   // from the DOM renderer's; a raw fit here reflows on a transient one-column-off
-  // grid and garbles diff-painting inline TUIs (grok minimize→restore).
+  // grid and garbles diff-painting inline TUIs (minimize→restore).
   manager.fitAllRevealedPanes()
   if (shouldFocus) {
     focusActivePane(manager)

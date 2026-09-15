@@ -18,7 +18,7 @@ describe('mobile agent status builder', () => {
     const retained: RuntimeAgentRowSnapshot = {
       paneKey: 'old-tab:old-leaf',
       connectionId: null,
-      payload: { state: 'working', prompt: 'ship it', agentType: 'codex' },
+      payload: { state: 'working', prompt: 'ship it', agentType: 'claude' },
       stateStartedAt: 10,
       updatedAt: 10,
       providerSession: PROVIDER_SESSION

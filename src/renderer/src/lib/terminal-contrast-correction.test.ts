@@ -108,7 +108,7 @@ describe('normalizeTerminalMinimumContrastRatio', () => {
 describe('DARK_BG_MIN_CONTRAST rescue window', () => {
   const DARK_BG = '#1e242a'
 
-  it('is high enough to lift Antigravity-style near-background body text', () => {
+  it('is high enough to lift near-background body text', () => {
     // #262b30 on #1e242a is ~1.1:1 — invisible at floor 1. The floor must exceed it so xterm corrects it.
     expect(contrastRatio(DARK_BG, '#262b30')).toBeLessThan(DARK_BG_MIN_CONTRAST)
   })

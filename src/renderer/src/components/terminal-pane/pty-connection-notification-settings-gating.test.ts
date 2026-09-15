@@ -161,9 +161,9 @@ describe('connectPanePty', () => {
       prompt: 'Fix notification payloads',
       updatedAt: Date.now(),
       stateStartedAt: Date.now(),
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: '* Codex done',
+      terminalTitle: '* OpenCode done',
       stateHistory: [],
       lastAssistantMessage: 'Implemented the formatter.'
     }
@@ -183,7 +183,7 @@ describe('connectPanePty', () => {
     }
 
     bellHandler()
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS)
     await flushAsyncTicks()
 
@@ -191,8 +191,8 @@ describe('connectPanePty', () => {
     expect(window.api.notifications.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         source: 'agent-task-complete',
-        terminalTitle: '* Codex done',
-        agentType: 'codex',
+        terminalTitle: '* OpenCode done',
+        agentType: 'opencode',
         agentLastAssistantMessage: 'Implemented the formatter.'
       })
     )
@@ -229,7 +229,7 @@ describe('connectPanePty', () => {
     }
 
     bellHandler()
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(250)
 
     expect(deps.dispatchNotification).toHaveBeenCalledWith(
@@ -245,7 +245,7 @@ describe('connectPanePty', () => {
 
   it('raises terminal attention for agent completion when OS completion notifications are disabled', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -273,7 +273,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected idle handler to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS)
 
     expect(deps.dispatchNotification).toHaveBeenCalledWith(
@@ -311,7 +311,7 @@ describe('connectPanePty', () => {
 
   it('does not dispatch generic title completions when agent-complete notifications are disabled', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -330,7 +330,7 @@ describe('connectPanePty', () => {
         window: { api: { pty: { getForegroundProcess: ReturnType<typeof vi.fn> } } }
       }
     ).window.api
-    api.pty.getForegroundProcess.mockResolvedValue('codex')
+    api.pty.getForegroundProcess.mockResolvedValue('opencode')
     const pane = createPane(1)
     const manager = createManager(1)
     const deps = createDeps()
@@ -356,7 +356,7 @@ describe('connectPanePty', () => {
 
   it('does not replay disabled generic title completions after notifications are re-enabled', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -399,7 +399,7 @@ describe('connectPanePty', () => {
         agentTaskComplete: true
       }
     }
-    inspection.resolve('codex')
+    inspection.resolve('opencode')
     await flushAsyncTicks()
     vi.advanceTimersByTime(1_000)
 
@@ -410,7 +410,7 @@ describe('connectPanePty', () => {
 
   it('clears title completion state when notifications are disabled', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -465,7 +465,7 @@ describe('connectPanePty', () => {
 
   it('cancels scheduled agent completion when notifications are disabled before dispatch', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -492,7 +492,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected onAgentBecameIdle to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     mockStoreState.settings = {
       ...mockStoreState.settings,
       notifications: {
@@ -518,7 +518,7 @@ describe('connectPanePty', () => {
 
   it('restores a suppressed terminal bell when disabling pending agent completion', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -547,7 +547,7 @@ describe('connectPanePty', () => {
     }
 
     bellHandler()
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(250)
     expect(deps.dispatchNotification).not.toHaveBeenCalledWith(
       expect.objectContaining({ source: 'terminal-bell' })
@@ -570,7 +570,7 @@ describe('connectPanePty', () => {
 
   it('requires fresh working evidence after notifications are disabled', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -617,7 +617,7 @@ describe('connectPanePty', () => {
       }
     }
     notifyStoreSubscribers()
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(1_000)
 
     expect(deps.dispatchNotification).not.toHaveBeenCalledWith(
@@ -627,7 +627,7 @@ describe('connectPanePty', () => {
 
   it('requires fresh working evidence when notifications start disabled then re-enable', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -666,7 +666,7 @@ describe('connectPanePty', () => {
       }
     }
     notifyStoreSubscribers()
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(1_000)
 
     expect(deps.dispatchNotification).not.toHaveBeenCalledWith(

@@ -38,7 +38,7 @@ beforeEach(() => {
   })
   useAppStore
     .getState()
-    .setAgentStatus(pane, { state: 'done', prompt: 'away test', agentType: 'codex' })
+    .setAgentStatus(pane, { state: 'done', prompt: 'away test', agentType: 'opencode' })
   useAppStore.getState().markAgentCompletionPaneUnread(pane)
 })
 afterEach(() => {

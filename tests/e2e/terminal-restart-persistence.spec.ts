@@ -427,7 +427,7 @@ test.describe('Terminal restart persistence', () => {
         .toBe(null)
       await expectSavedLayoutToContainTitle(secondLaunch.page, restoredTabId, title)
 
-      const runtimeTitle = '⠋ Codex restored working'
+      const runtimeTitle = '⠋ Claude Code restored working'
       await secondLaunch.page.evaluate(
         ({ targetTabId, title }) => {
           window.__store!.getState().updateTabTitle(targetTabId, title)

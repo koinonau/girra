@@ -55,7 +55,7 @@ function tab(): TerminalTab {
     id: TAB_ID,
     ptyId: 'pty-folder',
     worktreeId: WORKSPACE_ID,
-    title: 'codex',
+    title: 'opencode',
     customTitle: 'Docs reviewer',
     color: null,
     sortOrder: 0,
@@ -71,7 +71,7 @@ function entry(): AgentStatusEntry {
     updatedAt: NOW,
     stateStartedAt: NOW - 60_000,
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'opencode',
     tabId: TAB_ID,
     worktreeId: WORKSPACE_ID
   }

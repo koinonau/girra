@@ -37,7 +37,7 @@ describe('repo slice folder add', () => {
     store.setState({
       settings: {
         ...getDefaultSettings('/tmp/orca-workspaces'),
-        defaultTuiAgent: 'codex'
+        defaultTuiAgent: 'opencode'
       }
     })
 

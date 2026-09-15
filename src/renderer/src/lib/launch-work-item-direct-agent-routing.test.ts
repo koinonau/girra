@@ -2,8 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   settleStructuredAgentLaunch: vi.fn(),
-  activateAndRevealWorktree: vi.fn(),
-  preflightAgentTrust: vi.fn()
+  activateAndRevealWorktree: vi.fn()
 }))
 
 vi.mock('@/lib/structured-agent-launch-settlement', () => ({
@@ -14,15 +13,8 @@ vi.mock('@/lib/worktree-activation', () => ({
   activateAndRevealWorktree: mocks.activateAndRevealWorktree
 }))
 
-vi.mock('@/lib/agent-trust-preflight', () => ({
-  preflightAgentTrust: mocks.preflightAgentTrust
-}))
-
 import { adoptAgentSessionLaunchVerdict } from './agent-session-launch-plan'
-import {
-  markDirectWorkItemAgentTrusted,
-  settleDirectWorkItemStructuredLaunch
-} from './launch-work-item-direct-agent-routing'
+import { settleDirectWorkItemStructuredLaunch } from './launch-work-item-direct-agent-routing'
 
 const structuredPlan = adoptAgentSessionLaunchVerdict({
   route: 'structured-native-chat',
@@ -35,8 +27,6 @@ const structuredPlan = adoptAgentSessionLaunchVerdict({
 const baseArgs = {
   plan: structuredPlan,
   worktreeId: 'worktree-1',
-  workspacePath: '/repo/worktree',
-  connectionId: null,
   primaryTabId: null,
   startupPlan: null,
   launchSource: 'task_page' as const
@@ -65,7 +55,7 @@ describe('settleDirectWorkItemStructuredLaunch', () => {
     )
   })
 
-  it('runs trust preflight and the legacy terminal as the refusal fallback', async () => {
+  it('runs the legacy terminal as the refusal fallback', async () => {
     mocks.activateAndRevealWorktree.mockReturnValue({ primaryTabId: 'fallback-tab' })
     mocks.settleStructuredAgentLaunch.mockImplementation(
       async (_worktreeId, _agent, _options, hooks) => ({
@@ -80,11 +70,6 @@ describe('settleDirectWorkItemStructuredLaunch', () => {
       visibilityUnknown: false,
       failed: false,
       primaryTabId: 'fallback-tab'
-    })
-    expect(mocks.preflightAgentTrust).toHaveBeenCalledWith({
-      agent: 'claude',
-      workspacePath: '/repo/worktree',
-      connectionId: null
     })
     expect(mocks.activateAndRevealWorktree).toHaveBeenCalledWith(
       'worktree-1',
@@ -143,35 +128,5 @@ describe('settleDirectWorkItemStructuredLaunch', () => {
       primaryTabId: null
     })
     expect(mocks.settleStructuredAgentLaunch).not.toHaveBeenCalled()
-  })
-})
-
-describe('markDirectWorkItemAgentTrusted', () => {
-  beforeEach(() => vi.clearAllMocks())
-
-  it('marks trust before a legacy terminal launch', async () => {
-    await markDirectWorkItemAgentTrusted({
-      structuredLaunch: false,
-      agent: 'claude',
-      workspacePath: '/repo/worktree',
-      connectionId: 'ssh-1'
-    })
-
-    expect(mocks.preflightAgentTrust).toHaveBeenCalledWith({
-      agent: 'claude',
-      workspacePath: '/repo/worktree',
-      connectionId: 'ssh-1'
-    })
-  })
-
-  it('leaves trust to the refusal fallback on the structured route', async () => {
-    await markDirectWorkItemAgentTrusted({
-      structuredLaunch: true,
-      agent: 'claude',
-      workspacePath: '/repo/worktree',
-      connectionId: null
-    })
-
-    expect(mocks.preflightAgentTrust).not.toHaveBeenCalled()
   })
 })

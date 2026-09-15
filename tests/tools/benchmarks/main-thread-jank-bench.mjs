@@ -273,7 +273,7 @@ async function main() {
   console.log(`[fixture] userData=${fixtureDir} repo=${repoPath}`)
 
   // Why: the jank probe needs a stable workload and must never scan or mutate
-  // a developer Codex profile while running against synthetic userData.
+  // a developer Claude profile while running against synthetic userData.
   const isolatedHome = join(fixtureDir, 'home')
   mkdirSync(isolatedHome, { recursive: true })
   const env = {
@@ -285,8 +285,7 @@ async function main() {
     USERPROFILE: isolatedHome,
     ORCA_E2E_HOME_DIR: isolatedHome
   }
-  delete env.CODEX_HOME
-  delete env.ORCA_CODEX_HOME
+  delete env.CLAUDE_CONFIG_DIR
   if (args.headless) {
     env.ORCA_E2E_HEADLESS = '1'
     console.warn(

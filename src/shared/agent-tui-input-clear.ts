@@ -1,7 +1,7 @@
 // Clearing an agent TUI's input buffer when it may hold MORE THAN ONE line.
 //
 // Shared by desktop native chat and mobile: the law below is a property of the
-// agent TUIs (Claude Code, codex), not of either client.
+// agent TUIs (Claude Code, OpenCode), not of either client.
 
 /** Ctrl+U — clears toward the start of the input buffer. */
 export const AGENT_TUI_CLEAR_INPUT_LINE = '\x15'

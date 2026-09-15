@@ -439,12 +439,9 @@ describe('AgentsPane', () => {
       expect(matchesSettingsSearch(agent.cmd, getAgentsPaneSearchEntries())).toBe(true)
     }
 
-    expect(matchesSettingsSearch('GitHub Copilot', getAgentsPaneSearchEntries())).toBe(true)
-    expect(matchesSettingsSearch('open claude', getAgentsPaneSearchEntries())).toBe(true)
-    expect(matchesSettingsSearch('command-code', getAgentsPaneSearchEntries())).toBe(true)
-    expect(matchesSettingsSearch('command code', getAgentsPaneSearchEntries())).toBe(true)
-    expect(matchesSettingsSearch('agy', getAgentsPaneSearchEntries())).toBe(true)
-    expect(matchesSettingsSearch('cursor-agent', getAgentsPaneSearchEntries())).toBe(true)
+    expect(matchesSettingsSearch('open code', getAgentsPaneSearchEntries())).toBe(true)
+    expect(matchesSettingsSearch('claude-agent-teams', getAgentsPaneSearchEntries())).toBe(true)
+    expect(matchesSettingsSearch('claude agent teams', getAgentsPaneSearchEntries())).toBe(true)
   })
 
   it('renders per-agent availability as labeled status choices without row explanation copy', () => {
@@ -560,7 +557,7 @@ describe('AgentsPane', () => {
       getSettings: () => useAppStore.getState().settings,
       fallbackSettings: settings,
       updateSettings,
-      agentId: 'codex',
+      agentId: 'opencode',
       enabled: false
     })
 
@@ -573,7 +570,7 @@ describe('AgentsPane', () => {
     await flushPromiseQueue()
 
     expect(updateSettings).toHaveBeenCalledTimes(2)
-    expect(updates[1]).toMatchObject({ disabledTuiAgents: ['claude', 'codex'] })
+    expect(updates[1]).toMatchObject({ disabledTuiAgents: ['claude', 'opencode'] })
 
     writes[1].resolve()
     await secondWrite

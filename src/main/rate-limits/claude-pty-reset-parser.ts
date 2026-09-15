@@ -15,7 +15,7 @@ const MONTH_DAY_TIME_RE = new RegExp(
 const WEEKDAY_TIME_RE =
   /\b(sun(?:day)?|mon(?:day)?|tue(?:sday)?|wed(?:nesday)?|thu(?:rsday)?|fri(?:day)?|sat(?:urday)?)\.?\s+(?:at\s+)?(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i
 const TIME_ONLY_RE = /\b(\d{1,2})(?::(\d{2}))?\s*(am|pm)\b/i
-// Why: newer Codex CLIs print 24-hour reset times ("10:21 on 28 Jul") with no am/pm.
+// Why: some CLIs print 24-hour reset times ("10:21 on 28 Jul") with no am/pm.
 const TIME_24H_RE = /\b(\d{1,2}):(\d{2})\b/
 const DAY_MONTH_RE = new RegExp(`\\b(?:on\\s+)?(\\d{1,2})\\s+(${MONTH_PATTERN})\\b`, 'i')
 const RELATIVE_RESET_RE = /^(?:\s*\d+\s*(?:d(?:ays?)?|h(?:ours?|rs?)?|m(?:in(?:ute)?s?)?)\s*)+$/i

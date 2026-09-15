@@ -63,7 +63,7 @@ describe('adopted native-chat disposal in legacy terminal bulk actions', () => {
             entityId: 'close-a',
             contentType: 'terminal',
             viewMode: 'chat',
-            structuredSessionId: 'codex-adopted-1'
+            structuredSessionId: 'opencode-adopted-1'
           }
         ]
       },
@@ -77,7 +77,7 @@ describe('adopted native-chat disposal in legacy terminal bulk actions', () => {
     expect(mocks.closeTab).toHaveBeenCalledWith('close-a')
     expect(mocks.closeStructuredTerminalSessionWithRetry).toHaveBeenCalledWith(
       { kind: 'local' },
-      'codex-adopted-1'
+      'opencode-adopted-1'
     )
     expect(mocks.disposeStructuredTerminalSession).not.toHaveBeenCalled()
   })
@@ -92,7 +92,7 @@ describe('adopted native-chat disposal in legacy terminal bulk actions', () => {
             entityId: 'close-a',
             contentType: 'terminal',
             viewMode: 'chat',
-            structuredSessionId: 'codex-adopted-2'
+            structuredSessionId: 'opencode-adopted-2'
           }
         ]
       },
@@ -109,7 +109,7 @@ describe('adopted native-chat disposal in legacy terminal bulk actions', () => {
     expect(mocks.closeTab).toHaveBeenCalledWith('close-a')
     expect(mocks.closeStructuredTerminalSessionWithRetry).toHaveBeenCalledWith(
       { kind: 'local' },
-      'codex-adopted-2'
+      'opencode-adopted-2'
     )
     expect(mocks.disposeStructuredTerminalSession).not.toHaveBeenCalled()
   })
@@ -124,7 +124,7 @@ describe('adopted native-chat disposal in legacy terminal bulk actions', () => {
             entityId: 'close-a',
             contentType: 'terminal',
             viewMode: 'chat',
-            structuredSessionId: 'codex-live-1'
+            structuredSessionId: 'opencode-live-1'
           }
         ]
       },

@@ -507,12 +507,12 @@ describe('worktree RPC methods', () => {
       makeRequest('worktree.create', {
         repo: 'repo-1',
         name: 'agent-startup',
-        startupAgent: 'codex',
-        startupCommand: "codex 'summarize repo'",
+        startupAgent: 'opencode',
+        startupCommand: "opencode --prompt 'summarize repo'",
         startupCommandDelivery: 'shell-ready',
         startupEnv: { ORCA_AGENT_MODE: 'direct' },
         startupLaunchConfig: {
-          agentCommand: 'codex',
+          agentCommand: 'opencode',
           agentArgs: '--model gpt-5',
           agentEnv: { ORCA_AGENT_MODE: 'direct' }
         },
@@ -530,13 +530,13 @@ describe('worktree RPC methods', () => {
         repoSelector: 'repo-1',
         name: 'agent-startup',
         activate: true,
-        startupAgent: 'codex',
+        startupAgent: 'opencode',
         startup: {
-          command: "codex 'summarize repo'",
+          command: "opencode --prompt 'summarize repo'",
           startupCommandDelivery: 'shell-ready',
           env: { ORCA_AGENT_MODE: 'direct' },
           launchConfig: {
-            agentCommand: 'codex',
+            agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
             agentEnv: { ORCA_AGENT_MODE: 'direct' }
           }
@@ -558,9 +558,9 @@ describe('worktree RPC methods', () => {
       makeRequest('worktree.create', {
         repo: 'repo-1',
         name: 'agent-startup',
-        startupCommand: "codex 'summarize repo'",
+        startupCommand: "opencode --prompt 'summarize repo'",
         startupLaunchConfig: {
-          agentCommand: 'codex',
+          agentCommand: 'opencode',
           agentArgs: '--model gpt-5',
           agentEnv: { ['__proto__']: 'polluted' }
         }
@@ -571,7 +571,7 @@ describe('worktree RPC methods', () => {
     expect(runtime.createManagedWorktree).toHaveBeenCalledWith(
       expect.objectContaining({
         startup: expect.objectContaining({
-          command: "codex 'summarize repo'"
+          command: "opencode --prompt 'summarize repo'"
         })
       })
     )
@@ -594,7 +594,7 @@ describe('worktree RPC methods', () => {
         repo: 'repo-1',
         name: 'issue-123',
         startupDraft: 'https://github.com/stablyai/orca/issues/123',
-        createdWithAgent: 'codex',
+        createdWithAgent: 'opencode',
         activate: true
       })
     )
@@ -604,7 +604,7 @@ describe('worktree RPC methods', () => {
         repoSelector: 'repo-1',
         name: 'issue-123',
         activate: true,
-        createdWithAgent: 'codex',
+        createdWithAgent: 'opencode',
         startup: undefined,
         startupDraft: 'https://github.com/stablyai/orca/issues/123'
       })

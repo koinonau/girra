@@ -13,7 +13,6 @@ import {
   sendBracketedPasteToRunningAgent,
   submitPromptToAgentPty
 } from './agent-paste-draft'
-import { TUI_AGENT_CONFIG } from '../../../shared/tui-agent-config'
 
 const testState = vi.hoisted(() => ({
   appState: {
@@ -67,11 +66,8 @@ vi.mock('@/runtime/runtime-terminal-stream', () => ({
 
 const DECSET_BRACKETED_PASTE = '\x1b[?2004h'
 const SHOW_CURSOR = '\x1b[?25h'
-const CODEX_COMPOSER_PROMPT_RENDER = '\x1b[1m›\x1b[0m Ask Codex to do anything'
-const CODEX_DYNAMIC_COMPOSER_PROMPT_RENDER = '\x1b[?1049h\x1b[1m›\x1b[0m Implement {feature}'
 const ISSUE_URL = 'https://github.com/stablyai/orca/issues/123'
 const PASTED_ISSUE_URL = `\x1b[200~${ISSUE_URL}\x1b[201~`
-const CODEX_SUBMIT_RETRY_DELAY_MS = TUI_AGENT_CONFIG.codex.submitRetryDelayMs ?? 0
 
 describe('pasteDraftWhenAgentReady', () => {
   beforeEach(() => {
@@ -114,45 +110,18 @@ describe('pasteDraftWhenAgentReady', () => {
     vi.useRealTimers()
   })
 
-  it('pastes into Codex as soon as its composer prompt renders after bracketed paste is enabled', async () => {
-    const promise = pasteDraftWhenAgentReady({
-      tabId: 'tab-1',
-      content: ISSUE_URL,
-      agent: 'codex'
-    })
-    await flushMicrotasks()
-
-    testState.ptyObserver?.(CODEX_COMPOSER_PROMPT_RENDER)
-    await flushMicrotasks()
-    expect(testState.sendRuntimePtyInputVerified).not.toHaveBeenCalled()
-
-    testState.ptyObserver?.(DECSET_BRACKETED_PASTE)
-    await flushMicrotasks()
-    expect(testState.sendRuntimePtyInputVerified).not.toHaveBeenCalled()
-
-    testState.ptyObserver?.(CODEX_COMPOSER_PROMPT_RENDER)
-
-    await expect(promise).resolves.toBe(true)
-    expect(testState.sendRuntimePtyInputVerified).toHaveBeenCalledWith(
-      {},
-      'pty-1',
-      PASTED_ISSUE_URL
-    )
-    expect(vi.getTimerCount()).toBe(0)
-  })
-
-  it('replays buffered Codex output during PTY binding before the primary drain', async () => {
+  it('replays buffered opencode output during PTY binding before the primary drain', async () => {
     testState.appState.ptyIdsByTabId = {}
     testState.replayPreHandlerPtyData.mockImplementation(
       (_ptyId: string, observer: (data: string) => void) => {
-        observer(CODEX_DYNAMIC_COMPOSER_PROMPT_RENDER)
         observer(DECSET_BRACKETED_PASTE)
+        observer(SHOW_CURSOR)
       }
     )
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex',
+      agent: 'opencode',
       submit: true
     })
 
@@ -171,38 +140,18 @@ describe('pasteDraftWhenAgentReady', () => {
       'pty-1',
       PASTED_ISSUE_URL
     )
-    await vi.advanceTimersByTimeAsync(POST_PASTE_SUBMIT_DELAY_MS + CODEX_SUBMIT_RETRY_DELAY_MS)
+    await vi.advanceTimersByTimeAsync(POST_PASTE_SUBMIT_DELAY_MS)
     await expect(promise).resolves.toBe(true)
     expect(testState.sendRuntimePtyInputVerified).toHaveBeenNthCalledWith(2, {}, 'pty-1', '\r')
     expect(testState.unsubscribe).toHaveBeenCalledTimes(1)
     expect(vi.getTimerCount()).toBe(0)
   })
 
-  it('detects the Codex composer prompt inside a large first render chunk', async () => {
+  it('keeps the render-quiet wait for agents without a ready signal', async () => {
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
-    })
-    await flushMicrotasks()
-
-    testState.ptyObserver?.(
-      `${DECSET_BRACKETED_PASTE}${CODEX_COMPOSER_PROMPT_RENDER}${'x'.repeat(900)}`
-    )
-
-    await expect(promise).resolves.toBe(true)
-    expect(testState.sendRuntimePtyInputVerified).toHaveBeenCalledWith(
-      {},
-      'pty-1',
-      PASTED_ISSUE_URL
-    )
-  })
-
-  it('keeps the render-quiet wait for agents without the Codex ready signal', async () => {
-    const promise = pasteDraftWhenAgentReady({
-      tabId: 'tab-1',
-      content: ISSUE_URL,
-      agent: 'gemini'
+      agent: 'claude-agent-teams'
     })
     await flushMicrotasks()
 
@@ -350,7 +299,7 @@ describe('pasteDraftWhenAgentReady', () => {
 
   it('best-effort pastes for opencode at the hard timeout when its process is running', async () => {
     // Why: with no quiet window, the hard-timeout process-ownership check is the
-    // backstop if show-cursor is somehow missed — same model as Codex.
+    // backstop if show-cursor is somehow missed.
     testState.inspectRuntimeTerminalProcess.mockResolvedValue({
       foregroundProcess: 'opencode',
       hasChildProcesses: false
@@ -463,11 +412,11 @@ describe('pasteDraftWhenAgentReady', () => {
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
+      agent: 'opencode'
     })
     await flushMicrotasks()
 
-    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${CODEX_COMPOSER_PROMPT_RENDER}`)
+    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${SHOW_CURSOR}`)
 
     await expect(promise).resolves.toBe(false)
   })
@@ -477,57 +426,29 @@ describe('pasteDraftWhenAgentReady', () => {
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
+      agent: 'opencode'
     })
     await flushMicrotasks()
 
-    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${CODEX_COMPOSER_PROMPT_RENDER}`)
+    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${SHOW_CURSOR}`)
 
     await expect(promise).resolves.toBe(false)
   })
 
   it('best-effort pastes when the ready escape was missed but the agent process is running', async () => {
     testState.inspectRuntimeTerminalProcess.mockResolvedValue({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'claude',
       hasChildProcesses: false
     })
 
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
+      agent: 'claude-agent-teams'
     })
     await flushMicrotasks()
 
-    await vi.advanceTimersByTimeAsync(20000)
-
-    await expect(promise).resolves.toBe(true)
-    expect(testState.sendRuntimePtyInputVerified).toHaveBeenCalledWith(
-      {},
-      'pty-1',
-      PASTED_ISSUE_URL
-    )
-  })
-
-  it('waits past the default budget for a cold-boot Codex composer glyph (STA-3367)', async () => {
-    // Why: first-run/cold codex can take >8s to mount its composer. The '›' glyph
-    // is a positive readiness proof, so the marker-gated budget waits for it
-    // instead of giving up at 8s and dropping the handoff prompt. Process
-    // inspection stays 'bash' so only the real marker — not the fallback — delivers.
-    const promise = pasteDraftWhenAgentReady({
-      tabId: 'tab-1',
-      content: ISSUE_URL,
-      agent: 'codex'
-    })
-    await flushMicrotasks()
-
-    testState.ptyObserver?.(DECSET_BRACKETED_PASTE)
-    // Old 8s budget would have already timed out and dropped the prompt here.
     await vi.advanceTimersByTimeAsync(8000)
-    await flushMicrotasks()
-    expect(testState.sendRuntimePtyInputVerified).not.toHaveBeenCalled()
-
-    testState.ptyObserver?.(CODEX_COMPOSER_PROMPT_RENDER)
 
     await expect(promise).resolves.toBe(true)
     expect(testState.sendRuntimePtyInputVerified).toHaveBeenCalledWith(
@@ -535,19 +456,18 @@ describe('pasteDraftWhenAgentReady', () => {
       'pty-1',
       PASTED_ISSUE_URL
     )
-    expect(vi.getTimerCount()).toBe(0)
   })
 
   it('gives up on a never-spawned PTY at the spawn budget, not the composer budget (STA-3367)', async () => {
     // Why: the two waits must not each spend the marker budget. A tab whose PTY
-    // never appears is a failed launch, and must not also burn the 20s cold-boot
-    // composer window before the caller is told.
+    // never appears is a failed launch, and must not also burn the composer window
+    // before the caller is told.
     testState.appState.ptyIdsByTabId = {}
     const onTimeout = vi.fn()
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex',
+      agent: 'opencode',
       onTimeout
     })
 
@@ -562,13 +482,13 @@ describe('pasteDraftWhenAgentReady', () => {
 
   it('starts the composer budget once the PTY exists, so a slow spawn does not shorten it', async () => {
     // Why: "tab has a PTY" and "composer accepts input" are separate states. A
-    // spawn that eats most of a shared budget would leave a cold codex too little
-    // room and re-drop the prompt — the exact STA-3367 failure.
+    // spawn that eats most of a shared budget would leave a cold agent too little
+    // room and re-drop the prompt, the exact STA-3367 failure.
     testState.appState.ptyIdsByTabId = {}
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
+      agent: 'opencode'
     })
 
     // PTY takes 4s to appear — most of the old shared 8s budget.
@@ -579,13 +499,13 @@ describe('pasteDraftWhenAgentReady', () => {
     }
 
     testState.ptyObserver?.(DECSET_BRACKETED_PASTE)
-    // 19s of cold boot after the PTY appeared: past a shared budget, inside the
+    // 7s of cold boot after the PTY appeared: past a shared budget, inside the
     // composer's own window.
-    await vi.advanceTimersByTimeAsync(19000)
+    await vi.advanceTimersByTimeAsync(7000)
     await flushMicrotasks()
     expect(testState.sendRuntimePtyInputVerified).not.toHaveBeenCalled()
 
-    testState.ptyObserver?.(CODEX_COMPOSER_PROMPT_RENDER)
+    testState.ptyObserver?.(SHOW_CURSOR)
 
     await expect(promise).resolves.toBe(true)
     expect(testState.sendRuntimePtyInputVerified).toHaveBeenCalledWith(
@@ -603,7 +523,7 @@ describe('pasteDraftWhenAgentReady', () => {
       tabId: 'tab-1',
       ptyId: 'pty-1',
       content: ISSUE_URL,
-      agent: 'codex',
+      agent: 'opencode',
       forcePaste: true,
       timeoutMs: 1,
       onTimeout
@@ -630,11 +550,11 @@ describe('pasteDraftWhenAgentReady', () => {
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
+      agent: 'opencode'
     })
     await flushMicrotasks()
 
-    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${CODEX_COMPOSER_PROMPT_RENDER}`)
+    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${SHOW_CURSOR}`)
 
     await expect(promise).resolves.toBe(true)
     expect(testState.sendRuntimePtyInputVerified).toHaveBeenCalledWith(
@@ -668,11 +588,11 @@ describe('pasteDraftWhenAgentReady', () => {
     const promise = pasteDraftWhenAgentReady({
       tabId: 'tab-1',
       content: ISSUE_URL,
-      agent: 'codex'
+      agent: 'opencode'
     })
     await flushMicrotasks()
 
-    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${CODEX_COMPOSER_PROMPT_RENDER}`)
+    testState.ptyObserver?.(`${DECSET_BRACKETED_PASTE}${SHOW_CURSOR}`)
 
     await expect(promise).resolves.toBe(true)
     expect(testState.subscribeToRuntimeTerminalData).toHaveBeenCalledWith(

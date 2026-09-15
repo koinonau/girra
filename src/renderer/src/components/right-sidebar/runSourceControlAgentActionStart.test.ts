@@ -28,7 +28,7 @@ function buildArgs(
   overrides: Partial<Parameters<typeof runSourceControlAgentActionStart>[0]> = {}
 ): Parameters<typeof runSourceControlAgentActionStart>[0] {
   return {
-    selectedAgent: 'codex',
+    selectedAgent: 'opencode',
     trimmedCommandInput: 'Fix the bug',
     agentArgs: '--model gpt-5',
     commandTemplate: '{basePrompt}',
@@ -276,7 +276,7 @@ describe('runSourceControlAgentActionStart', () => {
     ).resolves.toBe(true)
 
     expect(onStart).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       commandInput: 'Fix the bug',
       agentArgs: '--model gpt-5'
     })

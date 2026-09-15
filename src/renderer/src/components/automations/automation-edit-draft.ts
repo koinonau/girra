@@ -56,7 +56,8 @@ export function buildExternalAutomationEditDraft(
   return {
     name: job.name,
     prompt: job.prompt ?? job.promptPreview,
-    agentId: 'hermes',
+    // Why: the Hermes save path never reads agentId; the draft type still needs a TuiAgent.
+    agentId: 'claude',
     projectId: placement.projectId,
     workspaceMode: 'existing',
     workspaceId: placement.workspaceId,

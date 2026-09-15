@@ -44,7 +44,7 @@ not exercise the operating system's input method. Changes must also cover:
 | Environment | Native evidence                                                                                                                                                                      |
 | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | macOS       | A native Korean 2-set composition in Native Chat and a terminal; preedit survives external renders, the caret remains visible, and commit occurs once.                               |
-| Windows     | Microsoft Korean IME over an untouched Codex placeholder; the preedit is the only visible text, the placeholder returns after cancel, and ordinary mid-line content remains visible. |
+| Windows     | Microsoft Korean IME over an untouched Claude placeholder; the preedit is the only visible text, the placeholder returns after cancel, and ordinary mid-line content remains visible. |
 | Linux / SSH | IBus Hangul with an SSH-hosted PTY; an empty-data `compositionend` still produces one diagnostic sample and one committed syllable.                                                  |
 
 For remote evidence, `live` means the owning host reported the current

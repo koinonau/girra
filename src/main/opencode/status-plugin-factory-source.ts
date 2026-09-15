@@ -1,4 +1,4 @@
-export function getStatusPluginFactorySource(options: { emitSessionStart: boolean }): string[] {
+export function getStatusPluginFactorySource(): string[] {
   return [
     '// Why: accept the factory argument as an optional opaque parameter instead',
     '// of destructuring (`async ({ client }) => …`). OpenCode can invoke the',
@@ -30,20 +30,16 @@ export function getStatusPluginFactorySource(options: { emitSessionStart: boolea
     '',
     '    const sessionID = event.properties?.sessionID;',
     '    const updatedPart = event.properties?.part;',
-    ...(options.emitSessionStart
-      ? [
-          '    if (event.type === "session.created") {',
-          '      const info = event.properties?.info;',
-          '      if (!info?.id || info.parentID) return;',
-          '      rememberSessionRoot(info.id, info.id);',
-          '      await enqueueLifecycle(() =>',
-          '        disposed ? undefined : post("SessionStart", { sessionID: info.id })',
-          '      );',
-          '      return;',
-          '    }',
-          ''
-        ]
-      : []),
+    '    if (event.type === "session.created") {',
+    '      const info = event.properties?.info;',
+    '      if (!info?.id || info.parentID) return;',
+    '      rememberSessionRoot(info.id, info.id);',
+    '      await enqueueLifecycle(() =>',
+    '        disposed ? undefined : post("SessionStart", { sessionID: info.id })',
+    '      );',
+    '      return;',
+    '    }',
+    '',
     '    if (',
     '      event.type === "message.part.updated" &&',
     '      updatedPart?.type === "tool" &&',

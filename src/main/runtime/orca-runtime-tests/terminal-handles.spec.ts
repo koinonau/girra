@@ -242,7 +242,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId,
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: leafId,
           layout: null
         }
@@ -268,7 +268,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId,
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: leafId,
           layout: null
         }
@@ -291,7 +291,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId,
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: leafId,
           layout: null
         }
@@ -334,7 +334,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId,
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: leafId,
           layout: null
         }

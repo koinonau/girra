@@ -101,12 +101,14 @@ describe('SourceControl conflict resolution state', () => {
   })
 
   it('uses the configured default agent when detected and otherwise falls back to catalog order', () => {
-    expect(pickDefaultSourceControlAgent('codex', ['claude', 'codex'])).toBe('codex')
-    expect(pickDefaultSourceControlAgent('blank', ['codex'])).toBe('codex')
+    expect(pickDefaultSourceControlAgent('opencode', ['claude', 'opencode'])).toBe('opencode')
+    expect(pickDefaultSourceControlAgent('blank', ['opencode'])).toBe('opencode')
     expect(pickDefaultSourceControlAgent('claude', [])).toBeNull()
-    expect(pickDefaultSourceControlAgent('codex', ['claude', 'codex'], ['codex'])).toBe('claude')
+    expect(pickDefaultSourceControlAgent('opencode', ['claude', 'opencode'], ['opencode'])).toBe(
+      'claude'
+    )
     expect(
-      pickDefaultSourceControlAgent('blank', ['claude', 'codex'], ['claude', 'codex'])
+      pickDefaultSourceControlAgent('blank', ['claude', 'opencode'], ['claude', 'opencode'])
     ).toBeNull()
     expect(pickDefaultSourceControlAgent(null, ['claude'], ['claude'])).toBeNull()
   })

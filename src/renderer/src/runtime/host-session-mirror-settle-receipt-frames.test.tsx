@@ -86,7 +86,7 @@ describe('a global singular frame whose patch never lands', () => {
   it('settles nothing until a later frame reaches the store', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-patch-throw')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-patch-throw')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // Acceptance bookkeeping dies after the frame passed its recovery gates but
@@ -113,13 +113,13 @@ describe('a global singular frame whose patch never lands', () => {
     })
 
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-patch-throw')
+    expectReplayedResume(paneKey, WT, 'claude-session-patch-throw')
   })
 
   it('settles nothing when the patch itself throws mid-apply', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-apply-throw')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-apply-throw')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // A malformed 'ready' tab without a terminal handle blows up inside the
@@ -146,7 +146,7 @@ describe('a global singular frame whose patch never lands', () => {
     })
 
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-apply-throw')
+    expectReplayedResume(paneKey, WT, 'claude-session-apply-throw')
   })
 })
 
@@ -165,7 +165,7 @@ describe('a stale frame against a newer accepted view', () => {
 
     // A re-pair voids every verdict; the accepted store view survives it.
     act(() => clearHostSessionMirrorHydration(ENV))
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-stale-settle')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-stale-settle')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // An older frame races in. Rejecting it is itself backed by the accepted
@@ -176,7 +176,7 @@ describe('a stale frame against a newer accepted view', () => {
     })
 
     expect(hasHostSessionMirrorHydrated(ENV, WT)).toBe(true)
-    expectReplayedResume(paneKey, WT, 'codex-session-stale-settle')
+    expectReplayedResume(paneKey, WT, 'claude-session-stale-settle')
   })
 })
 
@@ -197,7 +197,7 @@ describe('a deferred visibility-resume repair patch', () => {
       ...makePtylessHostSnapshot(BG_WT, `host-tab-2::${LEAF_ID}`, 'host-tab-2')
     })
     act(() => clearHostSessionMirrorHydration(ENV))
-    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-tombstone')
+    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-tombstone')
     expect(resumeSleepingAgentSessionsForWorktree(BG_WT)).toBe(0)
 
     act(() => {
@@ -225,7 +225,7 @@ describe('a deferred visibility-resume repair patch', () => {
     // The tombstone repair DID reach the store: the background mirror retracted,
     // which is the host answering — the parked resume is finally justified.
     expect(tabIds(BG_WT)).not.toContain(BG_MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, BG_WT, 'codex-session-tombstone')
+    expectReplayedResume(paneKey, BG_WT, 'claude-session-tombstone')
   })
 })
 
@@ -233,7 +233,7 @@ describe('the eager post-create list answers for its worktree', () => {
   installFrameOrderingHarness()
 
   it('releases the pane its retraction decides', async () => {
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-eager-refresh')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-eager-refresh')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     runtimeCall.mockImplementation((request: { method: string }) =>
@@ -254,7 +254,7 @@ describe('the eager post-create list answers for its worktree', () => {
     // The list retracted the mirror tab and its patch landed, so this worktree
     // has its verdict: the parked resume must drain, not wait for a stream.
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-eager-refresh')
+    expectReplayedResume(paneKey, WT, 'claude-session-eager-refresh')
   })
 
   it('settles nothing when the list answers for a workspace the mirror never writes', async () => {
@@ -290,7 +290,7 @@ describe('the eager post-create list answers for its worktree', () => {
           })
         : new Promise(() => {})
     )
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-eager-old-tracking')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-eager-old-tracking')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     const refresh = refreshWebRuntimeSessionTabsSnapshot(ENV, WT)
@@ -410,7 +410,7 @@ describe('a host frame for a workspace the mirror never writes', () => {
   it('does not cost a complete inventory its environment-wide verdict', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-floating-member')
+    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-floating-member')
     expect(resumeSleepingAgentSessionsForWorktree(BG_WT)).toBe(0)
 
     // Every published snapshot the mirror speaks for reached the store, so
@@ -428,7 +428,7 @@ describe('a host frame for a workspace the mirror never writes', () => {
     })
 
     expect(hasHostSessionMirrorHydrated(ENV, BG_WT)).toBe(true)
-    expectReplayedResume(paneKey, BG_WT, 'codex-session-floating-member')
+    expectReplayedResume(paneKey, BG_WT, 'claude-session-floating-member')
   })
 })
 
@@ -444,7 +444,7 @@ describe('a store subscriber that throws after the commit', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-subscriber-throw')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-subscriber-throw')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // Why: throw exactly once — the drain this releases writes to the same
@@ -475,7 +475,7 @@ describe('a store subscriber that throws after the commit', () => {
     )
 
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-subscriber-throw')
+    expectReplayedResume(paneKey, WT, 'claude-session-subscriber-throw')
     warn.mockRestore()
   })
 })

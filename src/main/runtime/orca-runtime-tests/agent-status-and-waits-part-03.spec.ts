@@ -9,7 +9,7 @@ describe('OrcaRuntimeService', () => {
       spawn: vi.fn().mockResolvedValue({ id: 'pty-1' }),
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'codex'
+      getForegroundProcess: async () => 'claude'
     })
     const leafId = '11111111-1111-4111-8111-111111111111'
     runtime.attachWindow(1)
@@ -63,7 +63,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex ready',
+          title: 'Claude ready',
           activeLeafId: 'pane:1',
           layout: null
         }

@@ -55,7 +55,7 @@ describe('RepositorySourceControlAiActionRows', () => {
           }
         },
         source,
-        defaultTuiAgent: 'codex',
+        defaultTuiAgent: 'opencode',
         savingActionIds: {},
         actionDirtyById,
         onActionModeChange: () => {},

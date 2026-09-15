@@ -150,14 +150,14 @@ describe('workspace cleanup enrichment performance', () => {
           entry: { ...alphaWorking, paneKey: 'tab-alpha:retained', state: 'done' },
           worktreeId: ALPHA_ID,
           tab: alphaTab,
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: NOW
         },
         'tab-beta:retained': {
           entry: { ...betaDone, paneKey: 'tab-beta:retained', state: 'working' },
           worktreeId: BETA_ID,
           tab: betaTab,
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: NOW
         }
       } as unknown as AppState['retainedAgentsByPaneKey'],

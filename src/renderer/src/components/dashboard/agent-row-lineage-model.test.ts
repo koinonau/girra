@@ -45,7 +45,7 @@ function makeRow(
     updatedAt: 1000,
     stateStartedAt: 1000,
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'opencode',
     ...(options.terminalHandle ? { terminalHandle: options.terminalHandle } : {}),
     ...(orchestration ? { orchestration } : {})
   }
@@ -54,7 +54,7 @@ function makeRow(
     paneKey,
     entry,
     tab: makeTab(paneKey.split(':')[0] ?? paneKey),
-    agentType: 'codex',
+    agentType: 'opencode',
     state: 'done',
     startedAt: 1000
   }

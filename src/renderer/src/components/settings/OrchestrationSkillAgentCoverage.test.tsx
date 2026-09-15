@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { OrchestrationSkillAgentCoverage } from './OrchestrationSkillAgentCoverage'
 
 const useDetectedAgents = vi.fn(() => ({
-  detectedIds: ['claude', 'codex'],
+  detectedIds: ['claude', 'opencode'],
   isLoading: false,
   isRefreshing: false,
   refresh: vi.fn()
@@ -48,7 +48,7 @@ describe('OrchestrationSkillAgentCoverage', () => {
     )
 
     expect(markup).toContain('Claude')
-    expect(markup).toContain('Codex')
+    expect(markup).toContain('OpenCode')
     expect(markup).toContain('Ready')
     expect(markup).toContain('Missing')
     expect(markup).not.toContain('View details')

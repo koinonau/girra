@@ -2,13 +2,8 @@ import { describe, expect, it, vi } from 'vitest'
 import type { Repo } from '../../shared/repo-types'
 
 const mocks = vi.hoisted(() => ({
-  markCopilotFolderTrusted: vi.fn(),
   detectRemoteAgents: vi.fn(),
   detectInstalledAgentsWithShellPathHydration: vi.fn()
-}))
-
-vi.mock('../agent-trust-presets', () => ({
-  markCopilotFolderTrusted: mocks.markCopilotFolderTrusted
 }))
 
 vi.mock('../preflight/agent-detection', () => ({
@@ -18,8 +13,7 @@ vi.mock('../preflight/agent-detection', () => ({
 
 import {
   buildWorktreeStartupForAgent,
-  buildWorktreeStartupForDraft,
-  markLocalWorktreeTrusted
+  buildWorktreeStartupForDraft
 } from './runtime-worktree-agent-startup'
 
 function makeRepo(fields: Partial<Repo>): Repo {
@@ -108,20 +102,5 @@ describe('buildWorktreeStartupForDraft agent detection', () => {
 
     expect(mocks.detectRemoteAgents).not.toHaveBeenCalled()
     expect(result?.agent).toBe('claude')
-  })
-})
-
-describe('markLocalWorktreeTrusted', () => {
-  it('marks a trust-gated agent workspace trusted', async () => {
-    await markLocalWorktreeTrusted('copilot', '/workspace/app')
-    expect(mocks.markCopilotFolderTrusted).toHaveBeenCalledWith('/workspace/app')
-  })
-
-  it('contains a failed trust write', async () => {
-    mocks.markCopilotFolderTrusted.mockImplementationOnce(() => {
-      throw new Error('write failed')
-    })
-
-    await expect(markLocalWorktreeTrusted('copilot', '/workspace/app')).resolves.toBeUndefined()
   })
 })

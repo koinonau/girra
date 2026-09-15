@@ -2,15 +2,9 @@ import type { TuiAgent } from './tui-agent'
 import { isTuiAgentEnabled } from './tui-agent-selection'
 import { labelFromModelId } from './model-id-label'
 import { buildPrimaryCommitMessageAgentSpecs } from './commit-message-agent-specs-primary'
-import { buildSecondaryCommitMessageAgentSpecs } from './commit-message-agent-specs-secondary'
 import {
-  BASIC_THINKING_LEVELS,
   CLAUDE_THINKING_LEVELS,
-  OPENAI_THINKING_LEVELS,
-  parseAntigravityModels,
   parseClaudeModels,
-  parseCodexModels,
-  parseCursorModels,
   parseLineModels,
   parsePiModels,
   withOpenAiThinking
@@ -87,23 +81,14 @@ export type CommitMessageAgentCapability = {
   defaultModelId: string
 }
 
-export const COMMIT_MESSAGE_AGENT_SPECS: Partial<Record<TuiAgent, CommitMessageAgentSpec>> = {
-  ...buildPrimaryCommitMessageAgentSpecs({
+export const COMMIT_MESSAGE_AGENT_SPECS: Partial<Record<TuiAgent, CommitMessageAgentSpec>> =
+  buildPrimaryCommitMessageAgentSpecs({
     CLAUDE_THINKING_LEVELS,
-    OPENAI_THINKING_LEVELS,
     parseClaudeModels,
-    parseCodexModels,
     parseLineModels,
     parsePiModels,
     withOpenAiThinking
-  }),
-  ...buildSecondaryCommitMessageAgentSpecs({
-    BASIC_THINKING_LEVELS,
-    OPENAI_THINKING_LEVELS,
-    parseCursorModels,
-    parseAntigravityModels
   })
-}
 
 export const DEFAULT_COMMIT_MESSAGE_AGENT_ID: TuiAgent = 'claude'
 

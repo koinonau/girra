@@ -211,14 +211,14 @@ describe('WorktreeCardAgents', () => {
   }, 30_000)
 
   it('uses compact mode when the display preference is absent', async () => {
-    mockAgents = [mockAgent({ agentType: 'codex', startedAt: 1000, prompt: 'Run tests' })]
+    mockAgents = [mockAgent({ agentType: 'opencode', startedAt: 1000, prompt: 'Run tests' })]
     const { default: WorktreeCardAgents } = await import('./WorktreeCardAgents')
 
     const markup = renderToStaticMarkup(<WorktreeCardAgents worktreeId="wt-1" />)
 
     expect(markup).toContain('role="group"')
     expect(markup).toContain('Run tests')
-    expect(markup).toContain('title="Codex"')
+    expect(markup).toContain('title="OpenCode"')
     expect(markup).not.toContain('data-testid="agent-row"')
   })
 
@@ -226,7 +226,7 @@ describe('WorktreeCardAgents', () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: 1000,
         prompt: 'Run tests',
         lastAssistantMessage: 'Inspecting changes'
@@ -247,7 +247,7 @@ describe('WorktreeCardAgents', () => {
     mockFocusedAgentPaneKey = 'tab-1:1'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: 1000,
         prompt: 'Focused prompt',
         lastAssistantMessage: 'Reading output'
@@ -541,7 +541,7 @@ describe('WorktreeCardAgents', () => {
   it('renders a compact summary affordance for two flat agents', async () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
-      mockAgent({ agentType: 'codex', state: 'done', startedAt: 1000, prompt: 'First agent' }),
+      mockAgent({ agentType: 'opencode', state: 'done', startedAt: 1000, prompt: 'First agent' }),
       mockAgent({
         paneKey: 'tab-1:2',
         agentType: 'claude',
@@ -556,7 +556,7 @@ describe('WorktreeCardAgents', () => {
 
     expect(markup).toContain('All 2 agents done')
     expect(markup).toContain('Expand All 2 agents done')
-    expect(markup).not.toContain('title="Codex done"')
+    expect(markup).not.toContain('title="OpenCode done"')
     expect(markup).not.toContain('title="Claude done"')
     expect(markup).not.toContain('>2 done<')
     expect(markup).not.toContain('First agent')
@@ -571,7 +571,7 @@ describe('WorktreeCardAgents', () => {
       mockAgent({
         paneKey,
         tabId: 'tab-1',
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         startedAt: 1000,
         prompt: 'First agent'
@@ -599,7 +599,7 @@ describe('WorktreeCardAgents', () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         startedAt: 1000,
         prompt: 'Check screenshot',
@@ -622,7 +622,7 @@ describe('WorktreeCardAgents', () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         startedAt: 1000,
         prompt: 'Check screenshot',
@@ -642,7 +642,7 @@ describe('WorktreeCardAgents', () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         startedAt: 1000,
         prompt: 'Check screenshot',
@@ -668,7 +668,7 @@ describe('WorktreeCardAgents', () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         startedAt: 1000,
         prompt: 'Check screenshot',
@@ -689,7 +689,7 @@ describe('WorktreeCardAgents', () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
       mockAgent({
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'waiting',
         startedAt: 1000,
         prompt: 'Pick a layout'
@@ -703,7 +703,7 @@ describe('WorktreeCardAgents', () => {
       }),
       mockAgent({
         paneKey: 'tab-1:3',
-        agentType: 'gemini',
+        agentType: 'pi',
         state: 'done',
         startedAt: 1700,
         stateStartedAt: 1700,
@@ -720,16 +720,16 @@ describe('WorktreeCardAgents', () => {
     expect(markup).toContain('width="13"')
     expect(markup).toContain('3 agents: 1 waiting, 1 working, 1 done')
     expect(markup).toContain('Expand 3 agents: 1 waiting, 1 working, 1 done')
-    expect(markup).not.toContain('title="Codex waiting"')
+    expect(markup).not.toContain('title="OpenCode waiting"')
     expect(markup).not.toContain('title="Claude working"')
-    expect(markup).not.toContain('title="Gemini done"')
+    expect(markup).not.toContain('title="Pi done"')
     expect(markup).not.toContain('data-testid="agent-row"')
   })
 
   it('avoids repeating the total when every compact summary agent has the same state', async () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
-      mockAgent({ agentType: 'codex', state: 'done', startedAt: 1000, prompt: 'One' }),
+      mockAgent({ agentType: 'opencode', state: 'done', startedAt: 1000, prompt: 'One' }),
       mockAgent({
         paneKey: 'tab-1:2',
         agentType: 'claude',
@@ -739,7 +739,7 @@ describe('WorktreeCardAgents', () => {
       }),
       mockAgent({
         paneKey: 'tab-1:3',
-        agentType: 'gemini',
+        agentType: 'pi',
         state: 'done',
         startedAt: 1700,
         prompt: 'Three'
@@ -758,10 +758,10 @@ describe('WorktreeCardAgents', () => {
   it('prioritizes agent varieties in compact summary icons', async () => {
     mockAgentActivityDisplayMode = 'compact'
     mockAgents = [
-      ['tab-1:1', 'codex', 'One'],
-      ['tab-1:2', 'codex', 'Two'],
-      ['tab-1:3', 'codex', 'Three'],
-      ['tab-1:4', 'gemini', 'Four'],
+      ['tab-1:1', 'opencode', 'One'],
+      ['tab-1:2', 'opencode', 'Two'],
+      ['tab-1:3', 'opencode', 'Three'],
+      ['tab-1:4', 'pi', 'Four'],
       ['tab-1:5', 'claude', 'Five']
     ].map(([paneKey, agentType, prompt]) =>
       mockAgent({ paneKey, agentType, startedAt: 1000, prompt })
@@ -781,7 +781,7 @@ describe('WorktreeCardAgents', () => {
   it('rotates the compact summary chevron when collapsed', async () => {
     const { CompactAgentSummaryButton } = await import('./worktree-card-compact-agents')
     const agents = [
-      mockAgent({ paneKey: 'tab-1:1', agentType: 'codex', startedAt: 1000, prompt: 'One' })
+      mockAgent({ paneKey: 'tab-1:1', agentType: 'opencode', startedAt: 1000, prompt: 'One' })
     ] as DashboardAgentRowData[]
 
     const markup = renderToStaticMarkup(
@@ -802,10 +802,10 @@ describe('WorktreeCardAgents', () => {
   it('uses a neutral compact summary label while expanded', async () => {
     const { CompactAgentSummaryButton } = await import('./worktree-card-compact-agents')
     const agents = [
-      ['tab-1:1', 'codex', 'One'],
-      ['tab-1:2', 'codex', 'Two'],
-      ['tab-1:3', 'codex', 'Three'],
-      ['tab-1:4', 'gemini', 'Four'],
+      ['tab-1:1', 'opencode', 'One'],
+      ['tab-1:2', 'opencode', 'Two'],
+      ['tab-1:3', 'opencode', 'Three'],
+      ['tab-1:4', 'pi', 'Four'],
       ['tab-1:5', 'claude', 'Five']
     ].map(([paneKey, agentType, prompt]) =>
       mockAgent({ paneKey, agentType, startedAt: 1000, prompt })
@@ -845,7 +845,7 @@ describe('WorktreeCardAgents', () => {
     mockAgents = [
       mockAgent({
         paneKey: 'tab-parent-a:1',
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: 1000,
         prompt: 'Parent A'
       }),
@@ -860,7 +860,7 @@ describe('WorktreeCardAgents', () => {
       }),
       mockAgent({
         paneKey: 'tab-parent-b:1',
-        agentType: 'gemini',
+        agentType: 'pi',
         state: 'waiting',
         startedAt: 1200,
         stateStartedAt: 1200,
@@ -868,7 +868,7 @@ describe('WorktreeCardAgents', () => {
       }),
       mockAgent({
         paneKey: 'tab-child-b:1',
-        agentType: 'codex',
+        agentType: 'opencode',
         startedAt: 1300,
         stateStartedAt: 1300,
         prompt: 'Child B',
@@ -876,7 +876,7 @@ describe('WorktreeCardAgents', () => {
       }),
       mockAgent({
         paneKey: 'tab-parent-c:1',
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         startedAt: 1400,
         stateStartedAt: 1400,
@@ -890,9 +890,9 @@ describe('WorktreeCardAgents', () => {
     expect(markup).toContain('data-compact-agent-list="true"')
     expect(markup).toContain('role="tree"')
     expect(markup).toContain('3 agents: 1 waiting, 1 working, 1 done')
-    expect(markup).not.toContain('title="Gemini waiting"')
-    expect(markup).not.toContain('title="Codex working"')
-    expect(markup).not.toContain('title="Codex done"')
+    expect(markup).not.toContain('title="Pi waiting"')
+    expect(markup).not.toContain('title="OpenCode working"')
+    expect(markup).not.toContain('title="OpenCode done"')
     expect(markup).not.toContain('Parent A')
     expect(markup).not.toContain('Child A')
     expect(markup).not.toContain('compact-agent-row')

@@ -9,10 +9,10 @@ import {
 import { resolveTabAgentFromSignals } from './tab-agent-from-signals'
 import type { TuiAgent } from '../../../shared/tui-agent'
 
-const AGENTS: readonly TuiAgent[] = ['claude', 'codex']
+const AGENTS: readonly TuiAgent[] = ['claude', 'opencode']
 const SLOT_COUNT = 7
 const SHAPE_COUNT = 3 ** SLOT_COUNT * 4 * 2
-const TITLES: readonly string[] = ['', 'zsh', 'Task - claude', 'Task - codex']
+const TITLES: readonly string[] = ['', 'zsh', 'Task - claude', 'Task - opencode']
 
 type Breakdown = Record<
   'launch' | 'completed-hook' | 'sleeping-session' | 'process' | 'sibling' | 'title',
@@ -163,16 +163,16 @@ describe('renderer ladder decision table', () => {
   })
 
   it('requires both freshness fields before process evidence can change the no-proof result', () => {
-    const values = [null, null, null, null, 'codex', null, 'claude'] as const
+    const values = [null, null, null, null, 'opencode', null, 'claude'] as const
     expect(canonicalResult(values, '', false)).toMatchObject({
       agent: 'claude',
       source: 'launch'
     })
     expect(
       resolveCanonicalPaneAgentIdentity({
-        foregroundAgent: 'codex',
+        foregroundAgent: 'opencode',
         processProof: {
-          agent: 'codex',
+          agent: 'opencode',
           processIncarnation: 'fixture-process',
           authorityId: 'fixture-authority',
           capturedAgeMs: undefined as unknown as number,
@@ -183,9 +183,9 @@ describe('renderer ladder decision table', () => {
     ).toMatchObject({ agent: 'claude', source: 'launch' })
     expect(
       resolveCanonicalPaneAgentIdentity({
-        foregroundAgent: 'codex',
+        foregroundAgent: 'opencode',
         processProof: {
-          agent: 'codex',
+          agent: 'opencode',
           processIncarnation: 'fixture-process',
           authorityId: 'fixture-authority',
           capturedAgeMs: 10,

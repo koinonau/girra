@@ -53,7 +53,7 @@ const DEFAULT_WINDOWS_ROWS: NativeProcessRow[] = [
     pid: 101,
     ppid: 100,
     name: 'node.exe',
-    commandLine: 'node C:\\Users\\dev\\AppData\\Roaming\\npm\\codex.cmd'
+    commandLine: 'node C:\\Users\\dev\\AppData\\Roaming\\npm\\opencode.cmd'
   }
 ]
 
@@ -96,10 +96,10 @@ describe('resolveAgentForegroundProcess', () => {
 
   it('does not report a suspended agent when a non-agent holds the foreground', async () => {
     // shell pid 100. vim (pid 102) holds the terminal foreground ('+'); a
-    // suspended codex (pid 101, stat 'T', no '+') is a backgrounded descendant.
+    // suspended opencode (pid 101, stat 'T', no '+') is a backgrounded descendant.
     mockPs(
       [
-        '101 100 T    node /Users/dev/.nvm/versions/node/bin/codex',
+        '101 100 T    node /Users/dev/.nvm/versions/node/bin/opencode',
         '102 100 S+   vim notes.txt'
       ].join('\n')
     )
@@ -108,9 +108,9 @@ describe('resolveAgentForegroundProcess', () => {
   })
 
   it('still reports a foreground agent', async () => {
-    mockPs(['101 100 S+   node /Users/dev/.nvm/versions/node/bin/codex'].join('\n'))
+    mockPs(['101 100 S+   node /Users/dev/.nvm/versions/node/bin/opencode'].join('\n'))
 
-    await expect(resolveAgentForegroundProcess(100, 'node')).resolves.toBe('codex')
+    await expect(resolveAgentForegroundProcess(100, 'node')).resolves.toBe('opencode')
   })
 
   it('reports bare pi', async () => {
@@ -120,7 +120,7 @@ describe('resolveAgentForegroundProcess', () => {
   })
 
   it('treats a fresh POSIX snapshot missing the PTY root as unavailable', async () => {
-    mockPs('101 999 S+ node /Users/dev/.nvm/versions/node/bin/codex')
+    mockPs('101 999 S+ node /Users/dev/.nvm/versions/node/bin/opencode')
 
     await expect(
       resolveAgentForegroundProcessWithAvailability(100, 'zsh', { fresh: true })
@@ -258,7 +258,7 @@ describe('resolveAgentForegroundProcess', () => {
 
   it('does not report a stopped agent after the shell regains foreground', async () => {
     mockPs(
-      ['100 99 Ss+  bash -i', '101 100 T    node /Users/dev/.nvm/versions/node/bin/codex'].join(
+      ['100 99 Ss+  bash -i', '101 100 T    node /Users/dev/.nvm/versions/node/bin/opencode'].join(
         '\n'
       )
     )
@@ -270,26 +270,26 @@ describe('resolveAgentForegroundProcess', () => {
     // No '+' marker at all (e.g. a detached/daemon descendant tree) — the
     // recognized agent may still be the best available signal.
     mockPs(
-      ['100 99 Ss   bash -i', '101 100 S    node /Users/dev/.nvm/versions/node/bin/codex'].join(
+      ['100 99 Ss   bash -i', '101 100 S    node /Users/dev/.nvm/versions/node/bin/opencode'].join(
         '\n'
       )
     )
 
-    await expect(resolveAgentForegroundProcess(100, 'node')).resolves.toBe('codex')
+    await expect(resolveAgentForegroundProcess(100, 'node')).resolves.toBe('opencode')
   })
 
   it('recognizes Windows wrapper-launched agents from descendant command lines', async () => {
     Object.defineProperty(process, 'platform', { value: 'win32' })
     mockWindowsRows()
 
-    await expect(resolveAgentForegroundProcess(100, 'node.exe')).resolves.toBe('codex')
+    await expect(resolveAgentForegroundProcess(100, 'node.exe')).resolves.toBe('opencode')
   })
 
   it('recognizes Windows shell-rooted agent launches from descendant command lines', async () => {
     Object.defineProperty(process, 'platform', { value: 'win32' })
     mockWindowsRows()
 
-    await expect(resolveAgentForegroundProcess(100, 'powershell.exe')).resolves.toBe('codex')
+    await expect(resolveAgentForegroundProcess(100, 'powershell.exe')).resolves.toBe('opencode')
   })
 
   it('recognizes Windows Git Bash shell-rooted agent launches', async () => {
@@ -305,11 +305,11 @@ describe('resolveAgentForegroundProcess', () => {
         pid: 101,
         ppid: 100,
         name: 'node.exe',
-        commandLine: 'node C:\\Users\\dev\\AppData\\Roaming\\npm\\codex.cmd'
+        commandLine: 'node C:\\Users\\dev\\AppData\\Roaming\\npm\\opencode.cmd'
       }
     ])
 
-    await expect(resolveAgentForegroundProcess(100, 'bash.exe')).resolves.toBe('codex')
+    await expect(resolveAgentForegroundProcess(100, 'bash.exe')).resolves.toBe('opencode')
   })
 
   it('keeps a multiline Windows command line inside its own row', async () => {
@@ -329,14 +329,14 @@ describe('resolveAgentForegroundProcess', () => {
         name: 'node.exe',
         commandLine: [
           'node',
-          'C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\bin\\codex.js',
+          'C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\opencode-ai\\bin\\opencode',
           '--prompt',
-          '"line one\r\nName=opencode.exe\r\nProcessId=999"'
+          '"line one\r\nName=claude.exe\r\nProcessId=999"'
         ].join(' ')
       }
     ])
 
-    await expect(resolveAgentForegroundProcess(100, 'powershell.exe')).resolves.toBe('codex')
+    await expect(resolveAgentForegroundProcess(100, 'powershell.exe')).resolves.toBe('opencode')
   })
 
   it('distinguishes unavailable Windows enumeration from a confirmed shell', async () => {
@@ -431,7 +431,7 @@ describe('resolveAgentForegroundProcess', () => {
     Object.defineProperty(process, 'platform', { value: 'win32' })
     mockWindowsRows([
       { pid: 100, ppid: 99, name: 'powershell.exe', commandLine: 'powershell.exe' },
-      { pid: 999, ppid: 500, name: 'node.exe', commandLine: 'node /usr/bin/codex' }
+      { pid: 999, ppid: 500, name: 'node.exe', commandLine: 'node /usr/bin/opencode' }
     ])
 
     await expect(
@@ -513,8 +513,8 @@ describe('resolveAgentForegroundProcess', () => {
       {
         pid: 102,
         ppid: 100,
-        name: 'codex.exe',
-        commandLine: 'codex'
+        name: 'opencode.exe',
+        commandLine: 'opencode'
       }
     ])
 
@@ -535,7 +535,7 @@ describe('resolveAgentForegroundProcess', () => {
         ppid: 100,
         name: 'node.exe',
         commandLine:
-          'node C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\bin\\codex.js'
+          'node C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\opencode-ai\\bin\\opencode'
       },
       {
         pid: 102,
@@ -626,7 +626,7 @@ describe('resolveAgentForegroundProcess', () => {
         ppid: 100,
         name: 'node.exe',
         commandLine:
-          'node C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\bin\\codex.js --cwd C:\\repo\\orca'
+          'node C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\opencode-ai\\bin\\opencode --cwd C:\\repo\\orca'
       },
       {
         pid: 102,
@@ -641,7 +641,7 @@ describe('resolveAgentForegroundProcess', () => {
       resolveAgentForegroundProcess(100, 'powershell.exe', {
         contextPaths: ['C:\\repo\\orca']
       })
-    ).resolves.toBe('codex')
+    ).resolves.toBe('opencode')
   })
 
   it('recognizes the deepest Windows shell-rooted agent when candidates share one lineage', async () => {
@@ -656,8 +656,8 @@ describe('resolveAgentForegroundProcess', () => {
       {
         pid: 101,
         ppid: 100,
-        name: 'codex.exe',
-        commandLine: 'codex --cwd C:\\repo\\orca'
+        name: 'claude.exe',
+        commandLine: 'claude --cwd C:\\repo\\orca'
       },
       {
         pid: 102,
@@ -686,8 +686,8 @@ describe('resolveAgentForegroundProcess', () => {
       {
         pid: 101,
         ppid: 100,
-        name: 'codex.exe',
-        commandLine: 'codex --cwd C:\\repo\\orca'
+        name: 'claude.exe',
+        commandLine: 'claude --cwd C:\\repo\\orca'
       },
       {
         pid: 102,
@@ -724,7 +724,7 @@ describe('resolveAgentForegroundProcess', () => {
         ppid: 100,
         name: 'node.exe',
         commandLine:
-          'node C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\@openai\\codex\\bin\\codex.js'
+          'node C:\\Users\\dev\\AppData\\Roaming\\npm\\node_modules\\opencode-ai\\bin\\opencode'
       }
     ])
 

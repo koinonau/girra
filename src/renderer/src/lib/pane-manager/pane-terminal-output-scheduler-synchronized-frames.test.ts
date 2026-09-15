@@ -349,7 +349,7 @@ describe('pane terminal output scheduler', () => {
     expect(terminal.write).toHaveBeenCalledWith('\x1b[?2026h\x1b[?25lpartial', expect.any(Function))
   })
 
-  // Why: issue #8754 — ConPTY splits Codex spinner frames into an open chunk and a
+  // Why: issue #8754: ConPTY splits agent spinner frames into an open chunk and a
   // close chunk; hold and coalesce each cancelled the other's fallback timer, so a
   // visible pane never repainted until the tab was blurred.
   it('keeps repainting when synchronized frames alternate hold and coalesce chunks', async () => {
@@ -365,7 +365,7 @@ describe('pane terminal output scheduler', () => {
         holdForeground: true
       })
     }
-    // Codex shows the cursor before the end marker, so this never hits the immediate-drain escape.
+    // The agent shows the cursor before the end marker, so this never hits the immediate-drain escape.
     const writeFrameClose = (): void => {
       writeTerminalOutput(terminal, '\x1b[10;8H\x1b[?25h\x1b[?2026l', {
         foreground: true,

@@ -52,7 +52,7 @@ function pendingSnapshot() {
         id: `${HOST_TAB_ID}::${LEAF_ID}`,
         parentTabId: HOST_TAB_ID,
         leafId: LEAF_ID,
-        title: 'Codex',
+        title: 'OpenCode',
         ptyId: 'pty-live',
         isActive: true,
         status: 'pending-handle' as const,

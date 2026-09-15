@@ -88,7 +88,7 @@ describe('registerNotificationHandlers', () => {
           worktreeLabel: 'feat/notis',
           repoLabel: 'orca',
           terminalTitle: '* Claude done',
-          agentType: 'codex',
+          agentType: 'opencode',
           agentState: 'done',
           agentPrompt: 'Fix rich notification text',
           agentLastAssistantMessage: 'Updated the notification body.'
@@ -98,7 +98,7 @@ describe('registerNotificationHandlers', () => {
 
     expect(notificationCtorMock).toHaveBeenCalledWith(
       expectedNativeNotificationOptions({
-        title: 'feat/notis - Codex finished',
+        title: 'feat/notis - OpenCode finished',
         body: 'Updated the notification body.'
       })
     )
@@ -126,7 +126,7 @@ describe('registerNotificationHandlers', () => {
           worktreeLabel: 'feat/notis',
           repoLabel: 'orca',
           hasMultipleActiveRepos: true,
-          agentType: 'codex',
+          agentType: 'opencode',
           agentState: 'done',
           agentLastAssistantMessage: 'Updated the notification body.'
         }
@@ -135,7 +135,7 @@ describe('registerNotificationHandlers', () => {
 
     expect(notificationCtorMock).toHaveBeenCalledWith(
       expectedNativeNotificationOptions({
-        title: 'orca / feat/notis - Codex finished',
+        title: 'orca / feat/notis - OpenCode finished',
         body: 'Updated the notification body.'
       })
     )

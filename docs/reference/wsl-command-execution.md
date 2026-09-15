@@ -56,7 +56,7 @@ The fence carries a per-call nonce so that `cat`-ing a file whose contents happe
 is not truncated, and it preserves the payload's exit status so `exit 2` → `ENOENT` mappings keep
 working.
 
-**Do not fence a command that `exec`s into a long-running program** (`codex app-server`, an
+**Do not fence a command that `exec`s into a long-running program** (a server process, an
 interactive terminal). It never reaches the closing fence, and there the shell's own output either
 belongs to the program or is what the user wants to see.
 

@@ -162,7 +162,7 @@ describe('connectPanePty', () => {
       .mockResolvedValueOnce({ data: hidden, cols: 120, rows: 40, seq: hidden.length })
       .mockResolvedValue({ data: done, cols: 120, rows: 40, seq: hidden.length + overflow.length })
     const pane = createPane(1)
-    const deps = createDeps({ isVisibleRef: { current: false }, startup: { command: 'codex' } })
+    const deps = createDeps({ isVisibleRef: { current: false }, startup: { command: 'opencode' } })
     const disposable = connectPanePty(pane as never, createManager(1) as never, deps as never)
     await flushAsyncTicks(6)
     safeFitAndThen.mockClear()

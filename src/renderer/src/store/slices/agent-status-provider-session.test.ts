@@ -36,7 +36,7 @@ describe('recordAgentProviderSession', () => {
     expect(store.getState().sleepingAgentSessionsByPaneKey[paneKey]).toBeUndefined()
   })
 
-  it('preserves the root session while a child permission hook moves Codex to waiting', () => {
+  it('preserves the root session while a child permission hook moves OpenCode to waiting', () => {
     const store = createTestStore()
     const providerSession = { key: 'session_id' as const, id: 'root-session' }
 
@@ -44,8 +44,8 @@ describe('recordAgentProviderSession', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'coordinate reviewers', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'coordinate reviewers', agentType: 'opencode' },
+        'OpenCode',
         { updatedAt: 10, stateStartedAt: 10 },
         undefined,
         { providerSession }
@@ -53,7 +53,7 @@ describe('recordAgentProviderSession', () => {
     store.getState().setAgentStatus('tab-1:leaf-1', {
       state: 'waiting',
       prompt: 'coordinate reviewers',
-      agentType: 'codex',
+      agentType: 'opencode',
       subagents: [{ id: 'child-1', state: 'waiting', startedAt: 11 }]
     })
 

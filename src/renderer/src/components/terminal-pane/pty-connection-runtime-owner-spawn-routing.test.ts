@@ -239,8 +239,8 @@ describe('connectPanePty', () => {
     const manager = createManager(2)
     const deps = createDeps({
       startup: {
-        command: "codex '--profile' 'recipe'",
-        launchAgent: 'codex',
+        command: "claude '--profile' 'recipe'",
+        launchAgent: 'claude',
         launchConfig: { agentArgs: '--profile recipe', agentEnv: {} },
         agentArgsOverride: '--profile recipe'
       }

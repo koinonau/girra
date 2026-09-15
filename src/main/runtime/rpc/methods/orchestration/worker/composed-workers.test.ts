@@ -95,7 +95,7 @@ describe('orchestration RPC methods', () => {
         call('orchestration.workerStart', {
           task: task.id,
           from: 'term_other',
-          agent: 'codex'
+          agent: 'opencode'
         })
       ).rejects.toMatchObject({ code: 'consumer_fenced' })
       expect(db.getDispatchContext(task.id)).toBeUndefined()
@@ -118,7 +118,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as { state: string }
 
       expect(result.state).toBe('ready')
@@ -133,7 +133,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as {
         dispatchId: string
         state: string
@@ -153,7 +153,7 @@ describe('orchestration RPC methods', () => {
       // Why: dispatching a worker is background work — surfaceOwner:false adopts
       // the tab without scrolling the sidebar to the worker's workspace.
       expect(runtime.createTerminal).toHaveBeenCalledWith('id:repo::worktree', {
-        startupAgent: 'codex',
+        startupAgent: 'opencode',
         title: `worker-${task.id}`,
         surfaceOwner: false
       })
@@ -223,22 +223,22 @@ describe('orchestration RPC methods', () => {
       expect(db.getDispatchContext(task.id)).toBeUndefined()
     })
 
-    // Why: `cursor` on PATH is the Cursor desktop app; passing the agent id as a
-    // shell command opened the IDE and left a blank shell (issue #11926).
+    // Why: an agent id is not always its launch command (Agent Teams runs `orca claude-teams`);
+    // passing the id as a shell command left a blank shell (issue #11926).
     it('never passes the agent id to the worker terminal as a shell command', async () => {
       setup()
       mockCurrentWorkerStart()
-      const task = db.createTask({ spec: 'start a cursor worker' })
+      const task = db.createTask({ spec: 'start an agent teams worker' })
 
       await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'cursor'
+        agent: 'claude-agent-teams'
       })
 
       expect(runtime.createTerminal).toHaveBeenCalledWith(
         'id:repo::worktree',
-        expect.objectContaining({ startupAgent: 'cursor' })
+        expect.objectContaining({ startupAgent: 'claude-agent-teams' })
       )
       expect(runtime.createTerminal).toHaveBeenCalledWith(
         'id:repo::worktree',
@@ -264,7 +264,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as { dispatchId: string }
 
       expect(db.getDispatchContextById(result.dispatchId)?.launch_token_hash).toBe(
@@ -287,7 +287,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as {
         state: string
         warning?: string
@@ -333,7 +333,7 @@ describe('orchestration RPC methods', () => {
         task: task.id,
         from: 'term_coord',
         worktree: 'id:repo::other',
-        agent: 'codex'
+        agent: 'opencode'
       })) as { state: string; setup: { state: string }; effects: unknown[] }
 
       expect(result).toMatchObject({ state: 'ready' })
@@ -347,7 +347,7 @@ describe('orchestration RPC methods', () => {
         'id:repo::other',
         // Why: starting a worker in an existing worktree must not pull the sidebar
         // away from whatever the user is looking at.
-        expect.objectContaining({ startupAgent: 'codex', surfaceOwner: false })
+        expect.objectContaining({ startupAgent: 'opencode', surfaceOwner: false })
       )
       expect(createWorktree).not.toHaveBeenCalled()
       expect(runtime.showTerminal).toHaveBeenCalledWith('term_coord')
@@ -378,12 +378,12 @@ describe('orchestration RPC methods', () => {
           task: task.id,
           from: 'term_coord',
           worktree: 'folder:workspace-1',
-          agent: 'codex'
+          agent: 'opencode'
         })
       ).resolves.toMatchObject({ state: 'ready' })
       expect(runtime.createTerminal).toHaveBeenCalledWith(
         'id:folder:workspace-1',
-        expect.objectContaining({ startupAgent: 'codex', surfaceOwner: false })
+        expect.objectContaining({ startupAgent: 'opencode', surfaceOwner: false })
       )
     })
 
@@ -423,7 +423,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as { state: string; failedStage: string; residualResources: { id: string }[] }
 
       expect(result).toMatchObject({ state: 'failed', failedStage: 'agent_readiness' })
@@ -441,7 +441,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as { state: string; failedStage: string; residualResources: unknown[] }
 
       expect(result).toMatchObject({
@@ -463,7 +463,7 @@ describe('orchestration RPC methods', () => {
       const result = (await call('orchestration.workerStart', {
         task: task.id,
         from: 'term_coord',
-        agent: 'codex'
+        agent: 'opencode'
       })) as {
         state: string
         failedStage: string
@@ -500,7 +500,7 @@ describe('orchestration RPC methods', () => {
         const result = (await call('orchestration.workerStart', {
           task: task.id,
           from: 'term_coord',
-          agent: 'codex'
+          agent: 'opencode'
         })) as { state: string; failedStage: string; lastError: string }
 
         expect(result).toMatchObject({
@@ -536,7 +536,7 @@ describe('orchestration RPC methods', () => {
       } as never)
       vi.spyOn(runtime, 'listTerminals').mockResolvedValue({
         terminals: [
-          { handle: 'term_worker', title: 'Codex' },
+          { handle: 'term_worker', title: 'OpenCode' },
           { handle: 'term_setup', title: 'Setup' },
           { handle: 'term_logs', title: 'Logs' }
         ],
@@ -550,7 +550,7 @@ describe('orchestration RPC methods', () => {
         from: 'term_coord',
         worktree: 'new-child',
         name: 'child-worker',
-        agent: 'codex'
+        agent: 'opencode'
       })) as {
         state: string
         setup: { requested: string; startupPolicy: string; state: string }
@@ -571,7 +571,7 @@ describe('orchestration RPC methods', () => {
           name: 'child-worker',
           runHooks: false,
           setupDecision: 'run',
-          startupAgent: 'codex',
+          startupAgent: 'opencode',
           activate: false,
           lineage: expect.objectContaining({ parentWorktree: 'repo::parent', noParent: false })
         })

@@ -128,7 +128,7 @@ it('a phone report during the boot wait takes the pane and fences the later rele
   const start = h.call('orchestration.workerStart', {
     task: task.id,
     from: 'term_coord',
-    agent: 'codex'
+    agent: 'claude'
   })
   await vi.waitFor(() => expect(h.runtime.waitForTerminal).toHaveBeenCalled())
   const dispatchId = (

@@ -68,7 +68,7 @@ beforeEach(() => {
   detectLocalAgents
     .mockReset()
     .mockImplementation((context) =>
-      Promise.resolve(context?.projectRuntime?.runtime.kind === 'wsl' ? ['claude'] : ['codex'])
+      Promise.resolve(context?.projectRuntime?.runtime.kind === 'wsl' ? ['claude'] : ['opencode'])
     )
   refreshLocalAgents.mockReset().mockResolvedValue({
     agents: [],
@@ -160,7 +160,7 @@ describe('Floating Workspace authority', () => {
     )
 
     expect(activeResult.current?.detectedIds).toEqual(['claude'])
-    expect(floatingResult.current?.detectedIds).toEqual(['codex'])
+    expect(floatingResult.current?.detectedIds).toEqual(['opencode'])
     expect(useAppStore.getState().detectedAgentIds).toEqual(['claude'])
     const detectedContexts = detectLocalAgents.mock.calls.map(([context]) => context)
     expect(detectedContexts).toEqual([
@@ -173,7 +173,7 @@ describe('Floating Workspace authority', () => {
     ])
 
     refreshLocalAgents.mockResolvedValueOnce({
-      agents: ['codex'],
+      agents: ['opencode'],
       addedPathSegments: [],
       shellHydrationOk: true
     })
@@ -183,7 +183,7 @@ describe('Floating Workspace authority', () => {
     await flushEffects()
 
     expect(activeResult.current?.detectedIds).toEqual(['claude'])
-    expect(floatingResult.current?.detectedIds).toEqual(['codex'])
+    expect(floatingResult.current?.detectedIds).toEqual(['opencode'])
     expect(useAppStore.getState().detectedAgentIds).toEqual(['claude'])
     expect(refreshLocalAgents).toHaveBeenLastCalledWith(undefined)
   })
@@ -226,12 +226,12 @@ describe('useDetectedAgents (ssh call site)', () => {
       firstRoot.unmount()
     })
     roots.splice(roots.indexOf(firstRoot), 1)
-    detectRemoteAgents.mockResolvedValueOnce(['kilo'])
+    detectRemoteAgents.mockResolvedValueOnce(['opencode'])
 
     await renderProbe({ kind: 'ssh', connectionId: 'ssh-1' })
 
     expect(detectRemoteAgents).toHaveBeenCalledTimes(2)
-    expect(useAppStore.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['kilo'])
+    expect(useAppStore.getState().remoteDetectedAgentIds['ssh-1']).toEqual(['opencode'])
   })
 })
 
@@ -347,7 +347,7 @@ describe('useDetectedAgents (runtime call site)', () => {
         }
       } else {
         detectCalls += 1
-        result = detectCalls === 1 ? [] : ['kilo']
+        result = detectCalls === 1 ? [] : ['opencode']
       }
       return Promise.resolve({
         id: method,
@@ -370,6 +370,6 @@ describe('useDetectedAgents (runtime call site)', () => {
     await renderProbe({ kind: 'runtime', environmentId: 'env-1' })
 
     expect(detectCalls).toBe(2)
-    expect(useAppStore.getState().runtimeDetectedAgentIds['env-1']).toEqual(['kilo'])
+    expect(useAppStore.getState().runtimeDetectedAgentIds['env-1']).toEqual(['opencode'])
   })
 })

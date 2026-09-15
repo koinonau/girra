@@ -18,11 +18,6 @@ import { finishRuntimeRemoteWorktreeCreate } from './runtime-remote-worktree-cre
 type Dependencies = {
   store: RuntimeStore
   canSpawn(): boolean
-  markTrusted(
-    agent: NonNullable<RuntimeRemoteWorktreeCreateArgs['createdWithAgent']>,
-    connectionId: string,
-    path: string
-  ): Promise<void>
   createTerminal(
     selector: string,
     options: TerminalCreateOptions
@@ -104,10 +99,6 @@ export async function createRuntimeRemoteManagedWorktree(
 
   if (sequencedStartup && deps.canSpawn()) {
     try {
-      const startupTrustAgent = args.startupDraftPaste?.agent ?? args.createdWithAgent
-      if (startupTrustAgent) {
-        await deps.markTrusted(startupTrustAgent, repo.connectionId!, result.worktree.path)
-      }
       const terminal = await deps.createTerminal(`path:${result.worktree.path}`, {
         command: sequencedStartup.command,
         ...(result.setup && args.startup

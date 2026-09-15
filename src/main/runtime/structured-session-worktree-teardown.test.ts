@@ -22,11 +22,11 @@ const OTHER_WORKTREE = 'repo_1::/tmp/wt-b'
 function record(
   sessionId: string,
   workspaceId: string,
-  options: { provider?: 'claude' | 'codex'; executionHostId?: string } = {}
+  options: { executionHostId?: string } = {}
 ): AgentSessionRecord {
   return {
     sessionId,
-    provider: options.provider ?? 'claude',
+    provider: 'claude',
     location: {
       executionHostId: options.executionHostId ?? 'local',
       wslDistro: null,
@@ -385,19 +385,15 @@ describe('worktree teardown and structured agent sessions', () => {
     expect(host.closed).toEqual(['s1'])
   })
 
-  it('names only the sessions that stayed, and every provider still there', async () => {
+  it('names only the sessions that stayed, and each provider once', async () => {
     installHost({
-      records: [
-        record('s1', WORKTREE),
-        record('s2', WORKTREE, { provider: 'codex' }),
-        record('s3', WORKTREE)
-      ],
+      records: [record('s1', WORKTREE), record('s2', WORKTREE), record('s3', WORKTREE)],
       stuck: new Set(['s2', 's3'])
     })
     const error = await killAllProcessesForWorktree(WORKTREE, destructiveDeps()).catch(
       (thrown: Error) => thrown.message
     )
-    expect(error).toContain('still live: 2 agent sessions (claude, codex)')
+    expect(error).toContain('still live: 2 agent sessions (claude)')
   })
 
   it('names the unconfirmed sessions too, instead of counting only the live ones', async () => {
@@ -405,7 +401,7 @@ describe('worktree teardown and structured agent sessions', () => {
     // those exited. Nothing proves that here: an `unverifiable` session is unclosed as well, so
     // naming only the live subset told the user "1 agent session" while two were about to go.
     installHost({
-      records: [record('s1', WORKTREE), record('s2', WORKTREE, { provider: 'codex' })],
+      records: [record('s1', WORKTREE), record('s2', WORKTREE)],
       stuck: new Set(['s1']),
       unverifiable: new Set(['s2'])
     })
@@ -413,7 +409,7 @@ describe('worktree teardown and structured agent sessions', () => {
       (thrown: Error) => thrown.message
     )
     expect(error).toContain(
-      'still live: 1 agent session (claude); could not confirm these closed: 1 agent session (codex)'
+      'still live: 1 agent session (claude); could not confirm these closed: 1 agent session (claude)'
     )
     // The marker still leads, so the toast keeps showing the stronger of the two warnings.
     expect(isProvenLiveStructuredSessionRemovalError(error as string)).toBe(true)
@@ -495,15 +491,15 @@ describe('worktree teardown and structured agent sessions', () => {
     // first chat still told the user both were still there, which is the exact thing this sweep
     // exists to stop doing: never report state nobody observed.
     installHost({
-      records: [record('s1', WORKTREE), record('s2', WORKTREE, { provider: 'codex' })],
+      records: [record('s1', WORKTREE), record('s2', WORKTREE)],
       closeGates: { s2: new Promise<void>(() => {}) }
     })
     const error = await killAllProcessesForWorktree(
       WORKTREE,
       destructiveDeps({ timeoutMs: 40 })
     ).catch((thrown: Error) => thrown.message)
-    expect(error).toContain('could not confirm these closed: 1 agent session (codex)')
-    expect(error).not.toContain('claude')
+    expect(error).toContain('could not confirm these closed: 1 agent session (claude)')
+    expect(error).not.toContain('2 agent sessions')
   })
 
   it('counts the closes that landed before the budget expired', async () => {
@@ -514,7 +510,7 @@ describe('worktree teardown and structured agent sessions', () => {
       setTimeout(resolve, 300)
     })
     installHost({
-      records: [record('s1', WORKTREE), record('s2', WORKTREE, { provider: 'codex' })],
+      records: [record('s1', WORKTREE), record('s2', WORKTREE)],
       closeGates: { s2: slowClose }
     })
     const result = await killAllProcessesForWorktree(
@@ -523,7 +519,7 @@ describe('worktree teardown and structured agent sessions', () => {
     )
     expect(result.structuredStopped).toBe(1)
     expect(structuredSessionWarning(warn)).toContain(
-      'could not confirm these closed: 1 agent session (codex)'
+      'could not confirm these closed: 1 agent session (claude)'
     )
     warn.mockRestore()
   })

@@ -57,10 +57,10 @@ describe('agent completion coordinator queued inspections', () => {
     })
 
     for (const [index, coordinator] of staleCoordinators.entries()) {
-      coordinator.observeTitle(`Codex working ${index}`)
+      coordinator.observeTitle(`Claude working ${index}`)
       coordinator.observeTitle(`~/stale-${index}`)
     }
-    liveCoordinator.observeTitle('Codex working')
+    liveCoordinator.observeTitle('Claude working')
     liveCoordinator.observeTitle('~/live')
     staleCoordinators.forEach((coordinator) => coordinator.dispose())
 

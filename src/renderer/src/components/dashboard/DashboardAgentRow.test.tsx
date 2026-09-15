@@ -29,7 +29,7 @@ function makeAgent(
     prompt: 'Fix hover scope',
     updatedAt: 60_000,
     stateStartedAt: 60_000,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
     stateHistory: [],
     ...entryOverrides
@@ -39,7 +39,7 @@ function makeAgent(
     paneKey,
     entry,
     tab,
-    agentType: entry.agentType ?? 'codex',
+    agentType: entry.agentType ?? 'opencode',
     state: entry.state,
     startedAt: entry.stateStartedAt,
     ...overrides
@@ -333,7 +333,7 @@ describe('DashboardAgentRow', () => {
       makeAgent({}, { toolName: 'ListDir', toolInput: '/Users/nwparker/orca' })
     )
 
-    // Why: Antigravity emits working hooks without tool metadata between
+    // Why: agents can emit working hooks without tool metadata between
     // tool-specific hooks; a whitespace placeholder collapses and makes the
     // sidebar row jump from one secondary line to two.
     expect(emptyToolMarkup).toContain('data-agent-row-tool-slot=""')
@@ -452,7 +452,7 @@ describe('DashboardAgentRow', () => {
       </TooltipProvider>
     )
 
-    expect(markup).toContain('title="Codex - dispatched 2 agents"')
+    expect(markup).toContain('title="OpenCode - dispatched 2 agents"')
     expect(markup).toContain('data-agent-lineage-parent-connector="true"')
     expect(classTokens(markup)).toContain('left-[13px]')
     expect(markup).toContain('aria-level="1"')

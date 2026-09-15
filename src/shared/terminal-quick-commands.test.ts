@@ -130,9 +130,9 @@ describe('terminal quick commands', () => {
           id: 'agent-review',
           label: 'Review',
           action: 'agent-prompt',
-          agent: 'codex',
+          agent: 'opencode',
           prompt: '  Review this diff\n',
-          command: "codex 'old workaround'"
+          command: "opencode 'old workaround'"
         },
         {
           id: 'unknown-agent',
@@ -143,9 +143,9 @@ describe('terminal quick commands', () => {
         },
         {
           id: 'post-start-agent',
-          label: 'Aider',
+          label: 'Agent Teams',
           action: 'agent-prompt',
-          agent: 'aider',
+          agent: 'claude-agent-teams',
           prompt: 'Do work'
         }
       ])
@@ -154,7 +154,7 @@ describe('terminal quick commands', () => {
         id: 'agent-review',
         label: 'Review',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: '  Review this diff',
         scope: { type: 'global' }
       }
@@ -172,14 +172,14 @@ describe('terminal quick commands', () => {
           id: 'large-review',
           label: 'Review',
           action: 'agent-prompt',
-          agent: 'codex',
+          agent: 'opencode',
           prompt: largePrompt
         },
         {
           id: 'over-limit-review',
           label: 'Review with cap',
           action: 'agent-prompt',
-          agent: 'codex',
+          agent: 'opencode',
           prompt: overLimitPrompt
         },
         {
@@ -193,7 +193,7 @@ describe('terminal quick commands', () => {
         id: 'large-review',
         label: 'Review',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: largePrompt.trimEnd(),
         scope: { type: 'global' }
       },
@@ -201,7 +201,7 @@ describe('terminal quick commands', () => {
         id: 'over-limit-review',
         label: 'Review with cap',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'x'.repeat(6000),
         scope: { type: 'global' }
       },
@@ -329,8 +329,8 @@ describe('terminal quick commands', () => {
 
   it('only allows agent prompt quick commands for launch-time prompt agents', () => {
     expect(supportsTerminalAgentQuickCommand('claude')).toBe(true)
-    expect(supportsTerminalAgentQuickCommand('gemini')).toBe(true)
-    expect(supportsTerminalAgentQuickCommand('aider')).toBe(false)
+    expect(supportsTerminalAgentQuickCommand('opencode')).toBe(true)
+    expect(supportsTerminalAgentQuickCommand('claude-agent-teams')).toBe(false)
     expect(supportsTerminalAgentQuickCommand('not-real')).toBe(false)
   })
 })

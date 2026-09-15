@@ -49,7 +49,7 @@ function makeAgentEntry(paneKey: string, stateStartedAt: number): AgentStatusEnt
     prompt: 'Review complete',
     updatedAt: stateStartedAt,
     stateStartedAt,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey,
     stateHistory: []
   }
@@ -126,7 +126,7 @@ describe('createUISlice agent send target mode', () => {
           prompt: 'previous',
           updatedAt: now,
           stateStartedAt: now,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: readyPaneKey,
           stateHistory: []
         },
@@ -135,7 +135,7 @@ describe('createUISlice agent send target mode', () => {
           prompt: 'busy',
           updatedAt: now,
           stateStartedAt: now,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: workingPaneKey,
           stateHistory: []
         }
@@ -273,7 +273,7 @@ describe('createUISlice agent send target mode', () => {
       noteTarget: { tabId, leafId: readyLeafId }
     })
     expect(onPromptDelivered).toHaveBeenCalledTimes(1)
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to Codex')
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to OpenCode')
     expect(store.getState().agentSendPopoverTargetMode).toBeNull()
   })
 
@@ -295,7 +295,7 @@ describe('createUISlice agent send target mode', () => {
     await expect(store.getState().sendPromptToSidebarAgentTarget(readyPaneKey)).resolves.toBe(false)
 
     expect(onPromptDelivered).not.toHaveBeenCalled()
-    expect(mocks.toastError).toHaveBeenCalledWith("Couldn't send to Codex", {
+    expect(mocks.toastError).toHaveBeenCalledWith("Couldn't send to OpenCode", {
       description: 'selected:not-ready'
     })
     expect(store.getState().agentSendPopoverTargetMode).toMatchObject({
@@ -326,7 +326,7 @@ describe('createUISlice agent send target mode', () => {
       prompt: 'Review this',
       noteTarget: { tabId, leafId: workingLeafId }
     })
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to Codex')
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to OpenCode')
     expect(store.getState().agentSendPopoverTargetMode).toBeNull()
   })
 
@@ -352,7 +352,7 @@ describe('createUISlice agent send target mode', () => {
 
     await expect(send).resolves.toBe(true)
     expect(onPromptDelivered).toHaveBeenCalledTimes(1)
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to Codex')
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to OpenCode')
     expect(store.getState().agentSendPopoverTargetMode).toBeNull()
   })
 
@@ -394,7 +394,7 @@ describe('createUISlice agent send target mode', () => {
       status: 'open'
     })
     expect(onPromptDelivered).toHaveBeenCalledTimes(1)
-    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to Codex')
+    expect(mocks.toastSuccess).toHaveBeenCalledWith('Sent to OpenCode')
     expect(mocks.toastError).not.toHaveBeenCalled()
   })
 
@@ -510,7 +510,7 @@ describe('createUISlice acknowledgeAgents notification dismissal', () => {
           entry: makeAgentEntry(retainedPaneKey, 2_000),
           worktreeId: 'wt-retained',
           tab: makeTerminalTab('tab-retained', 'wt-retained'),
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: 2_000
         }
       },
@@ -585,7 +585,7 @@ describe('createUISlice acknowledgeAgents notification dismissal', () => {
           entry: makeAgentEntry(livePaneKey, 1_000),
           worktreeId: 'wt-live',
           tab: makeTerminalTab(tabId, 'wt-live'),
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: 1_000
         }
       }

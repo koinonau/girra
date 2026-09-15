@@ -17,7 +17,7 @@ describe('createAgentStatusOscProcessor', () => {
     const process = createAgentStatusOscProcessor()
 
     const result = process(
-      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07after'
+      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"opencode"}\x07after'
     )
 
     expect(result.cleanData).toBe('beforeafter')
@@ -25,7 +25,7 @@ describe('createAgentStatusOscProcessor', () => {
       {
         state: 'working',
         prompt: 'ship it',
-        agentType: 'codex'
+        agentType: 'opencode'
       }
     ])
     expect(result.lastPayloadCleanOffset).toBe('before'.length)

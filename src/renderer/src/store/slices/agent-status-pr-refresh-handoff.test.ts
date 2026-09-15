@@ -61,10 +61,10 @@ describe('agent status PR refresh handoff', () => {
 
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'create a PR', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'create a PR', agentType: 'opencode' })
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'done', prompt: 'create a PR', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'done', prompt: 'create a PR', agentType: 'opencode' })
 
     await flushMicrotasks()
 
@@ -92,7 +92,7 @@ describe('agent status PR refresh handoff', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'create a PR', agentType: 'codex' },
+        { state: 'working', prompt: 'create a PR', agentType: 'opencode' },
         undefined,
         undefined,
         { tabId: 'tab-worker', worktreeId: 'wt-1', terminalHandle: 'term-worker' }
@@ -101,7 +101,7 @@ describe('agent status PR refresh handoff', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'done', prompt: 'create a PR', agentType: 'codex' },
+        { state: 'done', prompt: 'create a PR', agentType: 'opencode' },
         undefined,
         undefined,
         { tabId: 'tab-worker', worktreeId: 'wt-1', terminalHandle: 'term-worker' }
@@ -129,10 +129,10 @@ describe('agent status PR refresh handoff', () => {
 
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'create a PR', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'create a PR', agentType: 'opencode' })
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'done', prompt: 'create a PR', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'done', prompt: 'create a PR', agentType: 'opencode' })
 
     await flushMicrotasks()
 
@@ -147,14 +147,14 @@ describe('agent status PR refresh handoff', () => {
 
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'create a PR', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'create a PR', agentType: 'opencode' })
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'done', prompt: 'create a PR', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'done', prompt: 'create a PR', agentType: 'opencode' })
     store.getState().setAgentStatus('tab-1:0', {
       state: 'done',
       prompt: 'create a PR',
-      agentType: 'codex',
+      agentType: 'opencode',
       lastAssistantMessage: 'Opened https://github.com/acme/orca/pull/42'
     })
 

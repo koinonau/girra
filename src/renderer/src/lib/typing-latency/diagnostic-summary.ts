@@ -118,7 +118,7 @@ export function summarizeWorktreeNesting(
 export type FocusedPaneCensus = {
   paneId: number | null
   leafId: string | null
-  /** 'alternate' means a full-screen TUI (grok, Codex); 'normal' is a plain shell. */
+  /** 'alternate' means a full-screen TUI (e.g. OpenCode); 'normal' is a plain shell. */
   bufferType: 'normal' | 'alternate' | null
   cols: number | null
   rows: number | null

@@ -27,9 +27,9 @@ function makeRepo(overrides: Partial<Repo> = {}): Repo {
 describe('setup script prompt inspection', () => {
   it('returns ok with an import candidate when no setup script is effective', async () => {
     const candidate: SetupScriptImportCandidate = {
-      provider: 'codex',
-      label: 'Codex',
-      files: ['.codex/environments/environment.toml'],
+      provider: 'conductor',
+      label: 'Conductor',
+      files: ['conductor.json'],
       setup: 'pnpm install'
     }
 
@@ -152,9 +152,9 @@ describe('setup script prompt inspection', () => {
         } as Repo['hookSettings']
       }),
       {
-        provider: 'codex',
-        label: 'Codex',
-        files: ['.codex/environments/environment.toml'],
+        provider: 'conductor',
+        label: 'Conductor',
+        files: ['conductor.json'],
         setup: 'pnpm install'
       },
       true
@@ -286,11 +286,11 @@ describe('setup script prompt inspection', () => {
     ).toBe('pnpm-lock.yaml')
     expect(
       formatCandidateProvenance({
-        provider: 'codex',
-        label: 'Codex environment',
-        files: ['.codex/environments/environment.toml', 'package.json'],
+        provider: 'conductor',
+        label: 'Conductor',
+        files: ['conductor.json', 'package.json'],
         setup: 'pnpm install'
       })
-    ).toBe('.codex/environments/environment.toml and package.json')
+    ).toBe('conductor.json and package.json')
   })
 })

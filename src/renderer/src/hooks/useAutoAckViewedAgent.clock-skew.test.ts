@@ -36,7 +36,7 @@ function seedFutureStampedTurn(stateStartedAt: number): void {
     prompt: 'remote turn',
     updatedAt: stateStartedAt,
     stateStartedAt,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey: PANE_KEY,
     stateHistory: []
   }

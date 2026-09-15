@@ -9,14 +9,14 @@ import { FAKE_AGENT_WINDOWS_SHELL } from './helpers/fake-agent-command-override'
 import {
   cleanupCompletedWorkerFixture,
   clearCompletedWorkerLedger,
-  completedWorkerFakeCodexCommand,
+  completedWorkerFakeClaudeCommand,
   completedWorkerLaunchEnv,
   listRuntimeTerminals,
   readCompletedWorkerDispatchCapability,
   readCompletedWorkerLedger,
   readPersistedWorkerRecoveryRecord,
   runBuiltOrcaCli,
-  seedCurrentCodexTranscript,
+  seedCurrentClaudeTranscript,
   terminalIdentity
 } from './helpers/completed-worker-retirement-fixture'
 import { RuntimeClient } from '../../src/cli/runtime-client'
@@ -50,14 +50,14 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
     await orcaPage.evaluate(
       async ({ agentCommand, terminalWindowsShell }) => {
         await window.__store?.getState().updateSettings({
-          agentCmdOverrides: { codex: agentCommand },
+          agentCmdOverrides: { claude: agentCommand },
           terminalWindowsShell,
           disabledTuiAgents: [],
           terminalHiddenViewParking: false
         })
       },
       {
-        agentCommand: completedWorkerFakeCodexCommand,
+        agentCommand: completedWorkerFakeClaudeCommand,
         terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL
       }
     )
@@ -131,7 +131,7 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
       task: task.result.task.id,
       from: coordinatorHandle,
       worktree: `id:${String(targetWorktreeId)}`,
-      agent: 'codex',
+      agent: 'claude',
       timeoutMs: 30_000
     })
     expect(started.result.state).toBe('ready')
@@ -202,7 +202,7 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
       throw new Error('Background worker did not receive its dispatch capability')
     }
 
-    const transcriptPath = seedCurrentCodexTranscript(
+    const transcriptPath = seedCurrentClaudeTranscript(
       isolatedHome,
       PROVIDER_SESSION_ID,
       targetWorktreePath
@@ -231,17 +231,21 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
         const recovery = {
           providerSession,
           launchConfig: {
-            // Why not bare 'codex': resume prefers the captured command over
+            // Why not bare 'claude': resume prefers the captured command over
             // agentCmdOverrides, so a bare name would resolve the machine's real
-            // Codex off PATH and unpin the adoption leg this spec exercises.
+            // Claude off PATH and unpin the adoption leg this spec exercises.
             agentCommand,
-            agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+            agentArgs: '--dangerously-skip-permissions',
             agentEnv: {}
           }
         }
         state.setAgentStatus(
           paneKey,
-          { state: 'working', prompt: 'Report completion, then exit normally', agentType: 'codex' },
+          {
+            state: 'working',
+            prompt: 'Report completion, then exit normally',
+            agentType: 'claude'
+          },
           'Completed background worker',
           undefined,
           metadata,
@@ -249,7 +253,7 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
         )
         state.setAgentStatus(
           paneKey,
-          { state: 'done', prompt: 'Report completion, then exit normally', agentType: 'codex' },
+          { state: 'done', prompt: 'Report completion, then exit normally', agentType: 'claude' },
           'Completed background worker',
           undefined,
           metadata,
@@ -257,7 +261,7 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
         )
       },
       {
-        agentCommand: completedWorkerFakeCodexCommand,
+        agentCommand: completedWorkerFakeClaudeCommand,
         paneKey: workerPaneKey,
         providerSessionId: PROVIDER_SESSION_ID,
         tabId: worker.tabId,
@@ -512,7 +516,7 @@ for (const closeMode of ['terminal-close-cli', 'worker-release'] as const) {
     expect(spawnEvents).toHaveLength(1)
     expect(
       spawnEvents.filter(
-        (event) => event.args?.includes('resume') && event.args?.includes(PROVIDER_SESSION_ID)
+        (event) => event.args?.includes('--resume') && event.args?.includes(PROVIDER_SESSION_ID)
       )
     ).toEqual([])
     await expect(orcaPage.locator('.session-restored-banner')).toHaveCount(0)

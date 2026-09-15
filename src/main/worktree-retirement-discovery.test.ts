@@ -73,7 +73,7 @@ describe('discoverRetiredWorktreeNames', () => {
   }
 
   it('calls a machine with no agent state a complete answer, not a hole to rescan forever', async () => {
-    // ENOENT is the common case — a Codex-only or fresh install has no `~/.claude/projects`, and
+    // ENOENT is the common case — a machine without Claude or a fresh install has no `~/.claude/projects`, and
     // no workspace root until the first create. Reporting that as incomplete would turn the
     // one-time seed into a rescan on every composer open for the life of the process.
     const retired = await discoverRetiredWorktreeNames({

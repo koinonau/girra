@@ -133,7 +133,7 @@ describe('getFocusedAgentPaneKeyForWorktree', () => {
           entry,
           tab: makeTab(TAB_ID),
           worktreeId: WORKTREE_ID,
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: 1_000
         }
       }

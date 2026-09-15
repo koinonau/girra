@@ -36,24 +36,17 @@ export function projectIpcPtyConnectResult(
       sessionExpired: spawnResult.sessionExpired,
       coldRestore: spawnResult.coldRestore,
       replay: spawnResult.replay,
-      pendingEscapeTailAnsi: spawnResult.pendingEscapeTailAnsi,
-      ...(spawnResult.agentResumeUnavailable ? { agentResumeUnavailable: true as const } : {})
+      pendingEscapeTailAnsi: spawnResult.pendingEscapeTailAnsi
     }
   }
-  if (
-    launchAgent ||
-    spawnResult.launchConfig ||
-    spawnResult.startupCwdFallback ||
-    spawnResult.agentResumeUnavailable
-  ) {
+  if (launchAgent || spawnResult.launchConfig || spawnResult.startupCwdFallback) {
     return {
       id: spawnResult.id,
       ...(launchAgent ? { launchAgent } : {}),
       ...(spawnResult.launchConfig ? { launchConfig: spawnResult.launchConfig } : {}),
       ...(spawnResult.startupCwdFallback
         ? { startupCwdFallback: spawnResult.startupCwdFallback }
-        : {}),
-      ...(spawnResult.agentResumeUnavailable ? { agentResumeUnavailable: true as const } : {})
+        : {})
     }
   }
   return spawnResult.id

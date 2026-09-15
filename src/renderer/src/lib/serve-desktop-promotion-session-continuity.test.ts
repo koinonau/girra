@@ -6,7 +6,7 @@
  * The incident chain was: Cmd+Q leaves a packaged `orca serve` owning the
  * profile lock, a forced relaunch reaches that headless process, it mounts a
  * desktop renderer, and hydration cold-restores panes whose daemon PTYs are
- * still alive — launching duplicate `codex resume <session>` agents and
+ * still alive — launching duplicate `claude --resume <session>` agents and
  * interrupting the live ones.
  *
  * Both halves are joined here because either alone passes vacuously: promotion
@@ -34,9 +34,9 @@ import {
 
 const WORKTREE_ID = 'wt-serve-promotion'
 const AGENT_PANES = [
-  { tabId: 'tab-codex-1', leafId: '11111111-1111-4111-8111-111111111111', ptyId: 'daemon-pty-1' },
-  { tabId: 'tab-codex-2', leafId: '22222222-2222-4222-8222-222222222222', ptyId: 'daemon-pty-2' },
-  { tabId: 'tab-codex-3', leafId: '33333333-3333-4333-8333-333333333333', ptyId: 'daemon-pty-3' }
+  { tabId: 'tab-claude-1', leafId: '11111111-1111-4111-8111-111111111111', ptyId: 'daemon-pty-1' },
+  { tabId: 'tab-claude-2', leafId: '22222222-2222-4222-8222-222222222222', ptyId: 'daemon-pty-2' },
+  { tabId: 'tab-claude-3', leafId: '33333333-3333-4333-8333-333333333333', ptyId: 'daemon-pty-3' }
 ] as const
 /** Argv macOS delivers for `open -n -a Orca` / Finder / Dock relaunch. */
 const DESKTOP_RELAUNCH_ARGV = ['/Applications/Orca.app/Contents/MacOS/Orca'] as const
@@ -141,7 +141,7 @@ function makeTerminalTab(id: string): Record<string, unknown> {
     id,
     ptyId: null,
     worktreeId: WORKTREE_ID,
-    title: 'codex',
+    title: 'claude',
     customTitle: null,
     color: null,
     sortOrder: 0,

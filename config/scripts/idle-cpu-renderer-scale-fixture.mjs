@@ -89,7 +89,7 @@ export async function configureRendererScaleFixture(page, options, repoPath) {
               id: `idle-cpu-tab-${worktreeIndex}`
             })
           for (let agentIndex = 0; agentIndex < agentsPerWorktree; agentIndex += 1) {
-            const agentType = agentIndex % 2 === 0 ? 'codex' : 'claude'
+            const agentType = agentIndex % 2 === 0 ? 'opencode' : 'claude'
             const leafSequence =
               BigInt(worktreeIndex) * BigInt(agentsPerWorktree) + BigInt(agentIndex + 1)
             const leafId = `00000000-0000-4000-8000-${leafSequence.toString(16).padStart(12, '0')}`

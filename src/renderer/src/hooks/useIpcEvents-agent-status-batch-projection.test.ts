@@ -530,7 +530,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       updateTabTitle,
       workspaceSessionReady: true,
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Codex' }]
+        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Pi' }]
       },
       terminalLayoutsByTabId: {
         'tab-future': {

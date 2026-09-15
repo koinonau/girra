@@ -35,7 +35,7 @@ describe('orchestration federated folder placement', () => {
           worktree: 'new-top-level',
           repo: 'folder-repo',
           name: 'folder-worker',
-          agent: 'codex'
+          agent: 'claude'
         }),
         {
           runtime,

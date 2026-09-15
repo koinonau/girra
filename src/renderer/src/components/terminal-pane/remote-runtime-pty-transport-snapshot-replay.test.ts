@@ -56,7 +56,7 @@ describe('createRemoteRuntimePtyTransport', () => {
     const { streamId } = latestSubscribePayload()
     emitSnapshot(
       streamId,
-      'before\x1b]9999;{"state":"working","prompt":"old","agentType":"codex"}\x07after\x1b]0;Remote title\x07\x07'
+      'before\x1b]9999;{"state":"working","prompt":"old","agentType":"opencode"}\x07after\x1b]0;Remote title\x07\x07'
     )
 
     expect(onReplayData).toHaveBeenCalledWith('beforeafter\x1b]0;Remote title\x07\x07')
@@ -86,7 +86,7 @@ describe('createRemoteRuntimePtyTransport', () => {
     const { streamId } = latestSubscribePayload()
     emitSnapshot(
       streamId,
-      'before\x1b]9999;{"state":"working","prompt":"old","agentType":"codex"}\x07after'
+      'before\x1b]9999;{"state":"working","prompt":"old","agentType":"opencode"}\x07after'
     )
 
     expect(onReplayData).toHaveBeenCalledWith('beforeafter')

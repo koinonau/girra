@@ -6,9 +6,9 @@ import {
   getVersionManagerBinPaths,
   withCliRuntimeOnPath,
   resolveClaudeCommand,
-  resolveCliCommands,
-  resolveCodexCommand
-} from './command'
+  resolveCliCommand,
+  resolveCliCommands
+} from './node-cli-command-resolution'
 
 function makeExecutable(path: string): void {
   mkdirSync(dirname(path), { recursive: true })
@@ -26,36 +26,36 @@ function makeNonExecutableFile(path: string): void {
   }
 }
 
-describe('resolveCodexCommand', () => {
+describe('resolveCliCommand', () => {
   afterEach(() => {
     delete process.env.PATH
     delete process.env.Path
   })
 
-  it('prefers Codex already present on PATH', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
+  it('prefers OpenCode already present on PATH', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
     const pathDir = join(root, 'bin')
-    const commandPath = join(pathDir, 'codex')
+    const commandPath = join(pathDir, 'opencode')
     makeExecutable(commandPath)
 
-    expect(resolveCodexCommand({ platform: 'darwin', pathEnv: pathDir, homePath: root })).toBe(
-      commandPath
-    )
+    expect(
+      resolveCliCommand('opencode', { platform: 'darwin', pathEnv: pathDir, homePath: root })
+    ).toBe(commandPath)
   })
 
   it.skipIf(process.platform === 'win32')(
     'skips non-runnable PATH entries and keeps scanning',
     () => {
-      const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
+      const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
       const badDir = join(root, 'bad-bin')
       const goodDir = join(root, 'good-bin')
-      const badCommandPath = join(badDir, 'codex')
-      const goodCommandPath = join(goodDir, 'codex')
+      const badCommandPath = join(badDir, 'opencode')
+      const goodCommandPath = join(goodDir, 'opencode')
       makeNonExecutableFile(badCommandPath)
       makeExecutable(goodCommandPath)
 
       expect(
-        resolveCodexCommand({
+        resolveCliCommand('opencode', {
           platform: 'linux',
           pathEnv: [badDir, goodDir].join(delimiter),
           homePath: root
@@ -65,15 +65,15 @@ describe('resolveCodexCommand', () => {
   )
 
   it('skips PATH directories named like the command', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
     const badDir = join(root, 'bad-bin')
     const goodDir = join(root, 'good-bin')
-    mkdirSync(join(badDir, 'codex'), { recursive: true })
-    const goodCommandPath = join(goodDir, 'codex')
+    mkdirSync(join(badDir, 'opencode'), { recursive: true })
+    const goodCommandPath = join(goodDir, 'opencode')
     makeExecutable(goodCommandPath)
 
     expect(
-      resolveCodexCommand({
+      resolveCliCommand('opencode', {
         platform: 'linux',
         pathEnv: [badDir, goodDir].join(delimiter),
         homePath: root
@@ -81,84 +81,104 @@ describe('resolveCodexCommand', () => {
     ).toBe(goodCommandPath)
   })
 
-  it('falls back to the newest nvm-installed Codex when PATH misses it', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const v22Path = join(root, '.nvm', 'versions', 'node', 'v22.14.0', 'bin', 'codex')
-    const v24Path = join(root, '.nvm', 'versions', 'node', 'v24.13.0', 'bin', 'codex')
+  it('falls back to the newest nvm-installed OpenCode when PATH misses it', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const v22Path = join(root, '.nvm', 'versions', 'node', 'v22.14.0', 'bin', 'opencode')
+    const v24Path = join(root, '.nvm', 'versions', 'node', 'v24.13.0', 'bin', 'opencode')
     makeExecutable(v22Path)
     makeExecutable(v24Path)
 
-    expect(resolveCodexCommand({ platform: 'darwin', pathEnv: '', homePath: root })).toBe(v24Path)
+    expect(resolveCliCommand('opencode', { platform: 'darwin', pathEnv: '', homePath: root })).toBe(
+      v24Path
+    )
   })
 
-  it('finds Codex in pnpm global bin on macOS', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const pnpmPath = join(root, 'Library', 'pnpm', 'codex')
+  it('finds OpenCode in pnpm global bin on macOS', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const pnpmPath = join(root, 'Library', 'pnpm', 'opencode')
     makeExecutable(pnpmPath)
 
-    expect(resolveCodexCommand({ platform: 'darwin', pathEnv: '', homePath: root })).toBe(pnpmPath)
+    expect(resolveCliCommand('opencode', { platform: 'darwin', pathEnv: '', homePath: root })).toBe(
+      pnpmPath
+    )
   })
 
-  it('finds Codex in pnpm global bin on Linux', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const pnpmPath = join(root, '.local', 'share', 'pnpm', 'codex')
+  it('finds OpenCode in pnpm global bin on Linux', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const pnpmPath = join(root, '.local', 'share', 'pnpm', 'opencode')
     makeExecutable(pnpmPath)
 
-    expect(resolveCodexCommand({ platform: 'linux', pathEnv: '', homePath: root })).toBe(pnpmPath)
+    expect(resolveCliCommand('opencode', { platform: 'linux', pathEnv: '', homePath: root })).toBe(
+      pnpmPath
+    )
   })
 
-  it('finds Codex in pnpm global bin on Windows', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const pnpmPath = join(root, 'AppData', 'Local', 'pnpm', 'codex.cmd')
+  it('finds OpenCode in pnpm global bin on Windows', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const pnpmPath = join(root, 'AppData', 'Local', 'pnpm', 'opencode.cmd')
     makeExecutable(pnpmPath)
 
-    expect(resolveCodexCommand({ platform: 'win32', pathEnv: '', homePath: root })).toBe(pnpmPath)
+    expect(resolveCliCommand('opencode', { platform: 'win32', pathEnv: '', homePath: root })).toBe(
+      pnpmPath
+    )
   })
 
-  it('finds Codex in yarn global bin on macOS', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const yarnPath = join(root, '.yarn', 'bin', 'codex')
+  it('finds OpenCode in yarn global bin on macOS', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const yarnPath = join(root, '.yarn', 'bin', 'opencode')
     makeExecutable(yarnPath)
 
-    expect(resolveCodexCommand({ platform: 'darwin', pathEnv: '', homePath: root })).toBe(yarnPath)
+    expect(resolveCliCommand('opencode', { platform: 'darwin', pathEnv: '', homePath: root })).toBe(
+      yarnPath
+    )
   })
 
-  it('finds Codex in yarn global bin on Windows', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const yarnPath = join(root, 'AppData', 'Local', 'Yarn', 'bin', 'codex.cmd')
+  it('finds OpenCode in yarn global bin on Windows', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const yarnPath = join(root, 'AppData', 'Local', 'Yarn', 'bin', 'opencode.cmd')
     makeExecutable(yarnPath)
 
-    expect(resolveCodexCommand({ platform: 'win32', pathEnv: '', homePath: root })).toBe(yarnPath)
+    expect(resolveCliCommand('opencode', { platform: 'win32', pathEnv: '', homePath: root })).toBe(
+      yarnPath
+    )
   })
 
-  it('finds Codex in bun global bin', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const bunPath = join(root, '.bun', 'bin', 'codex')
+  it('finds OpenCode in bun global bin', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const bunPath = join(root, '.bun', 'bin', 'opencode')
     makeExecutable(bunPath)
 
-    expect(resolveCodexCommand({ platform: 'linux', pathEnv: '', homePath: root })).toBe(bunPath)
+    expect(resolveCliCommand('opencode', { platform: 'linux', pathEnv: '', homePath: root })).toBe(
+      bunPath
+    )
   })
 
-  it('finds Codex in bun global bin on Windows', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const bunPath = join(root, '.bun', 'bin', 'codex.exe')
+  it('finds OpenCode in bun global bin on Windows', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const bunPath = join(root, '.bun', 'bin', 'opencode.exe')
     makeExecutable(bunPath)
 
-    expect(resolveCodexCommand({ platform: 'win32', pathEnv: '', homePath: root })).toBe(bunPath)
+    expect(resolveCliCommand('opencode', { platform: 'win32', pathEnv: '', homePath: root })).toBe(
+      bunPath
+    )
   })
 
-  it('finds Codex in mise shims directory', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
-    const misePath = join(root, '.local', 'share', 'mise', 'shims', 'codex')
+  it('finds OpenCode in mise shims directory', () => {
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
+    const misePath = join(root, '.local', 'share', 'mise', 'shims', 'opencode')
     makeExecutable(misePath)
 
-    expect(resolveCodexCommand({ platform: 'linux', pathEnv: '', homePath: root })).toBe(misePath)
+    expect(resolveCliCommand('opencode', { platform: 'linux', pathEnv: '', homePath: root })).toBe(
+      misePath
+    )
   })
 
   it('returns the bare command when no filesystem candidate exists', () => {
-    const root = mkdtempSync(join(tmpdir(), 'orca-codex-command-'))
+    const root = mkdtempSync(join(tmpdir(), 'orca-cli-command-'))
 
-    expect(resolveCodexCommand({ platform: 'linux', pathEnv: '', homePath: root })).toBe('codex')
+    expect(resolveCliCommand('opencode', { platform: 'linux', pathEnv: '', homePath: root })).toBe(
+      'opencode'
+    )
   })
 })
 
@@ -240,20 +260,20 @@ describe('resolveCliCommands', () => {
     const root = mkdtempSync(join(tmpdir(), 'orca-cli-commands-'))
     const pathDir = join(root, 'bin')
     const pathClaude = join(pathDir, 'claude')
-    const nvmCodex = join(root, '.nvm', 'versions', 'node', 'v24.13.0', 'bin', 'codex')
+    const nvmPi = join(root, '.nvm', 'versions', 'node', 'v24.13.0', 'bin', 'pi')
     const pnpmOpencode = join(root, 'Library', 'pnpm', 'opencode')
     makeExecutable(pathClaude)
-    makeExecutable(nvmCodex)
+    makeExecutable(nvmPi)
     makeExecutable(pnpmOpencode)
 
-    const resolved = resolveCliCommands(['claude', 'codex', 'opencode', 'missing'], {
+    const resolved = resolveCliCommands(['claude', 'pi', 'opencode', 'missing'], {
       platform: 'darwin',
       pathEnv: pathDir,
       homePath: root
     })
 
     expect(resolved.get('claude')).toBe(pathClaude)
-    expect(resolved.get('codex')).toBe(nvmCodex)
+    expect(resolved.get('pi')).toBe(nvmPi)
     expect(resolved.get('opencode')).toBe(pnpmOpencode)
     expect(resolved.get('missing')).toBe('missing')
   })
@@ -321,15 +341,19 @@ describe('withCliRuntimeOnPath', () => {
     const v20 = join(root, '.nvm', 'versions', 'node', 'v20.11.0', 'bin')
     const v22 = join(root, '.nvm', 'versions', 'node', 'v22.9.0', 'bin')
     makeExecutable(join(v20, 'node'))
-    makeExecutable(join(v20, 'codex'))
+    makeExecutable(join(v20, 'opencode'))
     makeExecutable(join(v22, 'node'))
 
-    // default is v22, but codex only exists under v20
+    // default is v22, but opencode only exists under v20
     const env = { PATH: [v22, '/usr/bin'].join(delimiter) }
-    const codex = resolveCodexCommand({ platform: 'darwin', pathEnv: env.PATH, homePath: root })
-    expect(codex).toBe(join(v20, 'codex'))
+    const opencode = resolveCliCommand('opencode', {
+      platform: 'darwin',
+      pathEnv: env.PATH,
+      homePath: root
+    })
+    expect(opencode).toBe(join(v20, 'opencode'))
 
-    const paired = withCliRuntimeOnPath(codex, env, { platform: 'darwin' })
+    const paired = withCliRuntimeOnPath(opencode, env, { platform: 'darwin' })
     // the shebang's `node` must now come from v20, not v22
     expect(paired.PATH.split(delimiter)[0]).toBe(v20)
   })
@@ -337,38 +361,38 @@ describe('withCliRuntimeOnPath', () => {
   it('leaves PATH untouched for a CLI whose directory ships no node', () => {
     const root = mkdtempSync(join(tmpdir(), 'orca-pair-'))
     const brew = join(root, 'opt', 'homebrew', 'bin')
-    makeExecutable(join(brew, 'codex'))
+    makeExecutable(join(brew, 'opencode'))
     const env = { PATH: '/usr/bin' }
 
-    expect(withCliRuntimeOnPath(join(brew, 'codex'), env, { platform: 'darwin' })).toBe(env)
+    expect(withCliRuntimeOnPath(join(brew, 'opencode'), env, { platform: 'darwin' })).toBe(env)
   })
 
   it('leaves PATH untouched for a bare command name', () => {
     const env = { PATH: '/usr/bin' }
-    expect(withCliRuntimeOnPath('codex', env, { platform: 'darwin' })).toBe(env)
+    expect(withCliRuntimeOnPath('opencode', env, { platform: 'darwin' })).toBe(env)
   })
 
   it('is a no-op when the runtime directory already leads PATH', () => {
     const root = mkdtempSync(join(tmpdir(), 'orca-pair-'))
     const v20 = join(root, '.nvm', 'versions', 'node', 'v20.11.0', 'bin')
     makeExecutable(join(v20, 'node'))
-    makeExecutable(join(v20, 'codex'))
+    makeExecutable(join(v20, 'opencode'))
     const env = { PATH: [v20, '/usr/bin'].join(delimiter) }
 
-    expect(withCliRuntimeOnPath(join(v20, 'codex'), env, { platform: 'darwin' })).toBe(env)
+    expect(withCliRuntimeOnPath(join(v20, 'opencode'), env, { platform: 'darwin' })).toBe(env)
   })
 
   it('reads the Windows path key the child will actually use, whatever its casing', () => {
     const root = mkdtempSync(join(tmpdir(), 'orca-pair-'))
     const v20 = join(root, '.nvm', 'versions', 'node', 'v20.11.0', 'bin')
     makeExecutable(join(v20, 'node.exe'))
-    makeExecutable(join(v20, 'codex.cmd'))
+    makeExecutable(join(v20, 'opencode.cmd'))
     // Why: win32 resolves env names case-insensitively, so a block may spell it
     // any way. Reading a narrower set than the twin-dedupe deletes would drop
     // this entry unread and hand the child a PATH containing only our directory.
     const env = { path: 'C:\\Windows;C:\\Windows\\System32', HOME: 'x' }
 
-    const paired = withCliRuntimeOnPath(join(v20, 'codex.cmd'), env, { platform: 'win32' })
+    const paired = withCliRuntimeOnPath(join(v20, 'opencode.cmd'), env, { platform: 'win32' })
     expect(paired.path).toBe([v20, 'C:\\Windows', 'C:\\Windows\\System32'].join(';'))
     expect(Object.keys(paired).filter((key) => key.toLowerCase() === 'path')).toEqual(['path'])
   })
@@ -377,13 +401,13 @@ describe('withCliRuntimeOnPath', () => {
     const root = mkdtempSync(join(tmpdir(), 'orca-pair-'))
     const v20 = join(root, '.nvm', 'versions', 'node', 'v20.11.0', 'bin')
     makeExecutable(join(v20, 'node.exe'))
-    makeExecutable(join(v20, 'codex.cmd'))
+    makeExecutable(join(v20, 'opencode.cmd'))
     // Why both keys: with only `Path` seeded the assertion is vacuous — the
     // helper cannot invent a `PATH` key, so the dedupe loop could be deleted
     // wholesale and this test would still pass.
     const env = { Path: 'C:\\Windows;C:\\Windows\\System32', PATH: 'C:\\Stale' }
 
-    const paired = withCliRuntimeOnPath(join(v20, 'codex.cmd'), env, { platform: 'win32' })
+    const paired = withCliRuntimeOnPath(join(v20, 'opencode.cmd'), env, { platform: 'win32' })
     expect(Object.keys(paired)).toEqual(['Path'])
     // Why the whole string: splitting on the host delimiter while joining on ';'
     // shredded every drive letter into `C;\\Windows`.

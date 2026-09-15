@@ -592,7 +592,7 @@ describePosix('daemon shell-ready launch config', () => {
     expect(zlogin).toContain(agentTeamsPathRestoreLine)
     expect(bashRc).toContain(agentTeamsPathRestoreLine)
     for (const wrapperFile of [zshrc, zlogin, bashRc]) {
-      expect(wrapperFile).not.toContain('CODEX_HOME')
+      expect(wrapperFile).not.toContain('CLAUDE_CONFIG_DIR')
     }
   })
 

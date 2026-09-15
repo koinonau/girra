@@ -33,7 +33,7 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/orca-e2e-repo')
     await flushAsyncTicks()
 
@@ -61,9 +61,9 @@ describe('agent completion coordinator', () => {
     vi.advanceTimersByTime(2_000)
     await flushAsyncTicks()
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/orca-e2e-repo')
-    staleInspection.resolve(processResult('codex'))
+    staleInspection.resolve(processResult('claude'))
     await flushAsyncTicks()
 
     expect(inspectProcess).toHaveBeenCalledTimes(2)
@@ -92,13 +92,13 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/title-a')
     await flushAsyncTicks()
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/title-b')
-    titleAInspection.resolve(processResult('codex'))
+    titleAInspection.resolve(processResult('claude'))
     await flushAsyncTicks()
 
     expect(inspectProcess).toHaveBeenCalledTimes(2)
@@ -127,11 +127,11 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/title-a')
     await flushAsyncTicks()
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/title-b')
     titleAInspection.resolve(processResult('zsh'))
     await flushAsyncTicks()
@@ -139,7 +139,7 @@ describe('agent completion coordinator', () => {
     expect(inspectProcess).toHaveBeenCalledTimes(2)
     expect(dispatchCompletion).not.toHaveBeenCalledWith('/tmp/title-b')
 
-    titleBInspection.resolve(processResult('codex'))
+    titleBInspection.resolve(processResult('claude'))
     await flushAsyncTicks()
 
     expect(dispatchCompletion).toHaveBeenCalledWith('/tmp/title-b')
@@ -157,7 +157,7 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/orca-e2e-repo')
     inspection.reject(new Error('inspection failed'))
     await flushAsyncTicks()
@@ -177,14 +177,14 @@ describe('agent completion coordinator', () => {
       isLive: () => true
     })
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/orca-e2e-repo')
-    coordinator.observeTitle('Codex done')
+    coordinator.observeTitle('Claude done')
     inspection.resolve(processResult('zsh'))
     await flushAsyncTicks()
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('Codex done')
+    expect(dispatchCompletion).toHaveBeenCalledWith('Claude done')
   })
 
   it('still dispatches a generic completion title after process inspection confirms an agent', async () => {
@@ -193,12 +193,12 @@ describe('agent completion coordinator', () => {
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
       getSettings: () => null,
-      inspectProcess: vi.fn(async () => processResult('codex')),
+      inspectProcess: vi.fn(async () => processResult('claude')),
       dispatchCompletion,
       isLive: () => true
     })
 
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('Fix flaky e2e tests')
     await flushAsyncTicks()
 
@@ -220,7 +220,7 @@ describe('agent completion coordinator', () => {
     coordinator.observeTitle('⠋ experimental-agent-observability')
     coordinator.observeTitle('experimental-agent-observability')
     vi.advanceTimersByTime(10_500)
-    inspection.resolve(processResult('codex'))
+    inspection.resolve(processResult('claude'))
     await flushAsyncTicks()
 
     expect(dispatchCompletion).toHaveBeenCalledWith('experimental-agent-observability')

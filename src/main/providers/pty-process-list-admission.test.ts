@@ -11,7 +11,7 @@ import {
 describe('PtyProcessListAdmission', () => {
   const evidence = {
     verdict: 'live' as const,
-    processName: 'codex',
+    processName: 'opencode',
     authorityGeneration: 'relay-generation',
     observationEpoch: 4,
     capturedAgeMs: 12

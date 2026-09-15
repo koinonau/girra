@@ -72,7 +72,7 @@ describe('summarizeWorktreeNesting', () => {
       summarizeWorktreeNesting(
         worktreesAtPaths('/srv/Repo', '/srv/repo/nested').map((worktree) => ({
           ...worktree,
-          hostId: 'ssh:openclaw'
+          hostId: 'ssh:devbox'
         })),
         'darwin'
       )
@@ -104,7 +104,7 @@ describe('summarizeWorktreeNesting', () => {
     expect(
       summarizeWorktreeNesting([
         { path: '/srv/repo', hostId: 'local' },
-        { path: '/srv/repo/nested', hostId: 'ssh:openclaw' }
+        { path: '/srv/repo/nested', hostId: 'ssh:devbox' }
       ])
     ).toEqual({ maxDepth: 0, nestedWorktrees: 0 })
   })
@@ -112,8 +112,8 @@ describe('summarizeWorktreeNesting', () => {
   it('recognizes worktrees nested under filesystem roots', () => {
     expect(
       summarizeWorktreeNesting([
-        { path: '/', hostId: 'ssh:openclaw' },
-        { path: '/repo', hostId: 'ssh:openclaw' },
+        { path: '/', hostId: 'ssh:devbox' },
+        { path: '/repo', hostId: 'ssh:devbox' },
         { path: 'C:\\', hostId: 'windows' },
         { path: 'C:\\repo', hostId: 'windows' }
       ])
@@ -143,8 +143,8 @@ describe('summarizeTypingScaleCensus', () => {
     cols: 120,
     rows: 40,
     bufferLines: 5000,
-    foregroundAgent: 'codex',
-    statusAgentType: 'codex'
+    foregroundAgent: 'opencode',
+    statusAgentType: 'opencode'
   }
 
   it('aggregates agent rows, tabs, panes, nesting, and suspect settings', () => {

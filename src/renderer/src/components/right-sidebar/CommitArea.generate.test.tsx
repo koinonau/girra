@@ -241,7 +241,7 @@ describe('commit-message generation defaults', () => {
               ...settings.sourceControlAi!.actions,
               commitMessage: {
                 commandInputTemplate: '{basePrompt}',
-                agentId: 'codex'
+                agentId: 'opencode'
               }
             }
           }
@@ -286,7 +286,7 @@ describe('commit-message generation defaults', () => {
           ...settings,
           commitMessageAi: {
             ...settings.commitMessageAi!,
-            agentId: 'codex'
+            agentId: 'opencode'
           }
         },
         repo: null

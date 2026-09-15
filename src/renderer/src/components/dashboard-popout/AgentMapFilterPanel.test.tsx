@@ -26,13 +26,13 @@ function card(agentType: string, paneKey: string): DashboardCard {
     finishedAt: null,
     stateChangedAt: 1,
     unseen: false,
-    hostKind: agentType === 'codex' ? 'local' : 'ssh'
+    hostKind: agentType === 'opencode' ? 'local' : 'ssh'
   }
 }
 
 function controls(): AgentMapFilterControls {
   return {
-    ...emptyAgentMapFilterState(['claude', 'codex']),
+    ...emptyAgentMapFilterState(['claude', 'opencode']),
     states: new Set(ALL_AGENT_MAP_STATES),
     activeCount: 0,
     toggleState: vi.fn(),
@@ -49,7 +49,7 @@ function controls(): AgentMapFilterControls {
 
 describe('AgentMapFilterPanel', () => {
   it('offers agent filtering without a host section', () => {
-    const cards = [card('codex', 'codex-pane'), card('claude', 'claude-pane')]
+    const cards = [card('opencode', 'opencode-pane'), card('claude', 'claude-pane')]
     render(
       <AgentMapFilterPanel
         cards={cards}

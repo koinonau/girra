@@ -336,8 +336,8 @@ describe('connectPanePty', () => {
 
     it('replaces pending Pi routing when confirmation finds another agent', async () => {
       vi.useFakeTimers()
-      vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('codex')
-      const ptyId = 'pty-pi-reconfirm-codex'
+      vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('opencode')
+      const ptyId = 'pty-pi-reconfirm-opencode'
       const tabId = `tab-${ptyId}`
       const { binding, cacheKey } = await connectRestoredPaneForForegroundSampling({ ptyId, tabId })
       mockStoreState.paneForegroundAgentByPaneKey[cacheKey] = {
@@ -352,7 +352,7 @@ describe('connectPanePty', () => {
       await advanceVisibleForegroundRead()
 
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'codex',
+        agent: 'opencode',
         routingTrusted: true,
         shellForeground: false
       })

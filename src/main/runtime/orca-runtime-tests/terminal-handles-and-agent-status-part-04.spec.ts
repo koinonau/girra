@@ -103,15 +103,15 @@ describe('OrcaRuntimeService', () => {
               id: `tab-1::${leafId}`,
               parentTabId: 'tab-1',
               leafId,
-              title: 'codex [working]',
+              title: 'claude [working]',
               agentStatus: {
                 state: 'working',
                 prompt: 'fix parity',
                 updatedAt: 1_700_000_000_000,
                 stateStartedAt: 1_699_999_999_000,
-                agentType: 'codex',
+                agentType: 'claude',
                 paneKey: hostPaneKey,
-                terminalTitle: 'codex [working]',
+                terminalTitle: 'claude [working]',
                 stateHistory: []
               },
               isActive: true
@@ -132,7 +132,7 @@ describe('OrcaRuntimeService', () => {
         agentStatus: expect.objectContaining({
           state: 'working',
           prompt: 'fix parity',
-          agentType: 'codex',
+          agentType: 'claude',
           paneKey: hostPaneKey
         })
       })
@@ -142,21 +142,21 @@ describe('OrcaRuntimeService', () => {
   it.each([
     {
       behavior: 'fills a missing renderer session',
-      hookAgentType: 'codex',
+      hookAgentType: 'opencode',
       hookOffset: 0,
       rendererSessionId: null,
       expectedSessionId: 'hook-session'
     },
     {
       behavior: 'replaces a stale renderer session at the same event timestamp',
-      hookAgentType: 'codex',
+      hookAgentType: 'opencode',
       hookOffset: 0,
       rendererSessionId: 'stale-renderer-session',
       expectedSessionId: 'hook-session'
     },
     {
       behavior: 'preserves a renderer session newer than the hook row',
-      hookAgentType: 'codex',
+      hookAgentType: 'opencode',
       hookOffset: -1,
       rendererSessionId: 'newer-renderer-session',
       expectedSessionId: 'newer-renderer-session'
@@ -172,7 +172,7 @@ describe('OrcaRuntimeService', () => {
     '$behavior',
     async ({ hookAgentType, hookOffset, rendererSessionId, expectedSessionId }) => {
       const leafId = '11111111-1111-4111-8111-111111111111'
-      const paneKey = `codex-tab:${leafId}`
+      const paneKey = `opencode-tab:${leafId}`
       const providerSession = {
         key: 'session_id' as const,
         id: 'hook-session'
@@ -188,7 +188,7 @@ describe('OrcaRuntimeService', () => {
             connectionId: null,
             receivedAt: now + hookOffset,
             stateStartedAt: now + hookOffset,
-            tabId: 'codex-tab',
+            tabId: 'opencode-tab',
             worktreeId: TEST_WORKTREE_ID,
             providerSession
           }
@@ -204,22 +204,22 @@ describe('OrcaRuntimeService', () => {
             publicationEpoch: 'epoch-1',
             snapshotVersion: 1,
             activeGroupId: null,
-            activeTabId: `codex-tab::${leafId}`,
+            activeTabId: `opencode-tab::${leafId}`,
             activeTabType: 'terminal',
             tabs: [
               {
                 type: 'terminal',
-                id: `codex-tab::${leafId}`,
-                parentTabId: 'codex-tab',
+                id: `opencode-tab::${leafId}`,
+                parentTabId: 'opencode-tab',
                 leafId,
-                title: 'Codex',
-                launchAgent: 'codex',
+                title: 'OpenCode',
+                launchAgent: 'opencode',
                 agentStatus: {
                   state: 'working',
                   prompt: 'Reply with MOBILE QA OK and nothing else.',
                   updatedAt: now,
                   stateStartedAt: now,
-                  agentType: 'codex',
+                  agentType: 'opencode',
                   paneKey,
                   stateHistory: [],
                   ...(rendererSessionId
@@ -246,7 +246,7 @@ describe('OrcaRuntimeService', () => {
           agentStatus: expect.objectContaining({
             state: 'working',
             prompt: 'Reply with MOBILE QA OK and nothing else.',
-            agentType: 'codex'
+            agentType: 'opencode'
           })
         })
       )
@@ -263,30 +263,30 @@ describe('OrcaRuntimeService', () => {
 
   it('skips the foreground-process probe when the PTY launch agent is already known', async () => {
     // Why: foregroundAgent is only a fallback when launchAgent is unknown, so probing a launched agent burns a relay round-trip without changing the resolved owner.
-    const getForegroundProcess = vi.fn(async () => 'omp')
+    const getForegroundProcess = vi.fn(async () => 'pi')
     const runtime = new OrcaRuntimeService(store)
     runtime.setPtyController({
-      spawn: vi.fn().mockResolvedValue({ id: 'pty-omp' }),
+      spawn: vi.fn().mockResolvedValue({ id: 'pty-pi' }),
       write: () => true,
       kill: () => true,
       getForegroundProcess
     })
     runtime.attachWindow(1)
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'omp',
-      launchAgent: 'omp',
-      title: 'OMP',
+      command: 'pi',
+      launchAgent: 'pi',
+      title: 'Pi',
       activate: true
     })
 
-    runtime.onPtyData('pty-omp', '\x1b]0;⠋ OMP\x07working\n', 100)
-    runtime.onPtyData('pty-omp', '\x1b]0;OMP ready\x07idle\n', 200)
+    runtime.onPtyData('pty-pi', '\x1b]0;⠋ Pi\x07working\n', 100)
+    runtime.onPtyData('pty-pi', '\x1b]0;Pi ready\x07idle\n', 200)
 
     expect(getForegroundProcess).not.toHaveBeenCalled()
   })
 
   it('probes the foreground process only on a status transition for unknown launch agents', async () => {
-    const getForegroundProcess = vi.fn(async () => 'omp')
+    const getForegroundProcess = vi.fn(async () => 'pi')
     const runtime = createRuntime()
     runtime.setPtyController({
       write: () => true,
@@ -298,18 +298,18 @@ describe('OrcaRuntimeService', () => {
     const settleProbe = (): Promise<void> => new Promise((resolve) => setImmediate(resolve))
 
     // Two working frames (spinner churn) collapse to a single status transition.
-    runtime.onPtyData('pty-bg', '\x1b]0;⠋ OMP\x07alpha\n', 100)
-    runtime.onPtyData('pty-bg', '\x1b]0;⠊ OMP\x07bravo\n', 200)
+    runtime.onPtyData('pty-bg', '\x1b]0;⠋ Pi\x07alpha\n', 100)
+    runtime.onPtyData('pty-bg', '\x1b]0;⠊ Pi\x07bravo\n', 200)
     await settleProbe()
     expect(getForegroundProcess).toHaveBeenCalledTimes(1)
 
     // Transition to idle is a second distinct status, so it probes again.
-    runtime.onPtyData('pty-bg', '\x1b]0;OMP ready\x07charlie\n', 300)
+    runtime.onPtyData('pty-bg', '\x1b]0;Pi ready\x07charlie\n', 300)
     await settleProbe()
     expect(getForegroundProcess).toHaveBeenCalledTimes(2)
 
     // A repeated idle frame is not a transition, so it does not probe again.
-    runtime.onPtyData('pty-bg', '\x1b]0;OMP ready\x07delta\n', 400)
+    runtime.onPtyData('pty-bg', '\x1b]0;Pi ready\x07delta\n', 400)
     await settleProbe()
     expect(getForegroundProcess).toHaveBeenCalledTimes(2)
   })

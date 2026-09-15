@@ -117,8 +117,8 @@ for (const exitMode of ['normal', 'sigkill'] as const) {
         }
         state.setAgentStatus(
           paneKey,
-          { state: 'working', prompt: 'stale hidden TUI status', agentType: 'codex' },
-          'Codex',
+          { state: 'working', prompt: 'stale hidden TUI status', agentType: 'claude' },
+          'Claude',
           undefined,
           { tabId, worktreeId }
         )

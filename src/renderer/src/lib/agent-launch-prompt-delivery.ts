@@ -51,7 +51,7 @@ export function deliverLaunchPromptToAgentTab(args: {
     seedNativeChatLaunchDraftForAgentTab({ tabId, agent, text: content })
   }
 
-  // Why: native-prefill agents (claude/openclaude etc.) get the prompt at launch,
+  // Why: native-prefill agents (claude, pi) get the prompt at launch,
   // so pasteDraftWhenAgentReady returns false without pasting. That is a successful
   // native delivery, not a failure — don't flag the seeded bubble in that case.
   const deliversViaNativePrefill = agentDeliversDraftViaNativePrefill(agent, forcePaste)

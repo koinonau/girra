@@ -23,14 +23,13 @@ function createUserDataDir(): string {
 }
 
 describe('createElectronHomeIsolation', () => {
-  it('strips ambient home and Codex state before forcing a disposable home', () => {
+  it('strips ambient home and Claude config state before forcing a disposable home', () => {
     const userDataDir = createUserDataDir()
     const isolation = createElectronHomeIsolation({
       inheritedEnv: {
         HOME: '/real/home',
         USERPROFILE: '/real/home',
-        CODEX_HOME: '/real/codex',
-        ORCA_CODEX_HOME: '/real/orca-codex',
+        CLAUDE_CONFIG_DIR: '/real/home/.claude',
         ZDOTDIR: '/real/zdotdir',
         PATH: '/bin'
       },
@@ -52,11 +51,9 @@ describe('createElectronHomeIsolation', () => {
       USERPROFILE: canonicalHome,
       ORCA_E2E_USER_DATA_DIR: userDataDir
     })
-    expect(isolation.env.CODEX_HOME).toBeUndefined()
-    expect(isolation.env.ORCA_CODEX_HOME).toBeUndefined()
+    expect(isolation.env.CLAUDE_CONFIG_DIR).toBeUndefined()
     expect(isolation.env.ZDOTDIR).toBeUndefined()
-    // Codex always routes to the resolved home, so the post-launch guard must
-    // accept the boundary this env produces.
+    // The post-launch guard must accept the boundary this env produces.
     expect(() =>
       assertElectronResolvedIsolatedHome(isolation.isolatedHome, isolation)
     ).not.toThrow()
@@ -66,12 +63,12 @@ describe('createElectronHomeIsolation', () => {
     expect(() =>
       createElectronHomeIsolation({
         inheritedEnv: {},
-        launchEnv: { CODEX_HOME: '/unsafe' },
+        launchEnv: { CLAUDE_CONFIG_DIR: '/unsafe' },
         extraEnv: {},
         userDataDir: createUserDataDir(),
         realHome: '/real/home'
       })
-    ).toThrow(/launchEnv\.CODEX_HOME/)
+    ).toThrow(/launchEnv\.CLAUDE_CONFIG_DIR/)
 
     expect(() =>
       createElectronHomeIsolation({

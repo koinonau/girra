@@ -120,7 +120,7 @@ describe('sendTerminalQuickCommandToPane', () => {
         id: 'agent',
         label: 'Agent',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Review this'
       },
       pane: { leafId: 'leaf-1', terminal: { focus } },

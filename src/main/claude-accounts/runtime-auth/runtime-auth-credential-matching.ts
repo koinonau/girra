@@ -62,7 +62,7 @@ export class ClaudeRuntimeAuthCredentialMatching extends ClaudeRuntimeAuthRuntim
       return 'mismatch'
     }
 
-    // Why: mirrors the Codex runtime-home guard; don't persist shared runtime creds into the managed account if another login rewrote them.
+    // Why: don't persist shared runtime creds into the managed account if another login rewrote them.
     const selectedOrganizationUuid = this.normalizeField(
       account.organizationUuid ??
         managedIdentity?.organizationUuid ??

@@ -87,11 +87,11 @@ export function makeHostSnapshot(
       {
         type: 'terminal',
         id: hostSurfaceId,
-        title: 'Codex',
+        title: 'OpenCode',
         parentTabId,
         leafId: LEAF_ID,
         isActive: true,
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         status: 'ready',
         terminal: 'terminal-1'
       }
@@ -131,5 +131,5 @@ export function makePtylessHostSnapshot(
 }
 
 export function mirrorTabRow(tabId: string, worktreeId: string): unknown {
-  return { id: tabId, title: 'Codex', ptyId: null, worktreeId }
+  return { id: tabId, title: 'OpenCode', ptyId: null, worktreeId }
 }

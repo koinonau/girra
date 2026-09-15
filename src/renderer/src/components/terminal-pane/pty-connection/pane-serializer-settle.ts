@@ -1,5 +1,4 @@
 import { useAppStore } from '@/store'
-import type { SessionRestoredBannerReason } from '../session-restored-banner-pane-state'
 import { hasPtySerializer } from '../pty-buffer-serializer'
 import { inspectRuntimeTerminalProcess } from '@/runtime/runtime-terminal-inspection'
 import { waitForTerminalOutputParsed } from '@/lib/pane-manager/pane-terminal-output-scheduler'
@@ -169,7 +168,7 @@ export function bindSettlePaneSerializer(session: ConnectPanePtySession): void {
     startupDraftHardTimer = setTimeout(() => {
       startupDraftHardTimer = null
       void deliverStartupDraftIfAgentOwnsPty()
-    }, resolveDraftPasteReadyTimeoutMs(session.startupDraftAgent))
+    }, resolveDraftPasteReadyTimeoutMs())
   }
   const armStartupDraftQuietTimer = (): void => {
     if (!startupDraftReadyScanner || startupDraftPasteSettled) {
@@ -210,17 +209,12 @@ export function bindSettlePaneSerializer(session: ConnectPanePtySession): void {
   ) {
     session.armStartupDraftReadinessObservation()
   }
-  let sessionRestoredBannerShown: SessionRestoredBannerReason | null = null
-  session.showSessionRestoredBanner = (reason: SessionRestoredBannerReason = 'restored'): void => {
-    // Why: a plain 'restored' banner must not latch out the later 'resume-unavailable'
-    // upgrade — the pane would keep claiming a session it never got back.
-    if (
-      sessionRestoredBannerShown === reason ||
-      sessionRestoredBannerShown === 'resume-unavailable'
-    ) {
+  let sessionRestoredBannerShown = false
+  session.showSessionRestoredBanner = (): void => {
+    if (sessionRestoredBannerShown) {
       return
     }
-    sessionRestoredBannerShown = reason
-    session.deps.onShowSessionRestoredBanner(session.pane.id, reason)
+    sessionRestoredBannerShown = true
+    session.deps.onShowSessionRestoredBanner(session.pane.id)
   }
 }

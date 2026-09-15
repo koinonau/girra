@@ -134,7 +134,7 @@ describe('headless hook agent-status projection (#11761)', () => {
   it('ranks a completed hook below present launch evidence in terminal identity', async () => {
     const runtime = await createRuntimeWithHookRows([
       hookRow({
-        agentType: 'codex',
+        agentType: 'opencode',
         state: 'done',
         prompt: '',
         toolName: undefined,

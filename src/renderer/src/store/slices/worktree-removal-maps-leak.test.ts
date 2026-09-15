@@ -217,8 +217,8 @@ describe('worktree removal evicts the per-worktree + per-page maps it previously
         [WT2]: [makeTab({ id: TAB2, worktreeId: WT2 })]
       },
       nativeChatLaunchPromptByTabId: {
-        [TAB1]: { tabId: TAB1, agent: 'codex', text: 'fix wt1', createdAt: 1 },
-        [TAB2]: { tabId: TAB2, agent: 'codex', text: 'fix wt2', createdAt: 2 }
+        [TAB1]: { tabId: TAB1, agent: 'claude', text: 'fix wt1', createdAt: 1 },
+        [TAB2]: { tabId: TAB2, agent: 'claude', text: 'fix wt2', createdAt: 2 }
       }
     })
 
@@ -228,7 +228,7 @@ describe('worktree removal evicts the per-worktree + per-page maps it previously
     expect(s.nativeChatLaunchPromptByTabId[TAB1]).toBeUndefined()
     expect(s.nativeChatLaunchPromptByTabId[TAB2]).toEqual({
       tabId: TAB2,
-      agent: 'codex',
+      agent: 'claude',
       text: 'fix wt2',
       createdAt: 2
     })

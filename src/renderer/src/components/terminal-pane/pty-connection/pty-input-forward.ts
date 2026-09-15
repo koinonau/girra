@@ -225,7 +225,7 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
 
   // Why: renderer resize forwarding is fire-and-forget. A visible pane can
   // finish with xterm at the right grid while the PTY silently kept an older
-  // grid, so Codex keeps composing against stale columns. Fit first so xterm's
+  // grid, so a TUI keeps composing against stale columns. Fit first so xterm's
   // normal onResize can send, then read applied PTY size and repair only drift.
   session.ptySizeReassertion = createPtySizeReassertion({
     isDisposed: () => session.disposed,

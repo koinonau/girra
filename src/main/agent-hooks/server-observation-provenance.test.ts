@@ -80,7 +80,7 @@ describe('agent status observation provenance', () => {
     server.ingestTerminalStatus({
       paneKey: PANE,
       tabId: 'tab-1',
-      payload: { state: 'working', prompt: 'from bytes', agentType: 'codex' }
+      payload: { state: 'working', prompt: 'from bytes', agentType: 'opencode' }
     })
 
     expect(lastObservation(seen)).toMatchObject({ origin: 'osc', kind: 'snapshot' })

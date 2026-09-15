@@ -67,7 +67,7 @@ export function createPaneForegroundAgentTracker(deps: PaneForegroundAgentTracke
   let scheduledReadReason: ForegroundReadReason | null = null
   let activeReadReason: ForegroundReadReason | null = null
   let readGeneration = 0
-  // Why: a full-screen agent (Codex, etc.) runs nested command shells whose own
+  // Why: a full-screen agent runs nested command shells whose own
   // OSC 133;D leaks onto the main PTY. For a pane an agent has owned, that D is
   // not proof the prompt returned, so confirm the foreground before clearing.
   let hasForegroundAgentEvidence = false
@@ -253,7 +253,7 @@ export function createPaneForegroundAgentTracker(deps: PaneForegroundAgentTracke
       hasAgentExpectation = false
       deps.publish({ agent: null, shellForeground: true })
       // Why: confirmed exit — let callers clear a stale agent title the shell
-      // won't repaint (a plain `codex`/`opencode` leaves its OSC title behind).
+      // won't repaint (a plain `opencode` leaves its OSC title behind).
       deps.onConfirmedShellForeground?.(reason)
     }
   }
@@ -285,7 +285,7 @@ export function createPaneForegroundAgentTracker(deps: PaneForegroundAgentTracke
       if (expectsAgent || deps.hasKnownAgentIdentity?.() === true) {
         hasKnownAgentEvidence = true
       }
-      // Why: restored/manual agent panes can become visible while Codex is
+      // Why: restored/manual agent panes can become visible while the agent is
       // already foreground, so no OSC 133 command-start event will seed the tab icon.
       scheduleRead(VISIBLE_PTY_SETTLE_MS, 0, 'visible-pty')
       return true
@@ -325,7 +325,7 @@ export function createPaneForegroundAgentTracker(deps: PaneForegroundAgentTracke
       // recovery probe. All three are attempts to establish this pane's identity, so
       // a D that cancels one must re-confirm — never fast-path to shell, which the
       // sampleVisiblePaneForegroundAgent gate would then latch, permanently hiding
-      // an idle reattached agent's icon (the "codex reattached at rest" bug).
+      // an idle reattached agent's icon (the "agent reattached at rest" bug).
       const hadReadBeforeCommandFinish = hasPendingRead()
       cancelPendingRead()
       if (!trackablePtyId()) {

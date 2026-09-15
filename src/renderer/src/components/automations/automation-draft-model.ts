@@ -1,4 +1,6 @@
 import { getAgentCatalog } from '@/lib/agent-catalog'
+import { translate } from '@/i18n/i18n'
+import { isTuiAgent } from '../../../../shared/tui-agent-config'
 import type { AutomationPrecheck } from '../../../../shared/automations-types'
 import { buildAutomationCronSchedule } from '../../../../shared/automation-schedule-occurrences'
 import type { Worktree } from '../../../../shared/worktree/types'
@@ -48,5 +50,11 @@ export function buildHermesCronSchedule(draft: AutomationDraft): string {
 }
 
 export function getAgentLabel(agentId: string): string {
+  if (!isTuiAgent(agentId)) {
+    return translate(
+      'auto.components.automations.automation.draft.model.agentUnavailable',
+      'Agent no longer available'
+    )
+  }
   return getAgentCatalog().find((agent) => agent.id === agentId)?.label ?? agentId
 }

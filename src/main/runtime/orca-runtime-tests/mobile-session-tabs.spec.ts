@@ -580,7 +580,7 @@ describe('OrcaRuntimeService', () => {
             paneKey: 'tab-1:leaf-1',
             tabId: 'tab-1',
             worktreeId: TEST_WORKTREE_ID,
-            agent: 'codex',
+            agent: 'claude',
             providerSession: { key: 'session_id', id: 'session-1' },
             prompt: 'test',
             state: 'done',

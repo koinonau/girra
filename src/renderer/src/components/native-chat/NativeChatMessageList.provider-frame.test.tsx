@@ -14,9 +14,9 @@ describe('ProviderFrameRow', () => {
       <ProviderFrameRow
         block={{
           type: 'text',
-          text: 'codex · notification:new/event',
+          text: 'claude · notification:new/event',
           providerFrame: {
-            provider: 'codex',
+            provider: 'claude',
             kind: 'notification:new/event',
             payload: {
               head: '{"future":true}',
@@ -30,7 +30,7 @@ describe('ProviderFrameRow', () => {
     )
 
     expect(container.querySelector('details')).toBeInTheDocument()
-    expect(screen.getByText('codex')).toBeInTheDocument()
+    expect(screen.getByText('claude')).toBeInTheDocument()
     expect(screen.getByText('notification:new/event')).toBeInTheDocument()
     expect(screen.getByText('{"future":true}')).toBeInTheDocument()
   })
@@ -42,7 +42,7 @@ describe('ProviderFrameRow', () => {
           type: 'text',
           text: 'Your plan limit resets in 2 hours.',
           providerFrame: {
-            provider: 'codex',
+            provider: 'claude',
             kind: 'notification:warning',
             payload: { head: '{}', byteLength: 2, digest: 'digest', truncated: false }
           }

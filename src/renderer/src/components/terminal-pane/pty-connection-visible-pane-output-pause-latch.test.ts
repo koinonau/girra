@@ -1,5 +1,5 @@
 /**
- * STA-4593 incident: typing into a visible remote Codex pane produced no
+ * STA-4593 incident: typing into a visible remote agent pane produced no
  * visible output until the user switched workspaces away and back. The host
  * DROPS output while a stream is paused yet keeps accepting input, and every
  * hide→show cycle heals the pane with an unconditional snapshot repaint —

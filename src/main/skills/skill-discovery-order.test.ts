@@ -52,7 +52,7 @@ function skill(index: number): DiscoveredSkill {
     id: String(index),
     name: ['éclair', 'Eclair', 'item2', 'item10', 'Ångström', 'zebra', 'İstanbul'][index % 7],
     description: null,
-    providers: ['codex'],
+    providers: ['agent-skills'],
     sourceKind: 'home',
     sourceLabel: ['Home', 'hôme', 'Repo', 'repo'][index % 4],
     rootPath: '/skills',
@@ -78,7 +78,7 @@ function discoverySource(index: number): SkillDiscoverySource {
     label: COLLATION_CORPUS[index % COLLATION_CORPUS.length],
     path: `/roots/${index}`,
     sourceKind: 'home',
-    providers: ['codex'],
+    providers: ['agent-skills'],
     owner: null,
     exists: true
   }

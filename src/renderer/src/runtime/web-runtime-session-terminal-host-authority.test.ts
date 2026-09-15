@@ -160,10 +160,10 @@ describe('createWebRuntimeSessionTerminal', () => {
         createWebRuntimeSessionTerminal({
           worktreeId: WORKTREE_ID,
           agentSessionKind: sessionKind,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           ...(sessionKind === 'resume'
             ? {
-                command: "codex resume 'session-1'",
+                command: "opencode --session 'session-1'",
                 providerSession: { key: 'session_id' as const, id: 'session-1' }
               }
             : {}),
@@ -259,16 +259,16 @@ describe('createWebRuntimeSessionTerminal', () => {
       createWebRuntimeSessionTerminal({
         worktreeId: WORKTREE_ID,
         targetGroupId: 'group-left',
-        command: "codex 'linked issue context'",
+        command: "opencode --prompt 'linked issue context'",
         cwd: '/repo/packages/app',
-        env: { CODEX_PROFILE: 'captured' },
-        envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+        env: { OPENCODE_CONFIG: 'captured' },
+        envToDelete: ['OPENCODE_CONFIG_DIR', 'ORCA_OPENCODE_CONFIG_DIR'],
         startupCommandDelivery: 'shell-ready',
         launchConfig: {
           agentArgs: '--model gpt-5',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentEnv: { OPENCODE_CONFIG: 'captured' }
         },
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         prompt: 'linked issue context',
         promptDelivery: 'draft',
         agentArgs: '--model gpt-5 --profile captured',
@@ -285,7 +285,7 @@ describe('createWebRuntimeSessionTerminal', () => {
       params: {
         clientOperationId: expect.stringMatching(/^\d{13}-[0-9a-f]{32}$/),
         worktree: `id:${WORKTREE_ID}`,
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'linked issue context',
         promptDelivery: 'draft',
         agentArgs: '--model gpt-5 --profile captured',
@@ -347,7 +347,7 @@ describe('createWebRuntimeSessionTerminal', () => {
               terminal: {
                 id: 'pty-created',
                 handle: 'term_created',
-                title: 'Codex',
+                title: 'OpenCode',
                 cwd: '/repo',
                 worktreeId: WORKTREE_ID,
                 tabId: 'host-tab-created',
@@ -370,7 +370,7 @@ describe('createWebRuntimeSessionTerminal', () => {
         createWebRuntimeSessionTerminal({
           worktreeId: WORKTREE_ID,
           targetGroupId: failedMethod === 'session.tabs.move' ? 'group-left' : undefined,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           activate: true
         })
       ).resolves.toEqual({ status: 'created' })
@@ -429,7 +429,7 @@ describe('createWebRuntimeSessionTerminal', () => {
     await expect(
       createWebRuntimeSessionTerminal({
         worktreeId: WORKTREE_ID,
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         targetGroupId: 'group-left'
       })
     ).resolves.toEqual({ status: 'created' })

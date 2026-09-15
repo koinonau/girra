@@ -19,7 +19,7 @@ Orca only hibernates an agent terminal when **all** of the following are true:
 - The agent is in a **done** state — it has finished its last turn and isn't waiting on input.
 - The terminal isn't in the active worktree or any worktree currently rendering a foreground terminal.
 - It hasn't received keystrokes since the agent finished.
-- The agent is one with a [resumable session](/docs/agents/session-history): Claude, Codex, Gemini, Antigravity, OpenCode, Pi, MiMo Code, Droid, Grok, Devin, or OMP.
+- The agent is one with a [resumable session](/docs/agents/session-history): Claude, OpenCode, or Pi.
 - It's been idle for at least the configured idle window (default 30 minutes).
 - No mobile session is currently driving the terminal.
 - No [orchestration](/docs/cli/orchestration) Dispatch is still unsettled (`pending`, `dispatched`, or unknown). Sleep is allowed again after runtime-confirmed `completed`, `failed`, or `circuit_broken`.
@@ -45,7 +45,7 @@ The sidebar filter menu controls whether sleeping worktrees are shown. If you hi
 
 ## Resuming
 
-When you open a hibernated worktree, Orca relaunches the agent CLI with the same resume flags it would use from [Agent Session History](/docs/agents/session-history) — `claude --resume <id>`, `codex resume <id>`, and so on — so the conversation, working directory, and provider session pick up where they left off. There's nothing to click; the resume happens as part of bringing the terminal back into the foreground.
+When you open a hibernated worktree, Orca relaunches the agent CLI with the same resume flags it would use from [Agent Session History](/docs/agents/session-history) — `claude --resume <id>`, `opencode --session <id>`, and so on — so the conversation, working directory, and provider session pick up where they left off. There's nothing to click; the resume happens as part of bringing the terminal back into the foreground.
 
 Resume also reuses the launch command, arguments, and private environment captured when Orca first opened the agent.
 
@@ -53,7 +53,7 @@ If the agent CLI can't resume the session for any reason (the transcript was del
 
 ## Limitations
 
-Only the listed resumable agents hibernate. Cursor CLI, Hermes, Copilot, Trae, and other non-resumable terminals are left running.
+Only the listed resumable agents hibernate. Other terminals are left running.
 
 ## Next steps
 

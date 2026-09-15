@@ -246,9 +246,9 @@ describe('terminal tab title batches', () => {
     seedStore(sequentialStore, structuredClone(fixture))
     seedStore(batchStore, structuredClone(fixture))
     const liveUpdates = [
-      { tabId: 'tab-1', title: 'Codex' },
-      { tabId: 'tab-1', title: '⠋ Codex is thinking' },
-      { tabId: 'tab-1', title: '⠙ Codex is thinking' },
+      { tabId: 'tab-1', title: 'OpenCode' },
+      { tabId: 'tab-1', title: '⠋ OpenCode is thinking' },
+      { tabId: 'tab-1', title: '⠙ OpenCode is thinking' },
       { tabId: 'tab-1', title: '' },
       { tabId: 'tab-1', title: 'Final stable title' }
     ]

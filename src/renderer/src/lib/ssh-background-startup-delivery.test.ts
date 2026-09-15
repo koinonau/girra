@@ -10,7 +10,7 @@ function createDelivery(): {
   const write = vi.fn()
   return {
     delivery: createSshBackgroundStartupDelivery({
-      command: 'codex "run the automation"',
+      command: 'claude "run the automation"',
       waitForShellReady: true,
       write
     }),
@@ -20,7 +20,7 @@ function createDelivery(): {
 
 // Bracketed paste only wraps multiline submissions, so the marker's effect on it
 // is only observable through a command that carries a newline.
-const MULTILINE_COMMAND = 'codex "run the\nautomation"'
+const MULTILINE_COMMAND = 'claude "run the\nautomation"'
 
 function createMultilineDelivery(waitForShellReady: boolean): {
   delivery: ReturnType<typeof createSshBackgroundStartupDelivery>
@@ -61,7 +61,7 @@ describe('createSshBackgroundStartupDelivery shell-ready fallback', () => {
     vi.advanceTimersByTime(50)
 
     expect(write).toHaveBeenCalledTimes(1)
-    expect(write.mock.calls[0]?.[1]).toContain('codex "run the automation"')
+    expect(write.mock.calls[0]?.[1]).toContain('claude "run the automation"')
   })
 
   it('still delivers eventually when a shell can never emit the marker, and not before 15s', () => {
@@ -98,7 +98,7 @@ describe('createSshBackgroundStartupDelivery shell-ready fallback', () => {
   it('keeps the short deadline for fast delivery, which waits for no marker', () => {
     const write = vi.fn()
     const delivery = createSshBackgroundStartupDelivery({
-      command: 'codex "run the automation"',
+      command: 'claude "run the automation"',
       waitForShellReady: false,
       write
     })

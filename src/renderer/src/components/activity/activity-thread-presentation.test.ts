@@ -14,7 +14,7 @@ function makeThread(overrides: Partial<AgentPaneThread> = {}): AgentPaneThread {
   return {
     paneKey: PANE_KEY,
     paneTitle: 'low hanging issues',
-    agentType: 'codex',
+    agentType: 'opencode',
     worktree,
     repo: makeRepo(),
     tab: makeTabWithIds('tab-1', worktree.id),

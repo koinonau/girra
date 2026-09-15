@@ -17,7 +17,7 @@ test('launches an agent TUI with a live multiline composer', async ({ orcaPage }
   await launchGoldenStubAgentFromNewTab(orcaPage)
 
   const activeTab = orcaPage.locator('[data-testid="sortable-tab"][data-active="true"]')
-  await expect(activeTab).toHaveAttribute('data-tab-title', /Codex|Golden Stub Agent/i)
+  await expect(activeTab).toHaveAttribute('data-tab-title', /Claude|Golden Stub Agent/i)
 
   await focusActiveTerminalInput(orcaPage)
   await orcaPage.keyboard.type('hello from e2e')

@@ -269,7 +269,7 @@ describe('useEditorPanelContentState', () => {
   })
 
   it('keeps a client-local live-tail log tab on the client inside an SSH workspace', async () => {
-    const logPath = '/Users/me/.codex/sessions/session.jsonl'
+    const logPath = '/Users/me/.claude/projects/session.jsonl'
     const worktreeId = 'repo-ssh::/work/demo-project'
     const externalTab = { id: logPath, filePath: logPath, relativePath: logPath, worktreeId }
     const activeFile = createOpenFile({ ...externalTab, readOnly: true, liveTail: true })

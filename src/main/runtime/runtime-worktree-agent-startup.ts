@@ -4,7 +4,7 @@ import type { TuiAgent } from '../../shared/tui-agent'
 import type { WorktreeStartupLaunch } from '../../shared/worktree/launch-types'
 import { repoIsRemote } from '../../shared/agent-launch-remote'
 import { getRepoSshConnectionId } from '../../shared/execution-host'
-import { isTuiAgent, TUI_AGENT_CONFIG } from '../../shared/tui-agent-config'
+import { isTuiAgent } from '../../shared/tui-agent-config'
 import { isTuiAgentEnabled, pickTuiAgent } from '../../shared/tui-agent-selection'
 import {
   resolveTuiAgentLaunchArgs,
@@ -12,12 +12,10 @@ import {
 } from '../../shared/tui-agent-launch-defaults'
 import { buildAgentDraftLaunchPlan, buildAgentStartupPlan } from '../../shared/tui-agent-startup'
 import { resolveLocalWindowsAgentStartupShell } from '../../shared/windows-terminal-shell'
-import { markCopilotFolderTrusted } from '../agent-trust-presets'
 import {
   detectInstalledAgentsWithShellPathHydration,
   detectRemoteAgents
 } from '../preflight/agent-detection'
-import { markRemoteAgentWorkspaceTrusted } from '../remote-agent-trust-presets'
 import type { RuntimeStore } from './runtime-store-contract'
 
 export type WorktreeStartupDraftPaste = { agent: TuiAgent; content: string }
@@ -176,38 +174,5 @@ export function buildWorktreeStartupForAgent(
           }
         }
       : {})
-  }
-}
-
-export async function markLocalWorktreeTrusted(
-  agent: TuiAgent,
-  workspacePath: string
-): Promise<void> {
-  const preset = TUI_AGENT_CONFIG[agent].preflightTrust
-  if (!preset) {
-    return
-  }
-  try {
-    if (preset === 'copilot') {
-      markCopilotFolderTrusted(workspacePath)
-    }
-  } catch {
-    // Best-effort: the user can still accept the agent trust prompt manually.
-  }
-}
-
-export async function markRemoteWorktreeTrusted(
-  agent: TuiAgent,
-  connectionId: string,
-  workspacePath: string
-): Promise<void> {
-  const preset = TUI_AGENT_CONFIG[agent].preflightTrust
-  if (!preset) {
-    return
-  }
-  try {
-    await markRemoteAgentWorkspaceTrusted({ preset, connectionId, workspacePath })
-  } catch {
-    // Best-effort: the user can still accept the remote agent trust prompt manually.
   }
 }

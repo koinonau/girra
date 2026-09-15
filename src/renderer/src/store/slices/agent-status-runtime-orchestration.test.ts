@@ -17,7 +17,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     const epochBeforeRuntime = store.getState().agentStatusEpoch
     store.getState().setRuntimeAgentOrchestrationByPaneKey({
@@ -51,14 +51,14 @@ describe('agent status runtime orchestration metadata', () => {
       note: '',
       attachments: [],
       linkedWorkItem: null,
-      agent: 'codex' as const,
+      agent: 'opencode' as const,
       linkedIssue: '',
       linkedPR: null
     }
     store.getState().setAgentStatus(paneKey, {
       state: 'waiting',
       prompt: 'worker prompt',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     store.setState({
       unreadAgentCompletionPanes: { [paneKey]: true },
@@ -97,7 +97,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex',
+      agentType: 'opencode',
       orchestration: {
         taskId: 'task-1',
         dispatchId: 'ctx-1',
@@ -131,7 +131,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex',
+      agentType: 'opencode',
       orchestration: {
         taskId: 'task-1',
         dispatchId: 'ctx-1',
@@ -163,7 +163,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex',
+      agentType: 'opencode',
       orchestration: {
         taskId: 'task-1',
         dispatchId: 'ctx-1',
@@ -263,7 +263,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex',
+      agentType: 'opencode',
       orchestration: {
         taskId: 'task-2',
         dispatchId: 'ctx-2',
@@ -294,7 +294,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().agentStatusByPaneKey[childPaneKey].orchestration).toMatchObject({
@@ -312,7 +312,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'done',
       prompt: 'finished child',
-      agentType: 'codex',
+      agentType: 'opencode',
       orchestration: {
         taskId: 'task-1',
         dispatchId: 'ctx-1',
@@ -323,7 +323,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'manual follow-up',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().agentStatusByPaneKey[childPaneKey].orchestration).toBeUndefined()
@@ -337,7 +337,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'working',
       prompt: 'child agent',
-      agentType: 'codex',
+      agentType: 'opencode',
       orchestration: {
         taskId: 'task-1',
         dispatchId: 'ctx-1',
@@ -348,7 +348,7 @@ describe('agent status runtime orchestration metadata', () => {
     store.getState().setAgentStatus(childPaneKey, {
       state: 'done',
       prompt: 'child finished',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
 
     expect(store.getState().agentStatusByPaneKey[childPaneKey].orchestration).toEqual({
@@ -374,8 +374,8 @@ describe('agent status runtime orchestration metadata', () => {
     const retained: RetainedAgentEntry = {
       entry,
       worktreeId: 'wt-1',
-      tab: makeTab({ id: 'tab-child', worktreeId: 'wt-1', title: 'codex' }),
-      agentType: 'codex',
+      tab: makeTab({ id: 'tab-child', worktreeId: 'wt-1', title: 'opencode' }),
+      agentType: 'opencode',
       startedAt: now
     }
 

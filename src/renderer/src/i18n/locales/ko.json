@@ -289,42 +289,10 @@
     "lib": {
       "agent": {
         "catalog": {
-          "5dff448636": "OpenClaw",
-          "8a9ba743cc": "Hermes",
-          "4e63c7b956": "Rovo Dev",
-          "bee242fe3d": "Qwen Code",
-          "ca73055bd0": "Mistral Vibe",
-          "28810273af": "Kimi",
-          "739a930554": "Droid",
-          "667c104cff": "Cursor",
-          "9e2a9bb87b": "Continue",
-          "6f8056a565": "Command Code",
-          "4238b771b5": "Codebuff",
-          "cbaf0c2e0b": "Cline",
-          "1f8a19e9ad": "Autohand Code",
-          "5e8eff11b3": "Auggie",
-          "9477377a2a": "Charm",
-          "e0247254f2": "Kiro",
-          "918ba4ffed": "Kilocode",
-          "c73c573939": "Amp",
-          "8da11d876c": "Goose",
-          "b32627f09b": "Aider",
-          "691dd11789": "Antigravity",
-          "12e6baa4f7": "Gemini",
-          "09973b4d84": "OMP",
           "302934c5d9": "Pi",
           "e7a4ca5103": "OpenCode",
-          "706b0fe68b": "GitHub Copilot",
-          "0baad2d5d2": "Grok",
-          "760bc6883d": "Codex",
-          "a5fc0cb622": "OpenClaude",
           "bf53f09bf8": "Claude Agent Teams",
-          "0708ed89f1": "Claude",
-          "fc80296033": "Devin",
-          "da41abbdd4": "Ante",
-          "060d152fb5": "Trae",
-          "d443a47995": "Prime Agent",
-          "mimo_code_label": "MiMo Code"
+          "0708ed89f1": "Claude"
         },
         "skill": {
           "cli": {
@@ -2636,7 +2604,7 @@
               "blocked": {
                 "toast": {
                   "97c98f1afe": "설정 열기",
-                  "7cf51f74fd": "SSH, Zellij, tmux, Neovim, fzf 또는 Grok에서 복사하려면 Terminal 설정에서 TUI 클립보드 쓰기를 활성화하세요.",
+                  "7cf51f74fd": "SSH, Zellij, tmux, Neovim 또는 fzf에서 복사하려면 Terminal 설정에서 TUI 클립보드 쓰기를 활성화하세요.",
                   "89eaa3e80b": "Terminal 클립보드 쓰기가 차단되었습니다."
                 }
               },
@@ -5381,7 +5349,7 @@
           "1188e56af4": "예시 프롬프트 복사",
           "b84807f228": "\"",
           "59722f31b4": "\"",
-          "c5325e91f6": "이 중 하나를 Claude Code, Codex 또는 해당 스킬이 설치된 프로젝트의 다른 agent에 붙여넣으세요.",
+          "c5325e91f6": "이 중 하나를 Claude Code, OpenCode 또는 해당 스킬이 설치된 프로젝트의 다른 agent에 붙여넣으세요.",
           "2a180694f7": "시도해 보세요 - 예시 프롬프트",
           "5ec620ccc4": "복사하지 못했습니다.",
           "a602d43069": "{{value0}}을(를) 복사했습니다."
@@ -5974,7 +5942,7 @@
           "c12b253997": "예시 프롬프트 복사",
           "d151e25078": "\"",
           "b525ff2b12": "\"",
-          "4daa95f25a": "Orca CLI 스킬이 설치된 프로젝트의 Claude Code, Codex 또는 다른 agent에 이들 중 하나를 붙여넣으세요.",
+          "4daa95f25a": "Orca CLI 스킬이 설치된 프로젝트의 Claude Code, OpenCode 또는 다른 agent에 이들 중 하나를 붙여넣으세요.",
           "0820b3f84f": "시도해 보세요 - 예시 프롬프트",
           "1f608e7d60": "프롬프트를 복사하지 못했습니다.",
           "2b077b5544": "프롬프트를 복사했습니다."
@@ -6962,9 +6930,9 @@
           "d23b43c5be": "설정 스크립트 위치",
           "34a0dfa06e": "새 워크스페이스를 만들 때 repos 설정 스크립트를 실행할 위치입니다.",
           "21f8da2078": "워크스페이스 설정 스크립트",
-          "6e6480a7df": "terminal의 프로그램(Zellij, tmux, Neovim, fzf, Grok, SSH)이 시스템 클립보드에 복사할 수 있게 합니다.",
+          "6e6480a7df": "terminal의 프로그램(Zellij, tmux, Neovim, fzf, SSH)이 시스템 클립보드에 복사할 수 있게 합니다.",
           "3338dcf8c1": "TUI 클립보드 쓰기 허용(OSC 52)",
-          "69c64a479c": "Zellij, tmux, Neovim, fzf 및 Grok이 PTY(SSH 포함)를 통해 시스템 클립보드에 복사하도록 합니다.",
+          "69c64a479c": "Zellij, tmux, Neovim 및 fzf가 PTY(SSH 포함)를 통해 시스템 클립보드에 복사하도록 합니다.",
           "4729c645fc": "terminal 선택 사항을 클립보드에 자동으로 복사합니다.",
           "902f5dee1f": "선택 시 복사",
           "9129b7e805": "terminal 패널에 마우스를 가리키면 클릭하지 않고도 활성화됩니다.",
@@ -7560,7 +7528,6 @@
                 "3c4e5e5938": "액션 레시피",
                 "ee14a9e9f7": "활성화됨",
                 "82109d627d": "소스 제어",
-                "542e1a00a7": "codex",
                 "f121bec167": "claude",
                 "93e5210da8": "메시지",
                 "c33cb1b982": "ai",
@@ -7733,16 +7700,8 @@
             "e4fb4516d0": "스타",
             "e0b8c8bc25": "gh CLI를 통해 GitHub 스타로 프로젝트를 지원하세요.",
             "36a72f0d9e": "GitHub에서 Orca에 스타 주기",
-            "c61b14be7c": "그로크",
-            "5d9ba08673": "Copilot",
-            "f472e97440": "aider",
-            "3c30fe2d51": "gemini",
-            "5fdf1dc2d1": "omp",
             "9b0bc30160": "Pi",
             "882c4896fd": "opencode",
-            "27d9b996ba": "codex",
-            "5baf51c4d9": "open claude",
-            "aea7d2cccb": "OpenClaude",
             "95b63edde7": "claude",
             "41c2f9a025": "기본값",
             "8ea37a05bc": "agent",
@@ -8101,7 +8060,6 @@
             "f5d39af41e": "하위 agents",
             "c766a01978": "핸드오프",
             "08c65b12a2": "예시",
-            "f278fd04db": "codex",
             "32c5098e7b": "claude",
             "21c28ccdf7": "코디네이터",
             "741dfc03fa": "워커",
@@ -12764,6 +12722,11 @@
               "cc71e252ba": "매주 {{day}} {{time}}",
               "ba20c92073": "사용자 지정 일정",
               "086a5a9fe2": "잘못된 일정"
+            }
+          },
+          "draft": {
+            "model": {
+              "agentUnavailable": "에이전트를 더 이상 사용할 수 없습니다"
             }
           }
         },

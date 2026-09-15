@@ -90,13 +90,13 @@ describe('AgentExecHandler', () => {
 
     const pending = handlers.get('agent.execNonInteractive')!(
       {
-        binary: 'codex',
-        args: ['exec'],
+        binary: 'opencode',
+        args: ['run'],
         cwd: '/repo',
         stdin: 'PROMPT',
         timeoutMs: 5_000,
         env: {
-          CODEX_HOME: '/managed/codex-home',
+          OPENCODE_CONFIG_DIR: '/managed/opencode-config',
           PATH: '/managed/bin'
         }
       },
@@ -109,11 +109,11 @@ describe('AgentExecHandler', () => {
       exitCode: 0,
       timedOut: false
     })
-    expect(spawnMock).toHaveBeenCalledWith('codex', ['exec'], {
+    expect(spawnMock).toHaveBeenCalledWith('opencode', ['run'], {
       cwd: '/repo',
       env: expect.objectContaining({
         ...process.env,
-        CODEX_HOME: '/managed/codex-home',
+        OPENCODE_CONFIG_DIR: '/managed/opencode-config',
         PATH: '/managed/bin'
       }),
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -170,7 +170,7 @@ describe('AgentExecHandler', () => {
       const pending = handlers.get('agent.execNonInteractive')!(
         {
           binary: 'npx',
-          args: ['codex', 'exec'],
+          args: ['opencode-ai', 'run'],
           cwd: '/repo',
           timeoutMs: 5_000,
           env: {

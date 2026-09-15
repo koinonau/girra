@@ -8,7 +8,7 @@ import {
 describe('canRevalidateCachedAgentWithoutScan', () => {
   it('is true for a cached agent when node-pty only names the shell (a scan would run)', () => {
     expect(canRevalidateCachedAgentWithoutScan('claude', 'powershell.exe')).toBe(true)
-    expect(canRevalidateCachedAgentWithoutScan('codex', 'cmd.exe')).toBe(true)
+    expect(canRevalidateCachedAgentWithoutScan('opencode', 'cmd.exe')).toBe(true)
   })
 
   it('is false when node-pty already names a recognized agent (no scan needed)', () => {

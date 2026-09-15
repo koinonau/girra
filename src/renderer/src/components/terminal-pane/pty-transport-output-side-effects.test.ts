@@ -341,7 +341,7 @@ describe('createIpcPtyTransport', () => {
 
       processor.processData('\x1b]0;. Claude working\x07', callbacks)
       processor.processData(
-        '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07plain output\r\n',
+        '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"opencode"}\x07plain output\r\n',
         callbacks
       )
 
@@ -349,7 +349,7 @@ describe('createIpcPtyTransport', () => {
       expect(onAgentStatus).toHaveBeenCalledWith({
         state: 'working',
         prompt: 'ship it',
-        agentType: 'codex'
+        agentType: 'opencode'
       })
 
       vi.advanceTimersByTime(3_000)

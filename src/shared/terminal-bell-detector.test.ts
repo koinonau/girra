@@ -12,7 +12,7 @@ describe('createBellDetector', () => {
   it('keeps split OSC state so title terminators are not reported as bells', () => {
     const detector = createBellDetector()
 
-    expect(detector.chunkContainsBell('\x1b]0;Codex working')).toBe(false)
+    expect(detector.chunkContainsBell('\x1b]0;OpenCode working')).toBe(false)
     expect(detector.chunkContainsBell('\x07')).toBe(false)
     expect(detector.chunkContainsBell('\x07')).toBe(true)
   })

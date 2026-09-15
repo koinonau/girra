@@ -23,30 +23,19 @@ beforeEach(() => {
 })
 
 describe('WslSkillInstallFilesystem', () => {
-  it('allows every global provider destination inside the selected distro', async () => {
+  it('allows the global provider destination inside the selected distro', async () => {
     const home = '\\\\wsl.localhost\\Ubuntu-24.04\\home\\jin'
     const filesystem = createWslSkillInstallFilesystem({
       distro: 'Ubuntu-24.04',
       homeDirectory: home
     })
 
-    for (const directory of [
-      '.claude',
-      '.cursor',
-      '.gemini',
-      '.factory',
-      '.continue',
-      '.trae-cn',
-      '.grok',
-      '.augment'
-    ]) {
-      await filesystem.createAlias(
-        `${home}\\.agents\\skills\\private-skill`,
-        `${home}\\${directory}\\skills\\private-skill`
-      )
-    }
+    await filesystem.createAlias(
+      `${home}\\.agents\\skills\\private-skill`,
+      `${home}\\.claude\\skills\\private-skill`
+    )
 
-    expect(runWslProcessMock).toHaveBeenCalledTimes(8)
+    expect(runWslProcessMock).toHaveBeenCalledTimes(1)
   })
 
   it('applies and verifies manifest modes through bounded guest argv batches', async () => {

@@ -12,9 +12,9 @@ function skill(overrides: Partial<DiscoveredSkill>): DiscoveredSkill {
     id: 'id',
     name: 'Review',
     description: 'Code review',
-    providers: ['codex'],
+    providers: ['agent-skills'],
     sourceKind: 'home',
-    sourceLabel: 'Codex home',
+    sourceLabel: 'Agent skills home',
     rootPath: '/root',
     directoryPath: '/root/review',
     skillFilePath: '/root/review/SKILL.md',
@@ -27,7 +27,7 @@ function skill(overrides: Partial<DiscoveredSkill>): DiscoveredSkill {
 describe('skills filtering', () => {
   it('filters by provider, source, and text query', () => {
     const skills = [
-      skill({ name: 'React Patterns', providers: ['codex'], sourceKind: 'home' }),
+      skill({ name: 'React Patterns', providers: ['agent-skills'], sourceKind: 'home' }),
       skill({
         id: 'repo',
         name: 'Docs Writer',
@@ -40,7 +40,7 @@ describe('skills filtering', () => {
     // Why: the owning agent comes from the root a skill was found in, not from
     // its provider list, which flattens ten agents into "agent-skills".
     const agentByRootPath = new Map([
-      ['/home/dev/.codex/skills', 'codex'],
+      ['/home/dev/.agents/skills', 'opencode'],
       ['/repo/.claude/skills', 'claude']
     ])
     expect(

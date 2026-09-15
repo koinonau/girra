@@ -83,7 +83,7 @@ describe('parseTypeperfProcessOutput', () => {
   it('joins the Private Bytes counter onto the same process instance', async () => {
     const { parseTypeperfProcessOutput } = await loadWindowsProcessSampleParsing()
     const stdout = [
-      '"(PDH-CSV 4.0)","\\\\HOST\\Process(codex)\\ID Process","\\\\HOST\\Process(codex)\\Creating Process ID","\\\\HOST\\Process(codex)\\Working Set","\\\\HOST\\Process(codex)\\Private Bytes"',
+      '"(PDH-CSV 4.0)","\\\\HOST\\Process(opencode)\\ID Process","\\\\HOST\\Process(opencode)\\Creating Process ID","\\\\HOST\\Process(opencode)\\Working Set","\\\\HOST\\Process(opencode)\\Private Bytes"',
       '"07/15/2026 01:44:54.514","100.000000","1.000000","100663296.000000","5734400000.000000"'
     ].join('\r\n')
 
@@ -95,7 +95,7 @@ describe('parseTypeperfProcessOutput', () => {
   it('leaves committed bytes absent when the Private Bytes counter is missing', async () => {
     const { parseTypeperfProcessOutput } = await loadWindowsProcessSampleParsing()
     const stdout = [
-      '"(PDH-CSV 4.0)","\\\\HOST\\Process(codex)\\ID Process","\\\\HOST\\Process(codex)\\Creating Process ID","\\\\HOST\\Process(codex)\\Working Set"',
+      '"(PDH-CSV 4.0)","\\\\HOST\\Process(opencode)\\ID Process","\\\\HOST\\Process(opencode)\\Creating Process ID","\\\\HOST\\Process(opencode)\\Working Set"',
       '"time","100.000000","1.000000","2048.000000"'
     ].join('\r\n')
 

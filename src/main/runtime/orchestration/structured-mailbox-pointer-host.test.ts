@@ -42,8 +42,7 @@ describe('structured mailbox pointer host', () => {
     // The defect this pins: a running turn is announced by ONE lifecycle item, and settlement
     // tombstones it rather than rewriting it. A long tool-calling turn pushes that item arbitrarily
     // far from the tail, so any page-sized read reports a busy worker as idle — and the pointer is
-    // then delivered mid-turn, which Codex answers with `turn already running` and Claude settles
-    // `unknown` while the message is really queued.
+    // then delivered mid-turn, which Claude settles `unknown` while the message is really queued.
     const items = [runningTurn(), ...transcript(500)]
     hostRef.current = { journalSnapshot: () => ({ items }) }
     expect(createStructuredMailboxPointerHost().readGateFacts('s1')).toEqual({

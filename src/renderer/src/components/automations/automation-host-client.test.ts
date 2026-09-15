@@ -33,7 +33,7 @@ function makeAutomation(overrides: Partial<Automation> = {}): Automation {
     name: 'Remote check',
     prompt: 'Check',
     precheck: null,
-    agentId: 'codex',
+    agentId: 'opencode',
     projectId: 'repo-1',
     executionTargetType: 'local',
     executionTargetId: 'local',

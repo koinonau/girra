@@ -110,11 +110,11 @@ function makeHostSnapshot(args: {
     tabs: args.hostTabIds.map((hostTabId, index) => ({
       type: 'terminal' as const,
       id: `${hostTabId}::${leafByTab[hostTabId]}`,
-      title: hostTabId === RETRACTED_TAB ? 'Review origin/main' : 'Codex',
+      title: hostTabId === RETRACTED_TAB ? 'Review origin/main' : 'OpenCode',
       parentTabId: hostTabId,
       leafId: leafByTab[hostTabId]!,
       isActive: index === 0,
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       status: 'ready' as const,
       terminal: `terminal-${index + 1}`,
       ...(args.hostAgentStatusTabIds?.includes(hostTabId)
@@ -124,7 +124,7 @@ function makeHostSnapshot(args: {
               prompt: `work on ${hostTabId}`,
               updatedAt: args.hostNow,
               stateStartedAt: args.hostNow - 60_000,
-              agentType: 'codex',
+              agentType: 'opencode',
               paneKey: makePaneKey(hostTabId, leafByTab[hostTabId]!),
               tabId: hostTabId,
               worktreeId: WT,
@@ -192,8 +192,8 @@ function replayClientByteStatus(
     .getState()
     .setAgentStatus(
       paneKey,
-      { state, prompt: `review on ${hostTabId}`, agentType: 'codex' },
-      'codex',
+      { state, prompt: `review on ${hostTabId}`, agentType: 'opencode' },
+      'opencode',
       undefined,
       {
         tabId: mirrorTabId(hostTabId),
@@ -649,8 +649,8 @@ describe('a host-retracted paired tab leaves no ghost agent row behind', () => {
       .getState()
       .setAgentStatus(
         GHOST_PANE_KEY,
-        { state: 'done', prompt: 'review finished', agentType: 'codex' },
-        'codex',
+        { state: 'done', prompt: 'review finished', agentType: 'opencode' },
+        'opencode',
         undefined,
         { tabId: mirrorTabId(RETRACTED_TAB), worktreeId: WT }
       )

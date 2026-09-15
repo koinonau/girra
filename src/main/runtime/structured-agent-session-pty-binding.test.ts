@@ -55,7 +55,7 @@ describe('structured handoff PTY binding', () => {
     )
 
     await runtime.createTerminal('id:worktree-1', {
-      command: 'codex resume thread-1',
+      command: 'claude --resume thread-1',
       structuredAgentSessionId: SESSION_ID
     })
 

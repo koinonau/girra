@@ -3,7 +3,10 @@ import type { EffortLevel, Options as ClaudeAgentSdkOptions } from '@anthropic-a
 import type { AgentSessionJournalIdentity } from '../../shared/agent-session-journal-types'
 import { agentSessionProviderHandleChainHead } from '../../shared/agent-session-provider-handle'
 import { LOCAL_EXECUTION_HOST_ID } from '../../shared/execution-host'
-import { withCliRuntimeOnPath } from '../../shared/node-cli-command-resolution'
+import {
+  resolveClaudeCommand,
+  withCliRuntimeOnPath
+} from '../../shared/node-cli-command-resolution'
 import { structuredWorkerChildIdentityEnv } from '../runtime/structured-worker-child-identity-env'
 import {
   CLAUDE_AUTH_ENV_CONFLICT_MESSAGE,
@@ -21,7 +24,6 @@ import {
   structuredClaudeMatchesActiveManagedAccount,
   type ClaudeManagedAccountGateSettings
 } from '../native-chat/claude-structured-managed-account-support'
-import { resolveClaudeCommand } from '../codex-cli/command'
 import type { AgentSessionRecordStore } from '../runtime/agent-session-record-store'
 
 export const CLAUDE_DEFAULT_SETTING_SOURCES = ['user', 'project', 'local'] as const
@@ -199,7 +201,6 @@ export function createClaudeStructuredLaunchResolver(
     }
     // Every acquisition, not just the first: the account state can change under a live session, and
     // a reacquire after an unexpected exit would otherwise spawn under whatever it has become.
-    // Codex has no gate here — it resolves its account on a different path.
     if (
       deps.readManagedAccountGate &&
       !structuredClaudeMatchesActiveManagedAccount(deps.readManagedAccountGate())

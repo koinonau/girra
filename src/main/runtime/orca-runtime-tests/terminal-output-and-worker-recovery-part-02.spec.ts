@@ -473,16 +473,15 @@ describe('OrcaRuntimeService', () => {
     } as unknown as OrchestrationDb)
     const write = vi.fn(() => true)
     const kill = vi.fn(() => true)
-    const READY_SCREEN =
-      ' >_ OpenAI Codex (v0.131.0)\r\n model:       gpt-5.5 high\r\n directory:   /repo\r\n'
+    const PROMPT_SCREEN = 'Update available! 0.131.0 -> 0.132.0\r\nPress enter to continue\r\n'
     // Why scrollbackRows-aware: a visible-only request gets the grid in `data`;
     // a scrollback request gets history. Collapsing the two would let a test
     // pass on evidence the caller never asked for.
     const serializeProviderBuffer = vi
       .fn()
       .mockImplementation(async (_ptyId: string, opts?: { scrollbackRows?: number }) => ({
-        data: opts?.scrollbackRows === 0 ? READY_SCREEN : '',
-        scrollbackAnsi: opts?.scrollbackRows === 0 ? '' : READY_SCREEN,
+        data: opts?.scrollbackRows === 0 ? PROMPT_SCREEN : '',
+        scrollbackAnsi: opts?.scrollbackRows === 0 ? '' : PROMPT_SCREEN,
         cols: 80,
         rows: 24,
         seq: 100,
@@ -561,19 +560,19 @@ describe('OrcaRuntimeService', () => {
     expect(kill).not.toHaveBeenCalled()
     const [terminal] = (await runtime.listTerminals()).terminals
     await expect(runtime.readTerminal(terminal.handle)).resolves.toMatchObject({
-      tail: [' >_ OpenAI Codex (v0.131.0)', ' model:       gpt-5.5 high', ' directory:   /repo']
+      tail: ['Update available! 0.131.0 -> 0.132.0', 'Press enter to continue']
     })
     expect(serializeProviderBuffer).toHaveBeenCalledWith('pty-legacy', {
       scrollbackRows: 120
     })
     await expect(
       runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle', timeoutMs: 100 })
-    ).resolves.toMatchObject({ satisfied: true })
-    // Why: the ready banner stays in scrollback for the whole session, so a
-    // working grid must not inherit idleness from its own history (#15569 review).
+    ).resolves.toMatchObject({ satisfied: false, blockedReason: 'agent-update-prompt' })
+    // Why: an answered prompt stays in scrollback for the whole session, so a
+    // working grid must not inherit it from its own history (#15569 review).
     serializeProviderBuffer.mockResolvedValueOnce({
       data: '  working on it (12s)\r\n  Esc to interrupt\r\n',
-      scrollbackAnsi: READY_SCREEN,
+      scrollbackAnsi: PROMPT_SCREEN,
       cols: 80,
       rows: 24,
       seq: 101,
@@ -601,7 +600,7 @@ describe('OrcaRuntimeService', () => {
     await vi.waitFor(() => expect(serializeProviderBuffer).toHaveBeenCalledTimes(4))
     runtime.onPtyData('pty-legacy', '\x1b[H', Date.now())
     lateReadySnapshot.resolve({
-      data: READY_SCREEN,
+      data: PROMPT_SCREEN,
       scrollbackAnsi: '',
       cols: 80,
       rows: 24,

@@ -91,7 +91,7 @@ describe('cold-park store subscription narrowing', () => {
   // every mounted worktree's overlay layer.
   it('ignores a pending-startup write for another worktree tab', () => {
     act(() => {
-      useAppStore.setState({ pendingStartupByTabId: { 'other-tab': { command: 'codex' } } })
+      useAppStore.setState({ pendingStartupByTabId: { 'other-tab': { command: 'opencode' } } })
     })
     expect(harness.renders).toBe(0)
   })
@@ -110,7 +110,10 @@ describe('cold-park store subscription narrowing', () => {
   it('still re-renders when this worktree gains a pending startup', () => {
     act(() => {
       useAppStore.setState({
-        pendingStartupByTabId: { 'tab-1': { command: 'claude' }, 'other-tab': { command: 'codex' } }
+        pendingStartupByTabId: {
+          'tab-1': { command: 'claude' },
+          'other-tab': { command: 'opencode' }
+        }
       })
     })
     expect(harness.renders).toBeGreaterThan(0)

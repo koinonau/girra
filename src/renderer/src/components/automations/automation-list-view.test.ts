@@ -25,7 +25,7 @@ function makeAutomation(overrides: Partial<Automation> = {}): Automation {
     name: 'Zebra job',
     prompt: 'run',
     precheck: null,
-    agentId: 'codex',
+    agentId: 'opencode',
     projectId: 'repo-1',
     executionTargetType: 'local',
     executionTargetId: 'local',
@@ -182,16 +182,16 @@ describe('automation-list-view', () => {
   it('filters local rows by multiple agents and leaves external rows out of agent scopes', () => {
     const items = applyAutomationListView({
       rows: [
-        makeCatalogRow('codex-job', { agentId: 'codex' }),
+        makeCatalogRow('opencode-job', { agentId: 'opencode' }),
         makeCatalogRow('claude-job', { agentId: 'claude' })
       ],
       externalEntries: [makeExternalEntry()],
-      filter: { status: 'all', lastRun: 'all', agentIds: ['codex', 'claude'] },
+      filter: { status: 'all', lastRun: 'all', agentIds: ['opencode', 'claude'] },
       sort: null,
       locale: 'en'
     })
 
-    expect(items.map((item) => item.id)).toEqual([rowKey('codex-job'), rowKey('claude-job')])
+    expect(items.map((item) => item.id)).toEqual([rowKey('opencode-job'), rowKey('claude-job')])
   })
 
   it('counts an agent filter alongside status and last-run filters', () => {
@@ -206,7 +206,7 @@ describe('automation-list-view', () => {
       countAutomationListFilters({
         status: 'paused',
         lastRun: 'failed',
-        agentIds: ['codex']
+        agentIds: ['opencode']
       })
     ).toBe(3)
   })
@@ -224,10 +224,10 @@ describe('automation-list-view', () => {
 
   it('filters catalog rows by status, agent, and the projected last-run status', () => {
     const rows = [
-      makeCatalogRow('paused-codex', { enabled: false, agentId: 'codex' }),
+      makeCatalogRow('paused-opencode', { enabled: false, agentId: 'opencode' }),
       makeCatalogRow('failed-claude', { agentId: 'claude' }, 'dispatch_failed'),
-      makeCatalogRow('succeeded-codex', { agentId: 'codex' }, 'completed'),
-      makeCatalogRow('never-codex', { agentId: 'codex' })
+      makeCatalogRow('succeeded-opencode', { agentId: 'opencode' }, 'completed'),
+      makeCatalogRow('never-opencode', { agentId: 'opencode' })
     ]
     const ids = (filter: Partial<AutomationListFilter>) =>
       filterAutomationListRows(rows, {
@@ -235,11 +235,11 @@ describe('automation-list-view', () => {
         ...filter
       }).map((row) => row.automation.id)
 
-    expect(ids({ status: 'paused' })).toEqual(['paused-codex'])
+    expect(ids({ status: 'paused' })).toEqual(['paused-opencode'])
     expect(ids({ agentIds: ['claude'] })).toEqual(['failed-claude'])
     expect(ids({ lastRun: 'failed' })).toEqual(['failed-claude'])
-    expect(ids({ lastRun: 'succeeded' })).toEqual(['succeeded-codex'])
-    expect(ids({ lastRun: 'never' })).toEqual(['paused-codex', 'never-codex'])
+    expect(ids({ lastRun: 'succeeded' })).toEqual(['succeeded-opencode'])
+    expect(ids({ lastRun: 'never' })).toEqual(['paused-opencode', 'never-opencode'])
     // Inactive filter keeps the input identity so nothing re-renders for it.
     expect(filterAutomationListRows(rows, EMPTY_AUTOMATION_LIST_FILTER)).toBe(rows)
   })
@@ -277,7 +277,7 @@ describe('automation-list-view', () => {
     expect(
       filterExternalAutomationListEntries(entries, {
         ...EMPTY_AUTOMATION_LIST_FILTER,
-        agentIds: ['codex']
+        agentIds: ['opencode']
       })
     ).toEqual([])
     expect(

@@ -71,9 +71,6 @@ function computeAgentLabel(title: string): string | null {
     return 'Pi'
   }
 
-  if (titleHasAgentName(title, 'codex')) {
-    return 'Codex'
-  }
   if (titleHasAgentName(title, 'opencode')) {
     return 'OpenCode'
   }

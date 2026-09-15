@@ -1,7 +1,7 @@
 /**
  * A worker start that fails AFTER its structured session exists is the fourth settlement path.
  *
- * The create publishes a "Claude Chat"/"Codex Chat" tab and writes it into the durable restore
+ * The create publishes a "Claude Chat" tab and writes it into the durable restore
  * index before the start can fail on the authority gate or on the preamble turn. Dropping only the
  * dispatch hold there left one dead tab per failed start, re-published on every app launch and
  * re-attaching a session no dispatch owns.

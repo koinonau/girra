@@ -19,7 +19,7 @@ import { TUI_AGENT_DISPLAY_NAMES } from './tui-agent-display-names'
  *
  * The chain this replaces is a first-match-wins scan of substring predicates, so its answer is
  * decided by list position rather than by how strong the evidence is. That is why a Claude pane
- * whose task text mentions Codex reads as Codex, and why fixing one collision by hoisting a
+ * whose task text mentions OpenCode reads as OpenCode, and why fixing one collision by hoisting a
  * branch breaks another. Here every signal is collected first and ranked afterwards, by class:
  *
  *   vendor marker  — a control sequence or sigil the agent itself emits. Task text cannot forge it.
@@ -51,7 +51,6 @@ export type AgentTitleEvidence = {
 /** Names matched as whole tokens, paired with the agent each identifies. */
 const NAME_TOKENS: readonly (readonly [string, TuiAgent])[] = [
   ['claude', 'claude'],
-  ['codex', 'codex'],
   ['opencode', 'opencode']
 ]
 
@@ -69,7 +68,7 @@ const DISPLAY_LABELS = [
 /**
  * Orca renders `<task text>… - <agent>` and owns the suffix; task text cannot reach past it.
  * Why leading whitespace is required: without it this also matches the tail of a hyphenated
- * worktree name (`review-14600-codex`), which is a directory, not an owner declaration.
+ * worktree name (`review-14600-opencode`), which is a directory, not an owner declaration.
  */
 const OWNER_SUFFIX_RE = /\s-\s+([A-Za-z][\w-]*)\s*$/
 const WINDOWS_LAUNCHER_SUFFIX_RE = /\.(?:exe|cmd|bat|ps1)$/i
@@ -128,8 +127,8 @@ function agentForBareName(text: string): TuiAgent | null {
   }
   const bareToken = stripped.replace(WINDOWS_LAUNCHER_SUFFIX_RE, '')
   const names = namesIn(bareToken)
-  // Why the length check: the remainder must BE the name, not merely contain it. "codex" anchors;
-  // "fix the codex hook" does not, and neither does a hyphenated worktree name like "codex-split".
+  // Why the length check: the remainder must BE the name, not merely contain it. "opencode" anchors;
+  // "fix the opencode hook" does not, and neither does a hyphenated worktree name like "opencode-split".
   return names.length === 1 && /^[\p{L}\p{N}]+$/u.test(bareToken) ? names[0] : null
 }
 
@@ -236,7 +235,7 @@ function collectAnchoredNames(segments: readonly string[]): TuiAgent[] {
       }
     }
 
-    // Why strip a leading vendor sigil first: `✳ codex.exe` is a Claude-glyphed pane whose entire
+    // Why strip a leading vendor sigil first: `✳ opencode.exe` is a Claude-glyphed pane whose entire
     // remainder is another agent's launcher — the strongest name evidence a title can carry.
     const withoutSigil = segment.startsWith(`${CLAUDE_IDLE} `)
       ? segment.slice(CLAUDE_IDLE.length)
@@ -291,8 +290,8 @@ export function collectAgentTitleEvidence(title: string): AgentTitleEvidence {
     return { ...evidence, agent: null, reason: 'conflicting-vendor-markers' }
   }
   if (vendorMarkers.length === 1) {
-    // Why free text does not veto here: `✳ Fix Codex false attention notifications` is a Claude
-    // pane describing Codex work. The sigil is emitted by the agent; the name was typed by a
+    // Why free text does not veto here: `✳ Fix OpenCode false attention notifications` is a Claude
+    // pane describing OpenCode work. The sigil is emitted by the agent; the name was typed by a
     // human. A conflicting ANCHORED name already outranks this branch above.
     return { ...evidence, agent: vendorMarkers[0], reason: 'vendor-marker' }
   }

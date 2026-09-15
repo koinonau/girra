@@ -66,7 +66,7 @@ describe('registerPtyHandlers', () => {
           id: ownerPtyId,
           incarnationId: 'incarnation-remote',
           cwd: '/tmp/recovered-worktree',
-          title: 'Codex',
+          title: 'Claude Code',
           agentSessionOwners: [owner]
         }
       ],
@@ -124,7 +124,7 @@ describe('registerPtyHandlers', () => {
             id: localOwner.ptyId,
             incarnationId: 'incarnation-conflict-local',
             cwd: '/tmp/recovered-worktree',
-            title: 'Codex',
+            title: 'Claude Code',
             agentSessionOwners: [localOwner]
           }
         ],
@@ -139,7 +139,7 @@ describe('registerPtyHandlers', () => {
             id: remoteOwner.ptyId,
             incarnationId: 'incarnation-conflict-remote',
             cwd: '/tmp/recovered-worktree',
-            title: 'Codex',
+            title: 'Claude Code',
             agentSessionOwners: [remoteOwner]
           }
         ]
@@ -183,7 +183,7 @@ describe('registerPtyHandlers', () => {
         id: ownerA.ptyId,
         incarnationId: 'incarnation-conflict-a',
         cwd: '/tmp/recovered-worktree',
-        title: 'Codex',
+        title: 'Claude Code',
         agentSessionOwners: [ownerA]
       }
     ]
@@ -192,7 +192,7 @@ describe('registerPtyHandlers', () => {
         id: ownerB.ptyId,
         incarnationId: 'incarnation-conflict-b',
         cwd: '/tmp/recovered-worktree',
-        title: 'Codex',
+        title: 'Claude Code',
         agentSessionOwners: [ownerB]
       }
     ]
@@ -239,7 +239,7 @@ describe('registerPtyHandlers', () => {
         id: oldOwner.ptyId,
         incarnationId: 'incarnation-old',
         cwd: '/tmp/recovered-worktree',
-        title: 'Codex',
+        title: 'Claude Code',
         agentSessionOwners: [oldOwner]
       }
     ]
@@ -262,7 +262,7 @@ describe('registerPtyHandlers', () => {
           id: owner.ptyId,
           incarnationId: 'incarnation-new',
           cwd: '/tmp/recovered-worktree',
-          title: 'Codex',
+          title: 'Claude Code',
           agentSessionOwners: [owner]
         })
         return {
@@ -310,7 +310,7 @@ describe('registerPtyHandlers', () => {
         id: owner.ptyId,
         incarnationId: 'incarnation-reconnect',
         cwd: '/tmp/recovered-worktree',
-        title: 'Codex',
+        title: 'Claude Code',
         agentSessionOwners: [owner]
       }
     ]

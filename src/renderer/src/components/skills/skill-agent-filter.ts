@@ -15,7 +15,7 @@ export function skillAgentLabel(agentId: string): string {
 }
 
 /**
- * Discovery tags every non-Codex, non-Claude root as `agent-skills` and keeps
+ * Discovery tags every non-Claude root as `agent-skills` and keeps
  * the real agent on the source, so the owning agent has to come from the root
  * a skill was found in rather than from its provider list.
  */

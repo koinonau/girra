@@ -15,7 +15,7 @@ describe('agent completion steadyState opt-in', () => {
   const optionsOf = (call: unknown[]): unknown => call[2]
 
   it('marks cadence polls on a local pane as steadyState', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('claude'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
@@ -26,7 +26,7 @@ describe('agent completion steadyState opt-in', () => {
       shouldPollProcessCadence: () => true
     })
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     vi.advanceTimersByTime(3_000)
     await flushAsyncTicks()
     expect(inspectProcess).toHaveBeenCalled()
@@ -37,7 +37,7 @@ describe('agent completion steadyState opt-in', () => {
   })
 
   it('a pending-title read on a local pane is NOT steadyState: it decides a completion once', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('claude'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
@@ -47,7 +47,7 @@ describe('agent completion steadyState opt-in', () => {
       isLive: () => true,
       shouldPollProcessCadence: () => false
     })
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/orca-e2e-repo')
     await flushAsyncTicks()
     expect(inspectProcess).toHaveBeenCalled()
@@ -58,7 +58,7 @@ describe('agent completion steadyState opt-in', () => {
   })
 
   it('never marks a remote pane as steadyState: remote identity needs evidence', async () => {
-    const inspectProcess = vi.fn(async () => processResult('codex'))
+    const inspectProcess = vi.fn(async () => processResult('claude'))
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'remote:pty-1',
@@ -71,7 +71,7 @@ describe('agent completion steadyState opt-in', () => {
       shouldPollProcessCadence: () => true
     })
     coordinator.startProcessTracking()
-    coordinator.observeTitle('Codex working')
+    coordinator.observeTitle('Claude working')
     coordinator.observeTitle('/tmp/orca-e2e-repo')
     vi.advanceTimersByTime(3_000)
     await flushAsyncTicks()

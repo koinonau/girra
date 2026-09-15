@@ -56,9 +56,9 @@ const missingSnapshot = {
 const newerAgentTab = {
   type: 'agent-session',
   id: 'agent-1',
-  title: 'Gemini',
+  title: 'Future Agent',
   sessionId: 'session-1',
-  agent: 'gemini',
+  agent: 'future-agent',
   isActive: false
 }
 const newerAgentStatus = {

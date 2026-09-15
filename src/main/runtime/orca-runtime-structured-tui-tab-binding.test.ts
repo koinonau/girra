@@ -494,7 +494,6 @@ describe('structured TUI launch tab binding', () => {
         repo: null
         folderWorkspace: null
       }>
-      markLocalWorkspaceTrustedForAgent(): void
       waitForTerminal(): Promise<unknown>
       waitForStructuredClaudeTuiProof(): Promise<{ transcriptPath: string; leafUuid: string }>
       waitForStructuredTuiPtyExit(): Promise<void>
@@ -516,7 +515,6 @@ describe('structured TUI launch tab binding', () => {
       repo: null,
       folderWorkspace: null
     }))
-    internal.markLocalWorkspaceTrustedForAgent = vi.fn()
     const waitForTerminal = vi.fn(async () => ({}))
     internal.waitForTerminal = waitForTerminal
     const waitForStructuredClaudeTuiProof = vi.fn(async () => {
@@ -626,37 +624,6 @@ describe('structured TUI launch tab binding', () => {
     ).resolves.toBeNull()
 
     explicitStatus = { ...explicitStatus, state: 'done', receivedAt: Date.now() }
-    expect(transport.tuiStatus(owner)).toBe('idle')
-    await expect(transport.waitForTuiIdleOrExit(owner, new AbortController().signal)).resolves.toBe(
-      'idle'
-    )
-
-    explicitStatus = null
-    const livePty = (
-      runtime as unknown as {
-        ptysById: Map<
-          string,
-          {
-            tailBuffer: string[]
-            tailPartialLine: string
-            preview: string
-            lastAgentStatus: null
-            lastAgentStatusObservedLive: boolean
-          }
-        >
-      }
-    ).ptysById.get('pty-structured')!
-    Object.assign(livePty, {
-      tailBuffer: [
-        'OpenAI Codex (v0.147.0)',
-        'model: gpt-5.6-terra',
-        'directory: /tmp/structured-handoff'
-      ],
-      tailPartialLine: '',
-      preview: '',
-      lastAgentStatus: null,
-      lastAgentStatusObservedLive: false
-    })
     expect(transport.tuiStatus(owner)).toBe('idle')
     await expect(transport.waitForTuiIdleOrExit(owner, new AbortController().signal)).resolves.toBe(
       'idle'

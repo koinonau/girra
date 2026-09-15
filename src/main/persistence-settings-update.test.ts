@@ -163,7 +163,7 @@ describe('Store', () => {
     store.updateSettings(
       {
         theme: 'dark',
-        disabledTuiAgents: ['codex', 'not-real', 'codex'] as never
+        disabledTuiAgents: ['opencode', 'not-real', 'opencode'] as never
       },
       { notifyListeners: true, originWebContentsId: 42 }
     )
@@ -171,11 +171,11 @@ describe('Store', () => {
     expect(listener).toHaveBeenCalledWith(
       {
         theme: 'dark',
-        disabledTuiAgents: ['codex']
+        disabledTuiAgents: ['opencode']
       },
       expect.objectContaining({
         theme: 'dark',
-        disabledTuiAgents: ['codex']
+        disabledTuiAgents: ['opencode']
       }),
       42
     )
@@ -397,18 +397,18 @@ describe('Store', () => {
       join(testState.dir, 'orca-data.json'),
       JSON.stringify({
         settings: {
-          disabledTuiAgents: ['codex', 'not-real', 'codex', 'claude']
+          disabledTuiAgents: ['pi', 'not-real', 'pi', 'claude']
         }
       })
     )
     const store = await createStore()
 
-    expect(store.getSettings().disabledTuiAgents).toEqual(['codex', 'claude', 'claude-agent-teams'])
+    expect(store.getSettings().disabledTuiAgents).toEqual(['pi', 'claude', 'claude-agent-teams'])
 
     const updated = store.updateSettings({
-      disabledTuiAgents: ['gemini', 'not-real', 'gemini', 'opencode'] as never
+      disabledTuiAgents: ['opencode', 'not-real', 'opencode', 'pi'] as never
     })
-    expect(updated.disabledTuiAgents).toEqual(['gemini', 'opencode'])
+    expect(updated.disabledTuiAgents).toEqual(['opencode', 'pi'])
   })
 
   it('enables Claude Agent Teams by default for fresh installs', async () => {
@@ -431,11 +431,7 @@ describe('Store', () => {
 
     expect(store.getSettings().agentDefaultArgs).toMatchObject({
       claude: '--dangerously-skip-permissions',
-      codex: '--dangerously-bypass-approvals-and-sandbox',
-      cursor: '--yolo'
-    })
-    expect(store.getSettings().agentDefaultEnv).toMatchObject({
-      goose: { GOOSE_MODE: 'auto' }
+      'claude-agent-teams': '--dangerously-skip-permissions'
     })
     expect(store.getSettings().agentYoloDefaultsMigrated).toBe(true)
   })
@@ -446,17 +442,17 @@ describe('Store', () => {
       JSON.stringify({
         settings: {
           agentCmdOverrides: {
-            codex: 'codex --profile work',
-            goose: 'goose'
+            claude: 'claude --profile work'
           }
         }
       })
     )
     const store = await createStore()
 
-    expect(store.getSettings().agentDefaultArgs?.codex).toBe('')
-    expect(store.getSettings().agentDefaultEnv?.goose).toEqual({})
-    expect(store.getSettings().agentDefaultArgs?.claude).toBe('--dangerously-skip-permissions')
+    expect(store.getSettings().agentDefaultArgs?.claude).toBe('')
+    expect(store.getSettings().agentDefaultArgs?.['claude-agent-teams']).toBe(
+      '--dangerously-skip-permissions'
+    )
   })
 
   it('removes unsupported TUI skip-permissions args from migrated profiles', async () => {
@@ -467,8 +463,7 @@ describe('Store', () => {
           agentYoloDefaultsMigrated: true,
           agentDefaultArgs: {
             opencode: '--dangerously-skip-permissions --model opencode/gpt-5',
-            kilo: '--dangerously-skip-permissions',
-            codex: '--dangerously-bypass-approvals-and-sandbox'
+            pi: '--dangerously-skip-permissions'
           }
         }
       })
@@ -477,14 +472,10 @@ describe('Store', () => {
     store.flush()
 
     expect(store.getSettings().agentDefaultArgs?.opencode).toBe('--model opencode/gpt-5')
-    expect(store.getSettings().agentDefaultArgs?.kilo).toBe('')
-    expect(store.getSettings().agentDefaultArgs?.codex).toBe(
-      '--dangerously-bypass-approvals-and-sandbox'
-    )
+    expect(store.getSettings().agentDefaultArgs?.pi).toBe('--dangerously-skip-permissions')
     expect((readDataFile() as PersistedState).settings.agentDefaultArgs?.opencode).toBe(
       '--model opencode/gpt-5'
     )
-    expect((readDataFile() as PersistedState).settings.agentDefaultArgs?.kilo).toBe('')
   })
 
   it('normalizes app icon on load and update', async () => {
@@ -513,8 +504,8 @@ describe('Store', () => {
       sourceControlAi: {
         ...current,
         enabled: true,
-        agentId: 'codex',
-        selectedModelByAgent: { codex: 'gpt-5.4' },
+        agentId: 'opencode',
+        selectedModelByAgent: { opencode: 'gpt-5.4' },
         selectedThinkingByModel: { 'gpt-5.4': 'high' },
         instructionsByOperation: {
           commitMessage: 'Write concise commit messages.',
@@ -526,8 +517,8 @@ describe('Store', () => {
 
     expect(updated.commitMessageAi).toMatchObject({
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.4' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'gpt-5.4' },
       selectedThinkingByModel: { 'gpt-5.4': 'high' },
       customPrompt: 'Write concise commit messages.',
       customAgentCommand: ''

@@ -80,13 +80,13 @@ describe('probe lane', () => {
     // The whole point: the user's real PATH without paying for -- or being
     // blocked by -- a login shell on every call (#14288, #9768).
     seedWslGuestEnvironmentForTests(undefined, ENVIRONMENT)
-    await runWslProcess({ loginPath: 'preferred', program: 'codex', args: ['--version'] })
+    await runWslProcess({ loginPath: 'preferred', program: 'opencode', args: ['--version'] })
     expect(lastArgv()).toEqual([
       '--exec',
       '/usr/bin/env',
       'PATH=/home/u/.nvm/bin:/usr/bin',
       'HOME=/home/u',
-      'codex',
+      'opencode',
       '--version'
     ])
   })
@@ -103,14 +103,14 @@ describe('probe lane', () => {
       stderr: 'distro is stopped',
       timedOut: false
     })
-    const result = await runWslProcess({ loginPath: 'preferred', program: 'codex' })
+    const result = await runWslProcess({ loginPath: 'preferred', program: 'opencode' })
     expect(result.environmentResolved).toBe(false)
-    expect(lastArgv()).toEqual(['--exec', 'codex'])
+    expect(lastArgv()).toEqual(['--exec', 'opencode'])
   })
 
   it('reports a resolved environment on the happy path', async () => {
     seedWslGuestEnvironmentForTests(undefined, ENVIRONMENT)
-    const result = await runWslProcess({ loginPath: 'preferred', program: 'codex' })
+    const result = await runWslProcess({ loginPath: 'preferred', program: 'opencode' })
     expect(result.environmentResolved).toBe(true)
   })
 })
@@ -269,7 +269,7 @@ describe('program is a binary, not a shell string', () => {
     // rejecting it would fail legitimate installs under a spaced directory.
     seedWslGuestEnvironmentForTests(undefined, ENVIRONMENT)
     await expect(
-      runWslProcess({ loginPath: 'preferred', program: '/home/u/my tools/codex' })
+      runWslProcess({ loginPath: 'preferred', program: '/home/u/my tools/opencode' })
     ).resolves.toBeDefined()
   })
 })

@@ -32,7 +32,7 @@ describe('isNoiseMessage', () => {
   })
 
   it('keeps real user messages', () => {
-    expect(isNoiseMessage(msg('user', 'make it work for codex'))).toBe(false)
+    expect(isNoiseMessage(msg('user', 'make it work for opencode'))).toBe(false)
     expect(isNoiseMessage(msg('user', '<my-custom-element>pasted code'))).toBe(false)
   })
 

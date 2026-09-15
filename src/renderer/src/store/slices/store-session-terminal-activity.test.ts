@@ -345,7 +345,7 @@ describe('terminal slice behaviors', () => {
         updates: expect.objectContaining({ lastActivityAt: expect.any(Number) })
       })
     )
-    // The flag is consumed so a later legit respawn (codex restart etc.) isn't silently suppressed too.
+    // The flag is consumed so a later legit respawn (agent restart etc.) isn't silently suppressed too.
     expect(store.getState().tabsByWorktree[worktreeId][0].pendingActivationSpawn).toBeUndefined()
   })
 
@@ -446,7 +446,7 @@ describe('terminal slice behaviors', () => {
     store.getState().updateTabPtyId('tab-1', 'pty-live')
     expect(store.getState().tabsByWorktree[worktreeId][0].pendingActivationSpawn).toBeUndefined()
 
-    // Switch away, then re-activate: re-activation must NOT tag again, or a later legit spawn (codex restart, new pane) is dropped.
+    // Switch away, then re-activate: re-activation must NOT tag again, or a later legit spawn (agent restart, new pane) is dropped.
     store.getState().setActiveWorktree(null)
     store.getState().setActiveWorktree(worktreeId)
     expect(store.getState().tabsByWorktree[worktreeId][0].pendingActivationSpawn).toBeUndefined()

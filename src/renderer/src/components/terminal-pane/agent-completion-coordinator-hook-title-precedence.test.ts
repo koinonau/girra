@@ -26,25 +26,25 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'working',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
-    coordinator.observeClassifiedTitleCompletion('codex done')
+    coordinator.observeClassifiedTitleCompletion('claude done')
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
     expect(dispatchCompletion).toHaveBeenCalledWith(
-      'codex',
+      'claude',
       expect.objectContaining({
         source: 'hook',
         quietedHookDone: true,
         agentStatus: expect.objectContaining({
           state: 'done',
-          agentType: 'codex'
+          agentType: 'claude'
         })
       })
     )
@@ -64,13 +64,13 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
-    coordinator.observeTitle('⠋ codex')
-    coordinator.observeTitle('codex done')
+    coordinator.observeTitle('⠋ claude')
+    coordinator.observeTitle('claude done')
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex')
+    expect(dispatchCompletion).toHaveBeenCalledWith('claude')
   })
 
   it('suppresses delayed title completion after process inspection changes sessions', async () => {
@@ -79,7 +79,7 @@ describe('agent completion coordinator', () => {
       paneKey: 'tab-1:leaf-1',
       getPtyId: () => 'pty-1',
       getSettings: () => null,
-      inspectProcess: vi.fn(async () => processResult('codex')),
+      inspectProcess: vi.fn(async () => processResult('claude')),
       dispatchCompletion,
       isLive: () => true
     })
@@ -87,19 +87,19 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     coordinator.startProcessTracking()
     vi.advanceTimersByTime(2_000)
     await flushAsyncTicks()
-    coordinator.observeClassifiedTitleCompletion('codex done')
+    coordinator.observeClassifiedTitleCompletion('claude done')
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex')
+    expect(dispatchCompletion).toHaveBeenCalledWith('claude')
   })
 
   it('suppresses late process-exit backstop after process inspection follows hook completion', async () => {
-    let foregroundProcess: string | null = 'codex'
+    let foregroundProcess: string | null = 'claude'
     const dispatchCompletion = vi.fn()
     const coordinator = createAgentCompletionCoordinator({
       paneKey: 'tab-1:leaf-1',
@@ -113,7 +113,7 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     coordinator.startProcessTracking()
     vi.advanceTimersByTime(2_000)
@@ -123,7 +123,7 @@ describe('agent completion coordinator', () => {
     await flushAsyncTicks()
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
-    expect(dispatchCompletion).toHaveBeenCalledWith('codex')
+    expect(dispatchCompletion).toHaveBeenCalledWith('claude')
   })
 
   it('suppresses process-exit in another coordinator after a hook completion notified', async () => {
@@ -141,19 +141,19 @@ describe('agent completion coordinator', () => {
     hookCoordinator.observeHookStatus({
       state: 'working',
       prompt: 'say OK only',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     hookCoordinator.observeHookStatus({
       state: 'done',
       prompt: 'say OK only',
-      agentType: 'codex',
+      agentType: 'claude',
       stateStartedAt: 1_700_000_000_000
     })
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
-    let result = processResult('codex')
+    let result = processResult('claude')
     const processCoordinator = createAgentCompletionCoordinator({
       paneKey,
       getPtyId: () => 'pty-1',
@@ -175,7 +175,7 @@ describe('agent completion coordinator', () => {
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
-    result = processResult('codex')
+    result = processResult('claude')
     vi.advanceTimersByTime(2_000)
     await flushAsyncTicks()
     result = processResult('zsh', false)
@@ -205,14 +205,14 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
-    inspection.resolve(processResult('codex'))
+    inspection.resolve(processResult('claude'))
     await flushAsyncTicks()
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
 
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
@@ -232,26 +232,26 @@ describe('agent completion coordinator', () => {
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     coordinator.resetCompletionState({ requireFreshWorking: true })
-    coordinator.observeClassifiedTitleCompletion('codex done')
+    coordinator.observeClassifiedTitleCompletion('claude done')
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     expect(dispatchCompletion).toHaveBeenCalledTimes(1)
 
     coordinator.observeHookStatus({
       state: 'working',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     coordinator.observeHookStatus({
       state: 'done',
       prompt: '',
-      agentType: 'codex'
+      agentType: 'claude'
     })
     vi.advanceTimersByTime(HOOK_DONE_QUIET_MS)
 
@@ -273,7 +273,7 @@ describe('agent completion coordinator', () => {
     coordinator.startProcessTracking()
     vi.advanceTimersByTime(2_000)
     coordinator.resetCompletionState({ requireFreshWorking: true })
-    inspection.resolve(processResult('codex'))
+    inspection.resolve(processResult('claude'))
     await flushAsyncTicks()
     coordinator.observeTitle('⠋ experimental-agent-observability')
     coordinator.observeTitle('experimental-agent-observability')
@@ -304,11 +304,11 @@ describe('agent completion coordinator', () => {
     coordinator.resetCompletionState({ requireFreshWorking: true })
     coordinator.observeTitle('⠋ experimental-agent-observability')
     coordinator.observeTitle('experimental-agent-observability')
-    firstInspection.resolve(processResult('codex'))
+    firstInspection.resolve(processResult('claude'))
     await flushAsyncTicks()
     vi.advanceTimersByTime(2_000)
     await flushAsyncTicks()
-    secondInspection.resolve(processResult('codex'))
+    secondInspection.resolve(processResult('claude'))
     await flushAsyncTicks()
 
     expect(inspectProcess).toHaveBeenCalledTimes(2)

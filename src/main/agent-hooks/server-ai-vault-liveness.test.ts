@@ -13,14 +13,14 @@ function seedLocalIdentity(server: AgentHookServer): void {
     {
       paneKey: PANE,
       providerSession: PROVIDER_SESSION,
-      payload: { state: 'working', prompt: 'test', agentType: 'gemini' }
+      payload: { state: 'working', prompt: 'test', agentType: 'opencode' }
     },
     'seed-connection'
   )
   server.ingestTerminalStatus({
     paneKey: PANE,
     connectionId: null,
-    payload: { state: 'working', prompt: 'test', agentType: 'gemini' }
+    payload: { state: 'working', prompt: 'test', agentType: 'opencode' }
   })
 }
 

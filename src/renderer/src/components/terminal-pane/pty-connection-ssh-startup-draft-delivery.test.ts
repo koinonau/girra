@@ -175,14 +175,14 @@ describe('connectPanePty', () => {
     expect(transport.sendInput).not.toHaveBeenCalledWith("claude 'say test'\r")
   })
 
-  it('keeps the 8s fallback after a provider-owned non-Codex startup succeeds', async () => {
+  it('keeps the 8s fallback after a provider-owned OpenCode startup succeeds', async () => {
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
-    const transport = createMockTransport('pty-droid')
+    const transport = createMockTransport('pty-opencode')
     transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
       capturedDataCallback.current = callbacks.onData ?? null
-      return 'pty-ssh-droid'
+      return 'pty-ssh-opencode'
     })
     transportFactoryQueue.push(transport)
     mockStoreState = {
@@ -191,7 +191,7 @@ describe('connectPanePty', () => {
       repos: [{ id: 'repo1', connectionId: 'ssh-conn-1' }],
       sshConnectionStates: new Map([['ssh-conn-1', { status: 'connected' }]])
     }
-    vi.mocked(window.api.pty.getForegroundProcess).mockResolvedValue('droid')
+    vi.mocked(window.api.pty.getForegroundProcess).mockResolvedValue('opencode')
     const prompt = 'Review the linked work item'
 
     connectPanePty(
@@ -199,8 +199,8 @@ describe('connectPanePty', () => {
       createManager(1) as never,
       createDeps({
         startup: {
-          command: 'droid',
-          launchAgent: 'droid',
+          command: 'opencode',
+          launchAgent: 'opencode',
           launchConfig: { agentArgs: '', agentEnv: {} },
           launchToken: 'launch-token-ssh',
           draftPrompt: prompt
@@ -215,19 +215,19 @@ describe('connectPanePty', () => {
     await flushAsyncTicks()
 
     expect(createdTransportOptions[0]?.commandDelivery).toBe('provider')
-    expect(transport.sendInput).not.toHaveBeenCalledWith('droid\r')
+    expect(transport.sendInput).not.toHaveBeenCalledWith('opencode\r')
     expect(transport.sendInputAccepted).toHaveBeenCalledWith(`\x1b[200~${prompt}\x1b[201~`)
   })
 
-  it('waits past 8s for a cold Codex composer and preserves input ordering', async () => {
+  it('pastes on the OpenCode composer-ready signal and preserves input ordering', async () => {
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
 
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
       capturedDataCallback.current = callbacks.onData ?? null
-      return 'pty-codex'
+      return 'pty-opencode'
     })
     transportFactoryQueue.push(transport)
 
@@ -241,21 +241,21 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       startup: {
-        command: 'codex',
-        launchAgent: 'codex',
+        command: 'opencode',
+        launchAgent: 'opencode',
         launchConfig: { agentArgs: '', agentEnv: {} },
         launchToken: 'launch-token-1',
         draftPrompt: 'https://github.com/stablyai/orca/issues/42'
       }
     })
-    vi.mocked(window.api.pty.getForegroundProcess).mockResolvedValue('codex')
+    vi.mocked(window.api.pty.getForegroundProcess).mockResolvedValue('opencode')
 
     connectPanePty(pane as never, manager as never, deps as never)
     await vi.advanceTimersByTimeAsync(VISIBLE_PTY_SETTLE_MS)
     await flushAsyncTicks()
     expect(capturedDataCallback.current).not.toBeNull()
 
-    // A focused xterm emits CSI I after Codex enables focus reporting; the startup draft must reuse the same transport instead of racing a direct IPC.
+    // A focused xterm emits CSI I after the agent enables focus reporting; the startup draft must reuse the same transport instead of racing a direct IPC.
     ;(
       pane.terminal.onData as unknown as {
         mock: { calls: [(data: string) => void][] }
@@ -267,9 +267,9 @@ describe('connectPanePty', () => {
       }
     ).mock.calls[0]?.[0]('USER_DRAFT')
     ;(mockStoreState.recordTerminalInput as ReturnType<typeof vi.fn>).mockClear()
-    await vi.advanceTimersByTimeAsync(10_000)
+    await vi.advanceTimersByTimeAsync(1_000)
     expect(transport.sendInputAccepted).not.toHaveBeenCalled()
-    capturedDataCallback.current?.('\x1b[?2004h\x1b[2K› ')
+    capturedDataCallback.current?.('\x1b[?2004h\x1b[?25h')
     await flushAsyncTicks()
 
     expect(transport.sendInputAccepted).toHaveBeenCalledWith(
@@ -296,10 +296,10 @@ describe('connectPanePty', () => {
       return 1
     })
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
       capturedDataCallback.current = callbacks.onData ?? null
-      return 'pty-codex'
+      return 'pty-opencode'
     })
     transportFactoryQueue.push(transport)
 
@@ -313,8 +313,8 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const deps = createDeps({
       startup: {
-        command: 'wait-for-setup-then-codex',
-        launchAgent: 'codex',
+        command: 'wait-for-setup-then-opencode',
+        launchAgent: 'opencode',
         launchConfig: { agentArgs: '', agentEnv: {} },
         launchToken: 'launch-token-setup',
         draftPrompt: 'Linked Linear issue: STA-905'
@@ -343,7 +343,7 @@ describe('connectPanePty', () => {
     capturedDataCallback.current?.('\x1b[?2004hWaiting for setup to finish...')
     expect(transport.sendInputAccepted).not.toHaveBeenCalled()
 
-    capturedDataCallback.current?.('\x1b[?2004h\x1b[2K› ')
+    capturedDataCallback.current?.('\x1b[?25h')
     await flushAsyncTicks()
 
     expect(transport.sendInputAccepted).toHaveBeenCalledTimes(1)
@@ -355,7 +355,7 @@ describe('connectPanePty', () => {
   it('releases startup draft delivery when disposed before deferred connect starts', async () => {
     const { connectPanePty } = await import('./pty-connection')
     globalThis.requestAnimationFrame = vi.fn(() => 1)
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-opencode')
     transportFactoryQueue.push(transport)
 
     mockStoreState = {
@@ -369,8 +369,8 @@ describe('connectPanePty', () => {
       createManager(1) as never,
       createDeps({
         startup: {
-          command: 'codex',
-          launchAgent: 'codex',
+          command: 'opencode',
+          launchAgent: 'opencode',
           launchConfig: { agentArgs: '', agentEnv: {} },
           launchToken: 'launch-token-1',
           draftPrompt: 'https://github.com/stablyai/orca/issues/42'
@@ -425,7 +425,7 @@ describe('connectPanePty', () => {
       const manager = createManager(1)
       const deps = createDeps({
         startup: {
-          command: "codex 'linked issue context'",
+          command: "claude 'linked issue context'",
           startupCommandDelivery: 'shell-ready'
         }
       })
@@ -442,7 +442,7 @@ describe('connectPanePty', () => {
       }
 
       expect(createdTransportOptions[0]?.commandDelivery).toBe('provider')
-      expect(transport.sendInput).not.toHaveBeenCalledWith("codex 'linked issue context'\r")
+      expect(transport.sendInput).not.toHaveBeenCalledWith("claude 'linked issue context'\r")
     } finally {
       globalThis.setTimeout = originalSetTimeout
     }
@@ -483,7 +483,7 @@ describe('connectPanePty', () => {
       const manager = createManager(1)
       const deps = createDeps({
         startup: {
-          command: "codex 'linked issue context'",
+          command: "claude 'linked issue context'",
           startupCommandDelivery: 'shell-ready'
         }
       })
@@ -501,13 +501,13 @@ describe('connectPanePty', () => {
       }
 
       expect(createdTransportOptions[0]?.commandDelivery).toBe('provider')
-      expect(transport.sendInput).not.toHaveBeenCalledWith("codex 'linked issue context'\r")
+      expect(transport.sendInput).not.toHaveBeenCalledWith("claude 'linked issue context'\r")
     } finally {
       globalThis.setTimeout = originalSetTimeout
     }
   })
 
-  it('uses provider delivery for SSH Codex native prefill commands without an explicit hint', async () => {
+  it('uses provider delivery for SSH Claude native prefill commands without an explicit hint', async () => {
     const pendingTimeouts: (() => void)[] = []
     const originalSetTimeout = globalThis.setTimeout
     globalThis.setTimeout = vi.fn((fn: () => void) => {
@@ -540,7 +540,7 @@ describe('connectPanePty', () => {
       const pane = createPane(1)
       const manager = createManager(1)
       const deps = createDeps({
-        startup: { command: "codex --prefill 'linked issue context'" }
+        startup: { command: "claude --prefill 'linked issue context'" }
       })
 
       connectPanePty(pane as never, manager as never, deps as never)
@@ -557,7 +557,7 @@ describe('connectPanePty', () => {
 
       expect(createdTransportOptions[0]?.commandDelivery).toBe('provider')
       expect(transport.sendInput).not.toHaveBeenCalledWith(
-        "codex --prefill 'linked issue context'\r"
+        "claude --prefill 'linked issue context'\r"
       )
     } finally {
       globalThis.setTimeout = originalSetTimeout
@@ -601,7 +601,7 @@ describe('connectPanePty', () => {
         startup: {
           command: wrapperCommand,
           env: {
-            [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "codex --prefill 'linked issue context'"
+            [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "claude --prefill 'linked issue context'"
           }
         }
       })

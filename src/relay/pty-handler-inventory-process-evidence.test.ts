@@ -149,12 +149,12 @@ describe('PtyHandler inventory foreground evidence', () => {
   })
 
   it('names each pane from the batched capture', async () => {
-    const rows = [...paneRows(1000, ['node /opt/codex']), ...paneRows(2000, ['vim notes.txt'])]
+    const rows = [...paneRows(1000, ['node /opt/opencode']), ...paneRows(2000, ['vim notes.txt'])]
     mockGetStrictProcessTableSnapshot.mockResolvedValue(rows)
     await spawnPane(1000, 'zsh')
     await spawnPane(2000, 'vim')
 
-    expect((await listProcesses()).map((entry) => entry.title)).toEqual(['codex', 'vim'])
+    expect((await listProcesses()).map((entry) => entry.title)).toEqual(['opencode', 'vim'])
   })
 
   it('keeps the node-pty name when the capture cannot disambiguate a wrapper', async () => {
@@ -178,7 +178,7 @@ describe('PtyHandler inventory foreground evidence', () => {
     'walks the host table a fixed number of times for %s panes',
     async (paneCount) => {
       const table = Array.from({ length: paneCount }, (_, index) =>
-        paneRows(10_000 + index * 10, ['node /opt/codex'])
+        paneRows(10_000 + index * 10, ['node /opt/opencode'])
       ).flat()
       const { rows, reads } = countingRows(table)
       mockGetStrictProcessTableSnapshot.mockResolvedValue(rows)
@@ -189,7 +189,7 @@ describe('PtyHandler inventory foreground evidence', () => {
       const listed = await listProcesses()
 
       expect(listed).toHaveLength(paneCount)
-      expect(listed.every((entry) => entry.title === 'codex')).toBe(true)
+      expect(listed.every((entry) => entry.title === 'opencode')).toBe(true)
       expect(mockGetStrictProcessTableSnapshot).toHaveBeenCalledTimes(1)
       // Linear in the capture — NOT one full-table walk per pane, which would be
       // `table.length * paneCount` here.
@@ -226,7 +226,7 @@ describe('PtyHandler inventory foreground evidence', () => {
         tty: '/dev/pts/9',
         startTime: 'candidate-start',
         stat: 'S+',
-        command: 'node /opt/codex'
+        command: 'node /opt/opencode'
       }
     ])
     const inspection = await dispatcher.callRequest('pty.inspectProcess', {
@@ -235,7 +235,7 @@ describe('PtyHandler inventory foreground evidence', () => {
     })
 
     expect(inspection).toMatchObject({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       foregroundProcessEvidence: {
         verdict: 'live',
         ptyId: spawned.id,

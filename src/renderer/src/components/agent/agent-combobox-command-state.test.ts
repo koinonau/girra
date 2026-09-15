@@ -8,38 +8,38 @@ import {
 describe('agent combobox command state', () => {
   it('resets command highlight when the active query candidate changes while open', () => {
     const state = updateAgentComboboxCommandValue(
-      createAgentComboboxCommandState('codex'),
+      createAgentComboboxCommandState('opencode'),
       'claude'
     )
 
-    expect(resolveAgentComboboxCommandState(state, true, 'gemini')).toEqual({
-      commandValue: 'gemini',
-      activeCommandValue: 'gemini'
+    expect(resolveAgentComboboxCommandState(state, true, 'pi')).toEqual({
+      commandValue: 'pi',
+      activeCommandValue: 'pi'
     })
   })
 
   it('preserves hover selection while the active query candidate is unchanged', () => {
     const state = updateAgentComboboxCommandValue(
-      createAgentComboboxCommandState('codex'),
+      createAgentComboboxCommandState('opencode'),
       'claude'
     )
 
-    expect(resolveAgentComboboxCommandState(state, true, 'codex')).toBe(state)
+    expect(resolveAgentComboboxCommandState(state, true, 'opencode')).toBe(state)
   })
 
   it('does not repair command highlight while the popover is closed', () => {
     const state = updateAgentComboboxCommandValue(
-      createAgentComboboxCommandState('codex'),
+      createAgentComboboxCommandState('opencode'),
       'claude'
     )
 
-    expect(resolveAgentComboboxCommandState(state, false, 'gemini')).toBe(state)
+    expect(resolveAgentComboboxCommandState(state, false, 'pi')).toBe(state)
   })
 
   it('reuses the same object when command value is unchanged', () => {
-    const state = createAgentComboboxCommandState('codex')
+    const state = createAgentComboboxCommandState('opencode')
 
-    expect(updateAgentComboboxCommandValue(state, 'codex')).toBe(state)
-    expect(resolveAgentComboboxCommandState(state, true, 'codex')).toBe(state)
+    expect(updateAgentComboboxCommandValue(state, 'opencode')).toBe(state)
+    expect(resolveAgentComboboxCommandState(state, true, 'opencode')).toBe(state)
   })
 })

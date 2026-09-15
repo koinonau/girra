@@ -96,7 +96,7 @@ export type ClaudeChildTreeReaper = {
 }
 
 /**
- * The same shared primitives the Codex structured provider composes: a raw
+ * Composed from the shared tree-kill primitives: a raw
  * pipe child owns no PTY job, so there is nothing for the PTY job sweep to
  * terminate on Windows and no unref'd timer is allowed to outlive the proof.
  *
@@ -304,7 +304,7 @@ export function createClaudeChildTreeReaper(
       return 'exited'
     }
     // Why the root is killed while verification is already running, and never
-    // SIGSTOPped first the way the Codex non-group path does: measured on macOS, a
+    // SIGSTOPped first: measured on macOS, a
     // killed child of a stopped parent stays a zombie row in ps with its lstart
     // and pgid intact, so verification cannot pass until the root is dead. The
     // descendants are signalled by the verifier as soon as it revalidates their

@@ -311,8 +311,7 @@ export async function observeSkillPackage(
  *
  * `officialPaths` is what the CURRENT bundle says this skill owns, and it is what
  * separates a tolerable neighbour from drift. Agent CLIs drop their own metadata
- * beside an official SKILL.md (Codex writes `agents/openai.yaml` and cannot put it
- * anywhere else), and a file no revision claims is not evidence the user edited
+ * beside an official SKILL.md (for example `agents/openai.yaml`), and a file no revision claims is not evidence the user edited
  * anything — so extras alone must not mark the package unrecognized.
  *
  * A file the current bundle DOES list is never an extra, even when the revision

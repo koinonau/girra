@@ -112,7 +112,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-1',
       leafId: 'pane:1',
-      launchAgent: 'codex',
+      launchAgent: 'opencode',
       resumeProviderSession: { key: 'session_id', id: 'live-session' }
     })
 
@@ -162,7 +162,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       worktreeId: 'wt-1',
       tabId: 'provisional-tab',
       leafId: 'provisional-leaf',
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
 
     const connect = transport.connect({ url: '', callbacks: {} })
@@ -247,8 +247,8 @@ describe('createRemoteRuntimePtyTransport', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-1',
       leafId: 'pane:1',
-      command: "codex 'linked issue context'",
-      envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+      command: "claude 'linked issue context'",
+      envToDelete: ['CLAUDE_CONFIG_DIR', 'ORCA_CLAUDE_CONFIG_DIR'],
       startupCommandDelivery: 'shell-ready',
       terminalColorQueryReplies: { foreground: '#ffffff', background: '#282c34' }
     })
@@ -260,8 +260,8 @@ describe('createRemoteRuntimePtyTransport', () => {
         selector: 'env-1',
         method: 'terminal.create',
         params: expect.objectContaining({
-          command: "codex 'linked issue context'",
-          envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME'],
+          command: "claude 'linked issue context'",
+          envToDelete: ['CLAUDE_CONFIG_DIR', 'ORCA_CLAUDE_CONFIG_DIR'],
           startupCommandDelivery: 'shell-ready',
           terminalColorQueryReplies: { foreground: '#ffffff', background: '#282c34' }
         })
@@ -287,20 +287,20 @@ describe('createRemoteRuntimePtyTransport', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-1',
       leafId: 'pane:1',
-      command: "codex 'old'",
+      command: "opencode 'old'",
       launchConfig: { agentArgs: '--old', agentEnv: {} },
       agentArgsOverride: '--profile captured',
       launchToken: 'old-token',
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
 
     await transport.connect({
       url: '',
-      command: "codex '--model' 'gpt-5' 'resume' 'session-1'",
-      env: { CODEX_PROFILE: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
+      command: "claude '--model' 'sonnet' '--resume' 'session-1'",
+      env: { CLAUDE_CONFIG_DIR: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
       launchConfig: {
-        agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentArgs: '--model sonnet',
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       launchToken: 'fresh-token',
       launchAgent: 'claude',
@@ -361,7 +361,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       worktreeId: 'wt-1',
       tabId: 'provisional-tab',
       leafId: 'provisional-leaf',
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
 
     await transport.connect({ url: '', callbacks: {} })
@@ -401,22 +401,22 @@ describe('createRemoteRuntimePtyTransport', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-1',
       leafId: 'pane:1',
-      command: "codex 'old'",
+      command: "opencode 'old'",
       launchConfig: { agentArgs: '--old', agentEnv: {} },
       launchToken: 'old-token',
-      launchAgent: 'codex'
+      launchAgent: 'opencode'
     })
 
     await transport.connect({
       url: '',
-      command: "codex '--model' 'gpt-5' 'resume' 'session-1'",
-      env: { CODEX_PROFILE: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
+      command: "claude '--model' 'sonnet' '--resume' 'session-1'",
+      env: { CLAUDE_CONFIG_DIR: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
       launchConfig: {
-        agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentArgs: '--model sonnet',
+        agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
       },
       launchToken: 'fresh-token',
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       callbacks: {}
     })
 
@@ -426,14 +426,14 @@ describe('createRemoteRuntimePtyTransport', () => {
       params: {
         worktree: 'id:wt-1',
         clientMutationId: expect.any(String),
-        command: "codex '--model' 'gpt-5' 'resume' 'session-1'",
-        env: { CODEX_PROFILE: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
+        command: "claude '--model' 'sonnet' '--resume' 'session-1'",
+        env: { CLAUDE_CONFIG_DIR: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
         launchConfig: {
-          agentArgs: '--model gpt-5',
-          agentEnv: { CODEX_PROFILE: 'captured' }
+          agentArgs: '--model sonnet',
+          agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
         },
         launchToken: 'fresh-token',
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         tabId: 'tab-1',
         leafId: 'pane:1',
         focus: false,

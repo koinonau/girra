@@ -44,7 +44,7 @@ function providerFrame(id: string, sequence: number): AgentJournalRenderItem {
       kind: 'status',
       text: id,
       providerFrame: {
-        provider: 'codex',
+        provider: 'claude',
         kind: 'notification:item/commandExecution/outputDelta',
         payload: { head: id, byteLength: id.length, digest: id, truncated: false }
       }

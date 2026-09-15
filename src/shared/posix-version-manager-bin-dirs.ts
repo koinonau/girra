@@ -4,7 +4,7 @@
  * The guest-side twin of `detectCommandsInInstallDirs`, which the native
  * preflight branch already consults for the same reason -- "PATH may still be
  * unhydrated on a cold GUI launch". Without it, a WSL probe that cannot
- * establish the login PATH reports an nvm-installed claude/codex as not
+ * establish the login PATH reports an nvm-installed claude/opencode as not
  * installed, which is #9725.
  *
  * Kept in step with `getBaseVersionManagerDirectories` in

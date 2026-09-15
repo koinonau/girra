@@ -29,7 +29,7 @@ function revealSplitPaneFromMobile(harness: {
     tabId: 'tab-split',
     leafId: 'leaf-b',
     presentation: 'focused',
-    title: 'codex'
+    title: 'opencode'
   })
 }
 
@@ -38,7 +38,7 @@ describe('mobile terminal reveal tab adoption', () => {
     // Desktop has the worktree closed: no pane is mounted, so the live pty map is
     // empty and only the persisted layout still records the second leaf's pty.
     const storeState: HarnessStoreState = createHarnessStoreState({
-      tabsByWorktree: { [WORKTREE_ID]: [{ id: 'tab-split', ptyId: 'pty-a', title: 'codex' }] },
+      tabsByWorktree: { [WORKTREE_ID]: [{ id: 'tab-split', ptyId: 'pty-a', title: 'opencode' }] },
       ptyIdsByTabId: {},
       terminalLayoutsByTabId: {
         'tab-split': { ptyIdsByLeafId: { 'leaf-a': 'pty-a', 'leaf-b': 'pty-b' } }
@@ -53,7 +53,7 @@ describe('mobile terminal reveal tab adoption', () => {
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-split',
-      title: 'codex',
+      title: 'opencode',
       identity: revealIdentity('tab-split')
     })
   })
@@ -62,7 +62,7 @@ describe('mobile terminal reveal tab adoption', () => {
     // Same reveal, but layout hydration has not landed either; the pre-minted
     // tabId hint is the PTY's baked-in pane key and must still be honoured.
     const storeState: HarnessStoreState = createHarnessStoreState({
-      tabsByWorktree: { [WORKTREE_ID]: [{ id: 'tab-split', ptyId: 'pty-a', title: 'codex' }] },
+      tabsByWorktree: { [WORKTREE_ID]: [{ id: 'tab-split', ptyId: 'pty-a', title: 'opencode' }] },
       ptyIdsByTabId: { 'tab-split': ['pty-a'] },
       terminalLayoutsByTabId: {}
     })
@@ -75,7 +75,7 @@ describe('mobile terminal reveal tab adoption', () => {
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-split',
-      title: 'codex',
+      title: 'opencode',
       identity: revealIdentity('tab-split')
     })
   })
@@ -87,7 +87,7 @@ describe('mobile terminal reveal tab adoption', () => {
       tabsByWorktree: {
         [WORKTREE_ID]: [
           { id: 'tab-detached', ptyId: null, title: 'Terminal 1' },
-          { id: 'tab-split', ptyId: 'pty-a', title: 'codex' }
+          { id: 'tab-split', ptyId: 'pty-a', title: 'opencode' }
         ]
       },
       ptyIdsByTabId: { 'tab-split': ['pty-a'] },
@@ -105,14 +105,14 @@ describe('mobile terminal reveal tab adoption', () => {
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-detached',
-      title: 'codex',
+      title: 'opencode',
       identity: revealIdentity('tab-detached')
     })
   })
 
   it('adopts through the persisted layout when the PTY carries no tab id', async () => {
     const storeState: HarnessStoreState = createHarnessStoreState({
-      tabsByWorktree: { [WORKTREE_ID]: [{ id: 'tab-split', ptyId: 'pty-a', title: 'codex' }] },
+      tabsByWorktree: { [WORKTREE_ID]: [{ id: 'tab-split', ptyId: 'pty-a', title: 'opencode' }] },
       ptyIdsByTabId: {},
       terminalLayoutsByTabId: {
         'tab-split': { ptyIdsByLeafId: { 'leaf-a': 'pty-a', 'leaf-b': 'pty-b' } }
@@ -127,14 +127,14 @@ describe('mobile terminal reveal tab adoption', () => {
       ptyId: 'pty-b',
       leafId: 'leaf-b',
       presentation: 'focused',
-      title: 'codex'
+      title: 'opencode'
     })
 
     expect(storeState.createTab).not.toHaveBeenCalled()
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-split',
-      title: 'codex'
+      title: 'opencode'
     })
   })
 
@@ -144,7 +144,7 @@ describe('mobile terminal reveal tab adoption', () => {
       tabsByWorktree: {
         [WORKTREE_ID]: [
           { id: 'tab-stale', ptyId: null, title: 'Terminal 1' },
-          { id: 'tab-live', ptyId: null, title: 'codex' }
+          { id: 'tab-live', ptyId: null, title: 'opencode' }
         ]
       },
       ptyIdsByTabId: { 'tab-live': ['pty-b'] },
@@ -159,14 +159,14 @@ describe('mobile terminal reveal tab adoption', () => {
       ptyId: 'pty-b',
       leafId: 'leaf-b',
       presentation: 'focused',
-      title: 'codex'
+      title: 'opencode'
     })
 
     expect(storeState.createTab).not.toHaveBeenCalled()
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-live',
-      title: 'codex'
+      title: 'opencode'
     })
   })
 
@@ -176,7 +176,7 @@ describe('mobile terminal reveal tab adoption', () => {
     const storeState: HarnessStoreState = createHarnessStoreState({
       tabsByWorktree: {
         [WORKTREE_ID]: [
-          { id: 'tab-split', ptyId: null, title: 'codex' },
+          { id: 'tab-split', ptyId: null, title: 'opencode' },
           { id: 'tab-detached', ptyId: null, title: 'Terminal 2' }
         ]
       },
@@ -206,7 +206,7 @@ describe('mobile terminal reveal tab adoption', () => {
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-detached',
-      title: 'codex',
+      title: 'opencode',
       identity: revealIdentity('tab-detached')
     })
   })
@@ -233,13 +233,13 @@ describe('mobile terminal reveal tab adoption', () => {
       ptyId: 'pty-b',
       leafId: 'leaf-b',
       presentation: 'focused',
-      title: 'codex'
+      title: 'opencode'
     })
 
     expect(harness.replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'mobile-reveal',
       tabId: 'tab-minted',
-      title: 'codex'
+      title: 'opencode'
     })
   })
 })

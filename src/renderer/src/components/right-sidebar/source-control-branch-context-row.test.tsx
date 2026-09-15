@@ -302,7 +302,7 @@ describe('SourceControlBranchContextRow branch line total', () => {
         compareBaseRef={null}
         headDisplay={{
           kind: 'branch',
-          branchName: 'refactor-remove-legacy-gemini-cli-current-model-plumbing'
+          branchName: 'refactor-remove-legacy-claude-cli-current-model-plumbing'
         }}
         branchLineTotal={{ added: 16, removed: 1541, mergeBase: 'base' }}
         onChangeBaseRef={vi.fn()}

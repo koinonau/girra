@@ -289,42 +289,10 @@
     "lib": {
       "agent": {
         "catalog": {
-          "5dff448636": "OpenClaw",
-          "8a9ba743cc": "Hermes",
-          "4e63c7b956": "Rovo Dev",
-          "bee242fe3d": "Qwen Code",
-          "ca73055bd0": "Mistral Vibe",
-          "28810273af": "Kimi",
-          "739a930554": "Droid",
-          "667c104cff": "Cursor",
-          "9e2a9bb87b": "Continue",
-          "6f8056a565": "Command Code",
-          "4238b771b5": "Codebuff",
-          "cbaf0c2e0b": "Cline",
-          "1f8a19e9ad": "Autohand Code",
-          "5e8eff11b3": "Auggie",
-          "9477377a2a": "Charm",
-          "e0247254f2": "Kiro",
-          "918ba4ffed": "Kilocode",
-          "c73c573939": "Amp",
-          "8da11d876c": "Goose",
-          "b32627f09b": "Aider",
-          "691dd11789": "Antigravity",
-          "12e6baa4f7": "Gemini",
-          "09973b4d84": "OMP",
           "302934c5d9": "Pi",
           "e7a4ca5103": "OpenCode",
-          "706b0fe68b": "GitHub Copilot",
-          "0baad2d5d2": "Grok",
-          "760bc6883d": "Codex",
-          "a5fc0cb622": "OpenClaude",
           "bf53f09bf8": "Claude Agent Teams",
-          "0708ed89f1": "Claude",
-          "fc80296033": "Devin",
-          "da41abbdd4": "Ante",
-          "060d152fb5": "Trae",
-          "d443a47995": "Prime Agent",
-          "mimo_code_label": "MiMo Code"
+          "0708ed89f1": "Claude"
         },
         "skill": {
           "cli": {
@@ -2646,7 +2614,7 @@
               "blocked": {
                 "toast": {
                   "97c98f1afe": "打开设置",
-                  "7cf51f74fd": "在终端设置中启用 TUI 剪贴板写入，以从 SSH、Zellij、tmux、Neovim、fzf 或 Grok 进行复制。",
+                  "7cf51f74fd": "在终端设置中启用 TUI 剪贴板写入，以从 SSH、Zellij、tmux、Neovim 或 fzf 进行复制。",
                   "89eaa3e80b": "终端剪贴板写入被阻止"
                 }
               },
@@ -5442,7 +5410,7 @@
           "1188e56af4": "复制示例提示",
           "b84807f228": "”",
           "59722f31b4": "”",
-          "c5325e91f6": "将其中任何内容粘贴到 Claude Code、Codex 或安装该技能的项目中的其他智能体中。",
+          "c5325e91f6": "将其中任何内容粘贴到 Claude Code、OpenCode 或安装该技能的项目中的其他智能体中。",
           "2a180694f7": "尝试一下 - 示例提示",
           "5ec620ccc4": "复制失败。",
           "a602d43069": "复制{{value0}}。"
@@ -6035,7 +6003,7 @@
           "c12b253997": "复制示例提示",
           "d151e25078": "”",
           "b525ff2b12": "”",
-          "4daa95f25a": "将其中任何内容粘贴到安装了 Orca CLI 技能的项目中的 Claude Code、Codex 或其他智能体中。",
+          "4daa95f25a": "将其中任何内容粘贴到安装了 Orca CLI 技能的项目中的 Claude Code、OpenCode 或其他智能体中。",
           "0820b3f84f": "尝试一下 - 示例提示",
           "1f608e7d60": "复制提示失败。",
           "2b077b5544": "已复制提示。"
@@ -7023,9 +6991,9 @@
           "d23b43c5be": "安装脚本位置",
           "34a0dfa06e": "创建新工作区时运行存储库设置脚本的位置。",
           "21f8da2078": "工作区设置脚本",
-          "6e6480a7df": "让终端中的程序（Zellij、tmux、Neovim、fzf、Grok、SSH）复制到系统剪贴板。",
+          "6e6480a7df": "让终端中的程序（Zellij、tmux、Neovim、fzf、SSH）复制到系统剪贴板。",
           "3338dcf8c1": "允许 TUI 剪贴板写入 (OSC 52)",
-          "69c64a479c": "让 Zellij、tmux、Neovim、fzf 和 Grok 通过 PTY（包括通过 SSH）复制到系统剪贴板。",
+          "69c64a479c": "让 Zellij、tmux、Neovim 和 fzf 通过 PTY（包括通过 SSH）复制到系统剪贴板。",
           "4729c645fc": "自动将终端选择复制到剪贴板。",
           "902f5dee1f": "选择时复制",
           "9129b7e805": "将鼠标悬停在终端窗格上即可将其激活，无需单击。",
@@ -7625,7 +7593,6 @@
                 "3c4e5e5938": "操作方案",
                 "ee14a9e9f7": "已启用",
                 "82109d627d": "源代码控制",
-                "542e1a00a7": "codex",
                 "f121bec167": "claude",
                 "93e5210da8": "信息",
                 "c33cb1b982": "AI",
@@ -7798,16 +7765,8 @@
             "e4fb4516d0": "星星",
             "e0b8c8bc25": "点赞 GitHub star 支持该项目（通过 gh CLI ",
             "36a72f0d9e": "GitHub 上的 Star Orca",
-            "c61b14be7c": "grok",
-            "5d9ba08673": "copilot",
-            "f472e97440": "助手",
-            "3c30fe2d51": "gemini",
-            "5fdf1dc2d1": "奥普",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
-            "27d9b996ba": "codex",
-            "5baf51c4d9": "打开 Claude",
-            "aea7d2cccb": "openclaude",
             "95b63edde7": "claude",
             "41c2f9a025": "默认",
             "8ea37a05bc": "智能体",
@@ -8166,7 +8125,6 @@
             "f5d39af41e": "儿童特工",
             "c766a01978": "不可触摸",
             "08c65b12a2": "例子",
-            "f278fd04db": "codex",
             "32c5098e7b": "claude",
             "21c28ccdf7": "协调员",
             "741dfc03fa": "工人",
@@ -12785,6 +12743,11 @@
               "cc71e252ba": "每{{day}} {{time}}",
               "ba20c92073": "自定义日程",
               "086a5a9fe2": "无效日程"
+            }
+          },
+          "draft": {
+            "model": {
+              "agentUnavailable": "智能体已不可用"
             }
           }
         },

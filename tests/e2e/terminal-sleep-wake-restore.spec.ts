@@ -152,7 +152,7 @@ function richSleepWakePayload(runId: string): string {
     '├────────────┬───────────────┬───────────────┤',
     '│ agent      │ status        │ output        │',
     '├────────────┼───────────────┼───────────────┤',
-    `│ codex-${shortId.slice(0, 4)} │ thinking      │ box/table ok  │`,
+    `│ claude-${shortId.slice(0, 3)} │ thinking      │ box/table ok  │`,
     '│ opencode   │ streaming     │ unicode ✓     │',
     '│ shell      │ idle          │ prompt ready  │',
     '╰────────────┴───────────────┴───────────────╯',

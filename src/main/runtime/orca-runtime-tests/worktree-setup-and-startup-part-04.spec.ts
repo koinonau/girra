@@ -32,20 +32,20 @@ describe('OrcaRuntimeService', () => {
       }
     }
     const runtime = new OrcaRuntimeService(runtimeStore as never)
-    const spawn = vi.fn().mockResolvedValue({ id: 'pty-cli-aider-startup' })
+    const spawn = vi.fn().mockResolvedValue({ id: 'pty-cli-agent-teams-startup' })
     const write = vi.fn().mockReturnValue(true)
     runtime.setPtyController({
       spawn,
       write,
       kill: () => true,
-      getForegroundProcess: async () => 'aider'
+      getForegroundProcess: async () => 'claude'
     })
     runtime.setNotifier({
       worktreesChanged: vi.fn(),
       reposChanged: vi.fn(),
       activateWorktree: vi.fn(),
       createTerminal: vi.fn(),
-      revealTerminalSession: vi.fn().mockResolvedValue({ tabId: 'tab-cli-aider-startup' }),
+      revealTerminalSession: vi.fn().mockResolvedValue({ tabId: 'tab-cli-agent-teams-startup' }),
       splitTerminal: vi.fn(),
       renameTerminal: vi.fn(),
       focusTerminal: vi.fn(),
@@ -56,13 +56,13 @@ describe('OrcaRuntimeService', () => {
     })
     runtime.attachWindow(1)
 
-    computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-cli-aider-startup')
-    ensurePathWithinWorkspaceMock.mockReturnValue('/tmp/workspaces/runtime-cli-aider-startup')
+    computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-cli-agent-teams-startup')
+    ensurePathWithinWorkspaceMock.mockReturnValue('/tmp/workspaces/runtime-cli-agent-teams-startup')
     vi.mocked(listWorktrees).mockResolvedValue([
       {
-        path: '/tmp/workspaces/runtime-cli-aider-startup',
+        path: '/tmp/workspaces/runtime-cli-agent-teams-startup',
         head: 'def',
-        branch: 'runtime-cli-aider-startup',
+        branch: 'runtime-cli-agent-teams-startup',
         isBare: false,
         isMainWorktree: false
       }
@@ -70,20 +70,20 @@ describe('OrcaRuntimeService', () => {
 
     const result = await runtime.createManagedWorktree({
       repoSelector: TEST_REPO_ID,
-      name: 'runtime-cli-aider-startup',
-      startupAgent: 'aider',
+      name: 'runtime-cli-agent-teams-startup',
+      startupAgent: 'claude-agent-teams',
       startupPrompt: 'fix it'
     })
 
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
-        cwd: '/tmp/workspaces/runtime-cli-aider-startup',
-        command: "aider '--yes-always'",
+        cwd: '/tmp/workspaces/runtime-cli-agent-teams-startup',
+        command: expect.stringContaining("claude-teams '--dangerously-skip-permissions'"),
         worktreeId: result.worktree.id
       })
     )
     await vi.waitFor(() => {
-      expect(write).toHaveBeenCalledWith('pty-cli-aider-startup', 'fix it\r')
+      expect(write).toHaveBeenCalledWith('pty-cli-agent-teams-startup', 'fix it\r')
     })
   })
 
@@ -107,7 +107,7 @@ describe('OrcaRuntimeService', () => {
       const runtime = new OrcaRuntimeService(runtimeStore as never)
       const write = vi.fn().mockReturnValue(true)
       runtime.setPtyController({
-        spawn: vi.fn().mockResolvedValue({ id: 'pty-cli-aider-shell' }),
+        spawn: vi.fn().mockResolvedValue({ id: 'pty-cli-agent-teams-shell' }),
         write,
         kill: () => true,
         getForegroundProcess: async () => 'zsh',
@@ -118,7 +118,7 @@ describe('OrcaRuntimeService', () => {
         reposChanged: vi.fn(),
         activateWorktree: vi.fn(),
         createTerminal: vi.fn(),
-        revealTerminalSession: vi.fn().mockResolvedValue({ tabId: 'tab-cli-aider-shell' }),
+        revealTerminalSession: vi.fn().mockResolvedValue({ tabId: 'tab-cli-agent-teams-shell' }),
         splitTerminal: vi.fn(),
         renameTerminal: vi.fn(),
         focusTerminal: vi.fn(),
@@ -129,13 +129,13 @@ describe('OrcaRuntimeService', () => {
       })
       runtime.attachWindow(1)
 
-      computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-cli-aider-shell')
-      ensurePathWithinWorkspaceMock.mockReturnValue('/tmp/workspaces/runtime-cli-aider-shell')
+      computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-cli-agent-teams-shell')
+      ensurePathWithinWorkspaceMock.mockReturnValue('/tmp/workspaces/runtime-cli-agent-teams-shell')
       vi.mocked(listWorktrees).mockResolvedValue([
         {
-          path: '/tmp/workspaces/runtime-cli-aider-shell',
+          path: '/tmp/workspaces/runtime-cli-agent-teams-shell',
           head: 'def',
-          branch: 'runtime-cli-aider-shell',
+          branch: 'runtime-cli-agent-teams-shell',
           isBare: false,
           isMainWorktree: false
         }
@@ -143,8 +143,8 @@ describe('OrcaRuntimeService', () => {
 
       await runtime.createManagedWorktree({
         repoSelector: TEST_REPO_ID,
-        name: 'runtime-cli-aider-shell',
-        startupAgent: 'aider',
+        name: 'runtime-cli-agent-teams-shell',
+        startupAgent: 'claude-agent-teams',
         startupPrompt: 'fix it'
       })
 
@@ -163,8 +163,8 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        defaultTuiAgent: 'codex' as const,
-        disabledTuiAgents: ['codex' as const],
+        defaultTuiAgent: 'opencode' as const,
+        disabledTuiAgents: ['opencode' as const],
         agentCmdOverrides: {}
       }),
       getAllWorktreeMeta: () => metaById,
@@ -214,7 +214,7 @@ describe('OrcaRuntimeService', () => {
       repoSelector: TEST_REPO_ID,
       name: 'runtime-fallback-draft',
       startupDraft: 'https://github.com/stablyai/orca/issues/456',
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       activate: true
     })
 
@@ -235,7 +235,7 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        defaultTuiAgent: 'codex' as const,
+        defaultTuiAgent: 'claude' as const,
         setupScriptLaunchMode: 'split-vertical' as const
       }),
       getAllWorktreeMeta: () => metaById,
@@ -314,7 +314,7 @@ describe('OrcaRuntimeService', () => {
       expect.objectContaining({
         cwd: '/tmp/workspaces/runtime-startup-setup-split',
         env: expect.objectContaining({
-          [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: expect.stringContaining('codex')
+          [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: expect.stringContaining('claude')
         }),
         worktreeId: result.worktree.id
       })
@@ -343,7 +343,7 @@ describe('OrcaRuntimeService', () => {
     expect(nonceMatch?.[1]).toBeTruthy()
     const markerPath = `/tmp/repo/.git/orca/setup-runner.sh.${nonceMatch![1]}.done`
     expect(startupCommand.length).toBeLessThan(256)
-    expect(startupScript).toContain('--dangerously-bypass-approvals-and-sandbox')
+    expect(startupScript).toContain('--dangerously-skip-permissions')
     expect(setupCommand).toContain('printf')
     expect(setupCommand).toContain(`${nonceMatch![1]} "$status"`)
     expect(startupScript).toContain(markerPath)
@@ -509,7 +509,7 @@ describe('OrcaRuntimeService', () => {
       repoSelector: 'id:repo-1',
       name: 'runtime-explicit-draft',
       startupDraft: draftUrl,
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       activate: true
     })
 
@@ -518,20 +518,20 @@ describe('OrcaRuntimeService', () => {
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
         cwd: '/tmp/workspaces/runtime-explicit-draft',
-        command: "codex '--dangerously-bypass-approvals-and-sandbox'",
+        command: 'opencode',
         worktreeId: result.worktree.id
       })
     )
-    expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'codex' })
+    expect(metaById[result.worktree.id]).toMatchObject({ createdWithAgent: 'opencode' })
 
-    runtime.onPtyData('pty-explicit-draft', '\x1b[?2004h›', Date.now())
+    runtime.onPtyData('pty-explicit-draft', '\x1b[?2004h\x1b[?25h', Date.now())
     await vi.waitFor(() => {
       expect(write).toHaveBeenCalledWith('pty-explicit-draft', `\x1b[200~${draftUrl}\x1b[201~`)
     })
   })
 
   it('does not auto-launch an agent for startup drafts when the default is blank', async () => {
-    detectInstalledAgentsWithShellPathHydrationMock.mockResolvedValue(['claude', 'codex'])
+    detectInstalledAgentsWithShellPathHydrationMock.mockResolvedValue(['claude', 'opencode'])
     const metaById: Record<string, WorktreeMeta> = {}
     const runtimeStore = {
       ...store,

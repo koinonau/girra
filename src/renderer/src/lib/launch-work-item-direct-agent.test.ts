@@ -16,24 +16,24 @@ import {
 import type { AgentStartupPlan } from './tui-agent-startup'
 
 describe('buildDirectWorkItemStartupOpts', () => {
-  it('preserves Codex startup command delivery for linked work-item launches', () => {
+  it('preserves startup command delivery for linked work-item launches', () => {
     const plan: AgentStartupPlan = {
-      agent: 'codex',
-      launchCommand: "codex 'review linked issue'",
-      expectedProcess: 'codex',
+      agent: 'opencode',
+      launchCommand: "opencode 'review linked issue'",
+      expectedProcess: 'opencode',
       followupPrompt: null,
       launchConfig: { agentArgs: '', agentEnv: {} },
       startupCommandDelivery: 'shell-ready'
     }
 
-    expect(buildDirectWorkItemStartupOpts('codex', plan, 'task_page')).toEqual({
+    expect(buildDirectWorkItemStartupOpts('opencode', plan, 'task_page')).toEqual({
       startup: {
-        command: "codex 'review linked issue'",
-        launchAgent: 'codex',
+        command: "opencode 'review linked issue'",
+        launchAgent: 'opencode',
         launchConfig: { agentArgs: '', agentEnv: {} },
         startupCommandDelivery: 'shell-ready',
         telemetry: {
-          agent_kind: 'codex',
+          agent_kind: 'opencode',
           launch_source: 'task_page',
           request_kind: 'new'
         }

@@ -4,11 +4,11 @@ import { buildWslExecArgs } from '../../../src/shared/wsl-login-shell-command'
 
 /** A WSL-only path makes the stub marker proof that the pane ran in the distro. */
 const WSL_STUB_PATH = '/usr/local/bin/golden-stub-agent'
-const WSL_STUB_AGENT_LINK = '/usr/local/bin/codex'
+const WSL_STUB_AGENT_LINK = '/usr/local/bin/claude'
 const WSL_STUB_BACKUP_PATH = '/usr/local/bin/golden-stub-agent.orca-e2e-backup'
 /** mkdir is atomic in the distro, so the lock dir serializes overlapping invocations. */
 const WSL_STUB_LOCK_PATH = '/usr/local/bin/golden-stub-agent.orca-e2e-lock'
-const WSL_STUB_LINK_MARKER = `${WSL_STUB_LOCK_PATH}/created-codex-link`
+const WSL_STUB_LINK_MARKER = `${WSL_STUB_LOCK_PATH}/created-claude-link`
 const WSL_STUB_STAGED_MARKER = `${WSL_STUB_LOCK_PATH}/staged-stub`
 const WSL_STUB_LOCK_STALE_MINUTES = 10
 const WSL_STUB_LOCK_WAIT_SECONDS = 60
@@ -41,11 +41,11 @@ const BACKUP_EXISTING_STUB_SCRIPT =
 // The marker is written first so stale-lock recovery only removes a stub this helper wrote.
 const STAGE_SCRIPT =
   `mkdir -p /usr/local/bin && : > ${WSL_STUB_STAGED_MARKER} && ` +
-  `printf '#!/bin/sh\\nif [ "$1" = app-server ]; then echo "error: unrecognized subcommand app-server" >&2; exit 2; fi\\necho GOLDEN_STUB_AGENT_READY\\nexec sleep 3600\\n' > ${WSL_STUB_PATH} && ` +
+  `printf '#!/bin/sh\\necho GOLDEN_STUB_AGENT_READY\\nexec sleep 3600\\n' > ${WSL_STUB_PATH} && ` +
   `chmod 0755 ${WSL_STUB_PATH}`
 
 // The marker is written before the link so a crashed run over-reports rather than leaks a link.
-const STAGE_CODEX_LINK_IF_MISSING_SCRIPT =
+const STAGE_CLAUDE_LINK_IF_MISSING_SCRIPT =
   `if [ -e ${WSL_STUB_AGENT_LINK} ] || [ -L ${WSL_STUB_AGENT_LINK} ]; then ` +
   `printf existing; else : > ${WSL_STUB_LINK_MARKER} && ` +
   `ln -s ${WSL_STUB_PATH} ${WSL_STUB_AGENT_LINK} && printf created; fi`
@@ -54,7 +54,7 @@ const STAGE_CODEX_LINK_IF_MISSING_SCRIPT =
 function buildRestoreScript(stage: WslGoldenStubAgentStage): string {
   const steps: string[] = []
   if (stage.ownsStubPath) {
-    const removed = stage.createdCodexLink
+    const removed = stage.createdClaudeLink
       ? `${WSL_STUB_AGENT_LINK} ${WSL_STUB_PATH}`
       : WSL_STUB_PATH
     steps.push(`rm -f ${removed}`)
@@ -86,7 +86,7 @@ export async function getFirstWslDistro(page: Page): Promise<string | null> {
 }
 
 export type WslGoldenStubAgentStage = {
-  createdCodexLink: boolean
+  createdClaudeLink: boolean
   backedUpStub: boolean
   ownsStubPath: boolean
   heldLock: boolean
@@ -95,7 +95,7 @@ export type WslGoldenStubAgentStage = {
 /** Returns null when the distro cannot stage the stub. Holds a distro lock until cleanup. */
 export function stageWslGoldenStubAgent(distro: string): WslGoldenStubAgentStage | null {
   const stage: WslGoldenStubAgentStage = {
-    createdCodexLink: false,
+    createdClaudeLink: false,
     backedUpStub: false,
     ownsStubPath: false,
     heldLock: false
@@ -108,8 +108,8 @@ export function stageWslGoldenStubAgent(distro: string): WslGoldenStubAgentStage
     stage.backedUpStub = runInWslAsRoot(distro, BACKUP_EXISTING_STUB_SCRIPT).trim() === 'backed-up'
     stage.ownsStubPath = true
     runInWslAsRoot(distro, STAGE_SCRIPT)
-    stage.createdCodexLink =
-      runInWslAsRoot(distro, STAGE_CODEX_LINK_IF_MISSING_SCRIPT).trim() === 'created'
+    stage.createdClaudeLink =
+      runInWslAsRoot(distro, STAGE_CLAUDE_LINK_IF_MISSING_SCRIPT).trim() === 'created'
     return stage
   } catch {
     removeWslGoldenStubAgent(distro, stage)

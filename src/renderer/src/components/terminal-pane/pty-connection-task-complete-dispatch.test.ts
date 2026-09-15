@@ -155,9 +155,9 @@ describe('connectPanePty', () => {
     await restoreTerminalTestGlobals()
   })
 
-  it('dispatches agent-task-complete for generic Codex spinner titles after process identity is confirmed', async () => {
+  it('dispatches agent-task-complete for generic agent spinner titles after process identity is confirmed', async () => {
     const { connectPanePty } = await import('./pty-connection')
-    const transport = createMockTransport('pty-codex')
+    const transport = createMockTransport('pty-agent')
     transportFactoryQueue.push(transport)
 
     vi.useFakeTimers()
@@ -166,7 +166,7 @@ describe('connectPanePty', () => {
         window: { api: { pty: { getForegroundProcess: ReturnType<typeof vi.fn> } } }
       }
     ).window.api
-    api.pty.getForegroundProcess.mockResolvedValue('codex')
+    api.pty.getForegroundProcess.mockResolvedValue('opencode')
     const pane = createPane(1)
     const manager = createManager(1)
     const deps = createDeps()
@@ -191,7 +191,7 @@ describe('connectPanePty', () => {
       terminalTitle: 'experimental-agent-observability',
       paneKey: makePaneKey('tab-1', LEAF_1)
     })
-    expect(window.api.pty.inspectProcess).toHaveBeenCalledWith('pty-codex')
+    expect(window.api.pty.inspectProcess).toHaveBeenCalledWith('pty-agent')
   })
 
   it('does not dispatch generic spinner completions when process inspection finds no agent', async () => {
@@ -249,7 +249,7 @@ describe('connectPanePty', () => {
       | ((payload: {
           state: 'done'
           prompt: string
-          agentType: 'codex'
+          agentType: 'opencode'
           lastAssistantMessage: string
         }) => void)
       | undefined
@@ -260,7 +260,7 @@ describe('connectPanePty', () => {
     statusHandler({
       state: 'done',
       prompt: 'finish the implementation',
-      agentType: 'codex',
+      agentType: 'opencode',
       lastAssistantMessage: 'Done.'
     })
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS)
@@ -268,7 +268,7 @@ describe('connectPanePty', () => {
     expect(deps.dispatchNotification).toHaveBeenCalledWith(
       expect.objectContaining({
         source: 'agent-task-complete',
-        terminalTitle: 'codex',
+        terminalTitle: 'opencode',
         paneKey: makePaneKey('tab-1', LEAF_1)
       })
     )
@@ -316,7 +316,7 @@ describe('connectPanePty', () => {
     }
 
     capturedDataCallback.current('\x1b[6 q')
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
 
     expect(pane.terminal.write).not.toHaveBeenCalled()
     vi.advanceTimersByTime(50)
@@ -347,7 +347,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected onAgentBecameIdle to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     expect(window.api.notifications.dispatch).not.toHaveBeenCalled()
 
     mockStoreState.agentStatusByPaneKey[paneKey] = {
@@ -355,9 +355,9 @@ describe('connectPanePty', () => {
       prompt: 'Use delayed hook status in notification',
       updatedAt: Date.now(),
       stateStartedAt: Date.now(),
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: '* Codex done',
+      terminalTitle: '* OpenCode done',
       stateHistory: [],
       lastAssistantMessage: 'Delayed status arrived.'
     }
@@ -368,8 +368,8 @@ describe('connectPanePty', () => {
     expect(window.api.notifications.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         source: 'agent-task-complete',
-        terminalTitle: '* Codex done',
-        agentType: 'codex',
+        terminalTitle: '* OpenCode done',
+        agentType: 'opencode',
         agentState: 'done',
         agentPrompt: 'Use delayed hook status in notification',
         agentLastAssistantMessage: 'Delayed status arrived.'
@@ -401,7 +401,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected onAgentBecameIdle to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(250)
     await flushAsyncTicks()
     expect(window.api.notifications.dispatch).not.toHaveBeenCalled()
@@ -412,9 +412,9 @@ describe('connectPanePty', () => {
       prompt: 'Use the late hook status in notification',
       updatedAt: Date.now(),
       stateStartedAt: Date.now(),
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: '* Codex done',
+      terminalTitle: '* OpenCode done',
       stateHistory: [],
       lastAssistantMessage: 'Late status arrived.'
     }
@@ -426,8 +426,8 @@ describe('connectPanePty', () => {
     expect(window.api.notifications.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
         source: 'agent-task-complete',
-        terminalTitle: '* Codex done',
-        agentType: 'codex',
+        terminalTitle: '* OpenCode done',
+        agentType: 'opencode',
         agentState: 'done',
         agentPrompt: 'Use the late hook status in notification',
         agentLastAssistantMessage: 'Late status arrived.'
@@ -452,9 +452,9 @@ describe('connectPanePty', () => {
       prompt: 'Previous task that must not leak',
       updatedAt: Date.now() - 15_000,
       stateStartedAt: Date.now() - 20_000,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: '* Codex done',
+      terminalTitle: '* OpenCode done',
       stateHistory: [],
       lastAssistantMessage: 'Old response'
     }
@@ -472,7 +472,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected onAgentBecameIdle to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS)
     await flushAsyncTicks()
 
@@ -484,7 +484,7 @@ describe('connectPanePty', () => {
     expect(dispatchArgs).toMatchObject({
       source: 'agent-task-complete',
       worktreeId: 'wt-1',
-      terminalTitle: '* Codex done'
+      terminalTitle: '* OpenCode done'
     })
     expect('agentPrompt' in dispatchArgs).toBe(false)
     expect('agentLastAssistantMessage' in dispatchArgs).toBe(false)
@@ -506,7 +506,7 @@ describe('connectPanePty', () => {
       prompt: 'Should not leak into BEL',
       updatedAt: Date.now(),
       stateStartedAt: Date.now(),
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
       stateHistory: []
     }

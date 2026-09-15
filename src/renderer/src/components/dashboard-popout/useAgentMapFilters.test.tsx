@@ -7,7 +7,7 @@ import { useAgentMapFilters } from './useAgentMapFilters'
 
 describe('useAgentMapFilters', () => {
   it('resets states without clearing the other map filters', () => {
-    const hook = renderHook(() => useAgentMapFilters(['claude', 'codex']))
+    const hook = renderHook(() => useAgentMapFilters(['claude', 'opencode']))
 
     act(() => hook.result.current.applyQuickView('stuck'))
     act(() => hook.result.current.resetStates())
@@ -21,20 +21,20 @@ describe('useAgentMapFilters', () => {
   })
 
   it('preserves a muted agent type across disappearance and reappearance', () => {
-    let agentTypes = ['claude', 'codex']
+    let agentTypes = ['claude', 'opencode']
     const hook = renderHook(() => useAgentMapFilters(agentTypes))
 
     act(() => hook.result.current.toggleAgentType('claude'))
-    agentTypes = ['codex']
+    agentTypes = ['opencode']
     hook.rerender()
 
-    expect([...hook.result.current.agentTypes]).toEqual(['codex'])
+    expect([...hook.result.current.agentTypes]).toEqual(['opencode'])
     expect(hook.result.current.activeCount).toBe(0)
 
-    agentTypes = ['claude', 'codex']
+    agentTypes = ['claude', 'opencode']
     hook.rerender()
 
-    expect([...hook.result.current.agentTypes]).toEqual(['codex'])
+    expect([...hook.result.current.agentTypes]).toEqual(['opencode'])
     expect(hook.result.current.activeCount).toBe(1)
   })
 
@@ -42,14 +42,14 @@ describe('useAgentMapFilters', () => {
     let agentTypes = ['claude']
     const hook = renderHook(() => useAgentMapFilters(agentTypes))
 
-    agentTypes = ['claude', 'grok']
+    agentTypes = ['claude', 'pi']
     hook.rerender()
 
-    expect([...hook.result.current.agentTypes]).toEqual(['claude', 'grok'])
+    expect([...hook.result.current.agentTypes]).toEqual(['claude', 'pi'])
   })
 
   it('preserves each time-range identity across unrelated facet updates', () => {
-    let agentTypes = ['claude', 'codex']
+    let agentTypes = ['claude', 'opencode']
     const hook = renderHook(() => useAgentMapFilters(agentTypes))
     const ranges = hook.result.current.timeRanges
     const fields = AGENT_MAP_TIME_FIELDS.map((field) => ranges[field])
@@ -58,7 +58,7 @@ describe('useAgentMapFilters', () => {
     act(() => hook.result.current.toggleAgentType('claude'))
     act(() => hook.result.current.setUnreadOnly(true))
     act(() => hook.result.current.setOrchestrationOnly(true))
-    agentTypes = ['claude', 'codex', 'grok']
+    agentTypes = ['claude', 'opencode', 'pi']
     hook.rerender()
 
     expect(hook.result.current.timeRanges).toBe(ranges)

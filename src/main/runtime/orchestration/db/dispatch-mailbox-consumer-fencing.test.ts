@@ -124,7 +124,7 @@ describe('dispatch mailbox consumer fencing', () => {
       creator: { kind: 'system' },
       maxDepth: Number.MAX_SAFE_INTEGER,
       taskId: task.id,
-      startOptions: { topology: 'current', agent: 'codex' }
+      startOptions: { topology: 'current', agent: 'claude' }
     })
     const dispatchId = started.dispatch.id
     db.insertMessage({

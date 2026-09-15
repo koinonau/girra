@@ -106,8 +106,7 @@ only within itself (`inFlight` is a closure per reader), and the wedge set
 latches only _after_ a read misses its 3 s deadline, so through the healthy
 ~12 ms of a scan neither excludes the other. Overlap is the normal state rather
 than an edge case: other panes keep polling detailed at 750 ms while a teardown
-takes identity snapshots, and `codex-structured-turn-processes.ts` issues fresh
-detailed scans on turn stop.
+takes identity snapshots.
 
 `nativeReadGate` serializes every native read across both flag sets. It is also
 what makes the relay's bare addon safe: `adaptAddon` has no queue at all, and
@@ -170,7 +169,6 @@ through `toIdentityRow`, so an identity row carries no command line on any host.
 | ------------------------------------------ | --------------------------------- | -------- |
 | `windows-agent-foreground-process.ts`      | `command` (agent recognition)     | detailed |
 | `local-workspace-platform-port-scanner.ts` | `command` (port attribution)      | detailed |
-| `codex-structured-turn-processes.ts`       | `command` (turn-process identity) | detailed |
 | `structured-tui-process-identity.ts`       | `command` (child match)           | detailed |
 | `windows-pty-root-identity.ts`             | `pid` / `ppid` only               | identity |
 | `agent-session-process-identity-probe.ts`  | `creationTimeMs` only             | identity |
@@ -361,7 +359,7 @@ on any other OS keeps using the scan.
    die at configure. `node-pty` is patched the same way for the same reason.
 4. **No PEB reads, no `PROCESS_VM_READ`.** See below.
 5. **The `CreationTime` flag (4).** Upstream exposes no process start time, and
-   `isWindowsProcessStartTimeAvailable()` gates structured Claude and Codex
+   `isWindowsProcessStartTimeAvailable()` gates structured Claude
    chat on it, so without this change win32 silently fell back to the legacy
    transcript path. `GetProcessCreationTime` opens
    `PROCESS_QUERY_LIMITED_INFORMATION` and converts `GetProcessTimes`' FILETIME

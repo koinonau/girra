@@ -47,7 +47,7 @@ function seedState(worktree: ReturnType<typeof makeCreatedAgentWorktree>): void 
     activeWorktreeId: worktree.id,
     activeView: 'terminal',
     tabsByWorktree: {
-      [worktree.id]: [{ id: WEB_TAB_ID, title: 'Codex', ptyId: null } as never]
+      [worktree.id]: [{ id: WEB_TAB_ID, title: 'Claude', ptyId: null } as never]
     },
     unifiedTabsByWorktree: {
       [worktree.id]: [
@@ -118,7 +118,7 @@ function seedSleepingRecord(worktreeId: string, sessionId: string): string {
         origin: 'live' as const,
         capturedAt: 1000,
         updatedAt: 1000,
-        terminalTitle: 'Codex'
+        terminalTitle: 'Claude'
       }
     }
   }))

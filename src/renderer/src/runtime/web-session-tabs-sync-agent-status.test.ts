@@ -29,7 +29,7 @@ describe('applyWebSessionTabsSnapshot', () => {
         {
           type: 'terminal',
           id: HOST_SURFACE_ID,
-          title: 'codex [working]',
+          title: 'opencode [working]',
           parentTabId: 'host-tab-1',
           leafId: LEAF_ID,
           isActive: true,
@@ -40,11 +40,11 @@ describe('applyWebSessionTabsSnapshot', () => {
             prompt: 'fix web parity',
             updatedAt: NOW - 100,
             stateStartedAt: NOW - 1_000,
-            agentType: 'codex',
+            agentType: 'opencode',
             paneKey: hostPaneKey,
             tabId: 'host-tab-1',
             worktreeId: WT,
-            terminalTitle: 'codex [working]',
+            terminalTitle: 'opencode [working]',
             providerSession: { key: 'session_id', id: 'session-1' },
             stateHistory: []
           }
@@ -59,12 +59,12 @@ describe('applyWebSessionTabsSnapshot', () => {
     expect(patch.agentStatusByPaneKey?.[mirroredPaneKey]).toMatchObject({
       state: 'working',
       prompt: 'fix web parity',
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey: mirroredPaneKey,
       tabId: mirroredId,
       worktreeId: WT,
       providerSession: { key: 'session_id', id: 'session-1' },
-      terminalTitle: 'codex [working]'
+      terminalTitle: 'opencode [working]'
     })
     expect(patch.agentStatusByPaneKey?.[hostPaneKey]).toBeUndefined()
     expect(patch.agentStatusEpoch).toBe(1)
@@ -154,7 +154,7 @@ describe('applyWebSessionTabsSnapshot', () => {
       {
         type: 'terminal',
         id: HOST_SURFACE_ID,
-        title: 'codex [working]',
+        title: 'opencode [working]',
         parentTabId: 'host-tab-1',
         leafId: LEAF_ID,
         isActive: true,
@@ -165,7 +165,7 @@ describe('applyWebSessionTabsSnapshot', () => {
           prompt: 'fix web parity',
           updatedAt: NOW - 100,
           stateStartedAt: NOW - 1_000,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: hostPaneKey,
           tabId: 'host-tab-1',
           worktreeId: WT,
@@ -209,7 +209,7 @@ describe('applyWebSessionTabsSnapshot', () => {
       {
         type: 'terminal',
         id: HOST_SURFACE_ID,
-        title: 'codex [working]',
+        title: 'opencode [working]',
         parentTabId: 'host-tab-1',
         leafId: LEAF_ID,
         isActive: true,
@@ -220,7 +220,7 @@ describe('applyWebSessionTabsSnapshot', () => {
           prompt: 'fix web parity',
           updatedAt: NOW - 100,
           stateStartedAt: NOW - 1_000,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: hostPaneKey,
           worktreeId: WT,
           tabId: 'host-tab-1',
@@ -366,7 +366,7 @@ describe('applyWebSessionTabsSnapshot', () => {
       {
         type: 'terminal',
         id: HOST_SURFACE_ID,
-        title: 'Codex',
+        title: 'OpenCode',
         parentTabId: 'host-tab-1',
         leafId: LEAF_ID,
         isActive: true,
@@ -377,7 +377,7 @@ describe('applyWebSessionTabsSnapshot', () => {
           prompt: 'same prompt',
           updatedAt: NOW - 1_000,
           stateStartedAt: NOW - 2_000,
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: hostPaneKey,
           stateHistory: [],
           interrupted: true

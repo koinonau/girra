@@ -61,23 +61,23 @@ describe('activateAndRevealWorktree', () => {
             id: 'stale-local-agent-tab',
             ptyId: 'stale-local-agent-pty',
             worktreeId: worktree.id,
-            title: 'Codex',
+            title: 'OpenCode',
             customTitle: null,
             color: null,
             sortOrder: 0,
             createdAt: 1,
-            launchAgent: 'codex'
+            launchAgent: 'opencode'
           }
         ]
       }
     })
 
     activateAndRevealWorktree(worktree.id, {
-      agent: 'codex',
+      agent: 'opencode',
       startup: {
-        command: "codex 'fix the ownership race'",
+        command: "opencode 'fix the ownership race'",
         env: { ORCA_AGENT_PROFILE: 'review' },
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         launchToken: 'launch-1'
       }
     })
@@ -94,9 +94,9 @@ describe('activateAndRevealWorktree', () => {
     expect(createRequests[0]?.[0]).toEqual(
       expect.objectContaining({
         params: expect.objectContaining({
-          command: "codex 'fix the ownership race'",
+          command: "opencode 'fix the ownership race'",
           env: { ORCA_AGENT_PROFILE: 'review' },
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           launchToken: 'launch-1'
         })
       })
@@ -126,7 +126,7 @@ describe('activateAndRevealWorktree', () => {
     }))
 
     activateAndRevealWorktree(worktree.id, {
-      agent: 'codex',
+      agent: 'opencode',
       backendStartupTerminalSpawned: true
     })
     await vi.waitFor(() =>
@@ -148,10 +148,10 @@ describe('activateAndRevealFolderWorkspace', () => {
     [
       'the selected agent',
       {
-        agent: 'codex' as const,
-        startup: { command: 'codex', launchAgent: 'codex' as const, launchToken: 'launch-1' }
+        agent: 'opencode' as const,
+        startup: { command: 'opencode', launchAgent: 'opencode' as const, launchToken: 'launch-1' }
       },
-      { command: 'codex', launchAgent: 'codex', launchToken: 'launch-1' }
+      { command: 'opencode', launchAgent: 'opencode', launchToken: 'launch-1' }
     ],
     ['Blank Terminal', { agent: null }, { command: undefined }]
   ])('asks the runtime owner for exactly one %s surface', async (_label, activation, expected) => {

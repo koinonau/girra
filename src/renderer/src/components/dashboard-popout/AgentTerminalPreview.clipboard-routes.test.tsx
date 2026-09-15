@@ -225,7 +225,7 @@ describe('AgentTerminalPreview clipboard routes', () => {
     expect(input).toHaveBeenCalledWith('pty-1', 'clip-text')
   })
 
-  it('encodes a leading newline for a remote Windows Codex preview without submitting', async () => {
+  it('encodes a leading newline for a remote Windows input-record preview without submitting', async () => {
     readClipboardText.mockResolvedValueOnce('\nsecond line')
     const view = render(
       <AgentTerminalPreview

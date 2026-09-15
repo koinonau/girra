@@ -84,14 +84,14 @@ describe('OrcaRuntimeService', () => {
       name: 'folder-session',
       displayName: '\u0000\u202e',
       displayNameKind: 'user',
-      createdWithAgent: 'codex',
-      startup: { command: 'codex', viewMode: 'chat' }
+      createdWithAgent: 'claude',
+      startup: { command: 'claude', viewMode: 'chat' }
     })
 
     expect(addWorktreeMock).not.toHaveBeenCalled()
     expect(createTerminal).toHaveBeenCalledWith(
       `id:${result.worktree.id}`,
-      expect.objectContaining({ command: 'codex', viewMode: 'chat' })
+      expect.objectContaining({ command: 'claude', viewMode: 'chat' })
     )
     expect(result.worktree).toEqual(
       expect.objectContaining({
@@ -100,14 +100,14 @@ describe('OrcaRuntimeService', () => {
         path: '/workspace/folder',
         displayName: 'folder-session',
         isMainWorktree: false,
-        createdWithAgent: 'codex'
+        createdWithAgent: 'claude'
       })
     )
     expect(metaById[result.worktree.id]).toMatchObject({
       instanceId: result.worktree.instanceId,
       displayName: 'folder-session',
       orcaCreationSource: 'runtime',
-      createdWithAgent: 'codex'
+      createdWithAgent: 'claude'
     })
     expect(metaById[result.worktree.id]).not.toHaveProperty('displayNameIsPinned')
     await expect(runtime.showManagedWorktree(`id:${result.worktree.id}`)).resolves.toMatchObject({

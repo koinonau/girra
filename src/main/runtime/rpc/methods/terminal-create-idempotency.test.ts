@@ -30,7 +30,7 @@ describe('terminal.create RPC idempotency', () => {
         resumeProviderSession: {
           key: 'session_id',
           id: 'session-1',
-          transcriptPath: 'C:\\Users\\example\\.codex\\sessions\\rollout.jsonl'
+          transcriptPath: 'C:\\Users\\example\\.pi\\agent\\sessions\\session.jsonl'
         }
       },
       {
@@ -56,7 +56,7 @@ describe('terminal.create RPC idempotency', () => {
         resumeProviderSession: {
           key: 'session_id',
           id: 'session-1',
-          transcriptPath: 'C:\\Users\\example\\.codex\\sessions\\rollout.jsonl'
+          transcriptPath: 'C:\\Users\\example\\.pi\\agent\\sessions\\session.jsonl'
         }
       })
     )

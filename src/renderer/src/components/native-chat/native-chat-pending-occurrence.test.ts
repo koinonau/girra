@@ -9,7 +9,7 @@ import {
   type NativeChatPendingSendScope
 } from './native-chat-pending'
 
-const scope: NativeChatPendingSendScope = { paneKey: 'tab:leaf', agent: 'codex' }
+const scope: NativeChatPendingSendScope = { paneKey: 'tab:leaf', agent: 'claude' }
 
 function message(
   id: string,

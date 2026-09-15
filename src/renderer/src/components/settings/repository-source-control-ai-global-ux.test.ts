@@ -225,12 +225,12 @@ describe('useRepositorySourceControlAiGlobalUx', () => {
     const { result } = setup({}, updateRepo)
     await act(async () => {
       result.current.updateActionMode('fixCommitFailure', 'override')
-      result.current.updateActionAgent('fixCommitFailure', 'codex')
+      result.current.updateActionAgent('fixCommitFailure', 'opencode')
       result.current.updateEnablement(true)
     })
     // Enablement rolls back; the successfully saved agent override must remain visible.
     expect(result.current.displayRepoAi.enabled).toBeUndefined()
-    expect(result.current.displayRepoAi.actionOverrides?.fixCommitFailure?.agentId).toBe('codex')
+    expect(result.current.displayRepoAi.actionOverrides?.fixCommitFailure?.agentId).toBe('opencode')
     expect(result.current.saveError).toBe('Failed to save Source Control AI settings.')
   })
 })

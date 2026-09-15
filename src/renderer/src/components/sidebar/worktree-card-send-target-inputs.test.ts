@@ -84,7 +84,7 @@ describe('selectSendTargetInputs', () => {
 
     // A real pane-title write replaces the map ref -> shallow-unequal -> the
     // open popover re-derives eligibility, exactly as before this change.
-    const s2: SendTargetInputsState = { ...s1, runtimePaneTitlesByTabId: { 'tab-1': 'codex' } }
+    const s2: SendTargetInputsState = { ...s1, runtimePaneTitlesByTabId: { 'tab-1': 'opencode' } }
     expect(shallow(r1, selectSendTargetInputs(s2, 'wt-A'))).toBe(false)
   })
 })

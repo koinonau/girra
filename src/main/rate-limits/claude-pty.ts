@@ -1,9 +1,9 @@
 import type { ProviderRateLimits } from '../../shared/rate-limit-types'
 import { buildConfiguredProxyEnv, type NetworkProxySettings } from '../../shared/network-proxy'
-import { resolveClaudeCommand } from '../codex-cli/command'
-// Why: import from the shared module, not the codex-cli re-export, so a test that
-// mocks '../codex-cli/command' does not have to restate this pure helper.
-import { withCliRuntimeOnPath } from '../../shared/node-cli-command-resolution'
+import {
+  resolveClaudeCommand,
+  withCliRuntimeOnPath
+} from '../../shared/node-cli-command-resolution'
 import type { ClaudeRuntimeAuthPreparation } from '../claude-accounts/runtime-auth-service'
 import { applyClaudeEnvPatch } from '../claude-accounts/environment'
 import { withMacTailscaleDnsHint } from '../network/macos-tailscale-dns-diagnostic'

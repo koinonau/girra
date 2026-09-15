@@ -29,13 +29,13 @@ function lifecycle(
 ): AgentJournalRenderItem {
   sequence += 1
   return {
-    itemId: `legacy:codex:s:turn-lifecycle%3A${turnId}`,
+    itemId: `legacy:claude:s:turn-lifecycle%3A${turnId}`,
     revision: 1,
     sequence,
     observedAt,
     body: {
       kind: 'status',
-      text: 'Codex is working…',
+      text: 'Claude is working…',
       turnLifecycle: { turnId, state: 'running', ...lifecycle }
     }
   }
@@ -201,13 +201,13 @@ describe('explicit user-item attribution', () => {
       user('orca:second'),
       lifecycle('t1', {
         state: 'completed',
-        userItemId: 'codex:thread:t1:0',
+        userItemId: 'claude:session:t1:0',
         startedAt: 1_000,
         completedAt: 5_000
       })
     ]
     const timings = selectStructuredAgentTurnTimings(items, [
-      submission('first', 'codex:thread:t1:0'),
+      submission('first', 'claude:session:t1:0'),
       submission('second', null)
     ])
     expect([...timings.keys()]).toEqual(['orca:first'])
@@ -231,7 +231,7 @@ describe('explicit user-item attribution', () => {
       user('orca:first'),
       lifecycle('auto', {
         state: 'completed',
-        userItemId: 'codex:thread:auto:0',
+        userItemId: 'claude:session:auto:0',
         startedAt: 1_000,
         completedAt: 2_000
       })
@@ -291,14 +291,14 @@ describe('coalesced sends and canonical rows', () => {
       user('orca:second'),
       lifecycle('t1', {
         state: 'completed',
-        userItemId: 'codex:thread:t1:0',
+        userItemId: 'claude:session:t1:0',
         startedAt: 1_000,
         completedAt: 5_000
       })
     ]
     const timings = selectStructuredAgentTurnTimings(items, [
-      accepted('first', 'codex:thread:t1:0'),
-      accepted('second', 'codex:thread:t1:0')
+      accepted('first', 'claude:session:t1:0'),
+      accepted('second', 'claude:session:t1:0')
     ])
     expect([...timings.keys()]).toEqual(['orca:first'])
   })
@@ -306,7 +306,7 @@ describe('coalesced sends and canonical rows', () => {
   it('reads a canonical turn item exactly like the legacy carrier', () => {
     sequence += 1
     const canonical: AgentJournalRenderItem = {
-      itemId: 'legacy:codex:s:turn-lifecycle%3At9',
+      itemId: 'legacy:claude:s:turn-lifecycle%3At9',
       revision: 2,
       sequence,
       observedAt: 1_000,

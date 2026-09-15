@@ -3,8 +3,10 @@ import { extractOscTitleScanTail } from './osc-title-scan-tail'
 
 describe('extractOscTitleScanTail', () => {
   it('keeps incomplete OSC title candidates only', () => {
-    expect(extractOscTitleScanTail('\x1b]0;Codex work')).toBe('\x1b]0;Codex work')
-    expect(extractOscTitleScanTail('\x1b]2;Codex working\x1b')).toBe('\x1b]2;Codex working\x1b')
+    expect(extractOscTitleScanTail('\x1b]0;OpenCode work')).toBe('\x1b]0;OpenCode work')
+    expect(extractOscTitleScanTail('\x1b]2;OpenCode working\x1b')).toBe(
+      '\x1b]2;OpenCode working\x1b'
+    )
     expect(extractOscTitleScanTail('\x1b]')).toBe('\x1b]')
     expect(extractOscTitleScanTail('\x1b]1')).toBe('\x1b]1')
   })

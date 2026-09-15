@@ -101,14 +101,14 @@ describe('W3: the five per-call decisions are made once', () => {
 
   it('runs no shell on the probe lane, so ~/.profile cannot stall it', async () => {
     // #14288: one blocking line in ~/.profile ate the whole timeout.
-    await runWslProcess({ loginPath: 'preferred', distro: 'Ubuntu', program: 'codex' })
+    await runWslProcess({ loginPath: 'preferred', distro: 'Ubuntu', program: 'opencode' })
     expect(JSON.stringify(spawnSpec().args)).not.toContain('_orca_wsl_shell')
   })
 
   it('applies the user login PATH even with no shell in the loop', async () => {
     // The other half of the same trade: nvm-installed agents must still be
     // found (#9725, #7563, #8366).
-    await runWslProcess({ loginPath: 'preferred', distro: 'Ubuntu', program: 'codex' })
+    await runWslProcess({ loginPath: 'preferred', distro: 'Ubuntu', program: 'opencode' })
     expect(spawnSpec().args).toContain('PATH=/home/u/.nvm/bin:/usr/bin')
   })
 })
@@ -162,7 +162,7 @@ describe('failure modes stay distinguishable', () => {
     const result = await runWslProcess({
       loginPath: 'preferred',
       distro: 'Ubuntu',
-      program: 'codex'
+      program: 'opencode'
     })
     expect(result.environmentResolved).toBe(false)
   })

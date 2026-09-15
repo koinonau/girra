@@ -1,4 +1,3 @@
-import { inspectCodexEnvironmentConfig } from './setup-script-import-codex-environment'
 import { inspectPackageManagerSetupCandidate } from './setup-script-package-manager-suggestion'
 import type { SetupScriptImportProvider } from './setup-script-import-providers'
 import {
@@ -42,7 +41,6 @@ export async function inspectSetupScriptImportCandidates(
   const candidates = await Promise.all([
     inspectSupersetConfig(boundedReadFile),
     inspectConductorConfig(boundedReadFile),
-    inspectCodexEnvironmentConfig(boundedReadFile),
     inspectCmuxConfig(boundedReadFile),
     inspectPackageManagerSetupCandidate(boundedReadFile, options?.fileExists)
   ])

@@ -149,7 +149,7 @@ async function runValidation(mode) {
   const repoPath = createGitRepo()
   const userDataPath = mkdtempSync(path.join(tmpdir(), 'orca-wayland-gpu-userdata-'))
   // Why: this harness cannot use the E2E flag because that disables Linux GPU,
-  // but its Codex and Node home still must stay inside the disposable profile.
+  // but its agent and Node home still must stay inside the disposable profile.
   const isolatedHome = path.join(userDataPath, 'home')
   mkdirSync(isolatedHome, { recursive: true })
   const runId = `${Date.now()}`
@@ -196,17 +196,9 @@ async function runValidation(mode) {
   })
 
   try {
-    const {
-      ELECTRON_RUN_AS_NODE: _unused,
-      DISPLAY: _display,
-      CODEX_HOME: _codexHome,
-      ORCA_CODEX_HOME: _orcaCodexHome,
-      ...env
-    } = process.env
+    const { ELECTRON_RUN_AS_NODE: _unused, DISPLAY: _display, ...env } = process.env
     void _unused
     void _display
-    void _codexHome
-    void _orcaCodexHome
     logPhase('launch.start')
     app = await runWithTimeout(
       'Electron launch',

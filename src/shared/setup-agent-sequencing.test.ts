@@ -41,10 +41,10 @@ describe('createSequencedSetupAgentCommands', () => {
   it('uses the original sequenced startup command as the launch hint when present', () => {
     expect(
       resolveSetupAgentSequenceLaunchCommand(
-        { [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'omp --resume' },
+        { [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'pi --resume' },
         'powershell wait-wrapper'
       )
-    ).toBe('omp --resume')
+    ).toBe('pi --resume')
     expect(
       resolveSetupAgentSequenceLaunchCommand(
         { [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: '   ' },
@@ -56,7 +56,7 @@ describe('createSequencedSetupAgentCommands', () => {
   it('wraps POSIX setup and startup commands with a matching nonce marker', () => {
     const result = createSequencedSetupAgentCommands({
       runnerScriptPath: '/repo/.git/orca/setup-runner.sh',
-      startupCommand: "codex 'fix bug'",
+      startupCommand: "opencode 'fix bug'",
       platform: 'posix',
       nonce: 'nonce-123',
       waitTimeoutSeconds: 9
@@ -80,11 +80,11 @@ describe('createSequencedSetupAgentCommands', () => {
     expect(startupScript).toContain(
       'rm -f /repo/.git/orca/setup-runner.sh.nonce-123.done /repo/.git/orca/setup-runner.sh.nonce-123.done.tmp'
     )
-    expect(startupScript).toContain('exec codex')
+    expect(startupScript).toContain('exec opencode')
     expect(startupScript).toContain('fix bug')
     expect(result.startupEnv).toEqual(
       expect.objectContaining({
-        [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "codex 'fix bug'",
+        [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "opencode 'fix bug'",
         [SETUP_AGENT_SEQUENCE_STARTUP_SCRIPT_ENV]: startupScript
       })
     )
@@ -93,7 +93,7 @@ describe('createSequencedSetupAgentCommands', () => {
   it('announces success so the pane stops showing the waiting line', () => {
     const commands = createSequencedSetupAgentCommands({
       runnerScriptPath: '/repo/.git/orca/setup-runner.sh',
-      startupCommand: 'codex',
+      startupCommand: 'opencode',
       platform: 'posix',
       nonce: 'nonce-1'
     })
@@ -109,7 +109,7 @@ describe('createSequencedSetupAgentCommands', () => {
     const commands = createSequencedSetupAgentCommands({
       runnerScriptPath: 'C:\\repo\\.git\\orca\\setup-runner.cmd',
       platform: 'windows',
-      startupCommand: 'codex',
+      startupCommand: 'opencode',
       nonce: 'nonce-2'
     })
     const decoded = Buffer.from(
@@ -126,7 +126,7 @@ describe('createSequencedSetupAgentCommands', () => {
     const script =
       createSequencedSetupAgentCommands({
         runnerScriptPath: '/repo/.git/orca/setup-runner.sh',
-        startupCommand: 'codex',
+        startupCommand: 'opencode',
         platform: 'posix',
         nonce: 'nonce-3'
       }).startupEnv?.ORCA_SEQUENCED_STARTUP_SCRIPT ?? ''
@@ -139,7 +139,7 @@ describe('createSequencedSetupAgentCommands', () => {
   it('keeps the POSIX terminal submission below the canonical input floor', () => {
     const result = createSequencedSetupAgentCommands({
       runnerScriptPath: `/repo/${'nested-worktree/'.repeat(100)}setup-runner.sh`,
-      startupCommand: 'codex',
+      startupCommand: 'opencode',
       platform: 'posix',
       nonce: 'long-path'
     })
@@ -160,7 +160,7 @@ describe('createSequencedSetupAgentCommands', () => {
     })
     const second = createSequencedSetupAgentCommands({
       runnerScriptPath: '/repo/.git/orca/setup-runner.sh',
-      startupCommand: 'codex',
+      startupCommand: 'opencode',
       platform: 'posix',
       nonce: 'second-launch'
     })
@@ -180,15 +180,15 @@ describe('createSequencedSetupAgentCommands', () => {
   it('keeps simple POSIX startup commands eligible for exec when quoted text has separators', () => {
     const result = createSequencedSetupAgentCommands({
       runnerScriptPath: '/repo/.git/orca/setup-runner.sh',
-      startupCommand: "codex 'fix this; then test'",
+      startupCommand: "opencode 'fix this; then test'",
       platform: 'posix',
       nonce: 'nonce-quoted',
       waitTimeoutSeconds: 9
     })
 
     const startupScript = result.startupEnv?.[SETUP_AGENT_SEQUENCE_STARTUP_SCRIPT_ENV]
-    expect(startupScript).toContain("exec codex 'fix this; then test'")
-    expect(startupScript).not.toContain('eval codex')
+    expect(startupScript).toContain("exec opencode 'fix this; then test'")
+    expect(startupScript).not.toContain('eval opencode')
   })
 
   it('preserves POSIX inline environment assignment startup commands', () => {
@@ -262,7 +262,7 @@ describe('createSequencedSetupAgentCommands', () => {
   it('wraps native Windows runners in a cmd-pinned setup and startup gate', () => {
     const result = createSequencedSetupAgentCommands({
       runnerScriptPath: 'C:\\repo\\.git\\orca\\setup-runner.cmd',
-      startupCommand: "codex --model gpt-5 'fix !PATH! & test'",
+      startupCommand: "opencode --model gpt-5 'fix !PATH! & test'",
       platform: 'windows',
       nonce: 'nonce-win',
       waitTimeoutSeconds: 3
@@ -290,7 +290,7 @@ describe('createSequencedSetupAgentCommands', () => {
     expect(startupPowerShell).toContain('Invoke-Expression')
     expect(result.startupCommand).not.toContain('fix !PATH! & test')
     expect(result.startupEnv).toEqual({
-      [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "codex --model gpt-5 'fix !PATH! & test'"
+      [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: "opencode --model gpt-5 'fix !PATH! & test'"
     })
     // Why: `-EncodedCommand` is not execution-policy gated — only `-File` is — so the switch
     // was a no-op, and base64 beside `-ExecutionPolicy Bypass` is a heavily EDR-flagged shape.

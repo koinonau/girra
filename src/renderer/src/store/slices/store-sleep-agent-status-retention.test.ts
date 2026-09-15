@@ -152,7 +152,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
           providerSession: { key: 'session_id', id: 'old-session' },
           stateHistory: []
         },
-        tab: makeTab({ id: 'tab-1', worktreeId: wt, title: 'Old Codex' }),
+        tab: makeTab({ id: 'tab-1', worktreeId: wt, title: 'Old Claude' }),
         worktreeId: wt,
         agentType: 'claude',
         startedAt: 900
@@ -232,7 +232,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
           providerSession: { key: 'session_id', id: 'old-session' }
         },
         worktreeId: wt,
-        tab: makeTab({ id: 'tab-1', worktreeId: wt, title: 'Old Codex' }),
+        tab: makeTab({ id: 'tab-1', worktreeId: wt, title: 'Old Claude' }),
         agentType: 'claude',
         startedAt: 1000
       },
@@ -393,7 +393,7 @@ describe('shutdownWorktreeTerminals (sleep) — agent status hygiene', () => {
       'tab-1:0',
       {
         state: 'done',
-        prompt: 'codex prompt',
+        prompt: 'claude prompt',
         agentType: 'claude',
         interrupted: false
       },

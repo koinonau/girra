@@ -27,7 +27,7 @@ export function installPanePtyVisibilityBind(session: ConnectPanePtySession): vo
   session.bindActivePanePty = (
     ptyId: string,
     options: {
-      seedInitialAgentStatus?: boolean
+      freshSpawn?: boolean
       updateTabPtyId?: 'always' | 'if-missing'
       replacePtyId?: string
       sampleVisibleForegroundAgent?: boolean
@@ -129,16 +129,13 @@ export function installPanePtyVisibilityBind(session: ConnectPanePtySession): vo
       session.startupPtyBound = true
       session.deps.onStartupBound?.()
     }
-    if (options.seedInitialAgentStatus) {
-      session.applyInitialAgentStatus()
-    }
     // Spawn/attach completion is when a pane gains a concrete PTY ID. The initial
     // frame-level sync often runs before that async result arrives.
     scheduleRuntimeGraphSync()
     session.agentCompletionCoordinator.startProcessTracking()
     // Why: fresh spawns normally rely on a future OSC 133 command-start read to
     // identify the launched agent; only adopted or restored PTYs may already be
-    // inside Codex with no new foreground signal. But no-OSC shells (Git Bash,
+    // inside an agent with no new foreground signal. But no-OSC shells (Git Bash,
     // cmd.exe) never emit a command-start, so an expected-agent pane spawned into
     // one would never gain fresh evidence authorizing trusted Windows CSI-u
     // routing for the launched agent, so Shift+Enter could submit (#7620, #9703).
@@ -150,7 +147,7 @@ export function installPanePtyVisibilityBind(session: ConnectPanePtySession): vo
     // A real OSC 133;C, if it arrives, simply supersedes this.
     if (options.sampleVisibleForegroundAgent === true) {
       session.sampleVisiblePaneForegroundAgent()
-    } else if (options.seedInitialAgentStatus === true) {
+    } else if (options.freshSpawn === true) {
       const freshSpawnLaunchAgent = session.resolveExpectedLaunchTuiAgent()
       if (freshSpawnLaunchAgent) {
         session.paneForegroundAgentTracker.onCommandStarted(freshSpawnLaunchAgent)
@@ -174,9 +171,7 @@ export function installPanePtyVisibilityBind(session: ConnectPanePtySession): vo
     // just-created worktree) can be kept visible rather than tearing down the
     // worktree. Reattach/coldRestore skip onPtySpawn (pty-transport.ts).
     session.spawnedFreshPtyId = ptyId
-    // Why: Command Code has no prompt-start hook. Seed the visible working row
-    // once the PTY exists, then let real hook events refine or complete it.
-    const bound = session.bindActivePanePty(ptyId, { seedInitialAgentStatus: true })
+    const bound = session.bindActivePanePty(ptyId, { freshSpawn: true })
     if (!bound) {
       // A stale transport may report a spawn after a successor claimed this
       // pane slot. Its one-shot startup belongs to the successor, not here.

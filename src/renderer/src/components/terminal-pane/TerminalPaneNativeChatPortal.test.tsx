@@ -95,7 +95,7 @@ function makeController(
     managedPanes: [chatPane, { id: 2, leafId: '22222222-2222-4222-8222-222222222222' }],
     readNativeChatTerminalScreen: vi.fn(),
     resolveAgentForLeaf: vi.fn(() => null),
-    structuredChatAgent: overrides.structured ? 'codex' : null,
+    structuredChatAgent: overrides.structured ? 'claude' : null,
     structuredChatTarget: { kind: 'local' },
     structuredSessionId: overrides.structured ? 'session-1' : null,
     switchNativeChatToTerminal: vi.fn(),

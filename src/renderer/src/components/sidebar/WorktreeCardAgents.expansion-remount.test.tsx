@@ -17,7 +17,7 @@ function mockAgent(paneKey: string, prompt: string): unknown {
   return {
     paneKey,
     tab: { id: paneKey.split(':')[0] },
-    agentType: 'codex',
+    agentType: 'opencode',
     rowSource: undefined,
     state: 'done',
     startedAt: 1000,

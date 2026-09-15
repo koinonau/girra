@@ -236,7 +236,7 @@ export async function retireGeneratedWorktreeName(
 ): Promise<void> {
   store.addRetiredWorktreeName(repo.id, name)
   // Why local too: the repo-id row dies with the project, and the on-disk backfill cannot recover a
-  // name whose only surviving history is a Codex rollout file rather than a directory.
+  // name whose only surviving history lies outside a Claude bucket directory.
   //
   // On-demand runtimes are the exception: the address is part of the key and changes on every
   // provision, so a mirror written here is unreadable after the next one while still minting a

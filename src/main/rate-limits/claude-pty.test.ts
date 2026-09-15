@@ -1,11 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import type * as NodeCliCommandResolution from '../../shared/node-cli-command-resolution'
 
 const { resolveClaudeCommandMock, spawnMock } = vi.hoisted(() => ({
   resolveClaudeCommandMock: vi.fn(),
   spawnMock: vi.fn()
 }))
 
-vi.mock('../codex-cli/command', () => ({
+vi.mock('../../shared/node-cli-command-resolution', async (importOriginal) => ({
+  ...(await importOriginal<typeof NodeCliCommandResolution>()),
   resolveClaudeCommand: resolveClaudeCommandMock
 }))
 

@@ -794,7 +794,7 @@ describe('runner execFile timeout handling', () => {
       const child = createMockChildProcess(1234)
       spawnMock.mockReturnValue(child)
 
-      wslAwareSpawn('codex; touch /tmp/pwned', ['--version'], {
+      wslAwareSpawn('opencode; touch /tmp/pwned', ['--version'], {
         cwd: String.raw`C:\repo`,
         stdio: ['pipe', 'pipe', 'pipe'],
         wslDistro: 'Ubuntu',
@@ -802,7 +802,9 @@ describe('runner execFile timeout handling', () => {
       })
 
       const shellCommand = spawnMock.mock.calls[0]?.[1]?.[5] as string
-      expect(shellCommand).toContain(String.raw`'\''codex; touch /tmp/pwned'\'' '\''--version'\''`)
+      expect(shellCommand).toContain(
+        String.raw`'\''opencode; touch /tmp/pwned'\'' '\''--version'\''`
+      )
     })
   })
 })

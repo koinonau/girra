@@ -149,12 +149,12 @@ describe('removeWorktree state cleanup', () => {
       automaticAgentResumeClaimsByTabId: {
         'removed-tab': {
           worktreeId: removed.id,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           providerSession: { key: 'session_id', id: 'removed-session' }
         },
         'surviving-tab': {
           worktreeId: surviving.id,
-          launchAgent: 'codex',
+          launchAgent: 'opencode',
           providerSession: { key: 'session_id', id: 'surviving-session' }
         }
       }
@@ -165,7 +165,7 @@ describe('removeWorktree state cleanup', () => {
     expect(store.getState().automaticAgentResumeClaimsByTabId).toEqual({
       'surviving-tab': {
         worktreeId: surviving.id,
-        launchAgent: 'codex',
+        launchAgent: 'opencode',
         providerSession: { key: 'session_id', id: 'surviving-session' }
       }
     })

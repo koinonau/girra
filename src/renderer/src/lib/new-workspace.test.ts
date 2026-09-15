@@ -39,7 +39,7 @@ const {
     >,
     agentLaunchConfigByPaneKey: {
       'tab-1:11111111-1111-4111-8111-111111111111': {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: {
           tabId: 'tab-1',
@@ -257,13 +257,13 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: startupLeafId, launchToken: 'launch-token-1' }
       }
     }
     mockInspectRuntimeTerminalProcess.mockResolvedValue({
-      foregroundProcess: 'aider',
+      foregroundProcess: 'claude',
       hasChildProcesses: true
     })
     mockSendRuntimePtyInputVerified.mockResolvedValue(true)
@@ -279,9 +279,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     await ensureAgentStartupInTerminal({
       worktreeId: 'wt-1',
       startup: {
-        agent: 'aider',
-        launchCommand: 'aider',
-        expectedProcess: 'aider',
+        agent: 'claude-agent-teams',
+        launchCommand: 'orca claude-teams',
+        expectedProcess: 'claude',
         followupPrompt: 'fix the spinner',
         launchConfig: { agentArgs: '', agentEnv: {} }
       }
@@ -301,9 +301,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     await ensureAgentStartupInTerminal({
       worktreeId: 'wt-1',
       startup: {
-        agent: 'aider',
-        launchCommand: 'aider',
-        expectedProcess: 'aider',
+        agent: 'claude-agent-teams',
+        launchCommand: 'orca claude-teams',
+        expectedProcess: 'claude',
         followupPrompt: 'fix the spinner',
         launchConfig: { agentArgs: '', agentEnv: {} }
       }
@@ -317,9 +317,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     await ensureAgentStartupInTerminal({
       worktreeId: 'wt-1',
       startup: {
-        agent: 'aider',
-        launchCommand: 'aider',
-        expectedProcess: 'aider',
+        agent: 'claude-agent-teams',
+        launchCommand: 'orca claude-teams',
+        expectedProcess: 'claude',
         followupPrompt: 'fix the spinner',
         launchConfig: { agentArgs: '', agentEnv: {} }
       }
@@ -356,9 +356,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       ensureAgentStartupInTerminal({
         worktreeId: 'wt-1',
         startup: {
-          agent: 'aider',
-          launchCommand: 'aider',
-          expectedProcess: 'aider',
+          agent: 'claude-agent-teams',
+          launchCommand: 'orca claude-teams',
+          expectedProcess: 'claude',
           followupPrompt: 'fix the spinner',
           launchConfig: { agentArgs: '', agentEnv: {} }
         }
@@ -403,7 +403,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`agent-tab:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'agent-tab', leafId: startupLeafId, launchToken: 'launch-token-1' }
       }
@@ -413,9 +413,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       worktreeId: 'wt-1',
       primaryTabId: 'agent-tab',
       startup: {
-        agent: 'codex',
-        launchCommand: 'codex',
-        expectedProcess: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
+        expectedProcess: 'opencode',
         followupPrompt: null,
         launchConfig: { agentArgs: '', agentEnv: {} },
         draftPrompt: 'Linear context draft'
@@ -426,7 +426,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       tabId: 'agent-tab',
       ptyId: 'agent-pty',
       content: 'Linear context draft',
-      agent: 'codex',
+      agent: 'opencode',
       forcePaste: true,
       onTimeout: expect.any(Function)
     })
@@ -443,9 +443,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       worktreeId: 'wt-1',
       primaryTabId: 'tab-1',
       startup: {
-        agent: 'codex',
-        launchCommand: 'codex',
-        expectedProcess: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
+        expectedProcess: 'opencode',
         followupPrompt: null,
         launchConfig: { agentArgs: '', agentEnv: {} },
         draftPrompt: 'https://github.com/stablyai/orca/pull/2051'
@@ -469,7 +469,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: startupLeafId, launchToken: 'launch-token-1' }
       }
@@ -483,7 +483,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       tabId: 'tab-1',
       ptyId: 'pty-delayed',
       content: 'https://github.com/stablyai/orca/pull/2051',
-      agent: 'codex',
+      agent: 'opencode',
       forcePaste: true,
       onTimeout: expect.any(Function)
     })
@@ -500,9 +500,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       worktreeId: 'wt-1',
       primaryTabId: 'tab-1',
       startup: {
-        agent: 'codex',
-        launchCommand: 'codex',
-        expectedProcess: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
+        expectedProcess: 'opencode',
         followupPrompt: null,
         launchConfig: { agentArgs: '', agentEnv: {} },
         draftPrompt: 'linked draft'
@@ -524,7 +524,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${splitLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: splitLeafId, launchToken: 'other-token' }
       }
@@ -546,12 +546,12 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${splitLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: splitLeafId, launchToken: 'other-token' }
       },
       [`tab-1:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 2,
         identity: { tabId: 'tab-1', leafId: startupLeafId, launchToken: 'launch-token-1' }
       }
@@ -565,7 +565,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       tabId: 'tab-1',
       ptyId: 'startup-pty',
       content: 'linked draft',
-      agent: 'codex',
+      agent: 'opencode',
       forcePaste: true,
       onTimeout: expect.any(Function)
     })
@@ -582,9 +582,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       worktreeId: 'wt-1',
       primaryTabId: 'tab-1',
       startup: {
-        agent: 'codex',
-        launchCommand: 'codex',
-        expectedProcess: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
+        expectedProcess: 'opencode',
         followupPrompt: null,
         launchConfig: { agentArgs: '', agentEnv: {} },
         draftPrompt: 'linked draft'
@@ -606,7 +606,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: startupLeafId, launchToken: 'launch-token-1' }
       }
@@ -621,9 +621,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
 
   it('does not duplicate immediate delivery for the same launch token', async () => {
     const startup = {
-      agent: 'codex' as const,
-      launchCommand: 'codex',
-      expectedProcess: 'codex',
+      agent: 'opencode' as const,
+      launchCommand: 'opencode',
+      expectedProcess: 'opencode',
       followupPrompt: null,
       launchConfig: { agentArgs: '', agentEnv: {} },
       draftPrompt: 'linked draft',
@@ -651,9 +651,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     store.agentLaunchConfigByPaneKey = {}
     store.pendingStartupByTabId = { 'tab-1': { launchToken: 'launch-token-1' } }
     const startup = {
-      agent: 'codex' as const,
-      launchCommand: 'codex',
-      expectedProcess: 'codex',
+      agent: 'opencode' as const,
+      launchCommand: 'opencode',
+      expectedProcess: 'opencode',
       followupPrompt: null,
       launchConfig: { agentArgs: '', agentEnv: {} },
       draftPrompt: 'linked draft',
@@ -688,7 +688,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: startupLeafId, launchToken: 'launch-token-1' }
       }
@@ -712,9 +712,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
       worktreeId: 'wt-1',
       primaryTabId: 'tab-1',
       startup: {
-        agent: 'codex',
-        launchCommand: 'codex',
-        expectedProcess: 'codex',
+        agent: 'opencode',
+        launchCommand: 'opencode',
+        expectedProcess: 'opencode',
         followupPrompt: null,
         launchConfig: { agentArgs: '', agentEnv: {} },
         draftPrompt: 'old linked draft',
@@ -742,7 +742,7 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     }
     store.agentLaunchConfigByPaneKey = {
       [`tab-1:${startupLeafId}`]: {
-        launchConfig: { agentCommand: 'codex', agentArgs: '', agentEnv: {} },
+        launchConfig: { agentCommand: 'opencode', agentArgs: '', agentEnv: {} },
         registeredAt: 1,
         identity: { tabId: 'tab-1', leafId: startupLeafId, launchToken: 'launch-token-old' }
       }
@@ -764,9 +764,9 @@ describe('ensureAgentStartupInTerminal prompt delivery', () => {
     const delivery = ensureAgentStartupInTerminal({
       worktreeId: 'wt-1',
       startup: {
-        agent: 'aider',
-        launchCommand: 'aider',
-        expectedProcess: 'aider',
+        agent: 'claude-agent-teams',
+        launchCommand: 'orca claude-teams',
+        expectedProcess: 'claude',
         followupPrompt: 'fix the spinner',
         launchConfig: { agentArgs: '', agentEnv: {} }
       }
@@ -787,13 +787,13 @@ describe('getSetupConfig', () => {
         defaultTabs: [
           { title: 'Server', command: 'pnpm dev' },
           { title: 'Notes' },
-          { command: 'codex' }
+          { command: 'opencode' }
         ]
       })
     ).toEqual({
       source: 'yaml',
       kind: 'default-tabs',
-      command: '# defaultTabs[1] Server\npnpm dev\n\n# defaultTabs[3]\ncodex'
+      command: '# defaultTabs[1] Server\npnpm dev\n\n# defaultTabs[3]\nopencode'
     })
   })
 

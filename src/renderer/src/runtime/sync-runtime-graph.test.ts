@@ -110,7 +110,7 @@ describe('getRuntimeMobileSessionSyncKey', () => {
     const base = makeState({
       ...shared,
       tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Codex working', customTitle: null, ptyId: 'pty-1' }]
+        'wt-1': [{ id: 'term-1', title: 'OpenCode working', customTitle: null, ptyId: 'pty-1' }]
       } as unknown as AppState['tabsByWorktree']
     })
     const before = getRuntimeMobileSessionSyncKey(base)
@@ -121,7 +121,7 @@ describe('getRuntimeMobileSessionSyncKey', () => {
           'wt-1': [
             {
               id: 'term-1',
-              title: 'Codex working',
+              title: 'OpenCode working',
               generatedTitle: 'Fix remote tabs',
               customTitle: null,
               ptyId: 'pty-1'
@@ -173,7 +173,7 @@ describe('getRuntimeMobileSessionSyncKey', () => {
       'wt-1': [
         {
           id: 'term-1',
-          title: 'Codex working',
+          title: 'OpenCode working',
           generatedTitle: 'Fix remote tabs',
           customTitle: null,
           ptyId: 'pty-1'
@@ -351,7 +351,9 @@ describe('getRuntimeMobileSessionSyncKey', () => {
       makeState({
         ...sharedOverrides,
         tabsByWorktree: {
-          'wt-1': [{ id: 'term-1', title: 'Terminal 1', customTitle: null, launchAgent: 'codex' }]
+          'wt-1': [
+            { id: 'term-1', title: 'Terminal 1', customTitle: null, launchAgent: 'opencode' }
+          ]
         } as unknown as AppState['tabsByWorktree']
       })
     )

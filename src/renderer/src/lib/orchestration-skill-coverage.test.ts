@@ -53,17 +53,16 @@ describe('orchestration skill agent coverage', () => {
     expect(
       getOrchestrationSkillAgentStatuses(
         skills,
-        ['codex', 'gemini', 'droid'],
+        ['opencode', 'pi'],
         [source('/Users/test/.agents/skills', null)]
       )
     ).toEqual([
-      { agent: 'codex', label: 'Codex', installed: true },
-      { agent: 'gemini', label: 'Gemini', installed: true },
-      { agent: 'droid', label: 'Droid', installed: true }
+      { agent: 'opencode', label: 'OpenCode', installed: true },
+      { agent: 'pi', label: 'Pi', installed: true }
     ])
   })
 
-  it('marks Claude from ~/.claude/skills without requiring a dedicated Codex path', () => {
+  it('marks Claude from ~/.claude/skills without covering provider-home agents', () => {
     const skills = [
       skill({
         providers: ['claude'],
@@ -75,31 +74,12 @@ describe('orchestration skill agent coverage', () => {
 
     const sources = [source('/Users/test/.claude/skills', 'claude')]
     expect(agentHasOrchestrationSkill('claude', skills, sources)).toBe(true)
-    expect(agentHasOrchestrationSkill('codex', skills, sources)).toBe(false)
-    expect(agentHasOrchestrationSkill('gemini', skills, sources)).toBe(false)
-  })
-
-  it('marks Codex from plugin cache installs', () => {
-    expect(
-      agentHasOrchestrationSkill(
-        'codex',
-        [
-          skill({
-            providers: ['codex', 'agent-skills'],
-            sourceKind: 'plugin',
-            sourceLabel: 'Codex plugin cache',
-            rootPath: '/Users/test/.codex/plugins/cache',
-            directoryPath: '/Users/test/.codex/plugins/cache/vendor/orchestration'
-          })
-        ],
-        [source('/Users/test/.codex/plugins/cache', 'codex', 'plugin')]
-      )
-    ).toBe(true)
+    expect(agentHasOrchestrationSkill('opencode', skills, sources)).toBe(false)
+    expect(agentHasOrchestrationSkill('pi', skills, sources)).toBe(false)
   })
 
   it('marks Claude from an enabled plugin install', () => {
-    // Why: Claude Code loads skills from enabled plugins, so an owned plugin root
-    // counts the same as the Codex plugin cache does.
+    // Why: Claude Code loads skills from enabled plugins, so an owned plugin root counts like a home root.
     expect(
       agentHasOrchestrationSkill(
         'claude',
@@ -120,7 +100,7 @@ describe('orchestration skill agent coverage', () => {
   it('ignores repo-scoped orchestration installs', () => {
     expect(
       agentHasOrchestrationSkill(
-        'gemini',
+        'pi',
         [
           skill({
             providers: ['agent-skills'],
@@ -155,11 +135,6 @@ describe('orchestration skill agent coverage', () => {
   it('marks each provider-home agent from its own global skills location', () => {
     const cases: { agent: TuiAgent; rootPath: string; directoryPath: string }[] = [
       {
-        agent: 'grok',
-        rootPath: '/Users/test/.grok/skills',
-        directoryPath: '/Users/test/.grok/skills/orchestration'
-      },
-      {
         agent: 'opencode',
         rootPath: '/Users/test/.config/opencode/skills',
         directoryPath: '/Users/test/.config/opencode/skills/orchestration'
@@ -168,26 +143,6 @@ describe('orchestration skill agent coverage', () => {
         agent: 'pi',
         rootPath: '/Users/test/.pi/agent/skills',
         directoryPath: '/Users/test/.pi/agent/skills/orchestration'
-      },
-      {
-        agent: 'omp',
-        rootPath: '/Users/test/.omp/agent/skills',
-        directoryPath: '/Users/test/.omp/agent/skills/orchestration'
-      },
-      {
-        agent: 'gemini',
-        rootPath: '/Users/test/.gemini/skills',
-        directoryPath: '/Users/test/.gemini/skills/orchestration'
-      },
-      {
-        agent: 'antigravity',
-        rootPath: '/Users/test/.gemini/antigravity/skills',
-        directoryPath: '/Users/test/.gemini/antigravity/skills/orchestration'
-      },
-      {
-        agent: 'cursor',
-        rootPath: '/Users/test/.cursor/skills',
-        directoryPath: '/Users/test/.cursor/skills/orchestration'
       }
     ]
     for (const { agent, rootPath, directoryPath } of cases) {
@@ -203,57 +158,42 @@ describe('orchestration skill agent coverage', () => {
 
   it('marks every provider root retained after symlink deduplication', () => {
     const roots = [
-      source('/Users/test/.codex/skills', 'codex'),
       source('/Users/test/.claude/skills', 'claude'),
-      source('/Users/test/.grok/skills', 'grok'),
       source('/Users/test/.config/opencode/skills', 'opencode'),
-      source('/Users/test/.pi/agent/skills', 'pi'),
-      source('/Users/test/.gemini/skills', 'gemini'),
-      source('/Users/test/.gemini/antigravity/skills', 'antigravity'),
-      source('/Users/test/.cursor/skills', 'cursor')
+      source('/Users/test/.pi/agent/skills', 'pi')
     ]
     const skills = [
       skill({
-        providers: ['codex', 'claude', 'agent-skills'],
+        providers: ['claude', 'agent-skills'],
         rootPath: roots[0].path,
         rootPaths: roots.map((root) => root.path),
-        directoryPath: '/Users/test/.codex/skills/orchestration'
+        directoryPath: '/Users/test/.claude/skills/orchestration'
       })
     ]
 
     expect(
       getOrchestrationSkillAgentStatuses(
         skills,
-        [
-          'codex',
-          'claude',
-          'claude-agent-teams',
-          'grok',
-          'opencode',
-          'pi',
-          'gemini',
-          'antigravity',
-          'cursor'
-        ],
+        ['claude', 'claude-agent-teams', 'opencode', 'pi'],
         roots
       ).every((status) => status.installed)
     ).toBe(true)
   })
 
   it('does not treat a repository shared root as a global install after deduplication', () => {
-    const codexRoot = source('/Users/test/.codex/skills', 'codex')
+    const piRoot = source('/Users/test/.pi/agent/skills', 'pi')
     const repoRoot = source('/workspace/.agents/skills', null, 'repo')
     const skills = [
       skill({
-        providers: ['codex', 'agent-skills'],
-        rootPath: codexRoot.path,
-        rootPaths: [codexRoot.path, repoRoot.path],
-        directoryPath: '/Users/test/.codex/skills/orchestration'
+        providers: ['agent-skills'],
+        rootPath: piRoot.path,
+        rootPaths: [piRoot.path, repoRoot.path],
+        directoryPath: '/Users/test/.pi/agent/skills/orchestration'
       })
     ]
 
-    expect(agentHasOrchestrationSkill('codex', skills, [codexRoot, repoRoot])).toBe(true)
-    expect(agentHasOrchestrationSkill('grok', skills, [codexRoot, repoRoot])).toBe(false)
+    expect(agentHasOrchestrationSkill('pi', skills, [piRoot, repoRoot])).toBe(true)
+    expect(agentHasOrchestrationSkill('opencode', skills, [piRoot, repoRoot])).toBe(false)
   })
 
   it('keeps the owning home root when a repo root duplicates its path', () => {
@@ -289,23 +229,6 @@ describe('orchestration skill agent coverage', () => {
     expect(agentHasOrchestrationSkill('claude', skills, [])).toBe(false)
   })
 
-  it('marks OpenClaude from ~/.claude/skills like Claude Code', () => {
-    const skills = [
-      skill({
-        providers: ['claude'],
-        sourceKind: 'home',
-        rootPath: '/Users/test/.claude/skills',
-        directoryPath: '/Users/test/.claude/skills/orchestration'
-      })
-    ]
-
-    expect(
-      agentHasOrchestrationSkill('openclaude', skills, [
-        source('/Users/test/.claude/skills', 'claude')
-      ])
-    ).toBe(true)
-  })
-
   it('marks a multi-segment provider-home agent from a Windows-style path', () => {
     expect(
       agentHasOrchestrationSkill(
@@ -323,7 +246,7 @@ describe('orchestration skill agent coverage', () => {
     ).toBe(true)
   })
 
-  it('keeps Pi and OMP distinct despite sharing the <home>/agent/skills shape', () => {
+  it('keeps provider-home agents distinct from each other', () => {
     const piInstall = [
       skill({
         providers: ['agent-skills'],
@@ -332,49 +255,10 @@ describe('orchestration skill agent coverage', () => {
         directoryPath: '/Users/test/.pi/agent/skills/orchestration'
       })
     ]
-    const ompInstall = [
-      skill({
-        providers: ['agent-skills'],
-        sourceKind: 'home',
-        rootPath: '/Users/test/.omp/agent/skills',
-        directoryPath: '/Users/test/.omp/agent/skills/orchestration'
-      })
-    ]
-
     const piSources = [source('/Users/test/.pi/agent/skills', 'pi')]
-    const ompSources = [source('/Users/test/.omp/agent/skills', 'omp')]
+
     expect(agentHasOrchestrationSkill('pi', piInstall, piSources)).toBe(true)
-    expect(agentHasOrchestrationSkill('omp', piInstall, piSources)).toBe(false)
-    expect(agentHasOrchestrationSkill('omp', ompInstall, ompSources)).toBe(true)
-    expect(agentHasOrchestrationSkill('pi', ompInstall, ompSources)).toBe(false)
-  })
-
-  it('keeps Gemini and Antigravity distinct despite sharing the ~/.gemini root', () => {
-    const geminiInstall = [
-      skill({
-        providers: ['agent-skills'],
-        sourceKind: 'home',
-        rootPath: '/Users/test/.gemini/skills',
-        directoryPath: '/Users/test/.gemini/skills/orchestration'
-      })
-    ]
-    const antigravityInstall = [
-      skill({
-        providers: ['agent-skills'],
-        sourceKind: 'home',
-        rootPath: '/Users/test/.gemini/antigravity/skills',
-        directoryPath: '/Users/test/.gemini/antigravity/skills/orchestration'
-      })
-    ]
-
-    const geminiSources = [source('/Users/test/.gemini/skills', 'gemini')]
-    const antigravitySources = [source('/Users/test/.gemini/antigravity/skills', 'antigravity')]
-    expect(agentHasOrchestrationSkill('gemini', geminiInstall, geminiSources)).toBe(true)
-    expect(agentHasOrchestrationSkill('antigravity', geminiInstall, geminiSources)).toBe(false)
-    expect(agentHasOrchestrationSkill('antigravity', antigravityInstall, antigravitySources)).toBe(
-      true
-    )
-    expect(agentHasOrchestrationSkill('gemini', antigravityInstall, antigravitySources)).toBe(false)
+    expect(agentHasOrchestrationSkill('opencode', piInstall, piSources)).toBe(false)
   })
 
   it('marks Claude Agent Teams from ~/.claude/skills like Claude Code', () => {
@@ -397,16 +281,16 @@ describe('orchestration skill agent coverage', () => {
   it('marks Windows skill paths', () => {
     expect(
       agentHasOrchestrationSkill(
-        'codex',
+        'claude',
         [
           skill({
-            providers: ['codex'],
+            providers: ['claude'],
             sourceKind: 'home',
-            rootPath: 'C:\\Users\\test\\.codex\\skills',
-            directoryPath: 'C:\\Users\\test\\.codex\\skills\\orchestration'
+            rootPath: 'C:\\Users\\test\\.claude\\skills',
+            directoryPath: 'C:\\Users\\test\\.claude\\skills\\orchestration'
           })
         ],
-        [source('C:\\Users\\test\\.codex\\skills', 'codex')]
+        [source('C:\\Users\\test\\.claude\\skills', 'claude')]
       )
     ).toBe(true)
   })

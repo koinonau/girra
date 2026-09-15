@@ -132,7 +132,7 @@ export function installAgentTaskCompleteNotify(session: ConnectPanePtySession): 
   //
   // This path raises the same terminal attention marker as BEL through the
   // shared notification dispatcher. Not every agent CLI reliably emits BEL on
-  // completion (Gemini, some Codex flows), and the highlight needs to remain
+  // completion, and the highlight needs to remain
   // findable after the OS banner is gone. Double-firing with a concurrent BEL
   // is handled by delaying the BEL OS notification below; main still keeps a
   // 5 s per-worktree dedupe as the final guard.

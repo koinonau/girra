@@ -13,7 +13,7 @@ const {
   shortcutLabelMock: vi.fn<() => string | null>(),
   storeState: {
     settings: {
-      defaultTuiAgent: 'codex' as 'claude' | 'codex' | 'gemini' | 'blank' | null,
+      defaultTuiAgent: 'opencode' as 'claude' | 'opencode' | 'pi' | 'blank' | null,
       disabledTuiAgents: [] as string[]
     },
     worktreesByRepo: {} as Record<string, unknown[]>,
@@ -23,7 +23,7 @@ const {
   },
   openSettingsPageMock: vi.fn(),
   openSettingsTargetMock: vi.fn(),
-  useDetectedAgentsMock: vi.fn(() => ({ detectedIds: ['claude', 'codex', 'gemini'] }))
+  useDetectedAgentsMock: vi.fn(() => ({ detectedIds: ['claude', 'opencode', 'pi'] }))
 }))
 
 vi.mock('@/hooks/useDetectedAgents', () => ({
@@ -55,8 +55,8 @@ vi.mock('@/lib/agent-catalog', async () => {
   return {
     getAgentCatalog: () => [
       { id: 'claude', label: 'Claude' },
-      { id: 'codex', label: 'Codex' },
-      { id: 'gemini', label: 'Gemini' }
+      { id: 'opencode', label: 'OpenCode' },
+      { id: 'pi', label: 'Pi' }
     ],
     AgentIcon: ({ agent }: { agent: string }) => ReactActual.createElement('span', null, agent)
   }
@@ -119,7 +119,7 @@ beforeEach(() => {
   useDetectedAgentsMock.mockClear()
   openSettingsPageMock.mockReset()
   openSettingsTargetMock.mockReset()
-  storeState.settings.defaultTuiAgent = 'codex'
+  storeState.settings.defaultTuiAgent = 'opencode'
   storeState.settings.disabledTuiAgents = []
   storeState.worktreesByRepo = {}
   storeState.repos = []
@@ -134,9 +134,9 @@ describe('QuickLaunchAgentMenuItems', () => {
     const html = renderAgentMenuItems()
 
     expect(html.match(/data-dropdown-shortcut="true"/g) ?? []).toHaveLength(1)
-    expect(rowMarkup(html, 'Codex')).toContain('⌘⌥T')
+    expect(rowMarkup(html, 'OpenCode')).toContain('⌘⌥T')
     expect(rowMarkup(html, 'Claude')).not.toContain('⌘⌥T')
-    expect(rowMarkup(html, 'Gemini')).not.toContain('⌘⌥T')
+    expect(rowMarkup(html, 'Pi')).not.toContain('⌘⌥T')
   })
 
   it('hides the default-agent shortcut when the action is unbound', () => {

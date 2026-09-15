@@ -50,28 +50,7 @@ describe('pty-bound agent draft readiness budget', () => {
     vi.useRealTimers()
   })
 
-  it('delivers when a cold Codex composer becomes ready after 8s', async () => {
-    const promise = pasteDraftToAgentPtyWhenReady({
-      tabId: 'tab-1',
-      ptyId: 'pty-1',
-      content: 'draft',
-      agent: 'codex',
-      forcePaste: true
-    })
-
-    await vi.advanceTimersByTimeAsync(10_000)
-
-    await expect(promise).resolves.toBe(true)
-    expect(testState.waitForReady).toHaveBeenCalledWith(
-      'pty-1',
-      20_000,
-      'codex-composer-prompt',
-      {}
-    )
-    expect(testState.sendInput).toHaveBeenCalledTimes(1)
-  })
-
-  it('keeps the 8s readiness deadline for non-Codex agents', async () => {
+  it('keeps the 8s readiness deadline for agent drafts', async () => {
     const onTimeout = vi.fn()
     const promise = pasteDraftToAgentPtyWhenReady({
       tabId: 'tab-1',

@@ -14,15 +14,14 @@ async function readElectronHomeState(electronApp: ElectronApplication) {
       userDataDir: process.env.ORCA_E2E_USER_DATA_DIR,
       home: process.env.HOME,
       userProfile: process.env.USERPROFILE,
-      codexHome: process.env.CODEX_HOME,
-      orcaCodexHome: process.env.ORCA_CODEX_HOME
+      claudeConfigDir: process.env.CLAUDE_CONFIG_DIR
     }
   })
 }
 
-// Codex always routes to the real home now, so this single case covers both the
-// HOME boundary and that real-home routing lands inside the disposable profile.
-test('isolates Electron and Codex from the developer home by default', async ({ electronApp }) => {
+// Claude resolves its config under HOME, so this single case covers both the
+// HOME boundary and that agent state lands inside the disposable profile.
+test('isolates Electron and Claude from the developer home by default', async ({ electronApp }) => {
   const state = await readElectronHomeState(electronApp)
   const expectedHome = realpathSync.native(path.join(state.userDataDir!, 'home'))
 
@@ -30,6 +29,5 @@ test('isolates Electron and Codex from the developer home by default', async ({ 
   expect(state.nodeHome).toBe(expectedHome)
   expect(state.home).toBe(expectedHome)
   expect(state.userProfile).toBe(expectedHome)
-  expect(state.codexHome).toBeUndefined()
-  expect(state.orcaCodexHome).toBeUndefined()
+  expect(state.claudeConfigDir).toBeUndefined()
 })

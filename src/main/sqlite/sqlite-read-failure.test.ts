@@ -55,10 +55,8 @@ describe('isTransientSqliteContention', () => {
     expect(isTransientSqliteContention(thrown)).toBe(true)
   })
 
-  it('recognizes a relayed message with no errcode, as the Codex heal pass sees it', () => {
-    expect(
-      isTransientSqliteContention('codex app-server thread/read failed: database is locked')
-    ).toBe(true)
+  it('recognizes a relayed message with no errcode', () => {
+    expect(isTransientSqliteContention('relay thread/read failed: database is locked')).toBe(true)
     expect(isTransientSqliteContention(new Error('SQLITE_LOCKED: table is locked'))).toBe(true)
   })
 

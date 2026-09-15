@@ -38,7 +38,7 @@ function makeAutomation(
     name: 'Synthetic automation',
     prompt,
     precheck: null,
-    agentId: 'codex',
+    agentId: 'opencode',
     projectId: 'synthetic-project',
     executionTargetType: 'local',
     executionTargetId: 'local',

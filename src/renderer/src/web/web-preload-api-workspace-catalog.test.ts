@@ -595,14 +595,14 @@ describe('web worktree preload API', () => {
       baseBranch: TEST_COMMIT_OID,
       compareBaseRef: 'refs/remotes/origin/main',
       setupDecision: 'inherit',
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       displayName: 'Review label',
       displayNameKind: 'user',
       startup: {
-        command: "codex 'summarize repo'",
+        command: "opencode 'summarize repo'",
         env: { ORCA_AGENT_MODE: 'direct' },
         launchConfig: {
-          agentCommand: 'codex',
+          agentCommand: 'opencode',
           agentArgs: '--model gpt-5',
           agentEnv: { ORCA_AGENT_MODE: 'direct' }
         },
@@ -637,13 +637,13 @@ describe('web worktree preload API', () => {
           repo: 'repo-1',
           baseBranch: TEST_COMMIT_OID,
           compareBaseRef: 'refs/remotes/origin/main',
-          createdWithAgent: 'codex',
+          createdWithAgent: 'opencode',
           displayName: 'Review label',
           displayNameKind: 'user',
-          startupCommand: "codex 'summarize repo'",
+          startupCommand: "opencode 'summarize repo'",
           startupEnv: { ORCA_AGENT_MODE: 'direct' },
           startupLaunchConfig: {
-            agentCommand: 'codex',
+            agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
             agentEnv: { ORCA_AGENT_MODE: 'direct' }
           },

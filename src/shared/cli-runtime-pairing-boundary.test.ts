@@ -23,13 +23,13 @@ const ALLOWLIST: readonly string[] = readFileSync(
   .filter((line) => line.length > 0 && !line.startsWith('#'))
 
 // Why no call-paren: several sites pass the resolver as a value into a
-// dependency bag (`resolveCommand: resolveCodexCommand`) and call it later, so
+// dependency bag (`resolveCommand: resolveClaudeCommand`) and call it later, so
 // requiring `(` here let exactly that shape through the ratchet unnoticed.
-const RESOLVES_CLI = /\b(?:resolveCliCommand|resolveCodexCommand|resolveClaudeCommand)\b/
+const RESOLVES_CLI = /\b(?:resolveCliCommand|resolveClaudeCommand)\b/
 // Why the exec/fork family too: a resolved CLI handed to execFile is the same
-// unpaired launch as spawn. The first draft matched only the spawn names, and
-// codex-trust-grant-host.ts — which resolves a CLI and calls execFileSync — was
-// invisible to the ratchet purely through that omission.
+// unpaired launch as spawn. The first draft matched only the spawn names, and a
+// site that resolved a CLI and called execFileSync was invisible to the ratchet
+// purely through that omission.
 // The lookbehind keeps `RE.exec(` and other method calls out.
 const SPAWNS =
   /(?<!\.)\b(?:spawn|spawnProcess|spawnSync|runProcess|execFile|execFileSync|execSync|exec|fork)\s*\(/

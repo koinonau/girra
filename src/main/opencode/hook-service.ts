@@ -44,28 +44,21 @@ function toSafeDirName(id: string): string {
 }
 
 export function getOpenCodePluginSource(): string {
-  return getOpenCodeFamilyPluginSource('/hook/opencode', { emitSessionStart: true })
-}
-
-export function getOpenCodeFamilyPluginSource(
-  hookPathname: string,
-  options: { emitSessionStart: boolean }
-): string {
   // Why: the plugin posts PTY environment data from OpenCode to the shared hooks server.
   return [
     ...getStatusPluginEndpointSource(),
     ...getStatusPluginRuntimeStateSource(),
     ...getStatusPluginMessagePreviewSource(),
     ...getStatusPluginSessionLineageSource(),
-    ...getStatusPluginPostSource(hookPathname),
+    ...getStatusPluginPostSource('/hook/opencode'),
     ...getStatusPluginDeliverySource(),
     ...getStatusPluginOwnershipSource(),
     ...getStatusPluginLifecycleSource(),
-    ...getStatusPluginFactorySource(options)
+    ...getStatusPluginFactorySource()
   ].join('\n')
 }
 
-// Why: installs the plugin into OPENCODE_CONFIG_DIR so it POSTs to the shared agent-hooks server, unifying OpenCode status with Claude/Codex/Gemini (the old loopback-IPC path never reached agentStatusByPaneKey).
+// Why: installs the plugin into OPENCODE_CONFIG_DIR so it POSTs to the shared agent-hooks server, unifying OpenCode status with Claude and Pi (the old loopback-IPC path never reached agentStatusByPaneKey).
 export class OpenCodeHookService {
   clearPty(_ptyId: string): void {
     // Why: no-op — config dirs are app/source-scoped now, and recursive delete on the main-process hot path could freeze on Windows.

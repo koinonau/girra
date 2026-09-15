@@ -144,7 +144,7 @@ function foregroundSkipReason(
   }
   if (evidence.processName !== null) {
     // The host named something running in the pane. It registered no agent session, which is
-    // exactly the hand-launched `claude`/`codex` case agentSessionOwners cannot see.
+    // exactly the hand-launched `claude`/`opencode` case agentSessionOwners cannot see.
     return 'host observes a named foreground process'
   }
   if (evidence.shellOwnsEveryTtyProcessGroup !== true) {

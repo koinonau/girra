@@ -78,7 +78,7 @@ describe('OrcaRuntimeService', () => {
     ])
     const serializeProviderBuffer = vi.fn().mockResolvedValue(null)
     const serializeBuffer = vi.fn().mockResolvedValue({
-      data: ' >_ OpenAI Codex (v0.131.0)\r\n model:       gpt-5.5 high\r\n directory:   /repo\r\n',
+      data: 'Update available! 0.131.0 -> 0.132.0\r\nPress enter to continue\r\n',
       cols: 80,
       rows: 24
     })
@@ -190,7 +190,7 @@ describe('OrcaRuntimeService', () => {
     })
     await expect(
       runtime.waitForTerminal('term_ssh_legacy', { condition: 'tui-idle', timeoutMs: 100 })
-    ).resolves.toMatchObject({ satisfied: true })
+    ).resolves.toMatchObject({ satisfied: false, blockedReason: 'agent-update-prompt' })
     expect(serializeProviderBuffer).toHaveBeenCalledOnce()
     expect(serializeBuffer).toHaveBeenCalledOnce()
   })

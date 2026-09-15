@@ -162,7 +162,7 @@ describe('refusing to tree-kill our own Chromium processes', () => {
     expect(
       admitSelfInitiatedTreeKill({
         pid: 7777,
-        site: 'codex-account-login-teardown',
+        site: 'git-command-tree-kill',
         scope: 'win-taskkill-tree'
       })
     ).toBe(true)

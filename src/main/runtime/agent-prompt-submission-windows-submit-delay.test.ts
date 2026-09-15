@@ -39,7 +39,7 @@ vi.mock('../git/worktree', () => ({
   ])
 }))
 
-// Why: 'aider' is not a settlement agent, so submission takes the open-loop delay under test.
+// Why: 'opencode' is not a settlement agent, so submission takes the open-loop delay under test.
 async function createPromptRuntime(): Promise<{
   runtime: OrcaRuntimeService
   handle: string
@@ -63,7 +63,7 @@ async function createPromptRuntime(): Promise<{
     getForegroundProcess: async () => null
   })
   const terminal = await runtime.createTerminal(`path:${WORKTREE_PATH}`, {
-    launchAgent: 'aider'
+    launchAgent: 'opencode'
   })
   return { runtime, handle: terminal.handle, writes, submitTimes }
 }
@@ -296,7 +296,7 @@ describe('agent prompt render gate on a ConPTY host', () => {
     Object.defineProperty(process, 'platform', originalPlatform)
   })
 
-  /** Claude/Codex take the closed-loop gate; the paste-end write emits the show-cursor
+  /** Claude takes the closed-loop gate; the paste-end write emits the show-cursor
    *  marker and then goes silent, which is what an agent that repaints mid-ingest looks like. */
   async function createSettlementRuntime(
     // `noiseUntilMs` keeps the pane emitting inside every quiet window, so the gate can only

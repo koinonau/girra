@@ -183,7 +183,7 @@ describe('registerPtyHandlers', () => {
             worktreeId: recoveredAgentSurface.worktreeId,
             tabId: recoveredAgentSurface.tabId,
             leafId: recoveredAgentSurface.leafId,
-            command: "codex resume 'provider-session-1'",
+            command: "claude --resume 'provider-session-1'",
             agentSessionEnsure: {
               claim: recoveredAgentClaim,
               surface: recoveredAgentSurface

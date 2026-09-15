@@ -89,7 +89,7 @@ describe('createPtySubprocess', () => {
 
   it('normalizes foreground process names from node-pty', async () => {
     const proc = mockPtyProcess()
-    proc.process = '/opt/homebrew/bin/codex'
+    proc.process = '/opt/homebrew/bin/claude'
     spawnMock.mockReturnValue(proc)
 
     const handle = await createPtySubprocess({
@@ -98,7 +98,7 @@ describe('createPtySubprocess', () => {
       rows: 24
     })
 
-    expect(handle.getForegroundProcess()).toBe('codex')
+    expect(handle.getForegroundProcess()).toBe('claude')
   })
 
   it('serves daemon wrapper agent foreground from an async cache without blocking', async () => {
@@ -128,8 +128,8 @@ describe('createPtySubprocess', () => {
         expect.any(Object)
       )
 
-      resolveForeground('codex')
-      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('codex'))
+      resolveForeground('claude')
+      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('claude'))
     } finally {
       if (platform) {
         Object.defineProperty(process, 'platform', platform)
@@ -145,7 +145,7 @@ describe('createPtySubprocess', () => {
     spawnMock.mockReturnValue(proc)
     const platform = Object.getOwnPropertyDescriptor(process, 'platform')
     Object.defineProperty(process, 'platform', { value: 'darwin' })
-    resolveAgentForegroundProcessMock.mockResolvedValue('grok')
+    resolveAgentForegroundProcessMock.mockResolvedValue('pi')
 
     try {
       const handle = await createPtySubprocess({
@@ -157,12 +157,12 @@ describe('createPtySubprocess', () => {
       expect(handle.getForegroundProcess()).toBe('node')
       await Promise.resolve()
       await Promise.resolve()
-      expect(handle.getForegroundProcess()).toBe('grok')
+      expect(handle.getForegroundProcess()).toBe('pi')
 
       // Why: renderer reads poll slower than the 1s cache TTL — an expired
       // cache must keep answering with the resolved identity, not the wrapper.
       vi.advanceTimersByTime(1_500)
-      expect(handle.getForegroundProcess()).toBe('grok')
+      expect(handle.getForegroundProcess()).toBe('pi')
     } finally {
       vi.useRealTimers()
       if (platform) {
@@ -179,7 +179,7 @@ describe('createPtySubprocess', () => {
     spawnMock.mockReturnValue(proc)
     const platform = Object.getOwnPropertyDescriptor(process, 'platform')
     Object.defineProperty(process, 'platform', { value: 'darwin' })
-    resolveAgentForegroundProcessMock.mockResolvedValueOnce('grok').mockResolvedValue('node')
+    resolveAgentForegroundProcessMock.mockResolvedValueOnce('pi').mockResolvedValue('node')
 
     try {
       const handle = await createPtySubprocess({
@@ -191,7 +191,7 @@ describe('createPtySubprocess', () => {
       expect(handle.getForegroundProcess()).toBe('node')
       await Promise.resolve()
       await Promise.resolve()
-      expect(handle.getForegroundProcess()).toBe('grok')
+      expect(handle.getForegroundProcess()).toBe('pi')
       // Flush the first refresh's finally so the next read can revalidate.
       await Promise.resolve()
       await Promise.resolve()
@@ -199,7 +199,7 @@ describe('createPtySubprocess', () => {
       // An unrelated wrapper (e.g. npm) now owns the pane: the stale-served
       // identity is revalidated and dropped once the refresh finds no agent.
       vi.advanceTimersByTime(1_500)
-      expect(handle.getForegroundProcess()).toBe('grok')
+      expect(handle.getForegroundProcess()).toBe('pi')
       await Promise.resolve()
       await Promise.resolve()
       await Promise.resolve()
@@ -239,8 +239,8 @@ describe('createPtySubprocess', () => {
         expect.any(Object)
       )
 
-      resolveForeground('codex')
-      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('codex'))
+      resolveForeground('claude')
+      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('claude'))
     } finally {
       if (platform) {
         Object.defineProperty(process, 'platform', platform)
@@ -275,8 +275,8 @@ describe('createPtySubprocess', () => {
         expect.any(Object)
       )
 
-      resolveForeground('codex')
-      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('codex'))
+      resolveForeground('claude')
+      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('claude'))
     } finally {
       if (platform) {
         Object.defineProperty(process, 'platform', platform)
@@ -333,8 +333,8 @@ describe('createPtySubprocess', () => {
       await Promise.resolve()
       expect(settled).toBe(false)
 
-      resolveFresh('droid')
-      await expect(confirmation).resolves.toBe('droid')
+      resolveFresh('opencode')
+      await expect(confirmation).resolves.toBe('opencode')
       expect(resolveAgentForegroundProcessMock).toHaveBeenCalledExactlyOnceWith(
         proc.pid,
         'powershell.exe',
@@ -370,7 +370,7 @@ describe('createPtySubprocess', () => {
 
   it('returns null when a recognized Windows fallback disappears during confirmation', async () => {
     const proc = mockPtyProcess()
-    proc.process = 'droid'
+    proc.process = 'opencode'
     spawnMock.mockReturnValue(proc)
     const platform = Object.getOwnPropertyDescriptor(process, 'platform')
     Object.defineProperty(process, 'platform', { value: 'win32' })
@@ -446,15 +446,15 @@ describe('createPtySubprocess', () => {
       })
 
       expect(handle.getForegroundProcess()).toBe('powershell.exe')
-      proc.process = 'codex'
-      expect(handle.getForegroundProcess()).toBe('codex')
+      proc.process = 'claude'
+      expect(handle.getForegroundProcess()).toBe('claude')
 
       resolveForeground('powershell.exe')
       await Promise.resolve()
       await Promise.resolve()
 
       proc.process = 'powershell.exe'
-      expect(handle.getForegroundProcess()).toBe('codex')
+      expect(handle.getForegroundProcess()).toBe('claude')
     } finally {
       if (platform) {
         Object.defineProperty(process, 'platform', platform)
@@ -478,10 +478,10 @@ describe('createPtySubprocess', () => {
         cols: 80,
         rows: 24,
         cwd: 'C:\\repo\\orca',
-        command: 'codex'
+        command: 'claude'
       })
 
-      expect(handle.getForegroundProcess()).toBe('codex')
+      expect(handle.getForegroundProcess()).toBe('claude')
       expect(resolveAgentForegroundProcessMock).toHaveBeenCalledWith(
         proc.pid,
         'powershell.exe',
@@ -489,10 +489,10 @@ describe('createPtySubprocess', () => {
       )
 
       await Promise.resolve()
-      expect(handle.getForegroundProcess()).toBe('codex')
+      expect(handle.getForegroundProcess()).toBe('claude')
 
       vi.advanceTimersByTime(4_999)
-      expect(handle.getForegroundProcess()).toBe('codex')
+      expect(handle.getForegroundProcess()).toBe('claude')
 
       vi.advanceTimersByTime(2)
       expect(handle.getForegroundProcess()).toBe('powershell.exe')
@@ -525,10 +525,10 @@ describe('createPtySubprocess', () => {
         cols: 80,
         rows: 24,
         cwd: 'C:\\repo\\orca',
-        command: 'codex'
+        command: 'claude'
       })
 
-      expect(handle.getForegroundProcess()).toBe('codex')
+      expect(handle.getForegroundProcess()).toBe('claude')
       expect(resolveAgentForegroundProcessMock).toHaveBeenCalledWith(
         proc.pid,
         'powershell.exe',
@@ -538,7 +538,7 @@ describe('createPtySubprocess', () => {
       )
 
       vi.advanceTimersByTime(2_500)
-      expect(handle.getForegroundProcess()).toBe('codex')
+      expect(handle.getForegroundProcess()).toBe('claude')
 
       resolveForeground('powershell.exe')
       await vi.runAllTimersAsync()
@@ -556,7 +556,7 @@ describe('createPtySubprocess', () => {
     spawnMock.mockReturnValue(proc)
     const platform = Object.getOwnPropertyDescriptor(process, 'platform')
     Object.defineProperty(process, 'platform', { value: 'win32' })
-    resolveAgentForegroundProcessMock.mockResolvedValue('codex')
+    resolveAgentForegroundProcessMock.mockResolvedValue('claude')
 
     try {
       const handle = await createPtySubprocess({
@@ -573,7 +573,7 @@ describe('createPtySubprocess', () => {
         expect.any(Object)
       )
 
-      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('codex'))
+      await vi.waitFor(() => expect(handle.getForegroundProcess()).toBe('claude'))
     } finally {
       if (platform) {
         Object.defineProperty(process, 'platform', platform)

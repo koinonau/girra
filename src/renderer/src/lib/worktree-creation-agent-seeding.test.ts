@@ -36,7 +36,7 @@ const request: WorktreeCreationRequest = {
   repoId: 'repo-1',
   name: 'feature',
   setupDecision: 'inherit',
-  agent: 'codex',
+  agent: 'opencode',
   agentLaunchRoute: 'terminal-tui',
   pendingFirstAgentMessageRename: false,
   note: '',
@@ -64,7 +64,7 @@ describe('executeWorktreeCreation agent seeding', () => {
     expect(mocks.ensureWebRuntimeWorktreeTerminalAfterWake).toHaveBeenCalledOnce()
     expect(mocks.ensureWebRuntimeWorktreeTerminalAfterWake).toHaveBeenCalledWith('worktree-1', {
       startup: undefined,
-      agent: 'codex',
+      agent: 'opencode',
       activate: false
     })
     expect(mocks.completeWorktreeCreation).toHaveBeenCalledWith(
@@ -81,7 +81,7 @@ describe('executeWorktreeCreation agent seeding', () => {
 
     expect(mocks.activateAndRevealWorktree).toHaveBeenCalledWith(
       'worktree-1',
-      expect.objectContaining({ agent: 'codex' })
+      expect.objectContaining({ agent: 'opencode' })
     )
   })
 })

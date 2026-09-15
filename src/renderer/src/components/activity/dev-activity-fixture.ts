@@ -56,7 +56,7 @@ function fixtureTab(id: string, title: string, sortOrder: number): TerminalTab {
     color: null,
     sortOrder,
     createdAt: Date.now(),
-    launchAgent: id === 'dev-fixture-tab-1' ? 'codex' : 'claude'
+    launchAgent: id === 'dev-fixture-tab-1' ? 'opencode' : 'claude'
   }
 }
 
@@ -91,7 +91,7 @@ export function seedDevActivityFixture(): void {
       payload: {
         state: 'working',
         prompt: 'Refactor the activity filters and keep the list responsive.',
-        agentType: 'codex',
+        agentType: 'opencode',
         model: 'gpt-5-codex',
         toolName: 'Edit',
         toolInput: 'activity-scope-filter.ts'
@@ -116,7 +116,7 @@ export function seedDevActivityFixture(): void {
       payload: {
         state: 'done',
         prompt: 'Add a shortcut to focus the activity search field.',
-        agentType: 'codex',
+        agentType: 'opencode',
         model: 'gpt-5-codex',
         lastAssistantMessage: 'Added the shortcut and covered it with a test.'
       },

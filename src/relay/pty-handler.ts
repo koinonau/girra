@@ -493,7 +493,7 @@ export function attachIdentityMismatches(expected: PtyIdentity, managed: PtyIden
   )
 }
 /** Returns env to merge into the PTY's spawn env. Receives spawn context so augmenters can derive per-PTY identity from paneKey.
- *  `command` is the renderer-chosen agent launch command (`pi`, `omp`, …); undefined for CLI-launched bare shells. */
+ *  `command` is the renderer-chosen agent launch command (`pi`, `claude`, …); undefined for CLI-launched bare shells. */
 export type PtyEnvAugmenter = (ctx: {
   id: string
   paneKey?: string

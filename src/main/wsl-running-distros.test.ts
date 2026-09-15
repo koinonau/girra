@@ -147,11 +147,11 @@ describe('running WSL distro discovery', () => {
     await withPlatform('win32', async () => {
       await expect(
         filterPathsToRunningWslDistrosAsync([
-          'C:\\Users\\ada\\codex-home',
+          'C:\\Users\\ada\\claude-home',
           '\\\\wsl.localhost\\Ubuntu\\home\\ada',
           '\\\\wsl.localhost\\Debian\\home\\other'
         ])
-      ).resolves.toEqual(['C:\\Users\\ada\\codex-home', '\\\\wsl.localhost\\Ubuntu\\home\\ada'])
+      ).resolves.toEqual(['C:\\Users\\ada\\claude-home', '\\\\wsl.localhost\\Ubuntu\\home\\ada'])
     })
   })
 

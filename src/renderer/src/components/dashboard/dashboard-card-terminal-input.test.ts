@@ -36,14 +36,14 @@ function stateWith(
   } as Partial<DashboardCardTerminalInputState>
 }
 
-function codexEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusEntry {
+function openCodeEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusEntry {
   return {
     state: 'waiting',
     prompt: '',
     updatedAt: 1,
     stateStartedAt: 1,
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey: MAC_ARGS.paneKey,
     ...overrides
   }
@@ -115,25 +115,10 @@ describe('resolveDashboardCardTerminalInput', () => {
     expect(resolveDashboardCardTerminalInput(state, MAC_ARGS).hostPlatform).toBe('win32')
   })
 
-  it('relays Windows input-record paste encoding for a confirmed remote Codex pane', () => {
+  it('relays bracketed multiline paste for a confirmed non-Windows OpenCode pane', () => {
     const profile = resolveDashboardCardTerminalInput(
       stateWith({
-        runtimeStatusByEnvironmentId: new Map([
-          ['windows-box', { status: { hostPlatform: 'win32' } }]
-        ]),
-        agentStatusByPaneKey: { [MAC_ARGS.paneKey]: codexEntry() }
-      } as unknown as Partial<DashboardCardTerminalInputState>),
-      { ...MAC_ARGS, ptyId: 'remote:windows-box@@pty-1' }
-    )
-
-    expect(profile.windowsInputRecordPasteNewline).toBe('alt-enter')
-    expect(profile.forceBracketedMultilineTextPaste).toBeUndefined()
-  })
-
-  it('relays bracketed multiline paste for a confirmed non-Windows Codex pane', () => {
-    const profile = resolveDashboardCardTerminalInput(
-      stateWith({
-        agentStatusByPaneKey: { [MAC_ARGS.paneKey]: codexEntry() }
+        agentStatusByPaneKey: { [MAC_ARGS.paneKey]: openCodeEntry() }
       }),
       MAC_ARGS
     )
@@ -149,7 +134,7 @@ describe('resolveDashboardCardTerminalInput', () => {
           ['windows-box', { status: { hostPlatform: 'win32' } }]
         ]),
         agentStatusByPaneKey: {
-          [MAC_ARGS.paneKey]: codexEntry({ restoredUnconfirmed: true })
+          [MAC_ARGS.paneKey]: openCodeEntry({ restoredUnconfirmed: true })
         }
       } as unknown as Partial<DashboardCardTerminalInputState>),
       { ...MAC_ARGS, ptyId: 'remote:windows-box@@pty-1' }

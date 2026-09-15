@@ -177,7 +177,7 @@ describe('orchestration federated worker output', () => {
         worktree: 'new-top-level',
         repo: 'id:windows-repo',
         name: 'windows-output',
-        agent: 'codex'
+        agent: 'claude'
       }
     }
   }
@@ -199,7 +199,7 @@ describe('orchestration federated worker output', () => {
       }
     } as never)
     vi.spyOn(runtime, 'listTerminals').mockResolvedValue({
-      terminals: [{ handle: 'term_windows_worker', title: 'Codex' }],
+      terminals: [{ handle: 'term_windows_worker', title: 'Claude Code' }],
       totalCount: 1,
       truncated: false
     } as never)

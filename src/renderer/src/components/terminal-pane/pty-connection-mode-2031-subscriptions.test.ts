@@ -300,7 +300,7 @@ describe('connectPanePty', () => {
     })
   })
 
-  it('records hidden Codex mode 2031 subscribes split across becoming visible', async () => {
+  it('records hidden agent mode 2031 subscribes split across becoming visible', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport('pty-id')
     const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
@@ -326,7 +326,7 @@ describe('connectPanePty', () => {
         isVisibleRef,
         paneMode2031Ref,
         paneLastThemeModeRef,
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)
@@ -365,7 +365,7 @@ describe('connectPanePty', () => {
         isVisibleRef: { current: false },
         paneMode2031Ref,
         paneLastThemeModeRef,
-        startup: { command: 'codex' }
+        startup: { command: 'opencode' }
       }) as never
     )
     await flushAsyncTicks(6)

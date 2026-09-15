@@ -234,7 +234,7 @@ describe('ClaudeHookService.install', () => {
       )
       // Why: POSIX resolves the profile at runtime (`${HOME-}`, STA-3348). Windows cannot —
       // no single token expands in both Git Bash and cmd.exe — so it registers the absolute
-      // path, as Codex/Grok/Devin/Antigravity already do (#18875). A moved profile is caught
+      // path (#18875). A moved profile is caught
       // by getStatus's exact match and rewritten, and `|| echo {}` keeps a stale entry neutral.
       if (process.platform !== 'win32') {
         expect(JSON.stringify(managedHook)).not.toContain(tmpHome.replaceAll('\\', '/'))

@@ -20,7 +20,7 @@ This page covers the errors you’ll see most often and how to fix them.
 
 ## Rate limits (most common)
 
-GitHub gives each **authenticated user** a shared hourly budget. **Every tool on that account shares it**: Orca, `gh` in terminals, Claude/Codex/Grok agents that call `gh`, CI scripts, browser extensions, and other apps.
+GitHub gives each **authenticated user** a shared hourly budget. **Every tool on that account shares it**: Orca, `gh` in terminals, agents that call `gh`, CI scripts, browser extensions, and other apps.
 
 ### Buckets Orca cares about
 
@@ -42,7 +42,7 @@ Trust this order when they disagree:
 2. A real CLI check (below)
 3. The Settings budget numbers (useful, but probe-only)
 
-Also don’t confuse **GitHub API Budget** with **Claude / Grok usage** under Accounts: those are AI provider limits, not GitHub’s REST quota.
+Also don’t confuse **GitHub API Budget** with **Claude usage** under Accounts: those are AI provider limits, not GitHub’s REST quota.
 
 ### Confirm a rate limit from a terminal
 

@@ -61,7 +61,7 @@ snapshot (step 5), and `create` boots from the authenticated snapshot they produ
      remove verbs. If a provider advertises `ssh`, check whether it exposes a real dialable SSH
      target (host, port, user, key or proxy command) or only a provider-mediated interactive shell.
      Orca's SSH mode needs the former.
-   - **Coding-agent CLI and account:** which agent runs in the environment (`codex`, `claude`, and
+   - **Coding-agent CLI and account:** which agent runs in the environment (`claude`, `opencode`, and
      so on) and that the user has an account for it. It is logged in during step 6.
    - **Git auth:** the token source for cloning a private repo (`GH_TOKEN`, `GITHUB_TOKEN`, or
      `gh auth token`).

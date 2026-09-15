@@ -10,8 +10,6 @@ export type PaneAgentOwnerSignals = {
   launchAgent?: AgentType | null
   /** Never-cleared per-connection launch seed (pane connection only). */
   startupLaunchAgent?: AgentType | null
-  /** Startup-provided initial agent status (pane connection only). */
-  initialStatusAgent?: AgentType | null
   /** Agent inferred from a manually typed shell command (pane connection only). */
   commandInferredAgent?: AgentType | null
   /** Live focused-pane hook identity — host-stamped, published, mirror-safe. */
@@ -38,7 +36,6 @@ const PANE_OWNER_RANK: readonly {
 }[] = [
   { key: 'launchAgent', ownerIsLaunch: true },
   { key: 'startupLaunchAgent', ownerIsLaunch: true },
-  { key: 'initialStatusAgent', ownerIsLaunch: true },
   { key: 'commandInferredAgent', ownerIsLaunch: true },
   { key: 'hookAgent', ownerIsLaunch: false },
   { key: 'siblingHookAgent', ownerIsLaunch: false },
@@ -57,7 +54,7 @@ const PANE_OWNER_RANK: readonly {
  * process signal exists, so it leads. Once launch metadata is gone — a mirrored
  * or restored pane drops the host-owned launchAgent — the owner must fall
  * through to a durable pane identity rather than to the raw title, because a
- * wrapper agent's title (OMP emits Pi-compatible frames) cannot be told apart
+ * wrapper agent's title (one emitting Pi-compatible frames) cannot be told apart
  * from the agent it wraps. The host-stamped hook identity is that durable,
  * published, mirror-safe anchor; the last completed hook and the hibernated
  * session record carry it across the windows where no live hook exists. Ranking

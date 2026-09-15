@@ -5,8 +5,6 @@
     "supported",
     "claude-code",
     "glm-agent",
-    "codex",
-    "cursor-cli",
     "native-chat",
     "session-history",
     "hibernation",

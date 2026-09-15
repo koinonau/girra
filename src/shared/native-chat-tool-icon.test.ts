@@ -44,7 +44,7 @@ describe('native chat tool icons', () => {
     expect(new Set(glyphs).size).toBe(glyphs.length)
   })
 
-  it('maps the row words the Codex lane renders to their category', () => {
+  it('maps classified row words to their category', () => {
     expect(nativeChatToolCategory('read')).toBe('read')
     expect(nativeChatToolCategory('search')).toBe('search')
     expect(nativeChatToolCategory('list')).toBe('listFiles')
@@ -74,8 +74,8 @@ describe('native chat tool icons', () => {
   })
 
   it('reads the projected `Diff` row as a file change, which is what it renders', () => {
-    // Every Codex fileChange item projects to a call named `Diff`, so a wrench
-    // here headed a run whose body is an edited-file card.
+    // A projected file change is a call named `Diff`, so a wrench here headed a
+    // run whose body is an edited-file card.
     expect(nativeChatToolCategory('Diff')).toBe('fileChange')
     expect(nativeChatToolIconName('Diff')).toBe('pencil')
   })
@@ -109,9 +109,9 @@ describe('native chat tool icons', () => {
   })
 
   it('keeps the terminal glyph for a row that really ran a command', () => {
-    // `exec` and `local_shell` are how the Codex rollout transcript names a
-    // shell call; `native-chat-edit-normalize` already calls the three command
-    // tools by those words, so a wrench on one would deny a command that ran.
+    // `exec` and `local_shell` are how rollout transcripts name a shell call;
+    // `native-chat-edit-normalize` already calls the three command tools by
+    // those words, so a wrench on one would deny a command that ran.
     for (const name of ['shell', 'bash', 'run_terminal_cmd', 'exec', 'local_shell']) {
       expect(nativeChatToolCategory(name)).toBe('unknown')
       expect(nativeChatToolIconName(name)).toBe('square-terminal')
@@ -120,10 +120,10 @@ describe('native chat tool icons', () => {
 
   describe('terminal activity for a two-glyph lane', () => {
     // Mobile has only a terminal and a wrench, so it asks this instead of
-    // `nativeChatToolIconName`. The row word alone cannot answer it: Codex's
-    // classified `read` and Claude's `Read` are the same word lowercased.
+    // `nativeChatToolIconName`. The row word alone cannot answer it: a classified
+    // shell `read` and Claude's `Read` are the same word lowercased.
 
-    it('reads a classified Codex row as terminal activity, by the command it kept', () => {
+    it('reads a classified shell row as terminal activity, by the command it kept', () => {
       for (const [name, fields] of [
         ['read', { path: 'src/app.ts' }],
         ['search', { query: 'todo', directory: 'src' }],

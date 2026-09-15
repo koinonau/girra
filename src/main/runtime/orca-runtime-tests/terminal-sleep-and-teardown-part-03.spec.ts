@@ -196,7 +196,7 @@ describe('OrcaRuntimeService', () => {
       getForegroundProcess: async () => null,
       listProcesses: async () => [
         { id: 'pty-1', cwd: '/tmp/worktree-a', title: 'Claude' },
-        { id: 'pty-2', cwd: '/tmp/worktree-a', title: 'Codex' }
+        { id: 'pty-2', cwd: '/tmp/worktree-a', title: 'OpenCode' }
       ]
     })
 

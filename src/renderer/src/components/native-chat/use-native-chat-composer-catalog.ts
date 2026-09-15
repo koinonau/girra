@@ -34,7 +34,7 @@ export function useNativeChatComposerCatalog(
         ? getVerifiedNativeChatCommands(agent)
         : reported !== undefined
           ? sessionSlashCommandSuggestions(agent, reported)
-          : structuredSlashCommands(conversationCommands, agent),
+          : structuredSlashCommands(conversationCommands),
     [agent, conversationCommands, reported, structured]
   )
   const sessionSkillNames = useMemo(

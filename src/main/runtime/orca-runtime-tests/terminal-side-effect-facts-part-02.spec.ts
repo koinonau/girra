@@ -495,25 +495,25 @@ describe('terminal side-effect fact channel', () => {
     const { runtime } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07real output\r\n', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07real output\r\n', 100)
     // Hook-driven idle frame lands only in main's tracker; the emulator never sees fabricated bytes (invariant 5).
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Codex ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
 
     const snapshot = await runtime.serializeMainTerminalBuffer('pty-1', { scrollbackRows: 10 })
     expect(snapshot?.source).toBe('headless')
-    expect(snapshot?.lastTitle).toBe('Codex ready')
+    expect(snapshot?.lastTitle).toBe('Claude ready')
   })
 
   it('returns a title-only replay snapshot and never historical attention', () => {
     const { runtime } = createSideEffectRuntime()
     syncSinglePty(runtime)
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07\x07', 100)
 
     expect(runtime.getTerminalSideEffectSnapshot('pty-1')).toMatchObject({
       ptyId: 'pty-1',
       replay: true,
-      facts: [{ kind: 'title', normalizedTitle: 'Codex working', rawTitle: 'Codex working' }]
+      facts: [{ kind: 'title', normalizedTitle: 'Claude working', rawTitle: 'Claude working' }]
     })
     expect(runtime.getTerminalSideEffectSnapshot('pty-unknown')).toBeNull()
   })
@@ -529,7 +529,7 @@ describe('terminal side-effect fact channel', () => {
 
     runtime.onPtyData(
       'pty-1',
-      '\x1b]9999;{"state":"working","agentType":"codex"}\x07\x1b]0;Codex working\x07\x07',
+      '\x1b]9999;{"state":"working","agentType":"claude"}\x07\x1b]0;Claude working\x07\x07',
       100
     )
 
@@ -546,19 +546,19 @@ describe('terminal side-effect fact channel', () => {
       throw new Error('tracker boom')
     })
 
-    const first = '\x1b]0;Codex working\x07'
+    const first = '\x1b]0;Claude working\x07'
     expect(() => runtime.onPtyData('pty-1', first, 100)).toThrow('tracker boom')
-    runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
 
     expect(batches).toHaveLength(2)
     expect(batches[0].seq).toBe(first.length)
     expect(batches[0].facts).toEqual([
-      { kind: 'title', normalizedTitle: 'Codex working', rawTitle: 'Codex working' }
+      { kind: 'title', normalizedTitle: 'Claude working', rawTitle: 'Claude working' }
     ])
     // Next chunk's batch carries only its own facts: the throw aborted the first chunk's tracker pass, so no working state kept.
     expect(batches[1].seq).toBeGreaterThan(batches[0].seq)
     expect(batches[1].facts).toEqual([
-      { kind: 'title', normalizedTitle: 'Codex done', rawTitle: 'Codex done' }
+      { kind: 'title', normalizedTitle: 'Claude done', rawTitle: 'Claude done' }
     ])
   })
 
@@ -614,7 +614,7 @@ describe('terminal side-effect fact channel', () => {
       data: 'restored scrollback\n',
       cols: 80,
       rows: 24,
-      lastTitle: 'Codex working'
+      lastTitle: 'Claude working'
     })
     runtime.setPtyController({
       write: () => true,
@@ -631,12 +631,12 @@ describe('terminal side-effect fact channel', () => {
     await runtime.serializeMainTerminalBuffer('pty-1', { scrollbackRows: 10 })
     batches.length = 0
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
 
     // Without the seed the tracker never saw 'working', so this idle title could not produce a completion fact.
     expect(batches.flatMap((batch) => batch.facts)).toContainEqual({
       kind: 'agent-idle',
-      title: 'Codex done'
+      title: 'Claude done'
     })
   })
 })

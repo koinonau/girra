@@ -7642,7 +7642,7 @@
       "knownGaps": [
         "No live Linux, Windows, WSL, paired-runtime, or real-SSH manual compact journey was run.",
         "Claude versions before prompt_id support intentionally cannot complete a manual compact row through PostCompact.",
-        "Automatic Claude and Kimi completion remain intentionally fail-closed because their hooks do not prove an exact compact generation."
+        "Automatic Claude completion remains intentionally fail-closed because its hooks do not prove an exact compact generation."
       ],
       "demotionRule": "Demote or quarantine if identity-mismatched completion can retire newer work, cleanup retains compact authority, or the focused gate flakes without a product or harness bug."
     },
@@ -7664,7 +7664,7 @@
         "https://github.com/stablyai/orca/pull/13995"
       ],
       "invariant": "Every agent launch surface must advertise the provider set detected on its explicit execution authority and launch on that same authority; a local Floating Workspace must never inherit an unrelated active project's WSL, SSH, or paired-runtime context.",
-      "oracle": "Model an active WSL project and a native-Windows Floating Workspace with WSL-only Claude and host-only Codex. Keep both detection consumers mounted, require their advertised sets to stay disjoint through refresh, require the legacy active-project inventory to remain unchanged, then independently assert the Floating launch call and PTY transport select local IPC with no WSL project runtime.",
+      "oracle": "Model an active WSL project and a native-Windows Floating Workspace with WSL-only Claude and host-only OpenCode. Keep both detection consumers mounted, require their advertised sets to stay disjoint through refresh, require the legacy active-project inventory to remain unchanged, then independently assert the Floating launch call and PTY transport select local IPC with no WSL project runtime.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/hooks/useDetectedAgents.test.tsx src/renderer/src/hooks/useAgentDetectionTarget.test.ts src/renderer/src/store/slices/detected-agents.test.ts src/renderer/src/store/slices/local-detected-agent-state.test.ts src/renderer/src/store/slices/repos-remove-project-purge-leak.test.ts src/renderer/src/lib/local-preflight-context.test.ts src/renderer/src/lib/launch-agent-in-new-tab.test.ts --reporter=verbose",
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/pty-connection-fresh-spawn-guards.test.ts --reporter=dot",
@@ -7799,7 +7799,7 @@
         "https://github.com/stablyai/orca/pull/11819"
       ],
       "invariant": "Workspace activation, launch, restore, sleep, hibernate, dedupe, clearing, mount, remount, and reconnect code must not replay or resume a provider session id already owned, queued, pending, live, or durably bound to a host PTY in that workspace. A renderer with missing projection state must adopt the exact runtime-owned PTY for the original tab and leaf rather than create a replacement.",
-      "oracle": "Renderer-state tests assert provider-session ownership across preserved and queued panes. Main/provider contracts assert atomic attach-only adoption, stable host/worktree/tab/leaf identity, no fresh spawn on adoption, and safe paired-runtime cancellation. The Electron oracle creates inactive runtime-owned Codex and Setup PTYs plus an unrelated canary, seeds an exact resumable provider session, removes only the target renderer projections, and activates the workspace. It requires byte-stable handle, PTY, incarnation, tab, leaf, process PID, renderer graph, persisted binding, runtime id, graph epoch, and daemon PID across first mount and reload; PID-specific DOM keyboard I/O must remain live with one launch, zero resume argv, zero signals, zero interruption text, and no canary mutation.",
+      "oracle": "Renderer-state tests assert provider-session ownership across preserved and queued panes. Main/provider contracts assert atomic attach-only adoption, stable host/worktree/tab/leaf identity, no fresh spawn on adoption, and safe paired-runtime cancellation. The Electron oracle creates inactive runtime-owned Claude and Setup PTYs plus an unrelated canary, seeds an exact resumable provider session, removes only the target renderer projections, and activates the workspace. It requires byte-stable handle, PTY, incarnation, tab, leaf, process PID, renderer graph, persisted binding, runtime id, graph epoch, and daemon PID across first mount and reload; PID-specific DOM keyboard I/O must remain live with one launch, zero resume argv, zero signals, zero interruption text, and no canary mutation.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/lib/resume-sleeping-agent-session.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/completed-worker-retirement-resume.unit.test.ts --reporter=verbose",
@@ -7920,7 +7920,7 @@
       ],
       "knownGaps": [
         "Providers listed on this gate are affected identity surfaces; live integration is limited to local macOS while daemon and remote-runtime adoption also have focused contracts.",
-        "The Electron oracle seeds the production hook-store contract instead of running an authenticated Codex hook end to end.",
+        "The Electron oracle seeds the production hook-store contract instead of running an authenticated Claude hook end to end.",
         "The live Electron topology is local macOS only; folder workspaces, SSH, WSL, paired headed/headless servers, Linux, and Windows are not exercised by that journey.",
         "The oracle covers first activation and one renderer reload, not repeated soak activation or an installed-app update."
       ],
@@ -7948,7 +7948,7 @@
       "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
-      "coverageNotes": "Deterministic macOS tests cover controller claims, daemon and SSH/relay operation replay, mixed-version selection, runtime ownership, exact provisional handoff, durable terminal retirement, two independent viewer mirrors, guarded adoption of legacy live PTYs, and completion classification when either the outer remote transport or authoritative host/provider process inspection becomes unreachable. The adoption harness models v1.4.150 agent/setup/shell tabs, current-generation restart and reconnect, exact handle/incarnation/worktree/host checks, topology CAS, competing clients, split-pane/group restoration, WSL ownership, and SSH owner rejection. The secondary parity repro runs independent clients against one headless remote Orca runtime over encrypted pairing and a real daemon-backed PTY, with tokened fixture-process identity separated from unrelated Codex app-server startup probes. The automated primary topology runs an isolated headed macOS Orca desktop server plus a separate paired web client and proves viewer-local fresh/resume focus, exact legacy placement, writable PTYs, unrelated-terminal survival, and host/client cleanup. SSH coverage is provider/relay contract and fault-injection coverage only; it does not substitute for paired-server coverage. Live Windows, Linux, WSL, SSH, and physical paired-Linux hosts remain gaps.",
+      "coverageNotes": "Deterministic macOS tests cover controller claims, daemon and SSH/relay operation replay, mixed-version selection, runtime ownership, exact provisional handoff, durable terminal retirement, two independent viewer mirrors, guarded adoption of legacy live PTYs, and completion classification when either the outer remote transport or authoritative host/provider process inspection becomes unreachable. The adoption harness models v1.4.150 agent/setup/shell tabs, current-generation restart and reconnect, exact handle/incarnation/worktree/host checks, topology CAS, competing clients, split-pane/group restoration, WSL ownership, and SSH owner rejection. The secondary parity repro runs independent clients against one headless remote Orca runtime over encrypted pairing and a real daemon-backed PTY, with tokened fixture-process identity separated from unrelated agent startup probes. The automated primary topology runs an isolated headed macOS Orca desktop server plus a separate paired web client and proves viewer-local fresh/resume focus, exact legacy placement, writable PTYs, unrelated-terminal survival, and host/client cleanup. SSH coverage is provider/relay contract and fault-injection coverage only; it does not substitute for paired-server coverage. Live Windows, Linux, WSL, SSH, and physical paired-Linux hosts remain gaps.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/issues/8878",
         "https://github.com/stablyai/orca/issues/9151",
@@ -9525,7 +9525,7 @@
       "providers": ["paired-runtime", "ssh"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["paired-runtime"],
-      "coverageNotes": "Deterministic headed macOS runs launch an isolated Orca desktop server and a separate paired web client. A byte-identical headless run uses an isolated `orca serve` host. Both create six real paired host PTYs with bounded high-output scrollback, prove sustained output while all six client xterms are warm-mounted but hidden causes zero renderer scheduler work, then drive 180 timed real-PTY spinner frames through a second production `session.tabs.subscribeAll` transport and the real Zustand store. Each worktree must publish and apply only its exact initial-working and final-idle titles. Both topologies ordinary-park five xterms without enabling the lossy retention budget, assert bounded cells/heap/timer lag, then restore the bounded authoritative tail exactly once on the original PTY including output produced while parked and continued input/output. The headed oracle additionally keeps every remote target workspace and terminal unmounted in the host renderer before and after client recovery. Production-parity React contracts reproduce and remove the independent cold-park watcher/title feedback loop, including memo-cache discard, StrictMode cleanup replay, detached split-PTY replacement, and the zero-park fast path. A deterministic cross-boundary contract drives 24 real PTY trackers in distinct worktrees through 2,880 decorative spinner and bare-native redraw chunks and counts host publications, serialized bytes, renderer apply calls, and store mutations while preserving exact per-PTY raw chunks and per-worktree semantic transitions. Fake-clock continuation beyond the 30-minute stale boundary requires one deduplicated refresh per worktree every 15 minutes, globally spaced by at least 50 ms, with every mirrored working status still fresh. Exact-identical Pi plus rotating normalized Pi/Grok frames renew coarse working/permission state; rich prompt/tool/question fields retain their original 30-minute lease, and `stateStartedAt`/acknowledgement identity remain stable across title/hook source swaps. A separate headed desktop-client journey relaunches the host main process while retaining the daemon and a daemon-backgrounded PTY, then requires first-observation foreground sync and continued input/output on the same PTY. Unit coverage keeps layout versions out of snapshot output high-waters when a restored snapshot has no output sequence and retries an existing subscriber only after authoritative provider inventory proves the retained PTY exists. Separate headed/headless ACK-starvation tests recover one stalled stream without replacing its PTY. A headed output-drop oracle proves a successful snapshot probe cannot certify a stale live stream when the authoritative PTY sequence advanced beyond the client high-water. Unit coverage requires an unsequenced client to establish a first-probe baseline, remain attached at the same sequence, and recover only after a later probe advances. A capability-disabled run proves legacy hosts retain the prior lossy limit/TTL fallback. Unit tests cover exact-owner capability routing, raw-stream release, singleton side-effect facts with timed handoff cleanup, 64 simultaneous synthetic-title sources with zero decorative client events after convergence, per-client late-subscribe recovery, semantic bell/title transitions, local animation-frame preservation, legacy no-output-pause delivery gating with exact snapshot restore, provider-authoritative snapshots, 128 active streams plus retry after a 129th-stream capacity rejection, capacity-pressure backoff, full split-leaf remint reconciliation, truncation, and manual-disconnect queue fencing. Linux, Windows, live SSH, and production-scale paired hosts remain gaps.",
+      "coverageNotes": "Deterministic headed macOS runs launch an isolated Orca desktop server and a separate paired web client. A byte-identical headless run uses an isolated `orca serve` host. Both create six real paired host PTYs with bounded high-output scrollback, prove sustained output while all six client xterms are warm-mounted but hidden causes zero renderer scheduler work, then drive 180 timed real-PTY spinner frames through a second production `session.tabs.subscribeAll` transport and the real Zustand store. Each worktree must publish and apply only its exact initial-working and final-idle titles. Both topologies ordinary-park five xterms without enabling the lossy retention budget, assert bounded cells/heap/timer lag, then restore the bounded authoritative tail exactly once on the original PTY including output produced while parked and continued input/output. The headed oracle additionally keeps every remote target workspace and terminal unmounted in the host renderer before and after client recovery. Production-parity React contracts reproduce and remove the independent cold-park watcher/title feedback loop, including memo-cache discard, StrictMode cleanup replay, detached split-PTY replacement, and the zero-park fast path. A deterministic cross-boundary contract drives 24 real PTY trackers in distinct worktrees through 2,880 decorative spinner and bare-native redraw chunks and counts host publications, serialized bytes, renderer apply calls, and store mutations while preserving exact per-PTY raw chunks and per-worktree semantic transitions. Fake-clock continuation beyond the 30-minute stale boundary requires one deduplicated refresh per worktree every 15 minutes, globally spaced by at least 50 ms, with every mirrored working status still fresh. Exact-identical and rotating normalized Pi frames renew coarse working/permission state; rich prompt/tool/question fields retain their original 30-minute lease, and `stateStartedAt`/acknowledgement identity remain stable across title/hook source swaps. A separate headed desktop-client journey relaunches the host main process while retaining the daemon and a daemon-backgrounded PTY, then requires first-observation foreground sync and continued input/output on the same PTY. Unit coverage keeps layout versions out of snapshot output high-waters when a restored snapshot has no output sequence and retries an existing subscriber only after authoritative provider inventory proves the retained PTY exists. Separate headed/headless ACK-starvation tests recover one stalled stream without replacing its PTY. A headed output-drop oracle proves a successful snapshot probe cannot certify a stale live stream when the authoritative PTY sequence advanced beyond the client high-water. Unit coverage requires an unsequenced client to establish a first-probe baseline, remain attached at the same sequence, and recover only after a later probe advances. A capability-disabled run proves legacy hosts retain the prior lossy limit/TTL fallback. Unit tests cover exact-owner capability routing, raw-stream release, singleton side-effect facts with timed handoff cleanup, 64 simultaneous synthetic-title sources with zero decorative client events after convergence, per-client late-subscribe recovery, semantic bell/title transitions, local animation-frame preservation, legacy no-output-pause delivery gating with exact snapshot restore, provider-authoritative snapshots, 128 active streams plus retry after a 129th-stream capacity rejection, capacity-pressure backoff, full split-leaf remint reconciliation, truncation, and manual-disconnect queue fencing. Linux, Windows, live SSH, and production-scale paired hosts remain gaps.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/issues/8652",
         "https://github.com/stablyai/orca/pull/10625"
@@ -9641,7 +9641,7 @@
             "2,880 decorative spinner and bare-native real-PTY OSC chunks publish zero session-tabs snapshots or serialized bytes after semantic convergence",
             "the viewer performs zero snapshot applies and zero store mutations during decorative activity",
             "after 30 minutes, one globally spaced refresh per worktree keeps every mirrored working status fresh",
-            "exact Pi and rotating normalized Pi/Grok frames renew explicit and fallback status without changing stateStartedAt or acknowledgement semantics",
+            "exact and rotating normalized Pi frames renew explicit and fallback status without changing stateStartedAt or acknowledgement semantics",
             "matching title evidence renews retained OSC hook status without resetting stateStartedAt, then drops unverifiable prompt metadata after the hook row expires",
             "renderer-authored rich status keeps its original lease, then renews only coarse title-confirmed state and provider identity",
             "ordinary-shell title transitions replace working stateStartedAt with the completion transition time",
@@ -10401,10 +10401,9 @@
         {
           "file": "src/main/runtime/orca-runtime.test.ts",
           "assertions": [
-            "returns a blocked wait result for Codex update prompts",
-            "returns a blocked wait result for Codex workspace trust prompts",
-            "returns a blocked wait result for generic Codex interactive prompts",
-            "resolves tui-idle when a stale Codex prompt is followed by the ready header"
+            "returns an agent-neutral blocked wait result for update prompts",
+            "returns an agent-neutral blocked wait result for workspace trust prompts",
+            "returns an agent-neutral blocked wait result for generic interactive prompts"
           ]
         },
         {
@@ -12103,8 +12102,8 @@
         "https://github.com/stablyai/orca/issues/12729",
         "https://github.com/stablyai/orca/pull/17170"
       ],
-      "invariant": "Composition, native text forwarding, synthetic input, paste, and platform keyboard bypass paths must not send preedit/control bytes before commit and must commit text exactly once to the intended PTY. A live preedit must stay visible across an IME-resumed transaction, preserve every committed row-tail cell hidden by its opaque overlay, mask only a structurally verified Codex or Claude placeholder and never a row carrying typed text, keep the themed insertion caret and native candidate anchor inside the terminal at the final column, and clean up without stale overlay children or ownership classes. Layout-native Option text must preserve negotiated CSI-u alternate/associated fields and lock modifiers, distinguish repeat from press, and resolve releases with the press's primary identity plus the actual keyup modifiers without exposing a partial or stale layout refresh. An in-focus macOS input-source change must invalidate both renderer authorities before the next key can use the old source. When the snapshot source proves kitty state, macOS Preview commits must use the application's effective flags after the sequenced snapshot and every proven replay/live transition, and a claimed press delivered under report_event_types must produce exactly one matching release regardless of whether keyup arrives before or after insertText and regardless of xterm's defensive internal reset.",
-      "oracle": "Exact outbound bytes from the REAL native-text forwarder behind installPreviewImeBridge after initial snapshot restore, replacement resync, live transitions, and both keydown->insertText->keyup and keydown->keyup->insertText orderings; a wiring-only mock is supporting evidence, not the oracle. The current renderer-unit slice asserts native text commits route to the intended PTY once, composition/preedit bookkeeping does not leak premature text, resumed Windows event traces reactivate the visible preedit, an opaque mid-line overlay reproduces the committed row tail it covers, arbitrary DIM output remains visible, and final-column layout keeps both caret and textarea candidate anchor within the available screen width. The candidate-anchor slice reads back the inline `textarea.style.left` xterm's own listener and Orca's anchor listener both write during one composition event, so the assertion is the position the OS would sample rather than either writer's intent. A Codex frame whose prompt row is bold and whose dimmed model footer sits below a blank gap acquires the mask class while composing; the same placeholder text without that footer, a framed-versus-unframed Claude prompt, a row of arbitrary dimmed output, and a row carrying typed text do not. The class is gone after composition end, after a blur that is not followed by a session end, and after disposal. Rendered Electron/CDP geometry independently proves the overlay reproduces every committed cell it hides, that a real Codex placeholder at column 2 is masked rather than repeated, and that the final-column caret, preedit, and textarea right edges all land inside the screen. Input-source classification handles synthetic/native paths, paste/runtime forwarding avoids duplicate terminal payloads for covered fixtures, and Linux/Sogou candidate Space/digit selectors do not leak keydown/keypress/keyup while ordinary and long-held letter-to-digit typing remains available. A main/preload/renderer notification chain proves every live window invalidates immediately, the old native read settles before a coalesced refresh signal, and older refreshes are generation-fenced. The Electron/CDP live-PTY repro verifies Sogou-style Space and digit selectors submit only the committed Chinese text, while the legacy orphaned-letter-keyup sequence sends no selector byte to the PTY. Real legacy IME commit preservation, native candidate-window placement, and the full CJK/Vietnamese/Arabic/JIS-yen matrix run in follow-up platform soak where automation is possible.",
+      "invariant": "Composition, native text forwarding, synthetic input, paste, and platform keyboard bypass paths must not send preedit/control bytes before commit and must commit text exactly once to the intended PTY. A live preedit must stay visible across an IME-resumed transaction, preserve every committed row-tail cell hidden by its opaque overlay, mask only a structurally verified Claude placeholder and never a row carrying typed text, keep the themed insertion caret and native candidate anchor inside the terminal at the final column, and clean up without stale overlay children or ownership classes. Layout-native Option text must preserve negotiated CSI-u alternate/associated fields and lock modifiers, distinguish repeat from press, and resolve releases with the press's primary identity plus the actual keyup modifiers without exposing a partial or stale layout refresh. An in-focus macOS input-source change must invalidate both renderer authorities before the next key can use the old source. When the snapshot source proves kitty state, macOS Preview commits must use the application's effective flags after the sequenced snapshot and every proven replay/live transition, and a claimed press delivered under report_event_types must produce exactly one matching release regardless of whether keyup arrives before or after insertText and regardless of xterm's defensive internal reset.",
+      "oracle": "Exact outbound bytes from the REAL native-text forwarder behind installPreviewImeBridge after initial snapshot restore, replacement resync, live transitions, and both keydown->insertText->keyup and keydown->keyup->insertText orderings; a wiring-only mock is supporting evidence, not the oracle. The current renderer-unit slice asserts native text commits route to the intended PTY once, composition/preedit bookkeeping does not leak premature text, resumed Windows event traces reactivate the visible preedit, an opaque mid-line overlay reproduces the committed row tail it covers, arbitrary DIM output remains visible, and final-column layout keeps both caret and textarea candidate anchor within the available screen width. The candidate-anchor slice reads back the inline `textarea.style.left` xterm's own listener and Orca's anchor listener both write during one composition event, so the assertion is the position the OS would sample rather than either writer's intent. A framed Claude placeholder acquires the mask class while composing; the same placeholder without its frame, a row of arbitrary dimmed output, and a row carrying typed text do not. The class is gone after composition end, after a blur that is not followed by a session end, and after disposal. Rendered Electron/CDP geometry independently proves the overlay reproduces every committed cell it hides, that a real Claude Code placeholder at column 2 is masked rather than repeated, and that the final-column caret, preedit, and textarea right edges all land inside the screen. Input-source classification handles synthetic/native paths, paste/runtime forwarding avoids duplicate terminal payloads for covered fixtures, and Linux/Sogou candidate Space/digit selectors do not leak keydown/keypress/keyup while ordinary and long-held letter-to-digit typing remains available. A main/preload/renderer notification chain proves every live window invalidates immediately, the old native read settles before a coalesced refresh signal, and older refreshes are generation-fenced. The Electron/CDP live-PTY repro verifies Sogou-style Space and digit selectors submit only the committed Chinese text, while the legacy orphaned-letter-keyup sequence sends no selector byte to the PTY. Real legacy IME commit preservation, native candidate-window placement, and the full CJK/Vietnamese/Arabic/JIS-yen matrix run in follow-up platform soak where automation is possible.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/terminal-ime-native-text-forwarder.test.ts src/renderer/src/components/terminal-pane/terminal-ime-substituted-text-commit.test.ts src/renderer/src/components/terminal-pane/terminal-ime-macos-keybinding-dict-trace.test.ts src/renderer/src/components/terminal-pane/terminal-paste-runtime.test.ts src/renderer/src/components/terminal-pane/terminal-ime-composition-tracker.test.ts src/renderer/src/components/terminal-pane/terminal-ime-candidate-key-release-guard.test.ts src/renderer/src/components/terminal-pane/xterm-bypass-policy-non-mac.test.ts src/renderer/src/components/terminal-pane/xterm-bypass-policy.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/terminal-ime-linux-candidate-state.test.ts",
@@ -12225,8 +12224,8 @@
         {
           "file": "src/renderer/src/components/terminal-pane/terminal-ime-composer-placeholder-mask.test.ts",
           "assertions": [
-            "a bold Codex prompt row with a dimmed model footer below a blank gap, and a framed Claude prompt, acquire the mask class only while composing",
-            "the same placeholder text without its footer or frame, and arbitrary dimmed output, acquire nothing",
+            "a framed Claude prompt acquires the mask class only while composing",
+            "the same placeholder text without its frame, and arbitrary dimmed output, acquire nothing",
             "a row carrying typed text acquires no mask even while the stock placeholder is still rendered to its right",
             "the class is gone after composition end, after a blur with no session end behind it, and after disposal"
           ]
@@ -12427,7 +12426,7 @@
           "file": "tests/e2e/terminal-korean-midline-preedit-occlusion.spec.ts",
           "assertions": [
             "the rendered opaque overlay reproduces every committed row-tail cell its measured rectangle hides",
-            "a real Codex placeholder with bold prompt, blank footer gap, model footer, and cursor at column 2 stays masked while an end-of-row composition adds no tail"
+            "a real Claude Code placeholder with its prompt frame and cursor at column 2 stays masked while an end-of-row composition adds no tail"
           ]
         }
       ],
@@ -12784,7 +12783,7 @@
           "assertions": [
             "only routing-trusted current process identity overrides launch evidence and confirmed shell foreground clears stale identity",
             "a newer untrusted or neutral command generation blocks stale launch ownership until confirmation",
-            "only allowlisted fresh process or pane-scoped launch ownership selects Pi's CSI-u capability, while Claude, OpenCode and Codex keep Esc+CR",
+            "only allowlisted fresh process or pane-scoped launch ownership selects Pi's CSI-u capability, while Claude and OpenCode keep Esc+CR",
             "forged hook or OSC-derived Pi status cannot change the Windows byte encoding",
             "after split and original-pane close, a sole surviving sibling cannot inherit the original pane's Pi launch identity"
           ]
@@ -13088,13 +13087,13 @@
       "providers": ["local", "daemon", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos", "windows"],
       "coveredProviders": ["local"],
-      "coverageNotes": "Source-built macOS and physical Windows Electron journeys cover the public CLI through RPC, runtime identity, real PTY/ConPTY writes, and a delayed fake Codex composer. Focused units cover CLI intent, fresh Claude/Codex foreground identity, framing bytes, stale-agent shell fallback, and exact legacy behavior for every other configured agent. SSH, daemon, and remote-runtime remain explicit gaps.",
+      "coverageNotes": "Source-built macOS and physical Windows Electron journeys cover the public CLI through RPC, runtime identity, real PTY/ConPTY writes, and a delayed fake Claude composer. Focused units cover CLI intent, fresh Claude foreground identity, framing bytes, stale-agent shell fallback, and exact legacy behavior for every other configured agent. SSH, daemon, and remote-runtime remain explicit gaps.",
       "motivatingLinks": [
         "https://linear.app/stably/issue/STA-4328",
         "https://github.com/stablyai/orca/issues/14525"
       ],
-      "invariant": "A public CLI send containing non-empty text plus Enter and no interrupt identifies agent-prompt intent. The owning runtime uses bracketed-paste and settled submit only when a fresh foreground-process read positively identifies the exact target as Claude or Codex on a desktop call; every other agent, stale agent metadata over a shell, text-only input, bare Enter, interrupts, mobile input, query replies, and older clients keep the direct terminal contract.",
-      "oracle": "Launch a bare fake Codex through the real Electron PTY and delay its composer render for 1,200 ms, beyond the legacy generic 500 ms gap. Send a 557-byte prompt with the public CLI and require the marker, zero premature Enter, no rescue Enter, and one submission. POSIX child stdin must retain one bracketed-paste frame; Windows ConPTY consumes that control frame, so runtime tests require the frame at the PTY write boundary while the Windows child requires the exact prompt. The same harness against the installed pre-fix runtime must record one premature Enter and require one bare rescue Enter. Focused units require CLI intent only for text plus Enter, settlement only for freshly identified Claude/Codex, the legacy platform delay for every other configured agent, stale Codex launch identity over a shell to fall back, no wrapper polling, and byte-for-byte direct delivery for non-targets.",
+      "invariant": "A public CLI send containing non-empty text plus Enter and no interrupt identifies agent-prompt intent. The owning runtime uses bracketed-paste and settled submit only when a fresh foreground-process read positively identifies the exact target as Claude on a desktop call; every other agent, stale agent metadata over a shell, text-only input, bare Enter, interrupts, mobile input, query replies, and older clients keep the direct terminal contract.",
+      "oracle": "Launch a bare fake Claude through the real Electron PTY and delay its composer render for 1,200 ms, beyond the legacy generic 500 ms gap. Send a 557-byte prompt with the public CLI and require the marker, zero premature Enter, no rescue Enter, and one submission. POSIX child stdin must retain one bracketed-paste frame; Windows ConPTY consumes that control frame, so runtime tests require the frame at the PTY write boundary while the Windows child requires the exact prompt. The same harness against the installed pre-fix runtime must record one premature Enter and require one bare rescue Enter. Focused units require CLI intent only for text plus Enter, settlement only for freshly identified Claude, the legacy platform delay for every other configured agent, stale Claude launch identity over a shell to fall back, no wrapper polling, and byte-for-byte direct delivery for non-targets.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/cli/handlers/terminal.test.ts src/main/runtime/rpc/terminal-agent-prompt-send.test.ts src/main/runtime/rpc/terminal-send.test.ts src/main/runtime/orca-runtime.test.ts src/shared/agent-prompt-injection.test.ts",
         "pnpm run build:cli && pnpm exec playwright test tests/e2e/terminal-send-agent-prompt-submit.spec.ts --config tests/playwright.config.ts --project electron-headless --workers=1",
@@ -13121,14 +13120,14 @@
         {
           "file": "src/main/runtime/rpc/terminal-agent-prompt-send.test.ts",
           "assertions": [
-            "a freshly proven Claude or Codex desktop target uses settled prompt delivery",
+            "a freshly proven Claude desktop target uses settled prompt delivery",
             "a non-target agent or shell preserves the existing direct send"
           ]
         },
         {
           "file": "src/main/runtime/orca-runtime.test.ts",
           "assertions": [
-            "Claude and Codex wait for marker-gated composer quiescence before submit",
+            "Claude waits for marker-gated composer quiescence before submit",
             "every other configured TUI agent retains the legacy platform delay",
             "a speculative CLI prompt check does not poll wrapper foregrounds",
             "the PTY write boundary retains bracketed framing and one delayed submit"
@@ -13195,15 +13194,15 @@
       },
       "performanceBudget": {
         "required": true,
-        "evidence": "Only a CLI request with non-empty text plus Enter and no interrupt adds a bounded fresh foreground read and one non-retrying liveness check. Positively identified Claude and Codex reuse the O(prompt bytes) chunked prompt sender plus one PTY-local listener until post-marker quiescence or the bounded fallback. Every other agent and shell retains the existing direct-send path. Text-only, bare Enter, interrupt, mobile, renderer stream input, and query replies add no work."
+        "evidence": "Only a CLI request with non-empty text plus Enter and no interrupt adds a bounded fresh foreground read and one non-retrying liveness check. Positively identified Claude reuses the O(prompt bytes) chunked prompt sender plus one PTY-local listener until post-marker quiescence or the bounded fallback. Every other agent and shell retains the existing direct-send path. Text-only, bare Enter, interrupt, mobile, renderer stream input, and query replies add no work."
       },
       "promotionCriteria": [
-        "Collect live Codex and Claude CLI sends on representative slow systems.",
+        "Collect live Claude CLI sends on representative slow systems.",
         "Retain mixed-version evidence that old hosts strip the optional intent and new hosts accept old clients without a protocol bump."
       ],
       "knownGaps": [
         "Live SSH/daemon/remote-runtime evidence is not yet attached.",
-        "Only Claude and Codex opt into settlement; every other agent retains the legacy behavior until independently validated.",
+        "Only Claude opts into settlement; every other agent retains the legacy behavior until independently validated.",
         "A new CLI talking to an old host safely loses the optional field and therefore keeps the old timing behavior until the host updates.",
         "The E2E fake agent models the submission race without requiring external agent authentication; live account-backed agents are covered separately."
       ],
@@ -13227,7 +13226,7 @@
       "providers": ["local", "daemon", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local"],
-      "coverageNotes": "Local macOS evidence covers the runtime PTY write contract, live Codex orchestration, a dev-runtime CLI repro, and Claude and Codex composer traces. A deterministic worker-start RPC/SQLite contract proves delayed Codex composer acceptance, exactly one submitted turn, durable Dispatch success, and explicit stalled failure when Enter is swallowed without a rescue send. The render gate stays on the PTY-owning runtime, so paired and SSH callers use the same provider write/output path without a wire change. SSH, daemon, remote-runtime, Linux, and Windows live journeys remain gaps.",
+      "coverageNotes": "Local macOS evidence covers the runtime PTY write contract, live agent orchestration, a dev-runtime CLI repro, and Claude composer traces. A deterministic worker-start RPC/SQLite contract proves delayed Claude composer acceptance, exactly one submitted turn, durable Dispatch success, and explicit stalled failure when Enter is swallowed without a rescue send. The render gate stays on the PTY-owning runtime, so paired and SSH callers use the same provider write/output path without a wire change. SSH, daemon, remote-runtime, Linux, and Windows live journeys remain gaps.",
       "motivatingLinks": [
         "https://linear.app/stably/issue/STA-3800",
         "https://linear.app/stably/issue/STA-3904",
@@ -13236,12 +13235,12 @@
         "https://github.com/stablyai/orca/issues/13821",
         "https://github.com/stablyai/orca/issues/14347"
       ],
-      "invariant": "Injected orchestration task prompts for recognized agent CLIs must send the prompt body inside one bracketed-paste frame, sanitize embedded ESC bytes, preserve chunk boundaries without losing the frame, and submit exactly once only after the agent can accept Enter. Local worker-start with supported observation must preserve an unobserved turn as start_unknown without revoking authority, closing questions, or triggering a rescue Enter; a worker report during observation must settle normally. Claude and Codex must emit a post-paste composer marker and then settle, or reach the bounded fallback first; every other agent retains the platform delay.",
-      "oracle": "Runtime tests assert the exact PTY write sequence, failure cleanup, Claude/Codex marker-gated multi-frame renders, and the legacy platform delay for every other configured agent. The candidate resets settlement on later frames, gives a late marker a fresh bounded window, and still submits once at the hard deadline if output never settles. The worker-start contract drives the production RPC through a delayed fake Codex composer and independently checks exact turn/Enter counts plus reopened SQLite Task, Dispatch, worker receipt, and mutation receipt state for accepted and swallowed outcomes. Other orchestration tests assert dispatch/coordinator use the agent prompt path; the live CLI harness covers long Codex-like framing.",
+      "invariant": "Injected orchestration task prompts for recognized agent CLIs must send the prompt body inside one bracketed-paste frame, sanitize embedded ESC bytes, preserve chunk boundaries without losing the frame, and submit exactly once only after the agent can accept Enter. Local worker-start with supported observation must preserve an unobserved turn as start_unknown without revoking authority, closing questions, or triggering a rescue Enter; a worker report during observation must settle normally. Claude must emit a post-paste composer marker and then settle, or reach the bounded fallback first; every other agent retains the platform delay.",
+      "oracle": "Runtime tests assert the exact PTY write sequence, failure cleanup, Claude marker-gated multi-frame renders, and the legacy platform delay for every other configured agent. The candidate resets settlement on later frames, gives a late marker a fresh bounded window, and still submits once at the hard deadline if output never settles. The worker-start contract drives the production RPC through a delayed fake Claude composer and independently checks exact turn/Enter counts plus reopened SQLite Task, Dispatch, worker receipt, and mutation receipt state for accepted and swallowed outcomes. Other orchestration tests assert dispatch/coordinator use the agent prompt path; the live CLI harness covers long Claude-like framing.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/shared/agent-prompt-injection.test.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/methods/orchestration/runs/tasks-dispatch.test.ts src/main/runtime/orchestration/coordinator.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/methods/orchestration/worker/worker-start-prompt-contract.test.ts --reporter=dot",
-        "node tests/tools/repro-orchestration-long-prompt.mjs --cli out/bin/orca-dev --mode codex-like --size-kb 32 --timeout-ms 20000"
+        "node tests/tools/repro-orchestration-long-prompt.mjs --cli out/bin/orca-dev --mode claude-like --size-kb 32 --timeout-ms 20000"
       ],
       "testFiles": [
         "src/shared/agent-prompt-injection.test.ts",
@@ -13265,9 +13264,9 @@
           "file": "src/main/runtime/orca-runtime.test.ts",
           "assertions": [
             "runtime writes bracketed paste before a delayed submit",
-            "Claude and Codex ignore unrelated and split pre-marker output, then wait for render quiescence before one submit",
+            "Claude ignores unrelated and split pre-marker output, then waits for render quiescence before one submit",
             "every other configured TUI agent retains the platform delay",
-            "a late Codex marker receives a fresh settlement window before one submit",
+            "a late Claude marker receives a fresh settlement window before one submit",
             "a silent Claude composer reaches one bounded fallback submit",
             "a marked Claude composer with continuous render output reaches one bounded fallback submit",
             "large prompt frames are chunked and reconstructed before submit",
@@ -13300,7 +13299,7 @@
         {
           "file": "tests/tools/repro-orchestration-long-prompt.mjs",
           "assertions": [
-            "fake Codex-like worker observes submit after long orchestration dispatch",
+            "fake Claude-like worker observes submit after long orchestration dispatch",
             "32KB task marker survives before submit",
             "prompt bytes include a bracketed-paste frame with zero unframed line breaks"
           ]
@@ -13356,7 +13355,7 @@
           "date": "2026-07-07",
           "runner": "local",
           "platform": "macos",
-          "command": "node tests/tools/repro-orchestration-long-prompt.mjs --cli out/bin/orca-dev --mode codex-like --size-kb 32 --timeout-ms 20000",
+          "command": "node tests/tools/repro-orchestration-long-prompt.mjs --cli out/bin/orca-dev --mode claude-like --size-kb 32 --timeout-ms 20000",
           "result": "passed",
           "durationSeconds": 2.2,
           "summary": "Live dev-runtime repro passed: expectedSpecBytes=32830, hasSubmit=true, rawContainsMarker=true, hasBracketedPasteFrame=true, unframedLineBreaks=0, contractOk=true."
@@ -13372,11 +13371,11 @@
       },
       "redGreenEvidence": {
         "status": "partial",
-        "evidence": "The original Claude-shaped oracle fails on unmodified main and passes with the render gate. The hardened multi-frame oracle then fails on the first-marker candidate, which submits at 751 ms during an intermediate frame, and passes when the gate requires post-marker quiescence. Codex used the legacy platform delay before this candidate; the late-marker oracle proves the original deadline would pre-empt slow-host settlement without re-arming. The worker-start negative controls caught both premature submission before composer readiness and a false-ready swallowed Enter; the accepted candidate records one started turn, while the swallowed arm records agent_prompt_stalled without a rescue Enter. The earlier live harness also reproduced the unsafe raw multiline contract before its framing fix. Intentional-break evidence remains local rather than a separate CI job."
+        "evidence": "The original Claude-shaped oracle fails on unmodified main and passes with the render gate. The hardened multi-frame oracle then fails on the first-marker candidate, which submits at 751 ms during an intermediate frame, and passes when the gate requires post-marker quiescence. The late-marker oracle proves the original deadline would pre-empt slow-host settlement without re-arming. The worker-start negative controls caught both premature submission before composer readiness and a false-ready swallowed Enter; the accepted candidate records one started turn, while the swallowed arm records agent_prompt_stalled without a rescue Enter. The earlier live harness also reproduced the unsafe raw multiline contract before its framing fix. Intentional-break evidence remains local rather than a separate CI job."
       },
       "performanceBudget": {
         "required": true,
-        "evidence": "Agent prompt dispatch remains O(prompt bytes) with existing 16KB chunking. Claude and Codex add one PTY-local output listener until 1.5 seconds of post-marker output quiescence or the bounded fallback; each later frame resets one quiet timer. Other agents retain the platform delay. No polling, provider listing, subprocess churn, hidden-pane wakeups, renderer work, or wire traffic is added."
+        "evidence": "Agent prompt dispatch remains O(prompt bytes) with existing 16KB chunking. Claude adds one PTY-local output listener until 1.5 seconds of post-marker output quiescence or the bounded fallback; each later frame resets one quiet timer. Other agents retain the platform delay. No polling, provider listing, subprocess churn, hidden-pane wakeups, renderer work, or wire traffic is added."
       },
       "promotionCriteria": [
         "Run the live harness in soak with a self-starting dev runtime or provider-contract fixture.",
@@ -13474,7 +13473,7 @@
             "large persisted mismatches route in 50-row pages with coalesced per-mailbox wakes",
             "Run pointers pin the existing mixed-version-compatible --run identity",
             "direct and Dispatch mail remain durable without unpinned synthetic terminal turns",
-            "a staged pointer submits once when Codex or Claude becomes working and still withholds Enter for permission",
+            "a staged pointer submits once when Claude becomes working and still withholds Enter for permission",
             "an explicit check releases its staged pointer reservation without redrive",
             "accepted pointer text is durably deduplicated before delayed Enter and provider Enter refusal",
             "a known PTY exit releases staged rows for the replacement process",
@@ -13676,7 +13675,7 @@
       "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "daemon", "ssh"],
-      "coverageNotes": "A deterministic service-state-machine oracle now models a current-contract worker and coordinator whose renderer graph identities disappear across an app/runtime update. It exercises the production verifier with restored PTY and hydrated hook commitments, proves authenticated completion replay across a fresh runtime, explicit takeover, ordinary mail routing, remote-attachment process fencing, retained Task/Dispatch/terminal identity, and unchanged fixture marker bytes, and rejects foreign pane evidence. Other deterministic units cover authority-aware legacy formatting, exact legacy worker identity planning, local worker presentation, retained-output reads after adoption, reveal-failure warnings, stable-pane Run/Dispatch routing, creator pane/process/Run-generation fencing, indexed retained-Run lookup scaling, the SSH in-process CLI fallback, exact legacy Task/Dispatch/report-receipt verification, JSON rejection envelopes, and capability-negotiated Run-home settlement. The federation oracle drops the first terminal ACK, restarts Run-home twice, verifies replay through the existing polling path and the persisted acknowledgment watermark, races identical reports, accepts preexisting same-outcome ACK batches, rejects conflicting batches, and covers protocol v1/v2 completion across independently updated peers. A migration unit upgrades a v26 database with a zeroed watermark without replaying older migrations. Three isolated macOS Electron journeys launch fake Codex workers through the real RPC path. Distinct installed A/B artifacts plus live SSH, WSL, folder, Linux, and Windows cutover journeys remain explicit gaps.",
+      "coverageNotes": "A deterministic service-state-machine oracle now models a current-contract worker and coordinator whose renderer graph identities disappear across an app/runtime update. It exercises the production verifier with restored PTY and hydrated hook commitments, proves authenticated completion replay across a fresh runtime, explicit takeover, ordinary mail routing, remote-attachment process fencing, retained Task/Dispatch/terminal identity, and unchanged fixture marker bytes, and rejects foreign pane evidence. Other deterministic units cover authority-aware legacy formatting, exact legacy worker identity planning, local worker presentation, retained-output reads after adoption, reveal-failure warnings, stable-pane Run/Dispatch routing, creator pane/process/Run-generation fencing, indexed retained-Run lookup scaling, the SSH in-process CLI fallback, exact legacy Task/Dispatch/report-receipt verification, JSON rejection envelopes, and capability-negotiated Run-home settlement. The federation oracle drops the first terminal ACK, restarts Run-home twice, verifies replay through the existing polling path and the persisted acknowledgment watermark, races identical reports, accepts preexisting same-outcome ACK batches, rejects conflicting batches, and covers protocol v1/v2 completion across independently updated peers. A migration unit upgrades a v26 database with a zeroed watermark without replaying older migrations. Three isolated macOS Electron journeys launch fake Claude workers through the real RPC path. Distinct installed A/B artifacts plus live SSH, WSL, folder, Linux, and Windows cutover journeys remain explicit gaps.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/pull/11107#discussion_r3663321387",
         "https://github.com/stablyai/orca/issues/13858",
@@ -13686,7 +13685,7 @@
         "https://linear.app/stably/issue/STA-4022"
       ],
       "invariant": "Starting a worker in the coordinator's current workspace must materialize one inactive terminal tab before worker-start returns, preserve coordinator focus, and remain exactly once after workspace re-entry. After an app update or restart, an exact live legacy worker must fence automatic provider resume, adopt its original PTY into its original background pane, retain readable output, and clear the resume record without spawning, writing, signalling, interrupting, replacing, or focusing the worker. A current-contract worker whose renderer graph identity is temporarily absent must retain its Dispatch capability and settle exactly once from exact hook-attested handle, pane, and process evidence; otherwise only an exact attested coordinator may take over. A worker_done caller may report success only after the owning runtime returns an explicit lifecycle verdict or authoritative reads prove that the exact Task, Dispatch, and worker report receipt settled the expected outcome. Federated terminal settlement must remain replay-eligible until the worker durably acknowledges it, and identical same-outcome retries must converge idempotently. Independently updated clients and worker servers must preserve the negotiated protocol: current peers use Run-home lifecycle settlement, while protocol v1/v2 peers retain their legacy completion path without receiving newer-only fields. A federated worker may accept only the authority defined by its negotiated protocol. An exact existing target workspace must receive a discoverable tab without stealing coordinator focus; if renderer reveal fails, worker-start must expose that the live worker remains background-only. Run and Dispatch checks must resolve through the caller's stable pane identity when a terminal handle is reminted, while a live handle outranks mismatched pane metadata. A nested worker's creator edge requires the current creator pane, process incarnation, and owning Run generation; reminting and rebinding that pane to another Run must remove the stale edge. Explicit legacy terminal inspection remains handle-scoped, and remote or headless worker presentation remains background-only.",
-      "oracle": "Drive Run create, Task create, and worker-start through production Electron runtimes with a deterministic Codex fixture. Require append-only ledgers with one still-live PID and no interruption, a visible inactive worker tab while the coordinator stays active, Run delivery through stable pane identity, and stable PTY/incarnation, tab, leaf, worktree, Task, and Dispatch across workspace re-entry. In a restart journey, retain the original daemon PTY and PID, remove renderer ownership, retain sleeping-session evidence, mark the Dispatch legacy, relaunch, and require exact inactive tab adoption, readable ACK output, cleared resume state, one spawn, and no resume argv or Conversation interrupted text after another workspace round trip. The service oracle removes renderer lookup identity from current-contract callers while retaining real restored-PTY and hook commitments, replays authenticated completion and takeover across fresh runtimes, and requires one Task, Dispatch, terminal authority, message, mutation, ordinary-mail delivery, remote process fencing, and unchanged fixture marker bytes while foreign pane evidence remains rejected. Unit tests separately remint a creator pane and process from Run A into Run B, require the nested Run A worker to fall back to its current coordinator, require indexed query plans, and bound 300 Task reads with 50,000 retained Runs. They also assert authority-specific legacy affordances, exact identity and owner matching, retained-output fallback, pane-stable routing, federated non-activation, and SSH fallback parity.",
+      "oracle": "Drive Run create, Task create, and worker-start through production Electron runtimes with a deterministic Claude fixture. Require append-only ledgers with one still-live PID and no interruption, a visible inactive worker tab while the coordinator stays active, Run delivery through stable pane identity, and stable PTY/incarnation, tab, leaf, worktree, Task, and Dispatch across workspace re-entry. In a restart journey, retain the original daemon PTY and PID, remove renderer ownership, retain sleeping-session evidence, mark the Dispatch legacy, relaunch, and require exact inactive tab adoption, readable ACK output, cleared resume state, one spawn, and no resume argv or Conversation interrupted text after another workspace round trip. The service oracle removes renderer lookup identity from current-contract callers while retaining real restored-PTY and hook commitments, replays authenticated completion and takeover across fresh runtimes, and requires one Task, Dispatch, terminal authority, message, mutation, ordinary-mail delivery, remote process fencing, and unchanged fixture marker bytes while foreign pane evidence remains rejected. Unit tests separately remint a creator pane and process from Run A into Run B, require the nested Run A worker to fall back to its current coordinator, require indexed query plans, and bound 300 Task reads with 50,000 retained Runs. They also assert authority-specific legacy affordances, exact identity and owner matching, retained-output fallback, pane-stable routing, federated non-activation, and SSH fallback parity.",
       "commands": [
         "ORCA_BACKGROUND_LAUNCH=1 npx vitest run --config config/vitest.config.ts src/main/runtime/rpc/methods/orchestration/messaging/check-worker-federated-attachment.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/orchestration-runtime-update-settlement.test.ts --reporter=dot",
@@ -14086,7 +14085,7 @@
         "No distinct installed A/B headed or headless paired-runtime cutover is attached; the restart journey relaunches the same build while preserving the daemon and agent.",
         "No Docker SSH restart/reconnect, physical Windows WSL distro-authority, or git-independent folder-workspace cutover journey is attached.",
         "Packaged Windows updater and uninstaller continuity is owned by separate updater reliability work and is not claimed by this gate.",
-        "The Electron journey uses a deterministic fake Codex CLI rather than a real account.",
+        "The Electron journey uses a deterministic fake Claude CLI rather than a real account.",
         "The local presentation journey tolerates its existing terminal-handle remint and proves continuity by PTY/incarnation/tab/leaf; byte-stable handle proof across a real A/B cutover awaits the runtime-authority/RPC implementation.",
         "The local Electron restart proof covers retained visible output from the same-build daemon checkpoint, not transcript recovery after a transport cut or distinct A/B runtime replacement."
       ],
@@ -14812,7 +14811,7 @@
         {
           "file": "src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts",
           "assertions": [
-            "hidden Codex output is restored when the pty seq counter restarts, with or without an observed exit (#7173)"
+            "hidden OpenCode output is restored when the pty seq counter restarts, with or without an observed exit (#7173)"
           ]
         },
         {
@@ -18303,7 +18302,7 @@
       "providers": ["ssh"],
       "coveredPlatforms": ["macos", "linux"],
       "coveredProviders": ["ssh"],
-      "coverageNotes": "A macOS Electron client drives a Linux Docker SSH execution host. The six-spec suite passed ten enabled cases with clean worker exit (5.2m). The formerly skipped frozen-host input case now waits for recovered authority before sending input and passed four separate executions (one initial and three repetitions). The existing flooded-shell fixme remains an explicitly reproduced application gap. The bulk-open freeze reproduction runs in Linux headed CI with SwiftShader on Xvfb: headless Linux schedules idle animation frames about 1s apart, invalidating the foreground interaction measurement. Original uninstrumented five-pane workload passed all ten repetitions with zero retries/skips in 6.6m; bulk-open lag 79.3–147.8ms and interaction 127.1–155.9ms, unchanged 2500ms/5000ms budgets. Run 34037669843, head f25eab3fd7d723509ced026633f80b193a139b76, excludes unmerged replay-input application fix #19075. Deterministic remote Codex fixture validation passed three normal restores and three forced reconnects with zero retries on merged main plus the replay probe correction (run 34050117471). The original forced-reconnect probe missed nonempty replay returned in pty:spawn reattach replies. Routine coverage now includes both modes by default; real Codex service execution remains opt-in. The added five-pane input spec passed in Linux CI run 34033353595, and diagnostic run 34034754815 reproduced real input loss during scrollback replay; application fix #19075 (98b0c329ff3) has since merged and this spec now guards it.",
+      "coverageNotes": "A macOS Electron client drives a Linux Docker SSH execution host. The six-spec suite passed ten enabled cases with clean worker exit (5.2m). The formerly skipped frozen-host input case now waits for recovered authority before sending input and passed four separate executions (one initial and three repetitions). The existing flooded-shell fixme remains an explicitly reproduced application gap. The bulk-open freeze reproduction runs in Linux headed CI with SwiftShader on Xvfb: headless Linux schedules idle animation frames about 1s apart, invalidating the foreground interaction measurement. Original uninstrumented five-pane workload passed all ten repetitions with zero retries/skips in 6.6m; bulk-open lag 79.3–147.8ms and interaction 127.1–155.9ms, unchanged 2500ms/5000ms budgets. Run 34037669843, head f25eab3fd7d723509ced026633f80b193a139b76, excludes unmerged replay-input application fix #19075. The added five-pane input spec passed in Linux CI run 34033353595, and diagnostic run 34034754815 reproduced real input loss during scrollback replay; application fix #19075 (98b0c329ff3) has since merged and this spec now guards it.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/issues/18018",
         "https://github.com/stablyai/orca/pull/18546",
@@ -18320,8 +18319,6 @@
         "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/helpers/electron-process-shutdown.unit.test.ts",
         "ORCA_E2E_SSH_DOCKER=1 SKIP_BUILD=1 pnpm exec playwright test tests/e2e/ssh-docker-bulk-open-freeze-repro.spec.ts --config tests/playwright.config.ts --project=electron-headful --workers=1",
         "ORCA_E2E_SSH_DOCKER=1 SKIP_BUILD=1 pnpm exec playwright test tests/e2e/ssh-docker-bulk-open-freeze-repro.spec.ts --config tests/playwright.config.ts --project=electron-headful --workers=1 --repeat-each=10",
-        "ORCA_E2E_SSH_DOCKER=1 SKIP_BUILD=1 pnpm exec playwright test tests/e2e/ssh-codex-display-artifacts-repro.spec.ts --config tests/playwright.config.ts --project=electron-headless --workers=1",
-        "pnpm exec vitest run --config config/vitest.config.ts tests/e2e/ssh-codex-replay-reply-probe.unit.test.ts",
         "ORCA_E2E_SSH_DOCKER=1 SKIP_BUILD=1 pnpm exec playwright test tests/e2e/ssh-docker-five-pane-input-under-flood.spec.ts --config tests/playwright.config.ts --project=electron-headless --workers=1"
       ],
       "testFiles": [
@@ -18333,8 +18330,6 @@
         "tests/e2e/ssh-docker-watcher-isolation.spec.ts",
         "tests/e2e/helpers/electron-process-shutdown.unit.test.ts",
         "tests/e2e/ssh-docker-bulk-open-freeze-repro.spec.ts",
-        "tests/e2e/ssh-codex-display-artifacts-repro.spec.ts",
-        "tests/e2e/ssh-codex-replay-reply-probe.unit.test.ts",
         "tests/e2e/ssh-docker-five-pane-input-under-flood.spec.ts"
       ],
       "assertionRefs": [
@@ -18391,18 +18386,6 @@
           "file": "tests/e2e/ssh-docker-five-pane-input-under-flood.spec.ts",
           "assertions": [
             "five distinct SSH PTYs acknowledge actual keyboard input after two rendered hide/reopen cycles while all five producers flood"
-          ]
-        },
-        {
-          "file": "tests/e2e/ssh-codex-display-artifacts-repro.spec.ts",
-          "assertions": [
-            "normal restore and forced SSH reconnect leave no stale or duplicate status rows; forced reconnect preserves the original PTY and requires nonempty replay from that PTY through an event or reattach reply"
-          ]
-        },
-        {
-          "file": "tests/e2e/ssh-codex-replay-reply-probe.unit.test.ts",
-          "assertions": [
-            "unrelated, replacement, initial-spawn, empty and non-replay replies do not count; original reattach results and failures pass through unchanged"
           ]
         }
       ],
@@ -18462,8 +18445,7 @@
         "Linux headed CI covers the bulk-open freeze reproduction; Windows clients, WSL, folder workspaces, paired runtimes and live agent CLIs are not covered by that result.",
         "Some legacy assertions inspect terminal serialization or backing state rather than rendered DOM; no blanket visual coverage claim.",
         "No p95 CI history or full product mutation proof.",
-        "One headless bulk-open probe reached 6478.6ms in run 34035957303; animation-frame scheduling explains the consistent interaction failures, but does not directly explain that isolated timer-lag outlier. Long-term headed CI soak remains outstanding.",
-        "Codex replay artifact evidence uses a deterministic remote TUI on Linux CI; real-service, macOS/Windows clients and cross-version replay remain separate coverage gaps."
+        "One headless bulk-open probe reached 6478.6ms in run 34035957303; animation-frame scheduling explains the consistent interaction failures, but does not directly explain that isolated timer-lag outlier. Long-term headed CI soak remains outstanding."
       ],
       "demotionRule": "Keep experimental while any recovery reproduction fails or any teardown, identity, resource-count, or rendered oracle flakes; never promote by extending sleeps or retries."
     },

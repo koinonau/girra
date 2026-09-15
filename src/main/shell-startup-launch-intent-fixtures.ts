@@ -18,7 +18,7 @@ export const STARTUP_COMMAND_FEATURES = selectShellStartupFeatures({
 /** A pane carrying an Orca overlay but no startup command. */
 export const OVERLAY_ONLY_FEATURES = selectShellStartupFeatures({
   shellPath: 'zsh',
-  env: { ORCA_CODEX_HOME: '/tmp/orca-codex-home' },
+  env: { ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config' },
   hasStartupCommand: false,
   waitsForShellReady: false,
   emitsStartupIdentity: false

@@ -8,7 +8,7 @@ import {
 describe('agent session fork context', () => {
   it('cleans terminal control sequences before building fork context', () => {
     const cleaned = cleanAgentSessionForkTranscript(
-      '\x1b]0;Codex working\x07\x1b[31mUser\x1b[0m\r\nAssistant'
+      '\x1b]0;Claude working\x07\x1b[31mUser\x1b[0m\r\nAssistant'
     )
 
     expect(cleaned).toBe('User\nAssistant')
@@ -18,12 +18,12 @@ describe('agent session fork context', () => {
     const prompt = buildAgentSessionForkPrompt({
       capturedText: 'User: implement auth\nAssistant: reading files',
       sourceLabel: 'tab-1:leaf-1',
-      agentLabel: 'codex'
+      agentLabel: 'opencode'
     })
 
     expect(prompt).toContain('fork of an existing Orca agent session')
     expect(prompt).toContain('Source: tab-1:leaf-1')
-    expect(prompt).toContain('Original agent: codex')
+    expect(prompt).toContain('Original agent: opencode')
     expect(prompt).toContain('User: implement auth')
     expect(prompt).toContain('wait for my next instruction')
   })
@@ -69,7 +69,7 @@ describe('agent session fork context', () => {
 
   it('builds a bounded transcript without the fork prompt framing', () => {
     const transcript = buildBoundedSessionTranscript(
-      '\x1b]0;Codex working\x07\x1b[31mUser: ship it\x1b[0m\r\nAssistant: done'
+      '\x1b]0;Claude working\x07\x1b[31mUser: ship it\x1b[0m\r\nAssistant: done'
     )
 
     // Why: the standalone Copy Context action must yield raw transcript only —

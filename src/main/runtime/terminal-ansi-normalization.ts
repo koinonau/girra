@@ -104,7 +104,7 @@ export function normalizeTerminalChunk(
         }
       }
       if (parsed.kind === 'csi' && isTerminalPreviewLineControl(parsed)) {
-        // Why: Codex redraws status text with ANSI controls but no CR; keep them so the tail overwrites the prior frame.
+        // Why: agent TUIs redraw status text with ANSI controls but no CR; keep them so the tail overwrites the prior frame.
         parts.push(combined.slice(index, parsed.endIndex + 1))
       }
       index = parsed.endIndex

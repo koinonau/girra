@@ -197,10 +197,6 @@ export type TerminalActions = {
       agentArgsOverride?: string | null
       draftPrompt?: string
       sessionOptions?: Record<string, SessionOptionValue>
-      initialAgentStatus?: {
-        agent: TuiAgent
-        prompt: string
-      }
       showSessionRestoredBanner?: boolean
       telemetry?: AgentLaunchMetadata
     }
@@ -223,10 +219,6 @@ export type TerminalActions = {
     agentArgsOverride?: string | null
     draftPrompt?: string
     sessionOptions?: Record<string, SessionOptionValue>
-    initialAgentStatus?: {
-      agent: TuiAgent
-      prompt: string
-    }
     showSessionRestoredBanner?: boolean
     telemetry?: AgentLaunchMetadata
   } | null

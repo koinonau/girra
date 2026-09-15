@@ -150,9 +150,9 @@ describe('connectPanePty', () => {
       prompt: 'stop this task',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex',
+      terminalTitle: 'OpenCode',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -201,7 +201,7 @@ describe('connectPanePty', () => {
       baselineUpdatedAt: 1_000,
       baselineStateStartedAt: 900,
       baselinePrompt: 'stop this task',
-      baselineAgentType: 'codex',
+      baselineAgentType: 'opencode',
       intent: 'ctrl-c'
     })
   })
@@ -217,7 +217,7 @@ describe('connectPanePty', () => {
     const paneKey = makePaneKey('tab-1', LEAF_1)
     mockStoreState.runtimePaneTitlesByTabId = {
       'tab-1': {
-        1: 'Codex working'
+        1: 'OpenCode working'
       }
     }
     mockStoreState.agentStatusByPaneKey[paneKey] = {
@@ -225,9 +225,9 @@ describe('connectPanePty', () => {
       prompt: 'stop visible spinner',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -266,7 +266,7 @@ describe('connectPanePty', () => {
     expect(deps.updateTabTitle).toHaveBeenCalledWith('tab-1', 'Terminal')
     expect(
       resolveWorktreeStatus({
-        tabs: [{ id: 'tab-1', title: 'Codex working' }],
+        tabs: [{ id: 'tab-1', title: 'OpenCode working' }],
         browserTabs: [],
         ptyIdsByTabId: { 'tab-1': ['tab-pty'] },
         runtimePaneTitlesByTabId: mockStoreState.runtimePaneTitlesByTabId,
@@ -286,7 +286,7 @@ describe('connectPanePty', () => {
     vi.setSystemTime(1_100)
     mockStoreState.runtimePaneTitlesByTabId = {
       'tab-1': {
-        1: 'Codex working'
+        1: 'OpenCode working'
       }
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -335,7 +335,7 @@ describe('connectPanePty', () => {
     vi.setSystemTime(1_100)
     mockStoreState.runtimePaneTitlesByTabId = {
       'tab-1': {
-        1: 'Codex working'
+        1: 'OpenCode working'
       }
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -376,9 +376,9 @@ describe('connectPanePty', () => {
       prompt: 'stop from real terminal byte',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     const pane = createPane(1)
@@ -402,7 +402,7 @@ describe('connectPanePty', () => {
       baselineUpdatedAt: 1_000,
       baselineStateStartedAt: 900,
       baselinePrompt: 'stop from real terminal byte',
-      baselineAgentType: 'codex',
+      baselineAgentType: 'opencode',
       intent: 'ctrl-c'
     })
   })
@@ -448,9 +448,9 @@ describe('connectPanePty', () => {
       prompt: 'stop enhanced keyboard input',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -478,7 +478,7 @@ describe('connectPanePty', () => {
       baselineUpdatedAt: 1_000,
       baselineStateStartedAt: 900,
       baselinePrompt: 'stop enhanced keyboard input',
-      baselineAgentType: 'codex',
+      baselineAgentType: 'opencode',
       intent: 'ctrl-c'
     })
   })
@@ -492,7 +492,7 @@ describe('connectPanePty', () => {
     const paneKey = makePaneKey('tab-1', LEAF_1)
     mockStoreState.runtimePaneTitlesByTabId = {
       'tab-1': {
-        1: 'Codex working'
+        1: 'OpenCode working'
       }
     }
     mockStoreState.agentStatusByPaneKey[paneKey] = {
@@ -500,9 +500,9 @@ describe('connectPanePty', () => {
       prompt: 'stop after process exit',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -534,7 +534,7 @@ describe('connectPanePty', () => {
       baselineUpdatedAt: 1_000,
       baselineStateStartedAt: 900,
       baselinePrompt: 'stop after process exit',
-      baselineAgentType: 'codex',
+      baselineAgentType: 'opencode',
       intent: 'ctrl-c'
     })
     expect(mockStoreState.dropAgentStatus).not.toHaveBeenCalled()
@@ -549,7 +549,7 @@ describe('connectPanePty', () => {
     const paneKey = makePaneKey('tab-1', LEAF_1)
     mockStoreState.runtimePaneTitlesByTabId = {
       'tab-1': {
-        1: 'Codex working'
+        1: 'OpenCode working'
       }
     }
     mockStoreState.agentStatusByPaneKey[paneKey] = {
@@ -557,9 +557,9 @@ describe('connectPanePty', () => {
       prompt: 'stop and leave shell',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     vi.mocked(window.api.agentStatus.inferInterrupt).mockImplementation(async () => {
@@ -569,7 +569,7 @@ describe('connectPanePty', () => {
         interrupted: true,
         updatedAt: 1_100,
         stateStartedAt: 1_100,
-        agentType: 'codex',
+        agentType: 'opencode',
         paneKey,
         terminalTitle: 'Terminal 1'
       }
@@ -626,9 +626,9 @@ describe('connectPanePty', () => {
       prompt: 'ssh style write',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     const pane = createPane(1)
@@ -660,7 +660,7 @@ describe('connectPanePty', () => {
     const paneKey = makePaneKey('tab-1', LEAF_1)
     mockStoreState.runtimePaneTitlesByTabId = {
       'tab-1': {
-        1: 'Codex working'
+        1: 'OpenCode working'
       }
     }
     mockStoreState.agentStatusByPaneKey[paneKey] = {
@@ -668,9 +668,9 @@ describe('connectPanePty', () => {
       prompt: 'stop then exit',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex working',
+      terminalTitle: 'OpenCode working',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -717,9 +717,9 @@ describe('connectPanePty', () => {
       prompt: 'keep running',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex',
+      terminalTitle: 'OpenCode',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()
@@ -772,9 +772,9 @@ describe('connectPanePty', () => {
       prompt: 'copy selection',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       paneKey,
-      terminalTitle: 'Codex',
+      terminalTitle: 'OpenCode',
       stateHistory: []
     }
     const terminalTarget = createKeyboardEventTarget()

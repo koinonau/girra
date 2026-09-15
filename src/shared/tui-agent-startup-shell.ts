@@ -274,7 +274,7 @@ export function buildShellCommandFromArgv(
  *
  * `-g` is not optional: it scopes the erase to fish's GLOBAL scope, which is
  * where an inherited environment variable lands. Without it, a name that exists
- * only as a UNIVERSAL — `set -Ux CODEX_HOME …`, a perfectly normal thing for a
+ * only as a UNIVERSAL — `set -Ux CLAUDE_CONFIG_DIR …`, a perfectly normal thing for a
  * fish user to have — is permanently deleted from every future session. That is
  * real data loss to undo one launch's injection, and it is reachable from the
  * clipboard command, which a user may run with no Orca-injected value at all.

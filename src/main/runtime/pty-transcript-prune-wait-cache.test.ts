@@ -30,7 +30,7 @@ describe('pruneDisconnectedPtyTranscript clears the wait-scan cache', () => {
     pty.tailBuffer = ['Update available! Press Enter to continue.']
     pty.tailWaitState = {
       waitText: 'update available! press enter to continue.',
-      signal: { reason: 'codex-update-prompt', index: 0 },
+      signal: { reason: 'agent-update-prompt', index: 0 },
       fromTail: true
     }
 

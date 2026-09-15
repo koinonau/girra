@@ -66,10 +66,10 @@ describe('steadyState across daemon versions', () => {
   })
 
   it('a pre-inspection daemon never sees the field: the client composes from getForegroundProcess as before', async () => {
-    const request = vi.fn(async () => ({ foregroundProcess: 'codex' }))
+    const request = vi.fn(async () => ({ foregroundProcess: 'opencode' }))
     const adapter = createAdapter(COMPLETION_PROCESS_INSPECTION_PROTOCOL_VERSION - 1, request)
     await expect(adapter.inspectProcess('sess-a', { steadyState: true })).resolves.toEqual({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       hasChildProcesses: true
     })
     expect(request).toHaveBeenCalledWith('getForegroundProcess', { sessionId: 'sess-a' })

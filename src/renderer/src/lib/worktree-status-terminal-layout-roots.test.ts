@@ -22,7 +22,7 @@ describe('resolveWorktreeStatus terminal layout roots', () => {
       ptyIdsByTabId: { 'tab-1': ['pty-0'] },
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: 'codex [working]',
+          1: 'opencode [working]',
           2: 'bash'
         }
       },

@@ -21,7 +21,7 @@ function makeCanonicalUnifiedTab(entityId: string, sortOrder: number): Tab {
     groupId: 'group-1',
     worktreeId: WORKTREE_ID,
     contentType: 'terminal',
-    label: 'Grok',
+    label: 'OpenCode',
     customLabel: null,
     color: null,
     sortOrder,

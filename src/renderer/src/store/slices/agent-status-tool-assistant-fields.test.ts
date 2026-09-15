@@ -86,11 +86,11 @@ describe('agent status tool + assistant fields', () => {
     const store = createTestStore()
     store
       .getState()
-      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'p1', agentType: 'codex' })
+      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'p1', agentType: 'opencode' })
     store
       .getState()
       .setAgentStatus('tab-1:1', { state: 'working', prompt: 'p2', agentType: 'claude' })
-    expect(store.getState().agentStatusByPaneKey['tab-1:1'].agentType).toBe('codex')
+    expect(store.getState().agentStatusByPaneKey['tab-1:1'].agentType).toBe('opencode')
   })
 
   it('ignores nested done while the parent pane agent is still active', () => {
@@ -105,8 +105,8 @@ describe('agent status tool + assistant fields', () => {
       .getState()
       .setAgentStatus(
         'tab-1:1',
-        { state: 'working', prompt: 'parent codex', agentType: 'codex' },
-        'codex',
+        { state: 'working', prompt: 'parent opencode', agentType: 'opencode' },
+        'opencode',
         { updatedAt: 1_000, stateStartedAt: 1_000 }
       )
     const firstEpoch = store.getState().agentStatusEpoch
@@ -128,8 +128,8 @@ describe('agent status tool + assistant fields', () => {
     const entry = store.getState().agentStatusByPaneKey['tab-1:1']
     expect(entry).toMatchObject({
       state: 'working',
-      prompt: 'parent codex',
-      agentType: 'codex',
+      prompt: 'parent opencode',
+      agentType: 'opencode',
       updatedAt: 1_000,
       stateStartedAt: 1_000
     })
@@ -138,7 +138,10 @@ describe('agent status tool + assistant fields', () => {
     expect(entry.lastAssistantMessage).toBeUndefined()
     expect(store.getState().agentStatusEpoch).toBe(firstEpoch)
     expect(setGeneratedTabTitleFromAgentPrompt).toHaveBeenCalledTimes(1)
-    expect(setGeneratedTabTitleFromAgentPrompt).toHaveBeenLastCalledWith('tab-1:1', 'parent codex')
+    expect(setGeneratedTabTitleFromAgentPrompt).toHaveBeenLastCalledWith(
+      'tab-1:1',
+      'parent opencode'
+    )
   })
 
   it('does not let restored-unconfirmed identity suppress a live terminal status', () => {
@@ -148,11 +151,11 @@ describe('agent status tool + assistant fields', () => {
       'tab-1:1',
       {
         state: 'working',
-        prompt: 'stale codex turn',
-        agentType: 'codex',
+        prompt: 'stale opencode turn',
+        agentType: 'opencode',
         restoredUnconfirmed: true
       },
-      'codex',
+      'opencode',
       { updatedAt: 1_000, stateStartedAt: 1_000 }
     )
 
@@ -176,7 +179,9 @@ describe('agent status tool + assistant fields', () => {
   it('allows pane agentType to change after the prior turn is done', () => {
     vi.useFakeTimers()
     const store = createTestStore()
-    store.getState().setAgentStatus('tab-1:1', { state: 'done', prompt: 'p1', agentType: 'codex' })
+    store
+      .getState()
+      .setAgentStatus('tab-1:1', { state: 'done', prompt: 'p1', agentType: 'opencode' })
     store
       .getState()
       .setAgentStatus('tab-1:1', { state: 'working', prompt: 'p2', agentType: 'claude' })
@@ -188,10 +193,15 @@ describe('agent status tool + assistant fields', () => {
     const store = createTestStore()
     store
       .getState()
-      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'p1', agentType: 'codex' }, 'codex', {
-        updatedAt: 1_000,
-        stateStartedAt: 1_000
-      })
+      .setAgentStatus(
+        'tab-1:1',
+        { state: 'working', prompt: 'p1', agentType: 'opencode' },
+        'opencode',
+        {
+          updatedAt: 1_000,
+          stateStartedAt: 1_000
+        }
+      )
     store
       .getState()
       .setAgentStatus(

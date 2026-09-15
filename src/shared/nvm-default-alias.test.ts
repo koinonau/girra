@@ -25,8 +25,8 @@ function makeNvmHome(options: {
       chmodSync(join(bin, name), 0o755)
     }
     if (options.cliIn === version) {
-      writeFileSync(join(bin, 'codex'), '')
-      chmodSync(join(bin, 'codex'), 0o755)
+      writeFileSync(join(bin, 'opencode'), '')
+      chmodSync(join(bin, 'opencode'), 0o755)
     }
   }
   if (options.defaultAlias !== undefined) {
@@ -151,8 +151,8 @@ describe('nvm default alias decides the seeded runtime', () => {
       defaultAlias: '24',
       cliIn: 'v26.7.0'
     })
-    expect(resolveCliCommand('codex', { platform: 'darwin', pathEnv: '', homePath: home })).toBe(
-      join(home, '.nvm', 'versions', 'node', 'v26.7.0', 'bin', 'codex')
+    expect(resolveCliCommand('opencode', { platform: 'darwin', pathEnv: '', homePath: home })).toBe(
+      join(home, '.nvm', 'versions', 'node', 'v26.7.0', 'bin', 'opencode')
     )
   })
 })

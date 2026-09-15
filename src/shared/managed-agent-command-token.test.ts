@@ -8,12 +8,12 @@ import {
 
 describe('managed agent command tokens', () => {
   it('extracts quoted and escaped POSIX executable paths', () => {
-    expect(extractExecutableToken('"/opt/Agent Tools/codex" --flag', { platform: 'linux' })).toBe(
-      '/opt/Agent Tools/codex'
-    )
-    expect(extractExecutableToken('/opt/Agent\\ Tools/codex --flag', { platform: 'linux' })).toBe(
-      '/opt/Agent Tools/codex'
-    )
+    expect(
+      extractExecutableToken('"/opt/Agent Tools/opencode" --flag', { platform: 'linux' })
+    ).toBe('/opt/Agent Tools/opencode')
+    expect(
+      extractExecutableToken('/opt/Agent\\ Tools/opencode --flag', { platform: 'linux' })
+    ).toBe('/opt/Agent Tools/opencode')
   })
 
   it('preserves Windows path separators', () => {
@@ -29,15 +29,15 @@ describe('managed agent command tokens', () => {
     expect(isSafeExecutableBasename('../claude')).toBe(false)
     expect(isSafeExecutableBasename('claude;echo')).toBe(false)
     expect(hasPathSeparatorToken('C:\\Tools\\claude.exe')).toBe(true)
-    expect(hasPathSeparatorToken('/opt/codex')).toBe(true)
-    expect(hasPathSeparatorToken('codex')).toBe(false)
+    expect(hasPathSeparatorToken('/opt/opencode')).toBe(true)
+    expect(hasPathSeparatorToken('opencode')).toBe(false)
   })
 
   it('rejects traversal, control characters, and shell syntax in override paths', () => {
-    expect(isSafeOverrideExecutableToken('~/bin/codex')).toBe(true)
+    expect(isSafeOverrideExecutableToken('~/bin/opencode')).toBe(true)
     expect(isSafeOverrideExecutableToken('C:\\Program Files\\Claude\\claude.exe')).toBe(true)
-    expect(isSafeOverrideExecutableToken('../bin/codex')).toBe(false)
-    expect(isSafeOverrideExecutableToken('/opt/codex;echo')).toBe(false)
-    expect(isSafeOverrideExecutableToken('/opt/codex\0')).toBe(false)
+    expect(isSafeOverrideExecutableToken('../bin/opencode')).toBe(false)
+    expect(isSafeOverrideExecutableToken('/opt/opencode;echo')).toBe(false)
+    expect(isSafeOverrideExecutableToken('/opt/opencode\0')).toBe(false)
   })
 })

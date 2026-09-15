@@ -123,14 +123,14 @@ describe('activateAndRevealWorktree', () => {
     seedEmptyActivatableWorktree(worktree)
 
     const result = activateAndRevealWorktree(worktree.id, {
-      startup: { command: 'codex' }
+      startup: { command: 'opencode' }
     })
     const state = useAppStore.getState()
     const tabId = result === false ? undefined : (result.primaryTabId ?? undefined)
 
     expect(tabId).toBeDefined()
     expect(state.pendingStartupByTabId[tabId!]).toEqual(
-      expect.objectContaining({ command: 'codex' })
+      expect.objectContaining({ command: 'opencode' })
     )
   })
 
@@ -157,7 +157,7 @@ describe('activateAndRevealWorktree', () => {
             id: 'slept-tab',
             ptyId: 'wake-hint',
             worktreeId: worktree.id,
-            title: 'Codex',
+            title: 'OpenCode',
             customTitle: null,
             color: null,
             sortOrder: 0,
@@ -189,7 +189,7 @@ describe('activateAndRevealWorktree', () => {
           state: 'working',
           capturedAt: 1000,
           updatedAt: 1000,
-          terminalTitle: 'Codex'
+          terminalTitle: 'OpenCode'
         }
       },
       settings: {

@@ -704,13 +704,13 @@ describe('runtime git client', () => {
   it('passes commit-message settings to the active runtime', async () => {
     const commitMessageAi = {
       enabled: true,
-      agentId: 'codex' as const,
-      selectedModelByAgent: { codex: 'gpt-5.3-codex-spark' },
-      selectedThinkingByModel: { 'gpt-5.3-codex-spark': 'medium' },
+      agentId: 'opencode' as const,
+      selectedModelByAgent: { opencode: 'anthropic/claude-sonnet-4-5' },
+      selectedThinkingByModel: { 'anthropic/claude-sonnet-4-5': 'medium' },
       customPrompt: 'Prefer concise subjects.',
       customAgentCommand: ''
     }
-    const agentCmdOverrides = { codex: 'codex --profile work' }
+    const agentCmdOverrides = { opencode: 'opencode --log-level WARN' }
     runtimeEnvironmentCall.mockResolvedValue({
       id: 'rpc-1',
       ok: true,
@@ -743,8 +743,8 @@ describe('runtime git client', () => {
 
   it('passes one-shot commit-message params to local and runtime generation', async () => {
     const sourceControlAiResolvedParams = {
-      agentId: 'codex' as const,
-      model: 'gpt-5.5',
+      agentId: 'opencode' as const,
+      model: 'anthropic/claude-opus-4-1',
       thinkingLevel: 'high',
       customPrompt: 'Use Conventional Commits.'
     }
@@ -792,7 +792,7 @@ describe('runtime git client', () => {
   })
 
   it('discovers commit-message models through the active runtime', async () => {
-    const agentCmdOverrides = { cursor: 'cursor-agent' }
+    const agentCmdOverrides = { pi: 'pi-dev' }
     runtimeEnvironmentCall.mockResolvedValue({
       id: 'rpc-1',
       ok: true,
@@ -806,13 +806,13 @@ describe('runtime git client', () => {
         worktreeId: 'wt-1',
         worktreePath: '/repo'
       },
-      'cursor'
+      'pi'
     )
 
     expect(runtimeEnvironmentCall).toHaveBeenCalledWith({
       selector: 'env-1',
       method: 'git.discoverCommitMessageModels',
-      params: { worktree: 'id:wt-1', agentId: 'cursor', agentCmdOverrides },
+      params: { worktree: 'id:wt-1', agentId: 'pi', agentCmdOverrides },
       timeoutMs: 75_000
     })
     expect(gitDiscoverCommitMessageModels).not.toHaveBeenCalled()

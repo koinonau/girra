@@ -38,10 +38,6 @@ export const getCommitMessageAiPaneSearchEntries = createLocalizedCatalog(() => 
         'claude'
       ),
       ...translateSearchKeyword(
-        'auto.components.settings.commit.message.ai.search.542e1a00a7',
-        'codex'
-      ),
-      ...translateSearchKeyword(
         'auto.components.settings.commit.message.ai.search.82109d627d',
         'source control'
       ),

@@ -155,7 +155,7 @@ describe('useWorktreeActivityStatus', () => {
       },
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: '⠋ Codex',
+          1: '⠋ OpenCode',
           2: 'bash'
         }
       },
@@ -185,7 +185,7 @@ describe('useWorktreeActivityStatus', () => {
       },
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: '⠋ Codex',
+          1: '⠋ OpenCode',
           2: 'bash'
         }
       },
@@ -197,7 +197,7 @@ describe('useWorktreeActivityStatus', () => {
           entry: makeAgentStatusEntry({ paneKey, state: 'done' }),
           worktreeId,
           tab,
-          agentType: 'codex',
+          agentType: 'opencode',
           startedAt: 1_000
         }
       }
@@ -224,9 +224,9 @@ describe('useWorktreeActivityStatus', () => {
       },
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: '⠋ Codex',
-          2: '⠋ Codex',
-          3: '⠋ Codex'
+          1: '⠋ OpenCode',
+          2: '⠋ OpenCode',
+          3: '⠋ OpenCode'
         }
       },
       terminalLayoutsByTabId: {
@@ -239,7 +239,7 @@ describe('useWorktreeActivityStatus', () => {
             entry: makeAgentStatusEntry({ paneKey, state: 'done' }),
             worktreeId,
             tab,
-            agentType: 'codex',
+            agentType: 'opencode',
             startedAt: 1_000 + index
           }
         ])
@@ -262,7 +262,7 @@ describe('useWorktreeActivityStatus', () => {
       },
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: '⠋ Codex'
+          1: '⠋ OpenCode'
         }
       },
       agentStatusEpoch: 1,
@@ -288,7 +288,7 @@ describe('useWorktreeActivityStatus', () => {
       },
       runtimePaneTitlesByTabId: {
         'tab-parent': {
-          1: '⠋ Codex'
+          1: '⠋ OpenCode'
         }
       },
       terminalLayoutsByTabId: {

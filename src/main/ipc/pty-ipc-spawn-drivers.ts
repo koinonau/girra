@@ -31,7 +31,7 @@ export function createPtyIpcSpawnDrivers(ctx: {
       httpProxyUrl?: string
       httpProxyBypassRules?: string
     },
-    // Why: PR #2662 finding 2 — accept an optional `command` so callers can exercise OMP target resolution (was untested).
+    // Why: PR #2662 finding 2 — accept an optional `command` so callers can exercise Pi target resolution (was untested).
     command?: string,
     launchAgent?: TuiAgent,
     cwd?: string,

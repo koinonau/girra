@@ -3,8 +3,6 @@ import { hasStructuredTuiIdleEvidence } from './structured-tui-idle-evidence'
 
 describe('structured TUI idle evidence', () => {
   it('does not treat a ready prompt preview as proof that a turn is idle', () => {
-    const readyPreview = ' >_ OpenAI Codex\n model: gpt-5.5\n directory: /workspace'
-    expect(readyPreview).toContain('OpenAI Codex')
     expect(
       hasStructuredTuiIdleEvidence({ blocked: false, status: null, statusObservedLive: false })
     ).toBe(false)

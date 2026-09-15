@@ -21,9 +21,9 @@ import type { RuntimeTerminalListResult, RuntimeTerminalRead } from '../../src/s
 const fakeCliDir = mkdtempSync(path.join(os.tmpdir(), 'orca-e2e-orchestration-worker-'))
 const spawnLedgerPath = path.join(fakeCliDir, 'spawn.jsonl')
 const interruptionLedgerPath = path.join(fakeCliDir, 'interruption.jsonl')
-const fakeCodexPath = path.join(fakeCliDir, process.platform === 'win32' ? 'codex.cmd' : 'codex')
-const fakeCodexCommand = buildFakeAgentCommandOverride(fakeCodexPath)
-const fakeCodexSource = `
+const fakeClaudePath = path.join(fakeCliDir, process.platform === 'win32' ? 'claude.cmd' : 'claude')
+const fakeClaudeCommand = buildFakeAgentCommandOverride(fakeClaudePath)
+const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
 function appendLedger(envName, event) {
   const ledgerPath = process.env[envName]
@@ -32,12 +32,10 @@ function appendLedger(envName, event) {
     appendFileSync(ledgerPath, JSON.stringify({ pid: process.pid, at: Date.now(), ...event }) + '\\n')
   } catch {}
 }
-if (process.argv.slice(2).includes('app-server')) {
-  process.stderr.write("error: unrecognized subcommand 'app-server'\\n")
-  process.exit(2)
-}
+// Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
+if (require('node:path').basename(process.cwd()) === 'rate-limit-pty-cwd') process.exit(0)
 appendLedger('ORCA_E2E_SPAWN_LEDGER', { event: 'spawn', startedAt: Date.now() })
-process.stdout.write('\\u001b]0;Codex Ready\\u0007OpenAI Codex\\nmodel: e2e\\ndirectory: e2e\\n')
+process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 let acknowledged = false
 process.stdin.on('data', (chunk) => {
   const input = chunk.toString()
@@ -60,14 +58,14 @@ setInterval(() => {}, 60_000)
 `
 
 if (process.platform === 'win32') {
-  writeFileSync(path.join(fakeCliDir, 'fake-codex.js'), fakeCodexSource)
+  writeFileSync(path.join(fakeCliDir, 'fake-claude.js'), fakeClaudeSource)
   writeFileSync(
-    path.join(fakeCliDir, 'codex.cmd'),
-    '@echo off\r\nnode "%~dp0\\fake-codex.js" %*\r\n'
+    path.join(fakeCliDir, 'claude.cmd'),
+    '@echo off\r\nnode "%~dp0\\fake-claude.js" %*\r\n'
   )
 } else {
-  const executable = path.join(fakeCliDir, 'codex')
-  writeFileSync(executable, `#!/usr/bin/env node\n${fakeCodexSource}`)
+  const executable = path.join(fakeCliDir, 'claude')
+  writeFileSync(executable, `#!/usr/bin/env node\n${fakeClaudeSource}`)
   chmodSync(executable, 0o755)
 }
 
@@ -120,11 +118,11 @@ test('worker-start preserves one live inactive worker across workspace re-entry'
   await orcaPage.evaluate(
     async ({ agentCommand, terminalWindowsShell }) => {
       await window.__store?.getState().updateSettings({
-        agentCmdOverrides: { codex: agentCommand },
+        agentCmdOverrides: { claude: agentCommand },
         terminalWindowsShell
       })
     },
-    { agentCommand: fakeCodexCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
+    { agentCommand: fakeClaudeCommand, terminalWindowsShell: FAKE_AGENT_WINDOWS_SHELL }
   )
   const worktreeId = await waitForActiveWorktree(orcaPage)
   await ensureTerminalVisible(orcaPage)
@@ -164,7 +162,7 @@ test('worker-start preserves one live inactive worker across workspace re-entry'
   }>('orchestration.workerStart', {
     task: task.result.task.id,
     from: coordinator.result.terminal.handle,
-    agent: 'codex',
+    agent: 'claude',
     timeoutMs: 15_000
   })
   const workerHandle = started.result.effects.find(

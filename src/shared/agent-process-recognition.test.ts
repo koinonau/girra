@@ -8,21 +8,10 @@ import {
 } from './agent-process-recognition'
 
 describe('agent process recognition', () => {
-  it('recognizes packaged Codex foreground process names', () => {
-    expect(recognizeAgentProcess('codex-aarch64-ap')).toEqual({
-      agent: 'codex',
-      processName: 'codex-aarch64-ap'
-    })
-    expect(isRecognizedAgentType('codex-aarch64-ap')).toBe(true)
-  })
-
-  it('recognizes the OpenClaude foreground process', () => {
-    expect(recognizeAgentProcess('/usr/local/bin/openclaude')).toEqual({
-      agent: 'openclaude',
-      processName: 'openclaude'
-    })
-    expect(isRecognizedAgentType('openclaude')).toBe(true)
-    expect(isExpectedAgentProcess('/usr/local/bin/openclaude', 'claude')).toBe(false)
+  it('does not recognize a claude-prefixed binary as the Claude agent', () => {
+    expect(recognizeAgentProcess('/usr/local/bin/claudette')).toBeNull()
+    expect(isRecognizedAgentType('claudette')).toBe(false)
+    expect(isExpectedAgentProcess('/usr/local/bin/claudette', 'claude')).toBe(false)
   })
 
   it('recognizes the Pi foreground process on Windows', () => {
@@ -100,64 +89,19 @@ describe('agent process recognition', () => {
     expect(isExpectedAgentProcess('pi-mono', 'pi')).toBe(false)
   })
 
-  it('recognizes Trae by its traecli binary, not the ambiguous trae-cli name', () => {
-    expect(recognizeAgentProcess('traecli')).toEqual({
-      agent: 'trae',
-      processName: 'traecli'
+  it('recognizes a detect-command alias, not a lookalike name', () => {
+    expect(recognizeAgentProcess('/Users/dev/.local/bin/orca-ide')).toEqual({
+      agent: 'claude-agent-teams',
+      processName: 'orca-ide'
     })
-    expect(recognizeAgentProcess('/Users/dev/.local/bin/traecli')).toEqual({
-      agent: 'trae',
-      processName: 'traecli'
-    })
-    expect(isExpectedAgentProcess('/Users/dev/.local/bin/traecli', 'traecli')).toBe(true)
-    expect(isRecognizedAgentType('traecli')).toBe(true)
-    // Why: `trae-cli` and `trae-agent` both name the unrelated open-source bytedance/trae-agent.
-    expect(recognizeAgentProcess('trae-cli')).toBeNull()
-    expect(recognizeAgentProcess('trae-agent')).toBeNull()
-  })
-
-  it('recognizes Mistral Vibe by its installed executable and legacy alias', () => {
-    expect(recognizeAgentProcess('/home/dev/.local/bin/vibe')).toEqual({
-      agent: 'mistral-vibe',
-      processName: 'vibe'
-    })
-    expect(recognizeAgentProcess('mistral-vibe')).toEqual({
-      agent: 'mistral-vibe',
-      processName: 'mistral-vibe'
-    })
-    expect(isRecognizedAgentType('vibe')).toBe(true)
-  })
-
-  it('recognizes Kimi Code by the kimi-code process its launcher becomes', () => {
-    expect(recognizeAgentProcess('/home/dev/.kimi-code/bin/kimi')).toEqual({
-      agent: 'kimi',
-      processName: 'kimi'
-    })
-    expect(recognizeAgentProcess('kimi-code')).toEqual({
-      agent: 'kimi',
-      processName: 'kimi-code'
-    })
-    expect(isExpectedAgentProcess('/home/dev/.kimi-code/bin/kimi', 'kimi')).toBe(true)
-    expect(isRecognizedAgentType('kimi-code')).toBe(true)
-  })
-
-  it('recognizes Qwen Code by its installed qwen executable', () => {
-    expect(recognizeAgentProcess('/home/dev/.local/bin/qwen')).toEqual({
-      agent: 'qwen-code',
-      processName: 'qwen'
-    })
-    expect(recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Roaming\npm\qwen.cmd`)).toEqual({
-      agent: 'qwen-code',
-      processName: 'qwen'
-    })
-    expect(isExpectedAgentProcess('/usr/local/bin/qwen', 'qwen')).toBe(true)
-    expect(isRecognizedAgentType('qwen')).toBe(true)
+    expect(isRecognizedAgentType('orca-dev')).toBe(true)
+    expect(recognizeAgentProcess('orca-helper')).toBeNull()
   })
 
   it('recognizes agent CLIs launched through interpreter wrappers', () => {
     expect(
-      recognizeAgentProcessFromCommandLine('node /Users/dev/.nvm/versions/node/bin/codex')
-    ).toEqual({ agent: 'codex', processName: 'codex' })
+      recognizeAgentProcessFromCommandLine('node /Users/dev/.nvm/versions/node/bin/pi')
+    ).toEqual({ agent: 'pi', processName: 'pi' })
     expect(
       recognizeAgentProcessFromCommandLine('node /Users/dev/.nvm/versions/node/bin/opencode')
     ).toEqual({ agent: 'opencode', processName: 'opencode' })
@@ -184,14 +128,9 @@ describe('agent process recognition', () => {
     ).toEqual({ agent: 'opencode', processName: 'opencode' })
     expect(
       recognizeAgentProcessFromCommandLine(
-        String.raw`node C:\Users\dev\AppData\Roaming\npm\codex.cmd`
+        String.raw`node C:\Users\dev\AppData\Roaming\npm\claude.cmd`
       )
-    ).toEqual({ agent: 'codex', processName: 'codex' })
-    expect(
-      recognizeAgentProcessFromCommandLine(
-        String.raw`node C:\Users\dev\AppData\Roaming\npm\node_modules\@openai\codex\bin\codex.js`
-      )
-    ).toEqual({ agent: 'codex', processName: 'codex' })
+    ).toEqual({ agent: 'claude', processName: 'claude' })
   })
 
   it.each(['earendil-works', 'mariozechner'])('recognizes the @%s Pi npm entrypoint', (scope) => {
@@ -225,10 +164,10 @@ describe('agent process recognition', () => {
     expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\tmp\not-an-agent.js`)).toBeNull()
     expect(
       recognizeAgentProcessFromCommandLine(
-        String.raw`node C:\repo\server.js --plugin C:\tmp\codex.js`
+        String.raw`node C:\repo\server.js --plugin C:\tmp\claude.js`
       )
     ).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\repo\codex.js`)).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\repo\claude.js`)).toBeNull()
     expect(recognizeAgentProcessFromCommandLine(String.raw`node C:\repo\opencode.mjs`)).toBeNull()
     expect(
       recognizeAgentProcessFromCommandLine(
@@ -247,19 +186,18 @@ describe('agent process recognition', () => {
     expect(isAgentForegroundWrapperProcess('vim.exe')).toBe(false)
   })
 
-  it('recognizes the Antigravity CLI from bare, POSIX and Windows command lines', () => {
-    const agy = { agent: 'antigravity', processName: 'agy' }
+  it('recognizes the OpenCode CLI from bare, POSIX and Windows command lines', () => {
+    const opencode = { agent: 'opencode', processName: 'opencode' }
 
-    expect(recognizeAgentProcess('agy')).toEqual(agy)
-    expect(recognizeAgentProcess('/Users/dev/.local/bin/agy')).toEqual(agy)
-    expect(recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Local\agy\bin\agy.exe`)).toEqual(
-      agy
-    )
+    expect(recognizeAgentProcess('/Users/dev/.local/bin/opencode')).toEqual(opencode)
+    expect(
+      recognizeAgentProcess(String.raw`C:\Users\dev\AppData\Local\opencode\bin\opencode.exe`)
+    ).toEqual(opencode)
     expect(
       recognizeAgentProcessFromCommandLine(
-        String.raw`"C:\Users\dev\AppData\Local\agy\bin\agy.exe" --dangerously-skip-permissions`
+        String.raw`"C:\Users\dev\AppData\Local\opencode\bin\opencode.exe" --model build`
       )
-    ).toEqual(agy)
-    expect(recognizeAgentProcessFromCommandLine('agy --dangerously-skip-permissions')).toEqual(agy)
+    ).toEqual(opencode)
+    expect(recognizeAgentProcessFromCommandLine('opencode --model build')).toEqual(opencode)
   })
 })

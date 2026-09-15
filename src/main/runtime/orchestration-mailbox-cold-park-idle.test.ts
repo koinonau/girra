@@ -41,9 +41,9 @@ describe('orchestration mailbox cold-park idle continuation', () => {
 
     await driveToLiveIdle(harness.runtime)
     expect(pointerCount(harness.write)).toBe(1)
-    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Codex working\x07', 3)
+    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Claude working\x07', 3)
     harness.runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
-    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Codex done\x07', 4)
+    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Claude done\x07', 4)
     await vi.advanceTimersByTimeAsync(0)
 
     expect(pointerCount(harness.write)).toBe(1)
@@ -78,9 +78,9 @@ describe('orchestration mailbox cold-park idle continuation', () => {
     await driveToLiveIdle(harness.runtime)
     expect(pointerCount(harness.write)).toBe(1)
     expect(settlePointerWrite).toBeDefined()
-    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Codex working\x07', 3)
+    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Claude working\x07', 3)
     harness.runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
-    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Codex done\x07', 4)
+    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Claude done\x07', 4)
     await vi.advanceTimersByTimeAsync(0)
     expect(harness.write.mock.calls.filter(([, payload]) => payload === '\r')).toHaveLength(0)
 

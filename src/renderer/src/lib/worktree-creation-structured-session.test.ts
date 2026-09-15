@@ -14,7 +14,6 @@ const mocks = vi.hoisted(() => ({
   activateAndRevealWorktree: vi.fn(),
   ensureWorktreeHasInitialTerminal: vi.fn(),
   ensureWebRuntimeWorktreeTerminalAfterWake: vi.fn(),
-  preflightAgentTrust: vi.fn(),
   updateWorktreeMeta: vi.fn()
 }))
 
@@ -61,10 +60,6 @@ vi.mock('@/lib/web-runtime-worktree-terminal-after-wake', () => ({
 
 vi.mock('@/lib/worktree-activation', () => ({
   activateAndRevealWorktree: mocks.activateAndRevealWorktree
-}))
-
-vi.mock('@/lib/agent-trust-preflight', () => ({
-  preflightAgentTrust: mocks.preflightAgentTrust
 }))
 
 vi.mock('@/lib/launch-structured-agent-session', () => ({
@@ -124,7 +119,6 @@ describe('launchStructuredWorktreeSession', () => {
     mocks.closeStructuredAgentSession.mockResolvedValue('closed')
     mocks.callRuntimeRpc.mockResolvedValue(undefined)
     mocks.updateWorktreeMeta.mockResolvedValue(undefined)
-    mocks.preflightAgentTrust.mockResolvedValue(undefined)
   })
 
   it('activates the structured session once it is published', async () => {
@@ -308,11 +302,6 @@ describe('launchStructuredWorktreeSession', () => {
     expect(mocks.updateWorktreeMeta).toHaveBeenCalledWith('worktree-1', {
       pendingFirstAgentMessageRename: true
     })
-    expect(mocks.preflightAgentTrust).toHaveBeenCalledWith({
-      agent: 'claude',
-      workspacePath: '/tmp/worktree-1',
-      connectionId: 'ssh-1'
-    })
     expect(mocks.activateAndRevealWorktree).toHaveBeenCalledWith('worktree-1', {
       sidebarRevealBehavior: 'auto',
       createNewTerminalForStartup: true,
@@ -366,7 +355,7 @@ describe('launchStructuredWorktreeSession', () => {
   it('stops the fallback mid-way when the creation is dismissed and retires nothing', async () => {
     storeWithWorktree()
     refusedLaunch()
-    mocks.preflightAgentTrust.mockImplementation(async () => {
+    mocks.updateWorktreeMeta.mockImplementation(async () => {
       mocks.state = { ...mocks.state, pendingWorktreeCreations: {} }
       mocks.listener?.(mocks.state)
     })
@@ -403,7 +392,7 @@ describe('launchStructuredWorktreeSession', () => {
     await expect(
       launchStructuredWorktreeSession({
         creationId: 'creation-1',
-        request: { ...request, agent: 'gemini' },
+        request: { ...request, agent: 'opencode' },
         agentLaunchRoute: 'structured-native-chat',
         worktreeId: 'worktree-1',
         shouldActivateOnCompletion: true,

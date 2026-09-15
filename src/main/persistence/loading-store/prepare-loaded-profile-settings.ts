@@ -13,6 +13,7 @@ import { normalizeSourceControlGroupOrder } from '../../../shared/source-control
 import { normalizeProjectGroups } from '../../../shared/project-groups'
 import { normalizeDisabledTuiAgents } from '../../../shared/tui-agent-selection'
 import { hasUnsupportedTuiAgentArgs } from '../../../shared/tui-agent-launch-defaults'
+import { isTuiAgent } from '../../../shared/tui-agent-config'
 import { normalizeTerminalCursorStyleDefault } from '../../../shared/terminal-cursor-style-settings'
 import { normalizeTerminalLineHeight } from '../../../shared/terminal-line-height-settings'
 import { migrateAgentYoloDefaults } from '../applying-settings/terminal-settings-migrations'
@@ -39,6 +40,7 @@ export type PreparedLoadedProfileSettings = {
   migratePrimarySelectionPlatformDefault: boolean
   stampPrimarySelectionTerminalDefaults: boolean
   migratedDisabledTuiAgents: GlobalSettings['disabledTuiAgents']
+  normalizedDefaultTuiAgent: GlobalSettings['defaultTuiAgent']
   migratedAgentYoloDefaults: Pick<
     GlobalSettings,
     'agentDefaultArgs' | 'agentDefaultEnv' | 'agentYoloDefaultsMigrated'
@@ -131,11 +133,17 @@ export function prepareLoadedProfileSettings(
     markNeedsSave()
   }
   const migratedDisabledTuiAgents = normalizeDisabledTuiAgents(parsed.settings?.disabledTuiAgents)
+  const rawDefaultTuiAgent: unknown = parsed.settings?.defaultTuiAgent
+  // Why: a retired agent id would crash launch planning; fall back to auto-pick, never remap.
+  const normalizedDefaultTuiAgent: GlobalSettings['defaultTuiAgent'] =
+    rawDefaultTuiAgent === 'blank' || isTuiAgent(rawDefaultTuiAgent) ? rawDefaultTuiAgent : null
+  if (rawDefaultTuiAgent !== undefined && rawDefaultTuiAgent !== normalizedDefaultTuiAgent) {
+    markNeedsSave()
+  }
   const migratedAgentYoloDefaults = migrateAgentYoloDefaults(parsed.settings)
   if (
     parsed.settings?.agentYoloDefaultsMigrated !== true ||
-    hasUnsupportedTuiAgentArgs('opencode', parsed.settings?.agentDefaultArgs?.opencode) ||
-    hasUnsupportedTuiAgentArgs('kilo', parsed.settings?.agentDefaultArgs?.kilo)
+    hasUnsupportedTuiAgentArgs('opencode', parsed.settings?.agentDefaultArgs?.opencode)
   ) {
     markNeedsSave()
   }
@@ -232,6 +240,7 @@ export function prepareLoadedProfileSettings(
     migratePrimarySelectionPlatformDefault,
     stampPrimarySelectionTerminalDefaults,
     migratedDisabledTuiAgents,
+    normalizedDefaultTuiAgent,
     migratedAgentYoloDefaults,
     migratedWindowsRuntimeDefault,
     migratedLocalAccountRuntime,

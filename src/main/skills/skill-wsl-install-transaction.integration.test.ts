@@ -97,7 +97,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill install transactions', () => {
       homeDirectory,
       ...(scope === 'workspace' ? { workspaceDirectory } : {}),
       orcaStateDirectory: join(localRoot, `state-${scope}`),
-      detectedProviders: ['codex', 'claude'],
+      detectedProviders: ['opencode', 'claude'],
       destinationIdentity: `${scope}:real-wsl`,
       hostIdentity: 'windows-2',
       expectedArchiveSha256: archive.archiveSha256,
@@ -139,7 +139,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill install transactions', () => {
       scope: 'global' as const,
       homeDirectory,
       orcaStateDirectory: join(localRoot, 'state-global'),
-      detectedProviders: ['codex', 'claude'],
+      detectedProviders: ['opencode', 'claude'],
       filesystem
     }
     expect((await removeSharedSkill(removeInput)).conflict?.kind).toBe('modified')
@@ -181,7 +181,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill install transactions', () => {
           homeDirectory,
           workspaceDirectory,
           orcaStateDirectory: join(localRoot, 'state-workspace'),
-          detectedProviders: ['codex', 'claude'],
+          detectedProviders: ['opencode', 'claude'],
           filesystem
         })
       ).status
@@ -219,7 +219,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill install transactions', () => {
           homeDirectory,
           workspaceDirectory: windowsWorkspace,
           orcaStateDirectory: join(localRoot, 'state-drvfs'),
-          detectedProviders: ['codex', 'claude'],
+          detectedProviders: ['opencode', 'claude'],
           filesystem
         })
       ).status

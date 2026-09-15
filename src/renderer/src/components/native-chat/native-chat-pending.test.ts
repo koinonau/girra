@@ -164,7 +164,7 @@ describe('prunePendingSends', () => {
     expect(prunePendingSends(pending, [oldUser, oldAnswer])).toEqual(pending)
   })
 
-  it('prunes a first send against a timestampless transcript turn (grok)', () => {
+  it('prunes a first send against a timestampless transcript turn', () => {
     const pending = [{ ...pendingOf('p1', 'rename it'), afterMessageId: null }]
     const transcript = [
       { ...userMessage('u1', 'rename it'), timestamp: null },
@@ -500,7 +500,7 @@ describe('pendingSendsAsMessages', () => {
     expect(prunePendingSends(pending, remoteTranscript)).toEqual([])
   })
 
-  it('hides a first send while its timestampless transcript turn is visible (grok)', () => {
+  it('hides a first send while its timestampless transcript turn is visible', () => {
     const pending = [{ ...pendingOf('p1', 'rename it'), afterMessageId: null }]
 
     expect(
@@ -521,7 +521,7 @@ describe('launchPromptAsMessage', () => {
     expect(
       launchPromptAsMessage({
         tabId: 'tab-1',
-        agent: 'codex',
+        agent: 'opencode',
         text: 'Fix failing checks',
         createdAt: 42
       })
@@ -539,7 +539,7 @@ describe('launchPromptAsMessage', () => {
       launchPromptAsMessage(
         {
           tabId: 'tab-1',
-          agent: 'codex',
+          agent: 'opencode',
           text: 'Fix failing checks',
           createdAt: 42
         },
@@ -572,7 +572,7 @@ describe('launchPromptAsMessage', () => {
       shouldPruneLaunchPrompt(
         {
           tabId: 'tab-1',
-          agent: 'codex',
+          agent: 'opencode',
           text: prompt,
           createdAt: 42
         },
@@ -602,11 +602,11 @@ describe('launchPromptAsMessage', () => {
     ).toBe(true)
   })
 
-  // Grok transcripts carry no timestamps; before the null-matchable rule the
+  // Some transcripts carry no timestamps; before the null-matchable rule the
   // seeded bubble was never hidden or pruned and sat rank-pinned at the list
   // tail forever, reading as the conversation reordering.
-  it('hides and prunes the launch prompt against a timestampless transcript (grok)', () => {
-    const entry = { tabId: 'tab-1', agent: 'grok' as const, text: 'rename it', createdAt: 42 }
+  it('hides and prunes the launch prompt against a timestampless transcript', () => {
+    const entry = { tabId: 'tab-1', agent: 'opencode' as const, text: 'rename it', createdAt: 42 }
     const transcript = [
       { ...userMessage('u1', 'rename it'), timestamp: null },
       { ...assistantMessage('a1', 'done'), timestamp: null }
@@ -636,7 +636,7 @@ describe('launchPromptAsMessage', () => {
 describe('pending send cache', () => {
   it('persists optimistic sends for the same pane and agent', () => {
     clearPendingSendCacheForTests()
-    const scope = { paneKey: 'tab-a:leaf-a', agent: 'codex' }
+    const scope = { paneKey: 'tab-a:leaf-a', agent: 'opencode' }
 
     const appended = appendPendingSendCache(scope, pendingOf('p1', 'first prompt'))
 
@@ -654,7 +654,7 @@ describe('pending send cache', () => {
 
   it('clears cached pending sends when pruning removes all entries', () => {
     clearPendingSendCacheForTests()
-    const scope = { paneKey: 'tab-a:leaf-a', agent: 'codex' }
+    const scope = { paneKey: 'tab-a:leaf-a', agent: 'opencode' }
     appendPendingSendCache(scope, pendingOf('p1', 'first prompt'))
 
     writePendingSendCache(scope, [])
@@ -704,7 +704,7 @@ describe('commandMarkersAsMessages', () => {
 describe('command marker cache', () => {
   it('persists slash command markers for the same pane conversation', () => {
     clearCommandMarkerCacheForTests()
-    const scope = { paneKey: 'tab-a:leaf-a', agent: 'codex', sessionId: 'session-1' }
+    const scope = { paneKey: 'tab-a:leaf-a', agent: 'opencode', sessionId: 'session-1' }
 
     const appended = appendCommandMarkerCache(scope, '/clear', 10)
 

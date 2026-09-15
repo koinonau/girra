@@ -18,18 +18,14 @@ function terminalTab(id: string, worktreeId: string): TerminalTab {
 describe('pane foreground agent slice', () => {
   it('sets, value-bails, and clears entries per pane key', () => {
     const store = createTestStore()
-    store
-      .getState()
-      .setPaneForegroundAgent('tab-1:leaf-1', { agent: 'aider', shellForeground: false })
+    store.getState().setPaneForegroundAgent('tab-1:leaf-1', { agent: 'pi', shellForeground: false })
     const first = store.getState().paneForegroundAgentByPaneKey
 
-    store
-      .getState()
-      .setPaneForegroundAgent('tab-1:leaf-1', { agent: 'aider', shellForeground: false })
+    store.getState().setPaneForegroundAgent('tab-1:leaf-1', { agent: 'pi', shellForeground: false })
     expect(store.getState().paneForegroundAgentByPaneKey).toBe(first)
 
     store.getState().setPaneForegroundAgent('tab-1:leaf-1', {
-      agent: 'aider',
+      agent: 'pi',
       routingRevoked: true,
       routingConfirmationPending: true,
       shellForeground: false
@@ -72,12 +68,10 @@ describe('pane foreground agent slice', () => {
 
   it('sweeps only the closed tab prefix, not sibling tabs or prefix-share ids', () => {
     const store = createTestStore()
+    store.getState().setPaneForegroundAgent('tab-1:leaf-1', { agent: 'pi', shellForeground: false })
     store
       .getState()
-      .setPaneForegroundAgent('tab-1:leaf-1', { agent: 'aider', shellForeground: false })
-    store
-      .getState()
-      .setPaneForegroundAgent('tab-10:leaf-1', { agent: 'codex', shellForeground: false })
+      .setPaneForegroundAgent('tab-10:leaf-1', { agent: 'opencode', shellForeground: false })
 
     store.getState().clearPaneForegroundAgentByTabPrefix('tab-1')
 
@@ -92,13 +86,11 @@ describe('pane foreground agent slice', () => {
         'wt-2': [terminalTab('tab-3', 'wt-2')]
       }
     })
-    store
-      .getState()
-      .setPaneForegroundAgent('tab-1:leaf-1', { agent: 'aider', shellForeground: false })
+    store.getState().setPaneForegroundAgent('tab-1:leaf-1', { agent: 'pi', shellForeground: false })
     store.getState().setPaneForegroundAgent('tab-2:leaf-1', { agent: null, shellForeground: true })
     store
       .getState()
-      .setPaneForegroundAgent('tab-3:leaf-1', { agent: 'codex', shellForeground: false })
+      .setPaneForegroundAgent('tab-3:leaf-1', { agent: 'opencode', shellForeground: false })
 
     const before = store.getState().paneForegroundAgentByPaneKey
     store.getState().clearPaneForegroundAgentByWorktree('wt-missing')

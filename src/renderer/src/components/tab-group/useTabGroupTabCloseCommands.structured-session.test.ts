@@ -102,7 +102,7 @@ const AGENT_TAB = {
   groupId: 'group-1',
   worktreeId: 'wt-1',
   contentType: 'agent-session' as const,
-  label: 'Codex Chat',
+  label: 'OpenCode Chat',
   customLabel: null,
   color: null,
   sortOrder: 0,

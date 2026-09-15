@@ -312,11 +312,11 @@ describe('Store', () => {
         },
         modelOverridesByOperation: {
           commitMessage: {
-            selectedModelByAgent: { codex: 'gpt-5.4', claude: false },
+            selectedModelByAgent: { opencode: 'gpt-5.4', claude: false },
             selectedThinkingByModel: { 'gpt-5.4': 'high', bad: true }
           },
           unknown: {
-            selectedModelByAgent: { codex: 'ignored' }
+            selectedModelByAgent: { opencode: 'ignored' }
           }
         }
       } as never
@@ -337,7 +337,7 @@ describe('Store', () => {
       },
       modelOverridesByOperation: {
         commitMessage: {
-          selectedModelByAgent: { codex: 'gpt-5.4' },
+          selectedModelByAgent: { opencode: 'gpt-5.4' },
           selectedThinkingByModel: { 'gpt-5.4': 'high' }
         }
       }

@@ -314,7 +314,7 @@ async function runSnapshot(store: MemorySnapshotStore): Promise<MemorySnapshot> 
         sessionCpu += row.cpu
         sessionMemory += row.memory
         // Why the whole subtree: an agent's committed bytes live in the
-        // children it spawned (codex.exe, MCP servers), not in the shell.
+        // children it spawned (agent CLIs, MCP servers), not in the shell.
         sessionPrivateMemory += clampMemoryMetric(row.privateMemory)
       }
     }

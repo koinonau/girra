@@ -115,7 +115,6 @@ vi.mock('../shell-prompt-readiness-probe', () => ({
 }))
 
 import { LocalPtyProvider } from './local-pty-provider'
-import { POSIX_SHELL_STARTUP_COMMAND_ENV } from '../pty/posix-shell-startup-command'
 import {
   applyLocalPtyProviderMockDefaults,
   createLocalPtyMockProcess,
@@ -165,15 +164,15 @@ describe('LocalPtyProvider', () => {
       await provider.spawn({
         cols: 80,
         rows: 24,
-        env: { [POSIX_SHELL_STARTUP_COMMAND_ENV]: 'poisoned command' }
+        env: { ORCA_POSIX_SHELL_STARTUP_COMMAND: 'poisoned command' }
       })
 
       const spawnEnv = spawnMock.mock.calls.at(-1)?.[2].env
-      expect(spawnEnv[POSIX_SHELL_STARTUP_COMMAND_ENV]).toBeUndefined()
+      expect(spawnEnv.ORCA_POSIX_SHELL_STARTUP_COMMAND).toBeUndefined()
       expect(mockProc.write).not.toHaveBeenCalled()
     })
 
-    it('retains PTY delivery for unsupported local shells without leaking wrapper state', async () => {
+    it('retains PTY delivery for unsupported local shells', async () => {
       vi.useFakeTimers()
       try {
         process.env.SHELL = '/bin/sh'
@@ -181,8 +180,6 @@ describe('LocalPtyProvider', () => {
 
         await provider.spawn({ cols: 80, rows: 24, command })
 
-        const spawnEnv = spawnMock.mock.calls.at(-1)?.[2].env
-        expect(spawnEnv[POSIX_SHELL_STARTUP_COMMAND_ENV]).toBeUndefined()
         expect(mockProc.write).not.toHaveBeenCalled()
 
         await vi.advanceTimersByTimeAsync(200)

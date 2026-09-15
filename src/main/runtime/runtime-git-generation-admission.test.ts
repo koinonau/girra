@@ -39,7 +39,7 @@ vi.mock('../source-control/pull-request-template', () => ({
 
 import { RuntimeGitGenerationCommands } from './runtime-git-generation-commands'
 
-const params = { agentId: 'codex' as const, model: 'gpt-5.5' }
+const params = { agentId: 'opencode' as const, model: 'gpt-5.5' }
 const settingsOverride = { sourceControlAiResolvedParams: params }
 const pullRequestContext = {
   base: 'main',

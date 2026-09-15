@@ -118,7 +118,7 @@ describe('remote sibling editor content routing', () => {
   })
 
   it('keeps a client-local live-tail log on the client', async () => {
-    const logPath = '/Users/me/.codex/sessions/session.jsonl'
+    const logPath = '/Users/me/.claude/projects/session.jsonl'
     const activeFile = createOpenFile({
       id: logPath,
       filePath: logPath,

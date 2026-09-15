@@ -245,7 +245,7 @@ describe('TabBarCreateEntry keyboard navigation', () => {
 
   it('launches a matched agent when its highlighted row is selected', () => {
     const agentOptions: TabAgentLaunchOption[] = [
-      { agent: 'gemini', aliases: ['gemini'], label: 'Gemini' }
+      { agent: 'opencode', aliases: ['opencode'], label: 'OpenCode' }
     ]
     const onLaunchAgent = vi.fn()
     mount(
@@ -261,10 +261,10 @@ describe('TabBarCreateEntry keyboard navigation', () => {
 
     // A partial query surfaces the agent (issue #1); it is the top row, so Enter
     // launches it.
-    setQuery('gem')
+    setQuery('open')
     submitForm()
 
-    expect(onLaunchAgent).toHaveBeenCalledWith('gemini')
+    expect(onLaunchAgent).toHaveBeenCalledWith('opencode')
   })
 
   it('does not relaunch Claude when a structured launch is already pending', () => {

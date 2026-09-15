@@ -131,14 +131,14 @@ function isGraySlabPixel(red: number, green: number, blue: number, alpha: number
   return max - min <= 9 && max >= 48 && max <= 112
 }
 
-function isCodexStatusCyanPixel(red: number, green: number, blue: number, alpha: number): boolean {
+function isStatusGlyphCyanPixel(red: number, green: number, blue: number, alpha: number): boolean {
   if (alpha < 160) {
     return false
   }
   return blue >= 160 && green >= 130 && red >= 80 && red <= 180
 }
 
-function isCodexStatusGreenPixel(red: number, green: number, blue: number, alpha: number): boolean {
+function isStatusGlyphGreenPixel(red: number, green: number, blue: number, alpha: number): boolean {
   if (alpha < 160) {
     return false
   }
@@ -219,7 +219,7 @@ function analyzeGraySlabs(
       for (let x = originX; x < maxX; x += 1) {
         const offset = (y * image.width + x) * 4
         if (
-          isCodexStatusCyanPixel(
+          isStatusGlyphCyanPixel(
             image.data[offset] ?? 0,
             image.data[offset + 1] ?? 0,
             image.data[offset + 2] ?? 0,
@@ -228,7 +228,7 @@ function analyzeGraySlabs(
         ) {
           cyanPixelCount += 1
         } else if (
-          isCodexStatusGreenPixel(
+          isStatusGlyphGreenPixel(
             image.data[offset] ?? 0,
             image.data[offset + 1] ?? 0,
             image.data[offset + 2] ?? 0,
@@ -241,7 +241,7 @@ function analyzeGraySlabs(
     }
     if (
       row >= 8 &&
-      // Thresholds tuned to classify stale Codex status glyph rows in screenshots.
+      // Thresholds tuned to classify stale agent status glyph rows in screenshots.
       cyanPixelCount >= Math.max(12, Math.round(target.cellWidth * scaleX * 3)) &&
       greenPixelCount >= Math.max(24, Math.round(target.cellWidth * scaleX * 8)) &&
       !target.modelStatusRows.some((statusRow) => Math.abs(statusRow - row) <= 1)

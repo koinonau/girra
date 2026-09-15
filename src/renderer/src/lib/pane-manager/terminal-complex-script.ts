@@ -243,7 +243,7 @@ export function terminalOutputPrefersRenderRefresh(data: string): boolean {
     }
   }
   if (!hasNonAscii) {
-    // Why: Codex-style terminal redraws are usually ASCII; avoid the Unicode
+    // Why: TUI redraws are usually ASCII; avoid the Unicode
     // emoji/property regex and code-point walk on the hottest output path.
     return false
   }

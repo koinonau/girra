@@ -51,7 +51,6 @@ import { registerEmulatorVideoStreamHandlers } from '../emulator-video-stream'
 import { registerTerminalRenderDesyncEvidenceHandler } from '../terminal-render-desync-evidence'
 import { registerAgentHookHandlers } from '../agent-hooks'
 import { getPtyIdForPaneKey } from '../pty'
-import { registerAgentTrustHandlers } from '../agent-trust'
 import { registerClaudeAccountHandlers } from '../claude-accounts'
 import { registerMiniMaxCredentialsHandlers } from '../minimax-credentials'
 import {
@@ -115,7 +114,6 @@ export function registerCoreHandlers(
   registerPreflightHandlers()
   registerUsageProviderHandlers({ claudeUsage, openCodeUsage })
   registerAgentHookHandlers(runtime, { getPtyIdForPaneKey })
-  registerAgentTrustHandlers()
   registerClaudeAccountHandlers(claudeAccounts)
   registerMiniMaxCredentialsHandlers(rateLimits)
   registerRateLimitHandlers(rateLimits)

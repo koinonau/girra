@@ -1,7 +1,7 @@
-// Codex-like INLINE-mode TUI (normal buffer, never alt-screen): history lines
+// Claude Code-like INLINE-mode TUI (normal buffer, never alt-screen): history lines
 // scroll into terminal scrollback while a live block (working spinner + input
 // box + status line) repaints glued to the bottom of the screen, wrapped in
-// synchronized-output brackets. This is the write shape a real Codex CLI
+// synchronized-output brackets. This is the write shape a real Claude Code CLI
 // produces mid-generation — the shape the alt-screen fixtures cannot cover.
 //
 // argv[2] = heartbeat file path (latest frame number, rewritten every tick).
@@ -15,7 +15,7 @@ const heartbeatPath = process.argv[2]
 const TICK_MS = 60
 const HISTORY_LINES_PER_SECOND = Math.max(0, Number(process.argv[3]) || 4)
 const BLOCK_ROWS = 6
-// argv[4]: seed scrollback size — a field Codex session carries thousands of
+// argv[4]: seed scrollback size — a field agent session carries thousands of
 // lines, which is what makes the reveal replay long enough to lose races.
 const INITIAL_HISTORY_LINES = Math.max(0, Number(process.argv[4]) || 120)
 
@@ -42,7 +42,7 @@ function liveBlock() {
   const top = Math.max(1, rows() - BLOCK_ROWS + 1)
   const lines = [
     `╭${bar}╮`,
-    pad(`CODEX_FRAME_${String(frame).padStart(6, '0')} working${'.'.repeat(frame % 4).padEnd(3)}`),
+    pad(`AGENT_FRAME_${String(frame).padStart(6, '0')} working${'.'.repeat(frame % 4).padEnd(3)}`),
     pad(`tokens ${frame * 17} · ${frame % 2 === 0 ? 'thinking' : 'streaming'}`),
     `╰${bar}╯`,
     '› INPUT_BOX_READY_MARKER',
@@ -88,7 +88,7 @@ function tick() {
   }
 }
 
-// Codex-shaped startup: terminal queries (answered by xterm or the daemon's
+// Agent-shaped startup: terminal queries (answered by xterm or the daemon's
 // model responder) and mouse reporting, so the run takes the live-agent
 // classification branches instead of the plain-shell ones.
 process.stdout.write('\x1b[c\x1b[6n\x1b]10;?\x07\x1b]11;?\x07')

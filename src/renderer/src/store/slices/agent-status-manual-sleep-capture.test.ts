@@ -208,7 +208,7 @@ describe('manual sleep agent session capture', () => {
     vi.setSystemTime(NOW)
     const store = createTestStore()
     seedTabs(store)
-    const providerSession = { key: 'session_id', id: 'codex-shared' } as const
+    const providerSession = { key: 'session_id', id: 'claude-shared' } as const
     const entry = makeAgentEntry({ paneKey: 'tab-1:leaf-1', state: 'done', providerSession })
     store.setState({
       sleepingAgentSessionsByPaneKey: {

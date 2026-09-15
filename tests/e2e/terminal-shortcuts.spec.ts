@@ -592,7 +592,7 @@ test.describe('Terminal Shortcuts', () => {
     await orcaPage.keyboard.press('Backspace')
   })
 
-  test('@headful Codex-like background output stays visible without disabling WebGL in auto mode', async ({
+  test('@headful agent-style background output stays visible without disabling WebGL in auto mode', async ({
     orcaPage
   }) => {
     const hasPane = await orcaPage.evaluate(() => {
@@ -633,7 +633,7 @@ test.describe('Terminal Shortcuts', () => {
     test.skip(!webglActive, 'WebGL was not active in this headful environment')
 
     const ptyId = await waitForActivePanePtyId(orcaPage)
-    const marker = `CODEX_BG_${Date.now()}`
+    const marker = `AGENT_BG_${Date.now()}`
     await execInTerminal(orcaPage, ptyId, `printf '\\033[48;2;52;52;52m  ${marker}  \\033[0m\\n'`)
     await waitForTerminalOutput(orcaPage, marker)
 

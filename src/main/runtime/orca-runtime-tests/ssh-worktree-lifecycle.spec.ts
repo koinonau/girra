@@ -429,7 +429,7 @@ describe('OrcaRuntimeService', () => {
       spawn,
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'codex'
+      getForegroundProcess: async () => 'claude'
     })
     runtime.setNotifier({
       worktreesChanged: vi.fn(),
@@ -451,7 +451,7 @@ describe('OrcaRuntimeService', () => {
       const result = await runtime.createManagedWorktree({
         repoSelector: TEST_REPO_ID,
         name: 'agent-feature',
-        startupAgent: 'codex',
+        startupAgent: 'claude',
         startupPrompt: 'hi',
         activate: true
       })
@@ -459,7 +459,7 @@ describe('OrcaRuntimeService', () => {
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
           cwd: '/remote/agent-feature',
-          command: "codex '--dangerously-bypass-approvals-and-sandbox' 'hi'",
+          command: "claude '--dangerously-skip-permissions' 'hi'",
           worktreeId: result.worktree.id
         })
       )
@@ -541,7 +541,7 @@ describe('OrcaRuntimeService', () => {
       spawn,
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'codex'
+      getForegroundProcess: async () => 'claude'
     })
     runtime.setNotifier({
       worktreesChanged: vi.fn(),
@@ -563,14 +563,14 @@ describe('OrcaRuntimeService', () => {
       await runtime.createManagedWorktree({
         repoSelector: TEST_REPO_ID,
         name: 'agent-feature',
-        startupAgent: 'codex',
+        startupAgent: 'claude',
         startupPrompt: "fix Bob's branch"
       })
 
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
           cwd: 'C:/remote/agent-feature',
-          command: "codex '--dangerously-bypass-approvals-and-sandbox' 'fix Bob''s branch'"
+          command: "claude '--dangerously-skip-permissions' 'fix Bob''s branch'"
         })
       )
       expect(addWorktree).not.toHaveBeenCalled()

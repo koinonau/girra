@@ -166,10 +166,10 @@ describe('resolveOpenTabOccupantAgent', () => {
       resolve({
         layout: layout(LEAF_A),
         retainedAgentsByPaneKey: {
-          [makePaneKey(TAB_ID, LEAF_A)]: retained(LEAF_A, 'codex')
+          [makePaneKey(TAB_ID, LEAF_A)]: retained(LEAF_A, 'pi')
         }
       })
-    ).toBe('codex')
+    ).toBe('pi')
   })
 
   it('uses a live sibling when the focused pane is a shell', () => {

@@ -77,7 +77,7 @@ describe('PTY provider process inspection', () => {
   })
 
   it('falls back to the existing provider process APIs', async () => {
-    const getForegroundProcess = vi.fn().mockResolvedValue('codex')
+    const getForegroundProcess = vi.fn().mockResolvedValue('opencode')
     const hasChildProcesses = vi.fn().mockResolvedValue(true)
     const provider = {
       getForegroundProcess,
@@ -85,7 +85,7 @@ describe('PTY provider process inspection', () => {
     } as Pick<IPtyProvider, 'getForegroundProcess' | 'hasChildProcesses'> as IPtyProvider
 
     await expect(inspectPtyProviderProcess(provider, 'pty-1')).resolves.toEqual({
-      foregroundProcess: 'codex',
+      foregroundProcess: 'opencode',
       hasChildProcesses: true
     })
   })

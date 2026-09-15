@@ -46,17 +46,17 @@ describe('native chat task list history', () => {
 
   it('keeps interleaved tool families separate and ignores MCP lookalikes', () => {
     const claude = call()
-    const codex = call('update_plan')
+    const updatePlan = call('update_plan')
     const next = call('TodoWrite', 'completed')
-    const model = buildNativeChatTaskListRows([claude, codex, call('mcp__x__TodoWrite'), next])
-    expect(model.rows.get(codex)?.previous).toBeUndefined()
+    const model = buildNativeChatTaskListRows([claude, updatePlan, call('mcp__x__TodoWrite'), next])
+    expect(model.rows.get(updatePlan)?.previous).toBeUndefined()
     expect(model.rows.get(next)?.previous).toEqual(model.rows.get(claude)?.list)
     const history = nativeChatTaskListPredecessors([
       message('a', [claude]),
-      message('b', [codex]),
+      message('b', [updatePlan]),
       message('c', [next])
     ])
-    expect(history.get('c')).toEqual({ todowrite: claude, update_plan: codex })
+    expect(history.get('c')).toEqual({ todowrite: claude, update_plan: updatePlan })
   })
 
   it('skips failed and malformed calls and keeps errors unconsumed', () => {

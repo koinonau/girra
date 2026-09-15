@@ -7,69 +7,14 @@ const HOME = join('/home', 'dev')
 const WORKSPACE = join('/repos', 'orca')
 
 describe('resolveSkillProviderDestinations', () => {
-  it('gives an agent that reads the canonical root no placement of its own', () => {
-    const destinations = resolveSkillProviderDestinations({
-      scope: 'workspace',
-      homeDirectory: HOME,
-      workspaceDirectory: WORKSPACE,
-      detectedProviders: ['codex']
-    })
-    expect(destinations).toEqual([
-      {
-        provider: 'codex',
-        readsCanonicalRoot: true,
-        rootPath: join(WORKSPACE, '.agents', 'skills')
-      }
-    ])
-  })
-
-  // Why: Codex and Cursor read a project's .agents/skills but keep their own
-  // home directory, so the same agent needs a placement at one scope only.
-  it('resolves scope-specific roots for an agent that is canonical in a workspace only', () => {
-    const workspace = resolveSkillProviderDestinations({
-      scope: 'workspace',
-      homeDirectory: HOME,
-      workspaceDirectory: WORKSPACE,
-      detectedProviders: ['cursor']
-    })
-    const global = resolveSkillProviderDestinations({
-      scope: 'global',
-      homeDirectory: HOME,
-      detectedProviders: ['cursor']
-    })
-    expect(workspace[0]).toMatchObject({ readsCanonicalRoot: true })
-    expect(global[0]).toMatchObject({
-      readsCanonicalRoot: false,
-      rootPath: join(HOME, '.cursor', 'skills')
-    })
-  })
-
   it('places every detected agent that owns a directory', () => {
     const destinations = resolveSkillProviderDestinations({
       scope: 'global',
       homeDirectory: HOME,
-      detectedProviders: ['codex', 'claude', 'droid', 'grok', 'aug', 'continue', 'trae']
+      detectedProviders: ['claude']
     })
     expect(destinations.map((destination) => destination.rootPath)).toEqual([
-      join(HOME, '.agents', 'skills'),
-      join(HOME, '.claude', 'skills'),
-      join(HOME, '.factory', 'skills'),
-      join(HOME, '.continue', 'skills'),
-      join(HOME, '.trae-cn', 'skills'),
-      join(HOME, '.grok', 'skills'),
-      join(HOME, '.augment', 'skills')
-    ])
-  })
-
-  it('uses the canonical root for Codex at global scope', () => {
-    expect(
-      resolveSkillProviderDestinations({
-        scope: 'global',
-        homeDirectory: HOME,
-        detectedProviders: ['codex']
-      })
-    ).toEqual([
-      { provider: 'codex', readsCanonicalRoot: true, rootPath: join(HOME, '.agents', 'skills') }
+      join(HOME, '.claude', 'skills')
     ])
   })
 
@@ -111,24 +56,12 @@ describe('resolveSkillProviderDestinations', () => {
     ])
   })
 
-  it('rejects two providers claiming one noncanonical root', () => {
-    const sharedRoot = join(HOME, '.custom-agent', 'skills')
-    expect(() =>
-      resolveSkillProviderDestinations({
-        scope: 'global',
-        homeDirectory: HOME,
-        detectedProviders: ['claude', 'grok'],
-        providerRootOverrides: { claude: sharedRoot, grok: sharedRoot }
-      })
-    ).toThrow('skill-install-provider-root-collision')
-  })
-
   it('ignores agents Orca cannot place skills for', () => {
     expect(
       resolveSkillProviderDestinations({
         scope: 'global',
         homeDirectory: HOME,
-        detectedProviders: ['opencode', 'goose', 'not-an-agent']
+        detectedProviders: ['opencode', 'pi', 'not-an-agent']
       })
     ).toEqual([])
   })
@@ -148,20 +81,20 @@ describe('selectedOrDetectedSkillProviders', () => {
   // Why: removal passes no selection so it can still clean roots an earlier
   // install wrote, even if the user has since narrowed their agents.
   it('keeps every detected agent when nothing was selected', () => {
-    expect(selectedOrDetectedSkillProviders(['claude', 'codex'], undefined)).toEqual([
+    expect(selectedOrDetectedSkillProviders(['claude', 'opencode'], undefined)).toEqual([
       'claude',
-      'codex'
+      'opencode'
     ])
   })
 
   it('honors selected agents even when they are not currently detected', () => {
-    expect(selectedOrDetectedSkillProviders(['claude', 'codex'], ['claude', 'cursor'])).toEqual([
+    expect(selectedOrDetectedSkillProviders(['claude', 'opencode'], ['claude', 'pi'])).toEqual([
       'claude',
-      'cursor'
+      'pi'
     ])
   })
 
   it('places nothing extra when the choice is empty', () => {
-    expect(selectedOrDetectedSkillProviders(['claude', 'codex'], [])).toEqual([])
+    expect(selectedOrDetectedSkillProviders(['claude', 'opencode'], [])).toEqual([])
   })
 })

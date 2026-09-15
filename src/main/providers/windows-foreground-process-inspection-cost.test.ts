@@ -36,7 +36,7 @@ function buildNativeTable(): { pid: number; ppid: number; name: string; commandL
       pid: agentPid(pane),
       ppid: shellPid(pane),
       name: 'node.exe',
-      commandLine: 'node C:/Users/dev/AppData/codex/bin/codex.js'
+      commandLine: 'node C:/Users/dev/AppData/opencode/bin/opencode.js'
     })
   }
   for (let filler = rows.length; filler < TABLE_SIZE; filler += 1) {

@@ -95,7 +95,7 @@ orca worktree ps --json
 orca worktree current --json
 orca worktree show --worktree active --json
 orca worktree create --repo id:<repoId> --name fix-login --json
-orca worktree create --name child-task --agent codex --prompt "Investigate the flaky login test" --json
+orca worktree create --name child-task --agent claude --prompt "Investigate the flaky login test" --json
 orca worktree set --worktree active --comment "reproduced failure; testing token refresh fix" --json
 orca worktree rm --worktree id:<worktreeId> --force --json
 ```
@@ -106,7 +106,7 @@ Agent startup flags:
 
 ```bash
 orca worktree create --name review-api --agent claude --setup run --json
-orca worktree create --name quick-check --agent codex --prompt "Summarize the diff" --setup skip --json
+orca worktree create --name quick-check --agent claude --prompt "Summarize the diff" --setup skip --json
 orca worktree create --name hidden-setup --setup inherit --json
 ```
 
@@ -338,7 +338,7 @@ Scheduled prompts:
 
 ```bash
 orca automations list --json
-orca automations create --name "Daily review" --trigger daily --time 09:00 --prompt "Review open changes" --provider codex --repo id:<repoId> --disabled --json
+orca automations create --name "Daily review" --trigger daily --time 09:00 --prompt "Review open changes" --provider claude --repo id:<repoId> --disabled --json
 orca automations run <automationId> --json
 ```
 

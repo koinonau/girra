@@ -135,8 +135,8 @@ describe('orchestration notification mailbox consistency', () => {
       coordinatorHandle: SECOND_TERMINAL_HANDLE,
       coordinatorPaneKey: SECOND_PANE_KEY
     })
-    restarted.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Codex working\x07', 1)
-    restarted.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Codex done\x07', 2)
+    restarted.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Claude working\x07', 1)
+    restarted.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Claude done\x07', 2)
     const checked = await checkBoundMailbox(restarted.runtime, {
       terminal: SECOND_TERMINAL_HANDLE,
       paneKey: SECOND_PANE_KEY,
@@ -345,7 +345,7 @@ describe('orchestration notification mailbox consistency', () => {
     const restartedDb = new OrchestrationDb(dbPath)
     const restarted = createRuntime(restartedDb)
     await restarted.runtime.listTerminals()
-    restarted.runtime.onPtyData(PTY_ID, '\x1b]0;Codex done\x07', 3)
+    restarted.runtime.onPtyData(PTY_ID, '\x1b]0;Claude done\x07', 3)
     await Promise.resolve()
     await vi.advanceTimersByTimeAsync(500)
     const checked = await checkBoundMailbox(restarted.runtime)
@@ -374,12 +374,12 @@ describe('orchestration notification mailbox consistency', () => {
     const restartedDb = new OrchestrationDb(dbPath)
     const restarted = createRuntime(restartedDb)
     await restarted.runtime.listTerminals()
-    restarted.runtime.onPtyData(PTY_ID, '\x1b]0;Codex working\x07', 3)
+    restarted.runtime.onPtyData(PTY_ID, '\x1b]0;Claude working\x07', 3)
     await vi.advanceTimersByTimeAsync(500)
 
     expect(restarted.write.mock.calls.filter(([, payload]) => payload === '\r')).toHaveLength(0)
     expect(restartedDb.getMessageById(message.id)?.delivered_at).toEqual(expect.any(String))
-    restarted.runtime.onPtyData(PTY_ID, '\x1b]0;Codex done\x07', 4)
+    restarted.runtime.onPtyData(PTY_ID, '\x1b]0;Claude done\x07', 4)
     await Promise.resolve()
     expect(pointerCount(restarted.write)).toBe(0)
     restartedDb.close()
@@ -447,8 +447,8 @@ describe('orchestration notification mailbox consistency', () => {
       coordinatorHandle: SECOND_TERMINAL_HANDLE,
       coordinatorPaneKey: SECOND_PANE_KEY
     })
-    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Codex working\x07', 1)
-    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Codex done\x07', 2)
+    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Claude working\x07', 1)
+    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Claude done\x07', 2)
     await vi.advanceTimersByTimeAsync(500)
 
     expect(
@@ -487,8 +487,8 @@ describe('orchestration notification mailbox consistency', () => {
       subject: 'Second status',
       runId: run.id
     })
-    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Codex working\x07', 1)
-    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Codex done\x07', 2)
+    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Claude working\x07', 1)
+    harness.runtime.onPtyData(SECOND_PTY_ID, '\x1b]0;Claude done\x07', 2)
     await Promise.resolve()
     expect(
       harness.write.mock.calls.filter(
@@ -513,10 +513,10 @@ describe('orchestration notification mailbox consistency', () => {
   })
 
   it.each([
-    ['Codex', '\x1b]0;Codex working\x07', '\x1b]0;Codex done\x07'],
-    ['Claude', '\x1b]0;\u280b Claude working\x07', '\x1b]0;\u2733 Claude Code\x07']
+    ['a keyword title', '\x1b]0;Claude working\x07', '\x1b]0;Claude done\x07'],
+    ['a spinner title', '\x1b]0;\u280b Claude working\x07', '\x1b]0;\u2733 Claude Code\x07']
   ])(
-    'submits a staged pointer after %s becomes working without duplicating it',
+    'submits a staged pointer after the agent shows %s for working without duplicating it',
     async (_provider, workingTitle, idleTitle) => {
       vi.useFakeTimers()
       const db = createDatabase('orca-mailbox-working-before-enter-')
@@ -539,10 +539,10 @@ describe('orchestration notification mailbox consistency', () => {
   )
 
   it.each([
-    ['Codex', '\x1b]0;Codex permission\x07'],
-    ['Claude', '\x1b]0;Claude waiting for permission\x07']
+    ['a short permission title', '\x1b]0;Claude permission\x07'],
+    ['a waiting title', '\x1b]0;Claude waiting for permission\x07']
   ])(
-    'does not submit a staged pointer after %s enters a permission state',
+    'does not submit a staged pointer after the agent shows %s',
     async (_provider, permissionTitle) => {
       vi.useFakeTimers()
       const db = createDatabase('orca-mailbox-permission-before-enter-')
@@ -624,7 +624,7 @@ describe('orchestration notification mailbox consistency', () => {
         {
           tabId: TAB_ID,
           worktreeId: WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           activeLeafId: LEAF_ID,
           layout: null
         }
@@ -647,7 +647,7 @@ describe('orchestration notification mailbox consistency', () => {
         }
       ]
     })
-    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Codex working\x07', 3)
+    harness.runtime.onPtyData(PTY_ID, '\x1b]0;Claude working\x07', 3)
 
     await vi.advanceTimersByTimeAsync(500)
     expect(harness.write.mock.calls.filter(([, payload]) => payload === '\r')).toHaveLength(0)
@@ -655,8 +655,8 @@ describe('orchestration notification mailbox consistency', () => {
   })
 
   it.each([
-    ['working', '\x1b]0;Codex working\x07', '\x1b]0;Codex done\x07'],
-    ['permission', '\x1b]0;Codex waiting for permission\x07', '\x1b]0;Codex done\x07']
+    ['working', '\x1b]0;Claude working\x07', '\x1b]0;Claude done\x07'],
+    ['permission', '\x1b]0;Claude waiting for permission\x07', '\x1b]0;Claude done\x07']
   ])(
     'handles a cold-parked pointer after the agent becomes %s',
     async (state, title, idleTitle) => {

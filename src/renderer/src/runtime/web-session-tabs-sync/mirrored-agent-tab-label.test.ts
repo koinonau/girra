@@ -6,7 +6,7 @@ import { buildMirroredAgentTabs } from './terminal-surfaces'
 const WORKTREE = 'repo-1::worktree-1'
 const GROUP = 'group-1'
 
-function snapshotWith(agent: 'claude' | 'codex', title: string): RuntimeMobileSessionTabsResult {
+function snapshotWith(agent: 'claude' | 'opencode', title: string): RuntimeMobileSessionTabsResult {
   return {
     worktree: WORKTREE,
     publicationEpoch: 'epoch-1',
@@ -45,7 +45,7 @@ function build(
 describe('buildMirroredAgentTabs', () => {
   it('falls back to the agent-specific placeholder when the host publishes no title', () => {
     expect(build(snapshotWith('claude', '')).label).toBe('Claude Chat')
-    expect(build(snapshotWith('codex', '   ')).label).toBe('Codex Chat')
+    expect(build(snapshotWith('opencode', '   ')).label).toBe('OpenCode Chat')
   })
 
   it('prefers the host title over the placeholder', () => {
@@ -53,7 +53,7 @@ describe('buildMirroredAgentTabs', () => {
   })
 
   it('keeps a manual rename across host snapshots', () => {
-    const snapshot = snapshotWith('codex', 'Codex Chat')
+    const snapshot = snapshotWith('opencode', 'OpenCode Chat')
     const renamed = build(snapshot)
     const existing: Tab = { ...renamed, customLabel: 'My rename' }
     expect(build(snapshot, [existing]).customLabel).toBe('My rename')
@@ -62,8 +62,8 @@ describe('buildMirroredAgentTabs', () => {
   it('leaves customLabel null when the tab was never renamed', () => {
     // Guard: assert the row is actually built, so this cannot pass on an empty
     // result the way a bare null-check would.
-    const tab = build(snapshotWith('codex', 'Codex Chat'))
-    expect(tab.label).toBe('Codex Chat')
+    const tab = build(snapshotWith('opencode', 'OpenCode Chat'))
+    expect(tab.label).toBe('OpenCode Chat')
     expect(tab.customLabel).toBeNull()
   })
 
@@ -75,11 +75,11 @@ describe('buildMirroredAgentTabs', () => {
     expect(build(snapshot).label).toBe('Claude Chat')
   })
 
-  it('names an agent this build does not know after itself, not Codex', () => {
-    const snapshot = snapshotWith('codex', '')
-    // Cast: the wire union is claude|codex today, but Tab.agentSessionAgent is
+  it('names an agent this build does not know after itself', () => {
+    const snapshot = snapshotWith('opencode', '')
+    // Cast: the wire union is claude today, but Tab.agentSessionAgent is
     // the open AgentType, so a future agent can reach this label.
-    ;(snapshot.tabs[0] as { agent: string }).agent = 'gemini'
-    expect(build(snapshot).label).toBe('Gemini Chat')
+    ;(snapshot.tabs[0] as { agent: string }).agent = 'future-agent'
+    expect(build(snapshot).label).toBe('future-agent Chat')
   })
 })

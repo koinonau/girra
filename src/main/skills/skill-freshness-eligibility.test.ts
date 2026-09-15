@@ -102,10 +102,10 @@ describe('skill freshness name-scoped update eligibility', () => {
       eligible([
         placement('orca-cli'),
         placement('orca-cli', {
-          id: 'orca-cli-gemini',
-          rootId: 'home-gemini',
-          unresolvedPath: '/home/.gemini/skills/orca-cli',
-          resolvedPath: '/home/.gemini/skills/orca-cli',
+          id: 'orca-cli-opencode',
+          rootId: 'home-opencode',
+          unresolvedPath: '/home/.config/opencode/skills/orca-cli',
+          resolvedPath: '/home/.config/opencode/skills/orca-cli',
           topology: 'independent-copy',
           status: 'current'
         })
@@ -121,11 +121,11 @@ describe('skill freshness name-scoped update eligibility', () => {
       eligible([
         placement('orchestration', { status: 'current' }),
         placement('orchestration', {
-          id: 'orchestration-factory',
-          rootId: 'home-factory',
-          unresolvedPath: '/home/.factory/skills/orchestration',
-          resolvedPath: '/home/.factory/skills/orchestration',
-          physicalIdentity: 'physical-orchestration-factory',
+          id: 'orchestration-pi',
+          rootId: 'home-pi',
+          unresolvedPath: '/home/.pi/agent/skills/orchestration',
+          resolvedPath: '/home/.pi/agent/skills/orchestration',
+          physicalIdentity: 'physical-orchestration-pi',
           topology: 'independent-copy',
           status: 'outdated'
         })
@@ -139,9 +139,9 @@ describe('skill freshness name-scoped update eligibility', () => {
     expect(
       eligible([
         placement('orca-cli', {
-          rootId: 'home-gemini',
-          unresolvedPath: '/home/.gemini/skills/orca-cli',
-          resolvedPath: '/home/.gemini/skills/orca-cli',
+          rootId: 'home-opencode',
+          unresolvedPath: '/home/.config/opencode/skills/orca-cli',
+          resolvedPath: '/home/.config/opencode/skills/orca-cli',
           topology: 'independent-copy',
           status: 'outdated'
         })

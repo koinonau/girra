@@ -717,7 +717,7 @@ test.describe('Artificial OpenCode terminal load', () => {
       hiddenPaneCount,
       pressureOutputChars: PRESSURE_OUTPUT_CHARS,
       pressureOutputMode,
-      // Why: the 10s codex startup renderer-query window is deleted — every
+      // Why: the 10s agent startup renderer-query window is deleted — every
       // pressure mode measures steady-state model restore with one delay.
       pressureStartDelayMs: HIDDEN_PRESSURE_START_DELAY_MS,
       testInfo,

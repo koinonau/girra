@@ -116,7 +116,7 @@ describe('orchestration worker release recovery', () => {
     const result = (await call('orchestration.workerStart', {
       task: task.id,
       from: 'term_coord',
-      agent: 'codex'
+      agent: 'claude'
     })) as { dispatchId: string; state: string }
     expect(result.state).toBe('ready')
     return { taskId: task.id, dispatchId: result.dispatchId }

@@ -125,7 +125,7 @@ describe('ensureHooksConfirmed', () => {
         defaultTabs: [
           { title: 'Server', command: 'pnpm dev' },
           { title: 'Notes' },
-          { command: 'codex' }
+          { command: 'opencode' }
         ]
       },
       mayNeedUpdate: false
@@ -135,7 +135,7 @@ describe('ensureHooksConfirmed', () => {
 
     await vi.waitFor(() => expect(pending).toHaveLength(1))
     const expectedContent =
-      'pnpm install\n\n# defaultTabs[1] Server\npnpm dev\n\n# defaultTabs[3]\ncodex'
+      'pnpm install\n\n# defaultTabs[1] Server\npnpm dev\n\n# defaultTabs[3]\nopencode'
     expect(pending[0].data.scriptContent).toBe(expectedContent)
     expect(pending[0].data.contentHash).toBe(await hashOrcaHookScript(expectedContent))
 

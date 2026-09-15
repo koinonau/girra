@@ -430,7 +430,7 @@ describe('registerWorktreeHandlers', () => {
       nameWasGenerated: true,
       linkedIssue: 123,
       linkedPR: 456,
-      createdWithAgent: 'codex',
+      createdWithAgent: 'opencode',
       linkedLinearIssue: 'ENG-123',
       manualOrder: 123_456
     })
@@ -451,7 +451,7 @@ describe('registerWorktreeHandlers', () => {
       expect.objectContaining({
         linkedIssue: 123,
         linkedPR: 456,
-        createdWithAgent: 'codex',
+        createdWithAgent: 'opencode',
         linkedLinearIssue: 'ENG-123',
         manualOrder: 123_456
       })
@@ -460,7 +460,7 @@ describe('registerWorktreeHandlers', () => {
       worktree: expect.objectContaining({
         linkedIssue: 123,
         linkedPR: 456,
-        createdWithAgent: 'codex',
+        createdWithAgent: 'opencode',
         linkedLinearIssue: 'ENG-123',
         manualOrder: 123_456
       })

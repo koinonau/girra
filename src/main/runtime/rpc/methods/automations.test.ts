@@ -33,7 +33,7 @@ describe('automation RPC methods', () => {
         name: 'New review',
         prompt: 'Review changes',
         precheck: { command: 'test -f ready', timeoutSeconds: 30 },
-        agentId: 'codex',
+        agentId: 'pi',
         runContext: {
           kind: 'workspace-run',
           projectId: 'github:stablyai/orca',
@@ -82,7 +82,7 @@ describe('automation RPC methods', () => {
         name: 'New review',
         prompt: 'Review changes',
         precheck: { command: 'test -f ready', timeoutSeconds: 30 },
-        agentId: 'codex',
+        agentId: 'pi',
         runContext: expect.objectContaining({ hostId: 'runtime:gpu' }),
         sourceContext: expect.objectContaining({ hostId: 'local' }),
         repo: 'repo-1',
@@ -149,7 +149,7 @@ describe('automation RPC methods', () => {
         makeRequest('automation.create', {
           name: 'Bad schedule',
           prompt: 'Run',
-          agentId: 'codex',
+          agentId: 'pi',
           repo: 'repo-1',
           rrule: 'not a schedule',
           dtstart: 1

@@ -347,7 +347,7 @@ describe('createIpcPtyTransport', () => {
     registerEagerPtyBuffer('pty-status-only', vi.fn())
     onData?.({
       id: 'pty-status-only',
-      data: '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07'
+      data: '\x1b]9999;{"state":"working","prompt":"ship it","agentType":"claude"}\x07'
     })
 
     const transport = createIpcPtyTransport()

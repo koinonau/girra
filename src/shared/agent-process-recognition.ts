@@ -8,23 +8,15 @@ import { getFirstCommandToken } from './command-token-scanner'
 export type RecognizedAgentProcess = { agent: TuiAgent; processName: string }
 
 const PROCESS_EXTENSION_RE = /\.(?:exe|cmd|bat|ps1)$/i
-const INTERPRETER_SCRIPT_EXTENSION_RE = /\.(?:js|mjs|cjs)$/i
 const PYTHON_SCRIPT_EXTENSION_RE = /\.(?:py|pyw)$/i
 
-function normalizeProcessName(
-  processName: string | null | undefined,
-  options: { stripInterpreterScriptExtension?: boolean } = {}
-): string {
+function normalizeProcessName(processName: string | null | undefined): string {
   if (!processName) {
     return ''
   }
   const unquoted = processName.trim().replace(/^["']|["']$/g, '')
   const basename = unquoted.split(/[\\/]/).pop() ?? unquoted
-  const withoutProcessExtension = basename.toLowerCase().replace(PROCESS_EXTENSION_RE, '')
-  if (options.stripInterpreterScriptExtension === true) {
-    return withoutProcessExtension.replace(INTERPRETER_SCRIPT_EXTENSION_RE, '')
-  }
-  return withoutProcessExtension
+  return basename.toLowerCase().replace(PROCESS_EXTENSION_RE, '')
 }
 
 const STATIC_INTERPRETER_PROCESS_NAMES = new Set([
@@ -49,9 +41,6 @@ const INTERPRETER_OPTIONS_WITH_VALUE = new Set([
   '--experimental-loader'
 ])
 const INTERPRETER_OPTIONS_WITH_INLINE_SOURCE = new Set(['-e', '--eval', '-p', '--print', '--check'])
-const NODE_PACKAGE_SCRIPT_ENTRYPOINTS: Record<string, readonly string[]> = {
-  codex: ['node_modules/@openai/codex/']
-}
 const PYTHON_SCRIPT_ENTRYPOINT_DIRECTORIES = ['/bin/', '/scripts/', '/site-packages/']
 
 const PROCESS_TO_AGENT = new Map<string, TuiAgent>()
@@ -80,16 +69,7 @@ for (const [agent, config] of Object.entries(TUI_AGENT_CONFIG) as [
 }
 
 function agentForNormalizedProcess(normalized: string): TuiAgent | undefined {
-  const exact = PROCESS_TO_AGENT.get(normalized)
-  if (exact) {
-    return exact
-  }
-  // Why: node-pty can report Codex's packaged platform binary
-  // (for example codex-aarch64-ap) instead of the launch command.
-  if (normalized.startsWith('codex-')) {
-    return PROCESS_TO_AGENT.get('codex')
-  }
-  return undefined
+  return PROCESS_TO_AGENT.get(normalized)
 }
 
 function recognizedAgentForProcess(normalized: string): RecognizedAgentProcess | null {
@@ -205,15 +185,7 @@ function recognizeNodeScriptEntrypoint(token: string): RecognizedAgentProcess | 
       return { agent: identity.agent, processName: identity.processName }
     }
   }
-  const normalized = normalizeProcessName(token, { stripInterpreterScriptExtension: true })
-  const markers = NODE_PACKAGE_SCRIPT_ENTRYPOINTS[normalized]
-  if (!markers) {
-    return null
-  }
-  if (!markers.some((marker) => path.includes(marker))) {
-    return null
-  }
-  return recognizedAgentForProcess(normalized)
+  return null
 }
 
 function recognizePythonModule(

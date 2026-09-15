@@ -91,7 +91,7 @@ test('resumes an agent session after quit when its daemon PTY died while the app
     const marker = `AGENT_QUIT_RESUME_${Date.now()}`
     const descriptor = await waitForActivePaneHookDescriptor(page)
     const firstPtyId = await waitForActivePanePtyId(page)
-    const transcriptPath = session.seedCodexResumeRollout(PROVIDER_SESSION_ID, repoPath)
+    const transcriptPath = session.seedClaudeResumeTranscript(PROVIDER_SESSION_ID, repoPath)
     await execInTerminal(page, firstPtyId, `echo ${marker}`)
     await waitForTerminalOutput(page, marker)
 
@@ -102,8 +102,8 @@ test('resumes an agent session after quit when its daemon PTY died while the app
       ({ paneKey, worktreeId: wtId, providerSessionId, transcriptPath }) => {
         window.__store?.getState().setAgentStatus(
           paneKey,
-          { state: 'working', prompt: 'finish the task', agentType: 'codex' },
-          'Codex',
+          { state: 'working', prompt: 'finish the task', agentType: 'claude' },
+          'Claude',
           undefined,
           { worktreeId: wtId },
           {

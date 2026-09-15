@@ -32,8 +32,8 @@ function DisclosureHost(
 }
 
 const TASKS: AgentSessionBackgroundTask[] = [
-  { id: 'codex-agent:child-1', kind: 'agent', description: 'count_a' },
-  { id: 'codex-command:exec-1', kind: 'command', description: 'sleep 90' }
+  { id: 'agent:child-1', kind: 'agent', description: 'count_a' },
+  { id: 'command:exec-1', kind: 'command', description: 'sleep 90' }
 ]
 
 function renderStrip(props: { supportsTaskStop: boolean; supportsStopAll: boolean }): {
@@ -97,7 +97,7 @@ describe('NativeChatBackgroundTasksStatus stop affordances', () => {
   })
 
   it('offers no stop at all when the provider exposes none', () => {
-    // Codex: a Stop button here would be a control that cannot act.
+    // A Stop button here would be a control that cannot act.
     renderStrip({ supportsTaskStop: false, supportsStopAll: false })
     expect(screen.queryByLabelText('Stop background tasks')).not.toBeInTheDocument()
     expect(screen.queryByLabelText('Stop count_a')).not.toBeInTheDocument()

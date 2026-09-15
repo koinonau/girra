@@ -12,10 +12,10 @@ describe('resolveNativeChatLeafTitleAgent', () => {
       resolveNativeChatLeafTitleAgent({
         leafId: 'leaf-2',
         panes,
-        runtimePaneTitlesByPaneId: { 1: 'PowerShell', 2: 'Codex - working' },
+        runtimePaneTitlesByPaneId: { 1: 'PowerShell', 2: '✳ Claude Code' },
         tabLabel: 'PowerShell'
       })
-    ).toBe('codex')
+    ).toBe('claude')
   })
 
   it('does not reuse the active leaf tab label for an inactive split leaf', () => {
@@ -23,8 +23,8 @@ describe('resolveNativeChatLeafTitleAgent', () => {
       resolveNativeChatLeafTitleAgent({
         leafId: 'leaf-2',
         panes,
-        runtimePaneTitlesByPaneId: { 1: 'Codex - working', 2: 'PowerShell' },
-        tabLabel: 'Codex - working'
+        runtimePaneTitlesByPaneId: { 1: '✳ Claude Code', 2: 'PowerShell' },
+        tabLabel: '✳ Claude Code'
       })
     ).toBeNull()
   })

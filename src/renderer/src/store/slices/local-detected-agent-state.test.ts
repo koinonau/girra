@@ -43,7 +43,7 @@ describe('local detected agent context lifecycle', () => {
   beforeEach(() => {
     detectAgents.mockReset().mockResolvedValue(['claude'])
     refreshAgents.mockReset().mockResolvedValue({
-      agents: ['codex']
+      agents: ['opencode']
     })
   })
 
@@ -68,7 +68,7 @@ describe('local detected agent context lifecycle', () => {
     expect(ordinary).toBe(floating)
     expect(joinedOrdinary).toBe(floating)
     broadcasts = 0
-    resolveDetection(['codex'])
+    resolveDetection(['opencode'])
     await Promise.all([floating, ordinary, joinedOrdinary])
     expect(broadcasts).toBe(1)
 
@@ -136,12 +136,12 @@ describe('local detected agent context lifecycle', () => {
     const store = createTestStore([])
 
     const detect = store.getState().ensureDetectedAgents()
-    await expect(store.getState().refreshDetectedAgents()).resolves.toEqual(['codex'])
+    await expect(store.getState().refreshDetectedAgents()).resolves.toEqual(['opencode'])
     resolveDetection(['claude'])
     await expect(detect).resolves.toEqual(['claude'])
 
-    expect(store.getState().detectedAgentIds).toEqual(['codex'])
-    expect(store.getState().localDetectedAgentIdsByContext.host).toEqual(['codex'])
+    expect(store.getState().detectedAgentIds).toEqual(['opencode'])
+    expect(store.getState().localDetectedAgentIdsByContext.host).toEqual(['opencode'])
     expect(store.getState().isDetectingAgents).toBe(false)
     expect(store.getState().isDetectingLocalAgentsByContext).toEqual({})
   })
@@ -156,13 +156,13 @@ describe('local detected agent context lifecycle', () => {
     const store = createTestStore([])
 
     const detect = store.getState().ensureDetectedAgents()
-    await expect(store.getState().refreshDetectedAgents()).resolves.toEqual(['codex'])
+    await expect(store.getState().refreshDetectedAgents()).resolves.toEqual(['opencode'])
     rejectDetection(new Error('older detect failed'))
     await expect(detect).resolves.toEqual([])
 
-    expect(store.getState().detectedAgentIds).toEqual(['codex'])
-    expect(store.getState().localDetectedAgentIdsByContext.host).toEqual(['codex'])
-    await expect(store.getState().ensureDetectedAgents()).resolves.toEqual(['codex'])
+    expect(store.getState().detectedAgentIds).toEqual(['opencode'])
+    expect(store.getState().localDetectedAgentIdsByContext.host).toEqual(['opencode'])
+    await expect(store.getState().ensureDetectedAgents()).resolves.toEqual(['opencode'])
     expect(detectAgents).toHaveBeenCalledTimes(1)
   })
 
@@ -181,11 +181,11 @@ describe('local detected agent context lifecycle', () => {
     expect(detectAgents).not.toHaveBeenCalled()
 
     resolveRefresh({
-      agents: ['codex']
+      agents: ['opencode']
     })
-    await expect(Promise.all([refresh, ensure])).resolves.toEqual([['codex'], ['codex']])
-    expect(store.getState().detectedAgentIds).toEqual(['codex'])
-    expect(store.getState().localDetectedAgentIdsByContext.host).toEqual(['codex'])
+    await expect(Promise.all([refresh, ensure])).resolves.toEqual([['opencode'], ['opencode']])
+    expect(store.getState().detectedAgentIds).toEqual(['opencode'])
+    expect(store.getState().localDetectedAgentIdsByContext.host).toEqual(['opencode'])
   })
 
   it('retries after an authoritative refresh fails without a usable cache', async () => {

@@ -21,7 +21,7 @@ import { i18n } from '@/i18n/i18n'
 const BASE_DRAFT: AutomationDraft = {
   name: '',
   prompt: '',
-  agentId: 'codex',
+  agentId: 'opencode',
   projectId: '',
   workspaceMode: 'existing',
   workspaceId: '',

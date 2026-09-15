@@ -279,7 +279,7 @@ describe('orchestration RPC methods', () => {
       }
     })
 
-    it.each(['@all', '@idle', '@codex', '@reviewers'])(
+    it.each(['@all', '@idle', '@opencode', '@reviewers'])(
       'rejects %s with invalid_argument naming the Run mailbox (no message persisted)',
       async (to) => {
         setup()

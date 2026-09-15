@@ -41,6 +41,7 @@ export function normalizeLoadedGlobalSettings(
     migratePrimarySelectionPlatformDefault,
     stampPrimarySelectionTerminalDefaults,
     migratedDisabledTuiAgents,
+    normalizedDefaultTuiAgent,
     migratedAgentYoloDefaults,
     migratedWindowsRuntimeDefault,
     migratedLocalAccountRuntime,
@@ -119,6 +120,7 @@ export function normalizeLoadedGlobalSettings(
     terminalShortcutPolicy: normalizeTerminalShortcutPolicy(
       parsed.settings?.terminalShortcutPolicy
     ),
+    defaultTuiAgent: normalizedDefaultTuiAgent,
     disabledTuiAgents: migratedDisabledTuiAgents,
     ...migratedAgentYoloDefaults,
     claudeAgentTeamsDefaultDisabledMigrated: true,

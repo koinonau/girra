@@ -55,7 +55,7 @@ function invocationSpans(contents: string, file: string): Invocation[] {
   return found
 }
 
-/** Blank out quoted values so a nested `--model` inside `--command "codex --model ..."` is not read as a flag. */
+/** Blank out quoted values so a nested `--model` inside `--command "claude --model ..."` is not read as a flag. */
 function maskQuotedValues(text: string): string {
   let masked = ''
   let quote: string | null = null

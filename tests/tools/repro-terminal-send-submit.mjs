@@ -152,12 +152,12 @@ async function waitForWorktreeSelector(cli, repoId, cwd) {
   throw new Error(`worktree did not materialize for repo ${repoId}`)
 }
 
-async function createFakeCodexCommand(tempDir, args) {
-  const launcherPath = path.join(tempDir, 'codex')
+async function createFakeClaudeCommand(tempDir, args) {
+  const launcherPath = path.join(tempDir, 'claude')
   const runnerPath = path.join(tempDir, 'fake-agent.mjs')
   await writeFile(runnerPath, `import ${JSON.stringify(pathToFileURL(SCRIPT_PATH).href)}\n`, 'utf8')
   if (process.platform === 'win32') {
-    const commandPath = path.join(tempDir, 'codex.cmd')
+    const commandPath = path.join(tempDir, 'claude.cmd')
     await writeFile(
       commandPath,
       `@echo off\r\n"${process.execPath}" "%~dp0fake-agent.mjs" %*\r\n`,
@@ -194,7 +194,7 @@ async function parentMain() {
   if (!handle) {
     const command =
       argValue('agent-command') ??
-      (await createFakeCodexCommand(tempDir, [
+      (await createFakeClaudeCommand(tempDir, [
         '--fake-agent',
         '--report',
         shellQuote(reportPath),
@@ -310,7 +310,7 @@ async function parentMain() {
 }
 
 async function fakeAgentMain() {
-  process.title = 'codex'
+  process.title = 'claude'
   const reportPath = argValue('report')
   const marker = argValue('marker')
   const timeoutMs = parsePositiveInteger('timeout-ms', DEFAULT_TIMEOUT_MS)
@@ -324,10 +324,10 @@ async function fakeAgentMain() {
     process.stdin.setRawMode(true)
   }
   process.stdin.resume()
-  process.stdout.write('\x1b]0;Codex working\x07')
+  process.stdout.write('\x1b]0;Claude working\x07')
   setTimeout(() => {
-    const title = permissionBeforeSend ? 'Codex permission' : 'Codex Ready'
-    process.stdout.write(`\x1b]0;${title}\x07OpenAI Codex\nmodel: fake\ndirectory: fixture\n> `)
+    const title = permissionBeforeSend ? 'Claude permission' : 'Claude ready'
+    process.stdout.write(`\x1b]0;${title}\x07Claude Code\n> `)
     if (permissionBeforeSend) {
       process.stdout.write('\nPermission required\nAllow once\nAllow always\nReject\n')
     }
@@ -403,7 +403,7 @@ async function fakeAgentMain() {
           continue
         }
         clearTimeout(timeout)
-        process.stdout.write('\x1b]0;Codex working\x07')
+        process.stdout.write('\x1b]0;Claude working\x07')
         void finish()
         return
       }

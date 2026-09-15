@@ -33,9 +33,9 @@ export function makeAgentStatusEntry(overrides: Partial<AgentStatusEntry> = {}):
     prompt: 'fix parity',
     updatedAt: 1_700_000_000_000,
     stateStartedAt: 1_699_999_999_000,
-    agentType: 'codex',
+    agentType: 'opencode',
     paneKey: 'term-1:11111111-1111-4111-8111-111111111111',
-    terminalTitle: 'codex [working]',
+    terminalTitle: 'opencode [working]',
     stateHistory: [],
     ...overrides
   }

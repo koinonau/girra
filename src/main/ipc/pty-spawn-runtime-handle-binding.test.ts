@@ -407,7 +407,7 @@ describe('registerPtyHandlers', () => {
       id: 'ssh-reattach',
       incarnationId,
       isReattach: true as const,
-      launchAgent: 'codex' as const
+      launchAgent: 'claude' as const
     }))
     registerSshPtyProvider('ssh-reattach-1', {
       spawn,
@@ -455,9 +455,9 @@ describe('registerPtyHandlers', () => {
         ORCA_WORKTREE_ID: worktreeId
       },
       launchConfig: {
-        agentCommand: 'codex --model gpt-5',
-        agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentCommand: 'claude --model sonnet',
+        agentArgs: '--model sonnet',
+        agentEnv: { CLAUDE_CONFIG_DIR: '/captured/claude' }
       }
     })) as { id: string; isReattach?: boolean; launchConfig?: unknown }
 
@@ -471,7 +471,7 @@ describe('registerPtyHandlers', () => {
         tabId,
         leafId,
         incarnationId,
-        providerReattachLaunchIdentity: { incarnationId, launchAgent: 'codex' }
+        providerReattachLaunchIdentity: { incarnationId, launchAgent: 'claude' }
       }),
       undefined
     )

@@ -25,7 +25,6 @@ const mockRegisterEagerPtyBuffer = vi.fn()
 const mockSubscribeToPtyData = vi.fn()
 const mockSubscribeToPtyExit = vi.fn()
 const mockPasteDraftWhenAgentReady = vi.fn()
-const mockMarkTrusted = vi.fn()
 const mockDispatchEvent = vi.fn()
 const mockGetAgentLaunchPlatformForRepo = vi.fn<() => NodeJS.Platform>()
 const state = createAgentBackgroundSessionTestState({
@@ -79,7 +78,6 @@ describe('launchAgentBackgroundSession', () => {
       updateTabPtyId: mockUpdateTabPtyId,
       dispatchEvent: mockDispatchEvent,
       kill: mockKill,
-      markTrusted: mockMarkTrusted,
       spawn: mockSpawn,
       write: mockWrite
     })
@@ -342,22 +340,6 @@ describe('launchAgentBackgroundSession', () => {
     )
   })
 
-  it('pre-marks trust for agents with first-launch trust prompts', async () => {
-    const { launchAgentBackgroundSession } = await import('./launch-agent-background-session')
-
-    await launchAgentBackgroundSession({
-      agent: 'copilot',
-      worktreeId: 'wt-1',
-      prompt: 'run the automation'
-    })
-
-    expect(mockMarkTrusted).toHaveBeenCalledWith({
-      preset: 'copilot',
-      workspacePath: '/repo/worktree'
-    })
-    expect(mockSpawn).toHaveBeenCalled()
-  })
-
   it('stamps hidden SSH status from renderer fallback when the kill switch is off', async () => {
     // Why: with main side-effect authority disabled, this sidecar is the only
     // OSC 9999 → store path for hidden SSH sessions.
@@ -374,12 +356,12 @@ describe('launchAgentBackgroundSession', () => {
     })
 
     const dataSidecar = mockSubscribeToPtyData.mock.calls[0]?.[1] as (data: string) => void
-    dataSidecar('\x1b]9999;{"state":"done","prompt":"ok","agentType":"codex"}\x07')
+    dataSidecar('\x1b]9999;{"state":"done","prompt":"ok","agentType":"opencode"}\x07')
 
     const paneKey = expectStableAgentBackgroundPaneSpawn(mockSpawn)
     expect(state.setAgentStatus).toHaveBeenCalledWith(
       paneKey,
-      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'codex' }),
+      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'opencode' }),
       undefined,
       undefined,
       { connectionId: 'ssh-a' },
@@ -402,11 +384,11 @@ describe('launchAgentBackgroundSession', () => {
     })
 
     const dataSidecar = mockSubscribeToPtyData.mock.calls[0]?.[1] as (data: string) => void
-    dataSidecar('\x1b]9999;{"state":"done","prompt":"ok","agentType":"codex"}\x07')
+    dataSidecar('\x1b]9999;{"state":"done","prompt":"ok","agentType":"opencode"}\x07')
 
     expect(state.setAgentStatus).not.toHaveBeenCalled()
     expect(onAgentStatus).toHaveBeenCalledWith(
-      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'codex' })
+      expect.objectContaining({ state: 'done', prompt: 'ok', agentType: 'opencode' })
     )
   })
 
@@ -535,19 +517,19 @@ describe('launchAgentBackgroundSession', () => {
     const { launchAgentBackgroundSession } = await import('./launch-agent-background-session')
 
     await launchAgentBackgroundSession({
-      agent: 'aider',
+      agent: 'claude-agent-teams',
       worktreeId: 'wt-1',
       prompt: 'run the automation'
     })
 
     expect(mockSpawn).toHaveBeenCalledWith(
-      expect.objectContaining({ command: "aider '--yes-always'" })
+      expect.objectContaining({ command: "orca-ide claude-teams '--dangerously-skip-permissions'" })
     )
     expect(mockPasteDraftWhenAgentReady).toHaveBeenCalledWith(
       expect.objectContaining({
         tabId: expectReservedAgentBackgroundTabId(mockSpawn),
         content: 'run the automation',
-        agent: 'aider',
+        agent: 'claude-agent-teams',
         submit: true
       })
     )

@@ -239,7 +239,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
         payload: {
           state: 'working',
           prompt: 'ship it',
-          agentType: 'codex'
+          agentType: 'opencode'
         }
       })
 
@@ -256,7 +256,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
           payload: {
             state: 'working',
             prompt: 'ship it',
-            agentType: 'codex'
+            agentType: 'opencode'
           }
         })
       )
@@ -271,7 +271,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
           stateStartedAt: 1_000,
           state: 'working',
           prompt: 'ship it',
-          agentType: 'codex'
+          agentType: 'opencode'
         })
       ])
     } finally {
@@ -287,7 +287,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
       ptyId: 'legacy-pty',
       terminalHandle: 'term_legacy',
       worktreeId: 'wt-1',
-      payload: { state: 'working' as const, prompt: 'legacy task', agentType: 'codex' as const }
+      payload: { state: 'working' as const, prompt: 'legacy task', agentType: 'opencode' as const }
     }
 
     server.ingestTerminalStatus(event)
@@ -314,7 +314,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
       tabId: 'legacy-tab',
       ptyId: 'legacy-pty',
       terminalHandle: 'term_legacy',
-      payload: { state: 'working', prompt: 'legacy task', agentType: 'codex' },
+      payload: { state: 'working', prompt: 'legacy task', agentType: 'opencode' },
       ...overrides
     })
 
@@ -336,7 +336,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
         payload: {
           state: 'working' as const,
           prompt: 'same turn',
-          agentType: 'codex' as const
+          agentType: 'opencode' as const
         }
       }
 
@@ -376,7 +376,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
         payload: {
           state: 'working',
           prompt: 'ship it',
-          agentType: 'codex'
+          agentType: 'opencode'
         }
       })
 
@@ -389,7 +389,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
           payload: {
             state: 'working',
             prompt: 'ship it',
-            agentType: 'codex'
+            agentType: 'opencode'
           }
         })
       )
@@ -418,7 +418,7 @@ describe('AgentHookServer ingestTerminalStatus', () => {
       payload: {
         state: 'working',
         prompt: 'bad tab',
-        agentType: 'codex'
+        agentType: 'opencode'
       }
     })
 

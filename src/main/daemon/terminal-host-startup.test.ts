@@ -78,11 +78,11 @@ describe('TerminalHost startup command delivery logging', () => {
       sessionId: 'delivery-written',
       cols: 80,
       rows: 24,
-      command: 'codex',
+      command: 'opencode',
       shellReadySupported: false,
       streamClient: { onData: vi.fn(), onExit: vi.fn() }
     })
-    expect(delivery()).toMatchObject({ written: true, hasCommand: true, commandLength: 5 })
+    expect(delivery()).toMatchObject({ written: true, hasCommand: true, commandLength: 8 })
   })
 
   it('records a session created with no startup command at all', async () => {
@@ -122,11 +122,11 @@ describe('TerminalHost startup command delivery logging', () => {
         sessionId: 'delivery-sink-failure',
         cols: 80,
         rows: 24,
-        command: 'codex',
+        command: 'opencode',
         shellReadySupported: false,
         streamClient: { onData: vi.fn(), onExit: vi.fn() }
       })
     ).resolves.toMatchObject({ isNew: true })
-    expect(sub.write).toHaveBeenCalledWith(`codex${process.platform === 'win32' ? '\r' : '\n'}`)
+    expect(sub.write).toHaveBeenCalledWith(`opencode${process.platform === 'win32' ? '\r' : '\n'}`)
   })
 })

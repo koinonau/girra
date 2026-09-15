@@ -23,7 +23,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'waiting',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now - 1000,
           stateStartedAt: now - 1000,
@@ -34,7 +34,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: now,
           stateStartedAt: now,
@@ -89,7 +89,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -110,7 +110,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex - action required',
+          title: 'Claude - action required',
           activeLeafId: leafId,
           layout: null
         }
@@ -144,7 +144,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -177,7 +177,7 @@ describe('OrcaRuntimeService', () => {
           leafId,
           paneRuntimeId: 1,
           ptyId: 'pty-1',
-          paneTitle: 'Codex - action required'
+          paneTitle: 'Claude - action required'
         }
       ]
     })
@@ -200,7 +200,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -255,7 +255,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'working',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),
@@ -359,7 +359,7 @@ describe('OrcaRuntimeService', () => {
     const getForegroundProcess = vi.fn(async () => 'powershell.exe')
     const confirmForegroundProcess = vi.fn(
       async function (this: { getForegroundProcess: typeof getForegroundProcess }) {
-        return this.getForegroundProcess === getForegroundProcess ? 'codex' : null
+        return this.getForegroundProcess === getForegroundProcess ? 'claude' : null
       }
     )
     const { runtime, handle } = await createExplicitAgentStatusHarness({
@@ -412,8 +412,8 @@ describe('OrcaRuntimeService', () => {
   })
 
   it('skips strong confirmation when ordinary foreground evidence recognizes an agent', async () => {
-    const getForegroundProcess = vi.fn(async () => 'codex')
-    const confirmForegroundProcess = vi.fn(async () => 'codex')
+    const getForegroundProcess = vi.fn(async () => 'claude')
+    const confirmForegroundProcess = vi.fn(async () => 'claude')
     const { runtime, handle } = await createExplicitAgentStatusHarness({
       getForegroundProcess,
       confirmForegroundProcess
@@ -429,7 +429,7 @@ describe('OrcaRuntimeService', () => {
 
   it('skips both foreground reads when current title evidence blocks explicit hook state', async () => {
     const getForegroundProcess = vi.fn(async () => 'zsh')
-    const confirmForegroundProcess = vi.fn(async () => 'codex')
+    const confirmForegroundProcess = vi.fn(async () => 'claude')
     const { runtime, handle } = await createExplicitAgentStatusHarness({
       getForegroundProcess,
       confirmForegroundProcess,
@@ -447,7 +447,7 @@ describe('OrcaRuntimeService', () => {
   it('skips foreground reads for permission title and blocked wait evidence', async () => {
     for (const blocked of ['title', 'wait'] as const) {
       const getForegroundProcess = vi.fn(async () => 'zsh')
-      const confirmForegroundProcess = vi.fn(async () => 'codex')
+      const confirmForegroundProcess = vi.fn(async () => 'claude')
       const { runtime, handle } = await createExplicitAgentStatusHarness({
         getForegroundProcess,
         confirmForegroundProcess
@@ -455,7 +455,7 @@ describe('OrcaRuntimeService', () => {
       runtime.onPtyData(
         'pty-1',
         blocked === 'title'
-          ? '\x1b]0;Codex waiting for permission\x07'
+          ? '\x1b]0;Claude waiting for permission\x07'
           : 'Hooks need review. Press enter to confirm\n',
         Date.now() + 1000
       )
@@ -474,7 +474,7 @@ describe('OrcaRuntimeService', () => {
   it('rejects foreground evidence when the handle rebinds during the ordinary read', async () => {
     const foreground = deferred<string | null>()
     const getForegroundProcess = vi.fn(() => foreground.promise)
-    const confirmForegroundProcess = vi.fn(async () => 'codex')
+    const confirmForegroundProcess = vi.fn(async () => 'claude')
     const { runtime, handle, syncPty } = await createExplicitAgentStatusHarness({
       getForegroundProcess,
       confirmForegroundProcess
@@ -512,7 +512,7 @@ describe('OrcaRuntimeService', () => {
     const status = runtime.getTerminalAgentStatus(handle)
     await vi.waitFor(() => expect(confirmForegroundProcess).toHaveBeenCalledWith('pty-1'))
     syncPty('pty-2')
-    confirmation.resolve('codex')
+    confirmation.resolve('claude')
 
     await expect(status).rejects.toThrow('terminal_handle_stale')
   })
@@ -528,7 +528,7 @@ describe('OrcaRuntimeService', () => {
     const status = runtime.getTerminalAgentStatus(handle)
     await vi.waitFor(() => expect(confirmForegroundProcess).toHaveBeenCalledWith('pty-1'))
     runtime.onPtyExit('pty-1', 0)
-    confirmation.resolve('codex')
+    confirmation.resolve('claude')
 
     await expect(status).rejects.toThrow('terminal_exited')
   })
@@ -548,7 +548,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: TEST_WORKTREE_ID,
-          title: 'Codex waiting for permission',
+          title: 'Claude waiting for permission',
           activeLeafId: leafId,
           layout: null
         }
@@ -582,7 +582,7 @@ describe('OrcaRuntimeService', () => {
           paneKey,
           state: 'done',
           prompt: '',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: null,
           receivedAt: Date.now(),
           stateStartedAt: Date.now(),

@@ -32,7 +32,7 @@ export function admitSelfInitiatedTreeKill(target: {
   site: string
   scope: ProcessTreeKillScope
 }): boolean {
-  // Why: no PTY root, codex root or git child is ever one of our own Chromium
+  // Why: no PTY root, agent root or git child is ever one of our own Chromium
   // processes, so a pid that is means the caller is about to kill a renderer,
   // the GPU or the browser itself (#10680). Only the pid-addressed scope can
   // land there: a POSIX group holds only what Orca put in it, so that arm is

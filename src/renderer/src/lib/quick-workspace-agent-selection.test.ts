@@ -15,20 +15,20 @@ describe('pickQuickWorkspaceAgent', () => {
   it('uses the first enabled catalog agent while detection is pending', () => {
     expect(pickQuickWorkspaceAgent(null, null, [])).toBe('claude')
     expect(pickQuickWorkspaceAgent(null, null, ['claude'])).toBe('claude-agent-teams')
-    expect(pickQuickWorkspaceAgent(null, null, ['claude', 'claude-agent-teams'])).toBe('openclaude')
-    expect(
-      pickQuickWorkspaceAgent(null, null, ['claude', 'claude-agent-teams', 'openclaude'])
-    ).toBe('codex')
+    expect(pickQuickWorkspaceAgent(null, null, ['claude', 'claude-agent-teams'])).toBe('opencode')
+    expect(pickQuickWorkspaceAgent(null, null, ['claude', 'claude-agent-teams', 'opencode'])).toBe(
+      'pi'
+    )
   })
 
   it('respects blank and disabled preferred agents', () => {
     expect(pickQuickWorkspaceAgent('blank', null, [])).toBeNull()
-    expect(pickQuickWorkspaceAgent('codex', null, ['codex'])).toBe('claude')
+    expect(pickQuickWorkspaceAgent('opencode', null, ['opencode'])).toBe('claude')
   })
 
   it('uses detected enabled agents after detection resolves', () => {
-    expect(pickQuickWorkspaceAgent(null, ['codex'], ['claude'])).toBe('codex')
-    expect(pickQuickWorkspaceAgent('codex', ['claude', 'codex'], ['codex'])).toBe('claude')
+    expect(pickQuickWorkspaceAgent(null, ['opencode'], ['claude'])).toBe('opencode')
+    expect(pickQuickWorkspaceAgent('opencode', ['claude', 'opencode'], ['opencode'])).toBe('claude')
   })
 })
 
@@ -38,7 +38,7 @@ describe('resolveQuickWorkspaceAgentSelection', () => {
       resolveQuickWorkspaceAgentSelection({
         quickAgentOverride: undefined,
         preferredQuickAgent: 'claude',
-        detectedAgentIds: ['claude', 'codex'],
+        detectedAgentIds: ['claude', 'opencode'],
         disabledTuiAgents: []
       })
     ).toEqual({ quickAgent: 'claude', quickAgentOverride: undefined })
@@ -58,18 +58,18 @@ describe('resolveQuickWorkspaceAgentSelection', () => {
   it('keeps an available user override', () => {
     expect(
       resolveQuickWorkspaceAgentSelection({
-        quickAgentOverride: 'codex',
+        quickAgentOverride: 'opencode',
         preferredQuickAgent: 'claude',
-        detectedAgentIds: new Set(['claude', 'codex']),
+        detectedAgentIds: new Set(['claude', 'opencode']),
         disabledTuiAgents: []
       })
-    ).toEqual({ quickAgent: 'codex', quickAgentOverride: 'codex' })
+    ).toEqual({ quickAgent: 'opencode', quickAgentOverride: 'opencode' })
   })
 
   it('replaces an unavailable override with the preferred quick agent', () => {
     expect(
       resolveQuickWorkspaceAgentSelection({
-        quickAgentOverride: 'codex',
+        quickAgentOverride: 'opencode',
         preferredQuickAgent: 'claude',
         detectedAgentIds: ['claude'],
         disabledTuiAgents: []

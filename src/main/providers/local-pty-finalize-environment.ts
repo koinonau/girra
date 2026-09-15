@@ -7,7 +7,6 @@ import {
   POWERLEVEL10K_WIZARD_DISABLE_ENV,
   seedPowerlevel10kWizardEnv
 } from '../pty/powerlevel10k-wizard-env'
-import { POSIX_SHELL_STARTUP_COMMAND_ENV } from '../pty/posix-shell-startup-command'
 import { resolvePathEnvKey } from '../pty/windows-environment-path'
 import { selectShellStartupFeatures } from '../shell-startup-features'
 import {
@@ -91,7 +90,8 @@ export function finalizeLocalPtySpawnEnvironment(args: {
     // Why delete: ORCA_SHELL_FEATURES is Orca-owned, and only the launch
     // config below may name features for this shell.
     delete env.ORCA_SHELL_FEATURES
-    delete env[POSIX_SHELL_STARTUP_COMMAND_ENV]
+    // Why: sanitize a value inherited from a pane an older Orca build launched.
+    delete env.ORCA_POSIX_SHELL_STARTUP_COMMAND
     plan.getFallbackShellReadyConfig = (shell) => {
       const waitsForShellReady = Boolean(spawn.command)
       return getShellLaunchConfig(

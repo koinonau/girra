@@ -151,7 +151,7 @@ describeOnWindows('resolveWindowsCmdShim', () => {
   }
 
   it('resolves the npm node shim to node.exe plus the script', () => {
-    const resolved = resolveWindowsCmdShim(write('codexish.cmd', npmProgNodeShim('cli.js')), env)
+    const resolved = resolveWindowsCmdShim(write('agent.cmd', npmProgNodeShim('cli.js')), env)
     expect(resolved?.program.toLowerCase().endsWith('node.exe')).toBe(true)
     expect(resolved?.prefixArgs).toEqual([join(dir, 'cli.js')])
     expect(resolved?.env).toBeUndefined()

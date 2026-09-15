@@ -165,7 +165,7 @@ describe('acknowledgedAgentsByPaneKey cleanup on teardown', () => {
     vi.setSystemTime(new Date('2026-04-29T12:05:00.000Z'))
     store
       .getState()
-      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'second', agentType: 'codex' })
+      .setAgentStatus('tab-1:0', { state: 'working', prompt: 'second', agentType: 'opencode' })
     const newEntry = store.getState().agentStatusByPaneKey['tab-1:0']
     const ackAt = store.getState().acknowledgedAgentsByPaneKey['tab-1:0'] ?? 0
 

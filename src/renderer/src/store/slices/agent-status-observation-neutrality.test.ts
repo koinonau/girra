@@ -137,7 +137,7 @@ describe('agent status observation is behavior-neutral', () => {
       updatedAt: now,
       stateStartedAt: now,
       stateHistory: [],
-      agentType: 'codex'
+      agentType: 'opencode'
     }
 
     expect(isExplicitAgentStatusFresh(entry, now, AGENT_STATUS_STALE_AFTER_MS)).toBe(true)

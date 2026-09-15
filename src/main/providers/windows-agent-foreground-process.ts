@@ -76,7 +76,7 @@ export async function resolveWindowsAgentForegroundProcessWithAvailability(
   }
   const candidates = inventory.candidates
   // Resolve membership before applying the global ambiguity rule. A detached
-  // agent can otherwise make an attached Droid look ambiguous and suppress
+  // agent can otherwise make an attached OpenCode look ambiguous and suppress
   // the only identity that is actually able to receive this PTY's input.
   const hasRecognizedCandidate = windowsCandidatesContainRecognizedAgent(
     candidates,
@@ -89,7 +89,7 @@ export async function resolveWindowsAgentForegroundProcessWithAvailability(
     // descendant that detached from the console, and the job still contains
     // those by design. Answering it from the job would re-admit precisely what
     // the filter is for -- granting byte authority to a detached `Start-Process
-    // droid`, or making an attached agent look ambiguous.
+    // opencode`, or making an attached agent look ambiguous.
     const consoleProcessIds = await options.readWindowsConsoleAttachedProcessIds()
     if (!consoleProcessIds) {
       return { available: false, processName: null }

@@ -114,9 +114,9 @@ describe('launchAgentInNewTab execution host resolution', () => {
 
   it('shapes the launch from the worktree host, not a rival repo row on another SSH host', async () => {
     // `store.repos.find` is host-blind, so a worktree that names its own host could be shaped by
-    // an `ssh:openclaw` row it has nothing to do with (#11163).
+    // an `ssh:devbox` row it has nothing to do with (#11163).
     store.repos = [
-      { id: 'repo-1', connectionId: 'openclaw', path: '/srv/openclaw' },
+      { id: 'repo-1', connectionId: 'devbox', path: '/srv/devbox' },
       { id: 'repo-1', connectionId: null, executionHostId: 'local', path: '/repo' }
     ]
     store.worktreesByRepo = { 'repo-1': [worktreeOn('local', '/repo/worktree')] }
@@ -128,7 +128,7 @@ describe('launchAgentInNewTab execution host resolution', () => {
 
   it('keeps a worktree on one SSH host remote while a rival row names another', async () => {
     store.repos = [
-      { id: 'repo-1', connectionId: 'openclaw', path: '/srv/openclaw' },
+      { id: 'repo-1', connectionId: 'devbox', path: '/srv/devbox' },
       { id: 'repo-1', connectionId: null, executionHostId: 'ssh:m4air', path: '/srv/m4air' }
     ]
     store.worktreesByRepo = { 'repo-1': [worktreeOn('ssh:m4air', '/srv/m4air/worktree')] }

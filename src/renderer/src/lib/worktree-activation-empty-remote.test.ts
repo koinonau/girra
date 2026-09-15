@@ -43,7 +43,7 @@ function makeWorktree(): Worktree {
     isPinned: false,
     sortOrder: 0,
     lastActivityAt: 0,
-    createdWithAgent: 'codex',
+    createdWithAgent: 'opencode',
     hostId: 'local',
     runtimeOwnerEnvironmentId: 'web-runtime-1'
   }

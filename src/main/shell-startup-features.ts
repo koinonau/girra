@@ -18,8 +18,7 @@ export const SHELL_STARTUP_FEATURES = [
   'history',
   'markers',
   'ready',
-  'identity',
-  'startup'
+  'identity'
 ] as const
 
 export type ShellStartupFeature = (typeof SHELL_STARTUP_FEATURES)[number]

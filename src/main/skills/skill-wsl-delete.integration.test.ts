@@ -38,7 +38,12 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill deletion primitives', () => {
       throw new Error('unexpected-wsl-integration-root')
     }
     skillsRoot = `${guestRoot}/home/.agents/skills`
-    await runWsl('mkdir', '-p', `${skillsRoot}/demo`, `${guestRoot}/home/.codex/skills/demo`)
+    await runWsl(
+      'mkdir',
+      '-p',
+      `${skillsRoot}/demo`,
+      `${guestRoot}/home/.config/opencode/skills/demo`
+    )
     await runWsl('sh', '-c', `printf '%s' 'x' > ${skillsRoot}/demo/SKILL.md`)
     // An alias-dir in another provider root, and an alias-file inside a real one.
     await runWsl('mkdir', '-p', `${guestRoot}/home/.claude/skills`)
@@ -47,7 +52,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill deletion primitives', () => {
       'ln',
       '-sT',
       `${skillsRoot}/demo/SKILL.md`,
-      `${guestRoot}/home/.codex/skills/demo/SKILL.md`
+      `${guestRoot}/home/.config/opencode/skills/demo/SKILL.md`
     )
     // Deliberately differs only by case, to prove POSIX case-sensitivity.
     await runWsl('mkdir', '-p', `${guestRoot}/home/.agents/Skills`)
@@ -81,7 +86,7 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill deletion primitives', () => {
   it('classifies alias-dir and alias-file from one batched inspection', async () => {
     const filesystem = new WslSkillInstallFilesystem(DISTRO, [uncPath(`${guestRoot}/home`)])
     const aliasDir = uncPath(`${guestRoot}/home/.claude/skills/demo`)
-    const aliasFile = uncPath(`${guestRoot}/home/.codex/skills/demo/SKILL.md`)
+    const aliasFile = uncPath(`${guestRoot}/home/.config/opencode/skills/demo/SKILL.md`)
     const canonicalFile = uncPath(`${skillsRoot}/demo/SKILL.md`)
     const inspections = await filesystem.inspectPaths([aliasDir, aliasFile, canonicalFile])
 
@@ -101,10 +106,16 @@ describe.runIf(RUN_REAL_WSL)('real WSL skill deletion primitives', () => {
 
   it('reads mtime without dereferencing, so an alias-file records the link itself', async () => {
     const filesystem = new WslSkillInstallFilesystem(DISTRO, [uncPath(`${guestRoot}/home`)])
-    const aliasFile = uncPath(`${guestRoot}/home/.codex/skills/demo/SKILL.md`)
+    const aliasFile = uncPath(`${guestRoot}/home/.config/opencode/skills/demo/SKILL.md`)
     const inspection = (await filesystem.inspectPaths([aliasFile])).get(aliasFile)
     const linkSeconds = Number.parseInt(
-      await runWsl('stat', '-c', '%Y', '--', `${guestRoot}/home/.codex/skills/demo/SKILL.md`),
+      await runWsl(
+        'stat',
+        '-c',
+        '%Y',
+        '--',
+        `${guestRoot}/home/.config/opencode/skills/demo/SKILL.md`
+      ),
       10
     )
     expect(inspection?.mtimeMs).toBe(linkSeconds * 1000)

@@ -4,10 +4,7 @@ import type { AgentSessionRecord } from '../../shared/agent-session-record'
 import { probeAgentSessionProcessIdentity } from './agent-session-process-identity-probe'
 import type { StructuredTuiOwner } from '../native-chat/agent-session-wire/structured-agent-session-handoff-types'
 import { buildTerminalWaitText } from './terminal-wait-tail-state'
-import {
-  detectTerminalWaitBlockedReason,
-  isKnownReadyPromptPreview
-} from './terminal-wait-detection'
+import { detectTerminalWaitBlockedReason } from './terminal-wait-detection'
 import { hasStructuredTuiIdleEvidence } from './structured-tui-idle-evidence'
 import { ClaudeTranscriptTailIncompleteError } from '../claude/claude-transcript-branch-proof'
 import {
@@ -76,9 +73,6 @@ export class OrcaRuntimeWithStopStructuredSessionProcess extends OrcaRuntimeWith
     if (pty?.connected) {
       const text = buildTerminalWaitText(pty.tailBuffer, pty.tailPartialLine, pty.preview)
       const blocked = detectTerminalWaitBlockedReason(text) !== null
-      if (!blocked && isKnownReadyPromptPreview(text)) {
-        return 'idle'
-      }
       return hasStructuredTuiIdleEvidence({
         blocked,
         status: pty.lastAgentStatus,

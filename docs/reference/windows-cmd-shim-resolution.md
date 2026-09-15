@@ -20,9 +20,9 @@ Only `runProcess` / `spawnProcess` callers. Two things people expect it to
 cover, and it does not:
 
 - **The interactive terminal.** `src/main/daemon/pty-subprocess/native-pty-spawn.ts`
-  calls `pty.spawn` directly, so typing `codex` in an Orca terminal is
+  calls `pty.spawn` directly, so typing `claude` in an Orca terminal is
   completely unaffected.
-- **Orca's own hook wrappers** (`codex-hook.cmd` and friends). These are batch
+- **Orca's own hook wrappers** (the `.cmd` scripts under `~/.orca/agent-hooks`). These are batch
   files Orca writes, matching none of the generator shapes, so they keep the
   cmd.exe path. They are addressable — we generate them — but not by this
   module.

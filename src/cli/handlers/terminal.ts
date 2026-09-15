@@ -9,7 +9,7 @@ import type {
   RuntimeTerminalWait
 } from '../../shared/runtime-types'
 import type { CommandHandler } from '../dispatch'
-import { shouldUseRendererBackedInteractiveTerminal } from '../codex-command-classification'
+import { shouldUseRendererBackedInteractiveTerminal } from '../interactive-agent-command-classification'
 import {
   formatTerminalCreate,
   formatTerminalFocus,

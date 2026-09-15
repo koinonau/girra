@@ -399,9 +399,9 @@ describe('OrcaRuntimeService', () => {
                 prompt: 'fix parity',
                 updatedAt: 1_700_000_000_000,
                 stateStartedAt: 1_699_999_999_000,
-                agentType: 'codex',
+                agentType: 'opencode',
                 paneKey: hostPaneKey,
-                terminalTitle: 'codex [working]',
+                terminalTitle: 'opencode [working]',
                 stateHistory: []
               },
               isActive: true
@@ -419,7 +419,7 @@ describe('OrcaRuntimeService', () => {
         title: 'claude agents',
         agentStatus: expect.objectContaining({
           state: 'working',
-          agentType: 'codex',
+          agentType: 'opencode',
           paneKey: hostPaneKey
         })
       })

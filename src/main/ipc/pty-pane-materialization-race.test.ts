@@ -547,7 +547,7 @@ describe('registerPtyHandlers', () => {
           ORCA_WORKTREE_ID: worktreeId
         },
         telemetry: {
-          agent_kind: 'codex',
+          agent_kind: 'claude',
           launch_source: 'new_workspace_composer',
           request_kind: 'new'
         }
@@ -602,8 +602,8 @@ describe('registerPtyHandlers', () => {
         cols: 120,
         rows: 40,
         cwd,
-        command: 'codex resume should-not-run',
-        launchAgent: 'codex',
+        command: 'claude --resume should-not-run',
+        launchAgent: 'claude',
         worktreeId,
         preAllocatedHandle: 'term-live-owner',
         tabId,

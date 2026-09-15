@@ -280,7 +280,7 @@ describe('terminal send CLI', () => {
           prompt: {
             requestId: '11111111-1111-4111-8111-111111111111',
             stages: ['input_accepted'],
-            provider: 'codex',
+            provider: 'claude',
             observation: 'supported',
             processIncarnation: 'inc-1',
             generation: 1,
@@ -444,7 +444,7 @@ describe('terminal send CLI', () => {
           prompt: {
             requestId: '11111111-1111-4111-8111-111111111111',
             stages: ['input_accepted'],
-            provider: 'codex',
+            provider: 'claude',
             observation: 'supported',
             processIncarnation: 'inc-1',
             generation: 1,
@@ -644,7 +644,7 @@ describe('terminal send CLI', () => {
             prompt: {
               requestId: '22222222-2222-4222-8222-222222222222',
               stages: ['input_accepted'],
-              provider: 'codex',
+              provider: 'claude',
               observation: 'supported',
               processIncarnation: 'inc-1',
               generation: 1,

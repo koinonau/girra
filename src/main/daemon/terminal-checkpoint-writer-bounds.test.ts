@@ -80,14 +80,14 @@ describe('bounded terminal checkpoint writer', () => {
     await manager.checkpoint(SESSION_ID, {
       ...snapshot('body'),
       pendingEscapeTailAnsi: '\x1b[38;5;',
-      lastTitle: 'Codex working'
+      lastTitle: 'OpenCode working'
     })
 
     const checkpointPath = join(dir, getHistorySessionDirName(SESSION_ID), 'checkpoint.json')
     expect(existsSync(checkpointPath)).toBe(true)
     expect(JSON.parse(readFileSync(checkpointPath, 'utf8'))).toMatchObject({
       pendingEscapeTailAnsi: '\x1b[38;5;',
-      lastTitle: 'Codex working'
+      lastTitle: 'OpenCode working'
     })
   })
 

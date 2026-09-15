@@ -98,7 +98,7 @@ export function createDaemonActiveProviderFixtures(ctx: {
       httpProxyBypassRules?: string
     },
     processEnvOverrides?: Record<string, string | undefined>,
-    // Why: daemon spawn tests exercise both WSL launch metadata from main and PR #2662 command threading for OMP.
+    // Why: daemon spawn tests exercise both WSL launch metadata from main and PR #2662 command threading for Pi.
     spawnArgs?: {
       cwd?: string
       worktreeId?: string

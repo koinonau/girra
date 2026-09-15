@@ -26,7 +26,7 @@ describe('detectAgentStatusFromTitle', () => {
 
   // --- Braille spinner characters ---
   it('detects braille spinner ⠋ as working', () => {
-    expect(detectAgentStatusFromTitle('⠋ Codex is thinking')).toBe('working')
+    expect(detectAgentStatusFromTitle('⠋ OpenCode is thinking')).toBe('working')
   })
 
   it('detects braille spinner ⠙ as working', () => {
@@ -63,7 +63,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects "permission" keyword with agent name', () => {
-    expect(detectAgentStatusFromTitle('codex - permission needed')).toBe('permission')
+    expect(detectAgentStatusFromTitle('opencode - permission needed')).toBe('permission')
   })
 
   it('detects "waiting" keyword with agent name', () => {
@@ -75,7 +75,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects "idle" keyword as idle', () => {
-    expect(detectAgentStatusFromTitle('codex idle')).toBe('idle')
+    expect(detectAgentStatusFromTitle('opencode idle')).toBe('idle')
   })
 
   it('detects "done" keyword as idle', () => {
@@ -87,7 +87,7 @@ describe('detectAgentStatusFromTitle', () => {
   })
 
   it('detects "thinking" keyword as working', () => {
-    expect(detectAgentStatusFromTitle('codex thinking')).toBe('working')
+    expect(detectAgentStatusFromTitle('opencode thinking')).toBe('working')
   })
 
   it('detects "running" keyword as working', () => {
@@ -126,10 +126,6 @@ describe('detectAgentStatusFromTitle', () => {
     expect(detectAgentStatusFromTitle('claude')).toBe('idle')
   })
 
-  it('returns idle for bare agent name "codex"', () => {
-    expect(detectAgentStatusFromTitle('codex')).toBe('idle')
-  })
-
   it('returns idle for bare agent name "opencode"', () => {
     expect(detectAgentStatusFromTitle('opencode')).toBe('idle')
   })
@@ -163,13 +159,13 @@ describe('detectAgentStatusFromTitle', () => {
   // --- Case insensitivity ---
   it('is case-insensitive for agent names', () => {
     expect(detectAgentStatusFromTitle('CLAUDE')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Codex Working')).toBe('working')
+    expect(detectAgentStatusFromTitle('OpenCode Working')).toBe('working')
   })
 
-  // Why: `containsAgentName` token-matches, so cwd-path fragments like "~/codex-scratch" no longer mint an 'idle' agent signal.
+  // Why: `containsAgentName` token-matches, so cwd-path fragments like "~/opencode-scratch" no longer mint an 'idle' agent signal.
   it('does not treat cwd-path agent-name fragments as agent activity', () => {
-    expect(detectAgentStatusFromTitle('~/codex-scratch')).toBeNull()
-    expect(detectAgentStatusFromTitle('~/codex already built')).toBeNull()
+    expect(detectAgentStatusFromTitle('~/opencode-scratch')).toBeNull()
+    expect(detectAgentStatusFromTitle('~/opencode already built')).toBeNull()
     expect(detectAgentStatusFromTitle('opencode-blinker')).toBeNull()
     expect(detectAgentStatusFromTitle('claude-scratch')).toBeNull()
   })
@@ -182,38 +178,38 @@ describe('detectAgentStatusFromTitle', () => {
   })
 })
 
-// Why: regression guard — a path fragment like `~/codex/working` must never classify as 'working' (path separators aren't word boundaries).
+// Why: regression guard — a path fragment like `~/opencode/working` must never classify as 'working' (path separators aren't word boundaries).
 describe('detectAgentStatusFromTitle path-separator rejection', () => {
   test('rejects working keywords adjacent to POSIX path separators', () => {
-    expect(detectAgentStatusFromTitle('~/codex/working')).not.toBe('working')
-    expect(detectAgentStatusFromTitle('~/codex/thinking')).not.toBe('working')
-    expect(detectAgentStatusFromTitle('~/codex/running')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('~/opencode/working')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('~/opencode/thinking')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('~/opencode/running')).not.toBe('working')
   })
 
   test('rejects working keywords adjacent to Windows path separators', () => {
-    expect(detectAgentStatusFromTitle('C:\\codex\\working')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('C:\\claude\\working')).not.toBe('working')
     expect(detectAgentStatusFromTitle('C:\\opencode\\thinking')).not.toBe('working')
   })
 
   test('rejects working keywords adjacent to `.` separators', () => {
-    expect(detectAgentStatusFromTitle('codex.working')).not.toBe('working')
+    expect(detectAgentStatusFromTitle('claude.working')).not.toBe('working')
     expect(detectAgentStatusFromTitle('opencode.thinking')).not.toBe('working')
   })
 
   test('still accepts legitimate idle/working titles separated by whitespace', () => {
-    expect(detectAgentStatusFromTitle('Codex done')).toBe('idle')
+    expect(detectAgentStatusFromTitle('OpenCode done')).toBe('idle')
     expect(detectAgentStatusFromTitle('OpenCode ready')).toBe('idle')
     expect(detectAgentStatusFromTitle('Claude idle')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Codex working')).toBe('working')
+    expect(detectAgentStatusFromTitle('Claude working')).toBe('working')
     expect(detectAgentStatusFromTitle('OpenCode thinking')).toBe('working')
   })
 
   // Why: block path separators only on the LEFT of the keyword; blocking the right would regress titles ending in `.`/`!`/`?`.
   test('still accepts keywords followed by trailing punctuation', () => {
-    expect(detectAgentStatusFromTitle('Codex done.')).toBe('idle')
+    expect(detectAgentStatusFromTitle('OpenCode done.')).toBe('idle')
     expect(detectAgentStatusFromTitle('Claude idle!')).toBe('idle')
     expect(detectAgentStatusFromTitle('OpenCode ready?')).toBe('idle')
-    expect(detectAgentStatusFromTitle('Codex working.')).toBe('working')
+    expect(detectAgentStatusFromTitle('Claude working.')).toBe('working')
     expect(detectAgentStatusFromTitle('OpenCode thinking...')).toBe('working')
   })
 })
@@ -226,8 +222,8 @@ describe('clearWorkingIndicators', () => {
   })
 
   it('strips braille spinner characters and working keywords', () => {
-    const cleared = clearWorkingIndicators('⠋ Codex is thinking')
-    expect(cleared).toBe('Codex is')
+    const cleared = clearWorkingIndicators('⠋ OpenCode is thinking')
+    expect(cleared).toBe('OpenCode is')
     expect(detectAgentStatusFromTitle(cleared)).not.toBe('working')
   })
 
@@ -238,13 +234,13 @@ describe('clearWorkingIndicators', () => {
 
   // Why: clearWorkingIndicators must use the same hyphen-aware boundary as STRONG_WORKING_KEYWORDS_RE so clearer and detector stay symmetric.
   it('does not strip working keywords inside hyphenated compounds', () => {
-    expect(clearWorkingIndicators('codex is-working-cap')).toBe('codex is-working-cap')
+    expect(clearWorkingIndicators('opencode is-working-cap')).toBe('opencode is-working-cap')
     expect(clearWorkingIndicators('claude reworking diff')).toBe('claude reworking diff')
-    expect(clearWorkingIndicators('codex overthinking it')).toBe('codex overthinking it')
+    expect(clearWorkingIndicators('opencode overthinking it')).toBe('opencode overthinking it')
   })
 
   it('still strips working keywords at whitespace boundaries', () => {
-    const cleared = clearWorkingIndicators('Codex working on tests')
+    const cleared = clearWorkingIndicators('OpenCode working on tests')
     expect(cleared).not.toMatch(/\bworking\b/)
     expect(detectAgentStatusFromTitle(cleared)).not.toBe('working')
   })
@@ -277,12 +273,12 @@ describe('getAgentLabel', () => {
   it('treats Claude Code prefixed task titles as Claude even when they mention another CLI', () => {
     expect(getAgentLabel('✳ OpenCode ready')).toBe('Claude Code')
     expect(getAgentLabel('. Compare Opencode Vs Orca')).toBe('Claude Code')
-    expect(getAgentLabel('* Review Codex behavior')).toBe('Claude Code')
+    expect(getAgentLabel('* Review Pi behavior')).toBe('Claude Code')
   })
 
   it('labels supported agent families consistently', () => {
     expect(getAgentLabel('⠂ Claude Code')).toBe('Claude Code')
-    expect(getAgentLabel('⠋ Codex is thinking')).toBe('Codex')
+    expect(getAgentLabel('⠋ OpenCode is thinking')).toBe('OpenCode')
     expect(getAgentLabel('OpenCode running')).toBe('OpenCode')
     expect(getAgentLabel('⠋ OpenClaude')).toBeNull()
   })
@@ -295,7 +291,7 @@ describe('getAgentLabel', () => {
   it('does not label cwd/worktree path fragments as an agent', () => {
     expect(getAgentLabel('opencode-blinker')).toBeNull()
     expect(getAgentLabel('claude-scratch')).toBeNull()
-    expect(getAgentLabel('~/projects/codex-scratch')).toBeNull()
+    expect(getAgentLabel('~/projects/opencode-scratch')).toBeNull()
     expect(getAgentLabel('~/cursor-rules')).toBeNull()
     expect(getAgentLabel('pi-fixtures')).toBeNull()
   })
@@ -303,14 +299,14 @@ describe('getAgentLabel', () => {
   it('still labels real agent titles that contain the name as a token', () => {
     expect(getAgentLabel('OpenCode ready')).toBe('OpenCode')
     expect(getAgentLabel('claude.exe')).toBe('Claude Code')
-    expect(getAgentLabel('⠋ Codex')).toBe('Codex')
+    expect(getAgentLabel('⠋ OpenCode')).toBe('OpenCode')
     expect(getAgentLabel('opencode.cmd working')).toBe('OpenCode')
   })
 
   // Why: "cursor" is ordinary editor vocabulary, so a bare token is not agent identity.
   it('does not label a bare "cursor" token in another agent title', () => {
     expect(getAgentLabel('⠋ preserve cursor visibility across replays')).toBe('Claude Code')
-    expect(getAgentLabel('⠋ Codex: fix cursor offsets')).toBe('Codex')
+    expect(getAgentLabel('⠋ OpenCode: fix cursor offsets')).toBe('OpenCode')
     expect(getAgentLabel('Terminal Cursor and Orca slows down')).toBeNull()
   })
 })
@@ -376,13 +372,13 @@ describe('createAgentStatusTracker', () => {
     expect(onBecameIdle).toHaveBeenCalledTimes(1)
   })
 
-  // --- Codex: braille spinner working, bare name idle ---
-  it('fires on Codex working → idle', () => {
+  // --- OpenCode: braille spinner working, bare name idle ---
+  it('fires on OpenCode working → idle', () => {
     const onBecameIdle = vi.fn()
     const tracker = createAgentStatusTracker(onBecameIdle)
 
-    tracker.handleTitle('⠋ Codex is thinking') // working
-    tracker.handleTitle('codex') // idle (bare name)
+    tracker.handleTitle('⠋ OpenCode is thinking') // working
+    tracker.handleTitle('opencode') // idle (bare name)
     expect(onBecameIdle).toHaveBeenCalledTimes(1)
   })
 
@@ -545,44 +541,12 @@ describe('formatAgentTypeLabel', () => {
     expect(formatAgentTypeLabel('claude')).toBe('Claude')
   })
 
-  it("maps 'openclaude' to 'OpenClaude'", () => {
-    expect(formatAgentTypeLabel('openclaude')).toBe('OpenClaude')
+  it("maps 'opencode' to 'OpenCode'", () => {
+    expect(formatAgentTypeLabel('opencode')).toBe('OpenCode')
   })
 
-  it("maps 'codex' to 'Codex'", () => {
-    expect(formatAgentTypeLabel('codex')).toBe('Codex')
-  })
-
-  it("maps 'gemini' to 'Gemini'", () => {
-    expect(formatAgentTypeLabel('gemini')).toBe('Gemini')
-  })
-
-  it("maps 'antigravity' to 'Antigravity'", () => {
-    expect(formatAgentTypeLabel('antigravity')).toBe('Antigravity')
-  })
-
-  it("maps 'cursor' to 'Cursor'", () => {
-    expect(formatAgentTypeLabel('cursor')).toBe('Cursor')
-  })
-
-  it("maps 'hermes' to 'Hermes'", () => {
-    expect(formatAgentTypeLabel('hermes')).toBe('Hermes')
-  })
-
-  it("maps 'command-code' to 'Command Code'", () => {
-    expect(formatAgentTypeLabel('command-code')).toBe('Command Code')
-  })
-
-  it("maps 'ante' to 'Ante'", () => {
-    expect(formatAgentTypeLabel('ante')).toBe('Ante')
-  })
-
-  it("maps 'trae' to 'Trae'", () => {
-    expect(formatAgentTypeLabel('trae')).toBe('Trae')
-  })
-
-  it("maps 'prime-agent' to 'Prime Agent'", () => {
-    expect(formatAgentTypeLabel('prime-agent')).toBe('Prime Agent')
+  it("maps 'pi' to 'Pi'", () => {
+    expect(formatAgentTypeLabel('pi')).toBe('Pi')
   })
 
   it('passes through arbitrary custom agent names as-is', () => {
@@ -605,12 +569,9 @@ describe('agentTypeToIconAgent', () => {
 
   it("round-trips iconable agent types like 'claude'", () => {
     expect(agentTypeToIconAgent('claude')).toBe('claude')
-    expect(agentTypeToIconAgent('openclaude')).toBe('openclaude')
-    expect(agentTypeToIconAgent('antigravity')).toBe('antigravity')
-    expect(agentTypeToIconAgent('command-code')).toBe('command-code')
-    expect(agentTypeToIconAgent('ante')).toBe('ante')
-    expect(agentTypeToIconAgent('trae')).toBe('trae')
-    expect(agentTypeToIconAgent('prime-agent')).toBe('prime-agent')
+    expect(agentTypeToIconAgent('claude-agent-teams')).toBe('claude-agent-teams')
+    expect(agentTypeToIconAgent('opencode')).toBe('opencode')
+    expect(agentTypeToIconAgent('pi')).toBe('pi')
   })
 
   it('returns null for arbitrary non-iconable strings', () => {

@@ -3,6 +3,7 @@ import { tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
 import type * as FsPromises from 'node:fs/promises'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import type { Repo } from '../../shared/repo-types'
 
 // Why: the regression is measured in filesystem syscalls, not in returned data, so
 // the walk's own readdir is what the assertions below count.
@@ -34,7 +35,7 @@ async function buildFixture(
   const home = join(root, 'home')
   await writeSkill(join(home, '.agents', 'skills', 'shared'), 'shared')
   await writeSkill(join(home, '.claude', 'skills', 'review'), 'review')
-  await writeSkill(join(home, '.codex', 'skills', 'plan'), 'plan')
+  await writeSkill(join(home, '.pi', 'agent', 'skills', 'plan'), 'plan')
   const panes: string[] = []
   for (let index = 0; index < paneCount; index += 1) {
     const pane = join(root, `pane-${index}`)
@@ -60,16 +61,11 @@ function readdirCountUnder(path: string): number {
 beforeEach(() => {
   clearSkillRootScanCache()
   readdirPaths.length = 0
-  // Why: the Hermes root is the one home root an env var can move outside the
-  // fixture, so a developer with a real Hermes install would score it `present`.
-  vi.stubEnv('HERMES_HOME', '')
-  vi.stubEnv('LOCALAPPDATA', '')
   vi.spyOn(console, 'info').mockImplementation(() => undefined)
 })
 
 afterEach(() => {
   clearSkillRootScanCache()
-  vi.unstubAllEnvs()
   vi.restoreAllMocks()
 })
 
@@ -118,7 +114,9 @@ describe('bounded concurrent skill discovery', () => {
     expect(readdirCountUnder(join(home, '.claude', 'skills'))).toBe(
       READDIR_CALLS_PER_POPULATED_ROOT
     )
-    expect(readdirCountUnder(join(home, '.codex', 'skills'))).toBe(READDIR_CALLS_PER_POPULATED_ROOT)
+    expect(readdirCountUnder(join(home, '.pi', 'agent', 'skills'))).toBe(
+      READDIR_CALLS_PER_POPULATED_ROOT
+    )
     for (const pane of panes) {
       expect(readdirCountUnder(join(pane, '.agents', 'skills'))).toBe(
         READDIR_CALLS_PER_POPULATED_ROOT
@@ -131,10 +129,10 @@ describe('bounded concurrent skill discovery', () => {
 
     const result = await discoverSkills({ homeDir: home, repos: [], cwd: noWorkspace })
 
-    const missing = result.sources.find((source) => source.id === 'home-cursor')
+    const missing = result.sources.find((source) => source.id === 'home-opencode')
     expect(missing?.exists).toBe(false)
     expect(missing?.skippedReason).toBe('missing')
-    expect(readdirCountUnder(join(home, '.cursor', 'skills'))).toBe(0)
+    expect(readdirCountUnder(join(home, '.config', 'opencode', 'skills'))).toBe(0)
   })
 
   it('re-reads disk when a caller refreshes, and serves the new result afterwards', async () => {
@@ -179,13 +177,15 @@ describe('bounded concurrent skill discovery', () => {
   it('logs the roots it walked, by id, and never a filesystem path', async () => {
     const { home, noWorkspace } = await buildFixture(0)
     const info = vi.spyOn(console, 'info').mockImplementation(() => undefined)
+    // Why: enough missing repo roots to push the walked id list past its cap.
+    const repos = ['a', 'b', 'c', 'd'].map((name) => ({ id: name, path: join(home, name) }) as Repo)
 
-    await discoverSkills({ homeDir: home, repos: [], cwd: noWorkspace })
+    await discoverSkills({ homeDir: home, repos, cwd: noWorkspace })
 
     const line = String(info.mock.calls.at(0)?.at(0))
     // `present` is the signal that separates "big tree" from "big root set", and
     // is not derivable from the other counts.
-    expect(line).toContain('[skills] scan roots=24 present=3 walked=24 skills=3')
+    expect(line).toContain('[skills] scan roots=14 present=3 walked=14 skills=3')
     expect(line).toContain('home-claude')
     expect(line).not.toContain(home)
     expect(line).not.toContain(tmpdir())
@@ -193,7 +193,7 @@ describe('bounded concurrent skill discovery', () => {
     expect(line.slice(line.indexOf('ids=')).split(',')).toHaveLength(MAX_LOGGED_ROOT_IDS)
 
     info.mockClear()
-    await discoverSkills({ homeDir: home, repos: [], cwd: noWorkspace })
+    await discoverSkills({ homeDir: home, repos, cwd: noWorkspace })
     // A fully cached scan did no filesystem work, so it must stay silent.
     expect(info).not.toHaveBeenCalled()
   })

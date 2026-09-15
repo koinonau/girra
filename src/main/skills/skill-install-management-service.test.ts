@@ -33,7 +33,7 @@ describe('skill install management', () => {
         resolveFolderWorkspace: async () => null
       },
       stateDirectory,
-      detectProviders: async () => ['codex', 'claude']
+      detectProviders: async () => ['opencode', 'claude']
     }
   }
 
@@ -58,11 +58,11 @@ describe('skill install management', () => {
       currentState: 'missing',
       destinationIdentity: 'global:runtime-1'
     })
-    expect(preview.providers.map((provider) => provider.provider)).toEqual(['codex', 'claude'])
+    expect(preview.providers.map((provider) => provider.provider)).toEqual(['claude'])
   })
 
   it('resolves providers once for every skill in a bundle preview', async () => {
-    const detectProviders = vi.fn(async () => ['codex', 'claude'])
+    const detectProviders = vi.fn(async () => ['opencode', 'claude'])
     const preview = await previewSharedSkillBundleInstall(
       {
         package: {

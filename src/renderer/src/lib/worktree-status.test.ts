@@ -72,7 +72,7 @@ describe('getWorktreeStatus', () => {
       [{ id: 'tab-1', title: 'claude [done]' }],
       [],
       livePtyMap('tab-1'),
-      { 'tab-1': { 0: 'codex [working]', 1: 'claude [done]' } }
+      { 'tab-1': { 0: 'opencode [working]', 1: 'claude [done]' } }
     )
 
     expect(status).toBe('working')
@@ -131,7 +131,7 @@ describe('getWorktreeStatus', () => {
 
   it('still spins on an agent-attributable braille-spinner title', () => {
     const status = getWorktreeStatus(
-      [{ id: 'tab-1', title: '⠹ codex fix flaky test' }],
+      [{ id: 'tab-1', title: '⠹ opencode fix flaky test' }],
       [],
       livePtyMap('tab-1')
     )
@@ -310,7 +310,7 @@ describe('resolveWorktreeStatus', () => {
       ptyIdsByTabId: livePtyMap('tab-1'),
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: 'codex [working]',
+          1: 'opencode [working]',
           2: 'bash'
         }
       },
@@ -336,7 +336,7 @@ describe('resolveWorktreeStatus', () => {
       ptyIdsByTabId: livePtyMap('tab-1'),
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: 'codex [working]'
+          1: 'opencode [working]'
         }
       },
       agentStatusPaneIdsByTabId: {
@@ -359,7 +359,7 @@ describe('resolveWorktreeStatus', () => {
       runtimePaneTitlesByTabId: {
         'tab-1': {
           1: 'bash',
-          2: 'codex [working]'
+          2: 'opencode [working]'
         }
       },
       agentStatusPaneIdsByTabId: {

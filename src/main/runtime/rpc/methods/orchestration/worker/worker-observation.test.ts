@@ -77,7 +77,7 @@ describe('worker-show receipt shape', () => {
       setup_state: 'ran',
       effects: '[{"kind":"setup"}]',
       residual_resources: '["res-1"]',
-      start_options: '{"agent":"codex"}',
+      start_options: '{"agent":"claude"}',
       last_error: null,
       created_at: 'now',
       updated_at: 'now'
@@ -93,7 +93,7 @@ describe('worker-show receipt shape', () => {
       setupState: 'ran',
       effects: [{ kind: 'setup' }],
       residualResources: ['res-1'],
-      startOptions: { agent: 'codex' },
+      startOptions: { agent: 'claude' },
       lastError: null,
       createdAt: 'now',
       updatedAt: 'now'

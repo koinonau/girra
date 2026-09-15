@@ -192,9 +192,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
         isRemote: selectedRepoIsRemote
       })
 
-      // Why: no kept agent needs a pre-hook working seed; every launch waits for its first hook.
-      const shouldSeedInitialAgentStatus = false
-
       // Why: backend startup is safe only for self-contained launch commands; agents needing post-ready paste stay on the renderer path.
       const composerTelemetry: AgentLaunchMetadata = {
         agent_kind: tuiAgentToAgentKind(tuiAgent),
@@ -227,7 +224,6 @@ export function useFullSubmitPreparation(input: FullSubmitPreparationInput) {
         createDisplayName,
         pendingFirstAgentMessageRename,
         startupPlan,
-        shouldSeedInitialAgentStatus,
         composerTelemetry,
         backendStartup
       })

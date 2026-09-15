@@ -15,7 +15,7 @@ const BRACKETED_PASTE_QUIET_MS = 1500
  * Why a sidecar subscription:
  *   - the main pane may attach mid-flight; we must not race against its
  *     handler registration on the dispatcher's primary slot.
- *   - DECSET 2004 and the Codex composer prompt may straddle two data chunks,
+ *   - DECSET 2004 and the follow-up ready signal may straddle two data chunks,
  *     so keep a small ring of recent bytes and search the union.
  */
 export function waitForAgentDraftInputReady(
@@ -81,7 +81,7 @@ export function waitForAgentDraftInputReady(
         .catch(() => finish(false))
     } else {
       unsubscribe = subscribeToPtyData(ptyId, observeData)
-      // Why: spawn can resolve after the first Codex frame was buffered. Replay
+      // Why: spawn can resolve after the first agent frame was buffered. Replay
       // it to this observer without consuming the primary xterm handler's copy.
       replayPreHandlerPtyData(ptyId, observeData)
     }

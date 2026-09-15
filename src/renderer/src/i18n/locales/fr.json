@@ -388,42 +388,10 @@
     "lib": {
       "agent": {
         "catalog": {
-          "5dff448636": "OpenClaw",
-          "8a9ba743cc": "Hermes",
-          "4e63c7b956": "Rovo Dev",
-          "bee242fe3d": "Qwen Code",
-          "ca73055bd0": "Mistral Vibe",
-          "28810273af": "Kimi",
-          "739a930554": "Droid",
-          "667c104cff": "Cursor",
-          "9e2a9bb87b": "Continuer",
-          "6f8056a565": "Command Code",
-          "4238b771b5": "Codebuff",
-          "cbaf0c2e0b": "Cline",
-          "1f8a19e9ad": "Autohand Code",
-          "5e8eff11b3": "Auggie",
-          "9477377a2a": "Charm",
-          "e0247254f2": "Kiro",
-          "918ba4ffed": "Kilocode",
-          "c73c573939": "Amp",
-          "8da11d876c": "Goose",
-          "b32627f09b": "Aider",
-          "691dd11789": "Antigravity",
-          "12e6baa4f7": "Gemini",
-          "09973b4d84": "OMP",
           "302934c5d9": "Pi",
           "e7a4ca5103": "OpenCode",
-          "706b0fe68b": "GitHub Copilot",
-          "0baad2d5d2": "Grok",
-          "760bc6883d": "Codex",
-          "a5fc0cb622": "OpenClaude",
           "bf53f09bf8": "Claude Agent Teams",
-          "0708ed89f1": "Claude",
-          "fc80296033": "Devin",
-          "da41abbdd4": "Ante",
-          "060d152fb5": "Trae",
-          "d443a47995": "Prime Agent",
-          "mimo_code_label": "MiMo Code"
+          "0708ed89f1": "Claude"
         },
         "skill": {
           "cli": {
@@ -2830,7 +2798,7 @@
               "blocked": {
                 "toast": {
                   "97c98f1afe": "Ouvrir le paramètre",
-                  "7cf51f74fd": "Activez l'écriture du presse-papiers par les TUI dans les paramètres du terminal pour copier depuis SSH, Zellij, tmux, Neovim, fzf ou Grok.",
+                  "7cf51f74fd": "Activez l'écriture du presse-papiers par les TUI dans les paramètres du terminal pour copier depuis SSH, Zellij, tmux, Neovim ou fzf.",
                   "89eaa3e80b": "Écriture du presse-papiers du terminal bloquée"
                 }
               },
@@ -3835,7 +3803,6 @@
           "0bc1379f4c": "Toutes les sources",
           "38e0951c3a": "Skills d'agent",
           "fb6bf60b52": "Claude",
-          "426be2aac6": "Codex",
           "39b6998ddb": "Tous les fournisseurs",
           "a68dee6a32": "Rechercher des skills",
           "e46e162e2e": "de",
@@ -5930,7 +5897,7 @@
           "1188e56af4": "Copier l'exemple de prompt",
           "b84807f228": "\"",
           "59722f31b4": "\"",
-          "c5325e91f6": "Collez l'un de ces exemples dans Claude Code, Codex ou un autre agent, dans un projet où la skill est installée.",
+          "c5325e91f6": "Collez l'un de ces exemples dans Claude Code, OpenCode ou un autre agent, dans un projet où la skill est installée.",
           "2a180694f7": "Essayez — exemples de prompts",
           "5ec620ccc4": "Échec de la copie.",
           "a602d43069": "{{value0}} copié."
@@ -6590,7 +6557,7 @@
           "c12b253997": "Copier l'exemple de prompt",
           "d151e25078": "\"",
           "b525ff2b12": "\"",
-          "4daa95f25a": "Collez l'un de ces prompts dans Claude Code, Codex ou un autre agent, dans un projet où le skill CLI Orca est installé.",
+          "4daa95f25a": "Collez l'un de ces prompts dans Claude Code, OpenCode ou un autre agent, dans un projet où le skill CLI Orca est installé.",
           "0820b3f84f": "Essayez — exemples de prompts",
           "1f608e7d60": "Échec de la copie du prompt.",
           "2b077b5544": "Prompt copié."
@@ -7602,9 +7569,9 @@
           "d23b43c5be": "Emplacement du script de configuration",
           "34a0dfa06e": "Endroit où s'exécute le script de configuration du dépôt lors de la création d'un nouveau espace de travail.",
           "21f8da2078": "Script de configuration de l'espace de travail",
-          "6e6480a7df": "Permet aux programmes du terminal (Zellij, tmux, Neovim, fzf, Grok, SSH) de copier vers le presse-papiers système.",
+          "6e6480a7df": "Permet aux programmes du terminal (Zellij, tmux, Neovim, fzf, SSH) de copier vers le presse-papiers système.",
           "3338dcf8c1": "Autoriser les écritures presse-papiers des TUI (OSC 52)",
-          "69c64a479c": "Permet à Zellij, tmux, Neovim, fzf et Grok de copier vers le presse-papiers système via le PTY (y compris via SSH).",
+          "69c64a479c": "Permet à Zellij, tmux, Neovim et fzf de copier vers le presse-papiers système via le PTY (y compris via SSH).",
           "4729c645fc": "Copier automatiquement les sélections du terminal vers le presse-papiers.",
           "902f5dee1f": "Copie à la sélection",
           "9129b7e805": "Survoler un volet de terminal l'active sans avoir à cliquer.",
@@ -8208,7 +8175,6 @@
                 "3c4e5e5938": "Recettes d'action",
                 "ee14a9e9f7": "activé",
                 "82109d627d": "contrôle de code source",
-                "542e1a00a7": "codex",
                 "f121bec167": "claude",
                 "93e5210da8": "message",
                 "c33cb1b982": "ai",
@@ -8380,16 +8346,8 @@
             "e4fb4516d0": "étoile",
             "e0b8c8bc25": "Soutenez le projet avec une étoile GitHub via la CLI gh.",
             "36a72f0d9e": "Ajouter une étoile à Orca sur GitHub",
-            "c61b14be7c": "grok",
-            "5d9ba08673": "copilot",
-            "f472e97440": "aider",
-            "3c30fe2d51": "gemini",
-            "5fdf1dc2d1": "omp",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
-            "27d9b996ba": "codex",
-            "5baf51c4d9": "open claude",
-            "aea7d2cccb": "openclaude",
             "95b63edde7": "claude",
             "41c2f9a025": "default",
             "8ea37a05bc": "agent",
@@ -8752,7 +8710,6 @@
             "f5d39af41e": "agents enfants",
             "c766a01978": "handoff",
             "08c65b12a2": "exemples",
-            "f278fd04db": "codex",
             "32c5098e7b": "claude",
             "21c28ccdf7": "coordinateur",
             "741dfc03fa": "worker",
@@ -13635,6 +13592,11 @@
               "280ccd2701": "Chaque jour à {{time}}",
               "3f1422adc1": "En semaine à {{time}}",
               "cc71e252ba": "{{day}}s à {{time}}"
+            }
+          },
+          "draft": {
+            "model": {
+              "agentUnavailable": "L'agent n'est plus disponible"
             }
           }
         },

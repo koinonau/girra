@@ -34,7 +34,7 @@ describe('OrcaRuntimeService', () => {
         // Why: mirrors the spawn IPC handler — a command-carrying spawn records
         // its launch command right after registering the PTY.
         runtime.registerPty('pty-carried', TEST_WORKTREE_ID, null, { tabId: 'tab-carried', leafId })
-        runtime.noteTerminalSpawnCommand('pty-carried', 'codex')
+        runtime.noteTerminalSpawnCommand('pty-carried', 'claude')
         ipcMain.emit(
           'terminal:tabCreateReply',
           { sender: webContents },
@@ -50,7 +50,7 @@ describe('OrcaRuntimeService', () => {
       })
 
       const create = runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'codex',
+        agent: 'claude',
         activate: true
       })
       await vi.waitFor(() => expect(send).toHaveBeenCalledTimes(1))

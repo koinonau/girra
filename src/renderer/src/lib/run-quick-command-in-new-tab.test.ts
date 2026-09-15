@@ -130,7 +130,7 @@ describe('runQuickCommandInNewTab', () => {
         id: 'agent-review',
         label: 'Review',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Review this diff'
       },
       worktreeId: 'repo::worktree',
@@ -139,7 +139,7 @@ describe('runQuickCommandInNewTab', () => {
 
     expect(result).toEqual({ tabId: 'tab-agent' })
     expect(mocks.launchAgentInNewTab).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       prompt: 'Review this diff',
       worktreeId: 'repo::worktree',
       groupId: 'group-1',
@@ -159,7 +159,7 @@ describe('runQuickCommandInNewTab', () => {
         id: 'agent-review',
         label: 'Review',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Review this diff'
       },
       worktreeId: 'repo::worktree',
@@ -168,7 +168,7 @@ describe('runQuickCommandInNewTab', () => {
 
     expect(result).toEqual({ tabId: 'tab-agent' })
     expect(mocks.launchAgentInNewTab).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'opencode',
       prompt: 'Review this diff',
       worktreeId: 'repo::worktree',
       groupId: undefined,
@@ -194,7 +194,7 @@ describe('runQuickCommandInNewTab', () => {
         id: 'agent-review',
         label: 'Review',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Review this diff'
       },
       worktreeId: 'repo::worktree',
@@ -223,7 +223,7 @@ describe('runQuickCommandInNewTab', () => {
         id: 'agent-review',
         label: 'Review',
         action: 'agent-prompt',
-        agent: 'codex',
+        agent: 'opencode',
         prompt: 'Review this diff'
       },
       worktreeId: 'repo::worktree',
@@ -239,10 +239,10 @@ describe('runQuickCommandInNewTab', () => {
   it('does not launch post-start-only agent quick commands', () => {
     const result = runQuickCommandInNewTab({
       command: {
-        id: 'agent-aider',
-        label: 'Aider',
+        id: 'agent-teams',
+        label: 'Agent Teams',
         action: 'agent-prompt',
-        agent: 'aider',
+        agent: 'claude-agent-teams',
         prompt: 'Review this diff'
       },
       worktreeId: 'repo::worktree',

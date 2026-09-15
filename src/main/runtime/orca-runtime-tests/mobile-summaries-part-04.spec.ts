@@ -66,7 +66,7 @@ describe('OrcaRuntimeService', () => {
           tabId: 'active-tab',
           state: 'working' as const,
           prompt: 'active row',
-          agentType: 'codex',
+          agentType: 'claude',
           connectionId: 'ssh-pinned-limit',
           receivedAt: now,
           stateStartedAt: now - 100
@@ -105,7 +105,7 @@ describe('OrcaRuntimeService', () => {
         {
           tabId: 'tab-1',
           worktreeId: 'repo-1::/tmp/worktree-a',
-          title: 'Codex working',
+          title: 'Claude working',
           activeLeafId: 'pane:1',
           layout: null
         }
@@ -121,7 +121,7 @@ describe('OrcaRuntimeService', () => {
       ]
     })
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
     const working = await runtime.getWorktreePs()
     expect(working.worktrees[0].status).toBe('working')
 

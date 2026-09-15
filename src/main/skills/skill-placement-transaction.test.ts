@@ -260,42 +260,6 @@ describe('skill placement transaction recovery', () => {
     expect(await readFile(join(customRoot, 'alpha', 'SKILL.md'), 'utf8')).toBe('# Skill')
   })
 
-  it('rejects a historical root claimed by another selected provider before journaling', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'orca-placement-cross-provider-root-'))
-    roots.push(root)
-    const home = join(root, 'home')
-    const canonical = await skill(join(home, '.agents', 'skills', 'alpha'), '# Skill')
-    const sharedRoot = join(root, 'shared', 'skills')
-    const previousPath = join(sharedRoot, 'alpha')
-    await cp(canonical.path, previousPath, { recursive: true })
-    const previous = receipt(canonical.path, canonical.digest, 'version_1', [
-      {
-        provider: 'claude',
-        path: previousPath,
-        topology: 'independent-copy',
-        status: 'installed'
-      }
-    ])
-    const next = receipt(canonical.path, canonical.digest, 'version_2', [])
-    const stateDirectory = join(root, 'state')
-    const transaction = createSkillPlacementTransaction({
-      stateDirectory,
-      scope: 'global',
-      homeDirectory: home,
-      detectedProviders: ['claude', 'grok'],
-      providerRootOverrides: {
-        claude: join(root, 'new-claude', 'skills'),
-        grok: sharedRoot
-      }
-    })
-    await expect(transaction.prepare(previous, next)).rejects.toThrow(
-      'skill-install-provider-root-ownership-conflict'
-    )
-    await expect(
-      lstat(skillPlacementJournalPath(stateDirectory, canonical.path))
-    ).rejects.toMatchObject({ code: 'ENOENT' })
-  })
-
   it('does not treat a skipped historical placement as ownership', async () => {
     const root = await mkdtemp(join(tmpdir(), 'orca-placement-skipped-owner-'))
     roots.push(root)
@@ -316,8 +280,8 @@ describe('skill placement transaction recovery', () => {
       stateDirectory,
       scope: 'global',
       homeDirectory: home,
-      detectedProviders: ['grok'],
-      providerRootOverrides: { grok: sharedRoot }
+      detectedProviders: ['claude'],
+      providerRootOverrides: { claude: sharedRoot }
     })
 
     await expect(transaction.prepare(previous, next)).resolves.toBeUndefined()

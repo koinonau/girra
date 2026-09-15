@@ -54,7 +54,7 @@ function renderTextGenerationForm(input: {
       settings: null,
       repo: null,
       baseParams: {
-        agentId: 'codex',
+        agentId: 'opencode',
         model: 'gpt-5.4-mini',
         commandInputTemplate: input.commandInputTemplate
       },
@@ -95,7 +95,7 @@ describe('buildCommitMessageGenerationParams', () => {
         settings: null,
         repo: null,
         baseParams: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           commandInputTemplate: '{basePrompt}'
         },
@@ -123,7 +123,7 @@ describe('buildCommitMessageGenerationParams', () => {
         settings: null,
         repo: null,
         baseParams: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           commandInputTemplate: '{basePrompt}'
         },
@@ -146,7 +146,7 @@ describe('buildCommitMessageGenerationParams', () => {
         settings: null,
         repo: null,
         baseParams: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           commandInputTemplate: '{basePrompt}'
         },
@@ -189,26 +189,26 @@ describe('buildCommitMessageGenerationParams', () => {
   it('preserves the resolved model and thinking level for the selected agent', () => {
     expect(
       buildCommitMessageGenerationParams({
-        agentId: 'codex',
+        agentId: 'opencode',
         commandTemplate: '{basePrompt}\n\nUse Conventional Commits.',
         agentArgs: '--model gpt-5.5',
         baseParams: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           thinkingLevel: 'xhigh',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model gpt-5.5',
-          agentCommandOverride: 'codex'
+          agentCommandOverride: 'opencode'
         },
-        settings: { agentCmdOverrides: { codex: 'codex --profile work' } }
+        settings: { agentCmdOverrides: { opencode: 'opencode --profile work' } }
       })
     ).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       model: 'gpt-5.4-mini',
       thinkingLevel: 'xhigh',
       commandInputTemplate: '{basePrompt}\n\nUse Conventional Commits.',
       agentArgs: '--model gpt-5.5',
-      agentCommandOverride: 'codex --profile work'
+      agentCommandOverride: 'opencode --profile work'
     })
   })
 
@@ -241,7 +241,7 @@ describe('buildCommitMessageGenerationParams', () => {
         agentId: 'custom',
         commandTemplate: '{basePrompt}',
         baseParams: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           commandInputTemplate: '{basePrompt}'
         },
@@ -268,7 +268,7 @@ describe('buildCommitMessageGenerationParams', () => {
         instructionsByOperation: {},
         actions: {
           commitMessage: {
-            agentId: 'codex',
+            agentId: 'opencode',
             commandInputTemplate: '{basePrompt}'
           }
         }
@@ -293,14 +293,14 @@ describe('buildCommitMessageGenerationParams', () => {
     const saved = applySourceControlTextGenerationDefaults(
       {
         enabled: true,
-        agentId: 'codex',
+        agentId: 'opencode',
         selectedModelByAgent: {},
         selectedThinkingByModel: {},
         customAgentCommand: 'my-commit-writer',
         instructionsByOperation: {},
         actions: {
           pullRequest: {
-            agentId: 'codex',
+            agentId: 'opencode',
             commandInputTemplate: '{basePrompt}'
           }
         }
@@ -314,7 +314,7 @@ describe('buildCommitMessageGenerationParams', () => {
       }
     )
 
-    expect(saved.agentId).toBe('codex')
+    expect(saved.agentId).toBe('opencode')
     expect(saved.actions?.pullRequest).toEqual({
       agentId: 'custom',
       commandInputTemplate: '{basePrompt}\n\nPrefer ticket IDs.'
@@ -339,13 +339,13 @@ describe('buildCommitMessageGenerationParams', () => {
         },
         'local',
         {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           commandInputTemplate: 'just use "{branch}"'
         }
       ).actions?.commitMessage
     ).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: 'just use "{branch}"'
     })
   })
@@ -368,14 +368,14 @@ describe('buildCommitMessageGenerationParams', () => {
         },
         'pullRequest',
         {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.4-mini',
           commandInputTemplate: '{basePrompt}\n\nKeep it short.',
           agentArgs: '--model gpt-5.5'
         }
       ).actions?.pullRequest
     ).toEqual({
-      agentId: 'codex',
+      agentId: 'opencode',
       commandInputTemplate: '{basePrompt}\n\nKeep it short.',
       agentArgs: '--model gpt-5.5'
     })

@@ -49,9 +49,9 @@ describe('preflight RPC methods', () => {
   })
 
   it('detects agents and refreshes PATH on the server through runtime RPC', async () => {
-    detectInstalledAgentsWithShellPathHydrationMock.mockResolvedValueOnce(['codex'])
+    detectInstalledAgentsWithShellPathHydrationMock.mockResolvedValueOnce(['opencode'])
     refreshShellPathAndDetectAgentsMock.mockResolvedValueOnce({
-      agents: ['codex', 'claude'],
+      agents: ['opencode', 'claude'],
       addedPathSegments: ['/opt/bin'],
       shellHydrationOk: true
     })
@@ -63,10 +63,10 @@ describe('preflight RPC methods', () => {
 
     expect(detectInstalledAgentsWithShellPathHydrationMock).toHaveBeenCalled()
     expect(refreshShellPathAndDetectAgentsMock).toHaveBeenCalled()
-    expect(detected).toMatchObject({ ok: true, result: ['codex'] })
+    expect(detected).toMatchObject({ ok: true, result: ['opencode'] })
     expect(refreshed).toMatchObject({
       ok: true,
-      result: { agents: ['codex', 'claude'], shellHydrationOk: true }
+      result: { agents: ['opencode', 'claude'], shellHydrationOk: true }
     })
   })
 

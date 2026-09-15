@@ -11,7 +11,7 @@ const END = '\x1b[201~'
 
 const DEFAULT_SIZE_KB = 80
 const DEFAULT_TIMEOUT_MS = 20_000
-const DEFAULT_MODE = 'codex-like'
+const DEFAULT_MODE = 'claude-like'
 
 function argValue(name, fallback = undefined) {
   const prefix = `--${name}=`
@@ -159,8 +159,8 @@ async function tryCloseTerminal(cli, handle, cwd) {
 async function parentMain() {
   const cli = argValue('cli', process.env.ORCA_REPRO_CLI ?? 'orca')
   const mode = argValue('mode', DEFAULT_MODE)
-  if (!new Set(['wire', 'codex-like']).has(mode)) {
-    throw new Error('--mode must be wire or codex-like')
+  if (!new Set(['wire', 'claude-like']).has(mode)) {
+    throw new Error('--mode must be wire or claude-like')
   }
   const sizeKb = parsePositiveInteger('size-kb', DEFAULT_SIZE_KB)
   const timeoutMs = parsePositiveInteger('timeout-ms', DEFAULT_TIMEOUT_MS)
@@ -218,7 +218,7 @@ async function parentMain() {
       '--worktree',
       `path:${cwd}`,
       '--title',
-      'orchestration repro fake codex',
+      'orchestration repro fake claude',
       '--command',
       workerCommand
     ],
@@ -357,7 +357,7 @@ function buildReport(payload, mode, marker) {
   }
   return {
     ...base,
-    // Codex/Claude-like TUIs need generated multi-line prompts to arrive as
+    // Claude-like TUIs need generated multi-line prompts to arrive as
     // one paste frame; unframed newlines are treated as live editor keys.
     contractOk: hasSubmit && rawContainsMarker && hasBracketedPasteFrame && unframedLineBreaks === 0
   }
@@ -381,8 +381,8 @@ async function fakeWorkerMain() {
     throw new Error('--fake-worker requires --report and --marker')
   }
 
-  process.stdout.write('\x1b]0;codex ready\x07')
-  process.stdout.write('fake codex ready\n> ')
+  process.stdout.write('\x1b]0;claude ready\x07')
+  process.stdout.write('fake claude ready\n> ')
   if (process.stdin.isTTY) {
     process.stdin.setRawMode(true)
   }
@@ -472,7 +472,7 @@ function fakeCoordinatorMain() {
 async function main() {
   if (hasFlag('help')) {
     console.log(`Usage:
-  node tests/tools/repro-orchestration-long-prompt.mjs [--mode codex-like|wire] [--size-kb 80]
+  node tests/tools/repro-orchestration-long-prompt.mjs [--mode claude-like|wire] [--size-kb 80]
 
 The parent mode requires a running Orca runtime and creates temporary Orca
 terminals. The fake worker records whether orchestration dispatch delivered a

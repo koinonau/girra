@@ -1515,26 +1515,18 @@
         },
         "general": {
           "search": {
-            "27d9b996ba": "codex",
-            "3c30fe2d51": "gemini",
             "41c2f9a025": "default",
-            "5baf51c4d9": "open claude",
-            "5d9ba08673": "copilot",
-            "5fdf1dc2d1": "omp",
             "8436ff6f8e": "Proxy Bypass Rules",
             "882c4896fd": "opencode",
             "8ea37a05bc": "agent",
             "9b0bc30160": "pi",
             "9da6c875e5": "dock",
-            "aea7d2cccb": "openclaude",
             "c29f23ab57": "HTTP Proxy",
-            "c61b14be7c": "grok",
             "db11502270": "Default Agent",
             "e2da948f59": "Pre-select an AI coding agent in the new-workspace composer.",
             "e3b1d42f95": "Proxy URL for Orca network requests and local terminal children.",
             "e55d62dfa4": "launchpad",
-            "eb8946b2c9": "Hosts that should bypass the configured HTTP proxy.",
-            "f472e97440": "aider"
+            "eb8946b2c9": "Hosts that should bypass the configured HTTP proxy."
           }
         },
         "integrations": {
@@ -1998,7 +1990,6 @@
           "0c74e7ff34": "Installed",
           "38e0951c3a": "Agent Skills",
           "39b6998ddb": "All providers",
-          "426be2aac6": "Codex",
           "4d177feabd": "Bundled",
           "571c5818c1": "Home",
           "7e828fb2c6": "Back",

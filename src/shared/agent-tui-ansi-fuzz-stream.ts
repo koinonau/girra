@@ -1,7 +1,7 @@
 // Seeded ANSI byte-stream generator for the terminal garble differential
 // fuzz suites (headless-emulator-fidelity.fuzz.test.ts and
 // hidden-reveal-reconciliation.fuzz.test.ts). The op mix models real agent
-// TUI output (Claude Code / Codex): CR status-line redraws, cursor-up panel
+// TUI output (Claude Code / OpenCode): CR status-line redraws, cursor-up panel
 // repaints, DEC 2026 synchronized frames, SGR color runs, wide CJK and ZWJ
 // emoji, wrapped long lines, alt-screen sessions, and scroll regions.
 //
@@ -68,7 +68,7 @@ const WIDE_RUNS = [
   '터미널 상태 확인',
   '進捗を表示中',
   '🟢 working',
-  '🤖 codex',
+  '🤖 opencode',
   '✅ done ✨',
   // ZWJ emoji join — the exact width divergence the Orca unicode provider
   // exists for (shared/terminal-unicode-provider.ts).

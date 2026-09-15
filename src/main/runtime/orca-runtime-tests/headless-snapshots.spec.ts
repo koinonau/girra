@@ -18,12 +18,12 @@ describe('OrcaRuntimeService', () => {
     const runtime = createRuntime()
     syncSinglePty(runtime, 'pty-1')
 
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07hello\n', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07hello\n', 100)
 
     const snapshot = await runtime.serializeMainTerminalBuffer('pty-1', { scrollbackRows: 1000 })
     expect(snapshot).toMatchObject({
       source: 'headless',
-      lastTitle: 'Codex working'
+      lastTitle: 'Claude working'
     })
   })
 
@@ -118,9 +118,9 @@ describe('OrcaRuntimeService', () => {
     const serializeBuffer = vi.fn(async (_ptyId: string, opts?: { scrollbackRows?: number }) => {
       const suppressesScrollback =
         (opts as Record<string, unknown> | undefined)?.altScreenForcesZeroRows === true
-      const scrollback = suppressesScrollback ? '' : 'PRE_CODEX_START\r\nAGENTS.md\r\n'
+      const scrollback = suppressesScrollback ? '' : 'PRE_AGENT_START\r\nAGENTS.md\r\n'
       return {
-        data: `${scrollback}\x1b[?1049h\x1b[HCodex TUI frame`,
+        data: `${scrollback}\x1b[?1049h\x1b[HClaude TUI frame`,
         cols: 80,
         rows: 24
       }
@@ -140,7 +140,7 @@ describe('OrcaRuntimeService', () => {
 
     const snapshot = await runtime.serializeMainTerminalBuffer('pty-1', { scrollbackRows: 1000 })
     const restored = `${snapshot?.scrollbackAnsi ?? ''}${snapshot?.data ?? ''}`
-    expect(restored).toContain('PRE_CODEX_START')
+    expect(restored).toContain('PRE_AGENT_START')
     expect(restored).toContain('AGENTS.md')
   })
 
@@ -150,7 +150,7 @@ describe('OrcaRuntimeService', () => {
       data: `renderer scrollback\nwrote ${artifactPath}\n`,
       cols: 100,
       rows: 30,
-      lastTitle: 'Renderer seeded Codex'
+      lastTitle: 'Renderer seeded Claude'
     })
     const runtime = createRuntime()
     runtime.setPtyController({
@@ -169,7 +169,7 @@ describe('OrcaRuntimeService', () => {
     const snapshot = await runtime.serializeMainTerminalBuffer('pty-1', { scrollbackRows: 1000 })
     expect(snapshot).toMatchObject({
       source: 'headless',
-      lastTitle: 'Renderer seeded Codex'
+      lastTitle: 'Renderer seeded Claude'
     })
     expect(serializeBuffer).toHaveBeenCalledWith('pty-1', {
       scrollbackRows: expect.any(Number)
@@ -586,7 +586,7 @@ describe('OrcaRuntimeService', () => {
 
     runtime.onPtyData(
       'pty-1',
-      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"codex"}\x07after',
+      'before\x1b]9999;{"state":"working","prompt":"ship it","agentType":"claude"}\x07after',
       123
     )
 
@@ -603,7 +603,7 @@ describe('OrcaRuntimeService', () => {
         payload: {
           state: 'working',
           prompt: 'ship it',
-          agentType: 'codex'
+          agentType: 'claude'
         }
       }
     ])
@@ -638,7 +638,7 @@ describe('OrcaRuntimeService', () => {
     })
     runtime.registerPty('pty-ssh', TEST_WORKTREE_ID, 'ssh-conn-1')
 
-    runtime.onPtyData('pty-ssh', '\x1b]9999;{"state":"working","agentType":"codex"}\x07', 123)
+    runtime.onPtyData('pty-ssh', '\x1b]9999;{"state":"working","agentType":"claude"}\x07', 123)
 
     expect(statuses).toEqual([
       expect.objectContaining({
@@ -647,7 +647,7 @@ describe('OrcaRuntimeService', () => {
         connectionId: 'ssh-conn-1',
         payload: expect.objectContaining({
           state: 'working',
-          agentType: 'codex'
+          agentType: 'claude'
         })
       })
     ])

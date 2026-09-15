@@ -34,7 +34,7 @@ function seedClosedLastTerminal(worktreeId: string): void {
 describe('activating a workspace whose last terminal was closed', () => {
   it.each([
     ['Blank Terminal', null, 1],
-    ['an agent', 'codex' as const, 0]
+    ['an agent', 'opencode' as const, 0]
   ])('seeds a default shell for %s selection only', (_label, agent, expectedTabCount) => {
     const worktree = makeWorktree()
     seedEmptyActivatableWorktree(worktree)
@@ -253,7 +253,7 @@ function seedEmptiedFolderWorkspaceOnTwoHosts(): void {
 describe('activating a folder workspace whose last terminal was closed', () => {
   it.each([
     ['Blank Terminal', null, 1],
-    ['an agent', 'codex' as const, 0]
+    ['an agent', 'opencode' as const, 0]
   ])('seeds a default shell for %s selection only', (_label, agent, expectedTabCount) => {
     seedEmptiedFolderWorkspaceOnTwoHosts()
 

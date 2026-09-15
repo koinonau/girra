@@ -15,7 +15,7 @@ describe('agent status freshness expiry', () => {
     const store = createTestStore()
     store
       .getState()
-      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'Fix tests', agentType: 'codex' })
+      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'Fix tests', agentType: 'opencode' })
 
     // setAgentStatus bumps epoch once synchronously
     expect(store.getState().agentStatusEpoch).toBe(1)
@@ -36,7 +36,7 @@ describe('agent status freshness expiry', () => {
     const store = createTestStore()
     store
       .getState()
-      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'Fix tests', agentType: 'codex' })
+      .setAgentStatus('tab-1:1', { state: 'working', prompt: 'Fix tests', agentType: 'opencode' })
     // set bumps to 1, remove bumps to 2
     store.getState().removeAgentStatus('tab-1:1')
     expect(store.getState().agentStatusEpoch).toBe(2)
@@ -88,7 +88,7 @@ describe('agent status routing attribution', () => {
       .getState()
       .setAgentStatus(
         'tab-child:11111111-1111-4111-8111-111111111111',
-        { state: 'working', prompt: 'child agent', agentType: 'codex' },
+        { state: 'working', prompt: 'child agent', agentType: 'opencode' },
         undefined,
         undefined,
         { tabId: 'tab-child', worktreeId: 'wt-1', terminalHandle: 'term-child' }

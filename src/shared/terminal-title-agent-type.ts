@@ -96,14 +96,10 @@ function computeAgentLabel(title: string): string | null {
   if (isPiAgentTitle(title)) {
     return 'Pi'
   }
-  // Why: Codex/OpenCode can also use braille spinner prefixes while
-  // working. Prefer explicit name matches before Claude's generic spinner
-  // heuristic so mixed-agent hovercards stay truthful. Token-match (not
-  // substring) so cwd/worktree titles like "opencode-blinker" don't mint a
-  // false agent identity.
-  if (titleHasAgentName(title, 'codex')) {
-    return 'Codex'
-  }
+  // Why: OpenCode can also use braille spinner prefixes while working. Prefer
+  // explicit name matches before Claude's generic spinner heuristic so
+  // mixed-agent hovercards stay truthful. Token-match (not substring) so
+  // cwd/worktree titles like "opencode-blinker" don't mint a false agent identity.
   if (titleHasAgentName(title, 'opencode')) {
     return 'OpenCode'
   }
@@ -120,7 +116,6 @@ export const getAgentLabel: (title: string) => string | null =
 
 const TITLE_LABEL_TO_AGENT: Partial<Record<string, TuiAgent>> = {
   'Claude Code': 'claude',
-  Codex: 'codex',
   OpenCode: 'opencode',
   Pi: 'pi'
 }

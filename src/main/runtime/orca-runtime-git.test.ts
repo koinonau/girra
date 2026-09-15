@@ -298,7 +298,7 @@ describe('RuntimeGitCommands', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({
@@ -309,7 +309,7 @@ describe('RuntimeGitCommands', () => {
       resolveRuntimeGitTarget: async () => localTarget(worktreePath),
       getRuntimeSettings: () =>
         ({
-          commitMessageAi: { enabled: true, agentId: 'codex' },
+          commitMessageAi: { enabled: true, agentId: 'opencode' },
           agentCmdOverrides: {}
         }) as GlobalSettings,
       getCommitMessageAgentEnvironment: () => ({})
@@ -322,7 +322,7 @@ describe('RuntimeGitCommands', () => {
 
     expect(mocks.resolveCommitMessageSettings).toHaveBeenCalledWith(
       expect.objectContaining({
-        commitMessageAi: { enabled: true, agentId: 'codex' }
+        commitMessageAi: { enabled: true, agentId: 'opencode' }
       }),
       'local',
       'commitMessage',
@@ -346,7 +346,7 @@ describe('RuntimeGitCommands', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini', thinkingLevel: 'low' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({
@@ -361,7 +361,7 @@ describe('RuntimeGitCommands', () => {
       }),
       getRuntimeSettings: () =>
         ({
-          commitMessageAi: { enabled: true, agentId: 'codex' },
+          commitMessageAi: { enabled: true, agentId: 'opencode' },
           agentCmdOverrides: {}
         }) as GlobalSettings,
       getCommitMessageAgentEnvironment: () => ({})
@@ -396,7 +396,7 @@ describe('RuntimeGitCommands', () => {
       stagedPatch: '+hello'
     }
     const sourceControlAiResolvedParams = {
-      agentId: 'codex' as const,
+      agentId: 'opencode' as const,
       model: 'gpt-5.5',
       thinkingLevel: 'high',
       customPrompt: 'Use Conventional Commits.'
@@ -413,7 +413,7 @@ describe('RuntimeGitCommands', () => {
           sourceControlAi: {
             commitMessage: {
               enabled: true,
-              agentId: 'cursor',
+              agentId: 'pi',
               customPrompt: 'Saved default that should not win.'
             }
           }
@@ -452,7 +452,7 @@ describe('RuntimeGitCommands', () => {
       currentDraft: false
     }
     const sourceControlAiResolvedParams = {
-      agentId: 'codex' as const,
+      agentId: 'opencode' as const,
       model: 'gpt-5.5',
       thinkingLevel: 'high',
       commandInputTemplate: '{basePrompt}\n\nUse release-note style.'
@@ -474,7 +474,7 @@ describe('RuntimeGitCommands', () => {
           sourceControlAi: {
             pullRequest: {
               enabled: true,
-              agentId: 'cursor',
+              agentId: 'pi',
               customPrompt: 'Saved default that should not win.'
             }
           }
@@ -524,7 +524,7 @@ describe('RuntimeGitCommands', () => {
       currentDraft: false
     }
     const sourceControlAiResolvedParams = {
-      agentId: 'codex' as const,
+      agentId: 'opencode' as const,
       model: 'gpt-5.5'
     }
     mocks.resolveHostedReviewBodyForGeneration.mockResolvedValue(templateBody)
@@ -578,7 +578,7 @@ describe('RuntimeGitCommands', () => {
       stagedSummary: 'M\tREADME.md',
       stagedPatch: '+hello'
     }
-    const params = { agentId: 'cursor', model: 'remote-model' }
+    const params = { agentId: 'pi', model: 'remote-model' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.generateCommitMessageFromContext.mockResolvedValue({
       success: true,
@@ -598,8 +598,8 @@ describe('RuntimeGitCommands', () => {
         ({
           commitMessageAi: {
             enabled: true,
-            agentId: 'cursor',
-            selectedModelByAgentByHost: { 'ssh:conn-1': { cursor: 'remote-model' } }
+            agentId: 'pi',
+            selectedModelByAgentByHost: { 'ssh:conn-1': { pi: 'remote-model' } }
           }
         }) as unknown as GlobalSettings
     })
@@ -629,7 +629,7 @@ describe('RuntimeGitCommands', () => {
     const worktreePath = mkdtempSync(join(tmpdir(), 'orca-runtime-git-'))
     tempDirs.push(worktreePath)
     const context = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({ success: true, message: 'docs' })
@@ -650,7 +650,7 @@ describe('RuntimeGitCommands', () => {
   it('enriches the SSH commit context with the workspace linked issue', async () => {
     const worktreePath = '/home/tester/wt'
     const context = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
-    const params = { agentId: 'cursor', model: 'remote-model' }
+    const params = { agentId: 'pi', model: 'remote-model' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.generateCommitMessageFromContext.mockResolvedValue({ success: true, message: 'docs' })
     mocks.getSshGitProvider.mockReturnValue({
@@ -678,7 +678,7 @@ describe('RuntimeGitCommands', () => {
     const worktreePath = mkdtempSync(join(tmpdir(), 'orca-runtime-git-'))
     tempDirs.push(worktreePath)
     const context = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({ success: true, message: 'docs' })
@@ -705,7 +705,7 @@ describe('RuntimeGitCommands', () => {
     const context = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
     mocks.resolveCommitMessageSettings.mockReturnValue({
       ok: true,
-      params: { agentId: 'codex', model: 'gpt-5.4-mini' }
+      params: { agentId: 'opencode', model: 'gpt-5.4-mini' }
     })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({ success: true, message: 'docs' })
@@ -726,7 +726,7 @@ describe('RuntimeGitCommands', () => {
     const worktreePath = mkdtempSync(join(tmpdir(), 'orca-runtime-git-'))
     tempDirs.push(worktreePath)
     const context = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({ success: true, message: 'docs' })
@@ -770,7 +770,7 @@ describe('RuntimeGitCommands', () => {
     await commands.generateRuntimePullRequestFields(
       'id:wt-1',
       { base: 'main', title: '', body: '', draft: false },
-      { sourceControlAiResolvedParams: { agentId: 'codex' as const, model: 'gpt-5.5' } }
+      { sourceControlAiResolvedParams: { agentId: 'opencode' as const, model: 'gpt-5.5' } }
     )
 
     expect(mocks.generatePullRequestFieldsFromContext.mock.calls[0][0]).toEqual({
@@ -783,7 +783,7 @@ describe('RuntimeGitCommands', () => {
     const worktreePath = mkdtempSync(join(tmpdir(), 'orca-runtime-git-'))
     tempDirs.push(worktreePath)
     const context = { branch: 'main', stagedSummary: 'M\tREADME.md', stagedPatch: '+hello' }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
     mocks.resolveCommitMessageSettings.mockReturnValue({ ok: true, params })
     mocks.getStagedCommitContext.mockResolvedValue(context)
     mocks.generateCommitMessageFromContext.mockResolvedValue({ success: true, message: 'docs' })
@@ -806,7 +806,7 @@ describe('RuntimeGitCommands', () => {
       currentBody: '',
       currentDraft: false
     }
-    const params = { agentId: 'codex' as const, model: 'gpt-5.5' }
+    const params = { agentId: 'opencode' as const, model: 'gpt-5.5' }
     mocks.generatePullRequestFieldsFromContext.mockResolvedValue({ success: true, fields: {} })
     mocks.getSshGitProvider.mockReturnValue({
       exec: vi.fn(),
@@ -855,7 +855,7 @@ describe('RuntimeGitCommands', () => {
       currentBody: '',
       currentDraft: false
     }
-    const params = { agentId: 'codex' as const, model: 'gpt-5.5' }
+    const params = { agentId: 'opencode' as const, model: 'gpt-5.5' }
     mocks.getPullRequestDraftContext.mockResolvedValue(context)
     mocks.generatePullRequestFieldsFromContext.mockResolvedValue({ success: true, fields: {} })
 

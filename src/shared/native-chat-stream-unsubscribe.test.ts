@@ -10,9 +10,9 @@ describe('native-chat stream unsubscribe key builder', () => {
   })
 
   it('builds the unsubscribe RPC frame mobile and web share', () => {
-    expect(buildNativeChatUnsubscribe('codex', 'abc')).toEqual({
+    expect(buildNativeChatUnsubscribe('opencode', 'abc')).toEqual({
       method: 'nativeChat.unsubscribe',
-      params: { subscriptionId: 'codex:abc' }
+      params: { subscriptionId: 'opencode:abc' }
     })
   })
 

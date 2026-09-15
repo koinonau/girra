@@ -46,7 +46,7 @@ function renderForm(
       baseCommandInput: 'Resolve the merge conflicts reported for this pull request.',
       agentScopeNote: null,
       agentOptions: [],
-      selectedAgent: 'codex',
+      selectedAgent: 'opencode',
       hasEnabledAgents: true,
       detecting: false,
       statusCopy: null,
@@ -82,14 +82,14 @@ function settingsWithSavedGlobalRecipe(): GlobalSettings {
   return {
     sourceControlAi: {
       enabled: true,
-      agentId: 'codex',
+      agentId: 'opencode',
       selectedModelByAgent: {},
       selectedThinkingByModel: {},
       customAgentCommand: '',
       instructionsByOperation: {},
       actions: {
         resolveConflicts: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}'
         }
       }
@@ -138,11 +138,11 @@ describe('SourceControlAgentActionDialogForm', () => {
 
   it('surfaces a diverging repo override alongside the save controls', () => {
     const markup = renderForm({
-      agentScopeNote: { effectiveAgentLabel: 'Codex', globalAgentLabel: 'Claude' }
+      agentScopeNote: { effectiveAgentLabel: 'OpenCode', globalAgentLabel: 'Claude' }
     })
 
     expect(markup).toContain('overrides your global default (Claude)')
-    expect(markup).toContain('currently runs Codex')
+    expect(markup).toContain('currently runs OpenCode')
   })
 
   it('omits the scope note when there is no diverging repo override', () => {
@@ -153,7 +153,7 @@ describe('SourceControlAgentActionDialogForm', () => {
 
   it('omits the scope note when the save controls are hidden', () => {
     const markup = renderForm({
-      agentScopeNote: { effectiveAgentLabel: 'Codex', globalAgentLabel: 'Claude' },
+      agentScopeNote: { effectiveAgentLabel: 'OpenCode', globalAgentLabel: 'Claude' },
       canSaveAgentDefault: false
     })
 

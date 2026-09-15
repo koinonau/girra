@@ -327,7 +327,7 @@ export default function AgentCombobox({
               onKeyDown={handleTriggerKeyDown}
               className={cn(
                 // Why: callers sometimes pass `min-w-0` for grid layouts, but
-                // the compact trigger still needs room for "GitHub Copilot".
+                // the compact trigger still needs room for "Claude Agent Teams".
                 // py-0 clears the default size's py-2 so icon+label center in h-8/h-9.
                 'h-8 justify-between px-3 py-0 text-xs font-normal',
                 triggerClassName,

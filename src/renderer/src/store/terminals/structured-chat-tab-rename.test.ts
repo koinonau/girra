@@ -7,12 +7,12 @@ vi.mock('sonner', () => ({
 }))
 
 const WORKTREE = 'local-repo::/tmp/app'
-const STRUCTURED_TAB_ID = 'structured-agent-session-codex-1'
+const STRUCTURED_TAB_ID = 'structured-agent-session-claude-1'
 
 function structuredTab(): Tab {
   return {
     id: STRUCTURED_TAB_ID,
-    entityId: 'codex-1',
+    entityId: 'claude-1',
     groupId: 'group-1',
     worktreeId: WORKTREE,
     contentType: 'agent-session',

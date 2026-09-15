@@ -48,7 +48,7 @@ describe('orca CLI skill guidance', () => {
     expect(skill).toContain('Never base it on the current feature branch')
   })
 
-  it('documents non-lifecycle full handoffs and custom Codex model fallback', () => {
+  it('documents non-lifecycle full handoffs and custom Claude model fallback', () => {
     const skill = readSkill()
 
     for (const phrase of [
@@ -68,9 +68,9 @@ describe('orca CLI skill guidance', () => {
       '`task-create` is also forbidden because it records coordinator-owned tracking state'
     )
     expect(skill).toContain(
-      'ORCA worktree create --name <task-name> --no-parent --agent codex --prompt'
+      'ORCA worktree create --name <task-name> --no-parent --agent claude --prompt'
     )
-    expect(skill).toContain('codex --model gpt-6-astra -c model_reasoning_effort="xhigh"')
+    expect(skill).toContain('claude --model opus --effort xhigh')
     expect(skill).toContain('wait for TUI readiness')
     expect(skill).toContain('stop after confirming the send was accepted')
     // `terminal wait` prints an ordinary success envelope on timeout and only signals the

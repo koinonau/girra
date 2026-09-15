@@ -21,7 +21,7 @@ describe('isStatusBarItemAvailable', () => {
 
   it('hides CLI items not detected on PATH', () => {
     expect(isStatusBarItemAvailable('claude', [])).toBe(false)
-    expect(isStatusBarItemAvailable('claude', ['codex'])).toBe(false)
+    expect(isStatusBarItemAvailable('claude', ['opencode'])).toBe(false)
   })
 
   it('shows CLI items detected on PATH', () => {

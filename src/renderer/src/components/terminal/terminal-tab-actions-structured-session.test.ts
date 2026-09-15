@@ -46,7 +46,7 @@ describe('structured session disposal from terminal close', () => {
           {
             entityId: 'terminal-1',
             contentType: 'terminal',
-            structuredSessionId: 'codex-adopted-1',
+            structuredSessionId: 'opencode-adopted-1',
             viewMode: 'chat'
           }
         ]
@@ -64,7 +64,7 @@ describe('structured session disposal from terminal close', () => {
     await vi.waitFor(() =>
       expect(mocks.closeStructuredAgentSession).toHaveBeenCalledWith(
         { kind: 'local' },
-        'codex-adopted-1'
+        'opencode-adopted-1'
       )
     )
   })
@@ -78,7 +78,7 @@ describe('structured session disposal from terminal close', () => {
           {
             entityId: 'terminal-1',
             contentType: 'terminal',
-            structuredSessionId: 'codex-adopted-1',
+            structuredSessionId: 'opencode-adopted-1',
             viewMode: 'chat'
           }
         ]
@@ -110,7 +110,7 @@ describe('structured session disposal from terminal close', () => {
             {
               entityId: 'terminal-1',
               contentType: 'terminal',
-              structuredSessionId: 'codex-adopted-1',
+              structuredSessionId: 'opencode-adopted-1',
               viewMode: 'chat'
             }
           ]

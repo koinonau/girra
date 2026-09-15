@@ -81,7 +81,7 @@ function getManagedScript(
       'if not "%CLAUDE_JOB_DIR%"=="" exit /b 0',
       ...(options.skipWhenDevinImportsClaude
         ? [
-            // Why: Devin imports .claude hooks by default; skip Orca's managed hook there so status posts stay attributed to Devin.
+            // Why: Devin imports .claude hooks by default; skip there so a Devin run never posts as Claude.
             `if not "%DEVIN_PROJECT_DIR%"=="" goto :${WINDOWS_HOOK_STDIN_DRAIN_LABEL}`
           ]
         : []),
@@ -101,7 +101,7 @@ function getManagedScript(
     ...buildPosixHookSpoolLines('claude'),
     ...(options.skipWhenDevinImportsClaude
       ? [
-          // Why: Devin imports .claude hooks by default; skip Orca's managed hook there so status posts stay attributed to Devin.
+          // Why: Devin imports .claude hooks by default; skip there so a Devin run never posts as Claude.
           'if [ -n "$DEVIN_PROJECT_DIR" ]; then',
           '  exit 0',
           'fi'

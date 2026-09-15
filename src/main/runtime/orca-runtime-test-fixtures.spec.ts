@@ -40,7 +40,7 @@ function syncSinglePty(
       {
         tabId: 'tab-1',
         worktreeId: TEST_WORKTREE_ID,
-        title: options.tabTitle ?? 'Codex',
+        title: options.tabTitle ?? 'Claude',
         activeLeafId: 'pane:1',
         layout: null
       }
@@ -427,7 +427,7 @@ async function createExplicitAgentStatusHarness(options: {
         paneKey,
         state: 'working',
         prompt: '',
-        agentType: 'codex',
+        agentType: 'claude',
         connectionId: null,
         receivedAt: Date.now(),
         stateStartedAt: Date.now(),

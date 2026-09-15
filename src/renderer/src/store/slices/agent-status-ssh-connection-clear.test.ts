@@ -28,7 +28,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
         .getState()
         .setAgentStatus(
           paneKey,
-          { state: 'working', prompt: paneKey, agentType: 'codex' },
+          { state: 'working', prompt: paneKey, agentType: 'opencode' },
           undefined,
           { updatedAt },
           { connectionId }
@@ -46,7 +46,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         local,
-        { state: 'working', prompt: 'local', agentType: 'codex' },
+        { state: 'working', prompt: 'local', agentType: 'opencode' },
         undefined,
         { updatedAt: 6 },
         { connectionId: null }
@@ -54,7 +54,11 @@ describe('agent status cleanup for a lost SSH connection', () => {
     store.setState({
       agentLaunchConfigByPaneKey: {
         [oldA]: {
-          launchConfig: { agentCommand: 'codex', agentArgs: '--full-auto', agentEnv: {} },
+          launchConfig: {
+            agentCommand: 'opencode',
+            agentArgs: '--model anthropic/claude-sonnet-4-5',
+            agentEnv: {}
+          },
           registeredAt: 1,
           identity: {}
         }
@@ -121,7 +125,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         orphanA,
-        { state: 'working', prompt: 'orphan', agentType: 'codex' },
+        { state: 'working', prompt: 'orphan', agentType: 'opencode' },
         undefined,
         { updatedAt: 10 },
         { worktreeId: 'wt-a' }
@@ -131,7 +135,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         freshOrphanA,
-        { state: 'working', prompt: 'fresh', agentType: 'codex' },
+        { state: 'working', prompt: 'fresh', agentType: 'opencode' },
         undefined,
         { updatedAt: 40 },
         { worktreeId: 'wt-a' }
@@ -141,7 +145,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         otherHostB,
-        { state: 'working', prompt: 'other host', agentType: 'codex' },
+        { state: 'working', prompt: 'other host', agentType: 'opencode' },
         undefined,
         { updatedAt: 10 },
         { worktreeId: 'wt-b' }
@@ -192,7 +196,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         orphanA,
-        { state: 'working', prompt: 'orphan', agentType: 'codex' },
+        { state: 'working', prompt: 'orphan', agentType: 'opencode' },
         undefined,
         { updatedAt: 10 },
         { worktreeId: 'wt-a' }
@@ -201,7 +205,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         liveB,
-        { state: 'working', prompt: 'live b', agentType: 'codex' },
+        { state: 'working', prompt: 'live b', agentType: 'opencode' },
         undefined,
         { updatedAt: 10 },
         { worktreeId: 'wt-b' }
@@ -253,7 +257,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         liveOnB,
-        { state: 'working', prompt: 'live b', agentType: 'codex' },
+        { state: 'working', prompt: 'live b', agentType: 'opencode' },
         undefined,
         { updatedAt: 10 },
         { connectionId: 'ssh-b', worktreeId: 'shared::/p' }
@@ -263,7 +267,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         collidedOrphan,
-        { state: 'working', prompt: 'ambiguous', agentType: 'codex' },
+        { state: 'working', prompt: 'ambiguous', agentType: 'opencode' },
         undefined,
         { updatedAt: 10 },
         { worktreeId: 'shared::/p' }
@@ -282,7 +286,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'first', agentType: 'codex' },
+        { state: 'working', prompt: 'first', agentType: 'opencode' },
         undefined,
         { updatedAt: 1 },
         { connectionId: 'ssh-a' }
@@ -291,7 +295,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'ping', agentType: 'codex' },
+        { state: 'working', prompt: 'ping', agentType: 'opencode' },
         undefined,
         { updatedAt: 2 }
       )
@@ -329,7 +333,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'host a', agentType: 'codex' },
+        { state: 'working', prompt: 'host a', agentType: 'opencode' },
         undefined,
         { updatedAt: 1 },
         { connectionId: 'ssh-a' }
@@ -338,7 +342,7 @@ describe('agent status cleanup for a lost SSH connection', () => {
       .getState()
       .setAgentStatus(
         paneKey,
-        { state: 'working', prompt: 'host b', agentType: 'codex' },
+        { state: 'working', prompt: 'host b', agentType: 'opencode' },
         undefined,
         { updatedAt: 2 },
         { connectionId: 'ssh-b' }

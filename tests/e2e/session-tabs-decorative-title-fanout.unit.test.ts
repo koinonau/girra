@@ -275,7 +275,7 @@ describe('real PTY decorative session-tabs fanout', () => {
 
   it.each([
     ['build ⠁', 'build ⠂'],
-    ['Codex working task ⠁', 'Codex working task ⠂']
+    ['Claude Code working task ⠁', 'Claude Code working task ⠂']
   ])('publishes meaningful real-title changes from %j to %j', (firstTitle, secondTitle) => {
     const runtime = new OrcaRuntimeService()
     seedWorktree(runtime, 0)
@@ -681,7 +681,7 @@ describe('real PTY decorative session-tabs fanout', () => {
 
     runtime.onPtyData(
       ptyId,
-      '\x1b]9999;{"state":"working","prompt":"retained work","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"working","prompt":"retained work","agentType":"claude"}\x07',
       Date.now()
     )
     vi.advanceTimersByTime(50)
@@ -693,7 +693,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     publications.length = 0
 
     vi.advanceTimersByTime(10)
-    runtime.onPtyData(ptyId, '\x1b]0;⠋ Codex working\x07', Date.now())
+    runtime.onPtyData(ptyId, '\x1b]0;⠋ Claude Code\x07', Date.now())
     vi.advanceTimersByTime(50)
     expect(publications).toHaveLength(1)
     const titledTerminal = publications[0]?.tabs[0]
@@ -704,7 +704,7 @@ describe('real PTY decorative session-tabs fanout', () => {
     publications.length = 0
 
     vi.advanceTimersByTime(SESSION_TABS_AGENT_STATUS_HEARTBEAT_INTERVAL_MS)
-    runtime.onPtyData(ptyId, '\x1b]0;⠙ Codex working\x07', Date.now())
+    runtime.onPtyData(ptyId, '\x1b]0;⠙ Claude Code\x07', Date.now())
     vi.advanceTimersByTime(50)
 
     expect(publications).toHaveLength(1)
@@ -718,7 +718,7 @@ describe('real PTY decorative session-tabs fanout', () => {
 
     publications.length = 0
     vi.advanceTimersByTime(SESSION_TABS_AGENT_STATUS_HEARTBEAT_INTERVAL_MS)
-    runtime.onPtyData(ptyId, '\x1b]0;⠹ Codex working\x07', Date.now())
+    runtime.onPtyData(ptyId, '\x1b]0;⠹ Claude Code\x07', Date.now())
     vi.advanceTimersByTime(50)
 
     expect(publications).toHaveLength(1)

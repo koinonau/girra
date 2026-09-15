@@ -5,7 +5,7 @@ export const BUBBLE_GAP_MS = 3400
 export const ORCHESTRATION_CLI_COMMAND_TIMINGS_MS = [250, 2500, 5200, 8600] as const
 export const ORCHESTRATION_CLI_COMMAND_LOOP_MS = 12800
 
-export type AgentKey = 'coord-claude' | 'child-codex' | 'child-claude'
+export type AgentKey = 'coord-claude' | 'child-opencode' | 'child-claude'
 
 export type Beat = {
   from: AgentKey
@@ -21,7 +21,7 @@ export type Beat = {
 export const PHASE1_BEATS: readonly Beat[] = [
   {
     from: 'coord-claude',
-    to: 'child-codex',
+    to: 'child-opencode',
     recipientMsg: 'Adding the email_verified column…'
   },
   {
@@ -30,7 +30,7 @@ export const PHASE1_BEATS: readonly Beat[] = [
     recipientMsg: 'Wiring withSession middleware…'
   },
   {
-    from: 'child-codex',
+    from: 'child-opencode',
     to: 'coord-claude',
     coordMsg: 'PR 1/2 ready',
     senderFinishes: true
@@ -44,7 +44,7 @@ export const PHASE1_BEATS: readonly Beat[] = [
 ]
 
 export const COORD_INITIAL_MSG = 'Splitting auth rewrite into 2 PRs…'
-export const CHILD_CODEX_INITIAL_MSG = 'Writing the users table migration…'
+export const CHILD_OPENCODE_INITIAL_MSG = 'Writing the users table migration…'
 export const CHILD_CLAUDE_INITIAL_MSG = 'Sketching withSession middleware…'
 
 export type AgentRowState = 'working' | 'done'
@@ -56,12 +56,12 @@ export type RowPending = Partial<Record<AgentKey, boolean>>
 
 export const INITIAL_ROW_STATE: RowState = {
   'coord-claude': 'working',
-  'child-codex': 'working',
+  'child-opencode': 'working',
   'child-claude': 'working'
 }
 
 export const INITIAL_ROW_MESSAGES: RowMessages = {
   'coord-claude': COORD_INITIAL_MSG,
-  'child-codex': CHILD_CODEX_INITIAL_MSG,
+  'child-opencode': CHILD_OPENCODE_INITIAL_MSG,
   'child-claude': CHILD_CLAUDE_INITIAL_MSG
 }

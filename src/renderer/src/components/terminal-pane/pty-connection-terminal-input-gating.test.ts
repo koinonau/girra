@@ -170,7 +170,7 @@ describe('connectPanePty', () => {
             prompt: 'locked input',
             updatedAt: 1_000,
             stateStartedAt: 900,
-            agentType: 'codex',
+            agentType: 'opencode',
             stateHistory: []
           }
         }
@@ -303,7 +303,7 @@ describe('connectPanePty', () => {
       prompt: 'disconnected input',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       stateHistory: []
     }
 
@@ -344,7 +344,7 @@ describe('connectPanePty', () => {
       prompt: 'mobile race input',
       updatedAt: 1_000,
       stateStartedAt: 900,
-      agentType: 'codex',
+      agentType: 'opencode',
       stateHistory: []
     }
 

@@ -49,7 +49,7 @@ describe('showOsc52ClipboardBlockedToast', () => {
 
     showOsc52ClipboardBlockedToast()
 
-    expect(toastInfoMock.mock.calls[0]?.[1]?.description).toContain('Grok')
+    expect(toastInfoMock.mock.calls[0]?.[1]?.description).toContain('Zellij')
     const options = toastInfoMock.mock.calls[0]?.[1]
     expect(options).toMatchObject({
       action: {
@@ -92,7 +92,7 @@ describe('showOsc52ClipboardBlockedToast', () => {
     expect(toastInfoMock).toHaveBeenCalledTimes(2)
   })
 
-  it('mentions Grok and Zellij in every supported locale', () => {
+  it('mentions Zellij and fzf in every supported locale', () => {
     // Why assert the catalog, not the code fallback: en.json is bundled as the
     // `en` resource, so a catalog value silently wins over translate()'s fallback.
     const locales = [en, es, ja, ko, zh]
@@ -100,8 +100,8 @@ describe('showOsc52ClipboardBlockedToast', () => {
     for (const locale of locales) {
       const description =
         locale.auto.components.terminal.pane.osc52.clipboard.blocked.toast['7cf51f74fd']
-      expect(description).toContain('Grok')
       expect(description).toContain('Zellij')
+      expect(description).toContain('fzf')
     }
   })
 })

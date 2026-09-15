@@ -45,7 +45,7 @@ describe('shouldEmitTitleFactForFrame', () => {
   })
 
   it('keeps at least three frames inside the renderer hook-done quiet window', () => {
-    // Why: observeTitle's arriving working title is what cancels a Pi/OMP milestone `done`
+    // Why: observeTitle's arriving working title is what cancels a Pi milestone `done`
     // scheduled with HOOK_DONE_QUIET_MS = 1500. Losing that would mint a false completion.
     expect(DECORATIVE_TITLE_FACT_HEARTBEAT_MS * 3).toBeLessThanOrEqual(1_500)
   })

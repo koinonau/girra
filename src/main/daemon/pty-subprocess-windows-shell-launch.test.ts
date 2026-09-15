@@ -250,7 +250,7 @@ describe('createPtySubprocess', () => {
         rows: 24,
         cwd: 'C:\\repo\\orca',
         shellOverride: 'powershell.exe',
-        command: "& 'codex' '--no-alt-screen'"
+        command: "& 'opencode' '--print-logs'"
       })
     } finally {
       if (platform) {
@@ -261,7 +261,7 @@ describe('createPtySubprocess', () => {
     const lastCall = spawnMock.mock.calls.at(-1)!
     const encoded = String(lastCall[1][3])
     const command = Buffer.from(encoded, 'base64').toString('utf16le')
-    expect(command.trimEnd().endsWith("& 'codex' '--no-alt-screen'")).toBe(true)
+    expect(command.trimEnd().endsWith("& 'opencode' '--print-logs'")).toBe(true)
     expect(handle!.startupCommandDeliveredInShellArgs).toBe(true)
   })
 
@@ -280,7 +280,7 @@ describe('createPtySubprocess', () => {
         rows: 24,
         cwd: 'C:\\repo\\orca',
         shellOverride: 'cmd.exe',
-        command: `codex ${'x'.repeat(7000)}`
+        command: `opencode ${'x'.repeat(7000)}`
       })
     } finally {
       if (platform) {

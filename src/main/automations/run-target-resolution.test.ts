@@ -60,7 +60,7 @@ function makeAutomation(
     name: 'Nightly',
     prompt: 'Run checks',
     precheck: null,
-    agentId: 'codex',
+    agentId: 'opencode',
     projectId: 'repo-1',
     executionTargetType: 'local',
     executionTargetId: 'local',

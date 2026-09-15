@@ -255,7 +255,7 @@ describe('orchestration compatibility runtime authority', () => {
       {
         paneKey: PANE_KEY,
         launchToken: TOKEN,
-        payload: { state: 'working', prompt: 'coordinate', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'coordinate', agentType: 'claude' }
       },
       'saved-target'
     )
@@ -307,7 +307,7 @@ describe('orchestration compatibility runtime authority', () => {
       {
         paneKey: '33333333-3333-4333-8333-333333333333:44444444-4444-4444-8444-444444444444',
         launchToken: TOKEN,
-        payload: { state: 'working', prompt: 'duplicate', agentType: 'codex' }
+        payload: { state: 'working', prompt: 'duplicate', agentType: 'claude' }
       },
       'saved-target'
     )

@@ -343,7 +343,7 @@ describe('terminal recovery session-tabs snapshot validation', () => {
   // Wire-compat Rule 3: a newer host may publish labels this client has never seen. Rejecting the
   // whole snapshot would stall recovery forever; recovery reads none of these, so they pass through.
   it.each([
-    ['tabs.4.agent', 'gemini'],
+    ['tabs.4.agent', 'future-agent'],
     ['tabs.0.agentStatus.state', 'future-state'],
     ['tabs.0.agentStatus', { state: 'working' }],
     ['tabs.0.viewMode', 'future-view'],

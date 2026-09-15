@@ -81,7 +81,7 @@ function createRuntime(
     tabId: TAB_ID,
     leafId: LEAF_ID,
     incarnationId: 'sta-4325-incarnation',
-    agentLaunchAuthority: { launchToken: LAUNCH_TOKEN, launchAgent: 'codex' }
+    agentLaunchAuthority: { launchToken: LAUNCH_TOKEN, launchAgent: 'claude' }
   })
   runtime.registerPreAllocatedHandleForPty(PTY_ID, terminalHandle)
   runtime.attachWindow(1)
@@ -90,7 +90,7 @@ function createRuntime(
       {
         tabId: TAB_ID,
         worktreeId: WORKTREE_ID,
-        title: 'Codex',
+        title: 'Claude',
         activeLeafId: LEAF_ID,
         layout: null
       }
@@ -110,8 +110,8 @@ function createRuntime(
 
 async function driveToLiveIdle(runtime: OrcaRuntimeService): Promise<void> {
   await runtime.listTerminals()
-  const working = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Codex working\x07', 1)
-  const done = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Codex done\x07', 2)
+  const working = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Claude working\x07', 1)
+  const done = runtime.acceptPtyDataBounded(PTY_ID, '\x1b]0;Claude done\x07', 2)
   await Promise.all([working.completion, done.completion])
 }
 

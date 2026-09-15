@@ -31,7 +31,7 @@ const TICKS = Math.floor((WINDOW_SECONDS * 1000) / ACTIVE_POLL_INTERVAL_MS)
 const shellPid = (pane: number): number => 100 + pane * 1000
 
 // A snapshot returns the whole system, so one shared scan must contain every
-// pane's shell + foreground node/codex child. Each pane resolves its own
+// pane's shell + foreground node/opencode child. Each pane resolves its own
 // descendant from the single scan.
 const NATIVE_ROWS = Array.from({ length: PANE_COUNT }, (_, pane) => {
   const shell = shellPid(pane)
@@ -46,7 +46,7 @@ const NATIVE_ROWS = Array.from({ length: PANE_COUNT }, (_, pane) => {
       pid: shell + 1,
       ppid: shell,
       name: 'node.exe',
-      commandLine: 'node C:/Users/dev/AppData/codex/bin/codex.js'
+      commandLine: 'node C:/Users/dev/AppData/opencode/bin/opencode.js'
     }
   ]
 }).flat()

@@ -16,7 +16,7 @@ describe('source-control AI launch action defaults', () => {
     expect(
       normalizeSourceControlAiActionDefaults({
         fixChecks: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '  {basePrompt}  ',
           agentArgs: '  --model gpt-5.5  '
         },
@@ -28,7 +28,7 @@ describe('source-control AI launch action defaults', () => {
       })
     ).toEqual({
       fixChecks: {
-        agentId: 'codex',
+        agentId: 'opencode',
         commandInputTemplate: '  {basePrompt}  ',
         agentArgs: '  --model gpt-5.5  '
       },
@@ -43,9 +43,9 @@ describe('source-control AI launch action defaults', () => {
   it('rejects unsafe prototype keys and invalid agent ids', () => {
     expect(
       normalizeSourceControlAiActionDefaults({
-        __proto__: { agentId: 'codex' },
-        constructor: { agentId: 'codex' },
-        prototype: { agentId: 'codex' },
+        __proto__: { agentId: 'opencode' },
+        constructor: { agentId: 'opencode' },
+        prototype: { agentId: 'opencode' },
         fixCommitFailure: { agentId: 'not-real', commandInputTemplate: 42 }
       })
     ).toBeUndefined()
@@ -109,12 +109,12 @@ describe('source-control AI launch action defaults', () => {
   it('sets agent defaults without dropping neighboring action defaults', () => {
     expect(
       setSourceControlActionAgentDefault(
-        { fixChecks: { agentId: 'codex' } },
+        { fixChecks: { agentId: 'opencode' } },
         'resolveConflicts',
         'claude'
       )
     ).toEqual({
-      fixChecks: { agentId: 'codex' },
+      fixChecks: { agentId: 'opencode' },
       resolveConflicts: { agentId: 'claude' }
     })
   })
@@ -139,14 +139,14 @@ describe('source-control AI launch action defaults', () => {
     expect(
       normalizeSourceControlAiActionDefaults({
         fixPushFailure: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model gpt-5.4-mini'
         }
       })
     ).toEqual({
       fixPushFailure: {
-        agentId: 'codex',
+        agentId: 'opencode',
         commandInputTemplate: '{basePrompt}',
         agentArgs: '--model gpt-5.4-mini'
       }

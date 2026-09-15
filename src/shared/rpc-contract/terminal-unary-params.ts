@@ -161,7 +161,11 @@ export const TerminalCreateParams = z.object({
     })
     .optional(),
   launchToken: OptionalString,
-  launchAgent: z.string().refine(isTuiAgent).optional(),
+  // Why: older clients may name a retired agent; open the terminal without that launch identity.
+  launchAgent: z
+    .unknown()
+    .transform((value) => (isTuiAgent(value) ? value : undefined))
+    .optional(),
   terminalColorQueryReplies: z
     .object({
       foreground: z.string().max(128).optional(),

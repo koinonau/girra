@@ -16,7 +16,7 @@ export function configureFederationWorkerRuntime(runtime: OrcaRuntimeService): v
   } as never)
   vi.spyOn(runtime, 'listTerminals').mockResolvedValue({
     terminals: [
-      { handle: 'term_windows_worker', title: 'Codex' },
+      { handle: 'term_windows_worker', title: 'Claude Code' },
       { handle: 'term_windows_setup', title: 'Setup' }
     ],
     totalCount: 2,

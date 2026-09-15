@@ -1,8 +1,6 @@
 import { resolvePaneTitleDecision } from '../terminal-title-evidence'
 import { useAppStore } from '@/store'
 import { shouldSeedCacheTimerOnInitialTitle } from '../cache-timer-seeding'
-import { resolveCompatibleAgentTypeForOwner } from '../../../../../shared/agent-title-owner'
-import { rendererAgentStatusObservations } from '@/lib/renderer-agent-status-observations'
 
 import type { ConnectPanePtySession } from './connect-pane-pty-session'
 
@@ -60,39 +58,6 @@ export function installTitleSpawnBell(session: ConnectPanePtySession): void {
         session.deps.setCacheTimerStartedAt(session.cacheKey, Date.now())
       }
     }
-  }
-
-  session.applyInitialAgentStatus = (terminalTitle?: string): void => {
-    const initialStatus = session.paneStartup?.initialAgentStatus
-    const routing = session.resolveCurrentAgentStatusRouting()
-    if (!initialStatus || !routing) {
-      return
-    }
-    const statusPayload = {
-      state: 'working' as const,
-      prompt: initialStatus.prompt,
-      agentType: resolveCompatibleAgentTypeForOwner(
-        initialStatus.agent,
-        session.getAuthoritativePaneAgent()
-      ),
-      observation: rendererAgentStatusObservations.observe(session.cacheKey, {
-        origin: 'launch',
-        observedAt: Date.now(),
-        kind: 'transition'
-      })
-    }
-    if (session.paneStartup.launchConfig) {
-      useAppStore
-        .getState()
-        .setAgentStatus(session.cacheKey, statusPayload, terminalTitle, undefined, routing, {
-          launchConfig: session.paneStartup.launchConfig,
-          ...(session.launchToken ? { launchToken: session.launchToken } : {})
-        })
-      return
-    }
-    useAppStore
-      .getState()
-      .setAgentStatus(session.cacheKey, statusPayload, terminalTitle, undefined, routing)
   }
 
   installPanePtyVisibilityBind(session)

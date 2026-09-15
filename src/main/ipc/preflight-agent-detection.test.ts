@@ -143,20 +143,20 @@ describe('preflight', () => {
           timedOut: false
         }
       }
-      if (target === 'continue') {
+      if (target === 'pi') {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: 'continue: shell built-in command\n',
+          stdout: 'pi: shell built-in command\n',
           stderr: '',
           timedOut: false
         }
       }
-      if (target === 'cursor-agent') {
+      if (target === 'opencode') {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '/Users/test/.local/bin/cursor-agent\n',
+          stdout: '/Users/test/.local/bin/opencode\n',
           stderr: '',
           timedOut: false
         }
@@ -164,7 +164,7 @@ describe('preflight', () => {
       throw new Error('not found')
     })
 
-    await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'cursor'])
+    await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'opencode'])
   })
 
   it('does not report Claude Agent Teams when only the Orca shim is present', async () => {
@@ -265,8 +265,8 @@ describe('preflight', () => {
             if (cmd === 'claude') {
               return [cmd, '/Users/test/.local/bin/claude']
             }
-            if (cmd === 'codex') {
-              return [cmd, '/Users/test/.asdf/shims/codex']
+            if (cmd === 'pi') {
+              return [cmd, '/Users/test/.asdf/shims/pi']
             }
             if (cmd === 'opencode') {
               return [cmd, '/Users/test/Library/pnpm/opencode']
@@ -276,7 +276,7 @@ describe('preflight', () => {
         )
     )
 
-    await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'codex', 'opencode'])
+    await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'opencode', 'pi'])
     expect(resolveCliCommandsMock).toHaveBeenCalledTimes(1)
   })
 
@@ -326,20 +326,20 @@ describe('preflight', () => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
       }
-      if (String(args[0]) === 'openclaude') {
+      if (String(args[0]) === 'opencode') {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '/Users/test/.local/bin/openclaude\n',
+          stdout: '/Users/test/.local/bin/opencode\n',
           stderr: '',
           timedOut: false
         }
       }
-      if (String(args[0]) === 'cursor-agent') {
+      if (String(args[0]) === 'pi') {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '/Users/test/.local/bin/cursor-agent\n',
+          stdout: '/Users/test/.local/bin/pi\n',
           stderr: '',
           timedOut: false
         }
@@ -349,7 +349,7 @@ describe('preflight', () => {
 
     registerPreflightHandlers()
 
-    await expect(handlers['preflight:detectAgents']()).resolves.toEqual(['openclaude', 'cursor'])
+    await expect(handlers['preflight:detectAgents']()).resolves.toEqual(['opencode', 'pi'])
   })
 
   it('hydrates shell PATH before user-facing agent detection', async () => {
@@ -368,11 +368,11 @@ describe('preflight', () => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
       }
-      if (String(args[0]) === 'codex' && process.env.PATH?.startsWith('/home/test/.local/bin')) {
+      if (String(args[0]) === 'opencode' && process.env.PATH?.startsWith('/home/test/.local/bin')) {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '/home/test/.local/bin/codex\n',
+          stdout: '/home/test/.local/bin/opencode\n',
           stderr: '',
           timedOut: false
         }
@@ -381,7 +381,7 @@ describe('preflight', () => {
     })
 
     try {
-      await expect(detectInstalledAgentsWithShellPathHydration()).resolves.toEqual(['codex'])
+      await expect(detectInstalledAgentsWithShellPathHydration()).resolves.toEqual(['opencode'])
     } finally {
       if (originalPath === undefined) {
         delete process.env.PATH
@@ -441,16 +441,16 @@ describe('preflight', () => {
     await expect(detectInstalledAgents({ wslDistro: 'Ubuntu' })).resolves.toEqual(['claude'])
   })
 
-  it('detects Mistral Vibe from the installed vibe executable', async () => {
+  it('detects Claude Agent Teams from an alias Orca executable', async () => {
     execFileAsyncMock.mockImplementation(async (command, args) => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
       }
-      if (String(args[0]) === 'vibe') {
+      if (String(args[0]) === 'orca-dev' || String(args[0]) === 'claude') {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '/home/test/.local/bin/vibe\n',
+          stdout: `/home/test/.local/bin/${String(args[0])}\n`,
           stderr: '',
           timedOut: false
         }
@@ -458,21 +458,21 @@ describe('preflight', () => {
       throw new Error('not found')
     })
 
-    await expect(detectInstalledAgents()).resolves.toEqual(['mistral-vibe'])
+    await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'claude-agent-teams'])
   })
 
-  it('deduplicates Mistral Vibe when both current and legacy executables exist', async () => {
+  it('deduplicates Claude Agent Teams when several Orca executables exist', async () => {
     execFileAsyncMock.mockImplementation(async (command, args) => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
       }
-      if (String(args[0]) === 'vibe' || String(args[0]) === 'mistral-vibe') {
+      if (['orca', 'orca-dev', 'claude'].includes(String(args[0]))) {
         return { stdout: `/home/test/.local/bin/${String(args[0])}\n` }
       }
       throw new Error('not found')
     })
 
-    await expect(detectInstalledAgents()).resolves.toEqual(['mistral-vibe'])
+    await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'claude-agent-teams'])
   })
 
   it('detects agents from the selected WSL distro for a WSL workspace', async () => {
@@ -511,11 +511,11 @@ describe('preflight', () => {
       value: 'win32'
     })
     runWslProcessMock.mockImplementation(async ({ script }: { script: string }) => {
-      if (script.includes("'codex'")) {
+      if (script.includes("'opencode'")) {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '__ORCA_AGENT_PATH__codex\t/home/test/.local/bin/codex\n',
+          stdout: '__ORCA_AGENT_PATH__opencode\t/home/test/.local/bin/opencode\n',
           stderr: '',
           timedOut: false
         }
@@ -523,7 +523,7 @@ describe('preflight', () => {
       throw new Error('not found')
     })
 
-    await expect(detectInstalledAgents({ wslDefault: true })).resolves.toEqual(['codex'])
+    await expect(detectInstalledAgents({ wslDefault: true })).resolves.toEqual(['opencode'])
     expect(runWslProcessMock).toHaveBeenCalledTimes(1)
     // Why: the local fallback must not leak into WSL detection.
     expect(resolveCliCommandsMock).not.toHaveBeenCalled()

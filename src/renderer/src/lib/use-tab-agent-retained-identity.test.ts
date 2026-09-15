@@ -102,38 +102,38 @@ describe('useTabAgent retained completion identity', () => {
     useAppStore.setState(initialAppState, true)
   })
 
-  it('uses focused retained Codex identity over stale Claude launch metadata', async () => {
+  it('uses focused retained OpenCode identity over stale Claude launch metadata', async () => {
     const paneKey = makePaneKey(TAB_ID, FOCUSED_LEAF_ID)
     useAppStore.setState({
-      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'codex') }
+      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'opencode') }
     })
 
     await renderProbe()
 
-    expect(latestAgent).toBe('codex')
+    expect(latestAgent).toBe('opencode')
   })
 
   it('keeps a live focused hook ahead of retained identity', async () => {
     const paneKey = makePaneKey(TAB_ID, FOCUSED_LEAF_ID)
     useAppStore.setState({
       agentStatusByPaneKey: {
-        [paneKey]: statusEntry(paneKey, 'gemini', 'working')
+        [paneKey]: statusEntry(paneKey, 'pi', 'working')
       },
-      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'codex') }
+      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'opencode') }
     })
 
     await renderProbe()
 
-    expect(latestAgent).toBe('gemini')
+    expect(latestAgent).toBe('pi')
   })
 
   it('lets an explicit cross-agent title reclaim a retained idle pane', async () => {
     const paneKey = makePaneKey(TAB_ID, FOCUSED_LEAF_ID)
     useAppStore.setState({
-      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'codex') }
+      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'opencode') }
     })
 
-    await renderProbe({ ...baseTab, launchAgent: 'codex', title: '✳ Claude Code' })
+    await renderProbe({ ...baseTab, launchAgent: 'opencode', title: '✳ Claude Code' })
 
     expect(latestAgent).toBe('claude')
   })
@@ -141,7 +141,7 @@ describe('useTabAgent retained completion identity', () => {
   it('keeps focused launch metadata ahead of sibling retained identity', async () => {
     const paneKey = makePaneKey(TAB_ID, SIBLING_LEAF_ID)
     useAppStore.setState({
-      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'codex') }
+      retainedAgentsByPaneKey: { [paneKey]: retainedEntry(paneKey, 'opencode') }
     })
 
     await renderProbe()

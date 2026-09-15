@@ -4,7 +4,7 @@
  * Why a dedicated module: agent names must be matched as whole tokens, never as
  * substrings. Substring matching mis-fired on worktree/cwd titles like
  * "opencode-blinker" (⊃ "opencode") or "openclaude" (⊃ "claude"), painting a
- * Codex/OpenClaude tab as the wrong agent whenever the title fell back to the
+ * tab as the wrong agent whenever the title fell back to the
  * bare directory name. The boundary guard `(?<![\w./\\-])…(?![\w./\\-])` rejects
  * path separators (POSIX and Windows) and hyphenated compounds on both sides.
  */
@@ -12,7 +12,7 @@
 // Why: for OSC-title detection only. Intentionally narrower than the full set
 // of launchable agents because short names like "amp" would classify ordinary
 // shell titles like "timestamp ready" as agent activity.
-export const AGENT_NAMES = ['claude', 'codex', 'opencode']
+export const AGENT_NAMES = ['claude', 'opencode']
 
 // Why: Windows agent titles can surface launcher process names such as
 // `claude.exe`; still reject arbitrary dotted path fragments.

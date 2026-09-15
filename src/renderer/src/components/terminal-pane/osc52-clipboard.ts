@@ -1,6 +1,6 @@
 // OSC 52 — "Manipulate Selection Data". xterm.js does not implement this
 // handler itself; applications register it to let TUIs (Zellij, tmux, Neovim,
-// fzf, Grok) copy to the host clipboard over SSH or through the PTY.
+// fzf) copy to the host clipboard over SSH or through the PTY.
 //
 // Wire format (xterm.js strips the leading `\x1b]52;` and trailing BEL/ST
 // before handing us the payload string):

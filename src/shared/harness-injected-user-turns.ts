@@ -6,7 +6,7 @@
 // prompt-derived UI must not surface them.
 //
 // We match only tags we have observed from harnesses, never a broad kebab
-// shape: a real prompt starting with a custom `<my-element>` or a Grok
+// shape: a real prompt starting with a custom `<my-element>` or a
 // `<user_query>` envelope is a genuine user turn, and misclassifying it would
 // hide the turn (drop it from transcripts, demote its session title, or leave
 // the agent visibly done after an interrupt).

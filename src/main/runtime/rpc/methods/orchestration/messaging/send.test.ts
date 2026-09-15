@@ -525,7 +525,7 @@ describe('orchestration RPC methods', () => {
       expect(() => method.params!.parse({ to: 'b', subject: 'hi', priority: 'medium' })).toThrow()
     })
 
-    it.each(['@all', '@idle', '@worktree:wt_1', '@codex', '@nobody'])(
+    it.each(['@all', '@idle', '@worktree:wt_1', '@opencode', '@nobody'])(
       'rejects worker_done to group recipient %s without inserting rows',
       async (to) => {
         setup()

@@ -13,8 +13,8 @@ describe('resolveCommitMessageSettings', () => {
     const settings = getDefaultSettings('/tmp')
     settings.commitMessageAi = {
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'retired-model' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'retired-model' },
       selectedThinkingByModel: {},
       customPrompt: 'Use Conventional Commits.',
       customAgentCommand: ''
@@ -26,9 +26,8 @@ describe('resolveCommitMessageSettings', () => {
     expect(result).toEqual({
       ok: true,
       params: {
-        agentId: 'codex',
-        model: 'gpt-5.5',
-        thinkingLevel: 'low',
+        agentId: 'opencode',
+        model: 'opencode/deepseek-v4-flash-free',
         customPrompt: 'Use Conventional Commits.',
         commandInputTemplate: '{basePrompt}\n\nUse Conventional Commits.'
       }
@@ -61,15 +60,15 @@ describe('resolveCommitMessageSettings', () => {
 
   it("uses the user's default agent when the AI setting has no explicit agent", () => {
     const settings = getDefaultSettings('/tmp')
-    settings.defaultTuiAgent = 'codex'
+    settings.defaultTuiAgent = 'pi'
 
     const result = resolveCommitMessageSettings(settings)
 
     expect(result).toMatchObject({
       ok: true,
       params: {
-        agentId: 'codex',
-        model: 'gpt-5.5',
+        agentId: 'pi',
+        model: 'github-copilot/gpt-5.4-mini',
         thinkingLevel: 'low'
       }
     })
@@ -79,10 +78,10 @@ describe('resolveCommitMessageSettings', () => {
     const settings = getDefaultSettings('/tmp')
     settings.commitMessageAi = {
       enabled: true,
-      agentId: 'cursor',
-      selectedModelByAgent: { cursor: 'gpt-5.2' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'gpt-5.2' },
       discoveredModelsByAgent: {
-        cursor: [
+        opencode: [
           {
             id: 'gpt-5.2',
             label: 'GPT 5.2',
@@ -102,7 +101,7 @@ describe('resolveCommitMessageSettings', () => {
     expect(result).toMatchObject({
       ok: true,
       params: {
-        agentId: 'cursor',
+        agentId: 'opencode',
         model: 'gpt-5.2',
         thinkingLevel: 'xhigh'
       }
@@ -113,12 +112,12 @@ describe('resolveCommitMessageSettings', () => {
     const settings = getDefaultSettings('/tmp')
     settings.commitMessageAi = {
       enabled: true,
-      agentId: 'cursor',
-      selectedModelByAgent: { cursor: 'auto' },
-      selectedModelByAgentByHost: { 'ssh:conn-1': { cursor: 'remote-only' } },
-      discoveredModelsByAgent: { cursor: [{ id: 'auto', label: 'Auto' }] },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'auto' },
+      selectedModelByAgentByHost: { 'ssh:conn-1': { opencode: 'remote-only' } },
+      discoveredModelsByAgent: { opencode: [{ id: 'auto', label: 'Auto' }] },
       discoveredModelsByAgentByHost: {
-        'ssh:conn-1': { cursor: [{ id: 'remote-only', label: 'Remote Only' }] }
+        'ssh:conn-1': { opencode: [{ id: 'remote-only', label: 'Remote Only' }] }
       },
       selectedThinkingByModel: {},
       customPrompt: '',
@@ -131,7 +130,7 @@ describe('resolveCommitMessageSettings', () => {
     expect(result).toMatchObject({
       ok: true,
       params: {
-        agentId: 'cursor',
+        agentId: 'opencode',
         model: 'remote-only'
       }
     })
@@ -141,9 +140,9 @@ describe('resolveCommitMessageSettings', () => {
     const settings = getDefaultSettings('/tmp')
     settings.commitMessageAi = {
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.4-mini' },
-      selectedThinkingByModel: { 'gpt-5.4-mini': 'turbo' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'opencode/gpt-5.4-mini' },
+      selectedThinkingByModel: { 'opencode/gpt-5.4-mini': 'turbo' },
       customPrompt: '',
       customAgentCommand: ''
     }
@@ -154,8 +153,8 @@ describe('resolveCommitMessageSettings', () => {
     expect(result).toMatchObject({
       ok: true,
       params: {
-        agentId: 'codex',
-        model: 'gpt-5.4-mini',
+        agentId: 'opencode',
+        model: 'opencode/gpt-5.4-mini',
         thinkingLevel: 'low'
       }
     })
@@ -163,11 +162,11 @@ describe('resolveCommitMessageSettings', () => {
 
   it('passes the per-agent command override into non-interactive planning', () => {
     const settings = getDefaultSettings('/tmp')
-    settings.agentCmdOverrides.codex = 'npx codex'
+    settings.agentCmdOverrides.opencode = 'npx opencode-ai'
     settings.commitMessageAi = {
       enabled: true,
-      agentId: 'codex',
-      selectedModelByAgent: { codex: 'gpt-5.4-mini' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'opencode/gpt-5.4-mini' },
       selectedThinkingByModel: {},
       customPrompt: '',
       customAgentCommand: ''
@@ -179,8 +178,8 @@ describe('resolveCommitMessageSettings', () => {
     expect(result).toMatchObject({
       ok: true,
       params: {
-        agentId: 'codex',
-        agentCommandOverride: 'npx codex'
+        agentId: 'opencode',
+        agentCommandOverride: 'npx opencode-ai'
       }
     })
   })
@@ -189,8 +188,8 @@ describe('resolveCommitMessageSettings', () => {
     const settings = getDefaultSettings('/tmp')
     settings.commitMessageAi = {
       enabled: true,
-      agentId: 'cursor',
-      selectedModelByAgent: { cursor: 'gpt-5.2' },
+      agentId: 'opencode',
+      selectedModelByAgent: { opencode: 'gpt-5.2' },
       selectedThinkingByModel: { 'gpt-5.2': 'xhigh' },
       customPrompt: '',
       customAgentCommand: ''
@@ -202,8 +201,8 @@ describe('resolveCommitMessageSettings', () => {
     expect(result).toMatchObject({
       ok: true,
       params: {
-        agentId: 'cursor',
-        model: 'auto'
+        agentId: 'opencode',
+        model: 'opencode/deepseek-v4-flash-free'
       }
     })
   })

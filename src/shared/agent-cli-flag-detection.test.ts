@@ -5,17 +5,17 @@ const MODEL_FLAGS = ['-m', '--model']
 
 describe('hasFlag', () => {
   it('matches an exact token', () => {
-    expect(hasFlag(['-m', 'grok-build'], MODEL_FLAGS)).toBe(true)
-    expect(hasFlag(['--model', 'grok-build'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['-m', 'sonnet'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['--model', 'sonnet'], MODEL_FLAGS)).toBe(true)
   })
 
   it('matches the flag=value form', () => {
-    expect(hasFlag(['--model=grok-build'], MODEL_FLAGS)).toBe(true)
-    expect(hasFlag(['-m=grok-build'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['--model=sonnet'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['-m=sonnet'], MODEL_FLAGS)).toBe(true)
   })
 
   it('matches a clustered single-dash flag', () => {
-    expect(hasFlag(['-mgrok-build'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['-msonnet'], MODEL_FLAGS)).toBe(true)
   })
 
   it('does not clusters-match a long flag that merely shares the prefix', () => {
@@ -37,16 +37,16 @@ describe('hasFlag', () => {
   })
 
   it('scans every token, not just the first', () => {
-    expect(hasFlag(['--debug', '--yolo', '--model', 'grok-build'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['--debug', '--yolo', '--model', 'sonnet'], MODEL_FLAGS)).toBe(true)
   })
 
   it('stops scanning at the option terminator', () => {
     expect(hasFlag(['--', '--model'], MODEL_FLAGS)).toBe(false)
-    expect(hasFlag(['--', '-mgrok-build'], MODEL_FLAGS)).toBe(false)
-    expect(hasFlag(['--model', 'grok-build', '--', '--model'], MODEL_FLAGS)).toBe(true)
+    expect(hasFlag(['--', '-msonnet'], MODEL_FLAGS)).toBe(false)
+    expect(hasFlag(['--model', 'sonnet', '--', '--model'], MODEL_FLAGS)).toBe(true)
   })
 
-  it('detects either spelling of grok effort flags', () => {
+  it('detects either spelling of effort flags', () => {
     const effortFlags = ['--effort', '--reasoning-effort']
     expect(hasFlag(['--effort', 'low'], effortFlags)).toBe(true)
     expect(hasFlag(['--reasoning-effort=low'], effortFlags)).toBe(true)

@@ -182,7 +182,7 @@ export function resolvePaneKey(
   return {
     exists,
     title: paneTitle ?? tabTitle,
-    // Why: some agents (OpenClaude) keep the terminal title generic while the tab label carries the agent identity; use only the non-custom label for attribution.
+    // Why: some agents keep the terminal title generic while the tab label carries the agent identity; use only the non-custom label for attribution.
     identityTitle: paneTitle ?? unifiedTabLabel ?? tabTitle,
     repoConnectionId,
     repoConnectionResolved,

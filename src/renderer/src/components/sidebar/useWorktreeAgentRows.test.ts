@@ -128,7 +128,7 @@ describe('buildWorktreeAgentRows', () => {
 
   it('resolves live unknown rows from the launched tab agent', () => {
     const rows = buildWorktreeAgentRows({
-      tabs: [makeTab('tab-1', { launchAgent: 'codex', title: 'test-thing-2' })],
+      tabs: [makeTab('tab-1', { launchAgent: 'opencode', title: 'test-thing-2' })],
       entries: [
         makeEntry(PANE_KEY_1, 1000, {
           agentType: undefined,
@@ -139,23 +139,23 @@ describe('buildWorktreeAgentRows', () => {
       now: 2000
     })
 
-    expect(rows[0].agentType).toBe('codex')
+    expect(rows[0].agentType).toBe('opencode')
   })
 
   it('prefers an unrelated live title over the launched tab agent for unknown rows', () => {
     const rows = buildWorktreeAgentRows({
-      tabs: [makeTab('tab-1', { launchAgent: 'omp', title: '\u280b Codex' })],
+      tabs: [makeTab('tab-1', { launchAgent: 'pi', title: '\u280b OpenCode' })],
       entries: [
         makeEntry(PANE_KEY_1, 1000, {
           agentType: undefined,
-          terminalTitle: '\u280b Codex'
+          terminalTitle: '\u280b OpenCode'
         })
       ],
       retained: [],
       now: 2000
     })
 
-    expect(rows[0].agentType).toBe('codex')
+    expect(rows[0].agentType).toBe('opencode')
   })
 
   it('resolves retained unknown rows from the launched tab agent', () => {
@@ -164,7 +164,7 @@ describe('buildWorktreeAgentRows', () => {
         agentType: undefined,
         terminalTitle: 'test-thing-2'
       }),
-      tab: makeTab('tab-orphan', { launchAgent: 'codex', title: 'test-thing-2' }),
+      tab: makeTab('tab-orphan', { launchAgent: 'opencode', title: 'test-thing-2' }),
       agentType: 'unknown'
     })
     const rows = buildWorktreeAgentRows({
@@ -174,7 +174,7 @@ describe('buildWorktreeAgentRows', () => {
       now: 2000
     })
 
-    expect(rows[0].agentType).toBe('codex')
+    expect(rows[0].agentType).toBe('opencode')
   })
 
   it('prefers a live row over a retained snapshot with the same paneKey', () => {
@@ -194,7 +194,7 @@ describe('buildWorktreeAgentRows', () => {
   it('dedupes retained legacy numeric rows for a single current stable pane', () => {
     const liveEntry = makeEntry(PANE_KEY_1, 2000, {
       state: 'working',
-      agentType: 'copilot',
+      agentType: 'opencode',
       prompt: 'current turn'
     })
     const rows = buildWorktreeAgentRows({
@@ -213,7 +213,7 @@ describe('buildWorktreeAgentRows', () => {
   it('keeps a retained legacy numeric row for a different split pane', () => {
     const liveEntry = makeEntry(PANE_KEY_1, 2000, {
       state: 'working',
-      agentType: 'copilot',
+      agentType: 'opencode',
       prompt: 'current turn'
     })
     const rows = buildWorktreeAgentRows({
@@ -304,19 +304,19 @@ describe('buildWorktreeAgentRows', () => {
       state: 'working',
       worktreeId: 'wt-1',
       tabId: 'tab-1',
-      prompt: 'omp worker'
+      prompt: 'pi worker'
     })
     const second = makeEntry(PANE_KEY_2, 1000, {
       state: 'working',
       worktreeId: 'wt-1',
       tabId: 'tab-2',
-      prompt: 'omp worker'
+      prompt: 'pi worker'
     })
     const third = makeEntry(PANE_KEY_3, 1000, {
       state: 'working',
       worktreeId: 'wt-1',
       tabId: 'tab-3',
-      prompt: 'omp worker'
+      prompt: 'pi worker'
     })
 
     const build = (entries: AgentStatusEntry[]) =>
@@ -327,7 +327,7 @@ describe('buildWorktreeAgentRows', () => {
         now: 2000
       }).map((row) => row.paneKey)
 
-    // Why: OMP can send frequent same-state updates for several panes. When
+    // Why: agents can send frequent same-state updates for several panes. When
     // those workers are worktree-attributed before their tabs arrive, row order
     // must not inherit a noisy status-map iteration order.
     expect(build([third, first, second])).toEqual([PANE_KEY_1, PANE_KEY_2, PANE_KEY_3])
@@ -343,13 +343,13 @@ describe('buildWorktreeAgentRows', () => {
       state: 'done',
       worktreeId: 'wt-1',
       tabId: 'tab-1',
-      stateHistory: [{ state: 'working', prompt: 'omp worker', startedAt: 1000 }]
+      stateHistory: [{ state: 'working', prompt: 'pi worker', startedAt: 1000 }]
     })
     const second = makeEntry(PANE_KEY_2, 1500, {
       state: 'blocked',
       worktreeId: 'wt-1',
       tabId: 'tab-2',
-      stateHistory: [{ state: 'working', prompt: 'omp worker', startedAt: 1000 }]
+      stateHistory: [{ state: 'working', prompt: 'pi worker', startedAt: 1000 }]
     })
 
     const rows = buildWorktreeAgentRows({
@@ -373,8 +373,8 @@ describe('buildWorktreeAgentRows', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-1',
       stateHistory: [
-        { state: 'working', prompt: 'omp worker', startedAt: 1000 },
-        { state: 'blocked', prompt: 'omp worker', startedAt: 1800 }
+        { state: 'working', prompt: 'pi worker', startedAt: 1000 },
+        { state: 'blocked', prompt: 'pi worker', startedAt: 1800 }
       ]
     })
     const second = makeEntry(PANE_KEY_2, 1600, {
@@ -382,8 +382,8 @@ describe('buildWorktreeAgentRows', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-2',
       stateHistory: [
-        { state: 'working', prompt: 'omp worker', startedAt: 1000 },
-        { state: 'blocked', prompt: 'omp worker', startedAt: 1200 }
+        { state: 'working', prompt: 'pi worker', startedAt: 1000 },
+        { state: 'blocked', prompt: 'pi worker', startedAt: 1200 }
       ]
     })
 
@@ -528,7 +528,7 @@ describe('buildWorktreeAgentRows', () => {
       retained: [],
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: 'Codex working'
+          1: 'OpenCode working'
         }
       },
       ptyIdsByTabId: {
@@ -561,7 +561,7 @@ describe('buildWorktreeAgentRows', () => {
       retained: [retainedChild],
       runtimePaneTitlesByTabId: {
         'tab-1': {
-          1: 'Codex working'
+          1: 'OpenCode working'
         }
       },
       ptyIdsByTabId: {

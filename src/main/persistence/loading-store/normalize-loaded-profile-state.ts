@@ -19,6 +19,7 @@ import { normalizeLoadedGlobalSettings } from './normalize-loaded-global-setting
 import { normalizeLoadedUiState } from './normalize-loaded-ui-state'
 import {
   normalizeLoadedAutomationRuns,
+  normalizeLoadedAutomations,
   normalizeLoadedHostSessions,
   normalizeLoadedLocalSession,
   normalizeLoadedProjectCatalog
@@ -99,7 +100,7 @@ export function normalizeLoadedProfileState(
       parsed.migrationUnsupportedPtyEntries
     ),
     legacyPaneKeyAliasEntries: normalizeLegacyPaneKeyAliasEntries(parsed.legacyPaneKeyAliasEntries),
-    automations: Array.isArray(parsed.automations) ? parsed.automations : [],
+    automations: normalizeLoadedAutomations(parsed, markNeedsSave),
     automationRuns: normalizeLoadedAutomationRuns(parsed, markNeedsSave)
   }
 }

@@ -45,7 +45,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: sameTabPane,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'done', prompt: 'second', agentType: 'codex' }
+          payload: { state: 'done', prompt: 'second', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -104,7 +104,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'before close', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'before close', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -117,7 +117,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'done', prompt: 'late remote', agentType: 'codex' }
+          payload: { state: 'done', prompt: 'late remote', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -125,7 +125,7 @@ describe('AgentHookServer listener replay', () => {
         paneKey: PANE,
         tabId: 'tab-1',
         worktreeId: 'wt-1',
-        payload: { state: 'done', prompt: 'late terminal', agentType: 'codex' }
+        payload: { state: 'done', prompt: 'late terminal', agentType: 'opencode' }
       })
 
       vi.setSystemTime(16_001)
@@ -134,7 +134,7 @@ describe('AgentHookServer listener replay', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'working', prompt: 'future reuse', agentType: 'codex' }
+          payload: { state: 'working', prompt: 'future reuse', agentType: 'opencode' }
         },
         'conn-1'
       )

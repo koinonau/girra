@@ -106,9 +106,9 @@ describe('main title tracker parity with the renderer transport processor', () =
     expect(kinds.indexOf('became-working')).toBeLessThan(kinds.indexOf('became-idle'))
   })
 
-  // Why: OMP 17.2.12+ cannot animate under WSL/ConPTY, so it emits static state markers
+  // Why: Pi-compatible titles under WSL/ConPTY cannot animate, so they emit static state markers
   // instead of braille frames (#13890). Both paths must see the same working→idle turn.
-  it('derives identical facts from static OMP WSL state titles', () => {
+  it('derives identical facts from static Pi WSL state titles', () => {
     const chunk = `${ESC}]0;zsh | π : cwd${BEL}response text\r\n` + `${ESC}]0;zsh | π > cwd${BEL}`
     feedBoth(paths, chunk)
 
@@ -118,9 +118,9 @@ describe('main title tracker parity with the renderer transport processor', () =
     expect(kinds.indexOf('became-working')).toBeLessThan(kinds.indexOf('became-idle'))
   })
 
-  // Why: an OMP pane that stops emitting titles mid-turn must still leave working, or the
+  // Why: a Pi pane that stops emitting titles mid-turn must still leave working, or the
   // stale native marker keeps the pane — and its synthetic spinner — pinned to working.
-  it('clears a stale static OMP working title in both paths', () => {
+  it('clears a stale static Pi working title in both paths', () => {
     feedBoth(paths, `${ESC}]0;zsh | π : cwd${BEL}`)
     feedBoth(paths, 'title-free output')
     vi.advanceTimersByTime(3_000)
@@ -133,11 +133,11 @@ describe('main title tracker parity with the renderer transport processor', () =
   })
 
   it('derives identical facts from BEL- and ST-terminated titles', () => {
-    feedBoth(paths, `${ESC}]2;Codex working${ST}body bytes`)
-    feedBoth(paths, `${ESC}]0;Codex done${BEL}`)
+    feedBoth(paths, `${ESC}]2;OpenCode working${ST}body bytes`)
+    feedBoth(paths, `${ESC}]0;OpenCode done${BEL}`)
 
     expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events).toContainEqual({ kind: 'became-idle', title: 'Codex done' })
+    expect(paths.main.events).toContainEqual({ kind: 'became-idle', title: 'OpenCode done' })
   })
 
   it('clears a stale working title after the 3s timeout in both paths', () => {
@@ -151,17 +151,17 @@ describe('main title tracker parity with the renderer transport processor', () =
   })
 
   it('keeps the stale-title timer unperturbed by pure OSC 9999 status chunks', () => {
-    feedBoth(paths, `${ESC}]0;Codex working${BEL}`)
+    feedBoth(paths, `${ESC}]0;OpenCode working${BEL}`)
     feedBoth(paths, 'plain output arms the timer\r\n')
 
     vi.advanceTimersByTime(2_000)
     // Why: a chunk that is ONLY an Orca status payload strips to empty
     // cleanData; neither path may restart (or newly arm) the stale probe.
-    feedBoth(paths, `${ESC}]9999;{"state":"working","agentType":"codex"}${BEL}`)
+    feedBoth(paths, `${ESC}]9999;{"state":"working","agentType":"opencode"}${BEL}`)
     vi.advanceTimersByTime(1_000)
 
     expect(paths.main.events).toEqual(paths.renderer.events)
-    expect(paths.main.events.at(-1)).toEqual({ kind: 'became-idle', title: 'Codex' })
+    expect(paths.main.events.at(-1)).toEqual({ kind: 'became-idle', title: 'OpenCode' })
   })
 
   it('ignores a title split across chunk boundaries in both paths', () => {
@@ -202,7 +202,7 @@ describe('main title tracker parity with the renderer transport processor', () =
   })
 
   it('keeps bells suppressed inside OSC 9999 status payloads in both paths', () => {
-    feedBoth(paths, `${ESC}]9999;{"state":"working","agentType":"codex"}${BEL}`)
+    feedBoth(paths, `${ESC}]9999;{"state":"working","agentType":"opencode"}${BEL}`)
 
     expect(paths.main.events).toEqual(paths.renderer.events)
     expect(paths.main.events).toEqual([])

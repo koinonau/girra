@@ -40,7 +40,6 @@ export abstract class AgentHookServerCleanup extends AgentHookServerAuthorityFen
     this.commitStatusRowMutation(deleted, retained)
     this.scheduleStatusPersist()
     this.notifyStatusChangeListeners()
-    this.emitStatusDropped(deleted.paneKey)
   }
 
   /** Evict a UI-cleared status only if no newer status has replaced it. */
@@ -83,9 +82,6 @@ export abstract class AgentHookServerCleanup extends AgentHookServerAuthorityFen
     }
     this.scheduleStatusPersist()
     this.notifyStatusChangeListeners()
-    for (const paneKey of evicted) {
-      this.emitStatusDropped(paneKey)
-    }
     return evicted
   }
 

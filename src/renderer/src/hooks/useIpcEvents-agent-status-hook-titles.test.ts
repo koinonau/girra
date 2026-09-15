@@ -28,7 +28,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     vi.unstubAllGlobals()
   })
 
-  it('does not retain a Codex spinner terminal title when the hook reports done', async () => {
+  it('does not retain a Pi spinner tab title when the hook reports done', async () => {
     const setAgentStatus = vi.fn()
     const updateTabTitle = vi.fn()
     const onSetListenerRef: { current: ((data: AgentStatusSetData) => void) | null } = {
@@ -46,7 +46,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
             id: 'tab-future',
             ptyId: 'pty-1',
             worktreeId: 'wt-1',
-            title: '\u280b Codex'
+            title: '\u280b Pi'
           }
         ]
       },
@@ -55,7 +55,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
           root: { type: 'leaf', leafId: FUTURE_LEAF_ID },
           activeLeafId: FUTURE_LEAF_ID,
           expandedLeafId: null,
-          titlesByLeafId: { [FUTURE_LEAF_ID]: '\u280b Codex' }
+          titlesByLeafId: { [FUTURE_LEAF_ID]: '\u280b Pi' }
         }
       }
     })
@@ -90,9 +90,9 @@ describe('useIpcEvents agent status snapshot integration', () => {
     onSetListenerRef.current({
       paneKey: FUTURE_PANE_KEY,
       state: 'done',
-      prompt: 'codex prompt',
-      agentType: 'codex',
-      lastAssistantMessage: 'codex completion',
+      prompt: 'pi prompt',
+      agentType: 'pi',
+      lastAssistantMessage: 'pi completion',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_699_999_999_100
     })
@@ -102,17 +102,17 @@ describe('useIpcEvents agent status snapshot integration', () => {
       FUTURE_PANE_KEY,
       expect.objectContaining({
         state: 'done',
-        prompt: 'codex prompt',
-        agentType: 'codex',
-        lastAssistantMessage: 'codex completion'
+        prompt: 'pi prompt',
+        agentType: 'pi',
+        lastAssistantMessage: 'pi completion'
       }),
-      'Codex ready',
+      'Pi ready',
       { updatedAt: 1_700_000_000_200, stateStartedAt: 1_699_999_999_100 },
       expectWorktreeRouting('wt-1'),
       undefined
     )
     expect(updateTabTitle).toHaveBeenCalledTimes(1)
-    expect(updateTabTitle).toHaveBeenCalledWith('tab-future', 'Codex ready')
+    expect(updateTabTitle).toHaveBeenCalledWith('tab-future', 'Pi ready')
   })
 
   it('drops nested child done push events when the parent pane agent is still active', async () => {
@@ -128,8 +128,8 @@ describe('useIpcEvents agent status snapshot integration', () => {
       agentStatusByPaneKey: {
         [FUTURE_PANE_KEY]: {
           state: 'working',
-          prompt: 'parent codex',
-          agentType: 'codex',
+          prompt: 'parent pi',
+          agentType: 'pi',
           updatedAt: 1_700_000_000_000,
           stateStartedAt: 1_700_000_000_000,
           paneKey: FUTURE_PANE_KEY,
@@ -137,7 +137,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
         }
       },
       tabsByWorktree: {
-        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Codex' }]
+        'wt-1': [{ id: 'tab-future', ptyId: 'pty-1', worktreeId: 'wt-1', title: 'Pi' }]
       },
       terminalLayoutsByTabId: {
         'tab-future': {
@@ -244,7 +244,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'done',
       prompt: 'inactive prompt',
-      agentType: 'codex',
+      agentType: 'pi',
       lastAssistantMessage: 'inactive completion',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_699_999_999_100
@@ -256,7 +256,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'done',
         prompt: 'inactive prompt',
-        agentType: 'codex',
+        agentType: 'pi',
         lastAssistantMessage: 'inactive completion'
       }),
       'Inactive Tab',
@@ -328,7 +328,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'working',
       prompt: 'queued prompt',
-      agentType: 'codex',
+      agentType: 'pi',
       receivedAt: 1_700_000_000_100,
       stateStartedAt: 1_699_999_999_100
     })
@@ -336,7 +336,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       paneKey: FUTURE_PANE_KEY,
       state: 'done',
       prompt: 'queued prompt',
-      agentType: 'codex',
+      agentType: 'pi',
       lastAssistantMessage: 'queued completion',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_699_999_999_100
@@ -363,7 +363,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     expect(setAgentStatus).toHaveBeenNthCalledWith(
       1,
       FUTURE_PANE_KEY,
-      expect.objectContaining({ state: 'working', prompt: 'queued prompt', agentType: 'codex' }),
+      expect.objectContaining({ state: 'working', prompt: 'queued prompt', agentType: 'pi' }),
       'Future Tab',
       { updatedAt: 1_700_000_000_100, stateStartedAt: 1_699_999_999_100 },
       expectWorktreeRouting('wt-1'),
@@ -375,7 +375,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
       expect.objectContaining({
         state: 'done',
         prompt: 'queued prompt',
-        agentType: 'codex',
+        agentType: 'pi',
         lastAssistantMessage: 'queued completion'
       }),
       'Future Tab',
@@ -393,7 +393,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
           paneKey: FUTURE_PANE_KEY,
           state: 'working' as const,
           prompt: 'remote p',
-          agentType: 'codex',
+          agentType: 'pi',
           worktreeId: 'wt-1',
           connectionId: 'ssh-1',
           receivedAt: 1_700_000_000_000,
@@ -443,7 +443,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     expect(setAgentStatus).toHaveBeenCalledTimes(1)
     expect(setAgentStatus).toHaveBeenCalledWith(
       FUTURE_PANE_KEY,
-      expect.objectContaining({ state: 'working', prompt: 'remote p', agentType: 'codex' }),
+      expect.objectContaining({ state: 'working', prompt: 'remote p', agentType: 'pi' }),
       'SSH Tab',
       { updatedAt: 1_700_000_000_000, stateStartedAt: 1_699_999_999_000 },
       expectWorktreeRouting('wt-1'),

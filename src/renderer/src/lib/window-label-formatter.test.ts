@@ -61,7 +61,7 @@ describe('formatWindowLabel', () => {
 })
 
 describe('formatRateLimitWindowChipLabel', () => {
-  // Why: repro for #8378 — Codex session chip said "5h" while the popup said
+  // Why: repro for #8378: a session chip said "5h" while the popup said
   // "Resets in 2h 33m" for the same resetsAt. Both surfaces must share the
   // remaining-time duration when a reset timestamp is available.
   it('shows remaining time when resetsAt is known (repro-8378)', () => {

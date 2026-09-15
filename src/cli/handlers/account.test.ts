@@ -173,9 +173,9 @@ describe('account CLI handlers', () => {
     )
   })
 
-  it('rejects the retired Codex provider before any login', async () => {
-    await expect(ACCOUNT_HANDLERS['account add'](context('codex'))).rejects.toThrow(
-      'Unsupported --agent "codex"'
+  it('rejects an unsupported provider before any login', async () => {
+    await expect(ACCOUNT_HANDLERS['account add'](context('opencode'))).rejects.toThrow(
+      'Unsupported --agent "opencode"'
     )
     expect(spawnMock).not.toHaveBeenCalled()
   })

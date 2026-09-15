@@ -30,7 +30,7 @@ test('shows the remote browsing settings section and holds for review', async ({
     const state = window.__store?.getState()
     state?.updateSettings({ browserSshWorkspaceRoutingDisabledTargetIds: ['preview-target'] })
     window.__store?.setState({
-      sshTargetLabels: new Map([['preview-target', 'openclaw']])
+      sshTargetLabels: new Map([['preview-target', 'preview-host']])
     } as never)
     state?.openSettingsTarget({
       pane: 'browser',

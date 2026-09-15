@@ -56,7 +56,7 @@ const SNAPSHOT = { generatedAt: 1, cards: [] }
 const CARD = {
   paneKey: 'tab-1:leaf-1',
   ptyId: 'pty-1',
-  agentType: 'codex',
+  agentType: 'opencode',
   bucket: 'working',
   dotState: 'working',
   task: 'Ship it',
@@ -258,7 +258,7 @@ describe('registerDashboardPopoutHandlers', () => {
   })
 
   it('relays only valid agent launches from the popout', () => {
-    const args = { worktreeId: 'worktree-1', agent: 'codex' }
+    const args = { worktreeId: 'worktree-1', agent: 'opencode' }
     handlers.get('dashboardPopout:spawnAgent')!({ sender: untrustedSender } as never, args)
     handlers.get('dashboardPopout:spawnAgent')!({ sender: popoutSender } as never, {
       ...args,

@@ -53,16 +53,12 @@ function createRuntime(provider?: {
   )
   const internal = runtime as unknown as {
     resolveTerminalWorkspaceLaunchScope: ReturnType<typeof vi.fn>
-    markLocalWorkspaceTrustedForAgent: ReturnType<typeof vi.fn>
-    markRemoteWorkspaceTrustedForAgent: ReturnType<typeof vi.fn>
   }
   internal.resolveTerminalWorkspaceLaunchScope = vi.fn(async () => ({
     id: 'worktree-1',
     path: '/tmp/worktree-1',
     connectionId: null
   }))
-  internal.markLocalWorkspaceTrustedForAgent = vi.fn()
-  internal.markRemoteWorkspaceTrustedForAgent = vi.fn()
   return runtime
 }
 
@@ -80,7 +76,6 @@ function installRemoteReclaimHarness(
       connectionId: 'ssh-1'
     })),
     executionOwnerSupportsAgentSessionOperation: vi.fn(async () => true),
-    markWorkspaceTrustedForAgent: vi.fn(async () => {}),
     adoptControllerTerminalHandle: vi.fn((ptyId: string, handle: string) => {
       handleByPtyId.set(ptyId, handle)
     }),
@@ -111,16 +106,13 @@ async function fenceRemoteAgentSessionSpawn(runtime: OrcaRuntimeService) {
 }
 
 describe('agent-session create operation ledger', () => {
-  it('selects legacy before trust, spawn, or ledger state for an old daemon', async () => {
+  it('selects legacy before spawn or ledger state for an old daemon', async () => {
     const provider = {
       supportsAgentSessionClaims: vi.fn(() => false),
       supportsAgentSessionCreateOperations: vi.fn(() => false)
     }
     const runtime = createRuntime(provider)
     const createTerminal = vi.spyOn(runtime, 'createTerminal').mockResolvedValue(terminal())
-    const internal = runtime as unknown as {
-      markLocalWorkspaceTrustedForAgent: ReturnType<typeof vi.fn>
-    }
     const id = operationId()
 
     await expect(runtime.createAgentSession(request(id))).rejects.toThrow(
@@ -136,7 +128,6 @@ describe('agent-session create operation ledger', () => {
     ).rejects.toThrow('agent_session_legacy_required')
 
     expect(createTerminal).not.toHaveBeenCalled()
-    expect(internal.markLocalWorkspaceTrustedForAgent).not.toHaveBeenCalled()
 
     provider.supportsAgentSessionCreateOperations.mockReturnValue(true)
     await expect(runtime.createAgentSession(request(id))).resolves.toMatchObject({
@@ -163,12 +154,12 @@ describe('agent-session create operation ledger', () => {
       id: 'worktree-1',
       path: '/repo/worktree-1',
       connectionId: null,
-      // The rival row names openclaw while the worktree resolved to no SSH route at all.
+      // The rival row names another SSH target while the worktree resolved to no SSH route at all.
       repo: {
         id: 'repo-1',
-        connectionId: 'openclaw',
+        connectionId: 'rival-host',
         executionHostId: null,
-        path: '/srv/openclaw'
+        path: '/srv/rival-host'
       },
       folderWorkspace: null
     })
@@ -212,7 +203,6 @@ describe('agent-session create operation ledger', () => {
     const runtime = createRuntime()
     const internal = runtime as unknown as {
       resolveTerminalWorkspaceLaunchScope: ReturnType<typeof vi.fn>
-      markRemoteWorkspaceTrustedForAgent: ReturnType<typeof vi.fn>
     }
     internal.resolveTerminalWorkspaceLaunchScope.mockResolvedValue({
       id: 'worktree-1',
@@ -235,7 +225,6 @@ describe('agent-session create operation ledger', () => {
     ).rejects.toThrow('agent_session_legacy_required')
 
     expect(createTerminal).not.toHaveBeenCalled()
-    expect(internal.markRemoteWorkspaceTrustedForAgent).not.toHaveBeenCalled()
   })
 
   it('replays the same completed operation without spawning again', async () => {
@@ -360,7 +349,7 @@ describe('agent-session create operation ledger', () => {
       {
         id: 'ssh-1:pty2:e:1',
         cwd: '/remote/worktree-1',
-        title: 'codex',
+        title: 'claude',
         worktreeId: 'worktree-1',
         terminalHandle: orphanHandle
       }
@@ -413,7 +402,7 @@ describe('agent-session create operation ledger', () => {
       {
         id: 'ssh-1:pty2:e:9',
         cwd: '/remote/worktree-2',
-        title: 'codex',
+        title: 'claude',
         worktreeId: 'worktree-2',
         terminalHandle: createTerminal.mock.calls[0]?.[1]?.preAllocatedHandle
       }

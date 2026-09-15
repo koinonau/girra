@@ -126,14 +126,14 @@ describe('orca cli worktree awareness', () => {
     ])
   })
 
-  it('keeps interactive Codex startup commands backgrounded unless focus is explicit', async () => {
+  it('keeps a bare Claude startup command backgrounded unless focus is explicit', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex'
+          title: 'Claude'
         }
       })
     )
@@ -146,9 +146,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex',
+        'Claude',
         '--command',
-        'codex',
+        'claude',
         '--json'
       ],
       '/tmp/repo'
@@ -156,22 +156,22 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex',
-      title: 'Codex',
+      command: 'claude',
+      title: 'Claude',
       focus: false,
       rendererBacked: true,
       activate: false
     })
   })
 
-  it('keeps explicit focus semantics when forcing Codex through the renderer path', async () => {
+  it('keeps explicit focus semantics when forcing Claude through the renderer path', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex'
+          title: 'Claude'
         }
       })
     )
@@ -184,9 +184,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex',
+        'Claude',
         '--command',
-        'codex',
+        'claude',
         '--focus',
         '--json'
       ],
@@ -195,8 +195,8 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex',
-      title: 'Codex',
+      command: 'claude',
+      title: 'Claude',
       focus: true,
       presentation: 'focused',
       rendererBacked: true,
@@ -204,14 +204,14 @@ describe('orca cli worktree awareness', () => {
     })
   })
 
-  it('does not force the visible terminal path for explicit Codex exec commands', async () => {
+  it('does not force the visible terminal path for Claude print commands', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex exec'
+          title: 'Claude print'
         }
       })
     )
@@ -224,9 +224,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex exec',
+        'Claude print',
         '--command',
-        'codex exec summarize',
+        'claude -p summarize',
         '--json'
       ],
       '/tmp/repo'
@@ -234,20 +234,20 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex exec summarize',
-      title: 'Codex exec',
+      command: 'claude -p summarize',
+      title: 'Claude print',
       focus: false
     })
   })
 
-  it('does not force the visible terminal path for Codex exec commands after global options', async () => {
+  it('does not force the visible terminal path for Claude print commands after other options', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex exec'
+          title: 'Claude print'
         }
       })
     )
@@ -260,9 +260,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex exec',
+        'Claude print',
         '--command',
-        'codex -m gpt-5 --sandbox workspace-write exec summarize',
+        'claude --model sonnet -p summarize',
         '--json'
       ],
       '/tmp/repo'
@@ -270,20 +270,20 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex -m gpt-5 --sandbox workspace-write exec summarize',
-      title: 'Codex exec',
+      command: 'claude --model sonnet -p summarize',
+      title: 'Claude print',
       focus: false
     })
   })
 
-  it('does not force the visible terminal path for Codex review commands after long options', async () => {
+  it('does not force the visible terminal path for Claude long-form print commands', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex review'
+          title: 'Claude review'
         }
       })
     )
@@ -296,9 +296,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex review',
+        'Claude review',
         '--command',
-        'codex --model=gpt-5 --sandbox=workspace-write review',
+        'claude --model=sonnet --print=text review',
         '--json'
       ],
       '/tmp/repo'
@@ -306,20 +306,20 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex --model=gpt-5 --sandbox=workspace-write review',
-      title: 'Codex review',
+      command: 'claude --model=sonnet --print=text review',
+      title: 'Claude review',
       focus: false
     })
   })
 
-  it('does not force the visible terminal path for Codex help commands', async () => {
+  it('does not force the visible terminal path for Claude help commands', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex help'
+          title: 'Claude help'
         }
       })
     )
@@ -332,9 +332,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex help',
+        'Claude help',
         '--command',
-        'codex --help',
+        'claude --help',
         '--json'
       ],
       '/tmp/repo'
@@ -342,20 +342,20 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex --help',
-      title: 'Codex help',
+      command: 'claude --help',
+      title: 'Claude help',
       focus: false
     })
   })
 
-  it('keeps Codex prompts after global options backgrounded unless focus is explicit', async () => {
+  it('keeps Claude prompts after options backgrounded unless focus is explicit', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/tmp/repo/feature',
-          title: 'Codex prompt'
+          title: 'Claude prompt'
         }
       })
     )
@@ -368,9 +368,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'path:/tmp/repo/feature',
         '--title',
-        'Codex prompt',
+        'Claude prompt',
         '--command',
-        'codex -m gpt-5 "fix the flaky test"',
+        'claude --model sonnet "fix the flaky test"',
         '--json'
       ],
       '/tmp/repo'
@@ -378,8 +378,8 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'path:/tmp/repo/feature',
-      command: 'codex -m gpt-5 "fix the flaky test"',
-      title: 'Codex prompt',
+      command: 'claude --model sonnet "fix the flaky test"',
+      title: 'Claude prompt',
       focus: false,
       rendererBacked: true,
       activate: false
@@ -594,7 +594,7 @@ describe('orca cli worktree awareness', () => {
           satisfied: false,
           status: 'running',
           exitCode: null,
-          blockedReason: 'codex-cwd-prompt'
+          blockedReason: 'agent-cwd-prompt'
         }
       },
       _meta: {
@@ -617,20 +617,20 @@ describe('orca cli worktree awareness', () => {
         timeoutMs: 300000
       }
     )
-    expect(logSpy.mock.calls.flat().join('\n')).toContain('blockedReason: codex-cwd-prompt')
+    expect(logSpy.mock.calls.flat().join('\n')).toContain('blockedReason: agent-cwd-prompt')
     expect(process.exitCode).toBe(1)
 
     process.exitCode = priorExitCode
   })
 
-  it('does not force remote Codex terminal creates through a local renderer path', async () => {
+  it('does not force remote Claude terminal creates through a local renderer path', async () => {
     queueFixtures(
       callMock,
       okFixture('req_terminal_create', {
         terminal: {
           handle: 'term_1',
           worktreeId: 'repo-1::/srv/orca/feature',
-          title: 'Codex'
+          title: 'Claude'
         }
       })
     )
@@ -643,9 +643,9 @@ describe('orca cli worktree awareness', () => {
         '--worktree',
         'id:repo-1::/srv/orca/feature',
         '--command',
-        'codex',
+        'claude',
         '--title',
-        'Codex',
+        'Claude',
         '--pairing-code',
         'remote-runtime',
         '--json'
@@ -655,8 +655,8 @@ describe('orca cli worktree awareness', () => {
 
     expect(callMock).toHaveBeenCalledWith('terminal.create', {
       worktree: 'id:repo-1::/srv/orca/feature',
-      command: 'codex',
-      title: 'Codex',
+      command: 'claude',
+      title: 'Claude',
       focus: false
     })
   })

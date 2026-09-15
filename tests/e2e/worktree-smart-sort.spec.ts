@@ -152,14 +152,14 @@ async function seedSmartSortScenario(page: Page): Promise<SmartSortScenario> {
     const actions = store.getState()
     actions.setAgentStatus(
       `${doneTab.id}:${doneLeafId}`,
-      { state: 'done', prompt: 'Finished', agentType: 'codex' },
-      'codex',
+      { state: 'done', prompt: 'Finished', agentType: 'claude' },
+      'claude',
       { updatedAt: now, stateStartedAt: now - 1_000 }
     )
     actions.setAgentStatus(
       `${blockedTab.id}:${blockedLeafId}`,
-      { state: 'blocked', prompt: 'Needs approval', agentType: 'codex' },
-      'codex',
+      { state: 'blocked', prompt: 'Needs approval', agentType: 'claude' },
+      'claude',
       { updatedAt: now, stateStartedAt: now - 60_000 }
     )
 

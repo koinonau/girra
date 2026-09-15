@@ -31,11 +31,11 @@ describe('selectTabAgentTypesByTabId', () => {
   it('maps each tab to its first pane agent type, matching findTabAgentEntry', () => {
     const map: Record<string, AgentStatusEntry> = {
       'tab-1:leaf-a': entry({ agentType: 'claude' }),
-      'tab-1:leaf-b': entry({ agentType: 'codex' }),
-      'tab-2:leaf-a': entry({ agentType: 'codex' })
+      'tab-1:leaf-b': entry({ agentType: 'opencode' }),
+      'tab-2:leaf-a': entry({ agentType: 'opencode' })
     }
     const projection = selectTabAgentTypesByTabId(map)
-    expect(projection).toEqual({ 'tab-1': 'claude', 'tab-2': 'codex' })
+    expect(projection).toEqual({ 'tab-1': 'claude', 'tab-2': 'opencode' })
 
     // Parity with the lookup it replaces, for every tab.
     for (const tabId of ['tab-1', 'tab-2', 'tab-missing']) {
@@ -59,15 +59,15 @@ describe('selectTabAgentTypesByTabId', () => {
     const layouts = { 'tab-1': splitLayout('leaf-b') }
     const agentFirst = {
       'tab-1:leaf-a': entry({ agentType: 'claude' }),
-      'tab-1:leaf-b': entry({ agentType: 'codex' })
+      'tab-1:leaf-b': entry({ agentType: 'opencode' })
     }
     const activeFirst = {
-      'tab-1:leaf-b': entry({ agentType: 'codex' }),
+      'tab-1:leaf-b': entry({ agentType: 'opencode' }),
       'tab-1:leaf-a': entry({ agentType: 'claude' })
     }
 
-    expect(selectTabAgentTypesByTabId(agentFirst, layouts)['tab-1']).toBe('codex')
-    expect(selectTabAgentTypesByTabId(activeFirst, layouts)['tab-1']).toBe('codex')
+    expect(selectTabAgentTypesByTabId(agentFirst, layouts)['tab-1']).toBe('opencode')
+    expect(selectTabAgentTypesByTabId(activeFirst, layouts)['tab-1']).toBe('opencode')
     expect(selectNativeChatTabWideFallbackUnsafeTabsById(layouts)).toEqual({ 'tab-1': true })
   })
 
@@ -86,7 +86,7 @@ describe('selectTabAgentTypesByTabId', () => {
   it('uses the reassigned active sibling after the prior agent leaf closes', () => {
     const statuses = {
       'tab-1:leaf-a': entry({ agentType: 'claude' }),
-      'tab-1:leaf-b': entry({ agentType: 'codex' })
+      'tab-1:leaf-b': entry({ agentType: 'opencode' })
     }
 
     expect(
@@ -97,7 +97,7 @@ describe('selectTabAgentTypesByTabId', () => {
           expandedLeafId: null
         }
       })['tab-1']
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 
   it('does not fall back to insertion order while a split has no active leaf', () => {
@@ -173,11 +173,11 @@ describe('selectTabAgentTypesByTabId', () => {
       selectTabAgentTypesByTabId(
         {
           'tab-1:leaf-a': entry({ agentType: 'claude' }),
-          'tab-1:leaf-c': entry({ agentType: 'codex' })
+          'tab-1:leaf-c': entry({ agentType: 'opencode' })
         },
         { 'tab-1': layout }
       )
-    ).toEqual({ 'tab-1': 'codex' })
+    ).toEqual({ 'tab-1': 'opencode' })
   })
 
   it('stays shallow-equal across a working<->idle status flip (no re-render)', () => {
@@ -199,7 +199,7 @@ describe('selectTabAgentTypesByTabId', () => {
     })
     const gained = selectTabAgentTypesByTabId({
       'tab-1:leaf-a': entry({ agentType: 'claude' }),
-      'tab-2:leaf-a': entry({ agentType: 'codex' })
+      'tab-2:leaf-a': entry({ agentType: 'opencode' })
     })
     expect(shallow(before, gained)).toBe(false)
   })
@@ -219,8 +219,8 @@ describe('selectTabAgentTypesByTabId', () => {
     })
     const statuses = {
       'tab-1:leaf-a': entry({ agentType: 'claude' }),
-      'tab-2:leaf-a': entry({ agentType: 'codex' }),
-      'tab-3:leaf-a': entry({ agentType: 'grok' })
+      'tab-2:leaf-a': entry({ agentType: 'opencode' }),
+      'tab-3:leaf-a': entry({ agentType: 'pi' })
     }
     const layouts = {
       'tab-1': splitLayout('leaf-a'),
@@ -252,7 +252,7 @@ describe('selectTabAgentTypesByTabId', () => {
     const split = { 'tab-1': splitLayout('leaf-a') }
     const working = {
       'tab-1:leaf-a': entry({ agentType: 'claude', state: 'working' }),
-      'tab-1:leaf-b': entry({ agentType: 'codex', state: 'working' })
+      'tab-1:leaf-b': entry({ agentType: 'opencode', state: 'working' })
     }
 
     const first = select({
@@ -262,7 +262,7 @@ describe('selectTabAgentTypesByTabId', () => {
     })
     const done = {
       'tab-1:leaf-a': entry({ agentType: 'claude', state: 'done' }),
-      'tab-1:leaf-b': entry({ agentType: 'codex', state: 'done' })
+      'tab-1:leaf-b': entry({ agentType: 'opencode', state: 'done' })
     }
     const afterStatus = select({
       settings: { experimentalNativeChat: true },
@@ -288,7 +288,7 @@ describe('selectTabAgentTypesByTabId', () => {
       terminalLayoutsByTabId: singleLeaf
     })
 
-    expect(afterLayout.tabAgentTypesByTabId).toEqual({ 'tab-1': 'codex' })
+    expect(afterLayout.tabAgentTypesByTabId).toEqual({ 'tab-1': 'opencode' })
     expect(afterLayout.tabAgentTypesByTabId).not.toBe(first.tabAgentTypesByTabId)
     expect(afterLayout.nativeChatTabWideFallbackUnsafeTabsById).toEqual({})
     expect(afterLayout.nativeChatTabWideFallbackUnsafeTabsById).not.toBe(

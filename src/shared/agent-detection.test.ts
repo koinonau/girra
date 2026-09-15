@@ -162,12 +162,12 @@ describe('Pi-compatible title detection', () => {
     expect(hasCompatibleAgentTitleIdentity('Pi ready')).toBe(true)
     expect(hasCompatibleAgentTitleIdentity('π - tmp')).toBe(true)
     expect(hasCompatibleAgentTitleIdentity('Fix pi bugs')).toBe(false)
-    expect(hasCompatibleAgentTitleIdentity('\u280b Codex')).toBe(false)
+    expect(hasCompatibleAgentTitleIdentity('\u280b OpenCode')).toBe(false)
   })
 
   it('leaves an owner outside the compatible group untouched', () => {
-    expect(normalizeCompatibleAgentTitleForOwner('\u280b Pi', 'codex')).toBe('\u280b Pi')
-    expect(resolveCompatibleAgentTypeForOwner('codex', 'pi')).toBe('codex')
+    expect(normalizeCompatibleAgentTitleForOwner('\u280b Pi', 'opencode')).toBe('\u280b Pi')
+    expect(resolveCompatibleAgentTypeForOwner('opencode', 'pi')).toBe('opencode')
   })
 
   it.each(['~/pi/working', 'pi-scratch ready'])(

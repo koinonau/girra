@@ -98,12 +98,12 @@ describe('launchAgentInNewTab paired web runtime', () => {
   })
 
   it('forwards prompt launch env and captured config to the host runtime', async () => {
-    store.settings.agentDefaultArgs = { codex: '--model gpt-5 --reasoning-effort high' }
-    store.settings.agentDefaultEnv = { codex: { CODEX_PROFILE: 'captured' } }
+    store.settings.agentDefaultArgs = { claude: '--model sonnet --effort high' }
+    store.settings.agentDefaultEnv = { claude: { ORCA_TEST_PROFILE: 'captured' } }
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1',
       prompt: 'fix the spinner',
       groupId: 'group-1'
@@ -116,15 +116,14 @@ describe('launchAgentInNewTab paired web runtime', () => {
       targetGroupId: 'group-1',
       activate: true,
       agentSessionKind: 'fresh',
-      launchAgent: 'codex',
-      command: "codex '--model' 'gpt-5' '--reasoning-effort' 'high' 'fix the spinner'",
-      env: { CODEX_PROFILE: 'captured' },
+      launchAgent: 'claude',
+      command: "claude '--model' 'sonnet' '--effort' 'high' 'fix the spinner'",
+      env: { ORCA_TEST_PROFILE: 'captured' },
       launchConfig: {
-        agentCommand: "codex '--model' 'gpt-5' '--reasoning-effort' 'high'",
-        agentArgs: '--model gpt-5 --reasoning-effort high',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentCommand: "claude '--model' 'sonnet' '--effort' 'high'",
+        agentArgs: '--model sonnet --effort high',
+        agentEnv: { ORCA_TEST_PROFILE: 'captured' }
       },
-      startupCommandDelivery: 'shell-ready',
       prompt: 'fix the spinner',
       promptDelivery: 'auto-submit',
       viewMode: 'terminal'

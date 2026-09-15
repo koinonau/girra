@@ -113,13 +113,13 @@ describe('parseOrcaYaml', () => {
     const yaml = [
       'issueCommand: |',
       '  claude -p "Read issue #{{issue}}"',
-      '  codex exec "Review docs/design-{{issue}}.md"'
+      '  opencode run "Review docs/design-{{issue}}.md"'
     ].join('\n')
     const result = parseOrcaYaml(yaml)
     expect(result).toEqual({
       scripts: {},
       issueCommand:
-        'claude -p "Read issue #{{issue}}"\ncodex exec "Review docs/design-{{issue}}.md"'
+        'claude -p "Read issue #{{issue}}"\nopencode run "Review docs/design-{{issue}}.md"'
     })
   })
 

@@ -82,7 +82,7 @@ describe('registerFilesystemHandlers', () => {
       currentDraft: false
     }
     const PULL_REQUEST_ARGS = { base: 'main', title: '', body: '', draft: false }
-    const params = { agentId: 'codex', model: 'gpt-5.4-mini' }
+    const params = { agentId: 'opencode', model: 'gpt-5.4-mini' }
 
     beforeEach(() => {
       resolveCommitMessageSettingsMock.mockReturnValue({ ok: true, params })

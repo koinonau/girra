@@ -48,7 +48,7 @@ export function decodeClaudeTurnLifecycle(
     const stopReason = message?.stop_reason
     // Why: capable hosts rely on explicit terminals (prose is only a backup when
     // the latest lifecycle is not mid-generation). Emit completed for every real
-    // end marker — including historical/OpenClaude rows that omit stop_reason —
+    // end marker — including historical Claude-format rows that omit stop_reason —
     // while tool_use stays non-terminal so mid-turn tool loops keep working. The
     // no-stop_reason backup also excludes rows carrying a tool_use block: a
     // pre-tool assistant row that omits stop_reason is mid-turn, not done, so it

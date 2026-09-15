@@ -30,7 +30,7 @@ describe('normalizeNativeChatTaskList', () => {
     ])
   })
 
-  it('normalizes Codex JSON-string arguments and explanation', () => {
+  it('normalizes JSON-string arguments and explanation', () => {
     expect(
       normalizeNativeChatTaskList(
         'update_plan',

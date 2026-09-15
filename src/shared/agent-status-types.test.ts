@@ -45,12 +45,12 @@ describe('isFreshNonDoneAgentStatus', () => {
 describe('parseAgentStatusPayload', () => {
   it('parses a valid working payload', () => {
     const result = parseAgentStatusPayload(
-      '{"state":"working","prompt":"Fix the flaky assertion","agentType":"codex"}'
+      '{"state":"working","prompt":"Fix the flaky assertion","agentType":"opencode"}'
     )
     expect(result).toEqual({
       state: 'working',
       prompt: 'Fix the flaky assertion',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
   })
 
@@ -208,11 +208,11 @@ Fix dispatch fallback preview for normalized status prompts`
   })
 
   it('accepts custom non-empty agentType values', () => {
-    const result = parseAgentStatusPayload('{"state":"working","agentType":"cursor"}')
+    const result = parseAgentStatusPayload('{"state":"working","agentType":"some-in-house-agent"}')
     expect(result).toEqual({
       state: 'working',
       prompt: '',
-      agentType: 'cursor'
+      agentType: 'some-in-house-agent'
     })
   })
 
@@ -607,16 +607,16 @@ describe('normalizeAgentStatusPayload matches the JSON round trip', () => {
       state: 'working',
       workingMode: 'monitoring',
       prompt: 'p',
-      agentType: 'grok',
+      agentType: 'claude',
       toolName: 'sh',
       toolInput: 'ls'
     },
-    { state: 'done', prompt: '', agentType: 'devin', interrupted: true },
+    { state: 'done', prompt: '', agentType: 'pi', interrupted: true },
     // stringify DROPS undefined-valued keys; the direct path passes them through
     {
       state: 'working',
       prompt: 'p',
-      agentType: 'cursor',
+      agentType: 'claude-agent-teams',
       toolName: undefined,
       toolInput: undefined,
       interactivePrompt: undefined,
@@ -627,41 +627,46 @@ describe('normalizeAgentStatusPayload matches the JSON round trip', () => {
     {
       state: 'working',
       prompt: 'p',
-      agentType: 'copilot',
+      agentType: 'opencode',
       interactivePrompt: JSON.stringify({ q: 'pick {one}', options: ['a', 'b'] })
     },
     {
       state: 'working',
       prompt: 'a\r\nb c',
-      agentType: 'gemini',
+      agentType: 'claude',
       lastAssistantMessage: 'emoji \u{1f389} \u65e5\u672c\u8a9e\r\n\r\n\r\nmulti'
     },
-    { state: 'working', prompt: 'p', agentType: 'amp', lastAssistantMessage: 'x'.repeat(50_000) },
-    { state: 'done', prompt: 'p', agentType: 'hermes', toolName: '', toolInput: '' },
+    { state: 'working', prompt: 'p', agentType: 'pi', lastAssistantMessage: 'x'.repeat(50_000) },
+    { state: 'done', prompt: 'p', agentType: 'opencode', toolName: '', toolInput: '' },
     {
       state: 'working',
       prompt: 'p',
-      agentType: 'droid',
+      agentType: 'claude',
       toolInput: '{"nested":{"deep":{"deeper":[1,2,3]}}}'
     },
     {
       state: 'working',
       prompt: 'p',
-      agentType: 'kimi',
+      agentType: 'pi',
       lastAssistantMessage: '"escaped" quotes and \\ backslashes'
     },
     { state: 'working', prompt: 'p', agentType: 'opencode' },
-    { state: 'done', prompt: 'p', agentType: 'antigravity', interrupted: false },
+    { state: 'done', prompt: 'p', agentType: 'claude-agent-teams', interrupted: false },
     { state: 'working', prompt: 'p', agentType: 'pi', toolName: 'x'.repeat(9000) },
-    { state: 'working', prompt: 'x'.repeat(9000), agentType: 'omp' },
+    { state: 'working', prompt: 'x'.repeat(9000), agentType: 'claude' },
     {
       state: 'working',
       prompt: 'p',
-      agentType: 'command-code',
+      agentType: 'some-in-house-agent',
       lastAssistantMessage: 'tail with \u001b[0m escape codes'
     },
     // a lone surrogate is the case where stringify and a raw read could diverge
-    { state: 'working', prompt: 'p', agentType: 'grok', lastAssistantMessage: 'lone \ud800 pair' }
+    {
+      state: 'working',
+      prompt: 'p',
+      agentType: 'opencode',
+      lastAssistantMessage: 'lone \ud800 pair'
+    }
   ]
 
   it('produces identical output for every normalizer literal shape', () => {
@@ -685,20 +690,15 @@ describe('WellKnownAgentType', () => {
   const widenTuiAgent = (agent: TuiAgent): WellKnownAgentType => agent
 
   it('covers every TuiAgent id plus the unknown sentinel', () => {
-    // ids the previous 22-member hand-written union had drifted past
-    const formerlyMissing: WellKnownAgentType[] = [
-      'qwen-code',
-      'mistral-vibe',
-      'claude-agent-teams'
-    ]
+    const wellKnown: WellKnownAgentType[] = ['claude', 'claude-agent-teams', 'opencode']
     const sentinel: WellKnownAgentType = 'unknown'
 
-    expect([...formerlyMissing, sentinel, widenTuiAgent('rovo')]).toEqual([
-      'qwen-code',
-      'mistral-vibe',
+    expect([...wellKnown, sentinel, widenTuiAgent('pi')]).toEqual([
+      'claude',
       'claude-agent-teams',
+      'opencode',
       'unknown',
-      'rovo'
+      'pi'
     ])
   })
 

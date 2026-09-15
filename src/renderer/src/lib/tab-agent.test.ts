@@ -75,35 +75,35 @@ describe('resolveTabAgent', () => {
   it('prefers the focused pane when multiple panes run agents', () => {
     const map = {
       [`tab-1:${LEAF_A}`]: entry(`tab-1:${LEAF_A}`, 'claude'),
-      [`tab-1:${LEAF_B}`]: entry(`tab-1:${LEAF_B}`, 'codex')
+      [`tab-1:${LEAF_B}`]: entry(`tab-1:${LEAF_B}`, 'opencode')
     }
-    expect(resolveTabAgent(map, layout(LEAF_B), 'tab-1')).toBe('codex')
+    expect(resolveTabAgent(map, layout(LEAF_B), 'tab-1')).toBe('opencode')
   })
 
   it('exposes focused and sibling hook identity separately', () => {
     const map = {
       [`tab-1:${LEAF_A}`]: entry(`tab-1:${LEAF_A}`, 'claude'),
-      [`tab-1:${LEAF_B}`]: entry(`tab-1:${LEAF_B}`, 'codex')
+      [`tab-1:${LEAF_B}`]: entry(`tab-1:${LEAF_B}`, 'opencode')
     }
     expect(resolveFocusedTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('claude')
-    expect(resolveSiblingTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('codex')
+    expect(resolveSiblingTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('opencode')
   })
 
   it('falls back to any agent pane when the focused pane is a plain terminal', () => {
-    // Focused leaf A has no entry (it's a shell); the split sibling runs Codex.
-    const map = { [`tab-1:${LEAF_B}`]: entry(`tab-1:${LEAF_B}`, 'codex') }
-    expect(resolveTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('codex')
+    // Focused leaf A has no entry (it's a shell); the split sibling runs OpenCode.
+    const map = { [`tab-1:${LEAF_B}`]: entry(`tab-1:${LEAF_B}`, 'opencode') }
+    expect(resolveTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('opencode')
   })
 
   it('resolves via the prefix scan when the layout is missing', () => {
-    const map = { [`tab-1:${LEAF_A}`]: entry(`tab-1:${LEAF_A}`, 'droid') }
-    expect(resolveTabAgent(map, undefined, 'tab-1')).toBe('droid')
+    const map = { [`tab-1:${LEAF_A}`]: entry(`tab-1:${LEAF_A}`, 'pi') }
+    expect(resolveTabAgent(map, undefined, 'tab-1')).toBe('pi')
   })
 
   it('treats same-tab hook identity as focused when the layout is missing', () => {
-    const map = { [`tab-1:${LEAF_A}`]: entry(`tab-1:${LEAF_A}`, 'codex') }
+    const map = { [`tab-1:${LEAF_A}`]: entry(`tab-1:${LEAF_A}`, 'opencode') }
 
-    expect(resolveFocusedTabAgent(map, undefined, 'tab-1')).toBe('codex')
+    expect(resolveFocusedTabAgent(map, undefined, 'tab-1')).toBe('opencode')
     expect(resolveSiblingTabAgent(map, undefined, 'tab-1')).toBeNull()
   })
 
@@ -125,11 +125,11 @@ describe('resolveTabAgent', () => {
   it('exposes the completed hook agent for title disambiguation', () => {
     const map = {
       [`tab-1:${LEAF_A}`]: {
-        ...entry(`tab-1:${LEAF_A}`, 'openclaude'),
+        ...entry(`tab-1:${LEAF_A}`, 'pi'),
         state: 'done' as const
       }
     }
-    expect(resolveFocusedCompletedTabAgent(map, undefined, 'tab-1')).toBe('openclaude')
+    expect(resolveFocusedCompletedTabAgent(map, undefined, 'tab-1')).toBe('pi')
     expect(resolveSiblingCompletedTabAgent(map, undefined, 'tab-1')).toBeNull()
   })
 
@@ -140,37 +140,37 @@ describe('resolveTabAgent', () => {
         state: 'done' as const
       },
       [`tab-1:${LEAF_B}`]: {
-        ...entry(`tab-1:${LEAF_B}`, 'codex'),
+        ...entry(`tab-1:${LEAF_B}`, 'opencode'),
         state: 'done' as const
       }
     }
 
     expect(resolveFocusedCompletedTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('claude')
-    expect(resolveSiblingCompletedTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('codex')
+    expect(resolveSiblingCompletedTabAgent(map, layout(LEAF_A), 'tab-1')).toBe('opencode')
   })
 
   it('resolves retained completion identity for the focused pane and siblings separately', () => {
     const retained = {
-      [`tab-1:${LEAF_A}`]: retainedEntry(`tab-1:${LEAF_A}`, 'codex'),
+      [`tab-1:${LEAF_A}`]: retainedEntry(`tab-1:${LEAF_A}`, 'opencode'),
       [`tab-1:${LEAF_B}`]: retainedEntry(`tab-1:${LEAF_B}`, 'claude')
     }
 
-    expect(resolveFocusedRetainedTabAgent(retained, layout(LEAF_A), 'tab-1')).toBe('codex')
+    expect(resolveFocusedRetainedTabAgent(retained, layout(LEAF_A), 'tab-1')).toBe('opencode')
     expect(resolveSiblingRetainedTabAgent(retained, layout(LEAF_A), 'tab-1')).toBe('claude')
   })
 
   it('treats a same-tab retained completion as focused while layout is unavailable', () => {
     const retained = {
-      [`tab-1:${LEAF_A}`]: retainedEntry(`tab-1:${LEAF_A}`, 'codex')
+      [`tab-1:${LEAF_A}`]: retainedEntry(`tab-1:${LEAF_A}`, 'opencode')
     }
 
-    expect(resolveFocusedRetainedTabAgent(retained, undefined, 'tab-1')).toBe('codex')
+    expect(resolveFocusedRetainedTabAgent(retained, undefined, 'tab-1')).toBe('opencode')
     expect(resolveSiblingRetainedTabAgent(retained, undefined, 'tab-1')).toBeNull()
   })
 
   it('does not leak retained identity from another tab', () => {
     const retained = {
-      [`tab-2:${LEAF_A}`]: retainedEntry(`tab-2:${LEAF_A}`, 'codex')
+      [`tab-2:${LEAF_A}`]: retainedEntry(`tab-2:${LEAF_A}`, 'opencode')
     }
 
     expect(resolveFocusedRetainedTabAgent(retained, layout(LEAF_A), 'tab-1')).toBeNull()

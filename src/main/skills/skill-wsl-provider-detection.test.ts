@@ -18,13 +18,13 @@ describe('detectSkillProvidersInWsl', () => {
 
   it('asks for the login PATH so a nvm/mise-only install is still found (regression)', async () => {
     // Before this migration the site ran `sh -c` with no login shell, so an
-    // nvm-installed codex/claude -- reachable only through the PATH a login
+    // nvm-installed claude -- reachable only through the PATH a login
     // shell assembles from rc files -- resolved to nothing via `command -v`
     // and read as not installed.
     runWslProcessMock.mockResolvedValue({
       environmentResolved: true,
       code: 0,
-      stdout: 'codex\n',
+      stdout: 'claude\n',
       stderr: '',
       timedOut: false
     })
@@ -34,35 +34,21 @@ describe('detectSkillProvidersInWsl', () => {
     const [spec] = runWslProcessMock.mock.calls.at(-1) as [RunWslProcessSpec]
     expect(spec.loginPath).toBe('preferred')
     expect(spec.distro).toBe('Ubuntu')
-    expect(found).toEqual(['codex'])
-  })
-
-  it('parses both providers when present', async () => {
-    runWslProcessMock.mockResolvedValue({
-      environmentResolved: true,
-      code: 0,
-      stdout: 'codex\nclaude\n',
-      stderr: '',
-      timedOut: false
-    })
-
-    const found = await detectSkillProvidersInWsl('Ubuntu')
-
-    expect(found).toEqual(['codex', 'claude'])
+    expect(found).toEqual(['claude'])
   })
 
   it('ignores stray output that is not a recognized provider name', async () => {
     runWslProcessMock.mockResolvedValue({
       environmentResolved: true,
       code: 0,
-      stdout: 'codex\nsomething-else\n',
+      stdout: 'claude\nsomething-else\n',
       stderr: '',
       timedOut: false
     })
 
     const found = await detectSkillProvidersInWsl('Ubuntu')
 
-    expect(found).toEqual(['codex'])
+    expect(found).toEqual(['claude'])
   })
 
   it.each([
@@ -72,7 +58,7 @@ describe('detectSkillProvidersInWsl', () => {
   ])('%s', async (_case, stdout, unresolved) => {
     // The script ends in `|| true`, so "ran without the login PATH" and "no
     // providers installed" are the same exit 0 with the same empty stdout.
-    // Callers skip the ~/.codex and ~/.claude skill roots on an empty list, so
+    // Callers skip the ~/.claude skill roots on an empty list, so
     // conflating them loses an nvm-installed provider's skills (#9725).
     runWslProcessMock.mockResolvedValue({
       environmentResolved: !unresolved,

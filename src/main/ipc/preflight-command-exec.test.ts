@@ -25,18 +25,18 @@ describe('isCommandOnPath', () => {
   it('uses the shared literal lookup and accepts a sentinel-prefixed POSIX path', async () => {
     vi.spyOn(process, 'platform', 'get').mockReturnValue('win32')
     runPreflightCommandInWslMock.mockResolvedValue({
-      stdout: `shell startup chatter\n${sentinel}/home/user/.local/bin/codex\n`,
+      stdout: `shell startup chatter\n${sentinel}/home/user/.local/bin/opencode\n`,
       stderr: ''
     })
 
-    const found = await isCommandOnPath('codex', { distro: 'Ubuntu' })
+    const found = await isCommandOnPath('opencode', { distro: 'Ubuntu' })
 
     expect(found).toBe(true)
     expect(runPreflightCommandInWslMock).toHaveBeenCalledOnce()
     const [, command] = runPreflightCommandInWslMock.mock.calls[0] as [{ distro: string }, string]
     expect(command).toContain(
       buildPosixCommandPathLookupScript(
-        { kind: 'literal', value: 'codex' },
+        { kind: 'literal', value: 'opencode' },
         // The WSL branch skips Windows mounts, so detection and this check
         // cannot disagree about the same distro.
         { skipWindowsMountDirs: true }
@@ -50,12 +50,12 @@ describe('isCommandOnPath', () => {
   it.each([
     ['/absolute/startup/chatter', false],
     [`${sentinel}relative/path`, false],
-    ['codex', false],
-    ["alias codex='codex --wrapped'", false]
+    ['opencode', false],
+    ["alias opencode='opencode --wrapped'", false]
   ])('parses WSL lookup output %s as available: %s', async (stdout, expected) => {
     vi.spyOn(process, 'platform', 'get').mockReturnValue('win32')
     runPreflightCommandInWslMock.mockResolvedValue({ stdout: `${stdout}\n`, stderr: '' })
 
-    await expect(isCommandOnPath('codex', { distro: 'Ubuntu' })).resolves.toBe(expected)
+    await expect(isCommandOnPath('opencode', { distro: 'Ubuntu' })).resolves.toBe(expected)
   })
 })

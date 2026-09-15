@@ -71,7 +71,7 @@ describe('orca cli worktree awareness', () => {
         '--prompt',
         'Review open changes',
         '--provider',
-        'codex',
+        'claude',
         '--json'
       ],
       '/tmp/repo'
@@ -117,7 +117,7 @@ describe('orca cli worktree awareness', () => {
         '--prompt',
         'Review open changes',
         '--provider',
-        'codex',
+        'claude',
         '--json'
       ],
       '/tmp/repo'
@@ -144,7 +144,7 @@ describe('orca cli worktree awareness', () => {
         '--prompt',
         'Review open changes',
         '--provider',
-        'codex',
+        'claude',
         '--json'
       ]
     },

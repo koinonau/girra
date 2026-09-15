@@ -28,8 +28,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       const message = db.insertMessage({
         from: 'sender',
@@ -78,7 +78,7 @@ describe('OrcaRuntimeService', () => {
         coordinator_handle: terminal.handle,
         coordinator_pane_key: `${terminal.tabId}:${terminal.leafId}`
       })
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
       const message = db.insertMessage({
         from: 'term_worker',
         to: 'run:run_mailbox',
@@ -91,7 +91,7 @@ describe('OrcaRuntimeService', () => {
       await Promise.resolve()
       expect(write).not.toHaveBeenCalled()
 
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       expect(write).toHaveBeenCalledWith(
         'pty-1',
         '\nYou have 1 orchestration message. Run `orca-dev orchestration check --run run_mailbox`.\n'
@@ -139,8 +139,8 @@ describe('OrcaRuntimeService', () => {
         coordinator_handle: terminal.handle,
         coordinator_pane_key: `${terminal.tabId}:${terminal.leafId}`
       })
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       write.mockClear()
 
       const staleWait = runtime.waitForMessage('run:run_stale_waiter', {
@@ -200,7 +200,7 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
       db.insertMessage({
         from: 'term_worker',
         to: terminal.handle,
@@ -256,7 +256,7 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
       db.insertMessage({
         from: 'term_worker',
         to: terminal.handle,
@@ -269,7 +269,7 @@ describe('OrcaRuntimeService', () => {
       expect(pendingReads).not.toHaveBeenCalled()
       expect(pendingMailPointerRepoints(runtime)).toBe(0)
 
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       expect(pendingReads).toHaveBeenCalledTimes(1)
       expect(write).toHaveBeenCalledWith(
         'pty-1',
@@ -298,8 +298,8 @@ describe('OrcaRuntimeService', () => {
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
       runtime.registerPreAllocatedHandleForPty('pty-1', terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       runtime.markRendererReloading(1)
       db.insertMessage({
         from: 'term_worker',
@@ -339,8 +339,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       db.insertMessage({
         from: 'term_worker',
         to: terminal.handle,
@@ -378,8 +378,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       db.insertMessage({
         from: 'term_worker',
         to: terminal.handle,
@@ -417,7 +417,7 @@ describe('OrcaRuntimeService', () => {
       syncSinglePty(runtime)
 
       const [terminal] = (await runtime.listTerminals()).terminals
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
       db.insertMessage({
         runId: 'run_legacy_local',
         from: 'term_worker',
@@ -434,7 +434,7 @@ describe('OrcaRuntimeService', () => {
     }
   })
 
-  it('points already-idle Run mail after Codex replaces its completion title', async () => {
+  it('points already-idle Run mail after Claude replaces its completion title', async () => {
     const runtime = new OrcaRuntimeService(store)
     const db = new InMemoryOrchestrationMessages()
     const write = vi.fn().mockReturnValue(true)
@@ -443,36 +443,36 @@ describe('OrcaRuntimeService', () => {
       write,
       writeWithSettlement: settledWriteStub(write),
       kill: vi.fn(),
-      getForegroundProcess: async () => 'codex'
+      getForegroundProcess: async () => 'claude'
     })
     syncSinglePty(runtime)
 
     const [terminal] = (await runtime.listTerminals()).terminals
     db.setRun({
-      id: 'run_codex_native_title',
+      id: 'run_claude_native_title',
       coordinator_handle: terminal.handle,
       coordinator_pane_key: `${terminal.tabId}:${terminal.leafId}`
     })
-    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Codex ready\x07')
+    runtime.ingestSyntheticTitleFrame('pty-1', '\x1b]0;Claude ready\x07')
     runtime.onPtyData('pty-1', '\x1b]0;fix-12953-orchestration-mail-pointer\x07', 101)
     await Promise.resolve()
     await Promise.resolve()
     await Promise.resolve()
     db.insertMessage({
       from: 'term_worker',
-      to: 'run:run_codex_native_title',
+      to: 'run:run_claude_native_title',
       subject: 'real-agent smoke complete',
       body: 'The package name is orca.',
       type: 'worker_done'
     })
 
-    runtime.notifyMessageArrived('run:run_codex_native_title', 'worker_done')
+    runtime.notifyMessageArrived('run:run_claude_native_title', 'worker_done')
     await Promise.resolve()
 
     await vi.waitFor(() => {
       expect(write).toHaveBeenCalledWith(
         'pty-1',
-        '\nYou have 1 orchestration message. Run `orca-dev orchestration check --run run_codex_native_title`.\n'
+        '\nYou have 1 orchestration message. Run `orca-dev orchestration check --run run_claude_native_title`.\n'
       )
     })
     db.close()
@@ -493,7 +493,7 @@ describe('OrcaRuntimeService', () => {
 
     const [terminal] = (await runtime.listTerminals()).terminals
     bindSinglePtyRun(db, terminal.handle)
-    runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
+    runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
     const message = db.insertMessage({
       from: 'sender',
       to: terminal.handle,
@@ -528,7 +528,7 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       bindSinglePtyRun(db, terminal.handle)
-      runtime.seedTerminalRestoreTail('pty-1', { lastTitle: 'Codex done' })
+      runtime.seedTerminalRestoreTail('pty-1', { lastTitle: 'Claude done' })
       const message = db.insertMessage({
         from: 'sender',
         to: terminal.handle,
@@ -541,7 +541,7 @@ describe('OrcaRuntimeService', () => {
       // Why no working frame: a resumed agent sitting at its prompt emits an
       // already-idle title first. The seed left lastAgentStatus 'idle', so there
       // is no transition — only the liveness edge can release the row (#12536).
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 100)
 
       expect(write).toHaveBeenCalledWith(
         'pty-1',
@@ -574,7 +574,7 @@ describe('OrcaRuntimeService', () => {
       bindSinglePtyRun(db, terminal.handle)
       // Why: the persisted title is historical — the agent may have gone busy
       // across the relaunch, so a seeded 'idle' must not authorize a PTY write.
-      runtime.seedTerminalRestoreTail('pty-1', { lastTitle: 'Codex done' })
+      runtime.seedTerminalRestoreTail('pty-1', { lastTitle: 'Claude done' })
       const message = db.insertMessage({
         from: 'sender',
         to: terminal.handle,
@@ -590,8 +590,8 @@ describe('OrcaRuntimeService', () => {
       expect(message.delivered_at).toBeNull()
 
       // The first live idle frame authorizes it and the row still delivers.
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       expect(write).toHaveBeenCalledWith(
         'pty-1',
         expect.stringContaining('You have 1 orchestration message')
@@ -621,8 +621,8 @@ describe('OrcaRuntimeService', () => {
 
       const [terminal] = (await runtime.listTerminals()).terminals
       const mailbox = bindSinglePtyRun(db, terminal.handle)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex working\x07', 100)
-      runtime.onPtyData('pty-1', '\x1b]0;Codex done\x07', 101)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude working\x07', 100)
+      runtime.onPtyData('pty-1', '\x1b]0;Claude done\x07', 101)
       await runtime.waitForTerminal(terminal.handle, { condition: 'tui-idle' })
       write.mockClear()
 

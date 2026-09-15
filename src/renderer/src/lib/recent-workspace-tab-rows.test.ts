@@ -113,7 +113,7 @@ describe('resolveRecentWorkspaceTabStatus', () => {
   it.each(['tab', 'pane'] as const)(
     'suppresses a stale done pane permission %s title',
     (surface) => {
-      const title = 'Codex - action required'
+      const title = 'Pi - action required'
       const stale = entry('stale', 'done', NOW - AGENT_STATUS_STALE_AFTER_MS - 1)
       const paneSources = sources([stale], {
         ptyIdsByTabId: { stale: ['pty-1'] },
@@ -149,12 +149,12 @@ describe('resolveRecentWorkspaceTabStatus', () => {
           expandedLeafId: null
         }
       },
-      runtimePaneTitlesByTabId: { split: { 1: 'Codex - action required', 2: 'zsh' } }
+      runtimePaneTitlesByTabId: { split: { 1: 'Pi - action required', 2: 'zsh' } }
     })
     expect(resolveRecentWorkspaceTabStatus(row('split'), paneSources, NOW)).toBe('active')
-    paneSources.runtimePaneTitlesByTabId.split = { 1: '⠹ codex working', 2: 'zsh' }
+    paneSources.runtimePaneTitlesByTabId.split = { 1: '⠹ claude working', 2: 'zsh' }
     expect(resolveRecentWorkspaceTabStatus(row('split'), paneSources, NOW)).toBe('working')
-    paneSources.runtimePaneTitlesByTabId.split = { 2: 'Codex - action required' }
+    paneSources.runtimePaneTitlesByTabId.split = { 2: 'Pi - action required' }
     expect(resolveRecentWorkspaceTabStatus(row('split'), paneSources, NOW)).toBe('permission')
   })
 

@@ -516,7 +516,7 @@ describe('workspace cleanup removal and protection', () => {
       api: {
         pty: {
           hasChildProcesses: vi.fn().mockResolvedValue(true),
-          getForegroundProcess: vi.fn().mockResolvedValue('codex')
+          getForegroundProcess: vi.fn().mockResolvedValue('opencode')
         }
       }
     }
@@ -543,7 +543,7 @@ describe('workspace cleanup removal and protection', () => {
         pty: {
           hasChildProcesses: vi.fn(async (ptyId: string) => ptyId === 'pty-running'),
           getForegroundProcess: vi.fn(async (ptyId: string) =>
-            ptyId === 'pty-running' ? 'codex' : 'zsh'
+            ptyId === 'pty-running' ? 'opencode' : 'zsh'
           )
         }
       }
@@ -555,7 +555,7 @@ describe('workspace cleanup removal and protection', () => {
         tabsByWorktree: {
           [WORKTREE_ID]: [
             { id: 'tab-running', title: 'zsh' },
-            { id: 'tab-idle', title: 'Codex done' }
+            { id: 'tab-idle', title: 'OpenCode done' }
           ] as AppState['tabsByWorktree'][string]
         },
         ptyIdsByTabId: {

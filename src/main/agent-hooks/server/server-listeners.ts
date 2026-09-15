@@ -10,8 +10,7 @@ import type {
   AgentHookProviderSessionIdentity,
   AgentHookStatusChangeEntry,
   AgentHookStatusFreshnessObservation,
-  EnrichedAgentHookEventPayload,
-  StatusDropListener
+  EnrichedAgentHookEventPayload
 } from './server-types'
 import { toAgentStatusIpcPayload } from './server-status-identity'
 import { AgentHookServerState } from './server-state'
@@ -84,27 +83,6 @@ export abstract class AgentHookServerListeners extends AgentHookServerState {
     this.providerSessionChangeListeners.add(listener)
     return () => {
       this.providerSessionChangeListeners.delete(listener)
-    }
-  }
-
-  /** Multi-subscriber tap on definitive live-row deletions. `dropStatusEntry` is a user
-   * dismissal, so it never routes through the pane-status-clear fan-out — pane-owned
-   * cleanup (synthetic spinners) still has to retire with the row it was driving. */
-  subscribeStatusDrop(listener: StatusDropListener): () => void {
-    this.statusDropListeners.add(listener)
-    return () => {
-      this.statusDropListeners.delete(listener)
-    }
-  }
-
-  protected emitStatusDropped(paneKey: string): void {
-    for (const listener of this.statusDropListeners) {
-      // Why: matches every other fan-out here — one throwing subscriber must not strand the rest.
-      try {
-        listener(paneKey)
-      } catch (err) {
-        console.error('[agent-hooks] status-drop listener threw', err)
-      }
     }
   }
 

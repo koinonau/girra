@@ -7,7 +7,6 @@ import {
   homedir,
   ipcMain,
   join,
-  markCopilotFolderTrustedMock,
   mkdtemp,
   randomUUID,
   registerSshGitProvider,
@@ -97,8 +96,8 @@ describe('OrcaRuntimeService', () => {
       getSettings: () => ({
         ...store.getSettings(),
         disabledTuiAgents: [],
-        agentCmdOverrides: { codex: 'codex --profile work' },
-        agentDefaultArgs: { codex: '--dangerously-bypass-approvals-and-sandbox' },
+        agentCmdOverrides: { opencode: 'opencode --profile work' },
+        agentDefaultArgs: { opencode: '--print-logs' },
         agentDefaultEnv: {}
       })
     }
@@ -111,13 +110,11 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex'
+      command: 'opencode'
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as { command?: string } | undefined
-    expect(spawnCall?.command).toBe(
-      "codex --profile work '--dangerously-bypass-approvals-and-sandbox'"
-    )
+    expect(spawnCall?.command).toBe("opencode --profile work '--print-logs'")
   })
 
   it('keeps non-bare agent command terminal creates unchanged', async () => {
@@ -128,7 +125,7 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--dangerously-bypass-approvals-and-sandbox' },
+        agentDefaultArgs: { opencode: '--print-logs' },
         agentDefaultEnv: {}
       })
     }
@@ -141,13 +138,13 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex exec summarize'
+      command: 'opencode run summarize'
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
       | { command?: string; env?: Record<string, string> }
       | undefined
-    expect(spawnCall?.command).toBe('codex exec summarize')
+    expect(spawnCall?.command).toBe('opencode run summarize')
     expect(spawnCall?.env?.ORCA_AGENT_LAUNCH_TOKEN).toBeUndefined()
   })
 
@@ -157,9 +154,9 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        disabledTuiAgents: ['codex' as const],
+        disabledTuiAgents: ['opencode' as const],
         agentCmdOverrides: {},
-        agentDefaultArgs: { codex: '--dangerously-bypass-approvals-and-sandbox' },
+        agentDefaultArgs: { opencode: '--print-logs' },
         agentDefaultEnv: {}
       })
     }
@@ -172,13 +169,13 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex'
+      command: 'opencode'
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
       | { command?: string; env?: Record<string, string> }
       | undefined
-    expect(spawnCall?.command).toBe('codex')
+    expect(spawnCall?.command).toBe('opencode')
     expect(spawnCall?.env?.ORCA_AGENT_LAUNCH_TOKEN).toBeUndefined()
   })
 
@@ -189,8 +186,8 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { copilot: '--allow-all-tools' },
-        agentDefaultEnv: { copilot: { COPILOT_PROFILE: 'captured' } }
+        agentDefaultArgs: { opencode: '--print-logs' },
+        agentDefaultEnv: { opencode: { OPENCODE_PROFILE: 'captured' } }
       })
     }
     const runtime = new OrcaRuntimeService(runtimeStore)
@@ -213,7 +210,7 @@ describe('OrcaRuntimeService', () => {
       ipcMain.emit(
         'terminal:tabCreateReply',
         { sender: webContents },
-        { requestId: payload.requestId, tabId: 'tab-renderer', title: 'Copilot' }
+        { requestId: payload.requestId, tabId: 'tab-renderer', title: 'OpenCode' }
       )
     })
     runtime.attachWindow(1)
@@ -224,7 +221,7 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'copilot',
+      command: 'opencode',
       rendererBacked: true
     })
 
@@ -232,19 +229,15 @@ describe('OrcaRuntimeService', () => {
       'terminal:requestTabCreate',
       expect.objectContaining({
         worktreeId: TEST_WORKTREE_ID,
-        command: "copilot '--allow-all-tools'",
-        env: { COPILOT_PROFILE: 'captured' },
-        launchAgent: 'copilot',
+        command: "opencode '--print-logs'",
+        env: { OPENCODE_PROFILE: 'captured' },
+        launchAgent: 'opencode',
         launchConfig: {
-          agentCommand: "copilot '--allow-all-tools'",
-          agentArgs: '--allow-all-tools',
-          agentEnv: { COPILOT_PROFILE: 'captured' }
+          agentCommand: "opencode '--print-logs'",
+          agentArgs: '--print-logs',
+          agentEnv: { OPENCODE_PROFILE: 'captured' }
         }
       })
-    )
-    expect(markCopilotFolderTrustedMock).toHaveBeenCalledWith(TEST_WORKTREE_PATH)
-    expect(markCopilotFolderTrustedMock.mock.invocationCallOrder[0]).toBeLessThan(
-      webContents.send.mock.invocationCallOrder[0]!
     )
   })
 
@@ -266,14 +259,14 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
+      command: 'opencode',
       env: {
         ORCA_AGENT_HOOK_PORT: '1111',
         ORCA_AGENT_HOOK_TOKEN: 'stale-token',
         ORCA_AGENT_HOOK_TRANSPORT: 'stale-transport',
         ORCA_AGENT_HOOK_ENDPOINT: '/tmp/stale-endpoint.env'
       },
-      envToDelete: ['CODEX_HOME', 'ORCA_CODEX_HOME']
+      envToDelete: ['STALE_AGENT_HOME', 'ORCA_STALE_AGENT_HOME']
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
@@ -292,7 +285,7 @@ describe('OrcaRuntimeService', () => {
     )
     expect(spawnCall?.env?.ORCA_AGENT_HOOK_ENDPOINT).toBeUndefined()
     expect(spawnCall?.env?.ORCA_AGENT_HOOK_TRANSPORT).toBeUndefined()
-    expect(spawnCall?.envToDelete).toEqual(['CODEX_HOME', 'ORCA_CODEX_HOME'])
+    expect(spawnCall?.envToDelete).toEqual(['STALE_AGENT_HOME', 'ORCA_STALE_AGENT_HOME'])
   })
 
   it.each([
@@ -315,7 +308,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createTerminal(selector, {
-        command: 'codex',
+        command: 'claude',
         title: 'multi-repo worker'
       })
     ).resolves.toMatchObject({
@@ -357,7 +350,7 @@ describe('OrcaRuntimeService', () => {
 
     await expect(
       runtime.createTerminal(selector, {
-        command: 'codex',
+        command: 'claude',
         title: 'floating worker'
       })
     ).resolves.toMatchObject({
@@ -445,7 +438,7 @@ describe('OrcaRuntimeService', () => {
       command: "echo ok; claude 'hello'"
     })
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex'
+      command: 'opencode'
     })
 
     const directClaude = spawn.mock.calls[0]?.[0] as {
@@ -469,7 +462,7 @@ describe('OrcaRuntimeService', () => {
     expect(compoundClaude.env?.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS).toBeUndefined()
     expect(compoundClaude.env?.TMUX).toBeUndefined()
 
-    expect(normalAgent.command).toBe("codex '--dangerously-bypass-approvals-and-sandbox'")
+    expect(normalAgent.command).toBe('opencode')
     expect(normalAgent.env?.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS).toBeUndefined()
     expect(normalAgent.env?.TMUX).toBeUndefined()
   })

@@ -26,7 +26,7 @@ type CapturingSink = TracerSink & { records: unknown[] }
 const PRIVATE_VALUES = {
   localPath: '/Users/private/team skills/payroll-skill.tar.gz',
   canonicalPath: '/Users/private/.agents/skills/payroll',
-  providerPath: '/Users/private/.codex/skills/payroll',
+  providerPath: '/Users/private/.claude/skills/payroll',
   connectionId: 'private-production-ssh',
   skillName: 'payroll-instructions',
   filename: 'salary-review.md',
@@ -65,7 +65,7 @@ function result(): SkillInstallResult {
     canonicalPath: PRIVATE_VALUES.canonicalPath,
     placements: [
       {
-        provider: 'codex',
+        provider: 'claude',
         path: PRIVATE_VALUES.providerPath,
         topology: 'provider-alias',
         status: 'installed'
@@ -112,7 +112,7 @@ function bundleResult(): SkillBundleInstallResult {
         canonicalPath: PRIVATE_VALUES.canonicalPath,
         placements: [
           {
-            provider: 'codex',
+            provider: 'claude',
             path: PRIVATE_VALUES.providerPath,
             topology: 'provider-alias',
             status: 'skipped'

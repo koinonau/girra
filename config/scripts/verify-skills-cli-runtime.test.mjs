@@ -36,10 +36,10 @@ describe('skills CLI runtime closure', () => {
   it('reports the missing final-artifact import and its owner', async () => {
     const root = await mkdtemp(join(tmpdir(), 'orca-skills-cli-closure-'))
     try {
-      await writeSkillsCliFixture(root, "require('../../main/codex-cli/command')\n")
+      await writeSkillsCliFixture(root, "require('../../shared/node-cli-command-resolution')\n")
 
       expect(() => collectRuntimeClosure(root)).toThrow(
-        /missing runtime import "\.\.\/\.\.\/main\/codex-cli\/command" from cli\/handlers\/skills\.js/
+        /missing runtime import "\.\.\/\.\.\/shared\/node-cli-command-resolution" from cli\/handlers\/skills\.js/
       )
     } finally {
       await rm(root, { recursive: true, force: true })

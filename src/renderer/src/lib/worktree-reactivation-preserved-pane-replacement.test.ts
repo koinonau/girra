@@ -262,7 +262,7 @@ describe('preserved-pane replacement contract on workspace activation', () => {
   // Why (flipped by the aug20 "windows 2" incident): a still-published
   // web-mirror tab is a host tab, so the host owns its PTY. The client cannot
   // mount that pane and cannot see its liveness until the mirror hydrates, and
-  // the replacement it used to append relaunched `codex resume` against a
+  // the replacement it used to append relaunched `claude --resume` against a
   // session the host still held (-32600 "already has an active writer"),
   // stranding a bare shell while the live agent lost its tab.
   it('parks the resume for a still-published web-mirror tab and replays it on the verdict', async () => {

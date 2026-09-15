@@ -77,7 +77,7 @@ describe('fetchWorktrees', () => {
         kind: 'created-by-cli',
         createdAt: 123,
         callerTerminalHandle: 'term-1',
-        startupAgent: 'codex'
+        startupAgent: 'opencode'
       }
     })
     const second = makeWorktree({

@@ -116,8 +116,6 @@ describe('getDefaultSettings', () => {
     expect(getDefaultSettings('/tmp').experimentalAgentDashboardShowIdle).toBeUndefined()
   })
 
-  it('routes fresh Codex profiles through the real-home rollout by default', () => {})
-
   it('defaults local Windows projects to the host runtime', () => {
     expect(getDefaultSettings('/tmp').localWindowsRuntimeDefault).toEqual({
       kind: 'windows-host'
@@ -132,19 +130,11 @@ describe('getDefaultSettings', () => {
   it('defaults agent launch args to yolo mode where the CLI supports it', () => {
     const settings = getDefaultSettings('/tmp')
 
-    expect(settings.agentDefaultArgs).toMatchObject({
+    expect(settings.agentDefaultArgs).toEqual({
       claude: '--dangerously-skip-permissions',
-      codex: '--dangerously-bypass-approvals-and-sandbox',
-      gemini: '--yolo',
-      cursor: '--yolo',
-      copilot: '--yolo',
-      grok: '--permission-mode bypassPermissions'
+      'claude-agent-teams': '--dangerously-skip-permissions'
     })
-    expect(settings.agentDefaultArgs).not.toHaveProperty('opencode')
-    expect(settings.agentDefaultArgs).not.toHaveProperty('kilo')
-    expect(settings.agentDefaultEnv).toMatchObject({
-      goose: { GOOSE_MODE: 'auto' }
-    })
+    expect(settings.agentDefaultEnv).toEqual({})
     expect(settings.agentYoloDefaultsMigrated).toBe(true)
   })
 })

@@ -37,14 +37,14 @@ Task IDs printed in terminals, such as `task_...`, are clickable links. Clicking
 ```bash
 orca orchestration run-create --objective "Split checkout QA and summarize blockers" --json
 orca orchestration task-create --spec "Audit billing settings for mobile layout" --task-title "Billing audit" --json
-orca orchestration worker-start --task <taskId> --worktree current --agent codex --json
+orca orchestration worker-start --task <taskId> --worktree current --agent claude --json
 # or new worktree:
-orca orchestration worker-start --task <taskId> --worktree new-child --name billing-audit --agent codex --setup run --json
-# optional per-worker model / effort (Claude, Codex, Cursor only; not with --terminal):
+orca orchestration worker-start --task <taskId> --worktree new-child --name billing-audit --agent claude --setup run --json
+# optional per-worker model / effort (Claude only; not with --terminal):
 orca orchestration worker-start --task <taskId> --worktree current --agent claude --model <opaque-model-id> --effort high --json
 ```
 
-`--model` accepts opaque provider model IDs for Claude, Codex, and Cursor. `--effort` requires `--model` and only applies when that agent/model supports the level. Neither flag can combine with `--terminal` (reuse an existing pane). Overrides apply to that launch only and show under `launch.requested` / `launch.effective` in the start receipt. Federated starts need a worker host that advertises launch-preference support.
+`--model` accepts opaque provider model IDs for Claude. `--effort` requires `--model` and only applies when that agent/model supports the level. Neither flag can combine with `--terminal` (reuse an existing pane). Overrides apply to that launch only and show under `launch.requested` / `launch.effective` in the start receipt. Federated starts need a worker host that advertises launch-preference support.
 
 Wait for completions (process every message in a Delivery, then ack):
 
@@ -81,7 +81,7 @@ orca orchestration worker-release --dispatch <dispatchId> --json
 # Keep a settled worker live for debugging when the user asked to retain it:
 orca orchestration worker-retain --dispatch <dispatchId> --json
 # retry placement is explicit — --retry-of does not inherit --on/worktree:
-orca orchestration worker-start --task <taskId> --retry-of <dispatchId> --worktree current --agent codex --json
+orca orchestration worker-start --task <taskId> --retry-of <dispatchId> --worktree current --agent claude --json
 ```
 
 Do not leave completed worker terminals open just to re-read output — use `worker-read` after `worker-release`. Do not substitute a broad `terminal close` when release returns `release_pending` or `release_unknown`; follow the receipt's recovery action.
@@ -95,7 +95,7 @@ orca orchestration worker-start \
   --worktree new-top-level \
   --repo <exact_remote_repo_selector> \
   --name remote-worker \
-  --agent codex \
+  --agent claude \
   --setup run \
   --json
 orca orchestration send --to dispatch:<dispatchId> --subject "Follow-up" --body "…" --json
@@ -106,7 +106,7 @@ Later commands route by Dispatch ID; do not repeat `--on`.
 ## Low-level dispatch (custom topology)
 
 ```bash
-orca worktree create --name billing-audit --agent codex --json
+orca worktree create --name billing-audit --agent claude --json
 orca terminal wait --terminal <workerHandle> --for tui-idle --timeout-ms 60000 --json
 orca orchestration dispatch --task <taskId> --to <workerHandle> --inject --json
 ```
@@ -115,7 +115,7 @@ orca orchestration dispatch --task <taskId> --to <workerHandle> --inject --json
 
 - Default `check` is the bound Run's oldest unacked Delivery (FIFO). Replay until `--ack`.
 - `--peek` / `--all` do not consume mail.
-- Group addresses: `@all`, `@idle`, `@claude`, `@codex`, `@opencode`, `@gemini`, `@droid`, `@grok`, `@cursor`, `@worktree:<id>` — never for `worker_done` / heartbeat.
+- Group addresses: `@all`, `@idle`, `@claude`, `@opencode`, `@worktree:<id>` — never for `worker_done` / heartbeat.
 - Every group except `@worktree:<id>` means the live Dispatches of the sender's own Run, delivered to their Dispatch mailboxes (or child Run mailboxes for nested coordinators). A sender in no Run is refused; `--run` must match the audience and never grants membership.
 - Run groups exclude their owning coordinator. A worker raising a blocker sends to `run:<id>`. `@worktree:<id>` includes coordinators in that workspace.
 - Quote PowerShell group addresses: `--to "@all"`.
@@ -123,7 +123,7 @@ orca orchestration dispatch --task <taskId> --to <workerHandle> --inject --json
 ```bash
 orca orchestration send --to @all --subject "Heads up" --body "Pausing dispatches for a review." --json
 orca orchestration send --to @idle --subject "Anyone free?" --json
-orca orchestration send --to @codex --subject "Codex workers in this Run only" --json
+orca orchestration send --to @claude --subject "Claude workers in this Run only" --json
 ```
 
 While a wait is active, the CLI emits small JSON heartbeat lines to stderr every 15 seconds. Stdout remains the final command result.

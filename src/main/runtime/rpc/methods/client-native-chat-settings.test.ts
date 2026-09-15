@@ -21,10 +21,10 @@ describe('native-chat settings RPC', () => {
     const dispatcher = new RpcDispatcher({ runtime, methods: CLIENT_UI_METHODS })
     const mutation = {
       type: 'apply-picks' as const,
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       picks: [
-        { modelId: 'gpt-fast', optionId: 'model' as const, value: 'gpt-fast' },
-        { modelId: 'gpt-fast', optionId: 'effort' as const, value: 'low' }
+        { modelId: 'sonnet', optionId: 'model' as const, value: 'sonnet' },
+        { modelId: 'sonnet', optionId: 'effort' as const, value: 'low' }
       ]
     }
 
@@ -43,7 +43,7 @@ describe('native-chat settings RPC', () => {
     const dispatcher = new RpcDispatcher({ runtime, methods: CLIENT_UI_METHODS })
 
     for (const mutation of [
-      { type: 'apply-picks', agent: 'codex', picks: [] },
+      { type: 'apply-picks', agent: 'claude', picks: [] },
       {
         type: 'apply-picks',
         agent: 'opencode',
@@ -51,23 +51,28 @@ describe('native-chat settings RPC', () => {
       },
       {
         type: 'apply-picks',
-        agent: 'codex',
+        agent: 'claude',
         picks: [{ modelId: 'model', optionId: 'arbitrary', value: 'value' }]
       },
       {
         type: 'apply-picks',
-        agent: 'codex',
+        agent: 'claude',
         picks: [{ modelId: 'model', optionId: 'effort', value: true }]
       },
       {
         type: 'apply-picks',
-        agent: 'cursor',
+        agent: 'claude',
         picks: [{ modelId: 'model', optionId: 'fastMode', value: 'true' }]
       },
       {
         type: 'clear-model-if-missing',
-        agent: 'grok',
+        agent: 'claude',
         availableModelIds: []
+      },
+      {
+        type: 'clear-model-if-missing',
+        agent: 'retired-agent',
+        availableModelIds: ['model']
       }
     ]) {
       const response = await dispatcher.dispatch(request(mutation))

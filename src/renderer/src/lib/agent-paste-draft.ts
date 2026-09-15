@@ -27,10 +27,10 @@ export {
   sendAgentDraftPasteContent
 } from './agent-draft-paste-content'
 
-// Why: bracketed paste markers let modern TUIs (Claude Code / Codex / Pi /
-// OpenCode / Gemini / cursor-agent / copilot) treat the inserted text as a
-// single atomic paste instead of echoing character-by-character or triggering
-// line-edit shortcuts. Callers choose whether to append Enter after the paste.
+// Why: bracketed paste markers let modern TUIs (Claude Code / Pi / OpenCode)
+// treat the inserted text as a single atomic paste instead of echoing
+// character-by-character or triggering line-edit shortcuts. Callers choose
+// whether to append Enter after the paste.
 export const BRACKETED_PASTE_BEGIN = BRACKETED_PASTE_START
 export { BRACKETED_PASTE_END }
 export const POST_PASTE_SUBMIT_DELAY_MS = 50
@@ -71,7 +71,7 @@ export function getSettingsForAgentTabRuntimeOwner(
  *      output. This is the protocol-level "I accept bracketed paste"
  *      handshake.
  *   2. Either ≥`BRACKETED_PASTE_QUIET_MS` of silence after the last byte of
- *      the post-handshake render burst, or Codex's composer prompt glyph.
+ *      the post-handshake render burst, or the agent's configured ready signal.
  */
 export async function pasteDraftWhenAgentReady(args: {
   tabId: string
@@ -97,7 +97,7 @@ export async function pasteDraftWhenAgentReady(args: {
 
   const readySignal = agentConfig?.draftPasteReadySignal ?? 'render-quiet-after-bracketed-paste'
   const settings = getSettingsForAgentTabRuntimeOwner(tabId)
-  const readinessTimeoutMs = resolveDraftPasteReadyTimeoutMs(agent, timeoutMs)
+  const readinessTimeoutMs = resolveDraftPasteReadyTimeoutMs(timeoutMs)
   const readiness = await waitForAgentDraftInputReadyOnTab({
     tabId,
     spawnTimeoutMs: PTY_SPAWN_TIMEOUT_MS,
@@ -129,8 +129,7 @@ export async function pasteDraftWhenAgentReady(args: {
     settings,
     ptyId,
     content,
-    submit: submit === true,
-    agent
+    submit: submit === true
   })
 }
 
@@ -153,7 +152,7 @@ export async function pasteDraftToAgentPtyWhenReady(args: {
 
   const settings = getSettingsForAgentTabRuntimeOwner(tabId)
   const readySignal = agentConfig?.draftPasteReadySignal ?? 'render-quiet-after-bracketed-paste'
-  const budget = resolveDraftPasteReadyTimeoutMs(agent, timeoutMs)
+  const budget = resolveDraftPasteReadyTimeoutMs(timeoutMs)
   const ready = await waitForAgentDraftInputReady(ptyId, budget, readySignal, settings)
   if (!ready) {
     const fallbackReady = agentConfig
@@ -169,8 +168,7 @@ export async function pasteDraftToAgentPtyWhenReady(args: {
     settings,
     ptyId,
     content,
-    submit: submit === true,
-    agent
+    submit: submit === true
   })
 }
 
@@ -199,12 +197,10 @@ async function sendBracketedPasteToAgent(args: {
   ptyId: string
   content: string
   submit: boolean
-  agent?: TuiAgent
 }): Promise<boolean> {
-  const { settings = useAppStore.getState().settings, ptyId, content, submit, agent } = args
-  const submitRetryDelayMs = agent ? TUI_AGENT_CONFIG[agent]?.submitRetryDelayMs : undefined
+  const { settings = useAppStore.getState().settings, ptyId, content, submit } = args
   try {
-    // Why: paste + Enter (+ retry Enter) must be one transaction, or a concurrent
+    // Why: paste + Enter must be one transaction, or a concurrent
     // paste on this PTY can slip between them and submit a half-written prompt.
     return await runTerminalPtyInputTransaction(ptyId, async () => {
       const pasted = await sendAgentDraftPasteContentNow(settings, ptyId, content)
@@ -216,20 +212,7 @@ async function sendBracketedPasteToAgent(args: {
       // Enter arrive in the same PTY write. Split the submit into the next turn so
       // the TUI processes bracketed-paste termination before handling Enter.
       await new Promise<void>((resolve) => window.setTimeout(resolve, POST_PASTE_SUBMIT_DELAY_MS))
-      const submitted = await sendRuntimePtyInputVerified(settings, ptyId, '\r')
-
-      if (submitRetryDelayMs !== undefined) {
-        // Why: agents that render their composer before Enter is live silently eat
-        // the first Enter; the retry is best-effort and never downgrades `submitted`.
-        await new Promise<void>((resolve) => window.setTimeout(resolve, submitRetryDelayMs))
-        try {
-          await sendRuntimePtyInputVerified(settings, ptyId, '\r')
-        } catch {
-          // Why: a rejected retry leaves the first Enter's verdict untouched.
-        }
-      }
-
-      return submitted
+      return await sendRuntimePtyInputVerified(settings, ptyId, '\r')
     })
   } catch {
     return false

@@ -117,41 +117,11 @@ describe('planCommitMessageGeneration', () => {
     })
   })
 
-  it('plans Amp execute generation without the removed archive flag', () => {
-    const result = planCommitMessageGeneration(
-      {
-        agentId: 'amp',
-        model: 'large',
-        thinkingLevel: 'medium'
-      },
-      'PROMPT'
-    )
-
-    expect(result).toEqual({
-      ok: true,
-      plan: {
-        binary: 'amp',
-        args: [
-          '--execute',
-          '--no-notifications',
-          '--no-ide',
-          '--no-jetbrains',
-          '--mode',
-          'large',
-          '--effort',
-          'medium'
-        ],
-        stdinPayload: 'PROMPT',
-        label: 'Amp'
-      }
-    })
-  })
-
   it('allows discovered dynamic models that are not in the seed catalog', () => {
     const result = planCommitMessageGeneration(
       {
-        agentId: 'cursor',
-        model: 'gpt-5.2',
+        agentId: 'opencode',
+        model: 'openai/gpt-5.2',
         thinkingLevel: 'xhigh'
       },
       'PROMPT'
@@ -160,108 +130,33 @@ describe('planCommitMessageGeneration', () => {
     expect(result).toEqual({
       ok: true,
       plan: {
-        binary: 'cursor-agent',
+        binary: 'opencode',
         args: [
-          '--print',
-          '--mode',
-          'ask',
-          '--trust',
-          '--output-format',
-          'text',
+          'run',
           '--model',
-          'gpt-5.2',
-          'PROMPT'
+          'openai/gpt-5.2',
+          '--agent',
+          'build',
+          '--format',
+          'default',
+          '--variant',
+          'xhigh'
         ],
-        stdinPayload: null,
-        label: 'Cursor'
+        stdinPayload: 'PROMPT',
+        label: 'OpenCode'
       }
     })
   })
 
-  it('plans Antigravity generation with the prompt attached to --print, not stdin (#19539, #14059)', () => {
+  // Why: real #14059 reproduction config. CLI arguments repeat --model and add
+  // --add-dir/--effort/--dangerously-skip-permissions; the duplicate --model is deduped
+  // by DEFAULT_SINGLETON_OPTIONS on a spec that declares no singleton options.
+  it('keeps #14059-style recipe CLI arguments intact and deduped on a default-singleton spec', () => {
     const result = planCommitMessageGeneration(
       {
-        agentId: 'antigravity',
-        model: 'Gemini 3.5 Flash (Medium)'
-      },
-      'real commit prompt'
-    )
-
-    expect(result).toEqual({
-      ok: true,
-      plan: {
-        binary: 'agy',
-        args: ['--print=real commit prompt', '--sandbox', '--model', 'Gemini 3.5 Flash (Medium)'],
-        stdinPayload: null,
-        label: 'Antigravity'
-      }
-    })
-  })
-
-  it('keeps a leading-dash Antigravity prompt bound to --print instead of parsing as an option', () => {
-    const result = planCommitMessageGeneration(
-      { agentId: 'antigravity', model: 'Gemini 3.5 Flash (Medium)' },
-      '-fix: something'
-    )
-
-    expect(result.ok).toBe(true)
-    expect(result.ok && result.plan.args.slice(0, 2)).toEqual([
-      '--print=-fix: something',
-      '--sandbox'
-    ])
-  })
-
-  // Why: pins argv construction only. Real agy 1.2.1 separately rejects a --print value
-  // that exactly matches a registered flag name (its own heuristic, independent of this
-  // fix) — verified `agy --print=--sandbox` still errors there. Real prompts are never
-  // literally a bare flag name, so this doesn't affect actual generation.
-  it('still glues an Antigravity prompt that collides with a flag name onto --print', () => {
-    const result = planCommitMessageGeneration(
-      { agentId: 'antigravity', model: 'Gemini 3.5 Flash (Medium)' },
-      '--sandbox'
-    )
-
-    expect(result.ok).toBe(true)
-    expect(result.ok && result.plan.args.slice(0, 2)).toEqual(['--print=--sandbox', '--sandbox'])
-  })
-
-  // Why: agy has no documented stdin mode for --print (#19539's body: "--print ... is
-  // not a boolean flag that automatically reads from stdin; it expects the prompt
-  // string as its option argument"), so a large staged patch now rides on argv. This
-  // is the same unguarded argv delivery cursor/kimi/copilot already use (see the
-  // parity assertion below) — pinned here as a known property, not a regression.
-  it('puts a large Antigravity prompt on argv with no size guard, same as other argv-delivery agents', () => {
-    const bigPrompt = 'y'.repeat(70_000)
-    const result = planCommitMessageGeneration(
-      { agentId: 'antigravity', model: 'Gemini 3.5 Flash (Medium)' },
-      bigPrompt
-    )
-
-    expect(result.ok).toBe(true)
-    expect(result.ok && result.plan.args[0]).toBe(`--print=${bigPrompt}`)
-    expect(result.ok && result.plan.stdinPayload).toBeNull()
-
-    const cursorResult = planCommitMessageGeneration(
-      { agentId: 'cursor', model: 'auto' },
-      bigPrompt
-    )
-    expect(cursorResult.ok).toBe(true)
-    expect(cursorResult.ok && cursorResult.plan.args.at(-1)).toBe(bigPrompt)
-    expect(cursorResult.ok && cursorResult.plan.stdinPayload).toBeNull()
-  })
-
-  // Why: real #14059 reproduction config — CLI arguments field repeats --model and adds
-  // --add-dir/--effort/--dangerously-skip-permissions. Confirms none of it gets swallowed
-  // into the --print operand and the duplicate --model is deduped the same way every
-  // other spec's recipe args already are (DEFAULT_SINGLETON_OPTIONS, unaffected by
-  // argument order).
-  it('keeps #14059-style recipe CLI arguments intact and deduped around the print operand', () => {
-    const result = planCommitMessageGeneration(
-      {
-        agentId: 'antigravity',
-        model: 'Gemini 3.5 Flash (Medium)',
-        agentArgs:
-          '--add-dir . --model gemini-3.6-flash --effort low --dangerously-skip-permissions'
+        agentId: 'claude',
+        model: 'sonnet',
+        agentArgs: '--add-dir . --model opus --effort low --dangerously-skip-permissions'
       },
       'Generate a concise git commit message for the currently staged changes.'
     )
@@ -269,51 +164,23 @@ describe('planCommitMessageGeneration', () => {
     expect(result).toEqual({
       ok: true,
       plan: {
-        binary: 'agy',
+        binary: 'claude',
         args: [
-          '--print=Generate a concise git commit message for the currently staged changes.',
-          '--sandbox',
+          '-p',
+          '--output-format',
+          'text',
           '--model',
-          'gemini-3.6-flash',
+          'opus',
+          '--permission-mode',
+          'plan',
           '--add-dir',
           '.',
           '--effort',
           'low',
           '--dangerously-skip-permissions'
         ],
-        stdinPayload: null,
-        label: 'Antigravity'
-      }
-    })
-  })
-
-  it('plans Codex exec as non-interactive read-only generation with the prompt on stdin only', () => {
-    const result = planCommitMessageGeneration(
-      {
-        agentId: 'codex',
-        model: 'gpt-5.4-mini',
-        thinkingLevel: 'medium'
-      },
-      'PROMPT'
-    )
-
-    expect(result).toEqual({
-      ok: true,
-      plan: {
-        binary: 'codex',
-        args: [
-          'exec',
-          '--ephemeral',
-          '--skip-git-repo-check',
-          '-s',
-          'read-only',
-          '--model',
-          'gpt-5.4-mini',
-          '-c',
-          'model_reasoning_effort=medium'
-        ],
-        stdinPayload: 'PROMPT',
-        label: 'Codex'
+        stdinPayload: 'Generate a concise git commit message for the currently staged changes.',
+        label: 'Claude'
       }
     })
   })
@@ -321,9 +188,9 @@ describe('planCommitMessageGeneration', () => {
   it('uses preset agent command overrides as the spawn command prefix', () => {
     const result = planCommitMessageGeneration(
       {
-        agentId: 'codex',
-        model: 'gpt-5.4-mini',
-        agentCommandOverride: 'npx codex'
+        agentId: 'pi',
+        model: 'github-copilot/gpt-5.4-mini',
+        agentCommandOverride: 'npx pi'
       },
       'PROMPT'
     )
@@ -333,14 +200,16 @@ describe('planCommitMessageGeneration', () => {
       plan: {
         binary: 'npx',
         args: [
-          'codex',
-          'exec',
-          '--ephemeral',
-          '--skip-git-repo-check',
-          '-s',
-          'read-only',
+          'pi',
+          '--print',
+          '--no-session',
+          '--no-tools',
+          '--no-skills',
+          '--no-context-files',
+          '--mode',
+          'text',
           '--model',
-          'gpt-5.4-mini'
+          'github-copilot/gpt-5.4-mini'
         ],
         stdinPayload: 'PROMPT'
       }
@@ -348,21 +217,26 @@ describe('planCommitMessageGeneration', () => {
   })
 
   it.each([
-    ['long option', '--model gpt-5.6-luna', ['--model', 'gpt-5.6-luna'], []],
-    ['short option', '-m gpt-5.6-luna', ['-m', 'gpt-5.6-luna'], []],
-    ['equals form', '--model=gpt-5.6-luna', ['--model=gpt-5.6-luna'], []],
-    ['attached short form', '-mgpt-5.6-luna', ['-mgpt-5.6-luna'], []],
+    ['long option', '--model openai/gpt-5.6-luna', ['--model', 'openai/gpt-5.6-luna'], []],
+    ['short option', '-m openai/gpt-5.6-luna', ['-m', 'openai/gpt-5.6-luna'], []],
+    ['equals form', '--model=openai/gpt-5.6-luna', ['--model=openai/gpt-5.6-luna'], []],
+    ['attached short form', '-mopenai/gpt-5.6-luna', ['-mopenai/gpt-5.6-luna'], []],
     [
       'sibling arguments',
-      '--model gpt-5.6-luna --sandbox read-only',
-      ['--model', 'gpt-5.6-luna'],
-      ['--sandbox', 'read-only']
+      '--model openai/gpt-5.6-luna --share',
+      ['--model', 'openai/gpt-5.6-luna'],
+      ['--share']
     ]
   ])(
-    'lets Codex recipe args override the generated model via %s',
+    'lets OpenCode recipe args override the generated model via %s',
     (_, agentArgs, overrideArgs, trailingArgs) => {
       const result = planCommitMessageGeneration(
-        { agentId: 'codex', model: 'gpt-5.4-mini', thinkingLevel: 'medium', agentArgs },
+        {
+          agentId: 'opencode',
+          model: 'opencode/gpt-5.4-mini',
+          thinkingLevel: 'medium',
+          agentArgs
+        },
         'PROMPT'
       )
 
@@ -370,14 +244,14 @@ describe('planCommitMessageGeneration', () => {
         ok: true,
         plan: {
           args: [
-            'exec',
-            '--ephemeral',
-            '--skip-git-repo-check',
-            '-s',
-            'read-only',
+            'run',
             ...overrideArgs,
-            '-c',
-            'model_reasoning_effort=medium',
+            '--agent',
+            'build',
+            '--format',
+            'default',
+            '--variant',
+            'medium',
             ...trailingArgs
           ],
           stdinPayload: 'PROMPT'
@@ -386,12 +260,12 @@ describe('planCommitMessageGeneration', () => {
     }
   )
 
-  it('keeps Codex recipe arguments unchanged when they do not override the model', () => {
+  it('keeps Pi recipe arguments unchanged when they do not override the model', () => {
     const result = planCommitMessageGeneration(
       {
-        agentId: 'codex',
-        model: 'gpt-5.4-mini',
-        agentArgs: '--sandbox workspace-write'
+        agentId: 'pi',
+        model: 'github-copilot/gpt-5.4-mini',
+        agentArgs: '--offline'
       },
       'PROMPT'
     )
@@ -400,25 +274,26 @@ describe('planCommitMessageGeneration', () => {
       ok: true,
       plan: {
         args: [
-          'exec',
-          '--ephemeral',
-          '--skip-git-repo-check',
-          '-s',
-          'read-only',
+          '--print',
+          '--no-session',
+          '--no-tools',
+          '--no-skills',
+          '--no-context-files',
+          '--mode',
+          'text',
           '--model',
-          'gpt-5.4-mini',
-          '--sandbox',
-          'workspace-write'
+          'github-copilot/gpt-5.4-mini',
+          '--offline'
         ]
       }
     })
   })
 
-  it('keeps the generated Codex model when model-like text follows an option terminator', () => {
+  it('keeps the generated OpenCode model when model-like text follows an option terminator', () => {
     const result = planCommitMessageGeneration(
       {
-        agentId: 'codex',
-        model: 'gpt-5.4-mini',
+        agentId: 'opencode',
+        model: 'opencode/gpt-5.4-mini',
         agentArgs: '-- --model literal'
       },
       'PROMPT'
@@ -428,13 +303,13 @@ describe('planCommitMessageGeneration', () => {
       ok: true,
       plan: {
         args: [
-          'exec',
-          '--ephemeral',
-          '--skip-git-repo-check',
-          '-s',
-          'read-only',
+          'run',
           '--model',
-          'gpt-5.4-mini',
+          'opencode/gpt-5.4-mini',
+          '--agent',
+          'build',
+          '--format',
+          'default',
           '--',
           '--model',
           'literal'
@@ -543,20 +418,6 @@ describe('planCommitMessageGeneration', () => {
       ok: true,
       plan: {
         args: ['run', '--model', 'opencode/first', '--agent', 'build', '--format', 'default']
-      }
-    })
-  })
-
-  it('overrides the generated Amp mode rather than repeating it', () => {
-    const result = planCommitMessageGeneration(
-      { agentId: 'amp', model: 'smart', agentArgs: '--mode rush' },
-      'PROMPT'
-    )
-
-    expect(result).toMatchObject({
-      ok: true,
-      plan: {
-        args: ['--execute', '--no-notifications', '--no-ide', '--no-jetbrains', '--mode', 'rush']
       }
     })
   })

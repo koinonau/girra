@@ -18,7 +18,7 @@ describe('isTerseAgentFollowUpPrompt', () => {
 
   it('keeps substantive prompts', () => {
     expect(isTerseAgentFollowUpPrompt('Compare gpt5 claude prompting')).toBe(false)
-    expect(isTerseAgentFollowUpPrompt('Skill creator codex port')).toBe(false)
+    expect(isTerseAgentFollowUpPrompt('Skill creator opencode port')).toBe(false)
   })
 })
 
@@ -72,12 +72,12 @@ describe('getActivityThreadTaskTitle', () => {
       getActivityThreadTaskTitle({
         entry: {
           prompt: 'yes',
-          stateHistory: [{ state: 'working', prompt: 'Skill creator codex port', startedAt: 1 }]
+          stateHistory: [{ state: 'working', prompt: 'Skill creator opencode port', startedAt: 1 }]
         },
         tab: { ...tab, generatedTitle: undefined },
         generatedTitlesEnabled: true
       })
-    ).toBe('Skill creator codex port')
+    ).toBe('Skill creator opencode port')
   })
 
   it('picks the most recent substantive prompt from history, not the longest', () => {

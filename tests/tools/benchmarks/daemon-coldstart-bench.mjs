@@ -166,7 +166,7 @@ function runIteration({ exe, fixtureDir, timeoutMs, lingerMs }) {
     const commandArgs = exe ? [] : [repoRoot]
     const events = []
     const startedAt = process.hrtime.bigint()
-    // Why: daemon timings must not include real-home Codex work or let a
+    // Why: daemon timings must not include real-home Claude config or let a
     // benchmark launch resolve paths against the developer profile.
     const isolatedHome = join(fixtureDir, 'home')
     mkdirSync(isolatedHome, { recursive: true })
@@ -179,8 +179,7 @@ function runIteration({ exe, fixtureDir, timeoutMs, lingerMs }) {
       ORCA_E2E_HOME_DIR: isolatedHome,
       ORCA_E2E_HEADLESS: '1'
     }
-    delete env.CODEX_HOME
-    delete env.ORCA_CODEX_HOME
+    delete env.CLAUDE_CONFIG_DIR
     const child = spawn(command, commandArgs, {
       env,
       stdio: ['ignore', 'ignore', 'pipe']

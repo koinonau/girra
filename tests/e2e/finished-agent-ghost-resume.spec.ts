@@ -55,7 +55,7 @@ function readPersistedRecords(userDataDir: string): Record<string, PersistedReco
   return data.workspaceSession?.sleepingAgentSessionsByPaneKey ?? {}
 }
 
-/** Make the resume hermetic: the respawned tab echoes instead of running codex. */
+/** Make the resume hermetic: the respawned tab echoes instead of running claude. */
 function stubPersistedResumeCommand(userDataDir: string): PersistedRecord {
   const dataPath = path.join(
     userDataDir,
@@ -105,7 +105,7 @@ test('does not respawn an agent whose turn already finished', async (// oxlint-d
     const marker = `FINISHED_AGENT_${Date.now()}`
     const descriptor = await waitForActivePaneHookDescriptor(page)
     const ptyId = await waitForActivePanePtyId(page)
-    const transcriptPath = session.seedCodexResumeRollout(PROVIDER_SESSION_ID, repoPath)
+    const transcriptPath = session.seedClaudeResumeTranscript(PROVIDER_SESSION_ID, repoPath)
     await execInTerminal(page, ptyId, `echo ${marker}`)
     await waitForTerminalOutput(page, marker)
 
@@ -116,8 +116,8 @@ test('does not respawn an agent whose turn already finished', async (// oxlint-d
           ?.getState()
           .setAgentStatus(
             paneKey,
-            { state: 'done', prompt: 'review the diff', agentType: 'codex' },
-            'Codex',
+            { state: 'done', prompt: 'review the diff', agentType: 'claude' },
+            'Claude',
             undefined,
             { worktreeId: wtId },
             { providerSession: { key: 'session_id', id: providerSessionId, transcriptPath } }
@@ -202,7 +202,7 @@ test('does not respawn an agent whose turn already finished', async (// oxlint-d
       }))
     }, worktreeId)
     const resumeTabs = respawned.filter(
-      (tab) => tab.launchAgent === 'codex' || tab.startup?.includes(PROVIDER_SESSION_ID)
+      (tab) => tab.launchAgent === 'claude' || tab.startup?.includes(PROVIDER_SESSION_ID)
     )
     expect(resumeTabs, `a finished agent was respawned: ${JSON.stringify(respawned)}`).toEqual([])
   } finally {

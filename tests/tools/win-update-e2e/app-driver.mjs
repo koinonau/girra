@@ -33,8 +33,7 @@ const XTERM_INPUT = '.xterm-helper-textarea'
 const RESTRICTED_E2E_ENV_KEYS = new Set([
   'HOME',
   'USERPROFILE',
-  'CODEX_HOME',
-  'ORCA_CODEX_HOME',
+  'CLAUDE_CONFIG_DIR',
   'ORCA_E2E_HOME_DIR',
   'ORCA_E2E_USER_DATA_DIR'
 ])
@@ -55,13 +54,11 @@ export async function launchInstalledApp({
 }) {
   const {
     ELECTRON_RUN_AS_NODE: _drop,
-    CODEX_HOME: _codexHome,
-    ORCA_CODEX_HOME: _orcaCodexHome,
+    CLAUDE_CONFIG_DIR: _claudeConfigDir,
     ...cleanEnv
   } = process.env
   void _drop
-  void _codexHome
-  void _orcaCodexHome
+  void _claudeConfigDir
   const restrictedExtraEnvKey = Object.keys(extraEnv).find((key) =>
     RESTRICTED_E2E_ENV_KEYS.has(key.toUpperCase())
   )
@@ -73,7 +70,7 @@ export async function launchInstalledApp({
     seedFreshProfile(userDataDir, seedProfile)
   }
   // Why: userData relocation does not change Node's home; the packaged E2E
-  // must not resolve the default Codex account against the runner's profile.
+  // must not resolve the default Claude account against the runner's profile.
   const requestedIsolatedHome = path.join(userDataDir, 'home')
   mkdirSync(requestedIsolatedHome, { recursive: true })
   // Why: temp paths on runners use 8.3 aliases (RUNNER~1). Git canonicalizes

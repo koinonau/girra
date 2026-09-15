@@ -42,7 +42,7 @@ const FIXTURES: ShellFixture[] = [
     name: 'zsh profile',
     shellPath: '/bin/zsh',
     startupFile: '.zprofile',
-    replacement: 'exec -a kiro-cli-term /bin/zsh -o noglobalrcs -l -i',
+    replacement: 'exec -a agent-cli-term /bin/zsh -o noglobalrcs -l -i',
     command: `printf 'ORCA_STARTUP_%s:PF=%s\\n' COMMAND_RAN "\${(j:,:)precmd_functions}"\r`,
     instrumentationOutput: `${COMMAND_OUTPUT}:PF=`,
     secretRead: `: > "$HOME/${READ_STARTED_FILE}"; read -sk 1\n`,

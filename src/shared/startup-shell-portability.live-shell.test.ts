@@ -148,14 +148,14 @@ describe.skipIf(process.platform === 'win32')(
         // The child must read its own environment, the way the agent binary does;
         // expanding it in the caller would just echo the caller's value back.
         const launch = withoutEnvCommand(
-          ['CODEX_HOME', 'ORCA_CODEX_HOME'],
-          `sh -c 'printf "LAUNCHED:%s" "\${CODEX_HOME-unset}"'`,
+          ['CLAUDE_CONFIG_DIR', 'ORCA_CLAUDE_CONFIG_DIR'],
+          `sh -c 'printf "LAUNCHED:%s" "\${CLAUDE_CONFIG_DIR-unset}"'`,
           'posix'
         )
         const probe =
           shell.name === 'fish'
-            ? `set -gx CODEX_HOME /bad; ${launch}`
-            : `set -u; CODEX_HOME=/bad; export CODEX_HOME; ${launch}`
+            ? `set -gx CLAUDE_CONFIG_DIR /bad; ${launch}`
+            : `set -u; CLAUDE_CONFIG_DIR=/bad; export CLAUDE_CONFIG_DIR; ${launch}`
 
         expect(runInShell(shell, probe)).toContain('LAUNCHED:unset')
       })
@@ -236,7 +236,7 @@ describe.skipIf(process.platform === 'win32')(
       // errexit too, but that is not scriptable here. bash and zsh report `$-`
       // either way, and both DID silently enable errexit under the old `set -e`.
       // Why `-g` is not optional: without it, a name that exists ONLY as a
-      // universal — `set -Ux CODEX_HOME …`, a normal thing for a fish user to
+      // universal — `set -Ux CLAUDE_CONFIG_DIR …`, a normal thing for a fish user to
       // have — is permanently deleted from every future session. Reachable from
       // the clipboard command, which may run with no injected value at all.
       it.runIf(shell.name === 'fish')('never deletes a lone universal variable', () => {

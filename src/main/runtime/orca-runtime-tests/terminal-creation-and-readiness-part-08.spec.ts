@@ -420,12 +420,12 @@ describe('OrcaRuntimeService', () => {
     runtime.attachWindow(1)
     runtime.syncWindowGraph(1, { tabs: [], leaves: [] })
     const { handle } = await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      command: 'codex',
-      launchAgent: 'codex',
+      command: 'claude',
+      launchAgent: 'claude',
       launchConfig: {
-        agentCommand: 'codex',
+        agentCommand: 'claude',
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_PROFILE: 'captured' }
       },
       title: 'worker'
     })
@@ -440,12 +440,12 @@ describe('OrcaRuntimeService', () => {
       ptyId: 'pty-bg',
       title: 'worker',
       launchConfig: {
-        agentCommand: 'codex',
+        agentCommand: 'claude',
         agentArgs: '--model gpt-5',
-        agentEnv: { CODEX_PROFILE: 'captured' }
+        agentEnv: { CLAUDE_PROFILE: 'captured' }
       },
       launchToken: firstReveal?.launchToken,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       tabId: firstReveal?.tabId,
       leafId: firstReveal?.leafId
     })

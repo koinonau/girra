@@ -44,11 +44,11 @@ describe('host-stamped remote foreground resolver', () => {
     const evidence = resolveRemoteForegroundEvidence(
       { rootPid: 100, fallbackProcess: 'zsh' },
       metadata,
-      rowsFor(['node /opt/codex'])
+      rowsFor(['node /opt/opencode'])
     )
     expect(evidence).toMatchObject({
       verdict: 'live',
-      processName: 'codex',
+      processName: 'opencode',
       ptyId: 'pty-1',
       ptyIncarnationId: 'inc-1',
       fence: {
@@ -64,8 +64,8 @@ describe('host-stamped remote foreground resolver', () => {
 
   it.each([
     ['multiplexer_boundary', rowsFor(['tmux new-session'])],
-    ['ambiguous_foreground_group', rowsFor(['node /opt/codex', 'node /opt/claude'])],
-    ['candidate_start_time_missing', rowsFor(['node /opt/codex'], { candidateStart: '' })]
+    ['ambiguous_foreground_group', rowsFor(['node /opt/opencode', 'node /opt/claude'])],
+    ['candidate_start_time_missing', rowsFor(['node /opt/opencode'], { candidateStart: '' })]
   ])('degrades to unverifiable for %s', (reason, rows) => {
     const evidence = resolveRemoteForegroundEvidence(
       { rootPid: 100, fallbackProcess: 'zsh' },
@@ -80,7 +80,7 @@ describe('host-stamped remote foreground resolver', () => {
       resolveRemoteForegroundEvidence(
         { rootPid: 100, fallbackProcess: 'powershell.exe' },
         { ...metadata, platform: 'win32' },
-        rowsFor(['node /opt/codex'])
+        rowsFor(['node /opt/opencode'])
       )
     ).toMatchObject({ verdict: 'unverifiable', reason: 'windows_ssh_foreground_unavailable' })
   })

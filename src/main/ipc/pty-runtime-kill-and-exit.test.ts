@@ -47,7 +47,7 @@ describe('registerPtyHandlers', () => {
     setupPtyIpcSuite()
 
   it('routes runtime foreground confirmation to the provider owning the captured PTY', async () => {
-    const confirmForegroundProcess = vi.fn(async () => 'codex')
+    const confirmForegroundProcess = vi.fn(async () => 'claude')
     registerSshPtyProvider('ssh-1', { confirmForegroundProcess } as never)
     setPtyOwnership('remote-pty', 'ssh-1')
     const runtime = { setPtyController: vi.fn() }
@@ -57,7 +57,7 @@ describe('registerPtyHandlers', () => {
       confirmForegroundProcess: (ptyId: string) => Promise<string | null>
     }
 
-    await expect(controller.confirmForegroundProcess('remote-pty')).resolves.toBe('codex')
+    await expect(controller.confirmForegroundProcess('remote-pty')).resolves.toBe('claude')
     expect(confirmForegroundProcess).toHaveBeenCalledOnce()
     expect(confirmForegroundProcess).toHaveBeenCalledWith('remote-pty')
     deletePtyOwnership('remote-pty')

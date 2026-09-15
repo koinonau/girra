@@ -727,9 +727,9 @@ describe('SkillFreshnessUpdateDialog', () => {
       eligibleUpdateNames: [],
       scanIssues: [
         {
-          rootId: 'codex-plugin-cache',
-          sourceLabel: 'Codex plugin cache',
-          path: '/home/.codex/plugins/cache/vendor/locked',
+          rootId: 'claude-plugin-cache',
+          sourceLabel: 'Claude plugin cache',
+          path: '/home/.claude/plugins/cache/vendor/locked',
           reason: 'io-error',
           errorCode: 'EACCES'
         }
@@ -742,13 +742,13 @@ describe('SkillFreshnessUpdateDialog', () => {
     expect(container?.textContent).toContain(
       'Orca could not finish checking plugin-managed skills.'
     )
-    expect(container?.textContent).toContain('/home/.codex/plugins/cache/vendor/locked')
+    expect(container?.textContent).toContain('/home/.claude/plugins/cache/vendor/locked')
     expect(container?.textContent).toContain('EACCES')
     expect(container?.textContent).not.toContain('All installed Orca skills are up to date.')
     // Why: the fabricated per-skill path is exactly what this change removed — the
     // unreadable folder must never be rendered as a copy of a named skill.
     expect(container?.textContent).not.toContain(
-      '/home/.codex/plugins/cache/vendor/locked/orca-cli'
+      '/home/.claude/plugins/cache/vendor/locked/orca-cli'
     )
   })
 
@@ -765,9 +765,9 @@ describe('SkillFreshnessUpdateDialog', () => {
         eligibleUpdateNames: [],
         scanIssues: [
           {
-            rootId: 'codex-plugin-cache',
-            sourceLabel: 'Codex plugin cache',
-            path: '/home/.codex/plugins/cache',
+            rootId: 'claude-plugin-cache',
+            sourceLabel: 'Claude plugin cache',
+            path: '/home/.claude/plugins/cache',
             reason: reason,
             errorCode: null
           }
@@ -783,7 +783,7 @@ describe('SkillFreshnessUpdateDialog', () => {
       )
       // Why: the headline alone would pass with the folder list gone, leaving the user
       // told the scan stopped but never told where. Assert the diagnostic renders too.
-      expect(container?.textContent).toContain('/home/.codex/plugins/cache')
+      expect(container?.textContent).toContain('/home/.claude/plugins/cache')
     }
   )
 
@@ -799,9 +799,9 @@ describe('SkillFreshnessUpdateDialog', () => {
       eligibleUpdateNames: [],
       scanIssues: [
         {
-          rootId: 'codex-plugin-cache',
-          sourceLabel: 'Codex plugin cache',
-          path: '/home/.codex/plugins/cache/vendor/deep',
+          rootId: 'claude-plugin-cache',
+          sourceLabel: 'Claude plugin cache',
+          path: '/home/.claude/plugins/cache/vendor/deep',
           reason: 'depth-limit',
           errorCode: null
         }
@@ -815,7 +815,7 @@ describe('SkillFreshnessUpdateDialog', () => {
     expect(container?.textContent).not.toContain(
       'Orca could not finish checking plugin-managed skills.'
     )
-    expect(container?.textContent).toContain('/home/.codex/plugins/cache/vendor/deep')
+    expect(container?.textContent).toContain('/home/.claude/plugins/cache/vendor/deep')
     expect(container?.textContent).toContain('scan depth limit')
   })
 })

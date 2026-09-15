@@ -36,7 +36,7 @@ describe('resolveWindowsShiftEnterEncoding', () => {
     const state = {
       paneForegroundAgentByPaneKey: {
         'tab:pane': {
-          agent: 'codex' as const,
+          agent: 'opencode' as const,
           routingTrusted: true,
           shellForeground: false
         }
@@ -96,7 +96,7 @@ describe('resolveWindowsShiftEnterEncoding', () => {
     expect(resolveWindowsShiftEnterEncodingForPane(state, 'tab:pane', 'C:\\work\\pi-project')).toBe(
       'alt-enter'
     )
-    expect(resolveWindowsShiftEnterEncodingForPane(state, 'tab:pane', 'Codex')).toBe('alt-enter')
+    expect(resolveWindowsShiftEnterEncodingForPane(state, 'tab:pane', 'OpenCode')).toBe('alt-enter')
   })
 
   it('does not let hook status route bytes without a pane title or process proof', () => {
@@ -111,8 +111,8 @@ describe('resolveWindowsShiftEnterEncoding', () => {
     expect(resolveWindowsShiftEnterEncodingForPane(state, 'tab:pane')).toBe('alt-enter')
   })
 
-  it('keeps the legacy byte for Codex, OpenCode, Claude, unknown, and plain panes', () => {
-    for (const agent of ['codex', 'opencode', 'claude', null] as const) {
+  it('keeps the legacy byte for OpenCode, Claude, unknown, and plain panes', () => {
+    for (const agent of ['opencode', 'claude', null] as const) {
       expect(
         resolveWindowsShiftEnterEncoding({
           foreground: { agent, shellForeground: false }

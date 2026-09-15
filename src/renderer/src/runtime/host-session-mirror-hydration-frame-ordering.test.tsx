@@ -78,7 +78,7 @@ import { WINDOW_VISIBILITY_SUBSCRIPTION_PARK_DELAY_MS } from './window-visibilit
 /**
  * Parked waiters drain synchronously, so a settle placed before its frame's
  * patch reaches the store re-runs recovery while ptyIdsByTabId is still empty
- * — the pane reads as dead and the duplicate `codex resume` fires anyway.
+ * — the pane reads as dead and the duplicate `claude --resume` fires anyway.
  * These drive the real handlers because that ordering is the thing under test.
  *
  * The second block pins the other half: this latch releases into replaying a
@@ -243,7 +243,7 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
   it('does not relaunch when a stream frame is the first hydration signal', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-ordering-1')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-ordering-1')
 
     // Nothing has hydrated yet, so the sweep must park rather than relaunch.
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
@@ -259,7 +259,7 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
 
     expect(useAppStore.getState().ptyIdsByTabId[MIRROR_TAB_ID]).toEqual([HOST_PTY_ID])
     // RED before the ordering fix: the drain ran while ptyIdsByTabId was still
-    // empty, so a second `codex resume` tab was appended here.
+    // empty, so a second `claude --resume` tab was appended here.
     expect(tabIds(WT)).toEqual([MIRROR_TAB_ID])
     expect(useAppStore.getState().sleepingAgentSessionsByPaneKey[paneKey]).toBeDefined()
     expect(Object.keys(useAppStore.getState().automaticAgentResumeClaimsByTabId)).toHaveLength(0)
@@ -268,7 +268,7 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
   it('a single-worktree frame does not release panes parked on another worktree', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const backgroundPaneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-bg-1')
+    const backgroundPaneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-bg-1')
 
     expect(resumeSleepingAgentSessionsForWorktree(BG_WT)).toBe(0)
 
@@ -299,7 +299,7 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
     expect(backgroundTabIds[0]).not.toBe(BG_MIRROR_TAB_ID)
     expect(replayed.automaticAgentResumeClaimsByTabId[backgroundTabIds[0]!]).toMatchObject({
       launchAgent: 'claude',
-      providerSession: { key: 'session_id', id: 'codex-session-bg-1' }
+      providerSession: { key: 'session_id', id: 'claude-session-bg-1' }
     })
   })
 
@@ -317,7 +317,7 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
     )
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-listall-release')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-listall-release')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // The inventory retracts the mirror tab, so the host HAS spoken: this pane
@@ -335,13 +335,13 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
     })
 
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-listall-release')
+    expectReplayedResume(paneKey, WT, 'claude-session-listall-release')
   })
 
   it('a single frame on the global stream releases the pane it parked', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-global-frame')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-global-frame')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     await publish(findSubscription('session.tabs.subscribeAll'), {
@@ -350,13 +350,13 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
     })
 
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-global-frame')
+    expectReplayedResume(paneKey, WT, 'claude-session-global-frame')
   })
 
   it('the active-worktree scoped frame releases the pane it parked', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-scoped-frame')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-scoped-frame')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     await publish(findSubscription('session.tabs.subscribe'), {
@@ -365,13 +365,13 @@ describe('mirrored-pane resume deferral against real stream frames', () => {
     })
 
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-scoped-frame')
+    expectReplayedResume(paneKey, WT, 'claude-session-scoped-frame')
   })
 
   it('does not let a scoped frame from before tracking reset release its pane', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-scoped-old-tracking')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-scoped-old-tracking')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     clearWebSessionTabsTrackingForEnvironment(ENV)
@@ -399,7 +399,7 @@ describe('mirror latch verdicts against real stream failures', () => {
     )
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-listall-reject')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-listall-reject')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // Contact is lost AFTER the pane parked. That is `unverifiable`, not proof
@@ -417,8 +417,8 @@ describe('mirror latch verdicts against real stream failures', () => {
   it('a scoped stream error settles neither its own worktree nor another', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const activePaneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-active-error')
-    const backgroundPaneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-bg-error')
+    const activePaneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-active-error')
+    const backgroundPaneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-bg-error')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
     expect(resumeSleepingAgentSessionsForWorktree(BG_WT)).toBe(0)
 
@@ -440,7 +440,7 @@ describe('mirror latch verdicts against real stream failures', () => {
   it('a spawn that rejects after the patch still settles the frame that landed', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-spawn-reject')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-spawn-reject')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // The wake respawn this frame triggers fails, but the frame it failed after
@@ -453,13 +453,13 @@ describe('mirror latch verdicts against real stream failures', () => {
 
     expect(mocks.createTerminal).toHaveBeenCalled()
     expect(tabIds(WT)).not.toContain(MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, WT, 'codex-session-spawn-reject')
+    expectReplayedResume(paneKey, WT, 'claude-session-spawn-reject')
   })
 
   it('a rejection before the patch settles nothing', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'codex-session-preapply-reject')
+    const paneKey = seedSleepingRecord(MIRROR_TAB_ID, WT, 'claude-session-preapply-reject')
     expect(resumeSleepingAgentSessionsForWorktree(WT)).toBe(0)
 
     // Nothing of this frame reached the store, so it is no evidence at all.
@@ -477,7 +477,7 @@ describe('mirror latch verdicts against real stream failures', () => {
   it('an inventory whose recovery drops a worktree settles only the applied ones', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const backgroundPaneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-bg-drop')
+    const backgroundPaneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-bg-drop')
     expect(resumeSleepingAgentSessionsForWorktree(BG_WT)).toBe(0)
 
     // The background snapshot never reaches the store, so the pane it would
@@ -508,7 +508,7 @@ describe('a parked wake replay keeps the mount contract of its caller', () => {
   it('background-mounts the resume tab a parked sweep replayed', async () => {
     renderHook(() => useWebSessionTabsSync())
     await act(settle)
-    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-parked-wake')
+    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-parked-wake')
 
     // A phone opens a workspace the desktop is not looking at, while the mirror
     // for its pane is still unanswered — so the sweep parks instead of resuming.
@@ -521,7 +521,7 @@ describe('a parked wake replay keeps the mount contract of its caller', () => {
       snapshots: [makeHostSnapshot(WT, HOST_SURFACE_ID, HOST_PARENT_TAB_ID)]
     })
 
-    expectReplayedResume(paneKey, BG_WT, 'codex-session-parked-wake')
+    expectReplayedResume(paneKey, BG_WT, 'claude-session-parked-wake')
     const launchedTabId = Object.keys(useAppStore.getState().automaticAgentResumeClaimsByTabId)[0]!
     // Why: the replayed tab is created activate:false, so nothing else mounts it
     // and its queued `--resume` never reaches a PTY.
@@ -542,7 +542,7 @@ describe('an inventory whose post-patch bookkeeping throws', () => {
       type: 'snapshot',
       ...makeHostSnapshot(WT, HOST_SURFACE_ID, HOST_PARENT_TAB_ID)
     })
-    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'codex-session-bookkeeping-throw')
+    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-bookkeeping-throw')
     expect(resumeSleepingAgentSessionsForWorktree(BG_WT)).toBe(0)
 
     act(() => {
@@ -575,6 +575,6 @@ describe('an inventory whose post-patch bookkeeping throws', () => {
       ENV
     )
     expect(tabIds(BG_WT)).not.toContain(BG_MIRROR_TAB_ID)
-    expectReplayedResume(paneKey, BG_WT, 'codex-session-bookkeeping-throw')
+    expectReplayedResume(paneKey, BG_WT, 'claude-session-bookkeeping-throw')
   })
 })

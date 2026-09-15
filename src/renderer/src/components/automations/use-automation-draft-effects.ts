@@ -161,7 +161,6 @@ export function useAutomationDraftEffects({
           : null
         return {
           ...current,
-          agentId: 'hermes',
           projectId: nextRepo?.id ?? '',
           workspaceId: nextWorkspace?.id ?? '',
           workspaceMode: 'existing',

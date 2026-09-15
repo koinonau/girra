@@ -50,7 +50,6 @@ describe('useFullCreationExecution cancellation', () => {
       createDisplayName: undefined,
       pendingFirstAgentMessageRename: false,
       startupPlan: null,
-      shouldSeedInitialAgentStatus: false,
       composerTelemetry: {
         agent_kind: 'claude-code',
         launch_source: 'new_workspace_composer',

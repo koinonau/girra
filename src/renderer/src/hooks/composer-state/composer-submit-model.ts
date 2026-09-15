@@ -42,7 +42,6 @@ export type PreparedFullSubmit = FullSubmitSource & {
   createDisplayName: string | undefined
   pendingFirstAgentMessageRename: boolean
   startupPlan: AgentStartupPlan | null
-  shouldSeedInitialAgentStatus: boolean
   composerTelemetry: AgentLaunchMetadata
   backendStartup: WorktreeCreationRequest['startup']
 }

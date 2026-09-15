@@ -1,8 +1,7 @@
 /**
- * Record shapes every event-based usage provider (Codex, OpenCode, future plugin sources)
- * rolls up to. Each provider carries exactly one extra metric alongside the token counters —
- * Codex tracks inferred pricing, OpenCode tracks cost — so that metric stays generic instead
- * of forcing a nullable union onto both.
+ * Record shapes every event-based usage provider (OpenCode, future plugin sources) rolls up
+ * to. Each provider carries exactly one extra metric alongside the token counters (OpenCode
+ * tracks cost), so that metric stays generic instead of forcing a nullable union.
  */
 
 export type UsageAttributedEventFields = {

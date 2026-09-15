@@ -125,12 +125,12 @@ function createDeps(overrides: Record<string, unknown> = {}) {
   return buildPaneConnectionDeps(() => mockStoreState, overrides)
 }
 
-function installSleepingCodexResumeState(restoredPtyId?: string) {
+function installSleepingClaudeResumeState(restoredPtyId?: string) {
   const paneKey = makePaneKey('tab-1', LEAF_1)
   const launchConfig = {
-    agentCommand: "codex '--model' 'gpt-5'",
-    agentArgs: '--model gpt-5',
-    agentEnv: { CODEX_PROFILE: 'captured' }
+    agentCommand: "claude '--model' 'sonnet'",
+    agentArgs: '--model sonnet',
+    agentEnv: { CLAUDE_PROFILE: 'captured' }
   }
   mockStoreState = {
     ...mockStoreState,
@@ -523,7 +523,7 @@ describe('connectPanePty', () => {
     })
     transportFactoryQueue.push(transport)
     const manager = createManager(1)
-    const startup = { command: 'codex --resume session-1' }
+    const startup = { command: 'claude --resume session-1' }
     const deps = createDeps({ onPaneProcessDied: vi.fn(), startup })
 
     connectPanePty(createPane(1) as never, manager as never, deps as never)
@@ -554,9 +554,9 @@ describe('connectPanePty', () => {
       return 'resume-pty'
     })
     transportFactoryQueue.push(transport)
-    const launchConfig = installSleepingCodexResumeState()
+    const launchConfig = installSleepingClaudeResumeState()
     const deps = createDeps({
-      startup: { command: 'codex stale-startup' },
+      startup: { command: 'claude stale-startup' },
       onPaneProcessDied: vi.fn()
     })
 
@@ -600,7 +600,7 @@ describe('connectPanePty', () => {
       }
     )
     transportFactoryQueue.push(transport)
-    installSleepingCodexResumeState('lost-pty')
+    installSleepingClaudeResumeState('lost-pty')
     const deps = createDeps({
       onPaneProcessDied: vi.fn(),
       restoredLeafId: LEAF_1,

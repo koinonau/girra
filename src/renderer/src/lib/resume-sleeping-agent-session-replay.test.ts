@@ -221,13 +221,13 @@ describe('resumeSleepingAgentSessionsForWorktree replay protection', () => {
     const first = launchAiVaultSessionInNewTab({
       agent: 'claude',
       worktreeId: 'wt-1',
-      command: "codex resume 'sess-1'",
+      command: "claude --resume 'sess-1'",
       launchConfig: { agentArgs: '', agentEnv: {} }
     })
     const second = launchAiVaultSessionInNewTab({
       agent: 'claude',
       worktreeId: 'wt-1',
-      command: "codex resume 'sess-1'",
+      command: "claude --resume 'sess-1'",
       launchConfig: { agentArgs: '', agentEnv: {} }
     })
 

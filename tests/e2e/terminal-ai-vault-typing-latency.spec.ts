@@ -12,12 +12,12 @@ import {
 } from './helpers/terminal'
 import { ensureTerminalVisible, waitForActiveWorktree, waitForSessionReady } from './helpers/store'
 import {
-  collectCodexEchoLatencyReport,
-  installCodexEchoLatencyProbe,
+  collectEchoLatencyReport,
+  installEchoLatencyProbe,
   summarizeLatencies,
-  type CodexEchoProbeReport,
+  type EchoProbeReport,
   type LatencyDistribution
-} from './codex-composer-echo-latency-probe'
+} from './terminal-echo-latency-probe'
 import { seedVaultTranscriptBatch, typingEchoScript } from './ai-vault-typing-bench-corpus'
 import {
   readVaultRefreshDuration,
@@ -48,7 +48,7 @@ type ArmResult = {
   scenario: 'control' | 'vault-refresh'
   order: number
   refreshDurationMs: number | null
-  echo: CodexEchoProbeReport
+  echo: EchoProbeReport
   parse: LatencyDistribution
   render: LatencyDistribution
   missingEchoCount: number
@@ -96,7 +96,7 @@ async function runArm(args: {
     0,
     KEY_COUNT
   )
-  await installCodexEchoLatencyProbe(args.page, target)
+  await installEchoLatencyProbe(args.page, target)
   await startRendererJankProbe(args.page)
   if (args.scenario === 'vault-refresh') {
     await triggerVaultRefresh(args.page)
@@ -111,7 +111,7 @@ async function runArm(args: {
   const refreshDurationMs =
     args.scenario === 'vault-refresh' ? await readVaultRefreshDuration(args.page) : null
   await args.page.waitForTimeout(100)
-  const echo = await collectCodexEchoLatencyReport(args.page)
+  const echo = await collectEchoLatencyReport(args.page)
   const rendererJank = await stopRendererJankProbe(args.page)
   await sendToTerminal(args.page, args.ptyId, '\x03').catch(() => undefined)
   const parse = summarizeLatencies(echo.samples.map((sample) => sample.keyToParseMs))

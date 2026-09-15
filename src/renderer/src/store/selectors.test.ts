@@ -201,7 +201,7 @@ describe('store selectors', () => {
     const activeTab = makeTerminalTab({
       id: 'term-1',
       worktreeId: 'wt-1',
-      title: 'Codex working'
+      title: 'OpenCode working'
     })
     const secondTab = makeTerminalTab({
       id: 'term-2',
@@ -228,7 +228,7 @@ describe('store selectors', () => {
     const retitledState = {
       ...state,
       tabsByWorktree: {
-        'wt-1': [{ ...activeTab, title: 'Codex working · frame 2' }, secondTab],
+        'wt-1': [{ ...activeTab, title: 'OpenCode working · frame 2' }, secondTab],
         'wt-2': [{ ...otherWorktreeTab, title: 'Background · frame 2' }]
       }
     } satisfies Parameters<typeof selectActiveTerminalChromeState>[0]

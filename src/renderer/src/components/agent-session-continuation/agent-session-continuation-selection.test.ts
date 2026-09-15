@@ -5,9 +5,9 @@ describe('chooseInitialContinuationAgent', () => {
   it('keeps the source Agent when it is available', () => {
     expect(
       chooseInitialContinuationAgent({
-        availableAgents: ['codex', 'claude'],
+        availableAgents: ['opencode', 'claude'],
         sourceAgent: 'claude',
-        defaultAgent: 'codex'
+        defaultAgent: 'opencode'
       })
     ).toBe('claude')
   })
@@ -15,17 +15,17 @@ describe('chooseInitialContinuationAgent', () => {
   it('falls back to the saved default and then the first available Agent', () => {
     expect(
       chooseInitialContinuationAgent({
-        availableAgents: ['codex', 'claude'],
-        sourceAgent: 'gemini',
+        availableAgents: ['opencode', 'claude'],
+        sourceAgent: 'pi',
         defaultAgent: 'claude'
       })
     ).toBe('claude')
     expect(
       chooseInitialContinuationAgent({
-        availableAgents: ['codex'],
+        availableAgents: ['opencode'],
         sourceAgent: null,
         defaultAgent: 'blank'
       })
-    ).toBe('codex')
+    ).toBe('opencode')
   })
 })

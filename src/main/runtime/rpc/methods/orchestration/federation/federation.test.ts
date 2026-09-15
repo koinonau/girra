@@ -176,7 +176,7 @@ describe('orchestration federation', () => {
     const task = createHomeTask()
 
     const response = await homeDispatcher.dispatch(
-      startRequest(task.id, { agent: 'grok', model: 'unsupported-model' })
+      startRequest(task.id, { agent: 'opencode', model: 'unsupported-model' })
     )
 
     expect(response).toMatchObject({
@@ -184,7 +184,7 @@ describe('orchestration federation', () => {
       result: {
         state: 'failed',
         launch: {
-          requested: { agent: 'grok', model: 'unsupported-model', effort: null },
+          requested: { agent: 'opencode', model: 'unsupported-model', effort: null },
           effective: null
         }
       }

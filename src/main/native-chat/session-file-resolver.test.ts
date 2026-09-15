@@ -419,7 +419,7 @@ describe('resolveSessionFilePath', () => {
   })
 
   it('returns null for unsupported agents', async () => {
-    expect(await resolveSessionFilePath('gemini', 'whatever')).toBeNull()
+    expect(await resolveSessionFilePath('opencode', 'whatever')).toBeNull()
   })
 
   it('prefers the hook transcriptPath when it exists (Claude id != file name)', async () => {

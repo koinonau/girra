@@ -145,7 +145,7 @@ describe('registerPtyHandlers', () => {
         cols: 80,
         rows: 24,
         cwd: '/remote/dead-stable-pane',
-        command: 'codex resume exact-dead-ssh-provider-session',
+        command: 'claude --resume exact-dead-ssh-provider-session',
         connectionId,
         worktreeId,
         tabId,
@@ -165,7 +165,7 @@ describe('registerPtyHandlers', () => {
         command: undefined
       })
       expect(remoteSpawn.mock.calls[1]?.[0]).toMatchObject({
-        command: 'codex resume exact-dead-ssh-provider-session'
+        command: 'claude --resume exact-dead-ssh-provider-session'
       })
       expect(store.setWorkspaceSession).toHaveBeenCalledWith(expect.anything(), hostId)
       expect(store.persistPtyBinding).toHaveBeenCalledWith(

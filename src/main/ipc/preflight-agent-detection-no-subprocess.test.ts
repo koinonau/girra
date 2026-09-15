@@ -104,9 +104,8 @@ describe('#9297: local agent detection spawns zero where/which subprocesses', ()
         KNOWN_TUI_AGENT_DETECTION_COMMANDS,
         platform
       )
-      // Guardrail: the candidate list is large, so the old one-spawn-per-probe
-      // path multiplied a gated where.exe across dozens of startups.
-      expect(probeCommands.length).toBeGreaterThanOrEqual(20)
+      // Guardrail: a non-trivial candidate list keeps the zero-spawn assertion meaningful.
+      expect(probeCommands.length).toBeGreaterThanOrEqual(3)
 
       const agents = await detectInstalledAgents()
 

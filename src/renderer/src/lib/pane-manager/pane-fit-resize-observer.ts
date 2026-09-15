@@ -95,7 +95,7 @@ export function requestStablePaneFit(pane: StableFitPane, onSettled?: () => void
   //
   // Windows can report a short-lived one-column anchor/scrollbar wobble when
   // the right sidebar is open. Requiring a stable proposed grid before fitting
-  // prevents Codex from receiving a rapid SIGWINCH loop and visibly vibrating.
+  // prevents a TUI from receiving a rapid SIGWINCH loop and visibly vibrating.
   let previous = getProposedDimensions(pane)
   let frameCount = 0
   const waitForStableGrid = (): void => {

@@ -14,10 +14,10 @@ function settings(): GlobalSettings {
     sourceControlAi: {
       ...base.sourceControlAi!,
       enabled: true,
-      agentId: 'codex',
+      agentId: 'opencode',
       actions: {
         commitMessage: {
-          agentId: 'codex',
+          agentId: 'opencode',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model sonnet'
         }
@@ -34,7 +34,7 @@ describe('sourceControlTextGenerationDefaultsMatchTarget', () => {
         actionId: 'commitMessage',
         target: { type: 'global' },
         params: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.5',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model sonnet'
@@ -50,7 +50,7 @@ describe('sourceControlTextGenerationDefaultsMatchTarget', () => {
         actionId: 'commitMessage',
         target: { type: 'repo', repoId: 'repo-1' },
         params: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.5',
           commandInputTemplate: '{basePrompt}',
           agentArgs: '--model sonnet'
@@ -96,7 +96,7 @@ describe('sourceControlTextGenerationDefaultsMatchTarget', () => {
         actionId: 'commitMessage',
         target: { type: 'global' },
         params: {
-          agentId: 'codex',
+          agentId: 'opencode',
           model: 'gpt-5.5',
           commandInputTemplate: '{basePrompt}\n\nchanged',
           agentArgs: '--model sonnet'

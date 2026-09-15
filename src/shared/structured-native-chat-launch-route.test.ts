@@ -58,9 +58,9 @@ describe('per-launch structured feasibility', () => {
 
   it.each([
     ['a reused PTY agent', { reusesTerminal: true }, 'reused-terminal'],
-    ['codex', { agent: 'codex' }, 'agent-without-structured-session'],
-    ['grok', { agent: 'grok' }, 'agent-without-structured-session'],
-    ['openclaude', { agent: 'openclaude' }, 'agent-without-structured-session'],
+    ['opencode', { agent: 'opencode' }, 'agent-without-structured-session'],
+    ['pi', { agent: 'pi' }, 'agent-without-structured-session'],
+    ['claude-agent-teams', { agent: 'claude-agent-teams' }, 'agent-without-structured-session'],
     ['a floating workspace', { workspaceKind: 'floating' }, 'floating-workspace'],
     ['a custom TUI launch', { requiresTuiLaunchCustomization: true }, 'tui-launch-customization'],
     ['an SSH host', { executionHostId: 'ssh:host-a' }, 'remote-execution-host'],

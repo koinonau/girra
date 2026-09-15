@@ -134,7 +134,7 @@ function findOffenders(): string[] {
       // `shell: true` silently makes windowsHide a no-op (run-process.ts,
       // #14543), and `exec`/`execSync` imply it. A site can therefore read as
       // guarded while still flashing a conhost -- which is exactly how
-      // `execAsync('where gemini', { windowsHide: true })` got un-allowlisted.
+      // `execAsync('where <agent>', { windowsHide: true })` got un-allowlisted.
       const called = match[0].replace(/\s*\($/, '').trim()
       // Any `shell:` that is not literally `false` counts. `shell:
       // process.platform === 'win32'` IS shell: true on the platform this

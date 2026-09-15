@@ -134,7 +134,7 @@ describe('Last-status persistence', () => {
           paneKey: PANE,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          payload: { state: 'done', prompt: 'confirmed live', agentType: 'codex' }
+          payload: { state: 'done', prompt: 'confirmed live', agentType: 'opencode' }
         },
         'conn-1'
       )
@@ -142,7 +142,7 @@ describe('Last-status persistence', () => {
       expect(confirmed).toMatchObject({
         state: 'done',
         prompt: 'confirmed live',
-        agentType: 'codex'
+        agentType: 'opencode'
       })
       expect(confirmed?.restoredUnconfirmed).toBeUndefined()
     } finally {

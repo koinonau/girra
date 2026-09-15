@@ -107,7 +107,7 @@ describe('hook status session-tabs republish', () => {
       paneKey: PANE,
       tabId: 'tab-provider',
       worktreeId: 'repo::/worktree',
-      payload: { state: 'working' as const, prompt: 'active', agentType: 'codex' as const }
+      payload: { state: 'working' as const, prompt: 'active', agentType: 'opencode' as const }
     }
 
     try {

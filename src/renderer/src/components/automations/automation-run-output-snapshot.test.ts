@@ -37,7 +37,7 @@ describe('automation run output snapshot buffer', () => {
     expect(buffer.snapshot()).toBeNull()
   })
 
-  it('strips ST-terminated OSC title and progress frames from Codex TUI output', () => {
+  it('strips ST-terminated OSC title and progress frames from agent TUI output', () => {
     const buffer = createAutomationRunOutputSnapshotBuffer()
 
     buffer.append('\u001b]0;\u2834 orca q\u2022Working q\u001b\\')

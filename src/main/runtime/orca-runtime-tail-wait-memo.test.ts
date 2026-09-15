@@ -110,11 +110,10 @@ const SCENARIOS: Record<string, string[]> = {
     'to continue.\n'
   ],
   'empty and whitespace chunks': ['', '   ', '\n', 'ok\n', ''],
-  'ready header after stale blocked prompt': [
+  'agent banner after stale blocked prompt': [
     'Update available! Press Enter to continue.\n',
-    'OpenAI Codex\n',
-    'model: gpt\n',
-    'directory: /repo\n'
+    'Claude Code v2.1.0\n',
+    '/repo\n'
   ]
 }
 

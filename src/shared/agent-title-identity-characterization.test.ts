@@ -19,34 +19,32 @@ import { getAgentLabel } from './agent-title-identity'
 const ownerSuffix = (task: string, agent: string): string => `${task}… - ${agent}`
 
 describe('getAgentLabel — characterization (pre-refactor)', () => {
-  describe('the owner suffix loses to a foreign name in task text', () => {
-    // DEFECT. In each case the pane owner is OpenCode, named by Orca's own `- opencode` suffix
-    // grammar, while the competing agent appears only inside free-form task text. Codex is
-    // checked before OpenCode, so the weaker evidence wins.
+  describe('the owner suffix beats a foreign name in task text', () => {
+    // Formerly a DEFECT: a name checked earlier in the chain beat the `- opencode` suffix. With
+    // OpenCode the only named agent checked before Claude's generic heuristic, the suffix wins.
     it.each([
-      ['Switch Claude and Codex off the load balancer', 'Codex'],
-      ['Codex structured chat revalidation', 'Codex'],
-      ['Swap Codex off the load balancer', 'Codex']
-    ])('reads %j as %s instead of OpenCode', (task, current) => {
-      expect(getAgentLabel(ownerSuffix(task, 'opencode'))).toBe(current)
+      'Switch Claude off the load balancer',
+      'Claude structured chat revalidation',
+      'Swap Claude off the load balancer'
+    ])('reads %j as OpenCode', (task) => {
+      expect(getAgentLabel(ownerSuffix(task, 'opencode'))).toBe('OpenCode')
     })
 
-    it('reads a spinner-prefixed OpenCode pane as Codex', () => {
-      // DEFECT. Real shape: a status spinner and phase precede the task text.
+    it('reads a spinner-prefixed OpenCode pane as OpenCode', () => {
+      // Real shape: a status spinner and phase precede the task text.
       expect(
-        getAgentLabel(`⠸ - Thinking - ${ownerSuffix('Codex native-chat work', 'opencode')}`)
-      ).toBe('Codex')
+        getAgentLabel(`⠸ - Thinking - ${ownerSuffix('Claude native-chat work', 'opencode')}`)
+      ).toBe('OpenCode')
     })
 
-    it('resolves the owner suffix correctly only when no earlier agent is named', () => {
-      // Why this passes today: nothing earlier in the chain matches, so position never comes up.
+    it('resolves the owner suffix when no other agent is named', () => {
       expect(getAgentLabel(ownerSuffix('Fix the sidebar row', 'opencode'))).toBe('OpenCode')
     })
   })
 
   describe('a hyphenated worktree name is correctly not identity', () => {
     // Not a defect — pinned so the resolver does not start claiming these.
-    it.each(['review-14600-codex', 'sta4779-review-codex', 'codex-split-core'])(
+    it.each(['review-14600-opencode', 'sta4779-review-opencode', 'opencode-split-core'])(
       'declines %j',
       (title) => {
         expect(getAgentLabel(title)).toBeNull()
@@ -58,8 +56,8 @@ describe('getAgentLabel — characterization (pre-refactor)', () => {
     // Both orderings of each pair agree: detector precedence, rather than name order within
     // the title, chooses the label.
     it.each([
-      ['codex', 'opencode', 'Codex'],
-      ['opencode', 'codex', 'Codex']
+      ['claude', 'opencode', 'OpenCode'],
+      ['opencode', 'claude', 'OpenCode']
     ])('%s + %s both resolve to %s', (first, second, winner) => {
       expect(getAgentLabel(`${first} and ${second}`)).toBe(winner)
     })
@@ -69,7 +67,7 @@ describe('getAgentLabel — characterization (pre-refactor)', () => {
     it('claims a Claude glyph even when the task text names another agent', () => {
       // Correct today (the pane really is Claude) but for the wrong reason: the glyph is not
       // consulted as vendor evidence, the `✳ ` prefix branch simply sits first.
-      expect(getAgentLabel('✳ Fix Codex false attention notifications on Windows')).toBe(
+      expect(getAgentLabel('✳ Fix OpenCode false attention notifications on Windows')).toBe(
         'Claude Code'
       )
     })

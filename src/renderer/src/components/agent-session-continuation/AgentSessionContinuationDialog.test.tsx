@@ -8,7 +8,7 @@ import type { AgentSessionContinuationRequest } from '@/lib/agent-session-contin
 const mocks = vi.hoisted(() => ({
   detectAgents: vi.fn(),
   launchContinuation: vi.fn(),
-  settings: { defaultTuiAgent: 'codex', disabledTuiAgents: [] }
+  settings: { defaultTuiAgent: 'opencode', disabledTuiAgents: [] }
 }))
 
 vi.mock('@/store', () => ({
@@ -19,8 +19,8 @@ vi.mock('@/lib/launch-agent-session-continuation', () => ({
   launchAgentSessionContinuation: mocks.launchContinuation
 }))
 vi.mock('@/lib/agent-catalog', () => ({
-  getAgentCatalog: () => [{ id: 'codex', label: 'Codex' }],
-  getAgentLabel: () => 'Codex'
+  getAgentCatalog: () => [{ id: 'opencode', label: 'OpenCode' }],
+  getAgentLabel: () => 'OpenCode'
 }))
 vi.mock('@/components/agent/AgentCombobox', () => ({
   default: ({ value }: { value: string | null }) =>
@@ -54,9 +54,8 @@ import { AgentSessionContinuationDialog } from './AgentSessionContinuationDialog
 
 function request(worktreeId: string): AgentSessionContinuationRequest {
   return {
-    source: { capturedText: 'previous session', sourceAgent: 'codex' },
+    source: { capturedText: 'previous session', sourceAgent: 'opencode' },
     worktreeId,
-    workspacePath: '/repo',
     launchSource: 'sidebar'
   }
 }
@@ -81,9 +80,9 @@ describe('AgentSessionContinuationDialog', () => {
   })
 
   it('clears a prior detection failure while detecting a new request', async () => {
-    let resolveSecond: (agents: ['codex']) => void = () => {}
+    let resolveSecond: (agents: ['opencode']) => void = () => {}
     mocks.detectAgents.mockRejectedValueOnce(new Error('offline')).mockReturnValueOnce(
-      new Promise<['codex']>((resolve) => {
+      new Promise<['opencode']>((resolve) => {
         resolveSecond = resolve
       })
     )
@@ -103,7 +102,9 @@ describe('AgentSessionContinuationDialog', () => {
     expect(container.textContent).toContain('Detecting Agents')
     expect(container.textContent).not.toContain('Could not detect Agents')
 
-    await act(async () => resolveSecond(['codex']))
-    await vi.waitFor(() => expect(container.querySelector('[data-agent="codex"]')).not.toBeNull())
+    await act(async () => resolveSecond(['opencode']))
+    await vi.waitFor(() =>
+      expect(container.querySelector('[data-agent="opencode"]')).not.toBeNull()
+    )
   })
 })

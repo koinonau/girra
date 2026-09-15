@@ -17,7 +17,7 @@ function fleetProjection(verdict: 'live' | 'unverifiable' | 'exited'): Orchestra
     runId: 'run_1',
     role: 'worker',
     parent: null,
-    provider: { id: 'codex', model: null },
+    provider: { id: 'claude', model: null },
     host: { kind: 'local', id: 'local' },
     workspace: { id: 'ws_1', kind: 'folder_or_worktree' },
     stage: { worker: 'ready', dispatch: 'dispatched', detail: null, activity: 'working' },
@@ -108,7 +108,7 @@ describe('worker-read plain formatting', () => {
         workerReadResult({
           source: 'transcript',
           sourceIdentity: 'private-source-identity',
-          provider: 'codex',
+          provider: 'claude',
           transcript: {
             messages: [
               {
@@ -132,7 +132,7 @@ describe('worker-read plain formatting', () => {
         })
       )
     ).toBe(
-      'Source: transcript (provider=codex)\n' +
+      'Source: transcript (provider=claude)\n' +
         'Worker: ready\n' +
         'Archived: false\n' +
         'Source exact: true\n' +
@@ -186,7 +186,7 @@ describe('worker-read plain formatting', () => {
         workerReadResult({
           source: 'transcript',
           sourceIdentity: 'private-source-identity',
-          provider: 'codex',
+          provider: 'claude',
           transcript: {
             messages: [],
             nextCursor: 'owr1_empty',
@@ -201,7 +201,7 @@ describe('worker-read plain formatting', () => {
         })
       )
     ).toBe(
-      'Source: transcript (provider=codex)\n' +
+      'Source: transcript (provider=claude)\n' +
         'Worker: ready\n' +
         'Archived: false\n' +
         'Source exact: true\n' +
@@ -310,7 +310,7 @@ function transcriptRead(
     dispatchId: 'd1',
     source: 'transcript',
     sourceIdentity: 'pane:1',
-    provider: 'codex',
+    provider: 'claude',
     transcript: { messages: [message], nextCursor: '1', limited: false, returnedMessageCount: 1 },
     cursor: '1',
     status: { worker: 'running', terminal: 'running' },
@@ -354,7 +354,7 @@ describe('formatWorkerRead', () => {
     expect(output).not.toMatch(/\bworking\b/)
   })
 
-  // The body `codexSubagentGroupBody` actually writes: the plain-text twin, then
+  // The body a subagent-group producer writes: the plain-text twin, then
   // the block it stands in for. The twin exists for clients that cannot draw the
   // block, so a client printing the block must not print the twin beside it —
   // the renderer drops the twin for the same reason, from the other side.

@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   getHostClaimedNativeChatCommands,
-  getNativeChatAgentProfile,
-  getTextDrivenNativeChatCommands
+  getNativeChatAgentProfile
 } from './native-chat-agent-profiles'
 
 describe('native chat agent picker profiles', () => {
@@ -24,7 +23,6 @@ describe('host-claimed native chat commands', () => {
   // its catalog only answered "/init is not available" for commands that do run.
   it('claims nothing from the Claude catalog', () => {
     expect(names('claude')).toEqual([])
-    expect(getTextDrivenNativeChatCommands('claude')).toEqual([])
   })
 
   it('claims the whole catalog for agents with no pass-through policy', () => {

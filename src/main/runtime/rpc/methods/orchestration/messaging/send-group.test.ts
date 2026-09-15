@@ -231,7 +231,7 @@ describe('orchestration.send group addresses', () => {
     })
   })
 
-  it.each(['@all', '@idle', '@codex'])(
+  it.each(['@all', '@idle', '@opencode'])(
     'rejects %s from a sender in no Run, naming the durable alternatives',
     async (to) => {
       setup(false)
@@ -307,63 +307,41 @@ describe('orchestration.send group addresses', () => {
   it('fans out an agent name group by host-resolved identity within the Run', async () => {
     setupWithTerminals([
       makeSummary('term_coord', { agentIdentity: 'claude' }),
-      makeSummary('term_a', { agentIdentity: 'codex' }),
+      makeSummary('term_a', { agentIdentity: 'opencode' }),
       makeSummary('term_b', { agentIdentity: 'claude' }),
-      makeSummary('term_codex_elsewhere', { agentIdentity: 'codex' })
+      makeSummary('term_opencode_elsewhere', { agentIdentity: 'opencode' })
     ])
-    const codex = dispatchWorker('term_a')
+    const opencode = dispatchWorker('term_a')
     dispatchWorker('term_b')
 
     const result = (await call('orchestration.send', {
       from: 'term_coord',
-      to: '@codex',
-      subject: 'codex only'
+      to: '@opencode',
+      subject: 'opencode only'
     })) as GroupReceipt
 
     expect(result.recipients).toBe(1)
-    expect(result.messages[0].to_handle).toBe(`dispatch:${codex}`)
+    expect(result.messages[0].to_handle).toBe(`dispatch:${opencode}`)
   })
 
-  it('fans out @droid without claiming a pane whose title merely contains the word', async () => {
+  it('fans out @opencode without claiming a Claude pane whose title names OpenCode', async () => {
+    // The original hazard: agent groups matched any pane whose TITLE contained the name.
     setupWithTerminals([
-      makeSummary('term_coord', { agentIdentity: 'codex' }),
-      makeSummary('term_b', { agentIdentity: 'droid' }),
-      // Why kept: "Android build" contains `droid` as a substring. It was excluded before by
-      // whole-token matching and is excluded now because its identity is not droid.
-      makeSummary('term_c', { agentIdentity: 'claude', title: 'Android build' })
+      makeSummary('term_coord', { agentIdentity: 'pi' }),
+      makeSummary('term_b', { agentIdentity: 'opencode' }),
+      makeSummary('term_c', { agentIdentity: 'claude', title: '✳ Port the OpenCode plugin' })
     ])
-    const droid = dispatchWorker('term_b')
+    const opencode = dispatchWorker('term_b')
     dispatchWorker('term_c')
 
     const result = (await call('orchestration.send', {
       from: 'term_coord',
-      to: '@droid',
-      subject: 'droid only'
+      to: '@opencode',
+      subject: 'opencode only'
     })) as GroupReceipt
 
     expect(result.recipients).toBe(1)
-    expect(result.messages[0].to_handle).toBe(`dispatch:${droid}`)
-  })
-
-  it('fans out @cursor without claiming a Claude pane discussing a text cursor', async () => {
-    // The original hazard: `@cursor` matched any pane whose TITLE contained "cursor", so a
-    // Claude pane titled "Fix the text cursor blink" received Cursor's instructions.
-    setupWithTerminals([
-      makeSummary('term_coord', { agentIdentity: 'codex' }),
-      makeSummary('term_b', { agentIdentity: 'cursor' }),
-      makeSummary('term_c', { agentIdentity: 'claude', title: '✳ Fix the text cursor blink' })
-    ])
-    const cursor = dispatchWorker('term_b')
-    dispatchWorker('term_c')
-
-    const result = (await call('orchestration.send', {
-      from: 'term_coord',
-      to: '@cursor',
-      subject: 'cursor only'
-    })) as GroupReceipt
-
-    expect(result.recipients).toBe(1)
-    expect(result.messages[0].to_handle).toBe(`dispatch:${cursor}`)
+    expect(result.messages[0].to_handle).toBe(`dispatch:${opencode}`)
   })
 
   it('fans out @worktree:<id> to matching worktree terminals, unchanged by Run scoping', async () => {
@@ -466,7 +444,7 @@ describe('orchestration.send group addresses', () => {
     expect(db.getInbox(100)).toHaveLength(0)
   })
 
-  it.each(['@codex', '@idle'])(
+  it.each(['@opencode', '@idle'])(
     '%s resolves a reminted worker handle by its stable pane',
     async (to) => {
       const pane = 'tab_worker:11111111-1111-4111-8111-111111111111'
@@ -476,7 +454,7 @@ describe('orchestration.send group addresses', () => {
           makeSummary('term_new', {
             tabId: 'tab_worker',
             leafId: '11111111-1111-4111-8111-111111111111',
-            agentIdentity: 'codex'
+            agentIdentity: 'opencode'
           })
         ],
         { term_new: 'idle' }
@@ -525,12 +503,12 @@ describe('orchestration.send group addresses', () => {
     expect(checked.messages.map((m) => m.subject)).toEqual(['pause all work'])
     expect(db.getUnreadMessages(`dispatch:${dispatch.id}`)).toHaveLength(0)
   })
-  it.each(['@codex', '@idle'])('does not claim remote membership for %s', async (to) => {
+  it.each(['@opencode', '@idle'])('does not claim remote membership for %s', async (to) => {
     setupWithTerminals(
-      [makeSummary('term_coord'), makeSummary('term_codex', { agentIdentity: 'codex' })],
-      { term_codex: 'idle' }
+      [makeSummary('term_coord'), makeSummary('term_opencode', { agentIdentity: 'opencode' })],
+      { term_opencode: 'idle' }
     )
-    const local = dispatchWorker('term_codex')
+    const local = dispatchWorker('term_opencode')
     const remote = db.createStartingWorkerDispatch({
       taskSpec: 'remote work',
       taskRunId: activeRunId,
@@ -565,14 +543,14 @@ describe('orchestration.send group addresses', () => {
       message: `No recipients resolved for group address: ${to}`
     })
   })
-  it.each(['@all', '@idle', '@codex'])(
+  it.each(['@all', '@idle', '@opencode'])(
     'excludes an owning coordinator with a self-Dispatch from %s',
     async (to) => {
       setupWithTerminals(
         [
-          makeSummary('term_coord', { agentIdentity: 'codex' }),
-          makeSummary('term_a', { agentIdentity: 'codex' }),
-          makeSummary('term_b', { agentIdentity: 'codex' })
+          makeSummary('term_coord', { agentIdentity: 'opencode' }),
+          makeSummary('term_a', { agentIdentity: 'opencode' }),
+          makeSummary('term_b', { agentIdentity: 'opencode' })
         ],
         { term_coord: 'idle', term_a: 'idle', term_b: 'idle' }
       )
@@ -601,7 +579,7 @@ describe('orchestration.send group addresses', () => {
       const snapshot = makeSummary('term_snapshot', {
         tabId: 'tab_worker',
         leafId: '11111111-1111-4111-8111-111111111111',
-        agentIdentity: 'codex'
+        agentIdentity: 'opencode'
       })
       setupWithTerminals([makeSummary('term_coord'), snapshot])
       const dispatch = createRootDispatch(
@@ -622,8 +600,8 @@ describe('orchestration.send group addresses', () => {
       })
       const result = (await call('orchestration.send', {
         from: 'term_coord',
-        to: '@codex',
-        subject: 'codex guidance'
+        to: '@opencode',
+        subject: 'opencode guidance'
       })) as GroupReceipt
       expect(result.messages.map((m) => m.to_handle)).toEqual([`dispatch:${dispatch.id}`])
     }

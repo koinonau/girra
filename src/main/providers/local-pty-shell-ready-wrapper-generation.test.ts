@@ -344,9 +344,6 @@ describePosix('local PTY shell-ready launch config', () => {
     expect(zshrc).toContain(agentTeamsPathRestoreLine)
     expect(zlogin).toContain(agentTeamsPathRestoreLine)
     expect(bashRc).toContain(agentTeamsPathRestoreLine)
-    for (const wrapperFile of [zshrc, zlogin, bashRc]) {
-      expect(wrapperFile).not.toContain('CODEX_HOME')
-    }
   })
 
   // Why: issue #2422 — without OSC 133 C/D markers, bash sessions kept the worktree spinner "working" ~30min after the agent exited.

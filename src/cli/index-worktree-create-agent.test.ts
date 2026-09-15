@@ -111,7 +111,7 @@ describe('orca cli worktree awareness', () => {
         '--name',
         'agent-task',
         '--agent',
-        'codex',
+        'claude',
         '--prompt',
         'hi',
         '--setup',
@@ -137,7 +137,7 @@ describe('orca cli worktree awareness', () => {
       noParent: false,
       callerTerminalHandle: undefined,
       cliProvenanceRequest: {},
-      startupAgent: 'codex',
+      startupAgent: 'claude',
       startupPrompt: 'hi'
     })
   })
@@ -161,7 +161,7 @@ describe('orca cli worktree awareness', () => {
         '--name',
         'agent-task',
         '--agent',
-        'codex',
+        'claude',
         '--prompt',
         'hi',
         '--activate',
@@ -186,7 +186,7 @@ describe('orca cli worktree awareness', () => {
       noParent: false,
       callerTerminalHandle: undefined,
       cliProvenanceRequest: {},
-      startupAgent: 'codex',
+      startupAgent: 'claude',
       startupPrompt: 'hi'
     })
   })
@@ -260,7 +260,7 @@ describe('orca cli worktree awareness', () => {
         '--name',
         'child',
         '--agent',
-        'codex',
+        'claude',
         '--prompt'
       ],
       '/tmp/repo'

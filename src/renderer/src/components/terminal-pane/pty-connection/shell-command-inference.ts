@@ -93,9 +93,9 @@ export function installShellCommandInference(session: ConnectPanePtySession): vo
    * Resolves the authoritative owner agent type for this pane, checking tab launch,
    * pane startup, typed command ownership, and store state configuration.
    *
-   * Why: launch ownership wins so Pi-compatible live titles/hooks can't repaint an
-   * OMP-owned pane back to Pi; command ownership covers manually typed `omp`
-   * in generic terminals where launch metadata does not exist.
+   * Why: launch ownership wins so same-group live titles/hooks can't repaint the
+   * launched owner; command ownership covers manually typed agents in generic
+   * terminals where launch metadata does not exist.
    */
   session.getAuthoritativePaneAgent = (): AgentType | undefined => {
     const state = useAppStore.getState()
@@ -106,7 +106,6 @@ export function installShellCommandInference(session: ConnectPanePtySession): vo
       resolvePaneAgentOwner({
         launchAgent: tab?.launchAgent,
         startupLaunchAgent: session.paneStartup?.launchAgent,
-        initialStatusAgent: session.paneStartup?.initialAgentStatus?.agent,
         commandInferredAgent: session.commandInferredPaneAgent,
         hookAgent: state.agentStatusByPaneKey[session.cacheKey]?.agentType
       }) ?? undefined
@@ -195,7 +194,7 @@ export function installShellCommandInference(session: ConnectPanePtySession): vo
     }
     const title = session.getCurrentTerminalTitle() ?? ''
     // Why: broad token matching (getAgentLabel) fires on titles like
-    // "ssh devin@host"; that surface is too loose to gate mode preservation
+    // "ssh dev@host"; that surface is too loose to gate mode preservation
     // and PTY byte injection, so only exact/status titles count here.
     return detectAgentStatusFromTitle(title) !== null
   }

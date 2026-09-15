@@ -187,7 +187,7 @@ describe('connectPanePty', () => {
       | ((payload: {
           state: 'working' | 'done'
           prompt: string
-          agentType: 'codex'
+          agentType: 'opencode'
           lastAssistantMessage?: string
         }) => void)
       | undefined
@@ -199,12 +199,12 @@ describe('connectPanePty', () => {
     statusHandler({
       state: 'working',
       prompt: 'finish the implementation',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     statusHandler({
       state: 'done',
       prompt: 'finish the implementation',
-      agentType: 'codex',
+      agentType: 'opencode',
       lastAssistantMessage: 'Done.'
     })
     bellHandler()
@@ -224,12 +224,12 @@ describe('connectPanePty', () => {
     expect(deps.dispatchNotification).toHaveBeenCalledWith(
       expect.objectContaining({
         source: 'agent-task-complete',
-        terminalTitle: 'codex',
+        terminalTitle: 'opencode',
         paneKey: makePaneKey('tab-1', LEAF_1),
         agentStatusSnapshot: expect.objectContaining({
           state: 'done',
           prompt: 'finish the implementation',
-          agentType: 'codex',
+          agentType: 'opencode',
           lastAssistantMessage: 'Done.'
         })
       })
@@ -258,7 +258,7 @@ describe('connectPanePty', () => {
       | ((payload: {
           state: 'working' | 'done'
           prompt: string
-          agentType: 'codex'
+          agentType: 'opencode'
           lastAssistantMessage?: string
         }) => void)
       | undefined
@@ -270,12 +270,12 @@ describe('connectPanePty', () => {
     statusHandler({
       state: 'working',
       prompt: 'finish the implementation',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     statusHandler({
       state: 'done',
       prompt: 'finish the implementation',
-      agentType: 'codex',
+      agentType: 'opencode',
       lastAssistantMessage: 'Done.'
     })
     bellHandler()
@@ -287,7 +287,7 @@ describe('connectPanePty', () => {
     statusHandler({
       state: 'working',
       prompt: 'finish the implementation',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_GRACE_MS)
 
@@ -318,7 +318,7 @@ describe('connectPanePty', () => {
       | ((payload: {
           state: 'working' | 'done'
           prompt: string
-          agentType: 'codex'
+          agentType: 'opencode'
           lastAssistantMessage?: string
         }) => void)
       | undefined
@@ -333,12 +333,12 @@ describe('connectPanePty', () => {
     statusHandler({
       state: 'working',
       prompt: 'finish the implementation',
-      agentType: 'codex'
+      agentType: 'opencode'
     })
     statusHandler({
       state: 'done',
       prompt: 'finish the implementation',
-      agentType: 'codex',
+      agentType: 'opencode',
       lastAssistantMessage: 'Milestone complete.'
     })
     bellHandler()
@@ -383,7 +383,7 @@ describe('connectPanePty', () => {
     }
 
     bellHandler()
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     workingHandler()
     vi.advanceTimersByTime(250)
 
@@ -417,7 +417,7 @@ describe('connectPanePty', () => {
       throw new Error('Expected idle and working handlers to be registered')
     }
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS - 1)
     expect(deps.dispatchNotification).not.toHaveBeenCalledWith(
       expect.objectContaining({ source: 'agent-task-complete' })
@@ -429,12 +429,12 @@ describe('connectPanePty', () => {
       expect.objectContaining({ source: 'agent-task-complete' })
     )
 
-    idleHandler('* Codex done')
+    idleHandler('* OpenCode done')
     vi.advanceTimersByTime(AGENT_TASK_COMPLETE_NOTIFICATION_MAX_WAIT_MS)
 
     expect(deps.dispatchNotification).toHaveBeenCalledWith({
       source: 'agent-task-complete',
-      terminalTitle: '* Codex done',
+      terminalTitle: '* OpenCode done',
       paneKey: makePaneKey('tab-1', LEAF_1)
     })
   })

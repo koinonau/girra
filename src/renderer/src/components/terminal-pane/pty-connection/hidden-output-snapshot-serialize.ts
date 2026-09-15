@@ -69,7 +69,7 @@ export function bindSerializeHiddenOutputSnapshot(session: ConnectPanePtySession
   // session.dataCallback sync, leaving a spawn-time window where neither side
   // answered queries (the spawn-time DA1 loss). Declaring hidden on the
   // spawn IPC lets main mark the PTY before its first byte — including
-  // codex spawns: the model responder answers their startup probes from
+  // agent spawns: the model responder answers their startup probes from
   // byte zero now that the 10s renderer query window is gone.
   // Remote-runtime PTYs are never gate-markable (no local main transit).
   session.shouldDeclareHiddenAtSpawn = function (): boolean {

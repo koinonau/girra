@@ -18,7 +18,7 @@ function summary(overrides: Partial<RuntimeTerminalSummary>): RuntimeTerminalSum
     branch: 'main',
     tabId: 'tab-live',
     leafId: LEAF_ID,
-    title: 'Codex',
+    title: 'Claude',
     connected: true,
     writable: true,
     lastOutputAt: 1,

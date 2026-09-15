@@ -68,41 +68,41 @@ function rendersEverythingItCovers(sample: MidlinePreeditOcclusionSample): boole
 }
 
 test.describe('Terminal mid-line Korean preedit occlusion', () => {
-  test('masks a semantically owned Codex placeholder during its first Korean preedit', async ({
+  test('masks a semantically owned Claude Code placeholder during its first Korean preedit', async ({
     orcaPage
   }, testInfo) => {
     const arena = await openTerminalImePaneArena(orcaPage)
     let completed = false
     try {
-      const placeholder = 'Ask Codex to do anything'
+      const placeholder = 'Try “fix the failing test”'
       await writeToActiveTerminal(
         orcaPage,
-        [
-          '\x1b[2J\x1b[H\x1b[1m›\x1b[22m \x1b7',
-          `\x1b[2m${placeholder}\x1b[22m`,
-          '\r\n\r\n\x1b[2mgpt-5.6 · ~/repo\x1b[22m\x1b8'
-        ].join('')
+        `\x1b[2J\x1b[H${'─'.repeat(24)}\r\n❯ \x1b7\x1b[2m${placeholder}\x1b[22m\x1b8`
       )
       await setImeComposition(arena.session, '아')
 
       const sample = await sampleOpenComposition(orcaPage, '아')
-      expect(sample.cursorColumn, 'the cursor is not after the Codex prompt').toBe(2)
-      expect(sample.rowTailFromCursor, 'the Codex placeholder is not under the cursor').toBe(
+      expect(sample.cursorColumn, 'the cursor is not after the Claude Code prompt').toBe(2)
+      expect(sample.rowTailFromCursor, 'the Claude Code placeholder is not under the cursor').toBe(
         placeholder
       )
       expect(
         sample.hiddenByOverlay,
         `the opaque overlay does not mask the full placeholder — ${describeOcclusion(sample)}`
       ).toBe(placeholder)
-      expect(sample.overlayText, 'the Codex placeholder is repeated after the preedit').toBe('아')
+      expect(sample.overlayText, 'the Claude Code placeholder is repeated after the preedit').toBe(
+        '아'
+      )
       expect(sample.remainderText, 'the hidden span lost the placeholder width').toBe(placeholder)
-      expect(sample.remainderVisibility, 'the Codex placeholder is still painted').toBe('hidden')
+      expect(sample.remainderVisibility, 'the Claude Code placeholder is still painted').toBe(
+        'hidden'
+      )
       completed = true
     } finally {
       await closeTerminalImePaneArena(
         arena,
         testInfo,
-        'korean-codex-placeholder-preedit',
+        'korean-claude-placeholder-preedit',
         !completed
       )
     }

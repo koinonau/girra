@@ -395,9 +395,9 @@ describe('structured agent session status projection', () => {
     const projected = projectStructuredItemToNativeChat(
       item('frame', 1, {
         kind: 'status',
-        text: 'codex · notification:new/event',
+        text: 'claude · notification:new/event',
         providerFrame: {
-          provider: 'codex',
+          provider: 'claude',
           kind: 'notification:new/event',
           payload: { head: '{}', byteLength: 2, digest: 'digest', truncated: false }
         }
@@ -407,7 +407,7 @@ describe('structured agent session status projection', () => {
     expect(projected?.blocks).toEqual([
       expect.objectContaining({
         type: 'text',
-        text: 'codex · notification:new/event',
+        text: 'claude · notification:new/event',
         providerFrame: expect.objectContaining({ kind: 'notification:new/event' })
       })
     ])

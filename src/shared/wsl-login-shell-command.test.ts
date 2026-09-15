@@ -71,7 +71,7 @@ describe('wsl login shell command helpers', () => {
   it.skipIf(process.platform === 'win32')(
     'resolves env-node launchers from the current login-shell PATH on every run',
     () => {
-      const root = mkdtempSync(join(tmpdir(), 'orca-wsl-login-codex-'))
+      const root = mkdtempSync(join(tmpdir(), 'orca-wsl-login-agent-'))
       const tools = join(root, 'tools')
       const loginBin = join(root, 'login')
       const v1Bin = join(root, 'nvm-v1')
@@ -87,29 +87,29 @@ describe('wsl login shell command helpers', () => {
       )
       writeFileSync(
         loginShell,
-        '#!/bin/sh\nexport PATH="$ORCA_TEST_CODEX_BIN:/usr/bin:/bin"\nexec /bin/sh -c "$2"\n'
+        '#!/bin/sh\nexport PATH="$ORCA_TEST_AGENT_BIN:/usr/bin:/bin"\nexec /bin/sh -c "$2"\n'
       )
       for (const [bin, label] of [
         [v1Bin, 'v1'],
         [v2Bin, 'v2']
       ] as const) {
-        writeFileSync(join(bin, 'codex'), '#!/usr/bin/env node\n')
+        writeFileSync(join(bin, 'opencode'), '#!/usr/bin/env node\n')
         writeFileSync(join(bin, 'node'), `#!/bin/sh\nprintf '%s' '${label}'\n`)
-        chmodSync(join(bin, 'codex'), 0o755)
+        chmodSync(join(bin, 'opencode'), 0o755)
         chmodSync(join(bin, 'node'), 0o755)
       }
       chmodSync(join(tools, 'getent'), 0o755)
       chmodSync(loginShell, 0o755)
 
-      const command = buildWslLoginShellCommand('exec codex')
-      const run = (codexBin: string): string =>
+      const command = buildWslLoginShellCommand('exec opencode')
+      const run = (agentBin: string): string =>
         execFileSync('/bin/sh', ['-c', command], {
           encoding: 'utf8',
           env: {
             ...process.env,
             PATH: `${tools}:/usr/bin:/bin`,
             ORCA_TEST_LOGIN_SHELL: loginShell,
-            ORCA_TEST_CODEX_BIN: codexBin
+            ORCA_TEST_AGENT_BIN: agentBin
           }
         })
 

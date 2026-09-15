@@ -3,8 +3,8 @@
  * from code it does not own.
  *
  * Why a seam and not a direct call: `signalProcessTree` is the choke point every
- * `runProcess` termination funnels through, and the codex app-server and
- * ephemeral-VM kills are shared with the CLI — all of them live outside
+ * `runProcess` termination funnels through, and the ephemeral-VM kills are
+ * shared with the CLI — all of them live outside
  * `src/main` and cannot import the own-Chromium guard or the crash breadcrumb
  * store. Main registers the guard at startup; everywhere else this admits every
  * kill and records nothing.

@@ -145,12 +145,12 @@ describe('registerSettingsHandlers', () => {
   it('does not reconcile hooks when the disabled-agent set is unchanged', async () => {
     const before = {
       agentStatusHooksEnabled: true,
-      disabledTuiAgents: ['codex', 'claude']
+      disabledTuiAgents: ['opencode', 'claude']
     }
     store.getSettings.mockReturnValue(before)
     store.updateSettings.mockReturnValue({
       ...before,
-      disabledTuiAgents: ['claude', 'codex']
+      disabledTuiAgents: ['claude', 'opencode']
     })
     registerSettingsHandlers(store as never)
     const handler = handleMock.mock.calls.find((call) => call[0] === 'settings:set')?.[1] as (
@@ -158,7 +158,7 @@ describe('registerSettingsHandlers', () => {
       args: { disabledTuiAgents: string[] }
     ) => Promise<unknown>
 
-    await handler(settingsInvokeEvent, { disabledTuiAgents: ['claude', 'codex'] })
+    await handler(settingsInvokeEvent, { disabledTuiAgents: ['claude', 'opencode'] })
 
     expect(applyAgentStatusHooksEnabledMock).not.toHaveBeenCalled()
   })
@@ -166,7 +166,7 @@ describe('registerSettingsHandlers', () => {
   it('reconciles hooks when the disabled-agent set changes', async () => {
     const before = {
       agentStatusHooksEnabled: true,
-      disabledTuiAgents: ['codex', 'claude']
+      disabledTuiAgents: ['opencode', 'claude']
     }
     const updated = {
       ...before,
@@ -330,9 +330,9 @@ describe('registerSettingsHandlers', () => {
     if (!listener) {
       throw new Error('settings change listener was not registered')
     }
-    listener({ defaultTuiAgent: 'codex' }, { defaultTuiAgent: 'codex' })
+    listener({ defaultTuiAgent: 'opencode' }, { defaultTuiAgent: 'opencode' })
 
-    expect(send).toHaveBeenCalledWith('settings:changed', { defaultTuiAgent: 'codex' })
+    expect(send).toHaveBeenCalledWith('settings:changed', { defaultTuiAgent: 'opencode' })
   })
 
   it('does not rebroadcast renderer settings writes to the origin window', () => {
@@ -351,10 +351,10 @@ describe('registerSettingsHandlers', () => {
     if (!listener) {
       throw new Error('settings change listener was not registered')
     }
-    listener({ defaultTuiAgent: 'codex' }, { defaultTuiAgent: 'codex' }, 1)
+    listener({ defaultTuiAgent: 'opencode' }, { defaultTuiAgent: 'opencode' }, 1)
 
     expect(originSend).not.toHaveBeenCalled()
-    expect(otherSend).toHaveBeenCalledWith('settings:changed', { defaultTuiAgent: 'codex' })
+    expect(otherSend).toHaveBeenCalledWith('settings:changed', { defaultTuiAgent: 'opencode' })
   })
 
   it('updates the agent awake service when the keep-awake setting changes', () => {
@@ -391,7 +391,7 @@ describe('registerSettingsHandlers', () => {
       args: unknown
     ) => unknown
 
-    handler(settingsInvokeEvent, { defaultTuiAgent: 'codex' })
+    handler(settingsInvokeEvent, { defaultTuiAgent: 'opencode' })
 
     expect(agentAwakeService.setMode).not.toHaveBeenCalled()
   })

@@ -63,10 +63,6 @@ const getAllOrchestrationPaneSearchEntries = createLocalizedCatalog(() => [
         'claude'
       ),
       ...translateSearchKeyword(
-        'auto.components.settings.orchestration.search.f278fd04db',
-        'codex'
-      ),
-      ...translateSearchKeyword(
         'auto.components.settings.orchestration.search.08c65b12a2',
         'examples'
       ),

@@ -14,7 +14,6 @@ describe('PowerShell OSC 133 bootstrap', () => {
     expect(script).toContain('[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()')
     expect(script).toContain('ORCA_OPENCODE_CONFIG_DIR')
     expect(script).not.toContain('ORCA_PI_CODING_AGENT_DIR')
-    expect(script).not.toContain('CODEX')
     expect(script).toContain('function Global:prompt')
     expect(script).toContain('function Global:PSConsoleHostReadLine')
     expect(script).toContain('Esc = [char]27')
