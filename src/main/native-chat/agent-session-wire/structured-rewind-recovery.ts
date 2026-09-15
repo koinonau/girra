@@ -1,5 +1,4 @@
 import { restoreRewindJournalBody } from './structured-rewind-journal-body'
-import { mergeRetainedHostLifecycleRows } from './structured-rewind-retained-host-rows'
 import { isDeepStrictEqual } from 'node:util'
 import {
   agentJournalItemKey,
@@ -8,8 +7,6 @@ import {
 import type { AgentSessionRewindRecord } from '../../../shared/agent-session-rewind'
 import type { AgentSessionRecordStore } from '../../runtime/agent-session-record-store'
 import type { AgentSessionJournal } from '../agent-session-journal/journal-store'
-import type { StructuredAgentSessionAdapter } from './structured-agent-session-adapter'
-import { AGENT_SESSION_HISTORY_MAX_PAGE_BYTES } from './agent-session-history-page-bounds'
 
 export function persistRewindRecord(
   store: AgentSessionRecordStore,
@@ -30,78 +27,10 @@ export async function recoverStructuredRewind(
   store: AgentSessionRecordStore,
   sessionId: string,
   journal: AgentSessionJournal,
-  fence: number,
-  adapter?: StructuredAgentSessionAdapter,
-  now: () => number = Date.now
+  fence: number
 ): Promise<void> {
-  let rewind = store.getRecord(sessionId)?.rewind
-  if (rewind?.phase !== 'provider-succeeded' && rewind?.phase !== 'prepared') {
-    return
-  }
-  const target = parseAgentJournalItemKey(rewind.providerItemId ?? rewind.itemId)
-  if (target?.provider === 'codex' && !rewind.hydrationVerified) {
-    const recovered = await adapter?.recoverRewind?.({
-      sessionId,
-      fence,
-      beforeTurnId: target.turnId
-    })
-    if (!recovered?.ok) {
-      if (
-        recovered?.reason === 'provider-refused' &&
-        rewind.phase === 'prepared' &&
-        !rewind.providerApplied
-      ) {
-        await persistRewindRecord(store, sessionId, fence, {
-          ...rewind,
-          phase: 'refused',
-          reason: recovered.reason,
-          retained: []
-        })
-        return
-      }
-      throw new Error(`agent_session_rewind:${recovered?.reason ?? 'outcome-unknown'}`)
-    }
-    const expectedItems = new Set(
-      rewind.retained
-        .filter((item) => {
-          const identity = parseAgentJournalItemKey(item.itemId)
-          return identity?.provider === 'codex' && identity.threadId === target.threadId
-        })
-        .map((item) => item.itemId)
-    )
-    const observedItems = new Set<string>()
-    for (const { identity } of recovered.items) {
-      const itemId = agentJournalItemKey(identity)
-      if (
-        identity.provider !== 'codex' ||
-        identity.threadId !== target.threadId ||
-        !expectedItems.has(itemId)
-      ) {
-        throw new Error('agent_session_rewind:proof-mismatch')
-      }
-      observedItems.add(itemId)
-    }
-    if (observedItems.size !== expectedItems.size) {
-      throw new Error('agent_session_rewind:proof-mismatch')
-    }
-    const retained = mergeRetainedHostLifecycleRows(
-      rewind.retained,
-      recovered.items.map(({ identity, body }) => ({
-        itemId: agentJournalItemKey(identity),
-        body,
-        observedAt: now()
-      }))
-    )
-    if (
-      retained.length > 10_000 ||
-      Buffer.byteLength(JSON.stringify(retained), 'utf8') > AGENT_SESSION_HISTORY_MAX_PAGE_BYTES
-    ) {
-      throw new Error('agent_session_rewind:history-limit')
-    }
-    rewind = { ...rewind, retained, phase: 'provider-succeeded', hydrationVerified: true }
-    await persistRewindRecord(store, sessionId, fence, rewind)
-  }
-  if (rewind.phase !== 'provider-succeeded') {
+  const rewind = store.getRecord(sessionId)?.rewind
+  if (rewind?.phase !== 'provider-succeeded') {
     return
   }
   const replacement = rewind.retained.map((item) => {

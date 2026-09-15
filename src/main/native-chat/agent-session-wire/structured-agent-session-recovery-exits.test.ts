@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi, type Mock } from 'vitest'
 import { spawnProcess } from '../../../shared/child-process/run-process'
-import { CODEX_SPAWN_TOKEN_ENV } from '../../codex/codex-structured-owner-identity'
+import { AGENT_SESSION_SPAWN_TOKEN_ENV } from '../../runtime/agent-session-spawn-token-readback'
 import { AgentSessionRecordStore } from '../../runtime/agent-session-record-store'
 import { readProcessStartTimeMs } from '../../runtime/agent-session-process-identity-probe'
 import { createStructuredAgentSessionOwnerProbe } from '../../runtime/structured-agent-session-owner-probe'
@@ -33,7 +33,7 @@ async function spawnOwner(spawnToken: string) {
   const child = spawnProcess({
     program: process.execPath,
     args: ['-e', 'setInterval(() => {}, 1_000)'],
-    env: { ...process.env, [CODEX_SPAWN_TOKEN_ENV]: spawnToken }
+    env: { ...process.env, [AGENT_SESSION_SPAWN_TOKEN_ENV]: spawnToken }
   })
   spawnedOwners.add(child)
   const pid = child.pid
@@ -66,7 +66,8 @@ function adapter(): StructuredAgentSessionAdapter {
     dispatch: vi.fn(),
     cancelTurn: vi.fn(),
     answerPrompt: vi.fn(),
-    setOption: vi.fn()
+    setOption: vi.fn(),
+    supportsCreate: () => true
   } as unknown as StructuredAgentSessionAdapter
 }
 
@@ -99,7 +100,7 @@ beforeEach(async () => {
     },
     link: {
       linkId: `link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: store.getRecord(SESSION)?.providerHandleChain.length ? 'resumed' : 'created',
       mintedAtFence: fence,
       observedAt: NOW
@@ -279,7 +280,7 @@ describe('recovery exits', () => {
       process: outgoing.process,
       link: {
         linkId: 'link-outgoing',
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'created',
         mintedAtFence: 1,
         observedAt: NOW
@@ -324,7 +325,7 @@ describe('recovery exits', () => {
       process: replacement.process,
       link: {
         linkId: 'link-replacement',
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'resumed',
         mintedAtFence: 3,
         observedAt: NOW + 2

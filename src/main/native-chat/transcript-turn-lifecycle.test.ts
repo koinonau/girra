@@ -1,76 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import {
   decodeClaudeTurnLifecycle,
-  decodeCodexTurnLifecycle,
   nativeChatTurnLifecycleDecoderForAgent
 } from './transcript-turn-lifecycle'
 
 describe('native chat transcript turn lifecycle', () => {
   it('exposes a lifecycle decoder only for transcript formats with explicit boundaries', () => {
     expect(nativeChatTurnLifecycleDecoderForAgent('claude')).not.toBeNull()
-    expect(nativeChatTurnLifecycleDecoderForAgent('openclaude')).not.toBeNull()
-    expect(nativeChatTurnLifecycleDecoderForAgent('codex')).not.toBeNull()
-    expect(nativeChatTurnLifecycleDecoderForAgent('grok')).toBeNull()
-  })
-
-  it('decodes Codex task boundaries with the provider turn id', () => {
-    expect(
-      decodeCodexTurnLifecycle(
-        JSON.stringify({
-          timestamp: '2026-07-16T23:40:14.001Z',
-          type: 'event_msg',
-          payload: { type: 'task_started', turn_id: 'turn-1' }
-        }),
-        'fallback'
-      )
-    ).toEqual({
-      state: 'working',
-      turnId: 'turn-1',
-      timestamp: Date.parse('2026-07-16T23:40:14.001Z')
-    })
-
-    expect(
-      decodeCodexTurnLifecycle(
-        JSON.stringify({
-          timestamp: '2026-07-16T23:45:37.608Z',
-          type: 'event_msg',
-          payload: { type: 'task_complete', turn_id: 'turn-1' }
-        }),
-        'fallback'
-      )
-    ).toEqual({
-      state: 'completed',
-      turnId: 'turn-1',
-      timestamp: Date.parse('2026-07-16T23:45:37.608Z')
-    })
-
-    expect(
-      decodeCodexTurnLifecycle(
-        JSON.stringify({
-          timestamp: '2026-07-16T23:46:01.000Z',
-          type: 'event_msg',
-          payload: { type: 'turn_aborted', reason: 'interrupted', turn_id: 'turn-2' }
-        }),
-        'fallback'
-      )
-    ).toEqual({
-      state: 'interrupted',
-      turnId: 'turn-2',
-      timestamp: Date.parse('2026-07-16T23:46:01.000Z')
-    })
-  })
-
-  it('does not mistake a Codex assistant message for completion', () => {
-    expect(
-      decodeCodexTurnLifecycle(
-        JSON.stringify({
-          timestamp: '2026-07-16T23:45:37.472Z',
-          type: 'event_msg',
-          payload: { type: 'agent_message', message: 'final-looking prose' }
-        }),
-        'fallback'
-      )
-    ).toBeNull()
+    expect(nativeChatTurnLifecycleDecoderForAgent('codex')).toBeNull()
   })
 
   it('uses Claude terminal stop_reasons and excludes tool-result user rows', () => {

@@ -24,37 +24,30 @@ import {
   recoveryJournalDir
 } from './agent-session-journal-recovery'
 
-const CODEX_SESSION = '019fd532-7c11-7a90-b6de-4e1a2c3d5f60'
+const PROVIDER_SESSION = '019fd532-7c11-7a90-b6de-4e1a2c3d5f60'
 
 const IDENTITY: AgentSessionJournalIdentity = {
-  sessionId: CODEX_SESSION,
+  sessionId: PROVIDER_SESSION,
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: CODEX_SESSION }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: PROVIDER_SESSION, leafUuid: null }
 }
 
-const CODEX_LINES = [
+const CLAUDE_LINES = [
   {
-    type: 'session_meta',
-    timestamp: '2026-08-05T10:00:00.000Z',
-    payload: {
-      id: CODEX_SESSION,
-      session_id: CODEX_SESSION,
-      cwd: '/Users/dev/project',
-      originator: 'codex_cli_rs',
-      cli_version: '0.146.1'
-    }
-  },
-  {
-    type: 'event_msg',
+    type: 'user',
+    uuid: 'u-1',
+    sessionId: PROVIDER_SESSION,
     timestamp: '2026-08-05T10:00:02.000Z',
-    payload: { type: 'user_message', message: 'add a retry', kind: 'plain' }
+    message: { role: 'user', content: 'add a retry' }
   },
   {
-    type: 'event_msg',
+    type: 'assistant',
+    uuid: 'a-1',
+    sessionId: PROVIDER_SESSION,
     timestamp: '2026-08-05T10:00:05.000Z',
-    payload: { type: 'agent_message', message: 'On it.' }
+    message: { role: 'assistant', content: [{ type: 'text', text: 'On it.' }] }
   }
 ]
 
@@ -64,7 +57,7 @@ let historyFilePath: string
 const journals = createTrackedJournalOpener()
 
 function item(ordinal: number): AgentJournalItemIdentity {
-  return { provider: 'codex', threadId: CODEX_SESSION, turnId: 'turn-1', ordinal }
+  return { provider: 'claude', sessionId: PROVIDER_SESSION, uuid: `turn-1-${ordinal}` }
 }
 
 /** Fills a journal with `count` items and hands back its epoch. */
@@ -124,10 +117,10 @@ async function deleteRow(seq: number): Promise<void> {
 beforeEach(async () => {
   root = await mkdtemp(join(tmpdir(), 'orca-wire-recovery-'))
   journalDir = join(root, 'journal')
-  historyFilePath = join(root, 'rollout.jsonl')
+  historyFilePath = join(root, 'transcript.jsonl')
   await writeFile(
     historyFilePath,
-    `${CODEX_LINES.map((line) => JSON.stringify(line)).join('\n')}\n`,
+    `${CLAUDE_LINES.map((line) => JSON.stringify(line)).join('\n')}\n`,
     'utf-8'
   )
 })
@@ -139,7 +132,6 @@ afterEach(async () => {
 
 describe('providerHistoryId', () => {
   it('uses the provider handle, never the Orca session id', () => {
-    expect(providerHistoryId({ kind: 'codex', threadId: 'thread-9' })).toBe('thread-9')
     expect(providerHistoryId({ kind: 'claude', sessionId: 'sess-9', leafUuid: null })).toBe(
       'sess-9'
     )
@@ -187,7 +179,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
       db.prepare(
         'INSERT INTO journal_rows (session_id, epoch, seq, ts, row_json) VALUES (?, ?, ?, ?, ?)'
       ).run(
-        CODEX_SESSION,
+        PROVIDER_SESSION,
         epoch,
         3,
         1,
@@ -206,7 +198,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
 
     // The unreadable journal is left exactly as found; a newer host still owns it.
     await withJournalDatabase(journalDir, (db) => {
-      const rows = readJournalEpochRows(db, CODEX_SESSION, epoch)
+      const rows = readJournalEpochRows(db, PROVIDER_SESSION, epoch)
       expect(rows.some((entry) => entry.rowJson.includes('"v":99'))).toBe(true)
       expect(rows).toHaveLength(3)
     })
@@ -332,7 +324,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
     await first.journal.close()
 
     // The deletion is durable, so the demand for a rebuild has to be too.
-    expect(await loadJournal(journalDir, CODEX_SESSION)).toMatchObject({ corrupt: true })
+    expect(await loadJournal(journalDir, PROVIDER_SESSION)).toMatchObject({ corrupt: true })
 
     // A readable transcript rebuilds the epoch, and THAT is what retires it.
     const retried = await openAgentSessionJournalWithRecovery({
@@ -344,7 +336,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
     journals.track(retried.journal)
     expect(retried.recovery?.imported).toBeGreaterThan(0)
     await retried.journal.close()
-    expect(await loadJournal(journalDir, CODEX_SESSION)).toMatchObject({ corrupt: false })
+    expect(await loadJournal(journalDir, PROVIDER_SESSION)).toMatchObject({ corrupt: false })
   })
 
   // The reproduced path. Deleting sequence 1 leaves every surviving row
@@ -368,7 +360,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
     await first.journal.close()
 
     // Reopen: the epoch still holds nothing but the repair, so recovery runs again.
-    expect(await loadJournal(journalDir, CODEX_SESSION)).toMatchObject({ corrupt: true })
+    expect(await loadJournal(journalDir, PROVIDER_SESSION)).toMatchObject({ corrupt: true })
     const reopened = await openAgentSessionJournalWithRecovery({
       identity: IDENTITY,
       journalDir,
@@ -389,7 +381,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
     const epoch = reopened.journal.epoch
     await reopened.journal.close()
     await withJournalDatabase(journalDir, (db) => {
-      const rows = readJournalEpochRows(db, CODEX_SESSION, epoch)
+      const rows = readJournalEpochRows(db, PROVIDER_SESSION, epoch)
       expect(JSON.parse(rows[0]?.rowJson ?? '{}')).toMatchObject({ kind: 'epoch', seq: 1 })
     })
   })
@@ -418,7 +410,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
     const epoch = first.journal.epoch
     await first.journal.close()
     await withJournalDatabase(journalDir, (db) => {
-      const rows = readJournalEpochRows(db, CODEX_SESSION, epoch)
+      const rows = readJournalEpochRows(db, PROVIDER_SESSION, epoch)
       expect(JSON.parse(rows[0]?.rowJson ?? '{}')).toMatchObject({
         kind: 'epoch',
         seq: 1,
@@ -427,7 +419,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
     })
 
     // The session still reports corrupt, so the next attach retries.
-    expect(await loadJournal(journalDir, CODEX_SESSION)).toMatchObject({ corrupt: true })
+    expect(await loadJournal(journalDir, PROVIDER_SESSION)).toMatchObject({ corrupt: true })
 
     // And a transcript that DOES have content still rebuilds the timeline.
     const retried = await openAgentSessionJournalWithRecovery({

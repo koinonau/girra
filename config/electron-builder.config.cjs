@@ -226,7 +226,6 @@ module.exports = {
     'out/main/agent-hooks/**',
     'out/main/claude/**',
     'out/main/claude-accounts/keychain.js',
-    'out/main/codex/**',
     'out/main/daemon-entry.js',
     'out/main/session-scanner-service-entry.js',
     'out/main/wsl-transcript-fs-process-entry.js',

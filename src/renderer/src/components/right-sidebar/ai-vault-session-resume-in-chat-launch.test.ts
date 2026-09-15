@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const mocks = vi.hoisted(() => ({
   settleStructuredAgentLaunch: vi.fn(),
-  prepareAiVaultSessionForResume: vi.fn(),
   activateAndRevealWorktree: vi.fn(),
   activateAndRevealFolderWorkspace: vi.fn(),
   toastError: vi.fn(),
@@ -11,9 +10,6 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/lib/structured-agent-launch-settlement', () => ({
   settleStructuredAgentLaunch: mocks.settleStructuredAgentLaunch
-}))
-vi.mock('@/lib/ai-vault-session-resume-preparation', () => ({
-  prepareAiVaultSessionForResume: mocks.prepareAiVaultSessionForResume
 }))
 vi.mock('@/lib/worktree-activation', () => ({
   activateAndRevealWorktree: mocks.activateAndRevealWorktree,
@@ -26,22 +22,21 @@ vi.mock('@/store', () => ({
 
 import { resumeAiVaultSessionInNewChat } from './ai-vault-session-resume-in-chat-launch'
 
-const session = { agent: 'codex', sessionId: 'vault-1', filePath: '/x' } as never
+const session = { agent: 'claude', sessionId: 'provider-1', filePath: '/x' } as never
 
 describe('resumeAiVaultSessionInNewChat', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mocks.prepareAiVaultSessionForResume.mockResolvedValue({ sessionId: 'provider-1' })
   })
 
-  it('adopts the prepared conversation with no legacy fallback and reveals the workspace', async () => {
+  it('adopts the conversation with no legacy fallback and reveals the workspace', async () => {
     mocks.settleStructuredAgentLaunch.mockResolvedValue({ kind: 'structured', sessionId: 's' })
 
-    await resumeAiVaultSessionInNewChat(session, 'codex', 'worktree-1')
+    await resumeAiVaultSessionInNewChat(session, 'claude', 'worktree-1')
 
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'worktree-1',
-      'codex',
+      'claude',
       { resumeFrom: { providerSessionId: 'provider-1' } },
       {}
     )
@@ -55,7 +50,7 @@ describe('resumeAiVaultSessionInNewChat', () => {
       error: Object.assign(new Error('held'), { code: 'agent_session_conflict' })
     })
 
-    await resumeAiVaultSessionInNewChat(session, 'codex', 'worktree-1')
+    await resumeAiVaultSessionInNewChat(session, 'claude', 'worktree-1')
 
     expect(mocks.toastError).toHaveBeenCalledWith(
       'Another chat is already holding this conversation.'
@@ -69,7 +64,7 @@ describe('resumeAiVaultSessionInNewChat', () => {
       sessionId: 's'
     })
 
-    await resumeAiVaultSessionInNewChat(session, 'codex', 'worktree-1')
+    await resumeAiVaultSessionInNewChat(session, 'claude', 'worktree-1')
 
     expect(mocks.toastError).not.toHaveBeenCalled()
     expect(mocks.activateAndRevealWorktree).not.toHaveBeenCalled()

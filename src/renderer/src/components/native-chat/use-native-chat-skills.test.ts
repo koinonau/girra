@@ -39,44 +39,30 @@ function discovery(owner: string | null, rootPath = '/Users/test/.agents/skills'
 }
 
 describe('isNativeChatSkillForAgent', () => {
-  it('shows Codex-native and generic agent skills for Codex chat', () => {
-    expect(isNativeChatSkillForAgent('codex', skill({ providers: ['codex'] }))).toBe(true)
-    expect(isNativeChatSkillForAgent('codex', skill({ providers: ['agent-skills'] }))).toBe(true)
-  })
-
-  it('keeps Claude skills out of the Codex skill picker', () => {
-    expect(isNativeChatSkillForAgent('codex', skill({ providers: ['claude'] }))).toBe(false)
-  })
-
-  it('does not enable skill autocomplete for other agents yet', () => {
+  it('does not show skills before discovery reports their sources', () => {
     expect(isNativeChatSkillForAgent('claude', skill({ providers: ['agent-skills'] }))).toBe(false)
   })
 
   it('uses explicit source ownership and keeps shared roots visible', () => {
-    const shared = discovery(null)
-    expect(isNativeChatSkillForAgent('codex', skill({}), shared)).toBe(true)
-    expect(isNativeChatSkillForAgent('claude', skill({}), shared)).toBe(true)
-    expect(isNativeChatSkillForAgent('grok', skill({}), shared)).toBe(true)
+    expect(isNativeChatSkillForAgent('claude', skill({}), discovery(null))).toBe(true)
+    expect(isNativeChatSkillForAgent('claude', skill({}), discovery('claude'))).toBe(true)
+    expect(isNativeChatSkillForAgent('claude', skill({}), discovery('pi'))).toBe(false)
   })
 
-  it('aliases OpenClaude to Claude roots without exposing them to other agents', () => {
-    const claude = discovery('claude')
-    expect(isNativeChatSkillForAgent('claude', skill({}), claude)).toBe(true)
-    expect(isNativeChatSkillForAgent('openclaude', skill({}), claude)).toBe(true)
-    expect(isNativeChatSkillForAgent('codex', skill({}), claude)).toBe(false)
-    expect(isNativeChatSkillForAgent('grok', skill({}), claude)).toBe(false)
+  it('shows no skills for an agent without a native chat profile', () => {
+    expect(isNativeChatSkillForAgent('pi', skill({}), discovery(null))).toBe(false)
   })
 
   it('grants visibility through any contributing root, not just the dedup survivor', () => {
     const result = {
       sources: [
         {
-          id: 'codex-home',
-          label: 'Codex home',
-          path: '/Users/test/.codex/skills',
+          id: 'pi-home',
+          label: 'Pi home',
+          path: '/Users/test/.pi/skills',
           sourceKind: 'home' as const,
-          providers: ['codex' as const],
-          owner: 'codex',
+          providers: ['agent-skills' as const],
+          owner: 'pi',
           exists: true
         },
         {
@@ -90,19 +76,18 @@ describe('isNativeChatSkillForAgent', () => {
         }
       ]
     } satisfies Pick<SkillDiscoveryResult, 'sources'>
-    // A symlinked skill deduped under the Codex root but also reachable
-    // through the shared root stays visible to every agent.
+    // A symlinked skill deduped under another agent's root but also reachable
+    // through the shared root stays visible.
     const merged = skill({
-      rootPath: '/Users/test/.codex/skills',
-      rootPaths: ['/Users/test/.codex/skills', '/Users/test/.agents/skills']
+      rootPath: '/Users/test/.pi/skills',
+      rootPaths: ['/Users/test/.pi/skills', '/Users/test/.agents/skills']
     })
     expect(isNativeChatSkillForAgent('claude', merged, result)).toBe(true)
-    expect(isNativeChatSkillForAgent('codex', merged, result)).toBe(true)
-    const codexOnly = skill({
-      rootPath: '/Users/test/.codex/skills',
-      rootPaths: ['/Users/test/.codex/skills']
+    const piOnly = skill({
+      rootPath: '/Users/test/.pi/skills',
+      rootPaths: ['/Users/test/.pi/skills']
     })
-    expect(isNativeChatSkillForAgent('claude', codexOnly, result)).toBe(false)
+    expect(isNativeChatSkillForAgent('claude', piOnly, result)).toBe(false)
   })
 })
 

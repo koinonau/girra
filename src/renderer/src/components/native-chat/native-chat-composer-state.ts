@@ -116,15 +116,13 @@ function deriveSlashAutocomplete(
   if (dismissedTriggerKey === triggerKey) {
     return { mode: 'none' }
   }
-  // Every agent with a known grammar offers skills here; only the token a pick
-  // inserts differs. The caller owns catalog policy (e.g. Grok ships skills-only
-  // until a verified catalog lands), so this derivation must not re-gate per agent.
+  // Every agent with a known grammar offers skills here. The caller owns catalog
+  // policy, so this derivation must not re-gate per agent.
   const skillsEnabled = profile !== null
   const items = buildNativeChatPickerItems(
     agentCommands,
     skillsEnabled ? discovery.skills : [],
     query,
-    profile?.skillPrefix ?? '/',
     skillsEnabled ? sessionSkillNames : []
   )
   return {

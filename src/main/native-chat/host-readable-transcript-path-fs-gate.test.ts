@@ -2,10 +2,10 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type * as NodeFsPromisesModule from 'node:fs/promises'
 
 const UBUNTU_HOME = '\\\\wsl.localhost\\Ubuntu\\home\\ada'
-const firstGuestPath = '/home/ada/.codex/sessions/first.jsonl'
-const secondGuestPath = '/home/ada/.codex/sessions/second.jsonl'
-const firstUncPath = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\first.jsonl'
-const secondUncPath = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\second.jsonl'
+const firstGuestPath = '/home/ada/.claude/projects/first.jsonl'
+const secondGuestPath = '/home/ada/.claude/projects/second.jsonl'
+const firstUncPath = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\first.jsonl'
+const secondUncPath = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\second.jsonl'
 
 const fsMocks = vi.hoisted(() => ({
   access: vi.fn<(path: string) => Promise<void>>()
@@ -104,7 +104,7 @@ describe('WSL transcript filesystem gate', () => {
   it('falls through to the next distro when a probe exceeds the gate deadline', async () => {
     vi.useFakeTimers()
     const DEBIAN_HOME = '\\\\wsl.localhost\\Debian\\home\\ada'
-    const debianUncPath = '\\\\wsl.localhost\\Debian\\home\\ada\\.codex\\sessions\\first.jsonl'
+    const debianUncPath = '\\\\wsl.localhost\\Debian\\home\\ada\\.claude\\projects\\first.jsonl'
     try {
       fsMocks.access.mockImplementation((path) =>
         path === firstUncPath ? new Promise<void>(() => {}) : Promise.resolve()

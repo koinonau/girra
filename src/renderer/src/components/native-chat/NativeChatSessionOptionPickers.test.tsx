@@ -397,35 +397,6 @@ describe('NativeChatSessionOptionPickers', () => {
     }
   )
 
-  it('renders agent-picker routes as one action instead of radio choices', async () => {
-    const invokeAction = vi.fn().mockResolvedValue({ snapshot: [] })
-    const liveSurface = { ...surface, invokeAction }
-    render(
-      <NativeChatSessionOptionPickers
-        surface={liveSurface}
-        snapshot={[
-          model({
-            kind: {
-              type: 'select',
-              choices: [
-                { value: 'gpt-5.5', label: 'GPT-5.5' },
-                { value: 'gpt-5.2-codex', label: 'GPT-5.2 Codex' }
-              ]
-            },
-            valueSource: 'unknown',
-            action: { type: 'agent-picker' }
-          })
-        ]}
-        isWorking={false}
-      />
-    )
-    expect(screen.getByRole('button', { name: 'Choose in agent picker…' })).not.toBeNull()
-    expect(screen.queryByText('GPT-5.5')).toBeNull()
-    expect(screen.queryByText('GPT-5.2 Codex')).toBeNull()
-    screen.getByRole('button', { name: 'Choose in agent picker…' }).click()
-    await waitFor(() => expect(invokeAction).toHaveBeenCalledWith('model'))
-  })
-
   it('uses a Toggle action for unknown flip-only options via invokeAction', async () => {
     const invokeAction = vi.fn().mockResolvedValue({ snapshot: [] })
     const setOption = vi.fn().mockResolvedValue({ snapshot: [] })

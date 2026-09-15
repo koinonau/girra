@@ -2,44 +2,18 @@ import { describe, expect, it, vi } from 'vitest'
 import { StructuredSessionCompaction } from './structured-session-compaction'
 
 describe('structured compaction lifecycle', () => {
-  it('waits beyond the Codex acknowledgment and ignores other threads', async () => {
-    const tracker = new StructuredSessionCompaction()
-    const finished = vi.fn()
-    const result = tracker
-      .run('session', 'thread', async () => ({}))
-      .then((value) => {
-        finished()
-        return value
-      })
-    await Promise.resolve()
-    tracker.codex('session', 'turn/started', { threadId: 'other', turn: { id: 'foreign' } })
-    tracker.codex('session', 'turn/completed', {
-      threadId: 'other',
-      turn: { id: 'foreign', status: 'completed' }
-    })
-    expect(finished).not.toHaveBeenCalled()
-    tracker.codex('session', 'turn/started', { threadId: 'thread', turn: { id: 'compact-turn' } })
-    tracker.codex('session', 'item/completed', {
-      threadId: 'thread',
-      item: { type: 'contextCompaction' }
-    })
-    expect(finished).not.toHaveBeenCalled()
-    tracker.codex('session', 'turn/completed', {
-      threadId: 'thread',
-      turn: { id: 'compact-turn', status: 'completed' }
-    })
-    await expect(result).resolves.toEqual({})
-  })
-
   it('observes notifications arriving before the request acknowledgment', async () => {
     const tracker = new StructuredSessionCompaction()
     await expect(
       tracker.run('s', 't', async () => {
-        tracker.codex('s', 'turn/started', { threadId: 't', turn: { id: 'c' } })
-        tracker.codex('s', 'turn/completed', {
-          threadId: 't',
-          turn: { id: 'c', status: 'failed', error: { message: 'Unavailable' } }
+        tracker.claude('s', { type: 'system', session_id: 'other', compact_result: 'success' })
+        tracker.claude('s', {
+          type: 'system',
+          session_id: 't',
+          compact_result: 'failed',
+          compact_error: 'Unavailable'
         })
+        tracker.claude('s', { type: 'result', subtype: 'success', session_id: 't' })
       })
     ).resolves.toEqual({ error: 'Unavailable' })
   })
@@ -96,13 +70,5 @@ describe('structured compaction lifecycle', () => {
     } finally {
       vi.useRealTimers()
     }
-  })
-
-  it('does not mistake an unrelated completed turn for compaction', async () => {
-    const tracker = new StructuredSessionCompaction()
-    const result = tracker.run('s', 't', async () => ({}))
-    tracker.codex('s', 'turn/started', { threadId: 't', turn: { id: 'c' } })
-    tracker.codex('s', 'turn/completed', { threadId: 't', turn: { id: 'c', status: 'completed' } })
-    await expect(result).resolves.toEqual({ error: 'Compaction did not complete.' })
   })
 })

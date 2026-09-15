@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest'
 import type { AgentStatusEntry } from '../../../../shared/agent-status-types'
-import type { TuiAgent } from '../../../../shared/tui-agent'
 import { resolveNativeChatSession } from './native-chat-pane-resolution'
 
 function entry(
@@ -93,10 +92,10 @@ describe('resolveNativeChatSession', () => {
     })
     const right = resolveNativeChatSession({
       paneKey: rightKey,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       agentStatusEntry: entry({
         paneKey: rightKey,
-        agentType: 'codex',
+        agentType: 'claude',
         providerSession: { key: 'session_id', id: 'right-sess' }
       }),
       ptyId: 'pty-right'
@@ -109,7 +108,7 @@ describe('resolveNativeChatSession', () => {
       paneKey: leftKey
     })
     expect(right).toEqual({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'right-sess',
       transcriptPath: null,
       ptyId: 'pty-right',
@@ -125,65 +124,47 @@ describe('resolveNativeChatSession', () => {
         launchAgent: null,
         agentStatusEntry: entry({
           paneKey,
-          agentType: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-1' }
+          agentType: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-1' }
         }),
         ptyId: 'pty-1'
       })
     ).toEqual({
-      agent: 'codex',
-      sessionId: 'codex-1',
+      agent: 'claude',
+      sessionId: 'claude-1',
       transcriptPath: null,
       ptyId: 'pty-1',
       paneKey
     })
   })
 
-  it.each(['codex', 'claude', 'openclaude'] as TuiAgent[])(
-    'resolves supported title fallback %s when no hook or launch identity exists',
-    (resolvedAgent) => {
-      const paneKey = 'tab-1:11111111-1111-4111-8111-111111111111'
-      expect(
-        resolveNativeChatSession({
-          paneKey,
-          launchAgent: null,
-          resolvedAgent,
-          ptyId: 'pty-1'
-        })
-      ).toEqual({
-        agent: resolvedAgent,
-        sessionId: null,
-        transcriptPath: null,
-        ptyId: 'pty-1',
-        paneKey
+  it('resolves a supported title fallback when no hook or launch identity exists', () => {
+    const paneKey = 'tab-1:11111111-1111-4111-8111-111111111111'
+    expect(
+      resolveNativeChatSession({
+        paneKey,
+        launchAgent: null,
+        resolvedAgent: 'claude',
+        ptyId: 'pty-1'
       })
-    }
-  )
+    ).toEqual({
+      agent: 'claude',
+      sessionId: null,
+      transcriptPath: null,
+      ptyId: 'pty-1',
+      paneKey
+    })
+  })
 
-  it('does not resolve unsupported title fallback gemini', () => {
+  it('does not resolve an unsupported title fallback', () => {
     expect(
       resolveNativeChatSession({
         paneKey: 'tab-1:11111111-1111-4111-8111-111111111111',
         launchAgent: null,
-        resolvedAgent: 'gemini',
+        resolvedAgent: 'opencode',
         ptyId: 'pty-1'
       })
     ).toBeNull()
-  })
-
-  it('resolves Grok from title fallback once native chat supports its transcript', () => {
-    expect(
-      resolveNativeChatSession({
-        paneKey: 'tab-1:11111111-1111-4111-8111-111111111111',
-        launchAgent: null,
-        resolvedAgent: 'grok',
-        ptyId: 'pty-1'
-      })
-    ).toMatchObject({
-      agent: 'grok',
-      sessionId: null,
-      ptyId: 'pty-1'
-    })
   })
 
   it('does not resolve an unsupported live status entry', () => {
@@ -194,7 +175,7 @@ describe('resolveNativeChatSession', () => {
         launchAgent: null,
         agentStatusEntry: entry({
           paneKey,
-          agentType: 'gemini',
+          agentType: 'opencode',
           providerSession: { key: 'session_id', id: 'g-1' }
         }),
         ptyId: 'pty-1'
@@ -210,10 +191,10 @@ describe('resolveNativeChatSession', () => {
         launchAgent: null,
         agentStatusEntry: entry({
           paneKey,
-          agentType: 'gemini',
+          agentType: 'opencode',
           providerSession: { key: 'session_id', id: 'g-1' }
         }),
-        resolvedAgent: 'codex',
+        resolvedAgent: 'claude',
         ptyId: 'pty-1'
       })
     ).toBeNull()
@@ -224,10 +205,10 @@ describe('resolveNativeChatSession', () => {
     expect(
       resolveNativeChatSession({
         paneKey,
-        launchAgent: 'codex',
+        launchAgent: 'claude',
         agentStatusEntry: entry({
           paneKey,
-          agentType: 'gemini',
+          agentType: 'opencode',
           providerSession: { key: 'session_id', id: 'g-1' }
         }),
         resolvedAgent: 'claude',
@@ -236,42 +217,13 @@ describe('resolveNativeChatSession', () => {
     ).toBeNull()
   })
 
-  it('resolves a Grok launch agent', () => {
-    expect(
-      resolveNativeChatSession({
-        paneKey: 'tab-1:11111111-1111-4111-8111-111111111111',
-        launchAgent: 'grok',
-        ptyId: 'pty-1'
-      })
-    ).toMatchObject({
-      agent: 'grok',
-      sessionId: null,
-      ptyId: 'pty-1'
-    })
-  })
-
-  it('keeps Grok launch identity ahead of a different title agent', () => {
-    expect(
-      resolveNativeChatSession({
-        paneKey: 'tab-1:11111111-1111-4111-8111-111111111111',
-        launchAgent: 'grok',
-        resolvedAgent: 'codex',
-        ptyId: 'pty-1'
-      })
-    ).toMatchObject({
-      agent: 'grok',
-      sessionId: null,
-      ptyId: 'pty-1'
-    })
-  })
-
   it('keeps launch identity ahead of the title fallback', () => {
     const paneKey = 'tab-1:11111111-1111-4111-8111-111111111111'
     expect(
       resolveNativeChatSession({
         paneKey,
         launchAgent: 'claude',
-        resolvedAgent: 'codex',
+        resolvedAgent: 'opencode',
         ptyId: 'pty-1'
       })?.agent
     ).toBe('claude')
@@ -285,15 +237,15 @@ describe('resolveNativeChatSession', () => {
         launchAgent: 'claude',
         agentStatusEntry: entry({
           paneKey,
-          agentType: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-live' }
+          agentType: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-live' }
         }),
-        resolvedAgent: 'claude',
+        resolvedAgent: 'opencode',
         ptyId: 'pty-1'
       })
     ).toEqual({
-      agent: 'codex',
-      sessionId: 'codex-live',
+      agent: 'claude',
+      sessionId: 'claude-live',
       transcriptPath: null,
       ptyId: 'pty-1',
       paneKey

@@ -32,8 +32,8 @@ function link(overrides: Partial<AgentSessionProviderHandleLink> = {}) {
 }
 
 describe('handle identity', () => {
-  it('rejects unknown persisted provider names instead of defaulting to Codex', () => {
-    expect(isAgentSessionHandleProvider('codex')).toBe(true)
+  it('rejects unknown and retired persisted provider names', () => {
+    expect(isAgentSessionHandleProvider('codex')).toBe(false)
     expect(isAgentSessionHandleProvider('claude')).toBe(true)
     expect(isAgentSessionHandleProvider('gemini')).toBe(false)
     expect(isAgentSessionHandleProvider(undefined)).toBe(false)
@@ -47,15 +47,6 @@ describe('handle identity', () => {
     expect(agentSessionProviderHandleRoot(CLAUDE)).toEqual(
       agentSessionProviderHandleRoot({ ...CLAUDE, leafUuid: 'leaf-2' })
     )
-  })
-
-  it('keys a Codex handle by thread id alone', () => {
-    const codex: AgentSessionProviderHandle = { provider: 'codex', threadId: 'thread-1' }
-    expect(agentSessionProviderHandleKey(codex)).toBe('codex:"thread-1"')
-    expect(agentSessionProviderHandleRoot(codex)).toBe('codex:"thread-1"')
-    expect(
-      agentSessionProviderHandlesEqual(codex, { provider: 'codex', threadId: 'thread-2' })
-    ).toBe(false)
   })
 
   it('distinguishes a null leaf from an empty-string leaf and rejects malformed handles', () => {
@@ -145,18 +136,21 @@ describe('chain append', () => {
     ).toThrow('agent_session_provider_handle_stale_fence')
   })
 
-  it('rejects a provider change mid-chain', () => {
+  it('rejects a retired provider link mid-chain', () => {
     expect(() =>
       appendAgentSessionProviderHandleLink(
         [link()],
         link({
           linkId: 'link-2',
           origin: 'resumed',
-          handle: { provider: 'codex', threadId: 'thread-1' },
+          handle: {
+            provider: 'codex',
+            threadId: 'thread-1'
+          } as unknown as AgentSessionProviderHandle,
           mintedAtFence: 2
         })
       )
-    ).toThrow('agent_session_provider_handle_provider_mismatch')
+    ).toThrow('agent_session_provider_handle_invalid')
   })
 
   it('treats re-proving the same handle at the same fence as a retry, not a new link', () => {
@@ -339,26 +333,6 @@ describe('adopted chain heads', () => {
     )
 
     expect(elided).toEqual(chain)
-  })
-
-  it('appends a Codex resume only once the fence has moved', () => {
-    const codexAdopted = link({
-      linkId: 'codex-1-thread-1',
-      origin: 'adopted',
-      handle: { provider: 'codex', threadId: 'thread-1' }
-    })
-    const reproved = link({
-      linkId: 'codex-1-thread-1-retry',
-      origin: 'resumed',
-      handle: { provider: 'codex', threadId: 'thread-1' },
-      mintedAtFence: 1
-    })
-
-    // Codex's thread id is the whole key, so a same-fence re-proof can only ever be a retry.
-    expect(appendAgentSessionProviderHandleLink([codexAdopted], reproved)).toEqual([codexAdopted])
-    expect(
-      appendAgentSessionProviderHandleLink([codexAdopted], { ...reproved, mintedAtFence: 2 })
-    ).toHaveLength(2)
   })
 
   it('refuses a second origin link on top of an adopted head', () => {

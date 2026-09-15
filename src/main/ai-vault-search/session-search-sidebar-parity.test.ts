@@ -31,7 +31,7 @@ const SESSIONS: Fixture[] = [
   {
     id: 2,
     cwd: '/Users/ada/work/café',
-    filePath: '/Users/ada/.codex/sessions/two.jsonl',
+    filePath: '/Users/ada/.pi/agent/sessions/two.jsonl',
     text: 'harbor dock crane'
   },
   {
@@ -64,7 +64,7 @@ const QUERIES = [
   'harbor path:/Users/Ada/orca',
   'harbor repo:app',
   'harbor repo:Orca/App',
-  'harbor path:.codex',
+  'harbor path:.pi',
   'harbor path:/srv repo:other/service',
   'harbor repo:session-search path:jsonl',
   'harbor path:"/Users/ada/work"',

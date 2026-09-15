@@ -5,11 +5,12 @@ import { sshFileStreamReadCap } from '../../ssh/ssh-file-stream-read-cap'
 import { readWorkerTranscript } from './worker-transcript-read'
 import { MAX_REMOTE_TRANSCRIPT_SCAN_BYTES } from './worker-transcript-remote-read'
 
-function codexMessage(id: string, text: string): Buffer {
+function claudeMessage(id: string, text: string): Buffer {
   return Buffer.from(
     `${JSON.stringify({
-      type: 'event_msg',
-      payload: { id, type: 'agent_message', message: text }
+      type: 'assistant',
+      uuid: id,
+      message: { role: 'assistant', content: [{ type: 'text', text }] }
     })}\n`
   )
 }
@@ -67,7 +68,7 @@ function preRangeProvider(
 describe('remote worker transcript reads', () => {
   it('reports a missing attested path separately from remote capability loss', async () => {
     const result = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'missing-path-session',
       filesystemProvider: preRangeProvider(() => Buffer.from(''))
     })
@@ -81,15 +82,15 @@ describe('remote worker transcript reads', () => {
   ])(
     'holds a split EOF record at its start and emits it once after append on a %s host',
     async (_providerKind, createProvider) => {
-      const first = codexMessage('first', 'complete before split')
-      const splitRecord = codexMessage('split', 'completed by second append')
+      const first = claudeMessage('first', 'complete before split')
+      const splitRecord = claudeMessage('split', 'completed by second append')
       const splitAt = Math.floor(splitRecord.length / 2)
       let contents = Buffer.concat([first, splitRecord.subarray(0, splitAt)])
       const provider = createProvider(() => contents)
       const transcriptPath = '/remote/split-append.jsonl'
 
       const initial = await readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'split-session',
         transcriptPath,
         filesystemProvider: provider,
@@ -109,7 +110,7 @@ describe('remote worker transcript reads', () => {
 
       contents = Buffer.concat([contents, splitRecord.subarray(splitAt)])
       const completed = await readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'split-session',
         transcriptPath,
         filesystemProvider: provider,
@@ -130,7 +131,7 @@ describe('remote worker transcript reads', () => {
 
       await expect(
         readWorkerTranscript({
-          agent: 'codex',
+          agent: 'claude',
           sessionId: 'split-session',
           transcriptPath,
           filesystemProvider: provider,
@@ -148,13 +149,13 @@ describe('remote worker transcript reads', () => {
     let contents = Buffer.concat([
       Buffer.alloc(MAX_REMOTE_TRANSCRIPT_SCAN_BYTES + 128, 0x78),
       Buffer.from('\n'),
-      codexMessage('latest', `newest output ${capability}`)
+      claudeMessage('latest', `newest output ${capability}`)
     ])
     const { provider, readFile, readFileRange } = rangedProvider(() => contents)
-    const transcriptPath = '/remote/home/ada/.codex/sessions/rollout.jsonl'
+    const transcriptPath = '/remote/home/ada/.claude/projects/-work/session.jsonl'
 
     const initial = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'remote-session',
       transcriptPath,
       filesystemProvider: provider,
@@ -189,10 +190,10 @@ describe('remote worker transcript reads', () => {
     }
     expect(initial.warnings.join(' ')).not.toContain('continue with the cursor')
 
-    contents = Buffer.concat([contents, codexMessage('appended', 'arrived after the first read')])
+    contents = Buffer.concat([contents, claudeMessage('appended', 'arrived after the first read')])
     await expect(
       readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'remote-session',
         transcriptPath,
         filesystemProvider: provider,
@@ -212,7 +213,7 @@ describe('remote worker transcript reads', () => {
   })
 
   it('keeps the bounded whole-file fallback for an older SSH host', async () => {
-    const contents = codexMessage('legacy', 'small legacy transcript')
+    const contents = claudeMessage('legacy', 'small legacy transcript')
     const readFile = vi.fn(async () => ({ content: contents.toString('utf8'), isBinary: false }))
     const readFileRange = vi.fn()
     const provider = {
@@ -224,7 +225,7 @@ describe('remote worker transcript reads', () => {
 
     await expect(
       readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'legacy-session',
         transcriptPath: '/remote/legacy.jsonl',
         filesystemProvider: provider
@@ -243,7 +244,7 @@ describe('remote worker transcript reads', () => {
     let contents = Buffer.concat([
       Buffer.alloc(MAX_REMOTE_TRANSCRIPT_SCAN_BYTES + 128, 0x78),
       Buffer.from('\n'),
-      codexMessage('legacy-tail', 'newest legacy output')
+      claudeMessage('legacy-tail', 'newest legacy output')
     ])
     const readFile = vi.fn(async (_path: string, limits?: { maxTextBytes?: number }) => {
       if (contents.length > (limits?.maxTextBytes ?? 0)) {
@@ -260,7 +261,7 @@ describe('remote worker transcript reads', () => {
     const transcriptPath = '/remote/legacy-large.jsonl'
 
     const initial = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'legacy-large-session',
       transcriptPath,
       filesystemProvider: provider,
@@ -280,10 +281,10 @@ describe('remote worker transcript reads', () => {
       throw new Error('Expected an initial legacy transcript page')
     }
 
-    contents = Buffer.concat([contents, codexMessage('legacy-appended', 'followed from cursor')])
+    contents = Buffer.concat([contents, claudeMessage('legacy-appended', 'followed from cursor')])
     await expect(
       readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'legacy-large-session',
         transcriptPath,
         filesystemProvider: provider,
@@ -309,14 +310,14 @@ describe('remote worker transcript reads', () => {
     ['equal-size', 0],
     ['larger', 64]
   ])('rejects a same-identity ranged truncate/regrow at %s', async (_label, extraBytes) => {
-    let contents = codexMessage(
+    let contents = claudeMessage(
       'first',
       'original transcript with enough padding for equal-size rewrite'
     )
     const { provider } = rangedProvider(() => contents)
     const transcriptPath = '/remote/replaced.jsonl'
     const initial = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'replacement-session',
       transcriptPath,
       filesystemProvider: provider,
@@ -326,13 +327,13 @@ describe('remote worker transcript reads', () => {
       throw new Error('Expected the original remote transcript')
     }
 
-    const replacement = codexMessage('unrelated', 'replacement content')
+    const replacement = claudeMessage('unrelated', 'replacement content')
     contents = Buffer.concat([
       replacement,
       Buffer.alloc(Math.max(0, initial.nextOffset + extraBytes - replacement.length), 0x20)
     ])
     const replaced = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'replacement-session',
       transcriptPath,
       filesystemProvider: provider,
@@ -346,7 +347,7 @@ describe('remote worker transcript reads', () => {
   })
 
   it('degrades when a remote host cannot prove stable file identity', async () => {
-    const contents = codexMessage('legacy', 'identity unavailable')
+    const contents = claudeMessage('legacy', 'identity unavailable')
     const provider = {
       readFile: vi.fn(async () => ({ content: contents.toString('utf8'), isBinary: false })),
       readFileRange: vi.fn(),
@@ -356,7 +357,7 @@ describe('remote worker transcript reads', () => {
 
     await expect(
       readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'legacy-no-identity',
         transcriptPath: '/remote/legacy-no-identity.jsonl',
         filesystemProvider: provider

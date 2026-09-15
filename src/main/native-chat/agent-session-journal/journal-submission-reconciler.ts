@@ -23,8 +23,7 @@ export type ProviderHistoryItem = {
   /** The provider's own id for this item. Used to claim it at most once; the
    *  journal key comes from `identity`, because a provider id is not stable. */
   providerItemId: string
-  /** The client message id when the provider echoes one (Codex carries it on
-   *  user messages); null for providers that drop it. */
+  /** The client message id when the provider echoes one; null for providers that drop it. */
   clientMessageId: string | null
   /** Fingerprint of the submitted payload, when the caller can compute one from
    *  provider content. Used only to break an otherwise unique tie. */

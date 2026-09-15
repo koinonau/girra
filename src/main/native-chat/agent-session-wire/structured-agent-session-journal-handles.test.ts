@@ -46,8 +46,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: SESSION,
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: SESSION }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: SESSION, leafUuid: null }
 }
 
 let root: string
@@ -114,7 +114,7 @@ describe('site 6: recovery rehydration', () => {
     const seeded = await journals.open({ identity: IDENTITY, journalDir })
     for (let ordinal = 1; ordinal <= 3; ordinal += 1) {
       await seeded.appendItem(
-        { provider: 'codex', threadId: SESSION, turnId: 'turn-1', ordinal },
+        { provider: 'claude', sessionId: SESSION, uuid: `turn-1-${ordinal}` },
         { kind: 'status', text: `seed-${ordinal}` },
         { fence: 1 }
       )

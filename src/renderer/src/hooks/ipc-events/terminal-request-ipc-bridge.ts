@@ -1,7 +1,5 @@
 import { requestBackgroundTerminalWorktreeMount } from '@/components/terminal/background-terminal-worktree-mount'
-import { getConnectionIdFromState } from '@/lib/connection-context'
 import { initialAgentTabViewModeProps } from '@/lib/native-chat-initial-view-mode'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { resolveTerminalWorktreeRoute } from '@/lib/terminal-worktree-route'
 import { insertUnifiedTabAfterAnchor } from '@/lib/unified-tab-anchor-insertion'
 import { translate } from '@/i18n/i18n'
@@ -62,10 +60,7 @@ export function registerTerminalRequestIpcBridge(unsubs: (() => void)[]): void {
               ...(data.viewMode
                 ? { viewMode: data.viewMode }
                 : initialAgentTabViewModeProps(store.settings, {
-                    agent: data.launchAgent,
-                    nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-                      getConnectionIdFromState(store, worktreeId)
-                    )
+                    agent: data.launchAgent
                   })),
               ...(data.cwd ? { startupCwd: data.cwd } : {})
             }
@@ -80,7 +75,7 @@ export function registerTerminalRequestIpcBridge(unsubs: (() => void)[]): void {
               }
         const tab = store.createTab(worktreeId, data.targetGroupId, undefined, tabOptions)
         if (!shouldActivate) {
-          // Why: renderer-backed Codex startup must mount its new TerminalPane without switching UI or connecting every saved tab.
+          // Why: renderer-backed agent startup must mount its new TerminalPane without switching UI or connecting every saved tab.
           requestBackgroundTerminalWorktreeMount({ worktreeId, tabIds: [tab.id] })
         }
         if (data.afterTabId) {

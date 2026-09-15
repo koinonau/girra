@@ -76,7 +76,6 @@ const RUNTIME = {
   nativeChatEnabled: false,
   tabAgentTypesByTabId: {},
   nativeChatTabWideFallbackUnsafeTabsById: {},
-  nativeChatTranscriptIsLocalReadable: false,
   managedBrowserCreationEnabled: false,
   toggleTabViewMode: () => {},
   statusByRelativePath: new Map()

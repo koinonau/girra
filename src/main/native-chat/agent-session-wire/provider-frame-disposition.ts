@@ -1,5 +1,3 @@
-import type { CodexAppServerNotificationMethod } from '../../codex/codex-app-server-notification-schema'
-import { CODEX_SUBAGENT_ITEM_TYPE } from '../../codex/codex-subagent-activity'
 import type { ClaudeStreamJsonFrameKind } from './claude-stream-json-frame-schema'
 
 export type ProviderFrameClassification =
@@ -10,87 +8,10 @@ export type ProviderFrameClassification =
   | 'error-surface'
 
 type ProviderFrameClassificationTable = {
-  codex: Record<CodexAppServerNotificationMethod, ProviderFrameClassification>
   claude: Record<ClaudeStreamJsonFrameKind, ProviderFrameClassification>
 }
 
 export const PROVIDER_FRAME_CLASSIFICATIONS = {
-  codex: {
-    error: 'error-surface',
-    'thread/started': 'status-chrome',
-    'thread/status/changed': 'status-chrome',
-    'thread/archived': 'status-chrome',
-    'thread/deleted': 'status-chrome',
-    'thread/unarchived': 'status-chrome',
-    'thread/closed': 'status-chrome',
-    'skills/changed': 'status-chrome',
-    'thread/name/updated': 'status-chrome',
-    // The goal tool call is never emitted as an item, so these two frames are the only
-    // truthful evidence a goal exists; the model's prose about goals can be wrong.
-    'thread/goal/updated': 'timeline-substantive',
-    'thread/goal/cleared': 'timeline-substantive',
-    'thread/environment/connected': 'status-chrome',
-    'thread/environment/disconnected': 'status-chrome',
-    'thread/settings/updated': 'status-chrome',
-    'thread/tokenUsage/updated': 'status-chrome',
-    'turn/started': 'status-chrome',
-    'hook/started': 'suppressed-benign',
-    'turn/completed': 'status-chrome',
-    'hook/completed': 'suppressed-benign',
-    'turn/diff/updated': 'suppressed-benign',
-    'turn/plan/updated': 'timeline-substantive',
-    'item/started': 'timeline-substantive',
-    'item/autoApprovalReview/started': 'status-chrome',
-    'item/autoApprovalReview/completed': 'status-chrome',
-    'item/completed': 'timeline-substantive',
-    'rawResponseItem/completed': 'suppressed-benign',
-    'rawResponse/completed': 'suppressed-benign',
-    'item/agentMessage/delta': 'stream-into-item',
-    'item/plan/delta': 'stream-into-item',
-    'command/exec/outputDelta': 'stream-into-item',
-    'process/outputDelta': 'stream-into-item',
-    'process/exited': 'timeline-substantive',
-    'item/commandExecution/outputDelta': 'stream-into-item',
-    'item/commandExecution/terminalInteraction': 'stream-into-item',
-    'item/fileChange/outputDelta': 'stream-into-item',
-    'item/fileChange/patchUpdated': 'stream-into-item',
-    'serverRequest/resolved': 'suppressed-benign',
-    'item/mcpToolCall/progress': 'status-chrome',
-    'mcpServer/oauthLogin/completed': 'status-chrome',
-    'mcpServer/startupStatus/updated': 'status-chrome',
-    'account/updated': 'status-chrome',
-    'account/rateLimits/updated': 'suppressed-benign',
-    'app/list/updated': 'status-chrome',
-    'remoteControl/status/changed': 'status-chrome',
-    'externalAgentConfig/import/progress': 'status-chrome',
-    'externalAgentConfig/import/completed': 'status-chrome',
-    'fs/changed': 'suppressed-benign',
-    'item/reasoning/summaryTextDelta': 'stream-into-item',
-    'item/reasoning/summaryPartAdded': 'stream-into-item',
-    'item/reasoning/textDelta': 'stream-into-item',
-    'thread/compacted': 'timeline-substantive',
-    'model/rerouted': 'status-chrome',
-    'model/verification': 'status-chrome',
-    'turn/moderationMetadata': 'suppressed-benign',
-    'model/safetyBuffering/updated': 'status-chrome',
-    warning: 'error-surface',
-    guardianWarning: 'error-surface',
-    deprecationNotice: 'error-surface',
-    configWarning: 'error-surface',
-    'fuzzyFileSearch/sessionUpdated': 'suppressed-benign',
-    'fuzzyFileSearch/sessionCompleted': 'suppressed-benign',
-    'thread/realtime/started': 'status-chrome',
-    'thread/realtime/itemAdded': 'timeline-substantive',
-    'thread/realtime/transcript/delta': 'stream-into-item',
-    'thread/realtime/transcript/done': 'timeline-substantive',
-    'thread/realtime/outputAudio/delta': 'stream-into-item',
-    'thread/realtime/sdp': 'suppressed-benign',
-    'thread/realtime/error': 'error-surface',
-    'thread/realtime/closed': 'status-chrome',
-    'windows/worldWritableWarning': 'error-surface',
-    'windowsSandbox/setupCompleted': 'status-chrome',
-    'account/login/completed': 'status-chrome'
-  },
   claude: {
     'message:assistant': 'timeline-substantive',
     'message:user': 'timeline-substantive',
@@ -194,36 +115,8 @@ function hasProviderError(payload: unknown): boolean {
   return false
 }
 
-/** Codex thread-item types with no typed renderer, dispositioned by hand so a
- *  new item type cannot leak `codex · item:<type>` into the transcript. The
- *  notification catalog above is keyed by METHOD and never matches these. */
-const CODEX_ITEM_CLASSIFICATIONS: Record<string, ProviderFrameClassification> = {
-  // The journal coalesces this canonical completion with the legacy notification.
-  contextCompaction: 'timeline-substantive',
-  // Subagent lifecycle renders as the spawn-group roster row, so its raw items
-  // must not print a gray `codex · item:<type>` row beside it. The live
-  // notification path intercepts them before this catalog is reached;
-  // `restoreThread` replays them straight through `items.handle`, which is where
-  // the classification earns its keep.
-  //
-  // `collabAgentToolCall` is deliberately NOT suppressed with it. Nothing
-  // guarantees a session reports subagent work as `subAgentActivity` at all; one
-  // that only ever emits the collab tool call gets no roster row, and suppressing
-  // that too would leave its fan-out showing nothing.
-  [CODEX_SUBAGENT_ITEM_TYPE]: 'status-chrome',
-  // `{id, durationMs}` and nothing else — Codex's own transcript renders it as
-  // nothing at all. Every other item type this build does not model carries text
-  // a user would want (review output, an image path, hook prompt text), so those
-  // keep their visible fallback row.
-  sleep: 'status-chrome'
-}
-
 function notificationKind(kind: string): string {
   return kind.startsWith('notification:') ? kind.slice('notification:'.length) : kind
-}
-
-function itemKind(kind: string): string | null {
-  return kind.startsWith('item:') ? kind.slice('item:'.length) : null
 }
 
 export function isDeltaShapedProviderFrameKind(kind: string): boolean {
@@ -234,15 +127,6 @@ function catalogClassification(
   provider: string,
   kind: string
 ): ProviderFrameClassification | undefined {
-  if (provider === 'codex') {
-    const item = itemKind(kind)
-    if (item !== null) {
-      return CODEX_ITEM_CLASSIFICATIONS[item]
-    }
-    return PROVIDER_FRAME_CLASSIFICATIONS.codex[
-      notificationKind(kind) as CodexAppServerNotificationMethod
-    ]
-  }
   if (provider === 'claude') {
     return PROVIDER_FRAME_CLASSIFICATIONS.claude[kind as ClaudeStreamJsonFrameKind]
   }

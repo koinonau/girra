@@ -3,12 +3,8 @@ import { OrcaRuntimeWithGetWorktreePs } from './orca-runtime-get-worktree-ps'
 import type { RuntimePtyWorktreeRecord } from './runtime-terminal-state-records'
 import type { AgentSessionRecord } from '../../shared/agent-session-record'
 import { readStructuredTuiProcessIdentity } from './structured-tui-process-identity'
-import {
-  PROCESS_START_TIME_TOLERANCE_MS,
-  probeAgentSessionProcessIdentity
-} from './agent-session-process-identity-probe'
+import { PROCESS_START_TIME_TOLERANCE_MS } from './agent-session-process-identity-probe'
 import type { StructuredTuiOwner } from '../native-chat/agent-session-wire/structured-agent-session-handoff-types'
-import { resolvePinnedCodexRolloutProof } from '../codex/codex-tui-rollout-proof'
 import { randomUUID } from 'node:crypto'
 import { waitForStructuredTuiExitProof } from './structured-tui-exit-proof'
 
@@ -16,7 +12,7 @@ export class OrcaRuntimeWithProveRecoveredStructuredTuiPtyProcess extends OrcaRu
   protected async proveRecoveredStructuredTuiPtyProcess(
     pty: RuntimePtyWorktreeRecord,
     identity: NonNullable<AgentSessionRecord['lease']['ownerProcess']>,
-    provider: 'codex' | 'claude' = 'codex'
+    provider: 'claude' = 'claude'
   ): Promise<boolean> {
     const listings = await this.ptyController?.listProcesses?.(pty.connectionId)
     const listed = listings?.find(
@@ -97,32 +93,6 @@ export class OrcaRuntimeWithProveRecoveredStructuredTuiPtyProcess extends OrcaRu
     }
     await this.waitForStructuredTuiOwnerExit(owner)
     return owner.transcriptPath ? { transcriptPath: owner.transcriptPath } : {}
-  }
-
-  // The new exact `codex resume <thread>` child proves the resumed owner without
-  // a first turn; the pinned rollout then binds its durable transcript.
-  protected async waitForAdoptedStructuredTuiProof(input: {
-    owner: StructuredTuiOwner
-    threadId: string
-    codexHome: string
-  }): Promise<{ transcriptPath: string; leafUuid?: never }> {
-    const assertPaneIdentity = (): void => {
-      const pty = this.ptysById.get(input.owner.terminal.ptyId)
-      if (!pty?.connected || pty.paneKey !== input.owner.terminal.paneKey) {
-        throw new Error('The adopted terminal lost its pane identity.')
-      }
-    }
-    assertPaneIdentity()
-    const transcriptPath = await resolvePinnedCodexRolloutProof(input.codexHome, input.threadId)
-    if (!transcriptPath) {
-      throw new Error('The agent terminal did not prove the expected Codex rollout.')
-    }
-    assertPaneIdentity()
-    const processProof = await probeAgentSessionProcessIdentity({ identity: input.owner.process })
-    if (processProof.outcome !== 'identity-matched' || processProof.matchedOn.length === 0) {
-      throw new Error('The resumed Codex process could not be re-proved.')
-    }
-    return { transcriptPath }
   }
 
   protected refreshStructuredTuiOwnerBinding(owner: StructuredTuiOwner): StructuredTuiOwner {

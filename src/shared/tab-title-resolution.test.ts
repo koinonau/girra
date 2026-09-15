@@ -73,14 +73,14 @@ describe('tab title resolution', () => {
     ).toBe('Manual label')
   })
 
-  it('keeps a Codex thread name stable across activity plus project OSC titles', () => {
+  it('keeps a Claude session name stable across activity plus project OSC titles', () => {
     expect(
       resolveTerminalTabTitle(
         {
           customTitle: null,
           aiVaultTitle: {
-            agent: 'codex',
-            sessionId: 'codex-session',
+            agent: 'claude',
+            sessionId: 'claude-session',
             title: 'Repair provider-native tab titles'
           },
           title: '⠋ albacore'
@@ -122,9 +122,9 @@ describe('tab title resolution', () => {
 
   it('keeps OpenCode native and Orca-generated title behavior intact', () => {
     const aiVaultTitle = {
-      agent: 'codex' as const,
-      sessionId: 'codex-session',
-      title: 'Codex conversation'
+      agent: 'claude' as const,
+      sessionId: 'claude-session',
+      title: 'Claude conversation'
     }
     expect(
       resolveTerminalTabTitle(
@@ -148,7 +148,7 @@ describe('tab title resolution', () => {
   it('uses the same priority for unified tab labels', () => {
     expect(
       resolveUnifiedTabLabel(
-        { customLabel: null, generatedLabel: 'Fix flaky tests', label: 'Codex working' },
+        { customLabel: null, generatedLabel: 'Fix flaky tests', label: 'Claude working' },
         true
       )
     ).toBe('Fix flaky tests')
@@ -161,7 +161,7 @@ describe('tab title resolution', () => {
           customLabel: null,
           quickCommandLabel: 'Run build',
           generatedLabel: 'Fix flaky tests',
-          label: 'Codex working'
+          label: 'Claude working'
         },
         true
       )

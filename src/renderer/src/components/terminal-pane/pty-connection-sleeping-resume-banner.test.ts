@@ -171,8 +171,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -194,8 +194,8 @@ describe('connectPanePty', () => {
     expect(transport.connect).toHaveBeenCalledTimes(1)
     expect(transport.connect).toHaveBeenCalledWith(
       expect.objectContaining({
-        command: "codex '--dangerously-bypass-approvals-and-sandbox' 'resume' 'codex-session-1'",
-        launchAgent: 'codex',
+        command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
+        launchAgent: 'claude',
         env: expect.objectContaining({
           ORCA_PANE_KEY: paneKey,
           ORCA_TAB_ID: 'tab-1',
@@ -211,12 +211,12 @@ describe('connectPanePty', () => {
     expect(mockStoreState.registerAgentLaunchConfig).toHaveBeenCalledWith(
       paneKey,
       {
-        agentCommand: "codex '--dangerously-bypass-approvals-and-sandbox'",
-        agentArgs: '--dangerously-bypass-approvals-and-sandbox',
+        agentCommand: "claude '--dangerously-skip-permissions'",
+        agentArgs: '--dangerously-skip-permissions',
         agentEnv: {}
       },
       {
-        agentType: 'codex',
+        agentType: 'claude',
         launchToken: expect.stringMatching(new RegExp(`^${UUID_RE}$`)),
         tabId: 'tab-1',
         leafId: LEAF_2
@@ -276,8 +276,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -328,8 +328,8 @@ describe('connectPanePty', () => {
       paneKey,
       tabId: 'tab-1',
       worktreeId: 'wt-1',
-      agent: 'codex' as const,
-      providerSession: { key: 'session_id' as const, id: 'codex-session-1' },
+      agent: 'claude' as const,
+      providerSession: { key: 'session_id' as const, id: 'claude-session-1' },
       prompt: 'finish the task',
       state: 'done' as const,
       capturedAt: 1,
@@ -414,8 +414,8 @@ describe('connectPanePty', () => {
           paneKey,
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'finish the task',
           state: 'working',
           capturedAt: 1,
@@ -443,14 +443,14 @@ describe('connectPanePty', () => {
     const transport = createMockTransport('pty-1')
     transportFactoryQueue.push(transport)
     const pane = createPane(1)
-    const providerSession = { key: 'session_id', id: 'codex-session-1' } as const
+    const providerSession = { key: 'session_id', id: 'claude-session-1' } as const
 
     connectPanePty(
       pane as never,
       createManager(1) as never,
       createDeps({
         startup: {
-          command: "codex 'resume' 'codex-session-1'",
+          command: "claude '--resume' 'claude-session-1'",
           resumeProviderSession: providerSession,
           showSessionRestoredBanner: true
         }
@@ -469,7 +469,7 @@ describe('connectPanePty', () => {
     )
     expect(transport.connect).toHaveBeenCalledTimes(1)
     expect(createdTransportOptions[0]).toMatchObject({
-      command: "codex 'resume' 'codex-session-1'",
+      command: "claude '--resume' 'claude-session-1'",
       resumeProviderSession: providerSession
     })
   })

@@ -1,6 +1,5 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react'
-import type { AgentType } from '../../../../shared/agent-status-types'
-import { sendNativeChatMessage, sendNativeChatTypedCommand } from './native-chat-runtime-send'
+import { sendNativeChatMessage } from './native-chat-runtime-send'
 import type { NativeChatResolvedTarget } from './native-chat-composer-target'
 import {
   pushHistory,
@@ -11,7 +10,6 @@ import type { NativeChatSendLifecycle } from './use-native-chat-send-lifecycle'
 import type { NativeChatPtySessionOptionsSurface } from './native-chat-pty-session-options'
 
 export function useNativeChatPickerCommandDispatch(args: {
-  agent: AgentType
   disabled: boolean
   isDispatchingSessionOption: boolean
   resolveTarget: () => NativeChatResolvedTarget | null
@@ -27,7 +25,6 @@ export function useNativeChatPickerCommandDispatch(args: {
   setNotice: Dispatch<SetStateAction<string | null>>
 }): (command: Extract<NativeChatPickerItem, { kind: 'command' }>) => void {
   const {
-    agent,
     disabled,
     isDispatchingSessionOption,
     resolveTarget,
@@ -49,11 +46,7 @@ export function useNativeChatPickerCommandDispatch(args: {
       if (!target || disabled || isDispatchingSessionOption) {
         return
       }
-      trackPendingSend(
-        agent === 'codex'
-          ? sendNativeChatTypedCommand(target.settings, target.ptyId, text)
-          : sendNativeChatMessage(target.settings, target.ptyId, text)
-      )
+      trackPendingSend(sendNativeChatMessage(target.settings, target.ptyId, text))
       // Why: picker dispatch is a catalog-verified command send; it must leave
       // the same composer state as the typed path, including disarming
       // attachments, or a stale image rides the next prompt.
@@ -68,7 +61,6 @@ export function useNativeChatPickerCommandDispatch(args: {
       setNotice(null)
     },
     [
-      agent,
       clearImageAttachments,
       clearSkillOrigin,
       disabled,

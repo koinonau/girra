@@ -10,18 +10,14 @@ export type NativeChatLaunchDraftSendPlan =
   /** No injected draft is parked on the line; keep the ordinary send path. */
   | { kind: 'default' }
 
-/** Prompt glyphs both supported agent TUIs draw at the start of the input line. */
-const COMPOSER_PROMPT_LINE = /^\s*([❯›])\s?(.*)$/
+/** The prompt glyph Claude's TUI draws at the start of the input line. */
+const COMPOSER_PROMPT_LINE = /^\s*❯\s?(.*)$/
 const CLAUDE_FRAME_LINE = /^\s*─{3,}\s*$/
-const CODEX_FOOTER_LINE = /^\s*\S.*\s[·•]\s.*$/
 
-function composerContinuationIsEmpty(lines: string[], promptIndex: number, glyph: string): boolean {
+function composerContinuationIsEmpty(lines: string[], promptIndex: number): boolean {
   for (let index = promptIndex + 1; index < lines.length; index += 1) {
     const line = lines[index]!
-    if (
-      (glyph === '❯' && CLAUDE_FRAME_LINE.test(line)) ||
-      (glyph === '›' && CODEX_FOOTER_LINE.test(line))
-    ) {
+    if (CLAUDE_FRAME_LINE.test(line)) {
       return true
     }
     if (line.trim() !== '') {
@@ -43,7 +39,7 @@ export function agentInputLineCleared(screen: string | null | undefined): boolea
   for (let index = lines.length - 1; index >= 0; index -= 1) {
     const match = COMPOSER_PROMPT_LINE.exec(lines[index]!)
     if (match) {
-      return match[2]!.trim() === '' && composerContinuationIsEmpty(lines, index, match[1]!)
+      return match[1]!.trim() === '' && composerContinuationIsEmpty(lines, index)
     }
   }
   return false

@@ -183,7 +183,7 @@ describe('selectLiveAgentStatusEntriesForWorktree', () => {
       sortOrder: 0,
       createdAt: 0,
       isPinned: false,
-      agentSessionAgent: 'codex'
+      agentSessionAgent: 'claude'
     } satisfies Tab
     const state = {
       tabsByWorktree: { 'wt-1': [] },

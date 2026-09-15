@@ -18,15 +18,6 @@ import { AI_VAULT_AGENT_SOURCES, isDiscoverableSessionFile } from './session-sca
 import { subagentTranscriptsDirFor } from './session-scanner-subagent-transcripts'
 import type { AiVaultScanOptions } from './session-scanner-types'
 
-// Agents whose session IS the directory holding the scanned file: everything
-// beside it belongs to the same session (rovo's session_context.json, grok's
-// chat_history.jsonl), so the directory is the only complete delete unit.
-const AI_VAULT_DIRECTORY_SHAPED_DELETE_AGENTS = new Set<AiVaultDeletableAgent>([
-  'rovo',
-  'grok',
-  'cline'
-])
-
 export type ValidateAiVaultSessionDeleteTargetArgs = {
   agent: AiVaultAgent
   filePath: string
@@ -68,7 +59,7 @@ export function validateAiVaultSessionDeleteTarget(
   const source = AI_VAULT_AGENT_SOURCES[agent]
   const roots = source
     .rootDirs(args.rootOptions ?? {}, args.wslHomeDirs ?? [])
-    // Why: OMP_CODING_AGENT_DIR='/' normalizes to '', which resolve()s to the
+    // Why: PI_CODING_AGENT_DIR='/' normalizes to '', which resolve()s to the
     // process cwd — an empty root would silently allowlist it.
     .filter((rootDir) => rootDir.trim().length > 0)
     .map((rootDir) => resolve(rootDir))
@@ -108,14 +99,6 @@ function sessionDeleteRemovals(args: {
   roots: readonly string[]
 }): readonly AiVaultSessionDeleteRemoval[] | null {
   const { agent, resolvedPath, matchedRoot, roots } = args
-
-  if (AI_VAULT_DIRECTORY_SHAPED_DELETE_AGENTS.has(agent)) {
-    const sessionDir = dirname(resolvedPath)
-    if (sessionDir === matchedRoot || !isPathInsideOrEqual(matchedRoot, sessionDir)) {
-      return null
-    }
-    return [{ path: sessionDir, kind: 'directory', roots }]
-  }
 
   if (agent === 'claude') {
     const sessionId = basename(resolvedPath, extname(resolvedPath))

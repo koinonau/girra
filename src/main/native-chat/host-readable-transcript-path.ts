@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs'
 import { isAbsolute } from 'node:path'
 import { isWslUncPath, parseWslUncPath, toWindowsWslPath } from '../../shared/wsl-paths'
-import { WSL_CODEX_RUNTIME_HOME_SEGMENTS } from '../pty/codex-home-wsl-env'
 import { getWslHomeAsync, listRunningWslDistrosAsync, listRunningWslHomeDirsAsync } from '../wsl'
 import {
   filterPathsToRunningWslDistrosAsync,
@@ -112,13 +111,6 @@ const WSL_HOME_DIRS_TTL_MS = 5 * 60_000
 let cachedWslHomeDirs: string[] | null = null
 let cachedWslHomeDirsExpiresAt = 0
 let inflightWslHomeDirs: Promise<string[]> | null = null
-let getAdditionalCodexHomePaths: (() => readonly string[]) | undefined
-
-export function configureHostReadableTranscriptPathSources(options: {
-  getAdditionalCodexHomePaths?: () => readonly string[]
-}): void {
-  getAdditionalCodexHomePaths = options.getAdditionalCodexHomePaths
-}
 
 async function defaultListWslHomeDirs(): Promise<string[]> {
   return listRunningWslHomeDirsAsync()
@@ -151,13 +143,12 @@ export function resetHostReadableTranscriptPathCacheForTests(): void {
   cachedWslHomeDirs = null
   cachedWslHomeDirsExpiresAt = 0
   inflightWslHomeDirs = null
-  getAdditionalCodexHomePaths = undefined
 }
 
 /**
  * Map a hook-reported transcript path to a path the local main process can open.
  *
- * WSL Codex hooks report guest Linux paths (`/home/…/rollout-….jsonl`). On
+ * WSL agent hooks report guest Linux paths (`/home/…/<session>.jsonl`). On
  * Windows the main process must open the equivalent `\\wsl.localhost\…` UNC
  * form; without this, Chat UI never finds the live transcript (#10326).
  *
@@ -257,43 +248,4 @@ function rankDistrosForGuestPath(wslHomeUncDirs: readonly string[], guestPath: s
     }
   }
   return [...preferred, ...others]
-}
-
-/**
- * WSL Codex sessions live under the guest home, not Windows AppData. Mirror AI
- * Vault's dual-root discovery so the id-based resolve still finds them when the
- * hook path is absent.
- */
-export async function wslCodexSessionsDirs(
-  deps: Pick<HostReadableTranscriptPathDeps, 'platform' | 'listWslHomeDirs' | 'wslSnapshot'> = {}
-): Promise<string[]> {
-  const platform = deps.platform ?? process.platform
-  if (platform !== 'win32') {
-    return []
-  }
-  const additionalHomes = getAdditionalCodexHomePaths?.() ?? []
-  const [homeDirs, runningAdditionalHomes] = await Promise.all([
-    deps.wslSnapshot
-      ? snapshotHomeDirs(deps.wslSnapshot)
-      : resolveWslHomeDirs(deps.listWslHomeDirs),
-    deps.wslSnapshot
-      ? filterPathsToWslDistros(additionalHomes, deps.wslSnapshot.runningDistros)
-      : filterPathsToRunningWslDistrosAsync(additionalHomes)
-  ])
-  const dirs = homeDirs.flatMap((home) => [
-    joinUnderWslHome(home, ...WSL_CODEX_RUNTIME_HOME_SEGMENTS, 'sessions'),
-    joinUnderWslHome(home, '.codex', 'sessions')
-  ])
-  for (const home of runningAdditionalHomes) {
-    if (parseWslUncPath(home)) {
-      dirs.push(joinUnderWslHome(home, 'sessions'))
-    }
-  }
-  return dirs.filter((dir, index) => dirs.indexOf(dir) === index)
-}
-
-// Why: node:path.join is posix-flavoured off Windows and would mangle the
-// `\\wsl.localhost\` share prefix these roots must keep.
-function joinUnderWslHome(home: string, ...segments: string[]): string {
-  return `${home.replace(/[\\/]+$/, '')}\\${segments.join('\\')}`
 }

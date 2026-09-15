@@ -51,8 +51,8 @@ const IDENTITY: AgentSessionJournalIdentity = {
   sessionId: SESSION,
   workspaceId: 'ws-1',
   hostId: 'host-1',
-  agent: 'codex',
-  providerHandle: { kind: 'codex', threadId: SESSION }
+  agent: 'claude',
+  providerHandle: { kind: 'claude', sessionId: SESSION, leafUuid: null }
 }
 
 let root: string

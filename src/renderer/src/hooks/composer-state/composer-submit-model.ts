@@ -1,7 +1,6 @@
 import type { TuiAgent } from '../../../../shared/tui-agent'
 import type { GitPushTarget } from '../../../../shared/worktree/types'
 import type { SetupDecision } from '../../../../shared/worktree/create-types'
-import type { Repo } from '../../../../shared/repo-types'
 import type { WorkspaceIntentName } from '../../../../shared/workspace-name'
 import type { AgentStartupPlan } from '../../../../shared/tui-agent-startup'
 import type { AgentLaunchMetadata } from '@/lib/worktree-startup-payload'
@@ -87,8 +86,7 @@ export type ComposerSubmitModel = {
     requestedAgent: TuiAgent | null,
     workspaceNameSeed: string,
     workspaceRunContext: WorktreeCreationRequest['workspaceRunContext'],
-    repoId: string,
-    selectedRepo: Repo
+    repoId: string
   ) => Promise<void>
   prepareFullSubmit: (
     resolution: PendingSmartGitHubSubmitResolution

@@ -84,7 +84,7 @@ describe('settleStructuredAgentLaunch', () => {
     await expect(
       settleStructuredAgentLaunch(
         'worktree-1',
-        'codex',
+        'claude',
         { prompt: 'Fix' },
         {
           legacyFallback,
@@ -92,7 +92,7 @@ describe('settleStructuredAgentLaunch', () => {
         }
       )
     ).resolves.toEqual({ kind: 'structured', sessionId: 'session-1', promptDeliveryResult })
-    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'codex', {
+    expect(mocks.startStructuredAgentLaunch).toHaveBeenCalledWith('worktree-1', 'claude', {
       prompt: 'Fix'
     })
     expect(onStructuredReady).toHaveBeenCalledWith('session-1')
@@ -107,7 +107,7 @@ describe('settleStructuredAgentLaunch', () => {
     const onStructuredReady = vi.fn()
 
     await expect(
-      settleStructuredAgentLaunch('worktree-1', 'codex', {}, { legacyFallback, onStructuredReady })
+      settleStructuredAgentLaunch('worktree-1', 'claude', {}, { legacyFallback, onStructuredReady })
     ).resolves.toEqual({ kind: 'refused-then-legacy', ...fallbackResult })
     expect(legacyFallback).toHaveBeenCalledOnce()
     expect(onStructuredReady).not.toHaveBeenCalled()
@@ -123,7 +123,7 @@ describe('settleStructuredAgentLaunch', () => {
       .mockResolvedValue({ primaryTabId: 'new-tab', promptDeliveryResult })
 
     await expect(
-      settleStructuredAgentLaunch('worktree-1', 'codex', {}, { legacyFallback })
+      settleStructuredAgentLaunch('worktree-1', 'claude', {}, { legacyFallback })
     ).resolves.toEqual({
       kind: 'refused-then-legacy',
       primaryTabId: 'new-tab',
@@ -135,7 +135,7 @@ describe('settleStructuredAgentLaunch', () => {
     const error = new StructuredAgentSessionCreateRefusalError('unsupported')
     const { claimDefinitiveRefusalFallback } = fakeLaunch({ launchResult: Promise.reject(error) })
 
-    await expect(settleStructuredAgentLaunch('worktree-1', 'codex', {}, {})).resolves.toEqual({
+    await expect(settleStructuredAgentLaunch('worktree-1', 'claude', {}, {})).resolves.toEqual({
       kind: 'failed',
       error
     })
@@ -158,7 +158,7 @@ describe('settleStructuredAgentLaunch', () => {
 
     const settlement = settleStructuredAgentLaunch(
       'worktree-1',
-      'codex',
+      'claude',
       {},
       { legacyFallback, signal: cancellation.signal }
     )
@@ -186,7 +186,7 @@ describe('settleStructuredAgentLaunch', () => {
     const legacyFallback = vi.fn().mockRejectedValue(fallbackError)
 
     await expect(
-      settleStructuredAgentLaunch('worktree-1', 'codex', {}, { legacyFallback })
+      settleStructuredAgentLaunch('worktree-1', 'claude', {}, { legacyFallback })
     ).resolves.toEqual({ kind: 'failed', error: fallbackError })
   })
 
@@ -198,7 +198,7 @@ describe('settleStructuredAgentLaunch', () => {
     const legacyFallback = vi.fn()
 
     await expect(
-      settleStructuredAgentLaunch('worktree-1', 'codex', {}, { legacyFallback })
+      settleStructuredAgentLaunch('worktree-1', 'claude', {}, { legacyFallback })
     ).resolves.toEqual({ kind: 'visibility-unknown', sessionId: 'session-1' })
     expect(releaseCallerAfterUnknownOutcome).toHaveBeenCalledOnce()
     expect(legacyFallback).not.toHaveBeenCalled()
@@ -210,7 +210,7 @@ describe('settleStructuredAgentLaunch', () => {
     const legacyFallback = vi.fn()
 
     await expect(
-      settleStructuredAgentLaunch('worktree-1', 'codex', {}, { legacyFallback })
+      settleStructuredAgentLaunch('worktree-1', 'claude', {}, { legacyFallback })
     ).resolves.toEqual({ kind: 'failed', error })
     expect(releaseCallerAfterUnknownOutcome).not.toHaveBeenCalled()
     expect(legacyFallback).not.toHaveBeenCalled()
@@ -223,7 +223,7 @@ describe('settleStructuredAgentLaunch', () => {
     await expect(
       settleStructuredAgentLaunch(
         'worktree-1',
-        'codex',
+        'claude',
         {},
         {
           onStructuredReady,
@@ -243,7 +243,7 @@ describe('settleStructuredAgentLaunch', () => {
     await expect(
       settleStructuredAgentLaunch(
         'worktree-1',
-        'codex',
+        'claude',
         {},
         {
           legacyFallback,
@@ -266,7 +266,7 @@ describe('settleStructuredAgentLaunch', () => {
 
     const settlement = settleStructuredAgentLaunch(
       'worktree-1',
-      'codex',
+      'claude',
       {},
       { onStructuredReady, signal: cancellation.signal }
     )
@@ -291,7 +291,7 @@ describe('settleStructuredAgentLaunch', () => {
 
     const settlement = settleStructuredAgentLaunch(
       'worktree-1',
-      'codex',
+      'claude',
       {},
       { signal: cancellation.signal }
     )
@@ -308,7 +308,7 @@ describe('settleStructuredAgentLaunch', () => {
     const cancellation = fakeCancellation()
 
     await expect(
-      settleStructuredAgentLaunch('worktree-1', 'codex', {}, { signal: cancellation.signal })
+      settleStructuredAgentLaunch('worktree-1', 'claude', {}, { signal: cancellation.signal })
     ).resolves.toEqual({ kind: 'structured', sessionId: 'session-1' })
     expect(mocks.cancelStructuredAgentLaunch).not.toHaveBeenCalled()
     expect(cancellation.removeEventListener).toHaveBeenCalledOnce()

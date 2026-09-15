@@ -40,10 +40,7 @@ async function readAdoptedTranscript(
   }
   const prepared = await prepareLegacyTranscriptImport({
     agent: params.agent,
-    sessionId:
-      adopt.providerHandle.kind === 'claude'
-        ? adopt.providerHandle.sessionId
-        : adopt.providerHandle.threadId,
+    sessionId: adopt.providerHandle.sessionId,
     options: { filePath: adopt.transcriptPath }
   })
   if (!prepared.ok) {
@@ -92,10 +89,7 @@ async function applyAdoptedTranscript(
   const imported = await importLegacyTranscriptIntoJournal({
     journal: attached.journal,
     agent: params.agent,
-    sessionId:
-      adopt.providerHandle.kind === 'claude'
-        ? adopt.providerHandle.sessionId
-        : adopt.providerHandle.threadId,
+    sessionId: adopt.providerHandle.sessionId,
     fence: record.lease.runtimeFence,
     options: { filePath: adopt.transcriptPath }
   })

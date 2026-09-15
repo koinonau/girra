@@ -8,7 +8,6 @@ import type { SessionOptionValue } from './native-chat-session-options'
 import {
   clearNativeChatSessionModel,
   clearTrackedSessionOption,
-  flattenNativeChatSessionOptionRecord,
   isFlipOnlyMidSession,
   matchNativeChatCatalogModelId,
   type NativeChatSessionOptionRecord
@@ -38,41 +37,18 @@ export function isSessionOptionAgentPickerCommand(
   midSession: CatalogMidSessionApply | undefined,
   command: string
 ): boolean {
-  return (
-    (midSession?.kind === 'agent-picker' && command === midSession.command) ||
-    (midSession?.kind === 'command' && command === midSession.pickerCommand)
-  )
+  return midSession?.kind === 'command' && command === midSession.pickerCommand
 }
 
-export function buildNativeChatSessionOptionCommand(args: {
-  optionId: string
+export function buildNativeChatSessionOptionCommand(
+  apply: CatalogOptionApply,
   value: SessionOptionValue
-  apply: CatalogOptionApply
-  modelId: string | null
-  catalog: AgentSessionOptionCatalog
-  models: readonly CatalogModel[]
-  record: NativeChatSessionOptionRecord
-}): string | null {
-  const midSession = args.apply.midSession
+): string | null {
+  const midSession = apply.midSession
   if (midSession?.kind === 'command') {
-    return midSession.build(args.value)
+    return midSession.build(value)
   }
-  if (midSession?.kind === 'toggle-command') {
-    return midSession.command
-  }
-  if (!args.apply.composedIntoModel || !args.modelId || !args.catalog.composeModelValue) {
-    return null
-  }
-  const model = args.models.find((candidate) => candidate.id === args.modelId)
-  const values = flattenNativeChatSessionOptionRecord(args.record, args.modelId)
-  for (const option of model?.options ?? []) {
-    values[option.id] ??= option.kind.defaultValue
-  }
-  values[args.optionId] = args.value
-  const composed = args.catalog.composeModelValue(args.modelId, values)
-  return args.catalog.modelApply.midSession?.kind === 'command'
-    ? args.catalog.modelApply.midSession.build(composed)
-    : null
+  return midSession?.kind === 'toggle-command' ? midSession.command : null
 }
 
 type PersistSessionOption = (

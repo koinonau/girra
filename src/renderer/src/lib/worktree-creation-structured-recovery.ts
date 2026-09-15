@@ -13,7 +13,7 @@ export function markStructuredWorktreeLaunchUnconfirmed(
     status: 'error',
     error: translate(
       'auto.lib.worktree.creation.flow.structured.launch.unknown',
-      'Could not confirm whether Codex chat opened. Retry to check again.'
+      'Could not confirm whether Claude chat opened. Retry to check again.'
     ),
     structuredLaunchRecoveryWorktreeId: worktreeId
   })

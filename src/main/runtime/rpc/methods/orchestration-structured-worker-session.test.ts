@@ -178,14 +178,14 @@ describe('structured worker session hold', () => {
     const created = await createStructuredWorkerSession({
       runtime: { ensureStructuredAgentSessionHost: async () => {} } as never,
       worktreeId: 'wt_1',
-      agent: 'codex',
+      agent: 'claude',
       dispatchId: 'd2',
       onJournalActivity: () => {}
     })
     expect(created.identity.handle.startsWith('structworker_')).toBe(true)
     expect(created.identity.processIncarnation).toBe(`structured:${created.identity.sessionId}`)
     expect(structuredWorkerIdentities.getBySessionId(created.identity.sessionId)?.agent).toBe(
-      'codex'
+      'claude'
     )
     releaseStructuredWorkerSession('d2')
   })

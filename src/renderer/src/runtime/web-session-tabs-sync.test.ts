@@ -48,9 +48,9 @@ describe('applyWebSessionTabsSnapshot', () => {
     const agentTab = {
       type: 'agent-session' as const,
       id: 'agent-session:session-1',
-      title: 'Codex Chat',
+      title: 'Claude Chat',
       sessionId: 'session-1',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       isActive: true
     }
     const patch = applyWebSessionTabsSnapshot(
@@ -75,7 +75,7 @@ describe('applyWebSessionTabsSnapshot', () => {
         id: 'structured-agent-session-session-1',
         entityId: 'session-1',
         contentType: 'agent-session',
-        agentSessionAgent: 'codex'
+        agentSessionAgent: 'claude'
       })
     ])
     expect(patch.activeTabTypeByWorktree?.[WT]).toBe('agent-session')
@@ -95,9 +95,9 @@ describe('applyWebSessionTabsSnapshot', () => {
     const agentTab = {
       type: 'agent-session' as const,
       id: 'agent-session:session-seed',
-      title: 'Codex Chat',
+      title: 'Claude Chat',
       sessionId: 'session-seed',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       isActive: true
     }
     const snapshot = makeSnapshot([agentTab], { activeTabId: agentTab.id })
@@ -112,8 +112,8 @@ describe('applyWebSessionTabsSnapshot', () => {
       groupId: 'host-group-1',
       worktreeId: WT,
       contentType: 'agent-session',
-      agentSessionAgent: 'codex',
-      label: 'Codex Chat',
+      agentSessionAgent: 'claude',
+      label: 'Claude Chat',
       customLabel: null,
       color: null,
       sortOrder: 0,
@@ -140,8 +140,8 @@ describe('applyWebSessionTabsSnapshot', () => {
       groupId: 'host-group-1',
       worktreeId: WT,
       contentType: 'agent-session',
-      agentSessionAgent: 'codex',
-      label: 'Codex Chat',
+      agentSessionAgent: 'claude',
+      label: 'Claude Chat',
       customLabel: null,
       color: null,
       sortOrder: 0,

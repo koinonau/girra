@@ -326,7 +326,7 @@ describe('TabsSlice', () => {
               color: null,
               sortOrder: 1,
               createdAt: 2,
-              agentSessionAgent: 'codex'
+              agentSessionAgent: 'claude'
             }
           ]
         },

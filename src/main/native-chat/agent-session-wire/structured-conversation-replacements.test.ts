@@ -18,7 +18,7 @@ function replacements(records: AgentSessionRecord[], visible: string[]) {
 function record(id: string, next?: string): AgentSessionRecord {
   return {
     sessionId: id,
-    provider: 'codex',
+    provider: 'claude',
     location: { workspaceId: 'folder' },
     conversationCommand: next
       ? { command: 'clear', phase: 'committed', replacementSessionId: next }
@@ -55,7 +55,7 @@ describe('conversation replacement projection', () => {
       record('y', 'x')
     ]
     expect(replacements(records, ['b', 'c', 'x'])).toEqual([
-      { sourceSessionId: 'a', sessionId: 'c', workspaceId: 'folder', agent: 'codex' }
+      { sourceSessionId: 'a', sessionId: 'c', workspaceId: 'folder', agent: 'claude' }
     ])
     expect(replacements(records, [])).toEqual([])
   })

@@ -39,7 +39,7 @@ afterEach(() => {
 })
 
 describe('agentSession.reveal', () => {
-  it.each(['codex', 'claude'] as const)('republishes a persisted %s chat tab', async (agent) => {
+  it.each(['claude'] as const)('republishes a persisted %s chat tab', async (agent) => {
     hostCalls.revealSession.mockResolvedValueOnce({
       sessionId: SESSION,
       workspaceId: 'workspace-1',
@@ -82,7 +82,7 @@ describe('agentSession.reveal', () => {
     hostCalls.revealSession.mockResolvedValueOnce({
       sessionId: SESSION,
       workspaceId: 'workspace-1',
-      agent: 'codex',
+      agent: 'claude',
       readable: false
     })
 
@@ -187,11 +187,11 @@ describe('capability gating', () => {
           payloadFingerprint: computeAgentSessionPayloadFingerprint({
             method: 'agentSession.create',
             sessionId: SESSION,
-            fields: { worktree, agent: 'codex' }
+            fields: { worktree, agent: 'claude' }
           })
         }),
         worktree,
-        agent: 'codex'
+        agent: 'claude'
       },
       { clientKind: 'runtime', clientCapabilities: [] }
     )
@@ -394,68 +394,32 @@ describe('capability gating', () => {
 })
 
 describe('method routing', () => {
-  it('creates from a client intent while the host resolves paths and provider identity', async () => {
-    const worktree = 'id:workspace-1'
+  it.each(['claude'])('forwards a %s history resume through create preparation', async (agent) => {
+    const fields = {
+      worktree: 'id:workspace-1',
+      agent,
+      resumeFrom: { providerSessionId: 'prior-session' }
+    }
     const params = {
       envelope: envelope({
         expectedRuntimeFence: null,
         payloadFingerprint: computeAgentSessionPayloadFingerprint({
           method: 'agentSession.create',
           sessionId: SESSION,
-          fields: { worktree, agent: 'codex' }
+          fields
         })
       }),
-      worktree,
-      agent: 'codex'
+      ...fields
     }
-    const created = await call('agentSession.create', params, STRUCTURED_CLIENT)
-    expect(created).toMatchObject({ ok: true, result: { ok: true } })
+    expect(await call('agentSession.create', params, STRUCTURED_CLIENT)).toMatchObject({
+      ok: true,
+      result: { ok: true }
+    })
     expect(runtimeCalls.resolveStructuredAgentSessionCreateIntent).toHaveBeenCalledWith({
       ...params,
       callerKey: 'trusted-local:runtime'
     })
-    expect(hostCalls.attach).toHaveBeenCalledWith(
-      expect.anything(),
-      expect.objectContaining({
-        accountHome: { variable: 'CODEX_HOME', path: '/host/.codex' },
-        options: { model: 'gpt-5.6-sol', effort: 'medium' }
-      })
-    )
-    expect(hostCalls.attach.mock.calls[0]?.[1]).not.toHaveProperty('providerHandle')
-    expect(runtimeCalls.publishStructuredAgentSessionTab).toHaveBeenCalledWith(
-      expect.objectContaining({ sessionId: SESSION, activate: true })
-    )
   })
-
-  it.each(['claude', 'codex'])(
-    'forwards a %s history resume through create preparation',
-    async (agent) => {
-      const fields = {
-        worktree: 'id:workspace-1',
-        agent,
-        resumeFrom: { providerSessionId: 'prior-session' }
-      }
-      const params = {
-        envelope: envelope({
-          expectedRuntimeFence: null,
-          payloadFingerprint: computeAgentSessionPayloadFingerprint({
-            method: 'agentSession.create',
-            sessionId: SESSION,
-            fields
-          })
-        }),
-        ...fields
-      }
-      expect(await call('agentSession.create', params, STRUCTURED_CLIENT)).toMatchObject({
-        ok: true,
-        result: { ok: true }
-      })
-      expect(runtimeCalls.resolveStructuredAgentSessionCreateIntent).toHaveBeenCalledWith({
-        ...params,
-        callerKey: 'trusted-local:runtime'
-      })
-    }
-  )
 
   it('routes Claude create support and create through the provider-aware runtime', async () => {
     const worktree = 'id:workspace-1'
@@ -511,11 +475,11 @@ describe('method routing', () => {
         payloadFingerprint: computeAgentSessionPayloadFingerprint({
           method: 'agentSession.create',
           sessionId: SESSION,
-          fields: { worktree, agent: 'codex' }
+          fields: { worktree, agent: 'claude' }
         })
       }),
       worktree,
-      agent: 'codex'
+      agent: 'claude'
     }
 
     const response = await call('agentSession.create', params, STRUCTURED_CLIENT, {
@@ -561,7 +525,7 @@ describe('method routing', () => {
       }
     })
     expect(hostCalls.attach).not.toHaveBeenCalled()
-    expect(hostCalls.supportsCreate).toHaveBeenCalledWith(attachParams().location, 'codex')
+    expect(hostCalls.supportsCreate).toHaveBeenCalledWith(attachParams().location, 'claude')
   })
 
   it('keeps ensure failures as top-level errors for an unsupported client location', async () => {
@@ -574,7 +538,7 @@ describe('method routing', () => {
       error: { message: expect.stringContaining('structured_agent_session_unsupported') }
     })
     expect(hostCalls.attach).not.toHaveBeenCalled()
-    expect(hostCalls.supportsCreate).toHaveBeenCalledWith(attachParams().location, 'codex')
+    expect(hostCalls.supportsCreate).toHaveBeenCalledWith(attachParams().location, 'claude')
   })
 
   it('tags the prompt kind from the method name, not from the client', async () => {
@@ -669,7 +633,7 @@ describe('parameter validation', () => {
   it('rejects a journal-only opaque provider handle', async () => {
     await rejects(
       'agentSession.create',
-      attachParams({ providerHandle: { kind: 'opaque', agent: 'codex', value: 'thread-1' } })
+      attachParams({ providerHandle: { kind: 'opaque', agent: 'claude', value: 'session-1' } })
     )
   })
 
@@ -777,7 +741,7 @@ describe('agentSession.subscribeStatus', () => {
           {
             sessionId: STATUS_SESSION,
             workspaceId: 'workspace-1',
-            agent: 'codex',
+            agent: 'claude',
             status: 'working',
             latestPrompt: 'write a poem',
             updatedAt: 2

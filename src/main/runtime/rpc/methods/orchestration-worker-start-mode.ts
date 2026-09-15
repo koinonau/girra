@@ -36,7 +36,6 @@ export type WorkerStartModeReason =
   | 'structured_sessions_unavailable'
   | 'structured_support_unknown'
   | 'wsl_execution_runtime'
-  | 'codex_on_windows'
   | 'structured_unsupported_on_host'
 
 export type WorkerStartModeReceipt = {
@@ -75,7 +74,6 @@ const DOWNGRADE_DETAIL: Record<Exclude<WorkerStartModeReason, 'user_default'>, s
   structured_sessions_unavailable: 'this runtime does not support structured agent sessions',
   structured_support_unknown: 'the execution host has not established structured session support',
   wsl_execution_runtime: 'this workspace runs under WSL',
-  codex_on_windows: 'Codex has no structured session on Windows',
   structured_unsupported_on_host: 'the execution host cannot create one here'
 }
 
@@ -165,7 +163,7 @@ async function readStructuredCreateSupport(
   worktreeId: string,
   agent: TuiAgent | undefined
 ): Promise<{ supported: boolean; reason?: 'agent' | 'remote' | 'wsl' } | null> {
-  if (agent !== 'claude' && agent !== 'codex') {
+  if (agent !== 'claude') {
     return { supported: false, reason: 'agent' }
   }
   try {

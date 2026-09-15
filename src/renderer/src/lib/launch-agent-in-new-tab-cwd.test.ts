@@ -34,10 +34,6 @@ vi.mock('@/lib/connection-context', () => ({
   getConnectionIdFromState: () => null
 }))
 
-vi.mock('@/lib/native-chat-transcript-readability', () => ({
-  isNativeChatTranscriptLocalReadable: () => true
-}))
-
 vi.mock('@/runtime/web-runtime-session', () => ({
   isWebRuntimeSessionActive: mockIsWebRuntimeSessionActive
 }))

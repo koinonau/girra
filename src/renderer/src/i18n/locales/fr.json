@@ -8342,8 +8342,7 @@
             "87d99e634b": "Compagnon",
             "nativeChat": {
               "title": "Chat UI",
-              "description": "Prévisualisez la surface de chat de bureau pour les sessions de terminal d'agents prises en charge.",
-              "grok": "grok"
+              "description": "Prévisualisez la surface de chat de bureau pour les sessions de terminal d'agents prises en charge."
             },
             "agentDashboard": {
               "title": "Tableau de bord des agents",
@@ -11455,7 +11454,6 @@
             "openSupportedWorkspace": "Ouvrez un espace de travail avant de reprendre une session.",
             "sessionHostMismatchUnsupported": "Cette session appartient à un autre hôte. Ouvrez un espace de travail sur le même hôte pour la reprendre.",
             "localSessionSshWorkspaceUnsupported": "L'historique de cette session est stocké sur cette machine ; impossible de la reprendre dans un espace de travail SSH. Ouvrez plutôt un espace de travail local.",
-            "prepareSessionResumeFailed": "Impossible de préparer cette session pour la reprise.",
             "sessionDeleted": "Session supprimée",
             "sessionDeleteFailed": "Impossible de supprimer la session"
           },
@@ -14143,7 +14141,6 @@
         "thinking": "Réflexion",
         "options": "Options",
         "sessionOptions": "Options de session",
-        "chooseInAgentPicker": "Choisir dans le sélecteur d'agents…",
         "toggleOption": "Basculer {{value0}}",
         "pillAccessibleName": "{{value0}} {{value1}}",
         "valueUnknown": "Valeur actuelle inconnue — choisissez Activé ou Désactivé",

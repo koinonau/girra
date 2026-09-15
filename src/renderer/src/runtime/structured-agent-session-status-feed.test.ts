@@ -34,7 +34,7 @@ function summary(
   return {
     sessionId,
     workspaceId: 'wt-1',
-    agent: 'codex',
+    agent: 'claude',
     status,
     latestPrompt: 'hello',
     updatedAt: 1

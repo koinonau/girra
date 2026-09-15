@@ -7,8 +7,6 @@ import type { SplitTerminalPaneDetail } from '@/constants/terminal'
 import { singlePaneLayoutSnapshot } from '@/store/slices/terminal-helpers'
 import { verifyTerminalRevealIdentity } from '@/lib/terminal-reveal-identity'
 import { initialAgentTabViewModeProps } from '@/lib/native-chat-initial-view-mode'
-import { getConnectionIdFromState } from '@/lib/connection-context'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { tryMakePaneKey } from './agent-status-routing'
 import { useAppStore } from '../../store'
 import {
@@ -92,11 +90,7 @@ export function registerTerminalPresentationIpcBridge(unsubs: (() => void)[]): v
                         ...(viewMode
                           ? { viewMode }
                           : initialAgentTabViewModeProps(store.settings, {
-                              agent: launchAgent,
-                              nativeChatTranscriptIsLocalReadable:
-                                isNativeChatTranscriptLocalReadable(
-                                  getConnectionIdFromState(store, worktreeId)
-                                )
+                              agent: launchAgent
                             }))
                       }
                     : {}),

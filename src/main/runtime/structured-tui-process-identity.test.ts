@@ -9,16 +9,16 @@ describe('structured TUI process identity', () => {
     const child = {
       pid: 101,
       ppid: 100,
-      command: 'codex resume first',
+      command: 'claude --resume first',
       foreground: true
     }
-    const duplicate = { ...child, command: 'codex resume duplicate' }
+    const duplicate = { ...child, command: 'claude --resume duplicate' }
 
     expect(
       resolveStructuredTuiChildPid(
         [{ pid: 100, ppid: 1, command: '/bin/zsh', foreground: false }, child, duplicate],
         100,
-        'codex'
+        'claude'
       )
     ).toBe(101)
   })
@@ -31,7 +31,7 @@ describe('structured TUI process identity', () => {
       const row = {
         pid,
         ppid: index === 0 ? 1 : pid - 1,
-        command: index === 0 ? '/bin/zsh' : `codex resume ${index}`,
+        command: index === 0 ? '/bin/zsh' : `claude --resume ${index}`,
         foreground: index > 0
       }
       Object.defineProperty(row, 'pid', {
@@ -44,19 +44,19 @@ describe('structured TUI process identity', () => {
       return row
     })
 
-    expect(resolveStructuredTuiChildPid(rows, 100, 'codex')).toBe(101)
+    expect(resolveStructuredTuiChildPid(rows, 100, 'claude')).toBe(101)
     // The old per-descendant Array#find path performed quadratic PID reads on this chain.
     expect(pidReads).toBeLessThan(rowCount * 8)
   })
 
-  it('binds the direct Codex child instead of the PTY shell pid', async () => {
+  it('binds the direct Claude child instead of the PTY shell pid', async () => {
     const readStartTime = vi.fn(async () => 1_700_000_000_000)
     await expect(
       readStructuredTuiProcessIdentity({
         hostId: 'local',
         rootPid: 100,
         spawnToken: 'spawn-1',
-        agent: 'codex',
+        agent: 'claude',
         platform: 'darwin',
         readPosixRows: async () => [
           { pid: 100, ppid: 1, stat: 'Ss', command: '/bin/zsh' },
@@ -64,13 +64,13 @@ describe('structured TUI process identity', () => {
             pid: 101,
             ppid: 100,
             stat: 'S+',
-            command: 'node /opt/codex/bin/codex resume abc'
+            command: '/opt/claude/bin/claude --resume abc'
           },
           {
             pid: 102,
             ppid: 101,
             stat: 'S+',
-            command: '/opt/codex/vendor/codex'
+            command: '/opt/claude/bin/claude'
           }
         ],
         readStartTime
@@ -84,13 +84,13 @@ describe('structured TUI process identity', () => {
     expect(readStartTime).toHaveBeenCalledWith(101, 'darwin')
   })
 
-  it('fails closed when sibling Codex children make the owner ambiguous', async () => {
+  it('fails closed when sibling Claude children make the owner ambiguous', async () => {
     await expect(
       readStructuredTuiProcessIdentity({
         hostId: 'local',
         rootPid: 100,
         spawnToken: 'spawn-1',
-        agent: 'codex',
+        agent: 'claude',
         platform: 'win32',
         readWindowsRows: async () => [
           {
@@ -103,24 +103,24 @@ describe('structured TUI process identity', () => {
           {
             pid: 101,
             ppid: 100,
-            name: 'codex.exe',
-            command: 'codex resume a',
+            name: 'claude.exe',
+            command: 'claude --resume a',
             executablePath: ''
           },
           {
             pid: 102,
             ppid: 100,
-            name: 'codex.exe',
-            command: 'codex resume b',
+            name: 'claude.exe',
+            command: 'claude --resume b',
             executablePath: ''
           }
         ],
         timeoutMs: 0
       })
-    ).rejects.toThrow('one exact Codex child process')
+    ).rejects.toThrow('one exact Claude child process')
   })
 
-  it('waits for a shell-delivered Codex child before binding ownership', async () => {
+  it('waits for a shell-delivered Claude child before binding ownership', async () => {
     let snapshots = 0
     const delays: number[] = []
     await expect(
@@ -128,7 +128,7 @@ describe('structured TUI process identity', () => {
         hostId: 'local',
         rootPid: 100,
         spawnToken: 'spawn-2',
-        agent: 'codex',
+        agent: 'claude',
         platform: 'darwin',
         readPosixRows: async () => {
           snapshots += 1
@@ -140,7 +140,7 @@ describe('structured TUI process identity', () => {
                     pid: 101,
                     ppid: 100,
                     stat: 'S+',
-                    command: 'codex resume session-1'
+                    command: 'claude --resume session-1'
                   }
                 ]
               : [])
@@ -179,7 +179,7 @@ describe('structured TUI process identity', () => {
       hostId: 'local',
       rootPid: 100,
       spawnToken: 'spawn-cost',
-      agent: 'codex',
+      agent: 'claude',
       platform: 'darwin',
       readPosixRows: async () => {
         captures += 1
@@ -192,7 +192,7 @@ describe('structured TUI process identity', () => {
                   pid: 101,
                   ppid: 100,
                   stat: 'S+',
-                  command: 'codex resume session-1'
+                  command: 'claude --resume session-1'
                 }
               ]
             : [])
@@ -279,10 +279,10 @@ describe('structured TUI process identity', () => {
         hostId: 'local',
         rootPid: 100,
         spawnToken: 'spawn-1',
-        agent: 'codex',
+        agent: 'claude',
         platform: 'darwin',
         readPosixRows: async () => [
-          { pid: 101, ppid: 100, stat: 'S+', command: 'codex resume abc' }
+          { pid: 101, ppid: 100, stat: 'S+', command: 'claude --resume abc' }
         ]
       })
     ).rejects.toThrow('root process was not present')

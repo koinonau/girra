@@ -56,18 +56,10 @@ describe('session tab structured capability mutations', () => {
   for (const method of METHODS) {
     it(`rejects ${method.name} when the structured row is hidden`, async () => {
       const fixture = createFixture([])
-      const response = await fixture.dispatch(method.name, method.params('codex-session'))
+      const response = await fixture.dispatch(method.name, method.params('claude-session'))
 
       expect(response.ok).toBe(false)
       expect(fixture.calls[method.runtimeMethod]).not.toHaveBeenCalled()
-    })
-
-    it(`allows ${method.name} for a capable client`, async () => {
-      const fixture = createFixture([STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY])
-      const response = await fixture.dispatch(method.name, method.params('codex-session'))
-
-      expect(response.ok).toBe(true)
-      expect(fixture.calls[method.runtimeMethod]).toHaveBeenCalledOnce()
     })
 
     it(`rejects ${method.name} on a Claude row the client never negotiated`, async () => {
@@ -99,7 +91,7 @@ describe('session tab structured capability mutations', () => {
         structuredNativeChatEnabled: true
       })
 
-      const response = await dispatch(method.name, method.params('codex-session'))
+      const response = await dispatch(method.name, method.params('claude-session'))
 
       expect(response.ok).toBe(expectedToAllowPromptedRow)
       expect(calls[method.runtimeMethod as keyof typeof calls]).toHaveBeenCalledTimes(
@@ -142,10 +134,10 @@ describe('session tab structured capability mutations', () => {
           method,
           params:
             method === 'session.tabs.close'
-              ? { worktree: 'id:wt-1', tabId: 'codex-session', reason: 'user' }
+              ? { worktree: 'id:wt-1', tabId: 'claude-session', reason: 'user' }
               : {
                   worktree: 'id:wt-1',
-                  tabId: 'codex-session',
+                  tabId: 'claude-session',
                   reason: 'cleanup',
                   publicationEpoch: 'epoch-1',
                   terminal: 'pty-1'
@@ -155,7 +147,10 @@ describe('session tab structured capability mutations', () => {
         {
           clientKind: 'mobile',
           pairedDeviceId: 'paired-mobile',
-          clientCapabilities: [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY]
+          clientCapabilities: [
+            STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
+            CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY
+          ]
         }
       )
 
@@ -207,36 +202,22 @@ function createFixture(
 }
 
 function agentSnapshot() {
-  const codexTab = {
-    type: 'agent-session' as const,
-    id: 'codex-session',
-    sessionId: 'codex-session',
-    title: 'Codex session',
-    agent: 'codex' as const,
-    isActive: true
-  }
   const claudeTab = {
-    ...codexTab,
+    type: 'agent-session' as const,
     id: 'claude-session',
     sessionId: 'claude-session',
-    title: 'Legacy Claude session',
-    agent: 'claude',
-    isActive: false
+    title: 'Claude session',
+    agent: 'claude' as const,
+    isActive: true
   }
   return {
     worktree: 'wt-1',
     publicationEpoch: 'epoch-1',
     snapshotVersion: 1,
     activeGroupId: 'group-1',
-    activeTabId: 'codex-session',
+    activeTabId: 'claude-session',
     activeTabType: 'agent-session' as const,
-    tabGroups: [
-      {
-        id: 'group-1',
-        activeTabId: 'codex-session',
-        tabOrder: ['codex-session', 'claude-session']
-      }
-    ],
-    tabs: [codexTab, claudeTab]
+    tabGroups: [{ id: 'group-1', activeTabId: 'claude-session', tabOrder: ['claude-session'] }],
+    tabs: [claudeTab]
   } as unknown as RuntimeMobileSessionTabsResult
 }

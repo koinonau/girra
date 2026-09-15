@@ -16,46 +16,29 @@ const settings = {
 
 function route(overrides: Partial<Parameters<typeof resolveAgentLaunchRoute>[0]> = {}) {
   return resolveAgentLaunchRoute({
-    agent: 'codex',
+    agent: 'claude',
     settings,
     executionHostId: 'local',
     hostCapabilities: [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY],
     workspaceKind: 'git-worktree',
-    nativeChatTranscriptIsLocalReadable: true,
     ...overrides
   })
 }
 
 describe('resolveAgentLaunchRoute', () => {
-  it.each(['claude', 'codex'] as const)(
-    'routes a supported local %s launch to structured native chat',
-    (agent) => {
-      expect(route({ agent })).toBe('structured-native-chat')
-      expect(route({ agent, initialSessionOptions: { model: 'gpt-5.6-sol' } })).toBe(
-        'structured-native-chat'
-      )
-      expect(
-        route({ agent, launchText: 'explain this change', promptDelivery: 'auto-submit' })
-      ).toBe('structured-native-chat')
-    }
-  )
-
-  /** Windows eligibility is no client-side platform guess for either provider: the route lets the
-   *  launch through and the executing host settles it with agentSession.createSupport at create
-   *  time. A stale caller still passing the removed `platform` input must not flip Codex off the
-   *  structured route — the field is gone, not reinterpreted. */
-  it.each(['claude', 'codex'] as const)(
-    'routes %s to structured even when the caller claims a win32 client platform',
-    (agent) => {
-      expect(route({ agent, ...({ platform: 'win32' } as object) })).toBe('structured-native-chat')
-    }
-  )
-
-  it('routes a supported local Codex launch to structured native chat', () => {
+  it('routes a supported local launch to structured native chat', () => {
     expect(route()).toBe('structured-native-chat')
+    expect(route({ initialSessionOptions: { model: 'opus' } })).toBe('structured-native-chat')
     expect(route({ launchText: 'explain this change', promptDelivery: 'auto-submit' })).toBe(
       'structured-native-chat'
     )
+  })
+
+  /** Windows eligibility is no client-side platform guess: the route lets the launch through and
+   *  the executing host settles it with agentSession.createSupport at create time. A stale caller
+   *  still passing the removed `platform` input must not flip the launch off the structured route. */
+  it('routes to structured even when the caller claims a win32 client platform', () => {
+    expect(route({ ...({ platform: 'win32' } as object) })).toBe('structured-native-chat')
   })
 
   it('routes editable drafts to the structured chat composer', () => {
@@ -93,9 +76,7 @@ describe('resolveAgentLaunchRoute', () => {
   it('fails closed for missing capability, unsupported providers, and explicit TUI options', () => {
     expect(route({ hostCapabilities: [] })).toBe('legacy-native-chat')
     expect(route({ hostCapabilities: null })).toBe('legacy-native-chat')
-    // openclaude and grok render native chat but have no structured adapter.
-    expect(route({ agent: 'openclaude' })).toBe('legacy-native-chat')
-    expect(route({ agent: 'grok' })).toBe('legacy-native-chat')
+    expect(route({ agent: 'opencode' })).toBe('terminal-tui')
     expect(route({ requiresTuiLaunchCustomization: true })).toBe('legacy-native-chat')
   })
 
@@ -115,7 +96,6 @@ describe('resolveAgentLaunchRoute', () => {
 
   it('keeps floating, WSL, and repair-required launches terminal-backed', () => {
     expect(route({ workspaceKind: 'floating' })).toBe('legacy-native-chat')
-    expect(route({ agent: 'claude', workspaceKind: 'floating' })).toBe('legacy-native-chat')
     expect(
       route({
         projectRuntime: {
@@ -151,22 +131,20 @@ describe('resolveAgentLaunchRoute', () => {
     expect(hasSemanticallyNonEmptyAgentArgs('  \n\t')).toBe(false)
     expect(
       hasExplicitTuiLaunchCustomization(
-        { agentCmdOverrides: {}, agentDefaultArgs: { codex: '   ' }, agentDefaultEnv: {} },
-        'codex'
+        { agentCmdOverrides: {}, agentDefaultArgs: { claude: '   ' }, agentDefaultEnv: {} },
+        'claude'
       )
     ).toBe(false)
   })
 
   it('does not classify the resolved default TUI args as customization', () => {
-    expect(hasExplicitTuiAgentArgs('codex', '--dangerously-bypass-approvals-and-sandbox')).toBe(
-      false
-    )
-    expect(hasExplicitTuiAgentArgs('codex', '--model gpt-5.6-sol')).toBe(true)
+    expect(hasExplicitTuiAgentArgs('claude', '--dangerously-skip-permissions')).toBe(false)
+    expect(hasExplicitTuiAgentArgs('claude', '--model opus')).toBe(true)
   })
 })
 
 describe('explicit structured chat requests', () => {
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'supports %s history resume when new tabs default to terminal',
     (agent) => {
       const input = {

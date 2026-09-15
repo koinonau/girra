@@ -10,7 +10,6 @@ import type { RuntimeSubscriptionRegistry } from './runtime-subscription-registr
 export type RuntimeServiceCommandSurface = {
   listAiVaultSessions: RuntimeAiVaultCommands['list']
   resolveAiVaultSessionTitles: RuntimeAiVaultCommands['resolveTitles']
-  prepareAiVaultSessionResume: RuntimeAiVaultCommands['prepare']
   onClientEvent: RuntimeClientEventBus['on']
   notifyNativeChatLaunchDraftResolved: RuntimeNativeChatDraftResolutions['notify']
   registerSubscriptionCleanup: RuntimeSubscriptionRegistry['register']
@@ -71,7 +70,6 @@ export function installRuntimeServiceCommandSurface(
   Object.assign(target, {
     listAiVaultSessions: vault.list.bind(vault),
     resolveAiVaultSessionTitles: vault.resolveTitles.bind(vault),
-    prepareAiVaultSessionResume: vault.prepare.bind(vault),
     onClientEvent: events.on.bind(events),
     notifyNativeChatLaunchDraftResolved: drafts.notify.bind(drafts),
     registerSubscriptionCleanup: subscriptions.register.bind(subscriptions),

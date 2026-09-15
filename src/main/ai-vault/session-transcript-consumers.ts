@@ -58,7 +58,7 @@ export type TranscriptReadStart = {
 }
 
 export type TranscriptReadOutcome = {
-  /** Null when the parser rejected the file (an excluded Codex worker transcript). */
+  /** Null when the parser rejected the file. */
   session: AiVaultSession | null
   /** Byte offset just past the last complete line this read consumed. */
   byteOffset: number

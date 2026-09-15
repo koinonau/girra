@@ -13,7 +13,6 @@ const MTIME = 1_740_000_000_000
 function candidate(overrides: Partial<SessionFileCandidate['file']> = {}): SessionFileCandidate {
   return {
     agent: 'claude',
-    codexHome: null,
     file: {
       path: PATH,
       mtimeMs: MTIME,

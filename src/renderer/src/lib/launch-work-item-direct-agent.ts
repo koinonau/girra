@@ -35,7 +35,6 @@ export function buildDirectWorkItemAgentStartupPlan(args: {
     | null
     | undefined
   launchPlatform: NodeJS.Platform
-  nativeChatTranscriptIsLocalReadable?: boolean
   /** Why: SSH remotes deploy the CLI shim as plain `orca`, so the Linux-only
    * `orca-ide` rename must not be applied for remote launches. */
   isRemote?: boolean
@@ -57,8 +56,7 @@ export function buildDirectWorkItemAgentStartupPlan(args: {
     agent: args.agent,
     ...(args.promptDelivery === 'draft'
       ? { promptDelivery: 'draft' as const, launchDraftText: args.draftContent }
-      : {}),
-    nativeChatTranscriptIsLocalReadable: args.nativeChatTranscriptIsLocalReadable
+      : {})
   })
   const draftLaunchPlan =
     args.promptDelivery === 'submit-after-ready'

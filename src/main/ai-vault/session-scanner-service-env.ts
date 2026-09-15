@@ -33,19 +33,8 @@ export const RUNTIME_ENV_ALLOWLIST = [
 // Why: the desktop child resolves agent roots from its own environment, so
 // dropping one hides every session of a user who relocated that agent's home.
 const AGENT_ROOT_ENV_ALLOWLIST = [
-  'CODEX_HOME',
-  'CLINE_SESSION_DATA_DIR',
-  'COPILOT_HOME',
-  'DEVIN_HOME',
-  'GROK_HOME',
-  'KIMI_CODE_HOME',
-  'OMP_CODING_AGENT_DIR',
-  'OPENCLAW_STATE_DIR',
   'OPENCODE_DB',
   'PI_CODING_AGENT_DIR',
-  'PRIME_AGENT_CODING_AGENT_DIR',
-  'PRIME_AGENT_CODING_AGENT_SESSION_DIR',
-  'PRIME_AGENT_SESSION_DIR',
   // Why: OpenCode has no home variable — its store hangs off the XDG data dir,
   // so this one is an agent root here rather than generic runtime state.
   'XDG_DATA_HOME'
@@ -59,7 +48,7 @@ export function pickAllowedEnv(
   const windowsLookup = new Map<string, string>()
   if (platform === 'win32') {
     // Why: Windows resolves env names case-insensitively, so a lowercased
-    // `codex_home` still reaches the child; folding on POSIX instead would
+    // `pi_coding_agent_dir` still reaches the child; folding on POSIX instead would
     // promote an attacker-set `path` over the real one.
     for (const [key, value] of Object.entries(baseEnv)) {
       if (typeof value === 'string') {

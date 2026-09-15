@@ -5,7 +5,7 @@
 // (app quit, handoff to a TUI, and error cleanup). Closing a chat was never wired to any of them,
 // so a provider child outlived the chat that owned it for the whole app session.
 //
-// ORDER. The provider child stops FIRST. Closing it is not silent: the codex adapter emits its
+// ORDER. The provider child stops FIRST. Closing it is not silent: the adapter emits its
 // `ended` event and flushes coalesced text as part of shutting down, and those are the rows that
 // clear the running-turn marker. Draining or closing the sink ahead of that drops them, which
 // leaves the durable journal claiming the agent is still working — a worse outcome than the leak

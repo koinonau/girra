@@ -1,6 +1,4 @@
 import type { AiVaultScanIssue } from '../../shared/ai-vault-types'
-import { AI_VAULT_AGENT_SOURCES } from '../ai-vault/session-scanner-agent-sources'
-import { normalizedWslHomeDirs } from '../ai-vault/session-scanner-roots'
 import { sessionCandidatesFromDiscoveries } from '../ai-vault/session-scanner-candidates'
 import { discoverAiVaultSessionSources } from '../ai-vault/session-scanner-source-discovery'
 import type {
@@ -24,7 +22,7 @@ export type SessionSearchScanRoots = Omit<
 >
 
 export type SessionSearchDiscovery = {
-  /** Newest first, Codex hardlink aliases collapsed, exactly as a list scan sees them. */
+  /** Newest first, exactly as a list scan sees them. */
   candidates: SessionFileCandidate[]
   discoveries: SessionFileDiscovery[]
   issues: AiVaultScanIssue[]
@@ -46,7 +44,7 @@ export async function discoverSessionSearchCandidates(
     limitPerAgent: args.limitPerAgent,
     issues
   })
-  const candidates = await sessionCandidatesFromDiscoveries(discoveries, options)
+  const candidates = sessionCandidatesFromDiscoveries(discoveries)
   return { candidates, discoveries, issues }
 }
 
@@ -60,62 +58,20 @@ export function isUnderScanRoot(path: string, root: string): boolean {
 }
 
 /**
- * The real directories behind a scan's discoveries, with their file counts.
- *
- * Why this exists: an agent whose roots are alternates for one install reports
- * them as a single discovery whose `rootDir` is every path joined by the
- * platform's path delimiter. That string is not a directory. Health probes
- * readdir it and get ENOENT, a containment check never matches a file under it,
- * and a scan issue recorded against a real root never equals it — so the fence
- * meant to protect an unmounted tree is inert for exactly the agent most likely
- * to have one. Splitting the joined string back apart would be worse: a
- * directory may legally contain the delimiter. The constituent paths come from
- * the same source table discovery read.
+ * The directories a scan's discoveries walked, with the files found under each.
+ * A synthetic `<db>#<id>` row is not under its store's path, so it counts for no root.
  */
 export function sessionSearchRootListings(
-  roots: SessionSearchScanRoots,
   discoveries: readonly SessionFileDiscovery[]
 ): SessionSearchRootListing[] {
-  const wslHomeDirs = normalizedWslHomeDirs(roots.wslHomeDirs)
   const counts = new Map<string, number>()
   for (const discovery of discoveries) {
-    const constituents = constituentRoots(roots, wslHomeDirs, discovery)
-    for (const root of constituents) {
-      counts.set(root, counts.get(root) ?? 0)
-    }
-    for (const file of discovery.files) {
-      const owner = owningRoot(constituents, file.path)
-      if (owner !== null) {
-        counts.set(owner, (counts.get(owner) ?? 0) + 1)
-      }
-    }
+    const files = discovery.files.filter((file) =>
+      isUnderScanRoot(file.path, discovery.rootDir)
+    ).length
+    counts.set(discovery.rootDir, (counts.get(discovery.rootDir) ?? 0) + files)
   }
   return [...counts].map(([root, files]) => ({ root, files }))
-}
-
-function constituentRoots(
-  roots: SessionSearchScanRoots,
-  wslHomeDirs: readonly string[],
-  discovery: SessionFileDiscovery
-): string[] {
-  const declared = AI_VAULT_AGENT_SOURCES[discovery.agent]?.rootDirs(roots, wslHomeDirs) ?? []
-  if (declared.includes(discovery.rootDir)) {
-    return [discovery.rootDir]
-  }
-  // Either a merged discovery, whose rootDir is the joined string, or a source
-  // that builds its own discoveries (OpenCode, Antigravity) and reports a real
-  // directory that this table does not list.
-  return declared.length > 0 ? declared : [discovery.rootDir]
-}
-
-function owningRoot(constituents: readonly string[], path: string): string | null {
-  let owner: string | null = null
-  for (const root of constituents) {
-    if (isUnderScanRoot(path, root) && (owner === null || root.length > owner.length)) {
-      owner = root
-    }
-  }
-  return owner
 }
 
 /**

@@ -29,7 +29,7 @@ describe('OrcaRuntimeService', () => {
           paneKey: workerPaneKey,
           tabId: 'legacy-missing',
           worktreeId: TEST_WORKTREE_ID,
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'legacy-missing-session' },
           prompt: 'continue',
           state: 'working',
@@ -64,7 +64,7 @@ describe('OrcaRuntimeService', () => {
         creator: { kind: 'system' },
         maxDepth: Number.MAX_SAFE_INTEGER,
         taskId: task.id,
-        startOptions: { topology: 'current', agent: 'codex' }
+        startOptions: { topology: 'current', agent: 'claude' }
       })
       db.prepareStartingWorkerAuthority({
         dispatchId: started.dispatch.id,
@@ -134,7 +134,7 @@ describe('OrcaRuntimeService', () => {
           paneKey: workerPaneKey,
           tabId: 'legacy-missing-retry',
           worktreeId: TEST_WORKTREE_ID,
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'legacy-missing-retry-session' },
           prompt: 'continue',
           state: 'working',
@@ -174,7 +174,7 @@ describe('OrcaRuntimeService', () => {
         creator: { kind: 'system' },
         maxDepth: Number.MAX_SAFE_INTEGER,
         taskId: task.id,
-        startOptions: { topology: 'current', agent: 'codex' }
+        startOptions: { topology: 'current', agent: 'claude' }
       })
       db.prepareStartingWorkerAuthority({
         dispatchId: started.dispatch.id,
@@ -248,8 +248,8 @@ describe('OrcaRuntimeService', () => {
           paneKey: workerPaneKey,
           tabId: 'legacy-worker',
           worktreeId: TEST_WORKTREE_ID,
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'legacy-codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'legacy-claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 1,
@@ -260,8 +260,8 @@ describe('OrcaRuntimeService', () => {
           paneKey: secondWorkerPaneKey,
           tabId: 'legacy-worker-two',
           worktreeId: TEST_WORKTREE_ID,
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'legacy-codex-session-two' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'legacy-claude-session-two' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 1,
@@ -371,8 +371,8 @@ describe('OrcaRuntimeService', () => {
           paneKey: workerPaneKey,
           tabId: 'legacy-worker',
           worktreeId: TEST_WORKTREE_ID,
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'legacy-codex-session' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'legacy-claude-session' },
           prompt: 'continue',
           state: 'working',
           capturedAt: 1,

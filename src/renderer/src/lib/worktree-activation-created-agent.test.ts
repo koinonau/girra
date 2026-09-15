@@ -183,8 +183,8 @@ describe('activateAndRevealWorktree', () => {
           paneKey: 'slept-tab:0',
           tabId: 'slept-tab',
           worktreeId: worktree.id,
-          agent: 'codex',
-          providerSession: { key: 'session_id', id: 'codex-session-1' },
+          agent: 'claude',
+          providerSession: { key: 'session_id', id: 'claude-session-1' },
           prompt: 'resume prior task',
           state: 'working',
           capturedAt: 1000,
@@ -211,7 +211,7 @@ describe('activateAndRevealWorktree', () => {
     expect(state.pendingStartupByTabId).toEqual({})
     expect(state.sleepingAgentSessionsByPaneKey['slept-tab:0']).toMatchObject({
       paneKey: 'slept-tab:0',
-      providerSession: { key: 'session_id', id: 'codex-session-1' }
+      providerSession: { key: 'session_id', id: 'claude-session-1' }
     })
     expect(revealWorktreeInSidebar).toHaveBeenCalledWith(worktree.id)
   })

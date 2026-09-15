@@ -42,13 +42,13 @@ describe('filterAiVaultSessions', () => {
       baseSession,
       {
         ...baseSession,
-        id: 'codex:2',
-        agent: 'codex',
+        id: 'pi:2',
+        agent: 'pi',
         sessionId: 'session-2',
         title: 'Repair terminal tabs',
         cwd: '/Users/ada/other/packages/ui',
         branch: 'fix/terminal',
-        filePath: '/Users/ada/.codex/sessions/session-2.jsonl'
+        filePath: '/Users/ada/.pi/agent/sessions/session-2.jsonl'
       }
     ]
 
@@ -169,7 +169,7 @@ describe('filterAiVaultSessions', () => {
   })
 
   it('keeps zero-count sessions whose previews prove real turns when hiding empties', () => {
-    // Grok-style: the turn count only comes from metadata that may be absent,
+    // The turn count only comes from metadata that may be absent,
     // but the preview messages prove the conversation exists and is resumable.
     const previewOnly: AiVaultSession = {
       ...baseSession,
@@ -660,7 +660,7 @@ describe('groupAiVaultSessions', () => {
   it('groups by folder or agent without changing session order', () => {
     const sessions: AiVaultSession[] = [
       baseSession,
-      { ...baseSession, id: 'codex:2', agent: 'codex', cwd: '/Users/ada/repo/app' }
+      { ...baseSession, id: 'pi:2', agent: 'pi', cwd: '/Users/ada/repo/app' }
     ]
 
     expect(groupAiVaultSessions(sessions, 'folder')).toEqual([
@@ -668,14 +668,14 @@ describe('groupAiVaultSessions', () => {
     ])
     expect(groupAiVaultSessions(sessions, 'agent').map((group) => group.label)).toEqual([
       'Claude',
-      'Codex'
+      'Pi'
     ])
   })
 
   it('groups sibling worktree sessions by project label when resolved', () => {
     const sessions: AiVaultSession[] = [
       { ...baseSession, id: 'claude:1', cwd: '/repo/main' },
-      { ...baseSession, id: 'codex:2', agent: 'codex', cwd: '/repo/worktree' }
+      { ...baseSession, id: 'claude:2', agent: 'claude', cwd: '/repo/worktree' }
     ]
     const sessionProjectById = new Map(
       sessions.map((session) => [

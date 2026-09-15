@@ -717,23 +717,6 @@ describe('submitFolderWorkspaceCreate native-chat launch draft', () => {
     vi.restoreAllMocks()
   })
 
-  it('mirrors a startup-paste draft into the chat composer', async () => {
-    await submitFolderWorkspaceCreate({
-      projectGroup: makeProjectGroup(),
-      name: '',
-      lastAutoName: '',
-      linkedWorkItem: linkedIssue,
-      note: '',
-      quickAgent: 'codex',
-      autoRenameBranchFromWork: false,
-      agentCmdOverrides: {},
-      createFolderWorkspace: vi.fn(async () => makeFolderWorkspace()),
-      onOpenChange: vi.fn()
-    })
-
-    expect(seededDraftFor('tab-1')?.text).toBe(ISSUE_URL)
-  })
-
   it('mirrors an argv-prefill draft, which never lands in startupPlan.draftPrompt', async () => {
     await submitFolderWorkspaceCreate({
       projectGroup: makeProjectGroup(),
@@ -756,30 +739,6 @@ describe('submitFolderWorkspaceCreate native-chat launch draft', () => {
     expect(seededDraftFor('tab-1')?.text).toBe(ISSUE_URL)
   })
 
-  it('mirrors a multi-line draft into chat', async () => {
-    await submitFolderWorkspaceCreate({
-      projectGroup: makeProjectGroup(),
-      name: '',
-      lastAutoName: '',
-      linkedWorkItem: linkedIssue,
-      note: 'Reproduce on Windows first',
-      quickAgent: 'codex',
-      autoRenameBranchFromWork: false,
-      agentCmdOverrides: {},
-      createFolderWorkspace: vi.fn(async () => makeFolderWorkspace()),
-      onOpenChange: vi.fn()
-    })
-
-    expect(mocks.ensureAgentStartupInTerminal).toHaveBeenCalledWith(
-      expect.objectContaining({
-        startup: expect.objectContaining({
-          draftPrompt: `Reproduce on Windows first\n\n${ISSUE_URL}`
-        })
-      })
-    )
-    expect(seededDraftFor('tab-1')?.text).toBe(`Reproduce on Windows first\n\n${ISSUE_URL}`)
-  })
-
   it('does not mirror an unlinked note, which is submitted rather than drafted', async () => {
     await submitFolderWorkspaceCreate({
       projectGroup: makeProjectGroup(),
@@ -787,7 +746,7 @@ describe('submitFolderWorkspaceCreate native-chat launch draft', () => {
       lastAutoName: '',
       linkedWorkItem: null,
       note: 'Fix the flaky checkout flow',
-      quickAgent: 'codex',
+      quickAgent: 'claude',
       autoRenameBranchFromWork: false,
       agentCmdOverrides: {},
       createFolderWorkspace: vi.fn(async () => makeFolderWorkspace()),
@@ -825,14 +784,11 @@ describe('folder-workspace draft: seeded set == chat-opening set', () => {
     vi.restoreAllMocks()
   })
 
-  // Why: `claude` takes its draft on argv, so `startupPlan.draftPrompt` stays
-  // undefined; `codex` gets a startup paste and sets it. Both must reach the
-  // view-mode gate, and both must agree with what the composer actually holds.
+  // Why: `claude` takes its draft on argv, so `startupPlan.draftPrompt` stays undefined; the draft
+  // must still reach the view-mode gate and agree with what the composer actually holds.
   it.each([
     ['argv-prefill', 'claude' as const, '', true],
-    ['argv-prefill multi-line', 'claude' as const, 'Reproduce on Windows first', true],
-    ['startup-paste', 'codex' as const, '', true],
-    ['startup-paste multi-line', 'codex' as const, 'Reproduce on Windows first', true]
+    ['argv-prefill multi-line', 'claude' as const, 'Reproduce on Windows first', true]
   ])('%s', async (_label, quickAgent, note, expectMirrored) => {
     await submitFolderWorkspaceCreate({
       projectGroup: makeProjectGroup(),

@@ -7726,8 +7726,7 @@
             },
             "nativeChat": {
               "title": "Chat UI",
-              "description": "対応 Agent のターミナルセッション用デスクトップチャット画面をプレビューします。",
-              "grok": "grok"
+              "description": "対応 Agent のターミナルセッション用デスクトップチャット画面をプレビューします。"
             },
             "agentDashboard": {
               "title": "Agent ダッシュボード",
@@ -10631,7 +10630,6 @@
             "openSupportedWorkspace": "セッションを再開する前に、ワークスペースを開いてください。",
             "localSessionSshWorkspaceUnsupported": "このセッションの履歴はこのマシンに保存されているため、SSH ワークスペースでは再開できません。代わりにローカルワークスペースを開いてください。",
             "sessionHostMismatchUnsupported": "このセッションは別のホストに属しています。再開するには同じホスト上のワークスペースを開いてください。",
-            "prepareSessionResumeFailed": "このセッションを再開用に準備できませんでした。",
             "sessionDeleted": "セッションを削除しました",
             "sessionDeleteFailed": "セッションを削除できませんでした"
           },
@@ -13213,7 +13211,6 @@
         "thinking": "思考",
         "options": "オプション",
         "sessionOptions": "セッションオプション",
-        "chooseInAgentPicker": "Agent の選択画面で選ぶ…",
         "toggleOption": "{{value0}}を切り替える",
         "pillAccessibleName": "{{value0}} {{value1}}",
         "valueUnknown": "現在の値が不明です — オンまたはオフを選んでください",

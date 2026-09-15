@@ -246,7 +246,7 @@ describe('SSH fresh agent-session create operations', () => {
       keyId: 'key',
       identityDigest: 'a'.repeat(43),
       worktreeScopeDigest: 'b'.repeat(43),
-      agent: 'codex' as const
+      agent: 'claude' as const
     }
     const surface = {
       worktreeId: 'worktree',

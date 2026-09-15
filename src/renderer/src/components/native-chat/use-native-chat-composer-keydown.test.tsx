@@ -89,35 +89,32 @@ describe('useNativeChatComposerKeyDown', () => {
     expect(callbacks.send).toHaveBeenCalledOnce()
   })
 
-  it.each(['claude', 'openclaude', 'codex', 'grok'] as const)(
-    'completes mid-prompt command Enter without dispatching or losing prose for %s',
-    (agent) => {
-      const draft = 'Explain /cle before continuing'
-      const caret = 'Explain /cle'.length
-      const autocomplete = deriveComposerAutocomplete(
-        draft,
-        caret,
-        [COMMAND],
-        [],
-        getNativeChatAgentProfile(agent)
-      )
-      expect(autocomplete.mode).toBe('slash')
-      const { handler, callbacks } = setup(autocomplete, false, draft)
-      const event = keyEvent('Enter')
-      handler(event as never)
+  it('completes mid-prompt command Enter without dispatching or losing prose', () => {
+    const draft = 'Explain /cle before continuing'
+    const caret = 'Explain /cle'.length
+    const autocomplete = deriveComposerAutocomplete(
+      draft,
+      caret,
+      [COMMAND],
+      [],
+      getNativeChatAgentProfile('claude')
+    )
+    expect(autocomplete.mode).toBe('slash')
+    const { handler, callbacks } = setup(autocomplete, false, draft)
+    const event = keyEvent('Enter')
+    handler(event as never)
 
-      expect(event.preventDefault).toHaveBeenCalledOnce()
-      expect(callbacks.dispatchPickerCommand).not.toHaveBeenCalled()
-      expect(callbacks.send).not.toHaveBeenCalled()
-      expect(callbacks.completePickerItem).toHaveBeenCalledOnce()
-      const [item] = callbacks.completePickerItem.mock.calls[0]
-      expect(applyPickerSuggestion(draft, caret, item)).toEqual({
-        draft: 'Explain /clear  before continuing',
-        caret: 'Explain /clear '.length,
-        insertedToken: '/clear'
-      })
-    }
-  )
+    expect(event.preventDefault).toHaveBeenCalledOnce()
+    expect(callbacks.dispatchPickerCommand).not.toHaveBeenCalled()
+    expect(callbacks.send).not.toHaveBeenCalled()
+    expect(callbacks.completePickerItem).toHaveBeenCalledOnce()
+    const [item] = callbacks.completePickerItem.mock.calls[0]
+    expect(applyPickerSuggestion(draft, caret, item)).toEqual({
+      draft: 'Explain /clear  before continuing',
+      caret: 'Explain /clear '.length,
+      insertedToken: '/clear'
+    })
+  })
 
   it('dismisses Escape without interrupting the agent', () => {
     const { handler, callbacks } = setup()

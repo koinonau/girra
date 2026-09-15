@@ -44,11 +44,11 @@ function attachParams(
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    agent: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    provider: 'claude',
+    agent: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     runtimeKind: 'native',
-    providerHandle: { kind: 'codex', threadId: 'thread-1' }
+    providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
   }
   return {
     ...params,
@@ -122,7 +122,7 @@ describe('processless structured session reservation', () => {
         process: { hostId: 'local', pid: 4242, processStartTimeMs: NOW, spawnToken },
         link: {
           linkId: 'link-1',
-          handle: { provider: 'codex' as const, threadId: 'thread-1' },
+          handle: { provider: 'claude' as const, sessionId: 'thread-1', leafUuid: null },
           origin: 'created' as const,
           mintedAtFence: fence,
           observedAt: NOW
@@ -285,7 +285,7 @@ describe('processless structured session reservation', () => {
           },
           link: {
             linkId: 'link-1',
-            handle: { provider: 'codex', threadId: 'thread-1' },
+            handle: { provider: 'claude', sessionId: 'thread-1', leafUuid: null },
             origin: 'created',
             mintedAtFence: fence,
             observedAt: NOW

@@ -3,11 +3,7 @@ import { OrcaRuntimeWithStructuredAgentSessionLaunchTui } from './orca-runtime-s
 import { join } from 'node:path'
 import { claudeProviderHandleLink } from '../claude/claude-structured-owner-identity'
 import { probeAgentSessionProcessIdentity } from './agent-session-process-identity-probe'
-import {
-  agentSessionProviderHandleRoot,
-  agentSessionProviderHandlesEqual
-} from '../../shared/agent-session-provider-handle'
-import { resolvePinnedCodexRolloutProof } from '../codex/codex-tui-rollout-proof'
+import { agentSessionProviderHandleRoot } from '../../shared/agent-session-provider-handle'
 
 export class OrcaRuntimeWithStructuredAgentSessionReproveTuiOwner extends OrcaRuntimeWithStructuredAgentSessionLaunchTui {
   protected createStructuredAgentSessionReproveTuiOwnerCallback() {
@@ -30,46 +26,31 @@ export class OrcaRuntimeWithStructuredAgentSessionReproveTuiOwner extends OrcaRu
         )
       }
       const head = record.providerHandleChain.at(-1)
-      const sameProviderIdentity =
-        head &&
-        (current.link.handle.provider === 'claude'
-          ? agentSessionProviderHandleRoot(current.link.handle) ===
-            agentSessionProviderHandleRoot(head.handle)
-          : (record.lease.provenHandleLinkId === null ||
-              current.link.linkId === record.lease.provenHandleLinkId) &&
-            agentSessionProviderHandlesEqual(current.link.handle, head.handle))
-      if (!sameProviderIdentity) {
+      if (
+        !head ||
+        agentSessionProviderHandleRoot(current.link.handle) !==
+          agentSessionProviderHandleRoot(head.handle)
+      ) {
         throw new Error('agent_session_identity_required')
       }
-      if (current.link.handle.provider === 'claude' && head.handle.provider === 'claude') {
-        const proof = await this.waitForStructuredClaudeTuiProof({
-          handle: current.terminal.handle,
-          paneKey: current.terminal.paneKey,
+      const claudeProof = await this.waitForStructuredClaudeTuiProof({
+        handle: current.terminal.handle,
+        paneKey: current.terminal.paneKey,
+        sessionId: head.handle.sessionId,
+        previousLeafUuid: head.handle.leafUuid,
+        projectsDir: join(record.accountHome.path, 'projects')
+      })
+      return {
+        ...current,
+        link: claudeProviderHandleLink({
           sessionId: head.handle.sessionId,
-          previousLeafUuid: head.handle.leafUuid,
-          projectsDir: join(record.accountHome.path, 'projects')
-        })
-        return {
-          ...current,
-          link: claudeProviderHandleLink({
-            sessionId: head.handle.sessionId,
-            leafUuid: proof.leafUuid,
-            resumed: true,
-            fence: record.lease.runtimeFence,
-            observedAt: Date.now()
-          }),
-          transcriptPath: proof.transcriptPath
-        }
+          leafUuid: claudeProof.leafUuid,
+          resumed: true,
+          fence: record.lease.runtimeFence,
+          observedAt: Date.now()
+        }),
+        transcriptPath: claudeProof.transcriptPath
       }
-      if (current.transcriptPath || current.link.handle.provider !== 'codex') {
-        return current
-      }
-      if (head.handle.provider !== 'codex') {
-        return current
-      }
-      const threadId = head.handle.threadId
-      const transcriptPath = await resolvePinnedCodexRolloutProof(record.accountHome.path, threadId)
-      return transcriptPath ? { ...current, transcriptPath } : current
     }
   }
 }

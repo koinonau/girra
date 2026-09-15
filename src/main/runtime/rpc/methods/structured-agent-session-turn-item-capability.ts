@@ -33,7 +33,7 @@ function projectItems(items: AgentJournalRenderItem[]): AgentJournalRenderItem[]
       return item
     }
     const { kind: _kind, ...turn } = item.body
-    return { ...item, body: legacyAgentJournalTurnStatusBody(turn, item.itemId) }
+    return { ...item, body: legacyAgentJournalTurnStatusBody(turn) }
   })
 }
 

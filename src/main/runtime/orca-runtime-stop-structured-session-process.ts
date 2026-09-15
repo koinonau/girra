@@ -9,8 +9,6 @@ import {
   isKnownReadyPromptPreview
 } from './terminal-wait-detection'
 import { hasStructuredTuiIdleEvidence } from './structured-tui-idle-evidence'
-import type { RuntimePtyWorktreeRecord } from './runtime-terminal-state-records'
-import { proveCodexTuiRollout } from '../codex/codex-tui-rollout-proof'
 import { ClaudeTranscriptTailIncompleteError } from '../claude/claude-transcript-branch-proof'
 import {
   readClaudeTranscriptLeafUuid,
@@ -90,51 +88,6 @@ export class OrcaRuntimeWithStopStructuredSessionProcess extends OrcaRuntimeWith
         : 'busy'
     }
     return 'busy'
-  }
-
-  protected async waitForStructuredTuiProof(input: {
-    handle: string
-    paneKey: string
-    threadId: string
-    spawnToken: string
-    codexHome: string
-    sessionId: string
-  }): Promise<{ transcriptPath?: string; leafUuid?: never }> {
-    const readBoundPty = (): RuntimePtyWorktreeRecord => {
-      const pty = this.getLivePtyForHandle(input.handle)?.pty
-      if (
-        !pty?.connected ||
-        pty.paneKey !== input.paneKey ||
-        pty.launchAgent !== 'codex' ||
-        pty.launchToken !== input.spawnToken
-      ) {
-        throw new Error('The resumed terminal lost its launch identity.')
-      }
-      return pty
-    }
-    const initialPty = readBoundPty()
-    const kittyKeyboardFlags = this.providerModeTrackersByPtyId.get(initialPty.ptyId)?.flags ?? 0
-    return proveCodexTuiRollout({
-      codexHome: input.codexHome,
-      threadId: input.threadId,
-      kittyKeyboardFlags,
-      readOutput: () => {
-        const pty = readBoundPty()
-        return {
-          text: buildTerminalWaitText(pty.tailBuffer, pty.tailPartialLine, pty.preview),
-          lastOutputAt: pty.lastOutputAt
-        }
-      },
-      write: (data) => {
-        const pty = readBoundPty()
-        return (
-          this.ptyController?.writeAgentSessionProof?.(pty.ptyId, data, {
-            sessionId: input.sessionId,
-            spawnToken: input.spawnToken
-          }) ?? false
-        )
-      }
-    })
   }
 
   protected async waitForStructuredClaudeTuiProof(input: {

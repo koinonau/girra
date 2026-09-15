@@ -144,8 +144,8 @@ function installSleepingCodexResumeState(restoredPtyId?: string) {
         paneKey,
         tabId: 'tab-1',
         worktreeId: 'wt-1',
-        agent: 'codex',
-        providerSession: { key: 'session_id', id: 'codex-session-1' },
+        agent: 'claude',
+        providerSession: { key: 'session_id', id: 'claude-session-1' },
         prompt: 'finish the task',
         state: 'working',
         capturedAt: 1,
@@ -572,10 +572,10 @@ describe('connectPanePty', () => {
       paneId: 1,
       exitCode: 1,
       startup: expect.objectContaining({
-        command: expect.stringContaining("'resume' 'codex-session-1'"),
+        command: expect.stringContaining("'--resume' 'claude-session-1'"),
         launchConfig,
-        resumeProviderSession: { key: 'session_id', id: 'codex-session-1' },
-        launchAgent: 'codex',
+        resumeProviderSession: { key: 'session_id', id: 'claude-session-1' },
+        launchAgent: 'claude',
         showSessionRestoredBanner: true
       }),
       reason: 'git-bash-console-capacity'

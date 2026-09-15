@@ -159,9 +159,9 @@ describe('applyWebSessionTabsSnapshot', () => {
           {
             type: 'agent-session',
             id: hostTabId,
-            title: 'Codex Chat',
+            title: 'Claude Chat',
             sessionId,
-            agent: 'codex',
+            agent: 'claude',
             isActive: true
           }
         ],

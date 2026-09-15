@@ -40,7 +40,7 @@ describe('resolveAiVaultSessionResumeInChatEligibility', () => {
     expect(eligibility()).toEqual({ available: true, workspaceId: 'repo-1::/repo/orca' })
   })
 
-  it.each(['hermes', 'grok', 'opencode'] as AiVaultSession['agent'][])(
+  it.each(['opencode', 'pi'] as AiVaultSession['agent'][])(
     'refuses %s, which has no structured lane',
     (agent) => {
       expect(eligibility({ session: session({ agent }) })).toEqual({
@@ -128,16 +128,6 @@ describe('workspace matching, which only Claude is bound by', () => {
     expect(eligibility({ session: session({ cwd: null }) })).toEqual({
       available: false,
       reason: 'workspace'
-    })
-  })
-
-  it('keeps Codex available in a different workspace, and with no recorded cwd', () => {
-    // Codex is handed the rollout file and a cwd, so it resumes anywhere.
-    expect(eligibility({ session: session({ agent: 'codex', cwd: '/repo/other' }) })).toMatchObject(
-      { available: true }
-    )
-    expect(eligibility({ session: session({ agent: 'codex', cwd: null }) })).toMatchObject({
-      available: true
     })
   })
 

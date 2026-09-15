@@ -4,20 +4,12 @@ import { tmpdir } from 'node:os'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import { readWorkerTranscript } from './worker-transcript-read'
 
-function codexMessage(id: string, text: string): string {
+function claudeMessage(id: string, text: string): string {
   return JSON.stringify({
-    timestamp: '2026-07-24T12:00:00.000Z',
-    type: 'event_msg',
-    payload: { id, type: 'agent_message', message: text }
-  })
-}
-
-function grokMessage(id: string, text: string): string {
-  return JSON.stringify({
-    id,
-    timestamp: '2026-07-24T12:00:00.000Z',
     type: 'assistant',
-    content: text
+    uuid: id,
+    timestamp: '2026-07-24T12:00:00.000Z',
+    message: { role: 'assistant', content: [{ type: 'text', text }] }
   })
 }
 
@@ -27,7 +19,7 @@ describe('worker transcript reads', () => {
 
   beforeEach(async () => {
     directory = await mkdtemp(join(tmpdir(), 'orca-worker-transcript-'))
-    transcriptPath = join(directory, 'rollout-session.jsonl')
+    transcriptPath = join(directory, 'session.jsonl')
   })
 
   afterEach(async () => {
@@ -37,13 +29,17 @@ describe('worker transcript reads', () => {
   it('returns a bounded tail followed by new messages from the exact file', async () => {
     await writeFile(
       transcriptPath,
-      [codexMessage('one', 'first'), codexMessage('two', 'second'), codexMessage('three', 'third')]
+      [
+        claudeMessage('one', 'first'),
+        claudeMessage('two', 'second'),
+        claudeMessage('three', 'third')
+      ]
         .join('\n')
         .concat('\n')
     )
 
     const initial = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-exact',
       transcriptPath,
       limit: 2
@@ -60,9 +56,9 @@ describe('worker transcript reads', () => {
       throw new Error('Expected the initial transcript page')
     }
 
-    await appendFile(transcriptPath, `{malformed}\n${codexMessage('four', 'fourth')}\n`)
+    await appendFile(transcriptPath, `{malformed}\n${claudeMessage('four', 'fourth')}\n`)
     const appended = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-exact',
       transcriptPath,
       offset: initial.nextOffset,
@@ -85,10 +81,10 @@ describe('worker transcript reads', () => {
   ])('rejects a same-inode truncate/regrow at %s', async (_label, extraBytes) => {
     await writeFile(
       transcriptPath,
-      `${codexMessage('one', 'original transcript with enough padding for equal-size rewrite')}\n`
+      `${claudeMessage('one', 'original transcript with enough padding for equal-size rewrite')}\n`
     )
     const initial = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-exact',
       transcriptPath,
       limit: 10
@@ -97,7 +93,7 @@ describe('worker transcript reads', () => {
       throw new Error('Expected the original transcript page')
     }
     const before = await stat(transcriptPath, { bigint: true })
-    const replacementLine = `${codexMessage('other', 'unrelated rewrite')}\n`
+    const replacementLine = `${claudeMessage('other', 'unrelated rewrite')}\n`
     const replacement = replacementLine.padEnd(initial.nextOffset + extraBytes, ' ')
 
     await writeFile(transcriptPath, replacement)
@@ -108,7 +104,7 @@ describe('worker transcript reads', () => {
     expect(Number(after.size)).toBeGreaterThanOrEqual(initial.nextOffset)
     await expect(
       readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'session-exact',
         transcriptPath,
         offset: initial.nextOffset,
@@ -120,11 +116,11 @@ describe('worker transcript reads', () => {
   })
 
   it('reports source changes and unsupported providers without guessing', async () => {
-    await writeFile(transcriptPath, `${codexMessage('one', 'first')}\n`)
+    await writeFile(transcriptPath, `${claudeMessage('one', 'first')}\n`)
 
     await expect(
       readWorkerTranscript({
-        agent: 'codex',
+        agent: 'claude',
         sessionId: 'session-exact',
         transcriptPath,
         offset: 10_000,
@@ -142,39 +138,18 @@ describe('worker transcript reads', () => {
     ).resolves.toEqual({ ok: false, reason: 'provider_unsupported', warnings: [] })
   })
 
-  it('reuses the Native Chat Grok decoder', async () => {
-    await writeFile(transcriptPath, `${grokMessage('grok-one', 'Grok structured output')}\n`)
-
-    await expect(
-      readWorkerTranscript({
-        agent: 'grok',
-        sessionId: 'session-grok',
-        transcriptPath,
-        limit: 2
-      })
-    ).resolves.toMatchObject({
-      ok: true,
-      messages: [
-        {
-          role: 'assistant',
-          blocks: [{ type: 'text', text: 'Grok structured output' }]
-        }
-      ]
-    })
-  })
-
   it('makes file-position fallback IDs opaque', async () => {
     await writeFile(
       transcriptPath,
       `${JSON.stringify({
+        type: 'assistant',
         timestamp: '2026-07-24T12:00:00.000Z',
-        type: 'event_msg',
-        payload: { type: 'agent_message', message: 'no provider id' }
+        message: { role: 'assistant', content: [{ type: 'text', text: 'no provider id' }] }
       })}\n`
     )
 
     const result = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-exact',
       transcriptPath,
       limit: 2
@@ -192,7 +167,7 @@ describe('worker transcript reads', () => {
     await writeFile(transcriptPath, 'x'.repeat(8 * 1024 * 1024 + 10))
 
     const oversized = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-exact',
       transcriptPath,
       offset: 0,
@@ -212,9 +187,9 @@ describe('worker transcript reads', () => {
     }
     expect(oversized.nextOffset).toBe(8 * 1024 * 1024)
 
-    await appendFile(transcriptPath, `\n${codexMessage('after', 'after oversized')}\n`)
+    await appendFile(transcriptPath, `\n${claudeMessage('after', 'after oversized')}\n`)
     const continued = await readWorkerTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-exact',
       transcriptPath,
       offset: oversized.nextOffset,

@@ -48,16 +48,13 @@ export const MutationEnvelope = z
   })
   .strict()
 
-export const ProviderHandle = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('codex'), threadId: Identifier('Invalid thread id') }).strict(),
-  z
-    .object({
-      kind: z.literal('claude'),
-      sessionId: Identifier('Invalid provider session id'),
-      leafUuid: Identifier('Invalid leaf uuid').nullable()
-    })
-    .strict()
-])
+export const ProviderHandle = z
+  .object({
+    kind: z.literal('claude'),
+    sessionId: Identifier('Invalid provider session id'),
+    leafUuid: Identifier('Invalid leaf uuid').nullable()
+  })
+  .strict()
 
 export const ExecutionHostId = z
   .string()
@@ -78,7 +75,7 @@ export const ExecutionLocation = z
 
 export const AccountHome = z
   .object({
-    variable: z.enum(['CLAUDE_CONFIG_DIR', 'CODEX_HOME']),
+    variable: z.enum(['CLAUDE_CONFIG_DIR']),
     path: z.string().min(1).max(4096)
   })
   .strict()
@@ -87,7 +84,7 @@ export const AttachParams = z
   .object({
     envelope: MutationEnvelope,
     location: ExecutionLocation,
-    provider: z.enum(['codex', 'claude']),
+    provider: z.enum(['claude']),
     agent: Identifier('Invalid agent'),
     accountHome: AccountHome,
     runtimeKind: z.enum(['native', 'tui']),
@@ -108,7 +105,7 @@ export const CreateIntentParams = z
   .object({
     envelope: MutationEnvelope,
     worktree: Identifier('Invalid worktree selector'),
-    agent: z.enum(['claude', 'codex']),
+    agent: z.enum(['claude']),
     resumeFrom: ResumeSource.optional()
   })
   .strict()
@@ -118,7 +115,7 @@ export const CreateParams = z.union([AttachParams, CreateIntentParams])
 export const CreateSupportParams = z
   .object({
     worktree: Identifier('Invalid worktree selector'),
-    agent: z.enum(['claude', 'codex'])
+    agent: z.enum(['claude'])
   })
   .strict()
 

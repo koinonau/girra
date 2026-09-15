@@ -55,8 +55,8 @@ it('persists resumed provider options atomically with owner proof', async () => 
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/accounts/codex' },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/accounts/claude' },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'spawn-options',
@@ -96,8 +96,8 @@ it('persists resumed provider options atomically with owner proof', async () => 
     sessionId: SESSION,
     fence,
     link: {
-      linkId: 'codex-options-1',
-      handle: { provider: 'codex', threadId: 'thread-options' },
+      linkId: 'claude-options-1',
+      handle: { provider: 'claude', sessionId: 'thread-options', leafUuid: null },
       origin: 'created',
       mintedAtFence: fence,
       observedAt: NOW

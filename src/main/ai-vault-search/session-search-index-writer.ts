@@ -63,7 +63,7 @@ export type SessionSearchFileWrite = {
    * `identity` would publish them under a session with an empty id, an empty
    * title and a null cwd, and an interrupted read would leave that prefix
    * behind for good. The readers that supply no identity are the whole-file
-   * ones (Grok, Cursor, Gemini, OpenCode), whose formats are rewritten in place
+   * ones (OpenCode), whose formats are rewritten in place
    * and have no resumable state to ask; they are also small — the largest on
    * the author's machine is 5 MB — so buffering one to the end and committing
    * it whole costs nothing. Chunking stays reserved for the readers that can

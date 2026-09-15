@@ -6,20 +6,20 @@ import { EMPTY_AI_VAULT_SESSIONS, reuseAiVaultListResult } from './ai-vault-sess
 // {id, title} fixture reconciles even when the walker is broken, which is how
 // a scannedAt-only or Object.is fix stays green.
 function makeProductionSession(index: number, title = `session-${index}`): AiVaultSession {
-  const id = `local:codex:session-${index}:/sessions/session-${index}.jsonl`
+  const id = `local:claude:session-${index}:/sessions/session-${index}.jsonl`
   const timestamp = new Date(Date.UTC(2026, 6, 1, 0, 0, index)).toISOString()
   return {
     id,
     executionHostId: 'local',
     executionHostPlatform: 'darwin',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: `session-${index}`,
     title,
     cwd: '/Users/ada/orca',
     branch: 'nwparker/ai-vault-session-list-identity',
     model: 'gpt-5',
     filePath: `/sessions/session-${index}.jsonl`,
-    codexHome: '/Users/ada/.codex',
+    codexHome: null,
     createdAt: timestamp,
     updatedAt: timestamp,
     modifiedAt: timestamp,
@@ -41,7 +41,7 @@ function makeProductionSession(index: number, title = `session-${index}`): AiVau
     lastUserPrompt: 'keep session list identity on reminted scannedAt',
     queuedMessageCount: 0,
     subagentTranscriptCount: 1,
-    resumeCommand: `codex resume session-${index}`,
+    resumeCommand: `claude --resume session-${index}`,
     subagent: {
       parentSessionId: `session-${index}`,
       agentType: 'Explore',
@@ -63,7 +63,7 @@ describe('reuseAiVaultListResult', () => {
       issues: [
         {
           executionHostId: 'ssh:dev-box',
-          agent: 'codex',
+          agent: 'claude',
           kind: 'scope',
           path: '/home/ada',
           message: 'Only the first 64 project paths were scanned.'
@@ -112,7 +112,7 @@ describe('reuseAiVaultListResult', () => {
   it('replaces issues when sessions are unchanged', () => {
     const hostIssue = {
       executionHostId: 'ssh:dev-box' as const,
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       kind: 'host' as const,
       path: 'dev-box',
       message: 'Remote connection dropped.'

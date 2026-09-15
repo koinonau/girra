@@ -76,23 +76,6 @@ export function createNativeChatPtySessionOptions(
   if (args.reportedValues && applyNativeChatReportedSessionOptions(record, args.reportedValues)) {
     writeNativeChatSessionOptionCache(args.scopeKey, record)
   }
-  /** Why: an authoritative probe proved this id gone; left tracked it would re-enter
-   *  the picker via re-injection and re-persist the fatal `-m` on any later option
-   *  write, undoing the settings retirement. */
-  const untrackRetiredModel = (): boolean => {
-    if (!catalog.discoveredModelsAreAuthoritative || !modelsAreDiscovered) {
-      return false
-    }
-    const trackedId = typeof record.model?.value === 'string' ? record.model.value : null
-    if (!trackedId || models.some((model) => model.id === trackedId)) {
-      return false
-    }
-    clearNativeChatSessionModel(record)
-    return true
-  }
-  if (untrackRetiredModel()) {
-    writeNativeChatSessionOptionCache(args.scopeKey, record)
-  }
   const activeModels = (): CatalogModel[] => withTrackedNativeChatModel(catalog, models, record)
   let snapshot = buildNativeChatSessionOptionSnapshot({
     catalog,
@@ -122,9 +105,8 @@ export function createNativeChatPtySessionOptions(
     clearNativeChatSessionModel(record)
   }
 
-  /** Resolved at commit, not pre-dispatch: with nothing tracked the pre-dispatch id was
-   *  only the seed's guess at grok's default, and a probe landing mid-dispatch replaces
-   *  it with the id the CLI actually reported — the model the command truly reached. */
+  /** Resolved at commit, not pre-dispatch: a probe landing mid-dispatch replaces the
+   *  seed's default with the id the CLI actually reported. */
   const setTrackedValue = (
     optionId: string,
     value: SessionOptionValue,
@@ -138,23 +120,18 @@ export function createNativeChatPtySessionOptions(
       resolveEffectiveNativeChatModelId(catalog, activeModels(), record)
     )
 
-  /** The sole answer to "may this id become the persisted `-m` launch flag?", read at
-   *  persist time because a probe can settle mid-pick. Before one, `isDefault` is just
-   *  the seed's guess, so only an id the session actually tracks is evidence of
-   *  anything; after one, an authoritative list that omits the id proves it retired —
-   *  adopting either would emit an `-m` that is fatal on an account without it.
-   *  Both branches sit behind one precondition: some real list must carry the id.
-   *  A raw launch flag and an agent report both enter the record verbatim, so an id
-   *  neither list knows names nothing, whatever put it there. */
+  /** The sole answer to "may this id become the persisted launch flag?", read at persist
+   *  time because a probe can settle mid-pick. Before one, `isDefault` is just the seed's
+   *  guess, so only an id the session actually tracks is evidence of anything. Some real
+   *  list must carry the id: a raw launch flag and an agent report both enter the record
+   *  verbatim, so an id neither list knows names nothing. */
   const modelIsAdoptableAsLaunchDefault = (modelId: string): boolean => {
     const listedIn = (list: readonly CatalogModel[]): boolean =>
       list.some((model) => model.id === modelId)
     if (!listedIn(models) && !listedIn(catalog.models)) {
       return false
     }
-    return modelsAreDiscovered
-      ? !catalog.discoveredModelsAreAuthoritative || listedIn(models)
-      : record.model !== undefined
+    return modelsAreDiscovered || record.model !== undefined
   }
 
   /** Every persist path — picker applies and typed commands — funnels through here. */
@@ -175,7 +152,6 @@ export function createNativeChatPtySessionOptions(
     getModels: activeModels,
     getRecord: () => record,
     dispatchCommand: args.dispatchCommand,
-    onAgentPicker: args.onAgentPicker,
     persist,
     onDraftValuesChanged: args.onDraftValuesChanged,
     publish,
@@ -214,7 +190,6 @@ export function createNativeChatPtySessionOptions(
     replaceModels: (nextModels) => {
       models = [...nextModels]
       modelsAreDiscovered = true
-      untrackRetiredModel()
       publish()
     }
   }

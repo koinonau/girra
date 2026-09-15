@@ -75,8 +75,8 @@ it('appends onto its own cursor and carries the content hash forward', async () 
 })
 
 it('appends onto a file it read through and decoded no session from', async () => {
-  // An excluded Codex worker transcript: read through, nothing to index, and
-  // still growing. Its cursor is sound, so a re-read of the whole file every
+  // A transcript that decodes no session yet: read through, nothing to index,
+  // and still growing. Its cursor is sound, so a re-read of the whole file every
   // pass buys nothing.
   replayTranscriptRead({
     messages: userMessages('excluded span', 3),

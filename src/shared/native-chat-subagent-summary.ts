@@ -49,7 +49,7 @@ export function normalizeSubagentState(state: string): NativeChatSubagentState {
  *  away, replayed on every reconnect.
  *
  *  `groupId` is deliberately NOT bounded by the producer: the row's durable
- *  identity is `codex-subagents:${groupId}` and cannot be clipped without
+ *  identity is `claude-subagents:${groupId}` and cannot be clipped without
  *  changing which row a replay finds, so bounding only the block field would
  *  save nothing and make the two disagree. Both readers still clip it. */
 export const MAX_SUBAGENT_FIELD_CHARS = 512

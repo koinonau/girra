@@ -44,12 +44,12 @@ function attachParams(
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    agent: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    provider: 'claude',
+    agent: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     runtimeKind: 'native',
     ...(options ? { options } : {}),
-    providerHandle: { kind: 'codex', threadId: 'legacy-thread' }
+    providerHandle: { kind: 'claude', sessionId: 'legacy-thread', leafUuid: null }
   }
   return {
     ...params,
@@ -80,7 +80,7 @@ function adapter(input: {
         },
         link: {
           linkId: `${input.origin}-link`,
-          handle: { provider: 'codex', threadId: 'legacy-thread' },
+          handle: { provider: 'claude', sessionId: 'legacy-thread', leafUuid: null },
           origin: input.origin,
           mintedAtFence: fence,
           observedAt: NOW
@@ -314,7 +314,7 @@ describe('structured session acquisition options', () => {
           },
           link: {
             linkId: `link-${fence}`,
-            handle: { provider: 'codex', threadId: 'legacy-thread' },
+            handle: { provider: 'claude', sessionId: 'legacy-thread', leafUuid: null },
             origin: store.getRecord(SESSION)?.providerHandleChain.length ? 'resumed' : 'created',
             mintedAtFence: fence,
             observedAt: NOW

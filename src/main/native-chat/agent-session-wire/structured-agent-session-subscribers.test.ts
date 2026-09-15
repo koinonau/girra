@@ -41,8 +41,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'checkpoint-journal')
     })
@@ -80,8 +80,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'clock-journal')
     })
@@ -125,8 +125,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'catalog-journal')
     })
@@ -168,8 +168,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'hook-journal')
     })
@@ -204,8 +204,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'unread-journal')
     })
@@ -213,7 +213,7 @@ describe('AgentSessionSubscribers', () => {
       sessions: new Map([
         [
           SESSION,
-          { journal, params: { location: { workspaceId: 'workspace-1' }, provider: 'codex' } }
+          { journal, params: { location: { workspaceId: 'workspace-1' }, provider: 'claude' } }
         ]
       ]),
       getRecord: () => null,
@@ -224,10 +224,10 @@ describe('AgentSessionSubscribers', () => {
     })
     const statuses: AgentSessionStatusEvent[] = []
     statusFeed.subscribe({ id: 'session-list', emit: (event) => statuses.push(event) })
-    const turn = { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal: 0 } as const
+    const turn = { provider: 'claude', sessionId: 'thread-1', uuid: 'turn-1' } as const
 
     await journal.appendItem(
-      { ...turn, ordinal: 1 },
+      { ...turn, uuid: 'prompt-1' },
       { kind: 'message', role: 'user', blocks: [{ type: 'text', text: 'write a poem' }] },
       { fence: 1 }
     )
@@ -258,8 +258,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'journal')
     })
@@ -352,8 +352,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir: join(root, 'activity-journal')
     })
@@ -404,14 +404,14 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir
     })
     // A row admitted before identity bounding: its removal id alone exceeds
     // the outbound cap, so no catch-up batch can ever carry it.
-    const hugeItemId = `codex:thread-1:${'h'.repeat(5 * 1024 * 1024)}:1`
+    const hugeItemId = `claude:thread-1:${'h'.repeat(5 * 1024 * 1024)}`
     const resumeCursor = seeded.cursor()
     const seq = resumeCursor.sequence
     const rows: JournalRow[] = [
@@ -455,8 +455,8 @@ describe('AgentSessionSubscribers', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       journalDir
     })

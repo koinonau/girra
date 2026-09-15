@@ -19,7 +19,7 @@ function summary(over: Partial<AgentSessionStatusSummary> = {}): AgentSessionSta
   return {
     sessionId: SESSION,
     workspaceId: 'repo-1::/workspace/app',
-    agent: 'codex',
+    agent: 'claude',
     status: 'working',
     hostExecutionOwned: true,
     latestPrompt: 'ship the thing',
@@ -52,7 +52,7 @@ describe('AgentHookServer ingestStructuredStatus', () => {
         worktreeId: 'repo-1::/workspace/app',
         connectionId: null,
         state: 'working',
-        agentType: 'codex',
+        agentType: 'claude',
         prompt: 'ship the thing',
         model: 'gpt-6-astra',
         toolName: 'shell',
@@ -118,12 +118,12 @@ describe('AgentHookServer ingestStructuredStatus', () => {
   it('leaves no resume-identity remnant behind, even carrying a provider session', () => {
     const server = new AgentHookServer()
     const withProviderSession = summary({
-      providerSession: { key: 'session_id', id: 'codex-thread-1' }
+      providerSession: { key: 'session_id', id: 'claude-session-1' }
     })
     server.ingestStructuredStatus(withProviderSession)
     expect(server.getStatusSnapshot()[0]?.providerSession).toEqual({
       key: 'session_id',
-      id: 'codex-thread-1'
+      id: 'claude-session-1'
     })
 
     server.dropStructuredStatus(SESSION)
@@ -245,7 +245,7 @@ describe('structured rows and last-status.json', () => {
             receivedAt: Date.now(),
             stateStartedAt: Date.now(),
             structuredHost: 'owned',
-            payload: { state: 'working', prompt: 'ship the thing', agentType: 'codex' }
+            payload: { state: 'working', prompt: 'ship the thing', agentType: 'claude' }
           }
         }
       })

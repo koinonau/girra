@@ -3,7 +3,7 @@ import type {
   AgentSessionOptionChoice,
   AgentSessionOptionsResult
 } from '../../shared/agent-session-wire'
-import { CLAUDE_SESSION_OPTION_CATALOG } from '../../shared/agent-session-option-catalog-claude-codex'
+import { CLAUDE_SESSION_OPTION_CATALOG } from '../../shared/agent-session-option-catalog-claude'
 import type { CatalogModel } from '../../shared/agent-session-option-catalog-types'
 import type { ClaudeSession } from './claude-structured-session-state'
 

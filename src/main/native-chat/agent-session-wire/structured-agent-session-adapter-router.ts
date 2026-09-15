@@ -2,7 +2,7 @@ import type { AgentSessionJournalIdentity } from '../../../shared/agent-session-
 import type { AgentSessionExecutionLocation } from '../../../shared/agent-session-record'
 import type { StructuredAgentSessionAdapter } from './structured-agent-session-adapter'
 
-type RoutedAgent = 'claude' | 'codex'
+type RoutedAgent = 'claude'
 
 export class StructuredAgentSessionAdapterRouter implements StructuredAgentSessionAdapter {
   private readonly owners = new Map<string, StructuredAgentSessionAdapter>()
@@ -51,14 +51,6 @@ export class StructuredAgentSessionAdapterRouter implements StructuredAgentSessi
       supported: false,
       reason: 'unsupported'
     }
-
-  rewind: NonNullable<StructuredAgentSessionAdapter['rewind']> = (input) =>
-    this.owner(input.sessionId).rewind?.(input) ??
-    Promise.resolve({ ok: false, reason: 'unsupported' })
-
-  recoverRewind: NonNullable<StructuredAgentSessionAdapter['recoverRewind']> = (input) =>
-    this.owner(input.sessionId).recoverRewind?.(input) ??
-    Promise.resolve({ ok: false, reason: 'unsupported' })
 
   compact: NonNullable<StructuredAgentSessionAdapter['compact']> = (input) => {
     const compact = this.owner(input.sessionId).compact
@@ -155,6 +147,6 @@ export class StructuredAgentSessionAdapterRouter implements StructuredAgentSessi
   }
 
   private adapterForAgent(agent: string): StructuredAgentSessionAdapter | null {
-    return agent === 'claude' || agent === 'codex' ? this.adapters[agent] : null
+    return agent === 'claude' ? this.adapters[agent] : null
   }
 }

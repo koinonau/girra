@@ -215,7 +215,7 @@ function scopeTruncationIssue(
 ): AiVaultScanIssue {
   return {
     executionHostId,
-    agent: 'codex',
+    agent: 'claude',
     kind: 'scope',
     path: remoteHome,
     message: `Only the first ${AI_VAULT_SCOPE_PATHS_MAX_COUNT} project paths were scanned.`

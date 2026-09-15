@@ -72,8 +72,7 @@ export type NativeChatEditPatchHunk = {
 }
 
 /** Hunks the provider resolved against the real file before reporting the edit.
- *  Claude supplies these on its edit results; Codex resolves equivalently before
- *  sending, so its patch already carries ranges and needs no companion. */
+ *  Claude supplies these on its edit results. */
 export type NativeChatEditPatch = {
   filePath?: string
   hunks: NativeChatEditPatchHunk[]
@@ -114,7 +113,7 @@ export type NativeChatSubagentState = (typeof NATIVE_CHAT_SUBAGENT_STATES)[numbe
 
 /** One child agent in a spawn group. */
 export type NativeChatSubagentEntry = {
-  /** Provider's child id (Codex: the child thread id). The roster key. */
+  /** Provider's child id. The roster key. */
   id: string
   /** Row label — the provider's task name, disambiguated by ordinal on collision. */
   label: string
@@ -127,8 +126,7 @@ export type NativeChatSubagentEntry = {
   settledAt?: number
 }
 
-/** One spawn group's roster, revised in place as its children report activity.
- *  Provider-agnostic on purpose: the Codex and Claude lanes both feed this. */
+/** One spawn group's roster, revised in place as its children report activity. */
 export type NativeChatSubagentGroupBlock = {
   type: 'subagent-group'
   /** Stable group key — the parent turn that spawned these children. */
@@ -211,7 +209,7 @@ export function isToolResultBlock(block: NativeChatBlock): block is NativeChatTo
 }
 
 /** The provider-authored interrupt row the transcript decoders emit (Claude's
- *  `interruptedMessageId` record, Codex's `turn_aborted`). The turn it ends
+ *  `interruptedMessageId` record). The turn it ends
  *  never delivers results for the tool calls it left in flight. */
 export function isInterruptedStatusMessage(message: NativeChatMessage): boolean {
   return (

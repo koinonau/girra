@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getAgentSessionOptionCatalog, mergeCatalogModels } from './agent-session-option-catalog'
+import { getAgentSessionOptionCatalog } from './agent-session-option-catalog'
 import { resolveAgentSessionOptionLaunch } from './agent-session-option-launch'
 import {
   resolveNativeChatSessionOptionDefaults,
@@ -17,23 +17,6 @@ describe('agent session option catalog', () => {
       catalog?.models.find((model) => model.id === 'opus')?.options.map(({ id }) => id)
     ).toEqual(['effort', 'fastMode'])
     expect(catalog?.models.find((model) => model.id === 'haiku')?.options).toEqual([])
-  })
-
-  it('merges discovered labels while preserving cataloged option shapes', () => {
-    const seed = getAgentSessionOptionCatalog('cursor')!.models
-    const merged = mergeCatalogModels(seed, [
-      { id: 'gpt-5.3-codex', label: 'GPT 5.3 (live)', options: [] },
-      { id: 'new-account-model', label: 'new-account-model', options: [] }
-    ])
-    expect(merged.find((model) => model.id === 'gpt-5.3-codex')).toMatchObject({
-      label: 'GPT 5.3 (live)',
-      options: expect.arrayContaining([expect.objectContaining({ id: 'effort' })])
-    })
-    expect(merged.at(-1)).toEqual({
-      id: 'new-account-model',
-      label: 'new-account-model',
-      options: []
-    })
   })
 
   it('labels Claude seed models by alias family so no host is mislabeled', () => {
@@ -106,40 +89,6 @@ describe('agent session option catalog', () => {
     expect(parse(unsupported)).toEqual([])
     expect(parse('')).toEqual([])
     expect(parse('garbage')).toEqual([])
-  })
-
-  it('merges discovered Claude variants after the seed and overlays matched labels', () => {
-    const catalog = getAgentSessionOptionCatalog('claude')!
-    const merged = mergeCatalogModels(catalog.models, [
-      { id: 'opus[1m]', label: 'Opus (1M context)', options: [] },
-      { id: 'sonnet', label: 'Sonnet', description: 'Sonnet 5 · Efficient', options: [] }
-    ])
-    expect(merged.map(({ id }) => id)).toEqual(['fable', 'opus', 'sonnet', 'haiku', 'opus[1m]'])
-    const sonnet = merged.find((model) => model.id === 'sonnet')!
-    expect(sonnet.description).toBe('Sonnet 5 · Efficient')
-    expect(sonnet.isDefault).toBe(true)
-    expect(sonnet.options.map(({ id }) => id)).toEqual(['effort'])
-  })
-
-  it('parses Cursor model discovery without treating headings as models', () => {
-    const parsed = getAgentSessionOptionCatalog('cursor')!.listModels!.parse(
-      'Available models:\n- auto (default)\n- gpt-5.3-codex\nmodels\n'
-    )
-    expect(parsed.map(({ id }) => id)).toEqual(['auto', 'gpt-5.3-codex'])
-  })
-
-  it('composes Cursor effort and fast mode into the supported slug form', () => {
-    const resolved = resolveAgentSessionOptionLaunch('cursor', {
-      model: 'gpt-5.3-codex',
-      effort: 'high',
-      fastMode: true
-    })
-    expect(resolved.args).toEqual(['--model', 'gpt-5.3-codex-high-fast'])
-    expect(resolved.appliedValues).toEqual({
-      model: 'gpt-5.3-codex',
-      effort: 'high',
-      fastMode: true
-    })
   })
 
   it('passes unknown model and option values through launch mappings', () => {

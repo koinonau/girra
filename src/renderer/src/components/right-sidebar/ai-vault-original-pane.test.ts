@@ -12,15 +12,15 @@ const LEAF_ID = '11111111-1111-4111-8111-111111111111'
 const OTHER_LEAF_ID = '22222222-2222-4222-8222-222222222222'
 
 const baseSession: AiVaultSession = {
-  id: 'codex:session-1',
+  id: 'claude:session-1',
   executionHostId: 'local',
-  agent: 'codex',
+  agent: 'claude',
   sessionId: 'session-1',
   title: 'Fix the pane focus',
   cwd: '/repo',
   branch: null,
   model: null,
-  filePath: '/home/ada/.codex/session-1.jsonl',
+  filePath: '/home/ada/.claude/session-1.jsonl',
   codexHome: null,
   createdAt: null,
   updatedAt: '2026-06-24T10:00:00.000Z',
@@ -30,7 +30,7 @@ const baseSession: AiVaultSession = {
   previewMessages: [],
   queuedMessageCount: 0,
   subagentTranscriptCount: 0,
-  resumeCommand: "codex resume 'session-1'",
+  resumeCommand: "claude --resume 'session-1'",
   subagent: null
 }
 
@@ -74,7 +74,7 @@ function makeEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusEntry 
     prompt: 'continue',
     updatedAt: 1,
     stateStartedAt: 1,
-    agentType: 'codex',
+    agentType: 'claude',
     paneKey,
     tabId: 'tab-1',
     worktreeId: 'wt-1',
@@ -91,7 +91,7 @@ function makeSleepingRecord(
     paneKey: makePaneKey('tab-1', LEAF_ID),
     tabId: 'tab-1',
     worktreeId: 'wt-1',
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: 'session-1' },
     prompt: 'continue',
     state: 'working',
@@ -185,7 +185,7 @@ describe('findOriginalAiVaultSessionPane', () => {
             entry,
             worktreeId: 'wt-1',
             tab: makeTab(),
-            agentType: 'codex',
+            agentType: 'claude',
             startedAt: 1
           }
         }

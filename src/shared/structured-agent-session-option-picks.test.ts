@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { CODEX_SESSION_OPTION_CATALOG } from './agent-session-option-catalog-claude-codex'
+import { CLAUDE_SESSION_OPTION_CATALOG } from './agent-session-option-catalog-claude'
 import {
   applyNativeChatSessionOptionPicks,
   resolveStructuredLaunchSeedOptions,
@@ -14,8 +14,8 @@ import {
 
 function liveState(current: { model: string; effort?: string }) {
   return applyStructuredAgentSessionOptions(
-    createStructuredAgentSessionOptionState('codex'),
-    CODEX_SESSION_OPTION_CATALOG,
+    createStructuredAgentSessionOptionState('claude'),
+    CLAUDE_SESSION_OPTION_CATALOG,
     {
       models: [
         {
@@ -47,7 +47,7 @@ function liveState(current: { model: string; effort?: string }) {
 function persist(
   picks: readonly { modelId: string; optionId: string; value: string }[]
 ): PersistedNativeChatSessionOptions {
-  return applyNativeChatSessionOptionPicks({ persisted: undefined, agent: 'codex', picks })
+  return applyNativeChatSessionOptionPicks({ persisted: undefined, agent: 'claude', picks })
 }
 
 describe('structuredAgentSessionOptionPicks', () => {
@@ -57,7 +57,7 @@ describe('structuredAgentSessionOptionPicks', () => {
     })
     expect(picks).toEqual([{ modelId: 'account-model', optionId: 'effort', value: 'high' }])
     // Without the model the launch resolves nothing at all, so the effort would be dead.
-    expect(resolveStructuredLaunchSeedOptions(persist(picks), 'codex')).toEqual({
+    expect(resolveStructuredLaunchSeedOptions(persist(picks), 'claude')).toEqual({
       model: 'account-model',
       effort: 'high'
     })
@@ -73,7 +73,7 @@ describe('structuredAgentSessionOptionPicks', () => {
       { modelId: 'other-model', optionId: 'model', value: 'other-model' },
       { modelId: 'other-model', optionId: 'effort', value: 'low' }
     ])
-    expect(resolveStructuredLaunchSeedOptions(persist(picks), 'codex')).toEqual({
+    expect(resolveStructuredLaunchSeedOptions(persist(picks), 'claude')).toEqual({
       model: 'other-model',
       effort: 'low'
     })
@@ -99,12 +99,12 @@ describe('structuredAgentSessionOptionPicks', () => {
     ])
     const reselected = updateNativeChatSessionOptionDefaults({
       persisted,
-      agent: 'codex',
+      agent: 'claude',
       modelId: 'account-model',
       optionId: 'model',
       value: 'account-model'
     })
-    expect(resolveStructuredLaunchSeedOptions(reselected, 'codex')).toEqual({
+    expect(resolveStructuredLaunchSeedOptions(reselected, 'claude')).toEqual({
       model: 'account-model',
       effort: 'high'
     })
@@ -112,7 +112,7 @@ describe('structuredAgentSessionOptionPicks', () => {
 
   it('writes nothing before the provider catalog lands', () => {
     expect(
-      structuredAgentSessionOptionPicks(createStructuredAgentSessionOptionState('codex'), {
+      structuredAgentSessionOptionPicks(createStructuredAgentSessionOptionState('claude'), {
         effort: 'high'
       })
     ).toEqual([])
@@ -131,13 +131,13 @@ describe('applyNativeChatSessionOptionPicks', () => {
   it('keeps a later pick in the batch from dropping an earlier one', () => {
     const persisted = applyNativeChatSessionOptionPicks({
       persisted: undefined,
-      agent: 'codex',
+      agent: 'claude',
       picks: [
         { modelId: 'gpt-fast', optionId: 'model', value: 'gpt-fast' },
         { modelId: 'gpt-fast', optionId: 'effort', value: 'low' }
       ]
     })
-    expect(resolveStructuredLaunchSeedOptions(persisted, 'codex')).toEqual({
+    expect(resolveStructuredLaunchSeedOptions(persisted, 'claude')).toEqual({
       model: 'gpt-fast',
       effort: 'low'
     })
@@ -146,14 +146,14 @@ describe('applyNativeChatSessionOptionPicks', () => {
   it('leaves every other agent untouched', () => {
     const persisted = applyNativeChatSessionOptionPicks({
       persisted: { claude: { model: 'opus', valuesByModel: { opus: { effort: 'high' } } } },
-      agent: 'codex',
+      agent: 'opencode',
       picks: [{ modelId: 'gpt-fast', optionId: 'effort', value: 'low' }]
     })
     expect(resolveStructuredLaunchSeedOptions(persisted, 'claude')).toEqual({
       model: 'opus',
       effort: 'high'
     })
-    expect(resolveStructuredLaunchSeedOptions(persisted, 'codex')).toEqual({
+    expect(resolveStructuredLaunchSeedOptions(persisted, 'opencode')).toEqual({
       model: 'gpt-fast',
       effort: 'low'
     })
@@ -161,7 +161,7 @@ describe('applyNativeChatSessionOptionPicks', () => {
 
   it('returns the record unchanged for an empty batch', () => {
     expect(
-      applyNativeChatSessionOptionPicks({ persisted: undefined, agent: 'codex', picks: [] })
+      applyNativeChatSessionOptionPicks({ persisted: undefined, agent: 'claude', picks: [] })
     ).toEqual({})
   })
 })

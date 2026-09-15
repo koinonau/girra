@@ -25,19 +25,6 @@ describe('RateLimitService', () => {
     resetRateLimitProviderMocks()
   })
 
-  it('publishes the retired Codex fields with inert values for older paired clients', async () => {
-    const service = new RateLimitService()
-    vi.mocked(fetchClaudeRateLimits).mockResolvedValueOnce(okProvider('claude', 10, Date.now()))
-
-    await service.refresh()
-
-    expect(service.getState()).toMatchObject({
-      codex: null,
-      codexTarget: { runtime: 'host', wslDistro: null },
-      inactiveCodexAccounts: []
-    })
-  })
-
   it('uses the initialized WSL target for active Claude rate-limit fetches', async () => {
     const service = new RateLimitService()
     const resolver = vi.fn(async (target) => ({

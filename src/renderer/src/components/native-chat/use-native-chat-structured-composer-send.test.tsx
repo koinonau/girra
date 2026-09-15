@@ -52,8 +52,7 @@ function harness(agent: AgentType) {
 describe('attachment guard follows what the host claims', () => {
   it.each([
     ['claude', '/clear'],
-    ['claude', '/model'],
-    ['codex', '/permissions']
+    ['claude', '/model']
   ] as const)('refuses attachments on the host-claimed %s command %s', (agent, text) => {
     const { send, structuredTransport } = harness(agent)
     send(text)
@@ -65,8 +64,7 @@ describe('attachment guard follows what the host claims', () => {
 
   it.each([
     ['claude', '/init'],
-    ['claude', '/review'],
-    ['codex', '/goal ship the fix']
+    ['claude', '/review']
   ] as const)('sends %s attachments along with the passed-through %s', async (agent, text) => {
     const { send, structuredTransport } = harness(agent)
     send(text)

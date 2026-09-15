@@ -4,10 +4,8 @@ import type * as WslRunningPathFilterModule from '../wsl-running-path-filter'
 import { parseWslUncPath } from '../../shared/wsl-paths'
 
 const UBUNTU_HOME = '\\\\wsl.localhost\\Ubuntu\\home\\ada'
-const ROLLOUT_LINUX =
-  '/home/ada/.local/share/orca/codex-runtime-home/home/sessions/2026/07/24/rollout-wsl.jsonl'
-const ROLLOUT_UNC =
-  '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.local\\share\\orca\\codex-runtime-home\\home\\sessions\\2026\\07\\24\\rollout-wsl.jsonl'
+const TRANSCRIPT_LINUX = '/home/ada/.claude/projects/app/wsl.jsonl'
+const TRANSCRIPT_UNC = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\app\\wsl.jsonl'
 
 const mocks = vi.hoisted(() => ({
   filterPathsToRunningWslDistrosAsync: vi.fn(),
@@ -38,7 +36,7 @@ vi.mock('node:fs/promises', async (importOriginal) => {
   return {
     ...actual,
     access: async (path: string) => {
-      if (path !== ROLLOUT_UNC) {
+      if (path !== TRANSCRIPT_UNC) {
         await actual.access(path)
       }
     }
@@ -86,37 +84,37 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
   it('installs the watcher on the WSL UNC twin of the guest transcript path', async () => {
     setPlatform('win32')
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_LINUX,
+      transcriptPath: TRANSCRIPT_LINUX,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
 
     await vi.advanceTimersByTimeAsync(2_100)
     expect(mocks.install).toHaveBeenCalledWith(
-      ROLLOUT_UNC,
+      TRANSCRIPT_UNC,
       expect.anything(),
       expect.anything(),
       expect.any(AbortSignal)
     )
-    expect(mocks.install.mock.calls.every(([path]) => path !== ROLLOUT_LINUX)).toBe(true)
+    expect(mocks.install.mock.calls.every(([path]) => path !== TRANSCRIPT_LINUX)).toBe(true)
     subscription.unsubscribe()
   })
 
   it('passes the raw path through untouched off Windows', async () => {
     setPlatform('darwin')
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_LINUX,
+      transcriptPath: TRANSCRIPT_LINUX,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
 
     await vi.advanceTimersByTimeAsync(50)
     expect(mocks.install).toHaveBeenCalledWith(
-      ROLLOUT_LINUX,
+      TRANSCRIPT_LINUX,
       expect.anything(),
       expect.anything(),
       expect.any(AbortSignal)
@@ -127,16 +125,16 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
   it('validates an exact UNC path without probing distro homes', async () => {
     setPlatform('win32')
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_UNC,
+      transcriptPath: TRANSCRIPT_UNC,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
 
     await vi.advanceTimersByTimeAsync(2_100)
     expect(mocks.install).toHaveBeenCalledWith(
-      ROLLOUT_UNC,
+      TRANSCRIPT_UNC,
       expect.anything(),
       expect.anything(),
       expect.any(AbortSignal)
@@ -149,9 +147,9 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
     setPlatform('win32')
     mocks.listRunningWslDistrosAsync.mockResolvedValue([])
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_UNC,
+      transcriptPath: TRANSCRIPT_UNC,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -166,9 +164,9 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
     setPlatform('win32')
     mocks.listRunningWslDistrosAsync.mockResolvedValue([])
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_UNC,
+      transcriptPath: TRANSCRIPT_UNC,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -187,9 +185,9 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
     setPlatform('win32')
     mocks.listRunningWslDistrosAsync.mockResolvedValueOnce(['Ubuntu']).mockResolvedValue([])
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_UNC,
+      transcriptPath: TRANSCRIPT_UNC,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -207,9 +205,9 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
     mocks.listRunningWslDistrosAsync.mockResolvedValueOnce(['Ubuntu']).mockResolvedValue([])
     mocks.install.mockRejectedValueOnce(new WslTranscriptFsError('timeout', 'stalled'))
     const subscription = await subscribeNativeChatTranscript({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'wsl-sess',
-      transcriptPath: ROLLOUT_UNC,
+      transcriptPath: TRANSCRIPT_UNC,
       resolvePollIntervalMs: 10,
       onAppend: () => {}
     })
@@ -227,9 +225,9 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
     const subscriptions = await Promise.all(
       [0, 1].map((index) =>
         subscribeNativeChatTranscript({
-          agent: 'codex',
+          agent: 'claude',
           sessionId: `wsl-sess-${index}`,
-          transcriptPath: ROLLOUT_UNC,
+          transcriptPath: TRANSCRIPT_UNC,
           onAppend: () => {}
         })
       )
@@ -239,9 +237,9 @@ describe('exact hook path install on a Windows host with WSL (#10326)', () => {
       ...(await Promise.all(
         [2, 3].map((index) =>
           subscribeNativeChatTranscript({
-            agent: 'codex',
+            agent: 'claude',
             sessionId: `wsl-sess-${index}`,
-            transcriptPath: ROLLOUT_UNC,
+            transcriptPath: TRANSCRIPT_UNC,
             onAppend: () => {}
           })
         )

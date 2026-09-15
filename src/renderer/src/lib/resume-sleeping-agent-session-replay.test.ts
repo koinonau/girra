@@ -18,7 +18,7 @@ function makeRecord(
     paneKey: 'old-tab:leaf-1',
     tabId: 'old-tab',
     worktreeId: 'wt-1',
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: 'sess-1' },
     prompt: 'continue',
     state: 'working',
@@ -204,7 +204,7 @@ describe('resumeSleepingAgentSessionsForWorktree replay protection', () => {
       automaticAgentResumeClaimsByTabId: {
         'tab-1': {
           worktreeId: 'wt-1',
-          launchAgent: 'codex',
+          launchAgent: 'claude',
           providerSession: { key: 'session_id', id: 'sess-1' }
         }
       }
@@ -219,13 +219,13 @@ describe('resumeSleepingAgentSessionsForWorktree replay protection', () => {
     useAppStore.setState({ tabsByWorktree: { 'wt-1': [] } } as never)
 
     const first = launchAiVaultSessionInNewTab({
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1',
       command: "codex resume 'sess-1'",
       launchConfig: { agentArgs: '', agentEnv: {} }
     })
     const second = launchAiVaultSessionInNewTab({
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1',
       command: "codex resume 'sess-1'",
       launchConfig: { agentArgs: '', agentEnv: {} }

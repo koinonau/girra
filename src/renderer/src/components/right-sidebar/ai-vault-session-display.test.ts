@@ -10,15 +10,15 @@ import {
 } from './ai-vault-session-display'
 
 const baseSession: AiVaultSession = {
-  id: 'codex:1',
+  id: 'claude:1',
   executionHostId: 'local',
-  agent: 'codex',
+  agent: 'claude',
   sessionId: 'session-1',
   title: 'Fix the flaky golden tests',
   cwd: '/Users/ada/repo/app',
   branch: 'fix/golden',
   model: 'gpt-5.5',
-  filePath: '/Users/ada/.codex/sessions/session-1.jsonl',
+  filePath: '/Users/ada/.claude/sessions/session-1.jsonl',
   codexHome: null,
   createdAt: '2026-05-01T10:00:00.000Z',
   updatedAt: '2026-05-01T10:10:00.000Z',
@@ -33,7 +33,7 @@ const baseSession: AiVaultSession = {
   ],
   queuedMessageCount: 0,
   subagentTranscriptCount: 0,
-  resumeCommand: "cd '/Users/ada/repo/app' && codex resume 'session-1'",
+  resumeCommand: "cd '/Users/ada/repo/app' && claude --resume 'session-1'",
   subagent: null
 }
 

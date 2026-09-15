@@ -34,10 +34,9 @@ export type AgentJournalCursor = {
 }
 
 /** The durable provider session a journal is bound to.
- *  Codex is one thread id; Claude needs the leaf because concurrent resumes of
- *  one session id branch the same transcript. */
+ *  Claude needs the leaf because concurrent resumes of one session id branch
+ *  the same transcript. */
 export type AgentSessionProviderHandle =
-  | { kind: 'codex'; threadId: string }
   | { kind: 'claude'; sessionId: string; leafUuid: string | null }
   | { kind: 'opaque'; agent: AgentType; value: string }
 
@@ -56,12 +55,10 @@ export type AgentSessionJournalIdentity = {
 }
 
 // ─── Item identity ──────────────────────────────────────────────────────────
-// Reconciliation keys, settled by the provider spikes. Codex renumbers items
-// positionally on resume, so a persisted item id is never an identity. Claude
-// copies the original uuids on fork, so the uuid is.
+// Reconciliation keys, settled by the provider spikes. Claude copies the
+// original uuids on fork, so the uuid is an identity.
 
 export type AgentJournalItemIdentity =
-  | { provider: 'codex'; threadId: string; turnId: string; ordinal: number }
   | { provider: 'claude'; sessionId: string; uuid: string }
   /** A submission Orca minted before any provider echo existed. */
   | { provider: 'orca'; clientMessageId: string }

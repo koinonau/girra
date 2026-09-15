@@ -199,7 +199,7 @@ function makePostRevealWorkerRecoveryHarness(
         paneKey: workerPaneKey,
         tabId: 'legacy-post-reveal',
         worktreeId: TEST_WORKTREE_ID,
-        agent: 'codex',
+        agent: 'claude',
         providerSession: { key: 'session_id', id: 'legacy-post-reveal-session' },
         prompt: 'continue',
         state: 'working',

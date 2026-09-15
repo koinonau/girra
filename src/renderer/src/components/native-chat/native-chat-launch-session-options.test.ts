@@ -5,9 +5,9 @@ const settings = {
   experimentalNativeChat: true,
   openAgentTabsInChatByDefault: true,
   nativeChatSessionOptions: {
-    codex: {
-      model: 'gpt-5.2-codex',
-      valuesByModel: { 'gpt-5.2-codex': { effort: 'medium' } }
+    claude: {
+      model: 'opus',
+      valuesByModel: { opus: { effort: 'medium' } }
     }
   }
 }
@@ -17,14 +17,14 @@ describe('resolveInitialNativeChatSessionOptions', () => {
     expect(
       resolveInitialNativeChatSessionOptions(
         { ...settings, openAgentTabsInChatByDefault: false },
-        { agent: 'codex' }
+        { agent: 'claude' }
       )
     ).toBeUndefined()
   })
 
   it('applies native-chat preferences when the launch resolves to chat', () => {
-    expect(resolveInitialNativeChatSessionOptions(settings, { agent: 'codex' })).toEqual({
-      model: 'gpt-5.2-codex',
+    expect(resolveInitialNativeChatSessionOptions(settings, { agent: 'claude' })).toEqual({
+      model: 'opus',
       effort: 'medium'
     })
   })
@@ -32,22 +32,9 @@ describe('resolveInitialNativeChatSessionOptions', () => {
   it('omits preferences when a draft forces the initial view back to terminal', () => {
     expect(
       resolveInitialNativeChatSessionOptions(settings, {
-        agent: 'codex',
+        agent: 'claude',
         promptDelivery: 'draft',
         launchDraftText: 'one\u2028two'
-      })
-    ).toBeUndefined()
-  })
-
-  it('omits preferences when a remote transcript forces the initial view to terminal', () => {
-    const grokSettings = {
-      ...settings,
-      nativeChatSessionOptions: { grok: { model: 'grok-4.5' } }
-    }
-    expect(
-      resolveInitialNativeChatSessionOptions(grokSettings, {
-        agent: 'grok',
-        nativeChatTranscriptIsLocalReadable: false
       })
     ).toBeUndefined()
   })

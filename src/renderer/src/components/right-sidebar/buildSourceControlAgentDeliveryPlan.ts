@@ -40,8 +40,7 @@ export function buildSourceControlAgentDeliveryPlan({
       ? resolveInitialNativeChatSessionOptions(settings, {
           agent: selectedAgent,
           promptDelivery,
-          launchDraftText: commandInput.trim(),
-          nativeChatTranscriptIsLocalReadable: !isRemote
+          launchDraftText: commandInput.trim()
         })
       : undefined,
     promptDelivery,

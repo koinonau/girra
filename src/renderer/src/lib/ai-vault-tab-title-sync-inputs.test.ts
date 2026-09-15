@@ -33,7 +33,7 @@ function makeState(count = 1): AppState {
       paneKey: `${tab.id}:00000000-0000-4000-8000-000000000001`,
       tabId: tab.id,
       worktreeId: tab.worktreeId,
-      agentType: 'codex' as const,
+      agentType: 'claude' as const,
       providerSession: { key: 'session_id' as const, id: `session-${index}` },
       state: 'done' as const,
       prompt: '',
@@ -49,13 +49,13 @@ function makeState(count = 1): AppState {
         entry,
         tab,
         worktreeId: tab.worktreeId,
-        agentType: 'codex',
+        agentType: 'claude',
         startedAt: 1
       }
     } else {
       sleeping[entry.paneKey] = {
         ...entry,
-        agent: 'codex',
+        agent: 'claude',
         capturedAt: 1,
         origin: 'worktree-sleep'
       }
@@ -179,8 +179,8 @@ describe('AI Vault title subscription inputs', () => {
         : record
     const agentField = collection === 'sleepingAgentSessionsByPaneKey' ? 'agent' : 'agentType'
     const changedRecords = [
-      { ...record, [agentField]: 'claude' },
-      { ...record, [agentField]: 'gemini' },
+      { ...record, [agentField]: 'opencode' },
+      { ...record, [agentField]: 'pi' },
       { ...record, worktreeId: 'other' },
       ...['paneKey', 'tabId'].map((field) =>
         collection === 'retainedAgentsByPaneKey'
@@ -239,7 +239,7 @@ describe('AI Vault title subscription inputs', () => {
             'wt-title': [
               {
                 ...tabs[0],
-                aiVaultTitle: { agent: 'codex', sessionId: 'session-0', title: 'New title' }
+                aiVaultTitle: { agent: 'claude', sessionId: 'session-0', title: 'New title' }
               },
               ...tabs.slice(1)
             ]

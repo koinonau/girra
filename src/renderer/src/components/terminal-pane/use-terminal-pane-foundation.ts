@@ -67,7 +67,6 @@ export function useTerminalPaneFoundation(
   // react-doctor-disable-next-line react-doctor/no-ref-current-in-render
   isVisibleRef.current = isRendererVisible
   const {
-    nativeChatTranscriptIsLocalReadable,
     sshReconnectEnvironmentId,
     sshReconnectError,
     sshReconnectStatus,
@@ -179,7 +178,6 @@ export function useTerminalPaneFoundation(
     isRendererVisible,
     isVisibleRef,
     sshReconnectTargetId,
-    nativeChatTranscriptIsLocalReadable,
     sshReconnectEnvironmentId,
     sshReconnectError,
     sshReconnectStatus,

@@ -1,11 +1,6 @@
 import type { AiVaultScanIssue } from '../../shared/ai-vault-types'
 import { ensureSessionParseCacheLoaded } from '../ai-vault/session-parse-cache-persistence'
 import {
-  cursorChatMetaRefusals,
-  withCursorChatMetaScan
-} from '../ai-vault/session-scanner-cursor-chat-meta'
-import { recordSessionScanIssue } from '../ai-vault/session-scan-issues'
-import {
   mergeDegradedRoots,
   scanIssueDegradedRoots,
   unreadableRoots,
@@ -104,7 +99,7 @@ export async function runSessionSearchPass(
     await store.purgeOlderThan(store.retentionCutoff, signal)
   }
   await ensureSessionParseCacheLoaded()
-  return withCursorChatMetaScan(async () => {
+  {
     const swept = await discoverSessionSearchCandidates(args.roots, {
       limitPerAgent: args.full ? Number.POSITIVE_INFINITY : args.recentPerAgent,
       signal
@@ -128,7 +123,7 @@ export async function runSessionSearchPass(
       completed = false
     }
 
-    const listings = sessionSearchRootListings(args.roots, swept.discoveries)
+    const listings = sessionSearchRootListings(swept.discoveries)
     const roots = listings.map((listing) => listing.root)
     const rootsWithFiles = new Set(
       listings.filter((listing) => listing.files > 0).map((listing) => listing.root)
@@ -157,14 +152,6 @@ export async function runSessionSearchPass(
         })
       : { retired: [], unverifiable: [], unchecked: [], degradedRoots: [] }
 
-    for (const refusal of cursorChatMetaRefusals()) {
-      // One issue per refused chats root, not one per Cursor transcript.
-      recordSessionScanIssue(issues, {
-        agent: 'cursor',
-        path: refusal.chatsRoot,
-        message: refusal.message
-      })
-    }
     // Roots that listed no transcripts and cannot be listed either: the walker
     // swallows a readdir failure, so this is the only place it surfaces.
     const unlistable = completed
@@ -185,7 +172,7 @@ export async function runSessionSearchPass(
       completed,
       outOfTime
     }
-  })
+  }
 }
 
 /**

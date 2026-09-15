@@ -14,7 +14,7 @@ import {
  * into a journal and which credential directory the provider child launches against.
  */
 export type StructuredAgentSessionResumeSource = {
-  /** claude: the session id. codex: the thread id. */
+  /** The Claude session id. */
   providerSessionId: string
 }
 

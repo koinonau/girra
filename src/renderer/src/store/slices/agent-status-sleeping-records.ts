@@ -13,8 +13,7 @@ export function copyLaunchConfig(config: SleepingAgentLaunchConfig): SleepingAge
   return {
     ...(config.agentCommand ? { agentCommand: config.agentCommand } : {}),
     agentArgs: config.agentArgs,
-    agentEnv: { ...config.agentEnv },
-    ...(config.ompResumeFilePath ? { ompResumeFilePath: config.ompResumeFilePath } : {})
+    agentEnv: { ...config.agentEnv }
   }
 }
 

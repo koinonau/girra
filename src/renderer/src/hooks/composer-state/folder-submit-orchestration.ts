@@ -8,7 +8,6 @@ type FolderSubmitOrchestrationInput = Pick<
   | 'disabledTuiAgents'
   | 'folderCreateDisabled'
   | 'folderSourceRepos'
-  | 'folderTargetConnectionId'
   | 'folderTargetIsRemote'
   | 'folderTargetRuntimeEnvironmentId'
   | 'isSubmissionCancelled'
@@ -39,7 +38,6 @@ import {
   resolveTuiAgentLaunchEnv
 } from '../../../../shared/tui-agent-launch-defaults'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { translate } from '@/i18n/i18n'
 import {
   formatWorkspaceCreateError,
@@ -55,7 +53,6 @@ export function useFolderSubmitOrchestration(input: FolderSubmitOrchestrationInp
     disabledTuiAgents,
     folderCreateDisabled,
     folderSourceRepos,
-    folderTargetConnectionId,
     folderTargetIsRemote,
     folderTargetRuntimeEnvironmentId,
     isSubmissionCancelled,
@@ -134,9 +131,7 @@ export function useFolderSubmitOrchestration(input: FolderSubmitOrchestrationInp
                   agent,
                   ...(folderLaunchDraftText
                     ? { promptDelivery: 'draft' as const, launchDraftText: folderLaunchDraftText }
-                    : {}),
-                  nativeChatTranscriptIsLocalReadable:
-                    isNativeChatTranscriptLocalReadable(folderTargetConnectionId)
+                    : {})
                 }
               )
             : undefined,
@@ -186,7 +181,6 @@ export function useFolderSubmitOrchestration(input: FolderSubmitOrchestrationInp
       canResolveFolderSmartGitHubSubmit,
       disabledTuiAgents,
       folderCreateDisabled,
-      folderTargetConnectionId,
       folderTargetIsRemote,
       folderTargetRuntimeEnvironmentId,
       folderSourceRepos.length,

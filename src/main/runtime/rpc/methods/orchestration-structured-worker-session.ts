@@ -78,7 +78,7 @@ export function releaseStructuredWorkerSession(
 export async function createStructuredWorkerSession(args: {
   runtime: OrcaRuntimeService
   worktreeId: string
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   dispatchId: string
   /** The dispatch's own `--model`/`--effort`, already narrowed to the seedable string subset. */
   options?: Readonly<Record<string, string>>
@@ -188,7 +188,7 @@ function structuredCreateMayHaveCommitted(
  *
  * Exported because a start can also fail AFTER `createStructuredWorkerSession` returned — on the
  * authority gate, or on the preamble turn — and that is the fourth settlement path. Dropping only
- * the hold there left one dead "Claude Chat"/"Codex Chat" tab per failed start, durably restored
+ * the hold there left one dead "Claude Chat" tab per failed start, durably restored
  * on every subsequent app launch.
  */
 export async function discardStructuredWorkerSession(

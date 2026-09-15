@@ -39,12 +39,12 @@ function seedLiveLocalCodexPane(): void {
           id: TAB_ID,
           ptyId: 'pty-1',
           worktreeId: WORKTREE_ID,
-          title: 'Codex',
+          title: 'Claude',
           customTitle: null,
           color: null,
           sortOrder: 0,
           createdAt: 1,
-          launchAgent: 'codex'
+          launchAgent: 'claude'
         }
       ]
     },
@@ -66,11 +66,11 @@ function reportTurnFinished(interrupted = false): void {
     PANE_KEY,
     {
       state: 'done',
-      agentType: 'codex',
+      agentType: 'claude',
       prompt: 'review the diff',
       ...(interrupted ? { interrupted: true } : {})
     } as never,
-    'Codex',
+    'Claude',
     { updatedAt: 1000, stateStartedAt: 1000 },
     { tabId: TAB_ID, worktreeId: WORKTREE_ID, terminalHandle: 'pty-1' } as never,
     { providerSession: { key: 'session_id', id: SESSION_ID } } as never
@@ -84,7 +84,7 @@ describe('a finished local agent', () => {
         paneKey: 'quit-tab:quit-leaf',
         tabId: 'quit-tab',
         worktreeId: WORKTREE_ID,
-        agent: 'codex',
+        agent: 'claude',
         providerSession: { key: 'session_id', id: SESSION_ID },
         prompt: '',
         state: 'done',
@@ -105,7 +105,7 @@ describe('a finished local agent', () => {
     expect(record?.state, 'the done turn stays done').toBe('done')
     expect(record?.origin).toBe('live')
     // The identity a cold restore needs survives; only the turn text is dropped.
-    expect(record?.agent).toBe('codex')
+    expect(record?.agent).toBe('claude')
     expect(record?.providerSession).toEqual({ key: 'session_id', id: SESSION_ID })
     expect(
       isPassiveCompletedHibernationEvidence(record!),
@@ -133,7 +133,7 @@ describe('a finished local agent', () => {
     expect(launched).toBe(1)
     const state = useAppStore.getState()
     const resumedTab = state.tabsByWorktree[WORKTREE_ID]?.[0]
-    expect(resumedTab?.launchAgent).toBe('codex')
+    expect(resumedTab?.launchAgent).toBe('claude')
     expect(state.pendingStartupByTabId[resumedTab!.id]?.showSessionRestoredBanner).toBe(true)
   })
 

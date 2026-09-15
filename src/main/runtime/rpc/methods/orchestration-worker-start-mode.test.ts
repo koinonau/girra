@@ -32,7 +32,7 @@ function decide(
 }
 
 describe('worker start mode from the user default', () => {
-  it.each(['claude', 'codex'] as const)('starts a local %s worker structured', (agent) => {
+  it.each(['claude'] as const)('starts a local %s worker structured', (agent) => {
     expect(decide({ params: { agent } })).toMatchObject({
       mode: 'structured',
       preferred: 'structured',
@@ -89,7 +89,7 @@ describe('a structured default this dispatch cannot honour', () => {
   })
 
   it('keeps the current worktree structured, which is the ordinary dispatch', () => {
-    expect(decide({ params: { agent: 'codex', worktree: 'current' } }).mode).toBe('structured')
+    expect(decide({ params: { agent: 'claude', worktree: 'current' } }).mode).toBe('structured')
   })
 
   it('falls back rather than dropping a custom TUI launch the session cannot apply', () => {
@@ -100,9 +100,9 @@ describe('a structured default this dispatch cannot honour', () => {
     ).toMatchObject({ mode: 'terminal', reason: 'tui_launch_customization' })
   })
 
-  // Neither provider is refused here on the client's platform: only the executing host knows
-  // whether it can read a provider child's start time, and it answers at create time.
-  it.each(['claude', 'codex'] as const)('leaves a Windows %s worker to the host', (agent) => {
+  // The client's platform refuses nothing: only the executing host knows whether it can read a
+  // provider child's start time, and it answers at create time.
+  it.each(['claude'] as const)('leaves a Windows %s worker to the host', (agent) => {
     expect(decide({ params: { agent } }).mode).toBe('structured')
   })
 })

@@ -1,5 +1,5 @@
 /**
- * Revealing a persisted chat, for both structured providers.
+ * Revealing a persisted structured chat.
  *
  * The reveal path is the only way an Agent Session History row reaches a chat whose tab this
  * process never published — a chat closed cleanly, or one this process has not opened since
@@ -18,21 +18,8 @@ import * as readRestore from './structured-agent-session-read-restore'
 import * as providerSupport from './structured-agent-session-provider-support'
 import { revealStructuredAgentSession } from './structured-agent-session-reveal'
 
-function recordFor(provider: 'claude' | 'codex', sessionId: string): AgentSessionRecord {
-  const record = agentSessionRecordFixture(agentSessionLeaseFixture({ sessionId }))
-  return {
-    ...record,
-    provider,
-    providerHandleChain:
-      provider === 'codex'
-        ? [
-            {
-              ...record.providerHandleChain[0]!,
-              handle: { provider: 'codex', threadId: `thread-${sessionId}` }
-            }
-          ]
-        : record.providerHandleChain
-  }
+function recordFor(sessionId: string): AgentSessionRecord {
+  return agentSessionRecordFixture(agentSessionLeaseFixture({ sessionId }))
 }
 
 function harness(
@@ -75,9 +62,9 @@ describe('revealing one structured session on demand', () => {
     vi.spyOn(readRestore, 'restoreStructuredAgentSessionRead').mockResolvedValue(readable)
   })
 
-  it.each(['claude', 'codex'] as const)('restores a persisted %s chat', async (provider) => {
-    const sessionId = `session-${provider}`
-    const { restorer, live } = harness([recordFor(provider, sessionId)])
+  it('restores a persisted chat', async () => {
+    const sessionId = 'session-claude'
+    const { restorer, live } = harness([recordFor(sessionId)])
 
     await expect(restorer.restoreOne(sessionId)).resolves.toBe(true)
     expect(live.has(sessionId)).toBe(true)
@@ -86,7 +73,7 @@ describe('revealing one structured session on demand', () => {
   it('does not need the startup sweep to have run, or run it', async () => {
     // The whole point: `restore()` is latched to once per process, and a surface asking later must
     // not be answered from that latch — nor trip it, which would skip every other record.
-    const records = [recordFor('codex', 'session-asked'), recordFor('claude', 'session-untouched')]
+    const records = [recordFor('session-asked'), recordFor('session-untouched')]
     const { restorer, live } = harness(records)
 
     await restorer.restoreOne('session-asked')
@@ -96,7 +83,7 @@ describe('revealing one structured session on demand', () => {
   })
 
   it('serializes against the session it restores', async () => {
-    const { restorer, serializedIds } = harness([recordFor('claude', 'session-serialized')])
+    const { restorer, serializedIds } = harness([recordFor('session-serialized')])
 
     await restorer.restoreOne('session-serialized')
 
@@ -105,7 +92,7 @@ describe('revealing one structured session on demand', () => {
   })
 
   it('returns the live session instead of restoring over it', async () => {
-    const { restorer, live } = harness([recordFor('codex', 'session-live')])
+    const { restorer, live } = harness([recordFor('session-live')])
     live.set('session-live', readable)
 
     await expect(restorer.restoreOne('session-live')).resolves.toBe(true)
@@ -113,7 +100,7 @@ describe('revealing one structured session on demand', () => {
   })
 
   it('refuses a record no adapter supports', async () => {
-    const { restorer } = harness([recordFor('codex', 'session-unsupported')], {
+    const { restorer } = harness([recordFor('session-unsupported')], {
       supports: () => false
     })
 
@@ -129,18 +116,14 @@ describe('revealing one structured session on demand', () => {
 })
 
 describe('a record whose journal cannot be read', () => {
-  it('reports not-readable without throwing, for either provider', async () => {
+  it('reports not-readable without throwing', async () => {
     // A chat whose journal predates the SQLite store restores to nothing here. That is not a
     // refusal: attach still recovers it, so the caller publishes the tab and lets the pane's hold
     // finish the job. Throwing, or reporting success, would both be wrong.
     vi.spyOn(readRestore, 'restoreStructuredAgentSessionRead').mockResolvedValue(null)
-    const { restorer, live } = harness([
-      recordFor('claude', 'session-no-journal-claude'),
-      recordFor('codex', 'session-no-journal-codex')
-    ])
+    const { restorer, live } = harness([recordFor('session-no-journal-claude')])
 
     await expect(restorer.restoreOne('session-no-journal-claude')).resolves.toBe(false)
-    await expect(restorer.restoreOne('session-no-journal-codex')).resolves.toBe(false)
     expect(live.size).toBe(0)
   })
 })
@@ -151,15 +134,15 @@ describe('the host answer a client acts on', () => {
     vi.spyOn(providerSupport, 'adapterSupportsRecord').mockReturnValue(true)
   })
 
-  function record(provider: 'claude' | 'codex', workspaceId: string) {
-    const base = recordFor(provider, 'session-answered')
+  function record(workspaceId: string) {
+    const base = recordFor('session-answered')
     return { ...base, location: { ...base.location, workspaceId } }
   }
 
   it("answers with the record's own workspace and provider, never a caller's", async () => {
     // The security property: a client sends only a session id, so the tab cannot be aimed at
     // another workspace by asking for one.
-    const stored = record('claude', 'workspace-from-record')
+    const stored = record('workspace-from-record')
 
     await expect(
       revealStructuredAgentSession(
@@ -193,7 +176,7 @@ describe('the host answer a client acts on', () => {
     await expect(
       revealStructuredAgentSession(
         {
-          store: { getRecord: () => record('codex', 'workspace-1') } as never,
+          store: { getRecord: () => record('workspace-1') } as never,
           adapter: {} as never
         },
         'session-answered',
@@ -208,14 +191,14 @@ describe('the host answer a client acts on', () => {
     await expect(
       revealStructuredAgentSession(
         {
-          store: { getRecord: () => record('codex', 'workspace-1') } as never,
+          store: { getRecord: () => record('workspace-1') } as never,
           adapter: {} as never
         },
         'session-answered',
         () => false,
         async () => false
       )
-    ).resolves.toMatchObject({ readable: false, agent: 'codex' })
+    ).resolves.toMatchObject({ readable: false, agent: 'claude' })
   })
 
   it('does not restore over a session that is already live', async () => {
@@ -224,7 +207,7 @@ describe('the host answer a client acts on', () => {
     await expect(
       revealStructuredAgentSession(
         {
-          store: { getRecord: () => record('codex', 'workspace-1') } as never,
+          store: { getRecord: () => record('workspace-1') } as never,
           adapter: {} as never
         },
         'session-answered',

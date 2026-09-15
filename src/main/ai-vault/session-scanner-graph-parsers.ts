@@ -1,10 +1,8 @@
 import { remoteSessionContentLines } from './remote-session-content-lines'
-import { openTranscriptReadStream, wslGatedReadFile } from '../native-chat/wsl-transcript-fs-access'
-import { basename, dirname, join } from 'node:path'
+import { openTranscriptReadStream } from '../native-chat/wsl-transcript-fs-access'
 import { createInterface } from 'node:readline'
 import type { AiVaultSession } from '../../shared/ai-vault-types'
 import type { ExecutionHostId } from '../../shared/execution-host'
-import { withOmpSubagentTranscriptCount } from './session-scanner-omp-subagent-transcripts'
 import type {
   FileWithMtime,
   ResumableSessionParseState,
@@ -14,21 +12,15 @@ import type { TranscriptMessageSink } from './session-transcript-consumers'
 import {
   accumulatorFoldResumeState,
   addPreviewContent,
-  addPreviewMessage,
   createAccumulator,
-  finalizeSession,
   sessionIdFromFileName,
   updateTimeline
 } from './session-scanner-accumulator'
 import {
-  arrayValue,
   asRecord,
-  extractContentText,
   extractMessageText,
   extractString,
-  firstString,
   parseJsonObject,
-  readJsonObjectIfExists,
   tokenTotal
 } from './session-scanner-values'
 
@@ -37,145 +29,9 @@ type ParserSessionOptions = {
   executionHostPlatform?: NodeJS.Platform | null
 }
 
-export async function parseRovoSessionFile(
-  file: FileWithMtime,
-  platform: NodeJS.Platform = process.platform,
-  messages?: TranscriptMessageSink
-): Promise<AiVaultSession | null> {
-  const metadata = asRecord(
-    JSON.parse(await wslGatedReadFile(file.path, 'utf-8', 'scan')) as unknown
-  )
-  if (!metadata) {
-    return null
-  }
-  const accumulator = createAccumulator({
-    agent: 'rovo',
-    file,
-    sessionId: basename(dirname(file.path)),
-    messages
-  })
-  accumulator.title = firstString(metadata, ['title', 'name', 'summary'])
-  accumulator.cwd = firstString(metadata, [
-    'workspace_path',
-    'workspacePath',
-    'workspace',
-    'cwd',
-    'working_directory',
-    'workingDirectory',
-    'project_path',
-    'projectPath'
-  ])
-  updateTimeline(
-    accumulator,
-    extractString(metadata.created_at) ?? extractString(metadata.createdAt)
-  )
-  updateTimeline(
-    accumulator,
-    extractString(metadata.updated_at) ?? extractString(metadata.updatedAt)
-  )
-
-  const contextPath = join(dirname(file.path), 'session_context.json')
-  const context = await readJsonObjectIfExists(contextPath)
-  if (context) {
-    consumeRovoSessionContext(accumulator, context)
-  }
-
-  return finalizeSession(accumulator, platform)
-}
-
-export function consumeRovoSessionContext(
-  accumulator: SessionAccumulator,
-  context: Record<string, unknown>
-): void {
-  for (const message of arrayValue(context.messages)) {
-    const record = asRecord(message)
-    const role = extractString(record?.role)
-    if (role === 'user' || role === 'assistant') {
-      accumulator.messageCount++
-      updateTimeline(accumulator, extractString(record?.timestamp))
-      if (role === 'user') {
-        accumulator.title ??= extractContentText(record?.content)
-      }
-      addPreviewContent(accumulator, role, record?.content, record?.timestamp)
-    }
-  }
-
-  for (const historyEntry of arrayValue(context.message_history)) {
-    consumeRovoHistoryEntry(accumulator, asRecord(historyEntry))
-  }
-}
-
-export function consumeRovoHistoryEntry(
-  accumulator: SessionAccumulator,
-  record: Record<string, unknown> | null
-): void {
-  if (!record) {
-    return
-  }
-  updateTimeline(accumulator, extractString(record.timestamp))
-  const role = extractString(record.role) ?? rovoRoleFromKind(record.kind)
-  if (role !== 'user' && role !== 'assistant') {
-    return
-  }
-  const text = rovoPartsText(arrayValue(record.parts), role)
-  if (!text) {
-    return
-  }
-  accumulator.messageCount++
-  if (role === 'user') {
-    accumulator.title ??= text
-  }
-  addPreviewMessage(accumulator, {
-    role,
-    text,
-    timestamp: record.timestamp
-  })
-}
-
-export function rovoRoleFromKind(value: unknown): 'user' | 'assistant' | null {
-  if (value === 'request') {
-    return 'user'
-  }
-  if (value === 'response') {
-    return 'assistant'
-  }
-  return null
-}
-
-export function rovoPartsText(parts: unknown[], role: 'user' | 'assistant'): string | null {
-  const textParts: string[] = []
-  for (const part of parts) {
-    const record = asRecord(part)
-    if (!record) {
-      continue
-    }
-    const kind = extractString(record.part_kind)
-    if (role === 'user' && kind !== 'user-prompt' && kind !== 'text') {
-      continue
-    }
-    if (role === 'assistant' && kind !== 'text') {
-      continue
-    }
-    const text =
-      typeof record.content === 'string'
-        ? record.content
-        : typeof record.text === 'string'
-          ? record.text
-          : null
-    if (text !== null) {
-      textParts.push(text)
-    }
-  }
-  return extractContentText(textParts)
-}
-
-// Agents whose transcripts are append-only message-graph JSONL (session +
-// model_change + message records). OMP and Prime Agent are Pi forks and
-// share the format.
-export type MessageGraphAgent = 'openclaw' | 'pi' | 'omp' | 'prime-agent'
-
+// Pi transcripts are append-only message-graph JSONL (session + model_change +
+// message records).
 export async function parseMessageGraphSessionFile(
-  agent: MessageGraphAgent,
   file: FileWithMtime,
   platform: NodeJS.Platform = process.platform,
   messages?: TranscriptMessageSink
@@ -183,7 +39,7 @@ export async function parseMessageGraphSessionFile(
   const input = openTranscriptReadStream(file.path, { encoding: 'utf-8' }, 'scan')
   const lines = createInterface({ input, crlfDelay: Infinity })
   try {
-    return await parseMessageGraphSessionLines({ agent, file, lines, platform, messages })
+    return await parseMessageGraphSessionLines({ file, lines, platform, messages })
   } finally {
     // readline.close() leaves the underlying stream open; destroy it so a
     // mid-parse throw cannot leak the gated transcript handle.
@@ -193,7 +49,6 @@ export async function parseMessageGraphSessionFile(
 }
 
 export async function parseMessageGraphSessionContent(
-  agent: MessageGraphAgent,
   file: FileWithMtime,
   content: string,
   platform: NodeJS.Platform = process.platform,
@@ -201,7 +56,6 @@ export async function parseMessageGraphSessionContent(
   signal?: AbortSignal
 ): Promise<AiVaultSession | null> {
   return parseMessageGraphSessionLines({
-    agent,
     file,
     lines: remoteSessionContentLines(content, signal),
     platform,
@@ -224,8 +78,8 @@ function consumeMessageGraphRecordLine(accumulator: SessionAccumulator, line: st
     return
   }
   if (record.type === 'model_change') {
-    // Pi writes `modelId`; OMP writes `model`. Prefer either so an in-progress
-    // session shows its model before the first assistant reply lands.
+    // Pi writes `modelId`; older records wrote `model`. Prefer either so an
+    // in-progress session shows its model before the first assistant reply lands.
     accumulator.model =
       extractString(record.modelId) ?? extractString(record.model) ?? accumulator.model
     return
@@ -248,29 +102,23 @@ function consumeMessageGraphRecordLine(accumulator: SessionAccumulator, line: st
 }
 
 export function createMessageGraphSessionResumeState(
-  agent: MessageGraphAgent,
   file: FileWithMtime,
   messages?: TranscriptMessageSink
 ): ResumableSessionParseState {
-  const state = accumulatorFoldResumeState(
-    createAccumulator({ agent, file, sessionId: sessionIdFromFileName(file.path), messages }),
+  return accumulatorFoldResumeState(
+    createAccumulator({ agent: 'pi', file, sessionId: sessionIdFromFileName(file.path), messages }),
     consumeMessageGraphRecordLine
   )
-  // Why: only OMP materializes task-subagent transcripts beside its sessions
-  // (in the same-named artifact dir); the row UI shows the count without
-  // expanding details. Pi/OpenClaw/Prime Agent have no such layout — skip the readdir.
-  return agent === 'omp' ? withOmpSubagentTranscriptCount(state, file.path) : state
 }
 
 async function parseMessageGraphSessionLines(args: {
-  agent: MessageGraphAgent
   file: FileWithMtime
   lines: AsyncIterable<string> | Iterable<string>
   platform: NodeJS.Platform
   options?: ParserSessionOptions
   messages?: TranscriptMessageSink
 }): Promise<AiVaultSession | null> {
-  const state = createMessageGraphSessionResumeState(args.agent, args.file, args.messages)
+  const state = createMessageGraphSessionResumeState(args.file, args.messages)
   for await (const line of args.lines) {
     state.consumeLine(line)
   }

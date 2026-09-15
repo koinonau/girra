@@ -63,7 +63,7 @@ describe('account RPC methods', () => {
   )
 
   it('keeps explicit account-list refreshes on the forced refresh lane', async () => {
-    const snapshot = { claude: null, codex: null }
+    const snapshot = { claude: null }
     const runtime = {
       refreshAccountsForMobile: vi.fn().mockResolvedValue(undefined),
       getAccountsSnapshot: vi.fn(() => snapshot)
@@ -79,7 +79,7 @@ describe('account RPC methods', () => {
   })
 
   it('skips the forced provider refresh when the caller opts out', async () => {
-    const snapshot = { claude: null, codex: null }
+    const snapshot = { claude: null }
     const runtime = {
       refreshAccountsForMobile: vi.fn().mockResolvedValue(undefined),
       getAccountsSnapshot: vi.fn(() => snapshot)
@@ -96,7 +96,7 @@ describe('account RPC methods', () => {
   })
 
   it('uses a stale-aware refresh when a connection replays the subscription', async () => {
-    const snapshot = { claude: null, codex: null }
+    const snapshot = { claude: null }
     let cleanup: (() => void) | undefined
     const runtime = {
       getAccountsSnapshot: vi.fn(() => snapshot),

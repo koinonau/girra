@@ -117,12 +117,8 @@ function QuickLaunchAgentMenuItemsInner({
   const openSettingsPage = useAppStore((s) => s.openSettingsPage)
   const openSettingsTarget = useAppStore((s) => s.openSettingsTarget)
   const newAgentShortcut = useOptionalShortcutLabel('tab.newAgent')
-  // One hook per structured provider: the launch registry is keyed by agent, and hooks cannot run
-  // inside the agent list's render loop.
-  const structuredLaunchStatusByAgent = {
-    claude: useStructuredAgentLaunchStatus(worktreeId, 'claude'),
-    codex: useStructuredAgentLaunchStatus(worktreeId, 'codex')
-  }
+  // Claude is the only structured provider; hooks cannot run inside the agent list's render loop.
+  const claudeStructuredLaunchStatus = useStructuredAgentLaunchStatus(worktreeId, 'claude')
 
   const openAgentSettings = useCallback(() => {
     openSettingsTarget({ pane: 'agents', repoId: null })
@@ -205,7 +201,7 @@ function QuickLaunchAgentMenuItemsInner({
         const entry = getCatalogEntry(agent)
         const label = entry?.label ?? agent
         const isStructuredLaunchPending =
-          isAgentSessionHandleProvider(agent) && structuredLaunchStatusByAgent[agent] === 'pending'
+          isAgentSessionHandleProvider(agent) && claudeStructuredLaunchStatus === 'pending'
         const pendingLabel = translate(
           'components.native-chat.structuredSessionLaunchPending',
           'Starting {{value0}} chat…',

@@ -52,7 +52,7 @@ function adapter(): StructuredAgentSessionAdapter {
     ordinal += 1
     return {
       state: 'accepted',
-      providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal }
+      providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: `turn-1-${ordinal}` }
     }
   })
   return {
@@ -71,13 +71,13 @@ async function seedGroupedQuestion(): Promise<{ itemId: string; revision: number
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: THREAD }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
     },
     journalDir: journalDirectoryFor(root, { workspaceId: 'workspace-1', sessionId: SESSION })
   })
   const appended = await journal.appendItem(
-    { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 100 },
+    { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-100' },
     {
       kind: 'question',
       question: '2 grouped questions from Claude',
@@ -120,7 +120,7 @@ beforeEach(async () => {
     },
     link: {
       linkId: `link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: store.getRecord(SESSION)?.providerHandleChain.length ? 'resumed' : 'created',
       mintedAtFence: fence,
       observedAt: NOW

@@ -37,7 +37,7 @@ const cache = new Map<string, CachedTranscript>()
 // it unbounded. Map preserves insertion order, so evicting the first key drops
 // the oldest entry (a simple LRU once re-inserts bump recency; see setCached).
 const MAX_CACHE_ENTRIES = 50
-// Why: a heavy Claude/Codex coding session's JSONL is routinely tens of MB (tool
+// Why: a heavy Claude coding session's JSONL is routinely tens of MB (tool
 // results embed whole file contents, command output, and diffs), and each cached
 // entry is the full unwindowed parse. The count cap alone let 50 such entries
 // retain multiple GB in the one process that now serves desktop + every paired

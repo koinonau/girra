@@ -51,11 +51,11 @@ export function attachParams(overrides: Record<string, unknown> = {}) {
       workspaceId: 'workspace-1',
       workspaceKind: 'git-worktree'
     },
-    provider: 'codex',
-    agent: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/home/dev/.codex' },
+    provider: 'claude',
+    agent: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/home/dev/.claude' },
     runtimeKind: 'native',
-    providerHandle: { kind: 'codex', threadId: 'thread-1' },
+    providerHandle: { kind: 'claude', sessionId: 'session-1', leafUuid: null },
     ...overrides
   }
 }
@@ -104,7 +104,7 @@ function statusFeed(): StructuredAgentSessionStatusFeed {
             lastActivityAt: () => 2,
             snapshot: () => ({ items: STATUS_ITEMS })
           } as unknown as AgentSessionJournal,
-          params: { location: { workspaceId: 'workspace-1' }, provider: 'codex' as const }
+          params: { location: { workspaceId: 'workspace-1' }, provider: 'claude' as const }
         }
       ]
     ]),
@@ -169,7 +169,7 @@ export function hostStub(): StructuredAgentSessionHost {
     revealSession: vi.fn(async () => ({
       sessionId: SESSION,
       workspaceId: 'workspace-1',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       readable: true
     })),
     setSessionTabVisibility: vi.fn(async () => undefined),
@@ -223,14 +223,8 @@ export function dispatcher(runtimeOverrides: Record<string, unknown> = {}): RpcD
       },
       provider: params.agent,
       agent: params.agent,
-      accountHome: {
-        variable: params.agent === 'claude' ? 'CLAUDE_CONFIG_DIR' : 'CODEX_HOME',
-        path: params.agent === 'claude' ? '/host/.claude' : '/host/.codex'
-      },
-      options:
-        params.agent === 'claude'
-          ? { model: 'opus', effort: 'high' }
-          : { model: 'gpt-5.6-sol', effort: 'medium' },
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/host/.claude' },
+      options: { model: 'opus', effort: 'high' },
       runtimeKind: 'native'
     })),
     publishStructuredAgentSessionTab: vi.fn()

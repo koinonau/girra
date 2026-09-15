@@ -2,7 +2,6 @@ import {
   findCatalogModel,
   findCatalogOption,
   type AgentSessionOptionCatalog,
-  type CatalogMidSessionApply,
   type CatalogModel,
   type CatalogOptionApply
 } from '../../../../shared/agent-session-option-catalog'
@@ -33,7 +32,6 @@ type SessionOptionApplyContext = {
   getModels: () => CatalogModel[]
   getRecord: () => NativeChatSessionOptionRecord
   dispatchCommand: NativeChatSessionOptionDispatchCommand
-  onAgentPicker?: () => void
   /** The one persist entry point, shared with typed commands: it owns both the
    *  null-model guard and whether the id may be adopted as the launch default. */
   persist: (modelId: string | null, optionId: string, value: SessionOptionValue) => void
@@ -105,48 +103,23 @@ function finish(
   return { snapshot }
 }
 
-async function handleAgentPicker(
-  ctx: SessionOptionApplyContext,
-  midSession: Extract<CatalogMidSessionApply, { kind: 'agent-picker' }>
-): Promise<SessionOptionSetResult> {
-  await (midSession.delivery
-    ? ctx.dispatchCommand(midSession.command, { delivery: midSession.delivery })
-    : ctx.dispatchCommand(midSession.command))
-  ctx.clearModelTruth()
-  const snapshot = ctx.publish()
-  ctx.onAgentPicker?.()
-  return { snapshot }
-}
-
 async function dispatchLiveCommand(
   ctx: SessionOptionApplyContext,
   args: {
     optionId: string
     value: SessionOptionValue
     apply: CatalogOptionApply
-    modelId: string | null
   }
 ): Promise<NativeChatSessionOptionDispatchResult | void> {
   const models = ctx.getModels()
-  const record = ctx.getRecord()
-  const command = buildNativeChatSessionOptionCommand({
-    optionId: args.optionId,
-    value: args.value,
-    apply: args.apply,
-    modelId: args.modelId,
-    catalog: ctx.catalog,
-    models,
-    record
-  })
+  const command = buildNativeChatSessionOptionCommand(args.apply, args.value)
   if (!command) {
     throw new Error('This option can only be set when the session starts.')
   }
   const detectAgentInteraction =
     args.apply.midSession?.kind === 'command'
       ? args.apply.midSession.detectAgentInteraction
-      : args.apply.composedIntoModel && ctx.catalog.modelApply.midSession?.kind === 'command'
-        ? ctx.catalog.modelApply.midSession.detectAgentInteraction
-        : undefined
+      : undefined
   const expectedChoiceLabel =
     args.optionId === 'model' && typeof args.value === 'string'
       ? (findCatalogModel({ ...ctx.catalog, models }, args.value)?.label ?? args.value)
@@ -184,10 +157,6 @@ async function applySetOption(
     throw new Error(`Unknown session option: ${id}`)
   }
   const { apply, modelId: previousModelId } = resolved
-  if (ctx.mode === 'live' && apply.midSession?.kind === 'agent-picker') {
-    throw new Error('This option must be changed in the agent picker.')
-  }
-
   const liveFlipOnly = ctx.mode === 'live' && isFlipOnlyMidSession(apply.midSession)
   const trackedToggle = liveFlipOnly
     ? getTrackedOption(ctx.getRecord(), previousModelId, id)
@@ -216,10 +185,9 @@ async function applySetOption(
     dispatchResult = await dispatchLiveCommand(ctx, {
       optionId: id,
       value,
-      apply,
-      modelId: previousModelId
+      apply
     })
-  } else if (!apply.launchArgs && !apply.composedIntoModel) {
+  } else if (!apply.launchArgs) {
     throw new Error('This option is only available after the session starts.')
   }
 
@@ -276,12 +244,6 @@ async function applyInvokeAction(
     throw new Error(`Unknown session option: ${id}`)
   }
   const { apply, modelId } = resolved
-  if (apply.midSession?.kind === 'agent-picker') {
-    if (ctx.mode !== 'live') {
-      throw new Error('This option is only available after the session starts.')
-    }
-    return handleAgentPicker(ctx, apply.midSession)
-  }
   if (!isFlipOnlyMidSession(apply.midSession)) {
     throw new Error('This option requires a value.')
   }

@@ -224,14 +224,14 @@ describe('useIpcEvents updater integration', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'request' }
       },
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       activate: false
     })
 
     expect(createTab).toHaveBeenCalledWith('wt-2', 'group-left', undefined, {
       activate: false,
       recordInteraction: false,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'chat',
       startupCwd: '/repo/packages/app'
     })
@@ -259,7 +259,7 @@ describe('useIpcEvents updater integration', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'request' }
       },
-      launchAgent: 'codex'
+      launchAgent: 'claude'
     })
     expect(replyTerminalCreate).toHaveBeenCalledWith({
       requestId: 'req-renderer-backed',
@@ -276,14 +276,14 @@ describe('useIpcEvents updater integration', () => {
       targetGroupId: 'group-left',
       title: 'Runtime Terminal',
       command: 'codex',
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'terminal',
       activate: true,
       source: 'runtime-session'
     })
 
     expect(createTab).toHaveBeenCalledWith('wt-2', 'group-left', undefined, {
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'terminal'
     })
     expect(replyTerminalCreate).toHaveBeenCalledWith({
@@ -475,13 +475,13 @@ describe('useIpcEvents updater integration', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'adopted' }
       },
-      launchAgent: 'codex'
+      launchAgent: 'claude'
     })
 
     expect(createTab).toHaveBeenCalledWith('wt-2', undefined, undefined, {
       initialPtyId: 'pty-bg',
       activate: false,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'chat'
     })
     expect(setActiveView).not.toHaveBeenCalled()
@@ -496,7 +496,7 @@ describe('useIpcEvents updater integration', () => {
         agentEnv: { CODEX_PROFILE: 'adopted' }
       },
       {
-        agentType: 'codex',
+        agentType: 'claude',
         tabId: 'tab-new',
         leafId: '55555555-5555-4555-8555-555555555555'
       }
@@ -506,13 +506,13 @@ describe('useIpcEvents updater integration', () => {
     createTerminalListenerRef.current({
       worktreeId: 'wt-2',
       ptyId: 'pty-explicit-terminal',
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'terminal'
     })
     expect(createTab).toHaveBeenCalledWith('wt-2', undefined, undefined, {
       initialPtyId: 'pty-explicit-terminal',
       activate: false,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'terminal'
     })
 
@@ -521,13 +521,13 @@ describe('useIpcEvents updater integration', () => {
     createTerminalListenerRef.current({
       worktreeId: 'wt-2',
       ptyId: 'pty-explicit-chat',
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'chat'
     })
     expect(createTab).toHaveBeenCalledWith('wt-2', undefined, undefined, {
       initialPtyId: 'pty-explicit-chat',
       activate: false,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       viewMode: 'chat'
     })
     storeState.settings.openAgentTabsInChatByDefault = true

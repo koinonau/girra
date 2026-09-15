@@ -38,7 +38,7 @@ describe('conversationCommandBlocked background tasks', () => {
   })
 
   it('asks the user to wait when the provider exposes no stop at all', () => {
-    // Codex: an instruction to stop would name a control that does not exist.
+    // An instruction to stop would name a control that does not exist.
     const blocked = conversationCommandBlocked(
       contextWith({ state: 'monitoring', supportsStopAll: false }),
       RECORD

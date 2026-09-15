@@ -26,7 +26,6 @@ const ALLOWLIST = new Set([
   'session-scanner-opencode-sqlite-worker-spawn.ts',
   // On-demand IPC readers, gated in the STA-4049 follow-up.
   'session-scanner-claude-subagents.ts',
-  'session-scanner-omp-subagent-listing.ts',
   // Test-only fixture builder.
   'session-scanner-test-fixtures.ts'
 ])
@@ -72,8 +71,6 @@ describe('WSL transcript gate import guard', () => {
         'session-title-file-reader.ts',
         'session-scanner.ts',
         'session-scanner-values.ts',
-        'session-scanner-codex-title-index.ts',
-        'session-scanner-kimi-paths.ts',
         'session-scanner-opencode-sources.ts'
       ])
     )

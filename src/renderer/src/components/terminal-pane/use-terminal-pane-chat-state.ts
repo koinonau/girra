@@ -21,7 +21,6 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
   const {
     chatLeafId,
     managerRef,
-    nativeChatTranscriptIsLocalReadable,
     onAgentExitedRef,
     paneCount,
     setChatLeafId,
@@ -140,15 +139,13 @@ export function useTerminalPaneChatState(controller: TerminalPaneTitleController
         // foreground hook has not republished agent status after returning to TUI.
         resolvedAgent: detectedAgent
           ? null
-          : ((structuredSessionAgent as TuiAgent | null) ?? resolveTitleAgentForLeaf(leafId)),
-        nativeChatTranscriptIsLocalReadable
+          : ((structuredSessionAgent as TuiAgent | null) ?? resolveTitleAgentForLeaf(leafId))
       })
     },
     [
       tabAgentTypeByLeaf,
       nativeChatEnabled,
       structuredSessionAgent,
-      nativeChatTranscriptIsLocalReadable,
       terminalTab?.launchAgent,
       getNativeChatLeafIds,
       getTabWideAgentHintLeafId,

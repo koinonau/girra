@@ -4,8 +4,6 @@ import type {
 } from '../../../shared/worktree/launch-types'
 import { agentKindToTuiAgent } from '../../../shared/agent-kind'
 import { initialAgentTabViewModeProps } from './native-chat-initial-view-mode'
-import { getConnectionId } from '@/lib/connection-context'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { seedNativeChatAppliedSessionOptions } from '@/components/native-chat/native-chat-session-option-cache'
 import type {
   InitialTerminalOptions,
@@ -58,9 +56,6 @@ export function applyDefaultTerminalTabs(
               agent: launchAgent,
               ...draftViewModeProps(
                 isStartupTab ? resolveStartupLaunchDraftText(startup) : undefined
-              ),
-              nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-                getConnectionId(worktreeId)
               )
             })
           }

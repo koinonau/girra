@@ -4,7 +4,7 @@ import {
   createStructuredAgentSessionOptionState,
   structuredAgentSessionOptionSnapshot
 } from '../../shared/structured-agent-session-options'
-import { CLAUDE_SESSION_OPTION_CATALOG } from '../../shared/agent-session-option-catalog-claude-codex'
+import { CLAUDE_SESSION_OPTION_CATALOG } from '../../shared/agent-session-option-catalog-claude'
 import type { AgentSessionOptionsResult } from '../../shared/agent-session-wire'
 import type { SessionOptionDescriptor } from '../../shared/native-chat-session-options'
 import { setClaudeStructuredOption } from './claude-structured-options'

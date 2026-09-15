@@ -2259,9 +2259,6 @@ export function createRemoteRuntimePtyTransport(
                       worktree: toRuntimeTerminalWorktreeSelector(worktreeId),
                       agent: launchAgentToSend!,
                       providerSession: resumeProviderSessionToSend,
-                      ...(launchConfigToSend?.ompResumeFilePath
-                        ? { ompResumeFilePath: launchConfigToSend.ompResumeFilePath }
-                        : {}),
                       ...(agentArgsOverride !== undefined ? { agentArgs: agentArgsOverride } : {}),
                       ...(agentLaunchPreferences
                         ? { launchPreferences: agentLaunchPreferences }

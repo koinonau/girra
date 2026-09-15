@@ -238,7 +238,7 @@ async function claudeCandidate(transcript: string): Promise<SessionFileCandidate
     modifiedAt: stats.mtime.toISOString(),
     sizeBytes: stats.size
   }
-  return { agent: 'claude', file, codexHome: null }
+  return { agent: 'claude', file }
 }
 
 it('serializes overlapping parses of one path so no consumer read is orphaned', async () => {
@@ -280,7 +280,6 @@ it('reports a read whose parser cannot publish its messages as not complete', as
   const session = await readWholeTranscript({
     candidate: {
       agent: 'opencode',
-      codexHome: null,
       file: {
         path: `${dbPath}#sqlite-session`,
         mtimeMs: 1,
@@ -295,36 +294,4 @@ it('reports a read whose parser cannot publish its messages as not complete', as
   expect(consumer.reads).toHaveLength(1)
   expect(consumer.reads[0].messages).toEqual([])
   expect(consumer.reads[0].outcome?.incomplete).toBe(true)
-})
-
-it('reports the transcript size, not the cache key, as a whole-file read offset', async () => {
-  const root = await mkdtemp(join(tmpdir(), 'orca-transcript-cline-'))
-  tempRoots.push(root)
-  const roots = isolatedScanRoots(root)
-  // Cline is whole-file and declares a sibling content dependency, so its cache
-  // key covers two files while the read covers one.
-  const sessionDir = join(roots.clineSessionsDir, 'cline-session')
-  await mkdir(sessionDir, { recursive: true })
-  const metadataPath = join(sessionDir, 'cline-session.json')
-  await writeFile(
-    metadataPath,
-    JSON.stringify({
-      session_id: 'cline-session',
-      started_at: '2026-05-01T10:00:00.000Z',
-      cwd: '/tmp/cline'
-    })
-  )
-  await writeFile(
-    join(sessionDir, 'cline-session.messages.json'),
-    JSON.stringify({
-      updated_at: '2026-05-01T10:00:01.000Z',
-      messages: [{ role: 'user', content: [{ type: 'text', text: 'x'.repeat(400) }] }]
-    })
-  )
-  const consumer = recordingConsumer()
-
-  await scanAiVaultSessions({ ...roots, platform: 'darwin', limit: 20 })
-
-  const read = consumer.reads.find((entry) => entry.start.candidate.agent === 'cline')
-  expect(read?.outcome?.byteOffset).toBe((await stat(metadataPath)).size)
 })

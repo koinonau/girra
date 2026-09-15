@@ -16,7 +16,6 @@ export type ReadAiVaultFirstUserPromptArgs = {
   filePath: string
   sessionId?: string
   executionHostId?: ExecutionHostId
-  codexHome?: string | null
 }
 
 export type ReadAiVaultFirstUserPromptResult = AiVaultFirstUserPromptResult
@@ -48,8 +47,7 @@ export async function readAiVaultFirstUserPrompt(
       parseSessionForFullFirstUserPrompt({
         agent: args.agent,
         filePath,
-        sessionId: args.sessionId?.trim() || undefined,
-        codexHome: args.codexHome ?? null
+        sessionId: args.sessionId?.trim() || undefined
       })
     )
   } catch {
@@ -64,7 +62,6 @@ async function parseSessionForFullFirstUserPrompt(args: {
   agent: AiVaultAgent
   filePath: string
   sessionId?: string
-  codexHome: string | null
 }): Promise<AiVaultSession | null> {
   // Why: OpenCode SQLite sessions store filePath as the db path (not db#id).
   // Re-parse in-process under full capture so ALS applies and we can read the
@@ -92,14 +89,7 @@ async function parseSessionForFullFirstUserPrompt(args: {
     return null
   }
 
-  return parseAgentSessionFile(
-    {
-      agent: args.agent,
-      file,
-      codexHome: args.codexHome
-    },
-    process.platform
-  )
+  return parseAgentSessionFile({ agent: args.agent, file }, process.platform)
 }
 
 async function fileWithMtimeForPath(

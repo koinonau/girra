@@ -18,10 +18,6 @@ vi.mock('@/lib/agent-trust-preflight', () => ({
   preflightAgentTrust: mocks.preflightAgentTrust
 }))
 
-vi.mock('@/lib/native-chat-transcript-readability', () => ({
-  isNativeChatTranscriptLocalReadable: vi.fn(() => true)
-}))
-
 import { adoptAgentSessionLaunchVerdict } from './agent-session-launch-plan'
 import {
   markDirectWorkItemAgentTrusted,
@@ -30,7 +26,7 @@ import {
 
 const structuredPlan = adoptAgentSessionLaunchVerdict({
   route: 'structured-native-chat',
-  agent: 'codex',
+  agent: 'claude',
   worktreeId: 'worktree-1',
   prompt: 'Fix the route',
   promptDelivery: 'draft'
@@ -63,7 +59,7 @@ describe('settleDirectWorkItemStructuredLaunch', () => {
     })
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'worktree-1',
-      'codex',
+      'claude',
       { prompt: 'Fix the route', promptDelivery: 'draft' },
       expect.anything()
     )
@@ -86,7 +82,7 @@ describe('settleDirectWorkItemStructuredLaunch', () => {
       primaryTabId: 'fallback-tab'
     })
     expect(mocks.preflightAgentTrust).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'claude',
       workspacePath: '/repo/worktree',
       connectionId: null
     })
@@ -156,13 +152,13 @@ describe('markDirectWorkItemAgentTrusted', () => {
   it('marks trust before a legacy terminal launch', async () => {
     await markDirectWorkItemAgentTrusted({
       structuredLaunch: false,
-      agent: 'codex',
+      agent: 'claude',
       workspacePath: '/repo/worktree',
       connectionId: 'ssh-1'
     })
 
     expect(mocks.preflightAgentTrust).toHaveBeenCalledWith({
-      agent: 'codex',
+      agent: 'claude',
       workspacePath: '/repo/worktree',
       connectionId: 'ssh-1'
     })
@@ -171,7 +167,7 @@ describe('markDirectWorkItemAgentTrusted', () => {
   it('leaves trust to the refusal fallback on the structured route', async () => {
     await markDirectWorkItemAgentTrusted({
       structuredLaunch: true,
-      agent: 'codex',
+      agent: 'claude',
       workspacePath: '/repo/worktree',
       connectionId: null
     })

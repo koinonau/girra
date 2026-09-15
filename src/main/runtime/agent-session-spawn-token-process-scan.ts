@@ -9,8 +9,10 @@
  */
 
 import { readFile, readdir } from 'node:fs/promises'
-import { CODEX_SPAWN_TOKEN_ENV } from '../codex/codex-structured-owner-identity'
-import { spawnTokenFromEnvironBlock } from './agent-session-spawn-token-readback'
+import {
+  AGENT_SESSION_SPAWN_TOKEN_ENV,
+  spawnTokenFromEnvironBlock
+} from './agent-session-spawn-token-readback'
 
 export type AgentSessionSpawnTokenScan = ReadonlyMap<string, readonly number[]>
 
@@ -21,7 +23,7 @@ export type AgentSessionSpawnTokenScanEvidence =
 /** Tokens observed on this host, or null when the platform cannot answer at all. */
 export async function scanAgentSessionSpawnTokenProcesses(
   platform: NodeJS.Platform = process.platform,
-  variable: string = CODEX_SPAWN_TOKEN_ENV
+  variable: string = AGENT_SESSION_SPAWN_TOKEN_ENV
 ): Promise<AgentSessionSpawnTokenScan | null> {
   if (platform !== 'linux') {
     return null
@@ -60,7 +62,7 @@ export async function scanAgentSessionSpawnTokenProcesses(
  */
 export async function scanAgentSessionSpawnTokenEvidence(
   platform: NodeJS.Platform = process.platform,
-  variable: string = CODEX_SPAWN_TOKEN_ENV
+  variable: string = AGENT_SESSION_SPAWN_TOKEN_ENV
 ): Promise<AgentSessionSpawnTokenScanEvidence> {
   const processes = await scanAgentSessionSpawnTokenProcesses(platform, variable)
   return processes === null

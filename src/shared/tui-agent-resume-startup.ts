@@ -21,12 +21,11 @@ export function buildAgentResumeStartupPlan(args: {
   agentArgs?: string | null
   agentEnv?: Record<string, string> | null
   agentCommand?: string | null
-  ompResumeFilePath?: string | null
   sessionOptions?: Record<string, SessionOptionValue>
   sessionOptionsOverrideAgentArgs?: boolean
   isRemote?: boolean
 }): AgentStartupPlan | null {
-  const argv = getAgentResumeArgv(args.agent, args.providerSession, args.ompResumeFilePath)
+  const argv = getAgentResumeArgv(args.agent, args.providerSession)
   if (!argv) {
     return null
   }
@@ -64,7 +63,6 @@ export function buildAgentResumeStartupPlan(args: {
     expectedProcess: TUI_AGENT_CONFIG[args.agent].expectedProcess,
     followupPrompt: null,
     launchConfig,
-    ...(args.agent === 'codex' ? { startupCommandDelivery: 'shell-ready' as const } : {}),
     ...(Object.keys(applied).length > 0 ? { sessionOptions: { ...applied } } : {}),
     ...(args.agentEnv ? { env: { ...args.agentEnv } } : {})
   }

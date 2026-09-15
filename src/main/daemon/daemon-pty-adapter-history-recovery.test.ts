@@ -580,7 +580,7 @@ describe('DaemonPtyAdapter history recovery', () => {
       keyId: 'key',
       identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-      agent: 'codex' as const
+      agent: 'claude' as const
     }
     const surface = {
       worktreeId: 'worktree',
@@ -768,7 +768,7 @@ describe('DaemonPtyAdapter history recovery', () => {
       keyId: 'key',
       identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
       worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-      agent: 'codex' as const
+      agent: 'claude' as const
     }
     const surface = {
       worktreeId: 'worktree',

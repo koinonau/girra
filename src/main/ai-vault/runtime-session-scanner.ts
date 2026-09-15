@@ -1,4 +1,3 @@
-import { z } from 'zod'
 import {
   AI_VAULT_SCOPE_PATHS_MAX_COUNT,
   type AiVaultListArgs,
@@ -8,10 +7,6 @@ import {
 import { toRuntimeExecutionHostId } from '../../shared/execution-host'
 import { listEnvironments } from '../../shared/runtime-environment-store'
 import { callRuntimeEnvironment } from '../ipc/runtime-environment-transport-routing'
-import type {
-  AiVaultPrepareSessionResumeArgs,
-  AiVaultPrepareSessionResumeResult
-} from '../../shared/ai-vault-resume-preparation'
 import type {
   AiVaultSessionTitlesArgs,
   AiVaultSessionTitlesResult
@@ -27,13 +22,6 @@ export type RuntimeAiVaultHostInfo = {
 export type RuntimeAiVaultScanOptions = {
   timeoutMs?: number
 }
-
-// Why: zod strips unknown keys, so the repin home must be declared or the
-// parent would silently drop it and resume under the wrong account's home.
-const aiVaultPrepareSessionResumeResultSchema = z.object({
-  useRealCodexHome: z.boolean(),
-  substituteCodexHome: z.string().optional()
-})
 
 export function getSavedRuntimeAiVaultHostInfos(
   userDataPath: string
@@ -83,7 +71,7 @@ export async function scanRuntimeAiVaultSessions(
           ...result.issues,
           {
             executionHostId,
-            agent: 'codex',
+            agent: 'claude',
             kind: 'scope',
             path: environmentId,
             message: `Only the first ${AI_VAULT_SCOPE_PATHS_MAX_COUNT} project paths were scanned.`
@@ -128,29 +116,6 @@ export async function resolveRuntimeAiVaultSessionTitles(
   }
 }
 
-export async function prepareRuntimeAiVaultSessionResume(
-  userDataPath: string,
-  environmentId: string,
-  args: AiVaultPrepareSessionResumeArgs
-): Promise<AiVaultPrepareSessionResumeResult> {
-  const response = await callRuntimeEnvironment(
-    userDataPath,
-    environmentId,
-    'aiVault.prepareSessionResume',
-    args
-  )
-  if (response.ok !== true) {
-    throw new Error(response.error.message)
-  }
-  const parsed = aiVaultPrepareSessionResumeResultSchema.safeParse(response.result)
-  if (!parsed.success) {
-    throw new Error(
-      `Invalid aiVault.prepareSessionResume response: ${parsed.error.issues[0]?.message ?? 'unexpected result shape'}`
-    )
-  }
-  return parsed.data
-}
-
 function withRuntimeExecutionHost(
   result: AiVaultListResult,
   executionHostId: `runtime:${string}`
@@ -185,7 +150,7 @@ function runtimeScanIssueResult(args: {
     issues: [
       {
         executionHostId: args.executionHostId,
-        agent: 'codex',
+        agent: 'claude',
         kind: 'host',
         path: args.environmentId,
         message: args.message

@@ -2,8 +2,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { OrcaRuntimeService } from './orca-runtime'
 
 type InstalledDeps = {
-  resolveLaunchArgs: (provider: 'claude' | 'codex') => Promise<string[]> | string[]
-  resolveLaunchEnvOverlay: () => Record<string, string>
+  resolveLaunchArgs: (provider: 'claude') => Promise<string[]> | string[]
   resolveClaudeLaunchEnv?: () => Record<string, string>
 }
 
@@ -27,11 +26,11 @@ async function installedDeps(settings: Record<string, unknown>): Promise<Install
 }
 
 describe('structured agent-session launch args wiring', () => {
-  it('resolves Claude launch args from the Claude agent defaults, not Codex flags', async () => {
+  it('resolves Claude launch args from the Claude agent defaults only', async () => {
     const deps = await installedDeps({
       agentDefaultArgs: {
         claude: '--dangerously-skip-permissions --model opus',
-        codex: '--dangerously-bypass-approvals-and-sandbox'
+        opencode: '--not-a-claude-flag'
       },
       agentDefaultEnv: {}
     })
@@ -43,36 +42,12 @@ describe('structured agent-session launch args wiring', () => {
     ])
   })
 
-  it('still resolves Codex app-server args for a Codex session', async () => {
-    const deps = await installedDeps({
-      agentDefaultArgs: {
-        claude: '--dangerously-skip-permissions',
-        codex: '--dangerously-bypass-approvals-and-sandbox'
-      },
-      agentDefaultEnv: {}
-    })
-
-    const codexArgs = await deps.resolveLaunchArgs('codex')
-    expect(codexArgs).not.toContain('--dangerously-skip-permissions')
-    expect(codexArgs.length).toBeGreaterThan(0)
-  })
-
-  it('never lets a broken Codex args configuration block a Claude session', async () => {
-    const deps = await installedDeps({
-      agentDefaultArgs: { claude: '--model opus', codex: '--not-a-real-codex-flag' },
-      agentDefaultEnv: {}
-    })
-
-    expect(await deps.resolveLaunchArgs('claude')).toEqual(['--model', 'opus'])
-    expect(() => deps.resolveLaunchArgs('codex')).toThrow()
-  })
-
   it('supplies the Claude env overlay so the launch resolver does not fall back to process.env', async () => {
     const deps = await installedDeps({
       agentDefaultArgs: {},
       agentDefaultEnv: {
         claude: { ORCA_CLAUDE_OVERLAY: 'claude-value' },
-        codex: { ORCA_CODEX_OVERLAY: 'codex-value' }
+        opencode: { ORCA_OPENCODE_OVERLAY: 'opencode-value' }
       }
     })
 
@@ -80,7 +55,6 @@ describe('structured agent-session launch args wiring', () => {
     expect(deps.resolveClaudeLaunchEnv?.()).toMatchObject({
       ORCA_CLAUDE_OVERLAY: 'claude-value'
     })
-    expect(deps.resolveClaudeLaunchEnv?.()).not.toHaveProperty('ORCA_CODEX_OVERLAY')
-    expect(deps.resolveLaunchEnvOverlay()).toMatchObject({ ORCA_CODEX_OVERLAY: 'codex-value' })
+    expect(deps.resolveClaudeLaunchEnv?.()).not.toHaveProperty('ORCA_OPENCODE_OVERLAY')
   })
 })

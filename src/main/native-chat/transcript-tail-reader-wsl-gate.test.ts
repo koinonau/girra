@@ -36,7 +36,7 @@ describe('native chat transcript tail under WSL gate refusals', () => {
     mocks.resolve.mockRejectedValueOnce(new WslTranscriptFsError('timeout', 'slow share'))
 
     await expect(
-      readNativeChatTranscriptTail({ agent: 'codex', sessionId: 'session-id', limit: 10 })
+      readNativeChatTranscriptTail({ agent: 'claude', sessionId: 'session-id', limit: 10 })
     ).resolves.toEqual({ error: 'slow share' })
   })
 
@@ -44,13 +44,13 @@ describe('native chat transcript tail under WSL gate refusals', () => {
     mocks.resolve.mockRejectedValueOnce(new Error('resolver crashed'))
 
     await expect(
-      readNativeChatTranscriptTail({ agent: 'codex', sessionId: 'session-id', limit: 10 })
+      readNativeChatTranscriptTail({ agent: 'claude', sessionId: 'session-id', limit: 10 })
     ).rejects.toThrow('resolver crashed')
   })
 })
 
 describe('native chat transcript tail with stalled post-resolution UNC I/O', () => {
-  const UNC_PATH = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.codex\\sessions\\a.jsonl'
+  const UNC_PATH = '\\\\wsl.localhost\\Ubuntu\\home\\ada\\.claude\\projects\\app\\a.jsonl'
   // A stalled task holds its gate permit until the underlying call settles, so
   // each case releases its stall before the next one runs. The deadline also
   // quarantines the route, and a late release never lifts that, so each case
@@ -65,7 +65,7 @@ describe('native chat transcript tail with stalled post-resolution UNC I/O', () 
 
   async function tailAfterStall(): Promise<unknown> {
     const pending = readNativeChatTranscriptTail({
-      agent: 'codex',
+      agent: 'claude',
       sessionId: 'session-id',
       filePath: UNC_PATH,
       limit: 10

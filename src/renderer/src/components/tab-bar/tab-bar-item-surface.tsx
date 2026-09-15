@@ -65,7 +65,6 @@ export function renderTabBarItems({
     nativeChatEnabled,
     tabAgentTypesByTabId,
     nativeChatTabWideFallbackUnsafeTabsById,
-    nativeChatTranscriptIsLocalReadable,
     toggleTabViewMode,
     statusByRelativePath
   } = runtime
@@ -102,7 +101,7 @@ export function renderTabBarItems({
         title: resolveTerminalTabTitle(item.data, generatedTabTitlesEnabled, item.data.title)
       }
       const unifiedTabForItem = unifiedTabByVisibleId.get(item.id)
-      // Carry the agent *identity* (not just "an agent exists") so the native-chat gate can reject agents like Grok.
+      // Carry the agent *identity* (not just "an agent exists") so the native-chat gate can reject unsupported agents.
       const resolvedAgent = resolveNativeChatTabAgentEvidence(terminalTab, unifiedTabForItem)
       // Key the live-agent lookup by the backing terminal tab id: agent-status pane keys use it, not the unified tab id.
       const detectedAgent = tabAgentTypesByTabId[terminalTab.id] ?? null
@@ -115,7 +114,6 @@ export function renderTabBarItems({
           launchAgent: tabWideFallbackSafe ? terminalTab.launchAgent : null,
           detectedAgent,
           resolvedAgent: tabWideFallbackSafe ? resolvedAgent : null,
-          nativeChatTranscriptIsLocalReadable,
           isChatViewMode: unifiedTabForItem.viewMode === 'chat',
           structuredSessionId: unifiedTabForItem.structuredSessionId ?? null
         })

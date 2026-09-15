@@ -20,35 +20,24 @@ import {
 
 const journals = createTrackedJournalOpener()
 
-function importRecord(provider: 'claude' | 'codex', accountHome: string): AgentSessionRecord {
+function importRecord(accountHome: string): AgentSessionRecord {
   return {
-    provider,
-    accountHome: {
-      variable: provider === 'claude' ? 'CLAUDE_CONFIG_DIR' : 'CODEX_HOME',
-      path: accountHome
-    }
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: accountHome }
   } as AgentSessionRecord
 }
 
 describe('structured TUI transcript import roots', () => {
   it('uses the managed Claude account home when no live transcript path remains', () => {
-    expect(structuredTuiTranscriptImportOptions(importRecord('claude', '/managed/claude'))).toEqual(
-      {
-        claudeProjectsDir: join('/managed/claude', 'projects')
-      }
-    )
-  })
-
-  it('uses the managed Codex account home when no live transcript path remains', () => {
-    expect(structuredTuiTranscriptImportOptions(importRecord('codex', '/managed/codex'))).toEqual({
-      codexSessionsDirs: [join('/managed/codex', 'sessions')]
+    expect(structuredTuiTranscriptImportOptions(importRecord('/managed/claude'))).toEqual({
+      claudeProjectsDir: join('/managed/claude', 'projects')
     })
   })
 })
 
 describe('native handoff acquisition', () => {
   const sessionId = 'session-handoff-drain'
-  const threadId = 'thread-handoff-drain'
+  const providerSessionId = 'thread-handoff-drain'
   const now = 1_800_000_000_000
   let root: string
   let store: AgentSessionRecordStore
@@ -73,8 +62,8 @@ describe('native handoff acquisition', () => {
     const reserved = await store.reserveOwner({
       sessionId,
       location,
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'native',
       expectedFence: null,
       spawnToken: 'native-handoff',
@@ -93,8 +82,8 @@ describe('native handoff acquisition', () => {
         sessionId,
         workspaceId: location.workspaceId,
         hostId: location.executionHostId,
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: providerSessionId, leafUuid: null }
       },
       journalDir: join(root, 'journal')
     })
@@ -138,7 +127,7 @@ describe('native handoff acquisition', () => {
           },
           link: {
             linkId: 'native-link',
-            handle: { provider: 'codex' as const, threadId },
+            handle: { provider: 'claude' as const, sessionId: providerSessionId, leafUuid: null },
             origin: 'created' as const,
             mintedAtFence: fence,
             observedAt: now
@@ -157,11 +146,11 @@ describe('native handoff acquisition', () => {
           payloadFingerprint: 'handoff'
         },
         location,
-        provider: 'codex' as const,
-        agent: 'codex' as const,
-        accountHome: { variable: 'CODEX_HOME' as const, path: join(root, 'codex-home') },
+        provider: 'claude' as const,
+        agent: 'claude' as const,
+        accountHome: { variable: 'CLAUDE_CONFIG_DIR' as const, path: join(root, 'claude-home') },
         runtimeKind: 'native' as const,
-        providerHandle: { kind: 'codex' as const, threadId }
+        providerHandle: { kind: 'claude' as const, sessionId: providerSessionId, leafUuid: null }
       },
       fence: reserved.record.lease.runtimeFence,
       hasProviderChild: false,
@@ -215,8 +204,8 @@ describe('native handoff acquisition', () => {
     const reserved = await store.reserveOwner({
       sessionId: 'session-handoff-unsupported',
       location,
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'native',
       expectedFence: null,
       spawnToken: 'unsupported-spawn',
@@ -231,8 +220,8 @@ describe('native handoff acquisition', () => {
         sessionId: 'session-handoff-unsupported',
         workspaceId: location.workspaceId,
         hostId: location.executionHostId,
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'unsupported-thread' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'unsupported-thread', leafUuid: null }
       },
       journalDir: join(root, 'unsupported-journal')
     })
@@ -241,7 +230,7 @@ describe('native handoff acquisition', () => {
     const unbind = vi.spyOn(eventSink, 'unbind')
     const acquire = vi.fn<NonNullable<StructuredAgentSessionHostDeps['adapter']['acquire']>>()
     const adapter = {
-      supportsLocation: vi.fn(() => false),
+      supportsCreate: vi.fn(() => false),
       acquire
     }
     const session = {
@@ -254,11 +243,11 @@ describe('native handoff acquisition', () => {
           payloadFingerprint: 'unsupported'
         },
         location,
-        provider: 'codex' as const,
-        agent: 'codex' as const,
-        accountHome: { variable: 'CODEX_HOME' as const, path: join(root, 'codex-home') },
+        provider: 'claude' as const,
+        agent: 'claude' as const,
+        accountHome: { variable: 'CLAUDE_CONFIG_DIR' as const, path: join(root, 'claude-home') },
         runtimeKind: 'native' as const,
-        providerHandle: { kind: 'codex' as const, threadId: 'unsupported-thread' }
+        providerHandle: { kind: 'claude' as const, sessionId: 'unsupported-thread', leafUuid: null }
       },
       fence: reserved.record.lease.runtimeFence,
       hasProviderChild: false,
@@ -310,8 +299,8 @@ describe('native handoff acquisition', () => {
     const reserved = await store.reserveOwner({
       sessionId,
       location,
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'native',
       expectedFence: null,
       spawnToken: 'drift-spawn',
@@ -326,18 +315,18 @@ describe('native handoff acquisition', () => {
         sessionId,
         workspaceId: location.workspaceId,
         hostId: location.executionHostId,
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'drift-thread' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'drift-thread', leafUuid: null }
       },
       journalDir: join(root, 'drift-journal')
     })
     const eventSink = createDeferredStructuredAgentSessionEventSink()
     eventSink.bind({ journal, fence: reserved.record.lease.runtimeFence, publish: () => undefined })
     const unbind = vi.spyOn(eventSink, 'unbind')
-    const supportsLocation = vi.fn(() => true)
-    supportsLocation.mockReturnValueOnce(true).mockReturnValueOnce(false)
+    const supportsCreate = vi.fn(() => true)
+    supportsCreate.mockReturnValueOnce(true).mockReturnValueOnce(false)
     const acquire = vi.fn<NonNullable<StructuredAgentSessionHostDeps['adapter']['acquire']>>()
-    const adapter = { supportsLocation, acquire }
+    const adapter = { supportsCreate, acquire }
     const session = {
       journal,
       params: {
@@ -348,11 +337,11 @@ describe('native handoff acquisition', () => {
           payloadFingerprint: 'drift'
         },
         location,
-        provider: 'codex' as const,
-        agent: 'codex' as const,
-        accountHome: { variable: 'CODEX_HOME' as const, path: join(root, 'codex-home') },
+        provider: 'claude' as const,
+        agent: 'claude' as const,
+        accountHome: { variable: 'CLAUDE_CONFIG_DIR' as const, path: join(root, 'claude-home') },
         runtimeKind: 'native' as const,
-        providerHandle: { kind: 'codex' as const, threadId: 'drift-thread' }
+        providerHandle: { kind: 'claude' as const, sessionId: 'drift-thread', leafUuid: null }
       },
       fence: reserved.record.lease.runtimeFence,
       hasProviderChild: false,
@@ -384,7 +373,7 @@ describe('native handoff acquisition', () => {
         { sessionId, fence: reserved.record.lease.runtimeFence, spawnToken: 'drift-spawn' }
       )
     ).rejects.toThrow('structured_agent_session_unsupported')
-    expect(supportsLocation).toHaveBeenCalledTimes(2)
+    expect(supportsCreate).toHaveBeenCalledTimes(2)
     expect(unbind).toHaveBeenCalledOnce()
     expect(acquire).not.toHaveBeenCalled()
   })
@@ -447,8 +436,8 @@ describe('handoff status published for a session the host no longer holds', () =
         workspaceId: 'workspace-1',
         workspaceKind: 'git-worktree'
       },
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'native',
       expectedFence: null,
       spawnToken: 'detached-publish',

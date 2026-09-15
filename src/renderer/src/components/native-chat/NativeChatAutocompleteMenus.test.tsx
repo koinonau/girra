@@ -146,8 +146,7 @@ describe('NativeChatPickerMenu', () => {
               { name: 'wordy', kind: 'command', argumentHint: `<${'a'.repeat(200)}>` }
             ]),
             [],
-            '',
-            '/'
+            ''
           )
         })}
         activeIndex={0}

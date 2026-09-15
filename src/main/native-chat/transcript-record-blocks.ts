@@ -1,5 +1,5 @@
 // Centralized record→block mapping for native-chat transcripts. Kept separate
-// from the reader so the Claude and Codex per-record decoders share one place
+// from the reader so the per-record decoders share one place
 // to evolve as CLI transcript schemas drift (plan KTD risk: schema drift).
 
 import type {

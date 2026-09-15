@@ -27,7 +27,7 @@ describe('parseAiVaultListResult', () => {
     })
 
     expect(parsed.sessions).toHaveLength(1)
-    expect(parsed.sessions[0]?.agent).toBe('codex')
+    expect(parsed.sessions[0]?.agent).toBe('claude')
     expect(parsed.sessions[0]?.sessionId).toBe('session-1')
     expect(parsed.issues).toEqual([])
   })
@@ -138,11 +138,21 @@ describe('parseAiVaultListResult', () => {
   it('leaves an unkinded issue unkinded so real skipped transcripts still count', () => {
     const parsed = parseAiVaultListResult({
       sessions: [validSession()],
-      issues: [{ agent: 'codex', path: '/bad.jsonl', message: 'Malformed transcript' }],
+      issues: [{ agent: 'claude', path: '/bad.jsonl', message: 'Malformed transcript' }],
       scannedAt: '2026-07-27T00:00:00.000Z'
     })
 
     expect(parsed.issues[0]?.kind).toBeUndefined()
+  })
+
+  it('reads a retired Codex home from an older host as null', () => {
+    const parsed = parseAiVaultListResult({
+      sessions: [{ ...validSession(), codexHome: '/home/dev/.codex' }],
+      issues: [],
+      scannedAt: '2026-07-27T00:00:00.000Z'
+    })
+
+    expect(parsed.sessions[0]?.codexHome).toBeNull()
   })
 
   it('rejects a malformed result envelope', () => {
@@ -162,10 +172,10 @@ describe('parseAiVaultListResult', () => {
 
 function validSession(sessionId = 'session-1'): Record<string, unknown> {
   return {
-    id: `local:codex:${sessionId}:/tmp/${sessionId}.jsonl`,
+    id: `local:claude:${sessionId}:/tmp/${sessionId}.jsonl`,
     executionHostId: 'local',
     executionHostPlatform: 'linux',
-    agent: 'codex',
+    agent: 'claude',
     sessionId,
     title: 'Session one',
     cwd: '/repo',
@@ -181,12 +191,12 @@ function validSession(sessionId = 'session-1'): Record<string, unknown> {
     previewMessages: [],
     queuedMessageCount: 0,
     subagentTranscriptCount: 0,
-    resumeCommand: `codex resume ${sessionId}`,
+    resumeCommand: `claude --resume ${sessionId}`,
     subagent: null
   }
 }
 
-function validScanIssue(agent = 'codex'): Record<string, unknown> {
+function validScanIssue(agent = 'claude'): Record<string, unknown> {
   return {
     agent,
     path: '/tmp/sessions',

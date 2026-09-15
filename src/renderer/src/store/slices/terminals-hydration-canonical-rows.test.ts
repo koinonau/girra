@@ -129,7 +129,7 @@ describe('hydrateWorkspaceSession canonical terminal rows', () => {
       paneKey: `${tabId}:${leafId}`,
       tabId,
       worktreeId,
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: `session-${tabId}` },
       prompt: 'continue',
       state: 'working',

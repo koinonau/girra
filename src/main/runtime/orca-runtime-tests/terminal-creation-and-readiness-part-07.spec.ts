@@ -410,7 +410,7 @@ describe('OrcaRuntimeService', () => {
     }
   })
 
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'waits for %s composer output frames to settle before one submit',
     async (agent) => {
       vi.useFakeTimers()

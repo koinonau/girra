@@ -227,8 +227,7 @@ export async function readStructuredTuiProcessIdentity(input: {
     }
     const remainingMs = deadline - now()
     if (remainingMs <= 0 && captures >= STRUCTURED_TUI_PROCESS_MIN_CAPTURES) {
-      const label = input.agent === 'codex' ? 'Codex' : 'Claude'
-      throw new Error(`The resumed terminal did not expose one exact ${label} child process.`)
+      throw new Error('The resumed terminal did not expose one exact Claude child process.')
     }
     await sleep(Math.max(0, Math.min(pollDelayMs, remainingMs)))
     if (now() - startedAtMs >= STRUCTURED_TUI_PROCESS_FAST_POLL_WINDOW_MS) {

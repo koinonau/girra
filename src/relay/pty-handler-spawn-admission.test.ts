@@ -276,7 +276,7 @@ describe('PtyHandler', () => {
         keyId: 'claim-key',
         identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
         worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-        agent: 'codex'
+        agent: 'claude'
       },
       surface: {
         worktreeId: 'repo::/tmp/worktree',

@@ -15,11 +15,17 @@ const THREAD = '019fd532-7c11-7a90-b6de-4e1a2c3d5f60'
 let root: string
 let store: AgentSessionRecordStore
 
-function rolloutLine(message: string): string {
+function transcriptLine(message: string): string {
   return `${JSON.stringify({
-    type: 'event_msg',
+    type: 'assistant',
+    uuid: `uuid-${message.replaceAll(' ', '-')}`,
+    sessionId: THREAD,
     timestamp: '2026-08-11T10:00:00.000Z',
-    payload: { type: 'agent_message', message }
+    message: {
+      role: 'assistant',
+      content: [{ type: 'text', text: message }],
+      stop_reason: 'end_turn'
+    }
   })}\n`
 }
 
@@ -34,11 +40,11 @@ afterEach(async () => {
 })
 
 async function createCatchupFixture() {
-  const accountHome = join(root, 'isolated-codex-home')
-  const sessionsDir = join(accountHome, 'sessions', '2026', '08', '11')
-  const rollout = join(sessionsDir, `rollout-2026-08-11T10-00-00-${THREAD}.jsonl`)
-  await mkdir(sessionsDir, { recursive: true })
-  await writeFile(rollout, rolloutLine('before handoff'), 'utf8')
+  const accountHome = join(root, 'isolated-claude-home')
+  const projectDir = join(accountHome, 'projects', '-workspace-1')
+  const transcript = join(projectDir, `${THREAD}.jsonl`)
+  await mkdir(projectDir, { recursive: true })
+  await writeFile(transcript, transcriptLine('before handoff'), 'utf8')
   const reserved = await store.reserveOwner({
     sessionId: SESSION,
     location: {
@@ -47,8 +53,8 @@ async function createCatchupFixture() {
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: accountHome },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: accountHome },
     runtimeKind: 'tui',
     expectedFence: null,
     spawnToken: 'tui-token',
@@ -79,7 +85,7 @@ async function createCatchupFixture() {
     fence,
     link: {
       linkId: 'tui-link',
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: 'created',
       mintedAtFence: fence,
       observedAt: NOW
@@ -91,12 +97,12 @@ async function createCatchupFixture() {
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: THREAD }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
     },
     journalDir: join(root, 'journal')
   })
-  return { fence, journal, rollout }
+  return { fence, journal, transcript }
 }
 
 function createCatchup(input: Awaited<ReturnType<typeof createCatchupFixture>>) {
@@ -124,7 +130,7 @@ describe('StructuredTuiTranscriptCatchup', () => {
     await catchup.activate(SESSION)
     expect(fixture.journal.snapshot().items).toEqual([])
 
-    await appendFile(fixture.rollout, rolloutLine('during TUI'), 'utf8')
+    await appendFile(fixture.transcript, transcriptLine('during TUI'), 'utf8')
     await vi.waitFor(() =>
       expect(fixture.journal.snapshot().items.map((item) => item.body)).toContainEqual({
         kind: 'message',
@@ -134,7 +140,7 @@ describe('StructuredTuiTranscriptCatchup', () => {
     )
 
     catchup.stop(SESSION)
-    await appendFile(fixture.rollout, rolloutLine('after stop'), 'utf8')
+    await appendFile(fixture.transcript, transcriptLine('after stop'), 'utf8')
     await new Promise((resolve) => setTimeout(resolve, 100))
     expect(fixture.journal.snapshot().items).toHaveLength(1)
   })
@@ -144,11 +150,11 @@ describe('StructuredTuiTranscriptCatchup', () => {
     const beforeCrash = createCatchup(fixture)
     await beforeCrash.prepare(SESSION, fixture.fence)
     await beforeCrash.activate(SESSION)
-    await appendFile(fixture.rollout, rolloutLine('before host crash'), 'utf8')
+    await appendFile(fixture.transcript, transcriptLine('before host crash'), 'utf8')
     await vi.waitFor(() => expect(fixture.journal.snapshot().items).toHaveLength(1))
     beforeCrash.stopAll()
 
-    await appendFile(fixture.rollout, rolloutLine('while host was down'), 'utf8')
+    await appendFile(fixture.transcript, transcriptLine('while host was down'), 'utf8')
     const recovered = createCatchup(fixture)
     await recovered.recover(SESSION, fixture.fence)
     await recovered.activate(SESSION)

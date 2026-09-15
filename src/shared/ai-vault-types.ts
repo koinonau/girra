@@ -1,26 +1,7 @@
 import type { TuiAgent } from './tui-agent'
 import type { ExecutionHostId, ExecutionHostScope } from './execution-host'
 
-export const AI_VAULT_AGENTS = [
-  'claude',
-  'codex',
-  'hermes',
-  'pi',
-  'omp',
-  'prime-agent',
-  'cursor',
-  'gemini',
-  'antigravity',
-  'rovo',
-  'copilot',
-  'opencode',
-  'grok',
-  'openclaw',
-  'devin',
-  'droid',
-  'cline',
-  'kimi'
-] as const satisfies readonly TuiAgent[]
+export const AI_VAULT_AGENTS = ['claude', 'pi', 'opencode'] as const satisfies readonly TuiAgent[]
 
 // Why: the aiVault.listSessions RPC schema CLAMPS scopePaths to this bound
 // (safe: scope paths only widen discovery). Producer-side caps against the same
@@ -45,23 +26,8 @@ export type AiVaultGroup = 'project' | 'folder' | 'agent'
 
 export const AI_VAULT_AGENT_LABELS = {
   claude: 'Claude',
-  codex: 'Codex',
-  hermes: 'Hermes',
   pi: 'Pi',
-  omp: 'OMP',
-  'prime-agent': 'Prime Agent',
-  cursor: 'Cursor',
-  gemini: 'Gemini',
-  antigravity: 'Antigravity',
-  rovo: 'Rovo Dev',
-  copilot: 'GitHub Copilot',
-  opencode: 'OpenCode',
-  grok: 'Grok',
-  openclaw: 'OpenClaw',
-  devin: 'Devin',
-  droid: 'Droid',
-  cline: 'Cline',
-  kimi: 'Kimi'
+  opencode: 'OpenCode'
 } as const satisfies Record<AiVaultAgent, string>
 
 export type AiVaultSessionPreviewMessage = {
@@ -93,7 +59,8 @@ export type AiVaultSession = {
   branch: string | null
   model: string | null
   filePath: string
-  codexHome: string | null
+  // Why: retired Codex field kept on the wire; older clients reject rows without it.
+  codexHome: null
   createdAt: string | null
   updatedAt: string | null
   modifiedAt: string
@@ -148,7 +115,6 @@ export type AiVaultFirstUserPromptArgs = {
   sessionId?: string
   // Transcripts are local-FS only; non-local hosts resolve to null prompt.
   executionHostId?: ExecutionHostId
-  codexHome?: string | null
 }
 
 export type AiVaultFirstUserPromptResult = {
@@ -157,7 +123,7 @@ export type AiVaultFirstUserPromptResult = {
 
 // A session is only offered for normal resume when its transcript actually holds
 // conversation turns; resuming a zero-turn transcript lands in an empty session.
-// Conversation previews count as evidence too: some parsers (e.g. Grok, OpenCode
+// Conversation previews count as evidence too: some parsers (e.g. OpenCode
 // fallback schemas) only learn the turn count from metadata that may be absent.
 export function isAiVaultSessionResumableContent(
   session: Pick<AiVaultSession, 'messageCount' | 'previewMessages'>

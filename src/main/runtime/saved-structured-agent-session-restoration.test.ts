@@ -75,14 +75,13 @@ describe('saved structured session restoration targets', () => {
           structuredSessionId: 'session-claude'
         }),
         tab({
-          id: 'codex-tab',
-          agentSessionAgent: 'codex',
-          structuredSessionId: 'session-codex'
+          id: 'legacy-tab',
+          structuredSessionId: 'session-legacy'
         })
       ],
       'claude-tab'
     )
 
-    expect(collectSavedStructuredAgentSessionIds(saved)).toEqual(['session-codex'])
+    expect(collectSavedStructuredAgentSessionIds(saved)).toEqual(['session-legacy'])
   })
 })

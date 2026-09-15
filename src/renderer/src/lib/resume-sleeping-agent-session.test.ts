@@ -515,19 +515,19 @@ describe('resumeSleepingAgentSessionsForWorktree', () => {
 
   it('uses captured launch config instead of changed settings when resuming worktree sleep', () => {
     const record = makeRecord({
-      agent: 'codex',
+      agent: 'claude',
       origin: 'worktree-sleep',
       launchConfig: {
-        agentCommand: "codex --profile captured '--model' 'gpt-5' '--reasoning-effort' 'high'",
+        agentCommand: "claude --profile captured '--model' 'gpt-5' '--reasoning-effort' 'high'",
         agentArgs: '--model gpt-5 --reasoning-effort high',
         agentEnv: { CODEX_PROFILE: 'captured' }
       }
     })
     useAppStore.setState({
       settings: {
-        agentCmdOverrides: { codex: 'codex --profile changed' },
-        agentDefaultArgs: { codex: '--model changed' },
-        agentDefaultEnv: { codex: { CODEX_PROFILE: 'changed' } }
+        agentCmdOverrides: { claude: 'claude --profile changed' },
+        agentDefaultArgs: { claude: '--model changed' },
+        agentDefaultEnv: { claude: { CODEX_PROFILE: 'changed' } }
       },
       tabsByWorktree: { 'wt-1': [] },
       sleepingAgentSessionsByPaneKey: { [record.paneKey]: record }
@@ -540,7 +540,7 @@ describe('resumeSleepingAgentSessionsForWorktree', () => {
     const resumedTab = state.tabsByWorktree['wt-1']?.[0]
     const startup = state.pendingStartupByTabId[resumedTab!.id]
     expect(startup?.command).toBe(
-      "codex --profile captured '--model' 'gpt-5' '--reasoning-effort' 'high' 'resume' 'sess-1'"
+      "claude --profile captured '--model' 'gpt-5' '--reasoning-effort' 'high' '--resume' 'sess-1'"
     )
     expect(startup?.env).toEqual({ CODEX_PROFILE: 'captured' })
     expect(startup?.command).not.toContain('changed')

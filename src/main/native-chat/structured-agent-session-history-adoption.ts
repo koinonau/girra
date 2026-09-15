@@ -12,7 +12,7 @@ import { agentSessionLeaseAdmitsWriter } from '../../shared/agent-session-lease-
 
 export type StructuredAgentSessionAdoptionOwnership = {
   sessionId: string
-  provider: 'claude' | 'codex'
+  provider: 'claude'
   providerSessionId: string
   lease: AgentSessionLease
 }
@@ -30,7 +30,7 @@ export type CommittedStructuredAgentSessionAdoptionReplay = {
 
 /** Exact committed-operation identity; attach still validates its fingerprint. */
 export function findCommittedStructuredAgentSessionAdoptionReplay(input: {
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   providerSessionId: string
   selfSessionId: string
   callerKey: string
@@ -57,36 +57,29 @@ export function findCommittedStructuredAgentSessionAdoptionReplay(input: {
   ) {
     return null
   }
-  const providerSessionId =
-    adopted.handle.provider === 'codex' ? adopted.handle.threadId : adopted.handle.sessionId
-  if (providerSessionId !== input.providerSessionId) {
+  if (adopted.handle.sessionId !== input.providerSessionId) {
     return null
   }
   return {
     record,
-    providerHandle:
-      adopted.handle.provider === 'codex'
-        ? { kind: 'codex', threadId: adopted.handle.threadId }
-        : {
-            kind: 'claude',
-            sessionId: adopted.handle.sessionId,
-            leafUuid: adopted.handle.leafUuid
-          }
+    providerHandle: {
+      kind: 'claude',
+      sessionId: adopted.handle.sessionId,
+      leafUuid: adopted.handle.leafUuid
+    }
   }
 }
 
 /**
- * A conversation has exactly one writer. Codex takes no lock of its own: a second app-server holding
- * the same thread never errors, it loads history once and then diverges, and the rollout ends up
- * recording a conversation that never happened. So the refusal is the correctness guard, and it has
- * to be able to tell "someone else owns this" from "this very operation owns it".
+ * A conversation has exactly one writer, so the refusal is the correctness guard, and it has to be
+ * able to tell "someone else owns this" from "this very operation owns it".
  *
  * @param selfSessionId the structured session this create is reserving. A retry of a committed
  * create re-runs every pre-commit check, and by then the record it created is itself in the
  * ownership index — without this exemption the replay refuses instead of replaying.
  */
 export function findConflictingStructuredAdoption(input: {
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   providerSessionId: string
   selfSessionId: string
   ownership: readonly StructuredAgentSessionAdoptionOwnership[]
@@ -125,11 +118,11 @@ export function structuredAdoptionConflictError(
  * (selected account before the system default).
  */
 export async function resolveStructuredAgentSessionAdoption(input: {
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   providerSessionId: string
   candidateAccountHomes: readonly string[]
   resolveTranscript: (args: {
-    agent: 'claude' | 'codex'
+    agent: 'claude'
     providerSessionId: string
     accountHomePath: string
   }) => Promise<string | null>

@@ -38,7 +38,7 @@ describe('captureAllSleepingAgentSessions', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'captured' }
       },
-      { agentType: 'codex', launchToken: 'launch-token-1', tabId: 'tab-1', leafId: 'leaf-1' }
+      { agentType: 'claude', launchToken: 'launch-token-1', tabId: 'tab-1', leafId: 'leaf-1' }
     )
 
     store.getState().setAgentStatus(
@@ -46,13 +46,13 @@ describe('captureAllSleepingAgentSessions', () => {
       {
         state: 'working',
         prompt: 'finish the task',
-        agentType: 'codex'
+        agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
       {
-        providerSession: { key: 'session_id', id: 'codex-session-1' },
+        providerSession: { key: 'session_id', id: 'claude-session-1' },
         launchToken: 'launch-token-1'
       }
     )
@@ -60,10 +60,10 @@ describe('captureAllSleepingAgentSessions', () => {
     // Why: Windows update/reboot exits can miss beforeunload; the provider
     // session handle must already be durable for pane-level cold restore.
     expect(store.getState().sleepingAgentSessionsByPaneKey['tab-1:leaf-1']).toMatchObject({
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1',
       tabId: 'tab-1',
-      providerSession: { key: 'session_id', id: 'codex-session-1' },
+      providerSession: { key: 'session_id', id: 'claude-session-1' },
       origin: 'live'
     })
   })
@@ -81,12 +81,12 @@ describe('captureAllSleepingAgentSessions', () => {
       {
         state: 'working',
         prompt: 'finish the task',
-        agentType: 'codex'
+        agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
-      { providerSession: { key: 'session_id', id: 'codex-session-1' } }
+      { providerSession: { key: 'session_id', id: 'claude-session-1' } }
     )
     expect(
       store.getState().sleepingAgentSessionsByPaneKey['tab-1:leaf-1']?.launchConfig
@@ -99,7 +99,7 @@ describe('captureAllSleepingAgentSessions', () => {
         agentEnv: { CODEX_PROFILE: 'captured' }
       },
       {
-        agentType: 'codex',
+        agentType: 'claude',
         tabId: 'tab-1',
         leafId: 'leaf-1'
       }
@@ -125,10 +125,10 @@ describe('captureAllSleepingAgentSessions', () => {
       agentArgs: '--model gpt-5',
       agentEnv: { CODEX_PROFILE: 'captured' }
     }
-    const providerSession = { key: 'session_id' as const, id: 'codex-session-1' }
+    const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
 
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', launchConfig, {
-      agentType: 'codex',
+      agentType: 'claude',
       launchToken,
       tabId: 'tab-1',
       leafId: 'leaf-1'
@@ -137,8 +137,8 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession, launchToken }
@@ -147,8 +147,8 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'waiting', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'waiting', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 20, stateStartedAt: 20 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession }
@@ -157,8 +157,8 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'blocked', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'blocked', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 30, stateStartedAt: 30 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession }
@@ -185,10 +185,10 @@ describe('captureAllSleepingAgentSessions', () => {
       agentArgs: '--model gpt-5',
       agentEnv: { CODEX_PROFILE: 'captured' }
     }
-    const providerSession = { key: 'session_id' as const, id: 'codex-session-1' }
+    const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
 
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', launchConfig, {
-      agentType: 'codex',
+      agentType: 'claude',
       launchToken,
       tabId: 'tab-1',
       leafId: 'leaf-1'
@@ -197,8 +197,8 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession, launchToken }
@@ -221,13 +221,13 @@ describe('captureAllSleepingAgentSessions', () => {
         'wt-1': [makeTab({ id: 'tab-1', worktreeId: 'wt-1' })]
       }
     } as Partial<AppState>)
-    const providerSession = { key: 'session_id' as const, id: 'codex-session-1' }
+    const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
     store
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession }
@@ -247,8 +247,8 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'waiting', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'waiting', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 20, stateStartedAt: 20 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession }
@@ -266,13 +266,13 @@ describe('captureAllSleepingAgentSessions', () => {
         'wt-1': [makeTab({ id: 'tab-1', worktreeId: 'wt-1' })]
       }
     } as Partial<AppState>)
-    const providerSession = { key: 'session_id' as const, id: 'codex-session-1' }
+    const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
     store
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession }
@@ -289,16 +289,16 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'new task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'new task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 20, stateStartedAt: 20 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
-        { providerSession: { key: 'session_id', id: 'codex-session-2' } }
+        { providerSession: { key: 'session_id', id: 'claude-session-2' } }
       )
 
     expect(store.getState().sleepingAgentSessionsByPaneKey['tab-1:leaf-1']).toMatchObject({
       origin: 'live',
-      providerSession: { key: 'session_id', id: 'codex-session-2' }
+      providerSession: { key: 'session_id', id: 'claude-session-2' }
     })
   })
 
@@ -309,7 +309,7 @@ describe('captureAllSleepingAgentSessions', () => {
         'wt-1': [makeTab({ id: 'tab-1', worktreeId: 'wt-1' })]
       }
     } as Partial<AppState>)
-    const providerSession = { key: 'session_id' as const, id: 'codex-session-1' }
+    const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
     const launchConfig = {
       agentCommand: "codex '--model' 'gpt-5'",
       agentArgs: '--model gpt-5',
@@ -321,7 +321,7 @@ describe('captureAllSleepingAgentSessions', () => {
           paneKey: 'tab-1:leaf-1',
           tabId: 'tab-1',
           worktreeId: 'wt-1',
-          agent: 'codex',
+          agent: 'claude',
           providerSession,
           prompt: 'first task',
           state: 'working',
@@ -338,8 +338,8 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 20, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { providerSession }
@@ -376,7 +376,7 @@ describe('captureAllSleepingAgentSessions', () => {
         agentEnv: { CODEX_PROFILE: 'captured' }
       },
       {
-        agentType: 'codex',
+        agentType: 'claude',
         launchToken,
         tabId: 'tab-1',
         leafId: 'leaf-1'
@@ -387,12 +387,12 @@ describe('captureAllSleepingAgentSessions', () => {
       {
         state: 'working',
         prompt: 'first task',
-        agentType: 'codex'
+        agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
-      { providerSession: { key: 'session_id', id: 'codex-session-1' }, launchToken }
+      { providerSession: { key: 'session_id', id: 'claude-session-1' }, launchToken }
     )
     expect(store.getState().agentStatusByPaneKey['tab-1:leaf-1']).not.toHaveProperty('launchConfig')
 
@@ -401,17 +401,17 @@ describe('captureAllSleepingAgentSessions', () => {
       {
         state: 'working',
         prompt: 'manual follow-up',
-        agentType: 'codex'
+        agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 20, stateStartedAt: 20 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
-      { providerSession: { key: 'session_id', id: 'codex-session-2' } }
+      { providerSession: { key: 'session_id', id: 'claude-session-2' } }
     )
 
     expect(store.getState().agentStatusByPaneKey['tab-1:leaf-1']?.providerSession).toEqual({
       key: 'session_id',
-      id: 'codex-session-2'
+      id: 'claude-session-2'
     })
     expect(store.getState().agentStatusByPaneKey['tab-1:leaf-1']).not.toHaveProperty('launchConfig')
     expect(
@@ -434,7 +434,7 @@ describe('captureAllSleepingAgentSessions', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'captured' }
       },
-      { agentType: 'codex', tabId: 'tab-1', leafId: 'leaf-1' }
+      { agentType: 'claude', tabId: 'tab-1', leafId: 'leaf-1' }
     )
     store.getState().setAgentStatus(
       'tab-1:leaf-1',
@@ -472,7 +472,7 @@ describe('captureAllSleepingAgentSessions', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'captured' }
       },
-      { agentType: 'codex', launchToken: 'launch-token-1', tabId: 'tab-1', leafId: 'leaf-1' }
+      { agentType: 'claude', launchToken: 'launch-token-1', tabId: 'tab-1', leafId: 'leaf-1' }
     )
 
     store.getState().dropAgentStatus('tab-1:leaf-1')
@@ -493,7 +493,7 @@ describe('captureAllSleepingAgentSessions', () => {
         agentArgs: '--model gpt-5',
         agentEnv: { CODEX_PROFILE: 'captured' }
       },
-      { agentType: 'codex', tabId: 'tab-1', leafId: 'leaf-1' }
+      { agentType: 'claude', tabId: 'tab-1', leafId: 'leaf-1' }
     )
 
     store.getState().dropAgentStatusByWorktree('wt-1')
@@ -514,21 +514,21 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
-        { providerSession: { key: 'session_id', id: 'codex-session-1' } }
+        { providerSession: { key: 'session_id', id: 'claude-session-1' } }
       )
     store
       .getState()
       .setAgentStatus(
         'tab-2:leaf-2',
-        { state: 'working', prompt: 'second task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'second task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-2', worktreeId: 'wt-2' },
-        { providerSession: { key: 'session_id', id: 'codex-session-2' } }
+        { providerSession: { key: 'session_id', id: 'claude-session-2' } }
       )
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', {
       agentArgs: '--model gpt-5',
@@ -612,21 +612,21 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
-        { providerSession: { key: 'session_id', id: 'codex-session-1' } }
+        { providerSession: { key: 'session_id', id: 'claude-session-1' } }
       )
     store
       .getState()
       .setAgentStatus(
         'tab-2:leaf-2',
-        { state: 'working', prompt: 'second task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'second task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 10, stateStartedAt: 10 },
         { tabId: 'tab-2', worktreeId: 'wt-2' },
-        { providerSession: { key: 'session_id', id: 'codex-session-2' } }
+        { providerSession: { key: 'session_id', id: 'claude-session-2' } }
       )
     store.getState().registerAgentLaunchConfig('tab-1:leaf-1', {
       agentArgs: '--model gpt-5',
@@ -661,12 +661,12 @@ describe('captureAllSleepingAgentSessions', () => {
       {
         state: 'working',
         prompt: 'first prompt',
-        agentType: 'codex'
+        agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
-      { providerSession: { key: 'session_id', id: 'codex-session-1' } }
+      { providerSession: { key: 'session_id', id: 'claude-session-1' } }
     )
     const firstRecord = store.getState().sleepingAgentSessionsByPaneKey['tab-1:leaf-1']
 
@@ -675,12 +675,12 @@ describe('captureAllSleepingAgentSessions', () => {
       {
         state: 'working',
         prompt: 'second prompt',
-        agentType: 'codex'
+        agentType: 'claude'
       },
-      'Codex',
+      'Claude',
       { updatedAt: 20, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
-      { providerSession: { key: 'session_id', id: 'codex-session-1' } }
+      { providerSession: { key: 'session_id', id: 'claude-session-1' } }
     )
 
     expect(store.getState().sleepingAgentSessionsByPaneKey['tab-1:leaf-1']).toBe(firstRecord)
@@ -692,7 +692,7 @@ describe('captureAllSleepingAgentSessions', () => {
   // Covers claude (the reported agent) and codex; previously this was Pi-only.
   it.each([
     ['claude', 'Claude'],
-    ['codex', 'Codex']
+    ['claude', 'Claude']
   ] as const)(
     'retains the recovery anchor when a finished %s session stays resumable (#9454)',
     (agentType, title) => {
@@ -740,12 +740,12 @@ describe('captureAllSleepingAgentSessions', () => {
 
     store.getState().setAgentStatus(
       'tab-1:leaf-1',
-      { state: 'working', prompt: 'first task', agentType: 'codex' },
-      'Codex',
+      { state: 'working', prompt: 'first task', agentType: 'claude' },
+      'Claude',
       { updatedAt: 10, stateStartedAt: 10 },
       { tabId: 'tab-1', worktreeId: 'wt-1' },
       {
-        providerSession: { key: 'session_id', id: 'codex-session-1' },
+        providerSession: { key: 'session_id', id: 'claude-session-1' },
         launchToken,
         launchConfig: {
           agentArgs: '--model gpt-5',
@@ -757,19 +757,19 @@ describe('captureAllSleepingAgentSessions', () => {
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'done', prompt: 'first task', agentType: 'codex' },
-        'Codex',
+        { state: 'done', prompt: 'first task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 20, stateStartedAt: 10 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
-        { providerSession: { key: 'session_id', id: 'codex-session-1' }, launchToken }
+        { providerSession: { key: 'session_id', id: 'claude-session-1' }, launchToken }
       )
 
     store
       .getState()
       .setAgentStatus(
         'tab-1:leaf-1',
-        { state: 'working', prompt: 'manual task', agentType: 'codex' },
-        'Codex',
+        { state: 'working', prompt: 'manual task', agentType: 'claude' },
+        'Claude',
         { updatedAt: 30, stateStartedAt: 30 },
         { tabId: 'tab-1', worktreeId: 'wt-1' },
         { launchToken }

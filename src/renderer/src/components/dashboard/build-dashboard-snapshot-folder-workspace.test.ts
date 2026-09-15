@@ -217,13 +217,13 @@ describe('buildDashboardSnapshot folder workspaces', () => {
           groupId: 'group-1',
           worktreeId: WORKSPACE_ID,
           contentType: 'agent-session',
-          label: 'Codex Chat',
+          label: 'Claude Chat',
           customLabel: null,
           color: null,
           sortOrder: 0,
           createdAt: NOW,
           isPinned: false,
-          agentSessionAgent: 'codex'
+          agentSessionAgent: 'claude'
         } satisfies Tab
       ]
     }

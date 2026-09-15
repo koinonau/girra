@@ -10,7 +10,6 @@ import {
   resolveTuiAgentLaunchEnv
 } from '../../../../shared/tui-agent-launch-defaults'
 import { resolveInitialNativeChatSessionOptions } from '@/components/native-chat/native-chat-launch-session-options'
-import { isNativeChatTranscriptLocalReadable } from '@/lib/native-chat-transcript-readability'
 import { tuiAgentToAgentKind } from '../../../../shared/agent-kind'
 
 export type QuickComposerStartupInput = {
@@ -18,7 +17,6 @@ export type QuickComposerStartupInput = {
   prompt: string
   draftPrompt: string | null | undefined
   settings: GlobalSettings | null | undefined
-  repoConnectionId: string | null | undefined
   platform: NodeJS.Platform
   shell: AgentStartupShell | null | undefined
   isRemote: boolean
@@ -45,10 +43,7 @@ export function buildQuickComposerStartup(input: QuickComposerStartupInput): Qui
             agent,
             ...(draftPrompt
               ? { promptDelivery: 'draft' as const, launchDraftText: draftPrompt }
-              : {}),
-            nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(
-              input.repoConnectionId
-            )
+              : {})
           }
         )
   const draftLaunchPlan =

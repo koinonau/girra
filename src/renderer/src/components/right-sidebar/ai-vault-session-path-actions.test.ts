@@ -24,7 +24,7 @@ describe('isSyntheticAiVaultSessionPath', () => {
 
   it('treats ordinary JSONL/JSON transcript paths as real', () => {
     expect(isSyntheticAiVaultSessionPath('/home/user/.claude/sessions/log.jsonl')).toBe(false)
-    expect(isSyntheticAiVaultSessionPath('C:\\Users\\a\\.codex\\log.json')).toBe(false)
+    expect(isSyntheticAiVaultSessionPath('C:\\Users\\a\\.claude\\log.json')).toBe(false)
   })
 })
 

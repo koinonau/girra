@@ -144,8 +144,7 @@ export async function renameReplaceTranscript(
 }
 
 /**
- * A message-graph transcript, the shape OpenClaw, Pi, OMP and Prime Agent
- * write. The session id comes from the file name, so callers name the file.
+ * A message-graph transcript, the shape Pi writes. The session id comes from the file name, so callers name the file.
  */
 export async function writeMessageGraphTranscript(
   path: string,

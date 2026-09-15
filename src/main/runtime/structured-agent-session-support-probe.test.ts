@@ -38,7 +38,7 @@ function stubStructuredHostInstall(runtime: OrcaRuntimeService): {
     writeGateAttached: false,
     reaperStarted: false
   }
-  // `supportsCreate` answers as the real Codex adapter would, so a probe that reinstalls the host
+  // `supportsCreate` answers as the real adapter would, so a probe that reinstalls the host
   // still returns the right answer and fails on the install effects alone.
   const host = {
     reconcileRestartLeases: vi.fn(async () => {}),
@@ -82,7 +82,7 @@ function createRuntime(location: TestLocation): OrcaRuntimeService {
 }
 
 async function expectSupportWithoutInstall(input: {
-  agent: 'claude' | 'codex'
+  agent: 'claude'
   location: TestLocation
   expected: SupportResult
   repetitions?: number
@@ -117,7 +117,7 @@ describe('structured agent-session create-support probe', () => {
     vi.restoreAllMocks()
   })
 
-  it.each(['codex', 'claude'] as const)(
+  it.each(['claude'] as const)(
     'answers %s support repeatedly without installing the host',
     async (agent) => {
       await expectSupportWithoutInstall({
@@ -130,8 +130,6 @@ describe('structured agent-session create-support probe', () => {
   )
 
   it.each([
-    ['codex', true, { supported: true }],
-    ['codex', false, { supported: false, reason: 'agent' }],
     ['claude', true, { supported: true }],
     ['claude', false, { supported: false, reason: 'agent' }]
   ] as const)(
@@ -150,7 +148,7 @@ describe('structured agent-session create-support probe', () => {
     }
   )
 
-  it.each(['codex', 'claude'] as const)(
+  it.each(['claude'] as const)(
     'still reports an unsupported remote %s location without installing the host',
     async (agent) => {
       await expectSupportWithoutInstall({
@@ -161,7 +159,7 @@ describe('structured agent-session create-support probe', () => {
     }
   )
 
-  it.each(['codex', 'claude'] as const)(
+  it.each(['claude'] as const)(
     'still reports an unsupported WSL %s location without installing the host',
     async (agent) => {
       await expectSupportWithoutInstall({
@@ -172,7 +170,7 @@ describe('structured agent-session create-support probe', () => {
     }
   )
 
-  it.each(['codex', 'claude'] as const)(
+  it.each(['claude'] as const)(
     'supports a local folder workspace for %s without installing the host',
     async (agent) => {
       await expectSupportWithoutInstall({

@@ -6,8 +6,8 @@ import {
   type NativeChatEditFile,
   type NativeChatEditLine
 } from './native-chat-edit-model'
-import { editFilesFromPatchText, splitMoveMarker } from './native-chat-edit-patch-files'
-import { editLinesFromUnifiedPatch, editLinesFromWholeFile } from './native-chat-unified-patch'
+import { editFilesFromPatchText } from './native-chat-edit-patch-files'
+import { editLinesFromWholeFile } from './native-chat-unified-patch'
 import type { NativeChatEditPatch } from './native-chat-types'
 
 // `NotebookEdit` is deliberately absent: its input carries only the new cell
@@ -164,48 +164,6 @@ function claudeEditFiles(
   ]
 }
 
-function codexChangeFiles(changes: unknown[]): NativeChatEditFile[] {
-  return changes.flatMap((entry) => {
-    const change = record(entry)
-    const path = text(change?.path)
-    const diff = text(change?.diff)
-    if (!change || !path || !diff) {
-      return []
-    }
-    const kind = record(change.kind)
-    const kindType = text(kind?.type) ?? text(change.kind) ?? 'update'
-    const movePath = text(kind?.move_path) ?? text(change.movePath)
-    if (kindType === 'add' || kindType === 'delete') {
-      // Add and delete arrive as raw file content, with no hunk header or signs.
-      const whole = editLinesFromWholeFile(diff, kindType === 'add' ? 'add' : 'del')
-      return [
-        finalizeEditFile({
-          path,
-          oldPath: null,
-          changeKind: kindType === 'add' ? 'added' : 'deleted',
-          lines: whole.lines,
-          lineNumbersKnown: true,
-          truncated: whole.truncated
-        })
-      ]
-    }
-    const parsed = editLinesFromUnifiedPatch(splitMoveMarker(diff).body)
-    if (!parsed) {
-      return []
-    }
-    return [
-      finalizeEditFile({
-        path: movePath ?? path,
-        oldPath: movePath ? path : null,
-        changeKind: movePath ? 'renamed' : 'edited',
-        lines: parsed.lines,
-        lineNumbersKnown: parsed.lineNumbersKnown,
-        truncated: parsed.truncated
-      })
-    ]
-  })
-}
-
 /** One diff model for a tool call and its result, across every shape the
  *  supported agents use to report a file edit. */
 export function editFilesFromToolPair(pair: {
@@ -247,13 +205,6 @@ export function editFilesFromToolPair(pair: {
       requireApplyCommand: COMMAND_PATCH_TOOLS.has(pair.name)
     })
     const files = envelope ? editFilesFromBeginPatch(envelope) : []
-    if (files.length > 0) {
-      return files
-    }
-  }
-
-  if (input && Array.isArray(input.changes)) {
-    const files = codexChangeFiles(input.changes)
     if (files.length > 0) {
       return files
     }

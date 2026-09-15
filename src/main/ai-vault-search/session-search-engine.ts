@@ -248,7 +248,6 @@ function sessionFields(
     agent: session.agent,
     sessionId: session.session_id,
     filePath: session.file_path,
-    codexHome: session.codex_home,
     title: session.title,
     cwd: session.cwd,
     branch: session.branch,

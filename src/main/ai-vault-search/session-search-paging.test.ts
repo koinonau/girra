@@ -164,7 +164,7 @@ describe('a cursor is refused rather than reinterpreted', () => {
   it.each([
     ['scope', { scope: 'conversation' as const }],
     ['sort', { filters: { sort: 'newest' as const } }],
-    ['agents', { filters: { agents: ['codex' as const] } }],
+    ['agents', { filters: { agents: ['pi' as const] } }],
     ['scopePaths', { filters: { scopePaths: ['/repo/app'] } }],
     ['since', { filters: { since: '2026-09-01T00:00:00.000Z' } }]
   ])('rejects a cursor presented with a different %s', async (_field, changed) => {
@@ -219,8 +219,8 @@ describe('cursor encoding', () => {
   })
 
   it('reads a filter list in any order as the same request', () => {
-    expect(sessionSearchPageKey({ query: 'a', filters: { agents: ['claude', 'codex'] } })).toBe(
-      sessionSearchPageKey({ query: 'a', filters: { agents: ['codex', 'claude'] } })
+    expect(sessionSearchPageKey({ query: 'a', filters: { agents: ['claude', 'pi'] } })).toBe(
+      sessionSearchPageKey({ query: 'a', filters: { agents: ['pi', 'claude'] } })
     )
   })
 

@@ -51,49 +51,36 @@ describe('structured agent session launch', () => {
           }
     )
 
-    const intent = createStructuredAgentSessionLaunchIntent('workspace-1', 'codex')
+    const intent = createStructuredAgentSessionLaunchIntent('workspace-1', 'claude')
     const receipt = await launchStructuredAgentSession(intent)
     const params = vi
       .mocked(callStructuredAgentSession)
       .mock.calls.find(([, method]) => method === 'agentSession.create')?.[2] as {
       envelope: { sessionId: string; payloadFingerprint: string }
       worktree: string
-      agent: 'codex'
+      agent: 'claude'
     }
 
     expect(receipt).toEqual({
-      sessionId: expect.stringMatching(/^codex_[A-Za-z0-9_]{36}$/),
+      sessionId: expect.stringMatching(/^claude_[A-Za-z0-9_]{36}$/),
       fence: 1
     })
     expect(callStructuredAgentSession).toHaveBeenCalledWith(
       { kind: 'local' },
       'agentSession.create',
-      expect.objectContaining({ worktree: 'id:workspace-1', agent: 'codex' })
+      expect.objectContaining({ worktree: 'id:workspace-1', agent: 'claude' })
     )
     expect(params.envelope.payloadFingerprint).toBe(
       structuredAgentSessionPayloadFingerprint({
         method: 'agentSession.create',
         sessionId: params.envelope.sessionId,
-        fields: { worktree: 'id:workspace-1', agent: 'codex' }
+        fields: { worktree: 'id:workspace-1', agent: 'claude' }
       })
     )
     expect(params).toBe(intent.params)
   })
 
-  it('names Claude as the create provider and in the session id', () => {
-    const intent = createStructuredAgentSessionLaunchIntent('workspace-1', 'claude')
-    expect(intent.sessionId).toMatch(/^claude_[A-Za-z0-9_]{36}$/)
-    expect(intent.params.agent).toBe('claude')
-    expect(intent.params.envelope.payloadFingerprint).toBe(
-      structuredAgentSessionPayloadFingerprint({
-        method: 'agentSession.create',
-        sessionId: intent.sessionId,
-        fields: { worktree: 'id:workspace-1', agent: 'claude' }
-      })
-    )
-  })
-
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'asks the executing host for create support before creating a %s session',
     async (agent) => {
       vi.mocked(callStructuredAgentSession).mockImplementation(async (_target, method) =>
@@ -118,7 +105,7 @@ describe('structured agent session launch', () => {
     }
   )
 
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'refuses a %s launch the host says it cannot support, without creating',
     async (agent) => {
       vi.mocked(callStructuredAgentSession).mockResolvedValue({ supported: false, reason: 'agent' })
@@ -224,7 +211,7 @@ describe('structured agent session launch', () => {
     expect(callStructuredAgentSession).toHaveBeenCalledOnce()
   })
 
-  /** The probe now runs for Codex too, so create-outcome tests script it to say yes. */
+  /** Create-outcome tests script the support probe to say yes. */
   function mockSupportedCreate(create: () => unknown): void {
     vi.mocked(callStructuredAgentSession).mockImplementation(async (_target, method) =>
       method === 'agentSession.createSupport' ? { supported: true } : create()
@@ -232,7 +219,7 @@ describe('structured agent session launch', () => {
   }
 
   it('replays the exact create envelope when an unknown outcome is retried', async () => {
-    const intent = createStructuredAgentSessionLaunchIntent('workspace-retry', 'codex')
+    const intent = createStructuredAgentSessionLaunchIntent('workspace-retry', 'claude')
     mockSupportedCreate(() => {
       throw new Error('response lost')
     })
@@ -260,7 +247,7 @@ describe('structured agent session launch', () => {
     }))
 
     const error = await launchStructuredAgentSession(
-      createStructuredAgentSessionLaunchIntent('workspace-unknown', 'codex')
+      createStructuredAgentSessionLaunchIntent('workspace-unknown', 'claude')
     ).catch((caught: unknown) => caught)
 
     expect(error).toBeInstanceOf(StructuredAgentSessionCreateUnknownOutcomeError)
@@ -281,7 +268,7 @@ describe('structured agent session launch', () => {
     }))
 
     const error = await launchStructuredAgentSession(
-      createStructuredAgentSessionLaunchIntent('workspace-unknown-token', 'codex')
+      createStructuredAgentSessionLaunchIntent('workspace-unknown-token', 'claude')
     ).catch((caught: unknown) => caught)
 
     expect(error).toBeInstanceOf(StructuredAgentSessionCreateUnknownOutcomeError)
@@ -298,7 +285,7 @@ describe('structured agent session launch', () => {
     }))
 
     const error = await launchStructuredAgentSession(
-      createStructuredAgentSessionLaunchIntent('workspace-unsupported', 'codex')
+      createStructuredAgentSessionLaunchIntent('workspace-unsupported', 'claude')
     ).catch((caught: unknown) => caught)
 
     expect(error).toBeInstanceOf(StructuredAgentSessionCreateRefusalError)
@@ -313,7 +300,7 @@ describe('structured agent session launch', () => {
         throw Object.assign(new Error(code), { code })
       })
       const oldHostError = await launchStructuredAgentSession(
-        createStructuredAgentSessionLaunchIntent(`workspace-old-host-${code}`, 'codex')
+        createStructuredAgentSessionLaunchIntent(`workspace-old-host-${code}`, 'claude')
       ).catch((caught: unknown) => caught)
 
       expect(oldHostError).toBeInstanceOf(StructuredAgentSessionCreateRefusalError)
@@ -326,7 +313,7 @@ describe('structured agent session launch', () => {
       throw Object.assign(new Error('Connection lost'), { code: 'runtime_error' })
     })
     const transportError = await launchStructuredAgentSession(
-      createStructuredAgentSessionLaunchIntent('workspace-offline', 'codex')
+      createStructuredAgentSessionLaunchIntent('workspace-offline', 'claude')
     ).catch((caught: unknown) => caught)
 
     expect(transportError).not.toBeInstanceOf(StructuredAgentSessionCreateRefusalError)

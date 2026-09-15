@@ -29,20 +29,6 @@ async function writeFixture(prefix: string, records: unknown[]): Promise<string>
 }
 
 describe('readNativeChatTranscript (claude)', () => {
-  it('decodes OpenClaude with the Claude transcript format', async () => {
-    const filePath = await writeFixture('orca-native-chat-openclaude-', [
-      {
-        type: 'assistant',
-        uuid: 'openclaude-assistant',
-        message: { role: 'assistant', content: [{ type: 'text', text: 'hello' }] }
-      }
-    ])
-
-    await expect(
-      readNativeChatTranscript('openclaude', 'session', { filePath })
-    ).resolves.toMatchObject({ messages: [{ id: 'openclaude-assistant' }] })
-  })
-
   it('returns ordered user/assistant/tool messages with no 5-message cap', async () => {
     const records: unknown[] = []
     // 4 user/assistant turns = 8 messages, well past the AI-Vault preview cap.
@@ -189,75 +175,6 @@ describe('readNativeChatTranscript (claude)', () => {
       throw new Error('expected messages')
     }
     expect(result.messages[0].blocks[0]).toEqual({ type: 'text', text: 'pondering' })
-  })
-})
-
-describe('readNativeChatTranscript (codex)', () => {
-  it('maps tool calls and results to tool-call/tool-result blocks', async () => {
-    const filePath = await writeFixture('orca-native-chat-codex-', [
-      {
-        type: 'session_meta',
-        timestamp: '2026-06-01T10:00:00.000Z',
-        payload: { id: 'codex-sess', cwd: '/repo' }
-      },
-      {
-        type: 'response_item',
-        timestamp: '2026-06-01T10:00:01.000Z',
-        payload: {
-          type: 'message',
-          role: 'user',
-          content: [{ type: 'text', text: 'Run the build' }]
-        }
-      },
-      {
-        type: 'response_item',
-        timestamp: '2026-06-01T10:00:02.000Z',
-        payload: { type: 'reasoning', summary: [{ type: 'summary_text', text: 'I will run it' }] }
-      },
-      {
-        type: 'response_item',
-        timestamp: '2026-06-01T10:00:03.000Z',
-        payload: {
-          type: 'function_call',
-          name: 'shell',
-          arguments: '{"command":["bash","-lc","make"]}'
-        }
-      },
-      {
-        type: 'response_item',
-        timestamp: '2026-06-01T10:00:04.000Z',
-        payload: {
-          type: 'function_call_output',
-          output: { content: 'build ok', success: true }
-        }
-      },
-      {
-        type: 'response_item',
-        timestamp: '2026-06-01T10:00:05.000Z',
-        payload: { type: 'message', role: 'assistant', content: [{ type: 'text', text: 'Done.' }] }
-      }
-    ])
-
-    const result = await readNativeChatTranscript('codex', 'codex-sess', { filePath })
-    if (!('messages' in result)) {
-      throw new Error(`expected messages, got error`)
-    }
-
-    const roles = result.messages.map((m) => m.role)
-    expect(roles).toEqual(['user', 'reasoning', 'assistant', 'tool', 'assistant'])
-
-    const call = result.messages.find((m) => m.blocks[0]?.type === 'tool-call')
-    expect(call?.blocks[0]).toEqual({
-      type: 'tool-call',
-      name: 'shell',
-      input: '{"command":["bash","-lc","make"]}'
-    })
-
-    const toolResult = result.messages.find((m) => m.blocks[0]?.type === 'tool-result')
-    expect(toolResult?.blocks[0]).toEqual({ type: 'tool-result', output: 'build ok' })
-
-    const reasoning = result.messages.find((m) => m.role === 'reasoning')
-    expect(reasoning?.blocks[0]).toEqual({ type: 'text', text: 'I will run it' })
   })
 })
 

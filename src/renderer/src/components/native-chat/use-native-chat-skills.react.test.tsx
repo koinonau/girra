@@ -53,12 +53,12 @@ function stateForHost(hostId: string) {
 }
 
 function Probe({ enabled }: { enabled: boolean }): null {
-  mocks.snapshots.push(useNativeChatSkills('codex', 'tab-1', enabled))
+  mocks.snapshots.push(useNativeChatSkills('claude', 'tab-1', enabled))
   return null
 }
 
 function DraftProbe({ draft }: { draft: string }): React.JSX.Element {
-  return <Probe enabled={isSkillPickerTriggered(draft, getNativeChatAgentProfile('codex'))} />
+  return <Probe enabled={isSkillPickerTriggered(draft, getNativeChatAgentProfile('claude'))} />
 }
 
 describe('useNativeChatSkills', () => {

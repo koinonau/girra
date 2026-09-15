@@ -18,7 +18,11 @@ const BODY: AgentJournalItemBody = {
 }
 
 function identity(ordinal: number): AgentJournalItemIdentity {
-  return { provider: 'codex', threadId: 'thread-1', turnId: 'turn-1', ordinal }
+  return { provider: 'claude', sessionId: 'thread-1', uuid: `turn-1-${ordinal}` }
+}
+
+function ordinalOf(id: AgentJournalItemIdentity): number {
+  return id.provider === 'claude' ? Number(id.uuid.slice('turn-1-'.length)) : -1
 }
 
 type Recorded = {
@@ -36,7 +40,7 @@ function target(
 ): StructuredAgentSessionEventTarget {
   const journal = {
     appendItem: vi.fn(async (id: AgentJournalItemIdentity, _body: AgentJournalItemBody) => {
-      const ordinal = id.provider === 'codex' ? id.ordinal : -1
+      const ordinal = ordinalOf(id)
       if (ordinal === failOn) {
         throw new Error(`refused ${ordinal}`)
       }
@@ -47,7 +51,7 @@ function target(
       log.push({
         call: 'appendTombstone',
         fence,
-        ordinal: id.provider === 'codex' ? id.ordinal : -1
+        ordinal: ordinalOf(id)
       })
       return { epoch: 'e', sequence: 0 }
     }),

@@ -79,23 +79,23 @@ function structuredSnapshot(): RuntimeMobileSessionTabsResult {
     [
       {
         type: 'agent-session',
-        id: 'agent-session:codex-1',
-        title: 'Codex Chat',
-        sessionId: 'codex-1',
-        agent: 'codex',
+        id: 'agent-session:claude-1',
+        title: 'Claude Chat',
+        sessionId: 'claude-1',
+        agent: 'claude',
         isActive: true
       }
     ],
     {
       publicationEpoch: 'structured:epoch-1',
       activeGroupId: STRUCTURED_GROUP,
-      activeTabId: 'agent-session:codex-1',
+      activeTabId: 'agent-session:claude-1',
       activeTabType: 'agent-session',
       tabGroups: [
         {
           id: STRUCTURED_GROUP,
-          activeTabId: 'agent-session:codex-1',
-          tabOrder: ['agent-session:codex-1']
+          activeTabId: 'agent-session:claude-1',
+          tabOrder: ['agent-session:claude-1']
         }
       ],
       tabGroupLayout: { type: 'leaf', groupId: STRUCTURED_GROUP }

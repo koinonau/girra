@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   inferQuestionAnswered: vi.fn(() => Promise.resolve(true)),
   sendRuntimePtyInput: vi.fn(),
   sendNativeChatAskAnswer: vi.fn(),
-  sendNativeChatMessage: vi.fn(),
   // Mutable so a test can swap the live status between sendAnswer and settle.
   storeState: { agentStatusByPaneKey: {} as Record<string, unknown> }
 }))
@@ -40,8 +39,7 @@ vi.mock('@/lib/agent-paste-draft', () => ({
 }))
 
 vi.mock('./native-chat-runtime-send', () => ({
-  sendNativeChatAskAnswer: (...args: unknown[]) => mocks.sendNativeChatAskAnswer(...args),
-  sendNativeChatMessage: (...args: unknown[]) => mocks.sendNativeChatMessage(...args)
+  sendNativeChatAskAnswer: (...args: unknown[]) => mocks.sendNativeChatAskAnswer(...args)
 }))
 
 import { useNativeChatInteractiveSend } from './use-native-chat-interactive-send'
@@ -61,57 +59,6 @@ describe('useNativeChatInteractiveSend', () => {
     })
     const handle = { cancel: mocks.cancel, settleAfterMs: 500 }
     mocks.sendNativeChatAskAnswer.mockReturnValue(handle)
-    mocks.sendNativeChatMessage.mockReturnValue(handle)
-  })
-
-  it('routes a non-selector answer through the pasted-text send path', () => {
-    const { result } = renderHook(() =>
-      useNativeChatInteractiveSend('tab-1', PANE_KEY, 'pty-1', 'grok')
-    )
-
-    act(() => result.current.sendAnswer(PROMPT, [{ indices: [1] }]))
-
-    // Grok commits a pasted answer: label text 'B', not option-number keystrokes.
-    expect(mocks.sendNativeChatMessage).toHaveBeenCalledWith(
-      { terminalTabId: 'tab-1' },
-      'pty-1',
-      'B'
-    )
-    expect(mocks.sendNativeChatAskAnswer).not.toHaveBeenCalled()
-  })
-
-  it('routes a Codex answer through the option-number keystroke path', () => {
-    const { result } = renderHook(() =>
-      useNativeChatInteractiveSend('tab-1', PANE_KEY, 'pty-1', 'codex')
-    )
-
-    act(() => result.current.sendAnswer(PROMPT, [{ indices: [1] }]))
-
-    // Codex's request_user_input card ignores typed labels (STA-1860 shape):
-    // the 2nd option is delivered as its digit '2', which selects AND commits.
-    expect(mocks.sendNativeChatAskAnswer).toHaveBeenCalledWith(
-      { terminalTabId: 'tab-1' },
-      'pty-1',
-      [{ raw: '2' }],
-      expect.any(Function)
-    )
-    expect(mocks.sendNativeChatMessage).not.toHaveBeenCalled()
-  })
-
-  it('does not send a trailing Enter after Codex submits a multi-question answer', () => {
-    const prompt: AskPrompt = {
-      questions: [
-        { question: 'q1', multiSelect: false, options: [{ label: 'A' }, { label: 'B' }] },
-        { question: 'q2', multiSelect: false, options: [{ label: 'C' }, { label: 'D' }] }
-      ]
-    }
-    const { result } = renderHook(() =>
-      useNativeChatInteractiveSend('tab-1', PANE_KEY, 'pty-1', 'codex')
-    )
-
-    act(() => result.current.sendAnswer(prompt, [{ indices: [1] }, { indices: [0] }]))
-
-    expect(mocks.sendNativeChatAskAnswer.mock.calls[0]?.[2]).toEqual([{ raw: '2' }, { raw: '1' }])
   })
 
   it('routes a Claude answer through the option-number keystroke path', () => {
@@ -128,12 +75,11 @@ describe('useNativeChatInteractiveSend', () => {
       [{ raw: '2' }],
       expect.any(Function)
     )
-    expect(mocks.sendNativeChatMessage).not.toHaveBeenCalled()
   })
 
-  it('infers OpenClaude answers through its Claude-compatible selector path', () => {
+  it('infers the answer once the selector writes settle', () => {
     const { result } = renderHook(() =>
-      useNativeChatInteractiveSend('tab-1', PANE_KEY, 'pty-1', 'openclaude')
+      useNativeChatInteractiveSend('tab-1', PANE_KEY, 'pty-1', 'claude')
     )
 
     act(() => result.current.sendAnswer(PROMPT, [{ indices: [1] }]))
@@ -156,12 +102,11 @@ describe('useNativeChatInteractiveSend', () => {
 
     expect(resultValue).toEqual({ settleAfterMs: 0, waitsForVerifiedDelivery: false })
     expect(mocks.sendNativeChatAskAnswer).not.toHaveBeenCalled()
-    expect(mocks.sendNativeChatMessage).not.toHaveBeenCalled()
   })
 
   it('cancels delayed answer writes when the PTY target changes', () => {
     const { result, rerender } = renderHook(
-      ({ targetPtyId }) => useNativeChatInteractiveSend('tab-1', PANE_KEY, targetPtyId, 'codex'),
+      ({ targetPtyId }) => useNativeChatInteractiveSend('tab-1', PANE_KEY, targetPtyId, 'claude'),
       { initialProps: { targetPtyId: 'pty-1' as string | null } }
     )
 

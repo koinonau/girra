@@ -39,11 +39,6 @@ export async function handoffStructuredSessionToNative(
         }
       }
       transcriptPath = owner.transcriptPath ?? transcriptPath
-      if (owner.link.handle.provider === 'codex' && !transcriptPath) {
-        throw new Error(
-          'The Codex terminal has not written a durable rollout yet. Send a prompt before switching to structured chat.'
-        )
-      }
       context.setStatus(sessionId, {
         owner: 'tui',
         direction: 'to-native',

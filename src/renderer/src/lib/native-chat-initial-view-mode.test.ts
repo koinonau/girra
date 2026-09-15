@@ -1,10 +1,8 @@
 import { describe, it, expect } from 'vitest'
-import type { Tab } from '../../../shared/tab-types'
 import {
   decideInitialAgentTabViewMode,
   initialAgentTabViewModeProps
 } from './native-chat-initial-view-mode'
-import { isNativeChatTranscriptLocalReadable } from './native-chat-transcript-readability'
 
 describe('decideInitialAgentTabViewMode', () => {
   it("returns 'chat' when native chat and the opt-in default setting are on", () => {
@@ -12,7 +10,7 @@ describe('decideInitialAgentTabViewMode', () => {
       decideInitialAgentTabViewMode({
         experimentalNativeChat: true,
         openAgentTabsInChatByDefault: true,
-        agent: 'codex'
+        agent: 'claude'
       })
     ).toBe('chat')
   })
@@ -22,7 +20,7 @@ describe('decideInitialAgentTabViewMode', () => {
       decideInitialAgentTabViewMode({
         experimentalNativeChat: false,
         openAgentTabsInChatByDefault: true,
-        agent: 'codex'
+        agent: 'claude'
       })
     ).toBeUndefined()
   })
@@ -32,7 +30,7 @@ describe('decideInitialAgentTabViewMode', () => {
       decideInitialAgentTabViewMode({
         experimentalNativeChat: true,
         openAgentTabsInChatByDefault: false,
-        agent: 'codex'
+        agent: 'claude'
       })
     ).toBeUndefined()
   })
@@ -42,68 +40,19 @@ describe('decideInitialAgentTabViewMode', () => {
       decideInitialAgentTabViewMode({
         experimentalNativeChat: true,
         openAgentTabsInChatByDefault: undefined,
-        agent: 'codex'
+        agent: 'claude'
       })
     ).toBeUndefined()
   })
 
-  it.each(['gemini', 'opencode'] as const)(
-    'keeps unsupported agent %s in terminal view',
-    (agent) => {
-      expect(
-        decideInitialAgentTabViewMode({
-          experimentalNativeChat: true,
-          openAgentTabsInChatByDefault: true,
-          agent
-        })
-      ).toBeUndefined()
-    }
-  )
-
-  it.each([
-    ['local', null],
-    ['runtime-owned', 'runtime-ssh-env-1']
-  ] as const)('opens %s Grok in chat when configured', (_host, connectionId) => {
+  it.each(['pi', 'opencode'] as const)('keeps unsupported agent %s in terminal view', (agent) => {
     expect(
       decideInitialAgentTabViewMode({
         experimentalNativeChat: true,
         openAgentTabsInChatByDefault: true,
-        agent: 'grok',
-        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(connectionId)
-      })
-    ).toBe('chat')
-  })
-
-  it('keeps Model-A SSH omp in the terminal view but opens it locally', () => {
-    const forConnection = (connectionId: string | null): Tab['viewMode'] =>
-      decideInitialAgentTabViewMode({
-        experimentalNativeChat: true,
-        openAgentTabsInChatByDefault: true,
-        agent: 'omp',
-        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable(connectionId)
-      })
-    expect(forConnection('ssh-target-1')).toBeUndefined()
-    expect(forConnection(null)).toBe('chat')
-  })
-
-  it('keeps Model-A SSH Grok in the terminal view', () => {
-    expect(
-      decideInitialAgentTabViewMode({
-        experimentalNativeChat: true,
-        openAgentTabsInChatByDefault: true,
-        agent: 'grok',
-        nativeChatTranscriptIsLocalReadable: isNativeChatTranscriptLocalReadable('ssh-target-1')
+        agent
       })
     ).toBeUndefined()
-    expect(
-      initialAgentTabViewModeProps(
-        {
-          experimentalNativeChat: true,
-          openAgentTabsInChatByDefault: true
-        },
-        { agent: 'grok', nativeChatTranscriptIsLocalReadable: false }
-      )
-    ).toEqual({})
   })
 
   it('opens a mirrorable draft launch in chat', () => {

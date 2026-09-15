@@ -129,17 +129,6 @@ function DescriptorMenuRows(props: {
       </DropdownMenuItem>
     )
   }
-  // Why: agent-picker opens the TUI; it is not a set of radio choices.
-  if (descriptor.action?.type === 'agent-picker') {
-    return (
-      <DropdownMenuItem disabled={!descriptor.settable || pending} onSelect={() => invokeAction()}>
-        {translate(
-          'components.native-chat.composer.chooseInAgentPicker',
-          'Choose in agent picker…'
-        )}
-      </DropdownMenuItem>
-    )
-  }
   // Why: absolute On/Off only when we have tracked truth. Unknown composed
   // booleans leave the group unselected so empty radios are not a selection.
   if (descriptor.kind.type === 'boolean') {

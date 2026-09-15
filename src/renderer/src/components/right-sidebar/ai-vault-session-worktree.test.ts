@@ -16,15 +16,15 @@ import {
 } from './ai-vault-session-worktree'
 
 const baseSession: AiVaultSession = {
-  id: 'codex:session-1',
+  id: 'claude:session-1',
   executionHostId: 'local',
-  agent: 'codex',
+  agent: 'claude',
   sessionId: 'session-1',
   title: 'Find the pane',
   cwd: '/repo/orca/src',
   branch: null,
   model: null,
-  filePath: '/home/ada/.codex/session-1.jsonl',
+  filePath: '/home/ada/.claude/session-1.jsonl',
   codexHome: null,
   createdAt: null,
   updatedAt: '2026-06-24T10:00:00.000Z',
@@ -34,7 +34,7 @@ const baseSession: AiVaultSession = {
   previewMessages: [],
   queuedMessageCount: 0,
   subagentTranscriptCount: 0,
-  resumeCommand: "codex resume 'session-1'",
+  resumeCommand: "claude --resume 'session-1'",
   subagent: null
 }
 

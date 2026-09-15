@@ -1,9 +1,5 @@
 import { useEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import type { AgentType } from '../../../../shared/agent-status-types'
-import {
-  getAgentSessionOptionCatalog,
-  type CatalogModel
-} from '../../../../shared/agent-session-option-catalog'
 import type { SessionOptionDescriptor } from '../../../../shared/native-chat-session-options'
 import {
   createNativeChatPtySessionOptions,
@@ -26,30 +22,6 @@ const EMPTY_SNAPSHOT: SessionOptionDescriptor[] = []
 const subscribeEmpty = (): (() => void) => () => {}
 const getEmptySnapshot = (): SessionOptionDescriptor[] => EMPTY_SNAPSHOT
 const CLIENT_SETTINGS_TARGET = { kind: 'local' } as const
-
-/**
- * Why: the picker drops a retired model, but the persisted default is what launches
- * become `-m <id>` — every launch site reads it, including the ones that never show
- * the picker. Left alone the id is invisible and still fatal, so an authoritative
- * probe that no longer lists it must retire it here too.
- */
-export async function retirePersistedModelMissingFromDiscovery(
-  agent: AgentType,
-  models: readonly CatalogModel[]
-): Promise<void> {
-  if (!getAgentSessionOptionCatalog(agent)?.discoveredModelsAreAuthoritative) {
-    return
-  }
-  // An empty list means the probe failed, not that the account has no models.
-  if (models.length === 0) {
-    return
-  }
-  await enqueueSessionOptionSettingsWrite(CLIENT_SETTINGS_TARGET, {
-    type: 'clear-model-if-missing',
-    agent,
-    availableModelIds: models.map((model) => model.id)
-  })
-}
 
 export function useNativeChatSessionOptions(args: {
   agent: AgentType
@@ -182,16 +154,8 @@ export function useNativeChatSessionOptions(args: {
         if (reportedValues) {
           surface.reportSessionOptions(reportedValues)
         }
-        // A failed settings write must not surface as an unhandled rejection.
-        void retirePersistedModelMissingFromDiscovery(agent, models).catch(() => undefined)
       }
     )
-    // Why: the subscription never replays, so a probe that settled before this
-    // pane mounted would leave a retired persisted model in place forever.
-    const cached = readNativeChatEnrichedModels(agent, discoveryContext.hostKey)
-    if (cached) {
-      void retirePersistedModelMissingFromDiscovery(agent, cached).catch(() => undefined)
-    }
     ensureNativeChatModelEnrichment({
       agent,
       hostKey: discoveryContext.hostKey,

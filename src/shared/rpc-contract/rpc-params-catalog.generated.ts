@@ -21,11 +21,7 @@ import {
   SelectAccountParams
 } from './accounts-params'
 import { CreateAgentSessionParams, EnsureAgentSessionParams } from './agent-session-params'
-import {
-  AiVaultListSessionsParams,
-  AiVaultPrepareSessionResumeParams,
-  AiVaultSessionTitlesParams
-} from './ai-vault-params'
+import { AiVaultListSessionsParams, AiVaultSessionTitlesParams } from './ai-vault-params'
 import {
   AutomationCreate,
   AutomationId,
@@ -550,7 +546,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'agentTeams.prepareLaunch': AgentTeamsPrepareLaunch,
   'agentTeams.tmuxCompat': AgentTeamsTmuxCompat,
   'aiVault.listSessions': AiVaultListSessionsParams,
-  'aiVault.prepareSessionResume': AiVaultPrepareSessionResumeParams,
   'aiVault.resolveSessionTitles': AiVaultSessionTitlesParams,
   'automation.create': AutomationCreate,
   'automation.delete': AutomationId,

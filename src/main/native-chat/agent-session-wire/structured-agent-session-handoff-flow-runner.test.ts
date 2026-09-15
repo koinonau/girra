@@ -55,8 +55,8 @@ async function failingFlowRunner(
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: THREAD }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
     },
     journalDir: join(root, 'journal')
   })

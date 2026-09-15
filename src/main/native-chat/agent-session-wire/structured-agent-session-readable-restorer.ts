@@ -45,7 +45,7 @@ export class StructuredAgentSessionReadableRestorer {
    * `serialize` runs on already orders concurrent callers, and the second one sees `hasSession`.
    *
    * Provider-agnostic by construction: eligibility is `supportsRecord`, which the adapter router
-   * answers for Claude and Codex from the record's own provider.
+   * answers from the record's own provider.
    */
   async restoreOne(sessionId: string): Promise<boolean> {
     const record = this.input.store.getRecord(sessionId)

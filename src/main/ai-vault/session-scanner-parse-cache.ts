@@ -1,28 +1,15 @@
 import type { AiVaultSession } from '../../shared/ai-vault-types'
 import { inSessionParseFileLane } from './session-parse-file-lane'
-import { createAntigravitySessionResumeState } from './session-scanner-antigravity-parser'
-import { createCodexSessionResumeState } from './session-scanner-codex-parser'
-import { createDroidSessionResumeState } from './session-scanner-droid-parser'
 import { createMessageGraphSessionResumeState } from './session-scanner-graph-parsers'
 import { createClaudeSessionResumeState } from './session-scanner-primary-parsers'
-import { createGeminiJsonlSessionResumeState } from './session-scanner-gemini-parsers'
-import { createCopilotSessionResumeState } from './session-scanner-copilot-parser'
-import { createCursorSessionResumeState } from './session-scanner-cursor-parser'
 import { countSubagentTranscripts } from './session-scanner-subagent-transcripts'
-import { countOmpSubagentTranscripts } from './session-scanner-omp-subagent-transcripts'
 import type { ResumableSessionParseState, SessionFileCandidate } from './session-scanner-types'
-import { refreshCachedCodexTitle } from './session-scanner-codex-cached-title'
 import {
   getSessionParseCacheEntry,
   storeSessionParseCacheEntry,
   type SessionParseCacheEntry
 } from './session-parse-cache-store'
 import type { TranscriptMessageSink } from './session-transcript-consumers'
-import { sidecarUnchanged } from './session-sidecar-stat'
-import {
-  enrichSessionFromSidecar,
-  sidecarEnrichesWithoutReparse
-} from './session-scanner-sidecar-enrichment'
 import {
   readResumableTranscript,
   readWholeTranscript,
@@ -39,10 +26,8 @@ export {
 } from './session-parse-cache-store'
 
 // Incremental append-parsing applies only to transcripts that are append-only
-// JSONL line-folds. Whole-JSON documents (grok/rovo/devin/hermes/gemini-json)
-// are rewritten in place, Kimi reads a state doc plus a sibling wire file, and
-// OpenCode reads SQLite rows or a doc plus a message dir — those formats keep
-// unchanged-file reuse only and re-parse whole when they change.
+// JSONL line-folds. OpenCode reads SQLite rows or a doc plus a message dir, so
+// it keeps unchanged-file reuse only and re-parses whole when it changes.
 // Returns a factory (not a state) so steady-state resumes, which clone the
 // cached state instead, never pay for a throwaway accumulator.
 function resumableStateFactoryFor(
@@ -51,35 +36,9 @@ function resumableStateFactoryFor(
   switch (candidate.agent) {
     case 'claude':
       return (messages) => createClaudeSessionResumeState(candidate.file, messages)
-    case 'codex':
-      return (messages) =>
-        createCodexSessionResumeState(candidate.file, candidate.codexHome, messages)
-    case 'cursor':
-      return (messages) => createCursorSessionResumeState(candidate.file, messages)
-    case 'copilot':
-      return (messages) => createCopilotSessionResumeState(candidate.file, messages)
-    case 'droid':
-      return (messages) => createDroidSessionResumeState(candidate.file, messages)
-    case 'openclaw':
     case 'pi':
-    case 'omp':
-    case 'prime-agent': {
-      const agent = candidate.agent
-      return (messages) => createMessageGraphSessionResumeState(agent, candidate.file, messages)
-    }
-    case 'gemini':
-      return candidate.file.path.endsWith('.jsonl')
-        ? (messages) => createGeminiJsonlSessionResumeState(candidate.file, messages)
-        : null
-    case 'antigravity':
-      return (messages) => createAntigravitySessionResumeState(candidate.file, messages)
-    case 'devin':
-    case 'grok':
-    case 'hermes':
-    case 'cline':
-    case 'kimi':
+      return (messages) => createMessageGraphSessionResumeState(candidate.file, messages)
     case 'opencode':
-    case 'rovo':
       return null
   }
 }
@@ -89,7 +48,7 @@ export type SessionParseStats = TranscriptReadStats & {
 }
 
 export function createSessionParseStats(): SessionParseStats {
-  return { reused: 0, incremental: 0, fullParses: 0, earlyStopped: 0, bytesRead: 0 }
+  return { reused: 0, incremental: 0, fullParses: 0, bytesRead: 0 }
 }
 
 /**
@@ -166,21 +125,7 @@ async function parseCachedInLane(
   const entry = getSessionParseCacheEntry(file.path)
 
   if (entry !== undefined && sessionParseCacheCoversTranscript(candidate, platform)) {
-    if (sidecarUnchanged(entry.sidecar, file.sidecar)) {
-      return reuseCachedSession(candidate, entry, stats)
-    }
-    // Only the sibling moved. For an agent whose sibling just adds metadata,
-    // re-merge it onto the stored fold result; the transcript is not re-read.
-    if (sidecarEnrichesWithoutReparse(candidate) && entry.foldSession !== undefined) {
-      const enriched = await enrichSessionFromSidecar(candidate, entry.foldSession, platform)
-      entry.session = enriched.session
-      entry.sidecar = enriched.refused ? 'unknown' : file.sidecar
-      storeSessionParseCacheEntry(file.path, entry)
-      if (stats) {
-        stats.reused++
-      }
-      return entry.session
-    }
+    return reuseCachedSession(candidate, entry, stats)
   }
 
   const stateFactory = resumableStateFactoryFor(candidate)
@@ -192,20 +137,14 @@ async function parseCachedInLane(
       stateFactory,
       stats
     })
-    const enriched = await enrichSessionFromSidecar(candidate, read.session, platform)
     storeSessionParseCacheEntry(file.path, {
       mtimeMs: file.mtimeMs,
       sizeBytes: file.sizeBytes ?? null,
       platform,
-      session: enriched.session,
-      // A refused sibling leaves the transcript's own work cached and resumable;
-      // only the sibling is recorded as unknown, so the next healthy scan
-      // re-merges it without re-reading the transcript.
-      sidecar: enriched.refused ? 'unknown' : file.sidecar,
-      foldSession: read.session,
+      session: read.session,
       resume: read.resume
     })
-    return enriched.session
+    return read.session
   }
 
   const session = await readWholeTranscript({ candidate, platform, stats })
@@ -214,9 +153,6 @@ async function parseCachedInLane(
     sizeBytes: file.sizeBytes ?? null,
     platform,
     session,
-    // A whole-file parse reads the sibling itself, so a change to it re-parses.
-    sidecar: file.sidecar,
-    foldSession: session,
     resume: null
   })
   return session
@@ -231,28 +167,14 @@ async function reuseCachedSession(
     stats.reused++
   }
   // A zero-turn transcript usually never changes again, but its sibling
-  // subagent dir (Claude `<session>/subagents/`, OMP's same-named artifact
-  // dir) can gain files after the parent's last write (a still-running
-  // subagent finishing). The mtime+size key can't see that, so refresh the
-  // cheap directory count on reuse.
-  if (entry.session && entry.session.messageCount === 0) {
-    const subagentTranscriptCount =
-      candidate.agent === 'claude'
-        ? await countSubagentTranscripts(candidate.file.path)
-        : candidate.agent === 'omp'
-          ? await countOmpSubagentTranscripts(candidate.file.path)
-          : null
-    if (
-      subagentTranscriptCount !== null &&
-      subagentTranscriptCount !== entry.session.subagentTranscriptCount
-    ) {
+  // `<session>/subagents/` dir can gain files after the parent's last write (a
+  // still-running subagent finishing). The mtime+size key can't see that, so
+  // refresh the cheap directory count on reuse.
+  if (entry.session && entry.session.messageCount === 0 && candidate.agent === 'claude') {
+    const subagentTranscriptCount = await countSubagentTranscripts(candidate.file.path)
+    if (subagentTranscriptCount !== entry.session.subagentTranscriptCount) {
       entry.session = { ...entry.session, subagentTranscriptCount }
     }
-  }
-  // Codex titles come from session_index.jsonl, which mtime+size can't see.
-  // Remote counterpart: remote-session-scanner.ts's reusedCodexTitleRefresh.
-  if (entry.session && candidate.agent === 'codex') {
-    entry.session = await refreshCachedCodexTitle(candidate, entry.session)
   }
   storeSessionParseCacheEntry(candidate.file.path, entry)
   return entry.session

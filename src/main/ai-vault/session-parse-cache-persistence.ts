@@ -11,11 +11,10 @@ import {
   type PersistedSessionParseCacheEntry,
   type SessionParseStats
 } from './session-scanner-parse-cache'
-import type { SessionSidecarObservation } from './session-sidecar-stat'
 
 // Bump when the persisted entry layout or cached session semantics change; a
 // mismatched file is discarded whole.
-const SCHEMA_VERSION = 2
+const SCHEMA_VERSION = 3
 // Debounce so back-to-back scans (desktop IPC + runtime RPC) collapse into one write.
 const SAVE_DEBOUNCE_MS = 1_500
 // The payload contains transcript-derived preview text; keep it user-only
@@ -65,13 +64,11 @@ export function ensureSessionParseCacheLoaded(): Promise<void> {
 }
 
 /**
- * Schedule a debounced snapshot write after a scan that parsed something. An
- * early-stopped transcript counts: its stat key moved, so the entry must be
- * re-persisted or the next launch re-reads it. Reused-only scans schedule no
- * write (the file already reflects the cache).
+ * Schedule a debounced snapshot write after a scan that parsed something.
+ * Reused-only scans schedule no write (the file already reflects the cache).
  */
 export function scheduleSessionParseCachePersist(stats: SessionParseStats): void {
-  if (options === null || stats.incremental + stats.fullParses + stats.earlyStopped <= 0) {
+  if (options === null || stats.incremental + stats.fullParses <= 0) {
     return
   }
   const current = options
@@ -182,35 +179,15 @@ function parsePersistedEntry(item: unknown): [string, PersistedSessionParseCache
   if (entry.session !== null && typeof entry.session !== 'object') {
     return null
   }
-  const sidecar = parsePersistedSidecar(entry.sidecar)
   return [
     path,
     {
       mtimeMs: entry.mtimeMs,
       sizeBytes: entry.sizeBytes,
       platform: entry.platform as NodeJS.Platform,
-      session: entry.session as PersistedSessionParseCacheEntry['session'],
-      ...(sidecar === undefined ? {} : { sidecar })
+      session: entry.session as PersistedSessionParseCacheEntry['session']
     }
   ]
-}
-
-// Why: added after SCHEMA_VERSION 2 shipped, so a file an older build wrote has
-// no such field. Absent (or unreadable) means unknown, which costs one re-parse
-// of the rows that have a sibling and nothing at all for the rest.
-function parsePersistedSidecar(value: unknown): SessionSidecarObservation | undefined {
-  if (value === 'none' || value === 'unknown') {
-    return value
-  }
-  if (typeof value !== 'object' || value === null) {
-    return undefined
-  }
-  const record = value as Record<string, unknown>
-  return typeof record.path === 'string' &&
-    typeof record.mtimeMs === 'number' &&
-    typeof record.sizeBytes === 'number'
-    ? { path: record.path, mtimeMs: record.mtimeMs, sizeBytes: record.sizeBytes }
-    : undefined
 }
 
 async function persistSnapshot(current: SessionParseCachePersistenceOptions): Promise<void> {

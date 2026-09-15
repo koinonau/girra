@@ -23,7 +23,7 @@ const subscriptions: Subscription[] = []
 const owned: AgentSessionStatusSummary = {
   sessionId: 'running',
   workspaceId: 'workspace',
-  agent: 'codex',
+  agent: 'claude',
   status: 'working',
   latestPrompt: 'work',
   updatedAt: 1,

@@ -5,7 +5,7 @@ import {
   structuredAgentSessionPayloadFingerprint
 } from './structured-agent-session-mutation'
 
-const SESSION_ID = 'codex_11111111_2222_3333_4444_555555555555'
+const SESSION_ID = 'claude_11111111_2222_3333_4444_555555555555'
 const RESUME = { providerSessionId: 'thread-abc' }
 
 /** Distinct per call so two envelopes never share an operation id by accident. */
@@ -19,7 +19,7 @@ function createParams(overrides: { resumeFrom?: { providerSessionId: string } } 
   return structuredAgentSessionCreateParams({
     sessionId: SESSION_ID,
     worktree: 'id:repo-1::/repo/orca',
-    agent: 'codex',
+    agent: 'claude',
     ...overrides,
     randomUuid: nextUuid,
     now: 1_800_000_000_000
@@ -39,7 +39,7 @@ describe('structured agent session create params', () => {
       structuredAgentSessionCreateFingerprint({
         sessionId: SESSION_ID,
         worktree: 'id:repo-1::/repo/orca',
-        agent: 'codex',
+        agent: 'claude',
         resumeFrom: RESUME
       })
     )
@@ -72,11 +72,11 @@ describe('structured agent session create params', () => {
       structuredAgentSessionPayloadFingerprint({
         method: 'agentSession.create',
         sessionId: SESSION_ID,
-        fields: { worktree: 'id:repo-1::/repo/orca', agent: 'codex' }
+        fields: { worktree: 'id:repo-1::/repo/orca', agent: 'claude' }
       })
     )
     expect(createParams().envelope.payloadFingerprint).toBe(
-      '56cb15e22414c0f62fd89d77d00d2d6a0a422f16e95edee154fb8b5bf53fbbc3'
+      'b01b7893935b67722c1988e99fd540164b576d38930e1d485c6ec7766e1549ec'
     )
   })
 })

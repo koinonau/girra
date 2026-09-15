@@ -21,7 +21,7 @@ function makeAgentEntry(overrides: Partial<AgentStatusEntry> = {}): AgentStatusE
     updatedAt: NOW,
     stateStartedAt: NOW,
     stateHistory: [],
-    agentType: 'codex',
+    agentType: 'claude',
     paneKey,
     tabId: paneKey.split(':')[0],
     worktreeId: 'wt-1',
@@ -46,7 +46,7 @@ function makeSleepingRecord(
     paneKey,
     tabId: paneKey.split(':')[0],
     worktreeId: 'wt-1',
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: `sleeping-${paneKey}` },
     prompt: 'old prompt',
     state: 'working',
@@ -126,7 +126,7 @@ describe('manual sleep agent session capture', () => {
           entry: retainedEntry,
           tab: makeTab({ id: 'tab-1', worktreeId: 'wt-1' }),
           worktreeId: 'wt-1',
-          agentType: 'codex',
+          agentType: 'claude',
           startedAt: retainedEntry.stateStartedAt
         }
       }
@@ -154,7 +154,7 @@ describe('manual sleep agent session capture', () => {
           entry,
           tab,
           worktreeId: 'wt-1',
-          agentType: 'codex',
+          agentType: 'claude',
           startedAt: entry.stateStartedAt
         }
       }
@@ -187,7 +187,7 @@ describe('manual sleep agent session capture', () => {
           entry,
           tab: makeTab({ id: 'tab-1', worktreeId: 'wt-1' }),
           worktreeId: 'wt-1',
-          agentType: 'codex',
+          agentType: 'claude',
           startedAt: entry.stateStartedAt
         }
       }
@@ -219,7 +219,7 @@ describe('manual sleep agent session capture', () => {
           entry,
           tab: makeTab({ id: 'tab-1', worktreeId: 'wt-1' }),
           worktreeId: 'wt-1',
-          agentType: 'codex',
+          agentType: 'claude',
           startedAt: entry.stateStartedAt
         }
       }

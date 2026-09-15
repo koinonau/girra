@@ -7,7 +7,6 @@ import {
 import type { RuntimeMobileSessionTabsSnapshot } from '../../../../shared/runtime-types'
 import {
   CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE,
-  STRUCTURED_CHAT_UPDATE_REQUIRED_TAB_TITLE,
   projectSessionTabAgentStatus
 } from './session-tab-agent-status-projection'
 
@@ -41,6 +40,11 @@ function makeSnapshot(sessionBoundary: boolean): RuntimeMobileSessionTabsSnapsho
   }
 }
 
+const structuredMobile = [
+  STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
+  CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY
+]
+
 describe('projectSessionTabAgentStatus', () => {
   it('projects structured tabs and dangling group focus out of old clients', () => {
     const snapshot: RuntimeMobileSessionTabsSnapshot = {
@@ -72,17 +76,17 @@ describe('projectSessionTabAgentStatus', () => {
         {
           type: 'agent-session',
           id: 'agent-session:session-a',
-          title: 'Codex Chat',
+          title: 'Claude Chat',
           sessionId: 'session-a',
-          agent: 'codex',
+          agent: 'claude',
           isActive: true
         },
         {
           type: 'agent-session',
           id: 'agent-session:session-b',
-          title: 'Codex Chat',
+          title: 'Claude Chat',
           sessionId: 'session-b',
-          agent: 'codex',
+          agent: 'claude',
           isActive: false
         }
       ]
@@ -107,46 +111,24 @@ describe('projectSessionTabAgentStatus', () => {
       )
     ).toEqual(oldClient)
 
-    const capableMobile = projectSessionTabAgentStatus(
-      snapshot,
-      'mobile',
-      [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY],
-      true
-    )
+    const capableMobile = projectSessionTabAgentStatus(snapshot, 'mobile', structuredMobile, true)
     expect(capableMobile).toBe(snapshot)
 
-    const capable = projectSessionTabAgentStatus(
-      snapshot,
-      'runtime',
-      [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY],
-      true
-    )
+    const capable = projectSessionTabAgentStatus(snapshot, 'runtime', structuredMobile, true)
     expect(capable).toBe(snapshot)
 
     // The host setting is policy for every caller, so a capable desktop client with the
     // setting off sees the same projection an old client does.
-    expect(
-      projectSessionTabAgentStatus(
-        snapshot,
-        'runtime',
-        [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY],
-        false
-      )
-    ).toEqual(oldClient)
+    expect(projectSessionTabAgentStatus(snapshot, 'runtime', structuredMobile, false)).toEqual(
+      oldClient
+    )
     expect(projectSessionTabAgentStatus(snapshot, undefined, undefined, false)).toEqual(oldClient)
   })
 
   const claudeSnapshot = {
     ...makeSnapshot(false),
     tabs: [
-      {
-        type: 'agent-session',
-        id: 'agent-session:codex',
-        title: 'Codex Chat',
-        sessionId: 'codex',
-        agent: 'codex',
-        isActive: true
-      },
+      makeSnapshot(false).tabs[0]!,
       {
         type: 'agent-session',
         id: 'agent-session:claude',
@@ -157,10 +139,8 @@ describe('projectSessionTabAgentStatus', () => {
       }
     ],
     activeGroupId: 'group-a',
-    activeTabId: 'agent-session:codex',
-    activeTabType: 'agent-session',
     tabGroups: [
-      { id: 'group-a', activeTabId: 'agent-session:codex', tabOrder: ['agent-session:codex'] },
+      { id: 'group-a', activeTabId: 'tab-1::leaf-1', tabOrder: ['tab-1::leaf-1'] },
       { id: 'group-b', activeTabId: 'agent-session:claude', tabOrder: ['agent-session:claude'] }
     ],
     tabGroupLayout: {
@@ -171,11 +151,6 @@ describe('projectSessionTabAgentStatus', () => {
     }
   } as unknown as RuntimeMobileSessionTabsSnapshot
 
-  const structuredMobile = [
-    STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
-    CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY
-  ]
-
   it('withholds Claude rows from a paired runtime client that never negotiated them', () => {
     const projected = projectSessionTabAgentStatus(
       claudeSnapshot,
@@ -184,13 +159,13 @@ describe('projectSessionTabAgentStatus', () => {
       true
     )
 
-    expect(projected.tabs.map((tab) => tab.id)).toEqual(['agent-session:codex'])
+    expect(projected.tabs.map((tab) => tab.id)).toEqual(['tab-1::leaf-1'])
     // A row pruned from `tabs` but left in the layout is its own dead tab.
     expect(projected.tabGroups?.map((group) => group.id)).toEqual(['group-a'])
     expect(projected.tabGroupLayout).toEqual({ type: 'leaf', groupId: 'group-a' })
     expect(projected.activeGroupId).toBe('group-a')
-    expect(projected.activeTabId).toBe('agent-session:codex')
-    expect(projected.activeTabType).toBe('agent-session')
+    expect(projected.activeTabId).toBe('tab-1::leaf-1')
+    expect(projected.activeTabType).toBe('terminal')
   })
 
   it('uses a desktop fallback for an unsupported Claude row instead of withholding it', () => {
@@ -202,25 +177,22 @@ describe('projectSessionTabAgentStatus', () => {
     )
 
     // The row survives so the chat the desktop shows is not simply absent on the phone.
-    expect(projected.tabs.map((tab) => tab.id)).toEqual([
-      'agent-session:codex',
-      'agent-session:claude'
-    ])
+    expect(projected.tabs.map((tab) => tab.id)).toEqual(['tab-1::leaf-1', 'agent-session:claude'])
     expect(projected.tabs.map((tab) => tab.title)).toEqual([
-      'Codex Chat',
+      'Claude',
       CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE
     ])
     // Nothing is removed, so the layout it belonged to is untouched.
     expect(projected.tabGroups?.map((group) => group.id)).toEqual(['group-a', 'group-b'])
     expect(projected.tabGroupLayout).toEqual(claudeSnapshot.tabGroupLayout)
-    expect(projected.activeTabId).toBe('agent-session:codex')
+    expect(projected.activeTabId).toBe('tab-1::leaf-1')
   })
 
-  it('projects agent-specific fallback titles for a mobile client with no capabilities', () => {
+  it('projects the desktop fallback title for a mobile client with no capabilities', () => {
     const projected = projectSessionTabAgentStatus(claudeSnapshot, 'mobile', [], true)
 
     expect(projected.tabs.map((tab) => tab.title)).toEqual([
-      STRUCTURED_CHAT_UPDATE_REQUIRED_TAB_TITLE,
+      'Claude',
       CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE
     ])
     expect(projected.tabGroupLayout).toEqual(claudeSnapshot.tabGroupLayout)
@@ -235,12 +207,12 @@ describe('projectSessionTabAgentStatus', () => {
     )
 
     expect(projected.tabs.map((tab) => tab.title)).toEqual([
-      STRUCTURED_CHAT_UPDATE_REQUIRED_TAB_TITLE,
+      'Claude',
       CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE
     ])
   })
 
-  it('shows both real titles once mobile negotiates Claude', () => {
+  it('shows the real title once mobile negotiates Claude', () => {
     expect(projectSessionTabAgentStatus(claudeSnapshot, 'mobile', structuredMobile, true)).toBe(
       claudeSnapshot
     )
@@ -254,7 +226,7 @@ describe('projectSessionTabAgentStatus', () => {
       structuredMobile
     ]) {
       const projected = projectSessionTabAgentStatus(claudeSnapshot, 'mobile', capabilities, false)
-      expect(projected.tabs).toEqual([])
+      expect(projected.tabs.map((tab) => tab.type)).toEqual(['terminal'])
     }
   })
 
@@ -292,24 +264,6 @@ describe('projectSessionTabAgentStatus', () => {
       claudeSnapshot
     )
     expect(projectSessionTabAgentStatus(claudeSnapshot, undefined, [], true)).toBe(claudeSnapshot)
-  })
-
-  it('leaves Codex rows untouched whether or not the Claude capability is present', () => {
-    const codexOnly = {
-      ...claudeSnapshot,
-      tabs: claudeSnapshot.tabs.filter((tab) => tab.id !== 'agent-session:claude'),
-      tabGroups: claudeSnapshot.tabGroups?.filter((group) => group.id !== 'group-b'),
-      tabGroupLayout: { type: 'leaf', groupId: 'group-a' }
-    } as unknown as RuntimeMobileSessionTabsSnapshot
-
-    for (const capabilities of [[STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY], structuredMobile]) {
-      for (const clientKind of ['mobile', 'runtime'] as const) {
-        expect(projectSessionTabAgentStatus(codexOnly, clientKind, capabilities, true)).toBe(
-          codexOnly
-        )
-      }
-    }
-    expect(projectSessionTabAgentStatus(codexOnly, undefined, undefined, true)).toBe(codexOnly)
   })
 
   it('withholds session boundaries from legacy paired clients', () => {

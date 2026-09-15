@@ -1,5 +1,4 @@
 import type { SpawnedProcess } from '../../shared/child-process/run-process'
-import { waitForProcessExitUntil } from '../codex/codex-process-exit-deadline'
 import type { ClaudeChildTreeReaper } from './claude-agent-sdk-exit-proof'
 
 const GRACEFUL_EXIT_MS = 1_500
@@ -38,4 +37,22 @@ export async function proveClaudeChildExitWithReaper(
     await tree.reap()
   }
   return input.exited() && tree.treeVerdict === 'exited'
+}
+
+async function waitForProcessExitUntil(
+  exitPromise: Promise<void>,
+  timeoutMs: number
+): Promise<void> {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<void>((resolve) => {
+    timer = setTimeout(resolve, timeoutMs)
+  })
+  try {
+    await Promise.race([exitPromise, timeout])
+  } finally {
+    // Why: a live grace timer would keep a short-lived parent alive after the child exited.
+    if (timer !== undefined) {
+      clearTimeout(timer)
+    }
+  }
 }

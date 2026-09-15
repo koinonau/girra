@@ -149,7 +149,7 @@ function makeVaultSession(index: number): AiVaultSession {
   return {
     id,
     executionHostId: 'ssh:dev-box',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: id,
     title: id,
     cwd: '/repo',

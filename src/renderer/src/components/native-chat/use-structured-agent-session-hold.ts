@@ -2,7 +2,7 @@
 //
 // A structured chat is an in-place view on a terminal tab, so closing the tab unmounts this and
 // nothing else in the close path knows a provider process is involved: `closeUnifiedTab` retires
-// the PTY and drops the tab, main hears nothing, and a codex app-server outlives the chat for the
+// the PTY and drops the tab, main hears nothing, and the provider process outlives the chat for the
 // rest of the app's life. Surface activity is the honest signal — it covers closing the tab,
 // closing the window, and visibility changes for retained panes, none of which share a code path.
 //

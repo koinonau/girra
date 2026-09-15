@@ -17,7 +17,7 @@ function claim(
     keyId: 'key',
     identityDigest,
     worktreeScopeDigest,
-    agent: 'codex'
+    agent: 'claude'
   }
 }
 

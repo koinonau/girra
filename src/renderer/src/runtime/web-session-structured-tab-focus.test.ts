@@ -13,8 +13,8 @@ function structuredTab(sessionId: string, sortOrder: number): Tab {
     groupId: GROUP_ID,
     worktreeId: WORKTREE_ID,
     contentType: 'agent-session',
-    agentSessionAgent: 'codex',
-    label: 'Codex Chat',
+    agentSessionAgent: 'claude',
+    label: 'Claude Chat',
     customLabel: null,
     color: null,
     sortOrder,
@@ -82,17 +82,17 @@ describe('web session structured tab focus', () => {
         {
           type: 'agent-session',
           id: 'agent-session:session-1',
-          title: 'Codex Chat',
+          title: 'Claude Chat',
           sessionId: 'session-1',
-          agent: 'codex',
+          agent: 'claude',
           isActive: true
         },
         {
           type: 'agent-session',
           id: 'agent-session:session-2',
-          title: 'Codex Chat',
+          title: 'Claude Chat',
           sessionId: 'session-2',
-          agent: 'codex',
+          agent: 'claude',
           isActive: false
         }
       ]

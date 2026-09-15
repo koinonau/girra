@@ -34,8 +34,8 @@ async function reserve(store: AgentSessionRecordStore, runtimeKind: 'native' | '
       workspaceId: 'workspace-1',
       workspaceKind: 'folder'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: '/tmp/codex' },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: '/tmp/claude' },
     runtimeKind,
     expectedFence: null,
     spawnToken: 'spawn-recovery',
@@ -70,7 +70,7 @@ async function liveOwner(store: AgentSessionRecordStore, runtimeKind: 'native' |
     fence,
     link: {
       linkId: 'link-recovery',
-      handle: { provider: 'codex', threadId: 'thread-recovery' },
+      handle: { provider: 'claude', sessionId: 'thread-recovery', leafUuid: null },
       origin: 'created',
       mintedAtFence: fence,
       observedAt: NOW

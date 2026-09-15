@@ -267,10 +267,10 @@ describe('TabBarCreateEntry keyboard navigation', () => {
     expect(onLaunchAgent).toHaveBeenCalledWith('gemini')
   })
 
-  it('does not relaunch Codex when a structured launch is already pending', () => {
+  it('does not relaunch Claude when a structured launch is already pending', () => {
     structuredLaunchMock.status = 'pending'
     const agentOptions: TabAgentLaunchOption[] = [
-      { agent: 'codex', aliases: ['codex'], label: 'Codex' }
+      { agent: 'claude', aliases: ['claude'], label: 'Claude' }
     ]
     const onLaunchAgent = vi.fn()
     mount(
@@ -284,7 +284,7 @@ describe('TabBarCreateEntry keyboard navigation', () => {
       />
     )
 
-    setQuery('cod')
+    setQuery('cla')
     submitForm()
 
     expect(onLaunchAgent).not.toHaveBeenCalled()

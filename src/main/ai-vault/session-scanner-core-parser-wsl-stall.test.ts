@@ -39,32 +39,7 @@ function uncPath(distro: string, ...segments: string[]): string {
   return `\\\\wsl.localhost\\${distro}\\home\\ada\\${segments.join('\\')}`
 }
 
-const KIMI_HOME = ['.kimi-code', 'sessions', 'wd_app_9f2', 'session_abc']
-const GROK_DIR = ['.grok', 'sessions', 'ses-1']
 const OPENCODE_ROOT = ['.local', 'share', 'opencode', 'storage']
-
-const KIMI_STATE = JSON.stringify({
-  title: 'Kimi session',
-  createdAt: '2026-06-01T10:00:00.000Z',
-  updatedAt: '2026-06-01T10:05:00.000Z',
-  agents: { main: { type: 'main', parentAgentId: null } }
-})
-
-const KIMI_WIRE = `${JSON.stringify({
-  type: 'context.append_message',
-  message: { role: 'user', origin: { kind: 'user' }, content: 'ship it' }
-})}\n`
-
-const GROK_SESSION = JSON.stringify({
-  info: { id: 'ses-1', cwd: '/repo/app' },
-  generated_title: 'Grok session',
-  created_at: '2026-06-01T10:00:00.000Z'
-})
-
-const GROK_HISTORY = `${JSON.stringify({
-  type: 'user',
-  content: '<user_query>ship it</user_query>'
-})}\n`
 
 const OPENCODE_SESSION = JSON.stringify({
   id: 'ses-1',
@@ -79,30 +54,12 @@ const OPENCODE_MESSAGE = JSON.stringify({
   time: { created: 1780000000000 }
 })
 
-type ReadResult = { bytesRead: number; buffer: Buffer }
-
 let releaseStall: (() => void) | undefined
 
 function stalls<T>(): Promise<T> {
   return new Promise<T>((resolve) => {
     releaseStall = () => resolve({ bytesRead: 0, buffer: Buffer.alloc(0) } as T)
   })
-}
-
-function stallingHandle() {
-  return { read: vi.fn(stalls<ReadResult>), close: vi.fn(async () => {}) }
-}
-
-function servingHandle(body: string) {
-  const bytes = Buffer.from(body)
-  return {
-    read: vi.fn(async (buffer: Buffer, offset: number, length: number, position: number) => {
-      const slice = bytes.subarray(position, Math.min(position + length, bytes.length))
-      slice.copy(buffer, offset)
-      return { bytesRead: slice.length, buffer }
-    }),
-    close: vi.fn(async () => {})
-  }
 }
 
 function missing(): Error {
@@ -132,8 +89,7 @@ function candidate(agent: SessionFileCandidate['agent'], path: string): SessionF
       mtimeMs: 1,
       modifiedAt: '2026-06-01T10:05:00.000Z',
       sizeBytes: 128
-    },
-    codexHome: null
+    }
   }
 }
 
@@ -173,73 +129,6 @@ afterEach(async () => {
   vi.useRealTimers()
 })
 
-describe('Kimi session parse against a stalled WSL transcript', () => {
-  it('refuses a stalled state.json read instead of reporting no session', async () => {
-    const state = uncPath('KimiState', ...KIMI_HOME, 'state.json')
-    mocks.readFile.mockImplementation(stalls<string>)
-
-    await expectRefusal(candidate('kimi', state))
-  })
-
-  it('refuses a stalled wire read, then caches the full session once it recovers', async () => {
-    const state = uncPath('KimiWire', ...KIMI_HOME, 'state.json')
-    mocks.readFile.mockResolvedValue(KIMI_STATE)
-    mocks.open.mockResolvedValue(stallingHandle())
-
-    await expectRefusal(candidate('kimi', state))
-    await releaseAndSettle()
-
-    mocks.open.mockResolvedValue(servingHandle(KIMI_WIRE))
-    const recovered = await parseAgentSessionFileCached(candidate('kimi', state), 'linux')
-
-    expect(recovered?.messageCount).toBe(1)
-  })
-
-  // Pins the narrowness of the parser's `instanceof WslTranscriptFsError`
-  // rethrow: widening it to every error turns this into a hard scan issue.
-  it('still returns a metadata-only session when the wire file is simply missing', async () => {
-    const state = uncPath('KimiMissing', ...KIMI_HOME, 'state.json')
-    mocks.readFile.mockResolvedValue(KIMI_STATE)
-    mocks.open.mockRejectedValue(missing())
-
-    const session = await parseAgentSessionFileCached(candidate('kimi', state), 'linux')
-
-    expect(session).toMatchObject({ agent: 'kimi', title: 'Kimi session', messageCount: 0 })
-  })
-})
-
-describe('Grok session parse against a stalled WSL transcript', () => {
-  it('refuses a stalled chat_history read instead of reporting a summary-only session', async () => {
-    const file = uncPath('GrokHistory', ...GROK_DIR, 'session.json')
-    mocks.readFile.mockResolvedValue(GROK_SESSION)
-    mocks.open.mockResolvedValue(stallingHandle())
-
-    await expectRefusal(candidate('grok', file))
-    await releaseAndSettle()
-
-    mocks.open.mockResolvedValue(servingHandle(GROK_HISTORY))
-    const recovered = await parseAgentSessionFileCached(candidate('grok', file), 'linux')
-
-    expect(recovered?.previewMessages).toEqual([
-      expect.objectContaining({ role: 'user', text: 'ship it' })
-    ])
-  })
-
-  it('still returns the summary-only session when chat_history is missing', async () => {
-    const file = uncPath('GrokMissing', ...GROK_DIR, 'session.json')
-    mocks.readFile.mockResolvedValue(GROK_SESSION)
-    mocks.open.mockRejectedValue(missing())
-
-    const session = await parseAgentSessionFileCached(candidate('grok', file), 'linux')
-
-    expect(session).toMatchObject({
-      agent: 'grok',
-      title: 'Grok session',
-      previewMessages: []
-    })
-  })
-})
-
 describe('OpenCode session parse against a stalled WSL transcript', () => {
   function sessionPath(distro: string): string {
     return uncPath(distro, ...OPENCODE_ROOT, 'session', 'prj', 'ses-1.json')
@@ -270,8 +159,7 @@ describe('OpenCode session parse against a stalled WSL transcript', () => {
     expect(recovered?.messageCount).toBe(1)
   })
 
-  // Same guard as Kimi's: a live process mid-write must stay a parseable
-  // session, not a refusal.
+  // A live process mid-write must stay a parseable session, not a refusal.
   it('still returns the session when a live process left a half-written message', async () => {
     const file = sessionPath('OpenCodeHalfWritten')
     mocks.readdir.mockResolvedValue([dirent('msg-1.json')])

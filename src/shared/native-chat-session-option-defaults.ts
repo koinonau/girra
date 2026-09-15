@@ -100,9 +100,9 @@ export function applyNativeChatSessionOptionSettingsMutation(
   return clearNativeChatSessionOptionModel(persisted, mutation.agent)
 }
 
-/** Why: an authoritative probe proved this id gone, and a stale `model` is emitted
- *  verbatim as a launch flag — grok exits fatally on an unknown one. Dropping only
- *  `model` keeps the per-model option values for a later reselect. */
+/** Why: a probe proved this id gone, and a stale `model` is emitted verbatim as a
+ *  launch flag. Dropping only `model` keeps the per-model option values for a later
+ *  reselect. Older clients still send this mutation. */
 export function clearNativeChatSessionOptionModel(
   persisted: PersistedNativeChatSessionOptions | null | undefined,
   agent: AgentType

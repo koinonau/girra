@@ -45,7 +45,7 @@ function sleepingRecord(paneKey: string, tabId: string): SleepingAgentSessionRec
     paneKey,
     tabId,
     worktreeId: 'wt-1',
-    agent: 'codex',
+    agent: 'claude',
     providerSession: { key: 'session_id', id: paneKey },
     prompt: 'continue',
     state: 'working',

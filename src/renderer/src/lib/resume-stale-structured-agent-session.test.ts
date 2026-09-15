@@ -22,7 +22,7 @@ describe('stale structured sleeping session', () => {
       paneKey,
       tabId,
       worktreeId: WORKTREE_ID,
-      agent: 'codex',
+      agent: 'claude',
       providerSession: { key: 'session_id', id: SESSION_ID },
       prompt: 'continue',
       state: 'working',

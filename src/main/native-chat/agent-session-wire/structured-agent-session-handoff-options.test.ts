@@ -72,7 +72,7 @@ function tuiOwner(fence: number, spawnToken: string): StructuredTuiOwner {
     },
     link: {
       linkId: `tui-link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: 'resumed',
       mintedAtFence: fence,
       observedAt: NOW
@@ -118,7 +118,7 @@ function adapter(): StructuredAgentSessionAdapter {
       },
       link: {
         linkId: `native-link-${fence}`,
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: acquire.mock.calls.length === 1 ? 'created' : 'resumed',
         mintedAtFence: fence,
         observedAt: NOW
@@ -131,7 +131,7 @@ function adapter(): StructuredAgentSessionAdapter {
       dispatchedModels.push(activeModel)
       return {
         state: 'accepted',
-        providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 1 }
+        providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-1' }
       }
     }),
     cancelTurn: vi.fn(async () => ({ cancelled: true })),
@@ -172,7 +172,7 @@ beforeEach(async () => {
   dispatchedModels.length = 0
   launchedOptions.length = 0
   closedTuiOwners.length = 0
-  const accountHome = join(root, 'codex-home')
+  const accountHome = join(root, 'claude-home')
   const sessionsDir = join(accountHome, 'sessions', '2026', '08', '12')
   transcriptPath = join(sessionsDir, `rollout-2026-08-12T10-00-00-${THREAD}.jsonl`)
   await mkdir(sessionsDir, { recursive: true })
@@ -197,7 +197,9 @@ beforeEach(async () => {
   })
   const attached = await host.attach(
     CALLER,
-    hostTestAttachParams(null, { accountHome: { variable: 'CODEX_HOME', path: accountHome } })
+    hostTestAttachParams(null, {
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: accountHome }
+    })
   )
   expect(attached).toMatchObject({ ok: true })
 })

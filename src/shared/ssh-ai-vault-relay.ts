@@ -15,7 +15,7 @@ export type SshAiVaultRelayListParams = {
 
 export type SshAiVaultRelayTitleParams = {
   requests: {
-    agent: 'claude' | 'codex'
+    agent: 'claude'
     sessionId: string
     transcriptPath?: string
   }[]

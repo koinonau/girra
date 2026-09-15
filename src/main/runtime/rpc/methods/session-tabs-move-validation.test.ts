@@ -66,9 +66,9 @@ describe('session tab move validation', () => {
     const structured = {
       type: 'agent-session' as const,
       id: 'agent-session:session-a',
-      title: 'Codex Chat',
+      title: 'Claude Chat',
       sessionId: 'session-a',
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       isActive: false
     }
     setMobileSessionSnapshot(runtime, {
@@ -140,7 +140,7 @@ describe('session tab move validation', () => {
     await runtime.publishStructuredAgentSessionTab({
       workspaceId: 'wt-1',
       sessionId: 'session-a',
-      agent: 'codex',
+      agent: 'claude',
       activate: true
     })
 
@@ -176,9 +176,9 @@ describe('session tab move validation', () => {
         {
           type: 'agent-session',
           id: 'agent-session:session-a',
-          title: 'Codex Chat',
+          title: 'Claude Chat',
           sessionId: 'session-a',
-          agent: 'codex',
+          agent: 'claude',
           isActive: false
         },
         {

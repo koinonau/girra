@@ -29,8 +29,8 @@ describe('journal row schema versions', () => {
         sessionId: 'session-1',
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: 'thread-1' }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
       },
       now: () => 1_000,
       journalDir: join(root, 'session-1')
@@ -42,7 +42,12 @@ describe('journal row schema versions', () => {
       { fence: 1 }
     )
     await journal.appendItem(
-      { provider: 'legacy', agent: 'codex', sessionId: 'session-1', recordId: 'turn-lifecycle:t1' },
+      {
+        provider: 'legacy',
+        agent: 'claude',
+        sessionId: 'session-1',
+        recordId: 'turn-lifecycle:t1'
+      },
       agentJournalTurnBody({ turnId: 't1', state: 'running', startedAt: 1_000 }),
       { fence: 1 }
     )

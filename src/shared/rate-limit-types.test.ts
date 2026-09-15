@@ -9,15 +9,12 @@ describe('RateLimitState', () => {
     // across refactors.
     const state: RateLimitState = {
       claude: null,
-      codex: null,
       opencodeGo: null,
       minimax: null,
       minimaxCookieConfigured: false,
       minimaxApiKeyConfigured: false,
       claudeTarget: { runtime: 'host', wslDistro: null },
-      codexTarget: { runtime: 'host', wslDistro: null },
-      inactiveClaudeAccounts: [],
-      inactiveCodexAccounts: []
+      inactiveClaudeAccounts: []
     }
 
     expect(state.opencodeGo).toBeNull()

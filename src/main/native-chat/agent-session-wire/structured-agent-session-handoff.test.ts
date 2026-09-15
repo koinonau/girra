@@ -72,7 +72,7 @@ function process(spawnToken: string, pid: number) {
 function link(fence: number, id: string) {
   return {
     linkId: id,
-    handle: { provider: 'codex' as const, threadId: THREAD },
+    handle: { provider: 'claude' as const, sessionId: THREAD, leafUuid: null },
     origin: 'resumed' as const,
     mintedAtFence: fence,
     observedAt: NOW
@@ -88,8 +88,8 @@ async function establishNativeOwner(): Promise<void> {
       workspaceId: 'workspace-1',
       workspaceKind: 'git-worktree'
     },
-    provider: 'codex',
-    accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+    provider: 'claude',
+    accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
     runtimeKind: 'native',
     expectedFence: null,
     spawnToken: 'native-initial',
@@ -174,7 +174,7 @@ function createCoordinator(): StructuredAgentSessionHandoffCoordinator {
     acquireNativeStop: (_sessionId, turnId) => acquireNativeStop(turnId),
     importTuiHistory: async ({ fence }) => {
       await journal.appendItem(
-        { provider: 'codex', threadId: THREAD, turnId: 'tui-turn', ordinal: 0 },
+        { provider: 'claude', sessionId: THREAD, uuid: 'tui-turn-0' },
         { kind: 'message', role: 'assistant', blocks: [{ type: 'text', text: 'from tui' }] },
         { fence, recovered: true }
       )
@@ -220,8 +220,8 @@ beforeEach(async () => {
       sessionId: SESSION,
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: THREAD }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
     },
     journalDir: join(root, 'journal')
   })
@@ -397,8 +397,8 @@ describe('structured session ownership recovery on restore', () => {
         workspaceId: 'workspace-1',
         workspaceKind: 'git-worktree'
       },
-      provider: 'codex',
-      accountHome: { variable: 'CODEX_HOME', path: join(root, 'codex-home') },
+      provider: 'claude',
+      accountHome: { variable: 'CLAUDE_CONFIG_DIR', path: join(root, 'claude-home') },
       runtimeKind: 'native',
       expectedFence: null,
       spawnToken: 'plain-residue-token',
@@ -437,8 +437,8 @@ describe('structured session ownership recovery on restore', () => {
         sessionId: SESSION,
         workspaceId: 'workspace-1',
         hostId: 'local',
-        agent: 'codex',
-        providerHandle: { kind: 'codex', threadId: THREAD }
+        agent: 'claude',
+        providerHandle: { kind: 'claude', sessionId: THREAD, leafUuid: null }
       },
       journalDir: join(root, 'journal')
     })

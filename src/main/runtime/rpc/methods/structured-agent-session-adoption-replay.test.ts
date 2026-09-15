@@ -3,7 +3,10 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { computeAgentSessionPayloadFingerprint } from '../../../../shared/agent-session-mutation-envelope'
-import { STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY } from '../../../../shared/protocol-version'
+import {
+  CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
+  STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY
+} from '../../../../shared/protocol-version'
 import { AgentSessionRecordStore } from '../../agent-session-record-store'
 import type { StructuredAgentSessionAdapter } from '../../../native-chat/agent-session-wire/structured-agent-session-adapter'
 import { StructuredAgentSessionHost } from '../../../native-chat/agent-session-wire/structured-agent-session-host'
@@ -14,13 +17,16 @@ import { RpcDispatcher } from '../dispatcher'
 import { STRUCTURED_AGENT_SESSION_METHODS } from './structured-agent-session'
 
 const SESSION = 'session-adoption-replay'
-const THREAD = 'thread-adoption-replay'
+const THREAD = 'claude-adoption-replay'
 const WORKSPACE = 'workspace-1'
 const OPERATION = `${Date.now()}-00000000000000000000000000000001`
 const CLIENT = {
   clientId: 'device-a',
   clientKind: 'runtime' as const,
-  clientCapabilities: [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY]
+  clientCapabilities: [
+    STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
+    CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY
+  ]
 }
 
 let root: string
@@ -39,8 +45,8 @@ function adapter(): StructuredAgentSessionAdapter {
           spawnToken
         },
         link: {
-          linkId: `codex-${fence}-${THREAD}`,
-          handle: { provider: 'codex', threadId: THREAD },
+          linkId: `claude-${fence}-${THREAD}`,
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: 'resumed',
           mintedAtFence: fence,
           observedAt: 1_800_000_000_000
@@ -57,7 +63,7 @@ function adapter(): StructuredAgentSessionAdapter {
 function createParams(operationId = OPERATION) {
   const fields = {
     worktree: `id:${WORKSPACE}`,
-    agent: 'codex' as const,
+    agent: 'claude' as const,
     resumeFrom: { providerSessionId: THREAD }
   }
   return {
@@ -107,40 +113,33 @@ describe('committed adopting create RPC replay', () => {
   it('republishes from durable identity after the source disappears and account selection drifts', async () => {
     const originalHome = join(root, 'account-original')
     const driftedHome = join(root, 'account-drifted')
-    const transcriptPath = join(
-      originalHome,
-      'sessions',
-      '2026',
-      '09',
-      '06',
-      `rollout-2026-09-06T18-00-00-${THREAD}.jsonl`
-    )
+    const transcriptPath = join(originalHome, 'projects', '-workspace', `${THREAD}.jsonl`)
     await mkdir(dirname(transcriptPath), { recursive: true })
     await writeFile(
       transcriptPath,
       `${JSON.stringify({
-        type: 'session_meta',
-        payload: { id: THREAD, timestamp: '2026-09-06T18:00:00.000Z', cwd: '/workspace' }
-      })}\n${JSON.stringify({
-        type: 'response_item',
+        type: 'user',
+        uuid: 'user-1',
+        sessionId: THREAD,
         timestamp: '2026-09-06T18:00:01.000Z',
-        payload: { type: 'message', role: 'user', content: 'durable adopted history' }
+        message: { role: 'user', content: 'durable adopted history' }
       })}\n`,
       'utf8'
     )
 
     let selectedHome = originalHome
     const selectAccountHome = vi.fn(() => selectedHome)
-    const runtime = new OrcaRuntimeService(
-      {
-        getSettings: () => ({
-          experimentalStructuredNativeChat: true,
-          agentDefaultEnv: { codex: {} }
-        })
-      } as never,
-      undefined,
-      { prepareCodexStructuredLaunch: selectAccountHome }
-    )
+    const runtime = new OrcaRuntimeService({
+      getSettings: () => ({
+        experimentalStructuredNativeChat: true,
+        agentDefaultEnv: { claude: {} }
+      })
+    } as never)
+    vi.spyOn(
+      (runtime as unknown as { accounts: { getClaudeConfigDirectory: () => string | null } })
+        .accounts,
+      'getClaudeConfigDirectory'
+    ).mockImplementation(selectAccountHome)
     // The structured surface is settings-gated for every caller, not just mobile; this test
     // probes durable-identity replay, which only runs once the gate admits the call.
     vi.spyOn(runtime, 'getClientSettings').mockReturnValue({

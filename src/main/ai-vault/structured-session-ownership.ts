@@ -1,6 +1,5 @@
 import { agentSessionLeaseAdmitsWriter } from '../../shared/agent-session-lease-adjudication'
 import type { AiVaultListResult, AiVaultSession } from '../../shared/ai-vault-types'
-import type { AiVaultPrepareSessionResumeArgs } from '../../shared/ai-vault-resume-preparation'
 import { getStructuredAgentSessionHost } from '../native-chat/agent-session-wire/structured-agent-session-registry'
 import {
   listStructuredProviderSessionOwnership,
@@ -39,13 +38,6 @@ export function projectStructuredAiVaultSessions(
     : { ...result, sessions }
 }
 
-export function assertLegacyAiVaultResumeAllowed(args: AiVaultPrepareSessionResumeArgs): void {
-  const ownership = findResumeOwnership(args)
-  if (ownership) {
-    refuseLegacyWriter(ownership)
-  }
-}
-
 export async function assertLegacyAiVaultResumeCommandAllowed(
   command: string,
   ensureHost: () => Promise<void>
@@ -70,43 +62,14 @@ function isPotentialStructuredResumeCommand(command: string): boolean {
 }
 
 function findSessionOwnership(session: AiVaultSession): StructuredProviderSessionOwnership | null {
-  if (session.agent !== 'codex' && session.agent !== 'claude') {
-    return null
-  }
-  return findOwnership(session.agent, session.sessionId)
+  return session.agent === 'claude' ? findOwnership(session.sessionId) : null
 }
 
-function findResumeOwnership(
-  args: AiVaultPrepareSessionResumeArgs
-): StructuredProviderSessionOwnership | null {
-  if (args.agent !== 'codex' && args.agent !== 'claude') {
-    return null
-  }
-  const host = getStructuredAgentSessionHost()
-  if (!host) {
-    return null
-  }
-  const exact = args.sessionId ? findOwnership(args.agent, args.sessionId) : null
-  if (exact) {
-    return exact
-  }
-  const fileName = args.filePath.split(/[\\/]/).at(-1) ?? ''
+function findOwnership(providerSessionId: string): StructuredProviderSessionOwnership | null {
   return (
     listOwnership().find(
       (ownership) =>
-        ownership.provider === args.agent && fileName.includes(ownership.providerSessionId)
-    ) ?? null
-  )
-}
-
-function findOwnership(
-  provider: 'claude' | 'codex',
-  providerSessionId: string
-): StructuredProviderSessionOwnership | null {
-  return (
-    listOwnership().find(
-      (ownership) =>
-        ownership.provider === provider && ownership.providerSessionId === providerSessionId
+        ownership.provider === 'claude' && ownership.providerSessionId === providerSessionId
     ) ?? null
   )
 }
@@ -121,17 +84,16 @@ function isResumeCommandFor(
   ownership: StructuredProviderSessionOwnership
 ): boolean {
   const invocation = parseResumeInvocation(command)
-  if (!invocation || invocation.provider !== ownership.provider) {
+  if (!invocation || ownership.provider !== 'claude') {
     return false
   }
-  // A target-less resume (--last, --continue, or a bare --resume/-r) may pick
+  // A target-less resume (--continue, or a bare --resume/-r) may pick
   // any provider session, so it cannot be admitted while one is structured.
   // Only an explicit target that differs from this owned session is safe.
   return invocation.target === null || invocation.target === ownership.providerSessionId
 }
 
 type ResumeInvocation = {
-  provider: 'codex' | 'claude'
   target: string | null
 }
 
@@ -142,39 +104,30 @@ function parseResumeInvocation(command: string): ResumeInvocation | null {
   const tokens = command.match(/"[^"\\]*(?:\\.[^"\\]*)*"|'[^']*'|[^\s]+/g) ?? []
   const normalized = tokens.map((token) => token.replace(/^['"]|['"]$/g, ''))
   const executableIndex = normalized.findIndex((token) =>
-    /(?:^|[\\/])(?:codex|claude)(?:\.exe)?$/i.test(token)
+    /(?:^|[\\/])claude(?:\.exe)?$/i.test(token)
   )
   if (executableIndex === -1) {
     return null
   }
-  const provider = /codex(?:\.exe)?$/i.test(normalized[executableIndex]!) ? 'codex' : 'claude'
   const args = normalized.slice(executableIndex + 1)
   // `--continue`/`-c` resume the most recent session and never take an id, so a
   // following token is a prompt, not a target — they are always target-less.
-  const targetlessFlags = provider === 'codex' ? [] : ['--continue', '-c']
-  const targetlessIndex = args.findIndex((token) => targetlessFlags.includes(token.toLowerCase()))
-  if (targetlessIndex !== -1) {
-    return { provider, target: null }
+  if (args.some((token) => ['--continue', '-c'].includes(token.toLowerCase()))) {
+    return { target: null }
   }
-  const resumeFlags = provider === 'codex' ? ['resume'] : ['--resume', '-r']
   const inlineIndex = args.findIndex(
-    (token) =>
-      provider === 'claude' &&
-      (token.toLowerCase().startsWith('--resume=') || token.toLowerCase().startsWith('-r='))
+    (token) => token.toLowerCase().startsWith('--resume=') || token.toLowerCase().startsWith('-r=')
   )
   if (inlineIndex !== -1) {
     const target = args[inlineIndex]!.slice(args[inlineIndex]!.indexOf('=') + 1)
-    return { provider, target: target.length > 0 ? target : null }
+    return { target: target.length > 0 ? target : null }
   }
-  const markerIndex = args.findIndex((token) => resumeFlags.includes(token.toLowerCase()))
+  const markerIndex = args.findIndex((token) => ['--resume', '-r'].includes(token.toLowerCase()))
   if (markerIndex === -1) {
     return null
   }
   const candidate = args[markerIndex + 1]
-  return {
-    provider,
-    target: candidate && !candidate.startsWith('-') ? candidate : null
-  }
+  return { target: candidate && !candidate.startsWith('-') ? candidate : null }
 }
 
 function refuseLegacyWriter(ownership: StructuredProviderSessionOwnership): never {

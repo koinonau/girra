@@ -37,9 +37,7 @@ vi.mock('@/lib/agent-paste-draft', () => ({
 }))
 vi.mock('./native-chat-runtime-send', () => ({
   sendNativeChatMessage: vi.fn(),
-  sendNativeChatTypedCommand: vi.fn(),
   sendNativeChatMessageVerified: vi.fn(),
-  typeNativeChatCommand: vi.fn(),
   submitNativeChatPrompt: vi.fn()
 }))
 vi.mock('./native-chat-runtime-image-send', () => ({

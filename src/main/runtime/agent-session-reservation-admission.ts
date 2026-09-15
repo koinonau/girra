@@ -159,8 +159,7 @@ export function applyAgentSessionReservation(
   }
   // Inside the transaction, not only in the RPC resolver: two concurrent adoptions of one
   // conversation mint different session ids, so the compare-and-swap never collides and a
-  // pre-commit check passes for both. Codex would then hold one thread from two app-servers, which
-  // it permits silently and which corrupts the conversation rather than erroring.
+  // pre-commit check passes for both, leaving two writers on one conversation.
   assertAdoptedConversationUnowned(state, request)
   const existing = state.records.get(request.sessionId)
   if (!existing) {
@@ -207,8 +206,7 @@ export function applyAgentSessionReservation(
  *
  * It runs inside the store transaction because the pre-commit check in the RPC resolver cannot be
  * the guard: two concurrent adoptions of one conversation mint different session ids, so the
- * compare-and-swap never collides and both would pass. Codex permits two app-servers on one thread
- * silently, so the cost of missing this is a corrupted conversation rather than an error.
+ * compare-and-swap never collides and both would pass, leaving two writers on one conversation.
  */
 function assertAdoptedConversationUnowned(
   state: AgentSessionStoreState,

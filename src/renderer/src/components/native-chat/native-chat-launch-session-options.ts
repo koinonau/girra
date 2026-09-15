@@ -5,7 +5,7 @@ import {
   decideInitialAgentTabViewMode,
   type NativeChatLaunchPromptDelivery
 } from '@/lib/native-chat-initial-view-mode'
-import { resolveNativeChatLaunchSessionOptions } from './native-chat-session-option-enrichment'
+import { resolveNativeChatSessionOptionDefaults } from '../../../../shared/native-chat-session-option-defaults'
 
 type NativeChatLaunchSettings = Pick<
   GlobalSettings,
@@ -16,7 +16,6 @@ export type InitialNativeChatSessionOptionsArgs = {
   agent: TuiAgent
   promptDelivery?: NativeChatLaunchPromptDelivery
   launchDraftText?: string
-  nativeChatTranscriptIsLocalReadable?: boolean
 }
 
 export function resolveInitialNativeChatSessionOptions(
@@ -29,6 +28,6 @@ export function resolveInitialNativeChatSessionOptions(
     ...args
   })
   return viewMode === 'chat'
-    ? resolveNativeChatLaunchSessionOptions(settings?.nativeChatSessionOptions, args.agent)
+    ? resolveNativeChatSessionOptionDefaults(settings?.nativeChatSessionOptions, args.agent)
     : undefined
 }

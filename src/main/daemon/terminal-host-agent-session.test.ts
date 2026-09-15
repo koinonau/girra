@@ -10,7 +10,7 @@ function createClaimedSubprocess(): SubprocessHandle & {
   let onExit: ((code: number) => void) | null = null
   return {
     pid: 99_999,
-    getForegroundProcess: () => 'codex',
+    getForegroundProcess: () => 'claude',
     write: vi.fn(),
     resize: vi.fn(),
     kill: vi.fn(),
@@ -41,7 +41,7 @@ describe('TerminalHost agent-session claims', () => {
     keyId: 'key',
     identityDigest: 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
     worktreeScopeDigest: 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb',
-    agent: 'codex' as const
+    agent: 'claude' as const
   }
   const surface = {
     worktreeId: 'worktree',
@@ -103,7 +103,7 @@ describe('TerminalHost agent-session claims', () => {
       sessionId: 'renderer-owned-live-session',
       cols: 80,
       rows: 24,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       streamClient: { onData: vi.fn(), onExit: vi.fn() }
     })
 
@@ -111,7 +111,7 @@ describe('TerminalHost agent-session claims', () => {
       sessionId: 'replacement-resume-session',
       cols: 80,
       rows: 24,
-      launchAgent: 'codex',
+      launchAgent: 'claude',
       streamClient: { onData: vi.fn(), onExit: vi.fn() },
       agentSessionEnsure: { claim, surface }
     })

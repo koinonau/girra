@@ -12,9 +12,7 @@ type AppStoreState = ReturnType<typeof useAppStore.getState>
 
 export function getProviderSessionClaimKey(record: SleepingAgentSessionRecord): string {
   const base = `${record.worktreeId}\0${record.agent}\0${record.providerSession.key}\0${record.providerSession.id}`
-  return record.agent === 'pi' || record.agent === 'prime-agent'
-    ? `${base}\0${record.providerSession.transcriptPath ?? ''}`
-    : base
+  return record.agent === 'pi' ? `${base}\0${record.providerSession.transcriptPath ?? ''}` : base
 }
 
 // Why quit is excluded: it is an explicit request to keep resumable work. A

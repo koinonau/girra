@@ -7,11 +7,14 @@
 
 import { readFile } from 'node:fs/promises'
 import type { AgentSessionProcessIdentity } from '../../shared/agent-session-record'
-import { CODEX_SPAWN_TOKEN_ENV } from '../codex/codex-structured-owner-identity'
+
+/** The child echoes its spawn token here so the owner probe can tell a live
+ *  child of this reservation from a same-pid stranger. */
+export const AGENT_SESSION_SPAWN_TOKEN_ENV = 'ORCA_AGENT_SESSION_SPAWN_TOKEN'
 
 export function spawnTokenFromEnvironBlock(
   block: string,
-  variable: string = CODEX_SPAWN_TOKEN_ENV
+  variable: string = AGENT_SESSION_SPAWN_TOKEN_ENV
 ): string | null {
   for (const entry of block.split('\0')) {
     if (entry.startsWith(`${variable}=`)) {

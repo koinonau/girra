@@ -57,22 +57,22 @@ function headlessSnapshot(worktreeId: string): RuntimeMobileSessionTabsResult {
     publicationEpoch: 'structured:epoch-1',
     snapshotVersion: 1,
     activeGroupId: `headless-terminals:${worktreeId}`,
-    activeTabId: 'agent-session:codex-1',
+    activeTabId: 'agent-session:claude-1',
     activeTabType: 'agent-session',
     tabGroups: [
       {
         id: `headless-terminals:${worktreeId}`,
-        activeTabId: 'agent-session:codex-1',
-        tabOrder: ['agent-session:codex-1']
+        activeTabId: 'agent-session:claude-1',
+        tabOrder: ['agent-session:claude-1']
       }
     ],
     tabs: [
       {
         type: 'agent-session',
-        id: 'agent-session:codex-1',
-        title: 'Codex Chat',
-        sessionId: 'codex-1',
-        agent: 'codex',
+        id: 'agent-session:claude-1',
+        title: 'Claude Chat',
+        sessionId: 'claude-1',
+        agent: 'claude',
         isActive: true
       }
     ]

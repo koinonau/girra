@@ -16,7 +16,7 @@ function session(index: number): AiVaultSession {
   return {
     id,
     executionHostId: 'local',
-    agent: 'codex',
+    agent: 'claude',
     sessionId: id,
     title: id,
     cwd: '/repo',
@@ -39,7 +39,7 @@ function session(index: number): AiVaultSession {
 
 const SCOPE_TRUNCATION: AiVaultScanIssue = {
   executionHostId: 'ssh:dev-box',
-  agent: 'codex',
+  agent: 'claude',
   kind: 'scope',
   path: '/home/ada',
   message: 'Only the first 64 project paths were scanned.'
@@ -207,7 +207,7 @@ describe('mergeAiVaultListResults', () => {
   it('keeps a scope notice alongside a failing host so one bad host is not the whole story', () => {
     const hostDown: AiVaultScanIssue = {
       executionHostId: 'ssh:build-box',
-      agent: 'codex',
+      agent: 'claude',
       kind: 'host',
       path: 'build-box',
       message: 'Remote connection dropped.'

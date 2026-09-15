@@ -29,9 +29,9 @@ describe('agent prompt receipt correlation', () => {
     vi.useFakeTimers()
     const { runtime, handle, writes } = await createAgentPromptSubmissionRuntime(
       () => undefined,
-      'codex'
+      'claude'
     )
-    runtime.onPtyData('pty-prompt', '\x1b]0;Codex working\x07', Date.now())
+    runtime.onPtyData('pty-prompt', '\x1b]0;Claude working\x07', Date.now())
 
     const firstPromise = runtime.sendTerminalAgentPrompt(handle, 'first prompt', {
       acceptQueued: true,
@@ -50,8 +50,8 @@ describe('agent prompt receipt correlation', () => {
 
     runtime.onPtyData(
       'pty-prompt',
-      '\x1b]0;Codex idle\x07\x1b]0;Codex working\x07' +
-        '\x1b]0;Codex idle\x07\x1b]0;Codex working\x07',
+      '\x1b]0;Claude idle\x07\x1b]0;Claude working\x07' +
+        '\x1b]0;Claude idle\x07\x1b]0;Claude working\x07',
       Date.now()
     )
 

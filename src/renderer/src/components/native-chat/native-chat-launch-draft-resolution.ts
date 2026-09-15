@@ -30,7 +30,7 @@ export function nativeChatLaunchDraftTurnBaseline(
 //
 // A launch draft is seeded at agent launch, so its session starts with zero user
 // turns. That makes "not provably older than the seed" the right test rather than
-// "stamped after the seed": Grok omits row timestamps entirely, and a remote
+// "stamped after the seed": a row may omit its timestamp, and a remote
 // host's JSONL clock can trail the renderer's. Only a turn whose own timestamp
 // puts it before the seed by more than the cross-host slack is treated as
 // pre-existing history (a resumed session, or a `load earlier` page).

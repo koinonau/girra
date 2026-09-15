@@ -14,11 +14,8 @@ vi.mock('../ipc/runtime-environment-transport-routing', () => ({
   callRuntimeEnvironment: mocks.callRuntimeEnvironment
 }))
 
-const {
-  getSavedRuntimeAiVaultHostInfos,
-  prepareRuntimeAiVaultSessionResume,
-  scanRuntimeAiVaultSessions
-} = await import('./runtime-session-scanner')
+const { getSavedRuntimeAiVaultHostInfos, scanRuntimeAiVaultSessions } =
+  await import('./runtime-session-scanner')
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -91,7 +88,7 @@ describe('runtime AI Vault session scanner', () => {
         [
           {
             executionHostId: 'ssh:dev-box',
-            agent: 'codex',
+            agent: 'claude',
             path: '/sessions/session-1.jsonl',
             message: 'could not parse session'
           }
@@ -103,14 +100,14 @@ describe('runtime AI Vault session scanner', () => {
 
     expect(scanResult.sessions).toEqual([
       expect.objectContaining({
-        id: 'runtime:env-1:codex:session-1:/sessions/session-1.jsonl',
+        id: 'runtime:env-1:claude:session-1:/sessions/session-1.jsonl',
         executionHostId: 'runtime:env-1'
       })
     ])
     expect(scanResult.issues).toEqual([
       expect.objectContaining({
         executionHostId: 'runtime:env-1',
-        agent: 'codex',
+        agent: 'claude',
         path: '/sessions/session-1.jsonl'
       })
     ])
@@ -121,68 +118,10 @@ describe('runtime AI Vault session scanner', () => {
 
     expect(scanResult.sessions).toEqual([
       expect.objectContaining({
-        id: 'runtime:env-1:codex:session-1:/sessions/session-1.jsonl',
+        id: 'runtime:env-1:claude:session-1:/sessions/session-1.jsonl',
         executionHostId: 'runtime:env-1'
       })
     ])
-  })
-
-  it('prepares a resume on the transcript-owning runtime', async () => {
-    mocks.callRuntimeEnvironment.mockResolvedValueOnce({
-      ok: true,
-      result: { useRealCodexHome: true }
-    })
-    const args = {
-      agent: 'codex' as const,
-      filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-      codexHome: '/managed',
-      executionHostId: 'runtime:env-1' as const
-    }
-
-    await expect(prepareRuntimeAiVaultSessionResume('/user-data', 'env-1', args)).resolves.toEqual({
-      useRealCodexHome: true
-    })
-    expect(mocks.callRuntimeEnvironment).toHaveBeenCalledWith(
-      '/user-data',
-      'env-1',
-      'aiVault.prepareSessionResume',
-      args
-    )
-  })
-
-  it('keeps a repinned account home instead of stripping it', async () => {
-    mocks.callRuntimeEnvironment.mockResolvedValueOnce({
-      ok: true,
-      result: {
-        useRealCodexHome: false,
-        substituteCodexHome: '/data/orca/codex-accounts/account-2/home'
-      }
-    })
-
-    await expect(
-      prepareRuntimeAiVaultSessionResume('/user-data', 'env-1', {
-        agent: 'codex',
-        filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-        codexHome: '/managed',
-        executionHostId: 'runtime:env-1'
-      })
-    ).resolves.toEqual({
-      useRealCodexHome: false,
-      substituteCodexHome: '/data/orca/codex-accounts/account-2/home'
-    })
-  })
-
-  it('fails retryably when runtime preparation returns an invalid result', async () => {
-    mocks.callRuntimeEnvironment.mockResolvedValueOnce({ ok: true, result: {} })
-
-    await expect(
-      prepareRuntimeAiVaultSessionResume('/user-data', 'env-1', {
-        agent: 'codex',
-        filePath: '/managed/sessions/2026/07/20/rollout-a.jsonl',
-        codexHome: '/managed',
-        executionHostId: 'runtime:env-1'
-      })
-    ).rejects.toThrow('Invalid aiVault.prepareSessionResume response')
   })
 })
 
@@ -198,10 +137,10 @@ function session(
   sessionId: string
 ): AiVaultSession {
   return {
-    id: `${executionHostId}:codex:${sessionId}:/sessions/${sessionId}.jsonl`,
+    id: `${executionHostId}:claude:${sessionId}:/sessions/${sessionId}.jsonl`,
     executionHostId,
     executionHostPlatform: 'linux',
-    agent: 'codex',
+    agent: 'claude',
     sessionId,
     title: sessionId,
     cwd: '/srv/app',
@@ -217,7 +156,7 @@ function session(
     previewMessages: [],
     queuedMessageCount: 0,
     subagentTranscriptCount: 0,
-    resumeCommand: `codex resume ${sessionId}`,
+    resumeCommand: `claude --resume ${sessionId}`,
     subagent: null
   }
 }

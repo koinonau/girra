@@ -150,12 +150,7 @@ export const TerminalCreateParams = z.object({
     .object({
       agentCommand: z.string().optional(),
       agentArgs: z.string(),
-      agentEnv: z.record(z.string(), z.string()),
-      ompResumeFilePath: z
-        .string()
-        .min(1)
-        .max(32 * 1024)
-        .optional()
+      agentEnv: z.record(z.string(), z.string())
     })
     .optional(),
   resumeProviderSession: z

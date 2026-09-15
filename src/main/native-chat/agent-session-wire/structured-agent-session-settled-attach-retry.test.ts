@@ -58,13 +58,14 @@ let dispatch: Mock<StructuredAgentSessionAdapter['dispatch']>
 function accepted(): AgentSessionDispatchOutcome {
   return {
     state: 'accepted',
-    providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 1 }
+    providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-1' }
   }
 }
 
 function adapter(): StructuredAgentSessionAdapter {
   return {
     acquire,
+    supportsCreate: () => true,
     releaseAcquisition,
     dispatch,
     cancelTurn: vi.fn(async () => ({ cancelled: true })),
@@ -100,7 +101,7 @@ beforeEach(async () => {
     },
     link: {
       linkId: `link-${fence}`,
-      handle: { provider: 'codex', threadId: THREAD },
+      handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
       origin: store.getRecord(SESSION)?.providerHandleChain.length ? 'resumed' : 'created',
       mintedAtFence: fence,
       observedAt: NOW
@@ -180,7 +181,7 @@ describe('settled attach retry', () => {
         },
         link: {
           linkId: `link-${fence}`,
-          handle: { provider: 'codex', threadId: THREAD },
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: 'created',
           mintedAtFence: fence,
           observedAt: NOW
@@ -223,7 +224,7 @@ describe('settled attach retry', () => {
         },
         link: {
           linkId: `link-${fence}`,
-          handle: { provider: 'codex', threadId: THREAD },
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: 'created',
           mintedAtFence: fence,
           observedAt: NOW

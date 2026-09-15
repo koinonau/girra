@@ -89,9 +89,7 @@ describe('maybeAutoRenameBranchOnFirstWork', () => {
 
   it.each([
     ['claude', WORKTREE_ID],
-    ['codex', WORKTREE_ID],
-    ['claude', FOLDER_WORKTREE_ID],
-    ['codex', FOLDER_WORKTREE_ID]
+    ['claude', FOLDER_WORKTREE_ID]
   ] as const)(
     'renames %s workspace %s on live work without a subscriber, preserving replay, dedupe and retries',
     async (agent, workspaceId) => {
@@ -196,7 +194,7 @@ describe('maybeAutoRenameBranchOnFirstWork', () => {
     const location = { workspaceId, workspaceKind: 'git-worktree' as const }
     const pending: Promise<void>[] = []
     const feed = new StructuredAgentSessionStatusFeed({
-      sessions: new Map([['session', { journal, params: { location, provider: 'codex' } }]]),
+      sessions: new Map([['session', { journal, params: { location, provider: 'claude' } }]]),
       getRecord: () => null,
       now: () => 1,
       onStatusChanged: (summary, options) => {

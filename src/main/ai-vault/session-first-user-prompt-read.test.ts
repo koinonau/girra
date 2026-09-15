@@ -50,42 +50,6 @@ describe('readAiVaultFirstUserPrompt', () => {
     expect(result.prompt?.length).toBeGreaterThan(220)
   })
 
-  it('extracts full Codex input_text content blocks (not preview-capped)', async () => {
-    const root = await mkdtemp(join(tmpdir(), 'orca-first-prompt-codex-'))
-    tempRoots.push(root)
-    const sessionPath = join(root, 'sessions', '2026', '07', '21', 'rollout-full.jsonl')
-    await mkdir(join(root, 'sessions', '2026', '07', '21'), { recursive: true })
-    const longPrompt = `Review the PR and fix real regressions.\n\n${'context '.repeat(60).trimEnd()}`
-    await writeFile(
-      sessionPath,
-      [
-        JSON.stringify({
-          timestamp: '2026-07-21T10:00:00.000Z',
-          type: 'session_meta',
-          payload: { id: 'codex-full-prompt', cwd: '/repo/app' }
-        }),
-        JSON.stringify({
-          timestamp: '2026-07-21T10:00:01.000Z',
-          type: 'response_item',
-          payload: {
-            type: 'message',
-            role: 'user',
-            content: [{ type: 'input_text', text: longPrompt }]
-          }
-        })
-      ].join('\n')
-    )
-
-    const result = await readAiVaultFirstUserPrompt({
-      agent: 'codex',
-      filePath: sessionPath,
-      codexHome: root
-    })
-
-    expect(result.prompt).toBe(longPrompt)
-    expect(result.prompt?.length).toBeGreaterThan(220)
-  })
-
   it('skips meta/harness user turns and returns the first real ask', async () => {
     const root = await mkdtemp(join(tmpdir(), 'orca-first-prompt-meta-'))
     tempRoots.push(root)
@@ -126,12 +90,12 @@ describe('readAiVaultFirstUserPrompt', () => {
     tempRoots.push(root)
     const sessionDir = join(root, 'session-1')
     await mkdir(sessionDir, { recursive: true })
-    // Grok's parser JSON.parses summary.json eagerly, so truncated JSON throws.
-    const summaryPath = join(sessionDir, 'summary.json')
-    await writeFile(summaryPath, '{"info": {"id": "session-1", "cwd": "/repo/a')
+    // The legacy OpenCode parser JSON.parses the session doc eagerly, so truncated JSON throws.
+    const sessionPath = join(sessionDir, 'ses_1.json')
+    await writeFile(sessionPath, '{"id": "ses_1", "directory": "/repo/a')
 
     await expect(
-      readAiVaultFirstUserPrompt({ agent: 'grok', filePath: summaryPath })
+      readAiVaultFirstUserPrompt({ agent: 'opencode', filePath: sessionPath })
     ).resolves.toEqual({ prompt: null })
   })
 

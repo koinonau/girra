@@ -24,7 +24,6 @@ export function launchAiVaultSessionInNewTab(args: {
   command: string
   cwd?: string
   env?: Record<string, string>
-  envToDelete?: string[]
   launchConfig?: SleepingAgentLaunchConfig
   providerSession?: AgentProviderSessionMetadata
   targetGroupId?: string
@@ -43,7 +42,6 @@ export function launchAiVaultSessionInNewTab(args: {
       command: args.command,
       ...(args.cwd ? { cwd: args.cwd } : {}),
       ...(args.env ? { env: args.env } : {}),
-      ...(args.envToDelete ? { envToDelete: args.envToDelete } : {}),
       ...(args.launchConfig ? { launchConfig: args.launchConfig } : {}),
       ...(args.providerSession ? { providerSession: args.providerSession } : {}),
       ...(args.launchConfig ? { agentArgs: args.launchConfig.agentArgs } : {}),
@@ -74,7 +72,6 @@ export function launchAiVaultSessionInNewTab(args: {
   store.queueTabStartupCommand(tab.id, {
     command: args.command,
     ...(args.env ? { env: args.env } : {}),
-    ...(args.envToDelete ? { envToDelete: args.envToDelete } : {}),
     ...(args.launchConfig ? { launchConfig: args.launchConfig, launchAgent: args.agent } : {}),
     ...(args.providerSession ? { resumeProviderSession: args.providerSession } : {}),
     telemetry: {

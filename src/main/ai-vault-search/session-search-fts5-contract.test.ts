@@ -134,7 +134,7 @@ describe('sessions.file_path is deliberately not unique', () => {
       `INSERT INTO sessions(agent, session_id, file_path, title, resume_command)
        VALUES (?, ?, ?, ?, ?)`
     )
-    // OpenCode and Cursor keep every session in one SQLite store; files.path is the key.
+    // OpenCode keeps every session in one SQLite store; files.path is the key.
     const storePath = '/home/user/.local/share/opencode/storage.db'
     insert.run('opencode', 'ses_one', storePath, 'first', 'opencode --session ses_one')
     expect(() =>

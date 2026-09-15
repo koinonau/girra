@@ -24,7 +24,7 @@ import { readStructuredSessionGateFacts } from './structured-mailbox-pointer-hos
 export type OrchestrationAddressableAgent = {
   handle: string
   worktreeId: string
-  /** Absent means "unknown", and `@claude`/`@codex` fail closed on it, exactly as for a pane. */
+  /** Absent means "unknown", and `@claude` fails closed on it, exactly as for a pane. */
   agentIdentity?: TuiAgent
 }
 
@@ -49,8 +49,7 @@ export function listAddressableStructuredWorkers(): OrchestrationAddressableAgen
  * A structured worker's agent status, in the vocabulary `@idle` already matches on.
  *
  * Null when the session cannot be read: unknown must not read as idle, or a broadcast to `@idle`
- * would wake a worker mid-turn — which Codex answers with `turn already running` and Claude queues
- * behind the running turn.
+ * would wake a worker mid-turn, which Claude queues behind the running turn.
  */
 export function structuredWorkerAgentStatus(sessionId: string): string | null {
   const facts = readStructuredSessionGateFacts(sessionId)

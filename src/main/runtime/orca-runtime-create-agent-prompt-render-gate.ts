@@ -17,7 +17,7 @@ export class OrcaRuntimeWithCreateAgentPromptRenderGate extends OrcaRuntimeWithW
     dispose: () => void
   } | null {
     const pty = this.ptysById.get(ptyId)
-    if (!['claude', 'codex'].includes(pty?.launchAgent ?? pty?.foregroundAgent ?? '')) {
+    if ((pty?.launchAgent ?? pty?.foregroundAgent) !== 'claude') {
       return null
     }
     let armed = false

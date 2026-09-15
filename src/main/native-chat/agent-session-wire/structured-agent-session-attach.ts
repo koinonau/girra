@@ -15,7 +15,6 @@ import type {
   AgentSessionProviderHandleLink
 } from '../../../shared/agent-session-provider-handle'
 import { claudeProviderHandleLink } from '../../claude/claude-structured-owner-identity'
-import { codexProviderHandleLink } from '../../codex/codex-structured-owner-identity'
 import type {
   AgentSessionAccountHome,
   AgentSessionExecutionLocation,
@@ -140,15 +139,13 @@ export function journalIdentityFor(
 ): AgentSessionJournalIdentity {
   const head = agentSessionProviderHandleChainHead(record.providerHandleChain)
   const providerHandle: AgentSessionProviderHandle =
-    head?.handle.provider === 'codex'
-      ? { kind: 'codex', threadId: head.handle.threadId }
-      : head?.handle.provider === 'claude'
-        ? {
-            kind: 'claude',
-            sessionId: head.handle.sessionId,
-            leafUuid: head.handle.leafUuid
-          }
-        : (params.providerHandle ?? { kind: 'opaque', agent: params.agent, value: 'pending' })
+    head?.handle.provider === 'claude'
+      ? {
+          kind: 'claude',
+          sessionId: head.handle.sessionId,
+          leafUuid: head.handle.leafUuid
+        }
+      : (params.providerHandle ?? { kind: 'opaque', agent: params.agent, value: 'pending' })
   return {
     sessionId: record.sessionId,
     workspaceId: params.location.workspaceId,
@@ -219,22 +216,14 @@ function adoptedProviderHandleLink(
   handle: Exclude<AgentSessionProviderHandle, { kind: 'opaque' }>,
   observedAt: number
 ): AgentSessionProviderHandleLink {
-  return handle.kind === 'claude'
-    ? claudeProviderHandleLink({
-        sessionId: handle.sessionId,
-        leafUuid: handle.leafUuid,
-        resumed: false,
-        origin: 'adopted',
-        fence: ADOPTED_HANDLE_FENCE,
-        observedAt
-      })
-    : codexProviderHandleLink({
-        threadId: handle.threadId,
-        resumed: false,
-        origin: 'adopted',
-        fence: ADOPTED_HANDLE_FENCE,
-        observedAt
-      })
+  return claudeProviderHandleLink({
+    sessionId: handle.sessionId,
+    leafUuid: handle.leafUuid,
+    resumed: false,
+    origin: 'adopted',
+    fence: ADOPTED_HANDLE_FENCE,
+    observedAt
+  })
 }
 
 export function reserveRequestFor(input: {

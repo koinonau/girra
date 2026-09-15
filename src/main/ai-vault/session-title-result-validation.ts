@@ -21,7 +21,7 @@ function parseTitle(value: unknown): AiVaultSessionTitle {
   }
   const record = value as Record<string, unknown>
   if (
-    (record.agent !== 'claude' && record.agent !== 'codex') ||
+    record.agent !== 'claude' ||
     typeof record.sessionId !== 'string' ||
     !record.sessionId.trim() ||
     record.sessionId.length > 512 ||

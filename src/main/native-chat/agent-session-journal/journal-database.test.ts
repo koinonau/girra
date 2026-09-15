@@ -29,7 +29,7 @@ function epochRow(seq: number, epoch = 'epoch-1'): JournalRow {
   return {
     kind: 'epoch',
     reason: 'session_created',
-    providerHandle: { kind: 'codex', threadId: 'thread-1' },
+    providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null },
     v: AGENT_SESSION_JOURNAL_SCHEMA_VERSION,
     epoch,
     seq,

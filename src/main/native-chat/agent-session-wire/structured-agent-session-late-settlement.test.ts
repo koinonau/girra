@@ -35,7 +35,7 @@ let closeSession: Mock<NonNullable<StructuredAgentSessionAdapter['closeSession']
 function accepted(): AgentSessionDispatchOutcome {
   return {
     state: 'accepted',
-    providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 1 }
+    providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-1' }
   }
 }
 
@@ -88,7 +88,7 @@ beforeEach(async () => {
         },
         link: {
           linkId: `link-${fence}`,
-          handle: { provider: 'codex' as const, threadId: THREAD },
+          handle: { provider: 'claude' as const, sessionId: THREAD, leafUuid: null },
           origin: 'created' as const,
           mintedAtFence: fence,
           observedAt: NOW
@@ -99,7 +99,8 @@ beforeEach(async () => {
       closeSession,
       cancelTurn: vi.fn(async () => ({ cancelled: true })),
       answerPrompt: vi.fn(async () => undefined),
-      setOption: vi.fn(async () => undefined)
+      setOption: vi.fn(async () => undefined),
+      supportsCreate: () => true
     },
     journalRoot: root,
     claimKeyId: 'key-1',

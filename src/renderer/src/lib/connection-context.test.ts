@@ -620,11 +620,10 @@ describe('getConnectionIdFromState', () => {
     expect(getConnectionIdFromState(state, 'repo-shared::/srv/repo')).toBeNull()
   })
 
-  it('keeps a runtime host nested SSH target, which decides local readability', () => {
+  it('keeps a runtime host nested SSH target', () => {
     // `repoWithFetchedOwner` stamps the runtime host and spreads the nested target through. The
-    // pane pairs it with the environment (`selectRuntimeAwareSshStatus`) for reconnect state, and
-    // `isNativeChatTranscriptLocalReadable` treats a null here as "this client can read it" — so
-    // dropping it would send a transcript read to the wrong machine.
+    // pane pairs it with the environment (`selectRuntimeAwareSshStatus`) for reconnect state, so
+    // dropping it would lose the reconnect target.
     const state: ConnectionContextState = {
       folderWorkspaces: [],
       projectGroups: [],

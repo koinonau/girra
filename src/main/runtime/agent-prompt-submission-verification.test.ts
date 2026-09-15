@@ -1,11 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
   AGENT_PROMPT_EFFECT_TIMEOUT_MS,
-  AGENT_PROMPT_HOOK_EFFECT_TIMEOUT_MS,
   type AgentPromptActivity,
   isAgentPromptStalledError,
   readAgentPromptWaitText,
-  resolveAgentPromptEffectTimeoutMs,
   verifyAgentPromptSubmission
 } from './agent-prompt-submission-verification'
 
@@ -281,7 +279,7 @@ describe('agent prompt submission verification', () => {
     const verification = verifyAgentPromptSubmission({
       baseline: current,
       readActivity: () => current,
-      timeoutMs: AGENT_PROMPT_HOOK_EFFECT_TIMEOUT_MS
+      timeoutMs: AGENT_PROMPT_EFFECT_TIMEOUT_MS
     })
 
     await vi.advanceTimersByTimeAsync(15_000 + 1_000)
@@ -289,12 +287,6 @@ describe('agent prompt submission verification', () => {
     await vi.advanceTimersByTimeAsync(50)
 
     await expect(verification).resolves.toBeUndefined()
-  })
-
-  it('gives hook-observed agents the longer effect window', () => {
-    expect(resolveAgentPromptEffectTimeoutMs('codex')).toBe(AGENT_PROMPT_HOOK_EFFECT_TIMEOUT_MS)
-    expect(resolveAgentPromptEffectTimeoutMs('claude')).toBe(AGENT_PROMPT_EFFECT_TIMEOUT_MS)
-    expect(resolveAgentPromptEffectTimeoutMs(null)).toBe(AGENT_PROMPT_EFFECT_TIMEOUT_MS)
   })
 
   it('recognizes a stalled verdict from a message or a relayed error code', () => {

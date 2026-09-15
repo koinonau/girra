@@ -7,7 +7,6 @@ import { createNativeChatMessageListProjection } from './native-chat-message-lis
 import { nativeChatTaskListState } from './native-chat-task-list-state'
 import { nativeChatTaskListPredecessors } from './native-chat-task-list-history'
 import { NativeChatTaskList } from './NativeChatTaskList'
-import { projectNativeChatTaskListFrames } from './native-chat-task-list-frames'
 import { shouldShowNativeChatTypingIndicator } from './native-chat-typing-indicator'
 import { useNativeChatTurnStatus } from './use-native-chat-turn-status'
 import { NativeChatTypingIndicatorRow } from './NativeChatTypingIndicatorRow'
@@ -121,7 +120,7 @@ export function NativeChatMessageList({
     [session.agent, session.sessionId]
   )
   const messages = useMemo(
-    () => projectNativeChatTaskListFrames(projectMessages(session.messages)),
+    () => projectMessages(session.messages),
     [projectMessages, session.messages]
   )
   const taskListPredecessors = useMemo(() => nativeChatTaskListPredecessors(messages), [messages])

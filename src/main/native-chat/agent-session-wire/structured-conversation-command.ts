@@ -28,7 +28,7 @@ export type ConversationReplacement = {
   sourceSessionId: string
   sessionId: string
   workspaceId: string
-  agent: 'claude' | 'codex'
+  agent: 'claude'
 }
 
 export function runStructuredConversationCommand(

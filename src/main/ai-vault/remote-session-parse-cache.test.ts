@@ -5,11 +5,7 @@ import { resetRemoteSessionParseCacheForTests } from './remote-session-parse-cac
 import { scanRemoteAiVaultSessions } from './remote-session-scanner'
 import { MemoryRemoteProvider, jsonLines } from './remote-session-scanner-test-fixtures'
 
-/**
- * Counts whole-transcript reads, which is the cost #13753 is about. Codex's
- * per-scan `session_index.jsonl` title lookup is one small file and is not part
- * of the corpus term, so it is excluded rather than asserted on.
- */
+/** Counts whole-transcript reads, which is the cost #13753 is about. */
 class CountingRemoteProvider extends MemoryRemoteProvider {
   readonly readFilePaths: string[] = []
 
@@ -23,15 +19,11 @@ class CountingRemoteProvider extends MemoryRemoteProvider {
 
 function transcript(sessionId: string, title: string, timestamp: string): string {
   return jsonLines([
+    { type: 'session', id: sessionId, cwd: '/home/ada/repo', timestamp },
     {
+      type: 'message',
       timestamp,
-      type: 'session_meta',
-      payload: { id: sessionId, cwd: '/home/ada/repo' }
-    },
-    {
-      timestamp,
-      type: 'response_item',
-      payload: { type: 'message', role: 'user', content: [{ type: 'text', text: title }] }
+      message: { role: 'user', content: [{ type: 'text', text: title }] }
     }
   ])
 }
@@ -54,7 +46,7 @@ describe('remote AI Vault transcript re-reads', () => {
     const provider = new CountingRemoteProvider()
     for (const day of ['07/07', '07/25', '08/10']) {
       provider.addFile(
-        `/home/ada/.codex/sessions/2026/${day}/rollout-${day.replace('/', '')}.jsonl`,
+        `/home/ada/.pi/agent/sessions/${day.replace('/', '-')}/session-${day.replace('/', '')}.jsonl`,
         transcript(
           `session-${day.replace('/', '')}`,
           `Work from ${day}`,
@@ -80,7 +72,7 @@ describe('remote AI Vault transcript re-reads', () => {
 
   it('re-reads a transcript that actually changed', async () => {
     const provider = new CountingRemoteProvider()
-    const path = '/home/ada/.codex/sessions/2026/08/31/rollout-live.jsonl'
+    const path = '/home/ada/.pi/agent/sessions/08-31/session-live.jsonl'
     provider.addFile(
       path,
       transcript('live-session', 'First prompt', '2026-08-31T01:00:00.000Z'),
@@ -103,7 +95,7 @@ describe('remote AI Vault transcript re-reads', () => {
 
   it('re-reads when only the size changed under an unchanged mtime', async () => {
     const provider = new CountingRemoteProvider()
-    const path = '/home/ada/.codex/sessions/2026/08/31/rollout-grown.jsonl'
+    const path = '/home/ada/.pi/agent/sessions/08-31/session-grown.jsonl'
     provider.addFile(path, transcript('grown-session', 'Short', '2026-08-31T01:00:00.000Z'), 1_000)
 
     await scan(provider)
@@ -124,45 +116,9 @@ describe('remote AI Vault transcript re-reads', () => {
     expect(result.sessions[0]?.title).toBe('A much longer first prompt than before')
   })
 
-  // Codex names threads in $CODEX_HOME/session_index.jsonl asynchronously, after
-  // the rollout's last append — so the transcript's mtime+size never changes to
-  // signal it. That file sits outside `sessions/`, hence outside the read count.
-  it('picks up a session_index title written after the transcript was cached', async () => {
-    const provider = new CountingRemoteProvider()
-    const path = '/home/ada/.codex/sessions/2026/08/31/rollout-named-later.jsonl'
-    provider.addFile(
-      path,
-      transcript('named-later-session', 'First prompt', '2026-08-31T01:00:00.000Z'),
-      1_000
-    )
-    provider.addFile(
-      '/home/ada/.codex/session_index.jsonl',
-      jsonLines([{ id: 'some-other-session', thread_name: 'Unrelated thread' }]),
-      1_000
-    )
-
-    const first = await scan(provider)
-    expect(first.sessions[0]?.title).toBe('First prompt')
-
-    provider.readFilePaths.length = 0
-    provider.addFile(
-      '/home/ada/.codex/session_index.jsonl',
-      jsonLines([
-        { id: 'some-other-session', thread_name: 'Unrelated thread' },
-        { id: 'named-later-session', thread_name: 'Named by Codex after the fact' }
-      ]),
-      2_000
-    )
-    const second = await scan(provider)
-
-    expect(second.sessions[0]?.title).toBe('Named by Codex after the fact')
-    // The #13753 win is preserved: the index is read, the transcript is not.
-    expect(provider.readFilePaths).toEqual([])
-  })
-
   it('does not serve a cached parse to a different execution host', async () => {
     const provider = new CountingRemoteProvider()
-    const path = '/home/ada/.codex/sessions/2026/08/31/rollout-host.jsonl'
+    const path = '/home/ada/.pi/agent/sessions/08-31/session-host.jsonl'
     provider.addFile(
       path,
       transcript('host-session', 'Host scoped', '2026-08-31T01:00:00.000Z'),
@@ -185,7 +141,7 @@ describe('remote AI Vault transcript re-reads', () => {
 
   it('does not cache a read that failed', async () => {
     const provider = new CountingRemoteProvider()
-    const path = '/home/ada/.codex/sessions/2026/08/31/rollout-flaky.jsonl'
+    const path = '/home/ada/.pi/agent/sessions/08-31/session-flaky.jsonl'
     provider.addFile(
       path,
       transcript('flaky-session', 'Recovered', '2026-08-31T01:00:00.000Z'),

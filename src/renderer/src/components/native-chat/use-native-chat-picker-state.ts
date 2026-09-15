@@ -158,14 +158,8 @@ export function useNativeChatPickerState(args: {
   )
 
   const classifySend = useCallback(
-    (value: string) =>
-      classifyNativeChatSend(
-        value,
-        agentCommands,
-        skillOriginRef.current,
-        profile?.skillPrefix ?? null
-      ),
-    [agentCommands, profile]
+    (value: string) => classifyNativeChatSend(value, agentCommands, skillOriginRef.current),
+    [agentCommands]
   )
   const clearSkillOrigin = useCallback(() => {
     skillOriginRef.current = null

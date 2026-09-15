@@ -26,7 +26,7 @@ import {
 } from './agent-session-launch-plan'
 
 const store = { settings: {} } as unknown as AgentLaunchRouteStore
-const ROUTE_INPUT = { agent: 'codex', executionHostId: 'local' }
+const ROUTE_INPUT = { agent: 'claude', executionHostId: 'local' }
 const STRUCTURED = { kind: 'structured', sessionId: 'session-1' }
 const hooks = { onStructuredReady: vi.fn() }
 
@@ -41,7 +41,7 @@ describe('planAgentSessionLaunch', () => {
 
   it('decides the route once, from the builder input, and never again on launch', async () => {
     const plan = planAgentSessionLaunch(store, {
-      agent: 'codex',
+      agent: 'claude',
       workspace: { kind: 'git-worktree', worktreeId: 'wt-1' },
       prompt: 'Fix it',
       promptDelivery: 'draft'
@@ -50,7 +50,7 @@ describe('planAgentSessionLaunch', () => {
     expect(plan.route).toBe('structured-native-chat')
     expect(mocks.buildAgentLaunchRouteInput).toHaveBeenCalledWith(
       store,
-      expect.objectContaining({ agent: 'codex', prompt: 'Fix it', promptDelivery: 'draft' })
+      expect.objectContaining({ agent: 'claude', prompt: 'Fix it', promptDelivery: 'draft' })
     )
     expect(mocks.resolveAgentLaunchRoute).toHaveBeenCalledWith(ROUTE_INPUT)
     expect(mocks.structuredAgentLaunchSupported).not.toHaveBeenCalled()
@@ -89,14 +89,14 @@ describe('planAgentSessionLaunch', () => {
 
   it('sends no delivery fields the request did not carry', async () => {
     const plan = planAgentSessionLaunch(store, {
-      agent: 'codex',
+      agent: 'claude',
       workspace: { kind: 'folder', worktreeId: 'folder:ws-1' }
     })
 
     await plan.launch(hooks)
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'folder:ws-1',
-      'codex',
+      'claude',
       {},
       hooks
     )
@@ -107,7 +107,7 @@ describe('planAgentSessionLaunch', () => {
     async (route) => {
       mocks.resolveAgentLaunchRoute.mockReturnValue(route)
       const plan = planAgentSessionLaunch(store, {
-        agent: 'codex',
+        agent: 'claude',
         workspace: { kind: 'git-worktree', worktreeId: 'wt-1' }
       })
 
@@ -129,7 +129,7 @@ describe('planAgentSessionLaunch', () => {
 
   it('launches into the workspace created after planning when the target names one', async () => {
     const plan = planAgentSessionLaunch(store, {
-      agent: 'codex',
+      agent: 'claude',
       workspace: { kind: 'git-worktree', repoId: 'repo-1' },
       prompt: 'Fix it',
       promptDelivery: 'auto-submit'
@@ -138,7 +138,7 @@ describe('planAgentSessionLaunch', () => {
     await plan.launch(hooks, { worktreeId: 'wt-created' })
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'wt-created',
-      'codex',
+      'claude',
       { prompt: 'Fix it', promptDelivery: 'auto-submit' },
       hooks
     )
@@ -146,7 +146,7 @@ describe('planAgentSessionLaunch', () => {
 
   it('refuses to launch a prospective workspace that was never created', async () => {
     const plan = planAgentSessionLaunch(store, {
-      agent: 'codex',
+      agent: 'claude',
       workspace: { kind: 'git-worktree', repoId: 'repo-1' }
     })
 
@@ -168,7 +168,7 @@ describe('structuredAgentSessionLaunchFeasible', () => {
 
     expect(
       structuredAgentSessionLaunchFeasible(store, {
-        agent: 'codex',
+        agent: 'claude',
         workspace: { kind: 'git-worktree', worktreeId: 'wt-1' },
         settings
       })
@@ -180,13 +180,13 @@ describe('structuredAgentSessionLaunchFeasible', () => {
   it('builds the input from the named settings, not the store copy', () => {
     const settings = { experimentalStructuredNativeChat: true } as never
     structuredAgentSessionLaunchFeasible(store, {
-      agent: 'codex',
+      agent: 'claude',
       workspace: { kind: 'git-worktree', worktreeId: 'wt-1' },
       settings
     })
 
     expect(mocks.buildAgentLaunchRouteInput).toHaveBeenCalledWith(store, {
-      agent: 'codex',
+      agent: 'claude',
       workspace: { kind: 'git-worktree', worktreeId: 'wt-1' }
     })
     // The builder's input carries no settings, so seeing them here proves the named copy won.
@@ -205,7 +205,7 @@ describe('adoptAgentSessionLaunchVerdict', () => {
   it('re-enters a persisted verdict without resolving the route again', async () => {
     const plan = adoptAgentSessionLaunchVerdict({
       route: 'structured-native-chat',
-      agent: 'codex',
+      agent: 'claude',
       prompt: 'Fix it',
       promptDelivery: 'draft'
     })
@@ -217,7 +217,7 @@ describe('adoptAgentSessionLaunchVerdict', () => {
     expect(mocks.structuredAgentLaunchSupported).not.toHaveBeenCalled()
     expect(mocks.settleStructuredAgentLaunch).toHaveBeenCalledWith(
       'wt-recovered',
-      'codex',
+      'claude',
       { prompt: 'Fix it', promptDelivery: 'draft' },
       hooks
     )
@@ -226,7 +226,7 @@ describe('adoptAgentSessionLaunchVerdict', () => {
   it('keeps a non-structured verdict out of the loop', async () => {
     const plan = adoptAgentSessionLaunchVerdict({
       route: 'terminal-tui',
-      agent: 'codex',
+      agent: 'claude',
       worktreeId: 'wt-1'
     })
 

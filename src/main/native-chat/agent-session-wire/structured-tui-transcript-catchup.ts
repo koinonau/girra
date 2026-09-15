@@ -59,20 +59,13 @@ export class StructuredTuiTranscriptCatchup {
     this.stop(sessionId)
     const record = this.input.store.getRecord(sessionId)
     const head = record?.providerHandleChain.at(-1)
-    if (
-      !record ||
-      !head ||
-      (head.handle.provider !== 'codex' && head.handle.provider !== 'claude')
-    ) {
+    if (!record || head?.handle.provider !== 'claude') {
       return
     }
     const agent = head.handle.provider
-    const providerSessionId = agent === 'claude' ? head.handle.sessionId : head.handle.threadId
+    const providerSessionId = head.handle.sessionId
     const journal = this.input.session(sessionId).journal
-    const transcriptOptions =
-      agent === 'claude'
-        ? { claudeProjectsDir: join(record.accountHome.path, 'projects') }
-        : { codexSessionsDirs: [join(record.accountHome.path, 'sessions')] }
+    const transcriptOptions = { claudeProjectsDir: join(record.accountHome.path, 'projects') }
     const boundary = recovering
       ? await readStructuredTuiTranscriptBoundary(journal.directory)
       : null

@@ -29,10 +29,8 @@ import { terminateNotebookProcessTree } from './ipc/notebook'
 import { killLocalPrecheckProcessTree } from './automations/precheck-runner'
 import { killRecipeProcess } from '../shared/ephemeral-vm-recipe-process'
 import { killSpawnedCommandTree } from './git/command-runner/spawned-command-tree-kill'
-import { killCodexAppServerProcessTree } from './codex/codex-app-server-process-tree-kill'
 import { signalProcessTree } from '../shared/child-process/process-tree-termination'
 import { killSourceControlAgentProcess } from './text-generation/source-control-local-process'
-import { terminateCodexTurnProcesses } from './codex/codex-structured-turn-processes'
 
 /** A pid Electron reports as one of ours: every gate below must refuse it. */
 const RENDERER_PID = 1001
@@ -128,18 +126,6 @@ describe('a refused tree-kill still terminates the root it owns', () => {
     expect(child.kill).toHaveBeenCalledWith('SIGKILL')
   })
 
-  it('kills the codex app-server root when the deadline tree walk is refused', () => {
-    const child = { pid: RENDERER_PID, kill: vi.fn() }
-
-    killCodexAppServerProcessTree(child as never, {
-      platform: 'win32',
-      spawnImpl: spawnMock as never
-    })
-
-    expect(spawnMock).not.toHaveBeenCalled()
-    expect(child.kill).toHaveBeenCalledWith('SIGKILL')
-  })
-
   it('kills the commit-message agent root when the tree walk is refused', async () => {
     setPlatform('win32')
     const child = { pid: RENDERER_PID, kill: vi.fn() }
@@ -160,8 +146,8 @@ describe('a refused tree-kill still terminates the root it owns', () => {
   })
 
   it('still signals the POSIX process group: a group only holds what Orca put in it', async () => {
-    // Same contract as the other three POSIX group arms in main (claude-login,
-    // codex teardown, PTY sweep): never refuse. A stale `getAppMetrics()` entry
+    // Same contract as the other POSIX group arms in main (claude-login, PTY
+    // sweep): never refuse. A stale `getAppMetrics()` entry
     // must not orphan a macOS/Linux tree.
     setPlatform('linux')
     const posixChild = { pid: RENDERER_PID, kill: vi.fn(), exitCode: null, signalCode: null }
@@ -171,31 +157,5 @@ describe('a refused tree-kill still terminates the root it owns', () => {
     expect(processKill).toHaveBeenCalledWith(-RENDERER_PID, 'SIGKILL')
     expect(posixChild.kill).not.toHaveBeenCalled()
     processKill.mockRestore()
-  })
-})
-
-/**
- * The one gated site with nothing to fall back to: the roots it kills are found
- * by a process-table walk, not spawned here, so there is no child handle. A
- * refusal must then be visible — the turn is reported as not cancelled — rather
- * than resolving as if the tree had gone.
- */
-describe('a refused tree-kill with no handle to fall back to', () => {
-  it('reports the codex turn as not cancelled', async () => {
-    const appServerPid = 500
-    const addedRoot = {
-      pid: RENDERER_PID,
-      ppid: appServerPid,
-      name: 'node.exe',
-      command: 'node',
-      depth: 1
-    }
-    queryWindowsProcessDescendantsMock.mockResolvedValue([addedRoot])
-
-    await expect(
-      terminateCodexTurnProcesses(appServerPid, { platform: 'win32', identities: new Map() })
-    ).resolves.toBe(false)
-
-    expect(execFileMock).not.toHaveBeenCalled()
   })
 })

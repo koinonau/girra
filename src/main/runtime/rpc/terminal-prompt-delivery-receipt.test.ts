@@ -79,7 +79,7 @@ async function createHarness(agent: TuiAgent, busy = false) {
 describe('durable terminal prompt delivery receipts', () => {
   afterEach(() => vi.useRealTimers())
 
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'reports a proven %s turn start with additive stages',
     async (agent) => {
       vi.useFakeTimers()
@@ -124,7 +124,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('returns all 16 busy-turn prompts as queued without duplicate Enter', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     const responses: RpcResponse[] = []
     for (let index = 0; index < 16; index += 1) {
       const pending = harness.dispatcher.dispatch(
@@ -148,7 +148,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('replays after a dispatcher replacement without duplicate text or Enter', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     const firstPromise = harness.dispatcher.dispatch(
       request(harness.handle, 'crash-retry', 'preserve once')
     )
@@ -196,7 +196,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('retries the same request after terminal_not_writable before any PTY write', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex')
+    const harness = await createHarness('claude')
     const pty = (
       harness.runtime as unknown as {
         ptysById: Map<string, { connected: boolean }>
@@ -222,7 +222,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('waits on a replay only for observation and never resends', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     const firstPromise = harness.dispatcher.dispatch(
       request(harness.handle, 'observe-retry', 'observe once')
     )
@@ -231,8 +231,8 @@ describe('durable terminal prompt delivery receipts', () => {
     const writesAfterFirst = [...harness.writes]
     harness.runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"done","agentType":"codex"}\x07' +
-        '\x1b]9999;{"state":"working","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"done","agentType":"claude"}\x07' +
+        '\x1b]9999;{"state":"working","agentType":"claude"}\x07',
       Date.now()
     )
 
@@ -257,7 +257,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('claims one lifecycle transition for one queued request', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     const firstPromise = harness.dispatcher.dispatch(
       request(harness.handle, 'queued-first', 'first prompt')
     )
@@ -279,8 +279,8 @@ describe('durable terminal prompt delivery receipts', () => {
 
     harness.runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"done","agentType":"codex"}\x07' +
-        '\x1b]9999;{"state":"working","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"done","agentType":"claude"}\x07' +
+        '\x1b]9999;{"state":"working","agentType":"claude"}\x07',
       Date.now()
     )
 
@@ -310,7 +310,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('does not let a later queued request claim an earlier lifecycle transition', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     const firstPromise = harness.dispatcher.dispatch(
       request(harness.handle, 'ordered-first', 'first prompt')
     )
@@ -324,8 +324,8 @@ describe('durable terminal prompt delivery receipts', () => {
 
     harness.runtime.onPtyData(
       'pty-prompt',
-      '\x1b]9999;{"state":"done","agentType":"codex"}\x07' +
-        '\x1b]9999;{"state":"working","agentType":"codex"}\x07',
+      '\x1b]9999;{"state":"done","agentType":"claude"}\x07' +
+        '\x1b]9999;{"state":"working","agentType":"claude"}\x07',
       Date.now()
     )
 
@@ -353,7 +353,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('rejects changed payload and replays queued truth after generation replacement', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     const firstPromise = harness.dispatcher.dispatch(
       request(harness.handle, 'bound-request', 'original')
     )
@@ -416,7 +416,7 @@ describe('durable terminal prompt delivery receipts', () => {
 
   it('does not clear a pre-existing provider draft before appending the prompt', async () => {
     vi.useFakeTimers()
-    const harness = await createHarness('codex', true)
+    const harness = await createHarness('claude', true)
     harness.runtime.onPtyData('pty-prompt', '› existing human draft', Date.now())
     const responsePromise = harness.dispatcher.dispatch(
       request(harness.handle, 'draft-safe', 'appended prompt')

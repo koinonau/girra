@@ -112,14 +112,14 @@ export function seedSleepingRecord(tabId: string, worktreeId: string, sessionId:
         paneKey,
         tabId,
         worktreeId,
-        agent: 'codex' as const,
+        agent: 'claude' as const,
         providerSession: { key: 'session_id' as const, id: sessionId },
         prompt: 'keep working',
         state: 'working' as const,
         origin: 'live' as const,
         capturedAt: 1000,
         updatedAt: 1000,
-        terminalTitle: 'Codex'
+        terminalTitle: 'Claude'
       }
     }
   }))
@@ -170,7 +170,7 @@ export function expectReplayedResume(paneKey: string, worktreeId: string, sessio
   expect(replacementTabId).not.toBe(MIRROR_TAB_ID)
   expect(tabIds(worktreeId)).toContain(replacementTabId)
   expect(state.automaticAgentResumeClaimsByTabId[replacementTabId]).toMatchObject({
-    launchAgent: 'codex',
+    launchAgent: 'claude',
     providerSession: { key: 'session_id', id: sessionId }
   })
 }

@@ -27,19 +27,19 @@ function terminalTab(worktreeId: string, aiVaultTitle?: TerminalTab['aiVaultTitl
   }
 }
 
-function titleResult(agent: 'claude' | 'codex', title: string): AiVaultSessionTitlesResult {
+function titleResult(agent: 'claude', title: string): AiVaultSessionTitlesResult {
   return { titles: [{ agent, sessionId: `${agent}-session`, title }] }
 }
 
 function makeState(args: {
-  agent?: 'claude' | 'codex'
+  agent?: 'claude'
   aiVaultTitle?: TerminalTab['aiVaultTitle']
   executionHostId: 'ssh:dev-box' | 'runtime:server-1'
   sleeping?: boolean
   path: string
   worktreeId: string
 }) {
-  const agent = args.agent ?? 'codex'
+  const agent = args.agent ?? 'claude'
   const tab = terminalTab(args.worktreeId, args.aiVaultTitle)
   const listeners = new Set<(state: AppState, previous: AppState) => void>()
   const providerSession = {
@@ -167,7 +167,7 @@ function makeState(args: {
 }
 
 describe('AI Vault tab title sync', () => {
-  it.each(['claude', 'codex'] as const)(
+  it.each(['claude'] as const)(
     'projects the canonical %s AI Vault session title',
     async (agent) => {
       const store = makeState({
@@ -225,7 +225,7 @@ describe('AI Vault tab title sync', () => {
     })
     const stop = startAiVaultTabTitleSync({
       ...store,
-      resolveSessionTitles: async () => titleResult('codex', 'Stable conversation')
+      resolveSessionTitles: async () => titleResult('claude', 'Stable conversation')
     })
 
     await vi.waitFor(() =>
@@ -239,7 +239,7 @@ describe('AI Vault tab title sync', () => {
 
   it('refreshes a live title when the AI Vault name changes', async () => {
     const store = makeState({
-      aiVaultTitle: { agent: 'codex', sessionId: 'codex-session', title: 'First name' },
+      aiVaultTitle: { agent: 'claude', sessionId: 'claude-session', title: 'First name' },
       executionHostId: 'ssh:dev-box',
       worktreeId: 'worktree-1',
       path: '/workspace/albacore'
@@ -248,7 +248,7 @@ describe('AI Vault tab title sync', () => {
     let refresh: (() => void) | undefined
     const stop = startAiVaultTabTitleSync({
       ...store,
-      resolveSessionTitles: async () => titleResult('codex', title),
+      resolveSessionTitles: async () => titleResult('claude', title),
       setTimer: (callback, delay) => {
         expect(delay).toBe(5 * 60_000)
         refresh = callback
@@ -295,7 +295,7 @@ describe('AI Vault tab title sync', () => {
       worktreeId: 'worktree-1',
       path: '/workspace/albacore'
     })
-    const resolveSessionTitles = vi.fn(async () => titleResult('codex', 'Deferred conversation'))
+    const resolveSessionTitles = vi.fn(async () => titleResult('claude', 'Deferred conversation'))
     let runScheduled: (() => void) | undefined
     const cancelScheduled = vi.fn()
     const stop = startAiVaultTabTitleSync({
@@ -319,7 +319,7 @@ describe('AI Vault tab title sync', () => {
       worktreeId: 'worktree-1',
       path: '/workspace/albacore'
     })
-    const resolveSessionTitles = vi.fn(async () => titleResult('codex', 'Stable conversation'))
+    const resolveSessionTitles = vi.fn(async () => titleResult('claude', 'Stable conversation'))
     const stop = startAiVaultTabTitleSync({ ...store, resolveSessionTitles })
 
     await vi.waitFor(() => expect(resolveSessionTitles).toHaveBeenCalledTimes(1))
@@ -337,7 +337,7 @@ describe('AI Vault tab title sync', () => {
       worktreeId: 'worktree-1',
       path: '/workspace/albacore'
     })
-    const resolveSessionTitles = vi.fn(async () => titleResult('codex', 'Stable conversation'))
+    const resolveSessionTitles = vi.fn(async () => titleResult('claude', 'Stable conversation'))
     const stop = startAiVaultTabTitleSync({ ...store, resolveSessionTitles })
 
     await vi.waitFor(() => expect(resolveSessionTitles).toHaveBeenCalledTimes(1))
@@ -355,11 +355,11 @@ describe('AI Vault tab title sync', () => {
       worktreeId: 'worktree-1',
       path: '/workspace/albacore'
     })
-    const resolveSessionTitles = vi.fn(async () => titleResult('codex', 'Original conversation'))
+    const resolveSessionTitles = vi.fn(async () => titleResult('claude', 'Original conversation'))
     const stop = startAiVaultTabTitleSync({ ...store, resolveSessionTitles })
 
     await vi.waitFor(() => expect(resolveSessionTitles).toHaveBeenCalledTimes(1))
-    store.setProviderSessionId('codex-session-2')
+    store.setProviderSessionId('claude-session-2')
 
     await vi.waitFor(() => expect(resolveSessionTitles).toHaveBeenCalledTimes(2))
     expect(store.getState().tabsByWorktree['worktree-1'][0].aiVaultTitle).toBeNull()
@@ -368,7 +368,7 @@ describe('AI Vault tab title sync', () => {
 
   it('batches title identities per host within the wire bound', () => {
     const request = (index: number): AiVaultTitleRequest => ({
-      agent: 'codex',
+      agent: 'claude',
       executionHostId: 'ssh:dev-box',
       providerSession: { key: 'session_id', id: `session-${index}` },
       refresh: true,
@@ -386,7 +386,7 @@ describe('AI Vault tab title sync', () => {
 
   it('runs hosts concurrently while serializing each host wire', async () => {
     const request = (executionHostId: AiVaultTitleRequest['executionHostId'], index: number) => ({
-      agent: 'codex' as const,
+      agent: 'claude' as const,
       executionHostId,
       providerSession: { key: 'session_id' as const, id: `session-${index}` },
       refresh: true,

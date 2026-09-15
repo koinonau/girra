@@ -22,8 +22,8 @@ beforeEach(async () => {
       sessionId: 'session-1',
       workspaceId: 'workspace-1',
       hostId: 'local',
-      agent: 'codex',
-      providerHandle: { kind: 'codex', threadId: 'thread-1' }
+      agent: 'claude',
+      providerHandle: { kind: 'claude', sessionId: 'thread-1', leafUuid: null }
     },
     journalDir: root
   })
@@ -76,12 +76,7 @@ describe('structured send idempotency', () => {
     }
     const dispatch = vi.fn(async () => ({
       state: 'accepted' as const,
-      providerIdentity: {
-        provider: 'codex' as const,
-        threadId: 'thread-1',
-        turnId: 'turn-1',
-        ordinal: 0
-      }
+      providerIdentity: { provider: 'claude' as const, sessionId: 'thread-1', uuid: 'turn-1-0' }
     }))
     const context: AgentSessionTurnContext = {
       sessionId: 'session-1',

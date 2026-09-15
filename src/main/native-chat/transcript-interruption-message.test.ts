@@ -5,7 +5,6 @@ import {
 } from '../../shared/native-chat-types'
 import { stripNoiseMessages } from '../../shared/native-chat-noise'
 import { decodeClaudeTranscriptLine } from './transcript-line-decoders-claude'
-import { decodeCodexTranscriptLine } from './transcript-line-decoders-codex'
 
 function expectNormalizedInterruption(message: NativeChatMessage | null): void {
   expect(message).toMatchObject({
@@ -34,19 +33,5 @@ describe('native chat transcript interruption messages', () => {
 
     expectNormalizedInterruption(message)
     expect(message?.id).toBe('interrupt-row')
-  })
-
-  it('normalizes Codex turn_aborted into one visible status row', () => {
-    const message = decodeCodexTranscriptLine(
-      JSON.stringify({
-        type: 'event_msg',
-        timestamp: '2026-07-16T23:46:01.000Z',
-        payload: { type: 'turn_aborted', reason: 'interrupted', turn_id: 'turn-2' }
-      }),
-      'fallback'
-    )
-
-    expectNormalizedInterruption(message)
-    expect(message?.id).toBe('fallback')
   })
 })

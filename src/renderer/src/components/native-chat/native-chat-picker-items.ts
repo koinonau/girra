@@ -52,24 +52,15 @@ export function buildNativeChatPickerItems(
   commands: readonly SlashCommandSuggestion[],
   skills: readonly DiscoveredSkill[],
   query: string,
-  skillSigil: '/' | '$',
   sessionSkillNames?: readonly string[]
 ): NativeChatPickerItem[] {
-  // A name can only collide when both kinds invoke through the same sigil;
-  // where skills carry their own, `/review` and `$review` are distinct entries.
-  const sharedSigil = skillSigil === '/'
   const unclassifiedNames = new Set(
     commands.filter((command) => command.kindUnspecified).map((command) => command.name)
   )
-  const mergedSkills = mergeNativeChatSkills(
-    skills,
-    sessionSkillNames,
-    unclassifiedNames,
-    skillSigil
-  )
+  const mergedSkills = mergeNativeChatSkills(skills, sessionSkillNames, unclassifiedNames)
   const skillNames = new Set(mergedSkills.map((skill) => skill.name))
   const resolvedCommands = commands.filter(
-    (command) => !(sharedSigil && command.kindUnspecified && skillNames.has(command.name))
+    (command) => !(command.kindUnspecified && skillNames.has(command.name))
   )
   const commandNames = new Set(resolvedCommands.map((command) => command.name))
   const commandItems = rankItems(
@@ -85,7 +76,7 @@ export function buildNativeChatPickerItems(
         argumentHint: command.argumentHint
           ? sanitizePickerText(command.argumentHint, 80)
           : undefined,
-        skillCollision: sharedSigil && skillNames.has(command.name)
+        skillCollision: skillNames.has(command.name)
       },
       stableOrder: index
     })),
@@ -93,7 +84,7 @@ export function buildNativeChatPickerItems(
   )
   const skillItems = rankItems(
     mergedSkills
-      .filter((skill) => !(sharedSigil && commandNames.has(skill.name)))
+      .filter((skill) => !commandNames.has(skill.name))
       .map((item, index) => ({ item, stableOrder: index })),
     query
   )
@@ -106,8 +97,7 @@ export function buildNativeChatPickerItems(
 function mergeNativeChatSkills(
   skills: readonly DiscoveredSkill[],
   sessionSkillNames: readonly string[] | undefined,
-  unclassifiedNames: ReadonlySet<string>,
-  skillSigil: '/' | '$'
+  unclassifiedNames: ReadonlySet<string>
 ): Extract<NativeChatPickerItem, { kind: 'skill' }>[] {
   const exactPaths = new Map<string, DiscoveredSkill>()
   for (const skill of skills) {
@@ -124,10 +114,7 @@ function mergeNativeChatSkills(
     byName.set(safeName, [...(byName.get(safeName) ?? []), { ...skill, name: safeName }])
   }
   const discovered = new Map(
-    [...byName.entries()].map(([name, namedSkills]) => [
-      name,
-      pickerSkill(name, namedSkills, skillSigil)
-    ])
+    [...byName.entries()].map(([name, namedSkills]) => [name, pickerSkill(name, namedSkills)])
   )
   // Why: when the running session reports its own skills, that report is the
   // authority on which ones exist — a disk scan cannot see what the session
@@ -142,21 +129,20 @@ function mergeNativeChatSkills(
         ]
       : [...discovered.keys()]
   return [...new Set(names)]
-    .map((name) => discovered.get(name) ?? pickerSkill(name, [], skillSigil))
+    .map((name) => discovered.get(name) ?? pickerSkill(name, []))
     .sort(comparePickerSkills)
 }
 
 function pickerSkill(
   name: string,
-  namedSkills: readonly DiscoveredSkill[],
-  skillSigil: '/' | '$'
+  namedSkills: readonly DiscoveredSkill[]
 ): Extract<NativeChatPickerItem, { kind: 'skill' }> {
   const sorted = [...namedSkills].sort(compareDiscoveredSkills)
   return {
     kind: 'skill' as const,
     id: `skill:${name}`,
     name,
-    token: `${skillSigil}${name}`,
+    token: `/${name}`,
     description: sorted[0]?.description ? sanitizePickerText(sorted[0].description, 240) : null,
     sources: sorted.map((skill) => ({
       sourceKind: skill.sourceKind,

@@ -11,11 +11,7 @@ export function launchConfigsEqual(
   if (a === undefined || b === undefined) {
     return a === b
   }
-  if (
-    a.agentCommand !== b.agentCommand ||
-    a.agentArgs !== b.agentArgs ||
-    a.ompResumeFilePath !== b.ompResumeFilePath
-  ) {
+  if (a.agentCommand !== b.agentCommand || a.agentArgs !== b.agentArgs) {
     return false
   }
   const aKeys = Object.keys(a.agentEnv)

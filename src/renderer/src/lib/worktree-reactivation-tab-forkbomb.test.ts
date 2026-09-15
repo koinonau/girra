@@ -90,14 +90,14 @@ describe('STA-1111 worktree reopen does not fork-bomb tabs', () => {
           paneKey,
           tabId: 'packaged-restart-pane',
           worktreeId: worktree.id,
-          agent: 'codex',
+          agent: 'claude',
           providerSession: { key: 'session_id', id: 'packaged-session' },
           prompt: 'resume prior task',
           state: 'working',
           origin: 'quit',
           capturedAt: 1000,
           updatedAt: 1000,
-          terminalTitle: 'Codex'
+          terminalTitle: 'Claude'
         }
       },
       terminalLayoutsByTabId: {
@@ -127,7 +127,7 @@ describe('STA-1111 worktree reopen does not fork-bomb tabs', () => {
                         branch: 'main',
                         tabId: 'packaged-restart-pane',
                         leafId,
-                        title: 'Codex',
+                        title: 'Claude',
                         connected: true,
                         writable: true,
                         lastOutputAt: null,
@@ -146,7 +146,7 @@ describe('STA-1111 worktree reopen does not fork-bomb tabs', () => {
             {
               id: livePtyId,
               cwd: worktree.path,
-              title: 'Codex',
+              title: 'Claude',
               agentOwnership: 'present' as const
             }
           ])
@@ -173,7 +173,7 @@ describe('STA-1111 worktree reopen does not fork-bomb tabs', () => {
     expect(restored.sleepingAgentSessionsByPaneKey[paneKey]).toBeDefined()
   })
 
-  it('re-captured sleeping codex session resumes once, not once per reopen', async () => {
+  it('re-captured sleeping claude session resumes once, not once per reopen', async () => {
     const worktree = { ...makeWorktree(), createdWithAgent: undefined }
     useAppStore.setState(baseState(worktree))
     vi.stubGlobal('window', {
@@ -184,7 +184,7 @@ describe('STA-1111 worktree reopen does not fork-bomb tabs', () => {
         pty: { listSessions: vi.fn(async () => []) }
       }
     })
-    const providerSession = { key: 'session_id' as const, id: 'codex-session-1' }
+    const providerSession = { key: 'session_id' as const, id: 'claude-session-1' }
     let resumedTabId: string | undefined
 
     for (let reopen = 0; reopen < 4; reopen++) {
@@ -196,14 +196,14 @@ describe('STA-1111 worktree reopen does not fork-bomb tabs', () => {
             paneKey,
             tabId: `slept-pane-${reopen}`,
             worktreeId: worktree.id,
-            agent: 'codex',
+            agent: 'claude',
             providerSession,
             prompt: 'resume prior task',
             state: 'working',
             origin: 'live',
             capturedAt: 1000 + reopen,
             updatedAt: 1000 + reopen,
-            terminalTitle: 'Codex'
+            terminalTitle: 'Claude'
           }
         }
       }))

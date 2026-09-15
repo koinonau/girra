@@ -17,7 +17,6 @@ vi.mock('./runtime-rpc-client', () => ({
 
 import { RuntimeRpcCallError } from './runtime-rpc-client'
 import { runRemoteAgentSessionLaunch } from './remote-agent-session-launch'
-import { agentResumeHostAuthorityCapability } from './agent-resume-host-authority-capability'
 
 describe('remote agent-session launch routing', () => {
   beforeEach(() => {
@@ -33,34 +32,31 @@ describe('remote agent-session launch routing', () => {
       runRemoteAgentSessionLaunch({
         environmentId: 'env-1',
         hostAuthority,
-        hostAuthorityCapability: 'agent-session.omp-resume-path.v1',
+        hostAuthorityCapability: 'agent-session.structured.v1',
         legacy
       })
     ).resolves.toBe('structured')
-    expect(mocks.supportsCapability).toHaveBeenCalledWith(
-      'env-1',
-      'agent-session.omp-resume-path.v1'
-    )
+    expect(mocks.supportsCapability).toHaveBeenCalledWith('env-1', 'agent-session.structured.v1')
     expect(hostAuthority).toHaveBeenCalledOnce()
     expect(legacy).not.toHaveBeenCalled()
   })
 
-  it('falls back to legacy when an older host lacks the Kimi resume capability', async () => {
+  it('falls back to legacy when an older host lacks the per-agent capability', async () => {
     const hostAuthority = vi.fn().mockResolvedValue('structured')
     const legacy = vi.fn().mockResolvedValue('legacy')
     mocks.supportsCapability.mockResolvedValue(false)
 
     // Why: an old host rejects the widened agent enum with invalid_argument, which is not a
-    // fallback code — so the probe, not the error handler, has to keep the pane alive.
+    // fallback code, so the probe, not the error handler, has to keep the pane alive.
     await expect(
       runRemoteAgentSessionLaunch({
         environmentId: 'env-1',
         hostAuthority,
-        hostAuthorityCapability: agentResumeHostAuthorityCapability('kimi'),
+        hostAuthorityCapability: 'agent-session.structured.v1',
         legacy
       })
     ).resolves.toBe('legacy')
-    expect(mocks.supportsCapability).toHaveBeenCalledWith('env-1', 'agent-session.kimi-resume.v1')
+    expect(mocks.supportsCapability).toHaveBeenCalledWith('env-1', 'agent-session.structured.v1')
     expect(hostAuthority).not.toHaveBeenCalled()
   })
 

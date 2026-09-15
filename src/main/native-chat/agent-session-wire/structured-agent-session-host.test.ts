@@ -71,18 +71,6 @@ describe('attach', () => {
     })
   })
 
-  it('refuses a provider handle that belongs to a different provider', async () => {
-    const params = attachParams({
-      providerHandle: { kind: 'claude', sessionId: 'claude-session', leafUuid: null }
-    })
-
-    expect(await host.attach(CALLER, params)).toMatchObject({
-      ok: false,
-      refusal: { code: 'agent_session_operation_invalid' }
-    })
-    expect(store.getRecord(SESSION)).toBeNull()
-  })
-
   it('refuses a second create against a live session', async () => {
     await attach()
     expect(await host.attach(CALLER, attachParams())).toMatchObject({ ok: false })
@@ -107,7 +95,7 @@ describe('attach', () => {
         },
         link: {
           linkId: 'stale-link',
-          handle: { provider: 'codex', threadId: THREAD },
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: 'created',
           mintedAtFence: fence + 1,
           observedAt: NOW
@@ -122,7 +110,7 @@ describe('attach', () => {
         },
         link: {
           linkId: `link-${fence}`,
-          handle: { provider: 'codex', threadId: THREAD },
+          handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
           origin: 'created',
           mintedAtFence: fence,
           observedAt: NOW
@@ -398,7 +386,8 @@ describe('restart', () => {
     store = await AgentSessionRecordStore.open({ directory: join(root, 'store'), hostId: 'local' })
     host = new StructuredAgentSessionHost({
       store,
-      adapter: adapter(),
+      // Restore gates on declared create support, which the production router always has.
+      adapter: { ...adapter(), supportsCreate: () => true },
       journalRoot: root,
       claimKeyId: 'key-1',
       mintSpawnToken: () => 'spawn-b',
@@ -445,7 +434,7 @@ describe('restart', () => {
     await host.restoreReadableSessions()
 
     expect(host.listSessionTabs()).toEqual([
-      { sessionId: SESSION, workspaceId: 'workspace-1', agent: 'codex' }
+      { sessionId: SESSION, workspaceId: 'workspace-1', agent: 'claude' }
     ])
     const history = host.history({ sessionId: SESSION, direction: 'tail' })
     expect(history.ok && history.page.items).not.toHaveLength(0)

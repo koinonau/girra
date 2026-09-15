@@ -80,7 +80,6 @@ export class SessionSearchFileRecords {
       session.agent,
       session.sessionId,
       session.filePath,
-      session.codexHome,
       session.title,
       session.cwd,
       cwdKey(session.cwd),
@@ -94,7 +93,7 @@ export class SessionSearchFileRecords {
     ]
     this.db
       .prepare(
-        `UPDATE sessions SET agent = ?, session_id = ?, file_path = ?, codex_home = ?, title = ?,
+        `UPDATE sessions SET agent = ?, session_id = ?, file_path = ?, title = ?,
         cwd = ?, cwd_key = ?, branch = ?, created_at = ?, updated_at = ?, message_count = ?, resume_command = ?,
         content_hash = ?, content_hash_count = ? WHERE id = ?`
       )

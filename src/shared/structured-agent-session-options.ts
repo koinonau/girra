@@ -67,7 +67,7 @@ export type StructuredAgentSessionOptionState = {
 }
 
 export function createStructuredAgentSessionOptionState(
-  agent = 'codex'
+  agent = 'claude'
 ): StructuredAgentSessionOptionState {
   return { catalog: null, record: createNativeChatSessionOptionRecord(agent), pendingId: null }
 }

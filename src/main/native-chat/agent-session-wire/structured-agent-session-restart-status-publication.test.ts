@@ -37,7 +37,7 @@ function adapter(): StructuredAgentSessionAdapter {
       process: { hostId: 'local', pid: 4242, processStartTimeMs: 1_700_000_000_000, spawnToken },
       link: {
         linkId: `link-${fence}`,
-        handle: { provider: 'codex', threadId: THREAD },
+        handle: { provider: 'claude', sessionId: THREAD, leafUuid: null },
         origin: 'created',
         mintedAtFence: fence,
         observedAt: NOW
@@ -45,11 +45,12 @@ function adapter(): StructuredAgentSessionAdapter {
     }),
     dispatch: async () => ({
       state: 'accepted',
-      providerIdentity: { provider: 'codex', threadId: THREAD, turnId: 'turn-1', ordinal: 1 }
+      providerIdentity: { provider: 'claude', sessionId: THREAD, uuid: 'turn-1-1' }
     }),
     cancelTurn: async () => ({ cancelled: true }),
     answerPrompt: async () => undefined,
-    setOption: async () => undefined
+    setOption: async () => undefined,
+    supportsCreate: () => true
   }
 }
 
@@ -123,7 +124,7 @@ describe('structured session restart status publication', () => {
           expect.objectContaining({
             sessionId: SESSION,
             workspaceId: 'workspace-1',
-            agent: 'codex',
+            agent: 'claude',
             status: 'idle',
             latestPrompt: 'persisted conversation'
           })

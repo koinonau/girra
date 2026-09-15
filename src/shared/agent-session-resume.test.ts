@@ -8,24 +8,9 @@ import {
 } from './agent-session-resume'
 
 describe('agent session resume metadata', () => {
-  it('treats devin as a resumable TUI agent', () => {
-    expect(isResumableTuiAgent('devin')).toBe(true)
-  })
-
-  it('treats omp as a resumable TUI agent', () => {
-    expect(isResumableTuiAgent('omp')).toBe(true)
-  })
-
-  it('treats Prime Agent as a resumable TUI agent', () => {
-    expect(isResumableTuiAgent('prime-agent')).toBe(true)
-  })
-
-  it('treats copilot as a resumable TUI agent', () => {
-    expect(isResumableTuiAgent('copilot')).toBe(true)
-  })
-
-  it('treats Kimi Code as a resumable TUI agent', () => {
-    expect(isResumableTuiAgent('kimi')).toBe(true)
+  it('keeps only the launch roster resumable', () => {
+    expect(['claude', 'opencode', 'pi'].every(isResumableTuiAgent)).toBe(true)
+    expect(['codex', 'omp', 'kimi', 'prime-agent'].some(isResumableTuiAgent)).toBe(false)
   })
 
   it.each([
@@ -42,30 +27,11 @@ describe('agent session resume metadata', () => {
 
   it.each([
     ['claude', { key: 'session_id', id: 's1' }, ['claude', '--resume', 's1']],
-    ['codex', { key: 'session_id', id: 's1' }, ['codex', 'resume', 's1']],
-    ['gemini', { key: 'session_id', id: 's1' }, ['gemini', '--resume', 's1']],
-    ['antigravity', { key: 'conversation_id', id: 's1' }, ['agy', '--conversation', 's1']],
     ['opencode', { key: 'session_id', id: 's1' }, ['opencode', '--session', 's1']],
     [
       'pi',
       { key: 'session_id', id: 's1', transcriptPath: '/tmp/pi-session.jsonl' },
       ['pi', '--session', '/tmp/pi-session.jsonl']
-    ],
-    ['mimo-code', { key: 'session_id', id: 's1' }, ['mimo', '--session', 's1']],
-    ['droid', { key: 'session_id', id: 's1' }, ['droid', '--resume', 's1']],
-    ['grok', { key: 'session_id', id: 's1' }, ['grok', '--resume', 's1']],
-    ['devin', { key: 'session_id', id: 'abc12345' }, ['devin', '--resume', 'abc12345']],
-    ['omp', { key: 'session_id', id: 's1' }, ['omp', '--resume', 's1']],
-    [
-      'prime-agent',
-      { key: 'session_id', id: 's1', transcriptPath: '/tmp/prime-session.jsonl' },
-      ['prime-agent', '--resume', '/tmp/prime-session.jsonl']
-    ],
-    ['copilot', { key: 'session_id', id: 's1' }, ['copilot', '--resume=s1']],
-    [
-      'kimi',
-      { key: 'session_id', id: 'session_431324d7' },
-      ['kimi', '--session', 'session_431324d7']
     ]
   ] as const)('builds %s resume argv', (agent, providerSession, expected) => {
     expect(getAgentResumeArgv(agent, providerSession)).toEqual(expected)
@@ -95,12 +61,11 @@ describe('agent session resume metadata', () => {
     const second = { key: 'session_id' as const, id: 'session-1', transcriptPath: '/tmp/second' }
 
     expect(agentProviderSessionsEqual('pi', first, second)).toBe(false)
-    expect(agentProviderSessionsEqual('prime-agent', first, second)).toBe(false)
     expect(agentProviderSessionsEqual('claude', first, second)).toBe(true)
   })
 
-  it('rejects devin resume when provider session key is not session_id', () => {
-    expect(getAgentResumeArgv('devin', { key: 'conversation_id', id: 'x' })).toBeNull()
+  it('rejects opencode resume when provider session key is not session_id', () => {
+    expect(getAgentResumeArgv('opencode', { key: 'conversation_id', id: 'x' })).toBeNull()
   })
 
   it('captures the hook transcript_path for claude', () => {
