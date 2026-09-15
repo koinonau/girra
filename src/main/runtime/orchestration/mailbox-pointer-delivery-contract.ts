@@ -23,7 +23,6 @@ export type PointerDeliveryDependencies<TWaiter extends OrchestrationMessageWait
   getLeafKey: (tabId: string, leafId: string) => string
   getLiveLeafForHandle: (handle: string) => OrchestrationMailboxLeaf
   getMessageWaiters: (mailboxHandle: string) => ReadonlySet<TWaiter> | undefined
-  getTabTitle: (tabId: string) => string | null | undefined
   getCliCommand: (terminalHandle: string) => OrchestrationCliCommand
   getTerminalHandleForLeafKey: (leafKey: string) => string | undefined
   resolveSubmitTarget: (

@@ -13,14 +13,10 @@ import { worktreeRow } from './worktree-row-locators'
 /**
  * Sidebar agent-row identity, driven by real OSC titles on real PTYs.
  *
- * #10258 — Cursor's only native OSC title is the literal `cursor agent`; it was
- * dropped unconditionally, so a hookless Cursor pane produced no sidebar row.
  * #8940 — an incidental `claude` token inside an OpenCode task title outranked
  * the pane's known owner, flipping the row label + identity icon to Claude Code.
  */
 
-// The literal Cursor emits on every redraw — the pane's ONLY identity signal.
-const CURSOR_NATIVE_OSC_TITLE = 'Cursor Agent'
 // An OpenCode task title that merely MENTIONS claude (see #8940).
 const OPENCODE_TASK_OSC_TITLE = '⠋ use Claude Sonnet'
 
@@ -70,7 +66,7 @@ function paneTitles(page: Page, tabId: string): Promise<string[]> {
 async function openAgentTab(
   page: Page,
   worktreeId: string,
-  launchAgent: 'cursor' | 'opencode'
+  launchAgent: 'opencode'
 ): Promise<{ tabId: string; ptyId: string }> {
   const tabId = await page.evaluate(
     ({ worktreeId, launchAgent }) => {
@@ -147,9 +143,7 @@ async function settledSidebarAgentRowIdentities(
   return settled
 }
 
-test('sidebar keeps a Cursor pane visible and an OpenCode pane out of Claude Code hands', async ({
-  orcaPage
-}) => {
+test('sidebar keeps an OpenCode pane out of Claude Code hands', async ({ orcaPage }) => {
   await waitForSessionReady(orcaPage)
   const worktreeId = await waitForActiveWorktree(orcaPage)
   await ensureTerminalVisible(orcaPage)
@@ -172,33 +166,17 @@ test('sidebar keeps a Cursor pane visible and an OpenCode pane out of Claude Cod
     })
     .toContain(OPENCODE_TASK_OSC_TITLE)
 
-  const cursor = await openAgentTab(orcaPage, worktreeId, 'cursor')
-  const cursorScript = await runNodeScriptInTerminal(
-    orcaPage,
-    cursor.ptyId,
-    oscTitleHolderScript(CURSOR_NATIVE_OSC_TITLE)
-  )
-  // Settle gate: the emitter has run, so the literal has been offered to the title
-  // pipeline — kept as Cursor identity on the fix, dropped on main.
-  await waitForTerminalOutput(orcaPage, PANE_HOLD_MARKER, 15_000)
-
   // Only the active worktree's card has agents, so this resolves to one list.
   const agentListSelector = `[data-worktree-sidebar] [aria-label="Agents"]`
   const agentList = worktreeRow(orcaPage, worktreeId).locator('[aria-label="Agents"]')
   await expect(agentList.locator('> div').first()).toBeVisible()
 
-  // #10258: the Cursor pane gets a row at all. #8940: the OpenCode pane stays OpenCode.
-  expect(await settledSidebarAgentRowIdentities(orcaPage, agentListSelector)).toEqual([
-    'Cursor',
-    'OpenCode'
-  ])
+  // #8940: the OpenCode pane stays OpenCode.
+  expect(await settledSidebarAgentRowIdentities(orcaPage, agentListSelector)).toEqual(['OpenCode'])
 
-  // Both panes are on the card: the Cursor row exists at all (#10258) next to the
-  // OpenCode row still labelled by its own task text (#8940).
-  await expect(agentList.locator('> div')).toHaveCount(2)
-  await expect(agentList).toContainText('Cursor')
+  // The OpenCode row is still labelled by its own task text (#8940).
+  await expect(agentList.locator('> div')).toHaveCount(1)
   await expect(agentList).toContainText('use Claude Sonnet')
 
   openCodeScript.cleanup()
-  cursorScript.cleanup()
 })

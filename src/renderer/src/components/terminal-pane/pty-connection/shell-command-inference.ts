@@ -5,11 +5,7 @@ import { AGENT_INTERRUPT_SETTLE_MS } from '../../../../../shared/agent-interrupt
 import { resolvePaneAgentOwner } from '../../../../../shared/pane-agent-owner'
 
 import { MANUAL_AGENT_COMMAND_MAX_CHARS } from './pty-connect-limits'
-import {
-  CURSOR_AGENT_REATTACH_HEADER,
-  terminalOwnsDomFocus,
-  hasCursorAgentReattachPayloadScreenSignal
-} from './cursor-agent-reattach-screen'
+import { terminalOwnsDomFocus } from './terminal-focus-mode'
 
 import type { ConnectPanePtySession } from './connect-pane-pty-session'
 
@@ -116,24 +112,6 @@ export function installShellCommandInference(session: ConnectPanePtySession): vo
       }) ?? undefined
     )
   }
-  // Why: the renderer veto (owner evidence beating a Gemini-looking title) must
-  // use only pane-scoped, CURRENT ownership. getAuthoritativePaneAgent leads
-  // with the tab-shared `tab.launchAgent` and a never-cleared
-  // `paneStartup.launchAgent`, which would let a sibling split pane or a reused
-  // pane keep WebGL for a genuine Gemini terminal (#7428 regression class).
-  // Launch identity is excluded, and the never-clearing startup seed
-  // (`paneStartup.initialAgentStatus`) too; a stale or `done` explicit row is
-  // ignored via the freshness predicate so a reused pane cannot inherit a prior
-  // agent's veto. Only live foreground command inference and a fresh, active
-  // hook row count. A genuine OMP/Pi pane stays protected owner-independently by
-  // the isPiAgentTitle guard inside isGeminiTerminalTitle.
-  session.getPaneScopedRendererOwner = (): AgentType | undefined => {
-    const entry = useAppStore.getState().agentStatusByPaneKey[session.cacheKey]
-    return (
-      session.commandInferredPaneAgent ??
-      (session.isFreshActivePaneAgentEntry(entry) ? entry.agentType : undefined)
-    )
-  }
   session.clearInferredInterruptWorkingTitle = (): void => {
     const state = useAppStore.getState()
     const currentTitle = state.runtimePaneTitlesByTabId?.[session.deps.tabId]?.[session.pane.id]
@@ -209,32 +187,9 @@ export function installShellCommandInference(session: ConnectPanePtySession): vo
     )?.title
     return runtimeTitle ?? tabTitle ?? null
   }
-  session.reattachReplayPayloadHasCursorAgentSignal = false
-  // Why: post-parse veto callbacks must only judge the latest replay frame; a
-  // newer frame bumps the generation so a stale callback stands down.
-  session.reattachReplayPayloadSignalGeneration = 0
-  session.rememberReattachPayloadAgentSignal = (
-    data: string,
-    opts: { fullScreenReplay: boolean }
-  ): void => {
-    session.reattachReplayPayloadSignalGeneration += 1
-    // Why: ordinary scrollback can mention agent names. Treat replay bytes as
-    // a live Cursor Agent signal only when they look like its restored screen.
-    const signal = hasCursorAgentReattachPayloadScreenSignal(data)
-    // Why: incremental (non-clearing) replay frames repaint only part of the
-    // screen, so their bytes can only add evidence — a full-screen replay is
-    // the authoritative repaint that may clear the flag.
-    session.reattachReplayPayloadHasCursorAgentSignal = opts.fullScreenReplay
-      ? signal
-      : session.reattachReplayPayloadHasCursorAgentSignal || signal
-  }
-  session.isCursorAgentNativeTitle = (title: string): boolean => {
-    return title.trim().toLowerCase() === CURSOR_AGENT_REATTACH_HEADER.toLowerCase()
-  }
   session.hasLiveAgentReattachStatusOrTitleSignal = (): boolean => {
     // Why: launch ownership (tab.launchAgent) never decays after the agent
-    // exits, so it must not count as liveness here — only live status, live
-    // titles, and the replayed screen shape do.
+    // exits, so it must not count as liveness here; only live status and titles do.
     if (useAppStore.getState().agentStatusByPaneKey[session.cacheKey]) {
       return true
     }
@@ -242,18 +197,12 @@ export function installShellCommandInference(session: ConnectPanePtySession): vo
     // Why: broad token matching (getAgentLabel) fires on titles like
     // "ssh devin@host"; that surface is too loose to gate mode preservation
     // and PTY byte injection, so only exact/status titles count here.
-    return detectAgentStatusFromTitle(title) !== null || session.isCursorAgentNativeTitle(title)
-  }
-  session.hasLiveAgentReattachSignal = (): boolean => {
-    return (
-      session.hasLiveAgentReattachStatusOrTitleSignal() ||
-      session.reattachReplayPayloadHasCursorAgentSignal
-    )
+    return detectAgentStatusFromTitle(title) !== null
   }
   session.shouldPreserveAgentReattachModes = (): boolean => {
     // Why: ordinary shells can inherit stale ?25l/?1004h from replay bytes.
     // Preserve those modes only when reattach still looks agent-owned.
-    return session.hasLiveAgentReattachSignal()
+    return session.hasLiveAgentReattachStatusOrTitleSignal()
   }
   session.shouldSendFocusedAgentReattachFocusIn = (): boolean => {
     return terminalOwnsDomFocus(session.pane.terminal) && session.shouldPreserveAgentReattachModes()

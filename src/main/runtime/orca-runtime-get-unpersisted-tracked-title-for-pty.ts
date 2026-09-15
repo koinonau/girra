@@ -37,7 +37,7 @@ export class OrcaRuntimeWithGetUnpersistedTrackedTitleForPty extends OrcaRuntime
 
   /** Decorative comparison key: only recognized agent titles fold leading spinner frames. */
   protected makeDecorativeTitleGateKey(rawTitle: string, normalizedTitle: string): string {
-    // Stable Pi/Gemini/Grok display normalization also defines their semantic gate.
+    // Stable Pi display normalization also defines its semantic gate.
     const normalizedSignature =
       rawTitle === normalizedTitle ? null : getDecorativeAgentTitleSignature(normalizedTitle)
     const signature = normalizedSignature ?? getDecorativeAgentTitleSignature(rawTitle)
@@ -93,8 +93,7 @@ export class OrcaRuntimeWithGetUnpersistedTrackedTitleForPty extends OrcaRuntime
               ...(meta?.staleWorkingTitleClear ? { staleWorkingTitleClear: true } : {})
             })
           }
-          const changed = this.applyTrackedPtyTitle(ptyId, rawTitle, normalizedTitle, meta)
-          const identityOnlyTitle = this.isLiveCursorNativeTitle(rawTitle, meta)
+          const changed = this.applyTrackedPtyTitle(ptyId, rawTitle, normalizedTitle)
           const tracksReplicatedStatus =
             live?.applyingChunk === true && this.mobileSessionTabListeners.size > 0
           const titleStatus = tracksReplicatedStatus ? detectAgentStatusFromTitle(rawTitle) : null
@@ -104,12 +103,10 @@ export class OrcaRuntimeWithGetUnpersistedTrackedTitleForPty extends OrcaRuntime
             !this.ptyForegroundAgent.hasDelayedSnapshot(ptyId) &&
             (titleStatus === 'working' || titleStatus === 'permission')
           ) {
-            // Normalized Pi/Gemini/Grok frames still renew the replicated status lease.
+            // Normalized Pi frames still renew the replicated status lease.
             this.mobileSessionTabsAgentStatusHeartbeat.scheduleDecorativeHeartbeat(ptyId)
           }
-          // Why: an identity-only cursor title records nothing, but the tracker
-          // title is that pane's only Cursor identity and must still fan out (#10258).
-          if (!changed && !identityOnlyTitle) {
+          if (!changed) {
             return
           }
           if (live?.applyingChunk) {
@@ -170,14 +167,7 @@ export class OrcaRuntimeWithGetUnpersistedTrackedTitleForPty extends OrcaRuntime
       lastMobileTitleGateKey: null,
       lastTitleFactAtMs: null,
       chunkTouchedSessionTabs: false,
-      pendingFacts: [],
-      // Why: command-code facts exist only for the pty:sideEffect channel —
-      // headless serve skips the per-chunk scrape entirely. The detector
-      // self-arms on the Command Code banner; the spawn command (when main
-      // saw one) mirrors the renderer detector's startupCommand fast-arm.
-      commandCodeDetector: this.terminalSideEffectConsumerAvailable
-        ? this.createTerminalSideEffectCommandCodeDetector(ptyId)
-        : null
+      pendingFacts: []
     }
     this.ptyTitleTrackersByPtyId.set(ptyId, entry)
     return entry

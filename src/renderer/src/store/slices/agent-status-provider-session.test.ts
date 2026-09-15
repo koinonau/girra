@@ -4,11 +4,7 @@ import type { AppState } from '../types'
 import { getProviderSessionClaimKey } from '../../lib/sleeping-agent-pane-ownership'
 import { createTestStore, makeTab } from './store-test-helpers'
 
-const PI_COMPATIBLE_CASES = [
-  { agent: 'pi' as const, label: 'Pi' },
-  { agent: 'omp' as const, label: 'OMP' },
-  { agent: 'prime-agent' as const, label: 'Prime Agent' }
-]
+const PI_COMPATIBLE_CASES = [{ agent: 'pi' as const, label: 'Pi' }]
 
 function makePiCompatibleProviderSession(agent: 'pi' | 'omp' | 'prime-agent') {
   const session = { key: 'session_id' as const, id: `${agent}-session-1` }

@@ -1,8 +1,3 @@
-import {
-  PRIMARY_AGENT_DIR_ENV_BY_KIND,
-  SOURCE_AGENT_DIR_ENV_BY_KIND,
-  type PiAgentKind
-} from '../../../../shared/pi-agent-kind'
 import { readSessionShellStartupEnvVar } from '../../../pty/shell-startup-env'
 import { AGENT_HOOK_RUNTIME_ENV_KEYS, CLAUDE_CHILD_SESSION_STAMP_ENV_KEYS } from './spawn-env-keys'
 
@@ -13,89 +8,25 @@ export function readEnvWithProcessFallback(
   return baseEnv[key] ?? process.env[key]
 }
 
-export function resolvePiAgentSourceDir(
-  baseEnv: Record<string, string>,
-  kind: PiAgentKind
-): string | undefined {
-  const sourceKey = SOURCE_AGENT_DIR_ENV_BY_KIND[kind]
-  const primaryKey = PRIMARY_AGENT_DIR_ENV_BY_KIND[kind]
-
-  const sourceDir = readEnvWithProcessFallback(baseEnv, sourceKey)
+export function resolvePiAgentSourceDir(baseEnv: Record<string, string>): string | undefined {
+  const sourceDir = readEnvWithProcessFallback(baseEnv, 'ORCA_PI_SOURCE_AGENT_DIR')
   if (sourceDir) {
     return sourceDir
   }
 
-  if (kind === 'prime-agent') {
-    return (
-      readEnvWithProcessFallback(baseEnv, primaryKey) ??
-      readSessionShellStartupEnvVar(primaryKey, baseEnv)
-    )
-  }
-
-  const overlayKey = kind === 'omp' ? 'ORCA_OMP_CODING_AGENT_DIR' : 'ORCA_PI_CODING_AGENT_DIR'
-  const otherOverlayKey = kind === 'omp' ? 'ORCA_PI_CODING_AGENT_DIR' : 'ORCA_OMP_CODING_AGENT_DIR'
-
-  const publicDir = readEnvWithProcessFallback(baseEnv, primaryKey)
-  const ownOverlayDir = readEnvWithProcessFallback(baseEnv, overlayKey)
-  const otherOverlayDir = readEnvWithProcessFallback(baseEnv, otherOverlayKey)
-  // Why: if PI_CODING_AGENT_DIR is a restored Orca overlay with no source shadow, remirroring leaks another agent's overlay tree; fall through to defaults.
-  if (publicDir && publicDir !== ownOverlayDir && publicDir !== otherOverlayDir) {
+  const publicDir = readEnvWithProcessFallback(baseEnv, 'PI_CODING_AGENT_DIR')
+  // Why: if PI_CODING_AGENT_DIR is a restored Orca overlay with no source shadow, remirroring leaks the overlay tree; fall through to defaults.
+  if (publicDir && publicDir !== readEnvWithProcessFallback(baseEnv, 'ORCA_PI_CODING_AGENT_DIR')) {
     return publicDir
   }
 
-  return readSessionShellStartupEnvVar(primaryKey, baseEnv)
-}
-
-export function resolveScopedPiAgentSourceDir(
-  baseEnv: Record<string, string>,
-  kind: PiAgentKind
-): string | undefined {
-  return readEnvWithProcessFallback(baseEnv, SOURCE_AGENT_DIR_ENV_BY_KIND[kind])
-}
-
-export function clearPiAgentShadowEnv(baseEnv: Record<string, string>, kind: PiAgentKind): void {
-  if (kind === 'omp') {
-    delete baseEnv.ORCA_OMP_CODING_AGENT_DIR
-    delete baseEnv.ORCA_OMP_SOURCE_AGENT_DIR
-    delete baseEnv.ORCA_OMP_STATUS_EXTENSION
-    return
-  }
-  if (kind === 'prime-agent') {
-    delete baseEnv.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-    delete baseEnv.ORCA_PRIME_AGENT_STATUS_EXTENSION
-    return
-  }
-  delete baseEnv.ORCA_PI_CODING_AGENT_DIR
-  delete baseEnv.ORCA_PI_SOURCE_AGENT_DIR
+  return readSessionShellStartupEnvVar('PI_CODING_AGENT_DIR', baseEnv)
 }
 
 export function exposePiManagedExtensionEnv(
   baseEnv: Record<string, string>,
-  kind: PiAgentKind,
   managedEnv: Record<string, string>
 ): void {
-  if (kind === 'omp') {
-    delete baseEnv.ORCA_OMP_CODING_AGENT_DIR
-    if (managedEnv.ORCA_OMP_SOURCE_AGENT_DIR) {
-      baseEnv.ORCA_OMP_SOURCE_AGENT_DIR = managedEnv.ORCA_OMP_SOURCE_AGENT_DIR
-    } else {
-      delete baseEnv.ORCA_OMP_SOURCE_AGENT_DIR
-    }
-    if (managedEnv.ORCA_OMP_STATUS_EXTENSION) {
-      baseEnv.ORCA_OMP_STATUS_EXTENSION = managedEnv.ORCA_OMP_STATUS_EXTENSION
-    } else {
-      delete baseEnv.ORCA_OMP_STATUS_EXTENSION
-    }
-    return
-  }
-  if (kind === 'prime-agent') {
-    if (managedEnv.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR) {
-      baseEnv.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR = managedEnv.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-    } else {
-      delete baseEnv.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-    }
-    return
-  }
   delete baseEnv.ORCA_PI_CODING_AGENT_DIR
   if (managedEnv.ORCA_PI_SOURCE_AGENT_DIR) {
     baseEnv.ORCA_PI_SOURCE_AGENT_DIR = managedEnv.ORCA_PI_SOURCE_AGENT_DIR
@@ -132,7 +63,7 @@ export function getInheritedClaudeSessionStampEnvKeysToDelete(
   return CLAUDE_CHILD_SESSION_STAMP_ENV_KEYS.filter((key) => env[key] === undefined)
 }
 
-// Why: a nested terminal can inherit prior OpenCode/Pi/OMP overlay env; restore the user's recorded source dir, else strip only Orca-owned values.
+// Why: a nested terminal can inherit prior OpenCode/Pi overlay env; restore the user's recorded source dir, else strip only Orca-owned values.
 export function restoreOrStripOverlayEnv(
   baseEnv: Record<string, string>,
   keys: {

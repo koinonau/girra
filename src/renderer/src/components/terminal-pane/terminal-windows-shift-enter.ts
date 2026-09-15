@@ -53,7 +53,7 @@ export function resolveWindowsShiftEnterEncodingForPane(
   ) {
     return encoding
   }
-  // Why: strict pane-local titles recover Pi/Droid through process-scan gaps without overriding process or shell proof.
+  // Why: strict pane-local titles recover Pi through process-scan gaps without overriding process or shell proof.
   const titleAgent = resolveCommittedTitleAgentType(terminalTitle)
   return titleAgent
     ? (TUI_AGENT_CONFIG[titleAgent].windowsShiftEnterEncoding ?? 'alt-enter')

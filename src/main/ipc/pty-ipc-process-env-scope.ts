@@ -7,12 +7,6 @@ export function createPtyIpcProcessEnvScope() {
   const savedPiAgentDir = process.env.PI_CODING_AGENT_DIR
   const savedOrcaPiAgentDir = process.env.ORCA_PI_CODING_AGENT_DIR
   const savedOrcaPiSourceAgentDir = process.env.ORCA_PI_SOURCE_AGENT_DIR
-  const savedOrcaOmpAgentDir = process.env.ORCA_OMP_CODING_AGENT_DIR
-  const savedOrcaOmpSourceAgentDir = process.env.ORCA_OMP_SOURCE_AGENT_DIR
-  const savedOrcaOmpStatusExtension = process.env.ORCA_OMP_STATUS_EXTENSION
-  const savedPrimeAgentDir = process.env.PRIME_AGENT_CODING_AGENT_DIR
-  const savedOrcaPrimeAgentSourceDir = process.env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-  const savedOrcaPrimeAgentStatusExtension = process.env.ORCA_PRIME_AGENT_STATUS_EXTENSION
   const savedOrcaClaudeAgentStatusSettings = process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS
   const savedProcessPlatform = Object.getOwnPropertyDescriptor(process, 'platform')
   const savedDisableMacosLoginShell = process.env.ORCA_DISABLE_MACOS_LOGIN_SHELL
@@ -34,12 +28,6 @@ export function createPtyIpcProcessEnvScope() {
     delete process.env.PI_CODING_AGENT_DIR
     delete process.env.ORCA_PI_SOURCE_AGENT_DIR
     delete process.env.ORCA_PI_CODING_AGENT_DIR
-    delete process.env.ORCA_OMP_SOURCE_AGENT_DIR
-    delete process.env.ORCA_OMP_CODING_AGENT_DIR
-    delete process.env.ORCA_OMP_STATUS_EXTENSION
-    delete process.env.PRIME_AGENT_CODING_AGENT_DIR
-    delete process.env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-    delete process.env.ORCA_PRIME_AGENT_STATUS_EXTENSION
   }
 
   function restoreProcessEnv() {
@@ -85,36 +73,6 @@ export function createPtyIpcProcessEnvScope() {
       delete process.env.ORCA_PI_SOURCE_AGENT_DIR
     } else {
       process.env.ORCA_PI_SOURCE_AGENT_DIR = savedOrcaPiSourceAgentDir
-    }
-    if (savedOrcaOmpAgentDir !== undefined) {
-      process.env.ORCA_OMP_CODING_AGENT_DIR = savedOrcaOmpAgentDir
-    } else {
-      delete process.env.ORCA_OMP_CODING_AGENT_DIR
-    }
-    if (savedOrcaOmpSourceAgentDir !== undefined) {
-      process.env.ORCA_OMP_SOURCE_AGENT_DIR = savedOrcaOmpSourceAgentDir
-    } else {
-      delete process.env.ORCA_OMP_SOURCE_AGENT_DIR
-    }
-    if (savedOrcaOmpStatusExtension !== undefined) {
-      process.env.ORCA_OMP_STATUS_EXTENSION = savedOrcaOmpStatusExtension
-    } else {
-      delete process.env.ORCA_OMP_STATUS_EXTENSION
-    }
-    if (savedPrimeAgentDir !== undefined) {
-      process.env.PRIME_AGENT_CODING_AGENT_DIR = savedPrimeAgentDir
-    } else {
-      delete process.env.PRIME_AGENT_CODING_AGENT_DIR
-    }
-    if (savedOrcaPrimeAgentSourceDir !== undefined) {
-      process.env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR = savedOrcaPrimeAgentSourceDir
-    } else {
-      delete process.env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-    }
-    if (savedOrcaPrimeAgentStatusExtension !== undefined) {
-      process.env.ORCA_PRIME_AGENT_STATUS_EXTENSION = savedOrcaPrimeAgentStatusExtension
-    } else {
-      delete process.env.ORCA_PRIME_AGENT_STATUS_EXTENSION
     }
     if (savedOrcaClaudeAgentStatusSettings === undefined) {
       delete process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS

@@ -216,56 +216,6 @@ describe('registerTerminalSideEffectFactConsumer', () => {
     ])
   })
 
-  it('routes command-code scrape facts to the registered consumer', () => {
-    const events: unknown[][] = []
-    registerTerminalSideEffectFactConsumer({
-      ptyId: PTY_ID,
-      callbacks: {
-        onCommandCodeWorking: (prompt) => events.push(['cc-working', prompt]),
-        onCommandCodeDone: (prompt) => events.push(['cc-done', prompt])
-      }
-    })
-
-    _dispatchTerminalSideEffectBatchForTest(
-      batch([
-        { kind: 'command-code-working', prompt: 'Fix the spinner' },
-        { kind: 'command-code-done', prompt: 'Fix the spinner' }
-      ])
-    )
-
-    expect(events).toEqual([
-      ['cc-working', 'Fix the spinner'],
-      ['cc-done', 'Fix the spinner']
-    ])
-  })
-
-  it('never replays command-code scrape facts', () => {
-    // Why: a replayed working/done seed would resurrect a finished turn's
-    // status row — replay batches restore title state only.
-    const events: unknown[][] = []
-    registerTerminalSideEffectFactConsumer({
-      ptyId: PTY_ID,
-      callbacks: {
-        onTitleChange: (normalizedTitle) => events.push(['title', normalizedTitle]),
-        onCommandCodeWorking: (prompt) => events.push(['cc-working', prompt]),
-        onCommandCodeDone: (prompt) => events.push(['cc-done', prompt])
-      }
-    })
-
-    _dispatchTerminalSideEffectBatchForTest(
-      batch(
-        [
-          { kind: 'title', normalizedTitle: 'restored', rawTitle: 'restored' },
-          { kind: 'command-code-working', prompt: 'Fix the spinner' },
-          { kind: 'command-code-done', prompt: 'Fix the spinner' }
-        ],
-        { replay: true, seq: 5 }
-      )
-    )
-
-    expect(events).toEqual([['title', 'restored']])
-  })
-
   it('routes 2031-subscribe facts to the registered consumer but never replays them', () => {
     // Why: the fact lets hidden-delivery-gated views answer the color-scheme
     // query without byte access; a replayed subscribe would re-answer a query
@@ -443,7 +393,7 @@ describe('registerTerminalSideEffectFactConsumer', () => {
   it('hands off facts emitted between the parked watcher unregistering and the pane registering', () => {
     // Why: the reveal window — the watcher unregisters synchronously in the
     // effect flush, the pane registers only after its async reattach resolves,
-    // and replay is title-only, so an unbuffered bell/command-code-done is lost.
+    // and replay is title-only, so an unbuffered bell/command-finished is lost.
     const watcher = createCallbackRecorder()
     const disposeWatcher = registerTerminalSideEffectFactConsumer({
       ptyId: PTY_ID,
@@ -453,7 +403,7 @@ describe('registerTerminalSideEffectFactConsumer', () => {
 
     const events: unknown[][] = []
     _dispatchTerminalSideEffectBatchForTest(
-      batch([{ kind: 'bell' }, { kind: 'command-code-done', prompt: 'Fix the spinner' }], {
+      batch([{ kind: 'bell' }, { kind: 'command-finished', exitCode: 0 }], {
         seq: 7
       })
     )
@@ -474,11 +424,11 @@ describe('registerTerminalSideEffectFactConsumer', () => {
       ptyId: PTY_ID,
       callbacks: {
         onBell: () => events.push(['bell']),
-        onCommandCodeDone: (prompt) => events.push(['cc-done', prompt])
+        onCommandFinished: (exitCode) => events.push(['finished', exitCode])
       }
     })
 
-    expect(events).toEqual([['bell'], ['cc-done', 'Fix the spinner']])
+    expect(events).toEqual([['bell'], ['finished', 0]])
     expect(watcher.events).toEqual([])
 
     // Drained exactly once: a later registration gets nothing.
@@ -488,7 +438,7 @@ describe('registerTerminalSideEffectFactConsumer', () => {
       ptyId: PTY_ID,
       callbacks: {
         onBell: () => later.push(['bell']),
-        onCommandCodeDone: (prompt) => later.push(['cc-done', prompt])
+        onCommandFinished: (exitCode) => later.push(['finished', exitCode])
       }
     })
 

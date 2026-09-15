@@ -1,6 +1,5 @@
 import { readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
-import { getPosixOmpShellWrapper } from '../main/pty/omp-shell-wrapper'
 import {
   BASH_FEATURE_CHANNEL_BLOCK,
   BASH_PROMPT_COMMAND_COMPOSITION_BLOCK,
@@ -69,7 +68,6 @@ fi
 # Why: remote startup files can re-export user defaults after relay spawn.
 [[ -n "\${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${ORCA_OPENCODE_CONFIG_DIR}"
 [[ -n "\${ORCA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"\${ORCA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="\${ORCA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac
-${getPosixOmpShellWrapper()}
 ${BASH_HISTFILE_RESTORE_BLOCK}
 # Why: SSH bash sessions need the same command lifecycle markers as local
 # bash so agent rows stop showing "working" when the foreground command exits.

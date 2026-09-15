@@ -166,15 +166,7 @@ export function resolveAttention(panes: PaneInput[], now: number): WorktreeAtten
         // working
         cls = 3
         // Why: sort Class 3 by most recent prior attention so a just-started turn outranks one working for an hour.
-        const prior = mostRecentAttentionInHistory(entry.stateHistory)
-        if (prior === null) {
-          ts = entry.stateStartedAt
-        } else if (entry.agentType === 'command-code') {
-          // Why: Command Code has no UserPromptSubmit hook; a new prompt only bumps stateStartedAt, so max beats stale prior-attention.
-          ts = Math.max(prior, entry.stateStartedAt)
-        } else {
-          ts = prior
-        }
+        ts = mostRecentAttentionInHistory(entry.stateHistory) ?? entry.stateStartedAt
       }
     } else {
       // Title-heuristic fallback: only fires for panes with no fresh hook entry.

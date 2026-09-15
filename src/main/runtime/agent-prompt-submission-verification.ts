@@ -5,7 +5,7 @@ import type { TuiAgent } from '../../shared/tui-agent'
 export const AGENT_PROMPT_HOOK_EFFECT_TIMEOUT_MS = AGENT_PROMPT_EFFECT_TIMEOUT_MS
 const AGENT_PROMPT_EFFECT_POLL_MS = 50
 
-const HOOK_OBSERVED_TURN_START_AGENTS = new Set<TuiAgent>(['codex', 'kimi'])
+const HOOK_OBSERVED_TURN_START_AGENTS = new Set<TuiAgent>(['codex'])
 
 /** The prompt bytes are written before verification, so this only ever means "not observed". */
 export const AGENT_PROMPT_STALLED_ERROR = 'agent_prompt_stalled'

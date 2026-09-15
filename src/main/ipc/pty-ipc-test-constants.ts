@@ -1,6 +1,5 @@
 import { it, vi } from 'vitest'
 import type { Mock } from 'vitest'
-import { posix } from 'node:path'
 import { resolveWindowsShellLaunchArgs } from '../providers/windows-shell-args'
 
 /** The narrow slice of vitest's test API these suites use; keeps `it`/`it.skip` interchangeable. */
@@ -13,12 +12,6 @@ export type PlatformGatedTest = (
 export const isWindowsHost = process.platform === 'win32'
 export const posixOnlyIt: PlatformGatedTest = isWindowsHost ? it.skip : it
 export const TEST_MANAGED_ROOT = isWindowsHost ? 'C:\\managed' : '/managed'
-// Why: bare shells no longer mkdir ~/.omp; OMP status lives under userData (#10196).
-export const expectedOmpStatusExtension = posix.join(
-  '/tmp/orca-user-data',
-  'omp-managed-status-extension',
-  'orca-agent-status.ts'
-)
 
 // Why: Windows resolves a bare PowerShell name to an absolute exe before ConPTY, else CreateProcessW fails with error 5 (PR #6537 / #5161).
 export const RESOLVED_WINDOWS_POWERSHELL =

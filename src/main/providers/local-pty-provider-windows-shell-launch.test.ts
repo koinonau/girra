@@ -382,19 +382,14 @@ describe('LocalPtyProvider', () => {
       await provider.spawn({
         cols: 80,
         rows: 24,
-        cwd: '\\\\wsl.localhost\\Ubuntu\\home\\jin\\repo',
-        env: { ORCA_HERMES_STARTUP_QUERY: 'line one\nline two' }
+        cwd: '\\\\wsl.localhost\\Ubuntu\\home\\jin\\repo'
       })
 
       const spawnCall = spawnMock.mock.calls.at(-1)!
       expect(spawnCall[0]).toBe('wsl.exe')
       expect(spawnCall[2].env.ORCA_TERMINAL_HANDLE).toBe('term_wsl')
       expect(spawnCall[2].env.WSLENV?.split(':')).toEqual(
-        expect.arrayContaining([
-          'ORCA_TERMINAL_HANDLE/u',
-          'ORCA_HERMES_STARTUP_QUERY',
-          POWERLEVEL10K_WIZARD_DISABLE_ENV
-        ])
+        expect.arrayContaining(['ORCA_TERMINAL_HANDLE/u', POWERLEVEL10K_WIZARD_DISABLE_ENV])
       )
     })
 

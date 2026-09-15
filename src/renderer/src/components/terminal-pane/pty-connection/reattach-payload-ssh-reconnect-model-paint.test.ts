@@ -38,7 +38,6 @@ function createSession(
 ): ReattachPayloadSession {
   return {
     pane: createPane(1),
-    rememberReattachPayloadAgentSignal: vi.fn(),
     writeReplayData: vi.fn((data: string) => fireLog.push(`write:${data}`)),
     reattachReplayResetSequence: vi.fn(() => '<reset>'),
     sendFocusedReattachFocusInAfterReplay: vi.fn(),

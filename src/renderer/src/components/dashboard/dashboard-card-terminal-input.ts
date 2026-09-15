@@ -1,6 +1,5 @@
 import type { AppState } from '@/store/types'
 import type { DashboardCardTerminalInput } from '../../../../shared/dashboard-snapshot'
-import type { TuiAgent } from '../../../../shared/tui-agent'
 import { toRuntimeExecutionHostId, toSshExecutionHostId } from '../../../../shared/execution-host'
 import { parseAppSshPtyId } from '../../../../shared/ssh-pty-id'
 import { getConnectionIdFromState } from '@/lib/connection-context'
@@ -9,7 +8,6 @@ import { shouldDisableKittyKeyboardForTerminal } from '@/lib/pane-manager/termin
 import { isLocalNativeWindowsConpty } from '@/lib/pane-manager/windows-pty-compatibility'
 import { resolveTerminalInputHostPlatform } from '@/components/terminal-pane/terminal-input-host-platform'
 import { resolveWindowsShiftEnterEncodingForPane } from '@/components/terminal-pane/terminal-windows-shift-enter'
-import { hasCtrlEnterCsiUAuthorityForPane } from '@/components/terminal-pane/terminal-ctrl-enter'
 import { getRemoteRuntimePtyEnvironmentId } from '@/runtime/runtime-terminal-stream'
 import { resolveProtectedMultilinePasteOptionsForAgentEvidence } from '@/components/terminal-pane/terminal-agent-paste-bracketing'
 
@@ -77,7 +75,6 @@ export function resolveDashboardCardTerminalInput(
     /** Worktree path — decides WSL vs native Windows for a local pty. */
     cwd: string
     shellOverride: string | null | undefined
-    launchAgent: TuiAgent | null | undefined
     clientPlatform: NodeJS.Platform
     userAgent: string
     osRelease: string | undefined
@@ -139,12 +136,6 @@ export function resolveDashboardCardTerminalInput(
     ...(protectedPaste?.windowsInputRecordNewline
       ? { windowsInputRecordPasteNewline: protectedPaste.windowsInputRecordNewline }
       : {}),
-    ctrlEnterCsiU: hasCtrlEnterCsiUAuthorityForPane(state, args.paneKey),
-    kittyKeyboardAdvertised: !shouldDisableKittyKeyboardForTerminal({
-      ...windowsPtyContext,
-      // Why: launch identity is the only agent signal the board holds; it opts
-      // Grok out of the ConPTY kitty withhold exactly as its pane does.
-      tuiAgent: args.launchAgent ?? null
-    })
+    kittyKeyboardAdvertised: !shouldDisableKittyKeyboardForTerminal(windowsPtyContext)
   }
 }

@@ -1,7 +1,5 @@
 // `worker-show` must distinguish a worker parked on a human prompt (STA-3714, STA-4513).
 // Deliberately unmocked below the RPC so detector, plumbing, and RPC shape are all covered.
-import { readFileSync } from 'node:fs'
-import { join } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { OrcaRuntimeService } from '../../../../orca-runtime'
 import { OrchestrationDb } from '../../../../orchestration/db'
@@ -20,10 +18,15 @@ const TAB_ID = 'tab-worker'
 const WORKTREE_ID = 'wt-worker'
 const PTY_ID = 'pty-worker'
 
-// Captured verbatim from cursor-agent 2026.08.11-e8db854 driven through Orca.
-function fixture(name: string): string {
-  return readFileSync(join(__dirname, '../../../../__fixtures__', `${name}.txt`), 'utf8')
-}
+// Claude Code 2.1.234's own trust screen.
+const CLAUDE_TRUST = [
+  'Accessing workspace:\n',
+  '/private/tmp/repo\n',
+  'Quick safety check: Is this a project you created or one you trust?\n',
+  '❯ 1. Yes, I trust this folder\n',
+  '  2. No, exit\n'
+].join('')
+const CLAUDE_WORKING_OUTPUT = 'Running the suite\n$ pnpm test\n'
 
 function workerShowMethod() {
   const method = ORCHESTRATION_METHODS.find(
@@ -56,7 +59,7 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
       spawn: vi.fn().mockResolvedValue({ id: PTY_ID, incarnationId: 'inc-1' }),
       write: () => true,
       kill: () => true,
-      getForegroundProcess: async () => 'cursor-agent'
+      getForegroundProcess: async () => 'claude'
     })
     const terminal = await runtime.createTerminal(`id:${WORKTREE_ID}`, {
       tabId: TAB_ID,
@@ -81,8 +84,8 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
           leafId: LEAF_ID,
           paneRuntimeId: 1,
           ptyId: PTY_ID,
-          // cursor-agent's spinner title, identical whether it runs or waits.
-          paneTitle: '⠇ Cursor Agent'
+          // Orca's tab title: the agent has set none, so the title neither blocks nor clears.
+          paneTitle: 'worker'
         }
       ]
     })
@@ -120,24 +123,24 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
   }
 
   it('names the pending prompt on the observation a coordinator polls', async () => {
-    const result = await showWorkerPaneServing(fixture('cursor-agent-approval-prompt'))
+    const result = await showWorkerPaneServing(CLAUDE_TRUST)
 
     expect(result).toMatchObject({
       observation: {
         exactWorker: true,
         agentWait: {
           source: 'prompt-text',
-          reason: 'agent-approval-prompt',
+          reason: 'agent-trust-workspace',
           since: expect.any(Number)
         }
       }
     })
   })
 
-  it('reports an explicit null for the same lane inside a long tool call', async () => {
+  it('reports an explicit null for the same lane while it works', async () => {
     // Why an explicit null and not an omitted key: a coordinator has to tell "not waiting"
     // from "this host is too old to know", and only absence may mean the latter.
-    const result = await showWorkerPaneServing(fixture('cursor-agent-long-tool-call'))
+    const result = await showWorkerPaneServing(CLAUDE_WORKING_OUTPUT)
 
     expect(result).toMatchObject({ observation: { exactWorker: true, agentWait: null } })
   })
@@ -145,7 +148,7 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
   it('omits the field entirely for a worker it could not verify', async () => {
     // Why not null: null is a claim that Orca looked. A replaced process is never looked at,
     // and reporting "no wait" there is the false negative this field exists to remove.
-    const result = (await showWorkerPaneServing(fixture('cursor-agent-approval-prompt'), {
+    const result = (await showWorkerPaneServing(CLAUDE_TRUST, {
       breakIdentity: true
     })) as { observation: Record<string, unknown> }
 
@@ -154,7 +157,7 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
   })
 
   it('agrees with the terminal payload it is derived from', async () => {
-    const result = (await showWorkerPaneServing(fixture('cursor-agent-approval-prompt'))) as {
+    const result = (await showWorkerPaneServing(CLAUDE_TRUST)) as {
       terminal: { agentWait: unknown } | null
       observation: { agentWait: unknown }
     }
@@ -162,7 +165,7 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
     // Why the explicit shape first: comparing the two fields alone passes when both are absent.
     expect(result.observation.agentWait).toMatchObject({
       source: 'prompt-text',
-      reason: 'agent-approval-prompt'
+      reason: 'agent-trust-workspace'
     })
     expect(result.observation.agentWait).toEqual(result.terminal?.agentWait)
   })

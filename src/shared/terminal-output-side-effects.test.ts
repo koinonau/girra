@@ -182,10 +182,10 @@ describe('createTerminalTitleTracker synthetic-frame isolation', () => {
     const { events, tracker } = createRecordingTracker()
 
     tracker.applySyntheticTitleFrame(
-      `${ESC}]0;⠋ Cursor Agent${BEL}${ESC}]133;D;0${BEL}https://github.com/acme/orca/pull/42\r\n`
+      `${ESC}]0;⠋ Claude Code${BEL}${ESC}]133;D;0${BEL}https://github.com/acme/orca/pull/42\r\n`
     )
 
-    expect(events).toEqual([['title', '⠋ Cursor Agent']])
+    expect(events).toEqual([['title', '⠋ Claude Code']])
   })
 
   it('keeps a split 133 carry intact across an interleaved synthetic frame', () => {
@@ -193,11 +193,11 @@ describe('createTerminalTitleTracker synthetic-frame isolation', () => {
 
     tracker.handleChunk(`out${ESC}]133;D;`)
     // An 80ms spinner tick lands between the two halves of the real OSC.
-    tracker.applySyntheticTitleFrame(`${ESC}]0;⠋ Cursor Agent${BEL}`)
+    tracker.applySyntheticTitleFrame(`${ESC}]0;⠋ Claude Code${BEL}`)
     tracker.handleChunk(`130${BEL}`)
 
     expect(events).toEqual([
-      ['title', '⠋ Cursor Agent'],
+      ['title', '⠋ Claude Code'],
       ['finished', 130]
     ])
   })

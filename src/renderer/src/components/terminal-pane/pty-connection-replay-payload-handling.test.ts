@@ -2,15 +2,10 @@ import type * as React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   POST_REPLAY_LIVE_AGENT_REATTACH_RESET,
-  POST_REPLAY_REATTACH_RESET,
-  RESET_KITTY_KEYBOARD_PROTOCOL,
-  RESET_TERMINAL_CURSOR_STYLE
+  POST_REPLAY_REATTACH_RESET
 } from '../../../../shared/terminal-mode-reset-profiles'
 import { flushAsyncTicks } from './pty-connection-test-async'
-import {
-  NORMAL_BUFFER_PROLOGUE,
-  ANSI_POSITIONED_CURSOR_AGENT_REATTACH_SCREEN
-} from './pty-connection-test-constants'
+import { NORMAL_BUFFER_PROLOGUE } from './pty-connection-test-constants'
 import {
   withMockedDocumentActiveElement,
   configureTerminalFocusMode
@@ -364,7 +359,7 @@ describe('connectPanePty', () => {
     disposable.dispose()
   })
 
-  it('preserves live agent modes when queued replay data carries the Cursor Agent screen', async () => {
+  it('preserves live agent modes when queued replay data reaches a live agent pane', async () => {
     const { connectPanePty } = await import('./pty-connection')
     enableActiveRuntimeEnvironment()
     const transport = createMockTransport('remote:env-1@@terminal-1')
@@ -376,7 +371,7 @@ describe('connectPanePty', () => {
       return { id: 'remote:env-1@@terminal-1', replay: '' }
     })
     transportFactoryQueue.push(transport)
-    setReattachPaneTitle('renamed shell')
+    setReattachPaneTitle('Claude done')
 
     const pane = createPane(1)
     const textarea = {} as HTMLTextAreaElement
@@ -387,7 +382,7 @@ describe('connectPanePty', () => {
       const connection = connectPanePty(pane as never, manager as never, deps as never)
       await flushAsyncTicks(6)
 
-      capturedReplayCallback.current?.(ANSI_POSITIONED_CURSOR_AGENT_REATTACH_SCREEN)
+      capturedReplayCallback.current?.('\x1b[9;3H> restored agent screen')
       await flushAsyncTicks(12)
 
       expect(pane.terminal.write).toHaveBeenCalledWith(
@@ -395,124 +390,6 @@ describe('connectPanePty', () => {
         expect.any(Function)
       )
       expect(transport.sendInput).toHaveBeenCalledWith('\x1b[I')
-      return connection
-    })
-    disposable.dispose()
-  })
-
-  // Why pinned: the classifier strips CSI precisely so a styled header still matches. A future
-  // "just lastIndexOf the raw bytes" shortcut would pass every other test and silently break this.
-  it('still detects the Cursor Agent screen when CSI styling splits the header and the marker', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    enableActiveRuntimeEnvironment()
-    const transport = createMockTransport('remote:env-1@@terminal-1')
-    const capturedReplayCallback: {
-      current: ((data: string, meta?: { clearBeforeReplay?: boolean }) => void) | null
-    } = { current: null }
-    transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
-      capturedReplayCallback.current = callbacks.onReplayData ?? null
-      return { id: 'remote:env-1@@terminal-1', replay: '' }
-    })
-    transportFactoryQueue.push(transport)
-    setReattachPaneTitle('renamed shell')
-
-    const pane = createPane(1)
-    const textarea = {} as HTMLTextAreaElement
-    configureTerminalFocusMode(pane, textarea)
-    const manager = createManager(1)
-    const deps = createDeps()
-    const disposable = await withMockedDocumentActiveElement(textarea, async () => {
-      const connection = connectPanePty(pane as never, manager as never, deps as never)
-      await flushAsyncTicks(6)
-
-      capturedReplayCallback.current?.(
-        '\x1b[4;3HCursor \x1b[1mAgent\x1b[0m\x1b[9;3H→\x1b[0m Plan, search, build anything'
-      )
-      await flushAsyncTicks(12)
-
-      expect(pane.terminal.write).toHaveBeenCalledWith(
-        POST_REPLAY_LIVE_AGENT_REATTACH_RESET,
-        expect.any(Function)
-      )
-      return connection
-    })
-    disposable.dispose()
-  })
-
-  // Why pinned: the scan reads only a bounded tail, so a header buried behind megabytes of
-  // scrollback describes a finished run, not the current screen.
-  it('ignores a Cursor Agent screen buried beyond the payload scan tail limit', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    enableActiveRuntimeEnvironment()
-    const transport = createMockTransport('remote:env-1@@terminal-1')
-    const capturedReplayCallback: {
-      current: ((data: string, meta?: { clearBeforeReplay?: boolean }) => void) | null
-    } = { current: null }
-    transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
-      capturedReplayCallback.current = callbacks.onReplayData ?? null
-      return { id: 'remote:env-1@@terminal-1', replay: '' }
-    })
-    transportFactoryQueue.push(transport)
-    setReattachPaneTitle('renamed shell')
-
-    const pane = createPane(1)
-    const textarea = {} as HTMLTextAreaElement
-    configureTerminalFocusMode(pane, textarea)
-    const manager = createManager(1)
-    const deps = createDeps()
-    const disposable = await withMockedDocumentActiveElement(textarea, async () => {
-      const connection = connectPanePty(pane as never, manager as never, deps as never)
-      await flushAsyncTicks(6)
-
-      capturedReplayCallback.current?.(
-        `${ANSI_POSITIONED_CURSOR_AGENT_REATTACH_SCREEN}${'shell scrollback\r\n'.repeat(20_000)}`
-      )
-      await flushAsyncTicks(12)
-
-      expect(transport.sendInput).not.toHaveBeenCalledWith('\x1b[I')
-      return connection
-    })
-    disposable.dispose()
-  })
-
-  it('downgrades a scrollback-only Cursor Agent signal when the parsed viewport shows a shell', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    enableActiveRuntimeEnvironment()
-    const transport = createMockTransport('remote:env-1@@terminal-1')
-    const capturedReplayCallback: {
-      current: ((data: string, meta?: { clearBeforeReplay?: boolean }) => void) | null
-    } = { current: null }
-    transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
-      capturedReplayCallback.current = callbacks.onReplayData ?? null
-      return { id: 'remote:env-1@@terminal-1', replay: '' }
-    })
-    transportFactoryQueue.push(transport)
-    setReattachPaneTitle('renamed shell')
-
-    const pane = createPane(1)
-    // Why: a buffer whose visible rows carry no Cursor Agent screen models a shell foreground after a dead run left its screen in scrollback.
-    Object.assign(pane.terminal.buffer.active, {
-      cursorX: 2,
-      getLine: () => undefined
-    })
-    const textarea = {} as HTMLTextAreaElement
-    configureTerminalFocusMode(pane, textarea)
-    const manager = createManager(1)
-    const deps = createDeps()
-    const disposable = await withMockedDocumentActiveElement(textarea, async () => {
-      const connection = connectPanePty(pane as never, manager as never, deps as never)
-      await flushAsyncTicks(6)
-
-      // A dead run left the cursor hidden; the live-agent reset preserves ?25l, so the veto must re-show the cursor for the shell.
-      capturedReplayCallback.current?.(`${ANSI_POSITIONED_CURSOR_AGENT_REATTACH_SCREEN}\x1b[?25l`)
-      await flushAsyncTicks(12)
-
-      expect(pane.terminal.write).toHaveBeenCalledWith(
-        `${RESET_TERMINAL_CURSOR_STYLE}${RESET_KITTY_KEYBOARD_PROTOCOL}`,
-        expect.any(Function)
-      )
-      expect(pane.terminal.write).toHaveBeenCalledWith('\x1b[?25h\x1b[?1004l', expect.any(Function))
-      expect(transport.sendInput).not.toHaveBeenCalledWith('\x1b[I')
       return connection
     })
     disposable.dispose()

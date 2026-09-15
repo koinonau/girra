@@ -122,7 +122,7 @@ describe('registerPtyHandlers', () => {
       }
     }
   })
-  it('uses the POSIX shell wrapper so Pi config survives shell startup files', async () => {
+  it('keeps the user Pi agent dir as the Pi source for a bare zsh login shell', async () => {
     const originalPlatform = process.platform
     const originalShell = process.env.SHELL
 
@@ -149,8 +149,6 @@ describe('registerPtyHandlers', () => {
       expect(options.env.PI_CODING_AGENT_DIR).toBe('/tmp/user-pi-agent')
       expect(options.env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
       expect(options.env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
-      expect(options.env.ZDOTDIR).toBe(join(getShellReadyWrapperRoot(), 'zsh'))
-      expect(options.env.ORCA_SHELL_FEATURES).not.toContain('ready')
     } finally {
       Object.defineProperty(process, 'platform', {
         configurable: true,

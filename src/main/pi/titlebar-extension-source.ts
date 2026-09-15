@@ -1,55 +1,46 @@
 import { getPiTitlebarLifetimeSourceLines } from './titlebar-extension-lifetime-source'
-import type { PiAgentKind } from '../../shared/pi-agent-kind'
-import { getPiOmpRuntimeDetectionSourceLines } from './agent-status-runtime-detection-source'
 
 export const ORCA_PI_EXTENSION_FILE = 'orca-titlebar-spinner.ts'
 
-export function getPiTitlebarExtensionSource(kind: PiAgentKind = 'pi'): string {
-  // Why: OMP reports input waits through its own approval events, which the status
-  // extension already maps, and it writes this same marker natively. The runtime check
-  // matters as well as the kind: a bare-shell OMP launch runs inside a pi-kind pane.
-  const uiPromptHandlers =
-    kind === 'pi'
-      ? [
-          "  on('ui_prompt_start', async (_event, ctx) => {",
-          '    if (isOmpRuntime() || !ownsMarker) return',
-          '    promptDepth++',
-          '    // Why: retry on every open rather than only the outermost, so an outer ctx',
-          '    // that could not paint cannot decide the whole stack stays unmarked.',
-          '    if (markerPainted) return',
-          '    const painter = resolvePainter(ctx)',
-          '    // Why: only hold the spinner off once the marker is actually up, or a ctx',
-          '    // that cannot paint would freeze the title on its last working frame.',
-          "    if (!paintTitle(painter, () => getMarkedTitle(pi, '!'))) return",
-          '    markerPainted = true',
-          '    promptCtx = painter',
-          '    startMarkerReassert(painter)',
-          '  })',
-          '',
-          "  on('ui_prompt_end', async (_event, ctx) => {",
-          '    if (isOmpRuntime() || !ownsMarker || promptDepth === 0) return',
-          '    promptDepth--',
-          '    if (promptDepth > 0) return',
-          '    // Why: the opening ctx already painted once, so a close whose own ctx is stale',
-          '    // does not leave the needs-input marker up until the next turn.',
-          '    const painter = resolvePainter(ctx) ?? promptCtx',
-          '    markerPainted = false',
-          '    promptCtx = null',
-          '    stopMarkerReassert()',
-          '    // Why: a still-live turn resumes its spinner in place; otherwise the pane is idle',
-          '    // and must drop the needs-input marker rather than keep asking for attention.',
-          '    if (timer) {',
-          '      renderFrame(painter)',
-          '      return',
-          '    }',
-          '    paintTitle(painter, () => getBaseTitle(pi))',
-          '  })',
-          ''
-        ]
-      : []
+export function getPiTitlebarExtensionSource(): string {
+  const uiPromptHandlers = [
+    "  on('ui_prompt_start', async (_event, ctx) => {",
+    '    if (!ownsMarker) return',
+    '    promptDepth++',
+    '    // Why: retry on every open rather than only the outermost, so an outer ctx',
+    '    // that could not paint cannot decide the whole stack stays unmarked.',
+    '    if (markerPainted) return',
+    '    const painter = resolvePainter(ctx)',
+    '    // Why: only hold the spinner off once the marker is actually up, or a ctx',
+    '    // that cannot paint would freeze the title on its last working frame.',
+    "    if (!paintTitle(painter, () => getMarkedTitle(pi, '!'))) return",
+    '    markerPainted = true',
+    '    promptCtx = painter',
+    '    startMarkerReassert(painter)',
+    '  })',
+    '',
+    "  on('ui_prompt_end', async (_event, ctx) => {",
+    '    if (!ownsMarker || promptDepth === 0) return',
+    '    promptDepth--',
+    '    if (promptDepth > 0) return',
+    '    // Why: the opening ctx already painted once, so a close whose own ctx is stale',
+    '    // does not leave the needs-input marker up until the next turn.',
+    '    const painter = resolvePainter(ctx) ?? promptCtx',
+    '    markerPainted = false',
+    '    promptCtx = null',
+    '    stopMarkerReassert()',
+    '    // Why: a still-live turn resumes its spinner in place; otherwise the pane is idle',
+    '    // and must drop the needs-input marker rather than keep asking for attention.',
+    '    if (timer) {',
+    '      renderFrame(painter)',
+    '      return',
+    '    }',
+    '    paintTitle(painter, () => getBaseTitle(pi))',
+    '  })',
+    ''
+  ]
 
   return [
-    ...(kind === 'pi' ? [...getPiOmpRuntimeDetectionSourceLines(`/hook/${kind}`), ''] : []),
     'const BRAILLE_FRAMES = [',
     "  '\\u280b',",
     "  '\\u2819',",
@@ -101,16 +92,12 @@ export function getPiTitlebarExtensionSource(kind: PiAgentKind = 'pi'): string {
     '',
     'export default function (pi) {',
     '  if (!process.env.ORCA_PANE_KEY) return',
-    ...(kind === 'pi'
-      ? [
-          '  // Why: child agents inherit the pane env, and the spinner is harmlessly',
-          '  // per-process — but the needs-input marker is status the pane reports, so only',
-          '  // one process may assert it. Mirrors ORCA_PI_STATUS_OWNED in the status hook.',
-          '  const markerOwnerPid = process.env.ORCA_PI_TITLE_MARKER_OWNED',
-          '  const ownsMarker = !markerOwnerPid || markerOwnerPid === String(process.pid)',
-          '  if (ownsMarker) process.env.ORCA_PI_TITLE_MARKER_OWNED = String(process.pid)'
-        ]
-      : []),
+    '  // Why: child agents inherit the pane env, and the spinner is harmlessly',
+    '  // per-process, but the needs-input marker is status the pane reports, so only',
+    '  // one process may assert it. Mirrors ORCA_PI_STATUS_OWNED in the status hook.',
+    '  const markerOwnerPid = process.env.ORCA_PI_TITLE_MARKER_OWNED',
+    '  const ownsMarker = !markerOwnerPid || markerOwnerPid === String(process.pid)',
+    '  if (ownsMarker) process.env.ORCA_PI_TITLE_MARKER_OWNED = String(process.pid)',
 
     ...getPiTitlebarLifetimeSourceLines(),
     '  let timer = null',
@@ -255,17 +242,13 @@ export function getPiTitlebarExtensionSource(kind: PiAgentKind = 'pi'): string {
     '    resetPromptState()',
     '  })',
     '',
-    '  // Why: modern Pi/OMP emit agent_end mid-run and only settle later, so settlement is the',
+    '  // Why: modern Pi emits agent_end mid-run and only settles later, so settlement is the',
     '  // authoritative completion boundary. Legacy runtimes never emit it, so agent_end stays.',
     "  on('agent_settled', async (_event, ctx) => {",
     '    stopAnimation(ctx)',
     '  })',
     '',
-    "  on('agent_end', async (event, ctx) => {",
-    '    if (event?.willContinue === true) {',
-    '      clearPendingAgentEndCheck()',
-    '      return',
-    '    }',
+    "  on('agent_end', async (_event, ctx) => {",
     "    if (!ctx || typeof ctx.isIdle !== 'function') {",
     '      stopAnimation(ctx)',
     '      return',

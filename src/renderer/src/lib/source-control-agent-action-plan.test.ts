@@ -56,28 +56,21 @@ describe('planSourceControlAgentActionLaunch', () => {
   })
 
   it.each([
-    {
-      terminalWindowsShell: 'cmd.exe',
-      expectedCommand: 'powershell.exe -NoProfile -EncodedCommand'
-    },
-    {
-      terminalWindowsShell: 'git-bash',
-      expectedCommand: 'ORCA_HERMES_STARTUP_QUERY'
-    }
+    { terminalWindowsShell: 'cmd.exe', expectedCommand: 'claude "Review the change"' },
+    { terminalWindowsShell: 'git-bash', expectedCommand: "claude 'Review the change'" }
   ])(
-    'uses $terminalWindowsShell quoting for Hermes source-control prompts',
+    'uses $terminalWindowsShell quoting for source-control prompts',
     ({ terminalWindowsShell, expectedCommand }) => {
       const result = planSourceControlAgentActionLaunch({
-        agent: 'hermes',
+        agent: 'claude',
         commandInput: 'Review the change',
         promptDelivery: 'auto-submit',
-        detectedAgents: ['hermes'],
+        detectedAgents: ['claude'],
         platform: 'win32',
         terminalWindowsShell
       })
 
-      expect(result.ok && result.plan.launchCommand).toContain(expectedCommand)
-      expect(result.ok && result.plan.env?.ORCA_HERMES_STARTUP_QUERY).toBe('Review the change')
+      expect(result.ok && result.plan.launchCommand).toBe(expectedCommand)
     }
   )
 

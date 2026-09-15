@@ -21,9 +21,9 @@ const UNCHANGED_TITLES = [
   'opencode-blinker',
   'zsh',
   '✳ Claude Code',
-  'copilot.exe - action required',
-  'gemini',
-  'cursor agent'
+  'claude.exe - action required',
+  'opencode ready',
+  'π > session - ~/orca'
 ]
 const STORE_WRITES = 50
 
@@ -49,13 +49,13 @@ describe('terminal title classification memo', () => {
       classifyEveryTitle()
     }
 
-    // Unmemoized this is STORE_WRITES x titles x the whole regex ladder — 4,350
-    // leaf matches for this fixture. Memoized, an unchanged title costs nothing.
+    // Unmemoized this is STORE_WRITES x titles x the whole regex ladder.
+    // Memoized, an unchanged title costs nothing.
     expect(classifierCalls).not.toHaveBeenCalled()
   })
 
   it('classifies a title once no matter how many readers ask', () => {
-    const title = 'aider running'
+    const title = 'opencode running'
     getAgentLabel(title)
     const firstReadCalls = classifierCalls.mock.calls.length
     expect(firstReadCalls).toBeGreaterThan(0)
@@ -68,7 +68,7 @@ describe('terminal title classification memo', () => {
 
   it('reclassifies as soon as the title changes', () => {
     expect(getAgentLabel('codex ready')).toBe('Codex')
-    expect(getAgentLabel('grok ready')).toBe('Grok')
+    expect(getAgentLabel('opencode ready')).toBe('OpenCode')
     expect(detectAgentStatusFromTitle('codex ready')).toBe('idle')
     expect(detectAgentStatusFromTitle('codex working')).toBe('working')
   })

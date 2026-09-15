@@ -387,9 +387,7 @@ describe('OrcaRuntimeService', () => {
     )
   })
 
-  // Why: `cursor` on PATH is the Cursor desktop launcher; only `cursor-agent` is
-  // the CLI Orca can host (issue #11926).
-  it('launches the configured agent CLI for a startupAgent id, not the raw id', async () => {
+  it('launches the configured agent CLI for a startupAgent id', async () => {
     const spawn = vi.fn().mockResolvedValue({ id: 'pty-bg' })
     const runtimeStore = {
       ...store,
@@ -397,8 +395,8 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { cursor: '--force' },
-        agentDefaultEnv: { cursor: { CURSOR_PROFILE: 'captured' } }
+        agentDefaultArgs: { opencode: '--force' },
+        agentDefaultEnv: { opencode: { OPENCODE_PROFILE: 'captured' } }
       })
     }
     const runtime = new OrcaRuntimeService(runtimeStore)
@@ -410,19 +408,19 @@ describe('OrcaRuntimeService', () => {
     })
 
     await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-      startupAgent: 'cursor',
+      startupAgent: 'opencode',
       title: 'worker'
     })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
       | { command?: string; launchAgent?: string; env?: Record<string, string> }
       | undefined
-    expect(spawnCall?.command).toBe("cursor-agent '--force'")
-    expect(spawnCall?.launchAgent).toBe('cursor')
-    expect(spawnCall?.env).toMatchObject({ CURSOR_PROFILE: 'captured' })
+    expect(spawnCall?.command).toBe("opencode '--force'")
+    expect(spawnCall?.launchAgent).toBe('opencode')
+    expect(spawnCall?.env).toMatchObject({ OPENCODE_PROFILE: 'captured' })
   })
 
-  it('resolves a startupAgent to the CLI binary on Windows, where `cursor` is the IDE', async () => {
+  it('quotes a startupAgent launch for cmd.exe on Windows', async () => {
     setPlatform('win32')
     const spawn = vi.fn().mockResolvedValue({ id: 'pty-bg' })
     const runtimeStore = {
@@ -434,7 +432,7 @@ describe('OrcaRuntimeService', () => {
         agentCmdOverrides: {},
         // Why: pin the arg here rather than inherit the shared yolo default, so
         // this test tracks Windows quoting and not an unrelated default's value.
-        agentDefaultArgs: { cursor: '--force' },
+        agentDefaultArgs: { opencode: '--force' },
         agentDefaultEnv: {}
       })
     }
@@ -446,12 +444,12 @@ describe('OrcaRuntimeService', () => {
       getForegroundProcess: async () => null
     })
 
-    await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { startupAgent: 'cursor' })
+    await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { startupAgent: 'opencode' })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as { command?: string } | undefined
     // Why: assert the cmd.exe double quoting too — a platform-insensitive prefix
     // match would pass on any OS and prove nothing about the reported platform.
-    expect(spawnCall?.command).toBe('cursor-agent "--force"')
+    expect(spawnCall?.command).toBe('opencode "--force"')
   })
 
   // Why: claude-agent-teams is the only agent whose launcher name varies by
@@ -492,8 +490,6 @@ describe('OrcaRuntimeService', () => {
     }
   )
 
-  // Why: a user who worked around this bug by pointing the override at their own
-  // cursor-agent path must keep that override once the id resolves properly.
   it('honors an agentCmdOverrides entry for a startupAgent', async () => {
     const spawn = vi.fn().mockResolvedValue({ id: 'pty-bg' })
     const runtime = new OrcaRuntimeService({
@@ -501,8 +497,8 @@ describe('OrcaRuntimeService', () => {
       getSettings: () => ({
         ...store.getSettings(),
         disabledTuiAgents: [],
-        agentCmdOverrides: { cursor: 'cursor-agent --beta' },
-        agentDefaultArgs: { cursor: '--force' },
+        agentCmdOverrides: { opencode: 'opencode --beta' },
+        agentDefaultArgs: { opencode: '--force' },
         agentDefaultEnv: {}
       })
     })
@@ -513,10 +509,10 @@ describe('OrcaRuntimeService', () => {
       getForegroundProcess: async () => null
     })
 
-    await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { startupAgent: 'cursor' })
+    await runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { startupAgent: 'opencode' })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as { command?: string } | undefined
-    expect(spawnCall?.command).toBe("cursor-agent --beta '--force'")
+    expect(spawnCall?.command).toBe("opencode --beta '--force'")
   })
 
   // Why: with no selector the launch is never resolved, so a dropped startupAgent
@@ -532,7 +528,7 @@ describe('OrcaRuntimeService', () => {
     })
 
     await expect(
-      runtime.createTerminal(undefined, { startupAgent: 'cursor', rendererBacked: true })
+      runtime.createTerminal(undefined, { startupAgent: 'opencode', rendererBacked: true })
     ).rejects.toThrow(/requires a workspace selector/)
   })
 
@@ -549,7 +545,7 @@ describe('OrcaRuntimeService', () => {
         ...store.getSettings(),
         disabledTuiAgents: [],
         agentCmdOverrides: {},
-        agentDefaultArgs: { cursor: '--force' },
+        agentDefaultArgs: { opencode: '--force' },
         agentDefaultEnv: {}
       })
     } as never)
@@ -560,13 +556,13 @@ describe('OrcaRuntimeService', () => {
       getForegroundProcess: async () => null
     })
 
-    await runtime.createTerminal(`id:${TEST_FOLDER_WORKSPACE_KEY}`, { startupAgent: 'cursor' })
+    await runtime.createTerminal(`id:${TEST_FOLDER_WORKSPACE_KEY}`, { startupAgent: 'opencode' })
 
     const spawnCall = spawn.mock.calls[0]?.[0] as
       | { command?: string; launchAgent?: string }
       | undefined
-    expect(spawnCall?.command).toBe("cursor-agent '--force'")
-    expect(spawnCall?.launchAgent).toBe('cursor')
+    expect(spawnCall?.command).toBe("opencode '--force'")
+    expect(spawnCall?.launchAgent).toBe('opencode')
   })
 
   // Why: silently returning the caller's opts would spawn a bare shell that can
@@ -591,17 +587,17 @@ describe('OrcaRuntimeService', () => {
     for (const conflicting of [
       { env: { SOME_VAR: 'set' } },
       // Why: a raw command would be silently overwritten by the built launch.
-      { command: 'cursor-agent --resume' },
+      { command: 'opencode --continue' },
       // Why: resume identity paired with a freshly built launch is incoherent.
       { resumeProviderSession: { key: 'session_id', id: 'prior-session' } as never },
-      { launchAgent: 'cursor' as const },
+      { launchAgent: 'opencode' as const },
       { launchConfig: { agentArgs: '', agentEnv: {} } as never },
       { startupCommandDelivery: 'provider' as never },
       { claudeAgentTeamsSourceCommand: 'claude' }
     ]) {
       await expect(
         runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, {
-          startupAgent: 'cursor',
+          startupAgent: 'opencode',
           ...conflicting
         })
       ).rejects.toThrow(/cannot combine/)
@@ -615,7 +611,7 @@ describe('OrcaRuntimeService', () => {
       ...store,
       getSettings: () => ({
         ...store.getSettings(),
-        disabledTuiAgents: ['cursor' as const],
+        disabledTuiAgents: ['opencode' as const],
         agentCmdOverrides: {}
       })
     }
@@ -628,7 +624,7 @@ describe('OrcaRuntimeService', () => {
     })
 
     await expect(
-      runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { startupAgent: 'cursor' })
+      runtime.createTerminal(`path:${TEST_WORKTREE_PATH}`, { startupAgent: 'opencode' })
     ).rejects.toThrow(/disabled/)
     expect(spawn).not.toHaveBeenCalled()
   })

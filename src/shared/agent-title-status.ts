@@ -1,14 +1,6 @@
 import {
-  AGY_AGENT_NAME_RE,
   BRAILLE_SPINNER_RE,
   CLAUDE_IDLE,
-  CURSOR_NATIVE_TITLE_LOWER,
-  DROID_AGENT_NAME_RE,
-  GEMINI_IDLE,
-  GEMINI_PERMISSION,
-  GEMINI_SILENT_WORKING,
-  GEMINI_WORKING,
-  HERMES_AGENT_NAME_RE,
   QUARTER_CIRCLE_SPINNER_RE,
   STRONG_IDLE_KEYWORDS_RE,
   STRONG_WORKING_KEYWORDS_RE,
@@ -17,9 +9,7 @@ import {
   containsAgentSpinnerGlyph,
   containsAny,
   containsQuarterCircleSpinner,
-  containsLegacyAgentName,
   isClaudeManagementTitle,
-  isGeminiTerminalTitle,
   isPiAgentTitle,
   isPiTerminalTitle
 } from './agent-title-core'
@@ -31,14 +21,13 @@ import {
 } from './pi-compatible-synthetic-title'
 import { clearPiStateWorkingMarker, getPiStateTitleStatus } from './pi-state-title-marker'
 import { getWrapperTitleSegments } from './terminal-title-wrapper-segments'
-import { isGrokRotatingWorkingTitle } from './terminal-title-agent-type'
 import { memoizeTitleClassification } from './terminal-title-classification-memo'
 
 /**
  * Strip working-status indicators so stale exit titles stop reporting working.
  */
 export function clearWorkingIndicators(title: string): string {
-  // Why: Pi/OMP's static working marker survives every strip below, so a stale native
+  // Why: Pi's static working marker survives every strip below, so a stale native
   // title would keep re-arming the 3s clear timer without ever leaving working (#13890).
   const clearedPiStateMarker = clearPiStateWorkingMarker(title)
   if (clearedPiStateMarker) {
@@ -47,8 +36,6 @@ export function clearWorkingIndicators(title: string): string {
 
   let cleaned = title
 
-  cleaned = cleaned.replace(GEMINI_WORKING, '')
-  cleaned = cleaned.replace(GEMINI_SILENT_WORKING, '')
   cleaned = cleaned.replace(BRAILLE_SPINNER_RE, '')
   cleaned = cleaned.replace(QUARTER_CIRCLE_SPINNER_RE, '')
   if (cleaned.startsWith('. ')) {
@@ -132,22 +119,7 @@ export function normalizeTerminalTitle(title: string): string {
     return title
   }
 
-  // Why: a Pi/OMP label is cwd/session text that may contain Gemini's glyphs; its own
-  // state marker is explicit, so it outranks glyph sniffing here as it does in detection.
-  if (!getPiStateTitleStatus(title) && isGeminiTerminalTitle(title)) {
-    const status = detectAgentStatusFromTitle(title)
-    if (status === 'permission') {
-      return `${GEMINI_PERMISSION} Gemini CLI`
-    }
-    if (status === 'working') {
-      return `${GEMINI_WORKING} Gemini CLI`
-    }
-    if (status === 'idle') {
-      return `${GEMINI_IDLE} Gemini CLI`
-    }
-  }
-
-  // Why: Pi/OMP animate a braille frame every 80ms, so the frame is the churn — but the rest of
+  // Why: Pi animate a braille frame every 80ms, so the frame is the churn — but the rest of
   // the title is the session name and cwd the agent chose. Canonicalize the frame in place
   // (it leads in `⠋ π - session - cwd` and sits medially in `π ⠋ label`) and keep everything
   // else; collapsing to a bare "Pi" discarded both the identity and the label (#16093).
@@ -155,14 +127,6 @@ export function normalizeTerminalTitle(title: string): string {
   // match would skip the canonicalization and let the frame churn through (#8032).
   if (getWrapperTitleSegments(title).some(isPiAgentTitle)) {
     return canonicalizeBrailleSpinnerFrame(title)
-  }
-
-  // Why: Grok Build interpolates a rotating status/tool phrase between the
-  // spinner and its name, so its working frames change the title many times per
-  // turn. Collapse them to one stable label; idle/session titles carry no
-  // spinner and pass through, so the meaningful final title still shows (#7863).
-  if (isGrokRotatingWorkingTitle(title)) {
-    return '\u280b Grok'
   }
 
   return title
@@ -183,32 +147,18 @@ function computeAgentStatusFromTitle(title: string): AgentStatus | null {
   if (!title || isClaudeManagementTitle(title)) {
     return null
   }
-  if (title.trim().toLowerCase() === CURSOR_NATIVE_TITLE_LOWER) {
-    return null
-  }
-
   if (isOpenCodeNativeTitle(title)) {
     return containsAgentSpinnerGlyph(title) ? 'working' : 'idle'
   }
 
-  // Why: Pi/OMP's marker is an explicit state protocol, so it wins over the glyph and
+  // Why: Pi's marker is an explicit state protocol, so it wins over the glyph and
   // keyword gates below — its label is free-form cwd/session text that can carry either.
   const piStateStatus = getPiStateTitleStatus(title)
   if (piStateStatus) {
     return piStateStatus
   }
 
-  if (title.includes(GEMINI_PERMISSION)) {
-    return 'permission'
-  }
-  if (title.includes(GEMINI_WORKING) || title.includes(GEMINI_SILENT_WORKING)) {
-    return 'working'
-  }
-  if (title.includes(GEMINI_IDLE)) {
-    return 'idle'
-  }
-
-  // Why: resolve synthetic Pi/OMP permission/idle labels before the broader
+  // Why: resolve synthetic Pi permission/idle labels before the broader
   // Pi and braille-spinner checks below.
   const piCompatibleSyntheticAgentStatus = getPiCompatibleSyntheticAgentStatus(title)
   if (piCompatibleSyntheticAgentStatus) {
@@ -219,7 +169,7 @@ function computeAgentStatusFromTitle(title: string): AgentStatus | null {
     return 'idle'
   }
   // Why: read the state separator before the blanket idle below — `π ! <label>` is a
-  // blocked agent, and treating it as idle hides an OMP pane waiting on the user.
+  // blocked agent, and treating it as idle hides a Pi pane waiting on the user.
   const piCompatibleSeparatorStatus = getPiCompatibleTitleSeparatorStatus(title)
   if (piCompatibleSeparatorStatus) {
     return piCompatibleSeparatorStatus
@@ -230,11 +180,7 @@ function computeAgentStatusFromTitle(title: string): AgentStatus | null {
   if (containsAgentSpinnerGlyph(title)) {
     return 'working'
   }
-  const hasDroidAgentName = DROID_AGENT_NAME_RE.test(title)
-  const hasHermesAgentName = HERMES_AGENT_NAME_RE.test(title)
-  const hasAgyAgentName = AGY_AGENT_NAME_RE.test(title)
-  const hasLegacyAgentName = containsLegacyAgentName(title)
-  if (!hasLegacyAgentName && !hasDroidAgentName && !hasHermesAgentName && !hasAgyAgentName) {
+  if (!containsAgentName(title)) {
     return null
   }
   if (containsAny(title, ['action required', 'permission', 'waiting'])) {
@@ -252,12 +198,6 @@ function computeAgentStatusFromTitle(title: string): AgentStatus | null {
   }
   if (title.startsWith('* ')) {
     return 'idle'
-  }
-
-  // Why: Droid hook events are authoritative; native name-only titles should
-  // not turn a still-sleeping execute tool into completion.
-  if (hasDroidAgentName && !hasLegacyAgentName) {
-    return null
   }
 
   return 'idle'

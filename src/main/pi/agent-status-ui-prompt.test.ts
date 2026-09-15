@@ -10,7 +10,6 @@ function createHarness() {
   const state = createHookListenerState()
   const statuses: ReturnType<typeof normalizeHookPayload>[] = []
   const harness = createAgentStatusExtensionHarness({
-    kind: 'pi',
     env: HOOK_ENV,
     fetchImpl: async (_url, init) => {
       statuses.push(normalizeHookPayload(state, 'pi', JSON.parse(String(init?.body)), 'production'))
@@ -282,7 +281,6 @@ describe('Pi UI prompt status', () => {
   it('preserves blocked when a stalled sender coalesces away the start event', async () => {
     let finish: (() => void) | undefined
     const harness = createAgentStatusExtensionHarness({
-      kind: 'pi',
       env: HOOK_ENV,
       fetchImpl: () =>
         new Promise<void>((resolve) => {
@@ -308,19 +306,5 @@ describe('Pi UI prompt status', () => {
     expect(normalizeHookPayload(state, 'pi', resumed, 'production')?.payload.state).toBe('working')
     finish?.()
     await flushPosts()
-  })
-
-  it.each([
-    { kind: 'omp' as const },
-    { kind: 'prime-agent' as const },
-    { kind: 'pi' as const, title: 'omp' }
-  ])('does not add Pi prompt status to $kind ($title)', async (args) => {
-    const harness = createAgentStatusExtensionHarness(args)
-    await harness.callHook('ui_prompt_start')
-    await harness.callHook('ui_prompt_end', {}, { isIdle: () => true })
-    expect(harness.fetchMock).not.toHaveBeenCalled()
-    await harness.callHook('tool_call', { toolName: 'bash', input: { command: 'pwd' } })
-    const body = JSON.parse(String(harness.fetchMock.mock.calls[0]?.[1]?.body))
-    expect(body.payload.ui_prompt_active).toBeUndefined()
   })
 })

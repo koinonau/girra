@@ -1,8 +1,5 @@
 import { resolveSetupAgentSequenceLaunchCommand } from '../../../../shared/setup-agent-sequencing'
-import {
-  detectExplicitPiAgentKindFromCommand,
-  isPiCompatibleAgentType
-} from '../../../../shared/pi-agent-kind'
+import { isPiLaunchCommand } from '../../../../shared/pi-agent-kind'
 import { applyTerminalGitCredentialPromptGuard } from '../../terminal-git-credential-guard'
 import { openCodeHookService } from '../../../opencode/hook-service'
 import { agentHookServer } from '../../../agent-hooks/server'
@@ -14,11 +11,9 @@ import { mergePersistedWindowsPath } from '../../../pty/windows-environment-path
 import { buildConfiguredProxyEnv } from '../../../../shared/network-proxy'
 import type { BuildPtyHostEnvOptions } from './types'
 import {
-  clearPiAgentShadowEnv,
   exposePiManagedExtensionEnv,
   resolveOpenCodeSourceConfigDir,
   resolvePiAgentSourceDir,
-  resolveScopedPiAgentSourceDir,
   restoreOrStripOverlayEnv
 } from './pi-agent'
 import { AGENT_HOOK_RUNTIME_ENV_KEYS } from './spawn-env-keys'
@@ -40,14 +35,10 @@ export function buildPtyHostEnv(
   // Why: local path's baseEnv includes process.env but the daemon path doesn't (fork inheritance, not IPC); check both sources so guards stay in lock-step across spawn paths.
   const preexistingOpenCodeConfigDir = resolveOpenCodeSourceConfigDir(baseEnv)
   const launchCommandHint = resolveSetupAgentSequenceLaunchCommand(baseEnv, opts.launchCommand)
-  const explicitPiAgentKind = isPiCompatibleAgentType(opts.launchAgent)
-    ? opts.launchAgent
-    : opts.launchAgent === undefined
-      ? detectExplicitPiAgentKindFromCommand(launchCommandHint)
-      : null
-  const piAgentKind = explicitPiAgentKind ?? 'pi'
-  const hasLaunchCommand =
-    typeof launchCommandHint === 'string' && launchCommandHint.trim().length > 0
+  const isExplicitPiLaunch =
+    opts.launchAgent === undefined
+      ? isPiLaunchCommand(launchCommandHint)
+      : opts.launchAgent === 'pi'
 
   // Why: unattended agents must fail instead of looping on OS credential prompts; user terminals keep normal Git behavior.
   applyTerminalGitCredentialPromptGuard(baseEnv, {
@@ -56,17 +47,7 @@ export function buildPtyHostEnv(
     deferGitConfigGuardToHost: opts.deferGitConfigGuardToDaemon
   })
 
-  const shouldPrepareOmpShadow = piAgentKind === 'omp' || !hasLaunchCommand
-  // Why: source shadows are agent-scoped; trusting the other kind's source reintroduces Pi/OMP extension-state shadowing.
-  const preexistingPiAgentDir = resolvePiAgentSourceDir(baseEnv, 'pi')
-  const preexistingOmpAgentDir =
-    piAgentKind === 'omp'
-      ? resolvePiAgentSourceDir(baseEnv, 'omp')
-      : resolveScopedPiAgentSourceDir(baseEnv, 'omp')
-  const preexistingPrimeAgentDir =
-    piAgentKind === 'prime-agent'
-      ? resolvePiAgentSourceDir(baseEnv, 'prime-agent')
-      : resolveScopedPiAgentSourceDir(baseEnv, 'prime-agent')
+  const preexistingPiAgentDir = resolvePiAgentSourceDir(baseEnv)
 
   if (opts.agentStatusHooksEnabled) {
     // Why: OPENCODE_CONFIG_DIR is a single path, not a colon-list; mirror the user's value into an overlay so their plugins and Orca's status plugin coexist. See docs/opencode-config-dir-collision.md.
@@ -120,40 +101,14 @@ export function buildPtyHostEnv(
 
   // Why: PI_CODING_AGENT_DIR is the user's config/session root; install only Orca-owned extension files, don't override it.
   if (opts.agentStatusHooksEnabled) {
-    clearPiAgentShadowEnv(baseEnv, 'pi')
-    clearPiAgentShadowEnv(baseEnv, 'omp')
-    clearPiAgentShadowEnv(baseEnv, 'prime-agent')
-    // Why: bare shells historically defaulted to Pi + OMP shadow prep and
-    // created ~/.<agent>/agent even when the user never launches those agents
-    // (#10196). Only create default homes on an explicit Pi/OMP launch;
-    // otherwise install only into an existing agent dir (or userData for OMP
-    // status so a typed `omp` still gets the shell wrapper extension).
-    if (piAgentKind === 'pi') {
-      const piEnv = piTitlebarExtensionService.buildPtyEnv(id, preexistingPiAgentDir, 'pi', {
-        materializeDefaultHome: explicitPiAgentKind === 'pi'
-      })
-      Object.assign(baseEnv, piEnv)
-      exposePiManagedExtensionEnv(baseEnv, 'pi', piEnv)
-    }
-
-    if (shouldPrepareOmpShadow) {
-      const ompEnv = piTitlebarExtensionService.buildPtyEnv(id, preexistingOmpAgentDir, 'omp', {
-        materializeDefaultHome: explicitPiAgentKind === 'omp'
-      })
-      Object.assign(baseEnv, ompEnv)
-      exposePiManagedExtensionEnv(baseEnv, 'omp', ompEnv)
-    }
-
-    if (piAgentKind === 'prime-agent' && !opts.isWsl) {
-      const primeEnv = piTitlebarExtensionService.buildPtyEnv(
-        id,
-        preexistingPrimeAgentDir,
-        'prime-agent',
-        { materializeDefaultHome: explicitPiAgentKind === 'prime-agent' }
-      )
-      Object.assign(baseEnv, primeEnv)
-      exposePiManagedExtensionEnv(baseEnv, 'prime-agent', primeEnv)
-    }
+    // Why: bare shells used to create ~/.pi/agent even when the user never
+    // launched Pi (#10196). Only an explicit Pi launch creates the default
+    // home; otherwise install only into an existing agent dir.
+    const piEnv = piTitlebarExtensionService.buildPtyEnv(id, preexistingPiAgentDir, {
+      materializeDefaultHome: isExplicitPiLaunch
+    })
+    Object.assign(baseEnv, piEnv)
+    exposePiManagedExtensionEnv(baseEnv, piEnv)
   } else {
     // Why: nested PTYs must not inherit stale source or overlay state from another agent.
     restoreOrStripOverlayEnv(baseEnv, {
@@ -161,14 +116,6 @@ export function buildPtyHostEnv(
       overlay: 'ORCA_PI_CODING_AGENT_DIR',
       source: 'ORCA_PI_SOURCE_AGENT_DIR'
     })
-    restoreOrStripOverlayEnv(baseEnv, {
-      primary: 'PI_CODING_AGENT_DIR',
-      overlay: 'ORCA_OMP_CODING_AGENT_DIR',
-      source: 'ORCA_OMP_SOURCE_AGENT_DIR'
-    })
-    delete baseEnv.ORCA_OMP_STATUS_EXTENSION
-    delete baseEnv.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR
-    delete baseEnv.ORCA_PRIME_AGENT_STATUS_EXTENSION
   }
 
   // Why: WSL shells need the managed userData root for shell-ready wrappers; dev-mode terminals need the same export so `orca` targets the live dev instance.

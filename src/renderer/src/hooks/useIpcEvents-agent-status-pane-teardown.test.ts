@@ -496,7 +496,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
     expect(removeAgentStatus).not.toHaveBeenCalled()
   })
 
-  it('does not retain a Cursor spinner terminal title when the hook reports done', async () => {
+  it('does not retain a Pi spinner terminal title when the hook reports done', async () => {
     const setAgentStatus = vi.fn()
     const onSetListenerRef: { current: ((data: AgentStatusSetData) => void) | null } = {
       current: null
@@ -512,7 +512,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
             id: 'tab-future',
             ptyId: 'pty-1',
             worktreeId: 'wt-1',
-            title: '\u2839 Cursor Agent'
+            title: '\u2839 Pi'
           }
         ]
       },
@@ -521,7 +521,7 @@ describe('useIpcEvents agent status snapshot integration', () => {
           root: { type: 'leaf', leafId: FUTURE_LEAF_ID },
           activeLeafId: FUTURE_LEAF_ID,
           expandedLeafId: null,
-          titlesByLeafId: { [FUTURE_LEAF_ID]: '\u2839 Cursor Agent' }
+          titlesByLeafId: { [FUTURE_LEAF_ID]: '\u2839 Pi' }
         }
       }
     })
@@ -556,9 +556,9 @@ describe('useIpcEvents agent status snapshot integration', () => {
     onSetListenerRef.current({
       paneKey: FUTURE_PANE_KEY,
       state: 'done',
-      prompt: 'cursor prompt',
-      agentType: 'cursor',
-      lastAssistantMessage: 'cursor completion',
+      prompt: 'pi prompt',
+      agentType: 'pi',
+      lastAssistantMessage: 'pi completion',
       receivedAt: 1_700_000_000_200,
       stateStartedAt: 1_699_999_999_100
     })
@@ -568,11 +568,11 @@ describe('useIpcEvents agent status snapshot integration', () => {
       FUTURE_PANE_KEY,
       expect.objectContaining({
         state: 'done',
-        prompt: 'cursor prompt',
-        agentType: 'cursor',
-        lastAssistantMessage: 'cursor completion'
+        prompt: 'pi prompt',
+        agentType: 'pi',
+        lastAssistantMessage: 'pi completion'
       }),
-      'Cursor ready',
+      'Pi ready',
       { updatedAt: 1_700_000_000_200, stateStartedAt: 1_699_999_999_100 },
       expectWorktreeRouting('wt-1'),
       undefined

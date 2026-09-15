@@ -596,8 +596,8 @@ describe('OrcaRuntimeService', () => {
       getSettings: () => ({
         ...store.getSettings(),
         disabledTuiAgents: [],
-        agentCmdOverrides: { 'command-code': 'command-code --profile mobile' },
-        agentDefaultEnv: { 'command-code': { COMMAND_CODE_PROFILE: 'mobile-env' } }
+        agentCmdOverrides: { claude: 'claude --profile mobile' },
+        agentDefaultEnv: { claude: { CLAUDE_PROFILE: 'mobile-env' } }
       })
     } as never)
     runtime.setPtyController({
@@ -609,15 +609,15 @@ describe('OrcaRuntimeService', () => {
     runtime.syncWindowGraph(0, { tabs: [], leaves: [] })
 
     await runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-      agent: 'command-code'
+      agent: 'claude'
     })
 
     expect(spawn).toHaveBeenCalledWith(
       expect.objectContaining({
-        command: "command-code --profile mobile '--yolo'",
+        command: "claude --profile mobile '--dangerously-skip-permissions'",
         cwd: TEST_WORKTREE_PATH,
         env: expect.objectContaining({
-          COMMAND_CODE_PROFILE: 'mobile-env'
+          CLAUDE_PROFILE: 'mobile-env'
         }),
         worktreeId: TEST_WORKTREE_ID
       })

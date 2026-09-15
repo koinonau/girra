@@ -2,7 +2,6 @@
 import { OrcaRuntimeWithMaybeHydrateHeadlessFromRenderer } from './orca-runtime-maybe-hydrate-headless-from-renderer'
 import type { RuntimeHeadlessTerminal } from './runtime-terminal-state-records'
 import { HeadlessEmulator } from '../daemon/headless-emulator'
-import { shouldForwardHeadlessTerminalQueryReply } from './headless-terminal-query-reply-policy'
 import { isNativeWindowsConptyPty } from './terminal-model-query-authority'
 import { getTerminalViewAttributes } from './terminal-view-attribute-store'
 import { PtyShellOwnershipMirror } from './pty-shell-ownership-mirror'
@@ -35,11 +34,6 @@ export class OrcaRuntimeWithCreatePtyHeadlessTerminalState extends OrcaRuntimeWi
         // disposeHeadlessTerminal, and daemon respawns reuse session ids — a
         // stale link's reply must never reach a successor PTY under this id.
         if (state !== null && this.headlessTerminals.get(ptyId) === state) {
-          if (
-            !shouldForwardHeadlessTerminalQueryReply(this.ptysById.get(ptyId)?.launchAgent, reply)
-          ) {
-            return
-          }
           // Why this write is safe pre-shell-ready: daemon Session.write
           // QUEUES (never drops) input while the POSIX shell-ready gate is
           // pending and flushes at the ready marker or the 15s

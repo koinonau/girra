@@ -106,9 +106,7 @@ export function normalizeHookPayload(
     extractedPrompt
   })
   const providerSessionOnly =
-    (source === 'pi' || source === 'prime-agent') &&
-    eventName === 'session_start' &&
-    providerSession !== null
+    source === 'pi' && eventName === 'session_start' && providerSession !== null
   // A transcript session_start carries resume identity while idle; receivers discard the placeholder row.
   const transportPayload =
     dispatched.payload ??

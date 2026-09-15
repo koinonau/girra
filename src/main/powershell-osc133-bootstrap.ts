@@ -1,4 +1,3 @@
-import { getPowerShellOmpShellWrapper } from './pty/omp-shell-wrapper'
 export { encodePowerShellCommand } from '../shared/powershell-command-encoding'
 
 /**
@@ -51,8 +50,6 @@ if ($ExecutionContext.SessionState.LanguageMode -eq "FullLanguage" -and
         [Console]::InputEncoding = [System.Text.UTF8Encoding]::new()
         $OutputEncoding = [Console]::OutputEncoding
     } catch { Write-Error $_ -ErrorAction Continue }
-
-${getPowerShellOmpShellWrapper()}
 
     $Global:__OrcaOsc133State = @{
         OriginalPrompt = $function:prompt

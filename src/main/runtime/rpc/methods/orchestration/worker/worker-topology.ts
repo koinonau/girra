@@ -65,9 +65,8 @@ export async function createExistingWorktreeWorkerTerminal(args: {
   effects: WorkerEffect[]
 }): Promise<{ handle: string; warning?: string }> {
   const terminal = await args.runtime.createTerminal(`id:${args.worktreeId}`, {
-    // Why: the agent id is not a shell command — `cursor` resolves to the Cursor
-    // desktop app while its CLI is `cursor-agent`. Let the runtime build the
-    // configured launcher instead of executing the raw id.
+    // Why: the agent id is not a shell command (`claude-agent-teams` launches `orca claude-teams`).
+    // Let the runtime build the configured launcher instead of executing the raw id.
     startupAgent: args.agent,
     ...(args.launchPreferences ? { launchPreferences: args.launchPreferences } : {}),
     title: `worker-${args.taskId}`,

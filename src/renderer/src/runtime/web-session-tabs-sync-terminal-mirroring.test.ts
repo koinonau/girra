@@ -434,7 +434,7 @@ describe('applyWebSessionTabsSnapshot', () => {
           isActive: true,
           status: 'ready',
           terminal: 'terminal-1',
-          launchAgent: 'omp'
+          launchAgent: 'pi'
         }
       ]),
       ENV,
@@ -457,8 +457,8 @@ describe('applyWebSessionTabsSnapshot', () => {
     expect(patch.agentStatusByPaneKey?.[makePaneKey(mirroredId!, SECOND_LEAF_ID)]).toMatchObject({
       prompt: 'stale duplicate',
       paneKey: makePaneKey(mirroredId!, SECOND_LEAF_ID),
-      agentType: 'omp',
-      terminalTitle: 'OMP ready'
+      agentType: 'pi',
+      terminalTitle: 'Pi ready'
     })
   })
 

@@ -67,7 +67,6 @@ import {
 } from './ensure-virtual-display'
 import { maybeApplyGpuFallbackForThisLaunch, registerGpuLifecycleHandlers } from './gpu-lifecycle'
 import { mainProcessState as state } from './main-process-state'
-import { initializeSyntheticTitleRuntime } from './synthetic-title-runtime'
 
 export type MainProcessPreflightOptions = {
   focusExistingWindow: () => void
@@ -265,7 +264,6 @@ export function runMainProcessPreflight(options: MainProcessPreflightOptions): b
     process.stderr.write(`${MISSING_LINUX_DISPLAY_MESSAGE}\n`)
     app.exit(1)
   }
-  initializeSyntheticTitleRuntime()
   registerGpuLifecycleHandlers()
   return true
 }

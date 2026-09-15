@@ -8,11 +8,6 @@ import {
 } from './tui-agent-startup'
 import { TUI_AGENT_CONFIG } from './tui-agent-config'
 import { normalizeTuiAgentArgsRecord, resolveTuiAgentLaunchArgs } from './tui-agent-launch-defaults'
-import { tokenizeStartupCommand } from './tui-agent-startup-shell'
-import {
-  unwrapPosixShellScript,
-  unwrapPowerShellScript
-} from './tui-agent-startup-script.test-fixture'
 
 describe('draft prefill teardown ordering (#14975)', () => {
   // Why pinned: the teardown mutates the calling shell, so it must reference
@@ -140,62 +135,6 @@ describe('tui agent startup plans', () => {
     })
 
     expect(plan?.launchCommand).toBe("codex '--version'")
-  })
-
-  it.each([
-    { platform: 'linux' as const, shell: 'posix' as const },
-    { platform: 'win32' as const, shell: 'powershell' as const },
-    { platform: 'win32' as const, shell: 'cmd' as const }
-  ])('delivers multiline Hermes queries through a child-only expansion on $shell', (testCase) => {
-    const prompt = 'first line\nsecond "quoted" line with %PATH%'
-    const plan = buildAgentStartupPlan({
-      agent: 'hermes',
-      prompt,
-      cmdOverrides: {},
-      agentArgs: '--yolo',
-      platform: testCase.platform,
-      shell: testCase.shell
-    })
-
-    expect(plan?.launchCommand).not.toContain(prompt)
-    expect(plan?.followupPrompt).toBeNull()
-    expect(plan?.launchConfig.agentCommand).toBe('hermes --tui')
-    expect(plan?.env?.ORCA_HERMES_STARTUP_QUERY).toBe(prompt)
-    const script =
-      testCase.shell === 'posix'
-        ? unwrapPosixShellScript(plan?.launchCommand)
-        : unwrapPowerShellScript(plan?.launchCommand)
-    expect(script).toContain("'hermes' 'chat'")
-    expect(script).toContain('--query=')
-    expect(testCase.shell === 'posix' ? plan?.launchCommand : script).toContain(
-      'ORCA_HERMES_STARTUP_QUERY'
-    )
-    expect(script).toContain("'--yolo' '--tui'")
-    expect(script).toContain(
-      testCase.shell === 'posix'
-        ? '--query=${__orca_hermes_startup_query}'
-        : 'Remove-Item Env:ORCA_HERMES_STARTUP_QUERY'
-    )
-    if (testCase.shell === 'posix') {
-      expect(plan?.launchCommand).toContain('unset ORCA_HERMES_STARTUP_QUERY')
-    }
-  })
-
-  it('uses a sh invocation that POSIX-host PowerShell can parse', () => {
-    const plan = buildAgentStartupPlan({
-      agent: 'hermes',
-      prompt: 'run it',
-      cmdOverrides: {},
-      platform: 'linux'
-    })
-
-    expect(plan?.launchCommand).toMatch(/^sh -c /)
-    expect(plan?.launchCommand).not.toContain("'sh' '-c'")
-    // Why parse rather than string-match: the octal escapes must survive the
-    // OUTER quoting to reach the inner sh, and portable quoting emits a
-    // backslash as `"\\"` rather than leaving it inside a single-quoted run.
-    const tokens = tokenizeStartupCommand(plan?.launchCommand ?? '', 'posix')
-    expect(tokens.ok && tokens.tokens.at(-1)).toMatch(/\\0[0-7]{3}/)
   })
 
   it('does not launch Codex with the Orca profile when agent status hooks are enabled', () => {
@@ -563,23 +502,6 @@ describe('tui agent startup plans', () => {
     expect(
       buildAgentDraftLaunchPlan({
         agent: 'mimo-code',
-        draft: 'x',
-        cmdOverrides: {},
-        platform: 'darwin'
-      })
-    ).toBeNull()
-  })
-
-  it('keeps grok on the composer-glyph paste draft route', () => {
-    // Why: grok has no --prefill-style flag, so every launch draft goes through
-    // paste-after-ready — and its shimmering startup logo never settles the
-    // quiet window, which is what made the paste take the full hard timeout.
-    expect(TUI_AGENT_CONFIG.grok.draftPasteReadySignal).toBe('grok-composer-prompt')
-    expect(TUI_AGENT_CONFIG.grok.draftPromptFlag).toBeUndefined()
-    expect(TUI_AGENT_CONFIG.grok.draftPromptEnvVar).toBeUndefined()
-    expect(
-      buildAgentDraftLaunchPlan({
-        agent: 'grok',
         draft: 'x',
         cmdOverrides: {},
         platform: 'darwin'

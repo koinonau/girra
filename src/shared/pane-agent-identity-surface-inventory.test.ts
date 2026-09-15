@@ -48,11 +48,6 @@ const SURFACE_ROWS: readonly SurfaceRow[] = [
     path: 'src/renderer/src/components/terminal-pane/terminal-agent-paste-bracketing.ts',
     marker: 'resolveProtectedMultilinePasteOptionsForPane'
   },
-  {
-    row: 37,
-    path: 'src/renderer/src/components/terminal-pane/command-code-output-ownership.ts',
-    marker: 'canCommandCodeOutputOwnPane'
-  },
   { row: 38, path: 'src/renderer/src/lib/agent-ready-wait.ts', marker: 'waitForAgentReady' },
   {
     row: 39,
@@ -93,16 +88,6 @@ const SURFACE_ROWS: readonly SurfaceRow[] = [
     row: 46,
     path: 'src/renderer/src/components/terminal-pane/agent-question-answered-inference.ts',
     marker: 'inferQuestionAnsweredFromCurrentStatus'
-  },
-  {
-    row: 47,
-    path: 'src/renderer/src/components/terminal-pane/terminal-keyboard-protocol-pane-agent.ts',
-    marker: 'resolvePaneKeyboardProtocolAgent'
-  },
-  {
-    row: 47,
-    path: 'src/renderer/src/components/terminal-pane/terminal-pane-manager-options.ts',
-    marker: 'resolvePaneKeyboardProtocolAgent'
   },
   {
     row: 48,

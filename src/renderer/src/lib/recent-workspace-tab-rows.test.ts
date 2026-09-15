@@ -99,7 +99,7 @@ describe('orderRecentWorkspaceTabs', () => {
   it('retains permission badges without promoting an old permission title', () => {
     const old = row('old', {
       lastFocusedAt: NOW - 3 * 86400_000,
-      terminalTab: { id: 'old', title: 'OMP - action required' }
+      terminalTab: { id: 'old', title: 'Pi - action required' }
     })
     const paneSources = sources([], { ptyIdsByTabId: { old: ['pty-1'] } })
     expect(resolveRecentWorkspaceTabStatus(old, paneSources, NOW)).toBe('permission')

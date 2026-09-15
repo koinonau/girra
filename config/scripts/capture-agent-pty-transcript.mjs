@@ -28,7 +28,7 @@ const USAGE = `Capture a raw agent PTY transcript into src/main/runtime/__fixtur
   node config/scripts/capture-agent-pty-transcript.mjs --scan <file...> [--redact]
 
 Options
-  --name <fixture-name>  Output fixture name, e.g. antigravity-ready-personal-non-gemini
+  --name <fixture-name>  Output fixture name, e.g. claude-ready-personal
   --out <path>           Write somewhere other than the fixture directory
   --cols <n> --rows <n>  Pin the PTY size (default: this terminal's size, else 120x40)
   --duration <seconds>   Stop unattended after N seconds

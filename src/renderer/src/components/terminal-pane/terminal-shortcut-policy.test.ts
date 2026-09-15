@@ -122,7 +122,7 @@ describe('resolveTerminalShortcutAction', () => {
   })
 
   it('sends CSI-u Shift+Enter to Windows panes whose active agent requires it (#7620)', () => {
-    // Why: droid parses CSI-u directly and treats the Alt+Enter byte as a plain
+    // Why: Pi parses CSI-u directly and treats the Alt+Enter byte as a plain
     // Enter that submits, so its pane capability must produce `\x1b[13;2u`.
     expect(
       resolveTerminalShortcutAction(
@@ -274,17 +274,11 @@ describe('resolveTerminalShortcutAction', () => {
     const getWindowsShiftEnterEncoding = vi.fn(() => 'csi-u' as const)
     const isLocalWindowsConptyPane = vi.fn(() => true)
     const getKittyKeyboardFlagsActivePane = vi.fn(() => 0)
-    const hasCtrlEnterCsiUAuthority = vi.fn(() => false)
     const csiU = { type: 'sendInput', data: '\x1b[13;5u' }
     const legacyCr = { type: 'sendInput', data: '\r' }
-    const resolveCtrlEnter = (
-      localConpty: boolean,
-      kittyActive: boolean,
-      trustedConsumer: boolean
-    ) => {
+    const resolveCtrlEnter = (localConpty: boolean, kittyActive: boolean) => {
       isLocalWindowsConptyPane.mockReturnValue(localConpty)
       getKittyKeyboardFlagsActivePane.mockReturnValue(kittyActive ? 1 : 0)
-      hasCtrlEnterCsiUAuthority.mockReturnValue(trustedConsumer)
       return resolveTerminalShortcutAction(
         event({ key: 'Enter', code: 'Enter', ctrlKey: true }),
         false,
@@ -296,21 +290,16 @@ describe('resolveTerminalShortcutAction', () => {
         getKittyKeyboardFlagsActivePane,
         undefined,
         getWindowsShiftEnterEncoding,
-        () => true,
-        'orca-first',
-        hasCtrlEnterCsiUAuthority
+        () => true
       )
     }
 
-    expect(resolveCtrlEnter(true, false, false)).toEqual(legacyCr)
-    expect(resolveCtrlEnter(true, true, false)).toEqual(csiU)
-    expect(resolveCtrlEnter(true, false, true)).toEqual(csiU)
-    hasCtrlEnterCsiUAuthority.mockClear()
-    expect(resolveCtrlEnter(false, false, false)).toEqual(csiU)
-    expect(hasCtrlEnterCsiUAuthority).not.toHaveBeenCalled()
+    expect(resolveCtrlEnter(true, false)).toEqual(legacyCr)
+    expect(resolveCtrlEnter(true, true)).toEqual(csiU)
+    expect(resolveCtrlEnter(false, false)).toEqual(csiU)
     expect(getWindowsShiftEnterEncoding).not.toHaveBeenCalled()
 
-    // Missing pane-host context preserves the established Droid/Grok chord.
+    // Missing pane-host context preserves the established query-only chord.
     expect(
       resolveTerminalShortcutAction(event({ key: 'Enter', code: 'Enter', ctrlKey: true }), false)
     ).toEqual(csiU)

@@ -11,12 +11,8 @@ import {
   isAgentTaskCompleteOsNotificationEnabledFromState,
   isAgentTaskCompleteTrackingEnabledFromState
 } from './agent-task-complete-policy'
-import { createCommandCodeOutputStatusDetector } from '../../../../shared/command-code-output-status'
 import { createOsc133CommandFinishedScanner } from '../../../../shared/terminal-osc133-command-finished'
-import {
-  createParkedTerminalCommandStatusPolicy,
-  readInFlightCommandCodeTurn
-} from './parked-terminal-command-status'
+import { createParkedTerminalCommandStatusPolicy } from './parked-terminal-command-status'
 import { subscribeToPtyData } from './pty-data-sidecar-subscriptions'
 import { createPtyOutputProcessor } from './pty-transport'
 import { isRendererHiddenPtyDeliveryGateEnabled } from './terminal-hidden-delivery-gate'
@@ -185,12 +181,10 @@ export function startParkedTerminalByteWatcher(
   }
 
   // Why: command-lifecycle signals drive store-level policy only (git nudge, SSH same-turn
-  // status drop, Command Code seed/settle); the pane-coupled parts stay with the mounted pane.
+  // status drop); the pane-coupled parts stay with the mounted pane.
   const commandStatusPolicy = createParkedTerminalCommandStatusPolicy({
     ptyId,
     worktreeId,
-    tabId,
-    paneId,
     paneKey
   })
 
@@ -223,16 +217,6 @@ export function startParkedTerminalByteWatcher(
   const commandFinishedScanner = factSideEffectAuthority
     ? null
     : createOsc133CommandFinishedScanner(commandStatusPolicy.onCommandFinished)
-  // Why the seed: this detector is recreated per park cycle with no startup command
-  // to fast-arm it, and a Command Code TUI parked mid-turn is long past its banner —
-  // unseeded it would never scrape the turn's return to the idle composer.
-  const commandCodeOutputStatusDetector = factSideEffectAuthority
-    ? null
-    : createCommandCodeOutputStatusDetector({
-        inFlightTurn: readInFlightCommandCodeTurn(paneKey),
-        onWorking: commandStatusPolicy.onCommandCodeWorking,
-        onDone: commandStatusPolicy.onCommandCodeDone
-      })
   const unregisterFactConsumer = factSideEffectAuthority
     ? registerTerminalSideEffectFactConsumer({
         ptyId,
@@ -240,8 +224,6 @@ export function startParkedTerminalByteWatcher(
         callbacks: {
           ...sideEffectCallbacks,
           onCommandFinished: commandStatusPolicy.onCommandFinished,
-          onCommandCodeWorking: commandStatusPolicy.onCommandCodeWorking,
-          onCommandCodeDone: commandStatusPolicy.onCommandCodeDone,
           onPrLink: (link) =>
             useAppStore.getState().observeTerminalGitHubPullRequestLink(worktreeId, link)
         },
@@ -261,7 +243,6 @@ export function startParkedTerminalByteWatcher(
     }
     processor.processData(data, {})
     commandFinishedScanner?.scan(data)
-    commandCodeOutputStatusDetector?.observe(data)
     if (observeTerminalGitHubPRLink) {
       for (const link of observeTerminalGitHubPRLink(data)) {
         useAppStore.getState().observeTerminalGitHubPullRequestLink(worktreeId, link)
@@ -282,7 +263,7 @@ export function startParkedTerminalByteWatcher(
     releaseHiddenDeliveryClaim?.()
     unsubscribeByteParsers?.()
     unregisterFactConsumer?.()
-    // Why: clears tracker/timer/detector state so the watcher can't fire after the revealed pane's live parsers take over.
+    // Why: clears tracker/timer state so the watcher can't fire after the revealed pane's live parsers take over.
     processor?.clearAccumulatedState()
     commandFinishedScanner?.reset()
     commandStatusPolicy.dispose()

@@ -304,7 +304,7 @@ describe('connectPanePty', () => {
           tabId
         })
         mockStoreState.paneForegroundAgentByPaneKey[cacheKey] = {
-          agent: 'droid',
+          agent: 'pi',
           routingTrusted: true,
           shellForeground: false
         }
@@ -315,7 +315,7 @@ describe('connectPanePty', () => {
         // Scope to this pane's pty id: a delayed confirm for another test's pane can fire during this advance.
         expect(window.api.pty.confirmForegroundProcess).not.toHaveBeenCalledWith(ptyId)
         expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-          agent: 'droid',
+          agent: 'pi',
           routingRevoked: true,
           shellForeground: false
         })
@@ -346,7 +346,7 @@ describe('connectPanePty', () => {
           tabId
         })
         mockStoreState.paneForegroundAgentByPaneKey[cacheKey] = {
-          agent: 'droid',
+          agent: 'pi',
           routingTrusted: true,
           shellForeground: false
         }
@@ -356,7 +356,7 @@ describe('connectPanePty', () => {
 
         expect(window.api.pty.confirmForegroundProcess).not.toHaveBeenCalledWith(ptyId)
         expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-          agent: 'droid',
+          agent: 'pi',
           routingRevoked: true,
           shellForeground: false
         })
@@ -366,24 +366,24 @@ describe('connectPanePty', () => {
       }
     })
 
-    it('keeps trusted Droid routing through a rapid Shift+Enter burst', async () => {
+    it('keeps trusted Pi routing through a rapid Shift+Enter burst', async () => {
       vi.useFakeTimers()
-      const ptyId = 'pty-droid-shift-enter-burst'
+      const ptyId = 'pty-pi-shift-enter-burst'
       const tabId = `tab-${ptyId}`
       const { binding, cacheKey } = await connectRestoredPaneForForegroundSampling({
         ptyId,
         tabId
       })
       mockStoreState.paneForegroundAgentByPaneKey[cacheKey] = {
-        agent: 'droid',
+        agent: 'pi',
         routingTrusted: true,
         shellForeground: false
       }
       mockStoreState.agentStatusByPaneKey[cacheKey] = {
         state: 'working',
-        agentType: 'droid'
+        agentType: 'pi'
       }
-      vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('droid')
+      vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('pi')
 
       binding.requestWindowsShiftEnterReconfirmation()
       await vi.advanceTimersByTimeAsync(200)
@@ -391,14 +391,14 @@ describe('connectPanePty', () => {
       await vi.advanceTimersByTimeAsync(349)
 
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         routingTrusted: true,
         shellForeground: false
       })
 
       await vi.advanceTimersByTimeAsync(1)
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         routingRevoked: true,
         routingConfirmationPending: true,
         shellForeground: false
@@ -409,7 +409,7 @@ describe('connectPanePty', () => {
       await flushAsyncTicks()
       expect(window.api.pty.confirmForegroundProcess).toHaveBeenCalledWith(ptyId)
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         routingTrusted: true,
         shellForeground: false
       })
@@ -418,7 +418,7 @@ describe('connectPanePty', () => {
       await vi.advanceTimersByTimeAsync(700)
       await flushAsyncTicks()
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         routingTrusted: true,
         shellForeground: false
       })
@@ -479,7 +479,7 @@ describe('connectPanePty', () => {
 
     it('confirms daemon launch identity before restoring warm-reattach routing', async () => {
       vi.useFakeTimers()
-      vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('droid')
+      vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('pi')
       const ptyId = 'pty-launch-identity-no-sample'
       const tabId = `tab-${ptyId}`
       mockStoreState.tabsByWorktree = { 'wt-1': [{ id: tabId, ptyId }] }
@@ -487,18 +487,18 @@ describe('connectPanePty', () => {
       const { binding, cacheKey } = await connectRestoredPaneForForegroundSampling({
         ptyId,
         tabId,
-        launchAgent: 'droid'
+        launchAgent: 'pi'
       })
       expect(mockStoreState.registerAgentLaunchConfig).not.toHaveBeenCalled()
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         shellForeground: false
       })
       expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, cacheKey)).toBe('alt-enter')
 
       binding.sampleForegroundAgentOnFocus()
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         shellForeground: false
       })
       expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, cacheKey)).toBe('alt-enter')
@@ -506,7 +506,7 @@ describe('connectPanePty', () => {
       await advanceVisibleForegroundRead()
 
       expect(mockStoreState.paneForegroundAgentByPaneKey[cacheKey]).toEqual({
-        agent: 'droid',
+        agent: 'pi',
         routingTrusted: true,
         shellForeground: false
       })
@@ -523,7 +523,7 @@ describe('connectPanePty', () => {
       const { cacheKey } = await connectRestoredPaneForForegroundSampling({
         ptyId,
         tabId,
-        launchAgent: 'droid'
+        launchAgent: 'pi'
       })
       expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, cacheKey)).toBe('alt-enter')
 
@@ -532,7 +532,7 @@ describe('connectPanePty', () => {
       )
       await flushAsyncTicks()
 
-      // Assert the floor (initial read + two retries), not an exact count: an incidental droid reconfirm can add one more.
+      // Assert the floor (initial read + two retries), not an exact count: an incidental pi reconfirm can add one more.
       expect(
         vi.mocked(window.api.pty.confirmForegroundProcess).mock.calls.length
       ).toBeGreaterThanOrEqual(3)
@@ -574,8 +574,8 @@ describe('connectPanePty', () => {
         tabId,
         isVisibleRef: { current: false },
         launchConfig: {
-          agentCommand: 'custom-wrapper --agent droid',
-          agentArgs: 'droid',
+          agentCommand: 'custom-wrapper --agent pi',
+          agentArgs: 'pi',
           agentEnv: {}
         }
       })
@@ -596,7 +596,7 @@ describe('connectPanePty', () => {
       const ptyId = 'pty-stale-launch-shell-settled'
       const tabId = `tab-${ptyId}`
       mockStoreState.tabsByWorktree = {
-        'wt-1': [{ id: tabId, ptyId, launchAgent: 'droid' }]
+        'wt-1': [{ id: tabId, ptyId, launchAgent: 'pi' }]
       }
       mockStoreState.registerAgentLaunchConfig.mockImplementation(
         (key: string, launchConfig: unknown, identity: { agentType?: string }): void => {
@@ -611,7 +611,7 @@ describe('connectPanePty', () => {
         ptyId,
         tabId,
         isVisibleRef,
-        launchConfig: { agentCommand: 'droid', agentArgs: '', agentEnv: {} }
+        launchConfig: { agentCommand: 'pi', agentArgs: '', agentEnv: {} }
       })
       await vi.advanceTimersByTimeAsync(300)
       await flushAsyncTicks(20)
@@ -759,13 +759,13 @@ describe('connectPanePty', () => {
       expect(foregroundReadCallsFor(ptyId)).toHaveLength(0)
     })
 
-    it('re-confirms leaked 133;D after detach moved pane-scoped Droid identity', async () => {
+    it('re-confirms leaked 133;D after detach moved pane-scoped Pi identity', async () => {
       vi.useFakeTimers()
       const { connectPanePty } = await import('./pty-connection')
       const getForegroundProcess = vi.mocked(window.api.pty.getForegroundProcess)
-      getForegroundProcess.mockResolvedValue('droid')
-      const ptyId = 'pty-detached-droid-leaked-d'
-      const tabId = 'tab-detached-droid'
+      getForegroundProcess.mockResolvedValue('pi')
+      const ptyId = 'pty-detached-pi-leaked-d'
+      const tabId = 'tab-detached-pi'
       const cacheKey = makePaneKey(tabId, LEAF_1)
       const dataCallbackRef: { current: ((data: string) => void) | null } = { current: null }
       const transport = createMockTransport(ptyId)
@@ -777,12 +777,12 @@ describe('connectPanePty', () => {
       )
       transportFactoryQueue.push(transport)
       mockStoreState.paneForegroundAgentByPaneKey[cacheKey] = {
-        agent: 'droid',
+        agent: 'pi',
         shellForeground: false
       }
       mockStoreState.agentLaunchConfigByPaneKey[cacheKey] = {
         launchConfig: { agentArgs: '', agentEnv: {} },
-        identity: { agentType: 'droid' }
+        identity: { agentType: 'pi' }
       }
       const deps = createDeps({
         tabId,
@@ -802,7 +802,7 @@ describe('connectPanePty', () => {
         shellForeground: true
       })
       expect(mockStoreState.setPaneForegroundAgent).toHaveBeenCalledWith(cacheKey, {
-        agent: 'droid',
+        agent: 'pi',
         routingTrusted: true,
         shellForeground: false
       })

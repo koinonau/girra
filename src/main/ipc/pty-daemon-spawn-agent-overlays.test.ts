@@ -1,6 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
 import { openCodeBuildPtyEnvMock, piBuildPtyEnvMock } from './pty-ipc-mock-registry'
-import { expectedOmpStatusExtension } from './pty-ipc-test-constants'
 import { setupPtyIpcSuite } from './pty-ipc-test-harness'
 import { createDaemonActiveProviderFixtures } from './pty-ipc-daemon-provider-fixtures'
 import { SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV } from '../../shared/setup-agent-sequencing'
@@ -79,79 +78,56 @@ describe('registerPtyHandlers', () => {
       })
       it('installs Pi managed extensions without redirecting homes on the daemon path', async () => {
         const env = await daemonSpawnAndGetEnv({ PI_CODING_AGENT_DIR: '/user/.pi/agent' })
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-          expect.any(String),
-          '/user/.pi/agent',
-          'pi',
-          {
-            materializeDefaultHome: false
-          }
-        )
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, 'omp', {
+        expect(piBuildPtyEnvMock).toHaveBeenCalledTimes(1)
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/user/.pi/agent', {
           materializeDefaultHome: false
         })
         expect(env.PI_CODING_AGENT_DIR).toBe('/user/.pi/agent')
         expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
         expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
-        expect(env.ORCA_OMP_CODING_AGENT_DIR).toBeUndefined()
-        expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(expectedOmpStatusExtension)
       })
-      it('does not materialize agent homes when another daemon agent mentions OMP', async () => {
+      it('does not materialize the Pi home when another daemon agent mentions Pi', async () => {
         const env = await daemonSpawnAndGetEnv(undefined, undefined, undefined, {
-          command: 'codex "ask about omp"',
-          launchAgent: 'codex'
+          command: 'claude "ask about pi"',
+          launchAgent: 'claude'
         })
 
         expect(piBuildPtyEnvMock).toHaveBeenCalledTimes(1)
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, 'pi', {
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, {
           materializeDefaultHome: false
         })
         expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
       })
-      it('threads command: "omp" through to piBuildPtyEnv on the daemon path with OMP status metadata', async () => {
-        // Why: mirror of the local-spawn OMP threading assertion; the daemon path's `command` forwarding could silently regress otherwise.
+      it('threads command: "pi" through to piBuildPtyEnv on the daemon path', async () => {
+        // Why: the daemon path's `command` forwarding could silently regress otherwise.
         const env = await daemonSpawnAndGetEnv(
-          { PI_CODING_AGENT_DIR: '/user/.omp/agent' },
+          { PI_CODING_AGENT_DIR: '/user/.pi/agent' },
           undefined,
           undefined,
-          { command: 'omp' }
+          { command: 'pi' }
         )
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-          expect.any(String),
-          '/user/.omp/agent',
-          'omp',
-          { materializeDefaultHome: true }
-        )
-        expect(env.PI_CODING_AGENT_DIR).toBe('/user/.omp/agent')
-        expect(env.ORCA_OMP_CODING_AGENT_DIR).toBeUndefined()
-        expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(
-          '/user/.omp/agent/extensions/orca-agent-status.ts'
-        )
-        expect(env.ORCA_OMP_SOURCE_AGENT_DIR).toBe('/user/.omp/agent')
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/user/.pi/agent', {
+          materializeDefaultHome: true
+        })
+        expect(env.PI_CODING_AGENT_DIR).toBe('/user/.pi/agent')
         expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
+        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
       })
-      it('uses sequenced startup env as the daemon OMP launch hint when command is a wrapper', async () => {
+      it('uses sequenced startup env as the daemon Pi launch hint when command is a wrapper', async () => {
         const env = await daemonSpawnAndGetEnv(
           {
-            PI_CODING_AGENT_DIR: '/user/.omp/agent',
-            [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'omp --resume'
+            PI_CODING_AGENT_DIR: '/user/.pi/agent',
+            [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'pi --resume'
           },
           undefined,
           undefined,
           { command: 'powershell wait-wrapper' }
         )
 
-        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-          expect.any(String),
-          '/user/.omp/agent',
-          'omp',
-          { materializeDefaultHome: true }
-        )
-        expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(
-          '/user/.omp/agent/extensions/orca-agent-status.ts'
-        )
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
+        expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/user/.pi/agent', {
+          materializeDefaultHome: true
+        })
+        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
       })
     })
   })

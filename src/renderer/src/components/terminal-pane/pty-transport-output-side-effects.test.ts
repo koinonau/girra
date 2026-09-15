@@ -98,55 +98,6 @@ describe('createIpcPtyTransport', () => {
     }
   })
 
-  it('compacts ignored Cursor native titles into one deferred drain', async () => {
-    vi.useFakeTimers()
-    try {
-      const { createPtyOutputProcessor } = await import('./pty-transport')
-      const onTitleChange = vi.fn()
-      const processor = createPtyOutputProcessor({ onTitleChange })
-      const callbacks = { onData: vi.fn() }
-      const ignoredTitles = Array.from({ length: 4_096 }, () => '\x1b]0;Cursor Agent\x07').join('')
-
-      processor.processData(ignoredTitles, callbacks)
-
-      expect(vi.getTimerCount()).toBe(1)
-      await vi.runOnlyPendingTimersAsync()
-
-      expect(vi.getTimerCount()).toBe(0)
-      // Why: the literal is the pane's identity once (#10258); the redraw repeats stay ignored.
-      expect(onTitleChange.mock.calls).toEqual([['Cursor Agent', 'Cursor Agent']])
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
-  it('lets an ignored Cursor native title clear a pending stale-title fallback', async () => {
-    vi.useFakeTimers()
-    try {
-      const { createPtyOutputProcessor } = await import('./pty-transport')
-      const onAgentBecameIdle = vi.fn()
-      const processor = createPtyOutputProcessor({
-        onTitleChange: vi.fn(),
-        onAgentBecameIdle,
-        onAgentBecameWorking: vi.fn()
-      })
-      const callbacks = { onData: vi.fn() }
-
-      processor.processData('\x1b]0;⠋ Cursor Agent\x07', callbacks)
-      await vi.advanceTimersByTimeAsync(0)
-      processor.processData('plain output\r\n', callbacks)
-      await vi.advanceTimersByTimeAsync(0)
-
-      processor.processData('\x1b]0;Cursor Agent\x07', callbacks)
-      await vi.advanceTimersByTimeAsync(0)
-      await vi.advanceTimersByTimeAsync(3_000)
-
-      expect(onAgentBecameIdle).not.toHaveBeenCalled()
-    } finally {
-      vi.useRealTimers()
-    }
-  })
-
   it('re-arms stale-title fallback after a later title-free output scan', async () => {
     vi.useFakeTimers()
     try {
@@ -159,15 +110,14 @@ describe('createIpcPtyTransport', () => {
       })
       const callbacks = { onData: vi.fn() }
 
-      processor.processData('\x1b]0;⠋ Cursor Agent\x07', callbacks)
+      processor.processData('\x1b]0;⠋ Claude Code\x07', callbacks)
       await vi.advanceTimersByTimeAsync(0)
       onTitleChange.mockClear()
-      processor.processData('\x1b]0;Cursor Agent\x07', callbacks)
       processor.processData('plain output\r\n', callbacks)
       await vi.advanceTimersByTimeAsync(0)
       await vi.advanceTimersByTimeAsync(3_000)
 
-      expect(onTitleChange).toHaveBeenCalledWith('Cursor Agent', 'Cursor Agent')
+      expect(onTitleChange).toHaveBeenCalledWith('Claude Code', 'Claude Code')
     } finally {
       vi.useRealTimers()
     }

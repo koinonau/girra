@@ -388,15 +388,15 @@ describe('agent status tool + assistant fields', () => {
     expect(store.getState().sortEpoch).toBe(firstSortEpoch + 1)
   })
 
-  it('bumps sort epoch when Command Code starts a new prompt while still working', () => {
+  it('bumps sort epoch when Claude starts a new prompt while still working', () => {
     vi.useFakeTimers()
     const store = createTestStore()
     store
       .getState()
       .setAgentStatus(
         'tab-1:1',
-        { state: 'working', prompt: 'first task', agentType: 'command-code' },
-        'command-code',
+        { state: 'working', prompt: 'first task', agentType: 'claude' },
+        'claude',
         { updatedAt: 1_000, stateStartedAt: 1_000 }
       )
     const firstSortEpoch = store.getState().sortEpoch
@@ -405,8 +405,8 @@ describe('agent status tool + assistant fields', () => {
       .getState()
       .setAgentStatus(
         'tab-1:1',
-        { state: 'working', prompt: 'second task', agentType: 'command-code' },
-        'command-code',
+        { state: 'working', prompt: 'second task', agentType: 'claude' },
+        'claude',
         { updatedAt: 2_000, stateStartedAt: 2_000 }
       )
 
@@ -416,7 +416,7 @@ describe('agent status tool + assistant fields', () => {
     expect(store.getState().sortEpoch).toBe(firstSortEpoch + 1)
   })
 
-  it('bumps sort epoch when Command Code reruns the same prompt with a new turn key', () => {
+  it('bumps sort epoch when Claude reruns the same prompt with a new turn key', () => {
     vi.useFakeTimers()
     const store = createTestStore()
     store.getState().setAgentStatus(
@@ -424,10 +424,10 @@ describe('agent status tool + assistant fields', () => {
       {
         state: 'working',
         prompt: 'same task',
-        agentType: 'command-code',
-        promptInteractionKey: 'command-code-transcript-a'
+        agentType: 'claude',
+        promptInteractionKey: 'claude-transcript-a'
       },
-      'command-code',
+      'claude',
       { updatedAt: 1_000, stateStartedAt: 1_000 }
     )
     const firstSortEpoch = store.getState().sortEpoch
@@ -437,21 +437,21 @@ describe('agent status tool + assistant fields', () => {
       {
         state: 'working',
         prompt: 'same task',
-        agentType: 'command-code',
-        promptInteractionKey: 'command-code-transcript-b'
+        agentType: 'claude',
+        promptInteractionKey: 'claude-transcript-b'
       },
-      'command-code',
+      'claude',
       { updatedAt: 2_000, stateStartedAt: 2_000 }
     )
 
     const entry = store.getState().agentStatusByPaneKey['tab-1:1']
     expect(entry.prompt).toBe('same task')
-    expect(entry.promptInteractionKey).toBe('command-code-transcript-b')
+    expect(entry.promptInteractionKey).toBe('claude-transcript-b')
     expect(entry.stateStartedAt).toBe(2_000)
     expect(store.getState().sortEpoch).toBe(firstSortEpoch + 1)
   })
 
-  it('bumps sort epoch when main advances Command Code stateStartedAt without a renderer-visible key change', () => {
+  it('bumps sort epoch when main advances Claude stateStartedAt without a renderer-visible key change', () => {
     vi.useFakeTimers()
     const store = createTestStore()
     // First turn carries no interaction key (e.g. transcript read failed), so
@@ -460,8 +460,8 @@ describe('agent status tool + assistant fields', () => {
       .getState()
       .setAgentStatus(
         'tab-1:1',
-        { state: 'working', prompt: 'same task', agentType: 'command-code' },
-        'command-code',
+        { state: 'working', prompt: 'same task', agentType: 'claude' },
+        'claude',
         { updatedAt: 1_000, stateStartedAt: 1_000 }
       )
     const firstSortEpoch = store.getState().sortEpoch
@@ -473,8 +473,8 @@ describe('agent status tool + assistant fields', () => {
       .getState()
       .setAgentStatus(
         'tab-1:1',
-        { state: 'working', prompt: 'same task', agentType: 'command-code' },
-        'command-code',
+        { state: 'working', prompt: 'same task', agentType: 'claude' },
+        'claude',
         { updatedAt: 2_000, stateStartedAt: 2_000 }
       )
 

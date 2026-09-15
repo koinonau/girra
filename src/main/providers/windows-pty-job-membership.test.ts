@@ -90,7 +90,7 @@ describe('why the filter does NOT use this', () => {
 
   it('documents that job membership keeps console-detached descendants', () => {
     // The candidate filter in windows-agent-foreground-process.ts exists to DROP
-    // a descendant that left the console (`Start-Process droid`, a GUI child).
+    // a descendant that left the console (`Start-Process pi`, a GUI child).
     // The job still contains those by design, so answering that filter from the
     // job would re-admit exactly what it is for -- granting byte authority to a
     // pane no agent owns, or making an attached agent look ambiguous.

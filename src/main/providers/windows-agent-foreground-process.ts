@@ -1,14 +1,9 @@
 import {
   isAgentForegroundWrapperProcess,
   isExpectedAgentProcess,
-  recognizeAgentProcess,
   recognizeAgentProcessFromCommandLine,
   type RecognizedAgentProcess
 } from '../../shared/agent-process-recognition'
-import {
-  resolveOuterWrapperForegroundIdentity,
-  shouldInspectOuterWrapperForegroundProcess
-} from '../../shared/foreground-wrapper-agent'
 import { isShellProcess } from '../../shared/shell-process-detection'
 import {
   queryWindowsPaneProcessInventory,
@@ -54,12 +49,7 @@ type WindowsForegroundIdentity = {
 }
 
 export function shouldInspectWindowsAgentForeground(fallbackProcess: string): boolean {
-  const recognized = recognizeAgentProcess(fallbackProcess)
-  return (
-    isAgentForegroundWrapperProcess(fallbackProcess) ||
-    isShellProcess(fallbackProcess) ||
-    (recognized !== null && shouldInspectOuterWrapperForegroundProcess(recognized))
-  )
+  return isAgentForegroundWrapperProcess(fallbackProcess) || isShellProcess(fallbackProcess)
 }
 
 export async function resolveWindowsAgentForegroundProcess(
@@ -166,7 +156,7 @@ function resolveWindowsForegroundIdentity(
     recognizeAgentProcessFromCommandLine(candidate.command) ??
     recognizeAgentProcessFromCommandLine(candidate.name)
   if (recognized) {
-    return resolveOuterWrapperForegroundIdentity(recognized, candidate, candidates)
+    return { processName: recognized.processName, processId: candidate.pid }
   }
   return { processName: null }
 }
@@ -241,19 +231,15 @@ function resolveRecognizedWindowsProcessCandidates(
           windowsCandidateIsAncestor(candidate, other, candidatesByPid)
       )
   )
-  const leafIdentities = leafCandidates.map((candidate) =>
-    resolveOuterWrapperForegroundIdentity(candidate.recognized, candidate, allCandidates)
+  const leafProcessNames = new Set(
+    leafCandidates.map((candidate) => candidate.recognized.processName)
   )
-  const leafProcessNames = new Set(leafIdentities.map((identity) => identity.processName))
   // Why: Windows lacks a cheap PTY foreground marker like POSIX '+'. A single
   // recognized lineage leaf is strong enough; sibling agent leaves are not.
   if (leafProcessNames.size !== 1) {
     return { processName: null }
   }
-  // The anchor is the process the NAME belongs to — the outer wrapper when the
-  // leaf collapsed onto one, else the leaf itself. An embedded leaf can exit
-  // and restart under a live wrapper; its pid must not stand for the wrapper's.
-  const anchorProcessIds = new Set(leafIdentities.map((identity) => identity.processId))
+  const anchorProcessIds = new Set(leafCandidates.map((candidate) => candidate.pid))
   return {
     processName: [...leafProcessNames][0],
     // Distinct anchors agreeing on one name still leave no single liveness anchor.

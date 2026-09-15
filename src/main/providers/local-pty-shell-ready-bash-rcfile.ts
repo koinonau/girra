@@ -5,7 +5,6 @@
  * startup-file chain, OSC 133 hooks, and the shell-ready marker all live here.
  */
 import { BASH_PROMPT_COMMAND_COMPOSITION_BLOCK } from '../bash-prompt-command-composition'
-import { getPosixOmpShellWrapper } from '../pty/omp-shell-wrapper'
 import { getBashStartupCommandPromptBlock } from '../pty/posix-shell-startup-command'
 import { BASH_FEATURE_CHANNEL_BLOCK, SHELL_STARTUP_IDENTITY_MARKER_BLOCK } from '../shell-templates'
 import { SHELL_READY_MARKER_ESCAPED } from './local-pty-shell-ready-marker'
@@ -47,7 +46,6 @@ __orca_restore_agent_teams_path
 # Why: user startup files may set the default OpenCode config after Orca's
 # spawn env; restore the Orca-managed config dir before the first prompt.
 [[ -n "\${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${ORCA_OPENCODE_CONFIG_DIR}"
-${getPosixOmpShellWrapper()}
 # Why: emit OSC 133 C/D so terminal-command-lifecycle can drop stale agent
 # status when the foreground command (e.g. an interrupted Claude CLI)
 # exits — mirrors the zsh wrapper. Without this, bash users (default on most

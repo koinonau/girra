@@ -56,18 +56,18 @@ const BASE_ENV = {
 // stable, distinct identities.
 export const AGENT_STATUS_EXTENSION_SELF_PID = 4242
 
-export function createAgentStatusExtensionHarness(args: {
-  kind: 'pi' | 'omp' | 'prime-agent'
-  killImpl?: (pid: number, signal: number) => void
-  env?: Record<string, string | undefined>
-  pid?: number
-  title?: string
-  argv?: readonly string[]
-  existsSync?: (path: string) => boolean
-  readFileSync?: (path: string, encoding: string) => string
-  statSync?: (path: string) => { mtimeMs: number; size: number; ino: number }
-  fetchImpl?: (...params: Parameters<typeof fetch>) => Promise<unknown>
-}): AgentStatusExtensionHarness {
+export function createAgentStatusExtensionHarness(
+  args: {
+    killImpl?: (pid: number, signal: number) => void
+    env?: Record<string, string | undefined>
+    pid?: number
+    argv?: readonly string[]
+    existsSync?: (path: string) => boolean
+    readFileSync?: (path: string, encoding: string) => string
+    statSync?: (path: string) => { mtimeMs: number; size: number; ino: number }
+    fetchImpl?: (...params: Parameters<typeof fetch>) => Promise<unknown>
+  } = {}
+): AgentStatusExtensionHarness {
   const fetchMock = vi.fn(
     args.fetchImpl ??
       (async () => ({
@@ -122,11 +122,10 @@ export function createAgentStatusExtensionHarness(args: {
     kill: killMock,
     env: {
       ...BASE_ENV,
-      ...(args.kind === 'prime-agent' ? { PRIME_AGENT_INTERNAL_DAEMON_WORKER: '1' } : {}),
       ...args.env
     },
     pid: args.pid ?? AGENT_STATUS_EXTENSION_SELF_PID,
-    title: args.title ?? 'node',
+    title: 'node',
     argv: args.argv ?? ['node', '/usr/bin/orca']
   }
 
@@ -150,7 +149,7 @@ export function createAgentStatusExtensionHarness(args: {
   } as Record<string, unknown>
   context.globalThis = context
 
-  const source = getPiAgentStatusExtensionSource(args.kind)
+  const source = getPiAgentStatusExtensionSource()
   const output = ts.transpileModule(source, {
     compilerOptions: {
       module: ts.ModuleKind.CommonJS,

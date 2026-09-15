@@ -28,7 +28,6 @@ function pointerDeps(db: OrchestrationDb, writePty: () => WriteSettlement) {
     getLeafKey: () => 'tab-1:leaf-1',
     getLiveLeafForHandle: () => LEAF,
     getMessageWaiters: () => undefined,
-    getTabTitle: () => null,
     getCliCommand: () => 'orca' as const,
     getTerminalHandleForLeafKey: () => 'term-1',
     resolveSubmitTarget: () => ({

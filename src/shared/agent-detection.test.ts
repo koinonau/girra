@@ -5,18 +5,15 @@ import {
   extractAllOscTitles,
   extractLastOscTitle,
   getAgentLabel,
-  isCursorAgentTitle,
   MAX_OSC_TITLE_CHARS,
   MAX_OSC_TITLES_PER_CHUNK,
   normalizeTerminalTitle
 } from './agent-detection'
 import {
   hasCompatibleAgentTitleIdentity,
-  normalizeCompatibleAgentStatusEntryForOwner,
   normalizeCompatibleAgentTitleForOwner,
   resolveCompatibleAgentTypeForOwner
 } from './agent-title-owner'
-import { SYNTHETIC_AGENT_TITLE_PROFILES } from './synthetic-agent-title'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -81,26 +78,6 @@ describe('OSC title extraction', () => {
   })
 })
 
-describe('MiMo title detection', () => {
-  it.each([
-    ['MiMo Code', 'idle'],
-    ['mimo ready', 'idle'],
-    ['mimo working', 'working'],
-    ['\u280b MiMo Code', 'working']
-  ] as const)('classifies %s', (title, expectedStatus) => {
-    expect(getAgentLabel(title)).toBe('MiMo Code')
-    expect(detectAgentStatusFromTitle(title)).toBe(expectedStatus)
-  })
-
-  it.each(['~/mimo/working', 'mimo-code-fixtures ready'])(
-    'does not classify path or hyphen false positive %s',
-    (title) => {
-      expect(getAgentLabel(title)).toBeNull()
-      expect(detectAgentStatusFromTitle(title)).toBeNull()
-    }
-  )
-})
-
 describe('OpenCode native title detection', () => {
   // Why: `OC | …` names no agent token, so title-derived display and target surfaces
   // previously dropped OpenCode panes. Runtime sends corroborate the title separately.
@@ -119,14 +96,6 @@ describe('OpenCode native title detection', () => {
     expect(getAgentLabel(title)).toBe('OpenCode')
     expect(detectAgentStatusFromTitle(title)).toBe('working')
   })
-
-  it.each(['OC | ✦ Gemini CLI', 'OC | ✋ review Gemini permission handling'])(
-    'does not let a Gemini glyph in OpenCode session text override identity for %j',
-    (title) => {
-      expect(getAgentLabel(title)).toBe('OpenCode')
-      expect(detectAgentStatusFromTitle(title)).toBe('idle')
-    }
-  )
 
   // Why: the text after the marker is OpenCode's generated session summary — subject
   // matter, not status. Routing it through the keyword gates would let an ordinary task
@@ -152,10 +121,6 @@ describe('OpenCode native title detection', () => {
 
 describe('Pi-compatible title detection', () => {
   it.each([
-    ['\u280b OMP', 'OMP', 'working'],
-    ['OMP ready', 'OMP', 'idle'],
-    ['OMP', 'OMP', 'idle'],
-    ['OMP - action required', 'OMP', 'permission'],
     ['\u280b Pi', 'Pi', 'working'],
     ['Pi ready', 'Pi', 'idle'],
     // Why: titles stored by the old collapse are still bare "Pi"; re-detection
@@ -167,8 +132,8 @@ describe('Pi-compatible title detection', () => {
     expect(detectAgentStatusFromTitle(title)).toBe(expectedStatus)
   })
 
-  // Why: OMP 17.2.12+ writes static state markers on WSL/ConPTY (#13890). The label after
-  // the marker is cwd/session text, so glyphs another agent uses for status must not win.
+  // Why: static state markers on WSL/ConPTY (#13890). The label after the marker is
+  // cwd/session text, so glyphs another agent used for status must not win.
   it.each([
     ['π : my-project', 'working', 'π : my-project'],
     ['π > my-project', 'idle', 'π > my-project'],
@@ -176,10 +141,13 @@ describe('Pi-compatible title detection', () => {
     ['π > gemini ✦ ⏲ ◇ ✋', 'idle', 'π > gemini ✦ ⏲ ◇ ✋'],
     ['zsh | π : my-project', 'working', 'zsh | π : my-project'],
     ['zsh | π > gemini ✦ ⏲ ◇ ✋', 'idle', 'zsh | π > gemini ✦ ⏲ ◇ ✋']
-  ] as const)('classifies native OMP title %j as %s', (title, expectedStatus, expectedDisplay) => {
-    expect(detectAgentStatusFromTitle(title)).toBe(expectedStatus)
-    expect(normalizeTerminalTitle(title)).toBe(expectedDisplay)
-  })
+  ] as const)(
+    'classifies native state-marker title %j as %s',
+    (title, expectedStatus, expectedDisplay) => {
+      expect(detectAgentStatusFromTitle(title)).toBe(expectedStatus)
+      expect(normalizeTerminalTitle(title)).toBe(expectedDisplay)
+    }
+  )
 
   it('re-detects status after display-title normalization for Pi idle frames', () => {
     // Normalization now preserves the session name and cwd (#16093).
@@ -190,127 +158,23 @@ describe('Pi-compatible title detection', () => {
     )
   })
 
-  it.each([
-    ['\u280b Pi', 'omp', '\u280b OMP'],
-    ['Pi ready', 'omp', 'OMP ready'],
-    ['Pi - action required', 'omp', 'OMP - action required'],
-    // Why: the brand is swapped for the owner's label in place — the pane still reads as its
-    // launch owner, but the session name and cwd it chose survive (#16093).
-    ['π - tmp', 'omp', 'OMP - tmp'],
-    ['π: tmp', 'omp', 'OMP: tmp'],
-    ['\u280b π: tmp', 'omp', '\u280b OMP: tmp'],
-    ['\u280b π - tmp', 'omp', '\u280b OMP - tmp'],
-    ['\u280b OMP', 'pi', '\u280b Pi'],
-    [
-      'lucky-echidna | \u283c π - Diagnose Orca terminal title flicker - test',
-      'omp',
-      'lucky-echidna | \u283c OMP - Diagnose Orca terminal title flicker - test'
-    ],
-    ['lucky-echidna | Pi ready', 'omp', 'OMP ready'],
-    ['Codex | Pi ready', 'omp', 'OMP ready'],
-    // Why: the wrapped whole reads as a braille Claude title, but the re-ownable
-    // synthetic pane suffix must still win.
-    ['lucky-echidna | ⠋ OMP', 'omp', '⠋ OMP'],
-    [
-      'lucky-echidna | \u283c π - Diagnose | test',
-      'omp',
-      'lucky-echidna | \u283c OMP - Diagnose | test'
-    ]
-  ] as const)('normalizes %s to the authoritative %s owner', (title, owner, expectedTitle) => {
-    expect(normalizeCompatibleAgentTitleForOwner(title, owner)).toBe(expectedTitle)
-  })
-
-  it('preserves Pi-compatible custom titles and unrelated owners', () => {
-    expect(normalizeCompatibleAgentTitleForOwner('Fix pi bugs', 'omp')).toBe('Fix pi bugs')
-    // Why: a wrapped title with no re-ownable identity in any " | " segment
-    // passes through untouched instead of collapsing to the owner label.
-    expect(normalizeCompatibleAgentTitleForOwner('lucky-echidna | Fix pi bugs', 'omp')).toBe(
-      'lucky-echidna | Fix pi bugs'
-    )
-    expect(normalizeCompatibleAgentTitleForOwner('xxPi ready', 'omp')).toBe('xxPi ready')
-    expect(normalizeCompatibleAgentTitleForOwner('\u280b Pi', 'codex')).toBe('\u280b Pi')
-  })
-
   it('identifies titles whose compatible identity can be re-owned', () => {
     expect(hasCompatibleAgentTitleIdentity('Pi ready')).toBe(true)
     expect(hasCompatibleAgentTitleIdentity('π - tmp')).toBe(true)
-    expect(hasCompatibleAgentTitleIdentity('\u280b OMP')).toBe(true)
     expect(hasCompatibleAgentTitleIdentity('Fix pi bugs')).toBe(false)
     expect(hasCompatibleAgentTitleIdentity('\u280b Codex')).toBe(false)
   })
 
-  it('normalizes Pi-compatible status identity and terminal title to the owner', () => {
-    const status = normalizeCompatibleAgentStatusEntryForOwner(
-      {
-        state: 'working',
-        prompt: '',
-        updatedAt: 1,
-        stateStartedAt: 1,
-        agentType: 'pi',
-        paneKey: 'tab-1:leaf-1',
-        terminalTitle: '\u280b Pi',
-        stateHistory: []
-      },
-      'omp'
-    )
-
-    expect(status.agentType).toBe('omp')
-    expect(status.terminalTitle).toBe('\u280b OMP')
-    expect(resolveCompatibleAgentTypeForOwner('codex', 'omp')).toBe('codex')
+  it('leaves an owner outside the compatible group untouched', () => {
+    expect(normalizeCompatibleAgentTitleForOwner('\u280b Pi', 'codex')).toBe('\u280b Pi')
+    expect(resolveCompatibleAgentTypeForOwner('codex', 'pi')).toBe('codex')
   })
 
-  it.each(['~/omp/working', 'omp-harness ready', '~/pi/working', 'pi-scratch ready'])(
+  it.each(['~/pi/working', 'pi-scratch ready'])(
     'does not classify path or hyphen false positive %s',
     (title) => {
       expect(getAgentLabel(title)).toBeNull()
       expect(detectAgentStatusFromTitle(title)).toBeNull()
     }
   )
-})
-
-describe('Cursor agent title identity', () => {
-  // Why: the accepted vocabulary is the set of labels Orca actually synthesizes for Cursor.
-  // Pin it to that profile so renaming a label there cannot silently drop @cursor to zero
-  // recipients (and desync the auto-Enter suppression that shares this predicate).
-  it('accepts every label Orca synthesizes for Cursor', () => {
-    const profile = SYNTHETIC_AGENT_TITLE_PROFILES.cursor
-
-    for (const label of [
-      profile.workingLabel,
-      `⠋ ${profile.workingLabel}`,
-      profile.idleLabel,
-      profile.permissionLabel
-    ]) {
-      expect(isCursorAgentTitle(label)).toBe(true)
-    }
-  })
-
-  it.each([
-    'Cursor Agent',
-    '  cursor agent  ',
-    '⠋ Cursor Agent',
-    '⣿ Cursor Agent',
-    'Cursor ready',
-    'Cursor - action required'
-  ])('accepts the native or Orca-synthesized Cursor title %j', (title) => {
-    expect(isCursorAgentTitle(title)).toBe(true)
-  })
-
-  // Why: "cursor" is ordinary editor vocabulary in another agent's task-summary title,
-  // so a whole-token name match is not Cursor identity.
-  it.each([
-    '⠋ fix the text cursor blink',
-    '✳ Fix the text cursor blink',
-    '. fix cursor position',
-    '* cursor rendering done',
-    'Terminal Cursor and Orca slows down',
-    'cursor-agent',
-    'cursor.exe',
-    '~/cursor-rules',
-    '',
-    null,
-    undefined
-  ])('rejects the non-Cursor title %j', (title) => {
-    expect(isCursorAgentTitle(title)).toBe(false)
-  })
 })

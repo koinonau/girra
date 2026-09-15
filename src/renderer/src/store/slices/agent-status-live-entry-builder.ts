@@ -18,7 +18,6 @@ import {
   resolveAgentStatusIdentity,
   shouldSuppressInheritedTerminalStatus
 } from '../../../../shared/agent-status-identity'
-import { isCommandCodeNewTurnWhileWorking } from '../../../../shared/command-code-turn-boundary'
 import type {
   AgentStatusMetadata,
   AgentStatusPayload,
@@ -45,7 +44,6 @@ export type AgentStatusLiveEntryBuild = {
     next: Record<string, MigrationUnsupportedPtyEntry>
     changed: boolean
   }
-  commandCodeNewTurn: boolean
   sortRelevantChange: boolean
   retentionRelevantChange: boolean
   completionRefreshWorktreeId: string | null
@@ -118,27 +116,12 @@ export function buildAgentStatusLiveEntry(
     incoming: payload.agentType,
     now: updatedAt
   })
-  const commandCodeNewTurn =
-    existing !== undefined &&
-    isCommandCodeNewTurnWhileWorking({
-      agentType: identity.agentType,
-      previousState: existing.state,
-      incomingState: payload.state,
-      previousPrompt: existing.prompt,
-      incomingPrompt: payload.prompt,
-      previousPromptInteractionKey: existing.promptInteractionKey,
-      incomingPromptInteractionKey: payload.promptInteractionKey
-    })
   const promptInteractionKey =
     payload.promptInteractionKey ??
     (payload.prompt === existing?.prompt ? existing?.promptInteractionKey : undefined)
   const stateStartedAt =
     timing?.stateStartedAt ??
-    (commandCodeNewTurn
-      ? updatedAt
-      : existing && existing.state === payload.state
-        ? existing.stateStartedAt
-        : updatedAt)
+    (existing && existing.state === payload.state ? existing.stateStartedAt : updatedAt)
   if (
     existing &&
     shouldSuppressInheritedTerminalStatus({
@@ -285,7 +268,6 @@ export function buildAgentStatusLiveEntry(
     existing,
     launchConfigSource,
     retainsResumableRecoveryIdentity,
-    commandCodeNewTurn,
     updatedAt
   })
   return {
@@ -297,7 +279,6 @@ export function buildAgentStatusLiveEntry(
     providerSessionChanged,
     registryEntry,
     registryMatched,
-    retainsResumableRecoveryIdentity,
-    commandCodeNewTurn
+    retainsResumableRecoveryIdentity
   }
 }

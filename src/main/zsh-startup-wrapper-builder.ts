@@ -26,7 +26,6 @@
  * time, so defining them first makes them immune; `emulate -L zsh` inside the
  * hook restores zsh option semantics for the body at call time.
  */
-import { getPosixOmpShellWrapper } from './pty/omp-shell-wrapper'
 import {
   getZshShellReadyMarkerRegistrationBlock,
   SHELL_STARTUP_IDENTITY_MARKER_BLOCK,
@@ -113,8 +112,7 @@ function getOverlayRestoreBlocks(spec: ZshStartupHookSpec): (string | null)[] {
     spec.overlayRestoreComment,
     spec.restores.agentTeamsPath ? AGENT_TEAMS_PATH_RESTORE_BLOCK : null,
     OPENCODE_CONFIG_DIR_RESTORE,
-    spec.restores.remoteCliBinDir ? REMOTE_CLI_BIN_DIR_RESTORE : null,
-    getPosixOmpShellWrapper()
+    spec.restores.remoteCliBinDir ? REMOTE_CLI_BIN_DIR_RESTORE : null
   ]
 }
 

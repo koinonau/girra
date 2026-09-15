@@ -136,7 +136,7 @@ async function ensureTwoTerminalTabs(
 
 async function createAgentMarkedTerminalTab(
   page: Page,
-  agent: 'codex' | 'grok',
+  agent: 'codex' | 'opencode',
   command: string
 ): Promise<string> {
   const worktreeId = (await getActiveWorktreeId(page))!
@@ -171,8 +171,8 @@ async function createCodexMarkedTerminalTab(page: Page): Promise<string> {
   return createAgentMarkedTerminalTab(page, 'codex', 'node -e "setInterval(() => {}, 1000)"')
 }
 
-async function createGrokMarkedTerminalTab(page: Page): Promise<string> {
-  return createAgentMarkedTerminalTab(page, 'grok', 'node -e "setInterval(() => {}, 1000)"')
+async function createOpenCodeMarkedTerminalTab(page: Page): Promise<string> {
+  return createAgentMarkedTerminalTab(page, 'opencode', 'node -e "setInterval(() => {}, 1000)"')
 }
 
 async function activateTerminalTab(page: Page, tabId: string): Promise<void> {
@@ -414,7 +414,7 @@ async function injectHiddenStreamingBurst(page: Page, tabId: string, runId: stri
       if (!pane) {
         throw new Error(`No terminal pane for tab ${tabId}`)
       }
-      // Why: Grok sessions can emit large formatted bursts while the tab is
+      // Why: agent sessions can emit large formatted bursts while the tab is
       // hidden; stress the visibility-resume flush path beyond a few lines.
       const burst = Array.from({ length: 400 }, (_, frame) => {
         const progress = `${'█'.repeat((frame % 16) + 1)}${'░'.repeat(16 - ((frame % 16) + 1))}`
@@ -741,22 +741,22 @@ test.describe('Terminal tab switch visual restore', () => {
       .toContain(marker)
   })
 
-  test('restores skipped hidden Grok output on light tab resume', async ({ orcaPage }) => {
+  test('restores skipped hidden OpenCode output on light tab resume', async ({ orcaPage }) => {
     await waitForSessionReady(orcaPage)
     await waitForActiveWorktree(orcaPage)
     await ensureTerminalVisible(orcaPage)
     await waitForActiveTerminalManager(orcaPage, 30_000)
 
     const shellTabId = (await getActiveTabId(orcaPage))!
-    const grokTabId = await createGrokMarkedTerminalTab(orcaPage)
+    const agentTabId = await createOpenCodeMarkedTerminalTab(orcaPage)
     await waitForActiveTerminalManager(orcaPage, 30_000)
-    await waitForPanePtyIdOnTab(orcaPage, grokTabId)
-    const paneIdentity = await readPaneIdentityOnTab(orcaPage, grokTabId)
-    const paneKey = `${grokTabId}:${paneIdentity.leafId}`
+    await waitForPanePtyIdOnTab(orcaPage, agentTabId)
+    const paneIdentity = await readPaneIdentityOnTab(orcaPage, agentTabId)
+    const paneKey = `${agentTabId}:${paneIdentity.leafId}`
 
     await activateTerminalTab(orcaPage, shellTabId)
     const runId = `${Date.now()}`
-    const marker = `${TAB_SWITCH_MARKER_PREFIX}_SKIPPED_GROK_${runId}`
+    const marker = `${TAB_SWITCH_MARKER_PREFIX}_SKIPPED_OPENCODE_${runId}`
     // Why: synchronized-output mode exercises the hidden renderer skip path
     // used by agent TUIs before light tab resume requests recovery.
     const hiddenFrame = [
@@ -774,7 +774,7 @@ test.describe('Terminal tab switch visual restore', () => {
     await expect
       .poll(async () => (await readHiddenOutputDebug(orcaPage))?.hiddenRendererSkipCount ?? 0, {
         timeout: 5_000,
-        message: 'Grok-marked hidden output did not take the skipped renderer path'
+        message: 'OpenCode-marked hidden output did not take the skipped renderer path'
       })
       .toBeGreaterThan(0)
     await setHiddenSnapshotOverride(orcaPage, paneIdentity.ptyId, {
@@ -784,12 +784,12 @@ test.describe('Terminal tab switch visual restore', () => {
       seq: hiddenFrame.length
     })
 
-    await activateTerminalTab(orcaPage, grokTabId)
+    await activateTerminalTab(orcaPage, agentTabId)
 
     await expect
       .poll(() => getTerminalContent(orcaPage, 8_000), {
         timeout: 10_000,
-        message: 'light tab resume did not request skipped Grok hidden-output recovery'
+        message: 'light tab resume did not request skipped OpenCode hidden-output recovery'
       })
       .toContain(marker)
   })

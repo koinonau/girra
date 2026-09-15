@@ -54,7 +54,6 @@ export function resolvePreviewShortcutAction(
     () => hostPlatform === 'win32',
     // Why: without it a terminal-first user's remapped tab.close chord — Ctrl+W
     // is a shell word-kill — reaches the shell in the pane but is swallowed here.
-    normalizeTerminalShortcutPolicy(context.terminalShortcutPolicy),
-    () => context.terminalInput?.ctrlEnterCsiU === true
+    normalizeTerminalShortcutPolicy(context.terminalShortcutPolicy)
   )
 }

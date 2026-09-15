@@ -218,11 +218,6 @@ export class OrcaRuntimeWithOnPtyData extends OrcaRuntimeWithPreparePtyExecution
       titleTrackerEntry.tracker.handleChunk(agentStatusChunk.cleanData, {
         titleScanData: titleInput
       })
-      // Why: the Command Code scrape rides the same per-chunk batch (its facts
-      // trail the tracker's). cleanData keeps OSC 9999 payloads out of the
-      // detector's bounded recent-text window; the detector strips remaining
-      // control sequences itself, exactly like the renderer byte path.
-      titleTrackerEntry.commandCodeDetector?.observe(agentStatusChunk.cleanData)
     } finally {
       titleTrackerEntry.applyingChunk = false
       try {

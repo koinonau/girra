@@ -69,7 +69,7 @@ export function addOrcaWslInteropEnv(env: Record<string, string>): void {
   const opencodeOverlayEntries = (['OPENCODE_CONFIG_DIR', 'ORCA_OPENCODE_CONFIG_DIR'] as const)
     .filter((name) => env[name]?.startsWith('/'))
     .map((name) => `${name}/u`)
-  // Why: wsl.exe only imports selected Windows env vars, so WSL needs the wrapper root, pane identity, and hook/OMP coordinates at start.
+  // Why: wsl.exe only imports selected Windows env vars, so WSL needs the wrapper root, pane identity, and hook coordinates at start.
   const passthroughEntries = [
     'ORCA_TERMINAL_HANDLE/u',
     'ORCA_USER_DATA_PATH/p',
@@ -95,8 +95,6 @@ export function addOrcaWslInteropEnv(env: Record<string, string>): void {
     ...opencodeOverlayEntries,
     'ORCA_WSL_HOOK_RELAY_VERSION/u',
     'ORCA_WSL_HOOK_INSTANCE/u',
-    'ORCA_OMP_SOURCE_AGENT_DIR/p',
-    'ORCA_OMP_STATUS_EXTENSION/p',
     ...worktreeSetupWslenvEntries(env)
   ]
   applyWslenvPassthrough(env, passthroughEntries)

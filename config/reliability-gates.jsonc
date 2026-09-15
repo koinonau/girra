@@ -6679,13 +6679,7 @@
         "Resource Manager"
       ],
       "platforms": ["macos", "linux", "windows"],
-      "providers": [
-        "local",
-        "daemon",
-        "ssh",
-        "wsl",
-        "remote-runtime"
-      ],
+      "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "daemon", "ssh"],
       "coverageNotes": "Local macOS deterministic evidence covers the renderer snapshot/coordinator, exact local and SSH-shaped PTY request settlement, active-last and pinned terminal-tab routing, component-unmount continuation, and the existing current/legacy daemon management contract. Windows Electron process absence, live SSH/WSL behavior, and remote-runtime/mobile host completion remain explicit gaps.",
@@ -7301,19 +7295,13 @@
       "maturity": "experimental",
       "protection": "partial",
       "owner": "terminal-runtime",
-      "layer": "shared-main-renderer-and-posix-shell-contract",
-      "surfaces": [
-        "terminal lifecycle",
-        "tab creation",
-        "PTY spawn",
-        "startup cwd persistence",
-        "long-lived Bash and Zsh OMP launches"
-      ],
+      "layer": "shared-main-and-renderer-contract",
+      "surfaces": ["terminal lifecycle", "tab creation", "PTY spawn", "startup cwd persistence"],
       "platforms": ["macos", "linux", "windows", "mobile"],
       "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "ssh", "remote-runtime"],
-      "coverageNotes": "Local macOS evidence covers the shared missing-dir fallback policy, main pty:spawn recovery and metadata, no-flag and reattach strictness, renderer IPC flag routing, SSH-tagged and remote-runtime omission, and the visibility-gated terminal notice. Real Bash and Zsh node-pty tests replace the active cwd inode and exercise the shared POSIX OMP wrapper; generated-file snapshots pin identical local, daemon/SSH, and relay wrappers. Daemon shares the same pre-provider main cwd decision but lacks a live daemon-provider run; WSL UNC paths are exempt from the spawn probe and lack a live run; native PowerShell is unaffected; Linux/Windows and mobile/API strictness remain gaps.",
+      "coverageNotes": "Local macOS evidence covers the shared missing-dir fallback policy, main pty:spawn recovery and metadata, no-flag and reattach strictness, renderer IPC flag routing, SSH-tagged and remote-runtime omission, and the visibility-gated terminal notice. Daemon shares the same pre-provider main cwd decision but lacks a live daemon-provider run; WSL UNC paths are exempt from the spawn probe and lack a live run; native PowerShell is unaffected; Linux/Windows and mobile/API strictness remain gaps.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/issues/7239",
         "https://github.com/stablyai/orca/pull/7750",
@@ -7321,24 +7309,20 @@
         "https://github.com/stablyai/orca/issues/16457",
         "https://github.com/stablyai/orca/pull/17128"
       ],
-      "invariant": "A fresh local renderer terminal spawn may recover from a saved startup cwd whose directory no longer exists only by spawning at the selected workspace root and printing a generic in-terminal notice; existing directories — including ones outside the worktree (#7685) — spawn as requested, and reattach, SSH, remote-runtime, runtime/API, and mobile callers keep exact cwd semantics. A long-lived POSIX shell whose cwd inode was deleted and replaced may run a wrapped OMP command from the live path named by its logical PWD only in a subshell; the parent shell cwd, OMP argv, status extension, and exit status remain unchanged, while a genuinely unavailable path fails visibly without invoking OMP. A usable physical cwd remains authoritative when PWD is unset or names a removed logical symlink instead of being remapped to a workspace fallback.",
-      "oracle": "The shared resolver falls back to the workspace root only when the injected existence probe reports the resolved cwd missing and the workspace root present, and never probes floating terminals or a cwd equal to the root. The renderer sends cwdFallback only for fresh local IPC spawns, main honors it only when connectionId and sessionId are absent, WSL UNC paths never engage the probe-based fallback, main returns fallback metadata only after an actual fallback, the IPC transport preserves that metadata, and the connection layer writes a generic notice that omits the missing path. In real interactive Bash and Zsh PTYs, unset PWD and remove a logical symlink while the physical cwd stays usable, requiring OMP to remain there; then delete and recreate the active project path, require extension-enabled and extension-skipping invocations to observe the replacement inode with byte-exact argv and nonzero status preserved, require the parent shell to remain on the stale inode, unset PWD and require recovery through ORCA_WORKTREE_PATH, clear every logical fallback and require an actionable failure without invoking OMP, and finally delete the replacement and require the same for the missing PWD path.",
+      "invariant": "A fresh local renderer terminal spawn may recover from a saved startup cwd whose directory no longer exists only by spawning at the selected workspace root and printing a generic in-terminal notice; existing directories, including ones outside the worktree (#7685), spawn as requested, and reattach, SSH, remote-runtime, runtime/API, and mobile callers keep exact cwd semantics.",
+      "oracle": "The shared resolver falls back to the workspace root only when the injected existence probe reports the resolved cwd missing and the workspace root present, and never probes floating terminals or a cwd equal to the root. The renderer sends cwdFallback only for fresh local IPC spawns, main honors it only when connectionId and sessionId are absent, WSL UNC paths never engage the probe-based fallback, main returns fallback metadata only after an actual fallback, the IPC transport preserves that metadata, and the connection layer writes a generic notice that omits the missing path.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/shared/terminal-startup-cwd.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/ipc/pty-spawn-cwd-fallback.test.ts src/main/ipc/pty-wsl-cwd-validation.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/pty-transport-connect-spawn.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/pty-connection-runtime-owner-spawn-routing.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/pty/omp-shell-wrapper.node-pty.test.ts src/main/pty/omp-shell-wrapper-alias-safety.test.ts src/main/shell-wrapper-generated-file-snapshot.test.ts"
+        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/pty-connection-runtime-owner-spawn-routing.test.ts"
       ],
       "testFiles": [
         "src/shared/terminal-startup-cwd.test.ts",
         "src/main/ipc/pty-spawn-cwd-fallback.test.ts",
         "src/main/ipc/pty-wsl-cwd-validation.test.ts",
         "src/renderer/src/components/terminal-pane/pty-transport-connect-spawn.test.ts",
-        "src/renderer/src/components/terminal-pane/pty-connection-runtime-owner-spawn-routing.test.ts",
-        "src/main/pty/omp-shell-wrapper.node-pty.test.ts",
-        "src/main/pty/omp-shell-wrapper-alias-safety.test.ts",
-        "src/main/shell-wrapper-generated-file-snapshot.test.ts"
+        "src/renderer/src/components/terminal-pane/pty-connection-runtime-owner-spawn-routing.test.ts"
       ],
       "assertionRefs": [
         {
@@ -7380,25 +7364,6 @@
             "startup cwd fallback metadata prints a generic in-terminal notice",
             "remote-runtime worktree spawns are not marked with cwdFallback"
           ]
-        },
-        {
-          "file": "src/main/pty/omp-shell-wrapper.node-pty.test.ts",
-          "assertions": [
-            "real Bash and Zsh PTYs rebind OMP to a recreated cwd inode without changing the parent shell",
-            "an unset PWD with a usable cwd stays unset and does not remap OMP to ORCA_WORKTREE_PATH",
-            "a removed logical symlink does not invalidate its still-usable physical cwd",
-            "extension-skipping commands such as omp --version still recover the cwd without gaining extension argv",
-            "an unset PWD on a stale inode recovers through ORCA_WORKTREE_PATH",
-            "an unset PWD on a stale inode without a logical fallback fails visibly before invoking OMP",
-            "extension argv and a nonzero OMP exit status survive the recovery subshell",
-            "a subsequently missing logical cwd prints an actionable error and does not invoke OMP again"
-          ]
-        },
-        {
-          "file": "src/main/shell-wrapper-generated-file-snapshot.test.ts",
-          "assertions": [
-            "local, daemon/SSH, and relay Bash/Zsh files contain the byte-identical shared OMP wrapper"
-          ]
         }
       ],
       "evidenceRuns": [
@@ -7437,20 +7402,11 @@
           "result": "passed",
           "durationSeconds": 6.5,
           "summary": "1 test file passed, 341 tests passed; covers local IPC marking, the generic terminal fallback notice, and remote-runtime omission."
-        },
-        {
-          "date": "2026-08-29",
-          "runner": "local",
-          "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/pty/omp-shell-wrapper.node-pty.test.ts src/main/pty/omp-shell-wrapper-alias-safety.test.ts src/main/shell-wrapper-generated-file-snapshot.test.ts",
-          "result": "passed",
-          "durationSeconds": 3,
-          "summary": "3 test files passed; real Bash and Zsh PTYs covered usable physical cwd authority, stale-inode recovery with set and unset PWD, extension-enabled and extension-skipping argv, parent-shell isolation, exit status, missing-path visibility, alias safety, and generated local/daemon/relay parity."
         }
       ],
       "runtimeBudget": {
         "p95Seconds": 40,
-        "scope": "focused unit, IPC, generated-wrapper, and real Bash/Zsh PTY contracts"
+        "scope": "focused unit, IPC, and renderer contracts"
       },
       "flakeHistory": {
         "status": "unknown",
@@ -7458,25 +7414,23 @@
       },
       "redGreenEvidence": {
         "status": "partial",
-        "evidence": "The main IPC missing-cwd tests fail with the provider's 'Working directory ... does not exist.' error when the spawn fallback is removed and pass with it. Before the OMP recovery, the stale-inode reproduction makes the child process fail to resolve its cwd; the candidate rebinds to the recreated path in real Bash and Zsh PTYs. Full live Electron reproduction from a production persisted session is not captured."
+        "evidence": "The main IPC missing-cwd tests fail with the provider's 'Working directory ... does not exist.' error when the spawn fallback is removed and pass with it. Full live Electron reproduction from a production persisted session is not captured."
       },
       "performanceBudget": {
         "required": true,
-        "evidence": "The spawn recovery adds at most two statSync probes on the fresh-local spawn path (the provider already stats the same paths during validation) and one bounded terminal write only when fallback actually occurs. Each wrapped OMP launch adds a constant number of shell filesystem predicates; only a detected stale/unusable cwd creates one short recovery subshell. No polling, retry, provider listing, hidden-pane work, startup awaits, extra OMP subprocesses, or render-loop work was added."
+        "evidence": "The spawn recovery adds at most two statSync probes on the fresh-local spawn path (the provider already stats the same paths during validation) and one bounded terminal write only when fallback actually occurs. No polling, retry, provider listing, hidden-pane work, startup awaits, or render-loop work was added."
       },
       "promotionCriteria": [
         "Attach CI evidence for all declared test files.",
         "Add a live Electron regression that opens a local terminal whose persisted startupCwd was deleted and proves visible shell input/output at the workspace root.",
-        "Add a live stale-inode OMP run on Linux or WSL and through an SSH/relay-generated wrapper.",
         "Add WSL/mobile/API spawn provider-contract coverage or explicitly narrow their risk scope."
       ],
       "knownGaps": [
         "No live Electron fixture seeds a persisted tab whose startupCwd directory was deleted.",
         "Daemon coverage is via the shared pre-provider main cwd decision, not a live daemon provider spawn.",
-        "The stale-inode OMP oracle is local macOS Bash/Zsh plus shared generated-file parity; it does not execute through live SSH, relay, Linux, or WSL providers.",
         "WSL UNC paths bypass the spawn probe by design and have no live existence-recovery run; Linux, Windows, and mobile/API spawn strictness are not directly exercised."
       ],
-      "demotionRule": "Demote or quarantine if the gate flakes without a product bug, if an existing directory is ever remapped away from the requested cwd, if a reattach/remote/API caller can engage the spawn fallback, or if OMP recovery remaps a usable cwd with unset PWD, changes argv/status/parent cwd, or invokes OMP when the logical path remains unavailable."
+      "demotionRule": "Demote or quarantine if the gate flakes without a product bug, if an existing directory is ever remapped away from the requested cwd, or if a reattach/remote/API caller can engage the spawn fallback."
     },
     {
       "id": "agent-status.pi-hook-liveness",
@@ -7486,7 +7440,7 @@
       "owner": "agent-session",
       "layer": "main-provider-contract",
       "surfaces": [
-        "Pi and OMP managed extensions",
+        "Pi managed extensions",
         "agent status hooks",
         "runtime reload and session replacement",
         "loopback restart and stall recovery"
@@ -7495,13 +7449,13 @@
       "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": [],
-      "coverageNotes": "Local macOS execution of the generated Pi/OMP extension plus the shared hook normalizer. WSL fallback behavior is covered with mocked native-fetch failure and Windows curl handoff. Daemon PTYs use the same generated extension without a distinct delivery path. SSH/relay ingest uses the shared normalizer, but no live remote Pi process is exercised.",
+      "coverageNotes": "Local macOS execution of the generated Pi extension plus the shared hook normalizer. WSL fallback behavior is covered with mocked native-fetch failure and Windows curl handoff. Daemon PTYs use the same generated extension without a distinct delivery path. SSH/relay ingest uses the shared normalizer, but no live remote Pi process is exercised.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/issues/7791",
         "https://github.com/stablyai/orca/pull/7802",
         "https://github.com/stablyai/orca/pull/7838"
       ],
-      "invariant": "Orca status reporting must return synchronously from every Pi/OMP extension handler, retain at most one active request and one latest pending snapshot, and abandon stalled loopback delivery within one second. A Pi session_shutdown event cannot mark a turn done because Pi also emits it for reload, new, resume, and fork while the PTY remains alive; only agent_end proves turn completion, while real process exit is cleared by PTY teardown.",
+      "invariant": "Orca status reporting must return synchronously from every Pi extension handler, retain at most one active request and one latest pending snapshot, and abandon stalled loopback delivery within one second. A Pi session_shutdown event cannot mark a turn done because Pi also emits it for reload, new, resume, and fork while the PTY remains alive; only agent_end proves turn completion, while real process exit is cleared by PTY teardown.",
       "oracle": "Execute the generated extension with a fetch that remains pending and assert the Pi handler returns before delivery; emit three statuses during the stall and assert exactly one request is active and only the latest pending status is sent next; advance fake time by one second and assert the active signal aborts and the latest status proceeds. Through the shared normalizer, assert session_shutdown yields no status while agent_end still yields done.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/main/pi/agent-status-extension-source.test.ts src/main/agent-hooks/server-pi-normalization.test.ts --maxWorkers=1"
@@ -7525,7 +7479,7 @@
           "file": "src/main/agent-hooks/server-pi-normalization.test.ts",
           "assertions": [
             "session_shutdown normalizes to no status instead of done",
-            "agent_end remains the authoritative Pi/OMP done event"
+            "agent_end remains the authoritative Pi done event"
           ]
         }
       ],
@@ -7637,9 +7591,7 @@
         },
         {
           "file": "src/main/agent-hooks/manual-compact-status-cleanup.test.ts",
-          "assertions": [
-            "pane, tab, and server cleanup revoke compact completion authority"
-          ]
+          "assertions": ["pane, tab, and server cleanup revoke compact completion authority"]
         },
         {
           "file": "src/main/ssh/ssh-relay-session-agent-hooks.integration.test.ts",
@@ -12679,13 +12631,13 @@
       "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": [],
-      "coverageNotes": "Deterministic main/renderer tests run on macOS and exercise simulated Windows plus POSIX/Linux process-confirmation behavior. They cover exact local-ConPTY membership, detached-child rejection, SSH and paired-runtime host-platform routing including legacy runtime PTY IDs, active-PTY ownership after worktree host changes, Windows-to-WSL routing, unknown-metadata fallback, production handler composition, KKP authorization on every host, process-confirmed Droid routing and launch-triggered confirmation, typed-alias and forged-OSC isolation, shells without OSC 133, split/detach ownership with preserved shell classification, stale PTY exit/rebind rejection, command-generation revocation, daemon v21 warm-reattach identity, unavailable inspection, and lazy subprocess/RPC callback counts. A live linux-arm64 Docker target additionally proved real relay deployment, SSH PTY host detection, and exact inactive/active KKP bytes. The Electron byte test runs only on Windows; live Windows evidence remains uncollected. Test failures report exact expected bytes; no product telemetry or raw terminal logging is added.",
+      "coverageNotes": "Deterministic main/renderer tests run on macOS and exercise simulated Windows plus POSIX/Linux process-confirmation behavior. They cover exact local-ConPTY membership, detached-child rejection, SSH and paired-runtime host-platform routing including legacy runtime PTY IDs, active-PTY ownership after worktree host changes, Windows-to-WSL routing, unknown-metadata fallback, production handler composition, KKP authorization on every host, process-confirmed Pi routing and launch-triggered confirmation, typed-alias and forged-OSC isolation, shells without OSC 133, split/detach ownership with preserved shell classification, stale PTY exit/rebind rejection, command-generation revocation, daemon v21 warm-reattach identity, unavailable inspection, and lazy subprocess/RPC callback counts. A live linux-arm64 Docker target additionally proved real relay deployment, SSH PTY host detection, and exact inactive/active KKP bytes. The Electron byte test runs only on Windows; live Windows evidence remains uncollected. Test failures report exact expected bytes; no product telemetry or raw terminal logging is added.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/issues/7620",
         "https://github.com/stablyai/orca/pull/7668"
       ],
-      "invariant": "Shift+Enter key recognition follows the client OS, while emitted bytes follow the active application and PTY host: active Kitty keyboard protocol authorizes CSI-u on every host; otherwise Windows hosts use Esc+CR except when allowlisted Droid ownership or fresh routing-trusted Droid process evidence authorizes CSI-u, and non-Windows hosts use Esc+CR. The active SSH connection, remote-runtime PTY owner, or live local session outranks later worktree ownership changes, and missing host-platform metadata falls back to the client. Every new command and PTY replacement revokes stale agent routing until current evidence settles; split or reused panes cannot inherit sibling or prior-PTY authority; unrelated keys perform no host, agent, protocol, or ConPTY lookup.",
-      "oracle": "Renderer tests assert exact bytes across client/PTY-host combinations, including Kitty keyboard protocol active and inactive on Windows and non-Windows hosts, and prove SSH identity, the environment encoded in an active remote-runtime PTY id, and live local-session identity outrank current worktree ownership, while unavailable platform metadata falls back to the client. A live linux-arm64 SSH PTY independently captured Esc+CR with KKP inactive and CSI-u with KKP active. Fresh Windows process evidence authorizes Droid bytes only after a recognized global candidate is intersected with the exact ConPTY console process list; detached descendants, helper failure/timeout/root-only fallback, stale PTY exit/rebind results, typed text, and hook/OSC output fail closed. A new OSC 133;C immediately publishes a routing-neutral generation, including during D-to-C races. In cmd.exe/Git Bash/custom shells without OSC 133, accepted inferred commands start the same fresh generation; accepted submit/interrupt, title exit, focus, and visibility revoke trusted Droid bytes while one bounded confirmation runs. Detach preserves the live PTY's source shell override so WSL/native classification cannot change with the current default. Ordinary fast shell commands use cached/no-scan paths; routing-relevant confirmation bypasses cached process snapshots and keeps the bounded three-read ladder. Daemon protocol v21 persists only an allowlisted launchAgent; warm reattach uses it as a display/confirmation hint and restores routing only after current process proof. The Windows Electron test focuses the real xterm textarea and records exact renderer-to-main PTY writes.",
+      "invariant": "Shift+Enter key recognition follows the client OS, while emitted bytes follow the active application and PTY host: active Kitty keyboard protocol authorizes CSI-u on every host; otherwise Windows hosts use Esc+CR except when fresh routing-trusted process evidence for an agent configured with windowsShiftEnterEncoding 'csi-u' (Pi) authorizes CSI-u, and non-Windows hosts use Esc+CR. Agents without that encoding (Claude, OpenCode) keep Esc+CR. The active SSH connection, remote-runtime PTY owner, or live local session outranks later worktree ownership changes, and missing host-platform metadata falls back to the client. Every new command and PTY replacement revokes stale agent routing until current evidence settles; split or reused panes cannot inherit sibling or prior-PTY authority; unrelated keys perform no host, agent, protocol, or ConPTY lookup.",
+      "oracle": "Renderer tests assert exact bytes across client/PTY-host combinations, including Kitty keyboard protocol active and inactive on Windows and non-Windows hosts, and prove SSH identity, the environment encoded in an active remote-runtime PTY id, and live local-session identity outrank current worktree ownership, while unavailable platform metadata falls back to the client. A live linux-arm64 SSH PTY independently captured Esc+CR with KKP inactive and CSI-u with KKP active. Fresh Windows process evidence authorizes Pi's CSI-u bytes only after a recognized global candidate is intersected with the exact ConPTY console process list, while an OpenCode pane keeps Esc+CR; detached descendants, helper failure/timeout/root-only fallback, stale PTY exit/rebind results, typed text, and hook/OSC output fail closed. A new OSC 133;C immediately publishes a routing-neutral generation, including during D-to-C races. In cmd.exe/Git Bash/custom shells without OSC 133, accepted inferred commands start the same fresh generation; accepted submit/interrupt, title exit, focus, and visibility revoke trusted Pi bytes while one bounded confirmation runs. Detach preserves the live PTY's source shell override so WSL/native classification cannot change with the current default. Ordinary fast shell commands use cached/no-scan paths; routing-relevant confirmation bypasses cached process snapshots and keeps the bounded three-read ladder. Daemon protocol v21 persists only an allowlisted launchAgent; warm reattach uses it as a display/confirmation hint and restores routing only after current process proof. The Windows Electron test focuses the real xterm textarea and records exact renderer-to-main PTY writes.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/main/daemon/daemon-foreground-confirmation-protocol.test.ts src/main/daemon/daemon-pty-adapter.test.ts src/main/daemon/daemon-pty-router.test.ts src/main/daemon/daemon-server.test.ts src/main/daemon/degraded-daemon-pty-provider.test.ts src/main/daemon/pty-subprocess-foreground-scan-cadence.test.ts src/main/daemon/pty-subprocess.test.ts src/main/ipc/pty-runtime-kill-and-exit.test.ts src/main/providers/agent-foreground-process.test.ts src/main/providers/local-pty-provider-foreground-process.test.ts src/main/daemon/pty-subprocess-foreground-degraded-scan.test.ts src/main/providers/windows-console-attached-processes.test.ts src/main/providers/windows-pty-job-membership.test.ts src/renderer/src/components/terminal-pane/pane-foreground-agent-tracker.test.ts src/renderer/src/components/terminal-pane/pty-connection-command-finished-cleanup.test.ts src/renderer/src/components/terminal-pane/pty-connection-foreground-agent-routing.test.ts src/renderer/src/components/terminal-pane/pty-connection-foreground-agent-sampling.test.ts src/renderer/src/components/terminal-pane/pty-transport-reattach-admission.test.ts src/renderer/src/components/terminal-pane/terminal-pane-tab-detach.test.ts src/renderer/src/components/terminal-pane/terminal-shortcut-policy.test.ts src/renderer/src/components/terminal-pane/terminal-windows-shift-enter.test.ts src/renderer/src/store/slices/store-active-worktree-terminal-creation.test.ts src/renderer/src/store/slices/terminal-pane-detach-agent-identity.test.ts src/shared/agent-process-recognition.test.ts src/shared/process-table-snapshot.test.ts tests/e2e/terminal-foreground-confirmation.unit.test.ts",
         "pnpm run test:e2e -- tests/e2e/terminal-shortcuts.spec.ts",
@@ -12736,7 +12688,7 @@
           "assertions": [
             "successful root-present Windows enumeration and failed, blank, malformed, or root-missing enumeration remain distinct evidence states",
             "an observed shell root with no children is authoritative while a snapshot omitting that root is unavailable",
-            "an attached Droid candidate is authorized only when exact ConPTY membership contains it, while a detached Start-Process descendant is rejected",
+            "an attached agent candidate is authorized only when exact ConPTY membership contains it, while a detached Start-Process descendant is rejected",
             "a Windows process-table scan with no recognized agent performs zero ConPTY membership helper forks",
             "fresh POSIX scan failure or a snapshot missing the PTY root is unavailable rather than shell proof",
             "the compatibility process-name API still preserves its existing fallback contract for other consumers"
@@ -12796,7 +12748,7 @@
         {
           "file": "tests/e2e/terminal-foreground-confirmation.unit.test.ts",
           "assertions": [
-            "the real daemon handle and pane tracker keep restored Droid identity when confirmation resolves after the old cache window",
+            "the real daemon handle and pane tracker keep restored Pi identity when confirmation resolves after the old cache window",
             "one fresh command-finish scan confirms real shell exit, while unavailable inspection performs exactly three bounded reads and never claims shell"
           ]
         },
@@ -12824,8 +12776,8 @@
         {
           "file": "src/renderer/src/components/terminal-pane/terminal-shortcut-policy.test.ts",
           "assertions": [
-            "Windows defaults and non-Droid agents preserve Esc+CR while explicit Droid capability selects CSI-u",
-            "Windows and non-Windows PTYs reached cross-OS use CSI-u only with active Kitty keyboard protocol unless trusted Windows Droid evidence independently authorizes it",
+            "Windows defaults and agents without CSI-u encoding preserve Esc+CR while Pi's explicit capability selects CSI-u",
+            "Windows and non-Windows PTYs reached cross-OS use CSI-u only with active Kitty keyboard protocol unless trusted Windows Pi evidence independently authorizes it",
             "unrelated keys invoke neither host, agent, nor protocol callbacks"
           ]
         },
@@ -12834,9 +12786,9 @@
           "assertions": [
             "only routing-trusted current process identity overrides launch evidence and confirmed shell foreground clears stale identity",
             "a newer untrusted or neutral command generation blocks stale launch ownership until confirmation",
-            "only allowlisted fresh process or pane-scoped launch ownership selects Droid's CSI-u capability",
-            "forged hook or OSC-derived Droid status cannot change the Windows byte encoding",
-            "after split and original-pane close, a sole surviving sibling cannot inherit the original pane's Droid launch identity"
+            "only allowlisted fresh process or pane-scoped launch ownership selects Pi's CSI-u capability, while Claude, OpenCode and Codex keep Esc+CR",
+            "forged hook or OSC-derived Pi status cannot change the Windows byte encoding",
+            "after split and original-pane close, a sole surviving sibling cannot inherit the original pane's Pi launch identity"
           ]
         },
         {
@@ -12856,10 +12808,10 @@
         {
           "file": "src/renderer/src/components/terminal-pane/pty-connection-command-finished-cleanup.test.ts",
           "assertions": [
-            "a still-running Droid process republishes Droid instead of being overwritten with shell-foreground evidence",
-            "typed Droid input cannot replace live Antigravity process or pane-scoped launch identity inside another TUI",
-            "typed Droid input on SSH or remote-runtime panes never writes local process evidence",
-            "Droid routing survives a fresh command-finish scan that still sees Droid and retires after one fresh shell result",
+            "a still-running Pi process republishes Pi instead of being overwritten with shell-foreground evidence",
+            "typed Pi input cannot replace live OpenCode process or pane-scoped launch identity inside another TUI",
+            "typed Pi input on SSH or remote-runtime panes never writes local process evidence",
+            "Pi routing survives a fresh command-finish scan that still sees Pi and retires after one fresh shell result",
             "a D-to-C transition immediately routes legacy bytes while the new command generation is pending",
             "unavailable command-finish evidence resolves deferred cleanup, returns legacy routing, and does not assert shell foreground"
           ]
@@ -12867,10 +12819,10 @@
         {
           "file": "src/renderer/src/components/terminal-pane/pty-connection-foreground-agent-routing.test.ts",
           "assertions": [
-            "typing droid does not route CSI-u until fresh process evidence confirms Droid",
-            "null and rejected command-start reads never promote typed Droid text to process evidence",
-            "a manually typed Droid in a shell without OSC 133 gains routing only after accepted-input fresh confirmation",
-            "accepted no-OSC exit or interrupt input immediately revokes trusted Droid bytes and confirms the returned shell"
+            "typing pi does not route CSI-u until fresh process evidence confirms Pi",
+            "null and rejected command-start reads never promote typed Pi text to process evidence",
+            "a manually typed Pi in a shell without OSC 133 gains routing only after accepted-input fresh confirmation",
+            "accepted no-OSC exit or interrupt input immediately revokes trusted Pi bytes and confirms the returned shell"
           ]
         },
         {
@@ -12895,19 +12847,19 @@
             "pane-to-tab detach moves only the detached leaf's launch and process identity to its new pane key",
             "pane-to-tab detach preserves the source PTY shell override across native PowerShell and WSL classifications",
             "the source hook snapshot is retired rather than copied to a key the running PTY cannot emit",
-            "the detached Droid keeps CSI-u while the source sibling keeps its own legacy encoding"
+            "the detached Pi keeps CSI-u while the source sibling keeps its own legacy encoding"
           ]
         },
         {
           "file": "src/shared/agent-process-recognition.test.ts",
           "assertions": [
-            "Droid's process name resolves to the allowlisted Droid agent identity without substring matching"
+            "Pi's process name resolves to the allowlisted Pi agent identity without substring matching"
           ]
         },
         {
           "file": "tests/e2e/terminal-shortcuts.spec.ts",
           "assertions": [
-            "on Windows the focused terminal sends CSI-u bytes for a Droid pane and Esc+CR bytes after switching that same pane to Antigravity identity",
+            "on Windows the focused terminal sends CSI-u bytes for a Pi pane and Esc+CR bytes after switching that same pane to OpenCode identity",
             "the byte oracle observes the real renderer-to-main PTY write path rather than terminal DOM state"
           ]
         }
@@ -12933,22 +12885,22 @@
       },
       "redGreenEvidence": {
         "status": "partial",
-        "evidence": "Reverting to the previous unconditional Windows Esc+CR branch fails the Droid byte assertion, while resolving launch metadata from any key other than the active pane fails the split-survivor isolation assertion. Saved intentional-break artifacts and live Windows history are still missing."
+        "evidence": "Reverting to the previous unconditional Windows Esc+CR branch fails the Pi byte assertion, while resolving launch metadata from any key other than the active pane fails the split-survivor isolation assertion. Saved intentional-break artifacts and live Windows history are still missing."
       },
       "performanceBudget": {
         "required": true,
-        "evidence": "Callback-count tests prove unrelated ordinary keys invoke neither host, agent, nor Kitty-protocol resolution. Host and agent callbacks are created once per keyboard effect, so printable input adds no per-key allocations or store reads. Shift+Enter performs bounded synchronous active-transport and indexed store lookups, plus at most one pane-keyed protocol-mode lookup when trusted Windows Droid evidence does not already authorize CSI-u, with no IPC, RPC, subprocess, polling, listener, or timer. Typed text performs no routing write. Ordinary fast OSC 133;C-to-D shell commands perform no fresh confirmation RPC or process scan. An accepted submit/interrupt while trusted Droid is current, a typed allowlisted agent command, title exit, focus, visibility transition, or an idle burst after trusted Droid Shift+Enter can schedule the bounded confirmation ladder; each event cancels/deduplicates prior work and no timer recurs after settling. Windows confirmation performs one fresh process-table scan and forks exact ConPTY membership only after a recognized agent candidate appears; no recognized candidate makes zero helper calls. Same-turn fresh requests share one scan and later arrivals queue at most one successor. Recovery remains three bounded one-shot reads (350 ms, 1.2 s, 6 s). No polling loop, provider fanout, persistent listener, hidden-pane wake loop, or per-printable-key work is added."
+        "evidence": "Callback-count tests prove unrelated ordinary keys invoke neither host, agent, nor Kitty-protocol resolution. Host and agent callbacks are created once per keyboard effect, so printable input adds no per-key allocations or store reads. Shift+Enter performs bounded synchronous active-transport and indexed store lookups, plus at most one pane-keyed protocol-mode lookup when trusted Windows Pi evidence does not already authorize CSI-u, with no IPC, RPC, subprocess, polling, listener, or timer. Typed text performs no routing write. Ordinary fast OSC 133;C-to-D shell commands perform no fresh confirmation RPC or process scan. An accepted submit/interrupt while trusted Pi is current, a typed allowlisted agent command, title exit, focus, visibility transition, or an idle burst after trusted Pi Shift+Enter can schedule the bounded confirmation ladder; each event cancels/deduplicates prior work and no timer recurs after settling. Windows confirmation performs one fresh process-table scan and forks exact ConPTY membership only after a recognized agent candidate appears; no recognized candidate makes zero helper calls. Same-turn fresh requests share one scan and later arrivals queue at most one successor. Recovery remains three bounded one-shot reads (350 ms, 1.2 s, 6 s). No polling loop, provider fanout, persistent listener, hidden-pane wake loop, or per-printable-key work is added."
       },
       "promotionCriteria": [
         "Run the exact PTY-byte Electron oracle on Windows without silent platform skips.",
         "Collect stable runtime and flake history for local and daemon Windows ConPTY while retaining deterministic host-routing assertions for SSH, WSL, and remote runtime.",
-        "Attach saved intentional-break evidence for Droid capability removal and split-sibling identity leakage."
+        "Attach saved intentional-break evidence for Pi capability removal and split-sibling identity leakage."
       ],
       "knownGaps": [
         "No Windows runner or live Windows PTY evidence is attached; the Electron byte test skips on macOS and Linux, while a live Linux SSH PTY covers only the remote Linux host path.",
-        "Droid agent-specific CSI-u authorization is available only from trusted pane evidence; without it, Windows and non-Windows PTY hosts depend on the application's Kitty keyboard protocol state.",
-        "The Electron test injects allowlisted pane identity rather than launching the real Droid and Antigravity binaries.",
-        "If both Windows process-enumeration backends remain unavailable through the bounded ladder, routing fails closed to the legacy Esc+CR path; no live Droid artifact covers that degraded host configuration.",
+        "Pi's agent-specific CSI-u authorization is available only from trusted pane evidence; without it, Windows and non-Windows PTY hosts depend on the application's Kitty keyboard protocol state.",
+        "The Electron test injects allowlisted pane identity rather than launching the real Pi and OpenCode binaries.",
+        "If both Windows process-enumeration backends remain unavailable through the bounded ladder, routing fails closed to the legacy Esc+CR path; no live Pi artifact covers that degraded host configuration.",
         "Protocol v21 restarts older daemons because the minimal persisted launchAgent is a new contract; sessions preserved by pre-v21 daemons cannot supply warm-reattach launch ownership and fail closed until current process confirmation or restart.",
         "No live daemon, WSL, remote-runtime, paired-web, or restore/replay byte artifact has been collected; SSH is covered only by a macOS-client-to-Linux-host relay run.",
         "A running PTY keeps its spawn-time ORCA_PANE_KEY after pane-to-tab detach. This change transfers launch/process routing evidence and retires the stale hook snapshot, but does not redesign future hook reattribution across tab IDs."
@@ -16990,13 +16942,7 @@
         "relay capability enforcement"
       ],
       "platforms": ["macos", "linux", "windows"],
-      "providers": [
-        "local",
-        "daemon",
-        "ssh",
-        "wsl",
-        "remote-runtime"
-      ],
+      "providers": ["local", "daemon", "ssh", "wsl", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "ssh"],
       "coverageNotes": "Deterministic macOS contract evidence covers opaque local- and SSH-shaped terminal ids, one bounded worktree listing, mismatch rejection, and the main/relay host-call adapter matrix. It does not launch a live PTY or provision a relay-hosted plugin.",
@@ -17448,10 +17394,7 @@
       "protection": "partial",
       "owner": "agent-hooks",
       "layer": "ssh-relay-companion-runtime",
-      "surfaces": [
-        "SSH managed-hook companion startup",
-        "remote Claude hook installation"
-      ],
+      "surfaces": ["SSH managed-hook companion startup", "remote Claude hook installation"],
       "platforms": ["macos", "linux", "windows"],
       "providers": ["ssh"],
       "coveredPlatforms": ["macos"],

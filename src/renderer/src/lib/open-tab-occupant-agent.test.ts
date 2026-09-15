@@ -82,17 +82,17 @@ function resolve(
 
 describe('resolveOpenTabOccupantAgent', () => {
   it('uses launchAgent when no hook or sleeping record exists', () => {
-    expect(resolve({ launchAgent: 'grok' })).toBe('grok')
+    expect(resolve({ launchAgent: 'opencode' })).toBe('opencode')
   })
 
   it('prefers a live focused hook over launchAgent', () => {
     expect(
       resolve({
-        launchAgent: 'grok',
+        launchAgent: 'opencode',
         layout: layout(LEAF_A),
         agentStatusByPaneKey: {
           [makePaneKey(TAB_ID, LEAF_A)]: status(LEAF_A, 'claude'),
-          [makePaneKey(TAB_ID, LEAF_B)]: status(LEAF_B, 'grok')
+          [makePaneKey(TAB_ID, LEAF_B)]: status(LEAF_B, 'opencode')
         }
       })
     ).toBe('claude')
@@ -104,27 +104,27 @@ describe('resolveOpenTabOccupantAgent', () => {
         layout: layout(LEAF_B),
         agentStatusByPaneKey: {
           [makePaneKey(TAB_ID, LEAF_A)]: status(LEAF_A, 'claude'),
-          [makePaneKey(TAB_ID, LEAF_B)]: status(LEAF_B, 'grok')
+          [makePaneKey(TAB_ID, LEAF_B)]: status(LEAF_B, 'opencode')
         }
       })
-    ).toBe('grok')
+    ).toBe('opencode')
   })
 
   it('uses the tab-strip title identity when hooks have not reported yet', () => {
-    expect(resolve({ title: 'grok' })).toBe('grok')
+    expect(resolve({ title: 'opencode' })).toBe('opencode')
   })
 
-  it('does not let a grok mention in the title steal a launched Claude pane', () => {
+  it('does not let a opencode mention in the title steal a launched Claude pane', () => {
     expect(
       resolve({
         launchAgent: 'claude',
-        title: 'fix grok parser'
+        title: 'fix opencode parser'
       })
     ).toBe('claude')
   })
 
-  it('does not treat a hyphenated grok mention as occupancy', () => {
-    expect(resolve({ title: 'session-scanner-grok-parser' })).toBeNull()
+  it('does not treat a hyphenated opencode mention as occupancy', () => {
+    expect(resolve({ title: 'session-scanner-opencode-parser' })).toBeNull()
   })
 
   it('uses the focused sleeping session, matching useTabAgent', () => {
@@ -132,11 +132,11 @@ describe('resolveOpenTabOccupantAgent', () => {
       resolve({
         layout: layout(LEAF_A),
         sleepingAgentSessionsByPaneKey: {
-          [makePaneKey(TAB_ID, LEAF_A)]: sleeping(LEAF_A, 'grok'),
+          [makePaneKey(TAB_ID, LEAF_A)]: sleeping(LEAF_A, 'opencode'),
           [makePaneKey(TAB_ID, LEAF_B)]: sleeping(LEAF_B, 'claude')
         }
       })
-    ).toBe('grok')
+    ).toBe('opencode')
   })
 
   it('does not invent a sibling sleeping occupant when the focused leaf has none', () => {
@@ -144,7 +144,7 @@ describe('resolveOpenTabOccupantAgent', () => {
       resolve({
         layout: layout(LEAF_A),
         sleepingAgentSessionsByPaneKey: {
-          [makePaneKey(TAB_ID, LEAF_B)]: sleeping(LEAF_B, 'grok')
+          [makePaneKey(TAB_ID, LEAF_B)]: sleeping(LEAF_B, 'opencode')
         }
       })
     ).toBeNull()
@@ -155,10 +155,10 @@ describe('resolveOpenTabOccupantAgent', () => {
       resolve({
         layout: layout(LEAF_A),
         agentStatusByPaneKey: {
-          [makePaneKey(TAB_ID, LEAF_A)]: status(LEAF_A, 'grok', 'done')
+          [makePaneKey(TAB_ID, LEAF_A)]: status(LEAF_A, 'opencode', 'done')
         }
       })
-    ).toBe('grok')
+    ).toBe('opencode')
   })
 
   it('falls back to a retained completion when live status is gone', () => {
@@ -177,10 +177,10 @@ describe('resolveOpenTabOccupantAgent', () => {
       resolve({
         layout: layout(LEAF_A),
         agentStatusByPaneKey: {
-          [makePaneKey(TAB_ID, LEAF_B)]: status(LEAF_B, 'grok')
+          [makePaneKey(TAB_ID, LEAF_B)]: status(LEAF_B, 'opencode')
         }
       })
-    ).toBe('grok')
+    ).toBe('opencode')
   })
 
   it('ignores a live hook that belongs to another tab', () => {
@@ -189,7 +189,7 @@ describe('resolveOpenTabOccupantAgent', () => {
         launchAgent: undefined,
         agentStatusByPaneKey: {
           [makePaneKey('tab-other', LEAF_A)]: {
-            ...status(LEAF_A, 'grok'),
+            ...status(LEAF_A, 'opencode'),
             tabId: 'tab-other',
             paneKey: makePaneKey('tab-other', LEAF_A)
           }

@@ -12,7 +12,6 @@ import type { ReattachPayloadSession } from './reattach-payload-session'
 function createSession(overrides: Record<string, unknown> = {}): ReattachPayloadSession {
   return {
     pane: createPane(1),
-    rememberReattachPayloadAgentSignal: vi.fn(),
     writeReplayData: vi.fn(),
     reattachReplayResetSequence: vi.fn(() => '<reset>'),
     sendFocusedReattachFocusInAfterReplay: vi.fn(),
@@ -55,10 +54,11 @@ describe('reattach payload context', () => {
     await attemptB.applyReattachPayload()
     await attemptA.applyReattachPayload()
 
-    expect(session.rememberReattachPayloadAgentSignal.mock.calls).toEqual([
-      ['PAYLOAD-B', { fullScreenReplay: true }],
-      ['PAYLOAD-A', { fullScreenReplay: true }]
-    ])
+    expect(
+      session.writeReplayData.mock.calls
+        .map(([data]: [string]) => data)
+        .filter((data: string) => data.startsWith('PAYLOAD'))
+    ).toEqual(['PAYLOAD-B', 'PAYLOAD-A'])
     expect(session.sendFocusedReattachFocusInAfterReplay.mock.calls).toEqual([
       ['pty-1', 2],
       ['pty-1', 1]

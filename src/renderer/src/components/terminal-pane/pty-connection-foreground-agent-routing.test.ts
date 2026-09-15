@@ -244,16 +244,16 @@ describe('connectPanePty', () => {
     expect(mockStoreState.dropAgentStatus).not.toHaveBeenCalled()
   })
 
-  it('routes a manually typed Droid only after foreground enrichment confirms it', async () => {
+  it('routes a manually typed Pi only after foreground enrichment confirms it', async () => {
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
     const dataCallbackRef: { current: ((data: string) => void) | null } = { current: null }
     const pane = createPane(1)
-    const ptyId = 'pty-manually-typed-droid'
-    const tabId = 'tab-manually-typed-droid'
-    const foregroundResults = ['powershell.exe', 'droid']
+    const ptyId = 'pty-manually-typed-pi'
+    const tabId = 'tab-manually-typed-pi'
+    const foregroundResults = ['powershell.exe', 'pi']
     vi.mocked(window.api.pty.confirmForegroundProcess).mockImplementation(async (id: string) =>
-      id === ptyId ? (foregroundResults.shift() ?? 'droid') : null
+      id === ptyId ? (foregroundResults.shift() ?? 'pi') : null
     )
     const transport = createMockTransport(ptyId)
     transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
@@ -271,7 +271,7 @@ describe('connectPanePty', () => {
     await vi.advanceTimersByTimeAsync(20)
     await flushAsyncTicks()
 
-    sendTerminalInputThroughPane(pane, 'droid\r')
+    sendTerminalInputThroughPane(pane, 'pi\r')
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('alt-enter')
 
     dataCallbackRef.current?.('\x1b]133;C\x07')
@@ -280,19 +280,19 @@ describe('connectPanePty', () => {
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('alt-enter')
     await vi.advanceTimersByTimeAsync(1200)
     expect(mockStoreState.paneForegroundAgentByPaneKey[paneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
   })
 
-  it('confirms a manually typed Droid without OSC command boundaries', async () => {
+  it('confirms a manually typed Pi without OSC command boundaries', async () => {
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
-    vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('droid')
+    vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('pi')
     const pane = createPane(1)
-    const ptyId = 'pty-manual-droid-no-osc'
-    const tabId = 'tab-manual-droid-no-osc'
+    const ptyId = 'pty-manual-pi-no-osc'
+    const tabId = 'tab-manual-pi-no-osc'
     const paneKey = makePaneKey(tabId, LEAF_1)
     transportFactoryQueue.push(createMockTransport(ptyId))
 
@@ -304,29 +304,29 @@ describe('connectPanePty', () => {
     await vi.advanceTimersByTimeAsync(20)
     await flushAsyncTicks()
 
-    sendTerminalInputThroughPane(pane, 'droid\r')
+    sendTerminalInputThroughPane(pane, 'pi\r')
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('alt-enter')
 
     await vi.advanceTimersByTimeAsync(350)
 
     expect(window.api.pty.confirmForegroundProcess).toHaveBeenCalledWith(ptyId)
     expect(mockStoreState.paneForegroundAgentByPaneKey[paneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('csi-u')
   })
 
-  it('confirms an Orca-launched Droid fresh spawn in a no-OSC shell (Git Bash)', async () => {
+  it('confirms an Orca-launched Pi fresh spawn in a no-OSC shell (Git Bash)', async () => {
     // Why: no-OSC shells (Git Bash/cmd) emit no command boundary, so without a fresh-spawn sample the pane never earns routing trust and Shift+Enter regresses to Esc+CR (#7620).
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
-    vi.mocked(window.api.pty.getForegroundProcess).mockResolvedValue('droid')
-    vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('droid')
+    vi.mocked(window.api.pty.getForegroundProcess).mockResolvedValue('pi')
+    vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('pi')
     const pane = createPane(1)
-    const ptyId = 'pty-launched-droid-no-osc'
-    const tabId = 'tab-launched-droid-no-osc'
+    const ptyId = 'pty-launched-pi-no-osc'
+    const tabId = 'tab-launched-pi-no-osc'
     const paneKey = makePaneKey(tabId, LEAF_1)
     transportFactoryQueue.push(createMockTransport(ptyId))
 
@@ -335,7 +335,7 @@ describe('connectPanePty', () => {
       createManager(1) as never,
       createDeps({
         tabId,
-        startup: { command: 'droid', launchAgent: 'droid' }
+        startup: { command: 'pi', launchAgent: 'pi' }
       }) as never
     )
     await vi.advanceTimersByTimeAsync(20)
@@ -351,31 +351,31 @@ describe('connectPanePty', () => {
 
     expect(window.api.pty.confirmForegroundProcess).toHaveBeenCalledWith(ptyId)
     expect(mockStoreState.paneForegroundAgentByPaneKey[paneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('csi-u')
   })
 
-  it('trusts a launched Droid whose no-OSC boot only becomes foreground after retries', async () => {
-    // Why: the confirmation ladder must span Droid's boot — the shell is still foreground on the first read(s) before Droid takes over.
+  it('trusts a launched Pi whose no-OSC boot only becomes foreground after retries', async () => {
+    // Why: the confirmation ladder must span Pi's boot — the shell is still foreground on the first read(s) before Pi takes over.
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
-    const foregroundResults = ['bash.exe', 'bash.exe', 'droid']
+    const foregroundResults = ['bash.exe', 'bash.exe', 'pi']
     vi.mocked(window.api.pty.confirmForegroundProcess).mockImplementation(
-      async () => foregroundResults.shift() ?? 'droid'
+      async () => foregroundResults.shift() ?? 'pi'
     )
     const pane = createPane(1)
-    const ptyId = 'pty-launched-droid-slow-boot'
-    const tabId = 'tab-launched-droid-slow-boot'
+    const ptyId = 'pty-launched-pi-slow-boot'
+    const tabId = 'tab-launched-pi-slow-boot'
     const paneKey = makePaneKey(tabId, LEAF_1)
     transportFactoryQueue.push(createMockTransport(ptyId))
 
     connectPanePty(
       pane as never,
       createManager(1) as never,
-      createDeps({ tabId, startup: { command: 'droid', launchAgent: 'droid' } }) as never
+      createDeps({ tabId, startup: { command: 'pi', launchAgent: 'pi' } }) as never
     )
     await vi.advanceTimersByTimeAsync(20)
     await flushAsyncTicks()
@@ -387,35 +387,35 @@ describe('connectPanePty', () => {
     await flushAsyncTicks()
 
     expect(mockStoreState.paneForegroundAgentByPaneKey[paneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('csi-u')
   })
 
-  it('stays recoverable when a launched Droid outlasts the fresh-spawn confirmation window', async () => {
+  it('stays recoverable when a launched Pi outlasts the fresh-spawn confirmation window', async () => {
     // Why: a missed ladder (slow boot) must stay recoverable — latching a shell-confirm would clear launch identity and poison Shift+Enter for the session.
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
     let foreground = 'bash.exe'
     vi.mocked(window.api.pty.confirmForegroundProcess).mockImplementation(async () => foreground)
     const pane = createPane(1)
-    const ptyId = 'pty-launched-droid-slow'
-    const tabId = 'tab-launched-droid-slow'
+    const ptyId = 'pty-launched-pi-slow'
+    const tabId = 'tab-launched-pi-slow'
     const paneKey = makePaneKey(tabId, LEAF_1)
     transportFactoryQueue.push(createMockTransport(ptyId))
 
     const binding = connectPanePty(
       pane as never,
       createManager(1) as never,
-      createDeps({ tabId, startup: { command: 'droid', launchAgent: 'droid' } }) as never
+      createDeps({ tabId, startup: { command: 'pi', launchAgent: 'pi' } }) as never
     ) as unknown as { sampleForegroundAgentOnFocus: () => void }
     await vi.advanceTimersByTimeAsync(20)
     await flushAsyncTicks()
     const onPtySpawn = createdTransportOptions[0]?.onPtySpawn as ((id: string) => void) | undefined
     onPtySpawn?.(ptyId)
-    // Whole ladder elapses while the shell is still foreground (Droid not up yet).
+    // Whole ladder elapses while the shell is still foreground (Pi not up yet).
     await vi.advanceTimersByTimeAsync(350 + 1200 + 6000)
     await flushAsyncTicks()
 
@@ -426,27 +426,27 @@ describe('connectPanePty', () => {
     })
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('alt-enter')
 
-    // Droid finally boots and a focus event re-samples: trust is recoverable.
-    foreground = 'droid'
+    // Pi finally boots and a focus event re-samples: trust is recoverable.
+    foreground = 'pi'
     binding.sampleForegroundAgentOnFocus()
     await vi.advanceTimersByTimeAsync(350 + 1200 + 6000)
     await flushAsyncTicks()
 
     expect(mockStoreState.paneForegroundAgentByPaneKey[paneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     })
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('csi-u')
   })
 
-  it('revokes trusted Droid after accepted no-OSC exit input until shell confirmation', async () => {
+  it('revokes trusted Pi after accepted no-OSC exit input until shell confirmation', async () => {
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
     vi.mocked(window.api.pty.confirmForegroundProcess).mockResolvedValue('cmd.exe')
     const pane = createPane(1)
-    const ptyId = 'pty-droid-exit-no-osc'
-    const tabId = 'tab-droid-exit-no-osc'
+    const ptyId = 'pty-pi-exit-no-osc'
+    const tabId = 'tab-pi-exit-no-osc'
     const paneKey = makePaneKey(tabId, LEAF_1)
     transportFactoryQueue.push(createMockTransport(ptyId))
 
@@ -454,7 +454,7 @@ describe('connectPanePty', () => {
     await vi.advanceTimersByTimeAsync(20)
     await flushAsyncTicks()
     mockStoreState.paneForegroundAgentByPaneKey[paneKey] = {
-      agent: 'droid',
+      agent: 'pi',
       routingTrusted: true,
       shellForeground: false
     }
@@ -463,7 +463,7 @@ describe('connectPanePty', () => {
     await flushAsyncTicks()
 
     expect(mockStoreState.paneForegroundAgentByPaneKey[paneKey]).toEqual({
-      agent: 'droid',
+      agent: 'pi',
       routingRevoked: true,
       routingConfirmationPending: true,
       shellForeground: false
@@ -532,7 +532,7 @@ describe('connectPanePty', () => {
     })
   })
 
-  it('never promotes typed Droid text when foreground enrichment is unavailable', async () => {
+  it('never promotes typed Pi text when foreground enrichment is unavailable', async () => {
     vi.useFakeTimers()
     const { connectPanePty } = await import('./pty-connection')
     vi.mocked(window.api.pty.confirmForegroundProcess)
@@ -541,8 +541,8 @@ describe('connectPanePty', () => {
       .mockResolvedValueOnce(null)
     const dataCallbackRef: { current: ((data: string) => void) | null } = { current: null }
     const pane = createPane(1)
-    const ptyId = 'pty-typed-droid-unavailable-start'
-    const tabId = 'tab-typed-droid-unavailable-start'
+    const ptyId = 'pty-typed-pi-unavailable-start'
+    const tabId = 'tab-typed-pi-unavailable-start'
     const paneKey = makePaneKey(tabId, LEAF_1)
     const transport = createMockTransport(ptyId)
     transport.connect.mockImplementation(async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
@@ -559,7 +559,7 @@ describe('connectPanePty', () => {
     await vi.advanceTimersByTimeAsync(20)
     await flushAsyncTicks()
 
-    sendTerminalInputThroughPane(pane, 'droid\r')
+    sendTerminalInputThroughPane(pane, 'pi\r')
     dataCallbackRef.current?.('\x1b]133;C\x07')
     await vi.advanceTimersByTimeAsync(350)
     expect(resolveMockPaneWindowsShiftEnterEncoding(mockStoreState, paneKey)).toBe('alt-enter')

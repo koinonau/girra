@@ -293,7 +293,6 @@ describe('agent prompt submission verification', () => {
 
   it('gives hook-observed agents the longer effect window', () => {
     expect(resolveAgentPromptEffectTimeoutMs('codex')).toBe(AGENT_PROMPT_HOOK_EFFECT_TIMEOUT_MS)
-    expect(resolveAgentPromptEffectTimeoutMs('kimi')).toBe(AGENT_PROMPT_HOOK_EFFECT_TIMEOUT_MS)
     expect(resolveAgentPromptEffectTimeoutMs('claude')).toBe(AGENT_PROMPT_EFFECT_TIMEOUT_MS)
     expect(resolveAgentPromptEffectTimeoutMs(null)).toBe(AGENT_PROMPT_EFFECT_TIMEOUT_MS)
   })

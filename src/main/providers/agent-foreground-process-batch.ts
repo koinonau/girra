@@ -3,7 +3,6 @@ import {
   isExpectedAgentProcess
 } from '../../shared/agent-process-recognition'
 import { getFirstCommandToken } from '../../shared/command-token-scanner'
-import { resolveOuterWrapperForegroundProcess } from '../../shared/foreground-wrapper-agent'
 import { selectForegroundProcessCandidate } from '../../shared/foreground-process-selection'
 import type {
   ForegroundProcessEvidence,
@@ -259,11 +258,7 @@ export function resolveAgentForegroundProcessesFromIndex(
     if (selected) {
       return {
         available: true,
-        processName: resolveOuterWrapperForegroundProcess(
-          selected.recognized,
-          selected.candidate,
-          allCandidates
-        ),
+        processName: selected.recognized.processName,
         shellOwnsEveryTtyProcessGroup
       }
     }

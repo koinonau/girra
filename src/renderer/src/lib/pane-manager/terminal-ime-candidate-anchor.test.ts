@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import type { IBuffer, IBufferCell, IBufferLine, Terminal } from '@xterm/xterm'
+import { afterEach, describe, expect, it } from 'vitest'
+import type { Terminal } from '@xterm/xterm'
 import { installTerminalImeCandidateAnchor } from './terminal-ime-candidate-anchor'
 
 const COLS = 80
@@ -13,32 +13,8 @@ type AnchorHarness = {
   terminal: Terminal
   element: HTMLElement
   style: { top: string; left: string; width: string }
-  compositionStyle: CSSStyleDeclaration
   counts: { rectReads: number; styleWrites: number }
   setCursor: (cursorX: number, cursorY: number) => void
-  setLines: (lines: string[]) => void
-}
-
-function makeLine(text: string): IBufferLine {
-  const chars = Array.from(text)
-  while (chars.length < COLS) {
-    chars.push(' ')
-  }
-  const cellAt = (column: number): IBufferCell | undefined => {
-    const char = chars[column]
-    return char === undefined
-      ? undefined
-      : ({ getWidth: () => 1, getChars: () => (char === ' ' ? '' : char) } as IBufferCell)
-  }
-  return {
-    isWrapped: false,
-    length: chars.length,
-    getCell: cellAt,
-    translateToString: (trimRight = false, start = 0, end = chars.length) => {
-      const result = chars.slice(start, end).join('')
-      return trimRight ? result.replace(/\s+$/, '') : result
-    }
-  } as IBufferLine
 }
 
 function createHarness(): AnchorHarness {
@@ -46,9 +22,6 @@ function createHarness(): AnchorHarness {
   const element = document.createElement('div')
   const screen = document.createElement('div')
   screen.className = 'xterm-screen'
-  const compositionView = document.createElement('div')
-  compositionView.className = 'composition-view'
-  screen.appendChild(compositionView)
   element.appendChild(screen)
   document.body.appendChild(element)
 
@@ -71,14 +44,7 @@ function createHarness(): AnchorHarness {
     })
   } as unknown as HTMLTextAreaElement
 
-  let lines = ['']
-  const buffer = {
-    baseY: 0,
-    cursorX: 0,
-    cursorY: 0,
-    length: ROWS,
-    getLine: (row: number) => (row < lines.length ? makeLine(lines[row] ?? '') : makeLine(''))
-  } as unknown as IBuffer
+  const buffer = { cursorX: 0, cursorY: 0 }
 
   const terminal = {
     element,
@@ -92,13 +58,9 @@ function createHarness(): AnchorHarness {
     terminal,
     element,
     style,
-    compositionStyle: compositionView.style,
     counts,
     setCursor: (cursorX: number, cursorY: number) => {
       Object.assign(buffer, { cursorX, cursorY })
-    },
-    setLines: (next: string[]) => {
-      lines = next
     }
   }
 }
@@ -122,12 +84,7 @@ function typeHangulSyllable(
 }
 
 describe('installTerminalImeCandidateAnchor', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-
   afterEach(() => {
-    vi.useRealTimers()
     document.body.innerHTML = ''
   })
 
@@ -223,120 +180,5 @@ describe('installTerminalImeCandidateAnchor', () => {
     fire(harness.element, 'compositionupdate')
 
     expect(harness.counts.rectReads).toBe(2)
-  })
-
-  it('coalesces the deferred Cursor Agent re-apply to one timer per burst', () => {
-    const harness = createHarness()
-    harness.setLines(['Cursor Agent', '', '→ hello'])
-    installTerminalImeCandidateAnchor(harness.terminal)
-
-    typeHangulSyllable(harness, 0, 5, 1)
-
-    expect(vi.getTimerCount()).toBe(1)
-    harness.style.top = '0px'
-    vi.runAllTimers()
-    expect(harness.style).toEqual({
-      top: `${2 * CELL_HEIGHT}px`,
-      left: `${7 * CELL_WIDTH}px`,
-      width: ''
-    })
-  })
-
-  it("re-queues the correction after xterm's latest composition timer", () => {
-    const harness = createHarness()
-    harness.setLines(['Cursor Agent', '', '→ hello'])
-    harness.element.addEventListener('compositionupdate', () => {
-      window.setTimeout(() => {
-        harness.style.top = '0px'
-      }, 0)
-    })
-    installTerminalImeCandidateAnchor(harness.terminal)
-
-    harness.setCursor(0, 1)
-    fire(harness.element, 'compositionstart')
-    fire(harness.element, 'compositionupdate')
-    vi.runAllTimers()
-
-    expect(harness.style.top).toBe(`${2 * CELL_HEIGHT}px`)
-  })
-
-  it('keeps the Cursor Agent preedit overlay on the textarea anchor', () => {
-    const harness = createHarness()
-    harness.setLines(['Cursor Agent', '', '→ hello'])
-    harness.element.addEventListener('compositionupdate', () => {
-      window.setTimeout(() => {
-        harness.style.top = `${CELL_HEIGHT}px`
-        harness.compositionStyle.top = `${CELL_HEIGHT}px`
-        harness.compositionStyle.left = '0px'
-      }, 0)
-    })
-    installTerminalImeCandidateAnchor(harness.terminal)
-
-    harness.setCursor(0, 1)
-    fire(harness.element, 'compositionstart')
-    fire(harness.element, 'compositionupdate')
-    vi.runAllTimers()
-
-    expect(harness.style).toEqual({
-      top: `${2 * CELL_HEIGHT}px`,
-      left: `${7 * CELL_WIDTH}px`,
-      width: ''
-    })
-    expect(harness.compositionStyle.top).toBe(`${2 * CELL_HEIGHT}px`)
-    expect(harness.compositionStyle.left).toBe(`${7 * CELL_WIDTH}px`)
-    expect(harness.compositionStyle.height).toBe(`${CELL_HEIGHT}px`)
-    expect(harness.compositionStyle.lineHeight).toBe(`${CELL_HEIGHT}px`)
-  })
-
-  it('keeps typed follow-ups anchored after recognizing the initial Cursor Agent screen', () => {
-    const harness = createHarness()
-    harness.setLines(['Cursor Agent', '', '→ Plan, search, build anything', ''])
-    installTerminalImeCandidateAnchor(harness.terminal)
-    typeHangulSyllable(harness, 0, 1, 3)
-
-    harness.setLines(['transcript', '', '→ hello', ''])
-    harness.style.left = '0px'
-    fire(harness.element, 'compositionupdate')
-    vi.runAllTimers()
-
-    expect(harness.style).toEqual({
-      top: `${2 * CELL_HEIGHT}px`,
-      left: `${7 * CELL_WIDTH}px`,
-      width: ''
-    })
-    expect(harness.compositionStyle.left).toBe(`${7 * CELL_WIDTH}px`)
-  })
-
-  it('refreshes the deferred metrics and anchor after a refit', () => {
-    const harness = createHarness()
-    harness.setLines(['Cursor Agent', '', '→ hello'])
-    installTerminalImeCandidateAnchor(harness.terminal)
-    typeHangulSyllable(harness, 0, 5, 1)
-
-    Object.assign(harness.terminal, { cols: 40 })
-    harness.setLines(['Cursor Agent', '', '', '→ hello'])
-    harness.style.top = '0px'
-    vi.runAllTimers()
-
-    expect(harness.counts.rectReads).toBe(2)
-    expect(harness.style).toEqual({
-      top: `${3 * CELL_HEIGHT}px`,
-      left: `${14 * CELL_WIDTH}px`,
-      width: ''
-    })
-  })
-
-  it('stops writing once the textarea has been detached', () => {
-    const harness = createHarness()
-    harness.setLines(['Cursor Agent', '', '→ hello'])
-    installTerminalImeCandidateAnchor(harness.terminal)
-    typeHangulSyllable(harness, 0, 1, 1)
-
-    Object.assign(harness.terminal.textarea as object, { isConnected: false })
-    const writesBeforeTimer = harness.counts.styleWrites
-    harness.style.top = '0px'
-    vi.runAllTimers()
-
-    expect(harness.counts.styleWrites).toBe(writesBeforeTimer)
   })
 })

@@ -18,7 +18,7 @@ import { MANUAL_AGENT_COMMAND_MAX_CHARS } from './pty-connect-limits'
 import type { ConnectPanePtySession } from './connect-pane-pty-session'
 
 export function installCommandInferredPaneAgent(session: ConnectPanePtySession): void {
-  // Why: infer pane ownership from a manually typed agent command (e.g. `omp`) by
+  // Why: infer pane ownership from a manually typed agent command (e.g. `pi`) by
   // shadowing the shell's current command line, for generic terminals where no
   // launch metadata exists. Consumed by getAuthoritativePaneAgent below.
   session.commandInferredPaneAgent = null

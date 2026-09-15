@@ -195,7 +195,7 @@ What remains is `-EncodedCommand` without the bypass: the PTY bootstraps
 — that last one only as a _fallback_ since #18875, see below),
 `src/main/runtime/windows-default-route-interfaces.ts`,
 `src/main/runtime/orchestration/setup-completion-signal.ts`,
-`src/shared/hermes-startup-query.ts`, and the four ex-bypass sites above.
+and the four ex-bypass sites above.
 `src/main/runtime/windows-mobile-firewall.ts` encodes a script and launches it
 _elevated_ through `Start-Process -Verb RunAs`, which is a stronger shape than
 any of those; only that hop is encoded, because `-ArgumentList` re-splits an
@@ -361,9 +361,6 @@ non-update clusters contain no unsigned binary at all.
 
 Two limits the incident analysis recorded, kept here rather than smoothed over:
 
-- **No data on Hermes.** Nothing in this document describes how Hermes behaves
-  under the same tenant policy — though `src/shared/hermes-startup-query.ts` does
-  spell `-EncodedCommand`, so the gap is telemetry, not surface.
 - **Antigravity not being flagged is absence of evidence, not proof.** It is one
   reporter's recollection from one machine, not a measurement. It is strong
   enough to falsify "the problem is that we are not signed well enough"; it is

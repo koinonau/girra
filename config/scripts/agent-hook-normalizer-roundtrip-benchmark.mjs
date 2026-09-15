@@ -153,7 +153,7 @@ function makePayload(messageBytes) {
   return {
     state: 'working',
     prompt: 'do the thing',
-    agentType: 'grok',
+    agentType: 'claude',
     toolName: 'shell_command',
     toolInput: 'ls -la',
     lastAssistantMessage: 'x'.repeat(messageBytes)

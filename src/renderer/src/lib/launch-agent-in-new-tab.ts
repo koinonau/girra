@@ -22,7 +22,6 @@ import {
 } from '../../../shared/tui-agent-launch-defaults'
 import { resolveLocalWindowsAgentStartupShell } from '../../../shared/windows-terminal-shell'
 import { TUI_AGENT_CONFIG } from '../../../shared/tui-agent-config'
-import { seedCommandCodeSubmittedPromptStatus } from '@/lib/command-code-prompt-status-seed'
 import type { TuiAgent } from '../../../shared/tui-agent'
 import type { LaunchSource } from '../../../shared/worktree/launch-types'
 import { getConnectionIdFromState } from '@/lib/connection-context'
@@ -247,9 +246,6 @@ function launchAgentInNewTabInternal(
     ...(startupPlan.startupCommandDelivery
       ? { startupCommandDelivery: startupPlan.startupCommandDelivery }
       : {}),
-    ...(agent === 'command-code' && hasPrompt && promptDelivery === 'auto-submit'
-      ? { initialAgentStatus: { agent, prompt: trimmedPrompt } }
-      : {}),
     telemetry: {
       agent_kind: tuiAgentToAgentKind(agent),
       launch_source: launchSource ?? 'tab_bar_quick_launch',
@@ -278,11 +274,6 @@ function launchAgentInNewTabInternal(
       onTimeout: timeoutNotice.onTimeout
     }).then((delivered) => {
       if (delivered) {
-        if (agent === 'command-code' && submitPastedPrompt) {
-          // Why: Command Code has no prompt-submit hook; when Orca submits a
-          // generated prompt after readiness, seed working at delivery time.
-          seedCommandCodeSubmittedPromptStatus(worktreeId, tab.id, trimmedPrompt)
-        }
         onPromptDelivered?.()
       }
       return { delivered, failureNotified: !delivered && timeoutNotice.wasNotified() }

@@ -67,9 +67,9 @@ export function installPaneAgentIdentity(session: ConnectPanePtySession): void {
       isTuiAgent(registeredLaunchAgent)
     )
   }
-  // Why: a plain `codex`/`grok` sets its OSC title and the shell never repaints
+  // Why: a plain `codex`/`opencode` sets its OSC title and the shell never repaints
   // it on exit, so a confirmed return-to-shell must clear a title that still
-  // names an agent — otherwise the tab reads "grok" over a bare prompt. Only
+  // names an agent — otherwise the tab reads "opencode" over a bare prompt. Only
   // reset an agent-named title; user/shell-set titles are left untouched.
   session.clearStaleAgentTabTitleOnConfirmedShell = (): void => {
     const state = useAppStore.getState()

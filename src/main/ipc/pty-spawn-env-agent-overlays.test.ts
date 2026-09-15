@@ -141,37 +141,25 @@ describe('registerPtyHandlers', () => {
     )
     it('installs Pi managed extensions without redirecting Orca terminal PTY homes', async () => {
       const env = await spawnAndGetEnv(undefined, { PI_CODING_AGENT_DIR: '/tmp/user-pi-agent' })
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-        expect.any(String),
-        '/tmp/user-pi-agent',
-        'pi',
-        {
-          materializeDefaultHome: false
-        }
-      )
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, 'omp', {
+      expect(piBuildPtyEnvMock).toHaveBeenCalledTimes(1)
+      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/tmp/user-pi-agent', {
         materializeDefaultHome: false
       })
       expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/user-pi-agent')
       expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
       expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
-      expect(env.ORCA_OMP_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(
-        '/tmp/orca-user-data/omp-managed-status-extension/orca-agent-status.ts'
-      )
-      expect(env.ORCA_OMP_SOURCE_AGENT_DIR).toBeUndefined()
     })
     it('does not materialize a missing Pi home when another agent mentions Pi', async () => {
       const env = await spawnAndGetEnv(
         undefined,
         undefined,
         undefined,
-        'codex "ask about pi"',
-        'codex'
+        'claude "ask about pi"',
+        'claude'
       )
 
       expect(piBuildPtyEnvMock).toHaveBeenCalledTimes(1)
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, 'pi', {
+      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, {
         materializeDefaultHome: false
       })
       expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
@@ -179,94 +167,49 @@ describe('registerPtyHandlers', () => {
     it('materializes Pi home for an explicit Pi launch through a custom command', async () => {
       const env = await spawnAndGetEnv(undefined, undefined, undefined, 'custom-pi-wrapper', 'pi')
 
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, 'pi', {
+      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, {
         materializeDefaultHome: true
       })
       expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/default-pi-agent')
     })
-    it('threads command: "omp" through to piBuildPtyEnv and emits OMP status metadata', async () => {
-      // Why: OMP launches emit ORCA_OMP_* shadow vars, not Pi-named ones; only PI_CODING_AGENT_DIR stays (OMP's own binary reads it).
+    it('threads command: "pi" through to piBuildPtyEnv as an explicit launch', async () => {
       const env = await spawnAndGetEnv(
         undefined,
-        { PI_CODING_AGENT_DIR: '/tmp/user-omp-agent' },
+        { PI_CODING_AGENT_DIR: '/tmp/user-pi-agent' },
         undefined,
-        'omp'
+        'pi'
       )
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-        expect.any(String),
-        '/tmp/user-omp-agent',
-        'omp',
-        { materializeDefaultHome: true }
-      )
-      expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/user-omp-agent')
-      expect(env.ORCA_OMP_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(
-        '/tmp/user-omp-agent/extensions/orca-agent-status.ts'
-      )
-      expect(env.ORCA_OMP_SOURCE_AGENT_DIR).toBe('/tmp/user-omp-agent')
-      // CRITICAL: a Pi-named shadow MUST NOT leak into an OMP PTY env.
+      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/tmp/user-pi-agent', {
+        materializeDefaultHome: true
+      })
+      expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/user-pi-agent')
       expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
+      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
     })
-    it('installs Prime status into its independent agent dir on explicit launch', async () => {
+    it('uses sequenced startup env as the Pi launch hint when command is a wrapper', async () => {
       const env = await spawnAndGetEnv(
-        undefined,
         {
           PI_CODING_AGENT_DIR: '/tmp/user-pi-agent',
-          PRIME_AGENT_CODING_AGENT_DIR: '/tmp/user-prime-agent'
-        },
-        undefined,
-        'prime-agent'
-      )
-
-      expect(piBuildPtyEnvMock).toHaveBeenCalledTimes(1)
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-        expect.any(String),
-        '/tmp/user-prime-agent',
-        'prime-agent',
-        { materializeDefaultHome: true }
-      )
-      expect(env.PRIME_AGENT_CODING_AGENT_DIR).toBe('/tmp/user-prime-agent')
-      expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/user-pi-agent')
-      expect(env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR).toBe('/tmp/user-prime-agent')
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_OMP_SOURCE_AGENT_DIR).toBeUndefined()
-    })
-    it('uses sequenced startup env as the OMP launch hint when command is a wrapper', async () => {
-      const env = await spawnAndGetEnv(
-        {
-          PI_CODING_AGENT_DIR: '/tmp/user-omp-agent',
-          [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'omp --resume'
+          [SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV]: 'pi --resume'
         },
         undefined,
         undefined,
         'powershell wait-wrapper'
       )
 
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-        expect.any(String),
-        '/tmp/user-omp-agent',
-        'omp',
-        { materializeDefaultHome: true }
-      )
-      expect(env.ORCA_OMP_STATUS_EXTENSION).toBe(
-        '/tmp/user-omp-agent/extensions/orca-agent-status.ts'
-      )
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
+      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/tmp/user-pi-agent', {
+        materializeDefaultHome: true
+      })
+      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
     })
     it('mirrors the original Pi source dir when launched from an Orca overlay shell', async () => {
       const env = await spawnAndGetEnv({
         PI_CODING_AGENT_DIR: '/tmp/parent-orca-pi-overlay',
         ORCA_PI_SOURCE_AGENT_DIR: '/tmp/user-pi-agent'
       })
-      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(
-        expect.any(String),
-        '/tmp/user-pi-agent',
-        'pi',
-        {
-          materializeDefaultHome: false
-        }
-      )
+      expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/tmp/user-pi-agent', {
+        materializeDefaultHome: false
+      })
       expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/parent-orca-pi-overlay')
       expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
       expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')

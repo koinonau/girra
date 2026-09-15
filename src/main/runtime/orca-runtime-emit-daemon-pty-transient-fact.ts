@@ -5,8 +5,7 @@ import type {
   TerminalSideEffectBatch,
   TerminalSideEffectFact
 } from '../../shared/terminal-side-effect-facts'
-import { isCursorNativeAgentTitle, normalizeTerminalTitle } from '../../shared/agent-detection'
-import type { TerminalTitleFactMeta } from '../../shared/terminal-output-side-effects'
+import { normalizeTerminalTitle } from '../../shared/agent-detection'
 
 export class OrcaRuntimeWithEmitDaemonPtyTransientFact extends OrcaRuntimeWithScheduleWaitBlockedCheck {
   /** A transient fact the daemon detected while it held scan authority —
@@ -137,13 +136,7 @@ export class OrcaRuntimeWithEmitDaemonPtyTransientFact extends OrcaRuntimeWithSc
     const tracker = this.ptyTitleTrackersByPtyId.get(ptyId)?.tracker
     const recordTitle = this.ptysById.get(ptyId)?.lastOscTitle
     const normalizedTitle = tracker?.getLastNormalizedTitle() ?? null
-    // Why: a record-fallback snapshot must not replay the bare cursor-agent literal over a
-    // tracker title Orca synthesized from hooks — but with no tracker title it is the pane's
-    // only Cursor identity, so restored/mobile tabs keep it (#10258).
-    const rawTitle =
-      recordTitle && (normalizedTitle === null || !isCursorNativeAgentTitle(recordTitle))
-        ? recordTitle
-        : null
+    const rawTitle = recordTitle || null
     if (normalizedTitle === null && !rawTitle) {
       return null
     }
@@ -177,11 +170,7 @@ export class OrcaRuntimeWithEmitDaemonPtyTransientFact extends OrcaRuntimeWithSc
     return null
   }
 
-  protected isLiveCursorNativeTitle(rawTitle: string, meta?: TerminalTitleFactMeta): boolean {
-    return isCursorNativeAgentTitle(rawTitle) && meta?.staleWorkingTitleClear !== true
-  }
-
-  /** Display fallback for identities intentionally omitted from liveness records. */
+  /** Display title: the tracked record first, then the tracker's normalized title. */
   protected getTrackedDisplayTitleForPty(ptyId: string): string | null {
     return (
       this.getTrackedRawTitleForPty(ptyId) ??

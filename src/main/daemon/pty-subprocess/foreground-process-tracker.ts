@@ -17,10 +17,6 @@ import {
   recognizeAgentProcess,
   type RecognizedAgentProcess
 } from '../../../shared/agent-process-recognition'
-import {
-  shouldInspectOuterWrapperForegroundName,
-  shouldInspectOuterWrapperForegroundProcess
-} from '../../../shared/foreground-wrapper-agent'
 import { isShellProcess } from '../../../shared/shell-process-detection'
 import { resolveFallbackForegroundProcess } from './foreground-fallback-process'
 import { parsePtySessionId } from '../pty-session-id'
@@ -86,7 +82,6 @@ export function createPtyForegroundProcessTracker(args: {
     fallbackProcess !== null &&
     (isShellProcess(fallbackProcess) ||
       isAgentForegroundWrapperProcess(fallbackProcess) ||
-      shouldInspectOuterWrapperForegroundName(fallbackProcess) ||
       process.platform !== 'win32')
 
   const scheduleRefresh = (fallbackProcess: string | null): void => {
@@ -97,8 +92,7 @@ export function createPtyForegroundProcessTracker(args: {
     const fallbackRecognition = recognizeAgentProcess(fallbackProcess)
     if (
       !fallbackProcess ||
-      (fallbackRecognition !== null &&
-        !shouldInspectOuterWrapperForegroundProcess(fallbackRecognition)) ||
+      fallbackRecognition !== null ||
       !shouldInspectFallback(fallbackProcess)
     ) {
       return
@@ -224,11 +218,7 @@ export function createPtyForegroundProcessTracker(args: {
       }
       try {
         const fallbackProcess = getFallbackProcess()
-        const fallbackRecognition = recognizeAgentProcess(fallbackProcess)
-        const inspectOuterWrapper =
-          fallbackRecognition !== null &&
-          shouldInspectOuterWrapperForegroundProcess(fallbackRecognition)
-        if (fallbackProcess && fallbackRecognition && !inspectOuterWrapper) {
+        if (fallbackProcess && recognizeAgentProcess(fallbackProcess)) {
           cachedAgentForeground = {
             processName: fallbackProcess,
             pid: null,
@@ -249,7 +239,6 @@ export function createPtyForegroundProcessTracker(args: {
           cachedAgentForeground &&
           fallbackProcess !== null &&
           (isAgentForegroundWrapperProcess(fallbackProcess) ||
-            inspectOuterWrapper ||
             (process.platform === 'win32' && isShellProcess(fallbackProcess)))
         ) {
           return cachedAgentForeground.processName
@@ -272,9 +261,7 @@ export function createPtyForegroundProcessTracker(args: {
         const fallbackRecognition = recognizeAgentProcess(fallbackProcess)
         if (
           !fallbackProcess ||
-          (fallbackRecognition !== null &&
-            process.platform !== 'win32' &&
-            !shouldInspectOuterWrapperForegroundProcess(fallbackRecognition)) ||
+          (fallbackRecognition !== null && process.platform !== 'win32') ||
           (process.platform !== 'win32' && !shouldInspectFallback(fallbackProcess))
         ) {
           return fallbackProcess

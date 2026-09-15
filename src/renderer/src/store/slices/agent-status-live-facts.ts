@@ -34,7 +34,6 @@ export type AgentStatusLiveFactsArgs = {
   existing: AgentStatusEntry | undefined
   launchConfigSource: SleepingAgentLaunchConfig | undefined
   retainsResumableRecoveryIdentity: boolean
-  commandCodeNewTurn: boolean
   updatedAt: number
 }
 
@@ -46,7 +45,6 @@ export function deriveAgentStatusLiveFacts(args: AgentStatusLiveFactsArgs): Agen
     existing,
     launchConfigSource,
     retainsResumableRecoveryIdentity,
-    commandCodeNewTurn,
     updatedAt
   } = args
   const boundaryResolved =
@@ -76,7 +74,6 @@ export function deriveAgentStatusLiveFacts(args: AgentStatusLiveFactsArgs): Agen
     existing.state !== entry.state ||
     !wasFresh ||
     attributionChanged ||
-    commandCodeNewTurn ||
     sameStateStateStartedAtChanged ||
     sameStateDoneAttentionChanged
   const doneRetentionFieldsChanged =

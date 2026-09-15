@@ -37,7 +37,6 @@ export function bindPrepaintParkedSshSnapshot(session: ConnectPanePtySession): v
               return
             }
             const modelData = `${snapshot.scrollbackAnsi ?? ''}${snapshot.data}`
-            session.rememberReattachPayloadAgentSignal(modelData, { fullScreenReplay: true })
             if (
               hasPositiveTerminalDimensions(snapshot.cols, snapshot.rows) &&
               (session.pane.terminal.cols !== snapshot.cols ||

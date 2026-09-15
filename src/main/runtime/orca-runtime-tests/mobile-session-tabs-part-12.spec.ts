@@ -57,8 +57,8 @@ describe('OrcaRuntimeService', () => {
         getSettings: () => ({
           ...store.getSettings(),
           disabledTuiAgents: [],
-          agentCmdOverrides: { 'command-code': 'command-code --profile mobile' },
-          agentDefaultArgs: { 'command-code': '--note "can\'t"' },
+          agentCmdOverrides: { opencode: 'opencode --profile mobile' },
+          agentDefaultArgs: { opencode: '--note "can\'t"' },
           localWindowsRuntimeDefault: { kind: 'windows-host' }
         })
       } as never)
@@ -71,12 +71,12 @@ describe('OrcaRuntimeService', () => {
       runtime.syncWindowGraph(0, { tabs: [], leaves: [] })
 
       await runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'command-code'
+        agent: 'opencode'
       })
 
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
-          command: `command-code --profile mobile '--note' 'can'"'"'t'`,
+          command: `opencode --profile mobile '--note' 'can'"'"'t'`,
           cwd: TEST_WORKTREE_PATH,
           worktreeId: TEST_WORKTREE_ID
         })
@@ -103,8 +103,8 @@ describe('OrcaRuntimeService', () => {
         getSettings: () => ({
           ...store.getSettings(),
           disabledTuiAgents: [],
-          agentCmdOverrides: { 'command-code': 'command-code --profile mobile' },
-          agentDefaultArgs: { 'command-code': '--note "can\'t"' },
+          agentCmdOverrides: { opencode: 'opencode --profile mobile' },
+          agentDefaultArgs: { opencode: '--note "can\'t"' },
           localWindowsRuntimeDefault: { kind: 'wsl', distro: 'Ubuntu' }
         })
       } as never)
@@ -117,12 +117,12 @@ describe('OrcaRuntimeService', () => {
       runtime.syncWindowGraph(0, { tabs: [], leaves: [] })
 
       await runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'command-code'
+        agent: 'opencode'
       })
 
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
-          command: "command-code --profile mobile '--note' 'can''t'",
+          command: "opencode --profile mobile '--note' 'can''t'",
           cwd: TEST_WORKTREE_PATH,
           worktreeId: TEST_WORKTREE_ID
         })
@@ -149,8 +149,8 @@ describe('OrcaRuntimeService', () => {
         getSettings: () => ({
           ...store.getSettings(),
           disabledTuiAgents: [],
-          agentCmdOverrides: { 'command-code': 'command-code --profile mobile' },
-          agentDefaultArgs: { 'command-code': '--note "can\'t"' },
+          agentCmdOverrides: { opencode: 'opencode --profile mobile' },
+          agentDefaultArgs: { opencode: '--note "can\'t"' },
           localWindowsRuntimeDefault: { kind: 'wsl', distro: 'Ubuntu' },
           terminalWindowsShell: 'cmd.exe'
         })
@@ -164,12 +164,12 @@ describe('OrcaRuntimeService', () => {
       runtime.syncWindowGraph(0, { tabs: [], leaves: [] })
 
       await runtime.createMobileSessionTerminal(`id:${TEST_WORKTREE_ID}`, {
-        agent: 'command-code'
+        agent: 'opencode'
       })
 
       expect(spawn).toHaveBeenCalledWith(
         expect.objectContaining({
-          command: 'command-code --profile mobile "--note" "can\'t"',
+          command: 'opencode --profile mobile "--note" "can\'t"',
           cwd: TEST_WORKTREE_PATH,
           worktreeId: TEST_WORKTREE_ID
         })

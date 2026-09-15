@@ -5,31 +5,25 @@ import {
 } from './agent-status-extension-test-harness'
 
 describe('Pi status owner recovery', () => {
-  it.each(['pi', 'omp', 'prime-agent'] as const)(
-    'claims the pane for a restarted %s agent whose inherited owner PID is dead',
-    async (kind) => {
-      // Why: STA-5245 -- a restart leaves a dead owner PID in the inherited env.
-      // Without a liveness probe the guard suppresses every later load, so the
-      // pane never reports status again.
-      const ownerKey =
-        kind === 'prime-agent' ? 'ORCA_PRIME_AGENT_STATUS_OWNED' : 'ORCA_PI_STATUS_OWNED'
-      const harness = createHarness({
-        kind,
-        pid: SELF_PID,
-        env: { [ownerKey]: String(SELF_PID - 1) },
-        killImpl: () => {
-          throw Object.assign(new Error('ESRCH'), { code: 'ESRCH' })
-        }
-      })
+  it('claims the pane for a restarted agent whose inherited owner PID is dead', async () => {
+    // Why: STA-5245 -- a restart leaves a dead owner PID in the inherited env.
+    // Without a liveness probe the guard suppresses every later load, so the
+    // pane never reports status again.
+    const harness = createHarness({
+      pid: SELF_PID,
+      env: { ORCA_PI_STATUS_OWNED: String(SELF_PID - 1) },
+      killImpl: () => {
+        throw Object.assign(new Error('ESRCH'), { code: 'ESRCH' })
+      }
+    })
 
-      expect(harness.killMock).toHaveBeenCalledWith(SELF_PID - 1, 0)
-      expect(harness.handlers.agent_end).toBeTypeOf('function')
-      expect(harness.processEnv[ownerKey]).toBe(String(SELF_PID))
+    expect(harness.killMock).toHaveBeenCalledWith(SELF_PID - 1, 0)
+    expect(harness.handlers.agent_end).toBeTypeOf('function')
+    expect(harness.processEnv.ORCA_PI_STATUS_OWNED).toBe(String(SELF_PID))
 
-      await harness.callHook('agent_end')
-      expect(harness.fetchMock).toHaveBeenCalledTimes(1)
-    }
-  )
+    await harness.callHook('agent_end')
+    expect(harness.fetchMock).toHaveBeenCalledTimes(1)
+  })
 
   it.each(['EPERM', 'EACCES', 'EINVAL', undefined])(
     'keeps suppression for unverifiable probe error %s',
@@ -37,7 +31,6 @@ describe('Pi status owner recovery', () => {
       // Why: EPERM means the owner exists but belongs to another user, so
       // claiming the pane there would reintroduce double-reporting.
       const harness = createHarness({
-        kind: 'pi',
         pid: SELF_PID,
         env: { ORCA_PI_STATUS_OWNED: String(SELF_PID - 1) },
         killImpl: () => {
@@ -53,7 +46,6 @@ describe('Pi status owner recovery', () => {
   it('claims the pane when the inherited owner PID is not a usable pid', () => {
     // Why: a truncated/garbage marker is not evidence of a live owner.
     const harness = createHarness({
-      kind: 'pi',
       pid: SELF_PID,
       env: { ORCA_PI_STATUS_OWNED: 'not-a-pid' }
     })
@@ -65,7 +57,6 @@ describe('Pi status owner recovery', () => {
 
   it('claims the pane when the inherited owner PID exceeds safe integer precision', () => {
     const harness = createHarness({
-      kind: 'pi',
       pid: SELF_PID,
       env: { ORCA_PI_STATUS_OWNED: '99999999999999999999999' }
     })
@@ -77,7 +68,6 @@ describe('Pi status owner recovery', () => {
 
   it('claims the pane when the inherited owner PID exceeds the process API range', () => {
     const harness = createHarness({
-      kind: 'pi',
       pid: SELF_PID,
       env: { ORCA_PI_STATUS_OWNED: String(2 ** 31) }
     })

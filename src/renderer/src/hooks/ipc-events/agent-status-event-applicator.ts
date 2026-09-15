@@ -15,7 +15,6 @@ import {
   applyResolvedAgentTerminalTitleToTab,
   hasRuntimeBackedWorktreeAttribution,
   isAgentStatusForRecentlyClosedTab,
-  resolveHookPayloadAgentType,
   shouldApplyResolvedAgentTerminalTitleToTab
 } from './agent-status-routing'
 import {
@@ -170,10 +169,9 @@ export function createAgentStatusEventApplicator(args: {
       )
       return 'applied'
     }
-    const resolvedPayload = resolveHookPayloadAgentType(payload, identityTitle ?? title)
     const statusPayload = data.orchestration
-      ? { ...resolvedPayload, orchestration: data.orchestration }
-      : resolvedPayload
+      ? { ...payload, orchestration: data.orchestration }
+      : payload
     const statusPayloadWithTurnBoundary = data.promptInteractionKey
       ? { ...statusPayload, promptInteractionKey: data.promptInteractionKey }
       : statusPayload
@@ -233,11 +231,11 @@ export function createAgentStatusEventApplicator(args: {
           : undefined
     }
     const applyPostCommitNotification = (): void => {
-      if (statusWorktreeId && (options?.replay !== true || resolvedPayload.state === 'working')) {
+      if (statusWorktreeId && (options?.replay !== true || payload.state === 'working')) {
         const notificationPayload =
           typeof data.stateStartedAt === 'number'
-            ? { ...resolvedPayload, stateStartedAt: data.stateStartedAt }
-            : resolvedPayload
+            ? { ...payload, stateStartedAt: data.stateStartedAt }
+            : payload
         observeAgentHookCompletionForNotification({
           paneKey,
           worktreeId: statusWorktreeId,

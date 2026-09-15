@@ -253,7 +253,7 @@ export function createPaneForegroundAgentTracker(deps: PaneForegroundAgentTracke
       hasAgentExpectation = false
       deps.publish({ agent: null, shellForeground: true })
       // Why: confirmed exit — let callers clear a stale agent title the shell
-      // won't repaint (a plain `codex`/`grok` leaves its OSC title behind).
+      // won't repaint (a plain `codex`/`opencode` leaves its OSC title behind).
       deps.onConfirmedShellForeground?.(reason)
     }
   }

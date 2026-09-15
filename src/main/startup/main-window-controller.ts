@@ -31,10 +31,6 @@ import {
 } from './main-window-lifecycle-flags'
 import { presentGpuFallbackRecoveredLaunchPrompt } from './gpu-lifecycle'
 import { maybeAutoRenameBranchOnFirstWorkFromHook } from './branch-rename-hook'
-import {
-  resumeSyntheticTitleSpinnerTimer,
-  stopSyntheticTitleSpinnerTimer
-} from './synthetic-title-runtime'
 import { requireMainWindowServices } from './main-window-service-readiness'
 
 const TRAY_CREATE_FALLBACK_MS = 12_000
@@ -131,10 +127,6 @@ export function openMainWindow(options: { revealOnDidFinishLoad?: boolean } = {}
   window.webContents.on('did-finish-load', onFirstWindowLoad)
   attachMainWindowCoreServices(window, { markExpectedRendererReload })
   state.mainWindow = window
-  window.on('show', resumeSyntheticTitleSpinnerTimer)
-  window.on('restore', resumeSyntheticTitleSpinnerTimer)
-  window.on('hide', stopSyntheticTitleSpinnerTimer)
-  window.on('minimize', stopSyntheticTitleSpinnerTimer)
   window.on('show', notifyMainWindowBecameVisible)
   window.on('restore', notifyMainWindowBecameVisible)
   window.on('show', () => setTrayAttention(false))

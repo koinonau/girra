@@ -3,9 +3,8 @@ import { OrcaRuntimeService } from '../../../../orca-runtime'
 import { OrchestrationDb } from '../../../../orchestration/db'
 import { ORCHESTRATION_METHODS } from '../../orchestration'
 
-// Why: a federated worker terminal is created from an agent id. Passing that id
-// as a shell command launched Cursor's desktop app instead of `cursor-agent`
-// (issue #11926), so the remote path must resolve through the TUI agent config
+// Why: a federated worker terminal is created from an agent id, which is not a shell
+// command (issue #11926), so the remote path must resolve through the TUI agent config
 // exactly like the local one.
 describe('federated worker agent launch', () => {
   let db: OrchestrationDb | undefined
@@ -59,12 +58,12 @@ describe('federated worker agent launch', () => {
         runId: 'run-home',
         dispatchId: 'ctx_remote',
         taskId: 'task_remote',
-        taskSpec: 'remote cursor worker',
+        taskSpec: 'remote claude worker',
         depth: 2,
         protocolVersion: 3,
         worktree: 'folder:remote-workspace',
-        agent: 'cursor',
-        model: 'gpt-5.3-codex',
+        agent: 'claude',
+        model: 'opus',
         effort: 'high'
       }),
       {
@@ -88,16 +87,16 @@ describe('federated worker agent launch', () => {
     expect(result).toMatchObject({
       state: 'ready',
       launch: {
-        requested: { agent: 'cursor', model: 'gpt-5.3-codex', effort: 'high' },
-        effective: { agent: 'cursor', model: 'gpt-5.3-codex', effort: 'high' }
+        requested: { agent: 'claude', model: 'opus', effort: 'high' },
+        effective: { agent: 'claude', model: 'opus', effort: 'high' }
       }
     })
     expect(db.getRemoteDispatchAttachment('ctx_remote')?.depth).toBe(2)
     expect(createTerminal).toHaveBeenCalledWith(
       'id:folder:remote-workspace',
       expect.objectContaining({
-        startupAgent: 'cursor',
-        launchPreferences: { model: 'gpt-5.3-codex', effort: 'high' }
+        startupAgent: 'claude',
+        launchPreferences: { model: 'opus', effort: 'high' }
       })
     )
     expect(createTerminal).toHaveBeenCalledWith(

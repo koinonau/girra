@@ -1,10 +1,6 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { OrcaRuntimeWithApplyTrackedPtyTitle } from './orca-runtime-apply-tracked-pty-title'
-import type {
-  RuntimePtyTitleTrackerEntry,
-  RuntimePtyWorktreeRecord
-} from './runtime-terminal-state-records'
-import { createCommandCodeOutputStatusDetector } from '../../shared/command-code-output-status'
+import type { RuntimePtyWorktreeRecord } from './runtime-terminal-state-records'
 import { extractLastOsc7Uri, extractOscScanTail } from '../daemon/osc7-uri-extraction'
 import { parseFileUriPathParts } from '../daemon/osc7-file-uri'
 import { splitWorktreeIdForFilesystem } from '../../shared/worktree/id'
@@ -12,21 +8,7 @@ import { isWindowsAbsolutePathLike } from '../../shared/cross-platform-path'
 import type { ProcessedAgentStatusChunk } from '../../shared/agent-status-osc'
 import { mapExplicitAgentStateToRuntimeTerminalStatus } from './runtime-worktree-status-projection'
 
-export class OrcaRuntimeWithCreateTerminalSideEffectCommandCodeDetector extends OrcaRuntimeWithApplyTrackedPtyTitle {
-  protected createTerminalSideEffectCommandCodeDetector(
-    ptyId: string
-  ): NonNullable<RuntimePtyTitleTrackerEntry['commandCodeDetector']> {
-    return createCommandCodeOutputStatusDetector({
-      startupCommand: this.terminalSpawnCommandsByPtyId.get(ptyId) ?? null,
-      onWorking: (prompt) => {
-        this.recordTerminalSideEffectFact(ptyId, { kind: 'command-code-working', prompt })
-      },
-      onDone: (prompt) => {
-        this.recordTerminalSideEffectFact(ptyId, { kind: 'command-code-done', prompt })
-      }
-    })
-  }
-
+export class OrcaRuntimeWithEmitTerminalAgentStatusEvents extends OrcaRuntimeWithApplyTrackedPtyTitle {
   protected extractLastOsc7CwdForPty(
     ptyId: string,
     data: string

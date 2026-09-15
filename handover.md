@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phase 5b (Codex out of terminals, hooks and startup) is in its pull request.
+As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version harness deletion are merged. Phase 5b is merged, and Phase 5c (roster leaves: OMP and Prime Agent out of Pi, dropped agents' terminal special cases) is in its pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -21,7 +21,8 @@ As of 2026-09-15: Phases 0 to 4, 5a, 6 and 7a, the ADRs and the cross-version ha
 - Phase 4b merged in [#13](https://github.com/koinonau/girra/pull/13): Gemini, Grok, Kimi and Antigravity usage, the Grok account check and the Grok stats pane. 30 files deleted, 6,923 lines removed.
 - Phase 6 merged in [#14](https://github.com/koinonau/girra/pull/14): the feature wall, contextual tours and first-run onboarding. 189 files deleted, 27,662 lines removed.
 - Phase 5a merged in [#15](https://github.com/koinonau/girra/pull/15): Codex accounts, managed homes, reset credits, rate limits, usage, the CLI lock, the per-pane account registry and stale-pane restart. 254 files deleted, 58,851 lines removed.
-- Phase 5b removes Codex from the PTY and shell environment, hooks, trust, startup, the CLI and RPC agent-hooks surface, and renderer terminal special cases, plus the 136 `src/main/codex` files and orphans that lost their last importer: 179 files deleted, 41,801 lines removed and 900 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
+- Phase 5b merged in [#19](https://github.com/koinonau/girra/pull/19): Codex out of the PTY and shell environment, hooks, trust, startup, the agent-hooks CLI and RPC, and renderer terminal special cases. 179 files deleted, 41,801 lines removed.
+- Phase 5c removes OMP and Prime Agent from Pi's hooks, extensions, host environment, relay and shell wrappers, and the dropped agents' title detection, keyboard, readiness and output-scraping special cases (Command Code, Cursor, Gemini, Grok, Droid, Hermes startup query): 73 files deleted, 19,596 lines removed and 1,775 added, measured with `git diff --shortstat origin/main` (2026-09-15). Its pull request: `gh pr list --repo koinonau/girra`.
 - Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
 
 ## Files
@@ -191,6 +192,15 @@ After Phase 5b, on 2026-09-15:
 | `pnpm lint` | 0 | 45 s | 113 reliability gates (the Codex state-DB backfill gate lost its tests); `DIRECT_IMPORTER_PIN` 145 |
 | `pnpm build` | 0 | 17 s | Renderer 12,014 modules |
 
+After Phase 5c, on 2026-09-15:
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 2 s | No errors |
+| `pnpm test` | 1 | 696 s | Files: 6 failed, 7,846 passed, 56 skipped of 7,908. Tests: 6 failed, 72,439 passed, 321 skipped of 72,766. The five known failures plus the load-flaky `relay/subprocess.test.ts`, which passes alone (32 tests) |
+| `pnpm lint` | 0 | 42 s | 113 reliability gates |
+| `pnpm build` | 0 | 16 s | Main 5,138 modules, renderer 12,001 |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -277,6 +287,7 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: remove the plugin kill-list's remote fetch, though the tree ticks it with a `[STRIP]` PHONE-HOME tag, because the selection drops phone-home. The plugin system and marketplace stay; nothing blocks a plugin now.
 - 2026-09-15: delete `src/main/codex` files as soon as kept code stops reaching them, measured by an import walk from non-test files outside the directory, rather than waiting for the phase that owns the directory. A pull request must typecheck, and those files broke once hook types narrowed.
 - 2026-09-15: the SSH relay's hook installer ignores agents it does not know instead of failing the whole install, so an older desktop asking for Codex hooks still gets Claude's.
+- 2026-09-15: dropping OMP and title special cases changes hand-started CLIs: OMP started by hand in a Pi pane reports as Pi, and dropped CLIs started by hand get no title-based status. The renderer GPU gate now follows only the user setting, WebGL capability and context loss, since the Gemini fallback went.
 - 2026-09-15 (user): keep remote serving, pairing and the web UI (option A); remove only the mobile leftovers (`--mobile-pairing`, mobile session tabs, the mobile RPC allowlist, mobile-scope devices).
 - 2026-09-15 (user): workflows keep `pr.yml` and `unit-tests.yml` trimmed of Orca jobs and `e2e.yml` on demand, add one macOS build that signs and notarizes with the user's Apple developer account, and delete the rest; then re-enable Actions once the secrets exist (`MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD`, `APPLE_TEAM_ID`).
 - 2026-09-15 (user): delete remote skill install (the host-side `skills.install` API and the SSH relay skill handler). In its place, the Skills page gets an "Install kothar" action that opens a terminal on the chosen local or SSH host running the guided installer from gist `6d79d83dd27851d57fd1e346e04c7585` (`kothar-install-wizard.sh`, which installs the private `shanedolley/kothar` repository).

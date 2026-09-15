@@ -43,7 +43,6 @@ export function createReattachPayloadHandlers(
       const daemonSnapshotReplay = hasSplitDaemonAltFrame
         ? snapshotPrefixAnsi + snapshotFrameAnsi
         : ctx.connectResult.snapshot
-      session.rememberReattachPayloadAgentSignal(daemonSnapshotReplay, { fullScreenReplay: true })
       // Why: replay at the snapshot's own dimensions to avoid rewrapping soft-wrapped rows at a different column count (#7279); suppress the PTY forward so this layout-only resize doesn't SIGWINCH the remote TUI.
       const snapshotDimensions = resolvePositiveTerminalDimensions(
         ctx.connectResult.snapshotCols,
@@ -150,7 +149,6 @@ export function createReattachPayloadHandlers(
         // alt-screen choreography below (scrollbackAnsi is '' for
         // normal-buffer snapshots, so composition matches data there).
         const modelData = `${modelSnapshot.scrollbackAnsi ?? ''}${modelSnapshot.data}`
-        session.rememberReattachPayloadAgentSignal(modelData, { fullScreenReplay: true })
         const modelCols = modelSnapshot.cols
         const modelRows = modelSnapshot.rows
         if (
@@ -212,9 +210,6 @@ export function createReattachPayloadHandlers(
           window.api.pty.ackColdRestore(ctx.ptyId)
         }
       } else if (ctx.connectResult?.replay) {
-        session.rememberReattachPayloadAgentSignal(ctx.connectResult.replay, {
-          fullScreenReplay: true
-        })
         // Relay replay may overlap xterm's pre-disconnect content; clear first to avoid duplication.
         session.writeReplayData(`${RESET_GRAPHIC_RENDITION}\x1b[2J\x1b[3J\x1b[H`)
         // Why: raw relay replay may contain the app's own kitty pushes; re-arm with set semantics so redelivery can't grow the stack.

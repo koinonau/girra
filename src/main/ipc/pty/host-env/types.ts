@@ -7,9 +7,8 @@ export type BuildPtyHostEnvOptions = {
   isPackaged: boolean
   resourcesPath?: string
   userDataPath: string
-  /** Launch command the renderer chose (e.g. 'pi', 'omp', 'claude'); resolves the per-agent
-   *  extension target for Pi/OMP. Undefined for bare shells → defaults to Pi. NEVER infer from
-   *  disk presence (cross-agent shadowing when both dirs exist). */
+  /** Launch command the renderer chose (e.g. 'pi', 'claude'); an explicit Pi launch may create
+   *  Pi's default home. Undefined for bare shells. */
   launchCommand?: string
   /** Trusted agent identity for wrapped commands that cannot be recognized from text. */
   launchAgent?: TuiAgent

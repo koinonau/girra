@@ -577,7 +577,7 @@ describe('SshRelaySession agent hooks over a fake relay transport', () => {
       makeEnvelope({
         source: 'pi',
         hookEventName: 'session_start',
-        promptInteractionKey: 'command-code-transcript-user-3',
+        promptInteractionKey: 'claude-transcript-user-3',
         toolUseId: 'toolu-1',
         toolAgentId: 'agent-subagent-a',
         teammateName: 'reviewer',
@@ -601,7 +601,7 @@ describe('SshRelaySession agent hooks over a fake relay transport', () => {
       expect(ingestSpy).toHaveBeenCalledWith(
         expect.objectContaining({
           hookEventName: 'session_start',
-          promptInteractionKey: 'command-code-transcript-user-3',
+          promptInteractionKey: 'claude-transcript-user-3',
           toolUseId: 'toolu-1',
           toolAgentId: 'agent-subagent-a',
           teammateName: 'reviewer',

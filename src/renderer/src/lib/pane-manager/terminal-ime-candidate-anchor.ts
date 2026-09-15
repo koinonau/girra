@@ -1,5 +1,9 @@
 import type { Terminal } from '@xterm/xterm'
-import { resolveCursorAgentImeAnchor, type TerminalImeAnchor } from './terminal-ime-anchor'
+
+type TerminalImeAnchor = {
+  row: number
+  column: number
+}
 
 type ImeAnchorCellMetrics = {
   cellWidth: number
@@ -8,7 +12,7 @@ type ImeAnchorCellMetrics = {
   rows: number
 }
 
-type ImeAnchorStyleProperty = 'top' | 'left' | 'height' | 'lineHeight'
+type ImeAnchorStyleProperty = 'top' | 'left'
 
 /**
  * Keep the OS IME candidate window anchored to the cell the user is typing in.
@@ -39,11 +43,8 @@ export function installTerminalImeCandidateAnchor(terminal: Terminal): (() => vo
     return null
   }
   const screenElement = terminal.element.querySelector<HTMLElement>('.xterm-screen')
-  const compositionView = terminal.element.querySelector<HTMLElement>('.composition-view')
   const textarea = terminal.textarea
   let metrics: ImeAnchorCellMetrics | null = null
-  let deferredApply: number | null = null
-  let cursorAgentSeen = false
 
   const measureCells = (): ImeAnchorCellMetrics | null => {
     if (!screenElement) {
@@ -87,45 +88,14 @@ export function installTerminalImeCandidateAnchor(terminal: Terminal): (() => vo
     return Math.max(0, Math.min(cursorLeft, cells.cols * cells.cellWidth - width))
   }
 
-  const applyAnchor = (
-    row: number,
-    column: number,
-    cells: ImeAnchorCellMetrics,
-    isCursorAgent: boolean
-  ): void => {
-    const top = `${row * cells.cellHeight}px`
-    const left = `${column * cells.cellWidth}px`
-    writeStyle(textarea, 'top', top)
-    writeStyle(textarea, 'left', `${anchorLeft(column, cells)}px`)
-    if (isCursorAgent && compositionView) {
-      const height = `${cells.cellHeight}px`
-      writeStyle(compositionView, 'top', top)
-      writeStyle(compositionView, 'left', left)
-      writeStyle(compositionView, 'height', height)
-      writeStyle(compositionView, 'lineHeight', height)
-    }
+  const applyAnchor = (anchor: TerminalImeAnchor, cells: ImeAnchorCellMetrics): void => {
+    writeStyle(textarea, 'top', `${anchor.row * cells.cellHeight}px`)
+    writeStyle(textarea, 'left', `${anchorLeft(anchor.column, cells)}px`)
   }
 
-  const resolveAnchor = (): { anchor: TerminalImeAnchor; isCursorAgent: boolean } => {
+  const resolveAnchor = (): TerminalImeAnchor => {
     const buf = terminal.buffer.active
-    // Why: Cursor Agent draws its prompt UI while leaving xterm's public cursor
-    // on a blank row, so the OS IME anchor needs the rendered prompt row instead.
-    const cursorAgentAnchor = resolveCursorAgentImeAnchor({
-      buffer: buf,
-      rows: terminal.rows,
-      cols: terminal.cols,
-      cursorX: buf.cursorX,
-      cursorY: buf.cursorY,
-      knownCursorAgent: cursorAgentSeen
-    })
-    cursorAgentSeen ||= cursorAgentAnchor !== null
-    return {
-      anchor: cursorAgentAnchor ?? {
-        row: buf.cursorY,
-        column: Math.min(buf.cursorX, terminal.cols - 1)
-      },
-      isCursorAgent: cursorAgentAnchor !== null
-    }
+    return { row: buf.cursorY, column: Math.min(buf.cursorX, terminal.cols - 1) }
   }
 
   const handler = (event?: Event): void => {
@@ -143,35 +113,7 @@ export function installTerminalImeCandidateAnchor(terminal: Terminal): (() => vo
     if (!cells) {
       return
     }
-    const { anchor, isCursorAgent } = resolveAnchor()
-    applyAnchor(anchor.row, anchor.column, cells, isCursorAgent)
-    // Why: xterm re-positions the textarea from a setTimeout(0) of its own after
-    // each compositionupdate, so the correction has to land after that timer —
-    // one pending timer per burst, re-reading the anchor when it fires.
-    if (!isCursorAgent) {
-      if (deferredApply !== null) {
-        window.clearTimeout(deferredApply)
-        deferredApply = null
-      }
-      return
-    }
-    // Re-queue after xterm's latest timer while keeping only one correction pending.
-    if (deferredApply !== null) {
-      window.clearTimeout(deferredApply)
-    }
-    deferredApply = window.setTimeout(() => {
-      deferredApply = null
-      if (!textarea.isConnected) {
-        return
-      }
-      if (!metrics || metrics.cols !== terminal.cols || metrics.rows !== terminal.rows) {
-        metrics = measureCells()
-      }
-      if (metrics) {
-        const current = resolveAnchor()
-        applyAnchor(current.anchor.row, current.anchor.column, metrics, current.isCursorAgent)
-      }
-    }, 0)
+    applyAnchor(resolveAnchor(), cells)
   }
 
   terminal.element.addEventListener('compositionstart', handler)

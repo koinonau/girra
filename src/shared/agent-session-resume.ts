@@ -194,18 +194,12 @@ export function extractAgentProviderSession(
       const id = readSessionId(payload, ['sessionID'])
       return id ? { key: 'session_id', id } : null
     }
-    case 'pi':
-    case 'prime-agent': {
+    case 'pi': {
       const id = readSessionId(payload, ['session_id'])
       const providerSession = id
         ? withTranscriptPath({ key: 'session_id', id }, payload, ['session_file'])
         : null
       return providerSession?.transcriptPath ? providerSession : null
-    }
-    // Why: OMP's managed extension reports the authoritative CLI resume id.
-    case 'omp': {
-      const id = readSessionId(payload, ['session_id'])
-      return id ? { key: 'session_id', id } : null
     }
   }
 }

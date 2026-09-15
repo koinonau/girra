@@ -12,7 +12,7 @@ import type { SubprocessHandle } from './session-subprocess-handle'
 import { getDaemonPidPath, getDaemonSocketPath, serializeDaemonPidFile } from './daemon-spawner'
 import { waitForEndpointUnreachable } from './daemon-endpoint-reachability-test-harness'
 
-const confirmForegroundProcessMock = vi.fn(async () => 'droid')
+const confirmForegroundProcessMock = vi.fn(async () => 'pi')
 
 function createTestDir(): string {
   return mkdtempSync(join(tmpdir(), 'daemon-server-test-'))
@@ -369,16 +369,16 @@ describe('DaemonServer', () => {
         sessionId: 'agent-session',
         cols: 80,
         rows: 24,
-        launchAgent: 'droid'
+        launchAgent: 'pi'
       })
-      expect(first).toMatchObject({ isNew: true, launchAgent: 'droid' })
+      expect(first).toMatchObject({ isNew: true, launchAgent: 'pi' })
 
       const second = await c.request('createOrAttach', {
         sessionId: 'agent-session',
         cols: 80,
         rows: 24
       })
-      expect(second).toMatchObject({ isNew: false, launchAgent: 'droid' })
+      expect(second).toMatchObject({ isNew: false, launchAgent: 'pi' })
 
       const unknown = await c.request('createOrAttach', {
         sessionId: 'unknown-agent-session',
@@ -533,7 +533,7 @@ describe('DaemonServer', () => {
         c.request<{ foregroundProcess: string | null }>('confirmForegroundProcess', {
           sessionId: 'test-session'
         })
-      ).resolves.toEqual({ foregroundProcess: 'droid' })
+      ).resolves.toEqual({ foregroundProcess: 'pi' })
       expect(confirmForegroundProcessMock).toHaveBeenCalledTimes(1)
     })
 

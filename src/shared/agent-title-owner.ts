@@ -8,7 +8,7 @@ import {
 import { isLegacyPiCompatibleTitle } from './pi-compatible-synthetic-title'
 import { getWrapperTitleSegments } from './terminal-title-wrapper-segments'
 
-/** The π brand a Pi/OMP title leads with; the owner's label replaces it in place. */
+/** The π brand a Pi title leads with; the owner's label replaces it in place. */
 const LEGACY_PI_BRAND = 'π'
 
 type TitleProfileMatch = {
@@ -114,8 +114,8 @@ function hasIdleSuffix(title: string, sourceProfile: SyntheticAgentTitleProfile)
 }
 
 /**
- * Why: remote OMP surfaces may report Pi as the live status identity, while
- * launch ownership still identifies the user-selected agent.
+ * Why: a surface in the same title identity group may report a sibling agent as the
+ * live status identity, while launch ownership still identifies the user-selected agent.
  */
 export function resolveCompatibleAgentTypeForOwner(
   incomingAgentType: AgentType | null | undefined,

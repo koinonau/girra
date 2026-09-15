@@ -158,59 +158,6 @@ function isOriginMainBaseRefProbe(args: string[]): boolean {
   )
 }
 
-function antigravityReadyScreen(model = 'Gemini 3.5 Flash (High)'): string {
-  return [
-    'Antigravity CLI 1.0.3',
-    'user@example.com (Antigravity Business)',
-    model,
-    '~/orca/workspaces/orca/agy-dispatch-issue',
-    '>'
-  ].join('\n')
-}
-
-function antigravityPromptBeforeModelReadyScreen(model = 'Gemini 3.5 Flash (High)'): string {
-  return [
-    'Antigravity CLI 1.0.3',
-    'user@example.com',
-    '~/orca/workspaces/orca/agy-dispatch-issue',
-    '',
-    '',
-    '',
-    '',
-    '>',
-    '',
-    '? for shortcuts',
-    `\t\t  ${model}`,
-    '~/orca/workspaces/orca/agy-dispatch-issue',
-    '',
-    model,
-    ' (Antigravity Business)'
-  ].join('\n')
-}
-
-// Why: verbatim cursor-agent 2026.07 idle screen; the matcher keys on the "→" glyph, not the placeholder (which changes after the first turn).
-function cursorReadyScreen(): string {
-  return [
-    'Cursor Agent',
-    'v2026.07.09-a3815c0',
-    'Tip: Use /plan to plan execution and reach the right outcome faster.',
-    '→ Plan, search, build anything',
-    'Composer 2.5 Fast                                          Run Everything',
-    '~/Documents/projects/AutoGenie · main'
-  ].join('\n')
-}
-
-function cursorBusyScreen(): string {
-  return [
-    'Cursor Agent',
-    'v2026.07.09-a3815c0',
-    '⠰⠳ Thinking  28.61k tokens',
-    '→ Plan, search, build anything',
-    'Composer 2.5 Fast                                          Run Everything',
-    '~/Documents/projects/AutoGenie · main'
-  ].join('\n')
-}
-
 function setInMemoryOrchestrationMessages(
   runtime: RuntimeService,
   db: InMemoryOrchestrationMessages
@@ -663,10 +610,10 @@ export { InMemoryOrchestrationMessages, LIST_PROVIDER_DEADLINE, RESTORED_AUTHORI
 export { RESTORED_AUTHORITY_TOKEN_HASH, TEST_FOLDER_PROJECT_GROUP_ID, TEST_FOLDER_WORKSPACE_ID }
 export { TEST_FOLDER_WORKSPACE_KEY, TEST_FOLDER_WORKSPACE_PATH, TEST_REPO_ID, TEST_REPO_PATH }
 export { TEST_WINDOW_ID, TEST_WORKTREE_ID, TEST_WORKTREE_PATH, UUID_RE }
-export { antigravityPromptBeforeModelReadyScreen, antigravityReadyScreen, bindSinglePtyRun }
+export { bindSinglePtyRun }
 export { createExplicitAgentStatusHarness, createFolderWorkspaceRuntimeStore, createRuntime }
-export { createRuntimeWithSshLease, createStaleRuntimeWorktreeStore, cursorBusyScreen }
-export { cursorReadyScreen, deferred, expectStablePaneKeyEnv, isOriginMainBaseRefProbe }
+export { createRuntimeWithSshLease, createStaleRuntimeWorktreeStore }
+export { deferred, expectStablePaneKeyEnv, isOriginMainBaseRefProbe }
 export { makeDeferred, makeFolderProjectGroup, makeFolderWorkspace, makeHeadlessTerminalLayout }
 export { makeRpcRequest, makeRuntimeStoreWithWorkspaceSession, makeStatusFrame }
 export { makeWorkspaceSessionWithHeadlessTerminal, makeWorktreeInfo, makeWorktreeMeta }

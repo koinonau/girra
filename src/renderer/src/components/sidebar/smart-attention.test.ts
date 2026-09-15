@@ -273,21 +273,6 @@ describe('resolveAttention', () => {
     })
   })
 
-  it('uses a reset stateStartedAt for Command Code new prompts while still working', () => {
-    const entry = makeEntry({
-      paneKey: 't:1',
-      state: 'working',
-      agentType: 'command-code',
-      stateStartedAt: NOW - 2_000,
-      updatedAt: NOW - 500,
-      stateHistory: [makeHistory('done', NOW - 30 * 60_000)]
-    })
-    expect(resolveAttention([hookPane(entry)], NOW)).toEqual({
-      cls: 3,
-      attentionTimestamp: NOW - 2_000
-    })
-  })
-
   it('falls back to current stateStartedAt when working has no prior attention history', () => {
     const entry = makeEntry({
       paneKey: 't:1',
@@ -605,7 +590,7 @@ describe('buildAttentionByWorktree', () => {
       [w],
       { [w.id]: [tab] },
       {},
-      { [tab.id]: { 1: '✋ Gemini CLI' } },
+      { [tab.id]: { 1: 'Claude - action required' } },
       ptyMap([tab.id]),
       NOW
     )
@@ -668,7 +653,7 @@ describe('buildAttentionByWorktree', () => {
           restoredUnconfirmed: true
         })
       },
-      { [tab.id]: { 1: '⠋ Claude', 2: '✋ Gemini CLI' } },
+      { [tab.id]: { 1: '⠋ Claude', 2: 'Claude - action required' } },
       ptyMap([tab.id]),
       NOW,
       undefined,
@@ -717,7 +702,7 @@ describe('buildAttentionByWorktree', () => {
           updatedAt: NOW - AGENT_STATUS_STALE_AFTER_MS - 1
         })
       },
-      { [tab.id]: { 1: '✋ Gemini CLI' } },
+      { [tab.id]: { 1: 'Claude - action required' } },
       ptyMap([tab.id]),
       NOW
     )
@@ -744,7 +729,7 @@ describe('buildAttentionByWorktree', () => {
       { [w.id]: [tab] },
       entries,
       // Pane 2 has no hook — title fallback fires for it.
-      { [tab.id]: { 1: 'something', 2: '✋ Gemini CLI' } },
+      { [tab.id]: { 1: 'something', 2: 'Claude - action required' } },
       ptyMap([tab.id]),
       NOW,
       undefined,
@@ -766,7 +751,7 @@ describe('buildAttentionByWorktree', () => {
       [w],
       { [w.id]: [tab] },
       {},
-      { [tab.id]: { 1: '✋ Gemini CLI' } },
+      { [tab.id]: { 1: 'Claude - action required' } },
       // No live pty for this tab.
       {},
       NOW

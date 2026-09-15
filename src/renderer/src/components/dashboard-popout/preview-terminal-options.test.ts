@@ -102,7 +102,6 @@ describe('buildPreviewTerminalOptions', () => {
         hostPlatform: 'darwin',
         localWindowsConpty: false,
         windowsShiftEnterEncoding: 'alt-enter',
-        ctrlEnterCsiU: false,
         kittyKeyboardAdvertised: true
       }
     })
@@ -119,7 +118,6 @@ describe('buildPreviewTerminalOptions', () => {
         localWindowsConpty: true,
         osRelease: '10.0.22631',
         windowsShiftEnterEncoding: 'alt-enter',
-        ctrlEnterCsiU: false,
         kittyKeyboardAdvertised: false
       }
     })

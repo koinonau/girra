@@ -14,7 +14,6 @@ export type ReattachPayloadSession = Pick<
   | 'pendingReattachFit'
   | 'reattachReplayResetSequence'
   | 'recordRendererOrderedSeq'
-  | 'rememberReattachPayloadAgentSignal'
   | 'schedulePendingStartupCommandDelivery'
   | 'sendFocusedReattachFocusInAfterReplay'
   | 'setRestoredSnapshotBaseline'

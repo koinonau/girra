@@ -12,7 +12,6 @@ export {
   clearWorkingIndicators,
   createAgentStatusTracker,
   normalizeTerminalTitle,
-  isGeminiTerminalTitle,
   isClaudeAgent,
   isClaudeManagementTitle,
   getAgentLabel

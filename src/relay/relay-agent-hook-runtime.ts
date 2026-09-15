@@ -10,10 +10,7 @@ import {
 import { publishAgentHookEnvelope } from './agent-hook-envelope-publication'
 import { assertPluginSourceUnderByteCap } from './plugin-source-limit'
 import { resolveOpenCodeSourceConfigDir, resolvePiSourceAgentDir } from './plugin-overlay-env'
-import {
-  detectExplicitPiAgentKindFromCommand,
-  isPiCompatibleAgentType
-} from '../shared/pi-agent-kind'
+import { isPiLaunchCommand } from '../shared/pi-agent-kind'
 import { resolveSetupAgentSequenceLaunchCommand } from '../shared/setup-agent-sequencing'
 import { relayLogLine } from './relay-diagnostic-log'
 import { registerManagedHookInstaller } from './managed-hook-installer'
@@ -91,47 +88,17 @@ export class RelayAgentHookRuntime {
     if (!this.pluginOverlay.hasPiSource()) {
       return env
     }
-    const launchCommandHint = resolveSetupAgentSequenceLaunchCommand(context.env, context.command)
-    const explicitKind = isPiCompatibleAgentType(context.launchAgent)
-      ? context.launchAgent
-      : context.launchAgent === undefined
-        ? detectExplicitPiAgentKindFromCommand(launchCommandHint)
-        : null
-    const kind = explicitKind ?? 'pi'
-    const hasLaunchCommand =
-      typeof launchCommandHint === 'string' && launchCommandHint.trim().length > 0
-    if (kind === 'pi') {
-      const sourceDir = resolvePiSourceAgentDir(context.env, context.shell, 'pi')
-      const result = this.pluginOverlay.materializePi(overlayId, sourceDir, 'pi', {
-        materializeDefaultHome: explicitKind === 'pi'
-      })
-      if (result?.sourceAgentDir) {
-        env.ORCA_PI_SOURCE_AGENT_DIR = result.sourceAgentDir
-      }
-    }
-    if (kind === 'omp' || !hasLaunchCommand) {
-      const sourceDir =
-        kind === 'omp'
-          ? resolvePiSourceAgentDir(context.env, context.shell, 'omp')
-          : context.env.ORCA_OMP_SOURCE_AGENT_DIR
-      const result = this.pluginOverlay.materializePi(overlayId, sourceDir, 'omp', {
-        materializeDefaultHome: explicitKind === 'omp'
-      })
-      if (result?.statusExtensionPath) {
-        env.ORCA_OMP_STATUS_EXTENSION = result.statusExtensionPath
-      }
-      if (result?.sourceAgentDir) {
-        env.ORCA_OMP_SOURCE_AGENT_DIR = result.sourceAgentDir
-      }
-    }
-    if (kind === 'prime-agent') {
-      const sourceDir = resolvePiSourceAgentDir(context.env, context.shell, 'prime-agent')
-      const result = this.pluginOverlay.materializePi(overlayId, sourceDir, 'prime-agent', {
-        materializeDefaultHome: explicitKind === 'prime-agent'
-      })
-      if (result?.sourceAgentDir) {
-        env.ORCA_PRIME_AGENT_SOURCE_AGENT_DIR = result.sourceAgentDir
-      }
+    const isExplicitPiLaunch =
+      context.launchAgent === undefined
+        ? isPiLaunchCommand(resolveSetupAgentSequenceLaunchCommand(context.env, context.command))
+        : context.launchAgent === 'pi'
+    const result = this.pluginOverlay.materializePi(
+      overlayId,
+      resolvePiSourceAgentDir(context.env, context.shell),
+      { materializeDefaultHome: isExplicitPiLaunch }
+    )
+    if (result) {
+      env.ORCA_PI_SOURCE_AGENT_DIR = result.sourceAgentDir
     }
     return env
   }
@@ -144,24 +111,16 @@ export class RelayAgentHookRuntime {
     this.dispatcher.onRequest(AGENT_HOOK_INSTALL_PLUGINS_METHOD, async (params) => {
       const opencode = params.opencodePluginSource
       const pi = params.piExtensionSource
-      const omp = params.ompExtensionSource
-      const primeAgent = params.primeAgentExtensionSource
       assertPluginSourceUnderByteCap('opencodePluginSource', opencode)
       assertPluginSourceUnderByteCap('piExtensionSource', pi)
-      assertPluginSourceUnderByteCap('ompExtensionSource', omp)
-      assertPluginSourceUnderByteCap('primeAgentExtensionSource', primeAgent)
       this.pluginOverlay.setSources({
         opencodePluginSource: typeof opencode === 'string' ? opencode : undefined,
-        piExtensionSource: typeof pi === 'string' ? pi : undefined,
-        ompExtensionSource: typeof omp === 'string' ? omp : undefined,
-        primeAgentExtensionSource: typeof primeAgent === 'string' ? primeAgent : undefined
+        piExtensionSource: typeof pi === 'string' ? pi : undefined
       })
       return {
         installed: {
           opencode: this.pluginOverlay.hasOpenCodeSource(),
-          pi: this.pluginOverlay.hasPiSource('pi'),
-          omp: this.pluginOverlay.hasPiSource('omp'),
-          primeAgent: this.pluginOverlay.hasPiSource('prime-agent')
+          pi: this.pluginOverlay.hasPiSource()
         }
       }
     })

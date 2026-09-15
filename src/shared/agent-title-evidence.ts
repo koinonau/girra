@@ -1,20 +1,11 @@
 import {
-  AGY_AGENT_NAME_RE,
   CLAUDE_IDLE,
-  DROID_AGENT_NAME_RE,
-  GEMINI_IDLE,
-  GEMINI_PERMISSION,
-  GEMINI_SILENT_WORKING,
-  GEMINI_WORKING,
-  HERMES_AGENT_NAME_RE,
   containsAgentSpinnerGlyph,
   isClaudeIdentityFrameSegment,
   isClaudeManagementTitle,
-  isCursorNativeAgentTitle,
   titleHasAgentName
 } from './agent-title-core'
 import { isOpenCodeNativeTitle } from './opencode-terminal-title'
-import { stripLeadingAgentTitleDecorationOrEmpty } from './agent-title-decoration'
 import { getPiCompatibleSyntheticAgentLabel } from './pi-compatible-synthetic-title'
 import {
   SYNTHETIC_AGENT_TITLE_AGENTS,
@@ -27,7 +18,7 @@ import { TUI_AGENT_DISPLAY_NAMES } from './tui-agent-display-names'
  * Order-independent identity evidence from a terminal title.
  *
  * The chain this replaces is a first-match-wins scan of substring predicates, so its answer is
- * decided by list position rather than by how strong the evidence is. That is why a Grok pane
+ * decided by list position rather than by how strong the evidence is. That is why a Claude pane
  * whose task text mentions Codex reads as Codex, and why fixing one collision by hoisting a
  * branch breaks another. Here every signal is collected first and ranked afterwards, by class:
  *
@@ -60,47 +51,20 @@ export type AgentTitleEvidence = {
 /** Names matched as whole tokens, paired with the agent each identifies. */
 const NAME_TOKENS: readonly (readonly [string, TuiAgent])[] = [
   ['claude', 'claude'],
-  ['openclaude', 'openclaude'],
   ['codex', 'codex'],
-  ['copilot', 'copilot'],
-  ['cursor', 'cursor'],
-  ['gemini', 'gemini'],
-  ['antigravity', 'antigravity'],
-  ['opencode', 'opencode'],
-  ['mimo', 'mimo-code'],
-  ['openclaw', 'openclaw'],
-  ['aider', 'aider'],
-  ['grok', 'grok'],
-  ['devin', 'devin']
-]
-
-/** Agents whose name is matched by a dedicated pattern rather than a plain token. */
-const PATTERN_NAMES: readonly (readonly [RegExp, TuiAgent])[] = [
-  [AGY_AGENT_NAME_RE, 'antigravity'],
-  [DROID_AGENT_NAME_RE, 'droid'],
-  [HERMES_AGENT_NAME_RE, 'hermes']
+  ['opencode', 'opencode']
 ]
 
 /** Catalog labels known to be emitted as terminal titles, not merely presented in Orca's UI. */
-const EMITTED_DISPLAY_LABEL_AGENTS = [
-  'claude-agent-teams',
-  'mimo-code',
-  'prime-agent',
-  'command-code',
-  'copilot'
-] as const satisfies readonly TuiAgent[]
+const EMITTED_DISPLAY_LABEL_AGENTS = ['claude-agent-teams'] as const satisfies readonly TuiAgent[]
 
 const DISPLAY_LABELS = [
   ...EMITTED_DISPLAY_LABEL_AGENTS.map(
     (agent) => [TUI_AGENT_DISPLAY_NAMES[agent].toLowerCase(), agent] as const
   ),
   ['claude code', 'claude'],
-  ['gemini cli', 'gemini'],
   ['agent teams', 'claude-agent-teams']
 ] satisfies readonly (readonly [string, TuiAgent])[]
-
-const GEMINI_GLYPHS = [GEMINI_WORKING, GEMINI_SILENT_WORKING, GEMINI_IDLE, GEMINI_PERMISSION]
-const ANTIGRAVITY_MODEL_TITLE_RE = /^(?:agy|antigravity)(?:\s*[·—:-]\s*|\s+)gemini\s+\d/i
 
 /**
  * Orca renders `<task text>… - <agent>` and owns the suffix; task text cannot reach past it.
@@ -113,9 +77,7 @@ const WRAPPER_SEPARATOR = ' | '
 const MAX_WRAPPER_EVIDENCE_SEGMENTS = 8
 const RESERVED_OWNER_IDS: ReadonlyMap<string, TuiAgent> = new Map([
   ['pi', 'pi'],
-  ['omp', 'omp'],
-  ['claude-agent-teams', 'claude-agent-teams'],
-  ['qwen-code', 'qwen-code']
+  ['claude-agent-teams', 'claude-agent-teams']
 ])
 
 function getEvidenceTitleSegments(title: string): string[] {
@@ -139,11 +101,6 @@ function namesIn(text: string): TuiAgent[] {
   const found = new Set<TuiAgent>()
   for (const [token, agent] of NAME_TOKENS) {
     if (titleHasAgentName(text, token)) {
-      found.add(agent)
-    }
-  }
-  for (const [pattern, agent] of PATTERN_NAMES) {
-    if (pattern.test(text)) {
       found.add(agent)
     }
   }
@@ -171,8 +128,8 @@ function agentForBareName(text: string): TuiAgent | null {
   }
   const bareToken = stripped.replace(WINDOWS_LAUNCHER_SUFFIX_RE, '')
   const names = namesIn(bareToken)
-  // Why the length check: the remainder must BE the name, not merely contain it. "agy" anchors;
-  // "fix the agy hook" does not, and neither does a hyphenated worktree name like "codex-split".
+  // Why the length check: the remainder must BE the name, not merely contain it. "codex" anchors;
+  // "fix the codex hook" does not, and neither does a hyphenated worktree name like "codex-split".
   return names.length === 1 && /^[\p{L}\p{N}]+$/u.test(bareToken) ? names[0] : null
 }
 
@@ -231,9 +188,6 @@ function collectVendorMarkers(segments: readonly string[]): TuiAgent[] {
   for (const segment of segments) {
     // Why prefix-only: a sigil marks the pane's own status line only in the identity position.
     // The same character inside task text is decoration, not a vendor emission.
-    if (GEMINI_GLYPHS.some((glyph) => segment.startsWith(glyph))) {
-      markers.add('gemini')
-    }
     if (
       segment.startsWith(`${CLAUDE_IDLE} `) ||
       segment === CLAUDE_IDLE ||
@@ -241,9 +195,6 @@ function collectVendorMarkers(segments: readonly string[]): TuiAgent[] {
       segment.startsWith('* ')
     ) {
       markers.add('claude')
-    }
-    if (isCursorNativeAgentTitle(segment)) {
-      markers.add('cursor')
     }
   }
   return [...markers]
@@ -285,8 +236,8 @@ function collectAnchoredNames(segments: readonly string[]): TuiAgent[] {
       }
     }
 
-    // Why strip a leading vendor sigil first: `✳ agy` is a Claude-glyphed pane whose entire
-    // remainder is another agent's name — the strongest name evidence a title can carry.
+    // Why strip a leading vendor sigil first: `✳ codex.exe` is a Claude-glyphed pane whose entire
+    // remainder is another agent's launcher — the strongest name evidence a title can carry.
     const withoutSigil = segment.startsWith(`${CLAUDE_IDLE} `)
       ? segment.slice(CLAUDE_IDLE.length)
       : segment
@@ -302,19 +253,9 @@ function collectAnchoredNames(segments: readonly string[]): TuiAgent[] {
       anchored.add('claude')
     }
 
-    // Why Antigravity gets a grammar: its models are named `Gemini <n.n> <Name>`, so an agy pane's
-    // own title carries a whole `gemini` token. Read as identity-plus-model, the gemini token is
-    // metadata — which is the general rule, not an exception inside the Gemini detector.
-    const undecorated = stripLeadingAgentTitleDecorationOrEmpty(segment).trim()
-    if (ANTIGRAVITY_MODEL_TITLE_RE.test(undecorated)) {
-      anchored.add('antigravity')
-    }
-
     const piCompatible = getPiCompatibleSyntheticAgentLabel(segment)
     if (piCompatible === 'Pi') {
       anchored.add('pi')
-    } else if (piCompatible === 'OMP') {
-      anchored.add('omp')
     }
   }
 
@@ -340,7 +281,7 @@ export function collectAgentTitleEvidence(title: string): AgentTitleEvidence {
   const evidence = { vendorMarkers, anchoredNames, freeTextNames } as const
 
   if (anchoredNames.length === 1) {
-    // Why anchored beats a vendor marker: `✳ agy` is an agy pane whose title kept Claude's sigil.
+    // Why anchored beats a vendor marker: an owner suffix or launcher outranks a sigil the title kept.
     return { ...evidence, agent: anchoredNames[0], reason: 'anchored' }
   }
   if (anchoredNames.length > 1) {
@@ -352,8 +293,7 @@ export function collectAgentTitleEvidence(title: string): AgentTitleEvidence {
   if (vendorMarkers.length === 1) {
     // Why free text does not veto here: `✳ Fix Codex false attention notifications` is a Claude
     // pane describing Codex work. The sigil is emitted by the agent; the name was typed by a
-    // human. A conflicting ANCHORED name already outranks this branch above, which is what makes
-    // `✳ agy` resolve to Antigravity without also blinding the 13 recorded titles of this shape.
+    // human. A conflicting ANCHORED name already outranks this branch above.
     return { ...evidence, agent: vendorMarkers[0], reason: 'vendor-marker' }
   }
   return {
