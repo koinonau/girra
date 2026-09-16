@@ -1,7 +1,7 @@
 /**
  * The host-local signal that says a paired client is streaming this page. The host renderer needs
- * it because Chromium stops painting a display:none guest, and scoping the mobile stamp to phones
- * left a desktop/web/CLI viewer with nothing keeping its own stream alive.
+ * it because Chromium stops painting a display:none guest, so without this signal a remote viewer
+ * has nothing keeping its own stream alive.
  * The renderer half of the chain lives in tests/e2e/host-guest-paint-retention-remote-viewer.
  */
 import { describe, expect, it, vi } from 'vitest'
@@ -21,7 +21,7 @@ describe('browser screencast remote viewer signal', () => {
     const { runtime, subscribe } = createScreencastHarness()
     expect(runtime.getBrowserRemoteViewerPages()).toEqual([])
 
-    const desktop = subscribe({ connectionId: 'conn-desktop', clientKind: 'runtime' })
+    const desktop = subscribe({ connectionId: 'conn-desktop' })
     await desktop.streaming()
     expect(runtime.getBrowserRemoteViewerPages()).toEqual([PAGE])
 
@@ -32,13 +32,13 @@ describe('browser screencast remote viewer signal', () => {
 
   it('holds the signal until the last subscriber leaves', async () => {
     const { runtime, subscribe } = createScreencastHarness()
-    const phone = subscribe({ connectionId: 'conn-phone', clientKind: 'mobile' })
-    await phone.streaming()
-    const desktop = subscribe({ connectionId: 'conn-desktop', clientKind: 'runtime' })
+    const first = subscribe({ connectionId: 'conn-a' })
+    await first.streaming()
+    const desktop = subscribe({ connectionId: 'conn-desktop' })
     await desktop.streaming()
 
-    phone.stop()
-    await phone.done
+    first.stop()
+    await first.done
     expect(runtime.getBrowserRemoteViewerPages()).toEqual([PAGE])
 
     desktop.stop()
@@ -53,9 +53,9 @@ describe('browser screencast remote viewer signal', () => {
       browserRemoteViewersChanged
     } as unknown as Parameters<OrcaRuntimeService['setNotifier']>[0])
 
-    const first = subscribe({ connectionId: 'conn-a', clientKind: 'runtime' })
+    const first = subscribe({ connectionId: 'conn-a' })
     await first.streaming()
-    const second = subscribe({ connectionId: 'conn-b', clientKind: 'runtime' })
+    const second = subscribe({ connectionId: 'conn-b' })
     await second.streaming()
     expect(browserRemoteViewersChanged.mock.calls).toEqual([[PAGE, true]])
 
@@ -69,21 +69,5 @@ describe('browser screencast remote viewer signal', () => {
       [PAGE, true],
       [PAGE, false]
     ])
-  })
-
-  it('keeps a co-viewing desktop client watched across a take-back', async () => {
-    const { runtime, subscribe } = createScreencastHarness()
-    const phone = subscribe({ connectionId: 'conn-phone', clientKind: 'mobile' })
-    await phone.streaming()
-    const desktop = subscribe({ connectionId: 'conn-desktop', clientKind: 'runtime' })
-    await desktop.streaming()
-
-    runtime.reclaimBrowserForDesktop(PAGE)
-    await phone.done
-    expect(runtime.getBrowserRemoteViewerPages()).toEqual([PAGE])
-
-    desktop.stop()
-    await desktop.done
-    expect(runtime.getBrowserRemoteViewerPages()).toEqual([])
   })
 })

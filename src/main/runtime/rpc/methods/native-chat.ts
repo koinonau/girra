@@ -5,8 +5,8 @@ import {
   type NativeChatTranscriptSubscription,
   type SubscribeNativeChatTranscriptArgs
 } from '../../../native-chat/transcript-watch'
-import { defineMethod, defineStreamingMethod, type RpcContext } from '../core'
-import { sanitizeNativeChatRpcBlock } from './native-chat-rpc-block-sanitize'
+import { defineMethod, defineStreamingMethod } from '../core'
+import { sanitizeNativeChatRpcImageBlock } from './native-chat-rpc-image-block'
 import {
   MOBILE_NATIVE_CHAT_MAX_WINDOW,
   NativeChatSession,
@@ -15,34 +15,29 @@ import {
 
 // Why: a long agent session can hold thousands of turns (with full tool I/O).
 // Shipping all of them over the paired connection and rendering them at once
-// freezes the mobile app, so the runtime RPC windows to the most recent slice —
+// freezes the client, so the runtime RPC windows to the most recent slice —
 // the conversation tail is what the chat view shows first. The desktop IPC path
 // is unaffected (it reads locally with a virtualized list).
 // Small first page for a fast initial paint; the client raises `limit` to load
 // older history as the user scrolls back.
 const MOBILE_NATIVE_CHAT_DEFAULT_WINDOW = 40
 
-function sanitizeMessage(
-  message: NativeChatMessage,
-  clientKind: RpcContext['clientKind']
-): NativeChatMessage {
+function sanitizeMessage(message: NativeChatMessage): NativeChatMessage {
   return {
     ...message,
-    blocks: message.blocks.map((block) => sanitizeNativeChatRpcBlock(block, clientKind))
+    blocks: message.blocks.map((block) =>
+      block.type === 'image-ref' ? sanitizeNativeChatRpcImageBlock(block) : block
+    )
   }
 }
 
-function sanitizeAppendForClient(
-  messages: readonly NativeChatMessage[],
-  clientKind: RpcContext['clientKind']
-): NativeChatMessage[] {
-  return messages.map((message) => sanitizeMessage(message, clientKind))
+function sanitizeAppendForClient(messages: readonly NativeChatMessage[]): NativeChatMessage[] {
+  return messages.map((message) => sanitizeMessage(message))
 }
 
 /** Window a transcript to its most recent `limit` messages so a long session
  *  can't freeze the client. Windowing by count applies to ALL RPC clients —
- *  shipping thousands of turns over the paired link is bad for web and mobile
- *  alike. Char-clipping (the mobile-only payload diet) is applied separately. */
+ *  shipping thousands of turns over the paired link is bad for every one. */
 function windowTranscript(
   messages: readonly NativeChatMessage[],
   limit = MOBILE_NATIVE_CHAT_DEFAULT_WINDOW
@@ -51,23 +46,20 @@ function windowTranscript(
   return messages.length > window ? messages.slice(-window) : messages.slice()
 }
 
-/** Apply the windowed slice and keep inline image bytes off every RPC transport.
- *  Mobile clients additionally receive bounded text and tool bodies; runtime
- *  clients keep those bodies intact. */
+/** Apply the windowed slice and keep inline image bytes off every RPC transport. */
 function windowForClient(
   messages: readonly NativeChatMessage[],
-  clientKind: RpcContext['clientKind'],
   limit = MOBILE_NATIVE_CHAT_DEFAULT_WINDOW
 ): NativeChatMessage[] {
   const windowed = windowTranscript(messages, limit)
-  return windowed.map((message) => sanitizeMessage(message, clientKind))
+  return windowed.map((message) => sanitizeMessage(message))
 }
 
 export const NATIVE_CHAT_METHODS = [
   defineMethod({
     name: 'nativeChat.readSession',
     params: NativeChatSession,
-    handler: async (params, { clientKind, signal }) => {
+    handler: async (params, { signal }) => {
       const limit = params.limit ?? MOBILE_NATIVE_CHAT_DEFAULT_WINDOW
       const result = await readNativeChatTranscriptTail(
         {
@@ -81,7 +73,7 @@ export const NATIVE_CHAT_METHODS = [
       )
       return 'messages' in result
         ? {
-            messages: windowForClient(result.messages, clientKind, limit),
+            messages: windowForClient(result.messages, limit),
             hasMore: result.hasMore,
             beforeOffset: result.beforeOffset,
             ...(result.lifecycle ? { lifecycle: result.lifecycle } : {})
@@ -92,7 +84,7 @@ export const NATIVE_CHAT_METHODS = [
   defineStreamingMethod({
     name: 'nativeChat.subscribe',
     params: NativeChatSession,
-    handler: async (params, { runtime, connectionId, clientKind, signal }, emit) => {
+    handler: async (params, { runtime, connectionId, signal }, emit) => {
       if (signal?.aborted) {
         return
       }
@@ -144,7 +136,7 @@ export const NATIVE_CHAT_METHODS = [
           // instead of stranding the view at 'loading' when the read keeps throwing.
           emit({
             type: 'snapshot',
-            messages: windowForClient(messages, clientKind, limit),
+            messages: windowForClient(messages, limit),
             hasMore,
             beforeOffset,
             ...(error ? { error } : {}),
@@ -166,7 +158,7 @@ export const NATIVE_CHAT_METHODS = [
           }
           emit({
             type: 'replacement',
-            messages: windowForClient(messages, clientKind, limit),
+            messages: windowForClient(messages, limit),
             hasMore,
             beforeOffset,
             ...(lifecycle ? { lifecycle } : {})
@@ -178,7 +170,7 @@ export const NATIVE_CHAT_METHODS = [
           }
           emit({
             type: 'appended',
-            messages: sanitizeAppendForClient(messages, clientKind),
+            messages: sanitizeAppendForClient(messages),
             ...(lifecycle ? { lifecycle } : {})
           })
         }

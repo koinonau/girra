@@ -1,8 +1,7 @@
 import type { ManagedPaneInternal } from '@/lib/pane-manager/pane-manager-types'
 import { safeFit } from '@/lib/pane-manager/pane-tree-ops'
 import { requestStablePaneFit } from '@/lib/pane-manager/pane-fit-resize-observer'
-import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
-import { isPtyLocked } from '@/lib/pane-manager/mobile-driver-state'
+import { getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 import { reconcilePtySizeAcrossFrames } from '../pty-size-reconcile'
 import { shouldClaimRemoteDesktopViewport } from '../remote-desktop-viewport-claim'
 import { deferTerminalGeometryMutationDuringRebuild } from '@/lib/pane-manager/terminal-scroll-intent-rebuild'
@@ -70,35 +69,27 @@ export function installPtyResizeGeometry(session: ConnectPanePtySession): void {
     }
     const priorProposed = session.lastObservedDesktopGrid
     session.lastObservedDesktopGrid = proposed
-    if (fitOverride.mode === 'remote-desktop-fit') {
-      if (
-        shouldClaimRemoteDesktopViewport({
-          holdMode: fitOverride.mode,
-          prior: priorProposed,
-          current: proposed,
-          paneGeometryChanged,
-          paneVisible: session.deps.isVisibleRef.current,
-          documentVisible: document.visibilityState !== 'hidden',
-          documentFocused: document.hasFocus()
-        })
-      ) {
-        // Why: a focused, visible layout change is genuine activity; release
-        // the park and update xterm before claiming so the owner does not keep
-        // rendering the prior owner's stale grid.
-        session.suppressViewportClaimTerminalResize = true
-        try {
-          session.pane.terminal.resize(proposed.cols, proposed.rows)
-        } finally {
-          session.suppressViewportClaimTerminalResize = false
-        }
-        session.transport.resize(proposed.cols, proposed.rows, { claim: true })
+    if (
+      shouldClaimRemoteDesktopViewport({
+        holdMode: fitOverride.mode,
+        prior: priorProposed,
+        current: proposed,
+        paneGeometryChanged,
+        paneVisible: session.deps.isVisibleRef.current,
+        documentVisible: document.visibilityState !== 'hidden',
+        documentFocused: document.hasFocus()
+      })
+    ) {
+      // Why: a focused, visible layout change is genuine activity; release
+      // the park and update xterm before claiming so the owner does not keep
+      // rendering the prior owner's stale grid.
+      session.suppressViewportClaimTerminalResize = true
+      try {
+        session.pane.terminal.resize(proposed.cols, proposed.rows)
+      } finally {
+        session.suppressViewportClaimTerminalResize = false
       }
-      return
-    }
-    if (isRemoteRuntimePtyId(currentPtyId)) {
-      session.transport.resize(proposed.cols, proposed.rows)
-    } else {
-      window.api.pty.reportGeometry(currentPtyId, proposed.cols, proposed.rows)
+      session.transport.resize(proposed.cols, proposed.rows, { claim: true })
     }
   }
   session.geometryReportObserver =
@@ -138,7 +129,7 @@ export function installPtyResizeGeometry(session: ConnectPanePtySession): void {
   // is false mid-mount), pinning process.stdout.columns forever and garbling
   // TUIs. The reconcile re-fits across frames until the grid settles and forces
   // the PTY to xterm's dimensions; the spawn-time sync is authoritative by
-  // definition so it bypasses the visibility gate (but not the mobile-fit
+  // definition so it bypasses the visibility gate (but not the remote-desktop-fit
   // override, which legitimately parks the PTY at phone dims). See
   // pty-size-reconcile.ts for the convergence loop.
   session.ptySizeReconcileHandle = null
@@ -153,9 +144,9 @@ export function installPtyResizeGeometry(session: ConnectPanePtySession): void {
       spawnCols,
       spawnRows,
       isAlive: () => !session.disposed && session.transport.getPtyId() === ptyId,
-      // Mobile legitimately parks the PTY at phone dims; skip those frames
-      // (neither fit nor forward) instead of cancelling the reconcile window.
-      isParked: () => Boolean(getFitOverrideForPty(ptyId)) || isPtyLocked(ptyId),
+      // A fit hold legitimately parks the PTY; skip those frames (neither fit
+      // nor forward) instead of cancelling the reconcile window.
+      isParked: () => Boolean(getFitOverrideForPty(ptyId)),
       // Once the renderer resize is authoritative (pane visible), the live
       // onResize owns future corrections, so the reconcile can hand off after
       // the grid stabilizes. While hidden it keeps watching for a late settle.

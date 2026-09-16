@@ -12,7 +12,6 @@ type BrowserSurface = Omit<PublicMethods<RuntimeBrowserCommands>, 'browserScreen
     options: {
       connectionId?: string
       pairedDeviceId?: string
-      clientKind?: 'mobile' | 'runtime'
       sendBinary?: (bytes: Uint8Array<ArrayBufferLike>) => boolean | void
       signal?: AbortSignal
       emit: (result: BrowserScreencastResult) => void
@@ -159,10 +158,6 @@ export class RuntimeEdgeCommandController {
       ...bindPrefixedMethods(this.emulator, 'emulator'),
       browserScreencast: (params, options) => this.screencasts.start(params, options)
     } as RuntimeEdgeCommandSurface
-  }
-
-  cancelScreencast(browserPageId: string): void {
-    this.screencasts.cancelMobilePage(browserPageId, true)
   }
 
   getBrowserRemoteViewerPages(): string[] {

@@ -37,7 +37,6 @@ vi.mock('@/lib/worktree-runtime-owner', () => ({
   getExecutionHostIdForWorktree: () => mocks.executionHostId
 }))
 vi.mock('../host-guest/webview-registry', () => ({ destroyPersistentWebview: mocks.destroy }))
-vi.mock('./BrowserMobileDriverOverlay', () => ({ BrowserMobileDriverOverlay: () => null }))
 vi.mock('./browser-page-pane', () => ({
   BrowserPagePane: ({ browserTab, isActive }: { browserTab: BrowserPage; isActive: boolean }) => (
     <input data-page-id={browserTab.id} data-active={isActive} />
@@ -54,7 +53,6 @@ import {
   acquireBrowserAutomationVisibility,
   releaseBrowserAutomationVisibility
 } from '../host-guest/browser-automation-visibility'
-import { hydrateBrowserDrivers } from '@/lib/pane-manager/browser-mobile-driver-state'
 import { hydrateBrowserRemoteViewerPages } from '@/lib/pane-manager/browser-remote-viewer-state'
 
 function createState(): MockState {
@@ -143,11 +141,10 @@ describe('deferred browser lifecycle through the overlay and SSH gate', () => {
   })
   afterEach(() => {
     cleanup()
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
-  it.each(['automation', 'mobile', 'viewer'])(
+  it.each(['automation', 'viewer'])(
     'releases hidden sibling chrome without remounting the %s-claimed page',
     (consumer) => {
       const view = render(surface())
@@ -160,11 +157,6 @@ describe('deferred browser lifecycle through the overlay and SSH gate', () => {
       act(() => {
         if (consumer === 'automation') {
           token = acquireBrowserAutomationVisibility('a-2')
-        }
-        if (consumer === 'mobile') {
-          hydrateBrowserDrivers([
-            { browserPageId: 'a-2', driver: { kind: 'mobile', clientId: 'phone-1' } }
-          ])
         }
         if (consumer === 'viewer') {
           hydrateBrowserRemoteViewerPages(['a-2'])
@@ -183,7 +175,6 @@ describe('deferred browser lifecycle through the overlay and SSH gate', () => {
           if (token) {
             releaseBrowserAutomationVisibility(token)
           }
-          hydrateBrowserDrivers([])
           hydrateBrowserRemoteViewerPages([])
         })
         expect(view.container.querySelectorAll('[data-page-id]')).toHaveLength(0)

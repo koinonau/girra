@@ -101,20 +101,12 @@ export const TerminalSend = TerminalHandle.extend({
   agentPrompt: z.literal(true).optional(),
   // Why: waiting observes the same prompt receipt; it never authorizes a second write.
   waitSubmitMs: z.number().int().min(0).max(3_600_000).optional(),
-  resolvedLaunchDraft: z
-    .object({
-      text: z.string(),
-      createdAt: z.number().finite()
-    })
-    .optional(),
   requireAgentStatus: z.enum(['sendable']).optional(),
-  // Why: terminal-generated replies are valid input but must not transfer the shared terminal floor.
-  inputKind: z.enum(['query-reply']).optional(),
-  // Why: identifies the caller for the driver state machine; when absent (older clients) the server falls back to the most recent mobile actor (docs/mobile-presence-lock.md).
+  // Why: identifies the caller for the viewport floor.
   client: z
     .object({
       id: requiredString('Missing client ID'),
-      type: z.enum(['mobile', 'desktop']).default('desktop').optional()
+      type: z.literal('desktop').default('desktop').optional()
     })
     .optional(),
   viewport: z

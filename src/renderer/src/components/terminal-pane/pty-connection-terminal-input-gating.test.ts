@@ -147,147 +147,6 @@ describe('connectPanePty', () => {
     await restoreTerminalTestGlobals()
   })
 
-  it('does not infer interrupts when mobile presence lock blocks terminal input', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    const { setDriverForPty } = await import('@/lib/pane-manager/mobile-driver-state')
-
-    vi.useFakeTimers()
-    vi.setSystemTime(1_100)
-    const ptyId = 'pty-mobile-locked'
-    setDriverForPty(ptyId, { kind: 'mobile', clientId: 'phone-1' })
-    try {
-      const transport = createMockTransport(ptyId)
-      transportFactoryQueue.push(transport)
-      const paneKey = makePaneKey('tab-1', LEAF_1)
-      mockStoreState = {
-        ...mockStoreState,
-        tabsByWorktree: { 'wt-1': [{ id: 'tab-1', ptyId }] },
-        ptyIdsByTabId: { 'tab-1': [ptyId] },
-        agentStatusByPaneKey: {
-          [paneKey]: {
-            paneKey,
-            state: 'working',
-            prompt: 'locked input',
-            updatedAt: 1_000,
-            stateStartedAt: 900,
-            agentType: 'opencode',
-            stateHistory: []
-          }
-        }
-      }
-
-      const pane = createPane(1)
-      const terminalTarget = createKeyboardEventTarget()
-      ;(pane.terminal as { element?: unknown }).element = terminalTarget.target
-      let onDataHandler: ((data: string) => void) | null = null
-      pane.terminal.onData = vi.fn(((handler: (data: string) => void) => {
-        onDataHandler = handler
-        return { dispose: vi.fn() }
-      }) as typeof pane.terminal.onData)
-
-      connectPanePty(pane as never, createManager(1) as never, createDeps() as never)
-
-      if (!onDataHandler) {
-        throw new Error('expected onData handler to be registered')
-      }
-      terminalTarget.dispatch(keyEvent({ key: 'c', ctrlKey: true }))
-      ;(onDataHandler as unknown as (data: string) => void)('\x03')
-      ;(onDataHandler as unknown as (data: string) => void)('x')
-      vi.advanceTimersByTime(500)
-
-      expect(window.api.runtime.restoreTerminalFit).not.toHaveBeenCalled()
-      expect(transport.sendInput).not.toHaveBeenCalled()
-      expect(window.api.agentStatus.inferInterrupt).not.toHaveBeenCalled()
-    } finally {
-      setDriverForPty(ptyId, { kind: 'idle' })
-    }
-  })
-
-  it('drops xterm protocol replies from live TUI output while mobile presence lock is active', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    const { setDriverForPty } = await import('@/lib/pane-manager/mobile-driver-state')
-
-    const ptyId = 'pty-mobile-tui-query'
-    setDriverForPty(ptyId, { kind: 'mobile', clientId: 'phone-1' })
-    try {
-      const transport = createMockTransport(ptyId)
-      transportFactoryQueue.push(transport)
-      mockStoreState = {
-        ...mockStoreState,
-        tabsByWorktree: { 'wt-1': [{ id: 'tab-1', ptyId }] },
-        ptyIdsByTabId: { 'tab-1': [ptyId] }
-      }
-
-      const pane = createPane(1)
-      let onDataHandler: ((data: string) => void) | null = null
-      pane.terminal.onData = vi.fn(((handler: (data: string) => void) => {
-        onDataHandler = handler
-        return { dispose: vi.fn() }
-      }) as typeof pane.terminal.onData)
-
-      connectPanePty(pane as never, createManager(1) as never, createDeps() as never)
-
-      if (!onDataHandler) {
-        throw new Error('expected onData handler to be registered')
-      }
-      // Simulate xterm answering a TUI's DA1 query while the phone owns the PTY.
-      ;(onDataHandler as unknown as (data: string) => void)('\x1b[?1;2c')
-      // Capability handlers are registered outside onData and must honor the same mobile query-authority lock.
-      const csiCalls = (
-        pane.terminal.parser.registerCsiHandler as unknown as {
-          mock: { calls: [{ final: string }, (params: (number | number[])[]) => boolean][] }
-        }
-      ).mock.calls
-      const da1Handler = csiCalls.find(([id]) => id.final === 'c')?.[1]
-      expect(da1Handler).toBeTypeOf('function')
-      da1Handler?.([])
-      await flushAsyncTicks()
-
-      expect(window.api.runtime.restoreTerminalFit).not.toHaveBeenCalled()
-      expect(transport.sendInput).not.toHaveBeenCalled()
-      expect(transport.sendInputImmediate).not.toHaveBeenCalled()
-    } finally {
-      setDriverForPty(ptyId, { kind: 'idle' })
-    }
-  })
-
-  it('blocks remote locked terminal input before it reaches the runtime transport', async () => {
-    const { connectPanePty } = await import('./pty-connection')
-    const { setDriverForPty } = await import('@/lib/pane-manager/mobile-driver-state')
-
-    const ptyId = 'remote:env-1@@terminal-1'
-    setDriverForPty(ptyId, { kind: 'mobile', clientId: 'phone-1' })
-    try {
-      const transport = createMockTransport(ptyId)
-      transportFactoryQueue.push(transport)
-      mockStoreState = {
-        ...mockStoreState,
-        tabsByWorktree: { 'wt-1': [{ id: 'tab-1', ptyId }] },
-        ptyIdsByTabId: { 'tab-1': [ptyId] }
-      }
-
-      const pane = createPane(1)
-      let onDataHandler: ((data: string) => void) | null = null
-      pane.terminal.onData = vi.fn(((handler: (data: string) => void) => {
-        onDataHandler = handler
-        return { dispose: vi.fn() }
-      }) as typeof pane.terminal.onData)
-
-      connectPanePty(pane as never, createManager(1) as never, createDeps() as never)
-
-      if (!onDataHandler) {
-        throw new Error('expected onData handler to be registered')
-      }
-      ;(onDataHandler as unknown as (data: string) => void)('x')
-      await flushAsyncTicks()
-
-      expect(window.api.runtime.restoreTerminalFit).not.toHaveBeenCalled()
-      expect(transport.sendInput).not.toHaveBeenCalled()
-    } finally {
-      setDriverForPty(ptyId, { kind: 'idle' })
-    }
-  })
-
   it('does not infer interrupts when the transport rejects terminal input', async () => {
     const { connectPanePty } = await import('./pty-connection')
 
@@ -334,14 +193,14 @@ describe('connectPanePty', () => {
 
     vi.useFakeTimers()
     vi.setSystemTime(1_100)
-    const transport = createMockTransport('pty-mobile-race')
+    const transport = createMockTransport('pty-reject-race')
     transport.sendInputAccepted = vi.fn().mockResolvedValue(false)
     transportFactoryQueue.push(transport)
     const paneKey = makePaneKey('tab-1', LEAF_1)
     mockStoreState.agentStatusByPaneKey[paneKey] = {
       paneKey,
       state: 'working',
-      prompt: 'mobile race input',
+      prompt: 'reject race input',
       updatedAt: 1_000,
       stateStartedAt: 900,
       agentType: 'opencode',

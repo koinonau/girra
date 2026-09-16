@@ -181,11 +181,7 @@ export async function loadIpcEventsHarness(
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: (
             listener: (event: ClientHostedBrowserRowsEvent) => void
           ) => {

@@ -52,8 +52,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
 
     computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-headless-startup-setup')
@@ -140,8 +139,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
 
     computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-headless-parallel')
@@ -217,8 +215,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
 
     computeWorktreePathMock.mockReturnValue('/tmp/workspaces/runtime-observed-wsl-shell')
@@ -284,8 +281,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     runtime.attachWindow(1)
 
@@ -355,8 +351,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     runtime.attachWindow(1)
 
@@ -414,8 +409,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     runtime.attachWindow(1)
 
@@ -473,8 +467,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     runtime.attachWindow(1)
 
@@ -541,8 +534,7 @@ describe('OrcaRuntimeService', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     runtime.attachWindow(1)
 

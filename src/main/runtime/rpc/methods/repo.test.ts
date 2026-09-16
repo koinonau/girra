@@ -217,65 +217,6 @@ describe('repo RPC methods', () => {
     })
   })
 
-  it('lists sparse checkout presets for a repo', async () => {
-    const runtime = {
-      getRuntimeId: () => 'test-runtime',
-      listSparsePresets: vi.fn().mockResolvedValue([
-        {
-          id: 'preset-1',
-          projectId: 'repo-1',
-          name: 'Frontend',
-          directories: ['src/renderer'],
-          createdAt: 1,
-          updatedAt: 2
-        }
-      ])
-    } as unknown as OrcaRuntimeService
-    const dispatcher = new RpcDispatcher({ runtime, methods: REPO_METHODS })
-
-    const response = await dispatcher.dispatch(
-      makeRequest('repo.sparsePresets', { repo: 'repo-1' })
-    )
-
-    expect(runtime.listSparsePresets).toHaveBeenCalledWith('repo-1')
-    expect(response).toMatchObject({
-      ok: true,
-      result: { presets: [{ id: 'preset-1', directories: ['src/renderer'] }] }
-    })
-  })
-
-  it('saves sparse checkout presets for a repo', async () => {
-    const runtime = {
-      getRuntimeId: () => 'test-runtime',
-      saveSparsePreset: vi.fn().mockResolvedValue({
-        id: 'preset-1',
-        projectId: 'repo-1',
-        name: 'Frontend',
-        directories: ['src/renderer'],
-        createdAt: 1,
-        updatedAt: 2
-      })
-    } as unknown as OrcaRuntimeService
-    const dispatcher = new RpcDispatcher({ runtime, methods: REPO_METHODS })
-
-    const response = await dispatcher.dispatch(
-      makeRequest('repo.saveSparsePreset', {
-        repo: 'repo-1',
-        name: 'Frontend',
-        directories: ['src/renderer']
-      })
-    )
-
-    expect(runtime.saveSparsePreset).toHaveBeenCalledWith('repo-1', {
-      name: 'Frontend',
-      directories: ['src/renderer']
-    })
-    expect(response).toMatchObject({
-      ok: true,
-      result: { preset: { id: 'preset-1', directories: ['src/renderer'] } }
-    })
-  })
-
   it('routes repository hook operations to the runtime server', async () => {
     const runtime = {
       getRuntimeId: () => 'test-runtime',

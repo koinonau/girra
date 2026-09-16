@@ -5,7 +5,6 @@ import { useAppStore } from '@/store'
 import type { AppState } from '@/store/types'
 import { DEFAULT_AGENT_HIBERNATION_IDLE_MS } from './agent-hibernation-planner'
 import { resetAgentHibernationCoordinatorForTests } from './agent-hibernation-coordinator'
-import { hydrateDrivers } from './pane-manager/mobile-driver-state'
 import { resetForegroundTerminalTabIdsForTests } from './foreground-terminal-tabs'
 import { resetAgentHibernationOutputActivityForTests } from './agent-hibernation-output-activity'
 import {
@@ -191,7 +190,6 @@ export function resetAgentHibernationCoordinatorFixture(): void {
   resetForegroundTerminalTabIdsForTests()
   resetAgentHibernationOutputActivityForTests()
   resetHibernationPaneAgeForTests()
-  hydrateDrivers([])
   mockRuntimeEnvironmentCall.mockReset()
   vi.useRealTimers()
 }

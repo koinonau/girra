@@ -71,8 +71,7 @@ function createHarness() {
     revealTerminalSession: vi.fn(async () => null),
     createTerminal: vi.fn(),
     activateWorktree: vi.fn(),
-    focusTerminal: vi.fn(),
-    terminalDriverChanged: vi.fn()
+    focusTerminal: vi.fn()
   } as never)
   vi.spyOn(
     runtime as unknown as {

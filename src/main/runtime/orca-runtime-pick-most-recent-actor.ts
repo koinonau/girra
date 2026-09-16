@@ -3,47 +3,6 @@ import { OrcaRuntimeWithReclaimTerminalForDesktop } from './orca-runtime-reclaim
 import type { ApplyLayoutResult, PtyLayoutState, PtyLayoutTarget } from './orca-runtime-core'
 
 export class OrcaRuntimeWithPickMostRecentActor extends OrcaRuntimeWithReclaimTerminalForDesktop {
-  // Why: with multiple subscribers, the active phone-fit dims follow the
-  // most recent mobile actor (argmax(lastActedAt)). See
-  // docs/mobile-presence-lock.md "Active phone-fit dim selection".
-  protected pickMostRecentActor(
-    inner: Map<string, { clientId: string; lastActedAt: number }>
-  ): { clientId: string; lastActedAt: number } | null {
-    let best: { clientId: string; lastActedAt: number } | null = null
-    for (const sub of inner.values()) {
-      if (best === null || sub.lastActedAt > best.lastActedAt) {
-        best = sub
-      }
-    }
-    return best
-  }
-
-  // Why: restore-target selection on last-subscriber-leaves picks the
-  // earliest-by-subscribe-time subscriber AMONG those with non-null
-  // previousCols/Rows. Desktop-mode joins carry null and are skipped — they
-  // never captured pre-fit dims by design.
-  protected pickEarliestRestoreTarget(
-    inner: Map<
-      string,
-      { subscribedAt: number; previousCols: number | null; previousRows: number | null }
-    >
-  ): { previousCols: number; previousRows: number } | null {
-    let best: { subscribedAt: number; previousCols: number; previousRows: number } | null = null
-    for (const sub of inner.values()) {
-      if (sub.previousCols == null || sub.previousRows == null) {
-        continue
-      }
-      if (best === null || sub.subscribedAt < best.subscribedAt) {
-        best = {
-          subscribedAt: sub.subscribedAt,
-          previousCols: sub.previousCols,
-          previousRows: sub.previousRows
-        }
-      }
-    }
-    return best ? { previousCols: best.previousCols, previousRows: best.previousRows } : null
-  }
-
   // ─── Layout state machine ─────────────────────────────────────────
   //
   // See docs/mobile-terminal-layout-state-machine.md.
@@ -65,36 +24,28 @@ export class OrcaRuntimeWithPickMostRecentActor extends OrcaRuntimeWithReclaimTe
 
   // Why: `enqueueLayout`'s "no layouts entry" short-circuit must not fire
   // on the very first transition for a PTY (where the entry doesn't exist
-  // yet *because* we're about to create it). handleMobileSubscribe adds
-  // the ptyId to `freshSubscribeGuard` before calling enqueueLayout and
-  // removes it in a finally block.
+  // yet *because* we're about to create it). Callers add the ptyId to
+  // `freshSubscribeGuard` before calling enqueueLayout and remove it in a
+  // finally block.
   protected isFreshSubscribe(ptyId: string): boolean {
     return this.freshSubscribeGuard.has(ptyId)
   }
 
-  // Why: four-step fallback chain for desktop-restore targets. Always
+  // Why: three-step fallback chain for desktop-restore targets. Always
   // returns a value; the terminal {80,24} branch is reached only under
   // bug. Wrapping the chain as a single helper prevents callsite drift.
   protected resolveDesktopRestoreTarget(ptyId: string): { cols: number; rows: number } {
-    // 1. Earliest-by-subscribedAt subscriber with non-null baseline.
-    const inner = this.mobileSubscribers.get(ptyId)
-    if (inner) {
-      const earliest = this.pickEarliestRestoreTarget(inner)
-      if (earliest) {
-        return { cols: earliest.previousCols, rows: earliest.previousRows }
-      }
-    }
-    // 2. Most-recent desktop renderer geometry report.
+    // 1. Most-recent desktop renderer geometry report.
     const renderer = this.lastRendererSizes.get(ptyId)
     if (renderer) {
       return { cols: renderer.cols, rows: renderer.rows }
     }
-    // 3. Current PTY size.
+    // 2. Current PTY size.
     const size = this.getTerminalSize(ptyId)
     if (size) {
       return { cols: size.cols, rows: size.rows }
     }
-    // 4. Hard default.
+    // 3. Hard default.
     return { cols: 80, rows: 24 }
   }
 
@@ -105,9 +56,6 @@ export class OrcaRuntimeWithPickMostRecentActor extends OrcaRuntimeWithReclaimTe
   protected coalescesWith(prev: PtyLayoutTarget, next: PtyLayoutTarget): boolean {
     if (prev.kind !== next.kind) {
       return false
-    }
-    if (prev.kind === 'phone' && next.kind === 'phone') {
-      return prev.ownerClientId === next.ownerClientId
     }
     if (prev.kind === 'remote-desktop' && next.kind === 'remote-desktop') {
       // Why: each owner's claim promise gates its following input. Sharing a

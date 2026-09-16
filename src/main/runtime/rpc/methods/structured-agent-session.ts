@@ -3,7 +3,7 @@
 // Every method here is gated on the client advertising
 // `agent-session.structured.v1`. A client that does not is told the surface does
 // not exist rather than receiving the journal or mutation surface. Session-tab
-// inventory may expose only a metadata placeholder for an incapable mobile client.
+// inventory may expose only a metadata placeholder for an incapable client.
 
 import {
   agentSessionFingerprintConflict,
@@ -39,10 +39,7 @@ import {
   bindStructuredAgentSessionStream,
   STRUCTURED_AGENT_SESSION_STATUS_METHODS
 } from './structured-agent-session-status-stream'
-import {
-  structuredAgentSessionSubscriptionBase as subscriptionBaseFor,
-  structuredAgentSessionSubscriptionId as subscriptionIdFor
-} from './structured-agent-session-subscription-id'
+import { structuredAgentSessionSubscriptionId as subscriptionIdFor } from './structured-agent-session-subscription-id'
 import {
   AttachParams,
   CancelParams,
@@ -57,8 +54,7 @@ import {
   RewindParams,
   SendParams,
   SetOptionParams,
-  SubscribeParams,
-  UnsubscribeParams
+  SubscribeParams
 } from './structured-agent-session-schemas'
 import { sendStructuredAgentSessionForClient } from './structured-agent-session-send-compatibility'
 
@@ -253,11 +249,6 @@ export const STRUCTURED_AGENT_SESSION_METHODS = [
     handler: async (params, ctx) => requireHost(ctx).readOptions(params.sessionId)
   }),
   defineMethod({
-    name: 'agentSession.commands',
-    params: OptionsParams,
-    handler: async (params, ctx) => requireHost(ctx).readCommands(params.sessionId)
-  }),
-  defineMethod({
     name: 'agentSession.history',
     params: HistoryParams,
     handler: async (params, ctx) =>
@@ -305,23 +296,6 @@ export const STRUCTURED_AGENT_SESSION_METHODS = [
             console.warn('[agent-session] stream hold failed', params.sessionId, error)
           )
       }
-    }
-  }),
-  defineMethod({
-    name: 'agentSession.unsubscribe',
-    params: UnsubscribeParams,
-    handler: async (params, ctx) => {
-      // Why: cleanup must stay available after the setting is disabled, so an admitted caller can
-      // retire resources it already owns; the base still comes from main's shared helper.
-      requireStructuredCleanupHost(ctx)
-      const base = subscriptionBaseFor(ctx, params.sessionId)
-      if (params.subscriptionId) {
-        ctx.runtime.cleanupSubscription(`${base}:${params.subscriptionId}`)
-        return { unsubscribed: true }
-      }
-      ctx.runtime.cleanupSubscription(base)
-      ctx.runtime.cleanupSubscriptionsByPrefix(`${base}:`)
-      return { unsubscribed: true }
     }
   }),
   ...STRUCTURED_AGENT_SESSION_HOLD_METHODS,

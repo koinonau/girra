@@ -36,13 +36,7 @@ describe('admission revoked while a session is still open', () => {
       const response = await call(method, params, STRUCTURED_CLIENT, SETTING_OFF)
 
       expect(response).toMatchObject({ ok: true })
-      // `unsubscribe` retires runtime-owned subscriptions rather than calling the host, so its
-      // result payload is the observable effect.
-      if (hostCall === 'unsubscribe') {
-        expect(response).toMatchObject({ result: { unsubscribed: true } })
-      } else {
-        expect(hostCalls[hostCall]).toHaveBeenCalled()
-      }
+      expect(hostCalls[hostCall]).toHaveBeenCalled()
     }
   )
 
@@ -69,7 +63,7 @@ describe('admission revoked while a session is still open', () => {
     expect(hostCalls.cancel).toHaveBeenCalledOnce()
   })
 
-  it.each(['runtime', 'mobile'] as const)(
+  it.each(['runtime'] as const)(
     'lets a %s client close a chat it already owns',
     async (clientKind) => {
       const response = await call(

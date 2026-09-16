@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react'
 import type { ManagedPane } from '@/lib/pane-manager/pane-manager'
-import { getMobileFitOverridePtyIds } from '@/lib/pane-manager/mobile-fit-overrides'
-import { getAllDrivers } from '@/lib/pane-manager/mobile-driver-state'
+import { getAllOverrides } from '@/lib/pane-manager/fit-overrides'
 import { refitAndRefreshAllTerminalPanes } from '@/lib/pane-manager/pane-manager-registry'
 import { restoreTerminalFitToDesktop, restoreTerminalFitsToDesktop } from './terminal-fit-restore'
 import {
@@ -20,27 +19,19 @@ import { recordTerminalUserInputForLeaf } from './terminal-input-activity'
 import { splitTerminalPaneWithInheritedCwd } from './terminal-pane-split-with-inherited-cwd'
 import type { TerminalPaneContextController } from './use-terminal-pane-context-actions'
 
-export function useTerminalPaneMobileActions(controller: TerminalPaneContextController) {
+export function useTerminalPaneFitActions(controller: TerminalPaneContextController) {
   const {
     cwd,
     managerRef,
     paneCwdRef,
     paneTransportsRef,
-    refreshMobileOverlays,
+    refreshFitOverlays,
     setTerminalError,
     settingsRef,
     tabId,
     worktreeId
   } = controller
-  const getMobileOwnedTerminalPtyIds = useCallback((): string[] => {
-    const ptyIds = new Set(getMobileFitOverridePtyIds())
-    for (const [ptyId, driver] of getAllDrivers()) {
-      if (driver.kind === 'mobile') {
-        ptyIds.add(ptyId)
-      }
-    }
-    return [...ptyIds]
-  }, [])
+  const getHeldTerminalPtyIds = useCallback((): string[] => [...getAllOverrides().keys()], [])
   const scheduleRestoredTerminalRefit = useCallback((): void => {
     requestAnimationFrame(refitAndRefreshAllTerminalPanes)
     window.setTimeout(refitAndRefreshAllTerminalPanes, 100)
@@ -49,7 +40,7 @@ export function useTerminalPaneMobileActions(controller: TerminalPaneContextCont
     async (pane: ManagedPane, ptyId: string): Promise<void> => {
       const currentPtyId = paneTransportsRef.current.get(pane.id)?.getPtyId() ?? null
       if (currentPtyId !== ptyId) {
-        refreshMobileOverlays()
+        refreshFitOverlays()
         return
       }
       const restored = await restoreTerminalFitToDesktop(ptyId, settingsRef.current ?? undefined)
@@ -59,12 +50,12 @@ export function useTerminalPaneMobileActions(controller: TerminalPaneContextCont
       }
     },
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
-    [refreshMobileOverlays, scheduleRestoredTerminalRefit]
+    [refreshFitOverlays, scheduleRestoredTerminalRefit]
   )
   const restoreAllTerminalFits = useCallback(
     async (focusPane: ManagedPane): Promise<void> => {
       const restored = await restoreTerminalFitsToDesktop(
-        getMobileOwnedTerminalPtyIds(),
+        getHeldTerminalPtyIds(),
         settingsRef.current ?? undefined
       )
       if (restored) {
@@ -73,7 +64,7 @@ export function useTerminalPaneMobileActions(controller: TerminalPaneContextCont
       }
     },
     // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
-    [getMobileOwnedTerminalPtyIds, scheduleRestoredTerminalRefit]
+    [getHeldTerminalPtyIds, scheduleRestoredTerminalRefit]
   )
   const terminalShouldHandleMiddleClick = useCallback(
     (target: EventTarget | null): target is Node => {
@@ -235,7 +226,7 @@ export function useTerminalPaneMobileActions(controller: TerminalPaneContextCont
   )
 
   return {
-    getMobileOwnedTerminalPtyIds,
+    getHeldTerminalPtyIds,
     scheduleRestoredTerminalRefit,
     restorePaneTerminalFit,
     restoreAllTerminalFits,
@@ -249,5 +240,5 @@ export function useTerminalPaneMobileActions(controller: TerminalPaneContextCont
   }
 }
 
-export type TerminalPaneMobileController = TerminalPaneContextController &
-  ReturnType<typeof useTerminalPaneMobileActions>
+export type TerminalPaneFitController = TerminalPaneContextController &
+  ReturnType<typeof useTerminalPaneFitActions>

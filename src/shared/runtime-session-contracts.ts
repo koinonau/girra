@@ -24,13 +24,6 @@ export const HEADLESS_RUNTIME_WINDOW_ID = 0
 
 export type DeviceScope = 'runtime'
 
-export type RuntimeTerminalDriverState =
-  | { kind: 'idle' }
-  | { kind: 'desktop' }
-  | { kind: 'mobile'; clientId: string }
-
-export type RuntimeBrowserDriverState = RuntimeTerminalDriverState
-
 export const BROWSER_UNAVAILABLE_ERROR_CODE = 'browser_unavailable' as const
 
 // Why: one sentence per cause, each naming the thing the operator can change. The host
@@ -155,15 +148,8 @@ export type RuntimeRendererSyncWindowGraph = RuntimeSyncWindowGraph & {
   rendererGeneration: string
 }
 
-export type RuntimeNativeChatLaunchDraftResolution = {
-  tabId: string
-  text: string
-  createdAt: number
-}
-
 export type RuntimeSyncWindowGraphResult = RuntimeStatus & {
   agentOrchestrationByPaneKey?: Record<string, AgentStatusOrchestrationContext>
-  nativeChatLaunchDraftResolutions?: RuntimeNativeChatLaunchDraftResolution[]
   mobileSessionResyncWorktrees?: string[]
 }
 

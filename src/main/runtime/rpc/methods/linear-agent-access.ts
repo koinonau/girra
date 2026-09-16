@@ -4,7 +4,6 @@ import { isLinearUuid } from '../../../../shared/linear/uuid'
 import {
   AgentIssueContext,
   AgentSearchIssues,
-  LinearCurrentContext,
   LinearIssueAddComment,
   LinearIssueAttachLink,
   LinearIssueCreate,
@@ -79,11 +78,6 @@ export const LINEAR_AGENT_ACCESS_METHODS = [
     name: 'linear.agentProjectList',
     params: LinearProjectList,
     handler: async (params, { runtime }) => runtime.linearProjectListForAgents(params)
-  }),
-  defineMethod({
-    name: 'linear.resolveCurrentIssue',
-    params: LinearCurrentContext,
-    handler: async (params, { runtime }) => runtime.linearResolveCurrentIssue(params)
   }),
   defineMethod({
     name: 'linear.issueSetState',

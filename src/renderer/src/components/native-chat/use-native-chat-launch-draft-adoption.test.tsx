@@ -182,17 +182,6 @@ describe('useNativeChatLaunchDraftSignal', () => {
     expect(result.current.launchDraft).not.toBeNull()
   })
 
-  it('resolves immediately from an accepted mobile submission', () => {
-    mocks.storeState.nativeChatLaunchDraftByTabId = {
-      'tab-1': launchDraft({ adopted: true, resolved: true, createdAt: SEEDED_AT })
-    }
-
-    const { result } = renderSignal([], true)
-
-    expect(result.current.launchDraftResolved).toBe(true)
-    expect(result.current.launchDraft?.resolved).toBe(true)
-  })
-
   it("selects the tab's seed for every pane so the resolution machine keeps running", () => {
     // Pane ownership gates the composer *write*, not the signal: nulling it here
     // would also kill the resolved/cleanup branch for a split tab.

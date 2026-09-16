@@ -5,8 +5,7 @@ import { useAppStore } from '@/store'
 import { isTerminalQueryReply } from '../../../../../shared/terminal-query-reply'
 import { safeFitAndThen } from '@/lib/pane-manager/pane-tree-ops'
 import { requestStablePaneFit } from '@/lib/pane-manager/pane-fit-resize-observer'
-import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
-import { isPtyLocked } from '@/lib/pane-manager/mobile-driver-state'
+import { getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 import { getAppliedSizeReadE2eDelayMs } from '../pty-applied-size-read-e2e-delay'
 import { createPtySizeReassertion } from '../pty-size-reassertion'
 import { isPaneReplaying } from '../replay-guard'
@@ -39,14 +38,6 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
         isXtermMouseReport(data) ||
         (isXtermWheelCursorKey(data) && session.pane.terminal.buffer.active.type === 'alternate'))
     ) {
-      return
-    }
-    const currentPtyId = session.transport.getPtyId()
-    // Why: presence-lock input drop. While mobile is the driver for this
-    // PTY, desktop keystrokes must not reach the shell; the visible overlay's
-    // explicit Take back action owns restoring desktop input and dimensions.
-    if (currentPtyId && isPtyLocked(currentPtyId)) {
-      session.clearPendingTerminalInputIntent()
       return
     }
     // Why: xterm answers CPR/DSR/DA queries natively through this same onData
@@ -168,9 +159,7 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
 
   session.shouldSuppressDesktopPtyResize = (): boolean => {
     const currentPtyId = session.transport.getPtyId()
-    return Boolean(
-      currentPtyId && (getFitOverrideForPty(currentPtyId) || isPtyLocked(currentPtyId))
-    )
+    return Boolean(currentPtyId && getFitOverrideForPty(currentPtyId))
   }
 
   session.isRendererPtyResizeAuthoritative = (): boolean => {
@@ -186,15 +175,9 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
     if (!session.isRendererPtyResizeAuthoritative()) {
       return
     }
-    // Why: when a mobile-fit override is active OR mobile is currently the
-    // driver of this PTY, the PTY is already at phone dims and any desktop
-    // resize is wrong. Suppress resize forwarding to avoid spurious SIGWINCH
-    // signals (TUI flicker / wrap corruption). Both checks are needed:
-    // - getFitOverrideForPty covers the "phone-fit dims" state.
-    // - isPtyLocked covers the broader "mobile driving" state, including
-    //   transitions where override may not be set (e.g. legacy code paths).
-    // The pty:resize IPC has a defense-in-depth twin. See
-    // docs/mobile-presence-lock.md.
+    // Why: a remote desktop holding the fit parks the PTY at its dims, so any
+    // local resize is wrong. Suppress forwarding to avoid spurious SIGWINCH
+    // (TUI flicker / wrap corruption); the pty:resize IPC has a twin guard.
     if (session.shouldSuppressDesktopPtyResize()) {
       return
     }
@@ -345,8 +328,8 @@ export function installPtyInputForward(session: ConnectPanePtySession): void {
 
   // Why: observe the outer pane as the layout signal for both desktop drift
   // healing and mobile take-back. Normal desktop panes compare xterm against
-  // the PTY's applied size; mobile-fit panes only report desktop geometry so
-  // the parked phone-sized PTY is not resized. See docs/mobile-fit-hold.md.
+  // the PTY's applied size; remote-desktop-fit panes only report desktop geometry so
+  // the parked phone-sized PTY is not resized. See docs/remote-desktop-fit-hold.md.
   session.pendingGeometryReportRaf = null
   session.lastObservedDesktopGrid = null
   session.readPaneSize = (): { width: number; height: number } | null => {

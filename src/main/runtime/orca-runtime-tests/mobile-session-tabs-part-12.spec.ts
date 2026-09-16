@@ -286,8 +286,7 @@ describe('OrcaRuntimeService', () => {
       closeTerminal: vi.fn(),
       closeSessionTab: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     const webContents = { send: vi.fn() }
     const send = vi.fn((_channel: string, payload: { requestId: string; activate?: boolean }) => {
@@ -461,8 +460,7 @@ describe('OrcaRuntimeService', () => {
       closeTerminal: vi.fn(),
       closeSessionTab: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     const webContents = { send: vi.fn() }
     const send = vi.fn((_channel: string, payload: { requestId: string }) => {
@@ -546,8 +544,7 @@ describe('OrcaRuntimeService', () => {
       closeTerminal: vi.fn(),
       closeSessionTab: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     const webContents = { send: vi.fn() }
     const send = vi.fn((_channel: string, payload: { requestId: string }) => {

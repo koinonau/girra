@@ -37,23 +37,7 @@ function makeRuntime(): {
 }
 
 describe('runtime.clientEvents.subscribe', () => {
-  it('registers mobile subscriptions as non-consumers of terminal side effects', async () => {
-    const { runtime, onClientEvent, cleanups } = makeRuntime()
-
-    const done = subscribeMethod.handler(
-      undefined,
-      { runtime, connectionId: 'conn-1', clientKind: 'mobile' } as RpcContext,
-      () => {}
-    )
-
-    expect(onClientEvent).toHaveBeenCalledWith(expect.any(Function), {
-      consumesTerminalSideEffects: false
-    })
-    cleanups.forEach((cleanup) => cleanup())
-    await done
-  })
-
-  it('keeps non-mobile subscriptions consuming terminal side effects', async () => {
+  it('keeps subscriptions consuming terminal side effects', async () => {
     const { runtime, onClientEvent, cleanups } = makeRuntime()
 
     const done = subscribeMethod.handler(

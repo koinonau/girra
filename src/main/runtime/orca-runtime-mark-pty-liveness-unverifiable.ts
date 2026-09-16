@@ -1,7 +1,6 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { OrcaRuntimeWithOnPtyExit } from './orca-runtime-on-pty-exit'
 import type { PtyLivenessVerdict } from '../../shared/pty-liveness-verdict'
-import type { DriverState } from './orca-runtime-core'
 import { clampTerminalViewport } from './terminal-viewport'
 import { getPtyTerminalState, getTerminalState } from './terminal-wait-results'
 
@@ -143,34 +142,13 @@ export class OrcaRuntimeWithMarkPtyLivenessUnverifiable extends OrcaRuntimeWithO
     this.ptyLivenessVerdictByPtyId.delete(ptyId)
   }
 
-  // ─── Driver state (mobile-presence lock) ──────────────────────────
-  //
-  // See docs/mobile-presence-lock.md.
-
-  getDriver(ptyId: string): DriverState {
-    return this.terminalDrivers.get(ptyId)
-  }
-
-  protected setDriver(ptyId: string, next: DriverState): void {
-    this.terminalDrivers.set(ptyId, next)
-  }
-
   // Why: the host's own fit cascade (window resize, split drag, tab reveal,
-  // "+"-new-tab re-render) must not resize a PTY whose width a remote client
-  // owns — that is the remote "porridge" bug. True while a phone (mobile driver)
-  // OR an active remote desktop viewer owns the PTY. Input is deliberately NOT gated
-  // here (see the `writePtyInput` mobile-only checks): shared-control desktop
-  // viewers may still type alongside the host.
+  // "+"-new-tab re-render) must not resize a PTY whose width a remote desktop
+  // viewer owns — that is the remote "porridge" bug. Input is deliberately NOT
+  // gated here: shared-control desktop viewers may still type alongside the host.
   // Note: this is intentionally NOT a driver kind. An active remote viewer needs
-  // only resize suppression, not the mobile driver machinery (input lock,
-  // phone-fit, driver-change banners), so it lives in its own registry and does
-  // not perturb the presence-lock state machine. It also coexists with mobile:
-  // while a phone drives, the registry still suppresses host resize, and when
-  // the phone leaves the surviving viewer keeps the PTY suppressed.
+  // only resize suppression, so it lives in its own registry.
   isPtyResizeDrivenRemotely(ptyId: string): boolean {
-    if (this.getDriver(ptyId).kind === 'mobile') {
-      return true
-    }
     return this.isRemoteDesktopResizeDriven(ptyId)
   }
 
@@ -233,8 +211,7 @@ export class OrcaRuntimeWithMarkPtyLivenessUnverifiable extends OrcaRuntimeWithO
   // it must never *create* a width floor (that floor would leak — nothing
   // releases it, pinning the host at a stale width after the viewer is gone).
   // It only refreshes the floor(s) this client already owns via its stream
-  // subscription, keyed by clientId. Mirrors the mobile `updateMobileViewport`
-  // no-op-without-subscription invariant. Returns false when the client owns no
+  // subscription, keyed by clientId. Returns false when the client owns no
   // floor (passive/stream-less viewer) — a stream-less viewer must not lock host
   // resize.
   refreshRemoteDesktopViewer(
@@ -252,7 +229,7 @@ export class OrcaRuntimeWithMarkPtyLivenessUnverifiable extends OrcaRuntimeWithO
     viewport: { cols: number; rows: number }
   ): Promise<boolean> {
     const { cols, rows } = clampTerminalViewport(viewport.cols, viewport.rows)
-    if (this.terminalFitOverrides.has(ptyId) || this.getDriver(ptyId).kind === 'mobile') {
+    if (this.terminalFitOverrides.has(ptyId)) {
       this.recordRendererGeometry(ptyId, cols, rows)
       return true
     }
@@ -269,21 +246,5 @@ export class OrcaRuntimeWithMarkPtyLivenessUnverifiable extends OrcaRuntimeWithO
     } finally {
       this.freshSubscribeGuard.delete(ptyId)
     }
-  }
-
-  markMobileActor(ptyId: string, clientId: string): void {
-    const inner = this.mobileSubscribers.get(ptyId)
-    const sub = inner?.get(clientId)
-    if (sub) {
-      sub.lastActedAt = Date.now()
-    }
-    this.setDriver(ptyId, { kind: 'mobile', clientId })
-  }
-
-  beginMobileInputFloor(
-    ptyId: string,
-    clientId: string
-  ): { commit: () => Promise<void>; rollback: () => void } | null {
-    return this.terminalDrivers.beginMobileInputFloor(ptyId, clientId)
   }
 }

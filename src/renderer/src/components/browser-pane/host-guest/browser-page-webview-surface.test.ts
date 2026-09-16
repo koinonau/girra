@@ -25,7 +25,6 @@ function createGuest(): Electron.WebviewTag {
   return ensureBrowserPageWebview({
     browserTabId: 'surface-test',
     container,
-    inputLocked: false,
     webviewPartition: 'persist:browser-test',
     resolveContainer: () => container
   })!.webview
@@ -67,7 +66,6 @@ describe('browser page surface ownership', () => {
     const reused = ensureBrowserPageWebview({
       browserTabId: 'surface-test',
       container,
-      inputLocked: false,
       webviewPartition: 'persist:browser-test',
       resolveContainer: () => container
     })!

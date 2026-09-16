@@ -48,8 +48,7 @@ describe('OrcaRuntimeService', () => {
       closeTerminal: vi.fn(),
       closeSessionTab: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     const webContents = { send: vi.fn() }
     const send = vi.fn((_channel: string, payload: { requestId: string; worktreeId: string }) => {
@@ -178,8 +177,7 @@ describe('OrcaRuntimeService', () => {
         closeTerminal,
         closeSessionTab: vi.fn(),
         sleepWorktree: vi.fn(),
-        terminalFitOverrideChanged: vi.fn(),
-        terminalDriverChanged: vi.fn()
+        terminalFitOverrideChanged: vi.fn()
       })
       const webContents = { send: vi.fn() }
       const send = vi.fn((_channel: string, payload: { requestId: string }) => {
@@ -290,8 +288,7 @@ describe('OrcaRuntimeService', () => {
         closeTerminal,
         closeSessionTab: vi.fn(),
         sleepWorktree: vi.fn(),
-        terminalFitOverrideChanged: vi.fn(),
-        terminalDriverChanged: vi.fn()
+        terminalFitOverrideChanged: vi.fn()
       })
       // Why: reply with a tabId but never sync a surface graph, so waitForMobileTerminalSurface times out and rollback runs.
       const webContents = { send: vi.fn() }

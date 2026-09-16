@@ -2515,21 +2515,6 @@
             "stop_agent_confirm": "Detener agente",
             "stop_command_confirm": "Detener y cerrar"
           },
-          "MobileDriverOverlay": {
-            "c6460cf584": "Recuperar control",
-            "c8f2e1a4b9": "Recuperar control de este terminal",
-            "c44659e09f": "Teléfono controlando",
-            "7cffad954c": "Contraer",
-            "3eed73394f": "Tu teclado está en pausa",
-            "faa367dc74": "Tu teléfono dejó esto en tamaño móvil",
-            "54f7d6f69d": "Recuperar control de todos los terminales",
-            "b3d8e1f42a": "Restaurar este terminal",
-            "e8c4f2a91b": "Restaurar todos los terminales",
-            "f2a8b9c1d3": "Desde tu teléfono",
-            "c7e4a2b8f1": "Tu teléfono tiene el control",
-            "d9f3c6e2a4": "El teclado de escritorio está en pausa. Recupera este terminal para escribir aquí, recupera todos los terminales que controla tu teléfono o contrae para seguir observando.",
-            "a6b1d8f3e2": "La sesión del teléfono terminó. Restaura el tamaño de escritorio para este terminal o para todos los terminales que tu teléfono dejó en tamaño móvil."
-          },
           "TerminalAgentSessionForkDialog": {
             "17fc841e59": "Copiar contexto",
             "0c8a8629b1": "El fork aparece como su propio espacio de trabajo, no como un hijo anidado. El nuevo agente recibe una transcripción acotada como borrador editable.",
@@ -12086,12 +12071,6 @@
             "b24fef25be": "Importar",
             "02e89014c5": "Se importaron {{value0}} cookies de {{value1}}{{value2}}.",
             "d40d584769": "Se importaron {{value0}} cookies del archivo."
-          },
-          "BrowserMobileDriverOverlay": {
-            "a6914ee43f": "Devolver",
-            "f4ecd61552": "Esta pestaña se controla desde su teléfono. Vuelva a usarlo en el escritorio.",
-            "d9768ec642": "La entrada del navegador está en pausa",
-            "20539eca03": "El móvil impulsa este navegador"
           },
           "BrowserPane": {
             "1ded0d3168": "Copiar captura de pantalla",

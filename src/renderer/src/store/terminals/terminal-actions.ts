@@ -42,10 +42,6 @@ export type TerminalActions = {
   clearNativeChatLaunchPrompt: (tabId: string) => void
   seedNativeChatLaunchDraft: (draft: NativeChatLaunchDraft) => void
   markNativeChatLaunchDraftAdopted: (tabId: string) => void
-  resolveNativeChatLaunchDraft: (
-    tabId: string,
-    resolution: Pick<NativeChatLaunchDraft, 'createdAt' | 'text'>
-  ) => void
   clearNativeChatLaunchDraft: (tabId: string) => void
   markDefaultTerminalTabsApplied: (worktreeId: string) => void
   setHydrationSucceeded: (value: boolean) => void

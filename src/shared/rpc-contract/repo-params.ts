@@ -92,9 +92,3 @@ export const ProjectGroupImportNested = z.discriminatedUnion('mode', [
 export const RepoIssueCommandWrite = RepoSelector.extend({
   content: z.string()
 })
-
-export const RepoSparsePresetSave = RepoSelector.extend({
-  id: OptionalString,
-  name: requiredString('Missing preset name'),
-  directories: z.array(z.string())
-})

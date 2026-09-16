@@ -98,9 +98,7 @@ function startHost(): {
     subscribeToTerminalData: vi.fn().mockReturnValue(vi.fn()),
     subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
     subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-    subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
     getTerminalFitOverride: vi.fn().mockReturnValue(null),
-    getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
     registerSubscriptionCleanup: vi.fn(),
     cleanupSubscription: vi.fn(),
     waitForTerminal: vi.fn(() => new Promise<never>(() => {}))

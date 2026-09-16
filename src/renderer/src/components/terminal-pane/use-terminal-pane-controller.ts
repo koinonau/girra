@@ -13,7 +13,7 @@ import { useTerminalPaneGlobalListeners } from './use-terminal-pane-global-liste
 import { useTerminalPanePasteListeners } from './use-terminal-pane-paste-listeners'
 import { useTerminalPaneTitleEffects } from './use-terminal-pane-title-effects'
 import { useTerminalPaneContextActions } from './use-terminal-pane-context-actions'
-import { useTerminalPaneMobileActions } from './use-terminal-pane-mobile-actions'
+import { useTerminalPaneFitActions } from './use-terminal-pane-fit-actions'
 import { useTerminalPaneProjection } from './use-terminal-pane-projection'
 
 export function useTerminalPaneController(
@@ -34,8 +34,8 @@ export function useTerminalPaneController(
   useTerminalPanePasteListeners(reconciliation)
   useTerminalPaneTitleEffects(reconciliation)
   const context = Object.assign(reconciliation, useTerminalPaneContextActions(reconciliation))
-  const mobile = Object.assign(context, useTerminalPaneMobileActions(context))
-  return Object.assign(mobile, useTerminalPaneProjection(mobile))
+  const fit = Object.assign(context, useTerminalPaneFitActions(context))
+  return Object.assign(fit, useTerminalPaneProjection(fit))
 }
 
 export type TerminalPaneController = ReturnType<typeof useTerminalPaneController>

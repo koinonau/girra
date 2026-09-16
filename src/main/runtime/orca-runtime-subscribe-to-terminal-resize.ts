@@ -1,7 +1,7 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
 import { sessionIdFromStructuredWorkerIncarnation } from './structured-worker-identity'
 import { observeStructuredWorker } from './rpc/methods/orchestration-structured-worker-lifecycle'
-import { OrcaRuntimeWithApplyMobileDisplayMode } from './orca-runtime-apply-mobile-display-mode'
+import { OrcaRuntimeWithRendererGeometry } from './orca-runtime-renderer-geometry'
 import { addListenerToMap } from './orca-runtime-core'
 import { notifyRuntimeListeners, withTimeoutResult } from './runtime-async-boundaries'
 import type { TerminalExitCause } from '../../shared/terminal-exit-cause'
@@ -25,7 +25,7 @@ import {
 import { getRepoIdFromWorktreeId } from '../../shared/worktree/id'
 import { buildOrchestrationTaskDisplayMetadata } from '../../shared/orchestration-task-display'
 
-export class OrcaRuntimeWithSubscribeToTerminalResize extends OrcaRuntimeWithApplyMobileDisplayMode {
+export class OrcaRuntimeWithSubscribeToTerminalResize extends OrcaRuntimeWithRendererGeometry {
   subscribeToTerminalResize(
     ptyId: string,
     listener: (event: {

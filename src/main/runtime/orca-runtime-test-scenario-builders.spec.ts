@@ -38,7 +38,6 @@ type MobileCreateTestNotifier = {
   closeSessionTab: TestMock
   sleepWorktree: TestMock
   terminalFitOverrideChanged: TestMock
-  terminalDriverChanged: TestMock
 }
 
 function attachClientBrowserHost(runtime: RuntimeService) {
@@ -340,8 +339,7 @@ function createMobileCreateTestNotifier(
     closeTerminal,
     closeSessionTab: vi.fn(),
     sleepWorktree: vi.fn(),
-    terminalFitOverrideChanged: vi.fn(),
-    terminalDriverChanged: vi.fn()
+    terminalFitOverrideChanged: vi.fn()
   }
 }
 

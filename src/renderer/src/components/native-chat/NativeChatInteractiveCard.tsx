@@ -14,7 +14,6 @@ import type { NativeChatInteractiveSend } from './use-native-chat-interactive-se
  * approval. Cleared by the host once the agent moves on, so it disappears
  * automatically. Sends through the composer's verified runtime path (R8/R6):
  * answers via agent-specific paste or selector keystrokes; cancel/deny as ESC.
- * Guarded by `canSend` so a mobile presence-lock blocks desktop sends too.
  *
  * Dismiss-on-answer (mobile parity): the live status lingers after answering —
  * the agent emits a post-tool event carrying the same prompt — so we track the
@@ -31,7 +30,6 @@ import type { NativeChatInteractiveSend } from './use-native-chat-interactive-se
 export function NativeChatInteractiveCard({
   paneKey,
   send,
-  canSend,
   messages,
   transcriptSettled,
   onShowingQuestionChange,
@@ -39,7 +37,6 @@ export function NativeChatInteractiveCard({
 }: {
   paneKey: string
   send: NativeChatInteractiveSend
-  canSend: boolean
   /** Transcript to fall back on when live status carries no prompt. Pass the
    *  command-boundary-trimmed messages so an ask abandoned via `/clear` stays gone. */
   messages?: readonly NativeChatMessage[]
@@ -94,7 +91,7 @@ export function NativeChatInteractiveCard({
       clearDismissTimer()
       cancelPending()
     },
-    [canSend, cardKey, cancelPending, clearDismissTimer]
+    [cardKey, cancelPending, clearDismissTimer]
   )
 
   // Forget the dismissal once the prompt clears so a fresh prompt can show.
@@ -108,13 +105,13 @@ export function NativeChatInteractiveCard({
 
   // Tell the view when a question card is up so it can hide the composer (this
   // card supplies its own input). Reset on unmount so the composer comes back.
-  const showingQuestion = card?.kind === 'question' && canSend && cardKey !== dismissedKey
+  const showingQuestion = card?.kind === 'question' && cardKey !== dismissedKey
   useEffect(() => {
     onShowingQuestionChange?.(showingQuestion)
     return () => onShowingQuestionChange?.(false)
   }, [showingQuestion, onShowingQuestionChange])
 
-  if (!card || !canSend || cardKey === dismissedKey) {
+  if (!card || cardKey === dismissedKey) {
     return null
   }
   if (card.kind === 'question') {

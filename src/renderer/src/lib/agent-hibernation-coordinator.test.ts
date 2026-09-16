@@ -7,7 +7,6 @@ import {
   runAgentHibernationTick,
   startAgentHibernationCoordinator
 } from './agent-hibernation-coordinator'
-import { setDriverForPty } from './pane-manager/mobile-driver-state'
 import { registerVisibleTerminalTab, setForegroundTerminalTabIds } from './foreground-terminal-tabs'
 import { recordAgentHibernationPaneOutput } from './agent-hibernation-output-activity'
 import { createCompatibleRuntimeStatusResponseIfNeeded } from '../runtime/runtime-compatibility-test-fixture'
@@ -302,17 +301,6 @@ describe('agent sleep coordinator', () => {
     await vi.advanceTimersByTimeAsync(1000)
 
     expect(shutdown).toHaveBeenCalled()
-  })
-
-  it('does not hibernate a mobile-driven terminal', async () => {
-    vi.useFakeTimers()
-    const shutdown = installEligibleState(vi.fn().mockResolvedValue(undefined))
-    setDriverForPty('pty-1', { kind: 'mobile', clientId: 'phone-1' })
-    startAgentHibernationCoordinator({ intervalMs: 1000, now: () => NOW })
-
-    await vi.advanceTimersByTimeAsync(3000)
-
-    expect(shutdown).not.toHaveBeenCalled()
   })
 
   it.each(['wt-bg', 'folder:folder-1'])(

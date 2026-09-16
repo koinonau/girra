@@ -7,7 +7,6 @@ type LayoutTarget =
   | ({ kind: 'remote-desktop'; ownerSubscriptionKey: string } & Viewport)
 
 export type RemoteDesktopTerminalFloorDependencies = {
-  isMobileDriven: (ptyId: string) => boolean
   getTerminalSize: (ptyId: string) => Viewport | null
   resolveHostTarget: (ptyId: string) => Viewport
   applyLayout: (ptyId: string, target: LayoutTarget) => Promise<{ ok: boolean }>
@@ -59,7 +58,7 @@ export class RemoteDesktopTerminalFloor {
   }
 
   recordHostReclaimTarget(ptyId: string, cols: number, rows: number): void {
-    // Why: phone presence must not seed the separate remote-viewer cache.
+    // Why: a host measurement must not seed the cache with no viewer to reclaim from.
     if (!this.owners.has(ptyId) || cols <= 0 || rows <= 0) {
       return
     }
@@ -86,9 +85,6 @@ export class RemoteDesktopTerminalFloor {
   }
 
   async applyLayout(ptyId: string): Promise<boolean> {
-    if (this.dependencies.isMobileDriven(ptyId)) {
-      return true
-    }
     const owner = this.owners.get(ptyId)
     const target = owner ? (this.viewers.get(ptyId)?.get(owner) ?? null) : null
     const reclaimingHost = !target

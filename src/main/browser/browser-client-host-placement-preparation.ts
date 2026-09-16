@@ -55,7 +55,6 @@ export async function prepareBrowserClientHostPlacement(
     !expectsBrowserClientHosting({
       enabled: options.enabled,
       preference: options.preference,
-      deviceScope: status.deviceScope,
       capabilities: status.capabilities
     })
   ) {

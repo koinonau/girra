@@ -111,7 +111,6 @@ export type {
   CliRuntimeState,
   CliStatusResult,
   DeviceScope,
-  RuntimeBrowserDriverState,
   RuntimeDesktopWindowStatus,
   RuntimeGraphStatus,
   RuntimeMobileSessionAgentTab,
@@ -132,15 +131,13 @@ export type {
   RuntimeMobileSessionTerminalClientTab,
   RuntimeMobileSessionTerminalTab,
   RuntimeMobileTerminalTheme,
-  RuntimeNativeChatLaunchDraftResolution,
   RuntimeRendererSyncWindowGraph,
   RuntimeSessionTabCloseReason,
   RuntimeStatus,
   RuntimeSyncedLeaf,
   RuntimeSyncedTab,
   RuntimeSyncWindowGraph,
-  RuntimeSyncWindowGraphResult,
-  RuntimeTerminalDriverState
+  RuntimeSyncWindowGraphResult
 } from './runtime-session-contracts'
 export type {
   RuntimeTerminalAgentStatus,

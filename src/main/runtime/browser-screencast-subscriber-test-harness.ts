@@ -1,6 +1,5 @@
 import { expect, vi } from 'vitest'
 import { OrcaRuntimeService } from './orca-runtime'
-import type { RuntimeBrowserDriverState } from '../../shared/runtime-types'
 
 export const HARNESS_WORKTREE_ID = 'repo-1::/tmp/worktree-a'
 export const HARNESS_PAGE_ID = 'page-1'
@@ -44,11 +43,7 @@ export type ScreencastSubscriber = {
 
 export type ScreencastHarness = {
   runtime: OrcaRuntimeService
-  subscribe: (options: {
-    connectionId: string
-    clientKind?: 'mobile' | 'runtime'
-  }) => ScreencastSubscriber
-  driver: () => RuntimeBrowserDriverState | undefined
+  subscribe: (options: { connectionId: string }) => ScreencastSubscriber
 }
 
 /**
@@ -94,10 +89,7 @@ export function createScreencastHarness(): ScreencastHarness {
   })
   ;(runtime as unknown as { browserCommands: unknown }).browserCommands = { browserScreencast }
 
-  const subscribe = (options: {
-    connectionId: string
-    clientKind?: 'mobile' | 'runtime'
-  }): ScreencastSubscriber => {
+  const subscribe = (options: { connectionId: string }): ScreencastSubscriber => {
     const calls = browserScreencast.mock.results.length
     const emit = vi.fn()
     const done = runtime.browserScreencast(
@@ -125,9 +117,5 @@ export function createScreencastHarness(): ScreencastHarness {
     }
   }
 
-  return {
-    runtime,
-    subscribe,
-    driver: () => runtime.getAllBrowserDrivers().get(HARNESS_PAGE_ID)
-  }
+  return { runtime, subscribe }
 }

@@ -9,16 +9,10 @@ export const BROWSER_SCREENCAST_METHODS = [
   defineStreamingMethod({
     name: 'browser.screencast',
     params: Screencast,
-    handler: async (
-      params,
-      { runtime, connectionId, pairedDeviceId, clientKind, sendBinary, signal },
-      emit
-    ) =>
+    handler: async (params, { runtime, connectionId, pairedDeviceId, sendBinary, signal }, emit) =>
       runtime.browserScreencast(params, {
         connectionId,
         pairedDeviceId,
-        // Why: the pairing scope is what tells a phone driver apart from a desktop/web viewer of the same stream.
-        clientKind,
         sendBinary,
         signal,
         emit

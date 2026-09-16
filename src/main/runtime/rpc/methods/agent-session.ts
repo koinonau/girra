@@ -30,7 +30,7 @@ type AgentSessionRuntime = OrcaRuntimeService & {
 
 function callerContext(
   clientId: string | undefined,
-  clientKind: 'mobile' | 'runtime' | undefined,
+  clientKind: 'runtime' | undefined,
   signal: AbortSignal | undefined
 ): RuntimeAgentSessionRpcCaller {
   return {
@@ -42,7 +42,7 @@ function callerContext(
 
 function withExecutionHostAgentPresentation<T extends { presentation?: 'background' | 'focused' }>(
   params: T,
-  clientKind: 'mobile' | 'runtime' | undefined
+  clientKind: 'runtime' | undefined
 ): T {
   // Why: paired viewers focus their own mirror; the execution host may have no renderer.
   return clientKind && params.presentation === 'focused'

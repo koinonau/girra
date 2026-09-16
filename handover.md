@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-16: Phases 0 to 7b are merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install. The workflow prune and the signed macOS build are in their pull request. Actions is still disabled.
+As of 2026-09-16: Phases 0 to 7b are merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, and the workflow prune with the signed macOS build. The mobile client prune is in its pull request. Actions is still disabled.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -29,7 +29,8 @@ As of 2026-09-16: Phases 0 to 7b are merged, with the ADRs, the cross-version ha
 - Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
 - The Phase 7b text sweep renames displayed capital `Orca` to `Girra` across the six locale catalogues and their pinned override scripts, the renderer, shared and preload strings, the main process, CLI and relay, the skill guides and the documentation. It merged in [#24](https://github.com/koinonau/girra/pull/24): 1,958 files changed, 7,829 lines added and 7,827 removed.
 - Phase 7b's identity constants move what the operating system sees: `productName` `Girra`, `appId` `com.koinonau.girra` with the native Swift owner check, the executable names, the NSIS product id, the Windows daemon host root, the Casks, and the CLI installed as `girra` with `orca`, `orca-ide` and `orca-dev` kept as aliases. It merged in [#25](https://github.com/koinonau/girra/pull/25): 309 files changed, 2,357 lines added and 2,012 removed.
-- The workflow prune keeps `pr.yml`, `unit-tests.yml`, `e2e.yml` (dispatch only) and a new `mac-build.yml` that signs and notarizes an arm64 DMG, and deletes the other 33 workflows with the release scripts and contract tests they owned: 87 files deleted, 16,681 lines removed. Its pull request: `gh pr list --repo koinonau/girra`.
+- The workflow prune keeps `pr.yml`, `unit-tests.yml`, `e2e.yml` (dispatch only) and a new `mac-build.yml` that signs and notarizes an arm64 DMG, and deletes the other 33 workflows with the release scripts and contract tests they owned. It merged in [#26](https://github.com/koinonau/girra/pull/26): 87 files deleted, 16,681 lines removed.
+- The mobile client prune removes the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path: 67 files deleted, 18,972 lines removed and 1,203 added, measured with `git diff --cached --shortstat main` (2026-09-16). Its pull request: `gh pr list --repo koinonau/girra`. Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -261,6 +262,15 @@ After the workflow prune, on 2026-09-16 (same `PATH` and `DEVELOPER_DIR`):
 | `pnpm lint` | 0 | 41 s | Clean, 112 reliability gates |
 | `pnpm build` | 0 | 27 s | Renderer 11,961 modules |
 
+After the mobile client prune, on 2026-09-16 (same `PATH` and `DEVELOPER_DIR`):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 2 s | No errors |
+| `pnpm test` | 1 | 611 s | Files: 4 failed, 7,616 passed, 45 skipped of 7,665. The four known failures only |
+| `pnpm lint` | 0 | 41 s | Clean, 111 reliability gates |
+| `pnpm build` | 0 | 16 s | Renderer 11,961 modules |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -367,6 +377,7 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-16 (user): the rename ships a first-run migration. It copies the old user-data directory forward and re-encrypts safe-storage secrets while the old key still reads, leaving the originals in place. The only existing helper is `migrateMobilePairingDataToCanonicalUserDataPath` (`src/main/persistence/loading-store/user-data-path.ts:66`), which copies two files; its guards and comment are the template.
 - 2026-09-16 (user): the CLI installs as both `girra` and `orca`, with `girra` primary, so hook scripts, skill guides and SSH hosts already written against `orca` keep working. Retire the alias in a later story.
 - 2026-09-16: the Girra text sweep renames displayed capital `Orca` only. Kept: install and bundle paths derived from `productName`, `TERM_PROGRAM: 'Orca'` (third-party tools match it), `X-Orca-*` headers, `'Orca Nerd Font Symbols'`, GNOME Orca, the marine creature, `'Claude Code-credentials'`, upstream URLs and community labels, fixture repositories named Orca, and every lowercase `orca` code token. The locale toolchain lost its killer-whale brand repairs (`BRAND_MISTRANSLATIONS` and the re-Latinisation block in `locale-translation-policy.mjs`), which existed only to undo machine translations of "Orca".
+- 2026-09-16: the mobile client prune removes what only a connected phone could reach, now that no client can produce `clientKind: 'mobile'`: the presence lock and mobile driver mixins, the driver-state subsystem with its `driver-changed` frame and `runtime:getTerminalDrivers`, phone fit and display mode, both driver overlays, ten RPC methods nothing called, and `terminal.subscribe` with the legacy binary subscription path. Girra ships both ends of its own wire, so the compatibility argument for the legacy path did not apply. Four legacy-subscribe suites were ported onto `terminal.multiplex` rather than deleted. Three chains died with it: the mobile background wake, the native-chat launch-draft resolution and its store action.
 - 2026-09-16: the workflow prune keeps four workflows. `e2e.yml` is dispatch only, so `pr.yml` no longer runs end-to-end specs and the changed-spec routing that fed it is gone. `mac-build.yml` builds an arm64 DMG on `macos-latest`, signs and notarizes it with the five Apple secrets, verifies the staple before uploading, and publishes nothing. The dev channels, the release cut, the Homebrew bump and the Windows signing rehearsal are gone, along with the release scripts and `.github` actions only they used. Neither the credentials nor the notary round trip can be verified until Actions is on.
 - 2026-09-16 (user): a packaged Girra does not adopt the installed Orca.app's profile. The two stay separate, so Orca keeps working and Girra never touches another app's live data.
 - 2026-09-16: what the rename actually breaks, measured rather than assumed. The dev profile keeps its own directory (`orca-dev`, pinned in `configure-process.ts`), and Windows and Linux resolve their user-data directory from `package.json`'s `name`, still `orca`, because the file carries no `productName`. So only macOS moves, and a packaged Girra has no earlier profile of its own. The one real loss is the macOS safe-storage key, which Electron names after the app.

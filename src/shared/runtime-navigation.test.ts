@@ -6,9 +6,6 @@ describe('runtime navigation authority', () => {
     expect(resolveRuntimeNavigationTarget({ clientKind: 'runtime', notifyClients: true })).toBe(
       'caller'
     )
-    expect(resolveRuntimeNavigationTarget({ clientKind: 'mobile', notifyClients: true })).toBe(
-      'caller'
-    )
   })
 
   it('preserves legacy in-process routing and explicit intent', () => {

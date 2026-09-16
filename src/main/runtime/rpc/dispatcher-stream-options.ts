@@ -7,7 +7,7 @@ export type RpcDispatchStreamingOptions = {
   signal?: AbortSignal
   clientId?: string
   pairedDeviceId?: string
-  clientKind?: 'mobile' | 'runtime'
+  clientKind?: 'runtime'
   clientCapabilities?: readonly RuntimeCapability[]
   sendBinary?: (bytes: Uint8Array<ArrayBufferLike>) => boolean | void
   registerBinaryStreamHandler?: (

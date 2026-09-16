@@ -25,11 +25,6 @@ export const CLEANUP_METHODS = [
     method: 'agentSession.release',
     params: { sessionId: SESSION, holderId: 'surface-1' },
     hostCall: 'release'
-  },
-  {
-    method: 'agentSession.unsubscribe',
-    params: { sessionId: SESSION },
-    hostCall: 'unsubscribe'
   }
 ] as const
 

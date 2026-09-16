@@ -20,14 +20,9 @@ export type TerminalMultiplexEvent =
   | {
       type: 'fit-override-changed'
       streamId: number
-      mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+      mode: 'remote-desktop-fit' | 'desktop-fit'
       cols: number
       rows: number
-    }
-  | {
-      type: 'driver-changed'
-      streamId: number
-      driver: { kind: 'idle' } | { kind: 'desktop' } | { kind: 'mobile'; clientId: string }
     }
   | { type: string; streamId?: number; [key: string]: unknown }
 
@@ -52,13 +47,10 @@ export type RemoteRuntimeMultiplexedTerminalCallbacks = {
   onEnd?: (verdict: TerminalStreamEndVerdict) => void
   onError?: (message: string) => void
   onFitOverrideChanged?: (event: {
-    mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+    mode: 'remote-desktop-fit' | 'desktop-fit'
     cols: number
     rows: number
   }) => void
-  onDriverChanged?: (
-    driver: { kind: 'idle' } | { kind: 'desktop' } | { kind: 'mobile'; clientId: string }
-  ) => void
   onWriteUnavailable?: () => void
   onTransportClose?: (event: { recoverable: boolean; retryWithBackoff?: boolean }) => void
 }

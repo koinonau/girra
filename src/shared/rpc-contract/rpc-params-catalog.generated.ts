@@ -155,11 +155,9 @@ import {
   FileSearch,
   FileTreePath,
   FileUnwatch,
-  ResolveTerminalPath,
   ServerDirectoryBrowse
 } from './files-params'
 import { FileOpen, WorktreeSelector } from './files-target-params'
-import { TerminalArtifactFile, TerminalArtifactFileWrite } from './files-terminal-artifact-params'
 import {
   FolderWorkspaceCreate,
   FolderWorkspacePathStatus,
@@ -285,7 +283,6 @@ import {
 import {
   AgentIssueContext,
   AgentSearchIssues,
-  LinearCurrentContext,
   LinearIssueAddComment,
   LinearIssueAttachLink,
   LinearIssueCreate,
@@ -402,7 +399,6 @@ import {
   RepoReorder,
   RepoSearchRefs,
   RepoSetBaseRef,
-  RepoSparsePresetSave,
   RepoUpdate
 } from './repo-params'
 import { BrowserTarget } from './rpc-param-primitives'
@@ -435,16 +431,11 @@ import {
   RewindParams,
   SendParams,
   SetOptionParams,
-  SubscribeParams,
-  UnsubscribeParams
+  SubscribeParams
 } from './structured-agent-session-params'
 import { TerminalAdoptOrphans } from './terminal-orphan-params'
 import { TerminalQuickCommandsUpdate } from './terminal-quick-command-params'
-import {
-  TerminalMultiplex,
-  TerminalResizeForClient,
-  TerminalSubscribe
-} from './terminal-stream-params'
+import { TerminalMultiplex } from './terminal-stream-params'
 import {
   AgentTeamsPrepareLaunch,
   AgentTeamsTmuxCompat,
@@ -464,13 +455,7 @@ import {
   TerminalStopExact,
   TerminalWait
 } from './terminal-unary-params'
-import { TerminalGetAutoRestoreFitParams } from './terminal-viewport-methods-params'
-import {
-  TerminalSetAutoRestoreFit,
-  TerminalSetDisplayMode,
-  TerminalUnsubscribe,
-  TerminalUpdateViewport
-} from './terminal-viewport-schemas-params'
+import { TerminalUpdateViewport } from './terminal-viewport-schemas-params'
 import { WorkspacePortKillParams, WorkspacePortScanParams } from './workspace-ports-params'
 import { WorktreeCreate, WorktreePrefetchCreateBase } from './worktree-create-params'
 import {
@@ -501,7 +486,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'accounts.unsubscribe': AccountsUnsubscribeParams,
   'agentSession.cancel': CancelParams,
   'agentSession.close': OptionsParams,
-  'agentSession.commands': OptionsParams,
   'agentSession.conversationCommand': ConversationCommandParams,
   'agentSession.create': CreateParams,
   'agentSession.createSupport': CreateSupportParams,
@@ -520,7 +504,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'agentSession.setOption': SetOptionParams,
   'agentSession.subscribe': SubscribeParams,
   'agentSession.subscribeStatus': null,
-  'agentSession.unsubscribe': UnsubscribeParams,
   'agentTeams.prepareLaunch': AgentTeamsPrepareLaunch,
   'agentTeams.tmuxCompat': AgentTeamsTmuxCompat,
   'aiVault.listSessions': AiVaultListSessionsParams,
@@ -677,10 +660,7 @@ export const RPC_PARAMS_BY_METHOD = {
   'files.readDir': FileTreePath,
   'files.readDocPreview': DocPreviewFileRead,
   'files.readPreview': FileOpen,
-  'files.readTerminalArtifact': TerminalArtifactFile,
-  'files.readTerminalArtifactPreview': TerminalArtifactFile,
   'files.rename': FileRename,
-  'files.resolveTerminalPath': ResolveTerminalPath,
   'files.search': FileSearch,
   'files.searchPaths': FilePathSearch,
   'files.stat': FileTreePath,
@@ -689,7 +669,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'files.write': FileWrite,
   'files.writeBase64': FileWriteBase64,
   'files.writeBase64Chunk': FileWriteBase64Chunk,
-  'files.writeTerminalArtifact': TerminalArtifactFileWrite,
   'folderWorkspace.create': FolderWorkspaceCreate,
   'folderWorkspace.delete': FolderWorkspaceSelector,
   'folderWorkspace.getPathStatus': FolderWorkspacePathStatus,
@@ -865,7 +844,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'linear.listProjects': ListProjects,
   'linear.listTeams': WorkspaceSelection,
   'linear.mcpListIssues': McpListIssues,
-  'linear.resolveCurrentIssue': LinearCurrentContext,
   'linear.saveIssue': LinearSaveIssue,
   'linear.searchIssues': SearchIssuesOfLinearParams,
   'linear.selectWorkspace': SelectWorkspace,
@@ -957,12 +935,10 @@ export const RPC_PARAMS_BY_METHOD = {
   'repo.list': null,
   'repo.reorder': RepoReorder,
   'repo.rm': RepoSelector,
-  'repo.saveSparsePreset': RepoSparsePresetSave,
   'repo.searchRefs': RepoSearchRefs,
   'repo.setBaseRef': RepoSetBaseRef,
   'repo.setupScriptImports': RepoSelector,
   'repo.show': RepoSelector,
-  'repo.sparsePresets': RepoSelector,
   'repo.update': RepoUpdate,
   'runtime.clientEvents.subscribe': null,
   'runtime.clientEvents.unsubscribe': ClientEventsUnsubscribeParams,
@@ -1005,8 +981,6 @@ export const RPC_PARAMS_BY_METHOD = {
   'terminal.createAgentSession': CreateAgentSessionParams,
   'terminal.ensureAgentSession': EnsureAgentSessionParams,
   'terminal.focus': TerminalFocus,
-  'terminal.getAutoRestoreFit': TerminalGetAutoRestoreFitParams,
-  'terminal.getDisplayMode': TerminalHandle,
   'terminal.inspectProcess': TerminalInspectProcess,
   'terminal.isRunningAgent': TerminalHandle,
   'terminal.list': TerminalListParams,
@@ -1014,21 +988,16 @@ export const RPC_PARAMS_BY_METHOD = {
   'terminal.read': TerminalRead,
   'terminal.recoverPane': TerminalRecoverPane,
   'terminal.rename': TerminalRename,
-  'terminal.resizeForClient': TerminalResizeForClient,
   'terminal.resolveActive': TerminalResolveActive,
   'terminal.resolveIdentity': TerminalHandle,
   'terminal.resolvePane': TerminalResolvePane,
   'terminal.restoreFit': TerminalHandle,
   'terminal.send': TerminalSend,
-  'terminal.setAutoRestoreFit': TerminalSetAutoRestoreFit,
-  'terminal.setDisplayMode': TerminalSetDisplayMode,
   'terminal.show': TerminalHandle,
   'terminal.sleep': TerminalCloseAll,
   'terminal.split': TerminalSplit,
   'terminal.stop': TerminalCloseAll,
   'terminal.stopExact': TerminalStopExact,
-  'terminal.subscribe': TerminalSubscribe,
-  'terminal.unsubscribe': TerminalUnsubscribe,
   'terminal.updateViewport': TerminalUpdateViewport,
   'terminal.wait': TerminalWait,
   'ui.get': null,

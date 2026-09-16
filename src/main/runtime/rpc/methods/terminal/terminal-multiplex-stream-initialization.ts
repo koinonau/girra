@@ -21,7 +21,6 @@ export async function initializeMultiplexStream(
   onInstalled: (stream: TerminalMultiplexStream) => void
 ): Promise<TerminalMultiplexStream | null> {
   const { runtime, connectionId, streams, sourceRangeRegistry, registerBinaryStreamHandler } = state
-  const isMobile = request.client?.type === 'mobile'
   const remoteDesktopSubscriptionKey = `multiplex:${connectionId}:${request.streamId}`
   const streamGeneration = randomUUID()
   const requestedSourceRangeConsumer =
@@ -44,7 +43,6 @@ export async function initializeMultiplexStream(
     terminal: request.terminal,
     ptyId,
     client: request.client,
-    isMobile,
     ackOutput: request.capabilities?.ackOutput === 1,
     ackOutputSourceRanges: sourceRangeConsumerAttached,
     streamGeneration,
@@ -88,7 +86,6 @@ export async function initializeMultiplexStream(
     unsubscribeData: () => {},
     unsubscribeResize: () => {},
     unsubscribeFit: () => {},
-    unsubscribeDriver: () => {},
     unregisterBinaryHandler: () => {},
     exitWaiterAbort: new AbortController()
   }
@@ -118,15 +115,12 @@ export async function initializeMultiplexStream(
     unsubscribeStreamData()
   }
 
-  if (isMobile && request.client?.id) {
-    await runtime.handleMobileSubscribe(ptyId, request.client.id, request.viewport)
-  } else if (request.client?.id && request.viewport) {
+  if (request.client?.id && request.viewport) {
     // Why: subscribe records this stream's geometry and cleanup key but doesn't claim ownership; activity frames claim later.
     stream.registeredRemoteDesktopDriver = true
     stream.pendingRemoteDesktopViewport = request.viewport
   }
   if (
-    !isMobile &&
     request.client?.id &&
     stream.registeredRemoteDesktopDriver &&
     stream.pendingRemoteDesktopViewport
@@ -139,7 +133,6 @@ export async function initializeMultiplexStream(
       stream.remoteDesktopSubscriptionKey,
       request.client,
       viewport,
-      'desktop',
       'register',
       !stream.supportsDesktopViewportClaims
     )

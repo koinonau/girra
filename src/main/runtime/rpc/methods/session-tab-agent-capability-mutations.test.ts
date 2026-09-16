@@ -50,8 +50,6 @@ const METHODS = [
   }
 ] as const
 
-const DESTRUCTIVE_METHOD_NAMES = new Set(['session.tabs.close', 'session.tabs.closeLifecycle'])
-
 describe('session tab structured capability mutations', () => {
   for (const method of METHODS) {
     it(`rejects ${method.name} when the structured row is hidden`, async () => {
@@ -82,40 +80,8 @@ describe('session tab structured capability mutations', () => {
     })
   }
 
-  for (const method of METHODS) {
-    const expectedToAllowPromptedRow = !DESTRUCTIVE_METHOD_NAMES.has(method.name)
-
-    it(`${expectedToAllowPromptedRow ? 'allows' : 'rejects'} ${method.name} on a row an old mobile client was prompted to update`, async () => {
-      const { calls, dispatch } = createFixture([], {
-        clientKind: 'mobile',
-        structuredNativeChatEnabled: true
-      })
-
-      const response = await dispatch(method.name, method.params('claude-session'))
-
-      expect(response.ok).toBe(expectedToAllowPromptedRow)
-      expect(calls[method.runtimeMethod as keyof typeof calls]).toHaveBeenCalledTimes(
-        expectedToAllowPromptedRow ? 1 : 0
-      )
-    })
-
-    it(`${expectedToAllowPromptedRow ? 'allows' : 'rejects'} ${method.name} on a prompted Claude row for a mobile client without the Claude capability`, async () => {
-      const { calls, dispatch } = createFixture([STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY], {
-        clientKind: 'mobile',
-        structuredNativeChatEnabled: true
-      })
-
-      const response = await dispatch(method.name, method.params('claude-session'))
-
-      expect(response.ok).toBe(expectedToAllowPromptedRow)
-      expect(calls[method.runtimeMethod as keyof typeof calls]).toHaveBeenCalledTimes(
-        expectedToAllowPromptedRow ? 1 : 0
-      )
-    })
-  }
-
   it.each(['session.tabs.close', 'session.tabs.closeLifecycle'] as const)(
-    'allows capable mobile clients to close structured tabs when the experiment is enabled (%s)',
+    'allows capable clients to close structured tabs when the experiment is enabled (%s)',
     async (method) => {
       const snapshot = agentSnapshot()
       const closeMobileSessionTab = vi.fn().mockResolvedValue({ closed: true })
@@ -145,8 +111,8 @@ describe('session tab structured capability mutations', () => {
         },
         (response) => replies.push(response),
         {
-          clientKind: 'mobile',
-          pairedDeviceId: 'paired-mobile',
+          clientKind: 'runtime',
+          pairedDeviceId: 'paired-client',
           clientCapabilities: [
             STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
             CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY
@@ -162,7 +128,7 @@ describe('session tab structured capability mutations', () => {
 
 function createFixture(
   capabilities: RuntimeCapability[],
-  options: { clientKind?: 'mobile' | 'runtime'; structuredNativeChatEnabled?: boolean } = {}
+  options: { clientKind?: 'runtime'; structuredNativeChatEnabled?: boolean } = {}
 ) {
   const snapshot = agentSnapshot()
   const calls = {

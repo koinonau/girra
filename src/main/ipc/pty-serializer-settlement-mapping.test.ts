@@ -107,7 +107,6 @@ describe('registerPtyHandlers', () => {
       createPreAllocatedTerminalHandle: vi.fn(() => 'term_remote'),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()

@@ -240,7 +240,9 @@ describe('a client that disappears without cleanup', () => {
     expect(closeSession).toHaveBeenCalledWith(SESSION)
   })
 
-  it('unsubscribes and releases stream retention after the setting is disabled', async () => {
+  // Why: turning the setting off must not strand a stream opened while it was on; connection
+  // teardown is the only retirement path, so it has to release the retention regardless.
+  it('releases stream retention on connection teardown after the setting is disabled', async () => {
     await dispatcher.dispatchStreaming(
       {
         id: 'stream-disabled-cleanup',
@@ -254,12 +256,7 @@ describe('a client that disappears without cleanup', () => {
     expect(host.isHeld(SESSION)).toBe(true)
     structuredNativeChatEnabled = false
 
-    expect(
-      await call('agentSession.unsubscribe', {
-        sessionId: SESSION,
-        subscriptionId: 'stream-disabled-cleanup'
-      })
-    ).toMatchObject({ ok: true })
+    runtime.cleanupSubscriptionsForConnection(CONNECTION)
 
     await vi.waitFor(() => expect(host.hasSession(SESSION)).toBe(false))
     expect(closeSession).toHaveBeenCalledWith(SESSION)

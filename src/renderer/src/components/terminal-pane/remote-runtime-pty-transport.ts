@@ -63,8 +63,7 @@ import {
   createAgentSessionCreateOperation,
   withAgentSessionCreateOperationId
 } from '@/runtime/agent-session-create-operation'
-import { replaceFitOverridePtyId, setFitOverride } from '@/lib/pane-manager/mobile-fit-overrides'
-import { replaceDriverPtyId, setDriverForPty } from '@/lib/pane-manager/mobile-driver-state'
+import { replaceFitOverridePtyId, setFitOverride } from '@/lib/pane-manager/fit-overrides'
 import { isWebTerminalSurfaceTabId, toHostSessionTabId } from '@/runtime/web-terminal-surface-id'
 import { listRemoteRuntimeSessionTabsDeduped } from '@/runtime/remote-runtime-session-tabs-inflight'
 import { subscribeAcceptedWebSessionTerminalHandle } from '@/runtime/web-session-terminal-handle-events'
@@ -1334,7 +1333,6 @@ export function createRemoteRuntimePtyTransport(
         ) {
           if (replacedPtyId !== remotePtyId) {
             replaceFitOverridePtyId(replacedPtyId, remotePtyId)
-            replaceDriverPtyId(replacedPtyId, remotePtyId)
           }
           if (authoritativePtyIncarnationId) {
             onPtyRebind?.(remotePtyId, replacedPtyId, authoritativePtyIncarnationId)
@@ -1589,7 +1587,6 @@ export function createRemoteRuntimePtyTransport(
     // Why: host handle rotation preserves the pane generation; only the store identity changes, not spawn/exit semantics.
     if (replacedPtyId) {
       replaceFitOverridePtyId(replacedPtyId, remotePtyId)
-      replaceDriverPtyId(replacedPtyId, remotePtyId)
       if (nextIncarnationId) {
         onPtyRebind?.(remotePtyId, replacedPtyId, nextIncarnationId)
       } else {
@@ -2085,11 +2082,6 @@ export function createRemoteRuntimePtyTransport(
         onFitOverrideChanged: (event) => {
           if (isCurrentSubscription() && subscribedPtyId) {
             setFitOverride(subscribedPtyId, event.mode, event.cols, event.rows)
-          }
-        },
-        onDriverChanged: (driver) => {
-          if (isCurrentSubscription() && subscribedPtyId) {
-            setDriverForPty(subscribedPtyId, driver)
           }
         },
         onWriteUnavailable: () => {

@@ -1,10 +1,6 @@
-import type { BrowserScreencastResult, RuntimeBrowserDriverState } from '../../shared/runtime-types'
+import type { BrowserScreencastResult } from '../../shared/runtime-types'
 import { BrowserError } from '../browser/browser-error'
-import {
-  resolveBrowserDriverAfterMobileRelease,
-  screencastSubscriberDrivesAsMobile,
-  type BrowserScreencastSubscriber
-} from './browser-screencast-driver-scope'
+import type { BrowserScreencastSubscriber } from './browser-screencast-driver-scope'
 import type { RuntimeBrowserCommands } from './orca-runtime-browser'
 
 type RuntimeBrowserScreencastControllerDeps = {
@@ -15,28 +11,15 @@ type RuntimeBrowserScreencastControllerDeps = {
     connectionId?: string
   ) => void
   cleanupSubscription: (subscriptionId: string) => void
-  getDriver: (browserPageId: string) => RuntimeBrowserDriverState
-  setDriver: (browserPageId: string, next: RuntimeBrowserDriverState) => void
   notifyRemoteViewersChanged: (browserPageId: string, hasRemoteViewers: boolean) => void
 }
 
 export class RuntimeBrowserScreencastController {
-  private readonly activeByConnection = new Map<
-    string,
-    Omit<BrowserScreencastSubscriber, 'drivesAsMobile'>
-  >()
+  private readonly activeByConnection = new Map<string, BrowserScreencastSubscriber>()
   private readonly activeByPage = new Map<string, Set<BrowserScreencastSubscriber>>()
   private readonly remoteViewerPages = new Set<string>()
 
   constructor(private readonly deps: RuntimeBrowserScreencastControllerDeps) {}
-
-  cancelMobilePage(browserPageId: string, emitEnd = false): void {
-    for (const stream of this.activeByPage.get(browserPageId) ?? []) {
-      if (stream.drivesAsMobile) {
-        stream.cancel(emitEnd)
-      }
-    }
-  }
 
   getRemoteViewerPages(): string[] {
     return Array.from(this.remoteViewerPages)
@@ -60,7 +43,6 @@ export class RuntimeBrowserScreencastController {
     options: {
       connectionId?: string
       pairedDeviceId?: string
-      clientKind?: 'mobile' | 'runtime'
       sendBinary?: (bytes: Uint8Array<ArrayBufferLike>) => boolean | void
       signal?: AbortSignal
       emit: (result: BrowserScreencastResult) => void
@@ -74,7 +56,6 @@ export class RuntimeBrowserScreencastController {
     }
 
     const connectionKey = options.connectionId ?? 'local'
-    const drivesAsMobile = screencastSubscriberDrivesAsMobile(options.clientKind)
     let existingStream = this.activeByConnection.get(connectionKey)
     while (existingStream) {
       existingStream.cancel()
@@ -136,15 +117,12 @@ export class RuntimeBrowserScreencastController {
         return
       }
       activeBrowserPageId = screencast.ready.browserPageId
-      activePageStream = { cancel, done: activeDone, connectionKey, drivesAsMobile }
+      activePageStream = { cancel, done: activeDone, connectionKey }
       const pageStreams =
         this.activeByPage.get(activeBrowserPageId) ?? new Set<BrowserScreencastSubscriber>()
       pageStreams.add(activePageStream)
       this.activeByPage.set(activeBrowserPageId, pageStreams)
       this.publishRemoteViewers(activeBrowserPageId)
-      if (drivesAsMobile) {
-        this.deps.setDriver(activeBrowserPageId, { kind: 'mobile', clientId: connectionKey })
-      }
       this.deps.registerSubscriptionCleanup(
         screencast.subscriptionId,
         () => end(true),
@@ -178,13 +156,6 @@ export class RuntimeBrowserScreencastController {
           }
         }
         this.publishRemoteViewers(activeBrowserPageId)
-        const driver = this.deps.getDriver(activeBrowserPageId)
-        if (driver.kind === 'mobile' && driver.clientId === connectionKey) {
-          this.deps.setDriver(
-            activeBrowserPageId,
-            resolveBrowserDriverAfterMobileRelease(pageStreams ?? [])
-          )
-        }
       }
       resolveActiveDone()
     }

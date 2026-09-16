@@ -4,8 +4,7 @@ import { createRemoteRuntimePtyTransport } from '../remote-runtime-pty-transport
 import { toAgentLaunchPreferences } from '@/runtime/agent-session-create-operation'
 import { createUnresolvedOwnerPtyTransport } from '../unresolved-owner-pty-transport'
 import { recordTerminalTabParkedOnUnresolvedHost } from '@/lib/parked-terminal-host-hydration'
-import { getFitOverrideForPty, onOverrideChange } from '@/lib/pane-manager/mobile-fit-overrides'
-import { isPtyLocked } from '@/lib/pane-manager/mobile-driver-state'
+import { getFitOverrideForPty, onOverrideChange } from '@/lib/pane-manager/fit-overrides'
 import { isPaneReplaying } from '../replay-guard'
 import { registerUndeliverableWriteHandler } from '@/lib/pane-manager/terminal-write-pipeline-health'
 import { requestTerminalPaneRecovery } from '../terminal-pane-recovery'
@@ -132,14 +131,10 @@ export function installPtyInputRecovery(session: ConnectPanePtySession): void {
       : session.runtimeEnvironmentId
         ? createRemoteRuntimePtyTransport(session.runtimeEnvironmentId, session.transportOptions)
         : createIpcPtyTransport(session.transportOptions)
-  session.canSendDesktopQueryReply = (): boolean => {
-    const ptyId = session.transport.getPtyId()
-    return !ptyId || !isPtyLocked(ptyId)
-  }
-  // Why: parser/capability handlers bypass the ordinary onData guard. Keep
-  // desktop silent while the elected mobile xterm owns query replies.
+  // Why: parser/capability handlers bypass the ordinary onData guard, so query
+  // replies take this immediate path rather than the debounced input queue.
   session.sendDesktopQueryReplyImmediate = (data: string): boolean =>
-    session.canSendDesktopQueryReply() && session.transport.sendInputImmediate(data)
+    session.transport.sendInputImmediate(data)
   // Why (gate mode only): gate-managed PTYs never see the subscribe bytes, so this fact is
   // their only cue to record the subscription — without the registry entry a later theme
   // flip never pushes the CSI 997 update and the TUI keeps a stale theme after reveal.

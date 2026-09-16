@@ -163,11 +163,7 @@ describe('useIpcEvents rate-limit hydration', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },

@@ -187,7 +187,7 @@ describe('reconcilePtySizeAcrossFrames', () => {
     expect(resize).toHaveBeenLastCalledWith(79, 50)
   })
 
-  it('skips parked (mobile-fit) frames without forwarding a desktop resize', () => {
+  it('skips parked (remote-desktop-fit) frames without forwarding a desktop resize', () => {
     const pane = createTimelinePane(() => ({ cols: 79, rows: 50 }))
     const { resize, framesRun } = runReconcile({
       measure: pane.measure,
@@ -386,9 +386,9 @@ describe('reconcilePtySizeAcrossFrames', () => {
       expect(resize).not.toHaveBeenCalled()
     })
 
-    it('does NOT re-forward when a mobile-fit override parks the PTY mid-verification', async () => {
+    it('does NOT re-forward when a remote-desktop-fit override parks the PTY mid-verification', async () => {
       const scheduler = createFrameScheduler()
-      // Race: PTY parks after the read is issued but before it resolves; resolution must re-check parked (visibility-resume mobile-fit leak regression).
+      // Race: PTY parks after the read is issued but before it resolves; resolution must re-check parked (visibility-resume remote-desktop-fit leak regression).
       let parked = false
       const resize = vi.fn()
       const pane = createTimelinePane(() => ({ cols: 79, rows: 50 }))

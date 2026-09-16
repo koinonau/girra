@@ -20,7 +20,7 @@ import {
   normalizeTerminalScrollSensitivity,
   resolveTerminalCursorInactiveStyle
 } from '@/lib/pane-manager/pane-terminal-options'
-import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
+import { getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 import { setTerminalCursorBlinkOption } from '@/lib/pane-manager/pane-cursor-blink-suspension'
 import type { PtyTransport } from './pty-transport'
 import type { EffectiveMacOptionAsAlt } from '@/lib/keyboard-layout/detect-option-as-alt'
@@ -212,7 +212,7 @@ export function applyTerminalAppearance(
     // Why unconditional: the helper no-ops when addon state already matches, so this keeps new panes and live toggles in sync.
     manager.setPaneLigaturesEnabled(pane.id, ligaturesEnabled)
     const transport = paneTransports.get(pane.id)
-    // Why: PTY is already at phone dimensions under a mobile-fit override — don't resize it back to desktop.
+    // Why: PTY is already at the held dimensions under a remote-desktop-fit override — don't resize it back.
     const appearancePtyId = transport?.getPtyId()
     if (transport?.isConnected() && (!appearancePtyId || !getFitOverrideForPty(appearancePtyId))) {
       maybePushMode2031Flip(pane.id, appearance.mode, transport, paneMode2031, paneLastThemeMode)

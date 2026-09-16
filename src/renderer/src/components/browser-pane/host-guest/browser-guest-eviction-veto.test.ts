@@ -4,7 +4,6 @@ import {
   browserTabsVetoGuestEviction,
   selectBrowserGuestEvictionWorktreeIds
 } from './browser-guest-worktree-retention'
-import { hydrateBrowserDrivers } from '../../../lib/pane-manager/browser-mobile-driver-state'
 import { hydrateBrowserRemoteViewerPages } from '../../../lib/pane-manager/browser-remote-viewer-state'
 import {
   acquireBrowserAutomationVisibility,
@@ -35,7 +34,6 @@ function evictionRun(tabs: readonly BrowserWorkspace[]): string[] {
 
 describe('browser guest eviction veto', () => {
   beforeEach(() => {
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
@@ -46,13 +44,6 @@ describe('browser guest eviction veto', () => {
 
   it('spares a page a paired client is streaming', () => {
     hydrateBrowserRemoteViewerPages([WATCHED_PAGE])
-    expect(evictionRun(tabsFor(WATCHED_PAGE))).not.toContain(WATCHED_WORKTREE)
-  })
-
-  it('spares a page a phone is driving', () => {
-    hydrateBrowserDrivers([
-      { browserPageId: WATCHED_PAGE, driver: { kind: 'mobile', clientId: 'conn-phone' } }
-    ])
     expect(evictionRun(tabsFor(WATCHED_PAGE))).not.toContain(WATCHED_WORKTREE)
   })
 

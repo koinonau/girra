@@ -29,25 +29,18 @@ const METHOD_CASES: readonly (readonly [string, unknown, boolean])[] = [
   ['terminal.closeAll', { worktree: 'worktree' }, false],
   ['terminal.sleep', { worktree: 'worktree' }, false],
   ['terminal.stopExact', { worktree: 'worktree', expectedPtyIds: ['pty'] }, false],
-  ['terminal.resizeForClient', { terminal: 'term', mode: 'restore', clientId: 'client' }, false],
   ['terminal.focus', { terminal: 'term' }, false],
   ['terminal.close', { terminal: 'term' }, false],
   ['terminal.closeTab', { terminal: 'term' }, false],
   ['agentTeams.tmuxCompat', { teamId: 'team', token: 'token', envPane: 'pane', argv: [] }, false],
   ['agentTeams.prepareLaunch', { paneKey: 'pane' }, false],
-  ['terminal.setDisplayMode', { terminal: 'term', mode: 'auto' }, false],
   ['terminal.restoreFit', { terminal: 'term' }, false],
-  ['terminal.getDisplayMode', { terminal: 'term' }, false],
   [
     'terminal.updateViewport',
     { terminal: 'term', client: { id: 'client' }, viewport: { cols: 80, rows: 24 } },
     false
   ],
-  ['terminal.multiplex', {}, true],
-  ['terminal.subscribe', { terminal: 'term' }, true],
-  ['terminal.unsubscribe', { subscriptionId: 'term' }, false],
-  ['terminal.getAutoRestoreFit', {}, false],
-  ['terminal.setAutoRestoreFit', { ms: null }, false]
+  ['terminal.multiplex', {}, true]
 ]
 
 function schemaFor(name: string) {
@@ -67,11 +60,11 @@ async function invoke(name: string, params: unknown, runtime: Partial<OrcaRuntim
 
 describe('terminal RPC manifest characterization', () => {
   it('preserves all method names, order, streaming flags, and parseable minimum inputs', () => {
-    expect(TERMINAL_METHODS).toHaveLength(35)
+    expect(TERMINAL_METHODS).toHaveLength(28)
     expect(TERMINAL_METHODS.map((method) => [method.name, 'stream' in method])).toEqual(
       METHOD_CASES.map(([name, _params, stream]) => [name, stream])
     )
-    expect(new Set(TERMINAL_METHODS.map((method) => method.name)).size).toBe(35)
+    expect(new Set(TERMINAL_METHODS.map((method) => method.name)).size).toBe(28)
     for (const [name, params] of METHOD_CASES) {
       expect(() => schemaFor(name).parse(params), name).not.toThrow()
     }
@@ -94,22 +87,9 @@ describe('terminal RPC manifest characterization', () => {
         viewport: { cols: 241, rows: 120 }
       })
     ).toThrow()
-    expect(() =>
-      schemaFor('terminal.subscribe').parse({
-        terminal: 'term',
-        viewport: { cols: 1000, rows: 500 }
-      })
-    ).not.toThrow()
-    expect(() =>
-      schemaFor('terminal.setDisplayMode').parse({
-        terminal: 'term',
-        mode: 'auto',
-        viewport: { cols: 1001, rows: 501 }
-      })
-    ).not.toThrow()
   })
 
-  it('keeps multiplex control objects strict while subscribe remains skew-tolerant', () => {
+  it('keeps multiplex control objects strict while the subscribe frame stays skew-tolerant', () => {
     expect(TerminalMultiplexLegacyAckFrame.safeParse({ bytes: 1, future: true }).success).toBe(
       false
     )

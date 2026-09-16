@@ -10,56 +10,33 @@ function makeRequest(method: string, params?: unknown): RpcRequest {
 }
 
 describe('file preview RPC transport budgets', () => {
-  it.each(['mobile', 'runtime'] as const)(
-    'charges the %s request id to both preview content budgets',
-    async (clientKind) => {
-      const preview = {
-        content: 'base64',
-        isBinary: true,
-        isImage: true,
-        mimeType: 'image/png'
-      }
-      const readFileExplorerPreview = vi.fn().mockResolvedValue(preview)
-      const readTerminalArtifactPreview = vi.fn().mockResolvedValue(preview)
-      const runtime = {
-        getRuntimeId: () => 'test-runtime',
-        readFileExplorerPreview,
-        readTerminalArtifactPreview
-      } as unknown as OrcaRuntimeService
-      const dispatcher = new RpcDispatcher({ runtime, methods: FILE_METHODS })
-      const id = '\u0001'.repeat(8_192)
-      const reply = vi.fn()
+  it('charges the request id to the preview content budget', async () => {
+    const readFileExplorerPreview = vi.fn().mockResolvedValue({
+      content: 'base64',
+      isBinary: true,
+      isImage: true,
+      mimeType: 'image/png'
+    })
+    const runtime = {
+      getRuntimeId: () => 'test-runtime',
+      readFileExplorerPreview
+    } as unknown as OrcaRuntimeService
+    const dispatcher = new RpcDispatcher({ runtime, methods: FILE_METHODS })
+    const id = ''.repeat(8_192)
 
-      await dispatcher.dispatchStreaming(
-        {
-          ...makeRequest('files.readPreview', { worktree: 'id:wt-1', relativePath: 'logo.png' }),
-          id
-        },
-        reply,
-        { clientKind }
-      )
-      await dispatcher.dispatchStreaming(
-        {
-          ...makeRequest('files.readTerminalArtifactPreview', {
-            worktree: 'id:wt-1',
-            absolutePath: '/tmp/logo.png',
-            grantId: 'grant-1'
-          }),
-          id
-        },
-        reply,
-        { clientKind }
-      )
+    await dispatcher.dispatchStreaming(
+      {
+        ...makeRequest('files.readPreview', { worktree: 'id:wt-1', relativePath: 'logo.png' }),
+        id
+      },
+      vi.fn(),
+      { clientKind: 'runtime' }
+    )
 
-      const budget = remoteRpcContentBudget(id)
-      expect(readFileExplorerPreview).toHaveBeenCalledWith('id:wt-1', 'logo.png', budget)
-      expect(readTerminalArtifactPreview).toHaveBeenCalledWith(
-        'id:wt-1',
-        'grant-1',
-        '/tmp/logo.png',
-        undefined,
-        budget
-      )
-    }
-  )
+    expect(readFileExplorerPreview).toHaveBeenCalledWith(
+      'id:wt-1',
+      'logo.png',
+      remoteRpcContentBudget(id)
+    )
+  })
 })

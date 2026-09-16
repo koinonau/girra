@@ -17,7 +17,6 @@ export function createTerminalEphemeralActions(
   | 'clearNativeChatLaunchPrompt'
   | 'seedNativeChatLaunchDraft'
   | 'markNativeChatLaunchDraftAdopted'
-  | 'resolveNativeChatLaunchDraft'
   | 'clearNativeChatLaunchDraft'
   | 'recordTerminalInput'
   | 'setCacheTimerStartedAt'
@@ -108,25 +107,6 @@ export function createTerminalEphemeralActions(
           nativeChatLaunchDraftByTabId: {
             ...s.nativeChatLaunchDraftByTabId,
             [tabId]: { ...current, adopted: true }
-          }
-        }
-      })
-    },
-    resolveNativeChatLaunchDraft: (tabId, resolution) => {
-      set((s) => {
-        const current = s.nativeChatLaunchDraftByTabId[tabId]
-        if (
-          !current ||
-          current.resolved ||
-          current.createdAt !== resolution.createdAt ||
-          current.text !== resolution.text
-        ) {
-          return {}
-        }
-        return {
-          nativeChatLaunchDraftByTabId: {
-            ...s.nativeChatLaunchDraftByTabId,
-            [tabId]: { ...current, resolved: true }
           }
         }
       })

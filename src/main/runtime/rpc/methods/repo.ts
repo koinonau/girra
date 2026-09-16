@@ -20,7 +20,6 @@ import {
   RepoReorder,
   RepoSearchRefs,
   RepoSetBaseRef,
-  RepoSparsePresetSave,
   RepoUpdate
 } from '../../../../shared/rpc-contract/repo-params'
 
@@ -82,24 +81,6 @@ export const REPO_METHODS = [
     name: 'projectGroup.importNested',
     params: ProjectGroupImportNested,
     handler: async (params, { runtime }) => runtime.importNestedRepos(params)
-  }),
-  defineMethod({
-    name: 'repo.sparsePresets',
-    params: RepoSelector,
-    handler: async (params, { runtime }) => ({
-      presets: await runtime.listSparsePresets(params.repo)
-    })
-  }),
-  defineMethod({
-    name: 'repo.saveSparsePreset',
-    params: RepoSparsePresetSave,
-    handler: async (params, { runtime }) => ({
-      preset: await runtime.saveSparsePreset(params.repo, {
-        ...(params.id ? { id: params.id } : {}),
-        name: params.name,
-        directories: params.directories
-      })
-    })
   }),
   defineMethod({
     name: 'repo.add',

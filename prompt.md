@@ -4,11 +4,11 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-16. No tracker exists, so these come from the build plan's phases. Phases 0 to 7b and the ADRs are merged; the workflow prune is in review.
+Measured 2026-09-16. No tracker exists, so these come from the build plan's phases. Phases 0 to 7b, the workflow prune and the ADRs are merged; the mobile client prune is in review.
 
-1. **Mobile client dead code.** Remove the presence lock, driver overlays, phone-fit, display mode and `clientKind: 'mobile'` branches deferred by the remote serving cleanup. About 34 files, 10 unused RPC methods, 5 IPC channels and 108 locale keys; the map names the class-chain splices and the removal order.
-2. **Command examples in the documentation.** `docs/**` still writes `orca <verb>`. The commands work, because `orca` stays installed as an alias, but `girra` is the primary name now. Sweep the examples, keeping the skill ids (`orca-cli`, `orca-linear`), `orca.yaml`, `.orca/` and `ORCA_*`.
-3. **The orchestration wire token.** `girra` and `girra-dev` are normalised down to `orca` before crossing the RPC wire, so a resume hint shows the old name. Widen the three `z.enum`s in `src/shared/rpc-contract/orchestration-params.ts` and the inline types in `orchestration-legacy-operation.ts` first, then drop the normalisation in `runtime-compatibility.ts` a release later.
+1. **Command examples in the documentation.** `docs/**` still writes `orca <verb>`. The commands work, because `orca` stays installed as an alias, but `girra` is the primary name now. Sweep the examples, keeping the skill ids (`orca-cli`, `orca-linear`), `orca.yaml`, `.orca/` and `ORCA_*`.
+2. **The orchestration wire token.** `girra` and `girra-dev` are normalised down to `orca` before crossing the RPC wire, so a resume hint shows the old name. Widen the three `z.enum`s in `src/shared/rpc-contract/orchestration-params.ts` and the inline types in `orchestration-legacy-operation.ts` first, then drop the normalisation in `runtime-compatibility.ts` a release later.
+3. **The desktop take-back path is inert.** Phone fit was the only writer of `terminalFitOverrides`, so `reclaimTerminalForDesktop` now has no statement that can run, and `terminal.restoreFit`, `runtime:restoreTerminalFit` and the renderer's restore action always report nothing to reclaim. It was already inert for remote-desktop holds before the prune, because that map never held them: those run off `remoteDesktopFloor`. Either delete the path with its UI, or rewire it to the floor, which is new behaviour rather than a prune.
 4. **Re-enable Actions.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only.
 
 ## Backlog

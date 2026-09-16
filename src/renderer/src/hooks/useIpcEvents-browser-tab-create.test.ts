@@ -175,7 +175,6 @@ describe('useIpcEvents browser tab create routing', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: (
@@ -231,11 +230,7 @@ describe('useIpcEvents browser tab create routing', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },

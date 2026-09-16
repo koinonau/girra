@@ -1,6 +1,5 @@
 type RuntimeTerminalViewSubscriberDependencies = {
   notifyPresenceChanged: (ptyId: string) => void
-  hasMobileSubscribers: (ptyId: string) => boolean
   isUnattachedLocalCandidate: (ptyId: string) => boolean
   attachProvider: (ptyId: string) => Promise<boolean> | null
 }
@@ -54,7 +53,7 @@ export class RuntimeTerminalViewSubscribers {
   }
 
   hasRemote(ptyId: string): boolean {
-    return (this.remoteCounts.get(ptyId) ?? 0) > 0 || this.deps.hasMobileSubscribers(ptyId)
+    return (this.remoteCounts.get(ptyId) ?? 0) > 0
   }
 
   isKnownUnattachedLocal(ptyId: string): boolean {

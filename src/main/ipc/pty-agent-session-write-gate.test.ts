@@ -171,8 +171,7 @@ beforeEach(() => {
   const runtime = {
     setPtyController: (controller: { write: (ptyId: string, data: string) => boolean }) => {
       ptyController = controller
-    },
-    getDriver: () => ({ kind: 'desktop' })
+    }
   }
   registerPtyHandlers(mainWindow as never, runtime as never)
   provider = createMockProvider()

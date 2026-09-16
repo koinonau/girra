@@ -5,7 +5,6 @@ import { remoteFileContentBudget } from './files-remote-content-budget'
 import { QUICK_OPEN_SEARCH_VERSION } from '../../../../shared/quick-open-path-search'
 import { limitQuickOpenSearchReplyBySerializedBytes } from '../../../../shared/quick-open-transport-budget'
 import { FileOpen, WorktreeSelector } from './files-target-schemas'
-import { FILE_TERMINAL_ARTIFACT_METHODS } from './files-terminal-artifact-methods'
 import {
   DocPreviewFileRead,
   FileListAll,
@@ -15,7 +14,6 @@ import {
   FileSearch,
   FileTreePath,
   FileUnwatch,
-  ResolveTerminalPath,
   ServerDirectoryBrowse
 } from '../../../../shared/rpc-contract/files-params'
 
@@ -84,21 +82,6 @@ export const FILE_METHODS = [
         remoteFileContentBudget(clientKind, requestId)
       )
   }),
-  defineMethod({
-    name: 'files.resolveTerminalPath',
-    params: ResolveTerminalPath,
-    handler: async (params, { runtime, clientId }) =>
-      runtime.resolveTerminalPath(
-        params.worktree,
-        params.pathText,
-        params.cwd ?? null,
-        clientId,
-        params.terminal ?? null,
-        params.crossWorkspace === true,
-        params.nativeChatContext ?? null
-      )
-  }),
-  ...FILE_TERMINAL_ARTIFACT_METHODS,
   defineMethod({
     name: 'files.readPreview',
     params: FileOpen,

@@ -3,7 +3,7 @@ import type { ManagedPane, ManagedPaneInternal, ScrollState } from './pane-manag
 import { readProposedPaneFitDimensions, safeFit, safeFitAndThen } from './pane-fit'
 import { applyOrDeferPaneMetricOptions } from './pane-metric-options-deferral'
 import { paneFitClientSizeChanged } from './pane-reveal-fit'
-import { setFitOverride } from './mobile-fit-overrides'
+import { setFitOverride } from './fit-overrides'
 
 let nextRafId = 1
 let pendingRafs = new Map<number, FrameRequestCallback>()
@@ -516,7 +516,7 @@ describe('deferred metric flush inside safeFit', () => {
       },
       fitAddon: { proposeDimensions: vi.fn() }
     } as unknown as ManagedPane
-    setFitOverride('pty-override', 'mobile-fit', 49, 20)
+    setFitOverride('pty-override', 'remote-desktop-fit', 49, 20)
 
     try {
       expect(readProposedPaneFitDimensions(pane)).toEqual({ cols: 49, rows: 20 })
@@ -532,7 +532,7 @@ describe('deferred metric flush inside safeFit', () => {
     const pane = createMetricPane()
     pane.container.dataset.ptyId = 'pty-metric-override'
     applyOrDeferPaneMetricOptions(pane, { fontSize: 12 }, false)
-    setFitOverride('pty-metric-override', 'mobile-fit', 49, 20)
+    setFitOverride('pty-metric-override', 'remote-desktop-fit', 49, 20)
 
     try {
       expect(readProposedPaneFitDimensions(pane)).toEqual({ cols: 49, rows: 20 })

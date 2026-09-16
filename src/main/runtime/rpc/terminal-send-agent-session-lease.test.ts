@@ -20,14 +20,10 @@ const REFUSAL: AgentSessionPtyWriteRefusal = {
   runtimeFence: 7
 }
 
-const rollback = vi.fn()
-
 function stubRuntime(overrides: Partial<OrcaRuntimeService> = {}): OrcaRuntimeService {
   return {
     getRuntimeId: () => 'test-runtime',
     resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-    getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
-    beginMobileInputFloor: vi.fn(() => ({ commit: async () => {}, rollback })),
     ...overrides
   } as OrcaRuntimeService
 }
@@ -78,20 +74,6 @@ describe('terminal.send under a refusing lease', () => {
     expect(result.send.accepted).toBe(false)
     // A new `refusedReason` value would reach old clients as an unknown enum member.
     expect(result.send.refusedReason).toBeUndefined()
-  })
-
-  it('releases the mobile input floor a refused send never used', async () => {
-    rollback.mockClear()
-    const runtime = stubRuntime({
-      sendTerminal: vi.fn().mockImplementation(async (_handle, _action, options) => {
-        options?.reserveWrite?.('pty-1')
-        throw new AgentSessionPtyWriteRefusedError(REFUSAL)
-      })
-    })
-
-    await send(runtime, { id: 'mobile-1', type: 'mobile' })
-
-    expect(rollback).toHaveBeenCalled()
   })
 
   it('still surfaces unrelated send failures as errors', async () => {

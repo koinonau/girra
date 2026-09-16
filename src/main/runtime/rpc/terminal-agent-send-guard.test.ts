@@ -38,7 +38,6 @@ describe('terminal agent send guard', () => {
       .mockResolvedValue({ handle: 'terminal-1', isRunningAgent: true, status: 'working' })
     const runtime = stubRuntime({
       resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-      getDriver: vi.fn().mockReturnValue({ kind: 'desktop' }),
       getTerminalAgentStatus,
       sendTerminal: vi.fn().mockResolvedValue({
         handle: 'terminal-1',
@@ -69,7 +68,6 @@ describe('terminal agent send guard', () => {
     const write = vi.fn()
     const runtime = stubRuntime({
       resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-      getDriver: vi.fn().mockReturnValue({ kind: 'desktop' }),
       getTerminalAgentStatus,
       sendTerminal: vi.fn().mockImplementation(async (_handle, _action, options) => {
         await options.beforeWrite('pty-1')
@@ -101,7 +99,6 @@ describe('terminal agent send guard', () => {
     const sendTerminal = vi.fn()
     const runtime = stubRuntime({
       resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-      getDriver: vi.fn().mockReturnValue({ kind: 'desktop' }),
       getTerminalAgentStatus,
       sendTerminal
     })

@@ -113,7 +113,6 @@ describe('registerPtyHandlers', () => {
       })),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
@@ -189,7 +188,6 @@ describe('registerPtyHandlers', () => {
       preAllocateHandleForPty: vi.fn(() => 'term_seam'),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
@@ -328,7 +326,6 @@ describe('registerPtyHandlers', () => {
       preAllocateHandleForPty: vi.fn(() => 'term_seam'),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
@@ -368,7 +365,6 @@ describe('registerPtyHandlers', () => {
       })),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
@@ -494,7 +490,6 @@ describe('registerPtyHandlers', () => {
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
       noteTerminalSpawnCommand: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
@@ -543,7 +538,6 @@ describe('registerPtyHandlers', () => {
       }),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()
@@ -608,7 +602,6 @@ describe('registerPtyHandlers', () => {
       }),
       registerPreAllocatedHandleForPty: vi.fn(),
       registerPty: vi.fn(),
-      getDriver: vi.fn(() => ({ kind: 'host' })),
       onPtySpawned: vi.fn(),
       onPtyExit: vi.fn(),
       onPtyData: vi.fn()

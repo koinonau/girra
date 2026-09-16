@@ -8,7 +8,6 @@ import {
 const ELIGIBLE = {
   enabled: true,
   preference: 'auto' as const,
-  deviceScope: 'desktop',
   capabilities: [...BROWSER_CLIENT_HOSTING_RUNTIME_CAPABILITIES, 'browser.screencast.v1']
 }
 
@@ -24,7 +23,6 @@ describe('expectsBrowserClientHosting', () => {
   it.each([
     { name: 'client hosting is disabled', input: { enabled: false } },
     { name: 'the caller asked for a server page', input: { preference: 'server' as const } },
-    { name: 'the runtime is a mobile device', input: { deviceScope: 'mobile' } },
     { name: 'the runtime advertises nothing', input: { capabilities: undefined } }
   ])('refuses when $name', ({ input }) => {
     expect(expectsBrowserClientHosting({ ...ELIGIBLE, ...input })).toBe(false)

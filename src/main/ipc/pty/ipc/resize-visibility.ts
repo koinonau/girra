@@ -44,13 +44,11 @@ export function installPtyResizeVisibilityIpc(session: PtyIpcSession): void {
     if (runtime?.isResizeSuppressed()) {
       return
     }
-    // Why: presence-lock defense-in-depth — while a phone or remote-desktop viewer drives the width, host-side resizes must not reach the PTY or its alt-screen grid garbles; load-bearing because the renderer mirror lags one IPC hop. See docs/mobile-presence-lock.md.
-    const mobileOwnsResize = runtime?.getDriver(args.id).kind === 'mobile'
-    const remoteDesktopOwnsResize = runtime?.isRemoteDesktopResizeDriven?.(args.id) === true
-    if (mobileOwnsResize || remoteDesktopOwnsResize) {
-      if (remoteDesktopOwnsResize) {
-        runtime?.recordRemoteDesktopHostReclaimTarget(args.id, args.cols, args.rows)
-      }
+    // Why: defense-in-depth — while a remote-desktop viewer drives the width, host-side resizes
+    // must not reach the PTY or its alt-screen grid garbles; load-bearing because the renderer
+    // mirror lags one IPC hop.
+    if (runtime?.isRemoteDesktopResizeDriven?.(args.id) === true) {
+      runtime.recordRemoteDesktopHostReclaimTarget(args.id, args.cols, args.rows)
       return
     }
     const provider = tryGetProviderForPty(args.id)

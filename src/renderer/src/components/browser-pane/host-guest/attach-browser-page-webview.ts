@@ -28,7 +28,6 @@ export type AttachBrowserPageWebviewArgs = {
   webviewPartition: string
   isActive: boolean
   isPaintable: boolean
-  inputLockedRef: MutableRefObject<boolean>
   webviewRef: MutableRefObject<Electron.WebviewTag | null>
   handleInternalFileDragOverRef: MutableRefObject<(event: DragEvent<HTMLDivElement>) => void>
   handleInternalFileDropRef: MutableRefObject<(event: DragEvent<HTMLDivElement>) => void>
@@ -76,7 +75,6 @@ export function attachBrowserPageWebview(
     webviewPartition,
     isActive,
     isPaintable,
-    inputLockedRef,
     webviewRef,
     handleInternalFileDragOverRef,
     handleInternalFileDropRef,
@@ -96,7 +94,6 @@ export function attachBrowserPageWebview(
   const ensuredWebview = ensureBrowserPageWebview({
     browserTabId,
     container: webviewContainer,
-    inputLocked: inputLockedRef.current,
     webviewPartition,
     resolveContainer: () => ensureBrowserPageViewport(browserTabId, workspaceId)?.content ?? null
   })

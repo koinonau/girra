@@ -7,7 +7,6 @@ import {
   clearResyncTimer,
   clearSnapshot,
   discardOutputAcknowledgements,
-  isTerminalDriverState,
   rejectPendingSnapshotRequest
 } from './remote-runtime-terminal-snapshot-state'
 import type { TerminalMultiplexEvent } from './remote-runtime-terminal-multiplexer-types'
@@ -99,9 +98,7 @@ export abstract class RemoteRuntimeTerminalResponseController extends RemoteRunt
       stream.callbacks.onError?.(message)
     } else if (event.type === 'fit-override-changed') {
       if (
-        (event.mode !== 'mobile-fit' &&
-          event.mode !== 'remote-desktop-fit' &&
-          event.mode !== 'desktop-fit') ||
+        (event.mode !== 'remote-desktop-fit' && event.mode !== 'desktop-fit') ||
         typeof event.cols !== 'number' ||
         typeof event.rows !== 'number'
       ) {
@@ -112,11 +109,6 @@ export abstract class RemoteRuntimeTerminalResponseController extends RemoteRunt
         cols: event.cols,
         rows: event.rows
       })
-    } else if (event.type === 'driver-changed') {
-      if (!isTerminalDriverState(event.driver)) {
-        return
-      }
-      stream.callbacks.onDriverChanged?.(event.driver)
     }
   }
 }

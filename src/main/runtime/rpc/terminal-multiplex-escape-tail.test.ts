@@ -54,15 +54,12 @@ describe('terminal.multiplex pending-escape-tail threading (#7329)', () => {
           terminalOwner: 'shell'
         }),
         getTerminalSize: vi.fn().mockReturnValue({ cols: 80, rows: 24 }),
-        getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
         getLayout: vi.fn().mockReturnValue({ seq: 1 }),
         registerRemoteTerminalViewSubscriber: vi.fn(() => () => {}),
         subscribeToTerminalData: vi.fn().mockReturnValue(vi.fn()),
         subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
         subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-        subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
         getTerminalFitOverride: vi.fn().mockReturnValue(null),
-        getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
         registerSubscriptionCleanup: vi.fn((id: string, cleanup: () => void) => {
           cleanups.set(id, cleanup)
         }),

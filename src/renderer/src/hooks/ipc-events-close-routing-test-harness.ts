@@ -208,7 +208,6 @@ export async function useIpcEventsForCloseRouting({
         },
         respondTerminalTabClose,
         onSleepWorktree: () => () => {},
-        onResumeSleepingAgents: () => () => {},
         onNewBrowserTab: () => () => {},
         onNewMarkdownTab: () => () => {},
         onRequestTabCreate: () => () => {},
@@ -278,11 +277,7 @@ export async function useIpcEventsForCloseRouting({
       },
       runtime: {
         getTerminalFitOverrides: () => Promise.resolve([]),
-        getTerminalDrivers: () => Promise.resolve([]),
-        getBrowserDrivers: () => Promise.resolve([]),
         onTerminalFitOverrideChanged: () => () => {},
-        onTerminalDriverChanged: () => () => {},
-        onBrowserDriverChanged: () => {},
         onClientHostedBrowserRowsChanged: () => {},
         getClientHostedBrowserRows: async () => []
       },

@@ -62,7 +62,6 @@ export function getEligiblePane(args: {
   foregroundTerminalLastSeenAtByTabId: AgentHibernationPlannerSnapshot['foregroundTerminalLastSeenAtByTabId']
   ptyBindingFirstSeenAtByPaneKey: Record<string, number | undefined>
   boundaryResolvedAtByPaneKey: Record<string, number | undefined>
-  mobileLockedPtyIds: Set<string>
   now: number
   idleMs: number
 }): EligiblePane | null {
@@ -75,8 +74,7 @@ export function getEligiblePane(args: {
     lastTerminalInputAtByPaneKey,
     foregroundTerminalLastSeenAtByTabId,
     ptyBindingFirstSeenAtByPaneKey,
-    boundaryResolvedAtByPaneKey,
-    mobileLockedPtyIds
+    boundaryResolvedAtByPaneKey
   } = args
   const sleepingRecord = sleepingAgentSessionsByPaneKey[entry.paneKey]
   // Why: a completed turn leaves the TUI alive and resumable, so every resumable
@@ -142,7 +140,7 @@ export function getEligiblePane(args: {
   }
   const { leafId, ptyId } = livePane
   const runtimePtyId = toRuntimePtyId(ptyId)
-  if (!livePtyIds.has(runtimePtyId) || mobileLockedPtyIds.has(runtimePtyId)) {
+  if (!livePtyIds.has(runtimePtyId)) {
     return null
   }
   return {

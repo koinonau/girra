@@ -315,7 +315,7 @@ export class WebSocketTransport implements RpcTransport {
     ws.on('pong', onPong)
     ws.on('message', onMessage)
 
-    // Why: clean up connection-scoped state (e.g. mobile-fit overrides) so a dropped phone doesn't leave orphaned phone-fit on desktop.
+    // Why: clean up connection-scoped state (e.g. remote-desktop fit holds) so a dropped client doesn't strand the host PTY at its dims.
     ws.on('close', finalizeConnection)
     ws.on('error', onError)
 

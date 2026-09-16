@@ -4,8 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { BrowserPage, BrowserWorkspace } from '../../../../../shared/browser-workspace-types'
 
 // Every per-page retention term reaches the guest as a prop on BrowserPagePane, where a wrong value
-// parks the webview display:none. The threading itself had no coverage: a mutant hardcoding any of
-// the three to false left the whole suite green.
+// parks the webview display:none. The threading itself had no coverage: a mutant hardcoding either
+// of them to false left the whole suite green.
 type MockAppState = {
   browserPagesByWorkspace: Record<string, BrowserPage[]>
   remoteBrowserPageHandlesByPageId: Record<string, never>
@@ -18,7 +18,6 @@ const mocks = vi.hoisted(() => ({
   pageProps: [] as {
     id: string
     isAutomationVisible: boolean
-    isMobileDriven: boolean
     isRemotelyViewed: boolean
   }[]
 }))
@@ -48,21 +47,15 @@ vi.mock('./ssh-routed-browser-page-gate', () => ({
   }) => <>{children(null)}</>
 }))
 
-vi.mock('./BrowserMobileDriverOverlay', () => ({
-  BrowserMobileDriverOverlay: () => null
-}))
-
 vi.mock('./browser-page-pane', () => ({
   BrowserPagePane: (props: {
     browserTab: BrowserPage
     isAutomationVisible: boolean
-    isMobileDriven: boolean
     isRemotelyViewed: boolean
   }) => {
     mocks.pageProps.push({
       id: props.browserTab.id,
       isAutomationVisible: props.isAutomationVisible,
-      isMobileDriven: props.isMobileDriven,
       isRemotelyViewed: props.isRemotelyViewed
     })
     return <span data-browser-page-id={props.browserTab.id} />
@@ -73,7 +66,6 @@ import {
   acquireBrowserAutomationVisibility,
   releaseBrowserAutomationVisibility
 } from '../host-guest/browser-automation-visibility'
-import { hydrateBrowserDrivers } from '@/lib/pane-manager/browser-mobile-driver-state'
 import { hydrateBrowserRemoteViewerPages } from '@/lib/pane-manager/browser-remote-viewer-state'
 import BrowserPane from './browser-workspace-pane'
 
@@ -135,13 +127,11 @@ describe('browser workspace pane retention props', () => {
       updateBrowserPageState: () => {},
       setBrowserPageUrl: () => {}
     }
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
   afterEach(() => {
     cleanup()
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
@@ -164,13 +154,8 @@ describe('browser workspace pane retention props', () => {
     expect(renderedIds()).toEqual(['page-0'])
   })
 
-  it.each(['automation', 'mobile', 'viewer'])('loads an inactive page for %s only', (consumer) => {
+  it.each(['automation', 'viewer'])('loads an inactive page for %s only', (consumer) => {
     const token = consumer === 'automation' ? acquireBrowserAutomationVisibility('page-b') : null
-    if (consumer === 'mobile') {
-      hydrateBrowserDrivers([
-        { browserPageId: 'page-b', driver: { kind: 'mobile', clientId: 'phone-1' } }
-      ])
-    }
     if (consumer === 'viewer') {
       hydrateBrowserRemoteViewerPages(['page-b'])
     }
@@ -185,29 +170,24 @@ describe('browser workspace pane retention props', () => {
     }
   })
 
-  it('threads all three retention terms to the page that owns them', () => {
+  it('threads both retention terms to the page that owns them', () => {
     renderWorkspacePane()
     expect(mocks.pageProps.some((props) => props.id === 'page-b')).toBe(false)
 
     cleanup()
     const token = acquireBrowserAutomationVisibility('page-b')
-    hydrateBrowserDrivers([
-      { browserPageId: 'page-b', driver: { kind: 'mobile', clientId: 'phone-1' } }
-    ])
     hydrateBrowserRemoteViewerPages(['page-b'])
     renderWorkspacePane()
 
     expect(propsFor('page-b')).toEqual({
       id: 'page-b',
       isAutomationVisible: true,
-      isMobileDriven: true,
       isRemotelyViewed: true
     })
     // Why the sibling: each term must land on the page it belongs to, not on every page of the tab.
     expect(propsFor('page-a')).toEqual({
       id: 'page-a',
       isAutomationVisible: false,
-      isMobileDriven: false,
       isRemotelyViewed: false
     })
     releaseBrowserAutomationVisibility(token)

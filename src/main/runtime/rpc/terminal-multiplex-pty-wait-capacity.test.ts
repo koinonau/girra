@@ -77,7 +77,7 @@ describe('terminal multiplex RPC', () => {
           payload: encodeTerminalStreamJson({
             streamId: 7,
             terminal: 'terminal-1',
-            client: { id: 'phone-1', type: 'mobile' }
+            client: { id: 'desktop-1', type: 'desktop' }
           })
         })
       )!
@@ -552,50 +552,5 @@ describe('terminal multiplex RPC', () => {
     expect(errorFrame && decodeTerminalStreamText(errorFrame.payload)).toBe('no_connected_pty')
     cleanup()
     await dispatchPromise
-  })
-
-  it('preserves clientless legacy subscriptions without a PTY wait or mount', async () => {
-    const messages: string[] = []
-    const runtime = stubRuntime({
-      resolveLeafForHandle: vi.fn().mockReturnValue({ ptyId: null }),
-      waitForLeafPtyId: vi.fn(),
-      requestRendererTerminalTabMount: vi.fn(),
-      readTerminal: vi.fn().mockResolvedValue({ tail: ['scrollback'], truncated: false })
-    })
-    const dispatcher = new RpcDispatcher({ runtime, methods: TERMINAL_METHODS })
-    const dispatchPromise = dispatcher.dispatchStreaming(
-      makeRequest('terminal.subscribe', { terminal: 'terminal-1' }),
-      (msg) => messages.push(msg),
-      { connectionId: 'conn-clientless-legacy' }
-    )
-    await dispatchPromise
-    expect(runtime.waitForLeafPtyId).not.toHaveBeenCalled()
-    expect(runtime.requestRendererTerminalTabMount).not.toHaveBeenCalled()
-    expect(messages.map((msg) => JSON.parse(msg).result?.type)).toEqual(['subscribed', 'end'])
-  })
-
-  it('waits for a desktop legacy subscriber PTY before the scrollback-only fallback', async () => {
-    const messages: string[] = []
-    const runtime = stubRuntime({
-      resolveLeafForHandle: vi.fn().mockReturnValue({ ptyId: null }),
-      waitForLeafPtyId: vi.fn().mockRejectedValue(new Error('timeout')),
-      requestRendererTerminalTabMount: vi.fn().mockReturnValue(true),
-      readTerminal: vi.fn().mockResolvedValue({ tail: ['scrollback'], truncated: false })
-    })
-    const dispatcher = new RpcDispatcher({ runtime, methods: TERMINAL_METHODS })
-    const dispatchPromise = dispatcher.dispatchStreaming(
-      makeRequest('terminal.subscribe', {
-        terminal: 'terminal-1',
-        client: { id: 'desktop-1', type: 'desktop' }
-      }),
-      (msg) => messages.push(msg),
-      { connectionId: 'conn-desktop-legacy' }
-    )
-    await dispatchPromise
-    // Widened gate: a desktop client must mount + await its late PTY, not skip
-    // straight to the bare scrollback path the way it did under the mobile-only gate.
-    expect(runtime.requestRendererTerminalTabMount).toHaveBeenCalledWith('terminal-1')
-    expect(runtime.waitForLeafPtyId).toHaveBeenCalledWith('terminal-1', 10_000, undefined)
-    expect(messages.map((msg) => JSON.parse(msg).result?.type)).toEqual(['subscribed', 'end'])
   })
 })

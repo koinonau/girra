@@ -321,7 +321,6 @@ describe('terminal multiplex RPC', () => {
         .mockResolvedValueOnce({ data: 'initial snapshot', cols: 120, rows: 40 })
         .mockResolvedValue({ data: 'recovered snapshot', cols: 120, rows: 40, seq: 99 }),
       getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
       getLayout: vi.fn().mockReturnValue({ seq: 1 }),
       subscribeToTerminalData: vi.fn(
         (
@@ -334,9 +333,7 @@ describe('terminal multiplex RPC', () => {
       ),
       subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
       subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-      subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
       getTerminalFitOverride: vi.fn().mockReturnValue(null),
-      getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
       registerSubscriptionCleanup: vi.fn((id: string, cleanup: () => void) => {
         cleanups.set(id, cleanup)
       }),
@@ -577,7 +574,6 @@ describe('terminal multiplex RPC', () => {
         // retained pending chunk is already contained in the snapshot.
         .mockResolvedValue({ data: 'recovered snapshot', cols: 120, rows: 40, seq: floodedChars }),
       getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
       getLayout: vi.fn().mockReturnValue({ seq: 1 }),
       subscribeToTerminalData: vi.fn(
         (
@@ -590,9 +586,7 @@ describe('terminal multiplex RPC', () => {
       ),
       subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
       subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-      subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
       getTerminalFitOverride: vi.fn().mockReturnValue(null),
-      getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
       registerSubscriptionCleanup: vi.fn((id: string, cleanup: () => void) => {
         cleanups.set(id, cleanup)
       }),

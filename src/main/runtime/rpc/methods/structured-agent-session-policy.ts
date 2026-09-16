@@ -45,7 +45,7 @@ export function supportsStructuredAgentSessions(context: StructuredPolicyContext
 }
 
 export function structuredNativeChatProjectionEnabled(args: {
-  clientKind: 'mobile' | 'runtime' | undefined
+  clientKind: 'runtime' | undefined
   clientCapabilities: readonly RuntimeCapability[] | undefined
   // Required so no call site can silently project as if the host setting were off.
   structuredNativeChatEnabled: boolean

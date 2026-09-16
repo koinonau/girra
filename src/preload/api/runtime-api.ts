@@ -1,10 +1,8 @@
 import type { RuntimeHostStatusSnapshot } from '../../shared/runtime-host-status'
 import type {
-  RuntimeBrowserDriverState,
   RuntimeRendererSyncWindowGraph,
   RuntimeStatus,
-  RuntimeSyncWindowGraphResult,
-  RuntimeTerminalDriverState
+  RuntimeSyncWindowGraphResult
 } from '../../shared/runtime-types'
 import type { RuntimeRpcResponse } from '../../shared/runtime-rpc-envelope'
 import type { ClientHostedBrowserRowsEvent } from '../../shared/client-hosted-browser-rows'
@@ -33,42 +31,20 @@ export type RuntimeApi = {
       callback: (response: RuntimeRpcResponse<unknown>) => void
     ) => Promise<RuntimeEnvironmentSubscriptionHandle>
     getTerminalFitOverrides: () => Promise<
-      { ptyId: string; mode: 'mobile-fit' | 'remote-desktop-fit'; cols: number; rows: number }[]
-    >
-    getTerminalDrivers: () => Promise<
-      {
-        ptyId: string
-        driver: RuntimeTerminalDriverState
-      }[]
-    >
-    getBrowserDrivers: () => Promise<
-      {
-        browserPageId: string
-        driver: RuntimeBrowserDriverState
-      }[]
+      { ptyId: string; mode: 'remote-desktop-fit'; cols: number; rows: number }[]
     >
     getBrowserRemoteViewerPages?: () => Promise<string[]>
     getClientHostedBrowserRows: () => Promise<ClientHostedBrowserRowsEvent[]>
     restoreTerminalFit: (ptyId: string) => Promise<{ restored: boolean }>
-    reclaimBrowserForDesktop: (browserPageId: string) => Promise<{ reclaimed: boolean }>
     onTerminalFitOverrideChanged: (
       callback: (event: {
         ptyId: string
-        mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+        mode: 'remote-desktop-fit' | 'desktop-fit'
         cols: number
         rows: number
       }) => void
     ) => () => void
-    onTerminalDriverChanged: (
-      callback: (event: { ptyId: string; driver: RuntimeTerminalDriverState }) => void
-    ) => () => void
-    onNativeChatLaunchDraftResolved?: (
-      callback: (event: { tabId: string; text: string; createdAt: number }) => void
-    ) => () => void
-    onBrowserDriverChanged: (
-      callback: (event: { browserPageId: string; driver: RuntimeBrowserDriverState }) => void
-    ) => () => void
-    // Why optional: matches onNativeChatLaunchDraftResolved — a renderer running against an older
+    // Why optional: a renderer running against an older
     // preload keeps working without the retention signal instead of throwing on every mount.
     onBrowserRemoteViewersChanged?: (
       callback: (event: { browserPageId: string; hasRemoteViewers: boolean }) => void

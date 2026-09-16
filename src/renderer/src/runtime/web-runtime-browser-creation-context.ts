@@ -87,8 +87,6 @@ export function createWebRuntimeBrowserCreationContext(
   const expectsClientHosting = expectsBrowserClientHosting({
     enabled: useAppStore.getState().settings?.browserClientHostedRemoteEnabled !== false,
     preference: args.placementPreference,
-    deviceScope: useAppStore.getState().runtimeStatusByEnvironmentId?.get(environmentId)?.status
-      ?.deviceScope,
     capabilities: advertisedCapabilities
   })
   return {

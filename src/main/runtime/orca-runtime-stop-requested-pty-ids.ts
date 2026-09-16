@@ -7,7 +7,6 @@ import { OrcaRuntimeWithRuntimeId } from './orca-runtime-runtime-id'
 import { RuntimeTerminalAgentPresence } from './runtime-terminal-agent-presence'
 import type { RuntimeNotifier } from './runtime-notifier-contract'
 import { RuntimeClientEventBus } from './runtime-client-event-bus'
-import { RuntimeNativeChatDraftResolutions } from './runtime-native-chat-draft-resolutions'
 import { RuntimeWorktreeLifecycleEvents } from './runtime-worktree-lifecycle-events'
 import type {
   RuntimeWorktreeLifecycleEvent,
@@ -56,18 +55,6 @@ export class OrcaRuntimeWithStopRequestedPtyIds extends OrcaRuntimeWithRuntimeId
     makeTitleGateKey: (rawTitle, normalizedTitle) =>
       this.makeDecorativeTitleGateKey(rawTitle, normalizedTitle),
     onConsumerAvailabilityChanged: () => this.refreshTerminalSideEffectConsumerAvailability()
-  })
-
-  protected readonly nativeChatDraftResolutions = new RuntimeNativeChatDraftResolutions({
-    resolveOwner: (handle) => this.resolveNativeChatLaunchDraftOwner(handle),
-    listMobileSnapshots: () => this.mobileSessionTabsByWorktree,
-    setMobileSnapshot: (worktreeId, snapshot) =>
-      this.storeMobileSessionSnapshot(worktreeId, snapshot),
-    scheduleMobileSnapshot: (worktreeId) => this.scheduleMobileSessionTabsChanged(worktreeId),
-    notifyResolved: (tabId, resolution, event) => {
-      this.notifier?.nativeChatLaunchDraftResolved?.(tabId, resolution)
-      this.emitClientEvent(event)
-    }
   })
 
   protected readonly worktreeLifecycleEvents =
@@ -242,7 +229,7 @@ export class OrcaRuntimeWithStopRequestedPtyIds extends OrcaRuntimeWithRuntimeId
 
   protected readonly messageWaiters = new RuntimeMessageWaiters()
 
-  // Why: mobile clients subscribe to terminal output via terminal.subscribe.
+  // Why: remote clients subscribe to terminal output via terminal.multiplex.
   // These listeners fire on every onPtyData call, enabling real-time streaming
   // without polling. Keyed by ptyId for O(1) lookup per data event.
   protected readonly terminalStreamConsumers = new RuntimeTerminalStreamConsumers()

@@ -223,7 +223,6 @@ describe('registerPtyHandlers', () => {
         setPtyController: vi.fn(),
         createPreAllocatedTerminalHandle: vi.fn(() => null),
         registerPty: vi.fn(),
-        getDriver: vi.fn(() => ({ kind: 'host' })),
         isResizeSuppressed: vi.fn(() => false),
         onPtySpawned: vi.fn(),
         onPtyExit: vi.fn(),
@@ -254,7 +253,6 @@ describe('registerPtyHandlers', () => {
         setPtyController: vi.fn(),
         createPreAllocatedTerminalHandle: vi.fn(() => null),
         registerPty: vi.fn(),
-        getDriver: vi.fn(() => ({ kind: 'host' })),
         isResizeSuppressed: vi.fn(() => false),
         onPtySpawned: vi.fn(),
         onPtyExit: vi.fn(),
@@ -277,7 +275,6 @@ describe('registerPtyHandlers', () => {
         setPtyController: vi.fn(),
         createPreAllocatedTerminalHandle: vi.fn(() => null),
         registerPty: vi.fn(),
-        getDriver: vi.fn(() => ({ kind: 'idle' })),
         // The fix: a PTY with a remote viewer reports true even though driver state stays idle/desktop.
         isRemoteDesktopResizeDriven: vi.fn(() => true),
         isResizeSuppressed: vi.fn(() => false),
@@ -325,7 +322,6 @@ describe('registerPtyHandlers', () => {
         setPtyController: vi.fn(),
         createPreAllocatedTerminalHandle: vi.fn(() => null),
         registerPty: vi.fn(),
-        getDriver: vi.fn(() => ({ kind: 'idle' })),
         claimRemoteDesktopHost: vi.fn().mockResolvedValue(false),
         onPtySpawned: vi.fn(),
         onPtyExit: vi.fn(),
@@ -343,34 +339,6 @@ describe('registerPtyHandlers', () => {
       await Promise.resolve()
 
       expect(write).not.toHaveBeenCalled()
-    })
-    it('does not populate the remote reclaim cache when only a phone drives', async () => {
-      const resizeSpy = vi.fn()
-      setupProviderWithAppliedSize({ applied: { cols: 80, rows: 24 }, resize: resizeSpy })
-      const runtime = {
-        setPtyController: vi.fn(),
-        createPreAllocatedTerminalHandle: vi.fn(() => null),
-        registerPty: vi.fn(),
-        getDriver: vi.fn(() => ({ kind: 'mobile', clientId: 'phone-A' })),
-        isRemoteDesktopResizeDriven: vi.fn(() => false),
-        isResizeSuppressed: vi.fn(() => false),
-        onPtySpawned: vi.fn(),
-        onPtyExit: vi.fn(),
-        onPtyData: vi.fn(),
-        recordRemoteDesktopHostReclaimTarget: vi.fn(),
-        onExternalPtyResize: vi.fn()
-      }
-      handlers.clear()
-      registerPtyHandlers(mainWindow as never, runtime as never)
-      const spawn = await handlers.get('pty:spawn')!(null, { cols: 80, rows: 24, env: {} })
-      const id = (spawn as { id: string }).id
-      resizeSpy.mockClear()
-
-      resizeListener()(mainWindowIpcEvent, { id, cols: 125, rows: 48 })
-
-      expect(resizeSpy).not.toHaveBeenCalled()
-      expect(runtime.recordRemoteDesktopHostReclaimTarget).not.toHaveBeenCalled()
-      expect(runtime.onExternalPtyResize).not.toHaveBeenCalled()
     })
   })
 })

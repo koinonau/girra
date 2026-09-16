@@ -66,48 +66,48 @@ it('an unknown handle does not fence another worker or access the database', asy
   ).resolves.toMatchObject({ state: 'released' })
 })
 
-it.each(['unary', 'stream'])('mobile %s bytes do no orchestration database work', async (lane) => {
-  const worker = await h.startSettledWorker()
-  const runtime = h.runtime
-  runtime.registerPreAllocatedHandleForPty('pty-worker', 'term_worker')
-  runtime.registerPty('pty-worker', 'repo::worktree', undefined, {
-    tabId: 'tab_worker',
-    leafId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
-    incarnationId: 'runtime_test:term_worker:1'
-  })
-  const write = vi.fn(() => true)
-  runtime.setPtyController({ write, kill: () => true, getForegroundProcess: async () => null })
-  const commit = vi.fn(async () => {})
-  vi.spyOn(runtime, 'beginMobileInputFloor').mockReturnValue({ commit, rollback: vi.fn() })
-  const dbAccess = vi.spyOn(runtime, 'getOrchestrationDb')
-  const takeover = vi.spyOn(h.db, 'markWorkerTerminalUserOwned')
-  const prepare = vi.spyOn(h.db.db, 'prepare')
-  const exec = vi.spyOn(h.db.db, 'exec')
-  const params = {
-    terminal: 'term_worker',
-    text: 'x',
-    client: { id: 'phone', type: 'mobile' as const }
+it.each(['unary', 'stream'])(
+  'paired-client %s bytes do no orchestration database work',
+  async (lane) => {
+    const worker = await h.startSettledWorker()
+    const runtime = h.runtime
+    runtime.registerPreAllocatedHandleForPty('pty-worker', 'term_worker')
+    runtime.registerPty('pty-worker', 'repo::worktree', undefined, {
+      tabId: 'tab_worker',
+      leafId: 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+      incarnationId: 'runtime_test:term_worker:1'
+    })
+    const write = vi.fn(() => true)
+    runtime.setPtyController({ write, kill: () => true, getForegroundProcess: async () => null })
+    const dbAccess = vi.spyOn(runtime, 'getOrchestrationDb')
+    const takeover = vi.spyOn(h.db, 'markWorkerTerminalUserOwned')
+    const prepare = vi.spyOn(h.db.db, 'prepare')
+    const exec = vi.spyOn(h.db.db, 'exec')
+    const params = {
+      terminal: 'term_worker',
+      text: 'x',
+      client: { id: 'web-1', type: 'desktop' as const }
+    }
+    if (lane === 'stream') {
+      await expect(sendTerminalStreamInput(runtime, params.terminal, params.text)).resolves.toBe(
+        'delivered'
+      )
+    } else {
+      const method = eraseRpcMethods(TERMINAL_SEND_METHODS).find(
+        (m): m is RpcMethod => m.name === 'terminal.send' && !isStreamingMethod(m)
+      )!
+      await expect(
+        method.handler(method.params!.parse(params) as never, { runtime } as never)
+      ).resolves.toMatchObject({ send: { accepted: true } })
+    }
+    expect(write).toHaveBeenCalledWith('pty-worker', 'x')
+    expect(dbAccess).not.toHaveBeenCalled()
+    expect(takeover).not.toHaveBeenCalled()
+    expect(prepare).not.toHaveBeenCalled()
+    expect(exec).not.toHaveBeenCalled()
+    expect(h.db.getWorkerTerminalResourceByOwner(worker.dispatchId)?.ownership_state).toBe('owned')
   }
-  if (lane === 'stream') {
-    await expect(sendTerminalStreamInput(runtime, { ...params, isMobile: true })).resolves.toBe(
-      'delivered'
-    )
-  } else {
-    const method = eraseRpcMethods(TERMINAL_SEND_METHODS).find(
-      (m): m is RpcMethod => m.name === 'terminal.send' && !isStreamingMethod(m)
-    )!
-    await expect(
-      method.handler(method.params!.parse(params) as never, { runtime } as never)
-    ).resolves.toMatchObject({ send: { accepted: true } })
-  }
-  expect(write).toHaveBeenCalledWith('pty-worker', 'x')
-  expect(commit).toHaveBeenCalledTimes(1)
-  expect(dbAccess).not.toHaveBeenCalled()
-  expect(takeover).not.toHaveBeenCalled()
-  expect(prepare).not.toHaveBeenCalled()
-  expect(exec).not.toHaveBeenCalled()
-  expect(h.db.getWorkerTerminalResourceByOwner(worker.dispatchId)?.ownership_state).toBe('owned')
-})
+)
 
 // Round-1 regression (#19337 review): a phone key landing inside the worker's boot wait used to
 // find no `owned` row, report `changed: 0`, and still arm the client's 30 s gate — so the real

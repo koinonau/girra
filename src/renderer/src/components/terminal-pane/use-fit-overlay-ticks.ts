@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { onDriverChange } from '@/lib/pane-manager/mobile-driver-state'
-import { onOverrideChange } from '@/lib/pane-manager/mobile-fit-overrides'
+import { onOverrideChange } from '@/lib/pane-manager/fit-overrides'
 import type { ManagedPane, PaneManager } from '@/lib/pane-manager/pane-manager'
 import { safeFit } from '@/lib/pane-manager/pane-tree-ops'
 import { applyDesktopFitFallbackAfterReplay } from './desktop-fit-fallback'
 import { getOverrideAffectedPanes, getPanesNeedingOverrideFit } from './override-affected-panes'
 import type { PtyTransport } from './pty-transport'
 
-export type MobileOverlayTickDeps = {
+export type FitOverlayTickDeps = {
   managerRef: { current: PaneManager | null }
   // Why: the overlay render resolves each pane's pty through this map, so the
   // tick gate must read the same binding to stay behavior-preserving.
@@ -27,18 +26,18 @@ function isPtyMountedInTab(
 }
 
 /**
- * Re-render this tab's mobile-fit / presence-lock overlays when the pane-manager
- * state maps change, and refit panes the override moved.
+ * Re-render this tab's fit-hold overlays when the pane-manager state maps
+ * change, and refit panes the override moved.
  *
  * Both emitters are global listener sets: every event reaches every mounted tab.
  * The pty-affinity check therefore runs *before* the tick, not just before the
  * rAF work — a remote reconnect replays two handle-rotation events per pane, so
  * an ungated tick costs (events x mounted panes) re-renders per network blip.
  */
-export function useMobileOverlayTicks({ managerRef, paneTransportsRef }: MobileOverlayTickDeps): {
-  refreshMobileOverlays: () => void
+export function useFitOverlayTicks({ managerRef, paneTransportsRef }: FitOverlayTickDeps): {
+  refreshFitOverlays: () => void
 } {
-  // Why: override state lives in a Map for perf; this counter forces a re-render on override change so the mobile-fit banner toggles.
+  // Why: override state lives in a Map for perf; this counter forces a re-render on override change so the fit-hold banner toggles.
   const [, setOverrideTick] = useState(0)
   useEffect(() => {
     const pendingFitFrames = new Set<number>()
@@ -76,8 +75,8 @@ export function useMobileOverlayTicks({ managerRef, paneTransportsRef }: MobileO
           (paneId) => paneTransportsRef.current.get(paneId)?.getPtyId(),
           event.ptyId
         )
-      if (event.mode === 'mobile-fit' || event.mode === 'remote-desktop-fit') {
-        // Why: when mobile drives, xterm must shrink to phone dims or the wide desktop grid garbles the phone-wrapped stream.
+      if (event.mode === 'remote-desktop-fit') {
+        // Why: when a remote desktop drives, xterm must park at its dims or the mismatched grid garbles the wrapped stream.
         // Why: skip the rAF unless this tab actually has a mis-parked pane.
         const panesNeedingFit = getPanesNeedingOverrideFit(
           getAffectedPanes(),
@@ -106,7 +105,7 @@ export function useMobileOverlayTicks({ managerRef, paneTransportsRef }: MobileO
           }
         }
         scheduleFitFrame(fitAffectedPanes)
-        // Why: direct-resize fallback if safeFit no-op'd, only while xterm is still at the prior mobile-fit dims; else event.cols/rows is a stale baseline that clobbers the fit.
+        // Why: direct-resize fallback if safeFit no-op'd, only while xterm is still at the prior held dims; else event.cols/rows is a stale baseline that clobbers the fit.
         scheduleFallbackTimer(() => {
           for (const pane of getAffectedPanes()) {
             // Why: skip 0×0 hidden panes; forcing desktop dims with no DOM geometry leaves a mismatched grid (fallback is only for the visible pane that failed to refit).
@@ -137,23 +136,10 @@ export function useMobileOverlayTicks({ managerRef, paneTransportsRef }: MobileO
     }
   }, [managerRef, paneTransportsRef])
 
-  // Why: driver state lives in a Map for perf; this counter re-renders on driver flips so the lock banner toggles. See docs/mobile-presence-lock.md.
-  const [, setDriverTick] = useState(0)
-  useEffect(
-    () =>
-      onDriverChange((event) => {
-        if (!isPtyMountedInTab(paneTransportsRef.current, event.ptyId)) {
-          return
-        }
-        setDriverTick((n) => n + 1)
-      }),
-    [paneTransportsRef]
-  )
-
   // Why: a pane whose transport was swapped under a live overlay portal has no
   // pty affinity left to tick it; the reclaim path drops the stale banner itself.
-  const refreshMobileOverlays = useCallback((): void => {
+  const refreshFitOverlays = useCallback((): void => {
     setOverrideTick((n) => n + 1)
   }, [])
-  return { refreshMobileOverlays }
+  return { refreshFitOverlays }
 }

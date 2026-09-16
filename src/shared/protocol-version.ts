@@ -84,11 +84,6 @@ export const BROWSER_CLIENT_FILE_CHANNEL_RUNTIME_CAPABILITY =
 export const BROWSER_NETWORK_TUNNEL_RUNTIME_CAPABILITY = 'network.browserTunnel.v1' as const
 export const BROWSER_NETWORK_EXECUTION_HOSTS_RUNTIME_CAPABILITY =
   'network.browserTunnel.executionHosts.v1' as const
-// Why: hosts without this strip terminal.send's inputKind (zod object drops
-// unknown keys), so a mobile xterm query reply would land as ordinary
-// floor-taking input. Mobile must not forward replies unless advertised.
-export const TERMINAL_QUERY_REPLY_INPUT_RUNTIME_CAPABILITY =
-  'terminal.query-reply-input.v1' as const
 // Why: without this, prompt request IDs and waitSubmitMs are stripped and a retry would resend raw input.
 export const TERMINAL_PROMPT_DELIVERY_RUNTIME_CAPABILITY = 'terminal.prompt-delivery.v1' as const
 // Why: paired clients may unmount xterm only when the host can return a
@@ -250,7 +245,6 @@ export const RUNTIME_CAPABILITIES = [
   JIRA_USER_FIELDS_RUNTIME_CAPABILITY,
   AI_VAULT_RUNTIME_CAPABILITY,
   AI_VAULT_SESSION_TITLES_RUNTIME_CAPABILITY,
-  TERMINAL_QUERY_REPLY_INPUT_RUNTIME_CAPABILITY,
   TERMINAL_PROMPT_DELIVERY_RUNTIME_CAPABILITY,
   TERMINAL_PAIRED_PARKING_RUNTIME_CAPABILITY,
   TERMINAL_QUICK_COMMANDS_RUNTIME_CAPABILITY,

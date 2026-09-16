@@ -251,7 +251,7 @@ export async function call(
   params: unknown,
   client?: {
     clientId?: string
-    clientKind?: 'mobile' | 'runtime'
+    clientKind?: 'runtime'
     clientCapabilities?: string[]
     signal?: AbortSignal
   },
@@ -278,7 +278,7 @@ export const STRUCTURED_CLIENT = {
   ]
 }
 export const STRUCTURED_MOBILE_CLIENT = {
-  clientKind: 'mobile' as const,
+  clientKind: 'runtime' as const,
   clientCapabilities: [
     STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY,
     AGENT_SESSION_PENDING_SEND_RESULT_RUNTIME_CAPABILITY

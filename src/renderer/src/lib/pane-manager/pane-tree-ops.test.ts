@@ -6,7 +6,7 @@ import {
   safeFitAndThen
 } from './pane-tree-ops'
 import type { ManagedPaneInternal, ScrollState } from './pane-manager-types'
-import { setFitOverride, hydrateOverrides } from './mobile-fit-overrides'
+import { setFitOverride, hydrateOverrides } from './fit-overrides'
 import {
   captureTerminalStructuralScrollIntent,
   enforceTerminalCurrentScrollIntent,
@@ -627,15 +627,15 @@ describe('safeFit', () => {
     expect(pane.fitAddon.fit).toHaveBeenCalledTimes(1)
   })
 
-  it('resizes terminal to override dimensions when mobile-fit override is active', () => {
+  it('resizes terminal to override dimensions when a fit override is active', () => {
     const pane = createPane({
       proposedCols: 120,
       proposedRows: 40,
       terminalCols: 120,
       terminalRows: 40
     })
-    pane.container.dataset.ptyId = 'pty-phone'
-    setFitOverride('pty-phone', 'mobile-fit', 49, 20)
+    pane.container.dataset.ptyId = 'pty-held'
+    setFitOverride('pty-held', 'remote-desktop-fit', 49, 20)
 
     safeFit(pane)
 
@@ -666,8 +666,8 @@ describe('safeFit', () => {
       terminalCols: 49,
       terminalRows: 20
     })
-    pane.container.dataset.ptyId = 'pty-phone'
-    setFitOverride('pty-phone', 'mobile-fit', 49, 20)
+    pane.container.dataset.ptyId = 'pty-held'
+    setFitOverride('pty-held', 'remote-desktop-fit', 49, 20)
 
     safeFit(pane)
 
@@ -682,7 +682,7 @@ describe('safeFit', () => {
       terminalCols: 120,
       terminalRows: 32
     })
-    setFitOverride('pty-phone', 'mobile-fit', 49, 20)
+    setFitOverride('pty-held', 'remote-desktop-fit', 49, 20)
 
     safeFit(pane)
 
@@ -697,9 +697,9 @@ describe('safeFit', () => {
       terminalCols: 49,
       terminalRows: 20
     })
-    pane.container.dataset.ptyId = 'pty-phone'
-    setFitOverride('pty-phone', 'mobile-fit', 49, 20)
-    setFitOverride('pty-phone', 'desktop-fit', 120, 40)
+    pane.container.dataset.ptyId = 'pty-held'
+    setFitOverride('pty-held', 'remote-desktop-fit', 49, 20)
+    setFitOverride('pty-held', 'desktop-fit', 120, 40)
 
     safeFit(pane)
 
@@ -725,7 +725,7 @@ describe('safeFit', () => {
     })
     paneB.container.dataset.ptyId = 'pty-B'
 
-    setFitOverride('pty-A', 'mobile-fit', 49, 20)
+    setFitOverride('pty-A', 'remote-desktop-fit', 49, 20)
 
     safeFit(paneA)
     safeFit(paneB)

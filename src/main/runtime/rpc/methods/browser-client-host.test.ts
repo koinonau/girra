@@ -544,7 +544,7 @@ async function dispatchCommandResult(
   dispatcher: RpcDispatcher,
   params: Record<string, unknown>,
   overrides: {
-    clientKind?: 'runtime' | 'mobile'
+    clientKind?: 'runtime'
     pairedDeviceId?: string
     connectionId?: string
     clientCapabilities?: (typeof BROWSER_CLIENT_HOST_RUNTIME_CAPABILITY)[]

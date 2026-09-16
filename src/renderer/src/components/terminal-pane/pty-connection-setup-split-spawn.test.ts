@@ -138,10 +138,10 @@ describe('connectPanePty', () => {
     await restoreTerminalTestGlobals()
   })
 
-  it('clears the mobile-fit pane binding when the pane connection is disposed', async () => {
+  it('clears the remote-desktop-fit pane binding when the pane connection is disposed', async () => {
     const { connectPanePty } = await import('./pty-connection')
     const { getFitOverrideForPane, setFitOverride } =
-      await import('@/lib/pane-manager/mobile-fit-overrides')
+      await import('@/lib/pane-manager/fit-overrides')
     const transport = createMockTransport()
     transportFactoryQueue.push(transport)
     const pane = createPane(1)
@@ -152,9 +152,13 @@ describe('connectPanePty', () => {
       | undefined
     expect(onPtySpawn).toBeTypeOf('function')
     onPtySpawn?.('pty-fit')
-    setFitOverride('pty-fit', 'mobile-fit', 49, 20)
+    setFitOverride('pty-fit', 'remote-desktop-fit', 49, 20)
 
-    expect(getFitOverrideForPane(1, 'tab-1')).toEqual({ mode: 'mobile-fit', cols: 49, rows: 20 })
+    expect(getFitOverrideForPane(1, 'tab-1')).toEqual({
+      mode: 'remote-desktop-fit',
+      cols: 49,
+      rows: 20
+    })
     expect(pane.container.dataset.ptyId).toBe('pty-fit')
 
     binding.dispose()
@@ -163,8 +167,8 @@ describe('connectPanePty', () => {
     expect(pane.container.dataset.ptyId).toBeUndefined()
   })
 
-  it('refits immediately when binding to a PTY with an active mobile-fit override', async () => {
-    const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+  it('refits immediately when binding to a PTY with an active remote-desktop-fit override', async () => {
+    const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
     const { connectPanePty } = await import('./pty-connection')
     const transport = createMockTransport()
     transportFactoryQueue.push(transport)
@@ -188,7 +192,7 @@ describe('connectPanePty', () => {
       pane.terminal.cols = cols
       pane.terminal.rows = rows
     })
-    setFitOverride('pty-fit', 'mobile-fit', 49, 20)
+    setFitOverride('pty-fit', 'remote-desktop-fit', 49, 20)
 
     connectPanePty(pane as never, createManager(1) as never, createDeps() as never)
     const onPtySpawn = createdTransportOptions[0]?.onPtySpawn as
@@ -200,55 +204,6 @@ describe('connectPanePty', () => {
     expect(pane.terminal.resize).toHaveBeenCalledWith(49, 20)
     expect(pane.terminal.cols).toBe(49)
     expect(pane.terminal.rows).toBe(20)
-  })
-
-  it('continues post-spawn size reconcile after a transient mobile presence lock', async () => {
-    const frameCallbacks: FrameRequestCallback[] = []
-    globalThis.requestAnimationFrame = vi.fn((callback: FrameRequestCallback) => {
-      frameCallbacks.push(callback)
-      return frameCallbacks.length
-    })
-    const runNextFrame = (): void => {
-      const callback = frameCallbacks.shift()
-      if (!callback) {
-        throw new Error('expected a queued animation frame')
-      }
-      callback(0)
-    }
-
-    const { connectPanePty } = await import('./pty-connection')
-    const { setDriverForPty } = await import('@/lib/pane-manager/mobile-driver-state')
-
-    const ptyId = 'pty-post-spawn-transient-lock'
-    setDriverForPty(ptyId, { kind: 'mobile', clientId: 'phone-1' })
-    try {
-      const transport = createMockTransport(ptyId)
-      transportFactoryQueue.push(transport)
-      mockStoreState = {
-        ...mockStoreState,
-        tabsByWorktree: { 'wt-1': [{ id: 'tab-1', ptyId: null }] },
-        ptyIdsByTabId: { 'tab-1': [] }
-      }
-      const pane = createPane(1)
-      pane.terminal.cols = 80
-      pane.terminal.rows = 24
-
-      connectPanePty(pane as never, createManager(1) as never, createDeps() as never)
-      runNextFrame()
-      await flushAsyncTicks()
-
-      pane.terminal.cols = 120
-      pane.terminal.rows = 40
-      runNextFrame()
-      expect(transport.resize).not.toHaveBeenCalled()
-
-      setDriverForPty(ptyId, { kind: 'idle' })
-      runNextFrame()
-
-      expect(transport.resize).toHaveBeenCalledWith(120, 40)
-    } finally {
-      setDriverForPty(ptyId, { kind: 'idle' })
-    }
   })
 
   it('waits for setup-split geometry before spawning the initial startup command', async () => {
@@ -615,7 +570,7 @@ describe('connectPanePty', () => {
     const manager = createManager(1)
     const replayingPanesRef = { current: new Map<number, number>([[1, 1]]) }
     const deps = createDeps({ replayingPanesRef })
-    const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+    const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
 
     connectPanePty(pane as never, manager as never, deps as never)
 

@@ -9,7 +9,7 @@ import {
   TerminalMultiplexSnapshotRequestFrame,
   TerminalMultiplexSourceRangeAckFrame
 } from './stream-schemas'
-import { isTerminalInputLockedForClient, sendTerminalStreamInput } from './terminal-input-delivery'
+import { sendTerminalStreamInput } from './terminal-input-delivery'
 import {
   getOutputAfterSnapshotSeq,
   normalizeMultiplexSnapshotScrollbackRows
@@ -65,21 +65,11 @@ export function installMultiplexSlotFrames(
       if (!text) {
         return
       }
-      if (isTerminalInputLockedForClient(runtime, stream.ptyId, stream.client)) {
-        return
-      }
-      // Mobile already has the higher-priority floor, so a rejected desktop claim must not suppress later phone input.
-      const inputClaimTail = stream.isMobile ? Promise.resolve(true) : stream.desktopClaimTail
-      void inputClaimTail.then(async (claimed) => {
-        if (!claimed || isTerminalInputLockedForClient(runtime, stream.ptyId, stream.client)) {
+      void stream.desktopClaimTail.then(async (claimed) => {
+        if (!claimed) {
           return
         }
-        const outcome = await sendTerminalStreamInput(runtime, {
-          terminal: stream.terminal,
-          text,
-          client: stream.client,
-          isMobile: stream.isMobile
-        })
+        const outcome = await sendTerminalStreamInput(runtime, stream.terminal, text)
         state.notifyStreamWriteUnavailable(stream, outcome)
       })
       return
@@ -106,7 +96,7 @@ export function installMultiplexSlotFrames(
       const cols = viewport.cols
       const rows = viewport.rows
       // Why: resize registers stream-scoped geometry so detach can release it; older clients lack explicit claims.
-      if (!stream.isMobile && stream.client?.id) {
+      if (stream.client?.id) {
         stream.registeredRemoteDesktopDriver = true
         if (stream.buffering) {
           stream.pendingRemoteDesktopViewport = { cols: viewport.cols, rows: viewport.rows }
@@ -121,7 +111,6 @@ export function installMultiplexSlotFrames(
             stream.remoteDesktopSubscriptionKey,
             stream.client!,
             { cols, rows },
-            stream.isMobile ? 'mobile' : 'desktop',
             'register',
             !stream.supportsDesktopViewportClaims
           )
@@ -132,7 +121,7 @@ export function installMultiplexSlotFrames(
         .catch(() => false)
       return
     }
-    if (frame.opcode === TerminalStreamOpcode.ClaimViewport && stream.client && !stream.isMobile) {
+    if (frame.opcode === TerminalStreamOpcode.ClaimViewport && stream.client) {
       const viewport = decodeTerminalStreamJson<{ cols?: unknown; rows?: unknown }>(frame.payload)
       if (!viewport || typeof viewport.cols !== 'number' || typeof viewport.rows !== 'number') {
         return
@@ -194,7 +183,6 @@ export function installMultiplexSlotFrames(
         return
       }
       let size = runtime.getTerminalSize(stream.ptyId)
-      let displayMode = runtime.getMobileDisplayMode(stream.ptyId)
       if (stream.pendingOutputOverflowed) {
         // Why: the overflowed tail is newer than the first snapshot, so retry for a current image instead of null.
         stream.pendingOutput.splice(0)
@@ -205,7 +193,6 @@ export function installMultiplexSlotFrames(
           return
         }
         size = runtime.getTerminalSize(stream.ptyId)
-        displayMode = runtime.getMobileDisplayMode(stream.ptyId)
         if (stream.pendingOutputOverflowed) {
           sendSnapshotFrames(
             (opcode, payload) => state.sendFrame(stream.streamId, opcode, payload),
@@ -214,7 +201,6 @@ export function installMultiplexSlotFrames(
               cols: size?.cols ?? 80,
               rows: size?.rows ?? 24,
               requestId,
-              displayMode,
               truncated: true,
               truncatedByByteBudget: false,
               unavailable: 'pending-output-overflowed',
@@ -230,7 +216,6 @@ export function installMultiplexSlotFrames(
         cols: serialized?.cols ?? size?.cols ?? 80,
         rows: serialized?.rows ?? size?.rows ?? 24,
         requestId,
-        displayMode,
         seq: serialized?.seq,
         cwd: serialized?.cwd,
         source: serialized?.source,
@@ -275,7 +260,6 @@ export function installMultiplexSlotFrames(
         stream.outputBatcher.flush()
         // Why: a resize parked during snapshot buffering must be applied now, or it is dropped until the viewer's next resize.
         if (
-          !stream.isMobile &&
           stream.client?.id &&
           stream.registeredRemoteDesktopDriver &&
           stream.pendingRemoteDesktopViewport
@@ -288,7 +272,6 @@ export function installMultiplexSlotFrames(
             stream.remoteDesktopSubscriptionKey,
             stream.client,
             viewport,
-            'desktop',
             'register',
             !stream.supportsDesktopViewportClaims
           ).catch(() => {})

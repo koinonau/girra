@@ -16,9 +16,10 @@ vi.mock('../store', () => ({
   }
 }))
 
-// Why: the driver and automation-lease modules are the real ones — mocking them would leave
-// the wiring under test unproven, which is the whole point of this file.
-const { setDriverForBrowserPage } = await import('../lib/pane-manager/browser-mobile-driver-state')
+// Why: the remote-viewer and automation-lease modules are the real ones — mocking them would
+// leave the wiring under test unproven, which is the whole point of this file.
+const { setRemoteViewersForBrowserPage } =
+  await import('../lib/pane-manager/browser-remote-viewer-state')
 const { acquireBrowserAutomationVisibility, releaseBrowserAutomationVisibility } =
   await import('./browser-pane/host-guest/browser-automation-visibility')
 const { TerminalWorkbenchContainer } = await import('./TerminalWorkbenchContainer')
@@ -45,7 +46,7 @@ function mountWorkbench(isVisible: boolean): HTMLElement {
 
 afterEach(() => {
   cleanup()
-  setDriverForBrowserPage(PAGE_ID, { kind: 'idle' })
+  setRemoteViewersForBrowserPage(PAGE_ID, false)
   mocks.state = null
 })
 
@@ -62,17 +63,17 @@ describe('TerminalWorkbenchContainer', () => {
   })
 
   // Why: `hidden` is display:none, and Chromium emits no screencast frames from inside such a
-  // subtree — this is the exact regression that froze a phone's browser pane on Settings.
-  it('never applies display:none while a phone drives one of its pages', () => {
-    setDriverForBrowserPage(PAGE_ID, { kind: 'mobile', clientId: 'client-1' })
+  // subtree — this is the exact regression that froze a paired client's browser pane on Settings.
+  it('never applies display:none while a paired client watches one of its pages', () => {
+    setRemoteViewersForBrowserPage(PAGE_ID, true)
     const node = mountWorkbench(false)
     expect(node.className).not.toContain('hidden')
     expect(node.className).toContain('opacity-0')
   })
 
   // Why: the cold-start deadlock. A screencast cannot start until the guest registers, and the
-  // guest only mounts under an automation bootstrap lease — gating on the mobile driver alone
-  // means the guest never mounts, so the driver never flips.
+  // guest only mounts under an automation bootstrap lease — gating on the viewer term alone
+  // means the guest never mounts, so the flag never flips.
   it('never applies display:none while an automation lease holds one of its pages', () => {
     const token = acquireBrowserAutomationVisibility(PAGE_ID)
     try {
@@ -87,7 +88,7 @@ describe('TerminalWorkbenchContainer', () => {
   it('stays out of flow and non-interactive while painting hidden', () => {
     // Why: the active page is a flex sibling — an in-flow workbench would halve its height,
     // and a hittable one would swallow its clicks.
-    setDriverForBrowserPage(PAGE_ID, { kind: 'mobile', clientId: 'client-1' })
+    setRemoteViewersForBrowserPage(PAGE_ID, true)
     const node = mountWorkbench(false)
     expect(node.className).toContain('absolute')
     expect(node.className).toContain('pointer-events-none')
@@ -95,11 +96,11 @@ describe('TerminalWorkbenchContainer', () => {
     expect(node.getAttribute('aria-hidden')).toBe('true')
   })
 
-  it('re-parks once the phone stops driving the page', () => {
-    setDriverForBrowserPage(PAGE_ID, { kind: 'mobile', clientId: 'client-1' })
+  it('re-parks once the paired client stops watching the page', () => {
+    setRemoteViewersForBrowserPage(PAGE_ID, true)
     expect(mountWorkbench(false).className).not.toContain('hidden')
     cleanup()
-    setDriverForBrowserPage(PAGE_ID, { kind: 'idle' })
+    setRemoteViewersForBrowserPage(PAGE_ID, false)
     expect(mountWorkbench(false).className).toContain('hidden')
   })
 })

@@ -50,7 +50,7 @@ export type SerializedSnapshot = {
 
 export type TerminalViewportClient = {
   id: string
-  type?: 'mobile' | 'desktop'
+  type?: 'desktop'
 }
 
 export type TerminalMultiplexStream = {
@@ -58,7 +58,6 @@ export type TerminalMultiplexStream = {
   terminal: string
   ptyId: string
   client: TerminalViewportClient | undefined
-  isMobile: boolean
   ackOutput: boolean
   ackOutputSourceRanges: boolean
   streamGeneration: string
@@ -84,14 +83,13 @@ export type TerminalMultiplexStream = {
   pendingOutput: TerminalOutputChunk[]
   pendingOutputBytes: number
   pendingOutputOverflowed: boolean
-  // Cols the mobile client last rewrapped to; re-stream full scrollback only when width actually changes.
+  // Cols the client last rewrapped to; re-stream full scrollback only when width actually changes.
   lastResizeCols: number | undefined
   resizeGeneration: number
   outputBatcher: TerminalOutputBatcher
   unsubscribeData: () => void
   unsubscribeResize: () => void
   unsubscribeFit: () => void
-  unsubscribeDriver: () => void
   unregisterBinaryHandler: () => void
   // Why: the runtime drops the exit-waiter only on real PTY exit; abort on detach so a never-exiting agent terminal doesn't leak the waiter.
   exitWaiterAbort: AbortController

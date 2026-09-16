@@ -7,23 +7,14 @@ import {
   webviewRegistry
 } from './webview-registry'
 
-export function setBrowserPageWebviewInputLock(
-  webview: Electron.WebviewTag,
-  inputLocked: boolean
-): void {
-  webview.style.pointerEvents = inputLocked ? 'none' : 'auto'
-}
-
 export function ensureBrowserPageWebview({
   browserTabId,
   container,
-  inputLocked,
   webviewPartition,
   resolveContainer
 }: {
   browserTabId: string
   container: HTMLDivElement
-  inputLocked: boolean
   webviewPartition: string
   resolveContainer: () => HTMLDivElement | null
 }): { container: HTMLDivElement; created: boolean; webview: Electron.WebviewTag } | null {
@@ -51,7 +42,6 @@ export function ensureBrowserPageWebview({
     activeContainer = refreshedContainer
   }
   if (webview) {
-    setBrowserPageWebviewInputLock(webview, inputLocked)
     return { container: activeContainer, created, webview }
   }
 
@@ -70,7 +60,6 @@ export function ensureBrowserPageWebview({
   webview.style.width = '100%'
   webview.style.height = '100%'
   webview.style.border = 'none'
-  setBrowserPageWebviewInputLock(webview, inputLocked)
   webview.style.background = 'var(--background)'
   const guest = webview
   // A committed synthetic blank document belongs to New Tab, including while its first URL waits.
