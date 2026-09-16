@@ -29,7 +29,7 @@ export function printHelp(specs: CommandSpec[], commandPath: string[] = []): voi
 }
 
 export function formatCommandHelp(spec: CommandSpec): string {
-  const lines = [`orca ${spec.path.join(' ')}`, '', `Usage: ${spec.usage}`, '', spec.summary]
+  const lines = [`girra ${spec.path.join(' ')}`, '', `Usage: ${spec.usage}`, '', spec.summary]
   const displayedFlags =
     spec.argumentMode === 'passthrough'
       ? []
@@ -63,11 +63,11 @@ export function formatCommandHelp(spec: CommandSpec): string {
 
 export function formatGroupHelp(specs: CommandSpec[], group: string): string {
   const groupSpecs = specs.filter((spec) => spec.path[0] === group && spec.hidden !== true)
-  const lines = [`orca ${group}`, '', `Usage: orca ${group} <command> [options]`, '', 'Commands:']
+  const lines = [`girra ${group}`, '', `Usage: girra ${group} <command> [options]`, '', 'Commands:']
   for (const spec of groupSpecs) {
     lines.push(`  ${spec.path.slice(1).join(' ').padEnd(18)} ${spec.summary}`)
   }
-  lines.push('', `Run \`orca ${group} <command> --help\` for command-specific usage.`)
+  lines.push('', `Run \`girra ${group} <command> --help\` for command-specific usage.`)
   return lines.join('\n')
 }
 
@@ -279,7 +279,7 @@ export function formatFlagHelp(flag: string): string {
     expression: '--expression <js>     JavaScript expression to evaluate',
     amount: '--amount <pixels>      Scroll distance in pixels',
     index: '--index <n>            Tab index to switch to',
-    page: '--page <id>            Stable browser page id from `orca tab list --json`',
+    page: '--page <id>            Stable browser page id from `girra tab list --json`',
     profile: '--profile <id>        Browser profile id',
     'show-profile': '--show-profile        Include tab profile in text output',
     'no-ua-spoof': "--no-ua-spoof         Keep Electron's native user agent",

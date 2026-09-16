@@ -174,7 +174,8 @@ export function renderResolvedOrchestrationCommand(
   env: NodeJS.ProcessEnv = process.env
 ): string {
   const parts = parseCommandLine(command)
-  if (parts?.[0] !== 'orca') {
+  // Why both: a host on an older build still emits the pre-rename token.
+  if (parts?.[0] !== 'girra' && parts?.[0] !== 'orca') {
     return command
   }
   return renderCommand([executable, ...parts.slice(1)], platform, env)

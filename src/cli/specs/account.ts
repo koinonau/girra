@@ -8,23 +8,23 @@ export const ACCOUNT_COMMAND_SPECS: CommandSpec[] = [
   {
     path: ['account', 'add'],
     summary: 'Add a managed Claude account by signing in on this Girra host',
-    usage: 'orca account add [--agent claude] [--json]',
+    usage: 'girra account add [--agent claude] [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'agent'],
     notes: [
       'Runs `claude login` in this terminal, then registers the account with the local Girra runtime.',
       'Sign in with the account you want to add (e.g. use a private/incognito browser window for a second account).',
       '--agent defaults to claude. Requires the Girra runtime to be running on this machine.'
     ],
-    examples: ['orca account add']
+    examples: ['girra account add']
   },
   {
     path: ['account', 'list'],
     summary: 'List managed Claude accounts on this Girra host',
-    usage: 'orca account list [--json]',
+    usage: 'girra account list [--json]',
     allowedFlags: [...GLOBAL_FLAGS],
     notes: [
       'Lists the accounts on this machine. `--environment` / `--pairing-code` are rejected rather than ignored; run it on the host whose accounts you want to see.'
     ],
-    examples: ['orca account list']
+    examples: ['girra account list']
   }
 ]

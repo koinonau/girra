@@ -1,4 +1,5 @@
 import { safeStorage } from 'electron'
+import { decryptSealedSecret } from '../host/legacy-orca-safe-storage'
 import { existsSync, readFileSync, rmSync } from 'node:fs'
 import { homedir } from 'node:os'
 import { join } from 'node:path'
@@ -74,13 +75,13 @@ function readEnvelope(envelope: MiniMaxCookieEnvelope): string {
   if (!safeStorage.isEncryptionAvailable()) {
     throw new Error('MiniMax session cookie could not be decrypted')
   }
-  return safeStorage.decryptString(envelope.payload)
+  return decryptSealedSecret(envelope.payload)
 }
 
 function readLegacyCookie(raw: Buffer): string {
   if (safeStorage.isEncryptionAvailable()) {
     try {
-      return safeStorage.decryptString(raw)
+      return decryptSealedSecret(raw)
     } catch {
       const plaintext = raw.toString('utf8')
       if (looksLikeCookieHeader(plaintext)) {

@@ -48,17 +48,17 @@ function fail(message) {
 }
 
 /**
- * Prefer the CLI built from this checkout over whatever `orca` is on PATH: it is the
- * version under test, and a CI runner has no installed Orca app to fall back on.
+ * Prefer the CLI built from this checkout over whatever `girra` is on PATH: it is the
+ * version under test, and a CI runner has no installed Girra app to fall back on.
  */
 function resolveCli() {
   const built = join(projectDir, 'out', 'cli', 'index.js')
   return existsSync(built)
     ? { command: process.execPath, prefix: [built] }
-    : { command: 'orca', prefix: [] }
+    : { command: 'girra', prefix: [] }
 }
 
-/** The `orca` CLI, driven with an explicit pairing code so it targets this server only. */
+/** The `girra` CLI, driven with an explicit pairing code so it targets this server only. */
 function orca(pairingCode, args) {
   const cli = resolveCli()
   const result = spawnSync(

@@ -1,20 +1,20 @@
-; electron-builder NSIS hooks for the Orca Windows installer.
+; electron-builder NSIS hooks for the Girra Windows installer.
 ;
 ; electron-builder accepts exactly ONE `nsis.include` file, so every customInstall /
-; customUnInstall hook Orca needs lives here.
+; customUnInstall hook Girra needs lives here.
 
 ; ---------------------------------------------------------------------------
-; Markdown "Open with Orca" (issue #10138)
+; Markdown "Open with Girra" (issue #10138)
 ;
 ; Why hand-rolled instead of electron-builder's `fileAssociations` on Windows:
 ; app-builder-lib emits !insertmacro APP_ASSOCIATE, whose first line is
 ;   WriteRegStr SHELL_CONTEXT "Software\Classes\.md" "" "<ProgID>"
 ; That overwrites whichever editor currently owns .md, with no backup, for every
 ; existing user on their next UPDATE - and APP_UNASSOCIATE never restores it, so
-; uninstalling Orca would leave .md pointing at a deleted ProgID.
+; uninstalling Girra would leave .md pointing at a deleted ProgID.
 ;
 ; These writes are additive only. Registering a ProgID plus an OpenWithProgids
-; hint and an Applications\<exe>\SupportedTypes entry puts Orca in Explorer's
+; hint and an Applications\<exe>\SupportedTypes entry puts Girra in Explorer's
 ; "Open with" list and in "Choose another app", while the default handler stays
 ; exactly where the user left it. Never add a `Software\Classes\.<ext>` default
 ; value here.
@@ -22,7 +22,7 @@
 ; MARKDOWN_PROGID must stay in sync with the extension list handled by
 ; isMarkdownDocumentName() in src/main/ipc/markdown-documents.ts.
 ; ---------------------------------------------------------------------------
-!define MARKDOWN_PROGID "Orca.Markdown"
+!define MARKDOWN_PROGID "Girra.Markdown"
 
 !macro ORCA_REGISTER_MARKDOWN_OPEN_WITH EXT
   WriteRegNone SHELL_CONTEXT "Software\Classes\${EXT}\OpenWithProgids" "${MARKDOWN_PROGID}"
@@ -50,7 +50,7 @@
 ; Clean up the relocated terminal daemon on a REAL uninstall.
 ;
 ; Why: the daemon host is deliberately copied OUT of the install dir into
-; %LOCALAPPDATA%\Orca\daemon-host so that app UPDATES cannot kill it —
+; %LOCALAPPDATA%\Girra\daemon-host so that app UPDATES cannot kill it —
 ; electron-builder's kill sweep selects processes whose image path is under
 ; $INSTDIR, and that relocation is what keeps terminals alive across updates.
 ; The same design means a normal uninstall's process sweep and file removal both
@@ -93,7 +93,7 @@
     Pop $0
     ; Give the OS a moment to release the image lock before removing the tree.
     Sleep 500
-    RMDir /r "$LOCALAPPDATA\Orca\daemon-host"
+    RMDir /r "$LOCALAPPDATA\Girra\daemon-host"
   ${endIf}
   ; Why outside the ${isUpdated} guard: customInstall rewrites these on every update, so
   ; dropping them during uninstallOldVersion is correct and keeps the pair symmetric.

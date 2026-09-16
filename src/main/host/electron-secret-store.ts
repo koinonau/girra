@@ -1,5 +1,6 @@
 import { safeStorage } from 'electron'
 import type { SecretStore } from '../../shared/secret-store'
+import { decryptSealedSecret } from './legacy-orca-safe-storage'
 
 /**
  * Electron-backed SecretStore for the desktop app: a pass-through to
@@ -15,7 +16,8 @@ export class ElectronSecretStore implements SecretStore {
   }
 
   decryptString(cipher: Buffer): string {
-    return safeStorage.decryptString(cipher)
+    // Why: the rename moved the keychain key, so secrets sealed as Orca need the old one.
+    return decryptSealedSecret(cipher)
   }
 
   describeProtectionGap(): string | null {

@@ -145,7 +145,7 @@ export function runMainProcessPreflight(options: MainProcessPreflightOptions): b
   // Safe this early: ElectronAppEnvironment holds no state and calls `app` lazily per accessor, so it
   // changes no timing, and initDataPath only joins strings.
   setAppEnvironment(new ElectronAppEnvironment())
-  // Why captured now: after the dev/E2E override above, and before app.setName('Orca') (whenReady)
+  // Why captured now: after the dev/E2E override above, and before app.setName('Girra') (whenReady)
   // changes how userData resolves on a case-sensitive filesystem. See persistence.ts:20-28.
   initDataPath()
   state.startupDiagnosticsEnabled = isStartupDiagnosticsEnabled()

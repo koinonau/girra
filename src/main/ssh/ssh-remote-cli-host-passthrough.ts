@@ -111,7 +111,8 @@ export function buildHostCliEnv(args: {
   // subprocess cwd cannot be chdir'd there; ORCA_CLI_CWD carries it for
   // cwd-based selectors like `--worktree active`.
   env.ORCA_CLI_CWD = args.remoteCwd
-  // Why: recovery commands run on the SSH execution host through its relay shim.
+  // Why: recovery commands run on the SSH execution host through its relay shim, and a remote on an
+  // older build has only the pre-rename name; `orca` stays an installed alias on every new one.
   env.ORCA_CLI_COMMAND = 'orca'
   // Why: same node-mode hygiene as the shipped CLI launchers — stash and clear
   // NODE_OPTIONS so Electron's node bootstrap does not inherit them.

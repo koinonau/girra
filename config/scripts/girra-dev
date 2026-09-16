@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Dev CLI wrapper — uses a separate userData path to avoid clobbering production Orca data.
+# Dev CLI wrapper — uses a separate userData path to avoid clobbering production Girra data.
 set -euo pipefail
 
-# Resolve through symlinks so this works when called via /usr/local/bin/orca-dev
+# Resolve through symlinks so this works when called via /usr/local/bin/girra-dev
 SOURCE="$0"
 while [ -L "$SOURCE" ]; do
   DIR="$(cd "$(dirname "$SOURCE")" && pwd)"
@@ -14,7 +14,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 CLI_ENTRY="$REPO_ROOT/out/cli/index.js"
 
 if [ ! -f "$CLI_ENTRY" ]; then
-  echo "orca-dev: CLI not built yet. Run 'pnpm run build:cli' first." >&2
+  echo "girra-dev: CLI not built yet. Run 'pnpm run build:cli' first." >&2
   exit 1
 fi
 

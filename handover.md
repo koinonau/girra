@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-16: Phases 0 to 6, 7a, the remote serving cleanup and kothar install, the ADRs and the cross-version harness deletion are merged. Phase 7b's text sweep, which renames displayed "Orca" to "Girra", is in its pull request; its identity constants and CLI rename are the next story.
+As of 2026-09-16: Phases 0 to 6, 7a, the remote serving cleanup and kothar install and Phase 7b's text sweep are merged, with the ADRs and the cross-version harness deletion. Phase 7b's identity constants and CLI rename are in their pull request.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -27,7 +27,8 @@ As of 2026-09-16: Phases 0 to 6, 7a, the remote serving cleanup and kothar insta
 - Phase 5e merged in [#22](https://github.com/koinonau/girra/pull/22): `TuiAgent` and every registry shrunk to `claude`, `claude-agent-teams`, `opencode` and `pi`; the agent trust preset system, the `codex-cli/command.ts` shim, the Codex-only e2e specs and the dropped agents' icons and docs deleted; about 1,000 test files retargeted. 71 files deleted, 20,787 lines removed.
 - The remote serving cleanup and kothar install merged in [#23](https://github.com/koinonau/girra/pull/23): it removes `serve --mobile-pairing`, the mobile device scope, the mobile RPC allowlist, E2EE version 2, the mobile markdown tab and notification RPCs, and the remote skill install API and relay handler, and adds "Install kothar" to the Skills page. 163 files deleted, 27,661 lines removed.
 - Phase 7a merged in [#16](https://github.com/koinonau/girra/pull/16): the in-app feedback form and the plugin kill-list fetch, the last calls to Orca's servers apart from the Help menu links. 22 files deleted, 4,552 lines removed.
-- The Phase 7b text sweep renames displayed capital `Orca` to `Girra` across the six locale catalogues and their pinned override scripts, the renderer, shared and preload strings, the main process, CLI and relay, the skill guides and the documentation: 1,958 files changed, 7,829 lines added and 7,827 removed, measured with `git diff --cached --shortstat main` (2026-09-16). Its pull request: `gh pr list --repo koinonau/girra`.
+- The Phase 7b text sweep renames displayed capital `Orca` to `Girra` across the six locale catalogues and their pinned override scripts, the renderer, shared and preload strings, the main process, CLI and relay, the skill guides and the documentation. It merged in [#24](https://github.com/koinonau/girra/pull/24): 1,958 files changed, 7,829 lines added and 7,827 removed.
+- Phase 7b's identity constants move what the operating system sees: `productName` `Girra`, `appId` `com.koinonau.girra` with the native Swift owner check, the executable names, the NSIS product id, the Windows daemon host root, the Casks, and the CLI installed as `girra` with `orca`, `orca-ide` and `orca-dev` kept as aliases: 309 files changed, 2,357 lines added and 2,012 removed, measured with `git diff --cached --shortstat main` (2026-09-16). Its pull request: `gh pr list --repo koinonau/girra`.
 
 ## Files
 
@@ -241,6 +242,15 @@ After the Phase 7b text sweep, on 2026-09-16 (same `PATH` and `DEVELOPER_DIR`):
 | `pnpm lint` | 0 | 41 s | Clean, 112 reliability gates |
 | `pnpm build` | 0 | 15 s | Renderer 11,961 modules |
 
+After Phase 7b's identity constants, on 2026-09-16 (same `PATH` and `DEVELOPER_DIR`):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 5 s | No errors |
+| `pnpm test` | 1 | 550 s | Files: 8 failed, 7,679 passed, 45 skipped of 7,732. Four are the known failures; the other four are `src/main/cli` installer tests asserting the "non-Orca command" refusal text the lead renamed. Renamed and passing, 211 tests |
+| `pnpm lint` | 0 | 42 s | Clean, 112 reliability gates |
+| `pnpm build` | 0 | 33 s | Renderer 11,961 modules |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -347,6 +357,11 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-16 (user): the rename ships a first-run migration. It copies the old user-data directory forward and re-encrypts safe-storage secrets while the old key still reads, leaving the originals in place. The only existing helper is `migrateMobilePairingDataToCanonicalUserDataPath` (`src/main/persistence/loading-store/user-data-path.ts:66`), which copies two files; its guards and comment are the template.
 - 2026-09-16 (user): the CLI installs as both `girra` and `orca`, with `girra` primary, so hook scripts, skill guides and SSH hosts already written against `orca` keep working. Retire the alias in a later story.
 - 2026-09-16: the Girra text sweep renames displayed capital `Orca` only. Kept: install and bundle paths derived from `productName`, `TERM_PROGRAM: 'Orca'` (third-party tools match it), `X-Orca-*` headers, `'Orca Nerd Font Symbols'`, GNOME Orca, the marine creature, `'Claude Code-credentials'`, upstream URLs and community labels, fixture repositories named Orca, and every lowercase `orca` code token. The locale toolchain lost its killer-whale brand repairs (`BRAND_MISTRANSLATIONS` and the re-Latinisation block in `locale-translation-policy.mjs`), which existed only to undo machine translations of "Orca".
+- 2026-09-16 (user): a packaged Girra does not adopt the installed Orca.app's profile. The two stay separate, so Orca keeps working and Girra never touches another app's live data.
+- 2026-09-16: what the rename actually breaks, measured rather than assumed. The dev profile keeps its own directory (`orca-dev`, pinned in `configure-process.ts`), and Windows and Linux resolve their user-data directory from `package.json`'s `name`, still `orca`, because the file carries no `productName`. So only macOS moves, and a packaged Girra has no earlier profile of its own. The one real loss is the macOS safe-storage key, which Electron names after the app.
+- 2026-09-16: instead of a bulk re-encryption, `decryptSealedSecret` in `src/main/host/legacy-orca-safe-storage.ts` reads the old key when the current one fails: it finds the pre-rename keychain item, derives Chromium's PBKDF2 key and decrypts the `v10` AES-128-CBC blob. Every secret path routes through it (the secret store port, both MiniMax stores, plugin secrets). Nothing is rewritten, so a failed read loses nothing and the next save reseals under the new key. `ORCA_CLAUDE_SERVICE` keeps its Orca name for the same reason: renaming it would orphan every managed Claude account behind a keychain prompt.
+- 2026-09-16: `TERM_PROGRAM` stays `'Orca'`. Nothing in the repo reads it; the readers are third-party tools that feature-gate on the value.
+- 2026-09-16: the CLI is `girra`, with `orca`, `orca-ide` and `orca-dev` shipped as aliases in the same directory every managed terminal puts on `PATH`, so hook scripts and SSH hosts written against the old name keep working. `girra` and `girra-dev` are normalised to the legacy token before crossing the orchestration RPC wire, because an older host's strict enum would reject them.
 - 2026-09-16: two string pairs are parsed as well as displayed, so their text and their parser moved together: `ORCA_DISPATCH_STATUS_PREAMBLE_PREFIX` with `orchestration/preamble.ts`, and `ORCA_LINE_PREFIX` with the truncation marker in `journal-payload-bounds.ts`. A capital-only sweep also misses lowercased copies compared with `toLowerCase()` or an `/i` regex; three existed in `src/shared`.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
@@ -402,6 +417,7 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-16 | After a restart, macOS required the Xcode licence again, so `/usr/bin/git` and `/usr/bin/python3` exit 69 and a scripted edit through them silently changes nothing | Two agents re-ran edits; one `git rm` did nothing until redone | Put `/opt/homebrew/bin` first on `PATH` and set `DEVELOPER_DIR=/Library/Developer/CommandLineTools` for native builds until the user runs `sudo xcodebuild -license accept` |
 | 2026-09-16 | Running `pnpm exec` in a temporary worktree whose `node_modules` symlinks to the main repo runs postinstall, which wipes node-pty's native build in the shared `node_modules` | PTY tests failed spuriously until a rebuild | Never share `node_modules` into a temporary worktree; rebuild with `node config/scripts/ensure-native-runtime.mjs --runtime=node` |
 | 2026-09-16 | A capital-only rename misses lowercased copies of the same prose used by `toLowerCase()` comparisons and `/i` regexes, and copies written after an escape such as `\nOrca:`, which no `\bOrca\b` matches | Would have killed remote-runtime auto-reconnect silently; caught by an agent's own sweep | After a prose rename, sweep `rg -i` and `rg '\\[nrt]Orca'` as well, and read the matches by neighbour character |
+| 2026-09-16 | A `package.json` `bin` change makes pnpm install before every `pnpm run`, and that postinstall rebuild needs `DEVELOPER_DIR` while the Xcode licence is unaccepted | Agents chased a broken node-pty build twice | Run vitest directly (`mise exec -- node node_modules/vitest/vitest.mjs run --config config/vitest.config.ts <files>`) or export `DEVELOPER_DIR=/Library/Developer/CommandLineTools` |
 | 2026-09-16 | Tests in `config/scripts` assert the prose of files that agents own, so a rename splits across ownership areas and the area owner never runs them | Four skill-guidance test files failed in the full suite | Give the lead every test outside the areas, and run the full suite before calling a sweep done |
 | 2026-09-16 | After a `package.json` or lockfile change, pnpm 12 installs before `pnpm run`, and the postinstall native rebuild fails without `DEVELOPER_DIR`, leaving node-pty unbuilt | One rebuild | Update the lockfile with `pnpm install --lockfile-only`, then run `DEVELOPER_DIR=/Library/Developer/CommandLineTools node config/scripts/rebuild-native-deps.mjs` before any other pnpm command |
 | 2026-09-15 | The build plan omitted feature-tree drops that live outside its deletion table (feature wall, tours, onboarding) and misread `UsagePage.tsx` as a real dashboard | Caught only when Phase 6 was mapped | Diff the tree's unticked entries against the plan's phases before calling the plan complete |

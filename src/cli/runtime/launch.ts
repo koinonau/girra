@@ -244,7 +244,7 @@ function getExecutableSpawnOptions(executable: string): Pick<SpawnOptions, 'shel
 
 function resolveAppRoot(): string {
   // Why: dev-mode resource resolution in the Electron child may consult
-  // process.cwd(). Pin it to the app root so `orca serve` behaves the same
+  // process.cwd(). Pin it to the app root so `girra serve` behaves the same
   // regardless of the shell directory it was launched from.
   return resolve(__dirname, '../../..')
 }

@@ -52,7 +52,7 @@ const helperAppPath = path.join(
   'computer-use-macos',
   '.build',
   'release',
-  'Orca Computer Use.app'
+  'Girra Computer Use.app'
 )
 const helperPath = path.join(helperAppPath, 'Contents', 'MacOS', 'orca-computer-use-macos')
 

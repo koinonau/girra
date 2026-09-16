@@ -100,7 +100,7 @@
       "config/scripts/node-pty-master-cloexec-patch.test.mjs": 22,
       "config/scripts/node-pty-windows-pty-teardown-patch.test.mjs": 59,
       "config/scripts/orca-cli-skill-guidance.test.mjs": 14,
-      "config/scripts/orca-dev-bin.test.mjs": 68,
+      "config/scripts/girra-dev-bin.test.mjs": 68,
       "config/scripts/orca-linear-skill-guidance.test.mjs": 15,
       "config/scripts/orcad-operations-restart-safety.test.mjs": 5,
       "config/scripts/orchestration-guide-command-contract.test.mjs": 11,

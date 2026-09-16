@@ -25,23 +25,23 @@ export const AUTOMATION_COMMAND_SPECS: CommandSpec[] = [
   {
     path: ['automations', 'list'],
     summary: 'List scheduled Girra automations',
-    usage: 'orca automations list [--json]',
+    usage: 'girra automations list [--json]',
     allowedFlags: [...GLOBAL_FLAGS],
-    examples: ['orca automations list', 'orca automations list --json']
+    examples: ['girra automations list', 'girra automations list --json']
   },
   {
     path: ['automations', 'show'],
     summary: 'Show one Girra automation',
-    usage: 'orca automations show <id> [--json]',
+    usage: 'girra automations show <id> [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'id'],
     positionalArgs: ['id'],
-    examples: ['orca automations show 2f9e...', 'orca automations show --id 2f9e... --json']
+    examples: ['girra automations show 2f9e...', 'girra automations show --id 2f9e... --json']
   },
   {
     path: ['automations', 'create'],
     summary: 'Create a scheduled Girra automation',
     usage:
-      'orca automations create --name <name> --trigger <preset|cron|rrule> --prompt <text> --provider <agent> [--precheck <command>] [--repo <selector>|--workspace <selector>|--project <id> [--host <id>]|--project-host-setup <id>] [--json]',
+      'girra automations create --name <name> --trigger <preset|cron|rrule> --prompt <text> --provider <agent> [--precheck <command>] [--repo <selector>|--workspace <selector>|--project <id> [--host <id>]|--project-host-setup <id>] [--json]',
     allowedFlags: [
       ...GLOBAL_FLAGS,
       'name',
@@ -56,22 +56,22 @@ export const AUTOMATION_COMMAND_SPECS: CommandSpec[] = [
       'Trigger accepts hourly, daily, weekdays, weekly, a 5-field cron expression, or an RRULE string.',
       'When --repo is omitted, the CLI uses the enclosing Girra worktree when one can be resolved from cwd.',
       'Use --project with --host, or --project-host-setup, to run on a specific project host setup.',
-      '--host runtime:<environment-id> targets that paired Girra server; use the id from `orca environment list`, not the environment name.',
+      '--host runtime:<environment-id> targets that paired Girra server; use the id from `girra environment list`, not the environment name.',
       'Use --source-context with a JSON TaskSourceContext when task/provider data should come from a specific host/account; pass null on edit to clear it.',
       'Use --workspace to run in an existing worktree; otherwise the automation creates a new worktree per run.',
       'Use --precheck to run a bounded command before scheduled runs; exit code 0 continues, anything else records a skipped run.',
       'Use --reuse-session only with existing-workspace automations to submit later runs to the previous live automation session when it is still available. Use --fresh-session to disable reuse.'
     ],
     examples: [
-      'orca automations create --name "Daily review" --trigger daily --prompt "Review open changes" --provider claude',
-      'orca automations create --name "Weekday triage" --trigger "0 9 * * 1-5" --prompt "Triage issues" --provider claude --repo my-repo',
-      'orca automations create --name "PR review" --trigger hourly --precheck "gh pr list --json number -q .[0].number" --prompt "Review requested PRs" --provider claude'
+      'girra automations create --name "Daily review" --trigger daily --prompt "Review open changes" --provider claude',
+      'girra automations create --name "Weekday triage" --trigger "0 9 * * 1-5" --prompt "Triage issues" --provider claude --repo my-repo',
+      'girra automations create --name "PR review" --trigger hourly --precheck "gh pr list --json number -q .[0].number" --prompt "Review requested PRs" --provider claude'
     ]
   },
   {
     path: ['automations', 'edit'],
     summary: 'Edit a Girra automation',
-    usage: 'orca automations edit <id> [--name <name>] [--trigger <preset|cron|rrule>] [--json]',
+    usage: 'girra automations edit <id> [--name <name>] [--trigger <preset|cron|rrule>] [--json]',
     allowedFlags: [
       ...GLOBAL_FLAGS,
       'id',
@@ -85,32 +85,32 @@ export const AUTOMATION_COMMAND_SPECS: CommandSpec[] = [
     ],
     positionalArgs: ['id'],
     examples: [
-      'orca automations edit 2f9e... --disabled',
-      'orca automations edit --id 2f9e... --trigger "30 * * * *" --json'
+      'girra automations edit 2f9e... --disabled',
+      'girra automations edit --id 2f9e... --trigger "30 * * * *" --json'
     ]
   },
   {
     path: ['automations', 'remove'],
     destructive: true,
     summary: 'Remove a Girra automation and its run history',
-    usage: 'orca automations remove <id> [--json]',
+    usage: 'girra automations remove <id> [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'id'],
     positionalArgs: ['id'],
-    examples: ['orca automations remove 2f9e...', 'orca automations remove --id 2f9e... --json']
+    examples: ['girra automations remove 2f9e...', 'girra automations remove --id 2f9e... --json']
   },
   {
     path: ['automations', 'run'],
     summary: 'Run a Girra automation now',
-    usage: 'orca automations run <id> [--json]',
+    usage: 'girra automations run <id> [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'id'],
     positionalArgs: ['id'],
-    examples: ['orca automations run 2f9e...', 'orca automations run --id 2f9e... --json']
+    examples: ['girra automations run 2f9e...', 'girra automations run --id 2f9e... --json']
   },
   {
     path: ['automations', 'runs'],
     summary: 'List automation run history',
-    usage: 'orca automations runs [--id <automation-id>] [--json]',
+    usage: 'girra automations runs [--id <automation-id>] [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'id'],
-    examples: ['orca automations runs', 'orca automations runs --id 2f9e... --json']
+    examples: ['girra automations runs', 'girra automations runs --id 2f9e... --json']
   }
 ]

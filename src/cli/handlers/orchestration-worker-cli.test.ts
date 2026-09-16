@@ -243,8 +243,8 @@ describe('orchestration worker-start CLI contract', () => {
           effects: [],
           residualResources: [],
           nextCommands: [
-            'orca orchestration worker-show --dispatch ctx_unknown --json',
-            'orca orchestration worker-abandon --dispatch ctx_unknown --json'
+            'girra orchestration worker-show --dispatch ctx_unknown --json',
+            'girra orchestration worker-abandon --dispatch ctx_unknown --json'
           ]
         }
       })
@@ -283,7 +283,7 @@ describe('orchestration worker-start CLI contract', () => {
         state: 'failed',
         failedStage: 'dispatch_input',
         lastError:
-          'The target terminal is in Structured Chat. Switch it to Terminal, then retry `orca orchestration worker-start`.',
+          'The target terminal is in Structured Chat. Switch it to Terminal, then retry `girra orchestration worker-start`.',
         effects: [],
         residualResources: []
       }
@@ -316,9 +316,9 @@ describe('orchestration worker-start CLI contract', () => {
         state: 'failed',
         failedStage: 'dispatch_input',
         lastError:
-          'The target terminal is in Structured Chat. Switch it to Terminal, then retry `orca orchestration worker-start`.'
+          'The target terminal is in Structured Chat. Switch it to Terminal, then retry `girra orchestration worker-start`.'
       })
-    ).toMatch(/Structured Chat.*Switch it to Terminal.*orca orchestration worker-start/s)
+    ).toMatch(/Structured Chat.*Switch it to Terminal.*girra orchestration worker-start/s)
   })
 
   it('prints a reveal warning for a live background worker', async () => {

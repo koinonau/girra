@@ -56,10 +56,10 @@ describe('buildAgentStartupPlan', () => {
       })
     ).toEqual({
       agent: 'claude-agent-teams',
-      launchCommand: 'orca claude-teams',
+      launchCommand: 'girra claude-teams',
       expectedProcess: 'claude',
       followupPrompt: 'Refactor the parser',
-      launchConfig: emptyLaunchConfig('orca claude-teams')
+      launchConfig: emptyLaunchConfig('girra claude-teams')
     })
   })
 

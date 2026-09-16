@@ -142,14 +142,14 @@ describe('tui agent startup plans', () => {
       allowEmptyPromptLaunch: true
     })
 
-    expect(plan?.launchCommand).toBe('orca-ide claude-teams')
+    expect(plan?.launchCommand).toBe('girra claude-teams')
   })
 
-  it('uses the plain orca shim for Claude Agent Teams on Linux SSH remotes', () => {
-    // Why: the SSH relay deploys the CLI shim as `orca` (not the local-only
-    // `orca-ide` GNOME-screen-reader workaround), so a remote launch must not
-    // emit `orca-ide claude-teams` — that name is not on the remote PATH and
-    // `claude-teams` is rejected by the relay's CLI switch (issue #6500).
+  it('uses the same Girra shim for Claude Agent Teams on Linux SSH remotes', () => {
+    // Why: the SSH relay deploys the CLI shim as `girra`, the same name a local
+    // Linux install registers, so remoteness must not alter the command
+    // (`claude-teams` is rejected by the relay's CLI switch under any other
+    // name, issue #6500).
     const plan = buildAgentStartupPlan({
       agent: 'claude-agent-teams',
       prompt: '',
@@ -159,11 +159,11 @@ describe('tui agent startup plans', () => {
       allowEmptyPromptLaunch: true
     })
 
-    expect(plan?.launchCommand).toBe('orca claude-teams')
+    expect(plan?.launchCommand).toBe('girra claude-teams')
   })
 
-  it('keeps the Windows orca.cmd shim for Claude Agent Teams on SSH remotes', () => {
-    // Why: the Windows remote shim is also `orca.cmd`, matching the local
+  it('keeps the Windows girra.cmd shim for Claude Agent Teams on SSH remotes', () => {
+    // Why: the Windows remote shim is also `girra.cmd`, matching the local
     // win32 override, so remoteness must not alter the Windows command.
     const plan = buildAgentStartupPlan({
       agent: 'claude-agent-teams',
@@ -174,13 +174,12 @@ describe('tui agent startup plans', () => {
       allowEmptyPromptLaunch: true
     })
 
-    expect(plan?.launchCommand).toBe('orca.cmd claude-teams')
+    expect(plan?.launchCommand).toBe('girra.cmd claude-teams')
   })
 
-  it('keeps the Linux orca-ide wrapper for local (non-remote) Claude Agent Teams', () => {
-    // Why: the `orca-ide` rename is still required for a local Linux desktop
-    // install (avoids shadowing the GNOME Orca screen reader), so an explicit
-    // isRemote:false must preserve it.
+  it('keeps the Linux girra wrapper for local (non-remote) Claude Agent Teams', () => {
+    // Why: an explicit isRemote:false must resolve the same platform command
+    // the default does.
     const plan = buildAgentStartupPlan({
       agent: 'claude-agent-teams',
       prompt: '',
@@ -190,7 +189,7 @@ describe('tui agent startup plans', () => {
       allowEmptyPromptLaunch: true
     })
 
-    expect(plan?.launchCommand).toBe('orca-ide claude-teams')
+    expect(plan?.launchCommand).toBe('girra claude-teams')
   })
 
   it('launches stdin agents through their launch command and expected process', () => {
@@ -203,10 +202,10 @@ describe('tui agent startup plans', () => {
 
     expect(plan).toEqual({
       agent: 'claude-agent-teams',
-      launchCommand: 'orca claude-teams',
+      launchCommand: 'girra claude-teams',
       expectedProcess: 'claude',
       followupPrompt: 'fix it',
-      launchConfig: { agentCommand: 'orca claude-teams', agentArgs: '', agentEnv: {} }
+      launchConfig: { agentCommand: 'girra claude-teams', agentArgs: '', agentEnv: {} }
     })
   })
 
@@ -406,7 +405,7 @@ describe('tui agent startup plans', () => {
       platform: 'darwin'
     })
 
-    expect(plan?.launchCommand).toBe("orca claude-teams '--add-dir' '*'")
+    expect(plan?.launchCommand).toBe("girra claude-teams '--add-dir' '*'")
   })
 
   it('clears draft environment variables with the target shell syntax', () => {
@@ -462,11 +461,11 @@ describe('tui agent startup plans', () => {
     })
     expect(plan).toEqual({
       agent: 'claude-agent-teams',
-      launchCommand: "orca claude-teams '--dangerously-skip-permissions'",
+      launchCommand: "girra claude-teams '--dangerously-skip-permissions'",
       expectedProcess: 'claude',
       followupPrompt: 'fix the tests',
       launchConfig: {
-        agentCommand: "orca claude-teams '--dangerously-skip-permissions'",
+        agentCommand: "girra claude-teams '--dangerously-skip-permissions'",
         agentArgs: '--dangerously-skip-permissions',
         agentEnv: {}
       }

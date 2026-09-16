@@ -5,17 +5,17 @@
       "name": "computer-use",
       "sourcePath": "skills/computer-use",
       "releaseRevision": 9,
-      "packageDigest": "aa5a50f1f2c0b2732b8b27f19b7871bf0e98445cd74a296f9e6230400df8c15a",
-      "gitTreeSha": "05ae5b6c71c34d9f1f8d19c0e885ee2397056efd",
+      "packageDigest": "59b3c05c449715cee0c3d0faabaf1244f3f4b4e811902bc1d76158a51a0d1c83",
+      "gitTreeSha": "0a24b68b1fb2863b3a80ec1997e176b2ca3c7bfa",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 1873,
+          "size": 1964,
           "executable": false,
           "classification": "text",
-          "exactSha256": "b2d4c8a4a095544370ee0980af47a56a4a5278403d786e32135ec4d297415c22",
-          "textNormalizedSha256": "b2d4c8a4a095544370ee0980af47a56a4a5278403d786e32135ec4d297415c22",
-          "identitySha256": "b2d4c8a4a095544370ee0980af47a56a4a5278403d786e32135ec4d297415c22"
+          "exactSha256": "f2fe6959f15b7ad7ea593e472b54ca703e9ba1b917090916e902f33f385f3e28",
+          "textNormalizedSha256": "f2fe6959f15b7ad7ea593e472b54ca703e9ba1b917090916e902f33f385f3e28",
+          "identitySha256": "f2fe6959f15b7ad7ea593e472b54ca703e9ba1b917090916e902f33f385f3e28"
         }
       ]
     },
@@ -23,17 +23,17 @@
       "name": "linear-tickets",
       "sourcePath": "skills/linear-tickets",
       "releaseRevision": 11,
-      "packageDigest": "0ac6e329ea49348ca217d39e1dc1675e657c3ab722b7c99aeb58c44129810dc7",
-      "gitTreeSha": "a8d14af32f10eac01d54ac86f6e5a27011a18e9a",
+      "packageDigest": "6009ef412a3df5a2d1da57a8a10f8aa7048d9e6a0df717c1eaf5d6eb214d121b",
+      "gitTreeSha": "5500fceb4777422e41cf07de6e4b0df4e2419381",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2077,
+          "size": 2167,
           "executable": false,
           "classification": "text",
-          "exactSha256": "129f1a04411800de883821e169d33a098b08f892fee60e6d002891097c4901bf",
-          "textNormalizedSha256": "129f1a04411800de883821e169d33a098b08f892fee60e6d002891097c4901bf",
-          "identitySha256": "129f1a04411800de883821e169d33a098b08f892fee60e6d002891097c4901bf"
+          "exactSha256": "42da8718d1f163d7ca0b4bd65375233a43274e76a701b23ff3066f808e0272df",
+          "textNormalizedSha256": "42da8718d1f163d7ca0b4bd65375233a43274e76a701b23ff3066f808e0272df",
+          "identitySha256": "42da8718d1f163d7ca0b4bd65375233a43274e76a701b23ff3066f808e0272df"
         }
       ]
     },
@@ -41,17 +41,17 @@
       "name": "orca-cli",
       "sourcePath": "skills/orca-cli",
       "releaseRevision": 37,
-      "packageDigest": "42bb83612daa79f23184cf5642652d78dd33c8101012509ab0caad15c79d28c3",
-      "gitTreeSha": "627889366f969b02187c6363bae9f102ab061aaa",
+      "packageDigest": "e4988a3861245e7eec1de7e9f75b7fe2aedb47a01e5db391c57dab9d15c4bbbf",
+      "gitTreeSha": "edf66347cfd591b37585f4cd3372f5eb88247bf6",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2185,
+          "size": 2276,
           "executable": false,
           "classification": "text",
-          "exactSha256": "988ccffce08d028ff9d5eb92a87602ffe30caaa0492ff6a40af85dcf3c6e7e1d",
-          "textNormalizedSha256": "988ccffce08d028ff9d5eb92a87602ffe30caaa0492ff6a40af85dcf3c6e7e1d",
-          "identitySha256": "988ccffce08d028ff9d5eb92a87602ffe30caaa0492ff6a40af85dcf3c6e7e1d"
+          "exactSha256": "83de95ab1d0f6ec6e2d704ed1f1807bdea92309900e2ef57a66f61620b5302ae",
+          "textNormalizedSha256": "83de95ab1d0f6ec6e2d704ed1f1807bdea92309900e2ef57a66f61620b5302ae",
+          "identitySha256": "83de95ab1d0f6ec6e2d704ed1f1807bdea92309900e2ef57a66f61620b5302ae"
         }
       ]
     },
@@ -59,17 +59,17 @@
       "name": "orca-emulator",
       "sourcePath": "skills/orca-emulator",
       "releaseRevision": 8,
-      "packageDigest": "0c2d672366e750c772d36b268e8eb7a20504954a14ca4fa8d8cd5322a2b87a05",
-      "gitTreeSha": "732d4c695cfba638afa74a142d246d79e88a2db1",
+      "packageDigest": "8dcc4dd0f6f86e277d0a1ff8252d368a8de39c0ff66e75b68f77a36ec214d5d6",
+      "gitTreeSha": "4ca26ff2728a8c0f15f8bd6b241d9b9934c5ca41",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2188,
+          "size": 2278,
           "executable": false,
           "classification": "text",
-          "exactSha256": "8f5321fcc2e4fa5fef68f5de0e41b05c8c1f923dbf0b641d2538db415a26ef5c",
-          "textNormalizedSha256": "8f5321fcc2e4fa5fef68f5de0e41b05c8c1f923dbf0b641d2538db415a26ef5c",
-          "identitySha256": "8f5321fcc2e4fa5fef68f5de0e41b05c8c1f923dbf0b641d2538db415a26ef5c"
+          "exactSha256": "40fdc1a822d8abfac8df04ddcfe119795c20a64ec78e9855750fb1f4dffe8446",
+          "textNormalizedSha256": "40fdc1a822d8abfac8df04ddcfe119795c20a64ec78e9855750fb1f4dffe8446",
+          "identitySha256": "40fdc1a822d8abfac8df04ddcfe119795c20a64ec78e9855750fb1f4dffe8446"
         }
       ]
     },
@@ -77,17 +77,17 @@
       "name": "orca-emulator-android",
       "sourcePath": "skills/orca-emulator-android",
       "releaseRevision": 6,
-      "packageDigest": "c3eac02eedaa1947cd24827a0a1c1a7725ed50296404c083d8d2bae125a0db74",
-      "gitTreeSha": "15e52eaab221001604c306901bb00d43f92a3952",
+      "packageDigest": "6fda5f1ed1b2cd89fdd8dbff37006c55173252319c3b6b270d8efbaf9fbbf91d",
+      "gitTreeSha": "c6c5238cc42663707adce0a388a3d9df4e263a8c",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2083,
+          "size": 2173,
           "executable": false,
           "classification": "text",
-          "exactSha256": "82270eb730e5973cc5a560115b5c7238259853f521505e7d3ced3e9a0b5ba57b",
-          "textNormalizedSha256": "82270eb730e5973cc5a560115b5c7238259853f521505e7d3ced3e9a0b5ba57b",
-          "identitySha256": "82270eb730e5973cc5a560115b5c7238259853f521505e7d3ced3e9a0b5ba57b"
+          "exactSha256": "61398e4090af9edcf908263def5497ef99c4b2fc440cb971c24a15e5942fb67d",
+          "textNormalizedSha256": "61398e4090af9edcf908263def5497ef99c4b2fc440cb971c24a15e5942fb67d",
+          "identitySha256": "61398e4090af9edcf908263def5497ef99c4b2fc440cb971c24a15e5942fb67d"
         }
       ]
     },
@@ -95,17 +95,17 @@
       "name": "orca-linear",
       "sourcePath": "skills/orca-linear",
       "releaseRevision": 9,
-      "packageDigest": "ad648464f149b00094e453b4206b024502bfc43acc00012de59ec46786c21aab",
-      "gitTreeSha": "9576f5cf463813f1c62fa51157581840df658185",
+      "packageDigest": "c49f1b4909b2218ccf6a267e05f21526309a33f4766160850eaf8163ad87e89d",
+      "gitTreeSha": "e0459d24b4d2c11d3aed7696f91d3c8a5d0fc606",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 1936,
+          "size": 2026,
           "executable": false,
           "classification": "text",
-          "exactSha256": "541f4b13373c029659ef0513337d8260be9d4c1c22351963ebe36254074dca93",
-          "textNormalizedSha256": "541f4b13373c029659ef0513337d8260be9d4c1c22351963ebe36254074dca93",
-          "identitySha256": "541f4b13373c029659ef0513337d8260be9d4c1c22351963ebe36254074dca93"
+          "exactSha256": "e1f8ba3b6b110b032e99e7527ed2b869a79a8f0d49628212122124644cfd5bc4",
+          "textNormalizedSha256": "e1f8ba3b6b110b032e99e7527ed2b869a79a8f0d49628212122124644cfd5bc4",
+          "identitySha256": "e1f8ba3b6b110b032e99e7527ed2b869a79a8f0d49628212122124644cfd5bc4"
         }
       ]
     },
@@ -113,17 +113,17 @@
       "name": "orca-per-workspace-env",
       "sourcePath": "skills/orca-per-workspace-env",
       "releaseRevision": 6,
-      "packageDigest": "7ec433ac44d7ef295c5842d251de06400324081dea625720f0c129858c56dad4",
-      "gitTreeSha": "216ba36915285860df09187e7b1b2cd91eca16f7",
+      "packageDigest": "bc9bc8823743136b9c2dca9bf26f785d2fa9a8b35fb035b8314a770d764718ef",
+      "gitTreeSha": "3202527ece0c58b3e6da4a1366e7d8eb7e971c9d",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 2104,
+          "size": 2194,
           "executable": false,
           "classification": "text",
-          "exactSha256": "515829b6ef3520f91270418348c7ec4da0f4c54c73d805fd697e56a3a0c5087c",
-          "textNormalizedSha256": "515829b6ef3520f91270418348c7ec4da0f4c54c73d805fd697e56a3a0c5087c",
-          "identitySha256": "515829b6ef3520f91270418348c7ec4da0f4c54c73d805fd697e56a3a0c5087c"
+          "exactSha256": "fa2975dfb2d707016c76ed8c99127c43e6bce4a5d1d72eafc004dcd52c3d9ab4",
+          "textNormalizedSha256": "fa2975dfb2d707016c76ed8c99127c43e6bce4a5d1d72eafc004dcd52c3d9ab4",
+          "identitySha256": "fa2975dfb2d707016c76ed8c99127c43e6bce4a5d1d72eafc004dcd52c3d9ab4"
         }
       ]
     },
@@ -131,17 +131,17 @@
       "name": "orchestration",
       "sourcePath": "skills/orchestration",
       "releaseRevision": 29,
-      "packageDigest": "5bf562be7e6d67a5fb7f12d381614c09c9f821bc8a8140fc2fd21ff55e441234",
-      "gitTreeSha": "b485ef596e249f10c5a1423ceff32f26ed47b7e6",
+      "packageDigest": "c448da50d90c5c15eacc38190627534632ce2e0fb064a5e8d20c4d45b8800175",
+      "gitTreeSha": "cf76a05b6e219013b7f00bbc9fbf27af443d7e87",
       "files": [
         {
           "path": "SKILL.md",
-          "size": 3878,
+          "size": 3969,
           "executable": false,
           "classification": "text",
-          "exactSha256": "9c066b3bfb365fc446a74fff3171f43ea45674be168c7d19894876dae192a6de",
-          "textNormalizedSha256": "9c066b3bfb365fc446a74fff3171f43ea45674be168c7d19894876dae192a6de",
-          "identitySha256": "9c066b3bfb365fc446a74fff3171f43ea45674be168c7d19894876dae192a6de"
+          "exactSha256": "82d476d48ba3054d004b7cce71780b8502190b3442dfa74e57a7869580d61170",
+          "textNormalizedSha256": "82d476d48ba3054d004b7cce71780b8502190b3442dfa74e57a7869580d61170",
+          "identitySha256": "82d476d48ba3054d004b7cce71780b8502190b3442dfa74e57a7869580d61170"
         }
       ]
     }

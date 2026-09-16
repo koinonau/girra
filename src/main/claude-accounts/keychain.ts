@@ -4,6 +4,8 @@ import { realpathSync } from 'node:fs'
 import { userInfo } from 'node:os'
 
 const ACTIVE_CLAUDE_SERVICE = 'Claude Code-credentials'
+// Why the old name survives the rebrand: an opaque service string no user sees, and renaming it
+// orphans every managed account behind one macOS keychain prompt each.
 const ORCA_CLAUDE_SERVICE = 'Orca Claude Code Managed Credentials'
 const KEYCHAIN_COMMAND_TIMEOUT_MS = 3_000
 

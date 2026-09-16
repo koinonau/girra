@@ -94,6 +94,14 @@ function queuedCommand(): string {
   return mockQueueTabStartupCommand.mock.calls[0]?.[1]?.command
 }
 
+/**
+ * The launch shape is resolved from the worktree's own host row. Since the rename the CLI name is
+ * `girra` on every host, so it no longer discriminates local from remote here; these cases pin the
+ * resolution path end to end, and `repoIsRemote` itself is covered in
+ * src/shared/agent-launch-remote.test.ts.
+ */
+const AGENT_TEAMS_COMMAND = "girra claude-teams '--dangerously-skip-permissions'"
+
 describe('launchAgentInNewTab execution host resolution', () => {
   beforeEach(() => {
     vi.clearAllMocks()
@@ -123,7 +131,7 @@ describe('launchAgentInNewTab execution host resolution', () => {
 
     await launchOnLinux()
 
-    expect(queuedCommand()).toBe("orca-ide claude-teams '--dangerously-skip-permissions'")
+    expect(queuedCommand()).toBe(AGENT_TEAMS_COMMAND)
   })
 
   it('keeps a worktree on one SSH host remote while a rival row names another', async () => {
@@ -135,10 +143,10 @@ describe('launchAgentInNewTab execution host resolution', () => {
 
     await launchOnLinux()
 
-    expect(queuedCommand()).toBe("orca claude-teams '--dangerously-skip-permissions'")
+    expect(queuedCommand()).toBe(AGENT_TEAMS_COMMAND)
   })
 
-  it('keeps a runtime host reaching a nested SSH target on the relay shim name', async () => {
+  it('shapes a runtime host reaching a nested SSH target from that host', async () => {
     store.repos = [
       { id: 'repo-1', connectionId: 'nested', executionHostId: 'runtime:vm-1', path: '/srv/vm' }
     ]
@@ -146,10 +154,10 @@ describe('launchAgentInNewTab execution host resolution', () => {
 
     await launchOnLinux()
 
-    expect(queuedCommand()).toBe("orca claude-teams '--dangerously-skip-permissions'")
+    expect(queuedCommand()).toBe(AGENT_TEAMS_COMMAND)
   })
 
-  it('keeps a runtime host with no nested SSH target on the local CLI name', async () => {
+  it('shapes a runtime host with no nested SSH target from that host', async () => {
     store.repos = [
       { id: 'repo-1', connectionId: null, executionHostId: 'runtime:vm-1', path: '/srv/vm' }
     ]
@@ -157,6 +165,6 @@ describe('launchAgentInNewTab execution host resolution', () => {
 
     await launchOnLinux()
 
-    expect(queuedCommand()).toBe("orca-ide claude-teams '--dangerously-skip-permissions'")
+    expect(queuedCommand()).toBe(AGENT_TEAMS_COMMAND)
   })
 })

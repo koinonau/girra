@@ -177,16 +177,17 @@ describe('ExternalChromiumBrowserProcess', () => {
 describe('cross-platform browser provider paths', () => {
   it('resolves installed Electron launchers on macOS, Linux, and Windows', () => {
     expect(installedElectronCandidates('darwin', '/Users/test', {})).toContain(
-      '/Users/test/Applications/Orca.app/Contents/MacOS/Orca'
+      '/Users/test/Applications/Girra.app/Contents/MacOS/Girra'
     )
-    expect(installedElectronCandidates('linux', '/home/test', {})).toContain(
-      '/home/test/.local/bin/orca-ide'
-    )
+    const linuxCandidates = installedElectronCandidates('linux', '/home/test', {})
+    expect(linuxCandidates).toContain('/home/test/.local/bin/girra')
+    // The orca-ide alias must still resolve for hosts installed under the old name.
+    expect(linuxCandidates).toContain('/home/test/.local/bin/orca-ide')
     expect(
       installedElectronCandidates('win32', 'C:\\Users\\test', {
         LOCALAPPDATA: 'C:\\Users\\test\\AppData\\Local'
       })
-    ).toContain('C:\\Users\\test\\AppData\\Local\\Programs\\Orca\\Orca.exe')
+    ).toContain('C:\\Users\\test\\AppData\\Local\\Programs\\Girra\\Girra.exe')
   })
 
   it('uses platform-specific bundled agent-browser names', () => {

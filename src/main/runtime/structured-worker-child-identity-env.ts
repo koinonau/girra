@@ -8,11 +8,11 @@
  * SIBLING's dispatch mailbox, and a bare `send --type worker_done` can settle a sibling's
  * context-only dispatch, a tier that has no capability token to reject on.
  *
- * `ORCA_CLI_COMMAND: 'orca'` is honest ONLY because of the PATH prepend below. Girra's Linux CLI
- * installs as `orca-ide` so it never claims GNOME Orca's /usr/bin/orca (stablyai/orca#7904), and
- * on packaged macOS/Windows the bundled launcher is reachable only from the app's own resources
- * dir. A PTY worker gets that treatment from `buildPtyHostEnv`; a structured worker has no PTY,
- * so it applies the SAME function here rather than a second, drifting copy of the rule.
+ * `ORCA_CLI_COMMAND: 'girra'` is honest ONLY because of the PATH prepend below. Global CLI
+ * registration is optional, so on packaged hosts the bundled launcher is reachable only from the
+ * app's own resources dir (on Linux, from the userData shim dir). A PTY worker gets that treatment
+ * from `buildPtyHostEnv`; a structured worker has no PTY, so it applies the SAME function here
+ * rather than a second, drifting copy of the rule.
  *
  * Deliberately NOT `ORCA_PANE_KEY`. Claude structured sessions run hooks, and a pane key in their
  * environment starts flowing into hook-emitted agent-status payloads and the hook-attestation,
@@ -51,7 +51,7 @@ export function structuredWorkerChildIdentityEnv(
   const env: Record<string, string> = {
     ...childEnv,
     ORCA_TERMINAL_HANDLE: identity.handle,
-    ORCA_CLI_COMMAND: 'orca'
+    ORCA_CLI_COMMAND: 'girra'
   }
   applyOrcaCliPath(env)
   return env

@@ -16,13 +16,15 @@ import { withAppImageRegistrationLock } from './appimage-registration-lock'
 import { getBundledLauncherPath } from './bundled-cli-launcher-path'
 import { quoteShell } from './cli-install-path-format'
 
-// Why: marks a dispatcher this function wrote so repeat serve starts overwrite
-// our own file idempotently but never clobber a user's own ~/.local/bin/orca.
+// Why unchanged across the rename: marks a dispatcher this function wrote so repeat serve
+// starts overwrite our own file idempotently but never clobber a user's own command.
 const DISPATCHER_MARKER = '# orca-serve-bare-orca-dispatcher'
 
 export type LinuxBareOrcaDispatcherOptions = {
-  /** Packaged app resources root; the bundled `orca-ide` launcher lives under it. */
+  /** Packaged app resources root; the bundled Linux launcher lives under it. */
   resourcesPath: string
+  /** Command to publish; callers install the pre-rename `orca` alias with a second call. */
+  commandName?: string
   /** Test seam — defaults to the real home directory. */
   homePath?: string
   /** Trusted caller override; production requires the complete AppImage runtime identity. */
@@ -41,21 +43,25 @@ export type LinuxBareOrcaDispatcherState =
 export type LinuxBareOrcaDispatcherResult = {
   state: LinuxBareOrcaDispatcherState
   dispatcherPath: string
-  /** The bundled `orca-ide` launcher the dispatcher execs. */
+  /** The bundled Linux launcher the dispatcher execs. */
   target: string | null
 }
 
-// Why: on Linux the CLI installs as `orca-ide`, not bare `orca`, to avoid
-// shadowing GNOME Orca's /usr/bin/orca. But the Claude Team launcher typed into
-// the initial managed terminal invokes the literal `orca claude-teams`, so a
-// headless serve box needs a bare-`orca` dispatcher on the managed-terminal PATH
-// (~/.local/bin, which patchPackagedProcessPath puts ahead of /usr/bin). It is a
-// plain file, not a managed symlink, so CliInstaller.removeLegacyLinuxCommandIfManaged
-// never reclaims it.
+// Why: global CLI registration is optional on a headless serve box, but the
+// Claude Team launcher typed into the initial managed terminal invokes the CLI
+// by bare name, so drop a dispatcher on the managed-terminal PATH (~/.local/bin,
+// which patchPackagedProcessPath puts ahead of /usr/bin). It is a plain file,
+// not a managed symlink, so CliInstaller.removeLegacyLinuxCommandIfManaged never
+// reclaims it — and it never lands on GNOME Orca's /usr/bin/orca.
 export async function installLinuxBareOrcaDispatcher(
   options: LinuxBareOrcaDispatcherOptions
 ): Promise<LinuxBareOrcaDispatcherResult> {
-  const dispatcherPath = join(options.homePath ?? homedir(), '.local', 'bin', 'orca')
+  const dispatcherPath = join(
+    options.homePath ?? homedir(),
+    '.local',
+    'bin',
+    options.commandName ?? 'girra'
+  )
   if (existsSync(dispatcherPath) && !(await isOwnedDispatcher(dispatcherPath))) {
     return { state: 'skipped-foreign', dispatcherPath, target: null }
   }
@@ -74,7 +80,7 @@ export async function installLinuxBareOrcaDispatcher(
     : { state: 'skipped-foreign', dispatcherPath, target: null }
 }
 
-/** Bare-`orca` script that execs the one Linux CLI launcher. */
+/** Bare-name script that execs the one Linux CLI launcher. */
 export function buildBareOrcaCliScript(launcherPath: string): string {
   return `#!/usr/bin/env bash\nexec ${quoteShell(launcherPath)} "$@"\n`
 }

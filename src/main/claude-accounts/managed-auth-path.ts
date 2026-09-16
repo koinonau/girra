@@ -1,12 +1,14 @@
 import { existsSync, lstatSync, readFileSync, realpathSync, writeFileSync } from 'node:fs'
 import { join, relative, resolve, sep } from 'node:path'
-import { app } from 'electron'
 import { writeFileAtomically } from '../fs-utils'
+import { getCanonicalUserDataPath } from '../persistence'
 
 const MANAGED_AUTH_MARKER = '.orca-managed-claude-auth'
 
+// Why the canonical path and not app.getPath('userData'): the late value moves after app.setName,
+// so a case-sensitive filesystem would strand every managed account under the pre-rename directory.
 export function getClaudeManagedAccountsRoot(): string {
-  return join(app.getPath('userData'), 'claude-accounts')
+  return join(getCanonicalUserDataPath(), 'claude-accounts')
 }
 
 export function resolveOwnedClaudeManagedAuthPath(

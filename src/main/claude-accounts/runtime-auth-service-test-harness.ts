@@ -5,6 +5,7 @@ import { join } from 'node:path'
 import { getDefaultSettings } from '../../shared/constants'
 import type { GlobalSettings } from '../../shared/global-settings-types'
 import type { ClaudeManagedAccount } from '../../shared/managed-account-types'
+import { installFakeAppEnvironment } from '../../../config/scripts/vitest-host-ports-setup'
 
 const originalPlatform = Object.getOwnPropertyDescriptor(process, 'platform')
 export const hostPlatform = process.platform
@@ -153,6 +154,8 @@ export function resetRuntimeAuthTestState(): void {
   testState.runtimeWriteConfigDir = null
   testState.managedKeychainCredentials.clear()
   testState.userDataDir = mkdtempSync(join(tmpdir(), 'orca-claude-runtime-'))
+  // Why the port too: managed-auth paths resolve through getCanonicalUserDataPath, not electron.
+  installFakeAppEnvironment({ getPath: () => testState.userDataDir })
   testState.fakeHomeDir = mkdtempSync(join(tmpdir(), 'orca-claude-home-'))
   mkdirSync(join(testState.fakeHomeDir, '.claude'), { recursive: true })
 }

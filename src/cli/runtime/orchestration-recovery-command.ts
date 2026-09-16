@@ -1,15 +1,14 @@
-export function resolveOrchestrationCliExecutable(
-  env: NodeJS.ProcessEnv = process.env,
-  platform: NodeJS.Platform = process.platform
-): string {
+// Why no platform argument: `girra` is the command on every platform now that the Linux-only
+// `orca-ide` rename is gone, and Windows resolves the `.cmd` shim through PATHEXT.
+export function resolveOrchestrationCliExecutable(env: NodeJS.ProcessEnv = process.env): string {
   const configured = env.ORCA_CLI_COMMAND?.trim()
   if (configured) {
     return configured
   }
   if (env.ORCA_DEV_REPO_ROOT) {
-    return 'orca-dev'
+    return 'girra-dev'
   }
-  return platform === 'linux' ? 'orca-ide' : 'orca'
+  return 'girra'
 }
 
 export function buildOrchestrationRecoveryCommand(

@@ -6,7 +6,8 @@ import {
   readActiveClaudeKeychainCredentials,
   readActiveClaudeKeychainCredentialsStrict,
   writeActiveClaudeKeychainCredentials,
-  writeActiveClaudeKeychainCredentialsForRuntime
+  writeActiveClaudeKeychainCredentialsForRuntime,
+  writeManagedClaudeKeychainCredentials
 } from './keychain'
 
 vi.mock('node:child_process', () => ({
@@ -274,6 +275,27 @@ describe('Claude Keychain credentials', () => {
       ['delete-generic-password', '-s', scopedService, '-a', SSO_USER],
       ['delete-generic-password', '-s', 'Claude Code-credentials', '-a', 'claude-code-user'],
       ['delete-generic-password', '-s', 'Claude Code-credentials', '-a', SSO_USER]
+    ])
+  })
+
+  // Renaming this service orphans every stored managed credential, so pin the pre-rebrand name.
+  it('stores managed credentials under the unchanged Orca service name', async () => {
+    execFileMock.mockImplementation((_file, _args, _options, callback) => {
+      invokeExecFileCallback(callback, null, '', '')
+      return null as never
+    })
+
+    await writeManagedClaudeKeychainCredentials('account-1', 'credentials-json')
+
+    expect(execFileMock.mock.calls[0][1]).toEqual([
+      'add-generic-password',
+      '-U',
+      '-s',
+      'Orca Claude Code Managed Credentials',
+      '-a',
+      'account-1',
+      '-w',
+      'credentials-json'
     ])
   })
 })

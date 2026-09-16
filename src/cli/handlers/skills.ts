@@ -202,8 +202,8 @@ function formatSkillSelectionHelp(verb: SkillMutationVerb, skillNames: string[])
     `Choose one or more skills to ${verb}:`,
     ...skillNames.map((name) => `  ${name}`),
     '',
-    `Usage: orca skills ${verb} --skill <name> [--skill <name> ...]`,
-    `   or: orca skills ${verb} --all`
+    `Usage: girra skills ${verb} --skill <name> [--skill <name> ...]`,
+    `   or: girra skills ${verb} --all`
   ].join('\n')
 }
 
@@ -228,8 +228,8 @@ function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
     if (process.env.ORCA_CLI_CWD) {
       throw new RuntimeClientError(
         'invalid_environment',
-        `orca skills ${verb} writes to the machine that runs it, but this shell forwards ` +
-          `orca to the Girra host. Run the same orca skills ${verb} command on the machine ` +
+        `girra skills ${verb} writes to the machine that runs it, but this shell forwards ` +
+          `it to the Girra host. Run the same girra skills ${verb} command on the machine ` +
           "you want it on, where it can detect that host's agents."
       )
     }
@@ -255,7 +255,7 @@ function createSkillMutationHandler(verb: SkillMutationVerb): CommandHandler {
       // that stream is not JSON, so --json can't be honored here.
       throw new RuntimeClientError(
         'invalid_argument',
-        `orca skills ${verb} --json only supports --dry-run. Real ${verb}s stream ` +
+        `girra skills ${verb} --json only supports --dry-run. Real ${verb}s stream ` +
           "npx's own output, which isn't JSON."
       )
     }

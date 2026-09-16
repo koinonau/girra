@@ -44,7 +44,7 @@ describe('Windows CLI launcher', () => {
     const root = mkdtempSync(join(tmpdir(), 'orca-cli-launcher-reuse-'))
     try {
       const sourcePath = join(root, 'OrcaCliLauncher.cs')
-      const outputPath = join(root, '.build', 'orca.exe')
+      const outputPath = join(root, '.build', 'girra.exe')
       mkdirSync(join(root, '.build'))
       writeFileSync(sourcePath, 'source\n')
       writeFileSync(outputPath, 'binary\n')
@@ -72,7 +72,11 @@ describe('Windows CLI launcher', () => {
     try {
       const result = spawnSync(
         process.execPath,
-        ['config/scripts/build-windows-cli-launcher.mjs', '--output', join(outputRoot, 'orca.exe')],
+        [
+          'config/scripts/build-windows-cli-launcher.mjs',
+          '--output',
+          join(outputRoot, 'girra.exe')
+        ],
         { cwd: projectRoot, encoding: 'utf8' }
       )
 
@@ -102,11 +106,11 @@ describe('Windows CLI launcher', () => {
     const appRoot = mkdtempSync(join(tmpdir(), 'orca cli launcher '))
     try {
       const resourcesPath = join(appRoot, 'resources')
-      const launcherPath = join(resourcesPath, 'bin', 'orca.exe')
+      const launcherPath = join(resourcesPath, 'bin', 'girra.exe')
       const cliPath = join(resourcesPath, 'app.asar.unpacked', 'out', 'cli', 'index.js')
       mkdirSync(join(resourcesPath, 'bin'), { recursive: true })
       mkdirSync(dirname(cliPath), { recursive: true })
-      copyFileSync(process.execPath, join(appRoot, 'Orca.exe'))
+      copyFileSync(process.execPath, join(appRoot, 'Girra.exe'))
       writeFileSync(
         cliPath,
         `process.stdout.write(JSON.stringify({
@@ -161,7 +165,7 @@ describe('Windows CLI launcher', () => {
     const appRoot = mkdtempSync(join(tmpdir(), 'orca duplicate path launcher '))
     try {
       const resourcesPath = join(appRoot, 'resources')
-      const launcherPath = join(resourcesPath, 'bin', 'orca.exe')
+      const launcherPath = join(resourcesPath, 'bin', 'girra.exe')
       const cliPath = join(resourcesPath, 'app.asar.unpacked', 'out', 'cli', 'index.js')
       const outputPath = join(appRoot, 'child-result.json')
       const harnessSourcePath = join(
@@ -174,7 +178,7 @@ describe('Windows CLI launcher', () => {
       const harnessPath = join(appRoot, 'DuplicatePathLauncher.exe')
       mkdirSync(dirname(launcherPath), { recursive: true })
       mkdirSync(dirname(cliPath), { recursive: true })
-      copyFileSync(process.execPath, join(appRoot, 'Orca.exe'))
+      copyFileSync(process.execPath, join(appRoot, 'Girra.exe'))
       writeFileSync(
         cliPath,
         `require('node:fs').writeFileSync(process.env.ORCA_TEST_OUTPUT, JSON.stringify({

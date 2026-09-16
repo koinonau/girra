@@ -17164,8 +17164,8 @@
         "pnpm exec vitest run --config config/vitest.config.ts src/main/startup/ensure-virtual-display.test.ts config/scripts/headless-serve-shutdown-workflow.test.mjs --reporter=dot",
         "shellcheck config/docker/headless-serve-shutdown/run-signal-case.sh",
         "shellcheck config/docker/headless-serve-shutdown/run-appimage-desktop-startup-case.sh",
-        "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/orca-linux.AppImage",
-        "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/orca-linux.AppImage --platform linux/amd64"
+        "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/girra-linux.AppImage",
+        "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/girra-linux.AppImage --platform linux/amd64"
       ],
       "testFiles": [
         "src/main/startup/ensure-virtual-display.test.ts",
@@ -17236,7 +17236,7 @@
           "date": "2026-08-13",
           "runner": "local",
           "platform": "linux",
-          "command": "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/orca-linux.AppImage --platform linux/amd64",
+          "command": "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/girra-linux.AppImage --platform linux/amd64",
           "result": "passed",
           "durationSeconds": 48,
           "summary": "The extracted candidate AppRun passed process-group SIGINT and systemd-mixed main-PID SIGTERM under Ubuntu 26.04 amd64 emulation with status zero, no fatal evidence, full listener/Xvfb/tree cleanup, and an unchanged canary identity."
@@ -17245,7 +17245,7 @@
           "date": "2026-08-31",
           "runner": "ci",
           "platform": "linux",
-          "command": "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/orca-linux.AppImage --platform linux/amd64",
+          "command": "node config/scripts/run-headless-serve-shutdown-docker.mjs --appimage dist/girra-linux.AppImage --platform linux/amd64",
           "result": "passed",
           "durationSeconds": 1336,
           "summary": "Native-amd64 PR package job https://github.com/stablyai/orca/actions/runs/33360129768/job/99389831915 built AppImage SHA-256 999d43bfe123e87a77fe917a5f46be1efd5c45a5205f99f02998a75136d8a793 and ran the restricted original-AppImage startup oracle before each of the three signal matrices. Each startup reached the exact first-window-startup-services-ready marker with stable launcher/Xvfb PID-start-tick identities and bounded TERM/KILL cleanup; SIGINT and SIGTERM then returned wait status 0 with no fatal evidence, listener, descendant, Xvfb, or canary residue. This is CI evidence only; no fresh local Docker oracle is claimed."
@@ -17305,7 +17305,7 @@
       "invariant": "On a host without FUSE and without unprivileged user namespaces, every packaged CLI entrypoint either completes its command or reports a diagnosis, and never terminates on a signal.",
       "oracle": "Build the image, stage the AppImage payload, and run each case in the restricted container. Assert the preconditions first: unshare -Ur must fail and /dev/fuse must be absent, so a relaxed runner fails the job rather than silently skipping. For each case require the exact expected exit status and an expected substring of the command's own output, with the harness RESULT/CRASHED/PRECONDITION_FAILED control lines excluded so a case name can never satisfy its own assertion. Any status of 128 or above is a crash and fails immediately. The per-case timeout is a failure deadline, never a success condition.",
       "commands": [
-        "node config/scripts/run-linux-cli-launch-contract-docker.mjs --appimage dist/orca-linux.AppImage",
+        "node config/scripts/run-linux-cli-launch-contract-docker.mjs --appimage dist/girra-linux.AppImage",
         "shellcheck config/docker/cli-launch-contract/run-cli-case.sh"
       ],
       "testFiles": [
@@ -17336,7 +17336,7 @@
           "date": "2026-08-31",
           "runner": "ci",
           "platform": "linux",
-          "command": "node config/scripts/run-linux-cli-launch-contract-docker.mjs --appimage dist/orca-linux.AppImage",
+          "command": "node config/scripts/run-linux-cli-launch-contract-docker.mjs --appimage dist/girra-linux.AppImage",
           "result": "passed",
           "durationSeconds": 40,
           "summary": "PR package job https://github.com/stablyai/orca/actions/runs/33360129768/job/99389831915 ran all eight cases to ok on ubuntu-latest. The unshare and /dev/fuse preconditions held under moby's default seccomp profile rather than tripping."
@@ -17345,7 +17345,7 @@
           "date": "2026-09-01",
           "runner": "local",
           "platform": "linux",
-          "command": "node config/scripts/run-linux-cli-launch-contract-docker.mjs --appimage dist/orca-linux.AppImage",
+          "command": "node config/scripts/run-linux-cli-launch-contract-docker.mjs --appimage dist/girra-linux.AppImage",
           "result": "passed",
           "durationSeconds": 60,
           "summary": "All eight cases passed on Ubuntu 24.04 amd64 hardware against an AppImage built from the stack tip, invoked against a copy of that artifact outside dist/."

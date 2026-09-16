@@ -186,7 +186,7 @@ export async function main(
 
 async function runClaudeTeams(argv: string[], cwd: string): Promise<void> {
   try {
-    // Why: everything after `orca claude-teams` belongs to Claude Code, not
+    // Why: everything after `girra claude-teams` belongs to Claude Code, not
     // Girra's own flag parser, so new Claude flags work without Girra changes.
     const client = new (await loadRuntimeClientClass())(undefined, undefined, null, null)
     await dispatch(['claude-teams'], {

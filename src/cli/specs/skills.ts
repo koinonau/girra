@@ -5,19 +5,19 @@ export const SKILL_COMMAND_SPECS: CommandSpec[] = [
   {
     path: ['skills', 'list'],
     summary: 'List version-matched skill guides bundled with this Girra CLI',
-    usage: 'orca skills list [--json]',
+    usage: 'girra skills list [--json]',
     allowedFlags: [...GLOBAL_FLAGS],
     notes: [
       'Reads bundled guide metadata locally without contacting the Girra runtime.',
       'With --json, prints a topics array of canonical names and one-line descriptions.',
-      'Use `orca skills get <name>` for the compact guide, `--full` for its full reference package, or `orca skills install` to install skills.'
+      'Use `girra skills get <name>` for the compact guide, `--full` for its full reference package, or `girra skills install` to install skills.'
     ]
   },
   {
     path: ['skills', 'get'],
     aliases: [['skills', 'show']],
     summary: 'Print a version-matched skill guide as Markdown',
-    usage: 'orca skills get <topic> [--full | --reference <name>] [--json]',
+    usage: 'girra skills get <topic> [--full | --reference <name>] [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'topic', 'full', 'reference', 'references'],
     positionalArgs: ['topic'],
     notes: [
@@ -28,17 +28,17 @@ export const SKILL_COMMAND_SPECS: CommandSpec[] = [
       'Use --json for a deterministic object containing canonical topic metadata and content.'
     ],
     examples: [
-      'orca skills get orca-cli',
-      'orca skills get orchestration --full',
-      'orca skills get orchestration --references',
-      'orca skills get orchestration --reference recovery-and-cleanup'
+      'girra skills get orca-cli',
+      'girra skills get orchestration --full',
+      'girra skills get orchestration --references',
+      'girra skills get orchestration --reference recovery-and-cleanup'
     ]
   },
   {
     path: ['skills', 'install'],
     summary: 'Install bundled Girra skills via the community skills CLI',
     usage:
-      'orca skills install [--skill <name>]... [--all] [--agent <name>[,<name>]] ' +
+      'girra skills install [--skill <name>]... [--all] [--agent <name>[,<name>]] ' +
       '[--local] [--dry-run] [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'skill', 'all', 'agent', 'local', 'dry-run'],
     notes: [
@@ -61,17 +61,17 @@ export const SKILL_COMMAND_SPECS: CommandSpec[] = [
       'Intended for headless hosts (SSH, containers, CI) with no desktop Settings UI to copy the install command from.'
     ],
     examples: [
-      'orca skills install',
-      'orca skills install --skill orca-cli --skill orchestration',
-      'orca skills install --skill orca-cli --local',
-      'orca skills install --skill orca-cli --agent claude-code,opencode',
-      'orca skills install --all --dry-run'
+      'girra skills install',
+      'girra skills install --skill orca-cli --skill orchestration',
+      'girra skills install --skill orca-cli --local',
+      'girra skills install --skill orca-cli --agent claude-code,opencode',
+      'girra skills install --all --dry-run'
     ]
   },
   {
     path: ['skills', 'update'],
     summary: 'Update already-installed Girra skills via the community skills CLI',
-    usage: 'orca skills update [--skill <name>]... [--all] [--local] [--dry-run] [--json]',
+    usage: 'girra skills update [--skill <name>]... [--all] [--local] [--dry-run] [--json]',
     allowedFlags: [...GLOBAL_FLAGS, 'skill', 'all', 'local', 'dry-run'],
     notes: [
       'Reads the bundled skill registry locally without contacting the Girra runtime.',
@@ -80,7 +80,7 @@ export const SKILL_COMMAND_SPECS: CommandSpec[] = [
         'then runs it and forwards its output and exit code.',
       'Updates the global install (all projects, adds --global) by default. Use --local to ' +
         'update the current project instead.',
-      'Only refreshes skills that are already installed; use `orca skills install` first.',
+      'Only refreshes skills that are already installed; use `girra skills install` first.',
       'Use --dry-run to print the resolved command without running it.',
       'With --json, the skill listing and --dry-run emit JSON; a real update streams ' +
         "npx's own non-JSON output live and rejects --json.",
@@ -88,10 +88,10 @@ export const SKILL_COMMAND_SPECS: CommandSpec[] = [
       'Intended for headless hosts (SSH, containers, CI) with no desktop Settings UI to copy the update command from.'
     ],
     examples: [
-      'orca skills update',
-      'orca skills update --skill orca-cli --skill orchestration',
-      'orca skills update --skill orca-cli --local',
-      'orca skills update --all --dry-run'
+      'girra skills update',
+      'girra skills update --skill orca-cli --skill orchestration',
+      'girra skills update --skill orca-cli --local',
+      'girra skills update --all --dry-run'
     ]
   }
 ]

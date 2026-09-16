@@ -57,20 +57,20 @@ describe('electron-builder markdown file associations', () => {
   it('points the single NSIS include at the installer hooks file on disk', () => {
     const includePath = electronBuilderConfig.nsis.include
     expect(existsSync(includePath)).toBe(true)
-    expect(basename(includePath)).toBe('orca-installer-hooks.nsh')
+    expect(basename(includePath)).toBe('girra-installer-hooks.nsh')
   })
 
   // Guard for the guard: proves DEFAULT_HANDLER_WRITE really matches a takeover line, so
   // the assertion below is a live check rather than a regex that can never fire.
   it('recognizes an APP_ASSOCIATE-style default-handler write', () => {
     for (const takeover of [
-      '  WriteRegStr SHELL_CONTEXT "Software\\Classes\\.md" "" "Orca.Markdown"',
+      '  WriteRegStr SHELL_CONTEXT "Software\\Classes\\.md" "" "Girra.Markdown"',
       'WriteRegStr  SHELL_CONTEXT  "Software\\Classes\\.markdown"  ""  "$0"'
     ]) {
       expect(takeover).toMatch(DEFAULT_HANDLER_WRITE)
     }
     expect(
-      'WriteRegNone SHELL_CONTEXT "Software\\Classes\\.md\\OpenWithProgids" "Orca.Markdown"'
+      'WriteRegNone SHELL_CONTEXT "Software\\Classes\\.md\\OpenWithProgids" "Girra.Markdown"'
     ).not.toMatch(DEFAULT_HANDLER_WRITE)
     // Comment stripping must drop prose that quotes the bad line without swallowing a real
     // one that happens to carry a trailing comment.
@@ -88,7 +88,7 @@ describe('electron-builder markdown file associations', () => {
     const hooks = await readInstallerHooks()
 
     expect(stripNsisCommentLines(hooks)).not.toMatch(DEFAULT_HANDLER_WRITE)
-    // The additive hint that puts Orca in Explorer's "Open with" list.
+    // The additive hint that puts Girra in Explorer's "Open with" list.
     expect(hooks).toMatch(
       /WriteRegNone\s+SHELL_CONTEXT\s+"Software\\Classes\\\$\{EXT\}\\OpenWithProgids"/
     )
@@ -118,7 +118,7 @@ describe('electron-builder markdown file associations', () => {
     // Scopes both kills to the uninstalling user: an elevated machine-wide uninstall must
     // not reach another logged-on user's session.
     expect(script).toMatch(/\/FI\s+"USERNAME eq /)
-    expect(script).toContain('$LOCALAPPDATA\\Orca\\daemon-host')
+    expect(script).toContain('$LOCALAPPDATA\\Girra\\daemon-host')
     // Without this guard, uninstallOldVersion would kill the daemon on every update —
     // defeating the relocation that keeps terminals alive across updates.
     expect(script).toMatch(/\$\{ifNot\}\s+\$\{isUpdated\}/)

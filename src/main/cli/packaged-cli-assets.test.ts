@@ -17,23 +17,23 @@ const builderConfig = require('../../../config/electron-builder.config.cjs') as 
   linux?: { extraResources?: { from?: string; to?: string }[] }
   win?: { extraResources?: { from?: string; to?: string }[] }
 }
-const linuxLauncherAsset = new URL('../../../resources/linux/bin/orca-ide', import.meta.url)
-const darwinLauncherAsset = new URL('../../../resources/darwin/bin/orca', import.meta.url)
+const linuxLauncherAsset = new URL('../../../resources/linux/bin/girra', import.meta.url)
+const darwinLauncherAsset = new URL('../../../resources/darwin/bin/girra', import.meta.url)
 const unixLauncherFixtures = [
   {
     name: 'Linux',
     asset: linuxLauncherAsset,
-    appDir: ['Orca'],
-    launcher: ['resources', 'bin', 'orca-ide'],
-    executable: ['orca-ide'],
+    appDir: ['Girra'],
+    launcher: ['resources', 'bin', 'girra'],
+    executable: ['girra'],
     cli: ['resources', 'app.asar.unpacked', 'out', 'cli', 'index.js']
   },
   {
     name: 'macOS',
     asset: darwinLauncherAsset,
-    appDir: ['Orca.app'],
-    launcher: ['Contents', 'Resources', 'bin', 'orca'],
-    executable: ['Contents', 'MacOS', 'Orca'],
+    appDir: ['Girra.app'],
+    launcher: ['Contents', 'Resources', 'bin', 'girra'],
+    executable: ['Contents', 'MacOS', 'Girra'],
     cli: ['Contents', 'Resources', 'app.asar.unpacked', 'out', 'cli', 'index.js']
   }
 ] as const
@@ -197,8 +197,8 @@ server.listen(0, '127.0.0.1', () => {
         const resourcesDir = join(appDir, 'resources')
         const launcherDir = join(resourcesDir, 'bin')
         const cliDir = join(resourcesDir, 'app.asar.unpacked', 'out', 'cli')
-        const launcherPath = join(launcherDir, 'orca-ide')
-        const electronPath = join(appDir, 'orca-ide')
+        const launcherPath = join(launcherDir, 'girra')
+        const electronPath = join(appDir, 'girra')
         const cliPath = join(cliDir, 'index.js')
 
         await mkdir(launcherDir, { recursive: true })
@@ -224,7 +224,7 @@ printf 'arg=%s\\n' "$@"
 
         const homeDir = join(root, 'home')
         const commandDir = join(homeDir, '.local', 'bin')
-        const commandPath = join(commandDir, 'orca-ide')
+        const commandPath = join(commandDir, 'girra')
         await mkdir(commandDir, { recursive: true })
         await mkdir(join(homeDir, 'orca'), { recursive: true })
         await symlink(launcherPath, commandPath)
@@ -252,7 +252,7 @@ printf 'arg=%s\\n' "$@"
       const resourcesDir = join(appDir, 'resources')
       const launcherDir = join(resourcesDir, 'bin')
       const cliDir = join(resourcesDir, 'app.asar.unpacked', 'out', 'cli')
-      const launcherPath = join(launcherDir, 'orca-ide')
+      const launcherPath = join(launcherDir, 'girra')
       const cliPath = join(cliDir, 'index.js')
 
       await mkdir(launcherDir, { recursive: true })
@@ -260,7 +260,7 @@ printf 'arg=%s\\n' "$@"
       await copyFile(linuxLauncherAsset, launcherPath)
       await writeFile(cliPath, '', 'utf8')
       await writeFile(
-        join(appDir, 'orca-ide'),
+        join(appDir, 'girra'),
         `#!/usr/bin/env bash
 node -e 'console.log(JSON.stringify({
   argv: process.argv.slice(1),
@@ -310,9 +310,9 @@ node -e 'console.log(JSON.stringify({
       const resourcesDir = join(appDir, 'resources')
       const launcherDir = join(resourcesDir, 'bin')
       const cliDir = join(resourcesDir, 'app.asar.unpacked', 'out', 'cli')
-      const launcherPath = join(launcherDir, 'orca-ide')
+      const launcherPath = join(launcherDir, 'girra')
       const appRunPath = join(appDir, 'AppRun')
-      const electronPath = join(appDir, 'orca-ide')
+      const electronPath = join(appDir, 'girra')
       const cliPath = join(cliDir, 'index.js')
       const statePath = join(root, 'launch-state.json')
 

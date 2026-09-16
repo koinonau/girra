@@ -17,7 +17,7 @@ beforeEach(() => {
 
 describe('prependOrcaCliDirToChildPath', () => {
   it('leads packaged Linux PATH with the bare-orca shim dir', () => {
-    // Why this matters at all: the Linux CLI installs as `orca-ide` so it never claims GNOME
+    // Why this matters at all: the Linux CLI installs as `girra` so it never claims GNOME
     // Orca's /usr/bin/orca screen reader, so bare `orca` only works through this shim.
     const env: Record<string, string> = { PATH: '/usr/local/bin:/usr/bin' }
     prependOrcaCliDirToChildPath(env, {

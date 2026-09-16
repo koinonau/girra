@@ -148,21 +148,24 @@ async function launchServeMode(
       )
     }
   }
-  // Why: Linux CLI installs as `orca-ide`, but the Claude Team launcher invokes bare `orca`; drop a ~/.local/bin dispatcher (ahead of /usr/bin) so it resolves. Best-effort.
+  // Why: the Claude Team launcher invokes the CLI by bare name; drop ~/.local/bin dispatchers (ahead of /usr/bin) so both the current and pre-rename names resolve. Best-effort.
   if (process.platform === 'linux' && app.isPackaged && process.resourcesPath) {
-    try {
-      const dispatcher = await installLinuxBareOrcaDispatcher({
-        resourcesPath: process.resourcesPath
-      })
-      console.log(
-        `[serve] bare orca dispatcher ${dispatcher.state}: ${dispatcher.dispatcherPath}` +
-          `${dispatcher.target ? ` -> ${dispatcher.target}` : ''}`
-      )
-    } catch (error) {
-      console.warn(
-        '[serve] bare orca dispatcher install skipped:',
-        error instanceof Error ? error.message : String(error)
-      )
+    for (const commandName of ['girra', 'orca']) {
+      try {
+        const dispatcher = await installLinuxBareOrcaDispatcher({
+          resourcesPath: process.resourcesPath,
+          commandName
+        })
+        console.log(
+          `[serve] bare ${commandName} dispatcher ${dispatcher.state}: ${dispatcher.dispatcherPath}` +
+            `${dispatcher.target ? ` -> ${dispatcher.target}` : ''}`
+        )
+      } catch (error) {
+        console.warn(
+          `[serve] bare ${commandName} dispatcher install skipped:`,
+          error instanceof Error ? error.message : String(error)
+        )
+      }
     }
   }
   // Why: headless serve never opens a renderer, so arm scheduled automation dispatch here.

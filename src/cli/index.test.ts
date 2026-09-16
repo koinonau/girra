@@ -194,7 +194,7 @@ describe('unknown command surfaces a suggestion', () => {
     expect(process.exitCode).toBe(1)
     const stderr = errorSpy.mock.calls.map((call) => String(call[0])).join('\n')
     expect(stderr).toContain('Unknown command: worktree remov')
-    expect(stderr).toContain('orca worktree')
+    expect(stderr).toContain('girra worktree')
   })
 
   it('reports a mistyped pre-command flag without swallowing the command', async () => {
@@ -285,7 +285,7 @@ describe('unknown help command surfaces a suggestion', () => {
     await main(argv, '/tmp/repo')
 
     expect(process.exitCode).toBe(1)
-    expect(logSpy.mock.calls.flat().join('\n')).toContain('Did you mean: orca worktree')
+    expect(logSpy.mock.calls.flat().join('\n')).toContain('Did you mean: girra worktree')
     logSpy.mockRestore()
     process.exitCode = 0
   })
@@ -363,7 +363,7 @@ describe('orca root help', () => {
       '`worktree create --agent` creates a new checkout with an agent.'
     )
     expect(logSpy.mock.calls[0][0]).toContain(
-      'orca terminal create --worktree active --command "claude"'
+      'girra terminal create --worktree active --command "claude"'
     )
     expect(logSpy.mock.calls[0][0]).toContain(
       'orchestration worker-start Start a supervised worker locally or on a connected Girra server'
@@ -402,7 +402,7 @@ describe('orca root help', () => {
     await main(['linear', '--help'], '/tmp/repo')
 
     const groupHelp = String(logSpy.mock.calls[0][0])
-    expect(groupHelp).toContain('orca linear')
+    expect(groupHelp).toContain('girra linear')
     expect(groupHelp).toContain('issue')
     expect(groupHelp).toContain('search')
     expect(groupHelp).not.toContain('--comments')
@@ -412,7 +412,7 @@ describe('orca root help', () => {
     await main(['linear', 'issue', '--help'], '/tmp/repo')
 
     const issueHelp = String(logSpy.mock.calls[0][0])
-    expect(issueHelp).toContain('orca linear issue [<id>]')
+    expect(issueHelp).toContain('girra linear issue [<id>]')
     expect(issueHelp).toContain('--comments             Include threaded Linear comments')
     expect(issueHelp).toContain('--attachments          Include attachment metadata and URLs')
     expect(issueHelp).toContain('--activity             Include issue field-change history')
@@ -423,7 +423,7 @@ describe('orca root help', () => {
     await main(['linear', 'search', '--help'], '/tmp/repo')
 
     const searchHelp = String(logSpy.mock.calls[0][0])
-    expect(searchHelp).toContain('orca linear search <query>')
+    expect(searchHelp).toContain('girra linear search <query>')
     expect(searchHelp).toContain('--workspace <id|all>  Connected Linear workspace id, or all')
     expect(searchHelp).toContain('--query <text>        Text to search across Linear issues')
 
@@ -562,7 +562,7 @@ describe('orca root help', () => {
 
     expect(String(logSpy.mock.calls[0][0])).toContain('This creates a new checkout.')
     expect(String(logSpy.mock.calls[0][0])).toContain(
-      'orca terminal create --worktree active --command "claude"'
+      'girra terminal create --worktree active --command "claude"'
     )
 
     logSpy.mockClear()
@@ -571,7 +571,7 @@ describe('orca root help', () => {
     const terminalHelp = String(logSpy.mock.calls[0][0])
     expect(terminalHelp).toContain('Use this, not worktree create')
     expect(terminalHelp).toContain(
-      'orca terminal create --worktree active --command "claude" --json'
+      'girra terminal create --worktree active --command "claude" --json'
     )
     expect(callMock).not.toHaveBeenCalled()
   })

@@ -76,15 +76,15 @@ describe('structuredWorkerChildIdentityEnv', () => {
     expect(shim.ensureLinuxTerminalOrcaCliShimDir).not.toHaveBeenCalled()
   })
 
-  it('gives a packaged-Linux worker the bare-orca shim its ORCA_CLI_COMMAND assumes', () => {
-    // Without this the child's first `orca orchestration check` execs GNOME Orca — the CLI
-    // installs as `orca-ide` on Linux (stablyai/orca#7904) — and the dispatch hangs to timeout.
+  it('gives a packaged-Linux worker the shim dir its ORCA_CLI_COMMAND assumes', () => {
+    // Without this the child's first `girra orchestration check` finds no command at all, because
+    // global CLI registration is optional, and the dispatch hangs to timeout.
     pinPlatform('linux')
     installFakeAppEnvironment({ isPackaged: () => true, getPath: () => USER_DATA })
     const handle = registerWorker()
     const env = structuredWorkerChildIdentityEnv(SESSION_ID, { PATH: '/usr/bin:/bin' })
     expect(env.ORCA_TERMINAL_HANDLE).toBe(handle)
-    expect(env.ORCA_CLI_COMMAND).toBe('orca')
+    expect(env.ORCA_CLI_COMMAND).toBe('girra')
     expect(env.PATH).toBe(`${SHIM_DIR}:/usr/bin:/bin`)
   })
 
@@ -125,9 +125,9 @@ describe('structuredWorkerChildIdentityEnv', () => {
   })
 
   it('never names the WSL-scoped launcher, because a structured worker cannot run in WSL', () => {
-    // `orca-ide` is the literal the PTY lane exports for WSL only. A structured session that
-    // resolves to a WSL distro is refused a host scope, so it never becomes a worker at all —
-    // which is why the bare-`orca` shim, not the literal, is the right fix on Linux.
+    // A structured session that resolves to a WSL distro is refused a host scope, so it never
+    // becomes a worker at all — which is why the userData shim dir, not a WSL-only literal, is
+    // the right fix on Linux.
     expect(
       structuredWorkerHostScope({
         executionHostId: 'local',

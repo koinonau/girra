@@ -20,7 +20,7 @@ vi.mock('../runtime-client', async () => {
 import { main } from '../index'
 import { okFixture, queueFixtures } from '../test-fixtures'
 
-describe('orca computer action CLI validation', () => {
+describe('girra computer action CLI validation', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     callMock.mockReset()

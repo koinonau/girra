@@ -47,7 +47,7 @@ describe('tab agent launch options', () => {
       findMatchingTabAgentLaunchOptions('opencode-beta', options).map((option) => option.agent)
     ).toEqual(['opencode'])
     expect(
-      findMatchingTabAgentLaunchOptions('orca', options).map((option) => option.agent)
+      findMatchingTabAgentLaunchOptions('girra', options).map((option) => option.agent)
     ).toEqual(['claude-agent-teams'])
   })
 

@@ -8,9 +8,8 @@ import {
 describe('live remote freeze RPC', () => {
   it('resolves the Orca CLI for managed, dev, Linux, and default runtimes', () => {
     expect(resolveOrcaCliCommand({ env: { ORCA_CLI_COMMAND: 'custom-orca' } })).toBe('custom-orca')
-    expect(resolveOrcaCliCommand({ env: { ORCA_DEV_REPO_ROOT: '/repo' } })).toBe('orca-dev')
-    expect(resolveOrcaCliCommand({ env: {}, platform: 'linux' })).toBe('orca-ide')
-    expect(resolveOrcaCliCommand({ env: {}, platform: 'win32' })).toBe('orca')
+    expect(resolveOrcaCliCommand({ env: { ORCA_DEV_REPO_ROOT: '/repo' } })).toBe('girra-dev')
+    expect(resolveOrcaCliCommand({ env: {} })).toBe('girra')
   })
 
   it('bypasses the Windows dev cmd shim with the built Node CLI', () => {
