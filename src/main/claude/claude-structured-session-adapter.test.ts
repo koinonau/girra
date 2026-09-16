@@ -430,7 +430,7 @@ describe('ClaudeStructuredSessionAdapter acquisition cleanup', () => {
     expect(error).not.toBeInstanceOf(AgentSessionAcquisitionRootExitObservedError)
   })
 
-  it('never releases for a root Orca never saw leave', async () => {
+  it('never releases for a root Girra never saw leave', async () => {
     const error = await failedStart({ root: 'live', tree: 'unverifiable' })
 
     expect(error).toBeInstanceOf(AgentSessionAcquisitionExitUnprovenError)

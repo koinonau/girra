@@ -73,7 +73,7 @@ async function readInstallManifest(
   if (!satisfiesOrcaEngineRange(hostVersion, parsed.manifest.engines.orca)) {
     return {
       ok: false,
-      error: `plugin requires Orca ${parsed.manifest.engines.orca} (this is ${hostVersion})`
+      error: `plugin requires Girra ${parsed.manifest.engines.orca} (this is ${hostVersion})`
     }
   }
   return { ok: true, manifest: parsed.manifest }

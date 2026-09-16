@@ -22,7 +22,7 @@ vi.mock('../ui/dropdown-menu', () => ({
 const plugin: PluginHostListEntry = {
   pluginKey: 'stablyai.orca-skills',
   consentFingerprint: 'sha256-consent',
-  name: 'Orca Skills',
+  name: 'Girra Skills',
   version: '1.0.0',
   publisher: 'stablyai',
   status: 'disabled',
@@ -72,7 +72,7 @@ describe('PluginSettingsRow', () => {
     expect(container.textContent).toContain('Bundled')
     expect(container.textContent).not.toContain('Remove')
     expect(
-      container.querySelector<HTMLButtonElement>('[aria-label="Enable Orca Skills"]')?.disabled
+      container.querySelector<HTMLButtonElement>('[aria-label="Enable Girra Skills"]')?.disabled
     ).toBe(false)
     act(() => root.unmount())
   })

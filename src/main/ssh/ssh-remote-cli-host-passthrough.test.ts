@@ -64,7 +64,7 @@ describe('resolveHostCliEntryPath', () => {
 })
 
 describe('buildHostCliEnv', () => {
-  it('forwards only Orca terminal-context vars from the remote env', () => {
+  it('forwards only Girra terminal-context vars from the remote env', () => {
     const env = buildHostCliEnv({
       hostEnv: { PATH: '/host/bin', NODE_OPTIONS: '--inspect' },
       remoteEnv: {

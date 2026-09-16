@@ -167,7 +167,7 @@ describe('registerAppMenu', () => {
   // Why: pin the platform on every case — CI runs this suite on Linux only, so an
   // unpinned test leaves the other platforms' branches entirely uncovered.
   it.each(['darwin', 'linux', 'win32'] as const)(
-    'routes Edit > Paste through Orca coordinated paste ownership on %s',
+    'routes Edit > Paste through Girra coordinated paste ownership on %s',
     (platform) => {
       vi.spyOn(process, 'platform', 'get').mockReturnValue(platform)
       const send = vi.fn()
@@ -232,7 +232,7 @@ describe('registerAppMenu', () => {
   })
 
   it.each(['darwin', 'linux', 'win32'] as const)(
-    'routes Edit selection actions through the focused Orca window on %s',
+    'routes Edit selection actions through the focused Girra window on %s',
     (platform) => {
       vi.spyOn(process, 'platform', 'get').mockReturnValue(platform)
       const send = vi.fn()
@@ -319,8 +319,8 @@ describe('registerAppMenu', () => {
     )
 
     const helpLabels = getSubmenu(template, 'Help').map((item) => item.label)
-    expect(helpLabels).toEqual(expect.arrayContaining(['Getting Started with Orca']))
-    expect(helpLabels).not.toContain('Explore Orca')
+    expect(helpLabels).toEqual(expect.arrayContaining(['Getting Started with Girra']))
+    expect(helpLabels).not.toContain('Explore Girra')
   })
 
   it.runIf(isMac)('keeps the macOS app-named menu with Settings and quit roles', () => {
@@ -334,15 +334,15 @@ describe('registerAppMenu', () => {
     // the system app menu. Without global Export, there is no File item left.
     expect(template.find((item) => item.label === 'File')).toBeUndefined()
     const helpLabels = getSubmenu(template, 'Help').map((item) => item.label)
-    expect(helpLabels).toEqual(['Getting Started with Orca'])
+    expect(helpLabels).toEqual(['Getting Started with Girra'])
   })
 
-  it('routes Getting Started with Orca through its callback', () => {
+  it('routes Getting Started with Girra through its callback', () => {
     const options = buildMenuOptions()
     registerAppMenu(options)
 
     const setupGuideItem = getSubmenu(getTemplate(), 'Help').find(
-      (entry) => entry.label === 'Getting Started with Orca'
+      (entry) => entry.label === 'Getting Started with Girra'
     )
     expect(setupGuideItem?.accelerator).toBeUndefined()
 

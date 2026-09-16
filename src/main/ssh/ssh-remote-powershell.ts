@@ -52,7 +52,7 @@ export function powerShellCommand(
   const compressed = encodedPowerShellCommand(selfExtractingPowerShellScript(script), executable)
   if (compressed.length > WINDOWS_REMOTE_COMMAND_LINE_BUDGET_CHARS) {
     throw new Error(
-      `Remote Windows command needs ${compressed.length} characters; Orca budgets ${WINDOWS_REMOTE_COMMAND_LINE_BUDGET_CHARS} for a line sshd hands to cmd.exe, which itself refuses more than ${CMD_EXE_COMMAND_LINE_MAX_CHARS}.`
+      `Remote Windows command needs ${compressed.length} characters; Girra budgets ${WINDOWS_REMOTE_COMMAND_LINE_BUDGET_CHARS} for a line sshd hands to cmd.exe, which itself refuses more than ${CMD_EXE_COMMAND_LINE_MAX_CHARS}.`
     )
   }
   return compressed
@@ -62,7 +62,7 @@ function encodedPowerShellCommand(script: string, executable: WindowsPowerShellE
   return `${executable} -NoProfile -NonInteractive -EncodedCommand ${encodePowerShellCommand(script)}`
 }
 
-/** Orca-prefixed names so the payload can never shadow the bootstrap's own state. */
+/** Girra-prefixed names so the payload can never shadow the bootstrap's own state. */
 function selfExtractingPowerShellScript(script: string): string {
   const payload = gzipSync(Buffer.from(script, 'utf-8'), { level: 9 }).toString('base64')
   return [

@@ -90,8 +90,8 @@ export function verifyRemotePairingRuntimeStatus(
       kind: 'protocol-incompatible',
       message:
         compatibility.reason === 'client-too-old'
-          ? 'Update this Orca client before adding the remote host.'
-          : 'Update Orca on the remote host before adding it.'
+          ? 'Update this Girra client before adding the remote host.'
+          : 'Update Girra on the remote host before adding it.'
     }
   }
   if (!hasValidRuntimeStatusShape(status)) {

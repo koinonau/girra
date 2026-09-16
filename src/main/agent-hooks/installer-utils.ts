@@ -95,7 +95,7 @@ function decodePowerShellEncodedCommand(command: string): string | null {
   }
 }
 
-// Why: prod/dev/parallel Orca instances must write the same managed entry, not race between per-userData script paths.
+// Why: prod/dev/parallel Girra instances must write the same managed entry, not race between per-userData script paths.
 export function getSharedManagedScriptPath(scriptFileName: string): string {
   return join(homedir(), '.orca', 'agent-hooks', scriptFileName)
 }
@@ -114,7 +114,7 @@ export {
 export function wrapWindowsHookCommand(scriptPath: string): string {
   // Why: the encoded launcher protects paths across Windows shells and drains stdin when the config points at a missing script.
   const quoted = quotePowerShellString(scriptPath)
-  // Why the guard before ReadToEnd: outside an Orca pane the caller may abandon the pipe,
+  // Why the guard before ReadToEnd: outside a Girra pane the caller may abandon the pipe,
   // and ReadToEnd would strand the launcher there forever (#11549).
   const command = `if (Test-Path -LiteralPath ${quoted} -PathType Leaf) { & ${quoted}; exit $LASTEXITCODE }; ${WINDOWS_POWERSHELL_HOOK_ENVIRONMENT_GUARD}; [Console]::In.ReadToEnd() | Out-Null; exit 0`
   return wrapWindowsPowerShellEncodedCommand(command)

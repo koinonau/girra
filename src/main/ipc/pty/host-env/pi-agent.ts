@@ -15,7 +15,7 @@ export function resolvePiAgentSourceDir(baseEnv: Record<string, string>): string
   }
 
   const publicDir = readEnvWithProcessFallback(baseEnv, 'PI_CODING_AGENT_DIR')
-  // Why: if PI_CODING_AGENT_DIR is a restored Orca overlay with no source shadow, remirroring leaks the overlay tree; fall through to defaults.
+  // Why: if PI_CODING_AGENT_DIR is a restored Girra overlay with no source shadow, remirroring leaks the overlay tree; fall through to defaults.
   if (publicDir && publicDir !== readEnvWithProcessFallback(baseEnv, 'ORCA_PI_CODING_AGENT_DIR')) {
     return publicDir
   }
@@ -63,7 +63,7 @@ export function getInheritedClaudeSessionStampEnvKeysToDelete(
   return CLAUDE_CHILD_SESSION_STAMP_ENV_KEYS.filter((key) => env[key] === undefined)
 }
 
-// Why: a nested terminal can inherit prior OpenCode/Pi overlay env; restore the user's recorded source dir, else strip only Orca-owned values.
+// Why: a nested terminal can inherit prior OpenCode/Pi overlay env; restore the user's recorded source dir, else strip only Girra-owned values.
 export function restoreOrStripOverlayEnv(
   baseEnv: Record<string, string>,
   keys: {
@@ -94,7 +94,7 @@ export function resolveOpenCodeSourceConfigDir(
 
   const configDir = baseEnv.OPENCODE_CONFIG_DIR ?? process.env.OPENCODE_CONFIG_DIR
   const orcaConfigDir = baseEnv.ORCA_OPENCODE_CONFIG_DIR ?? process.env.ORCA_OPENCODE_CONFIG_DIR
-  // Why: with no recorded source dir, an inherited OPENCODE_CONFIG_DIR is Orca-owned, not user config; treating it as user config makes child Orcas mirror the hook dir.
+  // Why: with no recorded source dir, an inherited OPENCODE_CONFIG_DIR is Girra-owned, not user config; treating it as user config makes child Orcas mirror the hook dir.
   if (configDir && orcaConfigDir && configDir === orcaConfigDir) {
     return undefined
   }

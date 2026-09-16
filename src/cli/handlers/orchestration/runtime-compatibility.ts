@@ -18,7 +18,7 @@ export function resolvePackagedWindowsCompatibilityCommand(): 'orca' | 'orca-ide
   }
   throw new RuntimeClientError(
     'invalid_argument',
-    'The packaged Orca launcher did not provide a valid resume command. No question was created.'
+    'The packaged Girra launcher did not provide a valid resume command. No question was created.'
   )
 }
 

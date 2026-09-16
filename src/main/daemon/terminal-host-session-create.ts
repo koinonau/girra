@@ -188,7 +188,7 @@ async function spawnAndPublishSession(
   }
   if (startupCommandWritten && opts.command) {
     const submit = process.platform === 'win32' ? '\r' : '\n'
-    // Why: only Orca-wrapped shells advertise the paste-safe startup barrier.
+    // Why: only Girra-wrapped shells advertise the paste-safe startup barrier.
     session.write(
       buildStartupCommandSubmission(opts.command, {
         submit,

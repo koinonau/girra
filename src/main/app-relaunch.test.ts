@@ -25,7 +25,7 @@ afterEach(() => {
 })
 
 describe('relaunchApp', () => {
-  it('does not carry Orca PATH seeds into the replacement process', () => {
+  it('does not carry Girra PATH seeds into the replacement process', () => {
     process.env.PATH = '/seeded/newest-nvm/bin:/usr/bin'
     _setLaunchPathForTests('/usr/bin')
     let inheritedPath: string | undefined

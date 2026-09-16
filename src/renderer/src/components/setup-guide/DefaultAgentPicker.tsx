@@ -122,7 +122,7 @@ export function DefaultAgentPicker({
             <span className="font-medium">{selectedEntry.label}</span>{' '}
             {translate(
               'auto.components.onboarding.AgentStep.69af7e9c1c',
-              "isn't on your PATH yet. Orca will set it as your default and you can install it any time."
+              "isn't on your PATH yet. Girra will set it as your default and you can install it any time."
             )}
           </span>
           <button

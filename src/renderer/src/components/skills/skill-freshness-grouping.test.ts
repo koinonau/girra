@@ -219,8 +219,8 @@ describe('groupSkillFreshness', () => {
   })
 
   it('raises no group when every finding is project-owned', () => {
-    // Orca's updater only passes --global, so a project copy has no remedy; a row here
-    // would claim Orca considered an update it could never perform.
+    // Girra's updater only passes --global, so a project copy has no remedy; a row here
+    // would claim Girra considered an update it could never perform.
     expect(
       groupSkillFreshness(
         [placement('computer-use', { status: 'unrecognized', topology: 'repo-scope' })],

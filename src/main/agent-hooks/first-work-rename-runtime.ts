@@ -44,7 +44,7 @@ export function firstWorkRenameDeps(
     },
     canRenameOrcaCreatedBranch: (worktreeId) => {
       const meta = store.getWorktreeMeta(worktreeId)
-      // Why: a user branch could coincidentally match a creature name; only Orca-stamped worktrees are safe to auto-rename.
+      // Why: a user branch could coincidentally match a creature name; only Girra-stamped worktrees are safe to auto-rename.
       return !!meta?.orcaCreationSource && meta.preserveBranchOnDelete !== true
     },
     setDisplayName: (worktreeId, displayName) => {

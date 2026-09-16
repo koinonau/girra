@@ -86,7 +86,7 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
   }
 
   const setupGuideItem: Electron.MenuItemConstructorOptions = {
-    label: translateMain('menu.gettingStarted', 'Getting Started with Orca'),
+    label: translateMain('menu.gettingStarted', 'Getting Started with Girra'),
     click: (_menuItem, window) => onOpenSetupGuide(window)
   }
 
@@ -144,7 +144,7 @@ function buildAndApplyMenu(options: RegisterAppMenuOptions): void {
         accelerator: 'CmdOrCtrl+V',
         click: () => {
           // Why: a focused terminal/native-chat pane is not a native editable
-          // control, so raw Electron paste cannot know which Orca surface owns it.
+          // control, so raw Electron paste cannot know which Girra surface owns it.
           const focusedWindow = BrowserWindow.getFocusedWindow()
           if (focusedWindow) {
             focusedWindow.webContents.send('ui:appMenuPaste')

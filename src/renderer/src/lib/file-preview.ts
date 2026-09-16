@@ -21,7 +21,7 @@ import { ORCA_BROWSER_BLANK_URL } from '../../../shared/constants'
 export type PreviewableLanguage = 'html'
 /** Still the answer for flows that need a real `file://` URL (e.g. dropping a file on a browser pane). */
 export const REMOTE_FILE_BROWSER_UNSUPPORTED_MESSAGE =
-  'Open in Orca Browser is only available for local files.'
+  'Open in Girra Browser is only available for local files.'
 
 /** Localized lazily: a module constant would freeze the language at import time. */
 function pairedOutsideWorktreeMessage(): string {
@@ -149,7 +149,7 @@ export function getWorkspaceFileBrowserOpenTarget(params: {
 }): WorkspaceFileBrowserOpenTarget {
   if (getConnectionIdForFile(params.worktreeId, params.filePath) !== null) {
     // Why: Chromium resolves file:// URLs on the local machine. Remote files
-    // need an Orca-served URL before the browser can render them correctly.
+    // need a Girra-served URL before the browser can render them correctly.
     return {
       status: 'unsupported',
       reason: 'remote-worktree',

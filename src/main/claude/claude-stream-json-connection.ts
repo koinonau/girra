@@ -39,7 +39,7 @@ function loadClaudeAgentSdk(): Promise<typeof ClaudeAgentSdk> {
 }
 
 export type ClaudeStreamJsonLaunch = {
-  /** Orca's resolved user CLI; the SDK falls back to a bundled binary that is not installed. */
+  /** Girra's resolved user CLI; the SDK falls back to a bundled binary that is not installed. */
   pathToClaudeCodeExecutable: string
   options: ClaudeStructuredSdkOptions
   cwd: string
@@ -63,7 +63,7 @@ export type ClaudeStreamJsonConnectionHandlers = {
 }
 
 /**
- * Two questions with their own evidence. The root's verdict is first-hand: Orca's
+ * Two questions with their own evidence. The root's verdict is first-hand: Girra's
  * own child handle reported exit, or reported error then close before it ever had
  * a pid. The tree's comes from bounded descendant verification, and `unverifiable`
  * is never collapsed into either neighbour.

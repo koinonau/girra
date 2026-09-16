@@ -83,7 +83,7 @@ describe('repos:add + repos:clone', () => {
     expect(result).toHaveProperty('repo.displayName', 'inf-오케스트레이터')
   })
 
-  it('inherits global non-Orca visibility while retaining the mixed-version safety marker', async () => {
+  it('inherits global non-Girra visibility while retaining the mixed-version safety marker', async () => {
     const result = await handlers.get('repos:add')!(null, { path: '/tmp/from-add', kind: 'git' })
 
     expect(mockStore.addRepo).toHaveBeenCalledWith(

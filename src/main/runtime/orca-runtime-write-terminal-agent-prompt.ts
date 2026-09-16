@@ -128,7 +128,7 @@ export class OrcaRuntimeWithWriteTerminalAgentPrompt extends OrcaRuntimeWithReso
     }
     options.onInputAccepted?.(checkpoint)
     // Providers without a lifecycle verifier still get an honest accepted
-    // receipt; they must not fail a Dispatch merely because Orca cannot prove
+    // receipt; they must not fail a Dispatch merely because Girra cannot prove
     // submission through hooks.
     if (!settlementAgent) {
       return { submits: 1, prompt: inputAccepted }

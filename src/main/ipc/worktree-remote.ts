@@ -1123,7 +1123,7 @@ async function adoptExistingForkRemoteForBranch(
     )
   }
   const restored = await restoreUpstreamAfterMaterialize(execGit, repoPath, target)
-  // Why: a remote another worktree minted is still Orca-owned. Without stamping ownership on
+  // Why: a remote another worktree minted is still Girra-owned. Without stamping ownership on
   // the adopting worktree too, removing the minter leaves the survivor's metadata unowned and
   // #17842's sweep -- which gates solely on `remoteCreated` -- can never reclaim the remote.
   // Why derive: no caller supplies both -- IPC handlers pass a store with no repo id, runtime
@@ -1224,7 +1224,7 @@ export async function cleanupUnusedWorktreePushTargetRemote(
     console.warn(`[worktrees] Failed to clean up fork PR remote for ${removedWorktreeId}`, error)
   }
   // Why: also catches remotes this specific removal couldn't reclaim (legacy metadata,
-  // a preserved branch since deleted, a worktree removed outside Orca) -- see
+  // a preserved branch since deleted, a worktree removed outside Girra) -- see
   // worktree-push-target-reconciliation.ts. Rate-limited internally; safe to call every removal.
   // Not awaited: a repo with a large backlog (the scenario this exists for) can have dozens of
   // candidate remotes, each probed with a couple of git subprocesses -- that must never add
@@ -1271,7 +1271,7 @@ export async function prepareWorktreePushTargetSsh(
     const existingRemote = await findRemoteForUrl(execGit, repoPath, target.remoteUrl)
     if (existingRemote) {
       remoteName = existingRemote
-      // Why: a reused Orca-created fork remote must inherit ownership so deleting the final user can remove it.
+      // Why: a reused Girra-created fork remote must inherit ownership so deleting the final user can remove it.
       remoteCreated = store
         ? isPushTargetRemoteCreatedByKnownWorktree(
             store,
@@ -1290,7 +1290,7 @@ export async function prepareWorktreePushTargetSsh(
         // Why: relays predating fork-remote support reject this exec by policy; name the fix instead of surfacing their rule.
         if (error instanceof Error && error.message.includes('Destructive git remote operations')) {
           throw new Error(
-            'This SSH host is running an older Orca relay that cannot add a fork remote for a PR workspace. Reconnect to deploy the latest relay, then try again.'
+            'This SSH host is running an older Girra relay that cannot add a fork remote for a PR workspace. Reconnect to deploy the latest relay, then try again.'
           )
         }
         throw error

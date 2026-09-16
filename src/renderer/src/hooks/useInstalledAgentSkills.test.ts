@@ -69,7 +69,7 @@ describe('hasInstalledAgentSkill', () => {
       hasInstalledAgentSkill(
         [
           skill({
-            name: 'Orca CLI',
+            name: 'Girra CLI',
             directoryPath: 'C:\\Users\\test\\.agents\\skills\\orca-cli'
           })
         ],

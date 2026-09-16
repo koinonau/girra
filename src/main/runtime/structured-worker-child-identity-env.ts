@@ -8,7 +8,7 @@
  * SIBLING's dispatch mailbox, and a bare `send --type worker_done` can settle a sibling's
  * context-only dispatch, a tier that has no capability token to reject on.
  *
- * `ORCA_CLI_COMMAND: 'orca'` is honest ONLY because of the PATH prepend below. Orca's Linux CLI
+ * `ORCA_CLI_COMMAND: 'orca'` is honest ONLY because of the PATH prepend below. Girra's Linux CLI
  * installs as `orca-ide` so it never claims GNOME Orca's /usr/bin/orca (stablyai/orca#7904), and
  * on packaged macOS/Windows the bundled launcher is reachable only from the app's own resources
  * dir. A PTY worker gets that treatment from `buildPtyHostEnv`; a structured worker has no PTY,

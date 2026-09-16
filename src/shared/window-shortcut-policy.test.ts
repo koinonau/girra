@@ -202,7 +202,7 @@ describe('resolveWindowShortcutAction', () => {
     ).toBeNull()
   })
 
-  it('keeps Orca-first active in terminal context but lets Terminal-first pass risky app chords', () => {
+  it('keeps Girra-first active in terminal context but lets Terminal-first pass risky app chords', () => {
     const macWorktreePalette = {
       code: 'KeyJ',
       key: 'j',

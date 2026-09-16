@@ -128,7 +128,7 @@ export async function resolveCurrentWorktreeSelector(
   if (!enclosingWorktree) {
     throw new RuntimeClientError(
       'selector_not_found',
-      `No Orca-managed worktree contains the current directory: ${currentPath}`
+      `No Girra-managed worktree contains the current directory: ${currentPath}`
     )
   }
 
@@ -277,7 +277,7 @@ export async function getComputerCommandTarget(
 export type EmulatorCliTarget = {
   worktree?: string
   device?: string
-  emulator?: string // Orca id from list
+  emulator?: string // Girra id from list
 }
 
 export async function getEmulatorWorktreeSelector(

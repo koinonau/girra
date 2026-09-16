@@ -6,7 +6,7 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 Measured 2026-09-16. No tracker exists, so these come from the build plan's phases. Phases 0 to 6, 7a and the ADRs are merged; the remote serving cleanup and kothar install is in review.
 
-1. **Phase 7b, Girra identity.** Rename the app to Girra and the CLI to `girra`, then sweep displayed text. The build plan's Phase 7 records the scope and traps; remap first, since its map predates Phase 5.
+1. **Phase 7b, part two: identity constants.** In one commit: `productName`, `appId` `com.koinonau.girra` (with the native Swift owner check), `BASE_APP_NAME`, the executable names with `StartupWMClass`, the NSIS product id, the Windows daemon host root, the keychain service, the Casks, the icons, and the CLI installed as both `girra` and `orca`. Then the first-run migration of the user-data directory and the safe-storage secrets. `handover.md` holds the user's decisions and the map's risk order.
 2. **Workflows.** Prune to the kept set, add the signed macOS build, then re-enable Actions once the user has added the secrets. Drop the pull request template's skill upstream boundary item, whose document does not exist.
 3. **Mobile client dead code.** Remove the presence lock, driver overlays, phone-fit, display mode and `clientKind: 'mobile'` branches deferred by the remote serving cleanup (see `handover.md`).
 

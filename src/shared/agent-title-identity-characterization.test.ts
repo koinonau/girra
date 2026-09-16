@@ -15,7 +15,7 @@ import { getAgentLabel } from './agent-title-identity'
  * resolved to the wrong agent. Task text is minimized here; the corpus stays local.
  */
 
-/** Orca's own owner suffix: the agent that owns the pane is named after the final `- `. */
+/** Girra's own owner suffix: the agent that owns the pane is named after the final `- `. */
 const ownerSuffix = (task: string, agent: string): string => `${task}… - ${agent}`
 
 describe('getAgentLabel — characterization (pre-refactor)', () => {

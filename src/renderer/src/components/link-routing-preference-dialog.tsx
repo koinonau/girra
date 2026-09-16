@@ -142,11 +142,11 @@ export function LinkRoutingPreferenceDialogProvider({
                   {openLinksInAppDefault
                     ? translate(
                         'auto.components.link.routing.preference.dialog.keep.title',
-                        "Keep terminal links in Orca's browser?"
+                        "Keep terminal links in Girra's browser?"
                       )
                     : translate(
                         'auto.components.link.routing.preference.dialog.title',
-                        "Open terminal links in Orca's browser?"
+                        "Open terminal links in Girra's browser?"
                       )}
                 </DialogTitle>
                 <DialogDescription className="text-sm leading-relaxed">
@@ -157,7 +157,7 @@ export function LinkRoutingPreferenceDialogProvider({
                       )
                     : translate(
                         'auto.components.link.routing.preference.dialog.description',
-                        "Use Orca's browser for terminal links, or keep your system browser."
+                        "Use Girra's browser for terminal links, or keep your system browser."
                       )}
                 </DialogDescription>
               </div>
@@ -182,7 +182,7 @@ export function LinkRoutingPreferenceDialogProvider({
                 <p>
                   {translate(
                     'auto.components.link.routing.preference.dialog.orca.note',
-                    'Orca can use imported cookies for logged-in sites.'
+                    'Girra can use imported cookies for logged-in sites.'
                   )}
                 </p>
                 <p>
@@ -195,7 +195,7 @@ export function LinkRoutingPreferenceDialogProvider({
                   <span>
                     {translate(
                       'auto.components.link.routing.preference.dialog.shortcut.note.prefix',
-                      'When links open in Orca,'
+                      'When links open in Girra,'
                     )}
                   </span>
                   <ShortcutKeyCombo
@@ -226,11 +226,11 @@ export function LinkRoutingPreferenceDialogProvider({
               {openLinksInAppDefault
                 ? translate(
                     'auto.components.link.routing.preference.dialog.keep.orca.button',
-                    'Keep Orca'
+                    'Keep Girra'
                   )
                 : translate(
                     'auto.components.link.routing.preference.dialog.orca.button',
-                    'Open in Orca'
+                    'Open in Girra'
                   )}
             </Button>
           </DialogFooter>

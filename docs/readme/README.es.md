@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
+  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Girra" width="64" valign="middle" /></a> Girra
 </h1>
 
 <p align="center">
@@ -20,10 +20,10 @@
   Ejecuta Claude Code, OpenCode o Pi en paralelo — cada uno en su propio worktree, supervisados desde un solo lugar.
 </p>
 
-<h3 align="center"><a href="https://onorca.dev/download"><ins>Descargar Orca</ins></a></h3>
+<h3 align="center"><a href="https://onorca.dev/download"><ins>Descargar Girra</ins></a></h3>
 
 <p align="center">
-  <img src="../assets/readme-hero.jpg" alt="La app de escritorio de Orca ejecutando agentes en worktrees paralelos, con la app companion móvil de Orca en la esquina" width="960" />
+  <img src="../assets/readme-hero.jpg" alt="La app de escritorio de Girra ejecutando agentes en worktrees paralelos, con la app companion móvil de Girra en la esquina" width="960" />
 </p>
 
 ## Características
@@ -82,7 +82,7 @@ Explora PRs, issues y tableros de proyecto dentro de la app — abre un worktree
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Flujos de trabajo de GitHub y Linear en Orca" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Flujos de trabajo de GitHub y Linear en Girra" width="100%" /></picture></a>
 </td>
 </tr>
 <tr>
@@ -104,7 +104,7 @@ Ejecuta agentes en una máquina remota potente con edición completa de archivos
 
 ### Anotar diffs de IA
 
-Deja comentarios en cualquier línea de un diff y envíalos de vuelta al agente — revisa, edita y haz commit sin salir de Orca.
+Deja comentarios en cualquier línea de un diff y envíalos de vuelta al agente — revisa, edita y haz commit sin salir de Girra.
 
 [Docs →](https://www.onorca.dev/docs/review/annotate-ai-diff)
 
@@ -130,15 +130,15 @@ El editor de VS Code con autoguardado en todas partes — arrastra archivos o im
 <tr>
 <td width="50%" valign="middle">
 
-### Orca CLI
+### Girra CLI
 
-Los agentes también manejan Orca — automatiza cualquier flujo de trabajo con `orca worktree create`, `snapshot`, `click` y `fill`.
+Los agentes también manejan Girra — automatiza cualquier flujo de trabajo con `orca worktree create`, `snapshot`, `click` y `fill`.
 
 [Docs →](https://www.onorca.dev/docs/cli/overview)
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="Automatiza Orca desde la CLI" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="Automatiza Girra desde la CLI" width="100%" /></picture></a>
 </td>
 </tr>
 </table>
@@ -156,7 +156,7 @@ Los agentes también manejan Orca — automatiza cualquier flujo de trabajo con 
 
 ## Agentes compatibles
 
-Funciona con **cualquier agente CLI** — si corre en una terminal, corre en Orca.
+Funciona con **cualquier agente CLI** — si corre en una terminal, corre en Girra.
 
 <p>
   <a href="https://docs.anthropic.com/claude/docs/claude-code"><kbd><img src="../assets/claude-logo.svg" alt="Claude Code logo" width="16" valign="middle" /> Claude Code</kbd></a> &nbsp;
@@ -197,7 +197,7 @@ yay -S stably-orca-bin
 
 ## Desarrollo
 
-¿Quieres contribuir o ejecutar Orca localmente? Consulta nuestra guía [CONTRIBUTING.md](../../.github/CONTRIBUTING.md).
+¿Quieres contribuir o ejecutar Girra localmente? Consulta nuestra guía [CONTRIBUTING.md](../../.github/CONTRIBUTING.md).
 
 <a href="https://github.com/stablyai/orca/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=stablyai/orca" alt="Contribuidores de Orca" />
@@ -205,4 +205,4 @@ yay -S stably-orca-bin
 
 ## Licencia
 
-Orca es libre y de código abierto bajo la [Licencia MIT](../../LICENSE).
+Girra es libre y de código abierto bajo la [Licencia MIT](../../LICENSE).

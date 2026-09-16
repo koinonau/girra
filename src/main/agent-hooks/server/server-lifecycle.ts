@@ -200,7 +200,7 @@ export abstract class AgentHookServerLifecycle extends AgentHookServerRuntimeEnv
     this.legacyPaneKeyAliases.clear()
     this.paneKeyAliasPersistenceListener = null
     this.ownerStateInitialized = false
-    // Why: don't unlink the endpoint file — a stale file matches fail-open and avoids a TOCTOU race with a concurrent Orca.
+    // Why: don't unlink the endpoint file — a stale file matches fail-open and avoids a TOCTOU race with a concurrent Girra.
     clearAllListenerCaches(this.state)
     this.notifyStatusChangeListeners()
     this.paneStatusClearListeners.clear()

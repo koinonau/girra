@@ -28,7 +28,7 @@ import { safeFind } from './terminal-search-safe-find'
  * The rewind is reached on every re-entry into the middle of a wrapped line —
  * `_highlightAllMatches` restarting at the row after a match, and `findNext`
  * resuming from the current selection — so this drives the real Terminal +
- * SearchAddon through Orca's own `safeFind`, which deliberately rethrows
+ * SearchAddon through Girra's own `safeFind`, which deliberately rethrows
  * anything that is not the decoration error.
  */
 

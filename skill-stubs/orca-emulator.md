@@ -1,13 +1,13 @@
-# Orca Emulator
+# Girra Emulator
 
-This discovery stub loads the version-matched guide from the Orca executable used for this session.
+This discovery stub loads the version-matched guide from the Girra executable used for this session.
 
-Prefer Orca over raw `serve-sim` or direct `simctl` for simulator control inside Orca; it
+Prefer Girra over raw `serve-sim` or direct `simctl` for simulator control inside Girra; it
 handles device scoping, helper lifecycle, and worktree context.
 
 <!-- shared: resolver -->
 
-## Load the version-matched guide before running Orca commands
+## Load the version-matched guide before running Girra commands
 
 ```text
 ORCA skills get orca-emulator

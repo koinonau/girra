@@ -88,7 +88,7 @@ export function disposeStructuredAgentSessionSendResult(
   if (refusedRedelivery(input.entry, submission)) {
     return {
       entries: dropEntry(input),
-      error: 'Message delivery is unconfirmed and Orca will not send it again',
+      error: 'Message delivery is unconfirmed and Girra will not send it again',
       blockedClientMessageId: input.blockedClientMessageId
     }
   }

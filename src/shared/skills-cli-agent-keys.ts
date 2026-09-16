@@ -1,11 +1,11 @@
 import type { TuiAgent } from './tui-agent'
 
 /**
- * The community `skills` CLI's own `--agent` key for each agent Orca detects.
+ * The community `skills` CLI's own `--agent` key for each agent Girra detects.
  *
  * Why: `skills add` validates `--agent` against its own namespace and exits 1 on
  * an unknown key, so anything we are not certain of maps to null and is dropped
- * rather than guessed. Orca ids and skills keys agree less often than they look
+ * rather than guessed. Girra ids and skills keys agree less often than they look
  * (`claude` is `claude-code`).
  */
 export const SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT = {
@@ -17,7 +17,7 @@ export const SKILLS_CLI_AGENT_KEY_BY_TUI_AGENT = {
 
 /**
  * The shared `.agents/skills` target every universal agent reads. Always included
- * so agents Orca cannot map still receive the skill.
+ * so agents Girra cannot map still receive the skill.
  */
 export const SKILLS_CLI_UNIVERSAL_AGENT_KEY = 'universal'
 
@@ -35,7 +35,7 @@ export function isSkillsCliAgentKeyShaped(value: string): boolean {
   return /^(?:\*|[a-z0-9][a-z0-9.-]*)$/i.test(value)
 }
 
-/** Map detected Orca agents onto `skills --agent` keys, plus the universal target. */
+/** Map detected Girra agents onto `skills --agent` keys, plus the universal target. */
 export function toSkillsCliAgentKeys(detectedAgents: readonly TuiAgent[]): string[] {
   const keys = new Set<string>([SKILLS_CLI_UNIVERSAL_AGENT_KEY])
   for (const agent of detectedAgents) {

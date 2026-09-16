@@ -33,7 +33,7 @@ describe('orcad operations restart safety', () => {
     expect(operationsProse).toContain(
       'A separately paired runtime is outside that boundary; local execution and SSH hosts reached through this runtime are not. An affected or unknown omission, missing scope, truncation, a failed request or lost contact makes the result `unverifiable`'
     )
-    expect(operationsProse).toContain('Orca does not yet provide an atomic census-and-stop fence')
+    expect(operationsProse).toContain('Girra does not yet provide an atomic census-and-stop fence')
   })
 
   it('does not refer to the unavailable shipping design', () => {

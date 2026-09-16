@@ -53,7 +53,7 @@ export const ACCOUNT_METHODS = [
       // Why: capturing a host filesystem path is local-socket-only; paired
       // mobile and remote-runtime tokens must never read host credential paths.
       if (clientKind !== undefined) {
-        throw new Error('Adding Claude accounts is only available on the Orca host runtime.')
+        throw new Error('Adding Claude accounts is only available on the Girra host runtime.')
       }
       return runtime.addClaudeAccountFromConfigDir(params.configDir, {
         runtime: params.runtime,

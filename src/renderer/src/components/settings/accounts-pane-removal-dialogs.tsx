@@ -32,7 +32,7 @@ export function renderAccountsRemovalDialogs(
           <DialogDescription>
             {translate(
               'auto.components.settings.AccountsPane.854ebbcc45',
-              'Orca will delete the managed Claude auth for this saved account. If it is currently active, Orca falls back to the system default Claude login.'
+              'Girra will delete the managed Claude auth for this saved account. If it is currently active, Girra falls back to the system default Claude login.'
             )}
           </DialogDescription>
         </DialogHeader>

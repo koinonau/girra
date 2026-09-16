@@ -15,7 +15,7 @@ const BOOLEAN_FLAGS = new Set(['--keep-profile'])
 const USAGE = `
 win-crash-survival-e2e — packaged crash-survival proof harness (Windows only)
 
-Proves that force-killing ONLY Orca's main process (a real crash, no tree-kill)
+Proves that force-killing ONLY Girra's main process (a real crash, no tree-kill)
 leaves the detached terminal daemon + its pwsh shell alive, with no pwsh FailFast
 (0xE9 "No process is on the other end of the pipe"), and that a relaunch ADOPTS
 the surviving daemon instead of forking a new one. See #7742.
@@ -35,7 +35,7 @@ Required:
 
 Options:
   --exe-path <path>        Installed Orca.exe to drive (default: the per-user
-                           install under %LOCALAPPDATA%\\Programs\\Orca). The
+                           install under %LOCALAPPDATA%\\Programs\\Girra). The
                            harness NEVER installs/uninstalls — it only launches
                            this exe against an isolated userData dir.
   --soak-seconds <n>       Post-crash observation window before relaunch (default: 8)

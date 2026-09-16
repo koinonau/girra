@@ -138,7 +138,7 @@ function countStructuredSessions(sessions: readonly UnclosedStructuredSession[])
  * Both groups are named, though, which is where this differs from the PTY sibling: there, the
  * verdict is a fresh inventory, so anything absent from the live list is PROVEN exited and
  * rightly dropped. Here an `unverifiable` session is unclosed too — folding it into the live
- * count would overstate what Orca watched, and dropping it said "1 agent session" while three
+ * count would overstate what Girra watched, and dropping it said "1 agent session" while three
  * were about to be discarded.
  */
 export function describeUnclosedStructuredSessions(

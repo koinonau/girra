@@ -39,7 +39,7 @@ export function isAgentStatusHooksEnabled(
 export type StartupManagedHookAction = 'install' | 'skip'
 
 // Why never 'remove': this reads THIS instance's settings, but the managed hook files are
-// user-global (~/.claude/settings.json). A second Orca profile with the off switch set would
+// user-global (~/.claude/settings.json). A second Girra profile with the off switch set would
 // delete the hooks every other instance depends on (STA-5679). Honoring the off switch only
 // requires skipping the install; explicit removal stays on the Settings toggle.
 export function resolveStartupManagedHookAction(
@@ -114,8 +114,8 @@ async function runInstaller(entry: ManagedAgentHookInstaller): Promise<AgentHook
 }
 
 // Why (#11549 aftermath): a CLI that falls off PATH keeps its user-wide config invoking
-// Orca's script, but the presence gate below then skips install() forever, freezing the
-// script at whatever Orca generated last. Existing scripts are Orca-owned, so bring them
+// Girra's script, but the presence gate below then skips install() forever, freezing the
+// script at whatever Girra generated last. Existing scripts are Girra-owned, so bring them
 // current before any gating; creating new ones remains install()'s presence-gated job.
 async function refreshExistingManagedScripts(options: InstallOptions): Promise<void> {
   const allowed = options.agents ? new Set(options.agents) : null

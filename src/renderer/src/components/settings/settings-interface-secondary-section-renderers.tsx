@@ -103,7 +103,7 @@ export function renderStatsSettingsSection(context: SettingsRenderContext): Reac
       title={translate('auto.components.settings.Settings.954a8f5aef', 'Stats & Usage')}
       description={translate(
         'auto.components.settings.Settings.8acf3f22e0',
-        'Orca stats plus Claude and OpenCode token analytics.'
+        'Girra stats plus Claude and OpenCode token analytics.'
       )}
       searchEntries={navigation.getSectionSearchEntries('stats')}
     >

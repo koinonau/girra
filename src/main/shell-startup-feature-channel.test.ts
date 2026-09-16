@@ -7,7 +7,7 @@
  *    `process.env` can turn a feature on or off for a shell or its children.
  *    (#15197 shipped exported switches twice and re-broke #11146 and agent
  *    status both times.)
- * 2. Behaviour parity — a pane wrapped only because Orca injected a worktree
+ * 2. Behaviour parity — a pane wrapped only because Girra injected a worktree
  *    HISTFILE runs exactly what an unwrapped pane runs, with no OSC 133.
  */
 import { execFileSync, spawnSync } from 'node:child_process'
@@ -87,7 +87,7 @@ describe('shell startup feature selection', () => {
 
   it('does not wrap bash for history alone', () => {
     // Why: bash has no system rc that clobbers HISTFILE, and `--rcfile` would
-    // replace its login startup-file chain with Orca's approximation.
+    // replace its login startup-file chain with Girra's approximation.
     expect(
       selectShellStartupFeatures({
         shellPath: '/bin/bash',
@@ -148,8 +148,8 @@ describePosix('zsh launch config', () => {
   })
 
   it('does not treat another terminal’s hijacked ZDOTDIR as the user config dir', async () => {
-    // Why: Orca can be launched from a terminal that already owns ZDOTDIR. Only
-    // a dir Orca can prove is its own, or one holding no zsh startup file at
+    // Why: Girra can be launched from a terminal that already owns ZDOTDIR. Only
+    // a dir Girra can prove is its own, or one holding no zsh startup file at
     // all, may be rejected — never a vendor guessed at by name.
     const home = mkdtempSync(join(tmpdir(), 'orca-stacked-zdotdir-'))
     const foreignWrapper = join(home, 'other-terminal', 'zsh')
@@ -166,8 +166,8 @@ describePosix('zsh launch config', () => {
       // user with no ZDOTDIR must end up with none.
       expect(getShellLaunchConfig('/bin/zsh', ['history']).env.ORCA_ORIG_ZDOTDIR).toBeUndefined()
 
-      // Stamped as Orca-owned: rejected by positive identification, even though
-      // the path shape is not one of Orca's.
+      // Stamped as Girra-owned: rejected by positive identification, even though
+      // the path shape is not one of Girra's.
       writeFileSync(join(foreignWrapper, '.zshrc'), '')
       writeFileSync(join(foreignWrapper, ZSH_WRAPPER_DIR_MARKER_FILE), '')
       const stamped = await importFreshLocalPtyShellReady()
@@ -354,7 +354,7 @@ describePosix('history-only pane in a real zsh', () => {
     'emits no OSC 133 and leaves a pane observably identical to an unwrapped one',
     async () => {
       // Why a PTY: the hook runs from the first prompt's precmd sweep, so a shell
-      // started with -c would report a pane Orca had not finished setting up.
+      // started with -c would report a pane Girra had not finished setting up.
       const { env } = await launchHistoryOnly()
       const capture = [
         'PRECMD="${precmd_functions[*]}"; PREEXEC="${preexec_functions[*]}"',
@@ -371,11 +371,11 @@ describePosix('history-only pane in a real zsh', () => {
 
       expect(wrapped.output).not.toContain('\x1b]133;')
       // The whole point of removing the hook rather than parking a no-op in its
-      // place: a history-only pane leaves no Orca name in the user's hook arrays.
+      // place: a history-only pane leaves no Girra name in the user's hook arrays.
       expect(wrapped.values.PRECMD).toBe(unwrapped.values.PRECMD)
       expect(wrapped.values.PREEXEC).toBe(unwrapped.values.PREEXEC)
       // Why compared and not pinned to 'none': a host whose global zsh config
-      // installs its own zle-line-init widget has one either way, and what Orca
+      // installs its own zle-line-init widget has one either way, and what Girra
       // owes is that it looks the same wrapped as unwrapped.
       expect(wrapped.values.LINEINIT).toBe(unwrapped.values.LINEINIT)
       expect(wrapped.values.PRECMD).not.toContain('orca')

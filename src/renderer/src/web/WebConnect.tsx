@@ -24,7 +24,7 @@ export default function WebConnect({
   onConnected
 }: WebConnectProps): React.JSX.Element {
   const existingEnvironment = readStoredWebRuntimeEnvironment()
-  const [name, setName] = useState(existingEnvironment?.name ?? 'Orca Server')
+  const [name, setName] = useState(existingEnvironment?.name ?? 'Girra Server')
   const [pairingCode, setPairingCode] = useState(initialPairingInput ?? '')
   const [error, setError] = useState<string | null>(null)
   const [connecting, setConnecting] = useState(false)
@@ -34,12 +34,12 @@ export default function WebConnect({
   const connect = async (): Promise<void> => {
     setError(null)
     if (!parsedOffer) {
-      setError('Enter a valid Orca pairing URL or pairing code.')
+      setError('Enter a valid Girra pairing URL or pairing code.')
       return
     }
     if (isMixedContentWebSocket(parsedOffer.endpoint)) {
       setError(
-        'This HTTPS page cannot connect to a plain ws:// Orca server. Open the web client over HTTP or pair with a wss:// endpoint.'
+        'This HTTPS page cannot connect to a plain ws:// Girra server. Open the web client over HTTP or pair with a wss:// endpoint.'
       )
       return
     }
@@ -96,12 +96,12 @@ export default function WebConnect({
           </div>
           <div className="min-w-0">
             <h1 className="text-base font-semibold leading-6">
-              {translate('auto.web.WebConnect.e3bcd082ac', 'Connect to Orca')}
+              {translate('auto.web.WebConnect.e3bcd082ac', 'Connect to Girra')}
             </h1>
             <p className="mt-1 text-sm leading-5 text-muted-foreground">
               {translate(
                 'auto.web.WebConnect.3affe7de3a',
-                'Paste a pairing URL from an Orca server that this browser can reach.'
+                'Paste a pairing URL from a Girra server that this browser can reach.'
               )}
             </p>
           </div>

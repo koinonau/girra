@@ -32,7 +32,7 @@ describe('terminal startup command classifier', () => {
     expect(isKnownTuiAgentTerminalStartupCommand(command)).toBe(true)
   })
 
-  it('recognizes Orca agent startup commands by executable name only', () => {
+  it('recognizes Girra agent startup commands by executable name only', () => {
     expect(isKnownTuiAgentTerminalStartupCommand('pi --continue')).toBe(true)
     expect(isKnownTuiAgentTerminalStartupCommand('/Users/me/.local/bin/claude --resume abc')).toBe(
       true

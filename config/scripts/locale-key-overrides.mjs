@@ -15,9 +15,9 @@ const BASE_LOCALE_KEY_OVERRIDES = {
   // because the skills-dialog chip shares the English string but reads as a noun.
   'auto.components.right.sidebar.FileExplorerRow.0fec99bfd7': { zh: '创建副本' },
   'menu.showMobileButton': {
-    ko: 'Orca 모바일 버튼 표시',
-    zh: '显示 Orca Mobile 按钮',
-    ja: 'Orca Mobile ボタンを表示'
+    ko: 'Girra 모바일 버튼 표시',
+    zh: '显示 Girra Mobile 按钮',
+    ja: 'Girra Mobile ボタンを表示'
   },
   'menu.toggleLeftSidebar': {
     ko: '왼쪽 사이드바 표시/숨기기',
@@ -161,7 +161,7 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     zh: '打开 Linear 任务',
     ja: 'Linear タスクを開く'
   },
-  // Onboarding pill beside Orca Mobile: "New" marks a new feature, not a create action.
+  // Onboarding pill beside Girra Mobile: "New" marks a new feature, not a create action.
   'auto.components.sidebar.SidebarNav.c86d83b5c3': {
     ko: '신규',
     zh: '新功能',
@@ -173,9 +173,9 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     ja: 'Discord'
   },
   'auto.components.sidebar.SidebarSettingsHelpMenu.ad3d3ed7f1': {
-    ko: 'Orca 재시작',
-    zh: '重启 Orca',
-    ja: 'Orca を再起動'
+    ko: 'Girra 재시작',
+    zh: '重启 Girra',
+    ja: 'Girra を再起動'
   },
   'auto.components.sidebar.workspace.status.5f9ca31a84': {
     ko: '대기 중',
@@ -198,9 +198,9 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     ja: '終了中…'
   },
   'auto.components.status.bar.ResourceUsageStatusSegment.53dd5560ae': {
-    ko: 'Orca 접기',
-    zh: '折叠 Orca',
-    ja: 'Orca を折りたたむ'
+    ko: 'Girra 접기',
+    zh: '折叠 Girra',
+    ja: 'Girra を折りたたむ'
   },
   'auto.components.settings.ManageSessionsSection.a06ababda0': {
     ko: '모두 강제 종료',
@@ -308,9 +308,9 @@ const BASE_LOCALE_KEY_OVERRIDES = {
     ja: 'Linear イシューを検索...'
   },
   'auto.web.WebConnect.e3bcd082ac': {
-    ko: 'Orca에 연결',
-    zh: '连接到 Orca',
-    ja: 'Orca に接続'
+    ko: 'Girra에 연결',
+    zh: '连接到 Girra',
+    ja: 'Girra に接続'
   },
   'auto.App.caea5b51b9': {
     ko: '지금 재시작',

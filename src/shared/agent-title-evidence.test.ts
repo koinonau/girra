@@ -7,7 +7,7 @@ const reasonFor = (title: string) => collectAgentTitleEvidence(title).reason
 describe('collectAgentTitleEvidence', () => {
   describe('an anchored name outranks a name in task text', () => {
     // Minimized from real recorded titles that resolve to the wrong agent on the ordered chain:
-    // the pane owner is named by Orca's `- <agent>` suffix, the competitor only by task text.
+    // the pane owner is named by Girra's `- <agent>` suffix, the competitor only by task text.
     it.each([
       'Switch Claude off the load balancer… - opencode',
       'Claude structured chat revalidation… - opencode',
@@ -122,7 +122,7 @@ describe('collectAgentTitleEvidence', () => {
   it.each([
     ['Pi ready', 'pi'],
     ['Pi - action required', 'pi']
-  ] as const)('recognizes Orca-controlled synthetic title %s', (title, agent) => {
+  ] as const)('recognizes Girra-controlled synthetic title %s', (title, agent) => {
     expect(agentFor(title)).toBe(agent)
     expect(reasonFor(title)).toBe('anchored')
   })

@@ -121,7 +121,7 @@ export function getRelayShellLaunchConfig(
   }
   if (!wrappersReady) {
     // Why plain login shell: ZDOTDIR pointed at an incomplete wrapper dir makes
-    // zsh skip the user's whole config. Losing Orca's features is recoverable.
+    // zsh skip the user's whole config. Losing Girra's features is recoverable.
     return unwrapped
   }
 

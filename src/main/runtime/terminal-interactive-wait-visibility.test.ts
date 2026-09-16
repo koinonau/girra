@@ -40,7 +40,7 @@ async function createPane(
 describe('terminal interactive-wait visibility (STA-4513, STA-3714)', () => {
   describe('prompts the runtime already matched but never surfaced', () => {
     it('surfaces a startup trust screen on the pane, not only on terminal wait', async () => {
-      // A pane on its trust screen still wears Orca's tab title; the agent has set none.
+      // A pane on its trust screen still wears Girra's tab title; the agent has set none.
       const { runtime, handle } = await createPane({
         paneTitle: 'sta4513-claude',
         foregroundProcess: 'claude',

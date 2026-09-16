@@ -89,7 +89,7 @@ export type SparsePreset = {
 export type CreateWorktreeArgs = {
   repoId: string
   name: string
-  /** True only when `name` came from Orca's creature-name generator rather than the user. Gates
+  /** True only when `name` came from Girra's creature-name generator rather than the user. Gates
    *  name retirement: a generated name is never reissued, but `Orca`, `Runner` and `Molly` are all
    *  in that pool, so a name the user typed must stay reusable. Defaults to false, which keeps
    *  CLI and automation callers on the pre-retirement behavior. */

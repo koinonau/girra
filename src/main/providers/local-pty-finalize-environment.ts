@@ -76,10 +76,10 @@ export function finalizeLocalPtySpawnEnvironment(args: {
     // an inherited ORCA_HISTFILE would still reach the wrapper. Credit: #11146.
     delete env.ORCA_HISTFILE
     // Same for an exported `fish_history` from the fish pane that launched this
-    // Orca: history off means fish's own default, not another worktree's file.
+    // Girra: history off means fish's own default, not another worktree's file.
     dropInheritedOrcaFishHistory(env)
     // And for an exported HISTFILE: history off means the shell's own default,
-    // not the history file of the worktree this Orca was launched from.
+    // not the history file of the worktree this Girra was launched from.
     dropInheritedOrcaHistFile(env)
   }
 
@@ -87,10 +87,10 @@ export function finalizeLocalPtySpawnEnvironment(args: {
     // Why after history injection: the wrapper is what repairs a worktree
     // HISTFILE that the system zshrc clobbers, so the decision to wrap has to
     // see whether this spawn actually injected one.
-    // Why delete: ORCA_SHELL_FEATURES is Orca-owned, and only the launch
+    // Why delete: ORCA_SHELL_FEATURES is Girra-owned, and only the launch
     // config below may name features for this shell.
     delete env.ORCA_SHELL_FEATURES
-    // Why: sanitize a value inherited from a pane an older Orca build launched.
+    // Why: sanitize a value inherited from a pane an older Girra build launched.
     delete env.ORCA_POSIX_SHELL_STARTUP_COMMAND
     plan.getFallbackShellReadyConfig = (shell) => {
       const waitsForShellReady = Boolean(spawn.command)

@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
+  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Girra" width="64" valign="middle" /></a> Girra
 </h1>
 
 <p align="center">
@@ -20,10 +20,10 @@
   Claude Code、OpenCode、Pi を並べて実行 — それぞれを専用のワークツリーで動かし、1 か所で追跡できます。
 </p>
 
-<h3 align="center"><a href="https://onorca.dev/download"><ins>Orca をダウンロード</ins></a></h3>
+<h3 align="center"><a href="https://onorca.dev/download"><ins>Girra をダウンロード</ins></a></h3>
 
 <p align="center">
-  <img src="../assets/readme-hero.jpg" alt="並列ワークツリーでエージェントを実行する Orca デスクトップアプリと、隅に表示された Orca モバイル companion アプリ" width="960" />
+  <img src="../assets/readme-hero.jpg" alt="並列ワークツリーでエージェントを実行する Girra デスクトップアプリと、隅に表示された Girra モバイル companion アプリ" width="960" />
 </p>
 
 ## 機能
@@ -82,7 +82,7 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Orca の GitHub と Linear タスクワークフロー" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Girra の GitHub と Linear タスクワークフロー" width="100%" /></picture></a>
 </td>
 </tr>
 <tr>
@@ -104,7 +104,7 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 
 ### AI Diff に注釈
 
-任意の Diff 行にコメントを付けてエージェントへ送り返せます — Orca から離れずにレビュー、編集、コミットまで完結します。
+任意の Diff 行にコメントを付けてエージェントへ送り返せます — Girra から離れずにレビュー、編集、コミットまで完結します。
 
 [ドキュメント →](https://www.onorca.dev/docs/review/annotate-ai-diff)
 
@@ -130,15 +130,15 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 <tr>
 <td width="50%" valign="middle">
 
-### Orca CLI
+### Girra CLI
 
-エージェント自身も Orca を操作できます — `orca worktree create`、`snapshot`、`click`、`fill` であらゆるワークフローをスクリプト化できます。
+エージェント自身も Girra を操作できます — `orca worktree create`、`snapshot`、`click`、`fill` であらゆるワークフローをスクリプト化できます。
 
 [ドキュメント →](https://www.onorca.dev/docs/cli/overview)
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="CLI から Orca をスクリプト操作" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="CLI から Girra をスクリプト操作" width="100%" /></picture></a>
 </td>
 </tr>
 </table>
@@ -156,7 +156,7 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 
 ## 対応するエージェント
 
-**あらゆる CLI エージェント**で動作します — ターミナルで動くものなら、Orca でも動きます。
+**あらゆる CLI エージェント**で動作します — ターミナルで動くものなら、Girra でも動きます。
 
 <p>
   <a href="https://docs.anthropic.com/claude/docs/claude-code"><kbd><img src="../assets/claude-logo.svg" alt="Claude Code logo" width="16" valign="middle" /> Claude Code</kbd></a> &nbsp;
@@ -205,4 +205,4 @@ yay -S stably-orca-bin
 
 ## ライセンス
 
-Orca は [MIT License](../../LICENSE) の下で無料かつオープンソースです。
+Girra は [MIT License](../../LICENSE) の下で無料かつオープンソースです。

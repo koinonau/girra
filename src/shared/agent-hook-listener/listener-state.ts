@@ -2,7 +2,7 @@ import type { AgentStatusState } from '../agent-status-types'
 import type { ClaudeSubagentRoster } from '../claude-subagent-roster'
 import type { AgentHookEventPayload, ToolSnapshot } from './listener-event'
 
-/** Per-listener-instance caches needing per-PTY teardown; Orca's main process and the relay each get their own, never shared. */
+/** Per-listener-instance caches needing per-PTY teardown; Girra's main process and the relay each get their own, never shared. */
 export type HookListenerState = {
   warnedVersions: Set<string>
   warnedEnvs: Set<string>

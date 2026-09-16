@@ -91,7 +91,7 @@ export function parseHostAccessLink(input: string): ParseHostAccessLinkResult {
     return {
       ok: false,
       kind: 'invalid-input',
-      message: 'Enter an Orca access link or bare pairing code.'
+      message: 'Enter a Girra access link or bare pairing code.'
     }
   }
   let endpoint: URL

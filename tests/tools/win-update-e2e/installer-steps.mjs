@@ -1,6 +1,6 @@
 // Silent NSIS install / update / uninstall and installed-app discovery.
 //
-// Orca ships a per-user oneClick NSIS installer (electron-builder defaults:
+// Girra ships a per-user oneClick NSIS installer (electron-builder defaults:
 // oneClick=true, perMachine=false) named orca-windows-setup.exe. One-click
 // silent mode is `<setup.exe> /S`; the app installs under
 // %LOCALAPPDATA%\Programs\<dir> and the exe is Orca.exe. The install dir casing
@@ -14,7 +14,7 @@ import { spawnSync } from 'node:child_process'
 import { assertWin32 } from './platform-guard.mjs'
 import { runCommandSync } from './powershell-runner.mjs'
 
-const PRODUCT_NAME = 'Orca'
+const PRODUCT_NAME = 'Girra'
 const EXE_NAME = 'Orca.exe'
 
 /** Programs root that per-user oneClick NSIS installs into. */
@@ -178,7 +178,7 @@ export function getExeVersion(exePath) {
  * SAFETY: `installDir` is REQUIRED and must be the exact directory the harness
  * installed into this run — there is deliberately no scan-and-discover fallback,
  * because a `null` default once made this function locate and uninstall the
- * developer's REAL Orca. It additionally refuses to run against the default
+ * developer's REAL Girra. It additionally refuses to run against the default
  * per-user install location unless `allowDefaultLocation` is explicitly set (only
  * the owns-the-install non-isolated teardown may do so).
  */
@@ -191,7 +191,7 @@ export function silentUninstall(installDir, { allowDefaultLocation = false } = {
   if (!allowDefaultLocation && pathsEqual(resolved, path.join(programsRoot(), PRODUCT_NAME))) {
     throw new Error(
       `Refusing to uninstall the default install location "${resolved}" — this is where a ` +
-        `developer's REAL Orca lives. Isolated mode must target a separate --install-dir.`
+        `developer's REAL Girra lives. Isolated mode must target a separate --install-dir.`
     )
   }
   const exe = path.join(resolved, EXE_NAME)

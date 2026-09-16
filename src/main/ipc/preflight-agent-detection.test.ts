@@ -167,7 +167,7 @@ describe('preflight', () => {
     await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'opencode'])
   })
 
-  it('does not report Claude Agent Teams when only the Orca shim is present', async () => {
+  it('does not report Claude Agent Teams when only the Girra shim is present', async () => {
     execFileAsyncMock.mockImplementation(async (command, args) => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
@@ -187,7 +187,7 @@ describe('preflight', () => {
     await expect(detectInstalledAgents()).resolves.toEqual([])
   })
 
-  it('reports Claude Agent Teams when both Orca and Claude are present', async () => {
+  it('reports Claude Agent Teams when both Girra and Claude are present', async () => {
     execFileAsyncMock.mockImplementation(async (command, args) => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
@@ -441,7 +441,7 @@ describe('preflight', () => {
     await expect(detectInstalledAgents({ wslDistro: 'Ubuntu' })).resolves.toEqual(['claude'])
   })
 
-  it('detects Claude Agent Teams from an alias Orca executable', async () => {
+  it('detects Claude Agent Teams from an alias Girra executable', async () => {
     execFileAsyncMock.mockImplementation(async (command, args) => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)
@@ -461,7 +461,7 @@ describe('preflight', () => {
     await expect(detectInstalledAgents()).resolves.toEqual(['claude', 'claude-agent-teams'])
   })
 
-  it('deduplicates Claude Agent Teams when several Orca executables exist', async () => {
+  it('deduplicates Claude Agent Teams when several Girra executables exist', async () => {
     execFileAsyncMock.mockImplementation(async (command, args) => {
       if (command !== 'which') {
         throw new Error(`unexpected command ${String(command)}`)

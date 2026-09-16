@@ -12,7 +12,7 @@ import {
 } from './session-search-indexer-test-fixture'
 
 // Reviewer F4, and the plan's fourth open decision: a conversation held in
-// Orca's own chat is the same file in the same place as one held in the
+// Girra's own chat is the same file in the same place as one held in the
 // terminal, so it must be searchable through the same path with no panel
 // mounted, no scanner service running, and nobody calling refresh. Everything
 // below is the library and the filesystem.
@@ -39,7 +39,7 @@ afterEach(async () => {
   await harness.cleanup()
 })
 
-/** The rows Orca's native chat writes: uuid, block content, cwd on the first turn. */
+/** The rows Girra's native chat writes: uuid, block content, cwd on the first turn. */
 function nativeChatTurn(uuid: string, role: 'user' | 'assistant', text: string): string {
   const timestamp = new Date(1_740_000_000_000 + Number(uuid.slice(-2)) * 60_000).toISOString()
   return JSON.stringify({

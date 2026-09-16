@@ -2,11 +2,11 @@
 // small drift here breaks different terminal transports in different ways.
 import { SHELL_STARTUP_FEATURE_ENV } from './shell-startup-features'
 
-/** Basename of the file every Orca-generated zsh wrapper dir is stamped with. */
+/** Basename of the file every Girra-generated zsh wrapper dir is stamped with. */
 export const ZSH_WRAPPER_DIR_MARKER_FILE = '.orca-shell-wrapper'
 
-export const ZSH_WRAPPER_DIR_MARKER_CONTENT = `# Orca-generated zsh startup wrapper directory.
-# Its presence is how Orca recognises its own wrapper dir instead of treating it
+export const ZSH_WRAPPER_DIR_MARKER_CONTENT = `# Girra-generated zsh startup wrapper directory.
+# Its presence is how Girra recognises its own wrapper dir instead of treating it
 # as the user's ZDOTDIR. Do not edit; the whole directory is regenerated.
 `
 
@@ -18,7 +18,7 @@ export const ZSH_WRAPPER_DIR_MARKER_CONTENT = `# Orca-generated zsh startup wrap
  * variable, so it survives .zshenv -> .zprofile -> .zshrc -> .zlogin in this
  * process but physically cannot reach a child. Unsetting before the user's own
  * .zshenv is sourced means nothing the user's config spawns can see or inherit
- * Orca's feature selection.
+ * Girra's feature selection.
  */
 export const ZSH_FEATURE_CHANNEL_BLOCK = `builtin typeset -ga _orca_shell_features
 _orca_shell_features=(\${(s:,:)\${${SHELL_STARTUP_FEATURE_ENV}:-}})
@@ -26,7 +26,7 @@ builtin unset ${SHELL_STARTUP_FEATURE_ENV}
 # Why ORCA_HISTFILE is consumed HERE and not in the deferred hook: a user config
 # that replaces precmd_functions wholesale drops the hook, and an exported value
 # nothing will ever consume is then inherited by every child of this pane,
-# including a nested Orca (#11146). Captured non-exported, it cannot escape.
+# including a nested Girra (#11146). Captured non-exported, it cannot escape.
 builtin typeset -g _orca_histfile="\${ORCA_HISTFILE:-}"
 builtin unset ORCA_HISTFILE
 __orca_has_feature() { (( \${_orca_shell_features[(Ie)$1]} )) }`
@@ -48,7 +48,7 @@ export const SHELL_STARTUP_IDENTITY_MARKER_BLOCK = `__orca_has_feature identity 
  * back here means zsh reads all of them from the user's own directory, exactly
  * as it would with no wrapper at all. In particular /etc/zshrc's unguarded
  * `HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history` then derives the user's own path
- * instead of one inside Orca's wrapper dir, so #11044 cannot happen rather than
+ * instead of one inside Girra's wrapper dir, so #11044 cannot happen rather than
  * having to be repaired afterwards.
  *
  * ORCA_ORIG_ZDOTDIR is consumed: it has done its job, and leaving it exported
@@ -57,14 +57,14 @@ export const SHELL_STARTUP_IDENTITY_MARKER_BLOCK = `__orca_has_feature identity 
  * Why the value is vetted rather than trusted: the launch config only sets this
  * when it resolved a usable dir, but a pane also inherits its parent's
  * environment, so a stale ORCA_ORIG_ZDOTDIR written by an older build can arrive
- * on its own. Handing that back would point ZDOTDIR at an Orca wrapper dir — the
+ * on its own. Handing that back would point ZDOTDIR at a Girra wrapper dir — the
  * self-loop the Node-side ownership check exists to prevent, arriving by a route
  * that check never sees. Identification stays positive, as it is in Node: a
- * stamped marker file, or Orca's own path shape for wrappers older builds wrote.
+ * stamped marker file, or Girra's own path shape for wrappers older builds wrote.
  */
 export const ZSH_ZDOTDIR_HANDBACK_BLOCK = `__orca_usable_zdotdir() {
   [[ -n "\${1:-}" ]] || return 1
-  # Orca's own dir, by marker file or by the shape older builds wrote.
+  # Girra's own dir, by marker file or by the shape older builds wrote.
   [[ "$1" != */shell-ready/zsh ]] || return 1
   [[ ! -f "$1/${ZSH_WRAPPER_DIR_MARKER_FILE}" ]] || return 1
   # A directory holding no zsh startup file at all is not a config root,
@@ -117,8 +117,8 @@ export { BASH_PROMPT_COMMAND_COMPOSITION_BLOCK } from './bash-prompt-command-com
  * hook. The `elif` below is inert under bash, where ZDOTDIR is normally unset.
  *
  * That file assigns `HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history` with no
- * check-before-set, and it runs before any wrapper file Orca controls — so the
- * injected value is already gone, and because ZDOTDIR still points at Orca's
+ * check-before-set, and it runs before any wrapper file Girra controls — so the
+ * injected value is already gone, and because ZDOTDIR still points at Girra's
  * wrapper dir the replacement lands INSIDE it. Per-worktree history was a
  * silent no-op on the primary platform as a result (#11044).
  *
@@ -130,7 +130,7 @@ export const BASH_HISTFILE_RESTORE_BLOCK = `if [[ -n "\${ORCA_HISTFILE:-}" ]]; t
   HISTFILE="$ORCA_HISTFILE"
   builtin unset ORCA_HISTFILE
 elif [[ "\${HISTFILE:-}" == "$ZDOTDIR/.zsh_history" ]]; then
-  # Why also when Orca injected nothing: /etc/zshrc derived this from Orca's
+  # Why also when Girra injected nothing: /etc/zshrc derived this from Girra's
   # wrapper ZDOTDIR, so history would accumulate INSIDE the wrapper dir and the
   # user's real history would be invisible — the plain #11044 bug, with no
   # per-worktree scoping involved. Matching the exact clobbered value means a

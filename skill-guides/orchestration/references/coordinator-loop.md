@@ -31,7 +31,7 @@ ORCA orchestration worker-start --task <task_id> --worktree current --agent clau
 ```
 
 `--effort` requires `--model`; neither option combines with `--terminal`. A
-connected worker server must advertise launch-preference support before Orca
+connected worker server must advertise launch-preference support before Girra
 forwards either field. Compare `launch.requested` with `launch.effective`; never
 claim a model or effort from requested arguments alone.
 

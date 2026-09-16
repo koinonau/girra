@@ -46,7 +46,7 @@ export class AutomationService {
   private readonly runs: AutomationRunWriter
   private readonly completionWatcher: AutomationRunCompletionWatcher | null
   /** Installed by desktop IPC registration, where external probes live; null on
-   *  runtime servers. Orca's own automation traffic parks queued external
+   *  runtime servers. Girra's own automation traffic parks queued external
    *  probes behind this lease, whichever transport carried it. */
   externalProbePriority: (<T>(run: () => T) => T) | null = null
 
@@ -251,7 +251,7 @@ export class AutomationService {
         runId: missed.id,
         status: 'skipped_missed',
         workspaceId: automation.workspaceId,
-        error: 'Orca was unavailable during the missed-run grace window.'
+        error: 'Girra was unavailable during the missed-run grace window.'
       })
       this.store.advanceAutomationNextRun(automation.id, now)
       return

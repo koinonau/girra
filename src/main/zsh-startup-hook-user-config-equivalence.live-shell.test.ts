@@ -3,9 +3,9 @@
  * what an unwrapped pane would, for every odd or hostile `.zshenv` shape.
  *
  * These cases were previously asserted one expected value at a time against
- * `ORCA_ORIG_ZDOTDIR` — the output of Orca's own shell-side ZDOTDIR discovery.
+ * `ORCA_ORIG_ZDOTDIR` — the output of Girra's own shell-side ZDOTDIR discovery.
  * That discovery is gone: the wrapper hands ZDOTDIR back on its first lines and
- * zsh resolves the rest natively, so there is no Orca-computed value left to
+ * zsh resolves the rest natively, so there is no Girra-computed value left to
  * assert on. The contract those tests were really protecting is the one below,
  * and stated as an equivalence it is stricter — it pins the wrapped pane to
  * whatever the host's own zsh does, including on hosts where that differs,
@@ -251,7 +251,7 @@ function wrappedEnv(home: string): Record<string, string> {
   const launch = getShellLaunchConfig(ZSH_PATH, features)
   // Why ORCA_ORIG_ZDOTDIR is dropped rather than pinned to the sandbox home:
   // these cases are about a user who has no inherited ZDOTDIR, so the pane must
-  // resolve purely from HOME — and Orca must not invent a ZDOTDIR for it. The
+  // resolve purely from HOME — and Girra must not invent a ZDOTDIR for it. The
   // launch config computes this one from the real process env, which would
   // otherwise leak the developer's own ZDOTDIR into the run.
   const { ORCA_ORIG_ZDOTDIR: _dropped, ...env } = launch.env
@@ -400,7 +400,7 @@ describe.skipIf(process.platform === 'win32')('the fixes the old wrapper was bui
 
   itWithZsh('gives the user’s startup files their own ZDOTDIR while they run (#4667)', async () => {
     // Why it mattered: user startup files resolve plugin and theme paths from
-    // $ZDOTDIR, so sourcing them with Orca's dir in place sent those lookups into
+    // $ZDOTDIR, so sourcing them with Girra's dir in place sent those lookups into
     // the wrapper. The old wrapper swapped ZDOTDIR around each source; this one
     // never takes it away, so each file sees what it would see unwrapped.
     const home = makeZshHome({})
@@ -422,14 +422,14 @@ describe.skipIf(process.platform === 'win32')('the fixes the old wrapper was bui
     }
   })
 
-  itWithZsh('refuses an inherited ZDOTDIR that is an Orca wrapper dir (#15258)', async () => {
+  itWithZsh('refuses an inherited ZDOTDIR that is a Girra wrapper dir (#15258)', async () => {
     // Why the shell checks this and not only Node: the launch config sets
     // ORCA_ORIG_ZDOTDIR when it resolved a usable dir, but a pane also inherits
     // its parent's environment, so a stale value written by an older build can
     // arrive on its own — a route the Node-side check never sees. Handing that
     // back would point ZDOTDIR at a wrapper dir, which is the self-loop the
     // ownership check exists to prevent. Identification stays positive: a stamped
-    // marker file, or Orca's own path shape for wrappers older builds wrote.
+    // marker file, or Girra's own path shape for wrappers older builds wrote.
     const home = makeZshHome({ '.zshrc': 'export ORCA_TEST_FROM_ZSHRC=1\n' })
     const foreign = join(home, 'other-terminal', 'zsh')
     mkdirSync(foreign, { recursive: true })
@@ -450,11 +450,11 @@ describe.skipIf(process.platform === 'win32')('the fixes the old wrapper was bui
     }
   })
 
-  itWithZsh('leaves a nested Orca nothing of its own to inherit (#11044, #11146)', async () => {
+  itWithZsh('leaves a nested Girra nothing of its own to inherit (#11044, #11146)', async () => {
     // Why this closes #11044's plain shape rather than repairing it: that bug was
-    // a nested zsh inheriting Orca's ZDOTDIR, so /etc/zshrc derived HISTFILE
+    // a nested zsh inheriting Girra's ZDOTDIR, so /etc/zshrc derived HISTFILE
     // inside the wrapper dir. A pane can no longer hand any child a ZDOTDIR that
-    // is Orca's, because it does not have one itself past the first few lines.
+    // is Girra's, because it does not have one itself past the first few lines.
     const home = makeZshHome({ '.zshrc': 'export ORCA_TEST_FROM_ZSHRC=1\n' })
     try {
       const { values } = await runZshPty({
@@ -466,7 +466,7 @@ describe.skipIf(process.platform === 'win32')('the fixes the old wrapper was bui
         report: ['ORCA_CHILD_ENV', 'ORCA_CHILD_ZDOTDIR']
       })
 
-      // Neither channel survives into a child, and no ZDOTDIR of Orca's does.
+      // Neither channel survives into a child, and no ZDOTDIR of Girra's does.
       // `UNSET` here is the probe's rendering of an empty capture, i.e. `env`
       // printed no ZDOTDIR line at all.
       expect(values.ORCA_CHILD_ENV).toBe('0')

@@ -109,7 +109,7 @@ export async function prepareWorktreePushTargetWithExec(
     const existingRemote = await findRemoteForUrl(execGit, repoPath, target.remoteUrl)
     if (existingRemote) {
       remoteName = existingRemote
-      // Why: if a later PR worktree reuses an Orca-created fork remote, it
+      // Why: if a later PR worktree reuses a Girra-created fork remote, it
       // must inherit ownership so deleting the final user can remove it.
       remoteCreated = isRemoteCreatedByKnownWorktree(existingRemote)
       // Why: a remote created before this fix (or reused for a second branch on the

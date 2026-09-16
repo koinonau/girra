@@ -1,6 +1,6 @@
 # Remote wire compatibility
 
-Orca's remote-server feature pairs a desktop client to a remote Orca runtime, and
+Girra's remote-server feature pairs a desktop client to a remote Girra runtime, and
 users update the two independently. **Mixed versions are the normal state**, not an
 edge case. This page is the contract for changing anything a paired client and host
 exchange: the runtime RPC envelope, the terminal binary stream, and the content
@@ -77,9 +77,9 @@ runtime capability the same way Rule 2 gates an opcode.
 
 ## Enforcement
 
-Nothing checks these rules automatically. Orca's cross-version wire harness paired the
-working tree against Orca's newest release tag; girra removed it on 2026-09-14, because
-girra does not ship Orca's releases. Skew between two girra builds, such as a laptop and
+Nothing checks these rules automatically. The cross-version wire harness paired the
+working tree against Orca's newest release tag; Girra removed it on 2026-09-14, because
+Girra does not ship Orca's releases. Skew between two Girra builds, such as a laptop and
 the relay it installed on a remote host, still happens, so a change on any path a paired
 client and host exchange needs its own reasoning against the three rules above.
 

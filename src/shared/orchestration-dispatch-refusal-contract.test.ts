@@ -15,7 +15,7 @@ describe('buildInjectRejectionMessage', () => {
     expect(message).toContain('no recognized agent detected')
   })
 
-  it('names every agent Orca recognizes by process name, not launch id', () => {
+  it('names every agent Girra recognizes by process name, not launch id', () => {
     expect(message).not.toContain('claude-agent-teams')
     for (const config of Object.values(TUI_AGENT_CONFIG)) {
       expect(message).toContain(config.expectedProcess)

@@ -27,7 +27,7 @@ export function wrapRuntimeHomeHookCommand(
   // Why two forms: the missing-script fallback owns stdin, so it follows the rule of the host
   // it lands on. POSIX callers close the pipe, so capture-first is safe there and a mid-write
   // exit stays visible as EPIPE (#8110). A Windows caller may abandon the pipe, so there the
-  // answer comes first and the drain only runs with an Orca env behind it (#11549).
+  // answer comes first and the drain only runs with a Girra env behind it (#11549).
   const posixMissingScriptFallback = neutralJson ? `${drain}; ${neutralJson}` : drain
   const windowsMissingScriptFallback = [
     ...(neutralJson ? [neutralJson] : []),

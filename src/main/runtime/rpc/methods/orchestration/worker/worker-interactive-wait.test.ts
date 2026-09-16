@@ -84,7 +84,7 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
           leafId: LEAF_ID,
           paneRuntimeId: 1,
           ptyId: PTY_ID,
-          // Orca's tab title: the agent has set none, so the title neither blocks nor clears.
+          // Girra's tab title: the agent has set none, so the title neither blocks nor clears.
           paneTitle: 'worker'
         }
       ]
@@ -146,7 +146,7 @@ describe('worker-show interactive wait (STA-3714, STA-4513)', () => {
   })
 
   it('omits the field entirely for a worker it could not verify', async () => {
-    // Why not null: null is a claim that Orca looked. A replaced process is never looked at,
+    // Why not null: null is a claim that Girra looked. A replaced process is never looked at,
     // and reporting "no wait" there is the false negative this field exists to remove.
     const result = (await showWorkerPaneServing(CLAUDE_TRUST, {
       breakIdentity: true

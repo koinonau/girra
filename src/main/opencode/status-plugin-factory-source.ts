@@ -185,7 +185,7 @@ export function getStatusPluginFactorySource(): string[] {
     '          );',
     '        } else {',
     '          // Why: Instance disposal can happen while the PTY stays alive;',
-    '          // publish a final idle so Orca does not retain a dead owner.',
+    '          // publish a final idle so Girra does not retain a dead owner.',
     '          if (!deliveredStatusKey.startsWith("idle:") || ownsDeliveredMessagePart) {',
     '            await setStatus(',
     '              "idle",',
