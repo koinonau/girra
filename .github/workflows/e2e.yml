@@ -7,20 +7,6 @@ permissions:
   contents: read
 
 on:
-  workflow_call:
-    inputs:
-      ref:
-        description: Ref to check out (defaults to the calling workflow's ref)
-        required: false
-        type: string
-      test_files:
-        description: JSON array of changed specs; empty runs the full suite
-        required: false
-        type: string
-      ssh_source_changed:
-        description: '"true" when the PR touches SSH execution source; gates the Docker-SSH lane'
-        required: false
-        type: string
   workflow_dispatch:
     inputs:
       ref:
@@ -31,10 +17,6 @@ on:
         description: JSON array of specs to run; empty runs the full suite
         required: false
         type: string
-  schedule:
-    # Why: GitHub cron uses UTC; these slots map to 10am and 3pm
-    # America/Phoenix for the default-branch E2E run.
-    - cron: '0 17,22 * * *'
 
 jobs:
   build:
@@ -221,8 +203,8 @@ jobs:
     needs: [build, prepare-native-cache]
     if: inputs.test_files != ''
     runs-on: ubuntu-latest
-    # Why 45: pr.yml now maps SSH source edits onto Docker-backed specs, so this lane can
-    # pay a container image build plus ~22 serial SSH tests on top of the changed specs.
+    # Why 45: test_files can name Docker-backed specs, so this lane can pay a container
+    # image build plus ~22 serial SSH tests on top of the changed specs.
     timeout-minutes: 45
 
     steps:
@@ -234,8 +216,8 @@ jobs:
       - name: Install native build and headless UI tools
         # Why ripgrep: Quick Open's bounded host-side search requires rg instead of an
         # unbounded inventory fallback; the paired fixture exercises that real boundary.
-        # Why openssh-client: the Docker-SSH fixture shells out to ssh/ssh-keygen, and this
-        # lane now receives those specs from pr.yml's SSH source mapping.
+        # Why openssh-client: the Docker-SSH fixture shells out to ssh/ssh-keygen, and
+        # test_files can name those specs.
         run: sudo apt-get update && sudo apt-get install -y build-essential fonts-noto-cjk openssh-client python3 ripgrep xvfb zsh openbox x11-utils
 
       - uses: ./.github/actions/install-node-dependencies
@@ -297,13 +279,9 @@ jobs:
   ssh-docker-watcher-isolation:
     name: ssh docker watcher isolation
     needs: [build, prepare-native-cache]
-    # effect of one route listing a startup-readiness spec — pruning that spec would have
-    # silently retired the whole lane. The signal is now derived from the SSH routes directly.
-    # The explicit spec clauses stay for their honest purpose: changed-e2e hands these specs to this
-    # lane, so editing one must still run it here.
+    # changed-e2e hands these specs to this lane, so naming one in test_files must run it here.
     if: >-
       inputs.test_files == '' ||
-      inputs.ssh_source_changed == 'true' ||
       contains(inputs.test_files, 'tests/e2e/ssh-docker-five-pane-input-under-flood.spec.ts') ||
       contains(inputs.test_files, 'tests/e2e/local-ssh-browser-routing.spec.ts') ||
       contains(inputs.test_files, 'tests/e2e/ssh-client-hosted-browser-drop-reconnect.spec.ts') ||

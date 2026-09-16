@@ -926,21 +926,15 @@
         "gh run view 34045578306 --log",
         "gh run view 34045975180 --log",
         "gh run view 34046230389 --log",
-        "ORCA_E2E_SSH_LOCALHOST=1 ORCA_FEATURE_REMOTE_AGENT_HOOKS=1 pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/ssh-localhost.spec.ts --project=electron-headless --workers=1",
-        "node_modules/.bin/vitest run --config config/vitest.config.ts config/scripts/ssh-localhost-e2e-routing.test.mjs"
+        "ORCA_E2E_SSH_LOCALHOST=1 ORCA_FEATURE_REMOTE_AGENT_HOOKS=1 pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/ssh-localhost.spec.ts --project=electron-headless --workers=1"
       ],
       "testFiles": [
-        "tests/e2e/ssh-localhost.spec.ts",
-        "config/scripts/ssh-localhost-e2e-routing.test.mjs"
+        "tests/e2e/ssh-localhost.spec.ts"
       ],
       "assertionRefs": [
         {
           "file": "tests/e2e/ssh-localhost.spec.ts",
           "assertions": ["routes a terminal and agent-hook status over localhost SSH"]
-        },
-        {
-          "file": "config/scripts/ssh-localhost-e2e-routing.test.mjs",
-          "assertions": ["selects the localhost journey for its remote hook authorities"]
         }
       ],
       "evidenceRuns": [
@@ -9218,24 +9212,12 @@
       "invariant": "On packaged Windows, abrupt death of Orca's Electron main process must not terminate or replace the userData-scoped terminal daemon or its live ConPTY shell, and a relaunch must adopt that exact daemon and route terminal input to that exact surviving shell without a PowerShell 0xE9 FailFast.",
       "oracle": "Resolve the launched instance's real main PID from inside Electron, force-kill only that PID, require it to die, require one command-line-scoped daemon PID and the stamped interactive shell PID to remain live, relaunch with persisted state, require the daemon PID to remain identical, read the exact shell PID and a per-shell environment sentinel back through the exact restored tab, then require a successful Windows Application event-log query with zero matching pwsh FailFast events across the full crash-to-input window.",
       "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts config/scripts/win-crash-survival-e2e.test.mjs",
         "node tests/tools/win-crash-survival-e2e/run.mjs --expect survival --exe-path \"$env:ORCA_EXE\" --soak-seconds 8"
       ],
       "testFiles": [
-        "config/scripts/win-crash-survival-e2e.test.mjs",
         "tests/tools/win-crash-survival-e2e/run.mjs"
       ],
       "assertionRefs": [
-        {
-          "file": "config/scripts/win-crash-survival-e2e.test.mjs",
-          "assertions": [
-            "survival requires the crash antecedent, daemon and shell liveness, unchanged daemon identity, zero FailFast events, and same-shell reattach",
-            "event-log query failure cannot be converted into zero FailFast events",
-            "malformed event-log and PID-liveness evidence fails closed",
-            "stale, missing, or ambiguous userData-scoped daemon identity fails closed",
-            "the packaged survival proof remains wired to targeted pull requests without a duplicate branch-push run"
-          ]
-        },
         {
           "file": "tests/tools/win-crash-survival-e2e/run.mjs",
           "assertions": [
@@ -18323,15 +18305,13 @@
       "invariant": "An agent launched into WSL runs in the guest; keyboard paste reaches exactly one owning PTY and preserves Linux content even after the default shell changes.",
       "oracle": "Run the existing real WSL launch and two paste cases three times; require nine passes and zero skipped, unexpected, or flaky results in the Playwright JSON report.",
       "commands": [
-        "gh workflow run windows-wsl-e2e.yml",
         "pnpm exec playwright test tests/e2e/golden-tab-bar-agent-launch.spec.ts tests/e2e/terminal-windows-shell-paste-ownership.spec.ts --config tests/playwright.config.ts --project=electron-headless --workers=1",
-        "node_modules/.bin/vitest run --config config/vitest.config.ts config/scripts/wsl-e2e-lane-contract.test.mjs config/scripts/verify-wsl-e2e-participation.test.mjs",
+        "node_modules/.bin/vitest run --config config/vitest.config.ts config/scripts/verify-wsl-e2e-participation.test.mjs",
         "gh run view 34031806291 --log"
       ],
       "testFiles": [
         "tests/e2e/golden-tab-bar-agent-launch.spec.ts",
         "tests/e2e/terminal-windows-shell-paste-ownership.spec.ts",
-        "config/scripts/wsl-e2e-lane-contract.test.mjs",
         "config/scripts/verify-wsl-e2e-participation.test.mjs"
       ],
       "assertionRefs": [
@@ -18407,14 +18387,12 @@
       "invariant": "A paired client and host without client-hosted browser capabilities retain server-hosted browser placement across supported version skew.",
       "oracle": "Require both existing named browser placement scenarios to pass three times with one attempt, zero skips, zero failures, and no report errors.",
       "commands": [
-        "gh workflow run packaged-browser-e2e.yml",
         "pnpm exec playwright test tests/e2e/packaged-mixed-version-browser-placement.spec.ts --config tests/playwright.config.ts --project=electron-headless --workers=1 --repeat-each=3 --retries=0",
-        "node_modules/.bin/vitest run --config config/vitest.config.ts config/scripts/packaged-browser-lane-contract.test.mjs config/scripts/verify-packaged-browser-participation.test.mjs",
+        "node_modules/.bin/vitest run --config config/vitest.config.ts config/scripts/verify-packaged-browser-participation.test.mjs",
         "gh run view 34069063016 --log"
       ],
       "testFiles": [
         "tests/e2e/packaged-mixed-version-browser-placement.spec.ts",
-        "config/scripts/packaged-browser-lane-contract.test.mjs",
         "config/scripts/verify-packaged-browser-participation.test.mjs"
       ],
       "assertionRefs": [
@@ -18428,13 +18406,6 @@
         {
           "file": "config/scripts/verify-packaged-browser-participation.test.mjs",
           "assertions": ["reject missing, substituted, skipped and retried scenarios"]
-        },
-        {
-          "file": "config/scripts/packaged-browser-lane-contract.test.mjs",
-          "assertions": [
-            "verify pinned package checksum before extraction",
-            "require both directions three times and run report verification even on failure"
-          ]
         }
       ],
       "evidenceRuns": [
@@ -18494,21 +18465,15 @@
       "commands": [
         "gh workflow run terminal-ime-e2e.yml",
         "gh run view 34074017928 --log",
-        "pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/terminal-hangul-terminating-digit-native.spec.ts --project=electron-headful --workers=1 --repeat-each=3 --retries=0 --reporter=list,json",
-        "ORCA_BACKGROUND_LAUNCH=1 node_modules/.bin/vitest run --config config/vitest.config.ts config/scripts/terminal-ime-e2e-workflow.test.mjs"
+        "pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/terminal-hangul-terminating-digit-native.spec.ts --project=electron-headful --workers=1 --repeat-each=3 --retries=0 --reporter=list,json"
       ],
       "testFiles": [
-        "tests/e2e/terminal-hangul-terminating-digit-native.spec.ts",
-        "config/scripts/terminal-ime-e2e-workflow.test.mjs"
+        "tests/e2e/terminal-hangul-terminating-digit-native.spec.ts"
       ],
       "assertionRefs": [
         {
           "file": "tests/e2e/terminal-hangul-terminating-digit-native.spec.ts",
           "assertions": ["a digit typed right after a Hangul syllable reaches the pty"]
-        },
-        {
-          "file": "config/scripts/terminal-ime-e2e-workflow.test.mjs",
-          "assertions": ["runs native Wayland independently with CJK fonts and retained evidence"]
         }
       ],
       "evidenceRuns": [

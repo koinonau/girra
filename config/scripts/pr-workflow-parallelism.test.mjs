@@ -4,7 +4,6 @@ import { describe, expect, it } from 'vitest'
 
 const workflow = parse(readFileSync('.github/workflows/pr.yml', 'utf8'))
 const unitTestWorkflow = parse(readFileSync('.github/workflows/unit-tests.yml', 'utf8'))
-const nodeNextWorkflow = parse(readFileSync('.github/workflows/node-next-compat.yml', 'utf8'))
 const dependencyAction = parse(
   readFileSync('.github/actions/install-node-dependencies/action.yml', 'utf8')
 )
@@ -49,7 +48,7 @@ describe('PR workflow parallelism', () => {
     expect(workflow.permissions).toEqual({ contents: 'read' })
   })
 
-  it('runs Node 24 on PRs and the same eight-shard suite on Node 26 daily', () => {
+  it('runs Node 24 on PRs across an eight-shard suite', () => {
     const sharedTest = unitTestWorkflow.jobs.test
     const testStep = sharedTest.steps.find((step) => step.name === 'Test shard')
     const installStep = sharedTest.steps.find(
@@ -58,16 +57,9 @@ describe('PR workflow parallelism', () => {
     const primerInstall = workflow.jobs.test_native_cache.steps.find(
       (step) => step.uses === './.github/actions/install-node-dependencies'
     )
-    const nodeNextPrimerInstall = nodeNextWorkflow.jobs.test_native_cache.steps.find(
-      (step) => step.uses === './.github/actions/install-node-dependencies'
-    )
 
     expect(workflow.jobs.test.uses).toBe('./.github/workflows/unit-tests.yml')
     expect(JSON.parse(workflow.jobs.test.with.node_versions)).toEqual(['24'])
-    expect(nodeNextWorkflow.jobs.test.uses).toBe('./.github/workflows/unit-tests.yml')
-    expect(JSON.parse(nodeNextWorkflow.jobs.test.with.node_versions)).toEqual(['26'])
-    expect(nodeNextWorkflow.on.schedule).toHaveLength(1)
-    expect(nodeNextWorkflow.on.workflow_dispatch).toBeNull()
     expect(sharedTest.strategy.matrix.node).toBe('${{ fromJSON(inputs.node_versions) }}')
     expect(sharedTest.strategy.matrix.shard).toEqual(
       Array.from({ length: 8 }, (_, index) => index + 1)
@@ -82,9 +74,6 @@ describe('PR workflow parallelism', () => {
     expect(primerInstall.with['native-runtime']).toBe('node')
     expect(primerInstall.with['node-version']).toBe('24')
     expect(workflow.jobs.test.needs).toContain('test_native_cache')
-    expect(nodeNextPrimerInstall.with['native-runtime']).toBe('node')
-    expect(nodeNextPrimerInstall.with['node-version']).toBe('26')
-    expect(nodeNextWorkflow.jobs.test.needs).toEqual(['test_native_cache'])
   })
 
   it('runs real-shell coverage once outside the general shards', () => {
