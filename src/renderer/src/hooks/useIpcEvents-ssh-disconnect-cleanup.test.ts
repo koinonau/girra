@@ -161,7 +161,6 @@ describe('useIpcEvents updater integration', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: () => () => {},
@@ -200,11 +199,7 @@ describe('useIpcEvents updater integration', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },

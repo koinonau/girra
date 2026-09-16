@@ -1,11 +1,9 @@
 import { ipcRenderer } from 'electron'
 import type { ClientHostedBrowserRowsEvent } from '../../shared/client-hosted-browser-rows'
 import type {
-  RuntimeBrowserDriverState,
   RuntimeRendererSyncWindowGraph,
   RuntimeStatus,
-  RuntimeSyncWindowGraphResult,
-  RuntimeTerminalDriverState
+  RuntimeSyncWindowGraphResult
 } from '../../shared/runtime-types'
 import type { RuntimeRpcResponse } from '../../shared/runtime-rpc-envelope'
 import type { RuntimeEnvironmentSubscriptionHandle } from '../runtime-environment-subscriptions'
@@ -43,32 +41,18 @@ export const runtimeApi = {
     }
   },
   getTerminalFitOverrides: (): Promise<
-    { ptyId: string; mode: 'mobile-fit' | 'remote-desktop-fit'; cols: number; rows: number }[]
+    { ptyId: string; mode: 'remote-desktop-fit'; cols: number; rows: number }[]
   > => ipcRenderer.invoke('runtime:getTerminalFitOverrides'),
-  getTerminalDrivers: (): Promise<
-    {
-      ptyId: string
-      driver: RuntimeTerminalDriverState
-    }[]
-  > => ipcRenderer.invoke('runtime:getTerminalDrivers'),
-  getBrowserDrivers: (): Promise<
-    {
-      browserPageId: string
-      driver: RuntimeBrowserDriverState
-    }[]
-  > => ipcRenderer.invoke('runtime:getBrowserDrivers'),
   getBrowserRemoteViewerPages: (): Promise<string[]> =>
     ipcRenderer.invoke('runtime:getBrowserRemoteViewerPages'),
   getClientHostedBrowserRows: (): Promise<ClientHostedBrowserRowsEvent[]> =>
     ipcRenderer.invoke('runtime:getClientHostedBrowserRows'),
   restoreTerminalFit: (ptyId: string): Promise<{ restored: boolean }> =>
     ipcRenderer.invoke('runtime:restoreTerminalFit', { ptyId }),
-  reclaimBrowserForDesktop: (browserPageId: string): Promise<{ reclaimed: boolean }> =>
-    ipcRenderer.invoke('runtime:reclaimBrowserForDesktop', { browserPageId }),
   onTerminalFitOverrideChanged: (
     callback: (event: {
       ptyId: string
-      mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+      mode: 'remote-desktop-fit' | 'desktop-fit'
       cols: number
       rows: number
     }) => void
@@ -77,49 +61,13 @@ export const runtimeApi = {
       _event: Electron.IpcRendererEvent,
       data: {
         ptyId: string
-        mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+        mode: 'remote-desktop-fit' | 'desktop-fit'
         cols: number
         rows: number
       }
     ) => callback(data)
     ipcRenderer.on('runtime:terminalFitOverrideChanged', listener)
     return () => ipcRenderer.removeListener('runtime:terminalFitOverrideChanged', listener)
-  },
-  onTerminalDriverChanged: (
-    callback: (event: { ptyId: string; driver: RuntimeTerminalDriverState }) => void
-  ): (() => void) => {
-    const listener = (
-      _event: Electron.IpcRendererEvent,
-      data: {
-        ptyId: string
-        driver: RuntimeTerminalDriverState
-      }
-    ) => callback(data)
-    ipcRenderer.on('runtime:terminalDriverChanged', listener)
-    return () => ipcRenderer.removeListener('runtime:terminalDriverChanged', listener)
-  },
-  onNativeChatLaunchDraftResolved: (
-    callback: (event: { tabId: string; text: string; createdAt: number }) => void
-  ): (() => void) => {
-    const listener = (
-      _event: Electron.IpcRendererEvent,
-      data: { tabId: string; text: string; createdAt: number }
-    ) => callback(data)
-    ipcRenderer.on('runtime:nativeChatLaunchDraftResolved', listener)
-    return () => ipcRenderer.removeListener('runtime:nativeChatLaunchDraftResolved', listener)
-  },
-  onBrowserDriverChanged: (
-    callback: (event: { browserPageId: string; driver: RuntimeBrowserDriverState }) => void
-  ): (() => void) => {
-    const listener = (
-      _event: Electron.IpcRendererEvent,
-      data: {
-        browserPageId: string
-        driver: RuntimeBrowserDriverState
-      }
-    ) => callback(data)
-    ipcRenderer.on('runtime:browserDriverChanged', listener)
-    return () => ipcRenderer.removeListener('runtime:browserDriverChanged', listener)
   },
   onBrowserRemoteViewersChanged: (
     callback: (event: { browserPageId: string; hasRemoteViewers: boolean }) => void

@@ -23,28 +23,7 @@ export class OrcaRuntimeWithApplyLayout extends OrcaRuntimeWithPickMostRecentAct
 
     // Tentative writes — the resize is the point of no return.
     this.layouts.set(ptyId, next)
-    if (target.kind === 'phone') {
-      // Why: pull baseline cols+rows atomically from the same subscriber so
-      // they can't desync.
-      const baseline = (() => {
-        const inner = this.mobileSubscribers.get(ptyId)
-        if (!inner) {
-          return null
-        }
-        return this.pickEarliestRestoreTarget(inner)
-      })()
-      this.terminalFitOverrides.set(ptyId, {
-        mode: 'mobile-fit',
-        cols: target.cols,
-        rows: target.rows,
-        previousCols: baseline?.previousCols ?? null,
-        previousRows: baseline?.previousRows ?? null,
-        updatedAt: next.appliedAt,
-        clientId: target.ownerClientId
-      })
-    } else {
-      this.terminalFitOverrides.delete(ptyId)
-    }
+    this.terminalFitOverrides.delete(ptyId)
 
     if (dimsChanged) {
       let ok = false
@@ -76,91 +55,32 @@ export class OrcaRuntimeWithApplyLayout extends OrcaRuntimeWithPickMostRecentAct
     // Why: remote desktop ownership is a fit hold for the host and passive
     // peer viewers. Emit every remote layout so owner changes at equal geometry
     // still park/release the correct clients without relying on resize deltas.
-    // Defense-in-depth (#7588): also emit when the override's presence
-    // changed even without a kind flip. applyLayout is the sole writer and
-    // keeps override presence in lockstep with layout kind, so overrideChanged
-    // ≡ modeChanged in every reachable state today; the extra clause fires
-    // only if that invariant is ever violated, repairing the renderer instead
-    // of stranding the held modal.
-    const overrideChanged = (prevFitOverride != null) !== (target.kind === 'phone')
+    // Defense-in-depth (#7588): also emit when a stale override was cleared
+    // without a kind flip, repairing the renderer instead of stranding the held
+    // modal.
+    const overrideChanged = prevFitOverride != null
     if (target.kind === 'remote-desktop' || modeChanged || overrideChanged) {
-      // Why: phone→desktop arms the renderer-cascade suppress window
+      // Why: a flip back to desktop arms the renderer-cascade suppress window
       // before the collateral safeFit IPCs arrive. See "Renderer cascade
       // suppression".
       if (target.kind === 'desktop') {
         this.lastRendererSizes.delete(ptyId)
         this.suppressResizesForMs(500)
       }
-      this.notifier?.terminalFitOverrideChanged(
-        ptyId,
-        target.kind === 'phone'
-          ? 'mobile-fit'
-          : target.kind === 'remote-desktop'
-            ? 'remote-desktop-fit'
-            : 'desktop-fit',
-        target.cols,
-        target.rows
-      )
-      this.notifyFitOverrideListeners(
-        ptyId,
-        target.kind === 'phone'
-          ? 'mobile-fit'
-          : target.kind === 'remote-desktop'
-            ? 'remote-desktop-fit'
-            : 'desktop-fit',
-        target.cols,
-        target.rows
-      )
+      const mode = target.kind === 'remote-desktop' ? 'remote-desktop-fit' : 'desktop-fit'
+      this.notifier?.terminalFitOverrideChanged(ptyId, mode, target.cols, target.rows)
+      this.notifyFitOverrideListeners(ptyId, mode, target.cols, target.rows)
     }
 
-    // Mobile-facing event always fires (phone clients need to re-fit on
-    // every dim change, not just mode flips).
+    // Remote view clients re-fit on every dim change, not just mode flips.
     this.notifyTerminalResize(ptyId, {
       cols: target.cols,
       rows: target.rows,
-      displayMode: target.kind === 'phone' ? 'phone' : 'desktop',
+      displayMode: 'desktop',
       reason: 'apply-layout',
       seq
     })
 
     return { ok: true, state: next }
-  }
-
-  // ─── Server-Authoritative Mobile Display Mode ─────────────────────
-
-  setMobileDisplayMode(ptyId: string, mode: 'auto' | 'desktop'): void {
-    if (mode === 'auto') {
-      this.mobileDisplayModes.delete(ptyId)
-    } else {
-      this.mobileDisplayModes.set(ptyId, mode)
-    }
-  }
-
-  getMobileDisplayMode(ptyId: string): 'auto' | 'desktop' {
-    return this.mobileDisplayModes.get(ptyId) ?? 'auto'
-  }
-
-  isMobileSubscriberActive(ptyId: string): boolean {
-    const inner = this.mobileSubscribers.get(ptyId)
-    return inner !== undefined && inner.size > 0
-  }
-
-  // Why: late-bind viewport on an existing subscriber record. Subscribers
-  // that registered before the mobile side measured (e.g. terminal first
-  // mounted while the WebView was still loading) have null viewport, and
-  // applyMobileDisplayMode's auto branch needs a viewport to phone-fit.
-  // The setDisplayMode RPC carries the latest viewport so we can patch it
-  // here just before applyMobileDisplayMode runs.
-  updateMobileSubscriberViewport(
-    ptyId: string,
-    clientId: string,
-    viewport: { cols: number; rows: number }
-  ): void {
-    const inner = this.mobileSubscribers.get(ptyId)
-    const record = inner?.get(clientId)
-    if (!record) {
-      return
-    }
-    record.viewport = viewport
   }
 }

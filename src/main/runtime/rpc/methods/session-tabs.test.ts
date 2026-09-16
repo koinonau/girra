@@ -210,7 +210,7 @@ describe('session tab RPC methods', () => {
     await dispatcher.dispatchStreaming(
       makeRequest('session.tabs.close', { worktree: 'id:wt-1', tabId: 'tab-1' }),
       (response) => replies.push(response),
-      { clientKind: 'mobile' }
+      { clientKind: 'runtime' }
     )
 
     expect(replies).toHaveLength(1)

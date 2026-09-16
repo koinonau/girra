@@ -2895,21 +2895,6 @@
             "stop_agent_confirm": "Stop Agent",
             "stop_command_confirm": "Stop and Close"
           },
-          "MobileDriverOverlay": {
-            "c6460cf584": "Take back",
-            "c8f2e1a4b9": "Take back this terminal",
-            "c44659e09f": "Phone driving",
-            "7cffad954c": "Collapse",
-            "3eed73394f": "Your keyboard is paused",
-            "faa367dc74": "Your phone left this at phone size",
-            "54f7d6f69d": "Take back all terminals",
-            "b3d8e1f42a": "Restore this terminal",
-            "e8c4f2a91b": "Restore all terminals",
-            "f2a8b9c1d3": "From your phone",
-            "c7e4a2b8f1": "Your phone is in control",
-            "d9f3c6e2a4": "Desktop keyboard is paused. Take back this terminal to type here, take back all terminals your phone controls, or collapse to keep watching.",
-            "a6b1d8f3e2": "Your phone session ended. Restore to desktop size for this terminal, or for all terminals your phone left at phone size."
-          },
           "TerminalAgentSessionForkDialog": {
             "17fc841e59": "Copy context",
             "0c8a8629b1": "The fork appears as its own workspace, not as a nested child. The new agent receives a bounded transcript as an editable draft.",
@@ -13403,13 +13388,6 @@
             "b24fef25be": "Import",
             "02e89014c5": "Imported {{value0}} cookies from {{value1}}{{value2}}.",
             "d40d584769": "Imported {{value0}} cookies from file."
-          },
-          "BrowserMobileDriverOverlay": {
-            "a6914ee43f": "Take back",
-            "f4ecd61552": "This tab is being controlled from your phone. Take back to use it on desktop.",
-            "d9768ec642": "Browser input is paused",
-            "20539eca03": "Mobile is driving this browser",
-            "7c31b0da94": "Couldn't take back this tab. Check the phone session, then try again."
           },
           "BrowserPane": {
             "1ded0d3168": "Copy Screenshot",

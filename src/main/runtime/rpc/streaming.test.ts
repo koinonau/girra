@@ -3,8 +3,6 @@ import { z } from 'zod'
 import { RpcDispatcher } from './dispatcher'
 import { defineMethod, defineStreamingMethod, type RpcRequest } from './core'
 import type { OrcaRuntimeService } from '../orca-runtime'
-import { TERMINAL_METHODS } from './methods/terminal'
-import { createSubscriptionRegistryDouble } from './subscription-registry-test-double'
 
 function stubRuntime(overrides: Partial<OrcaRuntimeService> = {}): OrcaRuntimeService {
   return {
@@ -267,50 +265,5 @@ describe('RpcDispatcher streaming', () => {
       ok: false,
       error: { code: 'runtime_error' }
     })
-  })
-
-  it('ends terminal.subscribe when the backing terminal exits', async () => {
-    const messages: string[] = []
-    let resolveExit!: () => void
-    const registry = createSubscriptionRegistryDouble()
-    const runtime = stubRuntime({
-      resolveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-      readTerminal: vi.fn().mockResolvedValue({ tail: [], truncated: false }),
-      serializeTerminalBuffer: vi.fn().mockResolvedValue(null),
-      getTerminalSize: vi.fn().mockReturnValue({ cols: 80, rows: 24 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
-      getLayout: vi.fn().mockReturnValue({ seq: 1 }),
-      subscribeToTerminalData: vi.fn().mockReturnValue(vi.fn()),
-      subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-      registerSubscriptionCleanup: vi.fn(registry.registerSubscriptionCleanup),
-      registerOwnedSubscriptionCleanup: vi.fn(registry.registerOwnedSubscriptionCleanup),
-      cleanupSubscription: vi.fn(registry.cleanupSubscription),
-      cleanupSubscriptionIfOwnedByConnection: vi.fn(
-        registry.cleanupSubscriptionIfOwnedByConnection
-      ),
-      subscribeToPtyExit: vi.fn((_ptyId: string, listener: () => void) => {
-        resolveExit = listener
-        return vi.fn()
-      })
-    })
-    const dispatcher = new RpcDispatcher({ runtime, methods: TERMINAL_METHODS })
-
-    const dispatchPromise = dispatcher.dispatchStreaming(
-      makeRequest('terminal.subscribe', {
-        terminal: 'terminal-1',
-        client: { id: 'desktop-1', type: 'desktop' }
-      }),
-      (msg) => messages.push(msg)
-    )
-
-    await vi.waitFor(() => expect(registry.peekCleanup('terminal-1:desktop-1')).toBeDefined())
-    // Cleanup now registers before snapshot work so a disconnect cannot orphan
-    // a desktop width floor; wait for the actual exit waiter before resolving it.
-    await vi.waitFor(() => expect(runtime.subscribeToPtyExit).toHaveBeenCalled())
-    resolveExit()
-    await dispatchPromise
-
-    expect(messages.some((msg) => JSON.parse(msg).result?.type === 'end')).toBe(true)
-    expect(registry.peekCleanup('terminal-1:desktop-1')).toBeUndefined()
   })
 })

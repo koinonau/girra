@@ -54,10 +54,9 @@ export function useNativeChatLaunchDraftSignal(args: {
   const baseline = held?.baseline ?? null
   const launchDraftResolved = useMemo(
     () =>
-      paneLaunchDraft?.resolved === true ||
-      (paneLaunchDraft && !transcriptLoading
+      paneLaunchDraft && !transcriptLoading
         ? launchDraftResolvedByTranscript(paneLaunchDraft, messages, baseline)
-        : false),
+        : false,
     [paneLaunchDraft, messages, baseline, transcriptLoading]
   )
   return { launchDraft: paneLaunchDraft, launchDraftResolved }

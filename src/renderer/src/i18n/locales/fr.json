@@ -2695,21 +2695,6 @@
             "stop_agent_confirm": "Arrêter l'agent",
             "stop_command_confirm": "Arrêter et fermer"
           },
-          "MobileDriverOverlay": {
-            "c6460cf584": "Reprendre",
-            "c8f2e1a4b9": "Reprendre ce terminal",
-            "c44659e09f": "Pilotage par téléphone",
-            "7cffad954c": "Réduire",
-            "3eed73394f": "Votre clavier est en pause",
-            "faa367dc74": "Votre téléphone a laissé ce terminal en taille téléphone",
-            "54f7d6f69d": "Reprendre tous les terminaux",
-            "b3d8e1f42a": "Restaurer ce terminal",
-            "e8c4f2a91b": "Restaurer tous les terminaux",
-            "f2a8b9c1d3": "Depuis votre téléphone",
-            "c7e4a2b8f1": "Votre téléphone a le contrôle",
-            "d9f3c6e2a4": "Le clavier de l'ordinateur est en pause. Reprenez ce terminal pour taper ici, reprenez tous les terminaux contrôlés par votre téléphone, ou réduisez pour continuer à observer.",
-            "a6b1d8f3e2": "Votre session téléphone est terminée. Restaurez ce terminal à la taille bureau, ou tous les terminaux que votre téléphone a laissés en taille téléphone."
-          },
           "TerminalAgentSessionForkDialog": {
             "17fc841e59": "Copier le contexte",
             "0c8a8629b1": "Le fork apparaît comme son propre espace de travail, et non comme un enfant imbriqué. Le nouvel agent reçoit une transcription limitée sous forme de brouillon modifiable.",
@@ -12826,13 +12811,6 @@
             "b24fef25be": "Importer",
             "02e89014c5": "{{value0}} cookies importés depuis {{value1}}{{value2}}.",
             "d40d584769": "{{value0}} cookies importés depuis un fichier."
-          },
-          "BrowserMobileDriverOverlay": {
-            "a6914ee43f": "Reprendre",
-            "f4ecd61552": "Cet onglet est contrôlé depuis votre téléphone. Reprenez-le pour l'utiliser sur ordinateur.",
-            "d9768ec642": "Saisie du navigateur en pause",
-            "20539eca03": "Le mobile contrôle ce navigateur",
-            "7c31b0da94": "Impossible de reprendre cet onglet. Vérifiez la session sur le téléphone, puis réessayez."
           },
           "BrowserPane": {
             "1ded0d3168": "Copier la capture d'écran",

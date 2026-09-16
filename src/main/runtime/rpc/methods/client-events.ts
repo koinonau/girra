@@ -9,15 +9,13 @@ export const CLIENT_EVENT_METHODS = [
   defineStreamingMethod({
     name: 'runtime.clientEvents.subscribe',
     params: null,
-    handler: async (_params, { runtime, connectionId, clientKind }, emit) => {
+    handler: async (_params, { runtime, connectionId }, emit) => {
       await new Promise<void>((resolve) => {
-        // Why: mobile discards terminalSideEffects; excluding it stops the
-        // per-OSC batch frames from crossing the relay.
         const unsubscribe = runtime.onClientEvent(
           (event) => {
             emit(event)
           },
-          { consumesTerminalSideEffects: clientKind !== 'mobile' }
+          { consumesTerminalSideEffects: true }
         )
 
         const seq = ++clientEventSubscriptionSeq
@@ -34,10 +32,6 @@ export const CLIENT_EVENT_METHODS = [
 
         // Why: listener-first snapshotting closes the subscribe race while restoring state missed during disconnects.
         for (const event of runtime.getTerminalSleepClientEventSnapshot?.() ?? []) {
-          emit(event)
-        }
-        for (const event of runtime.getNativeChatLaunchDraftResolutionClientEventSnapshot?.() ??
-          []) {
           emit(event)
         }
         const sshStates = listRegisteredSshTargets().flatMap((target) => {

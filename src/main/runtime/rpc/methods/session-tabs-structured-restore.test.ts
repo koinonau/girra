@@ -79,7 +79,7 @@ describe('session tab structured restore gating', () => {
     const response = await dispatcher.dispatch(
       makeRequest('session.tabs.list', { worktree: 'id:wt-1' }),
       {
-        clientKind: 'mobile',
+        clientKind: 'runtime',
         clientCapabilities: [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY]
       }
     )
@@ -90,19 +90,6 @@ describe('session tab structured restore gating', () => {
 
   // Why: an old build has no capability to advertise, and skipping the restore left it with
   // nothing to project after a desktop restart — neither the chat nor its fallback row.
-  it('restores structured tabs for a mobile client that advertises no capability', async () => {
-    const runtime = makeRuntime(true)
-    const dispatcher = new RpcDispatcher({ runtime, methods: SESSION_TAB_METHODS })
-
-    const response = await dispatcher.dispatch(
-      makeRequest('session.tabs.list', { worktree: 'id:wt-1' }),
-      { clientKind: 'mobile', clientCapabilities: [] }
-    )
-
-    expect(response.ok).toBe(true)
-    expect(runtime.restoreStructuredAgentSessionTabs).toHaveBeenCalledTimes(1)
-  })
-
   it('restores structured tabs for mobile once the setting is present', async () => {
     const runtime = makeRuntime(true)
     const dispatcher = new RpcDispatcher({ runtime, methods: SESSION_TAB_METHODS })
@@ -110,7 +97,7 @@ describe('session tab structured restore gating', () => {
     const response = await dispatcher.dispatch(
       makeRequest('session.tabs.list', { worktree: 'id:wt-1' }),
       {
-        clientKind: 'mobile',
+        clientKind: 'runtime',
         clientCapabilities: [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY]
       }
     )

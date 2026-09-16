@@ -24,7 +24,6 @@ import {
 } from '../describe-page/browser-annotation-geometry'
 import { syncGuestAnnotationViewportBridge } from '../annotate/guest-annotation-viewport-bridge'
 import { attachBrowserPageWebview } from './attach-browser-page-webview'
-import { setBrowserPageWebviewInputLock } from './browser-page-webview'
 import type {
   BrowserPageRecoveryNavigationValidation,
   BrowserPageUrlSetter,
@@ -63,7 +62,6 @@ export function useBrowserPageWebviewLifecycle({
   setBrowserZoomPercent,
   pendingAnnotationPayload,
   browserAnnotationsLength,
-  inputLocked,
   faviconUrl,
   webviewRef,
   lastKnownWebviewUrlRef,
@@ -105,7 +103,6 @@ export function useBrowserPageWebviewLifecycle({
   setBrowserZoomPercent: Dispatch<SetStateAction<number>>
   pendingAnnotationPayload: BrowserGrabPayload | null
   browserAnnotationsLength: number
-  inputLocked: boolean
   faviconUrl: string | null
   webviewRef: MutableRefObject<Electron.WebviewTag | null>
   lastKnownWebviewUrlRef: MutableRefObject<string | null>
@@ -123,7 +120,6 @@ export function useBrowserPageWebviewLifecycle({
   const validateVisibleGuestRegistrationRef = useRef<() => void>(() => {})
   const wasPaintableForGuestValidationRef = useRef(isPaintable)
   const browserTabLoadingRef = useRef(browserTabLoading)
-  const inputLockedRef = useRef(inputLocked)
   const faviconUrlRef = useRef<string | null>(faviconUrl)
   const initialBrowserUrlRef = useRef(browserTabUrl)
   // Why: CDP viewport emulation doesn't survive renderer process swaps, so reapply the preset from this ref on every dom-ready.
@@ -145,7 +141,6 @@ export function useBrowserPageWebviewLifecycle({
 
   useLayoutEffect(() => {
     browserTabLoadingRef.current = browserTabLoading
-    inputLockedRef.current = inputLocked
     viewportPresetIdRef.current = viewportPresetId
     isActiveRef.current = isActive
     pendingAnnotationPayloadRef.current = pendingAnnotationPayload
@@ -156,19 +151,11 @@ export function useBrowserPageWebviewLifecycle({
     browserAnnotations,
     browserTabLoading,
     clearBrowserPageAnnotations,
-    inputLocked,
     isActive,
     isPaintable,
     pendingAnnotationPayload,
     viewportPresetId
   ])
-
-  useLayoutEffect(() => {
-    const webview = webviewRef.current
-    if (webview) {
-      setBrowserPageWebviewInputLock(webview, inputLocked)
-    }
-  }, [inputLocked, webviewRef])
 
   useEffect(() => {
     initialBrowserUrlRef.current = browserTabUrl
@@ -231,7 +218,6 @@ export function useBrowserPageWebviewLifecycle({
       webviewPartition,
       isActive,
       isPaintable,
-      inputLockedRef,
       webviewRef,
       handleInternalFileDragOverRef,
       handleInternalFileDropRef,

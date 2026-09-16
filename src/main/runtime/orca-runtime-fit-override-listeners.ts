@@ -16,18 +16,12 @@ import { RuntimeTerminalViewSubscribers } from './runtime-terminal-view-subscrib
 import { parseAppSshPtyId } from '../../shared/ssh-pty-id'
 
 export class OrcaRuntimeWithFitOverrideListeners extends OrcaRuntimeWithStopRequestedPtyIds {
-  // Why: mobile clients need to know when the desktop restores a terminal
-  // from mobile-fit so they can update their UI. These listeners are
-  // invoked from resizeForClient and onClientDisconnected/onPtyExit.
+  // Why: remote view clients need to know when the host releases a fit hold so
+  // they can update their UI. Invoked from applyLayout, the desktop take-back
+  // and onPtyExit.
   protected fitOverrideListeners = new Map<
     string,
-    Set<
-      (event: {
-        mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
-        cols: number
-        rows: number
-      }) => void
-    >
+    Set<(event: { mode: 'remote-desktop-fit' | 'desktop-fit'; cols: number; rows: number }) => void>
   >()
 
   protected readonly subscriptions = new RuntimeSubscriptionRegistry()
@@ -128,13 +122,12 @@ export class OrcaRuntimeWithFitOverrideListeners extends OrcaRuntimeWithStopRequ
   // See docs/mobile-prefer-renderer-scrollback.md.
   protected headlessHydrationState = new Map<string, 'pending' | 'done'>()
 
-  // Why: mobile-fit overrides are keyed by ptyId (not terminal handle) because
+  // Why: fit overrides are keyed by ptyId (not terminal handle) because
   // handles can be reissued while the PTY identity is stable. In-memory only —
-  // a stale phone override should not survive an app restart.
+  // a stale override should not survive an app restart.
   protected terminalFitOverrides = new Map<
     string,
     {
-      mode: 'mobile-fit'
       cols: number
       rows: number
       previousCols: number | null
@@ -144,49 +137,13 @@ export class OrcaRuntimeWithFitOverrideListeners extends OrcaRuntimeWithStopRequ
     }
   >()
 
-  // Why: server-authoritative display mode per terminal. 'auto' (default)
-  // means phone-fit when mobile subscribes, desktop otherwise. 'desktop'
-  // locks to no-resize regardless of subscriber state. The third historical
-  // value ('phone' = sticky phone-fit after unsubscribe) was removed since
-  // the toggle UI never produced it and nothing in product depended on it.
-  // In-memory only — modes reset on restart.
-  protected mobileDisplayModes = new Map<string, 'desktop'>()
-
-  // Why: tracks active mobile subscribers per PTY so the runtime can restore
-  // desktop dimensions on unsubscribe and prevent orphaned overrides during
-  // rapid tab switches. Keyed by ptyId → inner map of clientId → subscriber.
-  // The two-level map preserves multi-mobile soundness: phone B subscribing
-  // does not silently overwrite phone A's record. See
-  // docs/mobile-presence-lock.md "Multi-mobile subscriber model".
-  // subscribedAt drives "earliest-by-subscribe-time" restore-target selection
-  // (only among subscribers with non-null previousCols/Rows; desktop-mode
-  // joins carry null and are skipped). lastActedAt drives "most-recent
-  // actor's viewport wins" for active phone-fit dims.
-  protected mobileSubscribers = new Map<
-    string,
-    Map<
-      string,
-      {
-        clientId: string
-        viewport: { cols: number; rows: number } | null
-        wasResizedToPhone: boolean
-        previousCols: number | null
-        previousRows: number | null
-        subscribedAt: number
-        lastActedAt: number
-      }
-    >
-  >()
-
   // Why: Phase-5 query-responder suppression — a terminal-RPC subscribe
-  // stream feeds a remote xterm view (mobile/web/remote desktop) that answers
+  // stream feeds a remote xterm view (web/remote desktop) that answers
   // queries with view authority, so main must yield while one is attached
   // (terminal-query-authority.md). Ref-counted per PTY because multiple
-  // streams can attach concurrently; mobileSubscribers is consulted too so
-  // grace-window mobile records keep suppressing.
+  // streams can attach concurrently.
   protected readonly terminalViewSubscribers = new RuntimeTerminalViewSubscribers({
     notifyPresenceChanged: (ptyId) => this.notifyRemoteTerminalViewPresenceChanged(ptyId),
-    hasMobileSubscribers: (ptyId) => (this.mobileSubscribers.get(ptyId)?.size ?? 0) > 0,
     isUnattachedLocalCandidate: (ptyId) => {
       if (
         this.headlessTerminals.has(ptyId) ||

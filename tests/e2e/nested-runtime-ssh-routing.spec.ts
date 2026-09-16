@@ -327,8 +327,13 @@ async function assertRuntimeTerminalLifecycle(
     async ({ command, environmentId, terminal }) => {
       const resize = await window.api.runtimeEnvironments.call({
         selector: environmentId,
-        method: 'terminal.resizeForClient',
-        params: { terminal, mode: 'mobile-fit', cols: 91, rows: 31, clientId: 'nested-e2e' }
+        method: 'terminal.updateViewport',
+        params: {
+          terminal,
+          client: { id: 'nested-e2e', type: 'desktop' },
+          viewport: { cols: 91, rows: 31 },
+          claim: true
+        }
       })
       const send = await window.api.runtimeEnvironments.call({
         selector: environmentId,

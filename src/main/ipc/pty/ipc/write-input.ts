@@ -1,5 +1,4 @@
 import type { BrowserWindow, IpcMainEvent, IpcMainInvokeEvent, WebContents } from 'electron'
-import type { OrcaRuntimeService } from '../../../runtime/orca-runtime'
 import type { IPtyProvider } from '../../../providers/types'
 import { isPtyWriteUnavailableError } from '../../../providers/pty-write-unavailable-error'
 import {
@@ -36,7 +35,6 @@ export type PtyViewportClaimPayload = { id: string; cols: number; rows: number }
 
 export function createPtyWriteInput(deps: {
   mainWindow: BrowserWindow
-  runtime?: OrcaRuntimeService
   clearHiddenRendererResizeOutput: (id: string) => void
 }): {
   writePtyInput: (args: PtyWritePayload) => boolean | Promise<boolean>
@@ -48,7 +46,7 @@ export function createPtyWriteInput(deps: {
     mainWebContents: WebContents
   ) => boolean
 } {
-  const { mainWindow, runtime, clearHiddenRendererResizeOutput } = deps
+  const { mainWindow, clearHiddenRendererResizeOutput } = deps
 
   const reportUnavailablePtyWrite = (id: string, error: unknown): void => {
     if (
@@ -191,10 +189,6 @@ export function createPtyWriteInput(deps: {
   ): boolean => isMainWindowPtyIpcEvent(event, mainWindow, mainWebContents)
 
   const writePtyInput = (args: PtyWritePayload): boolean | Promise<boolean> => {
-    // Why: mobile-presence-lock defense-in-depth — the renderer's onData guard can let one keystroke slip during the state-flip lag, so catch it server-side. See docs/mobile-presence-lock.md.
-    if (runtime?.getDriver(args.id).kind === 'mobile') {
-      return false
-    }
     const admitted = admitAgentSessionPtyWrite(args.id)
     if (!admitted) {
       return false
@@ -217,9 +211,6 @@ export function createPtyWriteInput(deps: {
   }
 
   const writePtyInputAccepted = (args: PtyWritePayload): boolean | Promise<boolean> => {
-    if (runtime?.getDriver(args.id).kind === 'mobile') {
-      return false
-    }
     const admitted = admitAgentSessionPtyWrite(args.id)
     if (!admitted) {
       return false

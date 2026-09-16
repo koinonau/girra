@@ -52,9 +52,7 @@ export function BrowserPagePane({
   isActive,
   chromeShortcutScope,
   isAutomationVisible,
-  isMobileDriven,
   isRemotelyViewed,
-  inputLocked,
   onUpdatePageState,
   onSetUrl
 }: {
@@ -66,16 +64,13 @@ export function BrowserPagePane({
   isActive: boolean
   chromeShortcutScope: BrowserChromeShortcutScope
   isAutomationVisible: boolean
-  isMobileDriven: boolean
   isRemotelyViewed: boolean
-  inputLocked: boolean
   onUpdatePageState: (tabId: string, updates: BrowserTabPageState) => void
   onSetUrl: BrowserPageUrlSetter
 }): React.JSX.Element {
   const isPaintable = isBrowserPagePanePaintable({
     isActive,
     isAutomationVisible,
-    isMobileDriven,
     hasRemoteViewer: isRemotelyViewed
   })
   const pageViewport = ensureBrowserPageViewport(browserTab.id, workspaceId)
@@ -230,7 +225,6 @@ export function BrowserPagePane({
     setBrowserZoomPercent: zoom.setBrowserZoomPercent,
     pendingAnnotationPayload: grabAnnotations.pendingAnnotationPayload,
     browserAnnotationsLength: annotationSend.browserAnnotations.length,
-    inputLocked,
     faviconUrl: browserTab.faviconUrl,
     webviewRef,
     lastKnownWebviewUrlRef,
@@ -307,15 +301,6 @@ export function BrowserPagePane({
     if (!webview) {
       return
     }
-    // Why: Electron webviews keep receiving native input under a React overlay unless their own hit testing is disabled.
-    webview.style.pointerEvents = inputLocked ? 'none' : 'auto'
-  }, [inputLocked])
-
-  useEffect(() => {
-    const webview = webviewRef.current
-    if (!webview) {
-      return
-    }
     // Why: some Electron builds keep painting a hidden guest layer, so drop it from layout (display:none) instead of just hiding it.
     webview.style.display = showFailureOverlay ? 'none' : 'flex'
   }, [showFailureOverlay])
@@ -331,7 +316,7 @@ export function BrowserPagePane({
             ? 'pointer-events-none z-0 opacity-0'
             : 'pointer-events-none hidden'
       )}
-      // Why: hidden panes stay paintable (automation/mobile) but must not stay keyboard-focusable.
+      // Why: hidden panes stay paintable (automation/remote viewer) but must not stay keyboard-focusable.
       inert={!isActive}
       aria-hidden={!isActive}
     >

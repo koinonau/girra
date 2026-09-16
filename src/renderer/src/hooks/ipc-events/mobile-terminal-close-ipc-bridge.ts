@@ -7,10 +7,7 @@ import { buildWorkspaceSessionPayload } from '@/lib/workspace-session'
 import { persistWorkspaceSessionByHost } from '@/lib/workspace-session-host-persistence'
 import { useAppStore } from '../../store'
 
-export function registerMobileAndTerminalCloseIpcBridge(
-  unsubs: (() => void)[],
-  requestSleepingAgentWake: (worktreeId: string) => void
-): void {
+export function registerMobileAndTerminalCloseIpcBridge(unsubs: (() => void)[]): void {
   unsubs.push(
     window.api.ui.onOpenFileFromMobile(
       ({ worktreeId, filePath, relativePath, runtimeEnvironmentId }) => {
@@ -105,13 +102,6 @@ export function registerMobileAndTerminalCloseIpcBridge(
   unsubs.push(
     window.api.ui.onSleepWorktree(({ worktreeId }) => {
       void runSleepWorktree(worktreeId)
-    })
-  )
-
-  unsubs.push(
-    window.api.ui.onResumeSleepingAgents(({ worktreeId }) => {
-      // Why: a phone opened this worktree; wake its slept agents without changing the desktop's worktree/tab/view.
-      requestSleepingAgentWake(worktreeId)
     })
   )
 }

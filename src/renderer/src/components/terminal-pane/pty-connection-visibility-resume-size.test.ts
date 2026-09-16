@@ -327,94 +327,6 @@ describe('connectPanePty', () => {
       expect(transport.resize).toHaveBeenCalledWith(65, 63, { claim: true })
     })
 
-    it('skips foreground grid drift repair while mobile owns the PTY without a fit override', async () => {
-      const { setDriverForPty } = await import('@/lib/pane-manager/mobile-driver-state')
-      const { connectPanePty } = await import('./pty-connection')
-      const transport = createMockTransport('pty-pane-2')
-      const capturedDataCallback: { current: ((data: string) => void) | null } = { current: null }
-      transport.connect.mockImplementation(
-        async ({ callbacks }: { callbacks: ConnectCallbacks }) => {
-          capturedDataCallback.current = callbacks.onData ?? null
-          return 'pty-pane-2'
-        }
-      )
-      transportFactoryQueue.push(transport)
-      const manager = createManager(2)
-      const deps = createDeps({
-        restoredLeafId: LEAF_2,
-        paneTransportsRef: { current: new Map([[1, createMockTransport('pty-pane-1')]]) }
-      })
-      const pane = createPane(2)
-      let proposedGrid = { cols: 62, rows: 63 }
-      pane.terminal.cols = 62
-      pane.terminal.rows = 63
-      pane.fitAddon = {
-        ...pane.fitAddon,
-        fit: vi.fn(() => {
-          pane.terminal.cols = proposedGrid.cols
-          pane.terminal.rows = proposedGrid.rows
-        }),
-        proposeDimensions: vi.fn(() => proposedGrid)
-      } as never
-
-      try {
-        connectPanePty(pane as never, manager as never, deps as never)
-        await flushAsyncTicks()
-        proposedGrid = { cols: 65, rows: 63 }
-        setDriverForPty('pty-pane-2', { kind: 'mobile', clientId: 'phone-1' })
-        vi.mocked(pane.fitAddon.fit).mockClear()
-        transport.resize.mockClear()
-        vi.mocked(window.api.pty.getSize).mockClear()
-        expect(capturedDataCallback.current).not.toBeNull()
-
-        capturedDataCallback.current?.('\x1b[?2026hcodex redraw frame')
-        await flushAsyncTicks()
-
-        expect(pane.fitAddon.fit).not.toHaveBeenCalled()
-        expect(window.api.pty.getSize).not.toHaveBeenCalled()
-        expect(transport.resize).not.toHaveBeenCalled()
-      } finally {
-        setDriverForPty('pty-pane-2', { kind: 'idle' })
-      }
-    })
-
-    it('reports desktop geometry without resizing while a mobile-fit override is active', async () => {
-      const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
-      const pane = createPane(2)
-      const observer = installObservedPane(pane)
-      try {
-        const { connectPanePty } = await import('./pty-connection')
-        const transport = createMockTransport('pty-pane-2')
-        transportFactoryQueue.push(transport)
-        const manager = createManager(2)
-        const deps = createDeps({
-          restoredLeafId: LEAF_2,
-          paneTransportsRef: { current: new Map([[1, createMockTransport('pty-pane-1')]]) }
-        })
-        pane.fitAddon = {
-          ...pane.fitAddon,
-          proposeDimensions: vi.fn(() => ({ cols: 101, rows: 33 }))
-        } as never
-
-        connectPanePty(pane as never, manager as never, deps as never)
-        await flushAsyncTicks()
-        setFitOverride('pty-pane-2', 'mobile-fit', 40, 30)
-        transport.resize.mockClear()
-        vi.mocked(window.api.pty.getSize).mockClear()
-        vi.mocked(window.api.pty.reportGeometry).mockClear()
-
-        observer.trigger()
-        await flushAsyncTicks()
-
-        expect(window.api.pty.getSize).not.toHaveBeenCalled()
-        expect(window.api.pty.reportGeometry).toHaveBeenCalledWith('pty-pane-2', 101, 33)
-        expect(transport.resize).not.toHaveBeenCalled()
-      } finally {
-        setFitOverride('pty-pane-2', 'desktop-fit', 0, 0)
-        observer.restore()
-      }
-    })
-
     it('updates the claiming desktop xterm before forwarding an observed viewport claim', async () => {
       const originalDocument = globalThis.document
       ;(globalThis as { document?: Document }).document = {
@@ -425,7 +337,7 @@ describe('connectPanePty', () => {
         queueMicrotask(() => callback(0))
         return 1
       })
-      const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+      const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
       const pane = createPane(2)
       const observer = installObservedPane(pane)
       try {
@@ -475,7 +387,7 @@ describe('connectPanePty', () => {
         queueMicrotask(() => callback(0))
         return 1
       })
-      const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+      const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
       const { beginTerminalScrollIntentBufferRebuild, endTerminalScrollIntentBufferRebuild } =
         await import('@/lib/pane-manager/terminal-scroll-intent-rebuild')
       const pane = createPane(2)
@@ -517,47 +429,6 @@ describe('connectPanePty', () => {
         setFitOverride('pty-pane-2', 'desktop-fit', 0, 0)
         observer.restore()
         globalThis.document = originalDocument
-      }
-    })
-
-    it('skips observed desktop reassertion while mobile owns the PTY without a fit override', async () => {
-      const { setDriverForPty } = await import('@/lib/pane-manager/mobile-driver-state')
-      const pane = createPane(2)
-      const observer = installObservedPane(pane)
-      try {
-        const { connectPanePty } = await import('./pty-connection')
-        const transport = createMockTransport('pty-pane-2')
-        transportFactoryQueue.push(transport)
-        const manager = createManager(2)
-        const deps = createDeps({
-          restoredLeafId: LEAF_2,
-          paneTransportsRef: { current: new Map([[1, createMockTransport('pty-pane-1')]]) }
-        })
-        const fit = vi.fn()
-        pane.fitAddon = {
-          ...pane.fitAddon,
-          fit,
-          proposeDimensions: vi.fn(() => ({ cols: 130, rows: 50 }))
-        } as never
-
-        connectPanePty(pane as never, manager as never, deps as never)
-        await flushAsyncTicks()
-        setDriverForPty('pty-pane-2', { kind: 'mobile', clientId: 'phone-1' })
-        transport.resize.mockClear()
-        fit.mockClear()
-        vi.mocked(window.api.pty.getSize).mockClear()
-        vi.mocked(window.api.pty.reportGeometry).mockClear()
-
-        observer.trigger()
-        await flushAsyncTicks()
-
-        expect(window.api.pty.getSize).not.toHaveBeenCalled()
-        expect(window.api.pty.reportGeometry).not.toHaveBeenCalled()
-        expect(transport.resize).not.toHaveBeenCalled()
-        expect(fit).not.toHaveBeenCalled()
-      } finally {
-        setDriverForPty('pty-pane-2', { kind: 'idle' })
-        observer.restore()
       }
     })
 
@@ -659,7 +530,7 @@ describe('connectPanePty', () => {
         visibilityState: 'visible',
         hasFocus: vi.fn(() => documentFocused)
       } as unknown as Document
-      const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+      const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
       const { connectPanePty } = await import('./pty-connection')
       const ptyId = 'remote:env-1@@terminal-visible'
       const transport = createMockTransport(ptyId)
@@ -719,12 +590,12 @@ describe('connectPanePty', () => {
       binding.dispose()
     })
 
-    it('does NOT re-assert while a mobile-fit override parks the PTY at phone dims', async () => {
-      const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+    it('does NOT re-assert while a remote-desktop-fit override parks the PTY at phone dims', async () => {
+      const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
       vi.mocked(window.api.pty.getSize).mockResolvedValue({ cols: 80, rows: 24 })
       const { binding, transport } = await connectResumablePane()
       // Park the PTY at phone dims — desktop re-assert must be suppressed.
-      setFitOverride('pty-pane-2', 'mobile-fit', 40, 30)
+      setFitOverride('pty-pane-2', 'remote-desktop-fit', 40, 30)
       transport.resize.mockClear()
 
       binding.noteVisibilityResume()

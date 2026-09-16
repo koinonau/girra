@@ -12,7 +12,7 @@ import {
   nextWsMessage,
   waitForWsClose,
   authenticateMobileWs
-} from './runtime-rpc-mobile-ws-test-harness'
+} from './runtime-rpc-ws-test-harness'
 
 vi.mock('../git/worktree', () => {
   const worktrees = [

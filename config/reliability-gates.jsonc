@@ -94,10 +94,10 @@
       "layer": "shared-and-renderer-unit",
       "surfaces": ["native chat", "structured agent history", "structured agent subscriptions"],
       "platforms": ["macos", "linux", "windows"],
-      "providers": ["local", "ssh", "remote-runtime", "mobile"],
+      "providers": ["local", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local"],
-      "coverageNotes": "Deterministic provider, journal recovery, RPC projection and shared renderer tests run on macOS. Shared logic serves desktop and mobile; these tests do not prove native mobile or real SSH transport. Local/daemon PTY input, geometry and WSL process launch are unaffected.",
+      "coverageNotes": "Deterministic provider, journal recovery, RPC projection and shared renderer tests run on macOS. These tests do not prove real SSH transport. Local/daemon PTY input, geometry and WSL process launch are unaffected.",
       "motivatingLinks": ["https://github.com/stablyai/orca/pull/19695"],
       "invariant": "An observed completed turn retains the same host-recorded duration and initiating user-message attribution through client reload, settlement retry and loading older history; older clients receive the compatible item carrier, and a host-recorded unknown duration suppresses local estimates.",
       "oracle": "Render a host-settled duration without observing completion locally; preserve an exit at 2000 through failed settlement at 60000 and later retry; retain a seven-second older turn beyond 256 submitted turns; prune aliases with removed user items and preserve alias identity during item-only streaming; render no completed duration for an unverifiable turn both before and after client reload.",
@@ -168,7 +168,7 @@
       },
       "knownGaps": [
         "This deterministic gate does not launch Electron or prove a full app restart; exact-head manual screenshots are separate PR evidence.",
-        "Native mobile, live SSH/relay transport and Windows/Linux execution are not exercised by this command.",
+        "Live SSH/relay transport and Windows/Linux execution are not exercised by this command.",
         "Accumulated-history wall-clock profiling and CI soak remain unmeasured."
       ],
       "promotionCriteria": [
@@ -189,7 +189,7 @@
       "providers": ["local", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "ssh", "remote-runtime"],
-      "coverageNotes": "The real SQLite journal and production subscriber delivery are exercised with a folder workspace and remote host identity. The SQL and pagination code is shared across execution hosts; live SSH transport and Linux/Windows runtime execution are not exercised. PTY, daemon, WSL execution, and mobile rendering are unaffected.",
+      "coverageNotes": "The real SQLite journal and production subscriber delivery are exercised with a folder workspace and remote host identity. The SQL and pagination code is shared across execution hosts; live SSH transport and Linux/Windows runtime execution are not exercised. PTY, daemon and WSL execution are unaffected.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/blob/main/src/main/native-chat/agent-session-wire/structured-agent-session-subscribers.ts"
       ],
@@ -347,7 +347,7 @@
       "providers": ["local", "daemon", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "daemon", "ssh", "remote-runtime"],
-      "coverageNotes": "Shared parser tests cover provider-independent bytes; main and renderer contract tests cover status and terminal-output delivery. Live Linux, Windows, WSL, SSH and remote-runtime processes are not launched. Execution, liveness, paths, wire formats and mobile UI are unchanged.",
+      "coverageNotes": "Shared parser tests cover provider-independent bytes; main and renderer contract tests cover status and terminal-output delivery. Live Linux, Windows, WSL, SSH and remote-runtime processes are not launched. Execution, liveness, paths and wire formats are unchanged.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/blob/main/src/shared/agent-status-osc.ts"
       ],
@@ -505,7 +505,7 @@
       "providers": ["local", "daemon", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "daemon", "ssh", "remote-runtime"],
-      "coverageNotes": "The always-mounted desktop subscriber is covered through pure projection/reference and graph-sync contracts. All providers use the same serialized fields. WSL, platform launch, liveness, transport and mobile rendering are unaffected.",
+      "coverageNotes": "The always-mounted desktop subscriber is covered through pure projection/reference and graph-sync contracts. All providers use the same serialized fields. WSL, platform launch, liveness and transport are unaffected.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/blob/main/src/renderer/src/runtime/sync-runtime-graph-agent-status-projection-join.test.ts"
       ],
@@ -580,7 +580,7 @@
       "providers": ["local", "daemon", "ssh", "remote-runtime"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["local", "daemon", "ssh", "remote-runtime"],
-      "coverageNotes": "Shared parser, production emulator and Session contracts cover local/daemon paths; remote snapshot semantics use the existing corruption reproduction without live transport. The scanner has no workspace or host branching; folder/git workspaces, WSL, mobile/relay and platform execution/wire boundaries are unchanged.",
+      "coverageNotes": "Shared parser, production emulator and Session contracts cover local/daemon paths; remote snapshot semantics use the existing corruption reproduction without live transport. The scanner has no workspace or host branching; folder/git workspaces, WSL, relay and platform execution/wire boundaries are unchanged.",
       "motivatingLinks": ["https://github.com/stablyai/orca/issues/7329"],
       "invariant": "Partial escape tracking preserves exact pending UTF-16 and completion across chunk/snapshot boundaries while skipping ordinary ground-state text without a JavaScript per-code-unit walk.",
       "oracle": "Colored ASCII and UTF-16 output retains the exact incomplete CSI tail using fewer than 32 code-unit inspections. Every split of CSI/OSC/DCS/ESC-intermediate controls and CAN/SUB/ESC aborts preserve completion; one-character echo performs zero inspections or native ESC searches. Seeded headless snapshot restore matches a renderer terminal twin.",
@@ -6150,7 +6150,7 @@
       "invariant": "After a TUI exits or is killed, reveal, reattach, snapshot replay, or renderer remount must not deliver terminal-owned mouse or alternate-screen protocol bytes to the surviving shell. Recovery is an ordered output barrier in the daemon session data path: an OSC 133;D completing while the alternate screen is still active pauses the stream at that exact byte boundary, a fresh execution-host process inspection proves shell ownership, and on proof a mode reset is injected as in-stream output so every consumer converges by parsing the same bytes and the queued post-boundary shell output (the prompt) lands on the normal buffer. Snapshots are pure reads. Any failure — refuted proof, timeout, queue overflow, session death, disposal — flushes the queue unmodified, preserving incumbent behavior; later command or mode bytes revoke proof. Clean alternate-screen exits prove ownership asynchronously without pausing.",
       "oracle": "Run one fixed child-TUI journey for normal exit and cleanup-free SIGKILL. Assert renderer and host normal-buffer/non-mouse state, host snapshot terminalOwner metadata, exact PTY writes with no post-exit mouse report, unrelated-pane survival, post-boundary prompt output preserved (normal exit), ordered proof invalidation, bounded settlement and bail-out flush, one inspection per unclean episode with zero scans for ordinary output, split-escape safety at every chunk boundary, and old/new client-host fallback parity.",
       "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/daemon/terminal-shell-lifecycle-scanner.test.ts src/main/daemon/terminal-shell-recovery-barrier.test.ts src/main/daemon/session-shell-recovery.test.ts src/main/daemon/session.test.ts src/main/daemon/terminal-host-concurrent-create.test.ts src/main/daemon/daemon-pty-adapter.test.ts src/main/daemon/daemon-restore-scrollback-depth.test.ts src/main/daemon/terminal-checkpoint-serializer.test.ts src/main/providers/agent-foreground-process.test.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/mobile-subscribe-integration.test.ts src/main/runtime/rpc/terminal-multiplex-escape-tail.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-agent-queries.test.ts src/renderer/src/components/terminal-pane/pty-connection-reattach-mode-reset.test.ts src/renderer/src/components/terminal-pane/pty-connection-daemon-snapshot-replay.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-snapshot-escape-tail.test.ts src/shared/terminal-partial-escape-tail.test.ts src/shared/terminal-partial-escape-tail.fuzz.test.ts --reporter=dot",
+        "pnpm exec vitest run --config config/vitest.config.ts src/main/daemon/terminal-shell-lifecycle-scanner.test.ts src/main/daemon/terminal-shell-recovery-barrier.test.ts src/main/daemon/session-shell-recovery.test.ts src/main/daemon/session.test.ts src/main/daemon/terminal-host-concurrent-create.test.ts src/main/daemon/daemon-pty-adapter.test.ts src/main/daemon/daemon-restore-scrollback-depth.test.ts src/main/daemon/terminal-checkpoint-serializer.test.ts src/main/providers/agent-foreground-process.test.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-escape-tail.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-agent-queries.test.ts src/renderer/src/components/terminal-pane/pty-connection-reattach-mode-reset.test.ts src/renderer/src/components/terminal-pane/pty-connection-daemon-snapshot-replay.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-snapshot-escape-tail.test.ts src/shared/terminal-partial-escape-tail.test.ts src/shared/terminal-partial-escape-tail.fuzz.test.ts --reporter=dot",
         "pnpm exec electron-vite build --mode e2e",
         "SKIP_BUILD=1 pnpm exec playwright test tests/e2e/terminal-hidden-child-tui-kill-mode-reset.spec.ts --config tests/playwright.config.ts --project electron-headless --workers=1"
       ],
@@ -6165,7 +6165,6 @@
         "src/main/daemon/terminal-checkpoint-serializer.test.ts",
         "src/main/providers/agent-foreground-process.test.ts",
         "src/main/runtime/orca-runtime.test.ts",
-        "src/main/runtime/mobile-subscribe-integration.test.ts",
         "src/main/runtime/rpc/terminal-multiplex-escape-tail.test.ts",
         "src/renderer/src/components/terminal-pane/pty-connection-hidden-agent-queries.test.ts",
         "src/renderer/src/components/terminal-pane/pty-connection-reattach-mode-reset.test.ts",
@@ -9512,7 +9511,7 @@
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/mobile-session-tabs-agent-status-heartbeat.test.ts src/main/runtime/orca-runtime-hook-agent-status-projection.test.ts tests/e2e/session-tabs-decorative-title-fanout.unit.test.ts tests/e2e/session-tabs-rich-status-boundaries.unit.test.ts --maxWorkers=1",
         "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/terminal-cold-park-pre-gate-loop.react185.test.tsx src/renderer/src/components/terminal-pane/use-parked-terminal-watcher-synchronization.react185.test.tsx src/renderer/src/components/terminal-pane/terminal-cold-park-verdict-loop.test.tsx src/renderer/src/components/terminal-pane/use-terminal-tab-cold-parking.test.ts --maxWorkers=1",
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/renderer/src/components/terminal-pane/parked-terminal-byte-watcher.test.ts src/renderer/src/components/terminal-pane/terminal-side-effect-facts-handler.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/pty-connection-parked-ssh-snapshot.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-activation-inventory-fallback.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-view-parking.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-worktree-retention.test.ts src/renderer/src/components/terminal-pane/terminal-parked-tab-watchers.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-partial-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parking-e2e-overrides.test.ts src/renderer/src/runtime/remote-runtime-terminal-stall-recovery.test.ts src/renderer/src/runtime/runtime-client-events.test.ts src/renderer/src/web/web-preload-api-runtime-environment.test.ts src/main/ipc/runtime-environments-pairing.test.ts",
+        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/renderer/src/components/terminal-pane/parked-terminal-byte-watcher.test.ts src/renderer/src/components/terminal-pane/terminal-side-effect-facts-handler.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/pty-connection-parked-ssh-snapshot.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-activation-inventory-fallback.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-view-parking.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-worktree-retention.test.ts src/renderer/src/components/terminal-pane/terminal-parked-tab-watchers.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-partial-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parking-e2e-overrides.test.ts src/renderer/src/runtime/remote-runtime-terminal-stall-recovery.test.ts src/renderer/src/runtime/runtime-client-events.test.ts src/renderer/src/web/web-preload-api-runtime-environment.test.ts src/main/ipc/runtime-environments-pairing.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/terminal-subscriber-driven-daemon-attach.test.ts",
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/session-tabs-inventory-publication.test.ts src/main/runtime/rpc/methods/session-tabs-inventory-census-race.test.ts src/main/runtime/rpc/methods/session-tabs.test.ts src/renderer/src/runtime/host-session-mirror-empty-inventory-settle.test.ts src/main/daemon/terminal-host-agent-session.test.ts tests/e2e/session-tabs-empty-inventory-daemon-oracle.unit.test.ts --maxWorkers=1",
         "pnpm exec vitest run --config config/vitest.config.ts src/shared/remote-runtime-shared-control-connection.test.ts",
@@ -9546,7 +9545,6 @@
         "src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts",
         "src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts",
         "src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts",
-        "src/main/runtime/rpc/terminal-subscribe-buffer.test.ts",
         "src/main/runtime/terminal-subscriber-driven-daemon-attach.test.ts",
         "src/main/runtime/session-tabs-inventory-publication.test.ts",
         "src/main/runtime/rpc/methods/session-tabs-inventory-census-race.test.ts",
@@ -9667,12 +9665,6 @@
         {
           "file": "src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts",
           "assertions": ["keeps layout versions out of the output sequence domain"]
-        },
-        {
-          "file": "src/main/runtime/rpc/terminal-subscribe-buffer.test.ts",
-          "assertions": [
-            "omits an unknown snapshot output sequence instead of publishing the layout version"
-          ]
         },
         {
           "file": "tests/e2e/paired-remote-terminal-host-restart-background-sync.spec.ts",
@@ -9903,7 +9895,7 @@
           "date": "2026-08-02",
           "runner": "local",
           "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/renderer/src/components/terminal-pane/parked-terminal-byte-watcher.test.ts src/renderer/src/components/terminal-pane/terminal-side-effect-facts-handler.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/pty-connection-parked-ssh-snapshot.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-activation-inventory-fallback.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-view-parking.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-worktree-retention.test.ts src/renderer/src/components/terminal-pane/terminal-parked-tab-watchers.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-partial-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parking-e2e-overrides.test.ts src/renderer/src/runtime/remote-runtime-terminal-stall-recovery.test.ts src/renderer/src/runtime/runtime-client-events.test.ts src/renderer/src/web/web-preload-api-runtime-environment.test.ts src/main/ipc/runtime-environments-pairing.test.ts",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/renderer/src/components/terminal-pane/parked-terminal-byte-watcher.test.ts src/renderer/src/components/terminal-pane/terminal-side-effect-facts-handler.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/pty-connection-parked-ssh-snapshot.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-activation-inventory-fallback.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-view-parking.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-worktree-retention.test.ts src/renderer/src/components/terminal-pane/terminal-parked-tab-watchers.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-partial-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parking-e2e-overrides.test.ts src/renderer/src/runtime/remote-runtime-terminal-stall-recovery.test.ts src/renderer/src/runtime/runtime-client-events.test.ts src/renderer/src/web/web-preload-api-runtime-environment.test.ts src/main/ipc/runtime-environments-pairing.test.ts",
           "result": "passed",
           "durationSeconds": 18.71,
           "summary": "Seventeen focused files passed 2,044 tests with one existing skip, including the 64-PTY decorative-title bound, per-client late subscription, semantic-fact preservation, and the true no-output-pause legacy client shape."
@@ -9939,7 +9931,7 @@
           "date": "2026-07-29",
           "runner": "local",
           "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/renderer/src/components/terminal-pane/parked-terminal-byte-watcher.test.ts src/renderer/src/components/terminal-pane/terminal-side-effect-facts-handler.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/pty-connection-parked-ssh-snapshot.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-activation-inventory-fallback.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-view-parking.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-worktree-retention.test.ts src/renderer/src/components/terminal-pane/terminal-parked-tab-watchers.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-partial-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parking-e2e-overrides.test.ts src/renderer/src/runtime/remote-runtime-terminal-stall-recovery.test.ts src/renderer/src/runtime/runtime-client-events.test.ts src/renderer/src/web/web-preload-api-runtime-environment.test.ts src/main/ipc/runtime-environments-pairing.test.ts",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/orca-runtime.test.ts src/main/runtime/rpc/terminal-multiplex-initial-snapshot-buffering.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/renderer/src/components/terminal-pane/parked-terminal-byte-watcher.test.ts src/renderer/src/components/terminal-pane/terminal-side-effect-facts-handler.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/pty-connection-parked-ssh-snapshot.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-activation-inventory-fallback.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-view-parking.test.ts src/renderer/src/components/terminal-pane/terminal-hidden-worktree-retention.test.ts src/renderer/src/components/terminal-pane/terminal-parked-tab-watchers.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parked-watcher-partial-reconciliation.test.ts src/renderer/src/components/terminal-pane/terminal-parking-e2e-overrides.test.ts src/renderer/src/runtime/remote-runtime-terminal-stall-recovery.test.ts src/renderer/src/runtime/runtime-client-events.test.ts src/renderer/src/web/web-preload-api-runtime-environment.test.ts src/main/ipc/runtime-environments-pairing.test.ts",
           "result": "passed",
           "durationSeconds": 19.54,
           "summary": "Seventeen focused files passed 1,938 tests with one existing skip, including 128 active streams, retryable rejection at 129, released-slot snapshot recovery, bounded liveness probes, and balanced subscriber cleanup."
@@ -15094,151 +15086,37 @@
       "demotionRule": "Keep experimental or revert if ordinary input is evicted, pending replies exceed either ceiling, retained replies are coalesced, a trailing key sits behind more than the bounded reply window, or the gate develops unexplained flakes."
     },
     {
-      "id": "terminal-query.mobile-view-authority",
-      "title": "Mobile xterm answers live terminal queries exactly once without replay or floor side effects",
-      "maturity": "experimental",
-      "protection": "partial",
-      "owner": "terminal-runtime",
-      "layer": "mobile-runtime-rpc-contract",
-      "surfaces": [
-        "mobile terminal WebView",
-        "terminal query authority",
-        "runtime RPC",
-        "mobile subscription replay",
-        "multi-mobile input floor"
-      ],
-      "platforms": ["macos", "linux", "windows", "mobile"],
-      "providers": ["local", "daemon", "ssh", "remote-runtime"],
-      "coveredPlatforms": ["macos"],
-      "coveredProviders": [],
-      "coverageNotes": "Deterministic local tests execute the exact injected mobile replay/generation gate, the React Native query classifier, stale-subscription sender, server-side single-responder election, query-reply RPC semantics, and live-output capture during async mobile fit. The provider write path is shared, but no live iOS/Android, SSH, WSL, or multi-device run is registered yet.",
-      "motivatingLinks": [
-        "https://github.com/stablyai/orca/issues/8128",
-        "https://github.com/stablyai/orca/pull/8206"
-      ],
-      "invariant": "Snapshot and replacement-terminal replay answer no terminal queries; every live query delivered to subscribed mobile views has at most one current responder; a live query queued behind replay is answered after the replay boundary; terminal-generated replies never transfer the user-input floor.",
-      "oracle": "The injected gate emits zero replies during replay, exactly one after its live boundary, and ignores a superseded generation; native routing rejects ordinary input; the sender rejects disconnected or unsubscribed handles; runtime election accepts only the earliest active mobile subscriber and promotes its survivor; terminal.send writes only validated query grammar without mobileTookFloor; legacy binary subscribe captures a query while phone-fit is still pending and emits it after the snapshot.",
-      "commands": [
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-send.test.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/main/runtime/mobile-presence-lock.test.ts src/shared/terminal-query-reply.test.ts src/shared/terminal-reply-query-scan.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/pty-connection-terminal-input-gating.test.ts"
-      ],
-      "testFiles": [
-        "src/main/runtime/rpc/terminal-send.test.ts",
-        "src/main/runtime/rpc/terminal-subscribe-buffer.test.ts",
-        "src/main/runtime/mobile-presence-lock.test.ts",
-        "src/shared/terminal-query-reply.test.ts",
-        "src/shared/terminal-reply-query-scan.test.ts",
-        "src/renderer/src/components/terminal-pane/pty-connection-terminal-input-gating.test.ts"
-      ],
-      "assertionRefs": [
-        {
-          "file": "src/main/runtime/rpc/terminal-send.test.ts",
-          "assertions": [
-            "only the elected mobile subscriber can write a claimed query reply",
-            "valid replies skip mobileTookFloor",
-            "ordinary bytes and reply payloads combined with enter, interrupt, or guarded-send semantics are rejected"
-          ]
-        },
-        {
-          "file": "src/main/runtime/rpc/terminal-subscribe-buffer.test.ts",
-          "assertions": [
-            "live terminal data and view authority register before asynchronous mobile fit",
-            "a query received during that await is retained and emitted after the snapshot"
-          ]
-        },
-        {
-          "file": "src/renderer/src/components/terminal-pane/pty-connection-terminal-input-gating.test.ts",
-          "assertions": [
-            "desktop xterm onData replies are dropped while mobile owns the terminal driver",
-            "desktop capability-handler replies outside onData honor the same mobile authority lock"
-          ]
-        }
-      ],
-      "evidenceRuns": [
-        {
-          "date": "2026-07-10",
-          "runner": "local",
-          "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-send.test.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/main/runtime/mobile-presence-lock.test.ts src/shared/terminal-query-reply.test.ts src/shared/terminal-reply-query-scan.test.ts",
-          "result": "passed",
-          "durationSeconds": 4,
-          "summary": "69 shared/runtime tests passed. Before implementation, terminal.send took the floor for claimed replies and accepted ordinary claimed bytes."
-        },
-        {
-          "date": "2026-07-10",
-          "runner": "local",
-          "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/renderer/src/components/terminal-pane/pty-connection-terminal-input-gating.test.ts",
-          "result": "passed",
-          "durationSeconds": 11,
-          "summary": "421 renderer terminal connection tests passed, including desktop onData and capability-handler suppression while mobile owns query authority."
-        }
-      ],
-      "runtimeBudget": {
-        "p95Seconds": 20,
-        "scope": "mobile and runtime deterministic unit gate"
-      },
-      "flakeHistory": {
-        "status": "unknown",
-        "evidence": "New deterministic gate; no soak history yet. Tests use no timing sleeps or external services."
-      },
-      "redGreenEvidence": {
-        "status": "partial",
-        "evidence": "Observed red before implementation for the missing WebView listener/native route/sender and for RPC floor-taking plus unvalidated claims; all are green after the fix. The later multi-mobile and pre-fit race assertions have green deterministic coverage but no saved intentional-break artifact yet."
-      },
-      "performanceBudget": {
-        "required": true,
-        "evidence": "No polling, scans, timers, or output fanout were added. The WebView adds one disposable onData listener; native/RPC work occurs only for xterm data and is grammar-filtered; responder election is O(1) from Map insertion order; pre-fit output uses the existing capped pending-output queue."
-      },
-      "promotionCriteria": [
-        "Attach an intentional-break artifact for the pre-fit capture and multi-mobile election assertions.",
-        "Run live iOS and Android WebViews against a real querying TUI and verify no software-keyboard regression.",
-        "Exercise two physical/virtual mobile clients on one PTY and observe one reply per query.",
-        "Accumulate the normal soak window with zero unexplained flakes."
-      ],
-      "knownGaps": [
-        "No live iOS or Android WebView run is registered.",
-        "No real SSH, WSL, daemon, or two-device provider-contract run is registered.",
-        "Mixed-version pairing is gated by the terminal.query-reply-input.v1 capability (mobile drops replies unless the host advertises it), but no live old-binary pairing run is registered.",
-        "A desktop-to-mobile driver handoff has a bounded double-reply window: the server elects the mobile responder synchronously while the desktop renderer's cached driver map updates via an async event, so an in-flight query can be answered by both until the driver-change event lands."
-      ],
-      "demotionRule": "Keep experimental or disable mobile forwarding if the gate flakes without a product bug, live WebView input isolation regresses, or duplicate replies appear under multi-mobile use."
-    },
-    {
-      "id": "terminal-runtime.mobile-stream-budget",
-      "title": "Runtime and mobile terminal streams keep snapshot and live-output bytes bounded",
+      "id": "terminal-runtime.stream-budget",
+      "title": "Runtime terminal streams keep snapshot and live-output bytes bounded",
       "maturity": "experimental",
       "protection": "partial",
       "owner": "terminal-runtime",
       "layer": "runtime-rpc-contract",
       "surfaces": [
-        "mobile terminal",
         "native-chat terminal overlay",
         "runtime RPC",
         "binary multiplex",
-        "JSON subscribe fallback",
         "snapshot buffering"
       ],
-      "platforms": ["macos", "linux", "windows", "mobile"],
+      "platforms": ["macos", "linux", "windows"],
       "providers": ["remote-runtime", "ssh", "local", "daemon"],
       "coveredPlatforms": ["macos"],
       "coveredProviders": ["remote-runtime"],
-      "coverageNotes": "Local macOS evidence covers runtime-RPC stream budgets, paired-renderer parse/discard credit, and negotiated host-side suppression for hidden paired desktop panes. Deferred credit is shared by local and remote transports, batches ACKs at 192 KiB or 4 ms, grows per-stream windows from 512 KiB to 2 MiB and aggregate windows from 2 MiB to 8 MiB, bounds queued output to 256 KiB per stream, and caps each multiplex connection at 32 active or pending streams for an 8 MiB aggregate pending-output ceiling. Deterministic tests cover replay ordering, stale generations, malformed frames, hidden panes, queue eviction, disposal, send/recovery failure, repeated pending-slot replacement, reconnect, mixed-version pause negotiation, and round-robin fairness. The opt-in benchmark covers 1/20/100 ms RTT and 1/4/8 viewers, exact protocol-frame allocations, scheduler CPU, and measured @xterm/headless parser CPU/retained heap. Live Android restore evidence, browser/WebGL parser measurements, and legacy JSON subscribe parity remain required.",
+      "coverageNotes": "Local macOS evidence covers runtime-RPC stream budgets, paired-renderer parse/discard credit, and negotiated host-side suppression for hidden paired desktop panes. Deferred credit is shared by local and remote transports, batches ACKs at 192 KiB or 4 ms, grows per-stream windows from 512 KiB to 2 MiB and aggregate windows from 2 MiB to 8 MiB, bounds queued output to 256 KiB per stream, and caps each multiplex connection at 32 active or pending streams for an 8 MiB aggregate pending-output ceiling. Deterministic tests cover replay ordering, stale generations, malformed frames, hidden panes, queue eviction, disposal, send/recovery failure, repeated pending-slot replacement, reconnect, mixed-version pause negotiation, and round-robin fairness. The opt-in benchmark covers 1/20/100 ms RTT and 1/4/8 viewers, exact protocol-frame allocations, scheduler CPU, and measured @xterm/headless parser CPU/retained heap. Browser/WebGL parser measurements remain required.",
       "motivatingLinks": [
         "https://github.com/stablyai/orca/pull/6951",
         "https://github.com/stablyai/orca/pull/6955",
         "https://github.com/stablyai/orca/pull/7009"
       ],
-      "invariant": "Runtime and mobile terminal subscriptions must cap initial snapshots, live output buffered while snapshots load, chunk sizes, batches, and aggregate in-flight credit. ACK means the renderer parsed the bytes or intentionally discarded them; receipt-time ACK is forbidden. A capability-negotiated hidden paired desktop stream must deliver zero raw output frames after host model ingestion, preserve side-effect facts, and restore from one authoritative snapshot before exact live output resumes. Every replay, stale-generation, malformed-frame, hidden-pane, eviction, disposal, error, and reconnect path must settle credit exactly once so streams neither leak memory nor stall. A terminal covered by native chat must restore from fresh scrollback when revealed, while preserving output order, input locks, resize/driver events, fairness, and safe mixed-version fallback.",
-      "oracle": "Assert mobile initial snapshots downgrade until they fit <=512KB, requested binary snapshots downgrade until they fit <=2MB, live output queued while snapshots load stays <=256KB per stream, large output splits into <=48KB frames, and output bursts coalesce. Pause three negotiated paired desktop streams, sustain output, and assert zero renderer frames; reveal one and assert one authoritative snapshot followed by exact live bytes with no loss or duplication. Prove old clients continue receiving output and new clients never send pause to old hosts. Feed paired output through the xterm parse callback and prove ACK is deferred until parse or intentional discard, then inject stale generation, malformed/transformed frames, replay failure, queue eviction, hidden panes, pane disposal, ACK send failure, recovery serialization failure, and reconnect races; assert ordered replay and exactly-once credit settlement. Fill the aggregate window across bulk and interactive streams, ACK once, and prove round-robin progress. Run the opt-in 64 MiB/viewer RTT matrix and enforce bounded 8 MiB aggregate in-flight memory, >7 MiB/s/viewer at 100 ms RTT, and <200 ms completion spread. JSON fallback parity and live Android scrollback restoration remain explicit gaps.",
+      "invariant": "Runtime terminal subscriptions must cap initial snapshots, live output buffered while snapshots load, chunk sizes, batches, and aggregate in-flight credit. ACK means the renderer parsed the bytes or intentionally discarded them; receipt-time ACK is forbidden. A capability-negotiated hidden paired desktop stream must deliver zero raw output frames after host model ingestion, preserve side-effect facts, and restore from one authoritative snapshot before exact live output resumes. Every replay, stale-generation, malformed-frame, hidden-pane, eviction, disposal, error, and reconnect path must settle credit exactly once so streams neither leak memory nor stall. A terminal covered by native chat must restore from fresh scrollback when revealed, while preserving output order, resize events, fairness, and safe mixed-version fallback.",
+      "oracle": "Assert initial snapshots downgrade until they fit <=512KB, requested binary snapshots downgrade until they fit <=2MB, live output queued while snapshots load stays <=256KB per stream, large output splits into <=48KB frames, and output bursts coalesce. Pause three negotiated paired desktop streams, sustain output, and assert zero renderer frames; reveal one and assert one authoritative snapshot followed by exact live bytes with no loss or duplication. Prove old clients continue receiving output and new clients never send pause to old hosts. Feed paired output through the xterm parse callback and prove ACK is deferred until parse or intentional discard, then inject stale generation, malformed/transformed frames, replay failure, queue eviction, hidden panes, pane disposal, ACK send failure, recovery serialization failure, and reconnect races; assert ordered replay and exactly-once credit settlement. Fill the aggregate window across bulk and interactive streams, ACK once, and prove round-robin progress. Run the opt-in 64 MiB/viewer RTT matrix and enforce bounded 8 MiB aggregate in-flight memory, >7 MiB/s/viewer at 100 ms RTT, and <200 ms completion spread.",
       "commands": [
         "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts --maxWorkers=1",
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/main/runtime/rpc/terminal-output-batching.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts",
-        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/main/runtime/rpc/terminal-output-batching.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-stream-reconnect.test.ts src/renderer/src/components/terminal-pane/terminal-pty-ack-gate.test.ts src/renderer/src/lib/pane-manager/terminal-delivery-credit.test.ts src/renderer/src/runtime/remote-runtime-terminal-parse-backpressure.test.ts src/renderer/src/runtime/runtime-terminal-stream.test.ts --maxWorkers=1",
+        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-output-batching.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts",
+        "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-output-batching.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts src/renderer/src/components/terminal-pane/pty-connection-hidden-output-restore.test.ts src/renderer/src/components/terminal-pane/remote-runtime-pty-transport-stream-reconnect.test.ts src/renderer/src/components/terminal-pane/terminal-pty-ack-gate.test.ts src/renderer/src/lib/pane-manager/terminal-delivery-credit.test.ts src/renderer/src/runtime/remote-runtime-terminal-parse-backpressure.test.ts src/renderer/src/runtime/runtime-terminal-stream.test.ts --maxWorkers=1",
         "ORCA_TERMINAL_PERF_BENCH=1 pnpm exec vitest run --config config/vitest.config.ts --disableConsoleIntercept src/main/runtime/rpc/terminal-multiplex-flow-control.bench.test.ts"
       ],
       "testFiles": [
-        "src/main/runtime/rpc/terminal-subscribe-buffer.test.ts",
         "src/main/runtime/rpc/terminal-output-batching.test.ts",
         "src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts",
         "src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts",
@@ -15254,14 +15132,6 @@
         "src/renderer/src/runtime/runtime-terminal-stream.test.ts"
       ],
       "assertionRefs": [
-        {
-          "file": "src/main/runtime/rpc/terminal-subscribe-buffer.test.ts",
-          "assertions": [
-            "legacy binary output queued during initial snapshot serialization stays bounded",
-            "stale mobile resize re-stream completions are dropped for legacy binary streams",
-            "aborted stream signals do not register stale listeners"
-          ]
-        },
         {
           "file": "src/main/runtime/rpc/terminal-output-batching.test.ts",
           "assertions": [
@@ -15352,7 +15222,7 @@
           "date": "2026-07-03",
           "runner": "local",
           "platform": "macos",
-          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-subscribe-buffer.test.ts src/main/runtime/rpc/terminal-output-batching.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts",
+          "command": "pnpm exec vitest run --config config/vitest.config.ts src/main/runtime/rpc/terminal-output-batching.test.ts src/main/runtime/rpc/terminal-multiplex-snapshot-serialization.test.ts src/main/runtime/rpc/terminal-multiplex-ack-output-budget.test.ts src/main/runtime/rpc/terminal-multiplex-ack-overflow-recovery.test.ts src/main/runtime/rpc/terminal-multiplex-pty-wait-capacity.test.ts src/main/runtime/rpc/terminal-multiplex-output-pause-and-viewport.test.ts",
           "result": "passed",
           "durationSeconds": 3.8,
           "summary": "3 test file(s) passed, 28 tests passed on main@1282f5c2d in a clean checkout."
@@ -15386,7 +15256,7 @@
       },
       "redGreenEvidence": {
         "status": "partial",
-        "evidence": "The hidden paired-output oracle is red on origin/main, green on the candidate, and red with its causal host/protocol files reverted. It proves three paused streams emit no raw frames while an unpaused control remains live; compatibility tests preserve old-client/new-host output and prevent new-client/old-host pause opcodes. The broader gate remains partial pending legacy JSON fallback and live Android coverage."
+        "evidence": "The hidden paired-output oracle is red on origin/main, green on the candidate, and red with its causal host/protocol files reverted. It proves three paused streams emit no raw frames while an unpaused control remains live; compatibility tests preserve old-client/new-host output and prevent new-client/old-host pause opcodes. The broader gate remains partial pending browser renderer coverage."
       },
       "performanceBudget": {
         "required": true,
@@ -15394,12 +15264,9 @@
       },
       "promotionCriteria": [
         "Gate binary multiplex first.",
-        "Decide whether JSON fallback is supported, gated, or deprecated.",
         "Record byte counts and order/cursor artifacts on failure."
       ],
       "knownGaps": [
-        "The pure mobile decision gate does not yet prove live Android WebView scrollback restore after a chat toggle.",
-        "Legacy JSON subscribe parity is undecided.",
         "The parser measurement uses @xterm/headless; browser renderer/WebGL CPU, GPU, and allocation behavior still need packaged-app performance evidence."
       ],
       "demotionRule": "Cannot promote while a supported stream path has uncapped snapshot or live-output buffering."

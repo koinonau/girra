@@ -179,15 +179,8 @@ export function registerRuntimeWindowLifecycle(
     closeTerminalTab: (tabId, options) =>
       requestTerminalTabCloseFromRenderer(mainWindow, tabId, options),
     sleepWorktree: (worktreeId) => send('ui:sleepWorktree', { worktreeId }),
-    resumeSleepingAgents: (worktreeId) => send('ui:resumeSleepingAgents', { worktreeId }),
     terminalFitOverrideChanged: (ptyId, mode, cols, rows) =>
       send('runtime:terminalFitOverrideChanged', { ptyId, mode, cols, rows }),
-    terminalDriverChanged: (ptyId, driver) =>
-      send('runtime:terminalDriverChanged', { ptyId, driver }),
-    nativeChatLaunchDraftResolved: (tabId, resolution) =>
-      send('runtime:nativeChatLaunchDraftResolved', { tabId, ...resolution }),
-    browserDriverChanged: (browserPageId, driver) =>
-      send('runtime:browserDriverChanged', { browserPageId, driver }),
     browserRemoteViewersChanged: (browserPageId, hasRemoteViewers) =>
       send('runtime:browserRemoteViewersChanged', { browserPageId, hasRemoteViewers }),
     clientHostedBrowserRowsChanged: (event) => send('runtime:clientHostedBrowserRowsChanged', event)

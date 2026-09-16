@@ -222,14 +222,10 @@ describe('remote terminal stalled stream recovery', () => {
         emitStreamEvent({
           type: 'fit-override-changed',
           streamId: id,
-          mode: 'mobile-fit',
+          mode: 'remote-desktop-fit',
           cols: 80,
           rows: 24
         })
-    ],
-    [
-      'a driver change',
-      (id) => emitStreamEvent({ type: 'driver-changed', streamId: id, driver: { kind: 'idle' } })
     ],
     ['an unsolicited snapshot', (id) => emitSnapshot(id, undefined, 'baseline', 8)]
   ])('recovers missing live output despite %s', async (_label, emitIntervening) => {

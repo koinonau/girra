@@ -169,8 +169,7 @@ describe('OrcaRuntimeService', () => {
       closeTerminal: vi.fn(),
       closeSessionTab,
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
     const browserTab = {
       type: 'browser' as const,

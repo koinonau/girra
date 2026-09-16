@@ -41,12 +41,11 @@ const mocks = {
   cancel: vi.fn<NativeChatInteractiveSend['cancel']>()
 }
 
-function renderCard(canSend = true): ReturnType<typeof render> {
-  return render(cardElement(canSend))
+function renderCard(): ReturnType<typeof render> {
+  return render(cardElement())
 }
 
 function cardElement(
-  canSend = true,
   messages?: readonly NativeChatMessage[],
   onShowingQuestionChange?: (showing: boolean) => void,
   transcriptSettled = true
@@ -54,7 +53,6 @@ function cardElement(
   return (
     <NativeChatInteractiveCard
       paneKey="tab-1:leaf-1"
-      canSend={canSend}
       messages={messages}
       transcriptSettled={transcriptSettled}
       onShowingQuestionChange={onShowingQuestionChange}
@@ -139,16 +137,6 @@ describe('NativeChatInteractiveCard answer lifecycle', () => {
     expect(mocks.cancelPending).toHaveBeenCalledOnce()
   })
 
-  it('cancels delayed PTY writes when desktop send authority is lost', () => {
-    mocks.sendAnswer.mockReturnValue({ settleAfterMs: 5_000, waitsForVerifiedDelivery: false })
-    const rendered = renderCard()
-
-    chooseSpacesAndSubmit()
-    rendered.rerender(cardElement(false))
-
-    expect(mocks.cancelPending).toHaveBeenCalledOnce()
-  })
-
   it('shows the paced send as busy and freezes the snapshotted answer', () => {
     mocks.sendAnswer.mockReturnValue({ settleAfterMs: 5_000, waitsForVerifiedDelivery: false })
     renderCard()
@@ -229,21 +217,21 @@ describe('NativeChatInteractiveCard transcript fallback', () => {
 
   it('renders a pending transcript ask and reports the composer replacement', () => {
     const onShowingQuestionChange = vi.fn()
-    render(cardElement(true, [askCallMessage('Tabs or spaces?')], onShowingQuestionChange))
+    render(cardElement([askCallMessage('Tabs or spaces?')], onShowingQuestionChange))
 
     expect(screen.getByText('Tabs or spaces?')).toBeInTheDocument()
     expect(onShowingQuestionChange).toHaveBeenCalledWith(true)
   })
 
   it('withholds a retained transcript ask while its replacement read is unsettled', () => {
-    render(cardElement(true, [askCallMessage('Stale transcript question?')], undefined, false))
+    render(cardElement([askCallMessage('Stale transcript question?')], undefined, false))
 
     expect(screen.queryByText('Stale transcript question?')).not.toBeInTheDocument()
   })
 
   it('prefers live status over the transcript when both carry a prompt', () => {
     storeState.agentStatusByPaneKey['tab-1:leaf-1'].interactivePrompt = INITIAL_PROMPT
-    render(cardElement(true, [askCallMessage('Stale transcript question?')]))
+    render(cardElement([askCallMessage('Stale transcript question?')]))
 
     expect(screen.getByText('Tabs or spaces?')).toBeInTheDocument()
     expect(screen.queryByText('Stale transcript question?')).not.toBeInTheDocument()
@@ -253,7 +241,7 @@ describe('NativeChatInteractiveCard transcript fallback', () => {
     // Why no state gate: the mirrored status channel is exactly what fails in the
     // reported topology, so keying the fallback on it would suppress the card.
     storeState.agentStatusByPaneKey['tab-1:leaf-1'].state = 'working'
-    render(cardElement(true, [askCallMessage('Tabs or spaces?')]))
+    render(cardElement([askCallMessage('Tabs or spaces?')]))
 
     expect(screen.getByText('Tabs or spaces?')).toBeInTheDocument()
   })
@@ -261,7 +249,7 @@ describe('NativeChatInteractiveCard transcript fallback', () => {
   it('stays dismissed after answering while the transcript call is still pending', () => {
     mocks.sendAnswer.mockReturnValue({ settleAfterMs: 500, waitsForVerifiedDelivery: true })
     const messages = [askCallMessage('Tabs or spaces?')]
-    const rendered = render(cardElement(true, messages))
+    const rendered = render(cardElement(messages))
 
     let settleDelivery: ((delivered: boolean) => void) | undefined
     mocks.sendAnswer.mockImplementation((_prompt, _selections, onDeliverySettled) => {
@@ -270,16 +258,16 @@ describe('NativeChatInteractiveCard transcript fallback', () => {
     })
     chooseSpacesAndSubmit()
     act(() => settleDelivery?.(true))
-    rendered.rerender(cardElement(true, messages))
+    rendered.rerender(cardElement(messages))
 
     expect(screen.queryByText('Tabs or spaces?')).not.toBeInTheDocument()
   })
 
   it('clears once the FIFO tool result lands', () => {
-    const rendered = render(cardElement(true, [askCallMessage('Tabs or spaces?')]))
+    const rendered = render(cardElement([askCallMessage('Tabs or spaces?')]))
     expect(screen.getByText('Tabs or spaces?')).toBeInTheDocument()
 
-    rendered.rerender(cardElement(true, [askCallMessage('Tabs or spaces?'), askResultMessage()]))
+    rendered.rerender(cardElement([askCallMessage('Tabs or spaces?'), askResultMessage()]))
     expect(screen.queryByText('Tabs or spaces?')).not.toBeInTheDocument()
   })
 
@@ -291,7 +279,7 @@ describe('NativeChatInteractiveCard transcript fallback', () => {
       [abandoned as unknown as NativeChatMessage],
       [{ id: 'clear-1', command: '/clear', sentAt: 200 }]
     )
-    render(cardElement(true, trimmed))
+    render(cardElement(trimmed))
 
     expect(screen.queryByText('Tabs or spaces?')).not.toBeInTheDocument()
   })

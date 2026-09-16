@@ -1,6 +1,6 @@
 import { useAppStore } from '@/store'
 import { safeFit } from '@/lib/pane-manager/pane-tree-ops'
-import { bindPanePtyId, getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
+import { bindPanePtyId, getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 import { inspectRuntimeTerminalProcess } from '@/runtime/runtime-terminal-inspection'
 import { isFreshNonDoneAgentStatus } from '../../../../../shared/agent-status-types'
 import { isCtrlCKeyEvent, isPlainEscapeKeyEvent } from '../agent-interrupt-inference'

@@ -14,9 +14,6 @@ import { structuredNativeChatProjectionEnabled } from './structured-agent-sessio
 
 type SessionTabsPayload = RuntimeMobileSessionTabsResult | RuntimeMobileSessionTabsSnapshot
 
-/** Capped at 128px / one line in every shipped mobile build, so ~15-18 characters render. */
-export const CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE = 'Open on desktop'
-
 // Every structured tab is Claude, so rendering one needs both capabilities.
 function clientCanRenderStructuredAgentSessionTab(
   clientCapabilities: readonly RuntimeCapability[] | undefined
@@ -27,24 +24,9 @@ function clientCanRenderStructuredAgentSessionTab(
   )
 }
 
-function resolveMobileStructuredChatFallbackTitle(args: {
-  clientKind: 'mobile' | 'runtime' | undefined
-  clientCapabilities: readonly RuntimeCapability[] | undefined
-  structuredNativeChatEnabled?: boolean
-}): string | null {
-  if (
-    args.clientKind !== 'mobile' ||
-    args.structuredNativeChatEnabled !== true ||
-    clientCanRenderStructuredAgentSessionTab(args.clientCapabilities)
-  ) {
-    return null
-  }
-  return CLAUDE_STRUCTURED_CHAT_DESKTOP_ONLY_TAB_TITLE
-}
-
 export function projectSessionTabAgentStatus<TPayload extends SessionTabsPayload>(
   payload: TPayload,
-  clientKind: 'mobile' | 'runtime' | undefined,
+  clientKind: 'runtime' | undefined,
   clientCapabilities: readonly RuntimeCapability[] | undefined,
   structuredNativeChatEnabled: boolean
 ): TPayload {
@@ -53,28 +35,17 @@ export function projectSessionTabAgentStatus<TPayload extends SessionTabsPayload
     clientCapabilities,
     structuredNativeChatEnabled
   })
-  let projected: TPayload
-  if (clientKind === 'mobile' && structuredNativeChatEnabled === true) {
-    // Why: deleting the row left the user hunting for a chat the desktop says exists; the row
-    // survives with a title naming the fix. Nothing is removed, so no group/layout repair applies.
-    projected = projectUnsupportedAgentSessionTabTitles(payload, {
-      clientKind,
-      clientCapabilities,
-      structuredNativeChatEnabled
-    })
-  } else {
-    projected = structuredVisible ? payload : projectAgentSessionTabsOut(payload, () => true)
-    // Why: a paired client without the Claude capability renders no structured tab, so an
-    // ungated row would list and select into a pane that shows neither chat nor terminal.
-    if (
-      structuredVisible &&
-      clientKind !== undefined &&
-      !clientCapabilities?.includes(CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY)
-    ) {
-      projected = projectAgentSessionTabsOut(projected, () => true)
-    }
+  let projected = structuredVisible ? payload : projectAgentSessionTabsOut(payload, () => true)
+  // Why: a paired client without the Claude capability renders no structured tab, so an
+  // ungated row would list and select into a pane that shows neither chat nor terminal.
+  if (
+    structuredVisible &&
+    clientKind !== undefined &&
+    !clientCapabilities?.includes(CLAUDE_STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY)
+  ) {
+    projected = projectAgentSessionTabsOut(projected, () => true)
   }
-  // Why: only paired runtimes have legacy `done` completion side effects; mobile must keep its row without changing the exact v2 auth shape.
+  // Why: only paired runtimes have legacy `done` completion side effects.
   if (
     clientKind !== 'runtime' ||
     clientCapabilities?.includes(AGENT_SESSION_BOUNDARY_RUNTIME_CAPABILITY)
@@ -94,33 +65,10 @@ export function projectSessionTabAgentStatus<TPayload extends SessionTabsPayload
   return changed ? ({ ...projected, tabs } as TPayload) : projected
 }
 
-function projectUnsupportedAgentSessionTabTitles<TPayload extends SessionTabsPayload>(
-  payload: TPayload,
-  args: {
-    clientKind: 'mobile'
-    clientCapabilities: readonly RuntimeCapability[] | undefined
-    structuredNativeChatEnabled: true
-  }
-): TPayload {
-  let changed = false
-  const tabs = payload.tabs.map((tab) => {
-    if (tab.type !== 'agent-session') {
-      return tab
-    }
-    const title = resolveMobileStructuredChatFallbackTitle(args)
-    if (title === null) {
-      return tab
-    }
-    changed = true
-    return { ...tab, title }
-  })
-  return changed ? ({ ...payload, tabs } as TPayload) : payload
-}
-
 export function assertAgentSessionTabDestructiveMutationSupported(
   payload: SessionTabsPayload,
   tabId: string,
-  clientKind: 'mobile' | 'runtime' | undefined,
+  clientKind: 'runtime' | undefined,
   clientCapabilities: readonly RuntimeCapability[] | undefined
 ): void {
   if (clientKind === undefined) {

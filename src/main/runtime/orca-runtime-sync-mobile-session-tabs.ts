@@ -155,9 +155,7 @@ export class OrcaRuntimeWithSyncMobileSessionTabs extends OrcaRuntimeWithWriteOr
       ) {
         continue
       }
-      this.nativeChatDraftResolutions.reconcile(snapshot)
-      const launchDraftFencedSnapshot = this.nativeChatDraftResolutions.applyFence(snapshot)
-      const fencedSnapshot = this.applyMobileSessionRetirementFences(launchDraftFencedSnapshot)
+      const fencedSnapshot = this.applyMobileSessionRetirementFences(snapshot)
       this.releaseRuntimeSessionOwnershipForRendererRetiredTabs(fencedSnapshot, existing)
       const nextSnapshot = this.mergePreservedHeadlessMobileSessionTabs(fencedSnapshot, existing)
       // Why: clients drop same-epoch frames whose version isn't strictly newer,

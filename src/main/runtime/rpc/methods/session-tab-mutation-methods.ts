@@ -132,7 +132,7 @@ async function assertVisibleMutationTab(
   worktree: string,
   tabId: string,
   pairedDeviceId: string | undefined,
-  clientKind: 'mobile' | 'runtime' | undefined,
+  clientKind: 'runtime' | undefined,
   clientCapabilities: Parameters<typeof projectSessionTabsForClient>[2]
 ): Promise<void> {
   if (!clientKind) {

@@ -36,13 +36,11 @@ export function runtimeAdvertisesBrowserClientHosting(
 export function expectsBrowserClientHosting(input: {
   enabled: boolean
   preference: BrowserClientHostPlacementPreference | undefined
-  deviceScope: string | null | undefined
   capabilities: readonly string[] | undefined
 }): boolean {
   return (
     input.enabled &&
     (input.preference ?? 'auto') !== 'server' &&
-    input.deviceScope !== 'mobile' &&
     runtimeAdvertisesBrowserClientHosting(input.capabilities)
   )
 }

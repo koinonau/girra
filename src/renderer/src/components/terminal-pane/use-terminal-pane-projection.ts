@@ -15,12 +15,12 @@ import {
   resolveNativeChatLeafRoute
 } from '../native-chat/native-chat-leaf-routing'
 import { canContinueAgentSessionInNewSession } from './terminal-agent-session-continuation'
-import type { TerminalPaneMobileController } from './use-terminal-pane-mobile-actions'
+import type { TerminalPaneFitController } from './use-terminal-pane-fit-actions'
 import { useAppStore } from '@/store'
 import { makePaneKey } from '../../../../shared/stable-pane-id'
 import { resolvePaneAgentSessionId } from './pane-agent-session-id'
 
-export function useTerminalPaneProjection(controller: TerminalPaneMobileController) {
+export function useTerminalPaneProjection(controller: TerminalPaneFitController) {
   const {
     applyNativeChatLeafRoute,
     canToggleChatForLeaf,
@@ -225,5 +225,5 @@ export function useTerminalPaneProjection(controller: TerminalPaneMobileControll
   }
 }
 
-export type TerminalPaneProjectionController = TerminalPaneMobileController &
+export type TerminalPaneProjectionController = TerminalPaneFitController &
   ReturnType<typeof useTerminalPaneProjection>

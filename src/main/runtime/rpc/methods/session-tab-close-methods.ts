@@ -71,13 +71,7 @@ export const SESSION_TAB_CLOSE_METHODS = [
             deviceId: context.pairedDeviceId ?? 'in-process',
             worktree: params.worktree,
             tabId: params.tabId,
-            closeReason:
-              params.reason ??
-              (requiresIntent
-                ? 'missing'
-                : context.clientKind === 'mobile'
-                  ? 'legacy-mobile-user'
-                  : 'legacy-runtime-user'),
+            closeReason: params.reason ?? (requiresIntent ? 'missing' : 'legacy-runtime-user'),
             connectionGeneration: context.connectionId ?? 'in-process',
             requestId: context.requestId ?? 'in-process'
           }

@@ -2,18 +2,14 @@ import { z } from 'zod'
 import { requiredString } from '../../schemas'
 import { TerminalViewport } from './unary-schemas'
 import { TerminalHandle } from '../../../../../shared/rpc-contract/terminal-stream-params'
-export {
-  TerminalMultiplex,
-  TerminalResizeForClient,
-  TerminalSubscribe
-} from '../../../../../shared/rpc-contract/terminal-stream-params'
+export { TerminalMultiplex } from '../../../../../shared/rpc-contract/terminal-stream-params'
 
 export const TerminalMultiplexSubscribeFrame = TerminalHandle.extend({
   streamId: z.number().int().min(1),
   client: z
     .object({
       id: requiredString('Missing client ID'),
-      type: z.enum(['mobile', 'desktop']).default('desktop')
+      type: z.literal('desktop').default('desktop')
     })
     .optional(),
   viewport: TerminalViewport.optional(),

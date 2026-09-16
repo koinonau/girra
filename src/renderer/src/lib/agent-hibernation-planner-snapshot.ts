@@ -12,7 +12,6 @@ export type AgentHibernationPlannerSnapshot = {
   ptyIdsByTabId: Record<string, string[] | undefined>
   runtimeLivePtyIdsByWorktreeId?: Record<string, string[] | undefined>
   runtimeLivenessRequiredWorktreeIds?: string[]
-  mobileLockedPtyIds: string[]
   agentStatusByPaneKey: Record<string, AgentStatusEntry | undefined>
   sleepingAgentSessionsByPaneKey: Record<string, SleepingAgentSessionRecord | undefined>
   lastTerminalInputAtByPaneKey: Record<string, number | undefined>

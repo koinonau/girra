@@ -1,6 +1,6 @@
 import type { ManagedPane, ManagedPaneInternal, ScrollState } from './pane-manager-types'
 import { isManagedPaneDisplayNone } from './pane-display-visibility'
-import { getFitOverrideForPty } from './mobile-fit-overrides'
+import { getFitOverrideForPty } from './fit-overrides'
 import {
   armPaneFitContinuationRetry,
   clearPaneFitContinuationRetry
@@ -108,7 +108,7 @@ function performSafeFit(pane: ManagedPane): boolean {
     shouldRestoreScroll = true
   }
   try {
-    // Why: a mobile-owned PTY must stay at its phone grid on passive desktop panes.
+    // Why: a remotely owned PTY must stay at its held grid on passive local panes.
     const ptyId = pane.container?.dataset?.ptyId
     const override = ptyId ? getFitOverrideForPty(ptyId) : null
     if (override) {

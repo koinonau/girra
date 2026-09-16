@@ -134,7 +134,7 @@ export type BrowserTabCreateFocusResolution = {
 export function resolveBrowserTabCreateFocus(request: {
   activate?: boolean
   navigation?: RuntimeNavigationTarget
-  clientKind?: 'mobile' | 'runtime'
+  clientKind?: 'runtime'
 }): BrowserTabCreateFocusResolution {
   const navigation = resolveRuntimeNavigationTarget({
     navigation: request.navigation,

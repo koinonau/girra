@@ -16,7 +16,6 @@ const CAPABLE = [STRUCTURED_AGENT_SESSION_RUNTIME_CAPABILITY]
 /** Every caller shape that reaches the policy: desktop renderer, paired phone, in-process. */
 const CALLERS = [
   { name: 'desktop renderer', clientKind: 'runtime' as const, clientCapabilities: CAPABLE },
-  { name: 'paired mobile', clientKind: 'mobile' as const, clientCapabilities: CAPABLE },
   { name: 'in-process', clientKind: undefined, clientCapabilities: undefined }
 ]
 
@@ -30,7 +29,7 @@ describe('supportsStructuredAgentSessions', () => {
       })
     )
 
-    expect(decisions).toEqual([enabled, enabled, enabled])
+    expect(decisions).toEqual(CALLERS.map(() => enabled))
   })
 
   it('admits a capability-less in-process caller, which negotiates nothing', () => {
@@ -44,7 +43,7 @@ describe('supportsStructuredAgentSessions', () => {
   })
 
   it('still refuses a remote client that did not advertise the capability', () => {
-    for (const clientKind of ['runtime', 'mobile'] as const) {
+    for (const clientKind of ['runtime'] as const) {
       expect(
         supportsStructuredAgentSessions({
           clientKind,

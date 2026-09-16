@@ -15,7 +15,7 @@ type CreateProvenance = Pick<
 export function buildManagedWorktreeCreateArgs(
   params: WorktreeCreateParams,
   provenance: CreateProvenance,
-  origin: { clientKind?: 'mobile' | 'runtime' } = {}
+  origin: { clientKind?: 'runtime' } = {}
 ): ManagedWorktreeCreateArgs {
   return {
     repoSelector: params.repo,

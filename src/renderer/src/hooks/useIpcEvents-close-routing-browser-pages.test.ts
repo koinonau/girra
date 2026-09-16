@@ -151,7 +151,6 @@ describe('useIpcEvents browser tab close routing', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: () => () => {},
@@ -210,11 +209,7 @@ describe('useIpcEvents browser tab close routing', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },
@@ -370,7 +365,6 @@ describe('useIpcEvents browser tab close routing', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: () => () => {},
@@ -429,11 +423,7 @@ describe('useIpcEvents browser tab close routing', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },
@@ -584,7 +574,6 @@ describe('useIpcEvents browser tab close routing', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: () => () => {},
@@ -643,11 +632,7 @@ describe('useIpcEvents browser tab close routing', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },

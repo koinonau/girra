@@ -3,10 +3,7 @@ import type { RuntimeWorktreeScanResult } from './repo-worktree-resolution-scan'
 import type { TerminalWorkspaceLaunchScope } from './runtime-legacy-worker-terminal-recovery-types'
 import type { ResolvedWorktree } from './runtime-worktree-path-identity'
 import { isAbsolute, relative, resolve } from 'node:path'
-import type {
-  RuntimeTerminalDriverState,
-  RuntimeTerminalPresentation
-} from '../../shared/runtime-types'
+import type { RuntimeTerminalPresentation } from '../../shared/runtime-types'
 import type { RuntimeEdgeCommandSurface } from './runtime-edge-command-controller'
 import type { RuntimeLinearCommandSurface } from './runtime-linear-command-surface'
 import type { RuntimeFileCommandSurface } from './runtime-file-command-surface'
@@ -284,29 +281,20 @@ export type RuntimeWorktreeLifecycleEvent =
   | { kind: 'created'; worktreeId: string; path: string; branch: string }
   | { kind: 'removed'; worktreeId: string; path: string }
 
-// Why: presence-based driver state for the mobile-presence lock. Exactly one
-// driver per PTY at any moment. See docs/mobile-presence-lock.md.
-//   - `idle`: no mobile subscribers; desktop input flows freely
-//   - `desktop`: at least one mobile client subscribed but desktop reclaimed
-//      (or all mobile clients are passive `desktop`-mode watchers); desktop
-//      input flows freely
-//   - `mobile{clientId}`: a mobile client is the active driver; desktop
-//      input/resize are dropped server-side and the lock banner is mounted.
-//      `clientId` is the most recent mobile actor for this PTY.
-export type DriverState = RuntimeTerminalDriverState
+// Why: presence-based driver state. Exactly one driver per PTY at any moment.
+//   - `idle`: nothing holds the floor; desktop input flows freely
+//   - `desktop`: the host explicitly reclaimed the floor
 
 // Why: per-PTY layout target — what the PTY *should* be at right now.
-// `desktop` ⇒ runs at the desktop renderer's pane geometry; mobile passive
-// watchers (mode='desktop') still receive scrollback. `phone` ⇒ runs at
-// `ownerClientId`'s viewport; the desktop renderer's auto-fit is suppressed.
+// `desktop` ⇒ runs at the desktop renderer's pane geometry. `remote-desktop` ⇒
+// runs at the owning viewer's geometry; the host's auto-fit is suppressed.
 // See docs/mobile-terminal-layout-state-machine.md.
 export type PtyLayoutTarget =
   | { kind: 'desktop'; cols: number; rows: number }
-  | { kind: 'phone'; cols: number; rows: number; ownerClientId: string }
   | { kind: 'remote-desktop'; cols: number; rows: number; ownerSubscriptionKey: string }
 
 // Why: authoritative layout state with monotonic seq. Bumped on every
-// applyLayout success; emitted on mobile subscribe-stream events so clients
+// applyLayout success; emitted on terminal stream events so clients
 // drop stale events that arrive after a newer transition.
 export type PtyLayoutState = PtyLayoutTarget & {
   seq: number

@@ -61,7 +61,6 @@ export function buildWindowApi(args: {
         onOpenDiffFromMobile: () => () => {},
         onCloseTerminal: () => () => {},
         onSleepWorktree: () => () => {},
-        onResumeSleepingAgents: () => () => {},
         onNewBrowserTab: () => () => {},
         onNewMarkdownTab: () => () => {},
         onRequestTabCreate: () => () => {},
@@ -99,11 +98,7 @@ export function buildWindowApi(args: {
       },
       runtime: {
         getTerminalFitOverrides: () => Promise.resolve([]),
-        getTerminalDrivers: () => Promise.resolve([]),
-        getBrowserDrivers: () => Promise.resolve([]),
         onTerminalFitOverrideChanged: () => () => {},
-        onTerminalDriverChanged: () => () => {},
-        onBrowserDriverChanged: () => () => {},
         onClientHostedBrowserRowsChanged: () => () => {},
         getClientHostedBrowserRows: async () => [],
         ...args.runtime

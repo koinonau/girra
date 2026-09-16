@@ -9,33 +9,6 @@ export const FilePathSearch = WorktreeSelector.extend({
   mode: z.literal('quick-open').optional()
 })
 
-export const ResolveTerminalPath = WorktreeSelector.extend({
-  pathText: z
-    .unknown()
-    .transform((v) => (typeof v === 'string' ? v : ''))
-    .pipe(z.string().min(1, 'Missing path text')),
-  terminal: z
-    .unknown()
-    .transform((v) => (typeof v === 'string' && v.length > 0 ? v : null))
-    .nullable()
-    .optional(),
-  cwd: z
-    .unknown()
-    .transform((v) => (typeof v === 'string' && v.length > 0 ? v : null))
-    .nullable()
-    .optional(),
-  crossWorkspace: z
-    .unknown()
-    .transform((v) => v === true)
-    .optional(),
-  nativeChatContext: z
-    .object({
-      tabId: z.string().min(1),
-      sessionId: z.string().min(1)
-    })
-    .optional()
-})
-
 export const FileOpenDiff = FileOpen.extend({
   staged: z.boolean().optional()
 })

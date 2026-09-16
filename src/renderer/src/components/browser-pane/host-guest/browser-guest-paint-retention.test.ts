@@ -8,10 +8,6 @@ import {
   useBrowserGuestPaintRetention
 } from './browser-guest-paint-retention'
 import {
-  hydrateBrowserDrivers,
-  setDriverForBrowserPage
-} from '../../../lib/pane-manager/browser-mobile-driver-state'
-import {
   hydrateBrowserRemoteViewerPages,
   setRemoteViewersForBrowserPage
 } from '../../../lib/pane-manager/browser-remote-viewer-state'
@@ -29,8 +25,8 @@ describe('collectBrowserPageIds', () => {
     ).toEqual(['page-a', 'page-b'])
   })
 
-  // Why: a split tab can hold a background page a phone is driving while a different page is
-  // active; collecting only the active one would let that guest get parked.
+  // Why: a split tab can hold a background page a paired client is watching while a different page
+  // is active; collecting only the active one would let that guest get parked.
   it('does not drop background pages in favour of the active one', () => {
     expect(
       collectBrowserPageIds([{ id: 't', activePageId: 'p1', pageIds: ['p1', 'p2'] }])
@@ -66,21 +62,11 @@ describe('collectBrowserPageIds', () => {
 
 describe('useBrowserGuestPaintRetention', () => {
   afterEach(() => {
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
-  it('retains a hidden container for a phone driving one of its pages', () => {
-    hydrateBrowserDrivers([
-      { browserPageId: 'page-b', driver: { kind: 'mobile', clientId: 'phone-1' } }
-    ])
-    expect(
-      renderHook(() => useBrowserGuestPaintRetention(['page-a', 'page-b'])).result.current
-    ).toBe(true)
-  })
-
-  // Why: a paired desktop/web/CLI client never takes the presence lock, so the driver term above
-  // cannot cover it and its stream would go dark behind a hidden ancestor.
+  // Why: a paired desktop/web/CLI client is not the host's active pane, so its stream would go
+  // dark behind a hidden ancestor without this term.
   it('retains a hidden container for a page a paired client is watching', () => {
     hydrateBrowserRemoteViewerPages(['page-b'])
     expect(
@@ -88,7 +74,7 @@ describe('useBrowserGuestPaintRetention', () => {
     ).toBe(true)
   })
 
-  it('releases a hidden container once nothing drives or watches its pages', () => {
+  it('releases a hidden container once nothing watches its pages', () => {
     hydrateBrowserRemoteViewerPages(['page-elsewhere'])
     expect(
       renderHook(() => useBrowserGuestPaintRetention(['page-a', 'page-b'])).result.current
@@ -99,7 +85,6 @@ describe('useBrowserGuestPaintRetention', () => {
 // The imperative twin, for retention decisions taken outside a render (the eviction budget).
 describe('browserPageNeedsPaintRetention', () => {
   afterEach(() => {
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
@@ -109,12 +94,6 @@ describe('browserPageNeedsPaintRetention', () => {
     hydrateBrowserRemoteViewerPages(['page-a'])
     expect(browserPageNeedsPaintRetention('page-a')).toBe(true)
     hydrateBrowserRemoteViewerPages([])
-
-    hydrateBrowserDrivers([
-      { browserPageId: 'page-a', driver: { kind: 'mobile', clientId: 'phone-1' } }
-    ])
-    expect(browserPageNeedsPaintRetention('page-a')).toBe(true)
-    hydrateBrowserDrivers([])
 
     const token = acquireBrowserAutomationVisibility('page-a')
     expect(browserPageNeedsPaintRetention('page-a')).toBe(true)
@@ -130,13 +109,12 @@ describe('browserPageNeedsPaintRetention', () => {
 
 describe('onBrowserGuestPaintRetentionChange', () => {
   afterEach(() => {
-    hydrateBrowserDrivers([])
     hydrateBrowserRemoteViewerPages([])
   })
 
   // Why every channel: the eviction budget caches its decision until something invalidates it, so a
   // term that never notifies leaves a streamed guest queued for destruction until an unrelated bump.
-  it('fires for automation, driver and remote-viewer changes alike', () => {
+  it('fires for automation and remote-viewer changes alike', () => {
     const listener = vi.fn()
     const unsubscribe = onBrowserGuestPaintRetentionChange(listener)
 
@@ -145,15 +123,11 @@ describe('onBrowserGuestPaintRetentionChange', () => {
     releaseBrowserAutomationVisibility(token)
     expect(listener).toHaveBeenCalledTimes(2)
 
-    setDriverForBrowserPage('page-a', { kind: 'mobile', clientId: 'phone-1' })
-    expect(listener).toHaveBeenCalledTimes(3)
-
     setRemoteViewersForBrowserPage('page-a', true)
-    expect(listener).toHaveBeenCalledTimes(4)
+    expect(listener).toHaveBeenCalledTimes(3)
 
     unsubscribe()
     setRemoteViewersForBrowserPage('page-a', false)
-    setDriverForBrowserPage('page-a', { kind: 'idle' })
-    expect(listener).toHaveBeenCalledTimes(4)
+    expect(listener).toHaveBeenCalledTimes(3)
   })
 })

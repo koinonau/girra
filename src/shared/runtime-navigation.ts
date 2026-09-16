@@ -5,7 +5,7 @@ export type RuntimeNavigationTarget = (typeof RUNTIME_NAVIGATION_TARGETS)[number
 export function resolveRuntimeNavigationTarget(args: {
   navigation?: RuntimeNavigationTarget
   notifyClients?: boolean
-  clientKind?: 'mobile' | 'runtime'
+  clientKind?: 'runtime'
 }): RuntimeNavigationTarget {
   if (args.navigation) {
     return args.navigation

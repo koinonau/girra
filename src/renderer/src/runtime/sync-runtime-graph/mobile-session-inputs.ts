@@ -210,7 +210,7 @@ export function buildMobileLaunchDraftsByPaneKey(args: {
   > | null = null
   for (const terminal of args.terminalTabs) {
     const draft = args.launchDraftByTabId.get(terminal.id)
-    if (!draft || draft.resolved) {
+    if (!draft) {
       continue
     }
     const capture = args.mountedSurfaceCaptureByTabId.get(terminal.id)

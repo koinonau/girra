@@ -31,7 +31,7 @@ export class RuntimeBrowserCommandsWithBrowserTabCreate extends RuntimeBrowserCo
       targetGroupId?: string
       placement?: BrowserPageCreationPlacement
     },
-    caller?: { pairedDeviceId?: string; clientKind?: 'mobile' | 'runtime' }
+    caller?: { pairedDeviceId?: string; clientKind?: 'runtime' }
   ): Promise<{ browserPageId: string }> {
     const url = params.url ?? 'about:blank'
     const focus = resolveBrowserTabCreateFocus({

@@ -1,7 +1,4 @@
-import {
-  sendSnapshotFrames,
-  serializeBudgetedMobileSnapshot
-} from './terminal-snapshot-publication'
+import { sendSnapshotFrames, serializeInitialStreamSnapshot } from './terminal-snapshot-publication'
 import { getOutputAfterSnapshotSeq } from './terminal-stream-replay'
 import type {
   MultiplexSubscribeRequest,
@@ -10,9 +7,7 @@ import type {
 import type { TerminalMultiplexStream } from './terminal-stream-types'
 
 export type MultiplexPublishedInitialState = {
-  isMobile: boolean
   size: { cols: number; rows: number } | null
-  displayMode: string
 }
 
 export async function publishMultiplexInitialSnapshot(
@@ -22,11 +17,10 @@ export async function publishMultiplexInitialSnapshot(
 ): Promise<MultiplexPublishedInitialState | null> {
   const { runtime, streams, emit } = state
   const { ptyId } = stream
-  const isMobile = stream.isMobile
   const forcedInitialSnapshotTruncated =
     process.env.ORCA_E2E_FORCE_REMOTE_TERMINAL_INITIAL_SNAPSHOT_TRUNCATED === '1'
   let read = await runtime.readTerminal(request.terminal)
-  let serialized = await serializeBudgetedMobileSnapshot(runtime, ptyId, isMobile)
+  let serialized = await serializeInitialStreamSnapshot(runtime, ptyId)
   if (state.closed || streams.get(request.streamId) !== stream) {
     return null
   }
@@ -36,7 +30,7 @@ export async function publishMultiplexInitialSnapshot(
     stream.pendingOutputBytes = 0
     stream.pendingOutputOverflowed = false
     read = await runtime.readTerminal(request.terminal)
-    serialized = await serializeBudgetedMobileSnapshot(runtime, ptyId, isMobile)
+    serialized = await serializeInitialStreamSnapshot(runtime, ptyId)
     if (state.closed || streams.get(request.streamId) !== stream) {
       return null
     }
@@ -48,7 +42,6 @@ export async function publishMultiplexInitialSnapshot(
     }
   }
   const size = runtime.getTerminalSize(ptyId)
-  const displayMode = runtime.getMobileDisplayMode(ptyId)
   const layoutSeq = runtime.getLayout(ptyId)?.seq
   // Why: layout versions and output offsets are different sequence domains.
   const snapshotOutputSeq = serialized?.seq
@@ -58,7 +51,6 @@ export async function publishMultiplexInitialSnapshot(
     terminal: request.terminal,
     cols: serialized?.cols ?? size?.cols,
     rows: serialized?.rows ?? size?.rows,
-    displayMode,
     seq: layoutSeq,
     ...((stream.ackOutputSourceRanges || stream.supportsOutputPause) && {
       capabilities: {
@@ -90,7 +82,6 @@ export async function publishMultiplexInitialSnapshot(
       kind: 'scrollback',
       cols: serialized?.cols ?? size?.cols ?? 80,
       rows: serialized?.rows ?? size?.rows ?? 24,
-      displayMode,
       seq: snapshotOutputSeq,
       cwd: serialized?.cwd,
       truncated: initialOutputOverflowed,
@@ -122,8 +113,6 @@ export async function publishMultiplexInitialSnapshot(
       )
     }
   }
-  // Why: baseline for resize re-stream gating; the client already rewrapped to these cols via the initial snapshot replay.
-  stream.lastResizeCols = serialized?.cols ?? size?.cols
   stream.buffering = false
   const pendingOutput = stream.pendingOutput.splice(0)
   if (!initialOutputOverflowed) {
@@ -137,5 +126,5 @@ export async function publishMultiplexInitialSnapshot(
   stream.pendingOutputBytes = 0
   stream.pendingOutputOverflowed = false
   stream.outputBatcher.flush()
-  return { isMobile, size, displayMode }
+  return { size }
 }

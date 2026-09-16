@@ -26,7 +26,7 @@ describe('terminal focus navigation authority', () => {
     const dispatcher = new RpcDispatcher({ runtime, methods: TERMINAL_METHODS })
 
     await dispatcher.dispatchStreaming(request({ terminal: 'term-1' }), () => {}, {
-      clientKind: 'mobile',
+      clientKind: 'runtime',
       pairedDeviceId: 'device-a'
     })
     await dispatcher.dispatchStreaming(

@@ -11,7 +11,12 @@ import {
   encodeTerminalStreamJson,
   encodeTerminalStreamText
 } from '../../../shared/terminal-stream-protocol'
-import { makeRequest, stubRuntime } from './terminal-multiplex-test-harness'
+import {
+  makeRequest,
+  sendDesktopMultiplexSubscribe,
+  startDesktopMultiplexSubscribe,
+  stubRuntime
+} from './terminal-multiplex-test-harness'
 
 describe('terminal multiplex RPC', () => {
   it('flushes multibyte live output when encoded bytes reach the batch budget', async () => {
@@ -36,7 +41,6 @@ describe('terminal multiplex RPC', () => {
           rows: 40
         }),
         getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-        getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
         getLayout: vi.fn().mockReturnValue({ seq: 1 }),
         subscribeToTerminalData: vi.fn(
           (
@@ -49,9 +53,7 @@ describe('terminal multiplex RPC', () => {
         ),
         subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
         subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-        subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
         getTerminalFitOverride: vi.fn().mockReturnValue(null),
-        getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
         registerSubscriptionCleanup: vi.fn(registry.registerSubscriptionCleanup),
         registerOwnedSubscriptionCleanup: vi.fn(registry.registerOwnedSubscriptionCleanup),
         waitForTerminal: vi.fn(() => new Promise<RuntimeTerminalWait>(() => {})),
@@ -149,7 +151,6 @@ describe('terminal multiplex RPC', () => {
         rows: 40
       }),
       getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
       getLayout: vi.fn().mockReturnValue({ seq: 1 }),
       subscribeToTerminalData: vi.fn(
         (
@@ -162,9 +163,7 @@ describe('terminal multiplex RPC', () => {
       ),
       subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
       subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-      subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
       getTerminalFitOverride: vi.fn().mockReturnValue(null),
-      getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
       registerSubscriptionCleanup: vi.fn(registry.registerSubscriptionCleanup),
       registerOwnedSubscriptionCleanup: vi.fn(registry.registerOwnedSubscriptionCleanup),
       cleanupSubscription: vi.fn(registry.cleanupSubscription),
@@ -294,7 +293,6 @@ describe('terminal multiplex RPC', () => {
         rows: 40
       })),
       getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
       getLayout: vi.fn().mockReturnValue({ seq: 1 }),
       subscribeToTerminalData: vi.fn(
         (
@@ -307,9 +305,7 @@ describe('terminal multiplex RPC', () => {
       ),
       subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
       subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-      subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
       getTerminalFitOverride: vi.fn().mockReturnValue(null),
-      getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
       registerSubscriptionCleanup: vi.fn(registry.registerSubscriptionCleanup),
       registerOwnedSubscriptionCleanup: vi.fn(registry.registerOwnedSubscriptionCleanup),
       cleanupSubscription: vi.fn(registry.cleanupSubscription),
@@ -495,89 +491,35 @@ describe('terminal multiplex RPC', () => {
     await dispatchPromise
   })
 
-  it('bounds oversized live output frames for subscribed binary streams', async () => {
-    vi.useFakeTimers()
-    try {
-      const messages: string[] = []
-      const binaryFrames: Uint8Array<ArrayBufferLike>[] = []
-      const handlers = new Map<
-        number,
-        (frame: NonNullable<ReturnType<typeof decodeTerminalStreamFrame>>) => void
-      >()
-      const registry = createSubscriptionRegistryDouble()
-      const dataListenerRef: { current?: (data: string) => void } = {}
-      const runtime = stubRuntime({
-        resolveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-        readTerminal: vi.fn().mockResolvedValue({ tail: [], truncated: false }),
-        serializeTerminalBuffer: vi.fn().mockResolvedValue({
-          data: 'snapshot',
-          cols: 120,
-          rows: 40
-        }),
-        getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-        getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
-        getLayout: vi.fn().mockReturnValue({ seq: 1 }),
-        subscribeToTerminalData: vi.fn((_: string, listener: (data: string) => void) => {
-          dataListenerRef.current = listener
-          return vi.fn()
-        }),
-        subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
-        subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-        getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
-        registerSubscriptionCleanup: vi.fn(registry.registerSubscriptionCleanup),
-        registerOwnedSubscriptionCleanup: vi.fn(registry.registerOwnedSubscriptionCleanup),
-        cleanupSubscription: vi.fn(registry.cleanupSubscription),
-        waitForTerminal: vi.fn(() => new Promise<RuntimeTerminalWait>(() => {})),
-        sendTerminal: vi.fn().mockResolvedValue({ accepted: true }),
-        updateDesktopViewport: vi.fn().mockResolvedValue(true)
+  it('bounds oversized live output frames into per-frame chunks', async () => {
+    const dataListenerRef: { current?: (data: string) => void } = {}
+    const h = startDesktopMultiplexSubscribe({
+      subscribeToTerminalData: vi.fn((_ptyId, listener) => {
+        dataListenerRef.current = listener
+        return vi.fn()
       })
-      const dispatcher = new RpcDispatcher({
-        runtime,
-        methods: TERMINAL_METHODS
-      })
+    })
+    await vi.waitFor(() => expect(h.handlers.has(0)).toBe(true))
+    // Why no ackOutput: flow control would park later chunks and hide the chunking itself.
+    sendDesktopMultiplexSubscribe(h.handlers, { desktopViewportClaims: 1 })
+    await vi.waitFor(() => expect(dataListenerRef.current).toBeDefined())
+    h.binaryFrames.splice(0)
 
-      const dispatchPromise = dispatcher.dispatchStreaming(
-        makeRequest('terminal.subscribe', {
-          terminal: 'terminal-1',
-          client: { id: 'desktop-1', type: 'desktop' },
-          capabilities: { terminalBinaryStream: 1 }
-        }),
-        (msg) => messages.push(msg),
-        {
-          connectionId: 'conn-subscribe-output-chunking',
-          sendBinary: (bytes) => {
-            binaryFrames.push(bytes)
-          },
-          registerBinaryStreamHandler: (streamId, handler) => {
-            handlers.set(streamId, handler)
-            return () => handlers.delete(streamId)
-          }
-        }
-      )
+    const output = 'output-line\n'.repeat(8_000)
+    dataListenerRef.current?.(output)
 
-      await vi.waitFor(() =>
-        expect(messages.some((msg) => JSON.parse(msg).result?.type === 'subscribed')).toBe(true)
-      )
-      binaryFrames.splice(0)
-
-      const output = 'output-line\n'.repeat(8_000)
-      dataListenerRef.current?.(output)
-
-      const outputFrames = binaryFrames
+    await vi.waitFor(() => {
+      const frames = h.binaryFrames
         .map((frame) => decodeTerminalStreamFrame(frame))
         .filter((frame) => frame?.opcode === TerminalStreamOpcode.Output)
-      expect(outputFrames.length).toBeGreaterThan(1)
-      expect(outputFrames.every((frame) => (frame?.payload.byteLength ?? 0) <= 48 * 1024)).toBe(
-        true
-      )
+      expect(frames.length).toBeGreaterThan(1)
+      expect(frames.every((frame) => (frame?.payload.byteLength ?? 0) <= 48 * 1024)).toBe(true)
       expect(
-        outputFrames.map((frame) => (frame ? decodeTerminalStreamText(frame.payload) : '')).join('')
+        frames.map((frame) => (frame ? decodeTerminalStreamText(frame.payload) : '')).join('')
       ).toBe(output)
+    })
 
-      runtime.cleanupSubscription('terminal-1:desktop-1')
-      await dispatchPromise
-    } finally {
-      vi.useRealTimers()
-    }
+    h.registry.cleanupSubscriptionsForConnection('conn-desktop-first-paint')
+    await h.dispatchPromise
   })
 })

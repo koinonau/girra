@@ -61,7 +61,6 @@ export function installMultiplexFlowControl(
         )
         stream.sourceRangeReplacement = replacement
       }
-      const displayMode = runtime.getMobileDisplayMode(stream.ptyId)
       const publication = sendSnapshotFrames(
         (opcode, payload) =>
           !state.closed &&
@@ -71,7 +70,6 @@ export function installMultiplexFlowControl(
           kind: 'scrollback',
           cols: serialized.cols,
           rows: serialized.rows,
-          displayMode,
           reason: 'ack-pending-overflow',
           seq: serialized.seq,
           source: serialized.source,

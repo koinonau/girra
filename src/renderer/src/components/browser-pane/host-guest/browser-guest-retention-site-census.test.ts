@@ -11,10 +11,9 @@ import { describe, expect, it } from 'vitest'
 
 const RENDERER_SRC = join(__dirname, '..', '..', '..')
 
-// The three term stores.
+// The two term stores.
 const RETENTION_TERM_STORES = [
   'components/browser-pane/host-guest/browser-automation-visibility.ts',
-  'lib/pane-manager/browser-mobile-driver-state.ts',
   'lib/pane-manager/browser-remote-viewer-state.ts'
 ]
 
@@ -31,13 +30,6 @@ const RETENTION_TERM_SYMBOLS = [
   'useBrowserAutomationVisibilityForAny',
   'getBrowserAutomationVisiblePageIds',
   'onBrowserAutomationVisibilityChange',
-  'isBrowserPageMobileDriven',
-  'hasMobileDriverForAnyBrowserPage',
-  'useBrowserMobileDriverForAny',
-  'getBrowserMobileDrivenPageIds',
-  'getDriverForBrowserPage',
-  'useBrowserDriverForPage',
-  'onBrowserDriverChange',
   'isBrowserPageRemotelyViewed',
   'hasRemoteViewerForAnyBrowserPage',
   'useBrowserRemoteViewerForAny',
@@ -77,32 +69,18 @@ const RETENTION_SITES = new Map<string, readonly string[]>([
 
 // The per-page threading hooks are the carve-out: they hand one boolean per page to
 // browser-page-paintability's required fields, so a missing term IS a typecheck error there. They
-// still travel as a set — a caller that reads two of the three is the same omission bug.
+// still travel as a set — a caller that reads one of the two is the same omission bug.
 const PER_PAGE_RETENTION_HOOKS = [
   'useBrowserAutomationVisiblePageIds',
-  'useBrowserMobileDrivenPageIds',
   'useBrowserRemotelyViewedPageIds'
 ]
 
-// One production read of a term is not a retention decision: the pane reads *who* drives the active
-// page to label the overlay and lock input. Naming the exception per file rather than dropping the
-// symbol keeps every other file that reads it a census failure.
-const NON_RETENTION_TERM_READERS = new Map<string, readonly string[]>([
-  [
-    'components/browser-pane/assemble-chrome/browser-workspace-pane.tsx',
-    ['useBrowserDriverForPage']
-  ]
-])
-
-// Writers, hydrators, the bridge installer and the idle sentinel: they set or seed a term rather
-// than read it, so naming one is not a retention decision.
+// Writers, hydrators and the bridge installer: they set or seed a term rather than read it, so
+// naming one is not a retention decision.
 const NON_READER_TERM_EXPORTS = [
   'acquireBrowserAutomationVisibility',
   'releaseBrowserAutomationVisibility',
   'installBrowserAutomationVisibilityBridge',
-  'setDriverForBrowserPage',
-  'hydrateBrowserDrivers',
-  'IDLE_BROWSER_DRIVER',
   'setRemoteViewersForBrowserPage',
   'hydrateBrowserRemoteViewerPages'
 ]
@@ -137,9 +115,7 @@ describe('browser guest retention site census', () => {
       .filter(([file]) => !RETENTION_TERM_OWNERS.includes(file))
       .map(([file, source]) => ({
         file,
-        terms: namedSymbols(source, RETENTION_TERM_SYMBOLS).filter(
-          (term) => !(NON_RETENTION_TERM_READERS.get(file) ?? []).includes(term)
-        )
+        terms: namedSymbols(source, RETENTION_TERM_SYMBOLS)
       }))
       .filter(({ terms }) => terms.length > 0)
       .map(({ file, terms }) => `${file}: ${terms.join(', ')}`)

@@ -1,11 +1,9 @@
 import { BrowserWindow, ipcMain } from 'electron'
 import type { OrcaRuntimeService } from '../runtime/orca-runtime'
 import type {
-  RuntimeBrowserDriverState,
   RuntimeRendererSyncWindowGraph,
   RuntimeStatus,
-  RuntimeSyncWindowGraphResult,
-  RuntimeTerminalDriverState
+  RuntimeSyncWindowGraphResult
 } from '../../shared/runtime-types'
 import type { RuntimeRpcResponse } from '../../shared/runtime-rpc-envelope'
 import type { ClientHostedBrowserRowsEvent } from '../../shared/client-hosted-browser-rows'
@@ -161,7 +159,7 @@ export function registerRuntimeHandlers(runtime: OrcaRuntimeService): void {
     'runtime:getTerminalFitOverrides',
     (): {
       ptyId: string
-      mode: 'mobile-fit' | 'remote-desktop-fit'
+      mode: 'remote-desktop-fit'
       cols: number
       rows: number
     }[] => {
@@ -169,27 +167,6 @@ export function registerRuntimeHandlers(runtime: OrcaRuntimeService): void {
       return Array.from(overrides.entries()).map(([ptyId, override]) => ({
         ptyId,
         ...override
-      }))
-    }
-  )
-
-  ipcMain.removeHandler('runtime:getTerminalDrivers')
-  ipcMain.handle(
-    'runtime:getTerminalDrivers',
-    (): { ptyId: string; driver: RuntimeTerminalDriverState }[] => {
-      const drivers = runtime.getAllTerminalDrivers()
-      return Array.from(drivers.entries()).map(([ptyId, driver]) => ({ ptyId, driver }))
-    }
-  )
-
-  ipcMain.removeHandler('runtime:getBrowserDrivers')
-  ipcMain.handle(
-    'runtime:getBrowserDrivers',
-    (): { browserPageId: string; driver: RuntimeBrowserDriverState }[] => {
-      const drivers = runtime.getAllBrowserDrivers()
-      return Array.from(drivers.entries()).map(([browserPageId, driver]) => ({
-        browserPageId,
-        driver
       }))
     }
   )
@@ -205,24 +182,14 @@ export function registerRuntimeHandlers(runtime: OrcaRuntimeService): void {
     runtime.listClientHostedBrowserRows()
   )
 
-  // Why: the desktop "Restore" button sets the display mode to 'desktop' and
-  // applies it, which restores the PTY to its original dimensions and emits
-  // a 'resized' event to any active mobile subscriber. This uses the same
-  // code path as the mobile toggle button (terminal.setDisplayMode RPC).
+  // Why: this IPC powers the desktop "Take back" button — it drops a remote
+  // desktop's fit hold and restores the PTY to this window's dimensions.
   ipcMain.removeHandler('runtime:restoreTerminalFit')
   ipcMain.handle('runtime:restoreTerminalFit', async (_event, args: { ptyId: string }) => {
-    // Why: this IPC powers the desktop "Take back" button. Beyond restoring
-    // PTY dims (the original semantic), it now also reclaims the input
-    // floor for the desktop via the driver state machine. The lock banner
-    // unmounts and desktop input/resize are unblocked until the next
-    // mobile interaction takes the floor again. See
-    // docs/mobile-presence-lock.md.
-    //
-    // Why async: reclaimTerminalForDesktop awaits applyMobileDisplayMode's
-    // PTY-resize chain. Returning the unresolved Promise to ipcMain made
-    // Electron try to structured-clone a Promise — "An object could not
-    // be cloned" error — and the renderer's restoreTerminalFit() rejected
-    // with no useful info.
+    // Why async: reclaimTerminalForDesktop awaits a PTY-resize chain. Returning
+    // the unresolved Promise to ipcMain made Electron try to structured-clone a
+    // Promise — "An object could not be cloned" error — and the renderer's
+    // restoreTerminalFit() rejected with no useful info.
     // Why: keep one underlying reclaim per PTY even after callers time out;
     // layout serialization means a retry cannot bypass the wedged operation.
     let pending = pendingTerminalFitRestores.get(args.ptyId)
@@ -252,16 +219,4 @@ export function registerRuntimeHandlers(runtime: OrcaRuntimeService): void {
     }
     return { restored: await boundTerminalFitRestore(pending) }
   })
-
-  ipcMain.removeHandler('runtime:reclaimBrowserForDesktop')
-  ipcMain.handle(
-    'runtime:reclaimBrowserForDesktop',
-    (_event, args: { browserPageId: string }): { reclaimed: boolean } => {
-      try {
-        return { reclaimed: runtime.reclaimBrowserForDesktop(args.browserPageId) }
-      } catch {
-        return { reclaimed: false }
-      }
-    }
-  )
 }

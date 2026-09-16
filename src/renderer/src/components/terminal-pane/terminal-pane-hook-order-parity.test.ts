@@ -6,7 +6,7 @@ import ts from 'typescript-api'
 import { describe, expect, it } from 'vitest'
 
 const TERMINAL_PANE_HOOK_SOURCE_PATTERN =
-  /^(?:TerminalPane\.tsx|use-terminal-pane-(?:chat-state|close-actions|context-actions|controller|foundation|global-listeners|layout-bindings|layout-persistence|lifecycle-stage|mobile-actions|paste-listeners|process-exit-actions|projection|reconciliation|startup-actions|store-actions|store-bindings|title-effects|title-state)\.ts)$/
+  /^(?:TerminalPane\.tsx|use-terminal-pane-(?:chat-state|close-actions|context-actions|controller|fit-actions|foundation|global-listeners|layout-bindings|layout-persistence|lifecycle-stage|paste-listeners|process-exit-actions|projection|reconciliation|startup-actions|store-actions|store-bindings|title-effects|title-state)\.ts)$/
 // Rebased onto main after the workbench surface-per-workspace and deferred
 // split-cwd changes; the pane session-ID projection added one render hook (230 hooks).
 // Then 27 stable-action `useAppStore` subscriptions folded into four
@@ -19,8 +19,11 @@ const TERMINAL_PANE_HOOK_SOURCE_PATTERN =
 // Then host-authoritative layout removal added two `useRef`s in reconciliation
 // (last host layout leaf set, retired leaf set) (209 hooks, still 8 useMemo).
 // Then stale-pane restart removal dropped two hooks (207 hooks, still 8 useMemo).
+// Then the mobile prune renamed two stages -- useTerminalPaneMobileActions to
+// useTerminalPaneFitActions and useMobileOverlayTicks to useFitOverlayTicks --
+// which moves the hash without moving the count.
 const PRE_REFACTOR_HOOK_ORDER_SHA256 =
-  '13bcceaefc156315ddf5440a8fb63a5a0e19dbf5be21697c7367ecefce87536c'
+  'ed5e5fed37fcce5d253865a4314332e64a41b13ff6869581464252a25cc46acc'
 
 const sourceFiles = readdirSync(__dirname)
   .filter((name) => TERMINAL_PANE_HOOK_SOURCE_PATTERN.test(name))

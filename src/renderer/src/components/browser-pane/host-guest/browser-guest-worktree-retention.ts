@@ -16,7 +16,7 @@ export const BROWSER_GUEST_HIDDEN_WORKTREE_RETENTION_LIMIT = 4
  * worktree activation order). Only worktrees that actually hold live guests
  * count toward the limit. The active worktree never counts and is never
  * evicted. isEvictable is consulted lazily, only for worktrees beyond the
- * limit — a non-evictable one (a guest an automation/mobile controller is
+ * limit — a non-evictable one (a guest an automation controller is
  * actively driving, or one still writing a download) stays retained over
  * budget.
  */
@@ -81,7 +81,7 @@ export function browserTabsVetoGuestEviction(tabs: readonly BrowserWorkspace[]):
 }
 
 // Mirrors BrowserOverlaySlot's page-id derivation so visibility pinning
-// (automation-visible / mobile-driven) protects exactly the slots it paints.
+// (automation-visible / remotely-viewed) protects exactly the slots it paints.
 export function browserTabVisibilityPageIds(tab: BrowserWorkspace): readonly string[] {
   return tab.pageIds && tab.pageIds.length > 0 ? tab.pageIds : [tab.activePageId ?? tab.id]
 }

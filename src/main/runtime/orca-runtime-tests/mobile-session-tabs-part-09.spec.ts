@@ -67,10 +67,7 @@ describe('OrcaRuntimeService', () => {
       return { runtime, spawn }
     }
 
-    function setParkedRuntimeNotifier(
-      runtime: OrcaRuntimeService,
-      resumeSleepingAgents: (worktreeId: string) => void
-    ): void {
+    function setParkedRuntimeNotifier(runtime: OrcaRuntimeService): void {
       runtime.setNotifier({
         worktreesChanged: vi.fn(),
         reposChanged: vi.fn(),
@@ -82,9 +79,7 @@ describe('OrcaRuntimeService', () => {
         focusTerminal: vi.fn(),
         closeTerminal: vi.fn(),
         sleepWorktree: vi.fn(),
-        resumeSleepingAgents,
-        terminalFitOverrideChanged: vi.fn(),
-        terminalDriverChanged: vi.fn()
+        terminalFitOverrideChanged: vi.fn()
       })
       runtime.attachWindow(TEST_WINDOW_ID)
       runtime.markGraphReady(TEST_WINDOW_ID)
@@ -141,22 +136,18 @@ describe('OrcaRuntimeService', () => {
     })
 
     // Why: opening the tab is the documented wake gesture for a slept pane
-    // (#11598). These four cover every topology, because three of them never
-    // clear the record — the pane's own activation is the only thing that wakes it.
-    it('materializes a slept pane for a user tap under headless serve, which never wakes', async () => {
+    // (#11598). These cover every topology, because the pane's own activation is
+    // the only thing that clears the record.
+    it('materializes a slept pane for a user tap under headless serve', async () => {
       const { runtimeStore, getSession } = makeParkedSessionStore('worktree-sleep')
-      const resumeSleepingAgents = vi.fn()
       const { runtime, spawn } = makeParkedRuntime(runtimeStore)
-      setParkedRuntimeNotifier(runtime, resumeSleepingAgents)
+      setParkedRuntimeNotifier(runtime)
       electronMocks.BrowserWindow.fromId.mockReturnValue(null as never)
 
-      const worktreeActivation = await runtime.activateManagedWorktree(`id:${TEST_WORKTREE_ID}`, {
+      await runtime.activateManagedWorktree(`id:${TEST_WORKTREE_ID}`, {
         notifyClients: false,
-        clientKind: 'mobile'
+        clientKind: 'runtime'
       })
-
-      expect(worktreeActivation.sleepingAgentWake).toBe('unsupported-headless')
-      expect(resumeSleepingAgents).not.toHaveBeenCalled()
       expect(
         getSession().sleepingAgentSessionsByPaneKey?.[`host-tab:${HEADLESS_LEAF_ID}`]?.origin
       ).toBe('worktree-sleep')
@@ -167,19 +158,16 @@ describe('OrcaRuntimeService', () => {
       expect(activated.tabs[0]).toMatchObject({ status: 'ready' })
     })
 
-    it('materializes a slept pane for a paired desktop client tab click, which asks for no wake', async () => {
+    it('materializes a slept pane for a paired desktop client tab click', async () => {
       const { runtimeStore, getSession } = makeParkedSessionStore('worktree-sleep')
-      const resumeSleepingAgents = vi.fn()
       const { runtime, spawn } = makeParkedRuntime(runtimeStore)
-      setParkedRuntimeNotifier(runtime, resumeSleepingAgents)
+      setParkedRuntimeNotifier(runtime)
       electronMocks.BrowserWindow.fromId.mockReturnValue({ isDestroyed: () => false } as never)
 
       await runtime.activateManagedWorktree(`id:${TEST_WORKTREE_ID}`, {
         notifyClients: false,
         clientKind: 'runtime'
       })
-
-      expect(resumeSleepingAgents).not.toHaveBeenCalled()
       expect(
         getSession().sleepingAgentSessionsByPaneKey?.[`host-tab:${HEADLESS_LEAF_ID}`]
       ).toBeDefined()

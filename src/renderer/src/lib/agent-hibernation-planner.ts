@@ -104,7 +104,6 @@ export function planAgentHibernationCandidates(
     return []
   }
   const idleMs = getEffectiveAgentHibernationIdleMs(snapshot.settings.agentHibernationIdleMs)
-  const mobileLockedPtyIds = new Set(snapshot.mobileLockedPtyIds.map(toRuntimePtyId))
   const foregroundTerminalTabIds = new Set(snapshot.foregroundTerminalTabIds)
   const runtimeLivenessRequiredWorktreeIds = new Set(
     snapshot.runtimeLivenessRequiredWorktreeIds ?? []
@@ -150,7 +149,6 @@ export function planAgentHibernationCandidates(
           foregroundTerminalLastSeenAtByTabId: snapshot.foregroundTerminalLastSeenAtByTabId,
           ptyBindingFirstSeenAtByPaneKey: snapshot.ptyBindingFirstSeenAtByPaneKey ?? {},
           boundaryResolvedAtByPaneKey: snapshot.boundaryResolvedAtByPaneKey ?? {},
-          mobileLockedPtyIds,
           now: snapshot.now,
           idleMs
         })

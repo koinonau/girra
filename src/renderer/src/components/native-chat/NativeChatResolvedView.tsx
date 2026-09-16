@@ -8,7 +8,6 @@ import { selectNativeChatViewState } from './native-chat-view-state'
 import { NativeChatMessageList } from './NativeChatMessageList'
 import { NativeChatComposer, type NativeChatComposerHandle } from './NativeChatComposer'
 import { useNativeChatFontScale } from './use-native-chat-font-scale'
-import { useNativeChatCanSend } from './use-native-chat-can-send'
 import { NativeChatInteractiveCard } from './NativeChatInteractiveCard'
 import { NativeChatEmptyState } from './NativeChatEmptyState'
 import { useNativeChatInteractiveSend } from './use-native-chat-interactive-send'
@@ -114,7 +113,6 @@ export function NativeChatResolvedView({
   const hookWorkingEpoch = useAppStore(
     (s) => s.agentStatusByPaneKey[paneKey]?.stateStartedAt ?? null
   )
-  const canSend = useNativeChatCanSend(targetPtyId)
   // Reuse the verified composer send path for interactive cards and composer
   // stop (Stop sends ESC, the agent-TUI interrupt key).
   const interactiveSend = useNativeChatInteractiveSend(terminalTabId, paneKey, targetPtyId, agent)
@@ -138,7 +136,7 @@ export function NativeChatResolvedView({
     composerRef,
     isVisible,
     isFocusedGroup,
-    composerReady: !questionActive && targetPtyId !== null && canSend
+    composerReady: !questionActive && targetPtyId !== null
   })
   const contextMenu = useNativeChatContextMenu({
     rootRef,
@@ -417,15 +415,11 @@ export function NativeChatResolvedView({
       <NativeChatInteractiveCard
         paneKey={paneKey}
         send={interactiveSend}
-        canSend={canSend}
         messages={sessionAfterCommandBoundaries.messages}
         transcriptSettled={session.readPhase === 'ready'}
         onShowingQuestionChange={setQuestionActive}
         answerInputRef={questionAnswerInputRef}
       />
-      {/* canSend reflects the mobile presence-lock: when a mobile client holds
-          the pty, the composer shows its guarded state instead of racing the
-          mobile driver (R8). */}
       {questionActive ? null : (
         <NativeChatComposer
           ref={composerRef}
@@ -433,7 +427,6 @@ export function NativeChatResolvedView({
           paneKey={paneKey}
           targetPtyId={targetPtyId}
           agent={agent}
-          canSend={canSend}
           isWorking={isWorking}
           onStop={stopAgent}
           onOptimisticSend={onOptimisticSend}

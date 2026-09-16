@@ -101,7 +101,7 @@ export function useNativeChatComposerPaste({
   pasteFromClipboard: () => void
 } {
   // Re-read the live disabled state after the async clipboard round-trip:
-  // `canSend` can flip (mobile presence-lock) or the pty drop out mid-await, and
+  // `canSend` can flip or the pty drop out mid-await, and
   // the captured closure would otherwise attach/insert into a guarded composer.
   const disabledRef = useRef(disabled)
   disabledRef.current = disabled

@@ -631,7 +631,7 @@ describe('connectPanePty', () => {
     // forwardPtyResize's own suppression.
     const { connectPanePty } = await import('./pty-connection')
     const { safeFit } = await import('@/lib/pane-manager/pane-tree-ops')
-    const { setFitOverride } = await import('@/lib/pane-manager/mobile-fit-overrides')
+    const { setFitOverride } = await import('@/lib/pane-manager/fit-overrides')
     const transport = createMockTransport('tab-pty')
     transport.connect.mockImplementation(async ({ sessionId }: { sessionId?: string }) =>
       sessionId
@@ -671,7 +671,7 @@ describe('connectPanePty', () => {
 
     try {
       // Mobile takes the PTY while the pane is still hidden.
-      setFitOverride('tab-pty', 'mobile-fit', 49, 20)
+      setFitOverride('tab-pty', 'remote-desktop-fit', 49, 20)
 
       xtermContainerDisplay = 'block'
       ;(deps.isVisibleRef as { current: boolean }).current = true

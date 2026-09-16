@@ -1,6 +1,6 @@
 import { waitForTerminalOutputParsed } from '@/lib/pane-manager/pane-terminal-output-scheduler'
 import { safeFit, safeFitAndThen } from '@/lib/pane-manager/pane-tree-ops'
-import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
+import { getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 
 import { resolvePositiveTerminalDimensions } from '../terminal-snapshot-replay-paint'
 

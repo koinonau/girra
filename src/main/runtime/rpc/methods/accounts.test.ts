@@ -53,7 +53,7 @@ describe('account RPC methods', () => {
         throw new Error(`${methodName} must be a request method`)
       }
 
-      for (const clientKind of ['mobile', 'runtime'] as const) {
+      for (const clientKind of ['runtime'] as const) {
         await expect(addMethod.handler(params, { runtime, clientKind })).rejects.toThrow(
           /only available on the Girra host runtime/
         )

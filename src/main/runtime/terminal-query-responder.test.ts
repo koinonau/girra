@@ -265,12 +265,6 @@ describe('reply ownership matrix', () => {
     expect(runtime.hasRawTerminalViewSubscriber('pty-preview')).toBe(false)
   })
 
-  it('treats mobile subscriber records as remote view subscribers', async () => {
-    const { runtime } = createResponderRuntime()
-    await runtime.handleMobileSubscribe('pty-mob', 'client-1', { cols: 40, rows: 20 })
-    expect(runtime.hasRemoteTerminalViewSubscriber('pty-mob')).toBe(true)
-  })
-
   it('answers a dropped-chunk query exactly once', async () => {
     const { runtime, replies } = createResponderRuntime()
     markHiddenRendererPty('pty-once')

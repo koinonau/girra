@@ -1,8 +1,4 @@
 import {
-  hydrateBrowserDrivers,
-  setDriverForBrowserPage
-} from '@/lib/pane-manager/browser-mobile-driver-state'
-import {
   hydrateBrowserRemoteViewerPages,
   setRemoteViewersForBrowserPage
 } from '@/lib/pane-manager/browser-remote-viewer-state'
@@ -11,64 +7,48 @@ import {
   hydrateClientHostedBrowserRows
 } from '@/lib/pane-manager/client-hosted-browser-row-state'
 import type { ClientHostedBrowserRowsEvent } from '../../../../shared/client-hosted-browser-rows'
-import { setDriverForPty, hydrateDrivers } from '@/lib/pane-manager/mobile-driver-state'
-import { setFitOverride, hydrateOverrides } from '@/lib/pane-manager/mobile-fit-overrides'
-import { applyNativeChatLaunchDraftResolved } from '@/runtime/native-chat-launch-draft-runtime-resolution'
-import type {
-  RuntimeBrowserDriverState,
-  RuntimeTerminalDriverState
-} from '../../../../shared/runtime-types'
-import { useAppStore } from '../../store'
+import { setFitOverride, hydrateOverrides } from '@/lib/pane-manager/fit-overrides'
 
-const MAX_PENDING_MOBILE_STATE_EVENTS = 300
+const MAX_PENDING_FIT_STATE_EVENTS = 300
 
-type PendingMobileStateEvent =
+type PendingFitStateEvent =
   | {
       kind: 'fit'
       event: {
         ptyId: string
-        mode: 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+        mode: 'remote-desktop-fit' | 'desktop-fit'
         cols: number
         rows: number
       }
-    }
-  | { kind: 'driver'; event: { ptyId: string; driver: RuntimeTerminalDriverState } }
-  | {
-      kind: 'browser-driver'
-      event: { browserPageId: string; driver: RuntimeBrowserDriverState }
     }
   | {
       kind: 'browser-remote-viewers'
       event: { browserPageId: string; hasRemoteViewers: boolean }
     }
 
-export function registerMobileDriverIpcBridge(
+export function registerFitOverrideIpcBridge(
   unsubs: (() => void)[],
   isRuntimeEnvironmentActive: () => boolean
 ): () => void {
-  let mobileStateHydrated = isRuntimeEnvironmentActive()
-  const pendingMobileStateEvents: PendingMobileStateEvent[] = []
+  let fitStateHydrated = isRuntimeEnvironmentActive()
+  const pendingFitStateEvents: PendingFitStateEvent[] = []
   let disposed = false
 
-  const applyPendingMobileStateEvents = (): void => {
-    for (const pending of pendingMobileStateEvents) {
+  const applyPendingFitStateEvents = (): void => {
+    for (const pending of pendingFitStateEvents) {
       if (pending.kind === 'fit') {
         const { ptyId, mode, cols, rows } = pending.event
         setFitOverride(ptyId, mode, cols, rows)
-      } else if (pending.kind === 'driver') {
-        setDriverForPty(pending.event.ptyId, pending.event.driver)
-      } else if (pending.kind === 'browser-driver') {
-        setDriverForBrowserPage(pending.event.browserPageId, pending.event.driver)
       } else {
         setRemoteViewersForBrowserPage(pending.event.browserPageId, pending.event.hasRemoteViewers)
       }
     }
-    pendingMobileStateEvents.length = 0
+    pendingFitStateEvents.length = 0
   }
-  const enqueue = (event: PendingMobileStateEvent): void => {
-    pendingMobileStateEvents.push(event)
-    while (pendingMobileStateEvents.length > MAX_PENDING_MOBILE_STATE_EVENTS) {
-      pendingMobileStateEvents.shift()
+  const enqueue = (event: PendingFitStateEvent): void => {
+    pendingFitStateEvents.push(event)
+    while (pendingFitStateEvents.length > MAX_PENDING_FIT_STATE_EVENTS) {
+      pendingFitStateEvents.shift()
     }
   }
 
@@ -77,46 +57,11 @@ export function registerMobileDriverIpcBridge(
       if (isRuntimeEnvironmentActive()) {
         return
       }
-      if (!mobileStateHydrated) {
+      if (!fitStateHydrated) {
         enqueue({ kind: 'fit', event })
         return
       }
       setFitOverride(event.ptyId, event.mode, event.cols, event.rows)
-    })
-  )
-  unsubs.push(
-    window.api.runtime.onTerminalDriverChanged((event) => {
-      if (isRuntimeEnvironmentActive()) {
-        return
-      }
-      if (!mobileStateHydrated) {
-        enqueue({ kind: 'driver', event })
-        return
-      }
-      setDriverForPty(event.ptyId, event.driver)
-    })
-  )
-  const unsubscribeLaunchDraftResolution = window.api.runtime.onNativeChatLaunchDraftResolved?.(
-    (event) => {
-      applyNativeChatLaunchDraftResolved(useAppStore.getState(), {
-        type: 'nativeChatLaunchDraftResolved',
-        ...event
-      })
-    }
-  )
-  if (unsubscribeLaunchDraftResolution) {
-    unsubs.push(unsubscribeLaunchDraftResolution)
-  }
-  unsubs.push(
-    window.api.runtime.onBrowserDriverChanged((event) => {
-      if (isRuntimeEnvironmentActive()) {
-        return
-      }
-      if (!mobileStateHydrated) {
-        enqueue({ kind: 'browser-driver', event })
-        return
-      }
-      setDriverForBrowserPage(event.browserPageId, event.driver)
     })
   )
 
@@ -125,7 +70,7 @@ export function registerMobileDriverIpcBridge(
       if (isRuntimeEnvironmentActive()) {
         return
       }
-      if (!mobileStateHydrated) {
+      if (!fitStateHydrated) {
         enqueue({ kind: 'browser-remote-viewers', event })
         return
       }
@@ -136,7 +81,7 @@ export function registerMobileDriverIpcBridge(
     unsubs.push(unsubscribeBrowserRemoteViewers)
   }
 
-  // Why: no isRuntimeEnvironmentActive guard, unlike the driver channels above. These rows
+  // Why: no isRuntimeEnvironmentActive guard, unlike the fit channel above. These rows
   // describe pages a paired client renders for THIS runtime's own worktrees; pointing the window
   // at a remote environment does not make them someone else's, and dropping them would leave the
   // host with an uncloseable page it cannot see. Hydration below is unguarded for the same reason.
@@ -155,7 +100,7 @@ export function registerMobileDriverIpcBridge(
       // overwrites a page created while it was in flight.
       if (!clientHostedRowsHydrated) {
         pendingClientHostedRowEvents.push(event)
-        while (pendingClientHostedRowEvents.length > MAX_PENDING_MOBILE_STATE_EVENTS) {
+        while (pendingClientHostedRowEvents.length > MAX_PENDING_FIT_STATE_EVENTS) {
           pendingClientHostedRowEvents.shift()
         }
         return
@@ -180,38 +125,34 @@ export function registerMobileDriverIpcBridge(
       settleClientHostedRowHydration()
     })
 
-  // Subscribe before snapshots; queued pushes replay in arrival order after all three hydrate.
+  // Subscribe before snapshots; queued pushes replay in arrival order after both hydrate.
   if (!isRuntimeEnvironmentActive()) {
     void Promise.all([
       window.api.runtime.getTerminalFitOverrides(),
-      window.api.runtime.getTerminalDrivers(),
-      window.api.runtime.getBrowserDrivers(),
       window.api.runtime.getBrowserRemoteViewerPages?.() ?? []
     ])
-      .then(([overrides, drivers, browserDrivers, remoteViewerPages]) => {
+      .then(([overrides, remoteViewerPages]) => {
         if (disposed) {
           return
         }
         hydrateOverrides(overrides)
-        hydrateDrivers(drivers)
-        hydrateBrowserDrivers(browserDrivers)
         hydrateBrowserRemoteViewerPages(remoteViewerPages)
-        mobileStateHydrated = true
-        applyPendingMobileStateEvents()
+        fitStateHydrated = true
+        applyPendingFitStateEvents()
       })
       .catch((error: unknown) => {
         if (disposed) {
           return
         }
-        console.error('Failed to hydrate mobile terminal state:', error)
-        mobileStateHydrated = true
-        applyPendingMobileStateEvents()
+        console.error('Failed to hydrate terminal fit state:', error)
+        fitStateHydrated = true
+        applyPendingFitStateEvents()
       })
   }
 
   return () => {
     disposed = true
-    pendingMobileStateEvents.length = 0
+    pendingFitStateEvents.length = 0
     pendingClientHostedRowEvents.length = 0
   }
 }

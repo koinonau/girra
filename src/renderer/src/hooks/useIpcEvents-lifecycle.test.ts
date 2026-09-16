@@ -23,11 +23,8 @@ const EXPECTED_DIRECT_CALLBACK_METHODS = [
   'rateLimits.onUpdate',
   'remoteWorkspace.onChanged',
   'repos.onChanged',
-  'runtime.onBrowserDriverChanged',
   'runtime.onBrowserRemoteViewersChanged',
   'runtime.onClientHostedBrowserRowsChanged',
-  'runtime.onNativeChatLaunchDraftResolved',
-  'runtime.onTerminalDriverChanged',
   'runtime.onTerminalFitOverrideChanged',
   'runtimeEnvironments.onStatusChanged',
   'settings.onChanged',
@@ -68,7 +65,6 @@ const EXPECTED_DIRECT_CALLBACK_METHODS = [
   'ui.onRequestTabSetProfile',
   'ui.onRequestTerminalCreate',
   'ui.onRequestTerminalTabMount',
-  'ui.onResumeSleepingAgents',
   'ui.onSelectFloatingIndex',
   'ui.onSessionTabCloseRequest',
   'ui.onSleepWorktree',
@@ -147,7 +143,6 @@ const EXPECTED_CALLBACK_REGISTRATION_SEQUENCE = [
   'ui.onCloseTerminal',
   'ui.onTerminalTabCloseRequest',
   'ui.onSleepWorktree',
-  'ui.onResumeSleepingAgents',
   'ui.onFullscreenChanged',
   'browser.onGuestLoadFailed',
   'browser.onCertificateFailureChanged',
@@ -187,9 +182,6 @@ const EXPECTED_CALLBACK_REGISTRATION_SEQUENCE = [
   'agentStatus.onMigrationUnsupportedClear',
   'agentStatus.onLegacyWorkerTerminalRecovery',
   'runtime.onTerminalFitOverrideChanged',
-  'runtime.onTerminalDriverChanged',
-  'runtime.onNativeChatLaunchDraftResolved',
-  'runtime.onBrowserDriverChanged',
   'runtime.onBrowserRemoteViewersChanged',
   'runtime.onClientHostedBrowserRowsChanged'
 ] as const
@@ -395,28 +387,18 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
     expect(
       groupOrder([
         'runtime.onTerminalFitOverrideChanged',
-        'runtime.onTerminalDriverChanged',
-        'runtime.onNativeChatLaunchDraftResolved',
-        'runtime.onBrowserDriverChanged',
         'runtime.onBrowserRemoteViewersChanged',
         'runtime.onClientHostedBrowserRowsChanged',
         'runtime.getClientHostedBrowserRows',
         'runtime.getTerminalFitOverrides',
-        'runtime.getTerminalDrivers',
-        'runtime.getBrowserDrivers',
         'runtime.getBrowserRemoteViewerPages'
       ])
     ).toEqual([
       'runtime.onTerminalFitOverrideChanged',
-      'runtime.onTerminalDriverChanged',
-      'runtime.onNativeChatLaunchDraftResolved',
-      'runtime.onBrowserDriverChanged',
       'runtime.onBrowserRemoteViewersChanged',
       'runtime.onClientHostedBrowserRowsChanged',
       'runtime.getClientHostedBrowserRows',
       'runtime.getTerminalFitOverrides',
-      'runtime.getTerminalDrivers',
-      'runtime.getBrowserDrivers',
       'runtime.getBrowserRemoteViewerPages'
     ])
     expect(
@@ -444,7 +426,7 @@ describe('useIpcEvents App-lifetime lifecycle', () => {
       cleanupOrder.indexOf('ipc.repos.onChanged')
     )
     expect(cleanupOrder.indexOf('directSsh.stop')).toBeGreaterThan(
-      cleanupOrder.lastIndexOf('ipc.runtime.onBrowserDriverChanged')
+      cleanupOrder.lastIndexOf('ipc.runtime.onBrowserRemoteViewersChanged')
     )
     expect(cleanupOrder.at(-1)).toBe('notifications.reset')
     expect([...listeners.values()].every((records) => records.every((item) => !item.active))).toBe(

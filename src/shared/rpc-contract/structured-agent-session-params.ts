@@ -224,13 +224,6 @@ export const SubscribeParams = z
   .object({ sessionId: SessionId, cursor: JournalCursor.optional() })
   .strict()
 
-export const UnsubscribeParams = z
-  .object({
-    sessionId: SessionId,
-    subscriptionId: Identifier('Invalid subscription id').optional()
-  })
-  .strict()
-
 /** Read-only owner classification retained for restart safety; mutation handoff is separate. */
 export const HandoffStatusParams = z.object({ sessionId: SessionId }).strict()
 

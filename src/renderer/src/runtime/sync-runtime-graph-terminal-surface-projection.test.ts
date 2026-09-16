@@ -82,34 +82,6 @@ describe('buildMobileSessionTabSnapshots', () => {
     ])
   })
 
-  it('retracts a launch draft as soon as mobile resolves it', () => {
-    const leafId = '11111111-1111-4111-8111-111111111111'
-    const state = makeState({
-      tabsByWorktree: {
-        'wt-1': [{ id: 'term-1', title: 'Terminal 1', launchAgent: 'claude' }]
-      } as unknown as AppState['tabsByWorktree'],
-      terminalLayoutsByTabId: {
-        'term-1': {
-          root: { type: 'leaf', leafId },
-          activeLeafId: leafId,
-          expandedLeafId: null,
-          ptyIdsByLeafId: { [leafId]: 'pty-1' }
-        }
-      } as unknown as AppState['terminalLayoutsByTabId'],
-      nativeChatLaunchDraftByTabId: {
-        'term-1': {
-          tabId: 'term-1',
-          agent: 'claude',
-          text: 'issue link',
-          createdAt: 1,
-          resolved: true
-        }
-      }
-    })
-
-    expect(buildMobileSessionTabSnapshots(state)[0]?.tabs[0]).not.toHaveProperty('launchDraft')
-  })
-
   it('withholds a launch draft seeded for a different agent than the tab runs', () => {
     // The seed is keyed by tab id, which survives an agent switch. Desktop's
     // consumer declines on mismatch; publishing anyway would prefill the new

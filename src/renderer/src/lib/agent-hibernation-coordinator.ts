@@ -10,7 +10,6 @@ import {
   type AgentHibernationConfirmationState
 } from './agent-hibernation-confirmation'
 import type { AppState } from '@/store/types'
-import { getAllDrivers } from './pane-manager/mobile-driver-state'
 import {
   getForegroundTerminalTabIds,
   getForegroundTerminalTabLastSeenAtById
@@ -91,9 +90,6 @@ function snapshotFromState(
         ...getRuntimeLivenessTargetWorktrees(state, targetWorktreeId).keys()
       ])
     ],
-    mobileLockedPtyIds: [...getAllDrivers()]
-      .filter(([, driver]) => driver.kind === 'mobile')
-      .map(([ptyId]) => ptyId),
     agentStatusByPaneKey: state.agentStatusByPaneKey,
     sleepingAgentSessionsByPaneKey: state.sleepingAgentSessionsByPaneKey,
     // Why: input stamps are coalesced, so planning must see the not-yet-flushed keystroke.

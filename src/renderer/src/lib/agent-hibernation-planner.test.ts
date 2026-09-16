@@ -68,7 +68,6 @@ function snapshot(
     tabsByWorktree: { 'wt-bg': [tab()] },
     terminalLayoutsByTabId: { 'tab-1': layout() },
     ptyIdsByTabId: { 'tab-1': ['pty-1'] },
-    mobileLockedPtyIds: [],
     agentStatusByPaneKey: { [agentEntry.paneKey]: agentEntry },
     sleepingAgentSessionsByPaneKey: {},
     lastTerminalInputAtByPaneKey: {},
@@ -485,21 +484,6 @@ describe('agent sleep planner', () => {
     }
   )
 
-  it('rejects mobile-driven panes because paired clients can send input outside desktop xterm', () => {
-    expect(plannedWorktrees(snapshot({ mobileLockedPtyIds: ['pty-1'] }))).toEqual([])
-  })
-
-  it('does not let a mobile-locked sibling PTY block an unlocked target pane', () => {
-    expect(
-      plannedPaneKeys(
-        snapshot({
-          ptyIdsByTabId: { 'tab-1': ['pty-1', 'pty-shell'] },
-          mobileLockedPtyIds: ['pty-shell']
-        })
-      )
-    ).toEqual([`tab-1:${LEAF}`])
-  })
-
   it('selects runtime-backed live PTYs when the renderer live map is empty', () => {
     const [candidate] = planAgentHibernationCandidates(
       snapshot({
@@ -572,33 +556,6 @@ describe('agent sleep planner', () => {
         })
       )
     ).toEqual([`tab-1:${LEAF}`])
-  })
-
-  it('applies mobile locks to runtime-backed PTYs', () => {
-    expect(
-      plannedWorktrees(
-        snapshot({
-          ptyIdsByTabId: { 'tab-1': [] },
-          runtimeLivePtyIdsByWorktreeId: { 'wt-bg': ['pty-1'] },
-          runtimeLivenessRequiredWorktreeIds: ['wt-bg'],
-          mobileLockedPtyIds: ['pty-1']
-        })
-      )
-    ).toEqual([])
-  })
-
-  it('applies mobile locks across wrapped remote and raw runtime PTY IDs', () => {
-    expect(
-      plannedWorktrees(
-        snapshot({
-          terminalLayoutsByTabId: { 'tab-1': layout(LEAF, 'remote:env-1@@terminal-1') },
-          ptyIdsByTabId: { 'tab-1': ['remote:env-1@@terminal-1'] },
-          runtimeLivePtyIdsByWorktreeId: { 'wt-bg': ['terminal-1'] },
-          runtimeLivenessRequiredWorktreeIds: ['wt-bg'],
-          mobileLockedPtyIds: ['remote:env-1@@terminal-1']
-        })
-      )
-    ).toEqual([])
   })
 
   it('selects each eligible done agent pane independently', () => {

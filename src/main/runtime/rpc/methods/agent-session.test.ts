@@ -98,7 +98,7 @@ describe('agent session RPC methods', () => {
       runtimeMethod: 'ensureAgentSession' as const
     }
   ])('keeps $method presentation viewer-local for paired clients', async (testCase) => {
-    for (const clientKind of ['runtime', 'mobile'] as const) {
+    for (const clientKind of ['runtime'] as const) {
       const runtime = runtimeStub()
       const dispatcher = new RpcDispatcher({
         runtime: runtime as unknown as OrcaRuntimeService,

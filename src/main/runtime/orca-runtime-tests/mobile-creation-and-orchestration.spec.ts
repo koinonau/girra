@@ -584,24 +584,6 @@ describe('OrcaRuntimeService', () => {
     expect(compositeCleanup).not.toHaveBeenCalled()
   })
 
-  // Why: the lease-only branch's unguarded compensating handleMobileUnsubscribe is only
-  // safe while a viewport-less subscribe cannot yield to the macrotask queue. Pin it so
-  // adding an await to that path fails here instead of silently killing a live lease.
-  it('settles a viewport-less mobile subscribe without leaving the microtask queue', async () => {
-    const runtime = createRuntime()
-    let settled = false
-
-    void runtime.handleMobileSubscribe('pty-lease', 'phone-1', undefined).then(() => {
-      settled = true
-    })
-    // Drain microtasks only: any real await on this path leaves this unsettled.
-    for (let i = 0; i < 50; i += 1) {
-      await Promise.resolve()
-    }
-
-    expect(settled).toBe(true)
-  })
-
   it('tears down unconditionally for in-process callers that have no connection', async () => {
     const runtime = createRuntime()
     const cleanup = vi.fn()

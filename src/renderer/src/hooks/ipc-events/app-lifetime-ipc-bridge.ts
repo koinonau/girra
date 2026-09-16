@@ -1,7 +1,6 @@
 import type { RuntimeHostStatusSnapshot } from '../../../../shared/runtime-host-status'
 import { getTabIdsAwaitingHostHydrationRemount } from '@/lib/parked-terminal-host-hydration'
 import { emitAutomationsChangedWindowEvent } from '@/lib/automations-changed-window-event'
-import { createBackgroundSleepingAgentWakeDispatcher } from '@/lib/wake-sleeping-agents-in-background'
 import { resetAgentHookCompletionNotificationCoordinators } from '../agent-hook-completion-notifications'
 import { useAppStore } from '../../store'
 import { registerAgentStatusIpcBridge } from './agent-status-ipc-bridge'
@@ -11,7 +10,7 @@ import { registerContentCreationIpcBridge } from './content-creation-ipc-bridge'
 import { createDirectSshBridgeRuntime } from './direct-ssh-bridge-runtime'
 import { registerDirectSshStateIpcBridge } from './direct-ssh-state-ipc-bridge'
 import { registerMobileAndTerminalCloseIpcBridge } from './mobile-terminal-close-ipc-bridge'
-import { registerMobileDriverIpcBridge } from './mobile-driver-ipc-bridge'
+import { registerFitOverrideIpcBridge } from './fit-override-ipc-bridge'
 import { registerOsMarkdownFileOpenBridge } from './os-markdown-file-open-bridge'
 import { registerProjectCatalogIpcBridge } from './project-catalog-ipc-bridge'
 import { registerRateLimitIpcBridge } from './rate-limit-ipc-bridge'
@@ -53,8 +52,6 @@ export function installAppLifetimeIpcEvents(
 ): () => void {
   const unsubs: (() => void)[] = []
   const directSshRuntime = createDirectSshBridgeRuntime()
-  const backgroundWakeDispatcher = createBackgroundSleepingAgentWakeDispatcher()
-  unsubs.push(backgroundWakeDispatcher.dispose)
   unsubs.push(
     window.api.automations.onChanged((payload) => emitAutomationsChangedWindowEvent(payload))
   )
@@ -111,7 +108,7 @@ export function installAppLifetimeIpcEvents(
   registerPtySourceDisownedIpcBridge(unsubs)
   registerTerminalUiRoutingIpcBridge(unsubs)
   registerSessionTabIpcBridge(unsubs)
-  registerMobileAndTerminalCloseIpcBridge(unsubs, backgroundWakeDispatcher.request)
+  registerMobileAndTerminalCloseIpcBridge(unsubs)
   registerBrowserStateIpcBridge(unsubs, isRuntimeEnvironmentActive)
   registerContentCreationIpcBridge(unsubs, isRuntimeEnvironmentActive)
   registerBrowserRequestIpcBridge(unsubs, isRuntimeEnvironmentActive)
@@ -121,7 +118,7 @@ export function installAppLifetimeIpcEvents(
   registerRemoteWorkspaceIpcBridge(unsubs, directSshRuntime)
   registerZoomIpcBridge(unsubs)
   const agentStatusBridge = registerAgentStatusIpcBridge(unsubs)
-  const disposeMobileDriverHydration = registerMobileDriverIpcBridge(
+  const disposeFitOverrideHydration = registerFitOverrideIpcBridge(
     unsubs,
     isRuntimeEnvironmentActive
   )
@@ -129,7 +126,7 @@ export function installAppLifetimeIpcEvents(
   return () => {
     agentStatusBridge.disposeAsyncState()
     onCleanupPhase?.('agent.disposeAsyncState')
-    disposeMobileDriverHydration()
+    disposeFitOverrideHydration()
     onCleanupPhase?.('mobile.disposeHydration')
     unsubscribeRuntimeEnvironmentStore()
     onCleanupPhase?.('runtimeStore.unsubscribe')

@@ -1,12 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
-import type {
-  NativeChatMessage,
-  NativeChatSubagentEntry
-} from '../../../../shared/native-chat-types'
+import type { NativeChatMessage } from '../../../../shared/native-chat-types'
 import type { RpcContext } from '../core'
 
 // Stub the bounded tail reader so the handler returns a deterministic transcript with
-// one oversized tool-result block; the test then asserts clip behavior per client.
+// one oversized tool-result block.
 const OVERSIZED = 'x'.repeat(5000)
 const cachedResult = vi.hoisted(() => ({
   value: {
@@ -91,7 +88,6 @@ vi.mock('../../../native-chat/transcript-watch', () => ({
   }
 }))
 
-import { boundSubagentEntryId } from '../../../native-chat/subagent-entry-id-bounds'
 import { NATIVE_CHAT_METHODS } from './native-chat'
 
 function makeMessage(text: string): NativeChatMessage {
@@ -161,278 +157,13 @@ function activeWatcherArgs(): NonNullable<typeof watcher.args> {
   return watcher.args
 }
 
-describe('nativeChat.readSession clientKind truncation gating', () => {
+describe('nativeChat.readSession payload bounds', () => {
   it('passes request cancellation to transcript resolution', async () => {
     const controller = new AbortController()
     const context = { ...ctxWith('runtime'), signal: controller.signal }
     await readSessionHandler()({ agent: 'claude', sessionId: 's' }, context)
 
     expect(tailRead.signal).toBe(controller.signal)
-  })
-
-  it('clips oversized tool output for mobile clients', async () => {
-    cachedResult.value = { messages: [makeMessage(OVERSIZED)] }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const output = firstOutput(result)
-    expect(output).toBe(`${OVERSIZED.slice(0, 4000)}\n… (truncated)`)
-  })
-
-  // STA-3230: a paired desktop or mobile client saw long assistant replies cut
-  // at the tool-preview cap with `… (truncated)` and no way to read the rest.
-  it('passes a long assistant text block through unclipped for mobile clients', async () => {
-    const text = 'prose '.repeat(1000)
-    cachedResult.value = { messages: [makeTextMessage(text)] }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0] as {
-      text: string
-    }
-    expect(block.text).toBe(text)
-  })
-
-  it('bounds a subagent roster before it reaches mobile', async () => {
-    const agents: NativeChatSubagentEntry[] = Array.from({ length: 100 }, (_, index) => ({
-      id: `task-${index}-${'i'.repeat(600)}`,
-      label: 'l'.repeat(600),
-      state: 'working'
-    }))
-    cachedResult.value = {
-      messages: [
-        {
-          ...makeMessage(''),
-          blocks: [{ type: 'subagent-group', groupId: 'g', agents }]
-        }
-      ]
-    }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0] as {
-      agents: { id: string; label: string }[]
-    }
-    expect(block.agents).toHaveLength(64)
-    expect(block.agents[0].label).toBe(`${'l'.repeat(512)}\n… (truncated)`)
-    // The id is as untrusted as the label on an imported roster, but it is the
-    // roster key: it is bounded with a digest, never clipped to a bare prefix.
-    expect(block.agents[0].id).toHaveLength(512)
-    expect(block.agents[0].id).toBe(boundSubagentEntryId(`task-0-${'i'.repeat(600)}`))
-  })
-
-  it('clips a pathological text block at the safety ceiling for mobile clients', async () => {
-    const text = 'y'.repeat(70_000)
-    cachedResult.value = { messages: [makeTextMessage(text)] }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0] as {
-      text: string
-    }
-    expect(block.text).toBe(`${text.slice(0, 64_000)}\n… (truncated)`)
-  })
-
-  it.each(['mobile', 'runtime', undefined] as const)(
-    'omits inline image bodies and oversized metadata for %s clients',
-    async (clientKind) => {
-      cachedResult.value = {
-        messages: [
-          {
-            ...makeMessage('ignored'),
-            blocks: [
-              {
-                type: 'image-ref',
-                url: `data:image/png;base64,${'a'.repeat(10_000)}`,
-                alt: 'Inline image'
-              },
-              { type: 'image-ref', url: ' \tdata:image/png;base64,abc' },
-              { type: 'image-ref', url: 'https://example.com/reference.png' },
-              { type: 'image-ref', path: '/'.repeat(600) }
-            ]
-          }
-        ]
-      }
-
-      const result = await readSessionHandler()(
-        { agent: 'claude', sessionId: 's' },
-        ctxWith(clientKind)
-      )
-      const messages = (result as { messages: NativeChatMessage[] }).messages
-
-      expect(messages[0].blocks).toEqual([
-        { type: 'image-ref', alt: 'Inline image' },
-        { type: 'image-ref' },
-        { type: 'image-ref', url: 'https://example.com/reference.png' },
-        { type: 'image-ref' }
-      ])
-      expect(JSON.stringify(messages).length).toBeLessThan(1_000)
-    }
-  )
-
-  it('bounds raw tool-call inputs before sending them to mobile', async () => {
-    cachedResult.value = {
-      messages: [
-        {
-          ...makeMessage('ignored'),
-          blocks: [
-            {
-              type: 'tool-call',
-              name: 'Write',
-              input: { file_path: 'src/a.ts', content: OVERSIZED }
-            }
-          ]
-        }
-      ]
-    }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const input = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0]
-
-    expect(JSON.stringify(input).length).toBeLessThan(OVERSIZED.length)
-    expect(JSON.stringify(input)).toContain('truncated')
-  })
-
-  // The roster block reached mobile through a bare fall-through, uncapped, on the
-  // one path that exists to keep the payload off the phone.
-  it('bounds a spawn-group roster before sending it to mobile', async () => {
-    cachedResult.value = {
-      messages: [
-        {
-          ...makeMessage('ignored'),
-          blocks: [
-            {
-              type: 'subagent-group',
-              groupId: 'thread-1:turn-1',
-              agents: Array.from({ length: 80 }, (_unused, index) => ({
-                id: `child-${index}`,
-                label: index === 0 ? OVERSIZED : 'read',
-                state: index === 0 ? (OVERSIZED as 'working') : ('working' as const)
-              }))
-            }
-          ]
-        }
-      ]
-    }
-
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0]
-    if (block.type !== 'subagent-group') {
-      throw new Error('expected a subagent-group block')
-    }
-
-    expect(block.agents).toHaveLength(64)
-    expect(block.agents[0].label.length).toBeLessThan(OVERSIZED.length)
-    expect(block.agents[0].state).toBe('unverifiable')
-  })
-
-  it('preserves AskUserQuestion option objects at the supported nesting depth', async () => {
-    cachedResult.value = {
-      messages: [
-        {
-          ...makeMessage('ignored'),
-          blocks: [
-            {
-              type: 'tool-call',
-              name: 'AskUserQuestion',
-              input: {
-                questions: [
-                  {
-                    question: 'Pick one',
-                    header: 'Choice',
-                    options: [
-                      { label: 'Alpha', description: 'First option' },
-                      { label: 'Beta', description: 'Second option' }
-                    ]
-                  }
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    }
-
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0]
-
-    expect(block).toMatchObject({
-      type: 'tool-call',
-      input: {
-        questions: [
-          {
-            options: [
-              { label: 'Alpha', description: 'First option' },
-              { label: 'Beta', description: 'Second option' }
-            ]
-          }
-        ]
-      }
-    })
-  })
-
-  it('bounds tool-call keys and primitive node fanout', async () => {
-    const wide = Object.fromEntries(
-      Array.from({ length: 200 }, (_unused, index) => [`${'k'.repeat(200)}-${index}`, index])
-    )
-    cachedResult.value = {
-      messages: [
-        {
-          ...makeMessage('ignored'),
-          blocks: [{ type: 'tool-call', name: 'Write', input: wide }]
-        }
-      ]
-    }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const encoded = JSON.stringify((result as { messages: NativeChatMessage[] }).messages[0])
-
-    expect(encoded.length).toBeLessThan(10_000)
-    expect(encoded).toContain('truncated')
-  })
-
-  it('keeps sibling tool-call keys that share a 128-char prefix distinct', async () => {
-    const prefix = 'p'.repeat(128)
-    cachedResult.value = {
-      messages: [
-        {
-          ...makeMessage('ignored'),
-          blocks: [
-            {
-              type: 'tool-call',
-              name: 'Write',
-              input: { [`${prefix}A`]: 'first', [`${prefix}B`]: 'second' }
-            }
-          ]
-        }
-      ]
-    }
-    const result = await readSessionHandler()(
-      { agent: 'claude', sessionId: 's' },
-      ctxWith('mobile')
-    )
-    const block = (result as { messages: NativeChatMessage[] }).messages[0].blocks[0] as {
-      input: Record<string, unknown>
-    }
-    const keys = Object.keys(block.input)
-
-    expect(keys).toHaveLength(2)
-    expect(new Set(keys).size).toBe(2)
-    expect(Object.values(block.input)).toEqual(expect.arrayContaining(['first', 'second']))
   })
 
   it('passes oversized tool output through intact for runtime (web/desktop) clients', async () => {
@@ -486,7 +217,7 @@ describe('nativeChat.readSession clientKind truncation gating', () => {
 })
 
 describe('nativeChat.subscribe initial snapshot', () => {
-  it('preserves long assistant text across mobile stream frame types', async () => {
+  it('preserves long assistant text across stream frame types', async () => {
     watcher.watching = true
     watcher.args = null
     const emitted: unknown[] = []
@@ -494,7 +225,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const message = makeTextMessage(text)
     await subscribeHandler()(
       { agent: 'claude', sessionId: 's' },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
 
@@ -521,7 +252,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const emitted: unknown[] = []
     await subscribeHandler()(
       { agent: 'claude', sessionId: 's', capabilities: { transcriptPending: 1 } },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
 
@@ -543,7 +274,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const emitted: unknown[] = []
     await subscribeHandler()(
       { agent: 'claude', sessionId: 's' },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
 
@@ -557,7 +288,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const emitted: unknown[] = []
     await subscribeHandler()(
       { agent: 'claude', sessionId: 's', limit: 40 },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
     const messages = Array.from({ length: 60 }, (_unused, index) => ({
@@ -591,7 +322,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const emitted: unknown[] = []
     await subscribeHandler()(
       { agent: 'claude', sessionId: 'missing' },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
 
@@ -611,7 +342,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const emitted: unknown[] = []
     await subscribeHandler()(
       { agent: 'claude', sessionId: 's' },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
 
@@ -634,7 +365,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
     const emitted: unknown[] = []
     await subscribeHandler()(
       { agent: 'claude', sessionId: 's' },
-      streamingContext('mobile'),
+      streamingContext('runtime'),
       (value) => emitted.push(value)
     )
 
@@ -695,7 +426,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
 
   it('cancels pending setup when the stream is cleaned up', async () => {
     const cleanups = new Map<string, () => void>()
-    const context = streamingContext('mobile')
+    const context = streamingContext('runtime')
     vi.mocked(context.runtime.registerSubscriptionCleanup).mockImplementation((id, cleanup) => {
       cleanups.set(id, cleanup)
     })
@@ -735,7 +466,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
   it('handles request cancellation while setup rejects', async () => {
     const cleanups = new Map<string, () => void>()
     const controller = new AbortController()
-    const context = { ...streamingContext('mobile'), signal: controller.signal }
+    const context = { ...streamingContext('runtime'), signal: controller.signal }
     vi.mocked(context.runtime.registerSubscriptionCleanup).mockImplementation((id, cleanup) => {
       cleanups.set(id, cleanup)
     })
@@ -769,7 +500,7 @@ describe('nativeChat.subscribe initial snapshot', () => {
   it('skips setup for an already-cancelled request', async () => {
     const controller = new AbortController()
     controller.abort()
-    const context = { ...streamingContext('mobile'), signal: controller.signal }
+    const context = { ...streamingContext('runtime'), signal: controller.signal }
     watcher.args = null
     const emitted: unknown[] = []
 

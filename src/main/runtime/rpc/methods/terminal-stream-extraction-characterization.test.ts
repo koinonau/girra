@@ -114,7 +114,6 @@ describe('terminal stream extraction characterization', () => {
       streamId: 7,
       terminal: 'terminal',
       ptyId: 'pty',
-      isMobile: false,
       ackOutputSourceRanges: false,
       supportsOutputPause: false,
       pendingOutput: [{ data: 'lost-live', bytes: 9 }],
@@ -139,7 +138,6 @@ describe('terminal stream extraction characterization', () => {
         truncatedByByteBudget: false
       })),
       getTerminalSize: vi.fn(() => ({ cols: 80, rows: 24 })),
-      getMobileDisplayMode: vi.fn(() => 'fit'),
       getLayout: vi.fn(() => null)
     } as unknown as OrcaRuntimeService
     const state = {

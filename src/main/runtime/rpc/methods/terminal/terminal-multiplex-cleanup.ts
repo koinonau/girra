@@ -34,19 +34,12 @@ export function installMultiplexCleanup(
     stream.unsubscribeData()
     stream.unsubscribeResize()
     stream.unsubscribeFit()
-    stream.unsubscribeDriver()
     stream.unregisterBinaryHandler()
     streams.delete(streamId)
     state.flushAllAckPendingOutput()
     // Why: release the runtime exit-waiter for this slot (see the field's note); delete before abort so its .catch no-ops instead of re-detaching.
     stream.exitWaiterAbort.abort()
-    if (stream.isMobile && stream.client?.id) {
-      runtime.handleMobileUnsubscribe(stream.ptyId, stream.client.id)
-    } else if (
-      releaseRemoteDesktopDriver &&
-      stream.registeredRemoteDesktopDriver &&
-      stream.client?.id
-    ) {
+    if (releaseRemoteDesktopDriver && stream.registeredRemoteDesktopDriver && stream.client?.id) {
       // Why: release the width floor only if THIS stream took it, so a passive stream can't release a peer's floor.
       runtime.unregisterRemoteDesktopViewer(stream.ptyId, stream.remoteDesktopSubscriptionKey)
     }
@@ -79,7 +72,7 @@ export function installMultiplexCleanup(
     const remoteDesktopKeysByPty = new Map<string, string[]>()
     for (const streamId of Array.from(streams.keys())) {
       const stream = streams.get(streamId)
-      if (stream?.registeredRemoteDesktopDriver && !stream.isMobile && stream.client?.id) {
+      if (stream?.registeredRemoteDesktopDriver && stream.client?.id) {
         const keys = remoteDesktopKeysByPty.get(stream.ptyId) ?? []
         keys.push(stream.remoteDesktopSubscriptionKey)
         remoteDesktopKeysByPty.set(stream.ptyId, keys)

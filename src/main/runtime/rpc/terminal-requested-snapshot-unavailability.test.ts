@@ -65,7 +65,6 @@ async function requestSnapshotReply(options: {
     serializeAuthoritativeTerminalBuffer: serializeTerminalBuffer,
     readTerminal: vi.fn().mockResolvedValue({ tail: [], truncated: false }),
     getTerminalSize: vi.fn().mockReturnValue({ cols: 120, rows: 40 }),
-    getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
     getLayout: vi.fn().mockReturnValue({ seq: 1 }),
     subscribeToTerminalData: vi.fn((_: string, listener: (data: string) => void) => {
       dataListenerRef.current = listener
@@ -73,9 +72,7 @@ async function requestSnapshotReply(options: {
     }),
     subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
     subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
-    subscribeToDriverChanges: vi.fn().mockReturnValue(vi.fn()),
     getTerminalFitOverride: vi.fn().mockReturnValue(null),
-    getDriver: vi.fn().mockReturnValue({ kind: 'idle' }),
     registerSubscriptionCleanup: vi.fn((id: string, cleanup: () => void) => {
       cleanups.set(id, cleanup)
     }),

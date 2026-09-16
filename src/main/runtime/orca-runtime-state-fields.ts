@@ -106,10 +106,8 @@ export class OrcaRuntimeWithStateFields extends OrcaRuntimeWithLinearCommands {
     installRuntimeServiceCommandSurface(runtime, {
       aiVault: this.aiVault,
       clientEvents: this.clientEvents,
-      nativeChatDraftResolutions: this.nativeChatDraftResolutions,
       subscriptions: this.subscriptions,
       accounts: this.accounts,
-      browserDrivers: this.browserDrivers,
       messageWaiters: this.messageWaiters
     })
     runtime.resolveSkillDiscoveryProviderRoots = (target) =>

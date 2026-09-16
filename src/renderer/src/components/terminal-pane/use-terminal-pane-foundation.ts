@@ -15,7 +15,7 @@ import type { PreparedAgentSessionFork } from './terminal-agent-session-fork'
 import type { AgentSessionContinuationRequest } from '@/lib/agent-session-continuation'
 import { createTerminalQuickCommandDraft } from '@/components/terminal-quick-commands/TerminalQuickCommandDialog'
 import { useDaemonActions } from '@/components/shared/useDaemonActions'
-import { useMobileOverlayTicks } from './use-mobile-overlay-ticks'
+import { useFitOverlayTicks } from './use-fit-overlay-ticks'
 import type { TerminalPaneHandle, TerminalPaneProps } from './terminal-pane-types'
 import { useVisibleTerminalTabClaim } from './use-visible-terminal-tab-claim'
 import type { VisiblePtyRecoveryState } from './terminal-remote-runtime-recovery-ui-state'
@@ -142,7 +142,7 @@ export function useTerminalPaneFoundation(
   >({})
   const [sessionStateSaveFailureOpen, setSessionStateSaveFailureOpen] = useState(false)
   const daemonActions = useDaemonActions()
-  const { refreshMobileOverlays } = useMobileOverlayTicks({
+  const { refreshFitOverlays } = useFitOverlayTicks({
     managerRef,
     paneTransportsRef
   })
@@ -227,7 +227,7 @@ export function useTerminalPaneFoundation(
     sessionStateSaveFailureOpen,
     setSessionStateSaveFailureOpen,
     daemonActions,
-    refreshMobileOverlays
+    refreshFitOverlays
   }
 }
 

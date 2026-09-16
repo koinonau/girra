@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useAppStore } from '@/store'
 import { useFeatureInteractionWhileVisible } from '@/hooks/use-feature-interaction-while-visible'
 import { getRuntimeEnvironmentIdForWorktree } from '@/lib/worktree-runtime-owner'
@@ -6,12 +6,6 @@ import type { BrowserWorkspace as BrowserWorkspaceState } from '../../../../../s
 import { destroyPersistentWebview } from '../host-guest/webview-registry'
 import { useBrowserAutomationVisiblePageIds } from '../host-guest/browser-automation-visibility'
 import { getBrowserPagesForWorkspace } from './browser-pane-page-selection'
-import { BrowserMobileDriverOverlay } from './BrowserMobileDriverOverlay'
-import {
-  IDLE_BROWSER_DRIVER,
-  useBrowserDriverForPage,
-  useBrowserMobileDrivenPageIds
-} from '@/lib/pane-manager/browser-mobile-driver-state'
 import { useBrowserRemotelyViewedPageIds } from '@/lib/pane-manager/browser-remote-viewer-state'
 import { getBrowserPageRuntimeEnvironmentId } from '../describe-page/browser-page-url-display'
 import type { BrowserChromeShortcutScope } from '../describe-page/browser-page-types'
@@ -61,7 +55,6 @@ export default function BrowserPane({
   )
   const browserPageIds = useMemo(() => browserPages.map((page) => page.id), [browserPages])
   const automationVisiblePageIds = useBrowserAutomationVisiblePageIds(browserPageIds)
-  const mobileDrivenPageIds = useBrowserMobileDrivenPageIds(browserPageIds)
   const remotelyViewedPageIds = useBrowserRemotelyViewedPageIds(browserPageIds)
   const localBrowserPages = useMemo(
     () =>
@@ -76,9 +69,6 @@ export default function BrowserPane({
     [localBrowserPages]
   )
   const hasAdmittedPage = useAnyBrowserPageMountAdmission(localBrowserPageIds)
-  const pageDriver = useBrowserDriverForPage(activeBrowserPageId)
-  // Why: a runtime-backed page is streamed, never locally driven, so its driver must read idle.
-  const activeBrowserDriver = runtimeEnvironmentActive ? IDLE_BROWSER_DRIVER : pageDriver
 
   useEffect(() => {
     if (!runtimeEnvironmentActive) {
@@ -95,16 +85,6 @@ export default function BrowserPane({
     'browser',
     isActive && activeBrowserPage !== null && !runtimeEnvironmentActive
   )
-
-  const reclaimActiveBrowserForDesktop = useCallback(async (): Promise<void> => {
-    if (!activeBrowserPageId) {
-      return
-    }
-    const { reclaimed } = await window.api.runtime.reclaimBrowserForDesktop(activeBrowserPageId)
-    if (!reclaimed) {
-      throw new Error('Could not reclaim browser control')
-    }
-  }, [activeBrowserPageId])
 
   if (activeBrowserRuntimeEnvironmentId) {
     const environmentHandle =
@@ -174,7 +154,6 @@ export default function BrowserPane({
                       (isActive && page.id === activeBrowserPageId) ||
                       (hasAdmittedPage && isBrowserPageMountAdmitted(page.id)),
                     isAutomationVisible: automationVisiblePageIds.has(page.id),
-                    isMobileDriven: mobileDrivenPageIds.has(page.id),
                     hasRemoteViewer: remotelyViewedPageIds.has(page.id)
                   })}
                 >
@@ -195,19 +174,13 @@ export default function BrowserPane({
                         page.id === activeBrowserPage?.id ? resolvedChromeShortcutScope : 'inactive'
                       }
                       isAutomationVisible={automationVisiblePageIds.has(page.id)}
-                      isMobileDriven={mobileDrivenPageIds.has(page.id)}
                       isRemotelyViewed={remotelyViewedPageIds.has(page.id)}
-                      inputLocked={activeBrowserDriver.kind === 'mobile'}
                       onUpdatePageState={updateBrowserPageState}
                       onSetUrl={setBrowserPageUrl}
                     />
                   )}
                 </DeferredBrowserContent>
               ))}
-              <BrowserMobileDriverOverlay
-                driver={activeBrowserDriver}
-                onTakeBack={reclaimActiveBrowserForDesktop}
-              />
             </div>
           )}
         </SshRoutedBrowserPageGate>

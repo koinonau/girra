@@ -1,5 +1,5 @@
 import { safeFitAndThen } from '@/lib/pane-manager/pane-tree-ops'
-import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
+import { getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 import { waitForTerminalReplayWritesParsed } from '../replay-guard'
 import {
   POST_REPLAY_MODE_RESET,

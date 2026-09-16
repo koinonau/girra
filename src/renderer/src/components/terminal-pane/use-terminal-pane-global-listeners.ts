@@ -3,8 +3,7 @@ import { useTerminalFontZoom } from './useTerminalFontZoom'
 import { useTerminalKeyboardShortcuts } from './keyboard-handlers'
 import { useTerminalPaneGlobalEffects } from './use-terminal-pane-global-effects'
 import { safeFitAndThen } from '@/lib/pane-manager/pane-tree-ops'
-import { getFitOverrideForPty } from '@/lib/pane-manager/mobile-fit-overrides'
-import { isPtyLocked } from '@/lib/pane-manager/mobile-driver-state'
+import { getFitOverrideForPty } from '@/lib/pane-manager/fit-overrides'
 import {
   isXtermHelperTextarea,
   releaseTerminalFocusForOutsidePointerDown,
@@ -126,7 +125,7 @@ export function useTerminalPaneGlobalListeners(controller: TerminalPaneCloseCont
             return
           }
           const ptyId = transport.getPtyId()
-          if (!ptyId || getFitOverrideForPty(ptyId) || isPtyLocked(ptyId)) {
+          if (!ptyId || getFitOverrideForPty(ptyId)) {
             return
           }
           if (pane.terminal.cols < 8 || pane.terminal.rows < 4) {

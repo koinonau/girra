@@ -154,7 +154,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: () => () => {},
@@ -204,11 +203,7 @@ describe('useIpcEvents CLI-created worktree activation', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },
@@ -413,7 +408,6 @@ describe('useIpcEvents CLI-created worktree activation', () => {
           onOpenDiffFromMobile: () => () => {},
           onCloseTerminal: () => () => {},
           onSleepWorktree: () => () => {},
-          onResumeSleepingAgents: () => () => {},
           onNewBrowserTab: () => () => {},
           onNewMarkdownTab: () => () => {},
           onRequestTabCreate: () => () => {},
@@ -463,11 +457,7 @@ describe('useIpcEvents CLI-created worktree activation', () => {
         },
         runtime: {
           getTerminalFitOverrides: () => Promise.resolve([]),
-          getTerminalDrivers: () => Promise.resolve([]),
-          getBrowserDrivers: () => Promise.resolve([]),
           onTerminalFitOverrideChanged: () => () => {},
-          onTerminalDriverChanged: () => () => {},
-          onBrowserDriverChanged: () => () => {},
           onClientHostedBrowserRowsChanged: () => () => {},
           getClientHostedBrowserRows: async () => []
         },

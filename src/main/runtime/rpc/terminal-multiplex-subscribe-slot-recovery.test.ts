@@ -51,12 +51,9 @@ describe('terminal multiplex RPC', () => {
       readTerminal: vi.fn().mockResolvedValue({ tail: [], truncated: false }),
       serializeTerminalBuffer: vi.fn().mockResolvedValue({ data: 'snap', cols: 80, rows: 24 }),
       getTerminalSize: vi.fn().mockReturnValue({ cols: 80, rows: 24 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
       getLayout: vi.fn().mockReturnValue({ seq: 1 }),
       subscribeToTerminalData: vi.fn().mockReturnValue(vi.fn()),
       subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
-      handleMobileSubscribe: vi.fn().mockResolvedValue(undefined),
-      handleMobileUnsubscribe: vi.fn(),
       registerSubscriptionCleanup: vi.fn((id: string, cleanup: () => void) => {
         cleanups.set(id, cleanup)
       }),
@@ -91,7 +88,7 @@ describe('terminal multiplex RPC', () => {
             payload: encodeTerminalStreamJson({
               streamId: 7,
               terminal: 'terminal-1',
-              client: { id: 'phone-1', type: 'mobile' }
+              client: { id: 'desktop-1', type: 'desktop' }
             })
           })
         )!
@@ -144,7 +141,7 @@ describe('terminal multiplex RPC', () => {
     >()
     const cleanups = new Map<string, () => void>()
     let viewSubscriberCount = 0
-    const mobileSubscribeWaiters: {
+    const viewportWaiters: {
       resolve: () => void
       reject: (error: Error) => void
     }[] = []
@@ -166,17 +163,17 @@ describe('terminal multiplex RPC', () => {
       readTerminal: vi.fn().mockResolvedValue({ tail: [], truncated: false }),
       serializeTerminalBuffer: vi.fn().mockResolvedValue({ data: 'snap', cols: 80, rows: 24 }),
       getTerminalSize: vi.fn().mockReturnValue({ cols: 80, rows: 24 }),
-      getMobileDisplayMode: vi.fn().mockReturnValue('auto'),
       getLayout: vi.fn().mockReturnValue({ seq: 1 }),
       subscribeToTerminalData: vi.fn().mockReturnValue(vi.fn()),
       subscribeToTerminalResize: vi.fn().mockReturnValue(vi.fn()),
-      handleMobileSubscribe: vi.fn(
+      subscribeToFitOverrideChanges: vi.fn().mockReturnValue(vi.fn()),
+      getTerminalFitOverride: vi.fn().mockReturnValue(null),
+      updateRemoteDesktopViewer: vi.fn(
         () =>
           new Promise<boolean>((resolve, reject) => {
-            mobileSubscribeWaiters.push({ resolve: () => resolve(true), reject })
+            viewportWaiters.push({ resolve: () => resolve(true), reject })
           })
       ),
-      handleMobileUnsubscribe: vi.fn(),
       registerSubscriptionCleanup: vi.fn((id: string, cleanup: () => void) => {
         cleanups.set(id, cleanup)
       }),
@@ -211,20 +208,21 @@ describe('terminal multiplex RPC', () => {
             payload: encodeTerminalStreamJson({
               streamId: 9,
               terminal: 'terminal-1',
-              client: { id: 'phone-1', type: 'mobile' }
+              client: { id: 'desktop-1', type: 'desktop' },
+              viewport: { cols: 80, rows: 24 }
             })
           })
         )!
       )
     }
 
-    // A registers, then blocks in handleMobileSubscribe. B (same streamId)
+    // A registers, then blocks registering its viewport. B (same streamId)
     // evicts A on arrival and completes its own registration.
     sendSubscribe()
-    await vi.waitFor(() => expect(mobileSubscribeWaiters).toHaveLength(1))
+    await vi.waitFor(() => expect(viewportWaiters).toHaveLength(1))
     sendSubscribe()
-    await vi.waitFor(() => expect(mobileSubscribeWaiters).toHaveLength(2))
-    mobileSubscribeWaiters[1]!.resolve()
+    await vi.waitFor(() => expect(viewportWaiters).toHaveLength(2))
+    viewportWaiters[1]!.resolve()
     await vi.waitFor(() =>
       expect(messages.filter((msg) => JSON.parse(msg).result?.type === 'subscribed')).toHaveLength(
         1
@@ -234,7 +232,7 @@ describe('terminal multiplex RPC', () => {
 
     // A's pending await now rejects. The evicted stream must not detach the
     // successor that owns the slot.
-    mobileSubscribeWaiters[0]!.reject(new Error('mobile_subscribe_failed'))
+    viewportWaiters[0]!.reject(new Error('viewport_register_failed'))
     await Promise.resolve()
     await Promise.resolve()
     expect(viewSubscriberCount).toBe(1)

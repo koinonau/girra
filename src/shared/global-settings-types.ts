@@ -385,10 +385,6 @@ export type GlobalSettings = {
   mobileEmulatorDefaultDeviceUdid?: string | null
   /** Explicit Android SDK root for when auto-discovery (ANDROID_HOME / default path) fails; null (default) auto-discovers. */
   androidSdkPath?: string | null
-  /** Auto-restore window (ms) for a phone-fit PTY after the last mobile subscriber leaves.
-   *  `null` (default) holds phone size indefinitely; a finite value schedules restore.
-   *  Clamped on read to [5_000ms, 60min]. See docs/mobile-fit-hold.md. */
-  mobileAutoRestoreFitMs: number | null
   /** Experimental: floating animated pet in the bottom-right corner. Opt-in cosmetic;
    *  off never mounts the overlay, and toggling takes effect instantly (renderer-side). */
   experimentalPet: boolean

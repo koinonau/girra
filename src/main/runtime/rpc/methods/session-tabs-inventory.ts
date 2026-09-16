@@ -27,7 +27,7 @@ function clientUnderstandsAuthoritativeInventory(context: RpcContext): boolean {
 
 export function projectSessionTabsForClient(
   snapshot: RuntimeMobileSessionTabsResult,
-  clientKind: 'mobile' | 'runtime' | undefined,
+  clientKind: 'runtime' | undefined,
   clientCapabilities: Parameters<typeof projectSessionTabAgentStatus>[2],
   structuredNativeChatEnabled: boolean
 ): RuntimeMobileSessionTabsResult {

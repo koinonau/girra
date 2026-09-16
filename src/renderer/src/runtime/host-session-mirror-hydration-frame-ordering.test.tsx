@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { act, renderHook } from '@testing-library/react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { RuntimeMobileSessionTabsResult } from '../../../shared/runtime-types'
 import type * as WebRuntimeSessionModule from './web-runtime-session'
 import type * as WebSessionTerminalHandleEventsModule from './web-session-terminal-handle-events'
@@ -35,11 +35,6 @@ vi.mock('./web-runtime-session', async (importOriginal) => {
 
 import { useAppStore } from '@/store'
 import { resumeSleepingAgentSessionsForWorktree } from '@/lib/resume-sleeping-agent-session'
-import {
-  takeAllPendingBackgroundTerminalWorktreeMounts,
-  takePendingBackgroundTerminalWorktreeMount
-} from '@/components/terminal/background-terminal-worktree-mount'
-import { wakeSleepingAgentsForWorktreeInBackground } from '@/lib/wake-sleeping-agents-in-background'
 import {
   BG_MIRROR_TAB_ID,
   BG_WT,
@@ -497,35 +492,6 @@ describe('mirror latch verdicts against real stream failures', () => {
     expect(useAppStore.getState().ptyIdsByTabId[MIRROR_TAB_ID]).toEqual([HOST_PTY_ID])
     expect(tabIds(BG_WT)).toEqual([BG_MIRROR_TAB_ID])
     expect(useAppStore.getState().sleepingAgentSessionsByPaneKey[backgroundPaneKey]).toBeDefined()
-  })
-})
-
-describe('a parked wake replay keeps the mount contract of its caller', () => {
-  installFrameOrderingHarness()
-  beforeEach(takeAllPendingBackgroundTerminalWorktreeMounts)
-  afterEach(takeAllPendingBackgroundTerminalWorktreeMounts)
-
-  it('background-mounts the resume tab a parked sweep replayed', async () => {
-    renderHook(() => useWebSessionTabsSync())
-    await act(settle)
-    const paneKey = seedSleepingRecord(BG_MIRROR_TAB_ID, BG_WT, 'claude-session-parked-wake')
-
-    // A phone opens a workspace the desktop is not looking at, while the mirror
-    // for its pane is still unanswered — so the sweep parks instead of resuming.
-    wakeSleepingAgentsForWorktreeInBackground(BG_WT)
-    expect(takePendingBackgroundTerminalWorktreeMount(BG_WT)).toBeNull()
-
-    // The inventory retracts the background mirror tab, releasing the waiter.
-    await publish(findSubscription('session.tabs.subscribeAll'), {
-      type: 'snapshots',
-      snapshots: [makeHostSnapshot(WT, HOST_SURFACE_ID, HOST_PARENT_TAB_ID)]
-    })
-
-    expectReplayedResume(paneKey, BG_WT, 'claude-session-parked-wake')
-    const launchedTabId = Object.keys(useAppStore.getState().automaticAgentResumeClaimsByTabId)[0]!
-    // Why: the replayed tab is created activate:false, so nothing else mounts it
-    // and its queued `--resume` never reaches a PTY.
-    expect(takePendingBackgroundTerminalWorktreeMount(BG_WT)?.tabIds).toEqual([launchedTabId])
   })
 })
 

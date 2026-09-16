@@ -103,7 +103,6 @@ export type RuntimeStore = {
     prBotAuthorOverrides?: GlobalSettings['prBotAuthorOverrides']
     terminalQuickCommands?: GlobalSettings['terminalQuickCommands']
     gitlabProjects?: GlobalSettings['gitlabProjects']
-    mobileAutoRestoreFitMs?: number | null
     mobileEmulatorEnabled?: boolean
     mobileEmulatorDefaultDeviceUdid?: string | null
     claudeAgentTeamsMode?: GlobalSettings['claudeAgentTeamsMode']

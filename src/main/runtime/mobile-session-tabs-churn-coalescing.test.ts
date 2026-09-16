@@ -61,8 +61,7 @@ const store = {
     nestWorkspaces: false,
     refreshLocalBaseRefOnWorktreeCreate: false,
     branchPrefix: 'none',
-    branchPrefixCustom: '',
-    mobileAutoRestoreFitMs: null
+    branchPrefixCustom: ''
   }),
   updateSettings: () => {}
 }

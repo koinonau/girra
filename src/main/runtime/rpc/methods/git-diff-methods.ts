@@ -5,7 +5,7 @@ import { GitBranchDiff, GitCommitDiff, GitDiff } from './git-params'
 // Why: clientKind is set only for WebSocket-transported requests, so desktop-local and in-process
 // callers keep uncapped full-fidelity diffs.
 function remoteDiffContentBudget(
-  clientKind: 'mobile' | 'runtime' | undefined,
+  clientKind: 'runtime' | undefined,
   requestId: string | undefined
 ): number | undefined {
   return clientKind && requestId ? remoteRpcContentBudget(requestId) : undefined

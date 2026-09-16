@@ -1,10 +1,10 @@
-// Why: a phone or another desktop may own the shared PTY grid. Non-owners park
-// xterm at that authoritative size so passive fitting cannot start a resize war.
+// Why: another desktop may own the shared PTY grid. Non-owners park xterm at
+// that authoritative size so passive fitting cannot start a resize war.
 
-export type FitHoldMode = 'mobile-fit' | 'remote-desktop-fit' | 'desktop-fit'
+export type FitHoldMode = 'remote-desktop-fit' | 'desktop-fit'
 
 type FitOverride = {
-  mode: 'mobile-fit' | 'remote-desktop-fit'
+  mode: 'remote-desktop-fit'
   cols: number
   rows: number
 }
@@ -19,7 +19,7 @@ function fitBindingKey(tabId: string, paneId: number): string {
 }
 
 // Why: the override maps are plain JS — React components that read them
-// (e.g. the desktop mobile-fit banner) have no way to know when entries
+// have no way to know when entries
 // change. This listener set lets TerminalPane subscribe for re-renders
 // and trigger safeFit on affected panes.
 type OverrideChangeEvent = {
@@ -28,10 +28,10 @@ type OverrideChangeEvent = {
   cols: number
   rows: number
   // Why: the dimensions the PTY was at *before* this event fired. For a
-  // desktop-fit transition this is the prior mobile-fit cols/rows so
-  // listeners can check whether xterm is still stuck at phone dims and
+  // desktop-fit transition this is the prior remote-desktop-fit cols/rows so
+  // listeners can check whether xterm is still stuck at the held dims and
   // needs the safety-net resize, vs. already moved on (e.g. user resized
-  // the desktop pane while mobile was active).
+  // the pane while the hold was active).
   priorCols: number | null
   priorRows: number | null
 }
@@ -51,7 +51,7 @@ function notifyChange(event: OverrideChangeEvent): void {
 
 export function setFitOverride(ptyId: string, mode: FitHoldMode, cols: number, rows: number): void {
   const prior = overridesByPtyId.get(ptyId) ?? null
-  if (mode === 'mobile-fit' || mode === 'remote-desktop-fit') {
+  if (mode === 'remote-desktop-fit') {
     overridesByPtyId.set(ptyId, { mode, cols, rows })
   } else {
     overridesByPtyId.delete(ptyId)
@@ -128,7 +128,7 @@ export function unbindPane(paneId: number, tabId?: string): void {
 export function hydrateOverrides(
   overrides: {
     ptyId: string
-    mode: 'mobile-fit' | 'remote-desktop-fit'
+    mode: 'remote-desktop-fit'
     cols: number
     rows: number
   }[]
@@ -140,7 +140,7 @@ export function hydrateOverrides(
   }
 
   // Why: hydration can complete after terminal panes mount during reload. Notify
-  // readers so held phone-fit overlays appear even without a fresh IPC event.
+  // readers so held fits apply even without a fresh IPC event.
   for (const [ptyId, override] of overridesByPtyId) {
     const prior = previous.get(ptyId) ?? null
     notifyChange({
@@ -168,10 +168,4 @@ export function hydrateOverrides(
 
 export function getAllOverrides(): Map<string, FitOverride> {
   return new Map(overridesByPtyId)
-}
-
-export function getMobileFitOverridePtyIds(): string[] {
-  return [...overridesByPtyId].flatMap(([ptyId, override]) =>
-    override.mode === 'mobile-fit' ? [ptyId] : []
-  )
 }

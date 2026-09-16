@@ -281,8 +281,5 @@ export class OrcaRuntimeWithPreservedBranchCleanup extends OrcaRuntimeWithTermin
 
   protected readonly claudeAgentTeams = new ClaudeAgentTeamsService()
 
-  getNativeChatLaunchDraftResolutionClientEventSnapshot =
-    this.nativeChatDraftResolutions.snapshot.bind(this.nativeChatDraftResolutions)
-
   protected emitClientEvent = this.clientEvents.emit.bind(this.clientEvents)
 }

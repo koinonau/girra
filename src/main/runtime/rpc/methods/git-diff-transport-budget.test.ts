@@ -82,7 +82,7 @@ async function dispatchRemote(
   runtime: OrcaRuntimeService,
   method: string,
   params: Record<string, unknown>,
-  clientKind: 'mobile' | 'runtime'
+  clientKind: 'runtime'
 ): Promise<RpcResponse> {
   const dispatcher = new RpcDispatcher({ runtime, methods: GIT_METHODS })
   const replies: string[] = []
@@ -96,7 +96,7 @@ describe('remote git diff transport budget', () => {
   it.each(CASES)('caps $method for a mobile client', async ({ method, runtimeMethod, params }) => {
     const runtime = stubRuntime(runtimeMethod)
 
-    const response = await dispatchRemote(runtime, method, params, 'mobile')
+    const response = await dispatchRemote(runtime, method, params, 'runtime')
 
     expect(budgetArgument(runtime, runtimeMethod)).toBe(remoteRpcContentBudget('req-1'))
     expect(response).toMatchObject({
@@ -126,7 +126,7 @@ describe('remote git diff transport budget', () => {
     await dispatcher.dispatchStreaming(
       { ...makeRequest('git.diff', CASES[0]!.params), id: requestId },
       (reply) => replies.push(reply),
-      { clientKind: 'mobile' }
+      { clientKind: 'runtime' }
     )
 
     expect(budgetArgument(runtime, 'getRuntimeGitDiff')).toBe(remoteRpcContentBudget(requestId))
@@ -169,7 +169,7 @@ describe('remote git diff transport budget', () => {
       getRuntimeId: () => 'test-runtime'
     }) as unknown as OrcaRuntimeService
 
-    const response = await dispatchRemote(runtime, 'git.diff', CASES[0]!.params, 'mobile')
+    const response = await dispatchRemote(runtime, 'git.diff', CASES[0]!.params, 'runtime')
 
     expect(response).toMatchObject({ ok: false, error: { code: 'diff_too_large' } })
   })

@@ -95,8 +95,7 @@ describe('OrcaRuntimeService terminal startup cwd', () => {
       focusTerminal: vi.fn(),
       closeTerminal: vi.fn(),
       sleepWorktree: vi.fn(),
-      terminalFitOverrideChanged: vi.fn(),
-      terminalDriverChanged: vi.fn()
+      terminalFitOverrideChanged: vi.fn()
     })
 
     await runtime.createTerminal('id:wt-1', { cwd: '/repo/app/packages/web' })

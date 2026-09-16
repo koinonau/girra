@@ -44,7 +44,6 @@ describe('BrowserPane webview preferences', () => {
     const ensuredWebview = ensureBrowserPageWebview({
       browserTabId: 'browser-page-1',
       container,
-      inputLocked: false,
       webviewPartition: 'persist:orca-browser-session-profile-1',
       resolveContainer: () => container
     })
@@ -89,7 +88,6 @@ describe('BrowserPane webview preferences', () => {
     const ensuredWebview = ensureBrowserPageWebview({
       browserTabId: 'browser-page-1',
       container: staleContainer,
-      inputLocked: true,
       webviewPartition: 'persist:orca-browser-session-profile-1',
       resolveContainer
     })
@@ -103,7 +101,6 @@ describe('BrowserPane webview preferences', () => {
     expect(ensuredWebview?.webview.getAttribute('partition')).toBe(
       'persist:orca-browser-session-profile-1'
     )
-    expect(ensuredWebview?.webview.style.pointerEvents).toBe('none')
     expect(refreshedContainer.lastElementChild).toBe(ensuredWebview?.webview as unknown as Element)
   })
 
@@ -125,7 +122,6 @@ describe('BrowserPane webview preferences', () => {
     const ensuredWebview = ensureBrowserPageWebview({
       browserTabId: 'browser-page-1',
       container: requestedContainer,
-      inputLocked: false,
       webviewPartition: 'persist:orca-browser',
       resolveContainer
     })

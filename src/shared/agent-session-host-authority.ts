@@ -140,7 +140,7 @@ export type RuntimeCreateAgentSessionResult = {
 
 export type RuntimeAgentSessionRpcCaller = {
   clientId?: string
-  clientKind?: 'mobile' | 'runtime'
+  clientKind?: 'runtime'
   signal?: AbortSignal
 }
 

@@ -85,22 +85,10 @@ const CLIENT_HOSTING_CAPABILITIES = [
 
 type HarnessState = Record<string, unknown>
 
-/** The runtime status the create reads its capabilities and device scope from. */
-function statusMap(options: {
-  capabilities: string[]
-  deviceScope?: string
-}): Map<string, unknown> {
+/** The runtime status the create reads its capabilities from. */
+function statusMap(options: { capabilities: string[] }): Map<string, unknown> {
   return new Map([
-    [
-      ENVIRONMENT_ID,
-      {
-        status: {
-          capabilities: options.capabilities,
-          ...(options.deviceScope !== undefined ? { deviceScope: options.deviceScope } : {})
-        },
-        checkedAt: 1
-      }
-    ]
+    [ENVIRONMENT_ID, { status: { capabilities: options.capabilities }, checkedAt: 1 }]
   ])
 }
 
@@ -111,7 +99,6 @@ function statusMap(options: {
 async function stageHandleFor(
   options: {
     capabilities?: string[]
-    deviceScope?: string
     clientHostedSetting?: boolean
     placementPreference?: BrowserClientHostPlacementPreference
     onCreateCall?: (state: HarnessState) => void
@@ -119,8 +106,7 @@ async function stageHandleFor(
 ): Promise<Record<string, unknown>> {
   const state = mocks.getState() as HarnessState
   state.runtimeStatusByEnvironmentId = statusMap({
-    capabilities: options.capabilities ?? CLIENT_HOSTING_CAPABILITIES,
-    ...(options.deviceScope !== undefined ? { deviceScope: options.deviceScope } : {})
+    capabilities: options.capabilities ?? CLIENT_HOSTING_CAPABILITIES
   })
   state.settings = {
     ...(state.settings as Record<string, unknown>),
@@ -197,8 +183,7 @@ describe('staged client-hosting intent', () => {
         )
       }
     },
-    { name: 'the user turned client hosting off', options: { clientHostedSetting: false } },
-    { name: 'the runtime is a mobile device', options: { deviceScope: 'mobile' } }
+    { name: 'the user turned client hosting off', options: { clientHostedSetting: false } }
   ])('leaves the staged handle server-hosted when $name', async ({ options }) => {
     const handle = await stageHandleFor(options)
 

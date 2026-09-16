@@ -50,21 +50,13 @@ export type AgentStatusSetData = {
 }
 export type StoreLike = Record<string, unknown>
 export type StoreSubscribeListener = (state: StoreLike, previousState: StoreLike) => void
-export type MobileFitEvent = {
+export type FitOverrideEvent = {
   ptyId: string
-  mode: 'mobile-fit' | 'desktop-fit'
+  mode: 'remote-desktop-fit' | 'desktop-fit'
   cols: number
   rows: number
 }
-export type MobileFitListener = (event: MobileFitEvent) => void
-export type MobileDriverListener = (event: {
-  ptyId: string
-  driver: { kind: 'mobile'; clientId: string }
-}) => void
-export type MobileBrowserDriverListener = (event: {
-  browserPageId: string
-  driver: { kind: 'mobile'; clientId: string }
-}) => void
+export type FitOverrideListener = (event: FitOverrideEvent) => void
 
 export function applyMockAgentStatusUpdate(
   state: StoreLike,

@@ -146,17 +146,3 @@ export function classifySnapshotAvailability(
   }
   return { kind: 'snapshot' }
 }
-
-export function isTerminalDriverState(
-  value: unknown
-): value is { kind: 'idle' } | { kind: 'desktop' } | { kind: 'mobile'; clientId: string } {
-  if (!value || typeof value !== 'object' || !('kind' in value)) {
-    return false
-  }
-  const driver = value as { kind?: unknown; clientId?: unknown }
-  return (
-    driver.kind === 'idle' ||
-    driver.kind === 'desktop' ||
-    (driver.kind === 'mobile' && typeof driver.clientId === 'string')
-  )
-}

@@ -1,4 +1,4 @@
-import type { FitHoldMode } from '@/lib/pane-manager/mobile-fit-overrides'
+import type { FitHoldMode } from '@/lib/pane-manager/fit-overrides'
 
 type TerminalGrid = { cols: number; rows: number }
 

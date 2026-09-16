@@ -1,16 +1,13 @@
 import type { RuntimeAccountController } from './runtime-account-controller'
 import type { RuntimeAiVaultCommands } from './runtime-ai-vault-commands'
-import type { RuntimeBrowserDriverController } from './runtime-browser-driver-controller'
 import type { RuntimeClientEventBus } from './runtime-client-event-bus'
 import type { RuntimeMessageWaiters } from './runtime-message-waiters'
-import type { RuntimeNativeChatDraftResolutions } from './runtime-native-chat-draft-resolutions'
 import type { RuntimeSubscriptionRegistry } from './runtime-subscription-registry'
 
 export type RuntimeServiceCommandSurface = {
   listAiVaultSessions: RuntimeAiVaultCommands['list']
   resolveAiVaultSessionTitles: RuntimeAiVaultCommands['resolveTitles']
   onClientEvent: RuntimeClientEventBus['on']
-  notifyNativeChatLaunchDraftResolved: RuntimeNativeChatDraftResolutions['notify']
   registerSubscriptionCleanup: RuntimeSubscriptionRegistry['register']
   registerOwnedSubscriptionCleanup: RuntimeSubscriptionRegistry['registerOwned']
   cleanupSubscription: RuntimeSubscriptionRegistry['cleanup']
@@ -29,8 +26,6 @@ export type RuntimeServiceCommandSurface = {
   removeClaudeAccount: RuntimeAccountController['removeClaude']
   addClaudeAccountFromConfigDir: RuntimeAccountController['addClaudeFromConfigDir']
   onAccountsChanged: RuntimeAccountController['onChanged']
-  getAllBrowserDrivers: RuntimeBrowserDriverController['getAll']
-  reclaimBrowserForDesktop: RuntimeBrowserDriverController['reclaimForDesktop']
   notifyMessageArrived(handle: string, messageType?: string): void
   waitForMessage: RuntimeMessageWaiters['wait']
   cancelMessageWaiters: RuntimeMessageWaiters['cancel']
@@ -39,10 +34,8 @@ export type RuntimeServiceCommandSurface = {
 type RuntimeServiceCommandOwners = {
   aiVault: RuntimeAiVaultCommands
   clientEvents: RuntimeClientEventBus
-  nativeChatDraftResolutions: RuntimeNativeChatDraftResolutions
   subscriptions: RuntimeSubscriptionRegistry
   accounts: RuntimeAccountController
-  browserDrivers: RuntimeBrowserDriverController
   messageWaiters: RuntimeMessageWaiters
 }
 
@@ -52,16 +45,13 @@ export function installRuntimeServiceCommandSurface(
 ): void {
   const vault = owners.aiVault
   const events = owners.clientEvents
-  const drafts = owners.nativeChatDraftResolutions
   const subscriptions = owners.subscriptions
   const accounts = owners.accounts
-  const browsers = owners.browserDrivers
   const waiters = owners.messageWaiters
   Object.assign(target, {
     listAiVaultSessions: vault.list.bind(vault),
     resolveAiVaultSessionTitles: vault.resolveTitles.bind(vault),
     onClientEvent: events.on.bind(events),
-    notifyNativeChatLaunchDraftResolved: drafts.notify.bind(drafts),
     registerSubscriptionCleanup: subscriptions.register.bind(subscriptions),
     registerOwnedSubscriptionCleanup: subscriptions.registerOwned.bind(subscriptions),
     cleanupSubscription: subscriptions.cleanup.bind(subscriptions),
@@ -83,8 +73,6 @@ export function installRuntimeServiceCommandSurface(
     removeClaudeAccount: accounts.removeClaude.bind(accounts),
     addClaudeAccountFromConfigDir: accounts.addClaudeFromConfigDir.bind(accounts),
     onAccountsChanged: accounts.onChanged.bind(accounts),
-    getAllBrowserDrivers: browsers.getAll.bind(browsers),
-    reclaimBrowserForDesktop: browsers.reclaimForDesktop.bind(browsers),
     waitForMessage: waiters.wait.bind(waiters),
     cancelMessageWaiters: waiters.cancel.bind(waiters)
   })
