@@ -6,7 +6,7 @@ export const SERVE_COMMAND_SPECS: CommandSpec[] = [
     path: ['serve'],
     summary: 'Start a Girra runtime server without opening a desktop window',
     usage:
-      'orca serve [--port <port>] [--pairing-address <host>] [--no-pairing] [--project-root <path>] [--recipe-json] [--json]',
+      'girra serve [--port <port>] [--pairing-address <host>] [--no-pairing] [--project-root <path>] [--recipe-json] [--json]',
     allowedFlags: [
       ...GLOBAL_FLAGS,
       'port',
@@ -22,10 +22,10 @@ export const SERVE_COMMAND_SPECS: CommandSpec[] = [
       'When the web client bundle is available, the server also prints a browser URL with the pairing data embedded.'
     ],
     examples: [
-      'orca serve',
-      'orca serve --json',
-      'orca serve --project-root /workspace/repo --pairing-address wss://sandbox.example.com --recipe-json',
-      'orca serve --port 6768 --pairing-address 100.64.1.20'
+      'girra serve',
+      'girra serve --json',
+      'girra serve --project-root /workspace/repo --pairing-address wss://sandbox.example.com --recipe-json',
+      'girra serve --port 6768 --pairing-address 100.64.1.20'
     ]
   }
 ]

@@ -523,7 +523,7 @@ describe('launchAgentBackgroundSession', () => {
     })
 
     expect(mockSpawn).toHaveBeenCalledWith(
-      expect.objectContaining({ command: "orca-ide claude-teams '--dangerously-skip-permissions'" })
+      expect.objectContaining({ command: "girra claude-teams '--dangerously-skip-permissions'" })
     )
     expect(mockPasteDraftWhenAgentReady).toHaveBeenCalledWith(
       expect.objectContaining({

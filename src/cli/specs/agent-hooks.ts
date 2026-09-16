@@ -5,22 +5,22 @@ export const AGENT_HOOK_COMMAND_SPECS: CommandSpec[] = [
   {
     path: ['agent', 'hooks', 'status'],
     summary: 'Show whether Girra-managed agent status hooks are enabled',
-    usage: 'orca agent hooks status [--json]',
+    usage: 'girra agent hooks status [--json]',
     allowedFlags: [...GLOBAL_FLAGS],
-    examples: ['orca agent hooks status', 'orca agent hooks status --json']
+    examples: ['girra agent hooks status', 'girra agent hooks status --json']
   },
   {
     path: ['agent', 'hooks', 'off'],
     summary: 'Disable Girra-managed agent status hooks and remove local hook entries',
-    usage: 'orca agent hooks off [--json]',
+    usage: 'girra agent hooks off [--json]',
     allowedFlags: [...GLOBAL_FLAGS],
-    examples: ['orca agent hooks off']
+    examples: ['girra agent hooks off']
   },
   {
     path: ['agent', 'hooks', 'on'],
     summary: 'Enable Girra-managed agent status hooks',
-    usage: 'orca agent hooks on [--json]',
+    usage: 'girra agent hooks on [--json]',
     allowedFlags: [...GLOBAL_FLAGS],
-    examples: ['orca agent hooks on']
+    examples: ['girra agent hooks on']
   }
 ]

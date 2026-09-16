@@ -47,7 +47,7 @@ vi.mock('../runtime-client', () => {
 import { main } from '../index'
 import { buildWorktree, okFixture, queueFixtures, worktreeListFixture } from '../test-fixtures'
 
-describe('orca file CLI handlers', () => {
+describe('girra file CLI handlers', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     callMock.mockReset()

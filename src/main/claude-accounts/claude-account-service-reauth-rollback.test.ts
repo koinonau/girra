@@ -12,6 +12,7 @@ import {
   setPlatform
 } from './claude-account-service-test-harness'
 import type * as NodeCliCommandResolution from '../../shared/node-cli-command-resolution'
+import { installFakeAppEnvironment } from '../../../config/scripts/vitest-host-ports-setup'
 
 const CLAUDE_SERVICE_TEST_ROOT = join(tmpdir(), 'orca-claude-service-reauth-test')
 
@@ -46,6 +47,8 @@ describe('ClaudeAccountService credential capture', () => {
   beforeEach(() => {
     setPlatform('darwin')
     tempDir = null
+    // Why the port too: managed-auth paths resolve through getCanonicalUserDataPath, not electron.
+    installFakeAppEnvironment({ getPath: () => CLAUDE_SERVICE_TEST_ROOT })
     resetClaudeKeychainMocks()
   })
 

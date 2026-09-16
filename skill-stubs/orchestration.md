@@ -1,7 +1,7 @@
 # Girra Orchestration
 
 This file is a discovery stub, not the usage guide. The full, version-matched Girra
-orchestration reference is served by the `orca` binary itself — kept out of this file on
+orchestration reference is served by the `girra` binary itself — kept out of this file on
 purpose so it can never drift from the binary that will actually run your commands.
 
 Engage Girra orchestration whenever you need structured multi-agent coordination: threaded

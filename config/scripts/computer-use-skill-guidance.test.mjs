@@ -27,7 +27,7 @@ describe('computer-use skill guidance', () => {
   it('keeps web-app targeting on the computer-use surface', () => {
     const skill = readFileSync(guidePath, 'utf8')
 
-    expect(skill).toContain('Use this skill for desktop UI through `orca computer`')
+    expect(skill).toContain('Use this skill for desktop UI through `girra computer`')
     expect(skill).toContain('external desktop browser window that needs desktop-level control')
     expect(skill).not.toMatch(/\borca goto\b/iu)
     expect(skill).not.toMatch(/\borca snapshot\b/iu)

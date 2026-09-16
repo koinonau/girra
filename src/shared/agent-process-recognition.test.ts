@@ -94,6 +94,10 @@ describe('agent process recognition', () => {
       agent: 'claude-agent-teams',
       processName: 'orca-ide'
     })
+    expect(recognizeAgentProcess('/Users/dev/.local/bin/girra')).toEqual({
+      agent: 'claude-agent-teams',
+      processName: 'girra'
+    })
     expect(isRecognizedAgentType('orca-dev')).toBe(true)
     expect(recognizeAgentProcess('orca-helper')).toBeNull()
   })
@@ -142,17 +146,17 @@ describe('agent process recognition', () => {
   })
 
   it('recognizes only the agent subcommand of the generic Girra CLI', () => {
-    expect(recognizeAgentProcessFromCommandLine('orca claude-teams')).toEqual({
+    expect(recognizeAgentProcessFromCommandLine('girra claude-teams')).toEqual({
       agent: 'claude-agent-teams',
-      processName: 'orca'
+      processName: 'girra'
     })
-    expect(recognizeAgentProcessFromCommandLine('orca status')).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine('girra status')).toBeNull()
     expect(recognizeAgentProcessFromCommandLine('orca-dev terminal list')).toBeNull()
-    expect(recognizeAgentProcessFromCommandLine('node /usr/local/bin/orca claude-teams')).toEqual({
+    expect(recognizeAgentProcessFromCommandLine('node /usr/local/bin/girra claude-teams')).toEqual({
       agent: 'claude-agent-teams',
-      processName: 'orca'
+      processName: 'girra'
     })
-    expect(recognizeAgentProcessFromCommandLine('node /usr/local/bin/orca status')).toBeNull()
+    expect(recognizeAgentProcessFromCommandLine('node /usr/local/bin/girra status')).toBeNull()
   })
 
   it('does not classify prompt text as a wrapped agent command', () => {

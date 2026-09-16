@@ -15,6 +15,7 @@ import {
   writeActiveClaudeKeychainCredentials,
   writeManagedClaudeKeychainCredentials
 } from '../claude-accounts/keychain'
+import { initDataPath } from '../persistence'
 
 const { netFetchMock, readFileMock, resolveProxyMock, setProxyMock, appGetPathMock } = vi.hoisted(
   () => ({
@@ -83,6 +84,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('linux')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const unownedAuthPath = join(tempDir, 'unowned', 'auth')
     mkdirSync(unownedAuthPath, { recursive: true })
     writeFileSync(join(unownedAuthPath, '.orca-managed-claude-auth'), 'account-1\n', 'utf-8')
@@ -113,6 +116,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('linux')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const ownedAuthPath = join(tempDir, 'claude-accounts', 'account-1', 'auth')
     mkdirSync(ownedAuthPath, { recursive: true })
     writeFileSync(join(ownedAuthPath, '.orca-managed-claude-auth'), 'account-1\n', 'utf-8')
@@ -168,6 +173,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('darwin')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const ownedAuthPath = join(tempDir, 'claude-accounts', 'account-1', 'auth')
     const credentialsJson = JSON.stringify({
       claudeAiOauth: {
@@ -221,6 +228,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('darwin')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const ownedAuthPath = join(tempDir, 'claude-accounts', 'account-1', 'auth')
     mkdirSync(ownedAuthPath, { recursive: true })
     writeFileSync(join(ownedAuthPath, '.orca-managed-claude-auth'), 'account-1\n', 'utf-8')
@@ -250,6 +259,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('darwin')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const ownedAuthPath = join(tempDir, 'claude-accounts', 'account-1', 'auth')
     const staleCredentialsJson = JSON.stringify({
       claudeAiOauth: {
@@ -327,6 +338,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('darwin')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const ownedAuthPath = join(tempDir, 'claude-accounts', 'account-1', 'auth')
     mkdirSync(ownedAuthPath, { recursive: true })
     writeFileSync(join(ownedAuthPath, '.orca-managed-claude-auth'), 'account-1\n', 'utf-8')
@@ -375,6 +388,8 @@ describe('fetchClaudeRateLimits', () => {
     setPlatform('linux')
     tempDir = mkdtempSync(join(tmpdir(), 'orca-claude-fetcher-'))
     appGetPathMock.mockReturnValue(tempDir)
+    // Why: managed-auth paths read the userData captured here, not a late electron resolve.
+    initDataPath()
     const ownedAuthPath = join(tempDir, 'claude-accounts', 'account-1', 'auth')
     mkdirSync(ownedAuthPath, { recursive: true })
     writeFileSync(join(ownedAuthPath, '.orca-managed-claude-auth'), 'account-1\n', 'utf-8')

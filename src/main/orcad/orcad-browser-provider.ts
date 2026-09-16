@@ -65,23 +65,29 @@ export function installedElectronCandidates(
   const joinPath = platform === 'win32' ? win32.join : posix.join
   if (platform === 'darwin') {
     return [
-      '/Applications/Orca.app/Contents/MacOS/Orca',
-      joinPath(homePath, 'Applications', 'Orca.app', 'Contents', 'MacOS', 'Orca')
+      '/Applications/Girra.app/Contents/MacOS/Girra',
+      joinPath(homePath, 'Applications', 'Girra.app', 'Contents', 'MacOS', 'Girra')
     ]
   }
   if (platform === 'win32') {
     return [
       ...(environment.LOCALAPPDATA
-        ? [joinPath(environment.LOCALAPPDATA, 'Programs', 'Orca', 'Orca.exe')]
+        ? [joinPath(environment.LOCALAPPDATA, 'Programs', 'Girra', 'Girra.exe')]
         : []),
-      ...(environment.ProgramFiles ? [joinPath(environment.ProgramFiles, 'Orca', 'Orca.exe')] : [])
+      ...(environment.ProgramFiles
+        ? [joinPath(environment.ProgramFiles, 'Girra', 'Girra.exe')]
+        : [])
     ]
   }
   return [
+    joinPath(homePath, '.local', 'bin', 'girra'),
+    '/usr/local/bin/girra',
+    '/usr/bin/girra',
+    '/opt/Girra/girra',
+    // Kept: the Linux packages still install orca-ide as an alias of the same executable.
     joinPath(homePath, '.local', 'bin', 'orca-ide'),
     '/usr/local/bin/orca-ide',
-    '/usr/bin/orca-ide',
-    '/opt/Orca/orca-ide'
+    '/usr/bin/orca-ide'
   ]
 }
 

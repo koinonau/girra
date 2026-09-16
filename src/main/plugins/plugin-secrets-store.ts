@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { join } from 'node:path'
 import { safeStorage } from 'electron'
+import { decryptSealedSecret } from '../host/legacy-orca-safe-storage'
 import { isUnreadableError, writeSecureFile } from '../../shared/secure-file'
 import {
   PLUGIN_STORAGE_KEY_LIMIT,
@@ -84,7 +85,7 @@ export class PluginSecretsStore {
       return { ok: false, error: 'OS-backed encryption is unavailable' }
     }
     try {
-      return { ok: true, value: safeStorage.decryptString(Buffer.from(ciphertext, 'base64')) }
+      return { ok: true, value: decryptSealedSecret(Buffer.from(ciphertext, 'base64')) }
     } catch {
       return { ok: false, error: 'failed to decrypt stored secret' }
     }

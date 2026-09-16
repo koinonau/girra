@@ -4,11 +4,11 @@ import { describe, expect, it } from 'vitest'
 
 describe('packaged Windows CLI launcher asset', () => {
   it('keeps the batch compatibility shim behind the newline-safe native launcher', () => {
-    const launcherPath = join(process.cwd(), 'resources', 'win32', 'bin', 'orca.cmd')
+    const launcherPath = join(process.cwd(), 'resources', 'win32', 'bin', 'girra.cmd')
     const launcher = readFileSync(launcherPath, 'utf8')
 
-    expect(launcher).toContain('set "LAUNCHER=%SCRIPT_DIR%orca.exe"')
-    expect(launcher).toContain('orca.cmd cannot safely forward orchestration message bodies')
+    expect(launcher).toContain('set "LAUNCHER=%SCRIPT_DIR%girra.exe"')
+    expect(launcher).toContain('%~n0.cmd cannot safely forward orchestration message bodies')
     expect(launcher).not.toContain('"%ELECTRON%" "%CLI%" %*')
   })
 
@@ -24,7 +24,13 @@ describe('packaged Windows CLI launcher asset', () => {
     expect(source).toContain(
       'string requestedCliCommand = Environment.GetEnvironmentVariable("ORCA_CLI_COMMAND");'
     )
-    expect(source).toContain('requestedCliCommand == "orca-ide" ? "orca-ide" : "orca"')
+    // Why `girra` is the fallback, not the match: nothing sets ORCA_CLI_COMMAND on the normal
+    // packaged path, so making the old name the default would hide the new one from every
+    // invocation. Only an explicit alias passes through. Whitespace is normalized because the
+    // C# expression wraps across lines.
+    expect(source.replaceAll(/\s+/gu, ' ')).toContain(
+      'requestedCliCommand == "orca-ide" || requestedCliCommand == "orca" ? requestedCliCommand : "girra"'
+    )
     expect(source).toContain('child.WaitForExit();')
     expect(source).toContain('return child.ExitCode;')
   })

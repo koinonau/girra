@@ -1,5 +1,5 @@
 // Single source of truth for the app's logs directory and the files inside it.
-// macOS convention is `~/Library/Application Support/Orca/logs/`; Windows and
+// macOS convention is `~/Library/Application Support/Girra/logs/`; Windows and
 // Linux resolve the same intent via the host's `userData` dir. Falls back to a
 // homedir-derived path when no AppEnvironment is installed (unit tests).
 
@@ -17,13 +17,15 @@ function getUserDataDir(): string {
     return getAppEnvironment().getPath('userData')
   }
   const home = homedir()
+  // Why the case split: darwin reads CFBundleName (productName), the other two read package.json's
+  // `name`, still 'orca', and initDataPath() runs before the packaged app.setName can change it.
   if (platform() === 'darwin') {
-    return join(home, 'Library', 'Application Support', 'Orca')
+    return join(home, 'Library', 'Application Support', 'Girra')
   }
   if (platform() === 'win32') {
-    return join(process.env.APPDATA ?? home, 'Orca')
+    return join(process.env.APPDATA ?? home, 'orca')
   }
-  return join(home, '.config', 'Orca')
+  return join(home, '.config', 'orca')
 }
 
 export function getLogsDirectory(): string {

@@ -20,7 +20,7 @@ describe('TUI_AGENT_CONFIG', () => {
 
   it('keeps explicit overrides where the launch line or process differs from the binary', () => {
     const overrides: Partial<Record<TuiAgent, Partial<(typeof TUI_AGENT_CONFIG)[TuiAgent]>>> = {
-      'claude-agent-teams': { launchCmd: 'orca claude-teams', expectedProcess: 'claude' }
+      'claude-agent-teams': { launchCmd: 'girra claude-teams', expectedProcess: 'claude' }
     }
     for (const [agent, expected] of Object.entries(overrides)) {
       expect(TUI_AGENT_CONFIG[agent as TuiAgent]).toMatchObject(expected)

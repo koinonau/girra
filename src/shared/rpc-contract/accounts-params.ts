@@ -21,7 +21,7 @@ export const AddClaudeFromConfigDirParams = z.object({
     .optional()
 })
 
-// Why: `orca account list` prints only emails and the active ids, so it opts out
+// Why: `girra account list` prints only emails and the active ids, so it opts out
 // of the forced all-provider usage refresh below — that lane bypasses the poll
 // throttle and Retry-After gate and costs one serial round-trip per account.
 export const ListAccountsParams = z.object({

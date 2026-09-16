@@ -450,9 +450,9 @@ describe('OrcaRuntimeService', () => {
   // platform (launchCmdByPlatform), so it is what proves resolution is
   // platform-aware rather than a fixed string.
   it.each([
-    { platform: 'win32' as const, expected: 'orca.cmd claude-teams' },
-    { platform: 'linux' as const, expected: 'orca-ide claude-teams' },
-    { platform: 'darwin' as const, expected: 'orca claude-teams' }
+    { platform: 'win32' as const, expected: 'girra.cmd claude-teams' },
+    { platform: 'linux' as const, expected: 'girra claude-teams' },
+    { platform: 'darwin' as const, expected: 'girra claude-teams' }
   ])(
     'resolves a startupAgent through the $platform launcher name',
     async ({ platform, expected }) => {

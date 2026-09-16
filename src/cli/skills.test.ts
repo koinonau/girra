@@ -92,7 +92,7 @@ vi.mock('./runtime-client', async () => {
 import { dispatch } from './dispatch'
 import { main } from './index'
 
-describe('orca skills CLI', () => {
+describe('girra skills CLI', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
     runtimeClientConstructorMock.mockClear()
@@ -213,7 +213,7 @@ describe('orca skills CLI', () => {
     await main(['--help'], '/tmp/repo')
 
     expect(String(logSpy.mock.calls[0]?.[0])).toContain(
-      'Usage: orca skills get <topic> [--full | --reference <name>] [--json]'
+      'Usage: girra skills get <topic> [--full | --reference <name>] [--json]'
     )
     expect(String(logSpy.mock.calls[1]?.[0])).toContain(
       'Commands:\n  list               List version-matched skill guides'
@@ -256,8 +256,8 @@ describe('orca skills CLI', () => {
         '  gamma',
         '  zeta',
         '',
-        'Usage: orca skills install --skill <name> [--skill <name> ...]',
-        '   or: orca skills install --all',
+        'Usage: girra skills install --skill <name> [--skill <name> ...]',
+        '   or: girra skills install --all',
         ''
       ].join('\n')
     )
@@ -321,7 +321,7 @@ describe('orca skills CLI', () => {
           error: {
             code: 'invalid_argument',
             message:
-              "orca skills install --json only supports --dry-run. Real installs stream npx's " +
+              "girra skills install --json only supports --dry-run. Real installs stream npx's " +
               "own output, which isn't JSON."
           },
           _meta: { runtimeId: null }
@@ -573,8 +573,8 @@ describe('orca skills CLI', () => {
         '  gamma',
         '  zeta',
         '',
-        'Usage: orca skills update --skill <name> [--skill <name> ...]',
-        '   or: orca skills update --all',
+        'Usage: girra skills update --skill <name> [--skill <name> ...]',
+        '   or: girra skills update --all',
         ''
       ].join('\n')
     )
@@ -976,7 +976,7 @@ describe('orca skills CLI', () => {
           error: {
             code: 'invalid_argument',
             message:
-              "orca skills update --json only supports --dry-run. Real updates stream npx's " +
+              "girra skills update --json only supports --dry-run. Real updates stream npx's " +
               "own output, which isn't JSON."
           },
           _meta: { runtimeId: null }

@@ -13,7 +13,7 @@ describe('orchestration mutation recovery', () => {
       new RuntimeClientError('runtime_timeout', 'request timed out', {
         orchestrationRequestId: 'request_1',
         dispatchId: 'dispatch_1',
-        originalCommand: ['orca', 'orchestration', 'worker-start', '--task', 'task_1']
+        originalCommand: ['girra', 'orchestration', 'worker-start', '--task', 'task_1']
       })
     ) as RuntimeClientError
 
@@ -22,7 +22,7 @@ describe('orchestration mutation recovery', () => {
         orchestrationRequestId: 'request_1',
         dispatchId: 'dispatch_1',
         queryCommand: [
-          'orca',
+          'girra',
           'orchestration',
           'worker-show',
           '--dispatch',
@@ -30,7 +30,7 @@ describe('orchestration mutation recovery', () => {
           '--json'
         ],
         retryCommand: [
-          'orca',
+          'girra',
           'orchestration',
           'worker-start',
           '--task',
@@ -41,12 +41,12 @@ describe('orchestration mutation recovery', () => {
         workerDeathInferred: false
       }
     })
-    expect(result.message.indexOf('orca orchestration worker-show')).toBeLessThan(
-      result.message.indexOf('orca orchestration worker-start')
+    expect(result.message.indexOf('girra orchestration worker-show')).toBeLessThan(
+      result.message.indexOf('girra orchestration worker-start')
     )
     expect((result.data as { nextSteps?: string[] }).nextSteps).toEqual([
-      'Run orca orchestration worker-show --dispatch dispatch_1 --json before retrying.',
-      'After inspecting the Dispatch, if keyed recovery is still needed, run orca orchestration worker-start --task task_1 --retry-request request_1. --retry-request reuses the same operation identity so Girra can replay, join, or safely recover it without starting a separate duplicate.'
+      'Run girra orchestration worker-show --dispatch dispatch_1 --json before retrying.',
+      'After inspecting the Dispatch, if keyed recovery is still needed, run girra orchestration worker-start --task task_1 --retry-request request_1. --retry-request reuses the same operation identity so Girra can replay, join, or safely recover it without starting a separate duplicate.'
     ])
   })
 
@@ -54,7 +54,7 @@ describe('orchestration mutation recovery', () => {
     const result = orchestrationMutationRecoveryError(
       new RuntimeClientError('runtime_timeout', 'request timed out', {
         orchestrationRequestId: 'request_2',
-        originalCommand: ['orca', 'orchestration', 'worker-start', '--task', 'task_2']
+        originalCommand: ['girra', 'orchestration', 'worker-start', '--task', 'task_2']
       })
     ) as RuntimeClientError
 
@@ -73,17 +73,17 @@ describe('orchestration mutation recovery', () => {
     const result = orchestrationMutationRecoveryError(
       new RuntimeClientError('runtime_unavailable', 'runtime unavailable', {
         orchestrationRequestId: 'request_4',
-        originalCommand: ['orca', 'orchestration', 'worker-start', '--task', 'task_4']
+        originalCommand: ['girra', 'orchestration', 'worker-start', '--task', 'task_4']
       })
     ) as RuntimeClientError
 
     expect(result.data).toMatchObject({
       recovery: {
-        queryCommand: ['orca', 'orchestration', 'request-show', '--request', 'request_4', '--json']
+        queryCommand: ['girra', 'orchestration', 'request-show', '--request', 'request_4', '--json']
       }
     })
     expect((result.data as { nextSteps?: string[] }).nextSteps?.[0]).toBe(
-      'Run orca orchestration request-show --request request_4 --json before retrying.'
+      'Run girra orchestration request-show --request request_4 --json before retrying.'
     )
   })
 
@@ -91,7 +91,7 @@ describe('orchestration mutation recovery', () => {
     const result = orchestrationMutationRecoveryError(
       new RuntimeClientError('runtime_timeout', 'request timed out', {
         orchestrationRequestId: 'request_5',
-        originalCommand: ['orca', 'orchestration', 'worker-start', '--task', 'task_5']
+        originalCommand: ['girra', 'orchestration', 'worker-start', '--task', 'task_5']
       })
     ) as RuntimeClientError
 
@@ -154,11 +154,11 @@ describe('orchestration mutation recovery', () => {
   it.each([
     [
       'gate-create',
-      ['orca', 'orchestration', 'gate-create', '--task', 'task_1', '--question', 'ship?']
+      ['girra', 'orchestration', 'gate-create', '--task', 'task_1', '--question', 'ship?']
     ],
     [
       'worker-retain',
-      ['orca', 'orchestration', 'worker-retain', '--dispatch', 'dispatch_1', '--json']
+      ['girra', 'orchestration', 'worker-retain', '--dispatch', 'dispatch_1', '--json']
     ]
   ])('replays exact %s argv with the keyed retry', (_name, originalCommand) => {
     const result = orchestrationMutationRecoveryError(
@@ -178,7 +178,7 @@ describe('orchestration mutation recovery', () => {
       new RuntimeClientError('runtime_timeout', 'request timed out', {
         orchestrationRequestId: 'request_reused',
         originalCommand: [
-          'orca',
+          'girra',
           'orchestration',
           'worker-retain',
           '--dispatch',
@@ -191,7 +191,7 @@ describe('orchestration mutation recovery', () => {
     expect(
       (result.data as { recovery?: { retryCommand?: string[] } }).recovery?.retryCommand
     ).toEqual([
-      'orca',
+      'girra',
       'orchestration',
       'worker-retain',
       '--dispatch',
@@ -204,19 +204,19 @@ describe('orchestration mutation recovery', () => {
   it('renders Windows cmd recovery guidance without quote drift or percent expansion', () => {
     expect(
       renderCommand(
-        ['orca', 'orchestration', 'worker-start', '--comment', 'literal "quoted" %PATH% & safe'],
+        ['girra', 'orchestration', 'worker-start', '--comment', 'literal "quoted" %PATH% & safe'],
         'win32',
         { ComSpec: 'C:\\Windows\\System32\\cmd.exe' }
       )
     ).toBe(
-      '"orca" "orchestration" "worker-start" "--comment" "literal ""quoted"" "^%"PATH"^%" & safe"'
+      '"girra" "orchestration" "worker-start" "--comment" "literal ""quoted"" "^%"PATH"^%" & safe"'
     )
   })
 
   it('shell-quotes a configured Windows executable when resolving portable recovery commands', () => {
     expect(
       renderResolvedOrchestrationCommand(
-        'orca orchestration worker-show --dispatch ctx_1 --json',
+        'girra orchestration worker-show --dispatch ctx_1 --json',
         'C:\\Program Files\\Orca\\orca-ide.cmd',
         'win32',
         { ComSpec: 'C:\\Windows\\System32\\cmd.exe' }
@@ -228,12 +228,12 @@ describe('orchestration mutation recovery', () => {
 
   it('keeps PowerShell and POSIX recovery guidance literal', () => {
     expect(
-      renderCommand(['orca', 'literal "quoted" $HOME'], 'win32', {
+      renderCommand(['girra', 'literal "quoted" $HOME'], 'win32', {
         ComSpec: 'powershell.exe'
       })
-    ).toBe("& 'orca' 'literal \\\"quoted\\\" $HOME'")
-    expect(renderCommand(['orca', 'literal $(do-not-run)'], 'darwin')).toBe(
-      "orca 'literal $(do-not-run)'"
+    ).toBe("& 'girra' 'literal \\\"quoted\\\" $HOME'")
+    expect(renderCommand(['girra', 'literal $(do-not-run)'], 'darwin')).toBe(
+      "girra 'literal $(do-not-run)'"
     )
   })
 
@@ -261,18 +261,18 @@ describe('orchestration mutation recovery', () => {
   it.each([
     [
       'split',
-      ['orca', 'orchestration', 'send', '--pairing-code', 'split-secret', '--subject', 'status'],
+      ['girra', 'orchestration', 'send', '--pairing-code', 'split-secret', '--subject', 'status'],
       'split-secret'
     ],
     [
       'equals',
-      ['orca', 'orchestration', 'send', '--pairing-code=equals-secret', '--subject', 'status'],
+      ['girra', 'orchestration', 'send', '--pairing-code=equals-secret', '--subject', 'status'],
       'equals-secret'
     ],
     [
       'dispatch split',
       [
-        'orca',
+        'girra',
         'orchestration',
         'send',
         '--dispatch-capability',
@@ -285,7 +285,7 @@ describe('orchestration mutation recovery', () => {
     [
       'dispatch equals',
       [
-        'orca',
+        'girra',
         'orchestration',
         'send',
         '--dispatch-capability=equals-dispatch-secret',

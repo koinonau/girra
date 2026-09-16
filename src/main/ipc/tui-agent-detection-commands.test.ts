@@ -11,39 +11,33 @@ describe('tui agent detection commands', () => {
       (command) => command.id === 'claude-agent-teams'
     )
 
-    expect(commands).toEqual([
-      {
+    // Why the aliases: a host installed before the rename carries only the old name.
+    expect(commands).toEqual(
+      ['girra', 'girra-dev', 'orca', 'orca-dev', 'orca-ide'].map((cmd) => ({
         id: 'claude-agent-teams',
-        cmd: 'orca',
+        cmd,
         requiredCommands: ['claude'],
         unsupportedRuntimes: ['win32', 'wsl']
-      },
-      {
-        id: 'claude-agent-teams',
-        cmd: 'orca-dev',
-        requiredCommands: ['claude'],
-        unsupportedRuntimes: ['win32', 'wsl']
-      },
-      {
-        id: 'claude-agent-teams',
-        cmd: 'orca-ide',
-        requiredCommands: ['claude'],
-        unsupportedRuntimes: ['win32', 'wsl']
-      }
-    ])
+      }))
+    )
     expect(getTuiAgentDetectionProbeCommands(commands, 'linux')).toEqual([
-      'orca',
+      'girra',
       'claude',
+      'girra-dev',
+      'orca',
       'orca-dev',
       'orca-ide'
     ])
-    expect(resolveDetectedTuiAgentIds(commands, new Set(['orca']), 'linux')).toEqual([])
-    expect(resolveDetectedTuiAgentIds(commands, new Set(['orca', 'claude']), 'linux')).toEqual([
+    expect(resolveDetectedTuiAgentIds(commands, new Set(['girra']), 'linux')).toEqual([])
+    expect(resolveDetectedTuiAgentIds(commands, new Set(['girra', 'claude']), 'linux')).toEqual([
+      'claude-agent-teams'
+    ])
+    expect(resolveDetectedTuiAgentIds(commands, new Set(['orca-ide', 'claude']), 'linux')).toEqual([
       'claude-agent-teams'
     ])
     expect(getTuiAgentDetectionProbeCommands(commands, 'win32')).toEqual([])
-    expect(resolveDetectedTuiAgentIds(commands, new Set(['orca', 'claude']), 'win32')).toEqual([])
+    expect(resolveDetectedTuiAgentIds(commands, new Set(['girra', 'claude']), 'win32')).toEqual([])
     expect(getTuiAgentDetectionProbeCommands(commands, 'wsl')).toEqual([])
-    expect(resolveDetectedTuiAgentIds(commands, new Set(['orca-ide', 'claude']), 'wsl')).toEqual([])
+    expect(resolveDetectedTuiAgentIds(commands, new Set(['girra', 'claude']), 'wsl')).toEqual([])
   })
 })

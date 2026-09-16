@@ -35,7 +35,7 @@ describe('CliInstaller', () => {
     'refuses to replace an unknown symlink at the command path',
     async () => {
       const fixture = await makeFixture()
-      const installPath = join(fixture.root, 'bin', 'orca')
+      const installPath = join(fixture.root, 'bin', 'girra')
       const existingTarget = '/tmp/not-orca'
       await mkdir(join(fixture.root, 'bin'), { recursive: true })
       await symlink(existingTarget, installPath)
@@ -44,7 +44,7 @@ describe('CliInstaller', () => {
         platform: 'darwin',
         isPackaged: false,
         userDataPath: fixture.userDataPath,
-        execPath: '/Applications/Orca.app/Contents/MacOS/Orca',
+        execPath: '/Applications/Girra.app/Contents/MacOS/Girra',
         appPath: fixture.appPath,
         commandPathOverride: installPath
       })
@@ -53,22 +53,22 @@ describe('CliInstaller', () => {
         state: 'conflict',
         supported: true
       })
-      await expect(installer.install()).rejects.toThrow('Refusing to replace non-Orca command')
+      await expect(installer.install()).rejects.toThrow('Refusing to replace non-Girra command')
       await expect(readlink(installPath)).resolves.toBe(existingTarget)
     }
   )
 
-  // Why: packaged app moves can leave a symlink to an older Orca-owned launcher;
+  // Why: packaged app moves can leave a symlink to an older Girra-owned launcher;
   // those are safe to refresh, unlike arbitrary user symlinks.
   it.skipIf(process.platform === 'win32')(
-    'replaces stale packaged Orca launcher symlinks',
+    'replaces stale packaged Girra launcher symlinks',
     async () => {
       const fixture = await makeFixture()
       const commandDir = join(fixture.root, 'bin')
       const installPath = join(commandDir, 'orca')
       const resourcesPath = join(fixture.root, 'Current.app', 'Contents', 'Resources')
-      const launcherPath = join(resourcesPath, 'bin', 'orca')
-      const oldLauncherPath = join(fixture.root, 'Old.app', 'Contents', 'Resources', 'bin', 'orca')
+      const launcherPath = join(resourcesPath, 'bin', 'girra')
+      const oldLauncherPath = join(fixture.root, 'Old.app', 'Contents', 'Resources', 'bin', 'girra')
       await mkdir(commandDir, { recursive: true })
       await mkdir(join(resourcesPath, 'bin'), { recursive: true })
       await writeFile(launcherPath, '#!/usr/bin/env bash\n', 'utf8')
@@ -91,8 +91,8 @@ describe('CliInstaller', () => {
     }
   )
 
-  // Why: old dev/package experiments wrote a generated Orca launcher file
-  // directly into /usr/local/bin/orca. That broke profiling because Settings
+  // Why: old dev/package experiments wrote a generated Girra launcher file
+  // directly into /usr/local/bin/girra. That broke profiling because Settings
   // treated the regular file as a hard conflict and would not self-heal it.
   it.skipIf(process.platform === 'win32')(
     'replaces stale generated Unix launcher files',
@@ -101,7 +101,7 @@ describe('CliInstaller', () => {
       const commandDir = join(fixture.root, 'bin')
       const installPath = join(commandDir, 'orca')
       const resourcesPath = join(fixture.root, 'Current.app', 'Contents', 'Resources')
-      const launcherPath = join(resourcesPath, 'bin', 'orca')
+      const launcherPath = join(resourcesPath, 'bin', 'girra')
       const oldCliPath = join(fixture.root, 'OldWorktree', 'out', 'cli', 'index.js')
       await mkdir(commandDir, { recursive: true })
       await mkdir(join(resourcesPath, 'bin'), { recursive: true })
@@ -166,24 +166,24 @@ describe('CliInstaller', () => {
         state: 'conflict',
         currentTarget: null
       })
-      await expect(installer.install()).rejects.toThrow('Refusing to replace non-Orca command')
+      await expect(installer.install()).rejects.toThrow('Refusing to replace non-Girra command')
       await expect(readFile(installPath, 'utf8')).resolves.toContain('/tmp/not-orca')
     }
   )
 
   // Why: a dev build can temporarily own the public command on developer
-  // machines; packaged Orca should treat that as stale, not a hard conflict.
+  // machines; packaged Girra should treat that as stale, not a hard conflict.
   it.skipIf(process.platform === 'win32')(
     'replaces stale sibling dev launcher symlinks from packaged installs',
     async () => {
       const fixture = await makeFixture()
-      for (const devLauncherName of ['orca', 'orca-dev']) {
+      for (const devLauncherName of ['orca', 'girra-dev']) {
         const caseRoot = join(fixture.root, devLauncherName)
         const commandDir = join(caseRoot, 'bin')
         const installPath = join(commandDir, 'orca')
         const userDataPath = join(caseRoot, 'orca')
         const resourcesPath = join(caseRoot, 'Current.app', 'Contents', 'Resources')
-        const launcherPath = join(resourcesPath, 'bin', 'orca')
+        const launcherPath = join(resourcesPath, 'bin', 'girra')
         const devLauncherPath = join(`${userDataPath}-dev`, 'cli', 'bin', devLauncherName)
         await mkdir(commandDir, { recursive: true })
         await mkdir(join(resourcesPath, 'bin'), { recursive: true })

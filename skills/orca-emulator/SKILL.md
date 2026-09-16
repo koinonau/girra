@@ -23,11 +23,13 @@ Choose the executable once and reuse it for every later command:
 
 - If the `ORCA_CLI_COMMAND` environment variable is set, use its value. Girra exports this
   for managed WSL sessions.
-- Otherwise, in a dev checkout whose session exposes `ORCA_DEV_REPO_ROOT`, use `orca-dev`.
-- Otherwise, on Linux outside a Girra-managed terminal, use `orca-ide`. Never run bare
-  `orca` there — outside Girra's terminals it normally resolves to the
-  GNOME Orca screen reader (`/usr/bin/orca`) and starts speech on the user's machine.
-- Otherwise, use `orca`.
+- Otherwise, in a dev checkout whose session exposes `ORCA_DEV_REPO_ROOT`, use `girra-dev`.
+- Otherwise, use `girra`.
+
+If `girra` is not found, the host predates the rename: fall back to `orca-dev` in a dev
+checkout, to `orca-ide` on Linux, and to `orca` elsewhere. Never run bare `orca` on Linux
+outside a Girra-managed terminal — there it normally resolves to the
+GNOME Orca screen reader (`/usr/bin/orca`) and starts speech on the user's machine.
 
 Below, `ORCA` is a placeholder for the executable you resolved. Substitute it before
 running anything; do not create a shell variable or run `ORCA` literally. This works the

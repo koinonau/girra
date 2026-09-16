@@ -85,7 +85,7 @@ export async function resolveHostFlagEnvironmentId(
         knownSshTargets: sshTargets,
         nextSteps: [
           ...crossKindNextSteps(host.environmentId, { environments, sshTargets }, 'environment'),
-          'Run `orca environment list` to see paired Girra servers.',
+          'Run `girra environment list` to see paired Girra servers.',
           'Use --host local to target this machine.'
         ]
       }
@@ -200,7 +200,7 @@ export async function assertEnvironmentSelectorResolvable(
       knownSshTargets: sshTargets,
       nextSteps: [
         ...crossKindNextSteps(selector, { environments, sshTargets }, 'environment'),
-        'Run `orca host list` to see every machine you can target and the flag for each.'
+        'Run `girra host list` to see every machine you can target and the flag for each.'
       ]
     }
   )

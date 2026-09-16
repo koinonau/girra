@@ -7,7 +7,7 @@ describe('computerProviderUnavailableMessage', () => {
       'run pnpm build:computer-macos and restart Girra from this worktree'
     )
     expect(computerProviderUnavailableMessage('darwin')).toContain(
-      'Orca Computer Use.app was not found or this macOS version is unsupported'
+      'Girra Computer Use.app was not found or this macOS version is unsupported'
     )
   })
 

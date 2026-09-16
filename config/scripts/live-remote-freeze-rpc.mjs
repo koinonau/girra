@@ -12,14 +12,15 @@ export function appendOrcaRpcOutput(output, chunk, bytes, limit = MAX_ORCA_RPC_O
   }
 }
 
-export function resolveOrcaCliCommand({ env = process.env, platform = process.platform } = {}) {
+// Why no platform: `girra` is the command on every platform since the rename.
+export function resolveOrcaCliCommand({ env = process.env } = {}) {
   if (env.ORCA_CLI_COMMAND?.trim()) {
     return env.ORCA_CLI_COMMAND.trim()
   }
   if (env.ORCA_DEV_REPO_ROOT) {
-    return 'orca-dev'
+    return 'girra-dev'
   }
-  return platform === 'linux' ? 'orca-ide' : 'orca'
+  return 'girra'
 }
 
 export function resolveOrcaCliInvocation({
@@ -27,7 +28,7 @@ export function resolveOrcaCliInvocation({
   platform = process.platform,
   nodeExecutable = process.execPath
 } = {}) {
-  const command = resolveOrcaCliCommand({ env, platform })
+  const command = resolveOrcaCliCommand({ env })
   const commandName = platform === 'win32' ? path.win32.basename(command).toLowerCase() : command
   if (
     platform === 'win32' &&
@@ -71,7 +72,7 @@ export function createOrcaRpc({
   const cliInvocation = cliCommand
     ? { command: cliCommand, prefixArgs: [] }
     : resolveOrcaCliInvocation({ env, platform })
-  const commandLabel = cliCommand ?? resolveOrcaCliCommand({ env, platform })
+  const commandLabel = cliCommand ?? resolveOrcaCliCommand({ env })
   const commandArgs = (args, local) => [
     ...cliInvocation.prefixArgs,
     ...args,

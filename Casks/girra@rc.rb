@@ -1,13 +1,13 @@
-cask "orca@rc" do
+cask "girra@rc" do
   arch arm: "arm64", intel: "x64"
 
   version "1.4.36-rc.3"
   sha256 arm:   "563b6b14323fc9d5489299c82442d514bc12cabffc9d06d3964ed572af4b3955",
          intel: "457088c7021f07de1a419197f7b2bd00092741ad4727d4fef3d86af38a6831e7"
 
-  url "https://github.com/stablyai/orca/releases/download/v#{version}/orca-macos-#{arch}.dmg",
+  url "https://github.com/stablyai/orca/releases/download/v#{version}/girra-macos-#{arch}.dmg",
       verified: "github.com/stablyai/orca/"
-  name "Orca RC"
+  name "Girra RC"
   desc "IDE for orchestrating AI coding agents across terminals and worktrees"
   homepage "https://onorca.dev/"
 
@@ -27,31 +27,33 @@ cask "orca@rc" do
     end
   end
 
-  # Why: RC installs should follow Orca's prerelease-aware updater instead of
+  # Why: RC installs should follow Girra's prerelease-aware updater instead of
   # waiting for Homebrew metadata churn between frequent release candidates.
   auto_updates true
-  conflicts_with cask: "orca"
+  conflicts_with cask: "girra"
   depends_on macos: :big_sur
 
-  app "Orca.app"
+  app "Girra.app"
 
-  # Why: expose the bundled `orca` CLI on PATH at install time (Homebrew symlinks
-  # this into its already-on-PATH bin dir). Without it, the CLI is only registered
+  # Why: expose the bundled CLI on PATH at install time (Homebrew symlinks these
+  # into its already-on-PATH bin dir). Without it, the CLI is only registered
   # by the in-app "Install CLI" action, which a headless host can never trigger —
-  # so `orca serve` on a server would be unreachable from the shell. The shim
+  # so `girra serve` on a server would be unreachable from the shell. The shim
   # resolves the real app by walking symlinks, so the Homebrew symlink works.
-  binary "#{appdir}/Orca.app/Contents/Resources/bin/orca"
+  # Why both names: hook scripts and SSH hosts written against `orca` keep working.
+  binary "#{appdir}/Girra.app/Contents/Resources/bin/girra"
+  binary "#{appdir}/Girra.app/Contents/Resources/bin/orca"
 
-  # Why: Orca writes user data under ~/.orca (worktrees, agent state) and
+  # Why: Girra writes user data under ~/.orca (worktrees, agent state) and
   # Electron's standard userData directories. Zap removes everything the app
   # creates during normal use so `brew uninstall --zap` is a clean slate.
   zap trash: [
     "~/.orca",
-    "~/Library/Application Support/Orca",
-    "~/Library/Caches/com.stablyai.orca",
-    "~/Library/Caches/com.stablyai.orca.ShipIt",
-    "~/Library/HTTPStorages/com.stablyai.orca",
-    "~/Library/Preferences/com.stablyai.orca.plist",
-    "~/Library/Saved Application State/com.stablyai.orca.savedState",
+    "~/Library/Application Support/Girra",
+    "~/Library/Caches/com.koinonau.girra",
+    "~/Library/Caches/com.koinonau.girra.ShipIt",
+    "~/Library/HTTPStorages/com.koinonau.girra",
+    "~/Library/Preferences/com.koinonau.girra.plist",
+    "~/Library/Saved Application State/com.koinonau.girra.savedState",
   ]
 end

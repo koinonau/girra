@@ -13,13 +13,13 @@ describe('buildAgentContext', () => {
         ['worktree', 'delete']
       ],
       summary: 'Remove a worktree',
-      usage: 'orca worktree rm',
+      usage: 'girra worktree rm',
       allowedFlags: ['worktree', 'force']
     },
     {
       path: ['agent-context'],
       summary: 'Print the schema',
-      usage: 'orca agent-context',
+      usage: 'girra agent-context',
       allowedFlags: []
     }
   ]

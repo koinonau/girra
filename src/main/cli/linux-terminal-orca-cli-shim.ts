@@ -25,6 +25,8 @@ import { buildBareOrcaCliScript } from './linux-bare-orca-dispatcher'
 import { quoteShell } from './cli-install-path-format'
 
 const SHIM_DIR_NAME = 'linux-orca-cli-shim'
+// Why both: agent guidance now says `girra`, while hook scripts already on disk still call `orca`.
+const SHIM_COMMAND_NAMES = ['girra', 'orca'] as const
 
 export type LinuxTerminalOrcaCliShimOptions = {
   userDataPath: string
@@ -36,13 +38,12 @@ export type LinuxTerminalOrcaCliShimOptions = {
   appImageCacheRootPath?: string
 }
 
-// Why: on Linux the CLI installs as `orca-ide` so it never shadows the GNOME
-// Orca screen reader at /usr/bin/orca — but agent-facing surfaces (skills,
-// dispatch preambles, CLI hints) all invoke bare `orca`, so on stock Ubuntu an
-// agent inside an Orca terminal would launch the screen reader instead
-// (stablyai/orca#7904). Prepending this userData-scoped shim dir to managed-PTY
-// PATH makes bare `orca` resolve to the Orca CLI inside Orca terminals only,
-// leaving the user's own shells (and their screen reader) untouched.
+// Why: global CLI registration is optional, but agent-facing surfaces (skills,
+// dispatch preambles, CLI hints) invoke the CLI by bare name, so a managed PTY
+// has to supply one. Prepending this userData-scoped shim dir to managed-PTY
+// PATH resolves both `girra` and the pre-rename `orca` to this app's CLI inside
+// Girra terminals only, leaving the user's own shells — and the GNOME Orca
+// screen reader at /usr/bin/orca (stablyai/orca#7904) — untouched.
 export function ensureLinuxTerminalOrcaCliShimDir(
   options: LinuxTerminalOrcaCliShimOptions
 ): string | null {
@@ -215,13 +216,15 @@ function ensureShimForLauncher(userDataPath: string, launcherPath: string): stri
 
 function ensureShimForScript(userDataPath: string, script: string): string | null {
   const shimDir = join(userDataPath, SHIM_DIR_NAME)
-  const shimPath = join(shimDir, 'orca')
   try {
-    if (readShim(shimPath) !== script) {
-      mkdirSync(shimDir, { recursive: true })
-      writeFileSync(shimPath, script, 'utf8')
+    for (const commandName of SHIM_COMMAND_NAMES) {
+      const shimPath = join(shimDir, commandName)
+      if (readShim(shimPath) !== script) {
+        mkdirSync(shimDir, { recursive: true })
+        writeFileSync(shimPath, script, 'utf8')
+      }
+      chmodSync(shimPath, 0o755)
     }
-    chmodSync(shimPath, 0o755)
   } catch {
     return null
   }

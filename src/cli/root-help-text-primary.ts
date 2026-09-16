@@ -1,7 +1,7 @@
 export const ROOT_HELP_TEXT_PRIMARY = [
-  'orca',
+  'girra',
   '',
-  'Usage: orca <command> [options]',
+  'Usage: girra <command> [options]',
   '',
   'Startup:',
   '  open                      Launch Girra and wait for the runtime to be reachable',

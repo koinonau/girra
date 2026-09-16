@@ -6,14 +6,12 @@ import {
 
 describe('orchestration recovery command identity', () => {
   it.each([
-    ['configured dev', { ORCA_CLI_COMMAND: 'orca-dev' }, 'darwin', 'orca-dev'],
-    ['configured WSL', { ORCA_CLI_COMMAND: 'orca-ide' }, 'linux', 'orca-ide'],
-    ['dev checkout', { ORCA_DEV_REPO_ROOT: '/repo' }, 'darwin', 'orca-dev'],
-    ['packaged Linux', {}, 'linux', 'orca-ide'],
-    ['local macOS', {}, 'darwin', 'orca'],
-    ['local Windows', {}, 'win32', 'orca']
-  ] as const)('resolves the %s CLI identity', (_name, env, platform, expected) => {
-    expect(resolveOrchestrationCliExecutable(env, platform)).toBe(expected)
+    ['configured dev', { ORCA_CLI_COMMAND: 'girra-dev' }, 'girra-dev'],
+    ['pre-rename alias', { ORCA_CLI_COMMAND: 'orca-ide' }, 'orca-ide'],
+    ['dev checkout', { ORCA_DEV_REPO_ROOT: '/repo' }, 'girra-dev'],
+    ['no signal', {}, 'girra']
+  ] as const)('resolves the %s CLI identity', (_name, env, expected) => {
+    expect(resolveOrchestrationCliExecutable(env)).toBe(expected)
   })
 
   it('reconstructs the keyed worker-start command from its RPC params', () => {
@@ -27,10 +25,10 @@ describe('orchestration recovery command identity', () => {
           timeoutMs: 90_000,
           devMode: false
         },
-        'orca'
+        'girra'
       )
     ).toEqual([
-      'orca',
+      'girra',
       'orchestration',
       'worker-start',
       '--task',
@@ -84,7 +82,7 @@ describe('orchestration recovery command identity', () => {
       ['orchestration', 'worker-retain', '--dispatch', 'dispatch_1', '--json']
     ]
   ] as const)('preserves exact raw argv for %s recovery', (_name, method, args) => {
-    expect(buildOrchestrationRecoveryCommand(method, {}, 'orca', args)).toEqual(['orca', ...args])
+    expect(buildOrchestrationRecoveryCommand(method, {}, 'girra', args)).toEqual(['girra', ...args])
   })
 
   it.each([
@@ -100,7 +98,7 @@ describe('orchestration recovery command identity', () => {
     ]
   ])('blocks %s credential argv instead of exposing it', (_name, args) => {
     expect(
-      buildOrchestrationRecoveryCommand('orchestration.send', {}, 'orca', args)
+      buildOrchestrationRecoveryCommand('orchestration.send', {}, 'girra', args)
     ).toBeUndefined()
   })
 

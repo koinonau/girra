@@ -9,6 +9,7 @@ import {
   writeActiveClaudeKeychainCredentials,
   writeManagedClaudeKeychainCredentials
 } from '../claude-accounts/keychain'
+import { installFakeAppEnvironment } from '../../../config/scripts/vitest-host-ports-setup'
 
 /** Electron/fs mocks each claude-fetcher test file declares via its own `vi.mock` factories. */
 export type ClaudeFetcherHoistedMocks = {
@@ -46,6 +47,8 @@ export function primeClaudeFetcherMocks(mocks: ClaudeFetcherHoistedMocks): void 
   vi.mocked(deleteActiveClaudeKeychainCredentialsStrict).mockResolvedValue()
   vi.mocked(writeManagedClaudeKeychainCredentials).mockResolvedValue()
   mocks.appGetPathMock.mockReturnValue('/tmp/orca-claude-fetcher-test')
+  // Why delegate: managed-auth paths read getCanonicalUserDataPath, and tests retarget the mock.
+  installFakeAppEnvironment({ getPath: () => mocks.appGetPathMock() as string })
   mocks.resolveProxyMock.mockResolvedValue('DIRECT')
   mocks.netFetchMock.mockResolvedValue(
     new Response(

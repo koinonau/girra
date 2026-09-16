@@ -8,7 +8,8 @@ import {
   isDirectClaudeCommand,
   type ClaudeAgentTeamsMode
 } from '../../shared/claude-agent-teams-tmux-compat'
-import { getOrcaCliCommandNameForPlatform } from '../../shared/orca-cli-command-name'
+import { getOrcaCliCommandNameCandidatesForPlatform } from '../../shared/orca-cli-command-name'
+import { getBundledLauncherPath } from '../cli/bundled-cli-launcher-path'
 import { resolvePathEnvKey } from '../pty/windows-path-segment-merge'
 
 export type ClaudeAgentTeamsLaunchPlan = {
@@ -44,7 +45,7 @@ export async function buildClaudeAgentTeamsLaunchPlan(args: {
   }
   const shimBin = resolveClaudeAgentTeamsShimBin(args.baseEnv)
   if (!shimBin) {
-    // Why: without an absolute CLI path the shim would resolve a bare `orca` against the pane cwd, so degrade instead.
+    // Why: without an absolute CLI path the shim would resolve a bare `girra` against the pane cwd, so degrade instead.
     return {
       command: addClaudeTeammateModeInProcess(args.command),
       env: { CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS: '1' }
@@ -77,10 +78,18 @@ export function resolveClaudeAgentTeamsShimBin(
   if (bundled && isExecutableFile(bundled)) {
     return bundled
   }
-  return (
-    findExecutableOnPath(process.platform === 'win32' ? 'orca-dev.cmd' : 'orca-dev', pathValue) ??
-    findExecutableOnPath(getOrcaCliCommandNameForPlatform(process.platform), pathValue)
-  )
+  const candidates = [
+    process.platform === 'win32' ? 'girra-dev.cmd' : 'girra-dev',
+    process.platform === 'win32' ? 'orca-dev.cmd' : 'orca-dev',
+    ...getOrcaCliCommandNameCandidatesForPlatform(process.platform)
+  ]
+  for (const candidate of candidates) {
+    const found = findExecutableOnPath(candidate, pathValue)
+    if (found) {
+      return found
+    }
+  }
+  return null
 }
 
 function defaultShimRoot(): string {
@@ -88,19 +97,9 @@ function defaultShimRoot(): string {
 }
 
 function bundledLauncherPath(): string | null {
-  if (!process.resourcesPath) {
-    return null
-  }
-  if (process.platform === 'darwin') {
-    return join(process.resourcesPath, 'bin', 'orca')
-  }
-  if (process.platform === 'linux') {
-    return join(process.resourcesPath, 'bin', 'orca-ide')
-  }
-  if (process.platform === 'win32') {
-    return join(process.resourcesPath, 'bin', 'orca.exe')
-  }
-  return null
+  return process.resourcesPath
+    ? getBundledLauncherPath(process.platform, process.resourcesPath)
+    : null
 }
 
 function findExecutableOnPath(command: string, pathValue: string | undefined): string | null {

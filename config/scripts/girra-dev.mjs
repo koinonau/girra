@@ -12,7 +12,7 @@ const cliEntry =
   process.env.ORCA_DEV_CLI_ENTRY_PATH ?? path.join(repoRoot, 'out', 'cli', 'index.js')
 
 if (!existsSync(cliEntry)) {
-  console.error("orca-dev: CLI not built yet. Run 'pnpm run build:cli' first.")
+  console.error("girra-dev: CLI not built yet. Run 'pnpm run build:cli' first.")
   process.exit(1)
 }
 
@@ -26,7 +26,7 @@ if (!process.env.ORCA_APP_EXECUTABLE && isRunnableFile(electronExecutable)) {
   process.env.ORCA_APP_EXECUTABLE_NEEDS_APP_ROOT = '1'
 }
 
-// Why: headless `orca-dev serve` skips the Electron dev runner that normally installs terminal CLI shims.
+// Why: headless `girra-dev serve` skips the Electron dev runner that normally installs terminal CLI shims.
 prepareDevCliTerminalWrappers({
   repoRoot,
   userDataPath: process.env.ORCA_USER_DATA_PATH,

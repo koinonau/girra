@@ -27,9 +27,14 @@ describe('packaged Windows legacy ask protocol', () => {
     restoreEnv('ORCA_TERMINAL_HANDLE', originalTerminalHandle)
   })
 
-  it.each(['orca', 'orca-ide'] as const)(
+  // Why the wire value differs: `girra` normalises to the pre-rename `girra` an older host accepts.
+  it.each([
+    ['girra', 'orca'],
+    ['orca', 'orca'],
+    ['orca-ide', 'orca-ide']
+  ] as const)(
     'commits with the %s launcher and exits 75 before resume',
-    async (command) => {
+    async (command, wireCommand) => {
       process.env.ORCA_CLI_COMMAND = command
       callMock.mockResolvedValue({
         result: {
@@ -39,7 +44,7 @@ describe('packaged Windows legacy ask protocol', () => {
           timedOut: false,
           legacyCompatibility: {
             resumeRequired: true,
-            resumeCommand: `${command} orchestration ask --resume msg_question`
+            resumeCommand: `${wireCommand} orchestration ask --resume msg_question`
           }
         }
       })
@@ -52,20 +57,20 @@ describe('packaged Windows legacy ask protocol', () => {
         expect.objectContaining({
           question: 'Proceed?',
           resume: undefined,
-          compatibilityWindowsCommand: command
+          compatibilityWindowsCommand: wireCommand
         }),
         expect.any(Object)
       )
       expect(log.mock.calls.map(([line]) => line)).toEqual([
         'Question msg_question committed.',
-        `Resume with: ${command} orchestration ask --resume msg_question`
+        `Resume with: ${wireCommand} orchestration ask --resume msg_question`
       ])
       expect(process.exitCode).toBe(75)
     }
   )
 
   it('resumes the committed question without another exit-75 handoff', async () => {
-    process.env.ORCA_CLI_COMMAND = 'orca'
+    process.env.ORCA_CLI_COMMAND = 'girra'
     callMock.mockResolvedValue({
       result: {
         answer: 'yes',

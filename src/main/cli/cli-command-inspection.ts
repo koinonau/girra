@@ -3,7 +3,11 @@ import { lstat, readFile, readlink } from 'node:fs/promises'
 import { basename, dirname, resolve } from 'node:path'
 import type { CliInstallMethod, CliInstallStatus } from '../../shared/cli-install-types'
 import { isAppImageExtractedLauncherPath } from './appimage-extracted-root'
-import { DEV_COMMAND_NAME, DEV_LAUNCHER_DIR } from './cli-install-constants'
+import {
+  DEV_CLI_COMMAND_ALIASES,
+  DEV_COMMAND_NAME,
+  DEV_LAUNCHER_DIR
+} from './cli-install-constants'
 import { buildWindowsForwarder, extractManagedUnixLauncherTarget } from './cli-dev-launcher'
 import { isMissingError } from './cli-install-errors'
 import { CliInstallLocation } from './cli-install-location'
@@ -13,7 +17,13 @@ import { extractLegacyAppImageCliWrapperTarget } from './legacy-appimage-cli-wra
 // Why: electron-builder's /opt directory name varies with productName sanitization, which is why
 // resources/linux/packaging/after-install.sh enumerates all three of these. A symlink into one is a
 // previous packaged Orca and is ours to reclaim; anything else stays a conflict.
-const PACKAGED_LINUX_LAUNCHER_DIRECTORIES = ['/opt/Orca', '/opt/orca-ide', '/opt/orca']
+const PACKAGED_LINUX_LAUNCHER_DIRECTORIES = [
+  '/opt/Girra',
+  '/opt/girra',
+  '/opt/Orca',
+  '/opt/orca-ide',
+  '/opt/orca'
+]
 
 export class CliCommandInspection extends CliInstallLocation {
   protected async inspectSymlink(
@@ -135,7 +145,9 @@ export class CliCommandInspection extends CliInstallLocation {
     resolvedTarget: string,
     packagedLauncherName: string
   ): boolean {
-    if (![packagedLauncherName, DEV_COMMAND_NAME].includes(basename(resolvedTarget))) {
+    // Why the aliases: the dev profile also writes the pre-rename names beside its own launcher.
+    const names: string[] = [packagedLauncherName, DEV_COMMAND_NAME, ...DEV_CLI_COMMAND_ALIASES]
+    if (!names.includes(basename(resolvedTarget))) {
       return false
     }
 

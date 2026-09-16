@@ -254,20 +254,12 @@ export class OrcaRuntimeWithGetOrchestrationDispatchAuthority extends OrcaRuntim
       const ptyId = this.resolveLeafForHandle(handle)?.ptyId
       pty = ptyId ? (this.ptysById.get(ptyId) ?? null) : null
     } catch {
-      return 'orca'
-    }
-    if (!pty) {
-      return 'orca'
+      return 'girra'
     }
     return resolveTerminalOrchestrationCliCommand({
-      connectionId: pty.connectionId,
-      isWsl: pty.isWsl,
-      worktreeId: pty.worktreeId,
-      // Dev builds run the CLI as `orca-dev`; a packaged app must not advertise it.
-      runtimeCliCommand: getAppEnvironment().isPackaged() ? undefined : 'orca-dev',
-      projectRuntime: this.store
-        ? resolveLocalProjectRuntimeForWorktreeId(this.requireStore(), pty.worktreeId)
-        : undefined
+      connectionId: pty?.connectionId ?? null,
+      // Dev builds run the CLI as `girra-dev`; a packaged app must not advertise it.
+      runtimeCliCommand: getAppEnvironment().isPackaged() ? undefined : 'girra-dev'
     })
   }
 }

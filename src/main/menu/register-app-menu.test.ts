@@ -24,7 +24,7 @@ vi.mock('electron', () => ({
     sendActionToFirstResponder: sendActionToFirstResponderMock
   },
   app: {
-    name: 'Orca'
+    name: 'Girra'
   },
   webContents: {
     getFocusedWebContents: getFocusedWebContentsMock
@@ -306,10 +306,10 @@ describe('registerAppMenu', () => {
     registerAppMenu(buildMenuOptions())
 
     const template = getTemplate()
-    // Why: no redundant app-named "Orca" menu should exist on non-mac — the
+    // Why: no redundant app-named "Girra" menu should exist on non-mac — the
     // app-menu contents (Settings, Exit, About) have been
     // redistributed so users see them in File / Help instead.
-    expect(template.find((item) => item.label === 'Orca')).toBeUndefined()
+    expect(template.find((item) => item.label === 'Girra')).toBeUndefined()
 
     const fileLabels = getSubmenu(template, 'File').map((item) => item.label)
     expect(fileLabels).not.toContain(`Export as PDF...\t${isMac ? '⌘⇧E' : 'Ctrl+Shift+E'}`)
@@ -327,7 +327,7 @@ describe('registerAppMenu', () => {
     registerAppMenu(buildMenuOptions())
 
     const template = getTemplate()
-    const appSubmenu = getSubmenu(template, 'Orca')
+    const appSubmenu = getSubmenu(template, 'Girra')
     const appLabels = appSubmenu.map((item) => item.label)
     expect(appLabels).toEqual(expect.arrayContaining([`Settings\t${isMac ? '⌘,' : 'Ctrl+,'}`]))
     // Why: on macOS File should NOT duplicate Settings/Exit — those live in
