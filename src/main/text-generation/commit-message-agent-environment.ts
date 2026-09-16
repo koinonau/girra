@@ -45,8 +45,8 @@ function prepareShellConfigDirEnv(agentId: string): { ok: true; env?: NodeJS.Pro
     return { ok: true }
   }
 
-  // Why: GUI-launched Orca may not inherit shell startup exports, but these
-  // vars point the headless CLI at the user's auth/config root. Nested Orca
+  // Why: GUI-launched Girra may not inherit shell startup exports, but these
+  // vars point the headless CLI at the user's auth/config root. Nested Girra
   // launches inherit PTY overlays, so prefer ORCA_*_SOURCE_* when present.
   return { ok: true, env: { ...cloneProcessEnv(), [configVar]: value } }
 }

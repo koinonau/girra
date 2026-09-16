@@ -10,7 +10,7 @@ import type { WorkspaceSessionState } from '../../../shared/workspace-session-st
 import { SESSION_FIELDS_PRUNED_BY_OWNER_KEY } from '../../orca-profiles/profile-project-session-field-disposition'
 import { ownerKeyWorktreeIds } from '../../orca-profiles/profile-project-worktree-identity'
 
-/** A `runtime:*` host addresses a paired Orca desktop's rows, whose catalog lives on that host. */
+/** A `runtime:*` host addresses a paired Girra desktop's rows, whose catalog lives on that host. */
 const isPairedHost = (hostId: string | null | undefined): boolean =>
   parseExecutionHostId(hostId)?.kind === 'runtime'
 

@@ -1,6 +1,6 @@
 # Running orcad
 
-`orcad` is the Orca runtime served from plain Node. This is the contract between it and
+`orcad` is the Girra runtime served from plain Node. This is the contract between it and
 whatever supervises it: what it binds, what it owns on disk, who restarts what, and what its
 readiness payload actually proves.
 
@@ -95,7 +95,7 @@ execution host affected by the stop, and lists no terminals on those hosts. Ever
 boundary. A separately paired runtime is outside that boundary; local execution and SSH hosts
 reached through this runtime are not. An affected or unknown omission, missing scope,
 truncation, a failed request or lost contact makes the result `unverifiable`: defer the stop. Do
-not admit new work after the census. Orca does not yet provide an atomic census-and-stop fence.
+not admit new work after the census. Girra does not yet provide an atomic census-and-stop fence.
 
 ### Who supervises orcad
 

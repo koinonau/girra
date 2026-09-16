@@ -1,8 +1,8 @@
 ---
-title: Orca skills registry & MCP
-description: Install Orca agent skills with npx skills add. Hybrid stubs stay thin; orca skills get serves the version-matched guide. Orca can update skills in the background.
+title: Girra skills registry & MCP
+description: Install Girra agent skills with npx skills add. Hybrid stubs stay thin; orca skills get serves the version-matched guide. Girra can update skills in the background.
 keywords:
-  - Orca skills
+  - Girra skills
   - npx skills add
   - orca-cli skill
   - orchestration skill
@@ -12,11 +12,11 @@ keywords:
   - orca-emulator-android skill
 ---
 
-Orca ships **skills** that agents install into their skill directories. Public install packages are **hybrid discovery stubs**: short `SKILL.md` files that tell the agent _when_ to engage Orca and how to load the full guide from the running CLI. Command flags live in the binary so they cannot drift from the app version.
+Girra ships **skills** that agents install into their skill directories. Public install packages are **hybrid discovery stubs**: short `SKILL.md` files that tell the agent _when_ to engage Girra and how to load the full guide from the running CLI. Command flags live in the binary so they cannot drift from the app version.
 
-## Installable Orca skills
+## Installable Girra skills
 
-Use `npx skills add` with the public Orca repo and the skill name. Default agent setup usually installs `orca-cli`, `computer-use`, and `orchestration`.
+Use `npx skills add` with the public Girra repo and the skill name. Default agent setup usually installs `orca-cli`, `computer-use`, and `orchestration`.
 
 | Skill                                               | Install                                                                                   | Use it for                                                    |
 | --------------------------------------------------- | ----------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
@@ -51,7 +51,7 @@ Add `--json` when an agent needs deterministic output for automation. `skills sh
 
 ## Keep skills up to date
 
-When Orca ships a newer skill package than the one installed globally, the app can:
+When Girra ships a newer skill package than the one installed globally, the app can:
 
 - Show an **update available** nudge (and **Needs attention** when a copy is out of date somewhere the updater cannot safely rewrite).
 - Open **Update skills** — list of placements and skip reasons, then run **`npx --yes skills update <names> --global -y`** headlessly (no embedded terminal).
@@ -64,7 +64,7 @@ Manual equivalent (desktop Settings still shows the same `npx` form):
 npx skills update orca-cli orchestration computer-use --global
 ```
 
-On headless hosts (SSH, containers, CI, `orca serve`) with no Settings UI, use the local CLI wrappers — they resolve the same `npx` commands, add non-interactive flags, and do **not** need a running Orca runtime:
+On headless hosts (SSH, containers, CI, `orca serve`) with no Settings UI, use the local CLI wrappers — they resolve the same `npx` commands, add non-interactive flags, and do **not** need a running Girra runtime:
 
 ```bash
 orca skills install                                      # list installable names
@@ -76,11 +76,11 @@ orca skills update --skill orca-cli --dry-run
 ```
 
 - Default scope is **global** (`--global`); pass `--local` for the current project only.
-- `install` targets agents Orca detects on the host (plus the shared `.agents/skills` directory). Use `--agent <name>[,<name>…]` or `--agent universal` to override; if no agent is detected, `--agent` is required.
+- `install` targets agents Girra detects on the host (plus the shared `.agents/skills` directory). Use `--agent <name>[,<name>…]` or `--agent universal` to override; if no agent is detected, `--agent` is required.
 - `update` only refreshes skills that are already installed.
 - `--dry-run` prints the resolved command; `--json` is only valid with listing / `--dry-run`.
 
-Prefer the in-app updater when Orca offers it so the same global placements the app scanned get rewritten. Rows marked **Skipped** explain why that skill cannot be updated automatically (for example missing source registration) — fix the placement, then re-check.
+Prefer the in-app updater when Girra offers it so the same global placements the app scanned get rewritten. Rows marked **Skipped** explain why that skill cannot be updated automatically (for example missing source registration) — fix the placement, then re-check.
 
 ## Install kothar
 
@@ -88,7 +88,7 @@ Open the Skills page's **More actions** menu and choose **Install kothar…** to
 
 ## Skill deletion
 
-To remove a scanned skill, open its actions menu and choose **Delete…**. For several skills, open the page's **More actions** menu, choose **Delete skills…**, and select the eligible results. Before you confirm, Orca explains why a copy cannot be deleted, for example because it is bundled, plugin-managed, read-only, or outside a removable skill folder.
+To remove a scanned skill, open its actions menu and choose **Delete…**. For several skills, open the page's **More actions** menu, choose **Delete skills…**, and select the eligible results. Before you confirm, Girra explains why a copy cannot be deleted, for example because it is bundled, plugin-managed, read-only, or outside a removable skill folder.
 
 ## orca-cli
 
@@ -96,7 +96,7 @@ To remove a scanned skill, open its actions menu and choose **Delete…**. For s
 npx skills add https://github.com/stablyai/orca --skill orca-cli --global
 ```
 
-After install, load the version-matched command guide with `orca skills get orca-cli`. See [Orca CLI](/docs/cli/overview).
+After install, load the version-matched command guide with `orca skills get orca-cli`. See [Girra CLI](/docs/cli/overview).
 
 ## orchestration
 
@@ -128,7 +128,7 @@ Agents should load `orca skills get orca-linear` before mutating tickets. Covers
 npx skills add https://github.com/stablyai/orca --skill orca-emulator --global
 ```
 
-Use this when an agent should control an iOS Simulator from inside Orca through `orca emulator` commands.
+Use this when an agent should control an iOS Simulator from inside Girra through `orca emulator` commands.
 
 ## orca-emulator-android
 
@@ -144,11 +144,11 @@ Use for adb-connected Android AVDs/devices: list/boot, tap/swipe/type, hardware 
 npx skills add https://github.com/stablyai/orca --skill orca-per-workspace-env --global
 ```
 
-Use when setting up or debugging per-workspace environment recipes in `orca.yaml`. See [Ways to run Orca](/docs/ways-to-run#4-cloud-vms-per-workspace-environments).
+Use when setting up or debugging per-workspace environment recipes in `orca.yaml`. See [Ways to run Girra](/docs/ways-to-run#4-cloud-vms-per-workspace-environments).
 
 ## Discovery sources
 
-Orca's skill UI scans installed skill homes for Claude, OpenCode, Pi, and Agent Skills, so skills placed there show up without a manual symlink.
+Girra's skill UI scans installed skill homes for Claude, OpenCode, Pi, and Agent Skills, so skills placed there show up without a manual symlink.
 
 ## Add your own skills
 

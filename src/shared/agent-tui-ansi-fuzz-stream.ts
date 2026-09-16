@@ -70,7 +70,7 @@ const WIDE_RUNS = [
   '🟢 working',
   '🤖 opencode',
   '✅ done ✨',
-  // ZWJ emoji join — the exact width divergence the Orca unicode provider
+  // ZWJ emoji join — the exact width divergence the Girra unicode provider
   // exists for (shared/terminal-unicode-provider.ts).
   '👨‍👩‍👧‍👦 team',
   '🇰🇷 locale'

@@ -34,7 +34,7 @@ const MANAGED_HOOKS_DIR_NEEDLE = '/.orca/agent-hooks/'
 // Why: statusLine is not a hook — Claude's schema has no timeout field (type/command/padding/refreshInterval), and a slow statusline can't block agent turns.
 const STATUSLINE_SCRIPT_NEEDLE = '-statusline.'
 
-// Walk the parsed config and assert every Orca-managed command carrier (a node
+// Walk the parsed config and assert every Girra-managed command carrier (a node
 // with a `command`/`bash`/`powershell` string pointing at the managed script
 // dir) has a positive config-level `timeout` sibling. Returns the count of managed
 // carriers found so callers can assert the scan was not vacuous.

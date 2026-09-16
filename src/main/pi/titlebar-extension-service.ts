@@ -24,7 +24,7 @@ import {
 export const isSafeDescendCandidate = sharedIsSafeDescendCandidate
 
 const ORCA_MANAGED_EXTENSION_MARKER = '@orca-managed-pi-extension'
-// Why: old Orca versions used PTY-scoped overlays under this root. Keep the
+// Why: old Girra versions used PTY-scoped overlays under this root. Keep the
 // name so spawn and teardown can remove stale pre-migration dirs.
 const OVERLAY_ROOT_DIR_NAME = 'pi-agent-overlays'
 
@@ -67,7 +67,7 @@ export class PiTitlebarExtensionService {
     try {
       writeFileSync(path, source)
     } catch {
-      // Why: a failed install leaves Pi without Orca status; it must not block the spawn.
+      // Why: a failed install leaves Pi without Girra status; it must not block the spawn.
     }
   }
 

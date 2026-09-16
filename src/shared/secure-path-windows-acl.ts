@@ -107,7 +107,7 @@ function validateHardenedDacl(sddl: string, plan: AclPlan): string | null {
     }
     // The whole set, not just OI. (OI) without (CI) leaves subdirectories unprotected, and
     // adding (IO) makes every rule inherit-only, so the directory object itself grants nobody
-    // anything and Orca cannot even write into it. Both used to be repaired blindly on every
+    // anything and Girra cannot even write into it. Both used to be repaired blindly on every
     // pass; since hardening short-circuits on a DACL that verifies, whatever this accepts stays.
     if (
       ace.flags.length !== expectedFlags.length ||

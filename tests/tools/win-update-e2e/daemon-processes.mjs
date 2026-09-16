@@ -1,4 +1,4 @@
-// Identify and inspect the Orca terminal daemon on Windows.
+// Identify and inspect the Girra terminal daemon on Windows.
 //
 // The daemon is forked with ELECTRON_RUN_AS_NODE=1, so on Windows its process
 // image is Orca.exe (the Electron binary running as plain Node) — it CANNOT be
@@ -19,11 +19,11 @@ import { runCommandSync } from './powershell-runner.mjs'
 
 const DAEMON_ENTRY_MARKER = 'daemon-entry.js'
 
-/** Default packaged userData root on Windows: %APPDATA%\Orca. */
+/** Default packaged userData root on Windows: %APPDATA%\Girra. */
 export function defaultUserDataDir() {
   const appData =
     process.env.APPDATA ?? path.join(process.env.USERPROFILE ?? '', 'AppData', 'Roaming')
-  return path.join(appData, 'Orca')
+  return path.join(appData, 'Girra')
 }
 
 /**

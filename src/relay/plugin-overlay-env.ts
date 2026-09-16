@@ -39,7 +39,7 @@ export function resolvePiSourceAgentDir(
     return startupDir
   }
 
-  // Why: a matching Orca overlay shadow means this shell inherited an old PTY
+  // Why: a matching Girra overlay shadow means this shell inherited an old PTY
   // overlay. Do not remirror it; let plugin-overlay default to ~/.pi/agent.
   if (env.PI_CODING_AGENT_DIR && env.PI_CODING_AGENT_DIR !== env.ORCA_PI_CODING_AGENT_DIR) {
     return env.PI_CODING_AGENT_DIR

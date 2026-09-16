@@ -56,7 +56,7 @@ describe('Windows managed hook post interpreter', () => {
   beforeEach(() => {
     previousUserDataPath = process.env.ORCA_USER_DATA_PATH
     isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-interpreter-user-data-'))
-    // Why: Orca-managed hook paths can resolve through ORCA_USER_DATA_PATH before the mocked
+    // Why: Girra-managed hook paths can resolve through ORCA_USER_DATA_PATH before the mocked
     // home; an inherited live path would let this test rewrite the developer's own hooks.
     process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
     home = mkdtempSync(join(tmpdir(), 'orca-hook-interpreter-'))

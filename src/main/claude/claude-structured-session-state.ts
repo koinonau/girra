@@ -29,7 +29,7 @@ export type ClaudeStructuredSessionEvent =
       type: 'message'
       sessionId: string
       message: Record<string, unknown>
-      /** Present only when this replay acknowledged Orca's in-flight dispatch. */
+      /** Present only when this replay acknowledged Girra's in-flight dispatch. */
       startsTurn?: true
       /** Host clock at receipt; stamped on turn boundaries only. */
       observedAt?: number

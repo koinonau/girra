@@ -1,6 +1,6 @@
 // win-update-e2e — packaged NSIS update proof harness.
 //
-// Given two Orca Windows installers (version N and N+1), proves what happens to
+// Given two Girra Windows installers (version N and N+1), proves what happens to
 // the terminal daemon and its sessions across a real silent update, with
 // machine-checkable assertions. Windows-only. See README.md for usage and the
 // design context in docs/windows-terminal-update-survival-plan.md (Phase 0).
@@ -569,7 +569,7 @@ async function teardown({
   // — uninstalling would remove a build we did not put there.
   if (hadPreexistingInstall) {
     console.log(
-      '\n*** NOTE: an Orca install existed before this run. It was OVERWRITTEN and the\n' +
+      '\n*** NOTE: a Girra install existed before this run. It was OVERWRITTEN and the\n' +
         '    --to version is now installed. Your prior build was NOT restored — reinstall\n' +
         '    your intended build if needed. Skipping uninstall. ***\n'
     )

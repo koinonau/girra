@@ -44,7 +44,7 @@ export const CLAUDE_EVENTS = [
     eventName: 'Stop',
     definition: { hooks: [{ type: 'command', command: '' }] }
   },
-  // Why: API/model errors emit StopFailure instead of Stop; without this hook Orca
+  // Why: API/model errors emit StopFailure instead of Stop; without this hook Girra
   // leaves the turn spinning.
   {
     eventName: 'StopFailure',

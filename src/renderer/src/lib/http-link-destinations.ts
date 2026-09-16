@@ -28,7 +28,7 @@ export function canSourceOwnerOpenInOrca(
 }
 
 /** Which destinations a clicked link offers, primary first; a remote source that
- *  cannot reach Orca's managed browser offers only the system browser. */
+ *  cannot reach Girra's managed browser offers only the system browser. */
 export function httpLinkActionDestinationsFor(
   settings: { openLinksInApp?: boolean } | null | undefined,
   sourceOwner: HttpLinkSourceOwner,
@@ -46,7 +46,7 @@ export function httpLinkDestinationLabel(destination: HttpLinkDestination): stri
   return destination === 'orca'
     ? translate(
         'auto.components.terminal.pane.TerminalLinkActionPopover.orcaBrowser',
-        'Orca Browser'
+        'Girra Browser'
       )
     : translate(
         'auto.components.terminal.pane.TerminalLinkActionPopover.systemBrowser',

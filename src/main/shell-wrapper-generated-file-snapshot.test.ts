@@ -1,5 +1,5 @@
 /**
- * Byte-for-byte snapshots of every shell wrapper file Orca generates, for all
+ * Byte-for-byte snapshots of every shell wrapper file Girra generates, for all
  * three transports (local PTY, daemon/SSH, relay overlay).
  *
  * Why: the zsh generators were unified behind one builder; these fixtures were
@@ -58,9 +58,9 @@ async function expectWrapperFiles(transport: string, root: string): Promise<void
 }
 
 /**
- * Every shell name the wrapper is allowed to write that is not Orca-namespaced.
+ * Every shell name the wrapper is allowed to write that is not Girra-namespaced.
  *
- * Each is a deliberate contract with the shell or with Orca's own features, not
+ * Each is a deliberate contract with the shell or with Girra's own features, not
  * scratch space: the history path, the config dir, the two PATH-shaped exports
  * agent overlays need, and the prompt-hook arrays the readiness and OSC 133
  * markers register through.
@@ -155,7 +155,7 @@ describePosix('generated shell wrapper files', () => {
       (): string => getDaemonShellReadyWrapperRoot()
     ],
     ['relay', (): void => void ensureOverlayRestoreWrappers(root), (): string => root]
-  ])('%s wrappers write no shell global outside Orca’s namespace', (_transport, generate, dir) => {
+  ])('%s wrappers write no shell global outside Girra’s namespace', (_transport, generate, dir) => {
     generate()
 
     for (const [, relativePath] of WRAPPER_FILES) {

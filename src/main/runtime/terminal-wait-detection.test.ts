@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { detectTerminalWaitBlockedReason } from './terminal-wait-detection'
 import { buildTerminalWaitText } from './terminal-wait-tail-state'
 
-// Why these shapes: agents working on Orca print `rg` hits from this very detector and its
+// Why these shapes: agents working on Girra print `rg` hits from this very detector and its
 // specs, so quoted prompt wording lands in scrollback while the terminal sits at its input box.
 const QUOTED_DETECTOR_SOURCE_LINE =
   "└   if (hooksindex !== -1 && normalized.includes('press enter to confirm', hooksindex)) {"

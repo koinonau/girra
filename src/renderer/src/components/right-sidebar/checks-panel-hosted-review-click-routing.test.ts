@@ -80,15 +80,15 @@ describe('checks panel hosted review click routing', () => {
 })
 
 describe('checks panel hosted review modifier hint destination', () => {
-  it('names the system browser when a plain click already opens in Orca', () => {
+  it('names the system browser when a plain click already opens in Girra', () => {
     expect(resolveChecksPanelHostedReviewModifierDestination({ openLinksInApp: true }, true)).toBe(
       'system-browser'
     )
   })
 
-  // Why: inverting is inert while links already open in Orca — both meanings of the
+  // Why: inverting is inert while links already open in Girra — both meanings of the
   // modifier land on the system browser, so checking inverts first would misname it.
-  it('names the system browser when inverting is on and links already open in Orca', () => {
+  it('names the system browser when inverting is on and links already open in Girra', () => {
     expect(
       resolveChecksPanelHostedReviewModifierDestination(
         { openLinksInApp: true, openLinksInAppModifierInverts: true },
@@ -98,8 +98,8 @@ describe('checks panel hosted review modifier hint destination', () => {
   })
 
   // Why: this is the gesture the invert setting adds — without it the hint stays hidden
-  // and the only way to reach Orca from this button is undiscoverable.
-  it('names Orca when inverting is on and links open externally', () => {
+  // and the only way to reach Girra from this button is undiscoverable.
+  it('names Girra when inverting is on and links open externally', () => {
     expect(
       resolveChecksPanelHostedReviewModifierDestination(
         { openLinksInApp: false, openLinksInAppModifierInverts: true },
@@ -143,7 +143,7 @@ describe('checks panel hosted review modifier hint destination', () => {
     ).toBe('orca')
   })
 
-  // Why: openHttpLink gates routing to Orca on a worktree id, so without one the
+  // Why: openHttpLink gates routing to Girra on a worktree id, so without one the
   // modifier lands in the system browser either way.
   it('stays silent without a worktree', () => {
     expect(

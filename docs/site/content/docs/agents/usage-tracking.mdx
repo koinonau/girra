@@ -2,7 +2,7 @@
 title: Usage & rate-limit tracking
 ---
 
-Orca reads local usage state for Claude Code, OpenCode, and MiniMax and surfaces it in the status bar, so you know how close you are to a rate limit before an agent stalls.
+Girra reads local usage state for Claude Code, OpenCode, and MiniMax and surfaces it in the status bar, so you know how close you are to a rate limit before an agent stalls.
 
 ## What's shown
 
@@ -12,7 +12,7 @@ Orca reads local usage state for Claude Code, OpenCode, and MiniMax and surfaces
 
 ## How it works
 
-Orca reads the local usage state each agent maintains on disk (under `~/.claude` and the OpenCode equivalent). No API calls, no extra auth. This means the readout is only as fresh as the agent's own bookkeeping: numbers update when the agent writes, not in real time.
+Girra reads the local usage state each agent maintains on disk (under `~/.claude` and the OpenCode equivalent). No API calls, no extra auth. This means the readout is only as fresh as the agent's own bookkeeping: numbers update when the agent writes, not in real time.
 
 ## Multi-account accounting
 
@@ -31,4 +31,4 @@ Rows without live numbers show a short status instead: **Loading usage…**, **n
 
 ## Estimated cost (Stats)
 
-The Stats breakdown may show **estimated cost** for known model families (including Claude 5-class rows). Rows marked **• inferred pricing** use Orca’s local price table, not a live bill from the provider. Prefer the provider console for authoritative spend.
+The Stats breakdown may show **estimated cost** for known model families (including Claude 5-class rows). Rows marked **• inferred pricing** use Girra’s local price table, not a live bill from the provider. Prefer the provider console for authoritative spend.

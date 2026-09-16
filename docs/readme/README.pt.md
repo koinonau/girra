@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
+  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Girra" width="64" valign="middle" /></a> Girra
 </h1>
 
 <p align="center">
@@ -20,10 +20,10 @@
   Rode Claude Code, OpenCode ou Pi lado a lado — cada um em seu próprio worktree, acompanhado em um só lugar.
 </p>
 
-<h3 align="center"><a href="https://onorca.dev/download"><ins>Baixar o Orca</ins></a></h3>
+<h3 align="center"><a href="https://onorca.dev/download"><ins>Baixar o Girra</ins></a></h3>
 
 <p align="center">
-  <img src="../assets/readme-hero.jpg" alt="App desktop do Orca executando agentes em worktrees paralelos, com o app companion móvel do Orca no canto" width="960" />
+  <img src="../assets/readme-hero.jpg" alt="App desktop do Girra executando agentes em worktrees paralelos, com o app companion móvel do Girra no canto" width="960" />
 </p>
 
 ## Recursos
@@ -82,7 +82,7 @@ Navegue por PRs, issues e quadros de projeto dentro do app — abra um worktree 
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Fluxos de trabalho de tarefas do GitHub e Linear no Orca" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Fluxos de trabalho de tarefas do GitHub e Linear no Girra" width="100%" /></picture></a>
 </td>
 </tr>
 <tr>
@@ -104,7 +104,7 @@ Execute agentes em uma máquina remota potente com edição completa de arquivos
 
 ### Anotar diffs de IA
 
-Deixe comentários em qualquer linha de diff e envie-os de volta ao agente — revise, edite e faça commit sem sair do Orca.
+Deixe comentários em qualquer linha de diff e envie-os de volta ao agente — revise, edite e faça commit sem sair do Girra.
 
 [Docs →](https://www.onorca.dev/docs/review/annotate-ai-diff)
 
@@ -130,15 +130,15 @@ O editor do VS Code com salvamento automático em todos os lugares — arraste a
 <tr>
 <td width="50%" valign="middle">
 
-### Orca CLI
+### Girra CLI
 
-Agentes também controlam o Orca — automatize qualquer fluxo de trabalho com `orca worktree create`, `snapshot`, `click` e `fill`.
+Agentes também controlam o Girra — automatize qualquer fluxo de trabalho com `orca worktree create`, `snapshot`, `click` e `fill`.
 
 [Docs →](https://www.onorca.dev/docs/cli/overview)
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="Automatize o Orca pela CLI" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="Automatize o Girra pela CLI" width="100%" /></picture></a>
 </td>
 </tr>
 </table>
@@ -156,7 +156,7 @@ Agentes também controlam o Orca — automatize qualquer fluxo de trabalho com `
 
 ## Agentes compatíveis
 
-Funciona com **qualquer agente CLI** — se roda em um terminal, roda no Orca.
+Funciona com **qualquer agente CLI** — se roda em um terminal, roda no Girra.
 
 <p>
   <a href="https://docs.anthropic.com/claude/docs/claude-code"><kbd><img src="../assets/claude-logo.svg" alt="Logotipo do Claude Code" width="16" valign="middle" /> Claude Code</kbd></a> &nbsp;
@@ -206,4 +206,4 @@ Quer contribuir ou rodar localmente? Veja nosso guia [CONTRIBUTING.md](../../.gi
 
 ## Licença
 
-Orca é livre e de código aberto sob a [Licença MIT](../../LICENSE).
+Girra é livre e de código aberto sob a [Licença MIT](../../LICENSE).

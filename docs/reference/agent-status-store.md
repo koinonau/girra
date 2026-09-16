@@ -16,7 +16,7 @@ the step that delivers them; PR 1a and PR 1b have landed.
 
 ## The problem this solves
 
-Orca shows "what is this agent doing" in four places: the desktop sidebar, the
+Girra shows "what is this agent doing" in four places: the desktop sidebar, the
 `orca worktree ps` command, the mobile app, and the agent dashboard. Before
 #19217 those readers did not even share their inputs. After #19217 they share
 the structured-session mapping and nothing else.

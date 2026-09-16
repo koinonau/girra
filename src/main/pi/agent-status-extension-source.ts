@@ -9,7 +9,7 @@
 // Each Pi process gets its own paneKey through env. Like the OpenCode plugin,
 // the returned source is a string (loaded by jiti from disk inside the pi process), so we
 // keep the source body in plain JS without TS types and avoid pulling pi or
-// any Orca dep into the pi runtime.
+// any Girra dep into the pi runtime.
 import { getPiAgentStatusHandlerSourceLines } from './agent-status-handler-source'
 import { getPiAgentStatusWslCurlSourceLines } from './agent-status-wsl-curl-source'
 
@@ -17,16 +17,16 @@ export const ORCA_PI_AGENT_STATUS_EXTENSION_FILE = 'orca-agent-status.ts'
 
 export function getPiAgentStatusExtensionSource(): string {
   // Why: keep this string self-contained — it runs inside the pi process,
-  // so it cannot import from Orca's main bundle. fs/http coords come from
+  // so it cannot import from Girra's main bundle. fs/http coords come from
   // the same endpoint file the OpenCode plugin reads (process.env is frozen
-  // at PTY spawn, so on Orca restart we have to re-read it from disk).
+  // at PTY spawn, so on Girra restart we have to re-read it from disk).
   return [
     '// Why: warn-once so a recurring parse error on a malformed endpoint',
     '// file does not spam stderr inside the pi TUI on every event.',
     'let warnedBadEndpoint = false',
     '// Why: Pi awaits extension handlers. Status delivery stays off that',
     '// critical path, and the latest-only pending slot prevents a stalled',
-    '// Orca receiver from building an unbounded queue of obsolete snapshots.',
+    '// Girra receiver from building an unbounded queue of obsolete snapshots.',
     'const HOOK_POST_TIMEOUT_MS = 1000',
     'let activePost = false',
     'let piUiPromptDepth = 0',
@@ -153,7 +153,7 @@ export function getPiAgentStatusExtensionSource(): string {
     '  const timeoutPromise = new Promise<never>((_resolve, reject) => {',
     '    timeout = setTimeout(() => {',
     '      controller?.abort()',
-    "      reject(new Error('Orca hook delivery timed out'))",
+    "      reject(new Error('Girra hook delivery timed out'))",
     '    }, HOOK_POST_TIMEOUT_MS)',
     "    if (typeof timeout.unref === 'function') timeout.unref()",
     '  })',
@@ -171,8 +171,8 @@ export function getPiAgentStatusExtensionSource(): string {
     '      timeoutPromise,',
     '    ])',
     '  } catch {',
-    '    // Why: status reporting must never fail the pi run just because Orca',
-    '    // is unavailable or the loopback request failed (e.g. Orca restart).',
+    '    // Why: status reporting must never fail the pi run just because Girra',
+    '    // is unavailable or the loopback request failed (e.g. Girra restart).',
     '    if (!isWslRuntime()) return',
     '    postViaWindowsCurl(body)',
     '  } finally {',

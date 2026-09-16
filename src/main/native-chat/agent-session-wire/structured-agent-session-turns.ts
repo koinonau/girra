@@ -85,7 +85,7 @@ async function appendStatus(
  * Whether a user's Retry may put this message on the wire again: only where the
  * recorded doubt proves the frame never reached a provider. Everything else
  * replays the recorded outcome instead — one message reached the model five
- * times through this path. Orca never re-sends on its own either way.
+ * times through this path. Girra never re-sends on its own either way.
  */
 function retryWouldRedeliver(existing: AgentJournalSubmission | undefined): boolean {
   return existing?.dispatchState === 'unknown' && dispatchDoubtProvesUndelivered(existing.reason)

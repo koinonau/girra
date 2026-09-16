@@ -7,7 +7,7 @@ import { StatsSnapshotWriter } from './stats-snapshot-writer'
 
 const MAX_EVENTS = 10_000
 // Why: countedPRs is a deduplication registry that grows with every PR created
-// through Orca. Without a cap, a heavily-used instance accumulates thousands of
+// through Girra. Without a cap, a heavily-used instance accumulates thousands of
 // URL strings across months. 2000 entries is about 6-12 months of active use
 // for a power user, and at ~50 chars per URL the overhead is ~100KB max.
 const MAX_COUNTED_PRS = 2_000

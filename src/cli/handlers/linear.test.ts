@@ -41,7 +41,7 @@ describe('orca linear CLI handlers', () => {
     vi.restoreAllMocks()
     callMock.mockReset()
     process.env = { ...originalEnv }
-    // Why: these tests can run inside an Orca-managed terminal, which exports
+    // Why: these tests can run inside a Girra-managed terminal, which exports
     // real worktree/terminal/pairing env hints; clear them so handler context
     // assertions stay deterministic.
     delete process.env.ORCA_WORKTREE_ID

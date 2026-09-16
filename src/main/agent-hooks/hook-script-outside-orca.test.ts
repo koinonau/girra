@@ -36,8 +36,8 @@ function runHook(dir: string, extraEnv: NodeJS.ProcessEnv = {}) {
   })
 }
 
-describe('managed hook outside an Orca terminal', () => {
-  it('no Orca env at all: silent, exit 0, writes nothing', () => {
+describe('managed hook outside a Girra terminal', () => {
+  it('no Girra env at all: silent, exit 0, writes nothing', () => {
     const dir = mkdtempSync(join(tmpdir(), 'orca-outside-'))
     const res = runHook(dir)
     expect(res.status).toBe(0)
@@ -64,7 +64,7 @@ describe('managed hook outside an Orca terminal', () => {
     expect(res.status).toBe(0)
     expect(res.stdout).toBe(NEUTRAL_STDOUT)
     expect(res.stderr).toBe('')
-    // a stale env var must not create a spool tree for an Orca that is not installed here
+    // a stale env var must not create a spool tree for a Girra that is not installed here
     expect(readdirSync(dir)).toEqual(['claude-hook.sh'])
   })
 

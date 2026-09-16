@@ -41,7 +41,7 @@ type AgentPromptVerificationOptions = {
   timeoutMs?: number
 }
 
-/** Only these providers expose a turn-start signal Orca can settle a prompt receipt against. */
+/** Only these providers expose a turn-start signal Girra can settle a prompt receipt against. */
 export function isTerminalSendSettlementAgent(
   agent: TuiAgent | null | undefined
 ): agent is 'claude' {

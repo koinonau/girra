@@ -32,7 +32,7 @@ Required:
 Options:
   --install-dir <path>     Isolated-install mode: install the test build into
                            <path> instead of the default per-user location,
-                           leaving a developer's REAL Orca install untouched.
+                           leaving a developer's REAL Girra install untouched.
                            The path must be absolute and contain NO SPACES (the
                            NSIS /D override cannot be quoted), must not be the
                            default install location, and must not point at a
@@ -41,12 +41,12 @@ Options:
                            shared per-user registry keys + shortcuts at teardown
                            so the real install's "next update" target is
                            preserved. See README "Isolated install mode".
-  --allow-existing-install Proceed even if an Orca install already exists. The
+  --allow-existing-install Proceed even if a Girra install already exists. The
                            run overwrites it with the --from/--to versions and
                            leaves the --to version installed (your prior build
                            is NOT restored). Without this flag the harness
                            refuses to run when an install exists, to protect a
-                           developer's real Orca. Clean machines (CI/VM) never
+                           developer's real Girra. Clean machines (CI/VM) never
                            need it. Ignored in --install-dir mode, which never
                            touches the real install.
   --keep-install           Skip teardown/uninstall (leaves the app installed)
@@ -80,11 +80,11 @@ export function parseArgs(argv) {
   return { ...opts, errors }
 }
 
-/** Default per-user oneClick install location: %LOCALAPPDATA%\Programs\Orca. */
+/** Default per-user oneClick install location: %LOCALAPPDATA%\Programs\Girra. */
 function defaultInstallDir() {
   const localAppData =
     process.env.LOCALAPPDATA ?? path.join(process.env.USERPROFILE ?? '', 'AppData', 'Local')
-  return path.join(localAppData, 'Programs', 'Orca')
+  return path.join(localAppData, 'Programs', 'Girra')
 }
 
 /** True if `child` is equal to, inside, or an ancestor of `parent` (case-insensitive). */

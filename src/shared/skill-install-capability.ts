@@ -4,4 +4,4 @@
 export const SKILL_DELETE_CAPABILITY = 'skills.delete.v1' as const
 
 export const SKILL_DELETE_UPDATE_REQUIRED_MESSAGE =
-  'Update Orca on the selected machine to delete skills.'
+  'Update Girra on the selected machine to delete skills.'

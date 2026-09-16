@@ -468,7 +468,7 @@ describe('startStructuredAgentLaunch', () => {
     expect(toast.message).toHaveBeenCalledWith(
       "Structured chat isn't available",
       expect.objectContaining({
-        description: 'Orca tried to open a Claude terminal instead.'
+        description: 'Girra tried to open a Claude terminal instead.'
       })
     )
   })

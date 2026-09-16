@@ -1,7 +1,7 @@
 /**
  * End-to-end agent-status-over-SSH integration test.
  *
- * Wires Orca's main-side SshChannelMultiplexer to the relay-side
+ * Wires Girra's main-side SshChannelMultiplexer to the relay-side
  * RelayDispatcher through an in-memory pipe and starts a real
  * RelayAgentHookServer. POSTs a hook event to the relay's loopback HTTP
  * receiver and asserts the parsed payload arrives in `agentHookServer`'s
@@ -90,7 +90,7 @@ describe('Integration: relay hook server → mux → AgentHookServer.ingestRemot
     mux = new SshChannelMultiplexer(clientTransport)
 
     orcaServer = new AgentHookServer()
-    // Why: Orca-side never starts an HTTP server in this test — `ingestRemote`
+    // Why: Girra-side never starts an HTTP server in this test — `ingestRemote`
     // is the entry point we exercise. setListener registers the IPC fanout
     // sink we assert against. Server is otherwise inert.
     mux.onNotification((method, params) => {

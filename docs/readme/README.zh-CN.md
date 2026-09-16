@@ -1,5 +1,5 @@
 <h1 align="center">
-  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Orca" width="64" valign="middle" /></a> Orca
+  <a href="https://onOrca.dev"><img src="../../resources/build/icon.png" alt="Girra" width="64" valign="middle" /></a> Girra
 </h1>
 
 <p align="center">
@@ -20,10 +20,10 @@
   并排运行 Claude Code、OpenCode 或 Pi — 每个都在自己的 worktree 中运行，并在一个地方统一跟踪。
 </p>
 
-<h3 align="center"><a href="https://onorca.dev/download"><ins>下载 Orca</ins></a></h3>
+<h3 align="center"><a href="https://onorca.dev/download"><ins>下载 Girra</ins></a></h3>
 
 <p align="center">
-  <img src="../assets/readme-hero.jpg" alt="Orca 桌面应用在并行 worktree 中运行智能体，角落里是 Orca 移动 companion 应用" width="960" />
+  <img src="../assets/readme-hero.jpg" alt="Girra 桌面应用在并行 worktree 中运行智能体，角落里是 Girra 移动 companion 应用" width="960" />
 </p>
 
 ## 特性
@@ -82,7 +82,7 @@ Ghostty 级终端，支持 WebGL 渲染、无限分屏，以及重启后依然�
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Orca 中的 GitHub 与 Linear 任务工作流" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/review/linear"><picture><source srcset="../assets/feature-wall/github-linear.gif" type="image/gif"><img src="../assets/feature-wall/github-linear.jpg" alt="Girra 中的 GitHub 与 Linear 任务工作流" width="100%" /></picture></a>
 </td>
 </tr>
 <tr>
@@ -104,7 +104,7 @@ Ghostty 级终端，支持 WebGL 渲染、无限分屏，以及重启后依然�
 
 ### 标注 AI Diff
 
-在任意 diff 行上添加评论并发回给智能体 — 评审、编辑、提交，全程无需离开 Orca。
+在任意 diff 行上添加评论并发回给智能体 — 评审、编辑、提交，全程无需离开 Girra。
 
 [文档 →](https://www.onorca.dev/docs/review/annotate-ai-diff)
 
@@ -130,15 +130,15 @@ VS Code 的编辑器，处处自动保存 — 把文件或图片直接拖入智�
 <tr>
 <td width="50%" valign="middle">
 
-### Orca CLI
+### Girra CLI
 
-智能体也能驱动 Orca — 用 `orca worktree create`、`snapshot`、`click` 和 `fill` 把每个工作流脚本化。
+智能体也能驱动 Girra — 用 `orca worktree create`、`snapshot`、`click` 和 `fill` 把每个工作流脚本化。
 
 [文档 →](https://www.onorca.dev/docs/cli/overview)
 
 </td>
 <td width="50%">
-  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="从 CLI 脚本化 Orca" width="100%" /></picture></a>
+  <a href="https://www.onorca.dev/docs/cli/overview"><picture><source srcset="../assets/feature-wall/orca-cli.gif" type="image/gif"><img src="../assets/feature-wall/orca-cli.jpg" alt="从 CLI 脚本化 Girra" width="100%" /></picture></a>
 </td>
 </tr>
 </table>
@@ -156,7 +156,7 @@ VS Code 的编辑器，处处自动保存 — 把文件或图片直接拖入智�
 
 ## 支持的智能体
 
-适配**任何 CLI 智能体** — 只要能在终端里运行，就能在 Orca 里运行。
+适配**任何 CLI 智能体** — 只要能在终端里运行，就能在 Girra 里运行。
 
 <p>
   <a href="https://docs.anthropic.com/claude/docs/claude-code"><kbd><img src="../assets/claude-logo.svg" alt="Claude Code logo" width="16" valign="middle" /> Claude Code</kbd></a> &nbsp;
@@ -209,4 +209,4 @@ yay -S stably-orca-bin
 
 ## 许可证
 
-Orca 是自由且开源的软件，遵循 [MIT 许可证](../../LICENSE)。
+Girra 是自由且开源的软件，遵循 [MIT 许可证](../../LICENSE)。

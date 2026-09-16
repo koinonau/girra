@@ -1,8 +1,8 @@
 # Windows EDR signal surface
 
-Orca's Windows process tree is shaped like the thing behavioural EDR is built to
+Girra's Windows process tree is shaped like the thing behavioural EDR is built to
 find. An enterprise Windows 11 / Intune tenant opened **six Microsoft Defender
-for Endpoint incidents against Orca 1.4.192 in eight days**. All six fired as
+for Endpoint incidents against Girra 1.4.192 in eight days**. All six fired as
 active incidents and stayed open; three closed only because a human classified
 them by hand in the portal. Defender never downgraded or closed one on its own.
 
@@ -12,7 +12,7 @@ two escalated to multi-stage incidents carrying ATT&CK tactic mappings
 
 The framing this document keeps throughout, because both halves matter:
 
-> **Defender is not malfunctioning. It is describing the code accurately.** Orca
+> **Defender is not malfunctioning. It is describing the code accurately.** Girra
 > really does copy its own signed image under a different name, really did read
 > every process's memory on a timer, really does run base64-encoded PowerShell
 > with the execution policy bypassed, and really does take screenshots and
@@ -23,7 +23,7 @@ The framing this document keeps throughout, because both halves matter:
 > cannot see the difference.
 
 Do not read this as a bug report against Defender, and do not read it as a claim
-that Orca is malware. It is a map of which of our behaviours are legible to an
+that Girra is malware. It is a map of which of our behaviours are legible to an
 EDR as attack-technique-shaped, why each one exists, and what engineers and
 administrators can do about it.
 
@@ -154,7 +154,7 @@ What to declare to administrators is now one
 `PROCESS_QUERY_LIMITED_INFORMATION` handle per process on a detailed snapshot and
 no remote memory access at all; an identity snapshot opens nothing. What this
 does not narrow is _which_ processes are asked — a detailed scan still queries
-every pid, including `lsass.exe`. Restricting the command-line pass to Orca's own
+every pid, including `lsass.exe`. Restricting the command-line pass to Girra's own
 subtree needs job-object membership as its source of truth (a ppid-derived
 allowlist would miss the detached, reparented descendants of #9045 and #10475),
 and remains unclaimed work.
@@ -265,7 +265,7 @@ terminal multiplexer for coding agents _is_. `reg.exe` appears from
 `src/relay/pty-shell-utils.ts` (reading the OpenSSH `DefaultShell`).
 
 Nothing here is avoidable in principle. What is controllable is depth and
-breadth: every interpreter hop between Orca and the thing the user asked for adds
+breadth: every interpreter hop between Girra and the thing the user asked for adds
 a scored edge, which is why the shipped doctrine of #15520 and #15595 is to
 _shorten the interpreter chain_ rather than to hide a window.
 
@@ -276,7 +276,7 @@ It now registers the script path itself (`<path> || echo {}`), so `bash ->
 powershell -> cmd -> curl` became `bash -> cmd -> curl` and one
 `powershell.exe -EncodedCommand` per hook event — a first-class Defender alert
 title — leaves the tree. The reporting box fired ~6 900 of them in five days,
-70% from Claude sessions that were not running under Orca at all and whose hook
+70% from Claude sessions that were not running under Girra at all and whose hook
 exits at its first `ORCA_PANE_KEY` guard.
 
 What is measured is latency and the hop count, nothing else: median 471 ms ->
@@ -337,12 +337,12 @@ inherent to the feature and no refactor removes them.
 
 The most useful calibration in the whole incident set came from the reporter's
 own machine: **Antigravity IDE's main executable is `NotSigned` and was not
-flagged, while Orca's is signed and was flagged six times.** Their conclusion:
+flagged, while Girra's is signed and was flagged six times.** Their conclusion:
 _"signing is not the gate here — behaviour is."_
 
 The mechanism is that Defender reputation is signer **plus prevalence**, and
 prevalence is keyed on **file hash**. A widely installed unsigned binary clears
-on install count alone. Orca's signature is a free OV certificate from SignPath
+on install count alone. Girra's signature is a free OV certificate from SignPath
 Foundation (`config/electron-builder.config.cjs` sets
 `win.signtoolOptions.publisherName`; `config/scripts/verify-windows-inner-signature.mjs`
 pins `CN=SignPath Foundation, O=SignPath Foundation, L=Lewes, S=Delaware, C=US`),
@@ -391,14 +391,14 @@ The checklist. On Windows, do not reach for:
 
 Two framing rules that outlast the table:
 
-- **Shorten the interpreter chain.** Each hop between Orca and the user's actual
+- **Shorten the interpreter chain.** Each hop between Girra and the user's actual
   target is a scored edge and a place for AV to deny a `CreateProcess`. This is
   the shipped doctrine of #15520 and #15595.
 - **Do not spell a flag you can avoid spelling.** #16003 measured a denial that
   was independent of the payload and keyed purely on the switch combination on
   the command line. What is on the line is itself the detection surface.
 
-## Guidance for administrators deploying Orca
+## Guidance for administrators deploying Girra
 
 ### Path exclusions alone will not silence these
 
@@ -422,7 +422,7 @@ on:
 - **File paths** — `Orca.exe` and `orca-terminal-daemon.exe` under
   `%LOCALAPPDATA%\Programs\orca\` and `%LOCALAPPDATA%\Orca\daemon-host\`.
 
-Scope it as narrowly as your tenant will tolerate, and review it when Orca
+Scope it as narrowly as your tenant will tolerate, and review it when Girra
 updates: the `daemon-host` path carries a `<version>` segment, so a rule pinned
 to one version will silently stop matching. Two traps in that path in particular.
 Materialization stages into a `<version>.staging-<hex>` sibling before renaming
@@ -442,10 +442,10 @@ incidents being created.**
 
 Check whether the tenant has the Attack Surface Reduction rule **"Block
 executable files from running unless they meet a prevalence, age, or trusted list
-criterion"** enabled. If it is, that alone explains a freshly signed Orca build
+criterion"** enabled. If it is, that alone explains a freshly signed Girra build
 being hit immediately after every update: each release ships new hashes, so every
 build starts at zero prevalence and zero age no matter how it is signed. Either
-allowlist the Orca install paths for that rule or expect a hit on each update.
+allowlist the Girra install paths for that rule or expect a hit on each update.
 
 ### Expect the alerts to recur after each update
 
@@ -466,7 +466,7 @@ incident mapped to ATT&CK **Execution + Collection**, and a description naming
 screen capture found in a script launched by `powershell.exe`. Incident F adds
 runtime-compiled MSIL to the same tree.
 
-Every part of that is an accurate description of what the feature does. Orca's
+Every part of that is an accurate description of what the feature does. Girra's
 computer use takes screenshots, synthesises keyboard and mouse input into other
 applications, and compiles the P/Invoke stubs it needs at runtime. An
 organisation that monitors for Collection-tactic activity — and any organisation
@@ -476,7 +476,7 @@ as Collection.
 So decide deliberately, in advance:
 
 - **Allowlist it**, with a suppression rule covering the computer-use tree
-  (`powershell.exe` with `-File …\runtime.ps1`) as well as the base Orca paths,
+  (`powershell.exe` with `-File …\runtime.ps1`) as well as the base Girra paths,
   and tell your SOC what it is before the first incident rather than during it.
 - **Or leave it disabled** on monitored endpoints.
 

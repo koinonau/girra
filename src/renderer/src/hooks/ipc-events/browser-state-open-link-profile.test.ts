@@ -61,7 +61,7 @@ function captureOpenLinkHandler(): (event: {
   return handler
 }
 
-describe('link-opened Orca tabs', () => {
+describe('link-opened Girra tabs', () => {
   beforeEach(() => {
     createBrowserTabMock.mockReset()
   })

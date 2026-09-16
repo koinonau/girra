@@ -35,14 +35,14 @@ function renderEnabled({
           label="Scope"
           value="orca"
           options={[
-            { value: 'orca', label: 'Orca worktrees only' },
+            { value: 'orca', label: 'Girra worktrees only' },
             { value: 'all', label: 'All local usage' }
           ]}
           onValueChange={onScopeChange}
         />,
         <div key="range">Range filter</div>
       ]}
-      selectionSummary="Orca worktrees only • Last 7 days"
+      selectionSummary="Girra worktrees only • Last 7 days"
       emptyMessage="No local OpenCode usage found yet for this scope."
       onEnabledChange={onEnabledChange}
       onRefresh={onRefresh}
@@ -80,7 +80,7 @@ describe('UsageTrackingPaneShell', () => {
 
     expect(screen.getByText('Updated now')).toBeInTheDocument()
     expect(screen.getByText('Share usage')).toBeInTheDocument()
-    expect(screen.getByText('Orca worktrees only • Last 7 days')).toBeInTheDocument()
+    expect(screen.getByText('Girra worktrees only • Last 7 days')).toBeInTheDocument()
     expect(
       screen.getByText('No local OpenCode usage found yet for this scope.')
     ).toBeInTheDocument()

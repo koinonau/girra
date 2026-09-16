@@ -140,7 +140,7 @@ describe('ensureMacPressAndHoldDefault', () => {
       expect(writes).toEqual([])
     })
 
-    it('accepts Orca and its channel-scoped bundles, and nothing else', () => {
+    it('accepts Girra and its channel-scoped bundles, and nothing else', () => {
       expect(isOrcaPreferencesDomain('com.stablyai.orca')).toBe(true)
       expect(isOrcaPreferencesDomain('com.stablyai.orca.dev')).toBe(true)
       expect(isOrcaPreferencesDomain('com.github.Electron')).toBe(false)
@@ -244,7 +244,7 @@ describe('readBundleIdentifierFromExecutablePath', () => {
 
   it('reads CFBundleIdentifier from the plist beside the executable', () => {
     const exe = bundleWithPlist(
-      '<plist><dict>\n<key>CFBundleName</key>\n<string>Orca</string>\n' +
+      '<plist><dict>\n<key>CFBundleName</key>\n<string>Girra</string>\n' +
         '<key>CFBundleIdentifier</key>\n\t<string>com.stablyai.orca</string>\n</dict></plist>'
     )
 

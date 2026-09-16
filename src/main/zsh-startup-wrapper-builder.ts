@@ -1,19 +1,19 @@
 /**
- * The single `.zshenv` Orca writes for every transport: local PTY, daemon/SSH,
+ * The single `.zshenv` Girra writes for every transport: local PTY, daemon/SSH,
  * and relay.
  *
- * Orca needs to run code AFTER the user's own zsh startup files. The old shape
- * bought that by keeping ZDOTDIR pointed at Orca's wrapper dir for the whole of
+ * Girra needs to run code AFTER the user's own zsh startup files. The old shape
+ * bought that by keeping ZDOTDIR pointed at Girra's wrapper dir for the whole of
  * startup and sourcing each user file by hand — four generated files, and a
  * fake ZDOTDIR live while `/etc/zshrc` ran. That one decision was the root of a
  * whole bug family: `/etc/zshrc` assigns `HISTFILE=${ZDOTDIR:-$HOME}/.zsh_history`
- * unconditionally, so history landed inside Orca's own dir (#11044); zsh's
+ * unconditionally, so history landed inside Girra's own dir (#11044); zsh's
  * `sourcehome()` ignores ZDOTDIR once the shell enters sh/ksh emulation, so a
  * user file ending in `emulate sh` hid every later wrapper file; and one wrapper
  * dir shared by two installed builds could mix files from both.
  *
  * This shape gives ZDOTDIR back before anything else can observe it, then defers
- * Orca's work to a `precmd` hook that runs at the first prompt — after
+ * Girra's work to a `precmd` hook that runs at the first prompt — after
  * `.zprofile`, `/etc/zshrc`, `.zshrc` and `.zlogin`, all of which zsh now reads
  * from the user's own directory exactly as in an unwrapped shell. #11044 becomes
  * unreachable rather than repaired, and the emulation and mixed-build classes
@@ -36,14 +36,14 @@ import {
 
 /** Runtime values the hook re-exports after the user's own startup files ran. */
 export type ZshWrapperRestoreSpec = {
-  /** Orca's agent-teams shim dir back onto PATH. */
+  /** Girra's agent-teams shim dir back onto PATH. */
   agentTeamsPath: boolean
   /** Remote CLI bin dir onto PATH — relay hosts only. */
   remoteCliBinDir: boolean
 }
 
 export type ZshStartupHookSpec = {
-  /** First line of the generated file, e.g. `# Orca zsh shell-ready wrapper`. */
+  /** First line of the generated file, e.g. `# Girra zsh shell-ready wrapper`. */
   headerLabel: string
   readyMarkerEscaped: string
   /** OSC 133 command-lifecycle hooks (behind the `markers` feature). */
@@ -115,7 +115,7 @@ function getOverlayRestoreBlocks(spec: ZshStartupHookSpec): (string | null)[] {
 }
 
 /**
- * Everything Orca owns that must run after the user's config, in one function
+ * Everything Girra owns that must run after the user's config, in one function
  * invoked from the first prompt's precmd sweep and then retired.
  */
 function buildDeferredInit(spec: ZshStartupHookSpec): string {
@@ -123,7 +123,7 @@ function buildDeferredInit(spec: ZshStartupHookSpec): string {
   // permanent precmd, so swapping this hook for it keeps the array position the
   // user's own hooks were registered around. With no permanent hook to leave
   // behind, removing is what keeps a history-only pane observably identical to
-  // the unwrapped pane it was — no stray Orca name in `precmd_functions`.
+  // the unwrapped pane it was — no stray Girra name in `precmd_functions`.
   // Verified on zsh 5.9 that self-removal mid-sweep skips no later hook, from
   // the head, the middle and the tail of the array.
   const permanentPrecmd = spec.osc133CommandMarkers

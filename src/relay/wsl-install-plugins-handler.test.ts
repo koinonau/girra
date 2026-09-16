@@ -107,7 +107,7 @@ describe.skipIf(process.platform === 'win32')('createInstallPluginsHandler (gues
         ORCA_WSL_HOOK_INSTANCE: 'inst1'
       } as NodeJS.ProcessEnv)
       install({ opencodePluginSource: '// v1\n' })
-      // Why: a mid-session Orca upgrade ships new plugin source; future spawns must see it.
+      // Why: a mid-session Girra upgrade ships new plugin source; future spawns must see it.
       const dir = install({ opencodePluginSource: '// v2\n' }).overlayDirs.opencode as string
       expect(readFileSync(join(dir, 'plugins', 'orca-opencode-status.js'), 'utf8')).toBe('// v2\n')
     })

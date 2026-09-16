@@ -212,7 +212,7 @@ describe('startup managed hook reconciliation (STA-5679)', () => {
 
   it('skips instead of removing when this profile has the off switch set', () => {
     // Why this matters: the hook files are user-global. Startup removal here deleted the hooks that
-    // every other Orca instance depends on.
+    // every other Girra instance depends on.
     expect(resolveStartupManagedHookAction({ agentStatusHooksEnabled: false })).toBe('skip')
   })
 

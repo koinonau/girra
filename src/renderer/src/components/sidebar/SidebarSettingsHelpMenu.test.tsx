@@ -223,9 +223,9 @@ describe('SidebarSettingsHelpMenu', () => {
     expect(html).not.toContain('Onboarding')
   })
 
-  it('renders Restart Orca by default', () => {
+  it('renders Restart Girra by default', () => {
     const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('Restart Orca')
+    expect(html).toContain('Restart Girra')
   })
 
   it('renders Docs link', () => {

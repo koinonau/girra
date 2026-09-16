@@ -34,10 +34,10 @@ export function buildPosixHookSpoolLines(source: string): string[] {
     'spool_hook_event() {',
     '  case "$payload" in *\'"PreToolUse"\'*|*\'"PostToolUse"\'*|*\'"PostToolUseFailure"\'*) return 0 ;; esac',
     '  [ -n "${ORCA_AGENT_HOOK_ENDPOINT:-}" ] || return 0',
-    // Why: an endpoint can linger in a parent shell after leaving Orca; without a pane key
+    // Why: an endpoint can linger in a parent shell after leaving Girra; without a pane key
     // the record is un-attributable and would accumulate as pane-unknown.jsonl.
     '  [ -n "${ORCA_PANE_KEY:-}" ] || return 0',
-    // Why: a stale env var must not create a spool tree for an Orca that is not installed here.
+    // Why: a stale env var must not create a spool tree for a Girra that is not installed here.
     '  [ -r "$ORCA_AGENT_HOOK_ENDPOINT" ] || return 0',
     '  spool_base=${ORCA_AGENT_HOOK_ENDPOINT%/*}',
     '  spool_dir="$spool_base/spool"',
@@ -64,16 +64,16 @@ export const WINDOWS_HOOK_STDIN_DRAIN_LABEL = 'orca_agent_hook_drain_stdin'
 export const WINDOWS_HOOK_STDIN_READER = '"%SystemRoot%\\System32\\more.com"'
 const WINDOWS_HOOK_STDIN_DRAIN_COMMAND = `${WINDOWS_HOOK_STDIN_READER} >nul 2>nul`
 
-// The Orca context a hook needs before it may own stdin; see the rule below.
+// The Girra context a hook needs before it may own stdin; see the rule below.
 const WINDOWS_HOOK_ENVIRONMENT_VARS = [
   'ORCA_AGENT_HOOK_PORT',
   'ORCA_AGENT_HOOK_TOKEN',
   'ORCA_PANE_KEY'
 ] as const
 
-// Why (#11549): missing Orca context means the hook ran outside an Orca pane, where the caller
+// Why (#11549): missing Girra context means the hook ran outside a Girra pane, where the caller
 // may abandon stdin rather than close it — a read-to-EOF then blocks forever and strands a
-// visible window per hook event. The Windows rule: a hook must check the Orca env before it
+// visible window per hook event. The Windows rule: a hook must check the Girra env before it
 // owns stdin, and exit without reading when the env is missing — the payload is discarded on
 // that path anyway. This applies to .cmd hooks and to the launchers that own stdin themselves
 // when the managed script is missing.

@@ -1,17 +1,17 @@
-// Why: relay-side equivalent of Orca's local agent integration installers.
-// OpenCode still needs a config overlay, while Pi now gets Orca-managed
+// Why: relay-side equivalent of Girra's local agent integration installers.
+// OpenCode still needs a config overlay, while Pi now gets Girra-managed
 // extension files installed into the remote agent home. Host paths from the
 // renderer are meaningless on SSH targets, so the relay performs the remote
 // filesystem work itself.
 //
 // Plugin source strings ship over the JSON-RPC channel at session-ready —
 // they are NOT bundled with the relay binary because the relay is versioned
-// independently from Orca and the plugin source changes frequently as new
+// independently from Girra and the plugin source changes frequently as new
 // agent events get added; bundling would make every such change a relay
 // redeploy, and an old relay would silently serve stale plugin code.
 //
 // We deliberately do not reuse OpenCodeHookService / PiTitlebarExtensionService
-// directly: those modules import `electron` and ride on Orca's userData
+// directly: those modules import `electron` and ride on Girra's userData
 // path. The relay's electron-free constraint forces a thin parallel
 // implementation rooted at $HOME/.orca-relay/ for OpenCode and at the remote
 // Pi home for Pi.
@@ -46,7 +46,7 @@ function withOrcaManagedPiExtensionMarker(source: string): string {
 }
 function safeDirName(input: string): string {
   // Why: paneKey embeds tabId:paneId where tabId may itself contain
-  // filesystem-unsafe characters in some Orca builds. Hash to a fixed-width
+  // filesystem-unsafe characters in some Girra builds. Hash to a fixed-width
   // hex name so any input produces a portable directory name.
   return createHash('sha256').update(input).digest('hex').slice(0, 32)
 }
@@ -89,9 +89,9 @@ export class PluginOverlayManager {
     this.legacyPiRoot = join(home, RELAY_HOOKS_DIR, LEGACY_PI_OVERLAY_SUBDIR)
   }
 
-  /** Replace the cached source bodies. Called from relay.ts when Orca sends
+  /** Replace the cached source bodies. Called from relay.ts when Girra sends
    *  `agent_hook.installPlugins`. The first install enables the augmenter
-   *  output; subsequent installs (e.g. Orca version upgrade in flight) refresh
+   *  output; subsequent installs (e.g. Girra version upgrade in flight) refresh
    *  the cached source so future spawns see the new strings.
    *  Note: existing running agents keep whatever source they loaded at
    *  process start. Future PTYs pick up the refreshed source when the relay
@@ -180,7 +180,7 @@ export class PluginOverlayManager {
           return null
         }
         // Why: OPENCODE_CONFIG_DIR is a single config root. Mirror the user's
-        // remote root into the overlay before adding Orca's plugin so status
+        // remote root into the overlay before adding Girra's plugin so status
         // reporting does not hide their auth, models, keybinds, or plugins.
         this.mirrorOpenCodeConfig(existingConfigDir, dir)
       }

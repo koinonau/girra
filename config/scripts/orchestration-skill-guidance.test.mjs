@@ -44,7 +44,7 @@ describe('orchestration skill routing', () => {
       '"another worktree"',
       'lightweight terminal prompts',
       'shell commands',
-      'Orca worktree management',
+      'Girra worktree management',
       'reading or waiting on terminals'
     ]) {
       expect(description).toContain(trigger)
@@ -55,10 +55,10 @@ describe('orchestration skill routing', () => {
     const description = readDescription()
 
     expect(description).toContain(
-      "Use Computer Use for external browser windows, webviews, Orca app UI, or desktop UI outside Orca's embedded browser only when the task requires OS/window-level control such as focus, menus, dialogs, coordinates, or screenshots."
+      "Use Computer Use for external browser windows, webviews, Girra app UI, or desktop UI outside Girra's embedded browser only when the task requires OS/window-level control such as focus, menus, dialogs, coordinates, or screenshots."
     )
     expect(description).toContain(
-      "`orca-cli` for Orca's embedded pages and a page-automation tool such as Playwright or CDP for external pages."
+      "`orca-cli` for Girra's embedded pages and a page-automation tool such as Playwright or CDP for external pages."
     )
   })
 })
@@ -97,7 +97,7 @@ describe('orchestration kernel', () => {
     expect(kernel).toContain('Compatibility operator')
     expect(kernel).toContain('Ordinary terminal agent')
     expect(kernel).toContain('Model or effort selection does not make a handoff supervised')
-    expect(squash(kernel)).toContain('Never substitute a non-Orca subagent tool')
+    expect(squash(kernel)).toContain('Never substitute a non-Girra subagent tool')
   })
 
   it('makes Dispatch identity, remote uncertainty, folders, and mixed versions a safety floor', () => {
@@ -343,7 +343,7 @@ describe('owned orchestration references', () => {
 
     expect(reference).toContain('--worktree current --agent claude')
     expect(squash(reference)).toContain(
-      'A worktree selector needs the full `<repo-id>::<path>` value Orca returned, passed as `id:<newFullWorktreeId>`; a bare repo id is not a worktree id'
+      'A worktree selector needs the full `<repo-id>::<path>` value Girra returned, passed as `id:<newFullWorktreeId>`; a bare repo id is not a worktree id'
     )
     expect(reference).toContain('--worktree new-child')
     expect(reference).toContain('--worktree new-top-level')

@@ -33,18 +33,18 @@ describe('orca CLI skill guidance', () => {
       'Use Computer Use only for external windows or desktop UI that needs OS-level control, and Playwright or CDP for external pages.'
     )
     expect(skill).toContain(
-      'For external Chrome/Safari/webviews or Orca app chrome/settings, use the Computer Use skill/tool only when the task requires OS/window-level control'
+      'For external Chrome/Safari/webviews or Girra app chrome/settings, use the Computer Use skill/tool only when the task requires OS/window-level control'
     )
     expect(skill).toContain(
-      "Use `orca-cli` for Orca's embedded pages and a page-automation tool such as Playwright or CDP for external pages"
+      "Use `orca-cli` for Girra's embedded pages and a page-automation tool such as Playwright or CDP for external pages"
     )
   })
 
   it('keeps independent worktree lineage separate from Git base selection', () => {
     const skill = readSkill()
 
-    expect(skill).toContain('`--no-parent` only controls Orca lineage')
-    expect(skill).toContain('omit `--base-branch` so Orca uses the repo default base')
+    expect(skill).toContain('`--no-parent` only controls Girra lineage')
+    expect(skill).toContain('omit `--base-branch` so Girra uses the repo default base')
     expect(skill).toContain('Never base it on the current feature branch')
   })
 
@@ -172,7 +172,7 @@ describe('orca CLI install stub', () => {
   it('does not fall through to another executable on a resolution failure', () => {
     const stub = readSkill(stubPath).replace(/\s+/gu, ' ')
 
-    // Falling through can silently pair a version-matched guide with the wrong Orca build.
+    // Falling through can silently pair a version-matched guide with the wrong Girra build.
     expect(stub).toContain('report its exact error and stop')
     expect(stub).toContain('Do not fall through to another executable')
   })

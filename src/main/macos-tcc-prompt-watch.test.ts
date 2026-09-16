@@ -13,7 +13,7 @@ import {
 const REAL_PROMPT_LINE =
   '2026-07-27 15:35:26.136 Df tccd[79149:c81551c] [com.apple.TCC:access] AUTHREQ_PROMPTING: msgID=80871.81, service=kTCCServiceSystemPolicyDocumentsFolder, subject=Sub:{com.orca.tccprobe.shapecapture}Resp:{TCCDProcess: identifier=com.orca.tccprobe.shapecapture, pid=74171, auid=501, euid=501, binary_path=/private/tmp/tccprobe/TccProbe.app/Contents/MacOS/TccProbe},'
 
-// Same shape, but the #9756 case: an agent CLI accesses, Orca is held responsible.
+// Same shape, but the #9756 case: an agent CLI accesses, Girra is held responsible.
 const ORCA_APPDATA_LINE =
   '2026-07-27 15:40:02.001 Df tccd[79149:c81551c] [com.apple.TCC:access] AUTHREQ_PROMPTING: msgID=80871.99, service=kTCCServiceSystemPolicyAppData, subject=Sub:{node-5555494487fbc7467d473fd8b0a397018cbf954b}Resp:{TCCDProcess: identifier=com.stablyai.orca, pid=47548, auid=501, euid=501, binary_path=/opt/homebrew/Cellar/node/26.5.0/bin/node},'
 
@@ -33,7 +33,7 @@ describe('parseTccPromptEvent', () => {
 
   it('separates the accessing binary from the responsible app', () => {
     const event = parseTccPromptEvent(ORCA_APPDATA_LINE)
-    // The whole point of #9756: the dialog says Orca, but node did the access.
+    // The whole point of #9756: the dialog says Girra, but node did the access.
     expect(event?.responsibleIdentifier).toBe('com.stablyai.orca')
     expect(event?.accessingIdentifier).toBe('node-5555494487fbc7467d473fd8b0a397018cbf954b')
     expect(event?.binaryPath).toBe('/opt/homebrew/Cellar/node/26.5.0/bin/node')
@@ -49,7 +49,7 @@ describe('parseTccPromptEvent', () => {
 })
 
 describe('isOrcaAttributedPrompt', () => {
-  it('accepts the app and detached terminal helper across Orca build identities', () => {
+  it('accepts the app and detached terminal helper across Girra build identities', () => {
     for (const id of [
       'com.stablyai.orca',
       'com.stablyai.orca.helper',
@@ -78,7 +78,7 @@ describe('isOrcaAttributedPrompt', () => {
     ).toBe(false)
   })
 
-  it('rejects unrelated services even when Orca is responsible', () => {
+  it('rejects unrelated services even when Girra is responsible', () => {
     expect(
       isOrcaAttributedPrompt({
         service: 'kTCCServiceMicrophone',
@@ -135,7 +135,7 @@ describe('MacosTccPromptWatch', () => {
     expect(spawnLogStream).not.toHaveBeenCalled()
   })
 
-  it('reports only Orca-attributed dialogs from a live stream', async () => {
+  it('reports only Girra-attributed dialogs from a live stream', async () => {
     const { child, stdout } = createFakeLogStream()
     const onPrompt = vi.fn()
     const watch = new MacosTccPromptWatch({ onPrompt, spawnLogStream: () => child })

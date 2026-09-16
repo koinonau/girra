@@ -85,7 +85,7 @@ function runtimeHealth(
   compatibility: RuntimeCompatVerdict | null,
   remoteControl: RuntimeStatus['remoteControl'] | null | undefined
 ): ExecutionHostHealth {
-  // Why: with no live status we have no evidence the Orca server is reachable,
+  // Why: with no live status we have no evidence the Girra server is reachable,
   // unless a ready shared-control socket already proved the transport is up.
   if (!status) {
     return remoteControl?.state === 'ready' ? 'available' : 'disconnected'
@@ -182,7 +182,7 @@ function addRuntimeHost(
     id: hostId,
     kind: 'runtime',
     label,
-    detail: 'Orca server',
+    detail: 'Girra server',
     health: controlHealth ?? runtimeHealth(status, compatibility, remoteControl),
     compatibility: compatibility ?? undefined,
     capabilities: metadata?.capabilities,

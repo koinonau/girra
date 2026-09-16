@@ -25,7 +25,7 @@ const RENDERER_PID = 1001
 /** The standalone daemon is a sibling of the renderers, spawned by main. */
 const DAEMON_PID = 1500
 
-/** Orca's renderer is a direct child of the main process, so the ppid walk says `own`. */
+/** Girra's renderer is a direct child of the main process, so the ppid walk says `own`. */
 const PROCESS_ROWS = [
   { pid: RENDERER_PID, ppid: ORCA_MAIN_PID },
   { pid: ORCA_MAIN_PID, ppid: 900 }
@@ -79,7 +79,7 @@ describe('refusing to tree-kill our own Chromium processes', () => {
     ['an empty pid set', new Set<number>()],
     ['the live pid set', undefined]
   ])(
-    'refuses an Orca renderer from a daemon host with %s, because no Chromium descends from it',
+    'refuses a Girra renderer from a daemon host with %s, because no Chromium descends from it',
     (_case, ownChromiumPids) => {
       // The standalone daemon and orcad install no Chromium-backed AppEnvironment,
       // so this set is empty there. The ancestry walk is what refuses instead: it

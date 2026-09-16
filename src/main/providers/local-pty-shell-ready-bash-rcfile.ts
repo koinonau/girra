@@ -1,5 +1,5 @@
 /**
- * Content of the bash rcfile Orca launches interactive bash with.
+ * Content of the bash rcfile Girra launches interactive bash with.
  *
  * Why: bash gets a single `--rcfile` wrapper (not a ZDOTDIR tree), so the login
  * startup-file chain, OSC 133 hooks, and the shell-ready marker all live here.
@@ -9,7 +9,7 @@ import { BASH_FEATURE_CHANNEL_BLOCK, SHELL_STARTUP_IDENTITY_MARKER_BLOCK } from 
 import { SHELL_READY_MARKER_ESCAPED } from './local-pty-shell-ready-marker'
 
 export function getBashShellReadyRcfileContent(): string {
-  return `# Orca bash shell-ready wrapper
+  return `# Girra bash shell-ready wrapper
 ${BASH_FEATURE_CHANNEL_BLOCK}
 ${SHELL_STARTUP_IDENTITY_MARKER_BLOCK}
 # Why a plain variable: the channel is consumed and destroyed in these first
@@ -26,14 +26,14 @@ elif [[ -f "$HOME/.bash_login" ]]; then
 elif [[ -f "$HOME/.profile" ]]; then
   source "$HOME/.profile"
 fi
-# Why: enable bracketed paste so Orca can deliver a multiline startup prompt as
+# Why: enable bracketed paste so Girra can deliver a multiline startup prompt as
 # a single literal paste (ESC[200~…ESC[201~). Without it, older readline builds
 # treat each embedded newline as Enter and mangle the prompt into PS2
 # continuation. Modern readline defaults this on; force it for the rest.
 [[ $- == *i* ]] && bind 'set enable-bracketed-paste on' 2>/dev/null
 # Why: preserve bash's normal login-shell contract. Many users already source
 # ~/.bashrc from ~/.bash_profile; forcing ~/.bashrc again here would duplicate
-# PATH edits, hooks, and prompt init in Orca startup-command shells.
+# PATH edits, hooks, and prompt init in Girra startup-command shells.
 __orca_restore_agent_teams_path() {
   [[ -n "\${ORCA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0
   case "$PATH" in
@@ -42,8 +42,8 @@ __orca_restore_agent_teams_path() {
   export PATH="\${ORCA_AGENT_TEAMS_SHIM_DIR}:$PATH"
 }
 __orca_restore_agent_teams_path
-# Why: user startup files may set the default OpenCode config after Orca's
-# spawn env; restore the Orca-managed config dir before the first prompt.
+# Why: user startup files may set the default OpenCode config after Girra's
+# spawn env; restore the Girra-managed config dir before the first prompt.
 [[ -n "\${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${ORCA_OPENCODE_CONFIG_DIR}"
 # Why: emit OSC 133 C/D so terminal-command-lifecycle can drop stale agent
 # status when the foreground command (e.g. an interrupted Claude CLI)

@@ -6,7 +6,7 @@ import { stripElectronRunAsNode } from '../runtime/launch'
 import { getServeOptionValidationError } from '../../shared/serve-option-validation'
 
 function envRecord(): Record<string, string> {
-  // Why: the `orca` launcher runs Orca's Electron binary as Node, so this CLI
+  // Why: the `orca` launcher runs Girra's Electron binary as Node, so this CLI
   // process carries ELECTRON_RUN_AS_NODE=1. Strip it before it reaches the
   // spawned `claude` (and any nested Electron it launches), which would
   // otherwise be forced into headless plain-Node mode.
@@ -70,7 +70,7 @@ export const CORE_HANDLERS: Record<string, CommandHandler> = {
     if (!paneKey) {
       throw new RuntimeClientError(
         'invalid_environment',
-        'orca claude-teams must be run inside an Orca terminal.'
+        'orca claude-teams must be run inside a Girra terminal.'
       )
     }
     const response = await client.call<{ launch: { env: Record<string, string> } }>(

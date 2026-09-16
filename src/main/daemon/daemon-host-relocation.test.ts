@@ -215,14 +215,14 @@ describe('materializeRelocatedDaemonHost', () => {
   it('tracks a differently-named app exe rather than pinning an image name of its own', () => {
     // A dev-channel or rebranded build ships a different executableName; the host copy must follow
     // it, which is what keeps the copy verbatim instead of reintroducing a name mismatch.
-    renameSync(join(installDir, 'Orca.exe'), join(installDir, 'Orca Nightly.exe'))
-    setProcessProp('execPath', join(installDir, 'Orca Nightly.exe'))
+    renameSync(join(installDir, 'Orca.exe'), join(installDir, 'Girra Nightly.exe'))
+    setProcessProp('execPath', join(installDir, 'Girra Nightly.exe'))
     const result = materializeRelocatedDaemonHost()
     const dest = join(localAppDataDir, 'Orca', 'daemon-host', '9.9.9')
-    expect(result?.execPath).toBe(join(dest, 'Orca Nightly.exe'))
+    expect(result?.execPath).toBe(join(dest, 'Girra Nightly.exe'))
     expect(existsSync(join(dest, 'orca-terminal-daemon.exe'))).toBe(false)
     // Re-resolution must agree with materialization or the fork would target a missing exe.
-    expect(getRelocatedDaemonHost()?.execPath).toBe(join(dest, 'Orca Nightly.exe'))
+    expect(getRelocatedDaemonHost()?.execPath).toBe(join(dest, 'Girra Nightly.exe'))
   })
 
   it('is idempotent: a valid marker short-circuits without recopying', () => {

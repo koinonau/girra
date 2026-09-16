@@ -46,7 +46,7 @@ describe('toAiVaultProjectKey', () => {
 describe('buildAiVaultProjectContext', () => {
   it('uses durable worktree project ids before repo fallback', () => {
     const repo = makeRepo({ id: 'repo-1', displayName: 'Legacy Repo', path: '/Users/ada/orca' })
-    const project = makeProject({ id: 'project-1', displayName: 'Canonical Orca' })
+    const project = makeProject({ id: 'project-1', displayName: 'Canonical Girra' })
     const worktree = makeWorktree({
       id: 'wt-1',
       repoId: repo.id,
@@ -70,7 +70,7 @@ describe('buildAiVaultProjectContext', () => {
     expect(context.sessionProjectById.get(baseSession.id)).toMatchObject({
       kind: 'repo',
       key: 'project:project-1',
-      label: 'Canonical Orca'
+      label: 'Canonical Girra'
     })
   })
 
@@ -87,7 +87,7 @@ describe('buildAiVaultProjectContext', () => {
       repos: [repo],
       worktrees: [worktree],
       projectHostSetupProjection: makeProjection({
-        projects: [makeProject({ id: 'repo:repo-1', displayName: 'Compatibility Orca' })],
+        projects: [makeProject({ id: 'repo:repo-1', displayName: 'Compatibility Girra' })],
         setups: [makeSetup({ repoId: repo.id, projectId: 'repo:repo-1', path: repo.path })]
       }),
       activeRepo: repo,
@@ -122,7 +122,7 @@ describe('buildAiVaultProjectContext', () => {
   })
 
   it('inherits setup project ids for legacy worktrees without project metadata', () => {
-    const repo = makeRepo({ id: 'repo-1', displayName: 'Orca Repo', path: '/repo/orca' })
+    const repo = makeRepo({ id: 'repo-1', displayName: 'Girra Repo', path: '/repo/orca' })
     const worktree = makeWorktree({
       id: 'wt-legacy',
       repoId: repo.id,
@@ -134,7 +134,7 @@ describe('buildAiVaultProjectContext', () => {
       repos: [repo],
       worktrees: [worktree],
       projectHostSetupProjection: makeProjection({
-        projects: [makeProject({ id: 'github:stablyai/orca', displayName: 'Canonical Orca' })],
+        projects: [makeProject({ id: 'github:stablyai/orca', displayName: 'Canonical Girra' })],
         setups: [
           makeSetup({
             repoId: repo.id,
@@ -152,12 +152,12 @@ describe('buildAiVaultProjectContext', () => {
     expect(context.sessionProjectById.get(session.id)).toMatchObject({
       kind: 'repo',
       key: 'project:github:stablyai/orca',
-      label: 'Canonical Orca'
+      label: 'Canonical Girra'
     })
   })
 
   it('uses active worktree setup project ids when active repo is unavailable', () => {
-    const repo = makeRepo({ id: 'repo-1', displayName: 'Orca Repo', path: '/repo/orca' })
+    const repo = makeRepo({ id: 'repo-1', displayName: 'Girra Repo', path: '/repo/orca' })
     const worktree = makeWorktree({
       id: 'wt-restored',
       repoId: repo.id,
@@ -169,7 +169,7 @@ describe('buildAiVaultProjectContext', () => {
       repos: [repo],
       worktrees: [worktree],
       projectHostSetupProjection: makeProjection({
-        projects: [makeProject({ id: 'github:stablyai/orca', displayName: 'Canonical Orca' })],
+        projects: [makeProject({ id: 'github:stablyai/orca', displayName: 'Canonical Girra' })],
         setups: [
           makeSetup({
             repoId: repo.id,

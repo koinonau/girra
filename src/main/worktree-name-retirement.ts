@@ -147,7 +147,7 @@ async function getRetirementCollisionKey(
   return key
 }
 
-/** True when the repo executes on an Orca-provisioned on-demand runtime, whose address and
+/** True when the repo executes on a Girra-provisioned on-demand runtime, whose address and
  *  filesystem are both replaced on every provision. */
 function isRuntimeOwnedRetirementHost(repo: Repo): boolean {
   const parsed = parseExecutionHostId(getRepoExecutionHostId(repo))

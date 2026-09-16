@@ -1,7 +1,7 @@
 // A journal directory left behind by the pre-SQLite file format.
 //
 // Not `journal-legacy-import.ts`, which reads the PROVIDER's own transcript.
-// This is Orca's own `log.jsonl`, which no build after the SQLite move reads.
+// This is Girra's own `log.jsonl`, which no build after the SQLite move reads.
 // Nothing imports it, so the session it belonged to opens empty and is
 // indistinguishable from a chat created seconds ago — same `session_created`
 // epoch, same empty timeline. The remnant is the one durable fact that tells
@@ -50,7 +50,7 @@ export function journalFileFormatRemnantDisclosure(input: {
     body: {
       kind: 'status',
       text: boundJournalStatusText(
-        `This chat's history was saved in an older format Orca no longer reads, so it starts ` +
+        `This chat's history was saved in an older format Girra no longer reads, so it starts ` +
           `empty. The session still points at the same ${formatAgentTypeLabel(input.agent)} ` +
           `conversation — send a message to pick up where you left off. The original ` +
           `transcript is on the session's host at \`${input.transcriptPath}\``

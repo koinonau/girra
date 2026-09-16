@@ -1,7 +1,7 @@
 // Why: stdin ownership is a cross-agent process contract; one executable
 // matrix catches an unread early exit without duplicating template assertions.
 // Exception (#11549): Windows batch hooks give up stdin ownership on the
-// missing-Orca-env path, so their writer may break there.
+// missing-Girra-env path, so their writer may break there.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { spawn } from 'node:child_process'
 import { mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
@@ -16,7 +16,7 @@ let previousUserDataPath: string | undefined
 beforeEach(() => {
   previousUserDataPath = process.env.ORCA_USER_DATA_PATH
   isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-stdin-user-data-'))
-  // Why: Orca-managed hook paths can resolve through ORCA_USER_DATA_PATH before
+  // Why: Girra-managed hook paths can resolve through ORCA_USER_DATA_PATH before
   // the mocked home; an inherited live path would let this test rewrite them.
   process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
 })
@@ -104,7 +104,7 @@ function runHookProcess(
   executable: string,
   args: string[],
   env: NodeJS.ProcessEnv,
-  // Why: `abandon` leaves the pipe open and unwritten — the shape a caller outside an Orca
+  // Why: `abandon` leaves the pipe open and unwritten — the shape a caller outside a Girra
   // pane produces, and the only one that can catch a read-to-EOF that never returns (#11549).
   stdin: 'close' | 'abandon' = 'close'
 ): Promise<HookRun> {
@@ -188,7 +188,7 @@ async function withPlatform<T>(platform: NodeJS.Platform, run: () => T | Promise
 }
 
 describe('Windows managed hook stdin structure', () => {
-  it('exits immediately when Orca env is missing and keeps drain for other failures', async () => {
+  it('exits immediately when Girra env is missing and keeps drain for other failures', async () => {
     const home = mkdtempSync(join(tmpdir(), 'orca-hook-stdin-windows-'))
     homedirMock.mockReturnValue(home)
     seedCmdAutoRunTarget(home)
@@ -230,7 +230,7 @@ describe('Windows managed hook stdin structure', () => {
       }
 
       // Why (#11549): the Devin skip is the only remaining in-script jump to more.com, so it
-      // must sit below the env guards — otherwise a Devin session outside an Orca pane still
+      // must sit below the env guards — otherwise a Devin session outside a Girra pane still
       // parks there and strands the hook exactly like the pre-fix guards did.
       const claude = readFileSync(join(hooksDir, 'claude-hook.cmd'), 'utf8')
       expect(claude, 'claude devin guard present').toContain(
@@ -272,7 +272,7 @@ describe('Windows managed hook stdin structure', () => {
   })
 
   it.skipIf(process.platform !== 'win32')(
-    'exits 0 for every local script and missing-script launcher, dropping stdin only without Orca env',
+    'exits 0 for every local script and missing-script launcher, dropping stdin only without Girra env',
     async () => {
       const home = mkdtempSync(join(tmpdir(), 'orca-hook-stdin-windows-live-'))
       homedirMock.mockReturnValue(home)
@@ -294,7 +294,7 @@ describe('Windows managed hook stdin structure', () => {
           )
           expect(result.exitCode, `${fileName} exit code`).toBe(0)
           // Why (#11549 class): every Windows-local hook exits before owning stdin when the
-          // Orca env is missing, so the writer may break. hookEnvironment() strips every
+          // Girra env is missing, so the writer may break. hookEnvironment() strips every
           // ORCA_* var, so this relaxation only ever covers the missing-env path — a
           // happy-path case added to this loop must not reuse it.
           for (const error of result.stdinErrors) {
@@ -391,9 +391,9 @@ describe('Windows managed hook stdin structure', () => {
         ]
         // Why: cover guard exit, reached curl, and the launcher's missing-script fallback.
         const environments = [
-          { name: 'no Orca env', env: hookEnvironment({ USERPROFILE: home }) },
+          { name: 'no Girra env', env: hookEnvironment({ USERPROFILE: home }) },
           {
-            name: 'Orca env with dead listener',
+            name: 'Girra env with dead listener',
             env: hookEnvironment({
               USERPROFILE: home,
               ORCA_AGENT_HOOK_PORT: '59999',
@@ -451,7 +451,7 @@ describe.skipIf(process.platform === 'win32')('managed hook stdin lifecycle', ()
     }
   })
 
-  it('accepts a large payload without Orca environment or a broken writer', async () => {
+  it('accepts a large payload without Girra environment or a broken writer', async () => {
     const scripts = await generatePosixScripts()
     for (const [agent, script] of scripts) {
       const result = await runPosixHook(script)

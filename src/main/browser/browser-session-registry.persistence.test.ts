@@ -215,7 +215,7 @@ describe('BrowserSessionRegistry persistence', () => {
     expect(fsState.present.has(legacyPath)).toBe(false)
   })
 
-  it('persists new browser session profiles under the active Orca profile directory', async () => {
+  it('persists new browser session profiles under the active Girra profile directory', async () => {
     const fsState = createFsState()
     const profileMetaPath = '/user-data/profiles/local-work/browser-session-meta.json'
 
@@ -436,7 +436,7 @@ describe('BrowserSessionRegistry persistence', () => {
     )
     expect(appliedUas).not.toContain(brokenUa)
     expect(appliedUas).not.toContain(validUa)
-    // Why: every non-native profile falls to Orca's own cleaned engine UA.
+    // Why: every non-native profile falls to Girra's own cleaned engine UA.
     expect(appliedUas.length).toBeGreaterThan(0)
     expect(appliedUas.every((ua) => ua === CLEAN_USER_AGENT)).toBe(true)
     expect(cleanElectronUserAgentMock).toHaveBeenCalled()
@@ -625,7 +625,7 @@ describe('BrowserSessionRegistry persistence', () => {
       })
     )
 
-    // Opaque frame URLs have no site Orca can name accurately.
+    // Opaque frame URLs have no site Girra can name accurately.
     browserManagerNotifyPermissionDeniedMock.mockClear()
     requestHandler(guestWc, 'geolocation', permissionCallback, {
       requestingUrl: 'about:blank',
@@ -657,7 +657,7 @@ describe('BrowserSessionRegistry persistence', () => {
     expect(checkHandler(null, 'storage-access', '')).toBe(true)
 
     // Why: requestStorageAccessFor() is a different platform decision — Chromium consults Related
-    // Website Sets and has no third-party-cookie auto-grant, and Orca has no such data source. This
+    // Website Sets and has no third-party-cookie auto-grant, and Girra has no such data source. This
     // pins the deliberate denial so a future blanket widening of the allow-set fails loudly.
     requestHandler(guestWc, 'top-level-storage-access', permissionCallback)
     expect(permissionCallback).toHaveBeenLastCalledWith(false)

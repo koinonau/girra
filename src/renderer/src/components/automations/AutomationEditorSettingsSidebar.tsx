@@ -73,7 +73,7 @@ export function AutomationEditorSettingsSidebar({
     <aside className="flex w-[320px] shrink-0 flex-col overflow-auto border-l border-border/50 bg-muted/20 px-5 py-5 scrollbar-sleek">
       <div className="flex flex-col">
         {/* Why: Hermes keeps project/workspace/schedule only. Collapse the
-            Orca-only knobs so switching the create target does not jump. */}
+            Girra-only knobs so switching the create target does not jump. */}
         <div
           className={cn(
             'grid overflow-hidden transition-[grid-template-rows,margin] duration-200 ease-out',

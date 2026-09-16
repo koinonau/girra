@@ -71,7 +71,7 @@ describe('PtyHandler', () => {
     await endPtyHandlerTest(handler, originalPlatform)
   })
 
-  it("does not forward Orca's own NODE_ENV into the spawned shell", async () => {
+  it("does not forward Girra's own NODE_ENV into the spawned shell", async () => {
     // Why: NODE_ENV in the relay host process is a build-mode flag, not the
     // user's; leaking it breaks `next build` and Vitest in the terminal.
     const previous = process.env.NODE_ENV
@@ -242,7 +242,7 @@ describe('PtyHandler', () => {
 
   describe('history isolation off', () => {
     // Why isolation OFF: injectRelayFishHistoryEnv runs only for a fish pane with
-    // isolation on, but fish EXPORTS fish_history, so a relay launched from an Orca
+    // isolation on, but fish EXPORTS fish_history, so a relay launched from a Girra
     // fish pane inherits one on EVERY path — and it names someone else's worktree
     // (a desktop-minted name names a directory that does not exist here at all).
     it.each([
@@ -305,7 +305,7 @@ describe('PtyHandler', () => {
     // Why unconditionally, not only with isolation on: injectRelayHistoryEnv is
     // what normally mints (and first clears) ORCA_HISTFILE, and it runs only
     // with isolation on. An inherited one — the relay can be launched from an
-    // Orca pane — would otherwise reach the remote wrapper on the disabled and
+    // Girra pane — would otherwise reach the remote wrapper on the disabled and
     // revive paths, re-exporting another worktree's history path (#11146) and
     // wrapping a zsh pane nothing asked to wrap.
     it.each([

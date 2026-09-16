@@ -132,7 +132,7 @@ async function reportProbePoisonedWithSettledRepair(
 
 /**
  * The pre-window gate meeting a spent repair budget: the tree is still marked poisoned and
- * Orca has no repair left to try. icacls must never be reached, so the runner throws.
+ * Girra has no repair left to try. icacls must never be reached, so the runner throws.
  */
 async function gateFindsRepairBudgetSpent(): Promise<void> {
   const options = recoveryOptions()
@@ -383,7 +383,7 @@ describe('handleGpuChildCrash vs the install-dir ACL verdict', () => {
 })
 
 // The safe-graphics marker is read before whenReady, and the pre-window ACL gate runs after
-// that read. Asking "keep safe graphics?" on a machine Orca has just repaired invites a
+// that read. Asking "keep safe graphics?" on a machine Girra has just repaired invites a
 // `userConfirmed: true` marker that pins software rendering on healthy hardware.
 describe('presentGpuFallbackRecoveredLaunchPrompt vs a marker retired since it was read', () => {
   const realPlatform = process.platform

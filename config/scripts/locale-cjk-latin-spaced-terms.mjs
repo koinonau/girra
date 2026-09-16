@@ -31,6 +31,8 @@ export const CJK_LATIN_SPACED_TERMS = [
   'Gemini',
   'Kimi',
   'OpenCode',
+  'Girra',
+  // Still spelled Orca on the settings Support section and the usage share card.
   'Orca',
   'Cursor',
   'Bitbucket',

@@ -23,7 +23,7 @@ import { TUI_AGENT_DISPLAY_NAMES } from './tui-agent-display-names'
  * branch breaks another. Here every signal is collected first and ranked afterwards, by class:
  *
  *   vendor marker  — a control sequence or sigil the agent itself emits. Task text cannot forge it.
- *   anchored name  — a name in a position some grammar reserves for identity (Orca's `- <agent>`
+ *   anchored name  — a name in a position some grammar reserves for identity (Girra's `- <agent>`
  *                    owner suffix, or the whole undecorated remainder).
  *   free-text name — a name anywhere else. Anyone can type it.
  *
@@ -54,7 +54,7 @@ const NAME_TOKENS: readonly (readonly [string, TuiAgent])[] = [
   ['opencode', 'opencode']
 ]
 
-/** Catalog labels known to be emitted as terminal titles, not merely presented in Orca's UI. */
+/** Catalog labels known to be emitted as terminal titles, not merely presented in Girra's UI. */
 const EMITTED_DISPLAY_LABEL_AGENTS = ['claude-agent-teams'] as const satisfies readonly TuiAgent[]
 
 const DISPLAY_LABELS = [
@@ -66,7 +66,7 @@ const DISPLAY_LABELS = [
 ] satisfies readonly (readonly [string, TuiAgent])[]
 
 /**
- * Orca renders `<task text>… - <agent>` and owns the suffix; task text cannot reach past it.
+ * Girra renders `<task text>… - <agent>` and owns the suffix; task text cannot reach past it.
  * Why leading whitespace is required: without it this also matches the tail of a hyphenated
  * worktree name (`review-14600-opencode`), which is a directory, not an owner declaration.
  */

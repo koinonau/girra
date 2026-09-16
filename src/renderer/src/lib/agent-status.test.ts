@@ -272,7 +272,7 @@ describe('getAgentLabel', () => {
 
   it('treats Claude Code prefixed task titles as Claude even when they mention another CLI', () => {
     expect(getAgentLabel('✳ OpenCode ready')).toBe('Claude Code')
-    expect(getAgentLabel('. Compare Opencode Vs Orca')).toBe('Claude Code')
+    expect(getAgentLabel('. Compare Opencode Vs Girra')).toBe('Claude Code')
     expect(getAgentLabel('* Review Pi behavior')).toBe('Claude Code')
   })
 
@@ -307,7 +307,7 @@ describe('getAgentLabel', () => {
   it('does not label a bare "cursor" token in another agent title', () => {
     expect(getAgentLabel('⠋ preserve cursor visibility across replays')).toBe('Claude Code')
     expect(getAgentLabel('⠋ OpenCode: fix cursor offsets')).toBe('OpenCode')
-    expect(getAgentLabel('Terminal Cursor and Orca slows down')).toBeNull()
+    expect(getAgentLabel('Terminal Cursor and Girra slows down')).toBeNull()
   })
 })
 

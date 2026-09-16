@@ -17,7 +17,7 @@ export type AiVaultDeleteSessionResult =
   | { outcome: 'rejected'; agent: AiVaultAgent; reason: AiVaultSessionDeleteRejectionCode }
   | { outcome: 'failed'; agent: AiVaultAgent; error: string }
 
-// Agents whose sessions Orca can remove completely: everything the session
+// Agents whose sessions Girra can remove completely: everything the session
 // wrote is derivable from the one path the scanner surfaced, and none of it is
 // shared with another session.
 //

@@ -177,7 +177,7 @@ describe('getRelayShellLaunchConfig', () => {
   )
 
   it.skipIf(process.platform === 'win32')(
-    'keeps a remote zsh with nothing Orca-owned on the plain login path',
+    'keeps a remote zsh with nothing Girra-owned on the plain login path',
     () => {
       const env = buildSshPtySpawnEnv({ env: { HOME: homeDir, PATH: '/usr/bin:/bin' } })
 
@@ -353,7 +353,7 @@ describe('getRelayShellLaunchConfig', () => {
 
   // Why: RHEL-family /etc/bashrc prepends "history -a; " to PROMPT_COMMAND
   // outside its BASHRCSOURCED guard (repeated across re-sources), so the value
-  // Orca inherits ends in a ";"+whitespace separator. Prepend/append must not
+  // Girra inherits ends in a ";"+whitespace separator. Prepend/append must not
   // splice an empty command (";;") that breaks the prompt with a syntax error.
   itWithBash('normalizes an inherited PROMPT_COMMAND ending in a separator', () => {
     writeFileSync(

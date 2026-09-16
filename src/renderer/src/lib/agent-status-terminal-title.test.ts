@@ -10,8 +10,8 @@ describe('resolveAgentStatusTerminalTitle', () => {
 
   it('keeps descriptive completed titles that are already non-working', () => {
     expect(
-      resolveAgentStatusTerminalTitle({ agentType: 'pi', state: 'done' }, 'Orca Pi Done')
-    ).toBe('Orca Pi Done')
+      resolveAgentStatusTerminalTitle({ agentType: 'pi', state: 'done' }, 'Girra Pi Done')
+    ).toBe('Girra Pi Done')
   })
 
   it('uses permission titles for synthetic agents waiting on user input', () => {

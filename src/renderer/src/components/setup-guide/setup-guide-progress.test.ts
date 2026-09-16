@@ -284,7 +284,7 @@ describe('getSetupGuideProgress', () => {
     expect(progress.stepDone['agent-capabilities']).toBe(true)
   })
 
-  it('marks the Orca CLI setup row complete when installed skills are ready and Computer Use is unavailable', () => {
+  it('marks the Girra CLI setup row complete when installed skills are ready and Computer Use is unavailable', () => {
     const progress = getSetupGuideProgress(
       makeInput({
         browserUseSkillInstalled: true,

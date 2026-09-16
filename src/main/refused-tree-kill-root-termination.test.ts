@@ -145,7 +145,7 @@ describe('a refused tree-kill still terminates the root it owns', () => {
     expect(windowsChild.kill).toHaveBeenCalledWith('SIGKILL')
   })
 
-  it('still signals the POSIX process group: a group only holds what Orca put in it', async () => {
+  it('still signals the POSIX process group: a group only holds what Girra put in it', async () => {
     // Same contract as the other POSIX group arms in main (claude-login, PTY
     // sweep): never refuse. A stale `getAppMetrics()` entry
     // must not orphan a macOS/Linux tree.

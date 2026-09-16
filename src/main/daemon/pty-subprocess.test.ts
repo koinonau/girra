@@ -234,7 +234,7 @@ describe('createPtySubprocess', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     Object.defineProperty(process, 'platform', { configurable: true, value: 'linux' })
     delete process.env.SHELL
-    // Why: the test runner itself can execute inside an Orca-wrapped shell
+    // Why: the test runner itself can execute inside a Girra-wrapped shell
     // whose exported wrapper vars would leak through the process.env spread.
     delete process.env.ORCA_SHELL_FEATURES
     delete process.env.ZDOTDIR

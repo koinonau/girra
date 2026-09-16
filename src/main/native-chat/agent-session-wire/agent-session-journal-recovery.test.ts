@@ -131,7 +131,7 @@ afterEach(async () => {
 })
 
 describe('providerHistoryId', () => {
-  it('uses the provider handle, never the Orca session id', () => {
+  it('uses the provider handle, never the Girra session id', () => {
     expect(providerHistoryId({ kind: 'claude', sessionId: 'sess-9', leafUuid: null })).toBe(
       'sess-9'
     )
@@ -238,7 +238,7 @@ describe('openAgentSessionJournalWithRecovery', () => {
 
   // The rehydrate deletes every live row to publish its replacement epoch, so
   // everything replay rejected is gone for good by the time the import runs.
-  // Orca minted the submission, receipt and lifecycle identities; no provider
+  // Girra minted the submission, receipt and lifecycle identities; no provider
   // transcript can hand them back.
   it('rebuilds from provider history when the epoch row itself is gone', async () => {
     const journal = await journals.open({ identity: IDENTITY, journalDir })

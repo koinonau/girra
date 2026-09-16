@@ -1,4 +1,4 @@
-// Why a submission is in doubt, and whether Orca may put the message on the
+// Why a submission is in doubt, and whether Girra may put the message on the
 // wire a second time.
 
 import type { AgentJournalDispatchState } from '../../../shared/agent-session-journal-types'
@@ -48,7 +48,7 @@ export function dispatchWriteOutcomeUnknownReason(error: unknown): string {
  * A dead child and a dead host are NOT on this list. Both end the wait, neither
  * proves non-delivery: the message was already written to that child's stdin,
  * and Claude resumes the same provider session by id, so a message that child
- * processed before dying is in the conversation Orca resumes. Deciding those
+ * processed before dying is in the conversation Girra resumes. Deciding those
  * needs the message matched against provider history — which is exactly what
  * `journal-submission-reconciler.ts` does, and that module has no caller yet.
  */

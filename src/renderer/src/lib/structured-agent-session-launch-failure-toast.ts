@@ -32,7 +32,7 @@ export function trackStructuredLaunchFailureToast(
         {
           description: translate(
             'components.native-chat.structuredSessionFellBackToTerminalDescription',
-            'Orca tried to open a {{value0}} terminal instead.',
+            'Girra tried to open a {{value0}} terminal instead.',
             { value0: agentLabel }
           )
         }
@@ -52,7 +52,7 @@ export function trackStructuredLaunchFailureToast(
       {
         description: translate(
           'components.native-chat.structuredSessionLaunchFailedDescription',
-          'Orca could not open a structured {{value0}} chat. See the logs for details.',
+          'Girra could not open a structured {{value0}} chat. See the logs for details.',
           { value0: agentLabel }
         )
       }

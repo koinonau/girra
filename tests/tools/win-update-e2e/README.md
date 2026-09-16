@@ -1,6 +1,6 @@
 # win-update-e2e — packaged NSIS update proof harness
 
-**Windows only.** Given two Orca Windows installers (version N and N+1), this
+**Windows only.** Given two Girra Windows installers (version N and N+1), this
 harness performs a real silent update and proves, with machine-checkable
 assertions, what happens to the terminal **daemon** and its **sessions** across
 the update — and whether any console/terminal window flashes.
@@ -73,11 +73,11 @@ Or directly: `node tests/tools/win-update-e2e/run.mjs --from ... --to ... --expe
 This harness installs, overwrites, and can uninstall a real app. Two guards
 protect a developer's machine; a clean CI/VM is unaffected by either:
 
-- **Pre-existing app process → hard refusal.** If an Orca _app_ process (not a
+- **Pre-existing app process → hard refusal.** If a Girra _app_ process (not a
   daemon) is already running, the run aborts and prints the offending PIDs. The
   harness never kills a process it did not start.
 - **Pre-existing install → refusal unless `--allow-existing-install`.** If an
-  Orca install already exists under `%LOCALAPPDATA%\Programs`, the run refuses,
+  Girra install already exists under `%LOCALAPPDATA%\Programs`, the run refuses,
   because installing N then N+1 would silently overwrite that build and leave
   the `--to` version behind. Pass `--allow-existing-install` to proceed anyway.
 
@@ -93,7 +93,7 @@ Uninstall behavior at teardown follows ownership:
 ## Isolated install mode (developer machines)
 
 On a clean CI/VM the harness installs into the default per-user location
-(`%LOCALAPPDATA%\Programs\Orca`). A developer's box already has a real Orca there,
+(`%LOCALAPPDATA%\Programs\Girra`). A developer's box already has a real Girra there,
 and the safety guards above would (correctly) refuse to run. **Isolated mode**
 (`--install-dir <path>`) lets the harness run on that box without disturbing the
 real install.
@@ -115,7 +115,7 @@ Start Menu / Desktop shortcuts. Left hijacked, the user's **next real update wou
 install into the test directory**. So isolated mode, before installing:
 
 1. **Snapshots** the shared state (`registry-shortcut-backup.mjs`): `reg export`s
-   each existing key to `.reg` files, copies the Orca `*.lnk` shortcuts, and records
+   each existing key to `.reg` files, copies the Girra `*.lnk` shortcuts, and records
    a manifest (which keys/shortcuts existed, the pre-run `InstallLocation`).
 2. Runs the full install → update → assert proof against the isolated directory.
 3. **Always restores** at teardown (a `try/finally` wraps everything after the
@@ -127,7 +127,7 @@ install into the test directory**. So isolated mode, before installing:
    and removes the directory if empty — `--keep-install` is ignored.
 
 **Residual risk.** The backup/restore covers `InstallLocation`, the uninstall entry,
-and the Orca shortcuts — the state that steers a future update and the user-visible
+and the Girra shortcuts — the state that steers a future update and the user-visible
 launchers. It does **not** attempt to snapshot auto-update state files under the real
 install's `userData` (the harness uses an isolated `userData` throughout, so it never
 writes there), and it cannot restore state if the machine loses power mid-teardown
@@ -152,7 +152,7 @@ node tests/tools/win-update-e2e/registry-shortcut-backup.mjs
 ## What it does
 
 1. **Preflight** — assert win32; warn if elevated; **refuse** to run if a
-   pre-existing Orca _app_ process (not a daemon) is running that the harness
+   pre-existing Girra _app_ process (not a daemon) is running that the harness
    did not start (it is printed and the run aborts — the harness never kills a
    user's processes); snapshot the baseline set of visible top-level windows.
 2. **Install N** silently (`<setup.exe> /S`) and locate `Orca.exe`.
@@ -197,7 +197,7 @@ powershell -File tests/tools/win-update-e2e/window-enum.ps1
 | `cli-args.mjs`                 | Argument parsing / validation                                                 |
 | `preflight.mjs`                | win32/elevation checks, pre-existing-app refusal, baseline snapshot           |
 | `installer-steps.mjs`          | Silent install/update/uninstall, exe discovery, gh download                   |
-| `registry-shortcut-backup.mjs` | Isolated mode: snapshot/restore the shared HKCU keys + Orca shortcuts         |
+| `registry-shortcut-backup.mjs` | Isolated mode: snapshot/restore the shared HKCU keys + Girra shortcuts         |
 | `app-driver.mjs`               | Playwright Electron launch + terminal driving (production-safe DOM selectors) |
 | `interactivity-probes.mjs`     | Sentinel-file echo / heartbeat / Ctrl+C probes                                |
 | `daemon-processes.mjs`         | Daemon PID discovery (command-line marker + pid file), scoped                 |

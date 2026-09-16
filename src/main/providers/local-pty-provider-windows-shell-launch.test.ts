@@ -367,7 +367,7 @@ describe('LocalPtyProvider', () => {
       expect(spawnMock).toHaveBeenCalledTimes(callsBeforeSpawn)
     })
 
-    it('marks Orca terminal handle for WSL import when buildSpawnEnv opts in', async () => {
+    it('marks Girra terminal handle for WSL import when buildSpawnEnv opts in', async () => {
       Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
       provider.configure({
         buildSpawnEnv: (_id, env, ctx) => {
