@@ -17,7 +17,7 @@ the step that delivers them; PR 1a and PR 1b have landed.
 ## The problem this solves
 
 Girra shows "what is this agent doing" in four places: the desktop sidebar, the
-`orca worktree ps` command, the mobile app, and the agent dashboard. Before
+`girra worktree ps` command, the mobile app, and the agent dashboard. Before
 #19217 those readers did not even share their inputs. After #19217 they share
 the structured-session mapping and nothing else.
 
@@ -161,7 +161,7 @@ the admission gate that decides which rows a worktree listing may show:
   structured session's tab lives in the renderer's own tab state, and a
   headless host has no renderer to mirror it from. That argument only holds if
   the headless host is itself wired to the store, which is a separate
-  obligation per entry point: the Electron hosts (desktop and `orca serve`)
+  obligation per entry point: the Electron hosts (desktop and `girra serve`)
   share `main-process-runtime-service.ts`, and `orcad` constructs its own
   runtime in `src/main/orcad/orcad-entry.ts`. A host missing that wiring lists
   no agents at all, not just no structured ones, because `worktree ps` reads

@@ -7,7 +7,7 @@ import { Callout, ImagePlaceholder } from '@/components/docs/prose'
 
 A Remote Girra Server lets one computer do the work while another computer provides the UI. The server keeps the projects, worktrees, terminals, tabs, provider accounts, and agent sessions. Your laptop connects to that running Girra instance.
 
-The easiest setup is the Girra desktop app on both computers, connected through [Tailscale](https://tailscale.com/). You do not need to run `orca serve` for this path.
+The easiest setup is the Girra desktop app on both computers, connected through [Tailscale](https://tailscale.com/). You do not need to run `girra serve` for this path.
 
 <Callout title="Beta">
   Remote Girra Servers are beta. Keep the server and client on a private network path you control,
@@ -29,18 +29,18 @@ Server computer · Girra server
 
 Install and authenticate Claude Code, OpenCode, Pi, `git`, and any provider CLIs on the **server computer**. A login on your laptop does not automatically carry over to the server.
 
-On a headless `orca serve` host, register managed Claude accounts from the server shell (the remote client disables **Add account**):
+On a headless `girra serve` host, register managed Claude accounts from the server shell (the remote client disables **Add account**):
 
 ```bash
-orca account add --agent claude
-orca account list
+girra account add --agent claude
+girra account list
 ```
 
 Install or refresh agent skills without a Settings UI:
 
 ```bash
-orca skills install --skill orca-cli --skill orchestration
-orca skills update --all
+girra skills install --skill orca-cli --skill orchestration
+girra skills update --all
 ```
 
 ## Recommended: desktop app + Tailscale
@@ -119,32 +119,20 @@ Girra creates a separate, revocable token for each paired client. The server lis
 - Do not forward the Girra port directly to the public internet. Prefer Tailscale, WireGuard, a trusted LAN, SSH forwarding, or an authenticated tunnel.
 - Do not select `127.0.0.1` for another computer. That address only works on the server itself.
 
-## Alternative: `orca serve`
+## Alternative: `girra serve`
 
-Use `orca serve` when the host should run without the desktop window—for example, a headless Linux server or a service-managed VM. For a MacBook or desktop you can leave signed in, the in-app setup above is simpler.
+Use `girra serve` when the host should run without the desktop window—for example, a headless Linux server or a service-managed VM. For a MacBook or desktop you can leave signed in, the in-app setup above is simpler.
 
 Install Girra and its bundled CLI on the server, then run:
 
-<Callout title="On Linux, start it with orca-ide serve">
-  The Linux CLI is named `orca-ide`, because GNOME Orca's screen reader already owns
-  `/usr/bin/orca`. A packaged `orca serve` does write a bare `orca` into `~/.local/bin`, but only
-  while it is starting, so that shim can never be the command that starts the server. Read `orca
-  serve` as `orca-ide serve` throughout this page when the host is Linux. See [Install →
-  Linux](/docs/install#linux).
-</Callout>
-
 ```bash
-orca serve --pairing-address <server-tailscale-ip-or-hostname>
-# Linux
-orca-ide serve --pairing-address <server-tailscale-ip-or-hostname>
+girra serve --pairing-address <server-tailscale-ip-or-hostname>
 ```
 
 For example:
 
 ```bash
-orca serve --pairing-address 100.64.1.20
-# Linux
-orca-ide serve --pairing-address 100.64.1.20
+girra serve --pairing-address 100.64.1.20
 ```
 
 The command:
@@ -159,16 +147,14 @@ Paste the printed pairing URL into **Settings → Remote Girra Servers → Add S
 Add `--port 6768` when a firewall, tunnel, or service definition requires a fixed port:
 
 ```bash
-orca serve --port 6768 --pairing-address 100.64.1.20
-# Linux
-orca-ide serve --port 6768 --pairing-address 100.64.1.20
+girra serve --port 6768 --pairing-address 100.64.1.20
 ```
 
-Use only one host mode at a time. If the Girra desktop app is already sharing that computer, do not start a second `orca serve` process for the same setup.
+Use only one host mode at a time. If the Girra desktop app is already sharing that computer, do not start a second `girra serve` process for the same setup.
 
-## Desktop app or `orca serve`?
+## Desktop app or `girra serve`?
 
-|               | Desktop app on the server           | `orca serve`                                       |
+|               | Desktop app on the server           | `girra serve`                                       |
 | ------------- | ----------------------------------- | -------------------------------------------------- |
 | Best for      | An old laptop, Mac mini, or desktop | A headless Linux box, VM, or managed service       |
 | Setup         | Settings and buttons                | Terminal command and service configuration         |
@@ -204,12 +190,12 @@ On the server, open **Settings → Remote Girra Servers → Shared Server Access
 
 Install and authenticate that CLI on the server computer. Remote sessions use the server's `PATH`, home directory, and credentials—not the client's.
 
-### `orca serve` advertises the wrong address
+### `girra serve` advertises the wrong address
 
 Stop the command and restart it with an address the client can reach:
 
 ```bash
-orca serve --pairing-address <reachable-tailscale-ip-or-hostname>
+girra serve --pairing-address <reachable-tailscale-ip-or-hostname>
 ```
 
 Do not use a wildcard address or `127.0.0.1` for a remote client.
@@ -218,4 +204,4 @@ Do not use a wildcard address or `127.0.0.1` for a remote client.
 
 - Compare every run mode in [Ways to run Girra](/docs/ways-to-run).
 - Use [SSH worktrees](/docs/ssh) when the laptop should own the Girra runtime.
-- See the [Girra CLI reference](/docs/cli/reference) for `orca serve` flags and automation commands.
+- See the [Girra CLI reference](/docs/cli/reference) for `girra serve` flags and automation commands.

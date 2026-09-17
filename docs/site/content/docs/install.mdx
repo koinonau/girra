@@ -113,7 +113,7 @@ The AppImage has a stable download link per architecture — [`orca-linux.AppIma
 
 Which package manager appears depends on what your system actually has: `apt`, else `dpkg -i`, for a `.deb`; `zypper`, `dnf`, `yum`, then `rpm -Uvh` for an `.rpm`. The download directory follows `XDG_CACHE_HOME` when that is set and falls back to `~/.cache` when it is not.
 
-**Quit Girra before you run the command**, then reopen it once the install finishes. You are replacing the files of a running application, and the package manager cannot swap them safely underneath a live process. Girra deliberately never escalates privileges to do this for you: installing a system package needs root, `orca serve` runs as an unprivileged user, and a headless machine has no authentication agent to prompt. VS Code and Signal make the same call on `.deb`.
+**Quit Girra before you run the command**, then reopen it once the install finishes. You are replacing the files of a running application, and the package manager cannot swap them safely underneath a live process. Girra deliberately never escalates privileges to do this for you: installing a system package needs root, `girra serve` runs as an unprivileged user, and a headless machine has no authentication agent to prompt. VS Code and Signal make the same call on `.deb`.
 
 **A distro-managed build is left alone.** If you are running a repackaged Girra — an AUR build, a Nix derivation — Girra sees that no package manager it can drive owns this install and stops offering a download it could never apply. It still reports that a new version exists, so you can update the way you normally would.
 
@@ -123,17 +123,12 @@ Which package manager appears depends on what your system actually has: `apt`, e
   today, `.deb` and `.rpm` updates are the manual step described above.
 </Callout>
 
-#### The CLI command is `orca-ide`
+#### The CLI command is `girra`
 
-On Linux the [Girra CLI](/docs/cli/reference) installs as **`orca-ide`**, not `orca`. GNOME Orca — the screen reader that ships by default on Ubuntu and other GNOME desktops — already owns `/usr/bin/orca`, and Girra will not shadow it. The `.deb` and `.rpm` packages are named `orca-ide` for the same reason.
+On Linux the [Girra CLI](/docs/cli/reference) installs as **`girra`**, the same name as on macOS and Windows. Installs predating the rename answer to `orca-ide` and `orca`, which the packages keep as aliases.
 
-- The `.deb` and `.rpm` put `orca-ide` on your `PATH` at install time, as `/usr/bin/orca-ide`.
-- With the AppImage, register the CLI from [Settings → General → Girra CLI](/docs/settings). That installs `~/.local/bin/orca-ide`.
-- Inside Girra's own terminals, bare `orca` works. Girra puts a shim on the `PATH` of the terminals it manages, so agents and scripts running there use the same command as on macOS and Windows.
-- On a headless host, a packaged `orca serve` writes a bare `orca` into `~/.local/bin` as it starts, unless a file it does not own already holds that name. It writes that _during_ startup, so it is never what starts the server — the first launch is always [`orca-ide serve`](/docs/remote-servers).
+- The `.deb` and `.rpm` put `girra` on your `PATH` at install time, as `/usr/bin/girra`.
+- With the AppImage, register the CLI from [Settings → General → Girra CLI](/docs/settings). That installs `~/.local/bin/girra`.
+- On a headless host, a packaged `girra serve` writes bare `girra` and `orca` commands into `~/.local/bin` as it starts, unless a file it does not own already holds the name. It writes them _during_ startup, so neither is what starts the server — the first launch is always [`girra serve`](/docs/remote-servers).
 
-Do not verify with `command -v orca`: on a GNOME desktop that succeeds and resolves to the screen reader. Use `orca-ide` in your own shell and `orca` inside Girra. If you want the short name everywhere and you do not use the screen reader, link it yourself:
-
-```
-ln -s "$(command -v orca-ide)" ~/.local/bin/orca
-```
+Verify with `command -v girra`. Do not use `command -v orca`: on a GNOME desktop that succeeds and resolves to the GNOME Orca screen reader at `/usr/bin/orca`, which Girra never shadows.

@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. No work is in review. Actions is still disabled, and the repository has no Apple signing secrets yet.
+As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is in review. Actions is still disabled, and the repository has no Apple signing secrets yet.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -31,6 +31,7 @@ As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-ver
 - Phase 7b's identity constants move what the operating system sees: `productName` `Girra`, `appId` `com.koinonau.girra` with the native Swift owner check, the executable names, the NSIS product id, the Windows daemon host root, the Casks, and the CLI installed as `girra` with `orca`, `orca-ide` and `orca-dev` kept as aliases. It merged in [#25](https://github.com/koinonau/girra/pull/25): 309 files changed, 2,357 lines added and 2,012 removed.
 - The workflow prune keeps `pr.yml`, `unit-tests.yml`, `e2e.yml` (dispatch only) and a new `mac-build.yml` that signs and notarizes an arm64 DMG, and deletes the other 33 workflows with the release scripts and contract tests they owned. It merged in [#26](https://github.com/koinonau/girra/pull/26): 87 files deleted, 16,681 lines removed.
 - The mobile client prune merged in [#27](https://github.com/koinonau/girra/pull/27): the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path. 67 files deleted, 18,972 lines removed.
+- The documentation command sweep writes `girra <verb>` in every `docs/**` example and corrects the Linux CLI name. Measured 2026-09-18 with a verb-anchored `rg` over `docs/`: 0 files still write `orca <verb>`, down from 29.
 
 ## Files
 
@@ -86,6 +87,29 @@ Run in this repository through mise, so Node 24 and pnpm 12 apply: prefix each w
 | Build | `mise exec -- pnpm build`, desktop and native |
 | Run the app | `mise exec -- pnpm dev` |
 | Commit | `mise exec -- git commit`, so the pre-commit hook finds pnpm 12 |
+
+## CLI Names
+
+Measured 2026-09-18 from `package.json` `bin`, `src/shared/orca-cli-command-name.ts`,
+`src/main/cli/cli-install-constants.ts`, `src/main/cli/bundled-cli-launcher-path.ts` and
+`config/electron-builder.config.cjs`.
+
+| Surface | Name |
+|---|---|
+| The command to type, every platform | `girra` (`girra.cmd` on Windows) |
+| Aliases kept for hosts and scripts written before the rename | `orca` everywhere, `orca-ide` on Linux |
+| Dev CLI | `girra-dev`, with `orca-dev` and `orca` as aliases |
+| Linux executable, AppImage, deb and rpm package | `girra` |
+| Artifacts | `girra-macos-${arch}.dmg`, `girra-windows-setup.exe`, `girra-linux.AppImage`, `girra_${version}_${arch}.deb`, `girra-${version}.${arch}.rpm` |
+
+`orca-ide` no longer exists to dodge GNOME Orca: `girra` never collided with
+`/usr/bin/orca`, so Linux takes the same name as every other platform. The alias
+stays because hook scripts and SSH hosts on disk still call it.
+
+**Names the rename did not touch,** because they are internal identifiers under
+[ADR 0002](docs/adr/0002-keep-internal-orca-identifiers.md): the SSH relay shim
+at `~/.orca-relay/bin/orca`, the updater cache directory `orca-updater`,
+`orca-data.json`, `orca.yaml`, `.orca/` and `ORCA_*`.
 
 ## Baseline
 
@@ -271,6 +295,15 @@ After the mobile client prune, on 2026-09-16 (same `PATH` and `DEVELOPER_DIR`):
 | `pnpm lint` | 0 | 41 s | Clean, 111 reliability gates |
 | `pnpm build` | 0 | 16 s | Renderer 11,961 modules |
 
+After the documentation command sweep, on 2026-09-18 (`DEVELOPER_DIR=/Library/Developer/CommandLineTools`, stock `/bin/bash` on `PATH`):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 20 s | No errors |
+| `pnpm test` | 1 | 1,151 s | Files: 7 failed, 7,613 passed, 45 skipped of 7,665. Tests: 7 failed, 69,778 passed, 279 skipped of 70,064. Five are the known failures, `skill-recipe-shell` among them because Homebrew bash was not first on `PATH`; the other two are load-flaky and passed alone |
+| `pnpm lint` | 0 | 44 s | Clean, 111 reliability gates |
+| `pnpm build` | 0 | 24 s | Renderer 11,950 modules |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -286,6 +319,8 @@ Load-flaky: these failed under a full suite and passed alone (2026-09-14):
 - `src/main/daemon/daemon-reattach-checkpoint-isolation.test.ts`, `ENOTEMPTY` in teardown.
 - `src/relay/subprocess.test.ts`, "uses configured grace after a detached relay has accepted a socket client".
 - `src/main/claude/claude-structured-real-cli.test.ts`, "reports the current effort through get_settings".
+- `src/main/runtime/rpc/terminal-output-frame-chunks-equivalence.test.ts`, an 800-trial fuzz that exceeds the 30 s test timeout under load (2026-09-18).
+- `src/renderer/src/lib/palette-match/palette-match-performance.test.ts`, a wall-clock budget (2026-09-18).
 
 ## Environment
 
@@ -397,6 +432,7 @@ All 2026-09-13 unless dated otherwise.
 - **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it. Left for now (user, 2026-09-15).
 - **Star and support links.** The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL. Left for now (user, 2026-09-15).
 - **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug. Not part of the 2026-09-15 rename; they stay until decided.
+- **Where girra's own builds are downloaded from.** Every install page still links `github.com/stablyai/orca/releases` and names Orca's assets. Girra builds `girra-macos-${arch}.dmg` and the Linux and Windows artifacts above, but publishes none: `mac-build.yml` is dispatch only, Actions is disabled, and the repository holds no Apple signing secrets. Until a release exists there is no URL to write, so the 2026-09-18 documentation sweep left those links and asset filenames untouched. Raised 2026-09-18.
 
 ## Traps
 
@@ -442,6 +478,7 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-16 | A capital-only rename misses lowercased copies of the same prose used by `toLowerCase()` comparisons and `/i` regexes, and copies written after an escape such as `\nOrca:`, which no `\bOrca\b` matches | Would have killed remote-runtime auto-reconnect silently; caught by an agent's own sweep | After a prose rename, sweep `rg -i` and `rg '\\[nrt]Orca'` as well, and read the matches by neighbour character |
 | 2026-09-18 | Homebrew's pnpm downloads a placeholder instead of the pnpm 12 binary, so the husky pre-commit hook, which calls bare `pnpm`, fails with `ENOEXEC` even under `mise exec --`. Clearing `~/Library/pnpm/.tools/pnpm/12.0.0` re-fetches the same placeholder | One docs-only commit made with `--no-verify` | For a commit that stages no file lint-staged matches (its globs cover TypeScript, JavaScript, JSON and CSS only), `--no-verify` is safe. For code, run `pnpm exec oxlint` and `oxfmt --check` on the staged files first |
 | 2026-09-16 | A `package.json` `bin` change makes pnpm install before every `pnpm run`, and that postinstall rebuild needs `DEVELOPER_DIR` while the Xcode licence is unaccepted | Agents chased a broken node-pty build twice | Run vitest directly (`mise exec -- node node_modules/vitest/vitest.mjs run --config config/vitest.config.ts <files>`) or export `DEVELOPER_DIR=/Library/Developer/CommandLineTools` |
+| 2026-09-18 | Two tests pin the prose of the Linux guides verbatim: `config/scripts/headless-serve-shutdown-workflow.test.mjs` and `orcad-operations-restart-safety.test.mjs`. A doc edit fails them | Three assertions, found by running them | Run both after editing `docs/reference/headless-linux-server.md` or `orcad-operations.md`. `headlessLinuxProse` is whitespace-collapsed, `headlessLinuxGuide` is the raw file; assert wrapped prose against the former |
 | 2026-09-16 | Tests in `config/scripts` assert the prose of files that agents own, so a rename splits across ownership areas and the area owner never runs them | Four skill-guidance test files failed in the full suite | Give the lead every test outside the areas, and run the full suite before calling a sweep done |
 | 2026-09-16 | After a `package.json` or lockfile change, pnpm 12 installs before `pnpm run`, and the postinstall native rebuild fails without `DEVELOPER_DIR`, leaving node-pty unbuilt | One rebuild | Update the lockfile with `pnpm install --lockfile-only`, then run `DEVELOPER_DIR=/Library/Developer/CommandLineTools node config/scripts/rebuild-native-deps.mjs` before any other pnpm command |
 | 2026-09-15 | The build plan omitted feature-tree drops that live outside its deletion table (feature wall, tours, onboarding) and misread `UsagePage.tsx` as a real dashboard | Caught only when Phase 6 was mapped | Diff the tree's unticked entries against the plan's phases before calling the plan complete |

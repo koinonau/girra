@@ -23,7 +23,7 @@ Use `npx skills add` with the public Girra repo and the skill name. Default agen
 | [`orca-cli`](#orca-cli)                             | `npx skills add https://github.com/stablyai/orca --skill orca-cli --global`               | Worktrees, terminals, files, automations, embedded browser.   |
 | [`orchestration`](#orchestration)                   | `npx skills add https://github.com/stablyai/orca --skill orchestration --global`          | Multi-agent Runs, tasks, supervised workers, messages, gates. |
 | [`computer-use`](#computer-use)                     | `npx skills add https://github.com/stablyai/orca --skill computer-use --global`           | Desktop apps via accessibility trees and safe UI actions.     |
-| [`orca-linear`](#orca-linear)                       | `npx skills add https://github.com/stablyai/orca --skill orca-linear --global`            | Linear ticket read/write through `orca linear`.               |
+| [`orca-linear`](#orca-linear)                       | `npx skills add https://github.com/stablyai/orca --skill orca-linear --global`            | Linear ticket read/write through `girra linear`.               |
 | [`orca-emulator`](#orca-emulator)                   | `npx skills add https://github.com/stablyai/orca --skill orca-emulator --global`          | iOS Simulator control.                                        |
 | [`orca-emulator-android`](#orca-emulator-android)   | `npx skills add https://github.com/stablyai/orca --skill orca-emulator-android --global`  | Android emulator/device via adb.                              |
 | [`orca-per-workspace-env`](#orca-per-workspace-env) | `npx skills add https://github.com/stablyai/orca --skill orca-per-workspace-env --global` | Per-workspace environment recipes (`orca.yaml`).              |
@@ -37,12 +37,12 @@ After `npx skills add`, agents see a short stub that says:
 3. Prefer `--json` and do not invent flags from memory.
 
 ```bash
-orca skills list
-orca skills get orca-cli
-orca skills get orchestration --references
-orca skills get orchestration --reference recovery-and-cleanup
-orca skills get orchestration --full
-orca skills get orca-linear --json
+girra skills list
+girra skills get orca-cli
+girra skills get orchestration --references
+girra skills get orchestration --reference recovery-and-cleanup
+girra skills get orchestration --full
+girra skills get orca-linear --json
 ```
 
 A guide's action gates name conditional references. `--reference <name>` prints one of them alone, so an agent pays for the kernel plus that document instead of the whole package; `--references` lists the names. The name may be bare (`recovery-and-cleanup`) or spelled as the guide writes it (`references/recovery-and-cleanup.md`). `--full` still prints the kernel plus every reference.
@@ -64,15 +64,15 @@ Manual equivalent (desktop Settings still shows the same `npx` form):
 npx skills update orca-cli orchestration computer-use --global
 ```
 
-On headless hosts (SSH, containers, CI, `orca serve`) with no Settings UI, use the local CLI wrappers — they resolve the same `npx` commands, add non-interactive flags, and do **not** need a running Girra runtime:
+On headless hosts (SSH, containers, CI, `girra serve`) with no Settings UI, use the local CLI wrappers — they resolve the same `npx` commands, add non-interactive flags, and do **not** need a running Girra runtime:
 
 ```bash
-orca skills install                                      # list installable names
-orca skills install --skill orca-cli --skill orchestration
-orca skills install --skill orca-cli --agent claude-code
-orca skills install --all --dry-run
-orca skills update --all
-orca skills update --skill orca-cli --dry-run
+girra skills install                                      # list installable names
+girra skills install --skill orca-cli --skill orchestration
+girra skills install --skill orca-cli --agent claude-code
+girra skills install --all --dry-run
+girra skills update --all
+girra skills update --skill orca-cli --dry-run
 ```
 
 - Default scope is **global** (`--global`); pass `--local` for the current project only.
@@ -96,7 +96,7 @@ To remove a scanned skill, open its actions menu and choose **Delete…**. For s
 npx skills add https://github.com/stablyai/orca --skill orca-cli --global
 ```
 
-After install, load the version-matched command guide with `orca skills get orca-cli`. See [Girra CLI](/docs/cli/overview).
+After install, load the version-matched command guide with `girra skills get orca-cli`. See [Girra CLI](/docs/cli/overview).
 
 ## orchestration
 
@@ -104,7 +104,7 @@ After install, load the version-matched command guide with `orca skills get orca
 npx skills add https://github.com/stablyai/orca --skill orchestration --global
 ```
 
-Use this when an agent should coordinate other agents through Runs, tasks, supervised workers, and decision gates. See [Orchestration](/docs/cli/orchestration). Always load `orca skills get orchestration --full` before mutating orchestration state — the legacy `orchestration run` command is retired.
+Use this when an agent should coordinate other agents through Runs, tasks, supervised workers, and decision gates. See [Orchestration](/docs/cli/orchestration). Always load `girra skills get orchestration --full` before mutating orchestration state — the legacy `orchestration run` command is retired.
 
 ## computer-use
 
@@ -120,7 +120,7 @@ Use this when an agent needs to inspect and operate local desktop app windows. S
 npx skills add https://github.com/stablyai/orca --skill orca-linear --global
 ```
 
-Agents should load `orca skills get orca-linear` before mutating tickets. Covers `issue --full`, `save-issue`, `list-issues`, relations, completion attach+comment flow, and untrusted-ticket rules. Existing `linear-tickets` installs still resolve. See [CLI reference → Linear](/docs/cli/reference#linear).
+Agents should load `girra skills get orca-linear` before mutating tickets. Covers `issue --full`, `save-issue`, `list-issues`, relations, completion attach+comment flow, and untrusted-ticket rules. Existing `linear-tickets` installs still resolve. See [CLI reference → Linear](/docs/cli/reference#linear).
 
 ## orca-emulator
 
@@ -128,7 +128,7 @@ Agents should load `orca skills get orca-linear` before mutating tickets. Covers
 npx skills add https://github.com/stablyai/orca --skill orca-emulator --global
 ```
 
-Use this when an agent should control an iOS Simulator from inside Girra through `orca emulator` commands.
+Use this when an agent should control an iOS Simulator from inside Girra through `girra emulator` commands.
 
 ## orca-emulator-android
 
@@ -136,7 +136,7 @@ Use this when an agent should control an iOS Simulator from inside Girra through
 npx skills add https://github.com/stablyai/orca --skill orca-emulator-android --global
 ```
 
-Use for adb-connected Android AVDs/devices: list/boot, tap/swipe/type, hardware buttons, install/launch, permissions, accessibility tree, logcat. Load details with `orca skills get orca-emulator-android`.
+Use for adb-connected Android AVDs/devices: list/boot, tap/swipe/type, hardware buttons, install/launch, permissions, accessibility tree, logcat. Load details with `girra skills get orca-emulator-android`.
 
 ## orca-per-workspace-env
 

@@ -132,7 +132,7 @@ VS Code 的编辑器，处处自动保存 — 把文件或图片直接拖入智�
 
 ### Girra CLI
 
-智能体也能驱动 Girra — 用 `orca worktree create`、`snapshot`、`click` 和 `fill` 把每个工作流脚本化。
+智能体也能驱动 Girra — 用 `girra worktree create`、`snapshot`、`click` 和 `fill` 把每个工作流脚本化。
 
 [文档 →](https://www.onorca.dev/docs/cli/overview)
 

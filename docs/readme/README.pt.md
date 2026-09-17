@@ -132,7 +132,7 @@ O editor do VS Code com salvamento automático em todos os lugares — arraste a
 
 ### Girra CLI
 
-Agentes também controlam o Girra — automatize qualquer fluxo de trabalho com `orca worktree create`, `snapshot`, `click` e `fill`.
+Agentes também controlam o Girra — automatize qualquer fluxo de trabalho com `girra worktree create`, `snapshot`, `click` e `fill`.
 
 [Docs →](https://www.onorca.dev/docs/cli/overview)
 
@@ -173,7 +173,7 @@ Funciona com **qualquer agente CLI** — se roda em um terminal, roda no Girra.
 
 - **[Baixe em onOrca.dev](https://onorca.dev/download)**
 - Ou baixe um build diretamente: [macOS Apple Silicon](https://github.com/stablyai/orca/releases/latest/download/orca-macos-arm64.dmg) · [macOS Intel](https://github.com/stablyai/orca/releases/latest/download/orca-macos-x64.dmg) · [Windows (.exe)](https://github.com/stablyai/orca/releases/latest/download/orca-windows-setup.exe) · [Linux AppImage](https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage) · [Todos os builds](https://github.com/stablyai/orca/releases/latest)
-- Rodando `orca serve` em um servidor Linux headless? Veja o [guia de servidor Linux headless](../reference/headless-linux-server.md).
+- Rodando `girra serve` em um servidor Linux headless? Veja o [guia de servidor Linux headless](../reference/headless-linux-server.md).
 
 _Ou por um gerenciador de pacotes:_
 
