@@ -170,24 +170,25 @@ describe('headless serve shutdown PR gate', () => {
       'A separately paired runtime is outside that boundary; local execution and SSH hosts reached through this runtime are not. An affected or unknown omission, missing scope, failed request or lost connection is `unverifiable`'
     )
     expect(headlessLinuxGuide).toContain(
-      'sudo -Hu orca /home/orca/.local/bin/orca-ide terminal list --json'
+      'sudo -Hu orca /home/orca/.local/bin/girra terminal list --json'
     )
-    expect(headlessLinuxGuide).not.toContain('sudo -Hu orca orca-ide terminal list --json')
+    expect(headlessLinuxGuide).not.toContain('sudo -Hu orca girra terminal list --json')
     expect(headlessLinuxGuide).not.toContain('Two facts make this safe and predictable')
   })
 
   it('uses the registered CLI name from ordinary Linux shells', () => {
-    const commandRule =
-      'The registered Linux CLI command is `orca-ide`, not `orca`, to avoid shadowing the GNOME Orca screen reader.'
-    const substitutionRule =
-      "From an ordinary shell outside that service user's managed environment, substitute `orca-ide` for `orca` in commands below."
-    const censusCommand = '`sudo -Hu orca /home/orca/.local/bin/orca-ide terminal list --json`'
+    const commandRule = 'The registered Linux CLI command is `girra`.'
+    const aliasRule =
+      'Hosts installed before the rename carry `orca-ide` instead, which the packages still install as an alias.'
+    const censusCommand = '`sudo -Hu orca /home/orca/.local/bin/girra terminal list --json`'
 
     expect(headlessLinuxProse).toContain(commandRule)
-    expect(headlessLinuxProse).toContain(substitutionRule)
+    expect(headlessLinuxProse).toContain(aliasRule)
     expect(headlessLinuxProse).toContain(censusCommand)
-    expect(headlessLinuxGuide).toContain('best-effort dispatcher at `$HOME/.local/bin/orca`')
-    expect(headlessLinuxProse.indexOf(substitutionRule)).toBeLessThan(
+    expect(headlessLinuxProse).toContain(
+      'best-effort dispatchers at `$HOME/.local/bin/girra` and `$HOME/.local/bin/orca`'
+    )
+    expect(headlessLinuxProse.indexOf(commandRule)).toBeLessThan(
       headlessLinuxProse.indexOf(censusCommand)
     )
   })

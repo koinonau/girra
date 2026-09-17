@@ -1,16 +1,16 @@
 # Headless Linux Server
 
-Use this guide when you want to run `orca serve` on a Linux machine without a
+Use this guide when you want to run `girra serve` on a Linux machine without a
 desktop session, such as an Ubuntu VPS or a remote build box.
 
-`orca serve` starts the Girra runtime without opening the desktop window. On
+`girra serve` starts the Girra runtime without opening the desktop window. On
 Linux, the packaged AppImage still needs the libraries that Electron expects at
-startup. Current Girra builds start Xvfb automatically for `orca serve` when no
+startup. Current Girra builds start Xvfb automatically for `girra serve` when no
 `DISPLAY` is set, but Xvfb must be installed first. A separate D-Bus session is
 not required. When `DISPLAY` is set, Girra uses that display instead of starting
 a competing Xvfb process, provided the display is usable: its socket must exist,
 and if an X lock file is present it must name a running process. A `DISPLAY`
-whose lock names a dead process is refused rather than replaced, and `orca serve`
+whose lock names a dead process is refused rather than replaced, and `girra serve`
 exits — unset `DISPLAY` to let Girra start its own Xvfb. A socket published with
 no lock at all (a container bind-mounting `/tmp/.X11-unix`, or WSLg) is accepted.
 
@@ -23,7 +23,7 @@ differ on other Debian-derived releases.
 
 Install the CLI tools, Xvfb, and the shared libraries Electron links against.
 A minimal server or container image ships none of the Electron libraries, and
-`orca serve` then fails before Electron starts:
+`girra serve` then fails before Electron starts:
 
 ```bash
 sudo apt-get update
@@ -198,7 +198,7 @@ it. `--appimage-extract` writes `squashfs-root` as `drwx------ root root`, so th
 `orca` service user cannot read or traverse the extracted tree and the unit fails
 at startup. `chmod 755 /opt/orca` alone does not reach into it.
 
-For most hosts, one `orca serve` service is enough because Girra starts Xvfb on
+For most hosts, one `girra serve` service is enough because Girra starts Xvfb on
 display `:99` when no display exists:
 
 ```ini
@@ -332,13 +332,12 @@ sudo systemctl enable --now orca-xvfb.service orca-serve.service
 
 ## CLI Install Note
 
-The registered Linux CLI command is `orca-ide`, not `orca`, to avoid shadowing
-the GNOME Orca screen reader. Desktop-managed terminals receive a
-terminal-scoped bare-`orca` shim. A packaged headless `orca serve` also makes a
-best-effort dispatcher at `$HOME/.local/bin/orca` for the service user's own
-shell, so the Claude Teams launcher can resolve its bare command; it does not
-replace another user's `orca`. From an ordinary shell outside that service
-user's managed environment, substitute `orca-ide` for `orca` in commands below.
+The registered Linux CLI command is `girra`. A packaged headless `girra serve`
+also writes best-effort dispatchers at `$HOME/.local/bin/girra` and
+`$HOME/.local/bin/orca` for the service user's own shell, so the Claude Teams
+launcher can resolve its bare command; neither replaces a command Girra does not
+own. Hosts installed before the rename carry `orca-ide` instead, which the
+packages still install as an alias.
 
 On a headless host, you do not need to open the desktop UI just to run the
 server. Invoke the AppImage directly:
@@ -357,20 +356,20 @@ the command:
 This disables a security boundary. Prefer a dedicated unprivileged service
 user, especially when the listener is reachable beyond localhost.
 
-The Linux CLI is named `orca-ide`, not `orca`, so it never shadows the GNOME
-Orca screen reader at `/usr/bin/orca`. The `.deb` and `.rpm` packages put
-`orca-ide` on `PATH` themselves at install time; with the AppImage it arrives
-as `~/.local/bin/orca-ide` when the CLI is registered.
+The Linux CLI is named `girra`. The `.deb` and `.rpm` packages put it on `PATH`
+at install time as `/usr/bin/girra`, alongside an `orca-ide` alias for hosts and
+hook scripts written before the rename; with the AppImage it arrives as
+`~/.local/bin/girra` when the CLI is registered.
 
-A packaged `orca serve` start also writes a bare `orca` into `~/.local/bin`
-that execs the same launcher, which is why the skills commands below can be
-typed as `orca`. It writes it while starting, so it is never the command that
-starts the server — the first launch is `orca-ide serve`, or the AppImage
-invoked directly as above. The write is best-effort: it is gated on a packaged
-build, it is skipped when no bundled launcher resolves, and it is skipped when
-a file Girra does not own already holds that name (ownership is a marker on the
-second line of the file). A host that really does run the screen reader keeps
-its own `orca`.
+A packaged `girra serve` start also writes bare `girra` and `orca` commands into
+`~/.local/bin` that exec the same launcher, which is why the skills commands
+below can be typed either way. It writes them while starting, so neither is the
+command that starts the server - the first launch is `girra serve`, or the
+AppImage invoked directly as above. Each write is best-effort: it is gated on a
+packaged build, it is skipped when no bundled launcher resolves, and it is
+skipped when a file Girra does not own already holds that name (ownership is a
+marker on the second line of the file). A host running the GNOME Orca screen
+reader keeps its own `orca`.
 
 ## Pairing troubleshooting
 
@@ -406,7 +405,7 @@ depend on an interactive shell profile.
 
 ## Upgrade
 
-`orca serve` never updates itself. In headless mode Girra wires up no auto-updater
+`girra serve` never updates itself. In headless mode Girra wires up no auto-updater
 at all — the built-in updater only runs in the desktop GUI, and no paired
 desktop or web client can trigger it remotely. Upgrading is always a deliberate step:
 replace the AppImage and restart the service.
@@ -430,9 +429,9 @@ but its current process and any in-flight command are gone.
 Immediately before stopping the service, obtain a fresh census as the service's
 OS account and home. Use the installer's absolute launcher path so `sudo`'s
 `secure_path` cannot hide a per-user registration:
-`sudo -Hu orca /home/orca/.local/bin/orca-ide terminal list --json`.
+`sudo -Hu orca /home/orca/.local/bin/girra terminal list --json`.
 Replace both `orca` and `/home/orca` with the service account and home used by
-your unit; for an extracted deployment, use its absolute `resources/bin/orca-ide`
+your unit; for an extracted deployment, use its absolute `resources/bin/girra`
 launcher instead. Proceed only when the result is
 untruncated, has an explicit `hostScope`, covers every execution host affected
 by this service stop, and lists no terminals on those hosts. Every
@@ -447,9 +446,9 @@ Rolling back is the case that needs care — see [Roll back](#roll-back).
 
 ### Record the version you deploy
 
-The bundled CLI launcher prints the Girra build with `orca-ide --version`. For an
+The bundled CLI launcher prints the Girra build with `girra --version`. For an
 extracted deployment, that launcher is
-`squashfs-root/resources/bin/orca-ide`; deb/rpm installs and CLI registration put
+`squashfs-root/resources/bin/girra`; deb/rpm installs and CLI registration put
 it on `PATH`. Do not use `orca-linux.AppImage --version` for this audit because
 Electron owns the direct binary's version flags and may report its own runtime
 version. For an AppImage service, choose a release tag explicitly and record it
@@ -871,14 +870,14 @@ is resolved.
 Girra's agent skills (CLI usage, orchestration, computer use, etc.) are normally
 installed from Girra Settings, which pre-fills an `npx skills add ... --global`
 command in a terminal for you to run. A headless host has no Settings UI, so
-use `orca skills install` instead:
+use `girra skills install` instead:
 
 ```bash
-orca skills install                                      # list installable skills
-orca skills install --skill orca-cli --skill orchestration # install globally (default)
-orca skills install --skill orca-cli --local              # install into the current project only
-orca skills install --all                                 # install every bundled skill
-orca skills install --all --dry-run                       # print the npx command without running it
+girra skills install                                      # list installable skills
+girra skills install --skill orca-cli --skill orchestration # install globally (default)
+girra skills install --skill orca-cli --local              # install into the current project only
+girra skills install --all                                 # install every bundled skill
+girra skills install --all --dry-run                       # print the npx command without running it
 ```
 
 This resolves the same `npx skills add <repo> --skill <name> ...` command
@@ -900,24 +899,24 @@ CLI installs into all ~75 agents it knows and leaves a config directory for each
 Override the targets yourself, or narrow to the shared directory alone:
 
 ```bash
-orca skills install --skill orca-cli --agent claude-code
-orca skills install --skill orca-cli --agent universal
+girra skills install --skill orca-cli --agent claude-code
+girra skills install --skill orca-cli --agent universal
 ```
 
-If Girra detects no agent at all, `orca skills install` stops and asks for
+If Girra detects no agent at all, `girra skills install` stops and asks for
 `--agent` rather than guessing.
 
-To refresh already-installed skills, `orca skills update` mirrors the same
+To refresh already-installed skills, `girra skills update` mirrors the same
 selection flags (`--skill`, `--all`, `--local`, `--dry-run`) and resolves to
 `npx skills update <names...>` with a matching scope flag — `--global`, or
 `--project` when you pass `--local`:
 
 ```bash
-orca skills update --all                                  # update every bundled skill globally
-orca skills update --skill orca-cli --dry-run             # print the npx command without running it
+girra skills update --all                                  # update every bundled skill globally
+girra skills update --skill orca-cli --dry-run             # print the npx command without running it
 ```
 
-`orca skills update` only refreshes skills that are already installed — it exits
+`girra skills update` only refreshes skills that are already installed — it exits
 0 without doing anything for a skill that is missing, so install it first. More
 generally, a 0 exit means the `skills` CLI ran without erroring, not that it
 wrote anything; read its output to confirm what changed.
@@ -963,7 +962,7 @@ profile` and the unit exits `3`: another process already owns the profile, so
   `sudo systemctl reset-failed orca-serve.service` first.
 - Diagnosing other missing libraries: extract the AppImage without launching it
   with `./orca-linux.AppImage --appimage-extract`, then run
-  `ldd squashfs-root/orca-ide` to list any shared libraries the host is missing.
-  The Electron binary is `orca-ide`, not `orca`; `ldd` on a path that does not
+  `ldd squashfs-root/girra` to list any shared libraries the host is missing.
+  The Electron binary is `girra`, not `orca`; `ldd` on a path that does not
   exist prints nothing and exits cleanly, which reads as a clean result in
   exactly the situation where you are hunting a missing library.

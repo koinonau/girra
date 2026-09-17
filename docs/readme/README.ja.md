@@ -132,7 +132,7 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 
 ### Girra CLI
 
-エージェント自身も Girra を操作できます — `orca worktree create`、`snapshot`、`click`、`fill` であらゆるワークフローをスクリプト化できます。
+エージェント自身も Girra を操作できます — `girra worktree create`、`snapshot`、`click`、`fill` であらゆるワークフローをスクリプト化できます。
 
 [ドキュメント →](https://www.onorca.dev/docs/cli/overview)
 

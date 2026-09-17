@@ -15,7 +15,7 @@ This page is the map. Deep dives live on the linked pages.
 | ---------------------------------------- | ---------------------------------------------- | --------------------------------- | --------------------------------------------- |
 | **Local**                                | Your desktop                                   | You                               | Day-to-day coding, fast iteration             |
 | **SSH target**                           | A remote host you connect to over SSH          | You (or your team)                | Dev boxes, GPU hosts, always-on VPS           |
-| **Remote Girra Server**                  | A machine running Girra desktop or `orca serve` | You (or your team)                | Persistent shared runtime, web, automation    |
+| **Remote Girra Server**                  | A machine running Girra desktop or `girra serve` | You (or your team)                | Persistent shared runtime, web, automation    |
 | **Cloud VM / per-workspace environment** | A disposable VM/sandbox per workspace          | Your cloud account (BYO provider) | Isolated, ephemeral agent compute             |
 
 Girra does **not** sell managed VPS hosting. Remote modes always use machines and cloud accounts you control.
@@ -52,10 +52,10 @@ Keep Girra running on a machine you control—an old laptop, Mac mini, home serv
 
 **Easiest setup:** install Girra and Tailscale on both computers. On the server, open **Settings → Remote Girra Servers → Advertise this app as a server → New Link**, choose its Tailscale address, and generate an access link. On the client, choose **Add Server** and paste that link.
 
-For a headless Linux server or service-managed VM, use `orca serve` as the alternative. On Linux the CLI is named `orca-ide`, so the first launch is:
+For a headless Linux server or service-managed VM, use `girra serve` as the alternative. The first launch is:
 
 ```bash
-orca-ide serve --pairing-address <reachable-tailscale-ip-or-hostname>
+girra serve --pairing-address <reachable-tailscale-ip-or-hostname>
 ```
 
 Full detail: [Remote Girra Servers](/docs/remote-servers).
@@ -64,10 +64,10 @@ Full detail: [Remote Girra Servers](/docs/remote-servers).
 
 |               | SSH worktrees                                      | Remote Girra Server                                            |
 | ------------- | -------------------------------------------------- | -------------------------------------------------------------- |
-| Runtime owner | Laptop Girra                                       | Remote machine (Girra desktop or `orca serve`)                 |
+| Runtime owner | Laptop Girra                                       | Remote machine (Girra desktop or `girra serve`)                 |
 | Disconnect    | Agents keep running on the host; laptop reattaches | Full session state lives on the server                         |
 | Multi-client  | One laptop drives the host                         | Laptop, web, and automation can share the same runtime         |
-| Typical setup | Import SSH config, pick **Run on**                 | Share the server app or run `orca serve`, then pair with a URL |
+| Typical setup | Import SSH config, pick **Run on**                 | Share the server app or run `girra serve`, then pair with a URL |
 
 ## 4. Cloud VMs (per-workspace environments)
 
@@ -75,7 +75,7 @@ Each worktree can boot its own on-demand environment — a cloud sandbox, VM, or
 
 In the product UI this surface is labeled **Cloud VM** under [Settings → Experimental](/docs/settings). Recipes still create per-workspace environments.
 
-Providers people wire today include Vercel Sandbox, Fly, Modal, plain SSH hosts, and local Docker. Connection is either **Girra server** (recipe starts `orca serve` and returns a pairing URL) or **SSH** (recipe returns connection details Girra dials).
+Providers people wire today include Vercel Sandbox, Fly, Modal, plain SSH hosts, and local Docker. Connection is either **Girra server** (recipe starts `girra serve` and returns a pairing URL) or **SSH** (recipe returns connection details Girra dials).
 
 <ImagePlaceholder
   src="/docs/ways-to-run-per-workspace-env.png"

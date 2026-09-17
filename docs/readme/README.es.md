@@ -132,7 +132,7 @@ El editor de VS Code con autoguardado en todas partes — arrastra archivos o im
 
 ### Girra CLI
 
-Los agentes también manejan Girra — automatiza cualquier flujo de trabajo con `orca worktree create`, `snapshot`, `click` y `fill`.
+Los agentes también manejan Girra — automatiza cualquier flujo de trabajo con `girra worktree create`, `snapshot`, `click` y `fill`.
 
 [Docs →](https://www.onorca.dev/docs/cli/overview)
 
