@@ -4,7 +4,7 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-16. No tracker exists, so these come from the build plan's phases. Phases 0 to 7b, the workflow prune and the ADRs are merged; the mobile client prune is in review.
+Measured 2026-09-18. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. Nothing is in review.
 
 1. **Command examples in the documentation.** `docs/**` still writes `orca <verb>`. The commands work, because `orca` stays installed as an alias, but `girra` is the primary name now. Sweep the examples, keeping the skill ids (`orca-cli`, `orca-linear`), `orca.yaml`, `.orca/` and `ORCA_*`.
 2. **The orchestration wire token.** `girra` and `girra-dev` are normalised down to `orca` before crossing the RPC wire, so a resume hint shows the old name. Widen the three `z.enum`s in `src/shared/rpc-contract/orchestration-params.ts` and the inline types in `orchestration-legacy-operation.ts` first, then drop the normalisation in `runtime-compatibility.ts` a release later.
@@ -36,13 +36,13 @@ One pull request per story. Cut the branch from `origin/main`, stage files by na
 
 When a story must build on an unmerged one, stack it: branch from the earlier story's branch and target that branch. After the earlier pull request merges, retarget the stacked one to `main` with `gh pr edit --base main` before deleting the merged branch. Deleting it first closes the stacked pull request.
 
-Actions is disabled, so no CI runs. The local checks in the loop stand in for CI until workflows are pruned and Actions is re-enabled.
+Actions is disabled, so no CI runs. The workflows are pruned and the signed macOS build is written, so the local checks in the loop stand in for CI only until the user adds the Apple secrets and turns Actions on.
 
 Standing permission from the user, 2026-09-14: work through the phases without waiting for approval, and merge each pull request and clean up its branch once step 5 passes. Merge with a merge commit so `git branch -d` recognises the branch, then run the cleanup from the global instructions.
 
 ## Orca's Agent Instructions
 
-`CLAUDE.md` imports `AGENTS.md`, Orca's own contributor guide, and both load in every session here. Follow its code conventions: design system, style, max-lines, cross-platform, SSH and git compatibility. Where it and this file differ on process, this file wins. Its sections on the mobile companion and cloud features describe code girra is deleting.
+`CLAUDE.md` imports `AGENTS.md`, the contributor guide inherited from Orca, and both load in every session here. Follow its code conventions: design system, style, max-lines, cross-platform, SSH and git compatibility. Where it and this file differ on process, this file wins. It still names the mobile companion in one place, which girra has deleted.
 
 ## Decisions
 
