@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, and the orchestration wire enum now accepts `girra`. Nothing is in review, and every remaining story is parked: two on decisions, one on a release, one on the user. Actions is still disabled, and the repository has no Apple signing secrets yet.
+As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, the orchestration wire enum accepts `girra`, and the runtime's recovery strings now name `girra` with the SSH relay installing that name too. The user answered three open decisions on 2026-09-18. Actions is still disabled, and the repository has no Apple signing secrets yet.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -33,6 +33,7 @@ As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-ver
 - The mobile client prune merged in [#27](https://github.com/koinonau/girra/pull/27): the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path. 67 files deleted, 18,972 lines removed.
 - The documentation command sweep writes `girra <verb>` in every `docs/**` example and corrects the Linux CLI name. It merged in [#29](https://github.com/koinonau/girra/pull/29): 33 files changed, 432 lines added and 424 removed. Measured 2026-09-18 with a verb-anchored `rg` over `docs/`: 0 files still write `orca <verb>`, down from 29.
 - The desktop string sweep writes `girra <verb>` in the 55 strings the app prints about its own local CLI: seven source files and the six locale catalogues. It merged in [#30](https://github.com/koinonau/girra/pull/30).
+- The 41 runtime recovery strings name `girra`. The SSH relay installs `girra` beside `orca` on every host, and `retargetCliOutputCommandName` rewrites the name to whatever the caller actually has, so a host whose best-effort shim refresh failed still reads a command it can run.
 - The orchestration wire enum accepts `girra` and `girra-dev`. It merged in [#31](https://github.com/koinonau/girra/pull/31). Only the host side moved; the CLI still normalises down, because a host built before the widening rejects the new spelling and fails the whole call.
 
 ## Files
@@ -108,13 +109,23 @@ Measured 2026-09-18 from `package.json` `bin`, `src/shared/orca-cli-command-name
 `/usr/bin/orca`, so Linux takes the same name as every other platform. The alias
 stays because hook scripts and SSH hosts on disk still call it.
 
-**On an SSH host the command really is `orca`.** `createRemoteCliInstallPlan`
-(`src/main/ssh/ssh-remote-cli-launcher.ts:196`) writes one shim, named `orca`, or
-`orca.exe` on Windows, and `ssh-remote-cli-host-passthrough.ts:116` pins
-`ORCA_CLI_COMMAND=orca` to match. So `orca <verb>` in `src/main/ssh` help text is
-correct, not stale. `installRemoteOrcaCliLauncher` runs on every relay session
-setup (`ssh-relay-session.ts:1066`), so a current client rewrites that shim on
-each connect.
+**On an SSH host `orca` stays primary, with `girra` installed beside it.**
+`createRemoteCliInstallPlan` (`src/main/ssh/ssh-remote-cli-launcher.ts`) now
+writes both names from one script, and copies the compiled `orca.exe` to
+`girra.exe` on Windows. `orca` keeps the primary slot because a host reached by a
+client that predates this install has only that one, and
+`ssh-remote-cli-host-passthrough.ts:116` still pins `ORCA_CLI_COMMAND=orca` to
+match. So `orca <verb>` in `src/main/ssh` help text is correct, not stale.
+
+**The install is best-effort, which is why the CLI also rewrites the name.**
+`installRemoteOrcaCliLauncher` runs on every relay session setup
+(`ssh-relay-session.ts:1066`) but its caller warns instead of failing the
+connection, because it can fail on a `MaxSessions=1` remote. So a host can keep
+an old `orca`-only shim. `retargetCliOutputCommandName`
+(`src/cli/cli-output-command-name.ts`) closes that gap: the runtime writes the
+canonical `girra <verb>`, and the CLI process rendering the error rewrites it to
+whatever `resolveOrchestrationCliExecutable` says the caller has, on both the
+human and `--json` paths.
 
 `resolveOrchestrationCliExecutable` (`src/cli/runtime/orchestration-recovery-command.ts`)
 is how a caller learns its own name: `ORCA_CLI_COMMAND` first, then `girra-dev`
@@ -348,6 +359,15 @@ After the orchestration wire widening, on 2026-09-18 (same `DEVELOPER_DIR`, stoc
 | `pnpm lint` | 0 | 43 s | Clean, 111 reliability gates |
 | `pnpm build` | 0 | 35 s | Desktop and native |
 
+After the SSH shim and runtime string sweep, on 2026-09-18 (same `DEVELOPER_DIR`, stock `/bin/bash`):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 22 s | No errors |
+| `pnpm test` | 1 | 1,555 s | Files: 9 failed, 7,613 passed, 45 skipped of 7,667. Five are the known failures; the other four are load-flaky and passed alone. The run was heavily loaded, which is why it took twice the usual time |
+| `pnpm lint` | 0 | 44 s | Clean, 111 reliability gates |
+| `pnpm build` | 0 | 45 s | Desktop and native |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -365,6 +385,7 @@ Load-flaky: these failed under a full suite and passed alone (2026-09-14):
 - `src/main/claude/claude-structured-real-cli.test.ts`, "reports the current effort through get_settings".
 - `src/main/runtime/rpc/terminal-output-frame-chunks-equivalence.test.ts`, an 800-trial fuzz that exceeds the 30 s test timeout under load (2026-09-18).
 - `src/renderer/src/lib/palette-match/palette-match-performance.test.ts`, a wall-clock budget (2026-09-18).
+- `src/main/daemon/pty-subprocess-io-failure-native.test.ts`, `src/main/native-chat/transcript-watch-liveness.test.ts`, `src/renderer/src/components/right-sidebar/ai-vault-session-worktree-map.test.tsx` and `src/renderer/src/lib/browser-history-match.performance.test.ts`, all four under one heavily loaded run (2026-09-18).
 
 ## Environment
 
@@ -476,12 +497,13 @@ All 2026-09-13 unless dated otherwise.
 - **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it. Left for now (user, 2026-09-15).
 - **Star and support links.** The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL. Left for now (user, 2026-09-15).
 - **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug. Not part of the 2026-09-15 rename; they stay until decided.
-- **The 39 runtime strings that name a command.** The main process builds `nextSteps`, `recovery` and `recoveryCommand` strings saying `orca <verb>`, and they reach a caller that may be local, where the command is `girra`, or on an SSH host, where it is `orca`. Counted 2026-09-18 across `src/main`, excluding tests and comments: 15 in the Linear write and lookup commands, 11 in orchestration worker receipts and releases, 6 in the browser CDP paths, 2 in the emulator, and 5 elsewhere. Three options.
+- **DECIDED 2026-09-18 (user): install `girra` on SSH hosts, and rewrite the name at the CLI seam as well.** Kept below for the reasoning. The second half was added because the shim install is best-effort by design: `ssh-relay-session.ts:1065` warns rather than failing the connection, since it can fail on a `MaxSessions=1` remote, so a host with an old `orca`-only shim can keep it across a connect.
+- ~~**The 39 runtime strings that name a command.**~~ The main process builds `nextSteps`, `recovery` and `recoveryCommand` strings saying `orca <verb>`, and they reach a caller that may be local, where the command is `girra`, or on an SSH host, where it is `orca`. Counted 2026-09-18 across `src/main`, excluding tests and comments: 15 in the Linear write and lookup commands, 11 in orchestration worker receipts and releases, 6 in the browser CDP paths, 2 in the emulator, and 5 elsewhere. Three options.
   1. **Rewrite at the CLI output seam.** The runtime writes `girra` canonically and `src/cli/cli-error.ts` substitutes `resolveOrchestrationCliExecutable(process.env)` on both the human and `--json` paths. Costs one helper and two call sites, plus care not to rewrite prose that legitimately says Girra. Buys one canonical name in the runtime and the existing precedent in `orchestration-mutation-recovery.ts`.
   2. **Install `girra` on SSH hosts too,** then sweep the strings plainly. `createRemoteCliInstallPlan` writes one shim; writing the same launcher again as `girra` and flipping the passthrough's `ORCA_CLI_COMMAND` makes one name correct everywhere. Costs a compatibility window for a host whose shim an older client installed, which the remote-wire rules cover, and it changes what lands on remote machines. Buys no per-message machinery at all.
   3. **Leave them as `orca`.** Costs telling the local majority a name the documentation no longer uses. Buys nothing.
 
-  Recommended: 2. It removes the reason the names differ rather than translating between them, and the compatibility window is narrow because the client rewrites the remote shim on every connect. Raised 2026-09-18.
+  Answered: 2 plus 1. Raised and answered 2026-09-18.
 - **The desktop take-back path.** `reclaimTerminalForDesktop` reads `terminalFitOverrides`, whose only writer was mobile phone fit. Measured 2026-09-18: `rg 'terminalFitOverrides\.set'` finds one call, the rollback restore at `orca-runtime-apply-layout.ts:46`, which rewrites a value it read from the same empty map. So `heldOverride` is always null, `reclaimTerminalForDesktop` always returns `false`, and `terminal.restoreFit`, `runtime:restoreTerminalFit` and the renderer's restore action always report nothing to reclaim. It was already inert for remote-desktop holds before the prune: those run off `remoteDesktopFloor`, and that map never held them. Two options.
   1. **Delete the path.** The direct files are `orca-runtime-reclaim-terminal-for-desktop.ts` (60 lines), `terminal-fit-restore.ts` (89) and `use-terminal-pane-fit-actions.ts` (244), plus the IPC handler, the preload bridge and the RPC method, across about 25 files counting tests. Removing `terminal.restoreFit` is a wire change of the same class as removing a field, so either keep the method returning `{ restored: false }`, which is what it already returns, for one release, or accept that an old client gets an unknown-method error instead. Note the wider tangle: `terminalFitOverrides` also feeds the fit-override notifier surface, which a dozen `orca-runtime-tests` specs exercise, so deleting the map is a larger change than deleting the take-back path alone.
   2. **Rewire it to `remoteDesktopFloor`.** Take-back would work for remote-desktop holds for the first time. That is new behaviour, not a prune, and the feature tree does not ask for it.

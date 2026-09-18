@@ -76,7 +76,7 @@ export class RuntimeLinearSaveCommands extends RuntimeLinearCommentCommands {
               'Linear may have applied the issue save, but Girra could not confirm it.',
               {
                 nextSteps: [
-                  `Run \`orca linear issue ${target.issue.identifier} --workspace ${target.workspaceId} --json\` before retrying.`
+                  `Run \`girra linear issue ${target.issue.identifier} --workspace ${target.workspaceId} --json\` before retrying.`
                 ],
                 ...(cause ? { cause } : {})
               }
@@ -125,7 +125,7 @@ export class RuntimeLinearSaveCommands extends RuntimeLinearCommentCommands {
             'Linear may have applied the task update, but Girra could not confirm it.',
             {
               nextSteps: [
-                `Run \`orca linear issue ${target.issue.identifier} --workspace ${target.workspaceId} --json\` and check the updated field before retrying.`
+                `Run \`girra linear issue ${target.issue.identifier} --workspace ${target.workspaceId} --json\` and check the updated field before retrying.`
               ],
               ...(cause ? { cause } : {})
             }

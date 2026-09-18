@@ -4,14 +4,14 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-18. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs, and the three CLI-name stories are merged. **Nothing here is unblocked.** Each item names what unblocks it; read `handover.md`'s "Open Decisions" before starting one.
+Measured 2026-09-18. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. The user answered three decisions on 2026-09-18; the CLI-name work that followed is merged or in review.
 
-1. **The desktop take-back path is inert.** Parked on the decision of the same name, which measures deleting the path against rewiring it to `remoteDesktopFloor`, and recommends deleting. Needs the user.
-2. **The 39 runtime strings that name a command.** Parked on the decision of the same name, which recommends installing `girra` on SSH hosts as well. Needs the user. Do not sweep them blind: `orca` is the correct name on an SSH host and `girra` is correct locally. See "CLI Names" in `handover.md`.
+1. **Write girra's own asset names in the install docs.** Decided 2026-09-18 (user): rename the download filenames to what `config/electron-builder.config.cjs` produces and point the release links at `koinonau/girra`, accepting that they 404 until a release exists. The surface is `docs/site/content/docs/install.mdx`, the six `docs/readme/README.*.md` files and `docs/reference/headless-linux-server.md`. Leave `/opt/orca`, the `orca` service user and the `orca-*.service` unit names: those are the guide's own local conventions, not asset names.
+2. **Delete the desktop take-back path.** Decided 2026-09-18 (user): delete the path and its UI, leave `terminalFitOverrides` and its fit-override notifier surface alone, and keep `terminal.restoreFit` returning `{ restored: false }` for one release. See the decision in `handover.md` for the file list and why the map stays.
 3. **Send `girra` on the orchestration wire.** The host enum already accepts it. Drop the normalisation in `resolveCompatibilityCliCommand` and `resolvePackagedWindowsCompatibilityCommand` (`src/cli/handlers/orchestration/runtime-compatibility.ts`) once no supported host predates that widening, which needs a release to have shipped first.
 4. **Re-enable Actions.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only.
 
-Items 1 and 2 also each have a second story behind them: the dead locale keys `pairingCommand` and `960e901ae4`, which no code references, and the release links in `docs/site/content/docs/install.mdx`, which still point at Orca's assets. Both wait on the same answers.
+Smaller items behind these: the dead locale keys `pairingCommand` and `960e901ae4`, which no code references, and the READMEs' total-downloads badge, which counts Orca's releases.
 
 ## Backlog
 

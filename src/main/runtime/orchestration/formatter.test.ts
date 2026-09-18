@@ -73,14 +73,14 @@ describe('formatMessageBanner', () => {
   it('includes reply hint with message ID', () => {
     const banner = formatMessageBanner(makeMessage({ id: 'msg_xyz789' }))
     expect(banner).toContain(
-      '[Reply: orca orchestration reply --id msg_xyz789 --from term_coord --body "..."]'
+      '[Reply: girra orchestration reply --id msg_xyz789 --from term_coord --body "..."]'
     )
   })
 
   it('lets the CLI resolve the live sender for Run and Dispatch addresses', () => {
     for (const to_handle of ['run:run_test', 'dispatch:dispatch_test']) {
       const banner = formatMessageBanner(makeMessage({ to_handle }))
-      expect(banner).toContain('[Reply: orca orchestration reply --id msg_test1 --body "..."]')
+      expect(banner).toContain('[Reply: girra orchestration reply --id msg_test1 --body "..."]')
       expect(banner).not.toContain(`--from ${to_handle}`)
     }
   })
@@ -100,13 +100,13 @@ describe('formatMessageBanner', () => {
     const banner = formatMessageBanner(makeMessage({ id: 'msg_legacy' }), {
       authority: 'legacy_compatibility',
       supportedActionHints: [
-        'orca orchestration reply --id msg_legacy --from term_coord --body "..."'
+        'girra orchestration reply --id msg_legacy --from term_coord --body "..."'
       ]
     })
 
     expect(banner).toContain('[LEGACY COMPATIBILITY]')
     expect(banner).toContain(
-      '[Supported action: orca orchestration reply --id msg_legacy --from term_coord --body "..."]'
+      '[Supported action: girra orchestration reply --id msg_legacy --from term_coord --body "..."]'
     )
     expect(banner).not.toContain('[Reply:')
     expect(banner).not.toContain('acknowledgment')

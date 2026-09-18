@@ -42,6 +42,16 @@ describe('SSH remote Girra CLI launcher', () => {
     })
   }
 
+  function posixInstallPlan(): ReturnType<typeof createRemoteCliInstallPlan> {
+    return createRemoteCliInstallPlan({
+      binDir: '/home/me/.orca-relay/bin',
+      relayDir: '/home/me/.orca-remote/relay-v1',
+      nodePath: '/usr/bin/node',
+      sockPath: '/home/me/.orca-remote/relay-v1/relay.sock',
+      hostPlatform: getRemoteHostPlatform('linux-x64')
+    })
+  }
+
   it('compiles a native Windows launcher without a cmd.exe argument bridge', () => {
     const plan = windowsInstallPlan()
 
@@ -230,20 +240,44 @@ describe('SSH remote Girra CLI launcher', () => {
   })
 
   it('keeps the POSIX launcher as an argv-preserving shell exec', () => {
-    const plan = createRemoteCliInstallPlan({
-      binDir: '/home/me/.orca-relay/bin',
-      relayDir: '/home/me/.orca-remote/relay-v1',
-      nodePath: '/usr/bin/node',
-      sockPath: '/home/me/.orca-remote/relay-v1/relay.sock',
-      hostPlatform: getRemoteHostPlatform('linux-x64')
-    })
+    const plan = posixInstallPlan()
 
     expect(plan.launcherPath).toBe('/home/me/.orca-relay/bin/orca')
     expect(plan.files).toEqual([
       expect.objectContaining({
         path: '/home/me/.orca-relay/bin/orca',
         contents: expect.stringContaining('--orca-cli "$@"')
+      }),
+      expect.objectContaining({
+        path: '/home/me/.orca-relay/bin/girra',
+        contents: expect.stringContaining('--orca-cli "$@"')
       })
     ])
+  })
+
+  // Why both names: the runtime writes `girra <verb>` into the recovery steps it returns, and a
+  // caller on this host has to be able to run what it is told. `orca` stays primary because a
+  // host reached by a client that predates this install has only that one.
+  it('installs girra beside orca on a POSIX host, from the same script', () => {
+    const plan = posixInstallPlan()
+
+    expect(plan.aliasPath).toBe('/home/me/.orca-relay/bin/girra')
+    expect(plan.files[1]?.contents).toBe(plan.files[0]?.contents)
+    expect(plan.postWriteCommands).toEqual([
+      "chmod +x '/home/me/.orca-relay/bin/orca' '/home/me/.orca-relay/bin/girra'"
+    ])
+  })
+
+  it('copies the compiled Windows launcher to girra.exe', () => {
+    const plan = windowsInstallPlan()
+    const compileScript = decodePowerShellCommand(plan.postWriteCommands[0] ?? '')
+
+    expect(plan.aliasPath).toBe('C:/Users/me user/.orca-relay/bin/girra.exe')
+    expect(compileScript).toContain(
+      "Copy-Item -LiteralPath 'C:/Users/me user/.orca-relay/bin/orca.exe'"
+    )
+    expect(compileScript).toContain("-Destination 'C:/Users/me user/.orca-relay/bin/girra.exe'")
+    // The copy must follow the compile, or it copies whatever was there before.
+    expect(compileScript.indexOf('Copy-Item')).toBeGreaterThan(compileScript.indexOf('& $compiler'))
   })
 })

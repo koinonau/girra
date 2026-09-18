@@ -1,4 +1,5 @@
 import { computerUseErrorRecoveryData } from '../shared/computer-use-error-recovery'
+import { retargetCliOutputCommandName } from './cli-output-command-name'
 import {
   matchAutomationOwnerConflict,
   stripAutomationOwnerConflictCode
@@ -35,6 +36,10 @@ function errorCode(error: unknown): string | undefined {
 }
 
 export function formatCliError(error: unknown, context: CliErrorContext = {}): string {
+  return retargetCliOutputCommandName(formatCliErrorText(error, context))
+}
+
+function formatCliErrorText(error: unknown, context: CliErrorContext = {}): string {
   const message = error instanceof Error ? error.message : String(error)
   const selector = selectorRecovery(errorCode(error), context)
   if (selector) {
@@ -92,20 +97,16 @@ export function reportCliError(error: unknown, json: boolean, context: CliErrorC
   if (json) {
     if (error instanceof RuntimeRpcFailureError) {
       const response = withAutomationOwnerConflictRecovery(error.response)
-      console.log(
-        JSON.stringify(
-          selector
-            ? {
-                ...response,
-                error: {
-                  ...response.error,
-                  data: mergeSelectorRecovery(response.error.data, selector)
-                }
+      printRetargetedJson(
+        selector
+          ? {
+              ...response,
+              error: {
+                ...response.error,
+                data: mergeSelectorRecovery(response.error.data, selector)
               }
-            : response,
-          null,
-          2
-        )
+            }
+          : response
       )
     } else {
       const response: RuntimeRpcFailure = {
@@ -124,11 +125,17 @@ export function reportCliError(error: unknown, json: boolean, context: CliErrorC
           runtimeId: null
         }
       }
-      console.log(JSON.stringify(response, null, 2))
+      printRetargetedJson(response)
     }
   } else {
     console.error(formatCliError(error, context))
   }
+}
+
+// Why retarget the rendered text rather than each field: the command name only ever appears in
+// human-readable values, and doing it last cannot change any value a caller branches on.
+function printRetargetedJson(response: RuntimeRpcFailure): void {
+  console.log(retargetCliOutputCommandName(JSON.stringify(response, null, 2)))
 }
 
 /** Machine-readable half of the same recovery the human message carries. */
