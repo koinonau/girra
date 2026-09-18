@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, and the orchestration wire enum now accepts `girra`. The runtime's 39 recovery strings are parked on a decision. Actions is still disabled, and the repository has no Apple signing secrets yet.
+As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, and the orchestration wire enum now accepts `girra`. Nothing is in review, and every remaining story is parked: two on decisions, one on a release, one on the user. Actions is still disabled, and the repository has no Apple signing secrets yet.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -33,7 +33,7 @@ As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-ver
 - The mobile client prune merged in [#27](https://github.com/koinonau/girra/pull/27): the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path. 67 files deleted, 18,972 lines removed.
 - The documentation command sweep writes `girra <verb>` in every `docs/**` example and corrects the Linux CLI name. It merged in [#29](https://github.com/koinonau/girra/pull/29): 33 files changed, 432 lines added and 424 removed. Measured 2026-09-18 with a verb-anchored `rg` over `docs/`: 0 files still write `orca <verb>`, down from 29.
 - The desktop string sweep writes `girra <verb>` in the 55 strings the app prints about its own local CLI: seven source files and the six locale catalogues. It merged in [#30](https://github.com/koinonau/girra/pull/30).
-- The orchestration wire enum accepts `girra` and `girra-dev`. Only the host side moved; the CLI still normalises down, because a host built before the widening rejects the new spelling and fails the whole call.
+- The orchestration wire enum accepts `girra` and `girra-dev`. It merged in [#31](https://github.com/koinonau/girra/pull/31). Only the host side moved; the CLI still normalises down, because a host built before the widening rejects the new spelling and fails the whole call.
 
 ## Files
 
@@ -482,6 +482,11 @@ All 2026-09-13 unless dated otherwise.
   3. **Leave them as `orca`.** Costs telling the local majority a name the documentation no longer uses. Buys nothing.
 
   Recommended: 2. It removes the reason the names differ rather than translating between them, and the compatibility window is narrow because the client rewrites the remote shim on every connect. Raised 2026-09-18.
+- **The desktop take-back path.** `reclaimTerminalForDesktop` reads `terminalFitOverrides`, whose only writer was mobile phone fit. Measured 2026-09-18: `rg 'terminalFitOverrides\.set'` finds one call, the rollback restore at `orca-runtime-apply-layout.ts:46`, which rewrites a value it read from the same empty map. So `heldOverride` is always null, `reclaimTerminalForDesktop` always returns `false`, and `terminal.restoreFit`, `runtime:restoreTerminalFit` and the renderer's restore action always report nothing to reclaim. It was already inert for remote-desktop holds before the prune: those run off `remoteDesktopFloor`, and that map never held them. Two options.
+  1. **Delete the path.** The direct files are `orca-runtime-reclaim-terminal-for-desktop.ts` (60 lines), `terminal-fit-restore.ts` (89) and `use-terminal-pane-fit-actions.ts` (244), plus the IPC handler, the preload bridge and the RPC method, across about 25 files counting tests. Removing `terminal.restoreFit` is a wire change of the same class as removing a field, so either keep the method returning `{ restored: false }`, which is what it already returns, for one release, or accept that an old client gets an unknown-method error instead. Note the wider tangle: `terminalFitOverrides` also feeds the fit-override notifier surface, which a dozen `orca-runtime-tests` specs exercise, so deleting the map is a larger change than deleting the take-back path alone.
+  2. **Rewire it to `remoteDesktopFloor`.** Take-back would work for remote-desktop holds for the first time. That is new behaviour, not a prune, and the feature tree does not ask for it.
+
+  Recommended: 1, deleting the take-back path and its UI while leaving `terminalFitOverrides` and the notifier surface alone, and keeping `terminal.restoreFit` as a `{ restored: false }` method for one release. Reason: it removes the dead path without taking on the notifier tangle, and it costs no behaviour, since every caller already gets `false`. Raised 2026-09-18.
 - **Where girra's own builds are downloaded from.** Every install page still links `github.com/stablyai/orca/releases` and names Orca's assets. Girra builds `girra-macos-${arch}.dmg` and the Linux and Windows artifacts above, but publishes none: `mac-build.yml` is dispatch only, Actions is disabled, and the repository holds no Apple signing secrets. Until a release exists there is no URL to write, so the 2026-09-18 documentation sweep left those links and asset filenames untouched. Raised 2026-09-18.
 
 ## Traps
