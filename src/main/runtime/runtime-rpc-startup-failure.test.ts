@@ -121,7 +121,7 @@ describe('runtime RPC startup failure reporting', () => {
         title: 'Girra CLI unavailable',
         message: "Girra couldn't start its local command transport.",
         detail: expect.stringMatching(
-          /orca status.*orca terminal.*orchestration.*Cause: metadata write failed/s
+          /girra status.*girra terminal.*orchestration.*Cause: metadata write failed/s
         )
       })
     )

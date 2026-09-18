@@ -316,7 +316,7 @@ export function RuntimeHostAccessForm({
           <p className="mt-2 text-muted-foreground">
             {translate(
               'auto.components.settings.RuntimeHostAccessForm.headlessHelp',
-              'Using headless orca serve? Run orca serve --pairing-address <reachable-host> on the other computer.'
+              'Using headless girra serve? Run girra serve --pairing-address <reachable-host> on the other computer.'
             )}
           </p>
         )}
