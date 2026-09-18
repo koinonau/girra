@@ -4,13 +4,13 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-18. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. The user answered three decisions on 2026-09-18; two are built, and the first item below is what remains of the third.
+Measured 2026-09-18. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. The CLI-name work is finished: documentation, the desktop's own strings, the orchestration wire enum, the runtime recovery steps with the SSH shim, and girra's release artifact names.
 
-1. **Delete the desktop take-back path.** Decided 2026-09-18 (user): delete the path and its UI, leave `terminalFitOverrides` and its fit-override notifier surface alone, and keep `terminal.restoreFit` returning `{ restored: false }` for one release. See the decision in `handover.md` for the file list and why the map stays.
+1. **Decide the take-back path again.** Reopened 2026-09-18: tracing found it broken rather than inert, so the approved deletion was withdrawn before any code changed. A remote-desktop hold reaches the renderer's own override map through `terminalFitOverrideChanged`, without the host writing `terminalFitOverrides`, so the overlay appears and take-back cannot clear it. Read the decision in `handover.md` before proposing anything: rewiring is now a bug fix, and deleting removes the only manual escape from a hold.
 2. **Send `girra` on the orchestration wire.** The host enum already accepts it. Drop the normalisation in `resolveCompatibilityCliCommand` and `resolvePackagedWindowsCompatibilityCommand` (`src/cli/handlers/orchestration/runtime-compatibility.ts`) once no supported host predates that widening, which needs a release to have shipped first.
-3. **Re-enable Actions and publish a build.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only. The install pages now link `koinonau/girra/releases`, so every download link 404s until this ships.
+3. **Re-enable Actions and publish a build.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only. The install pages link `koinonau/girra/releases`, so every download link 404s until this ships.
 
-Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev` download and logo links, and their total-downloads badge, which counts Orca's releases; the dead locale keys `pairingCommand` and `960e901ae4`, which no code references; and the Homebrew and AUR instructions, now removed rather than repointed, because girra publishes to no package manager.
+Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev` download and logo links, and their total-downloads badge, which counts Orca's releases; and the dead locale keys `pairingCommand` and `960e901ae4`, which no code references.
 
 ## Backlog
 
