@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged and the desktop's own CLI strings follow it; the runtime's 39 recovery strings are parked on a decision. Actions is still disabled, and the repository has no Apple signing secrets yet.
+As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, and the orchestration wire enum now accepts `girra`. The runtime's 39 recovery strings are parked on a decision. Actions is still disabled, and the repository has no Apple signing secrets yet.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -32,7 +32,8 @@ As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-ver
 - The workflow prune keeps `pr.yml`, `unit-tests.yml`, `e2e.yml` (dispatch only) and a new `mac-build.yml` that signs and notarizes an arm64 DMG, and deletes the other 33 workflows with the release scripts and contract tests they owned. It merged in [#26](https://github.com/koinonau/girra/pull/26): 87 files deleted, 16,681 lines removed.
 - The mobile client prune merged in [#27](https://github.com/koinonau/girra/pull/27): the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path. 67 files deleted, 18,972 lines removed.
 - The documentation command sweep writes `girra <verb>` in every `docs/**` example and corrects the Linux CLI name. It merged in [#29](https://github.com/koinonau/girra/pull/29): 33 files changed, 432 lines added and 424 removed. Measured 2026-09-18 with a verb-anchored `rg` over `docs/`: 0 files still write `orca <verb>`, down from 29.
-- The desktop string sweep writes `girra <verb>` in the 55 strings the app prints about its own local CLI: seven source files and the six locale catalogues.
+- The desktop string sweep writes `girra <verb>` in the 55 strings the app prints about its own local CLI: seven source files and the six locale catalogues. It merged in [#30](https://github.com/koinonau/girra/pull/30).
+- The orchestration wire enum accepts `girra` and `girra-dev`. Only the host side moved; the CLI still normalises down, because a host built before the widening rejects the new spelling and fails the whole call.
 
 ## Files
 
@@ -120,6 +121,16 @@ is how a caller learns its own name: `ORCA_CLI_COMMAND` first, then `girra-dev`
 in a dev checkout, then `girra`. `src/cli/orchestration-mutation-recovery.ts`
 already uses it, rebuilding the recovery command from the caller's own
 executable rather than trusting the name the runtime wrote.
+
+**On the orchestration wire the CLI still sends a pre-rename token.** The host's
+`compatibilityCliCommand` enum accepts `girra`, `girra-dev`, `orca`, `orca-ide`
+and `orca-dev`, and `compatibilityWindowsCommand` accepts `girra`, `orca` and
+`orca-ide` (`src/shared/rpc-contract/orchestration-params.ts`), but
+`resolveCompatibilityCliCommand` in
+`src/cli/handlers/orchestration/runtime-compatibility.ts` still maps `girra` down
+to an alias. Send the new spelling once no supported host predates the widening.
+`src/cli/handlers/orchestration-compatibility-cli-command-wire.test.ts` is what
+makes that safe to do.
 
 **Names the rename did not touch,** because they are internal identifiers under
 [ADR 0002](docs/adr/0002-keep-internal-orca-identifiers.md): the SSH relay shim
@@ -328,6 +339,15 @@ After the desktop string sweep, on 2026-09-18 (same `DEVELOPER_DIR`, stock `/bin
 | `pnpm lint` | 0 | 45 s | Clean, 111 reliability gates. Inline defaults differing fell from 38 to 37 |
 | `pnpm build` | 0 | 38 s | Renderer 11,950 modules |
 
+After the orchestration wire widening, on 2026-09-18 (same `DEVELOPER_DIR`, stock `/bin/bash`):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 21 s | No errors |
+| `pnpm test` | 1 | 590 s | Files: 5 failed, 7,616 passed, 45 skipped of 7,666. Tests: 5 failed, 69,794 passed, 279 skipped of 70,078. The five known failures and nothing else |
+| `pnpm lint` | 0 | 43 s | Clean, 111 reliability gates |
+| `pnpm build` | 0 | 35 s | Desktop and native |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -508,6 +528,7 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-16 | A capital-only rename misses lowercased copies of the same prose used by `toLowerCase()` comparisons and `/i` regexes, and copies written after an escape such as `\nOrca:`, which no `\bOrca\b` matches | Would have killed remote-runtime auto-reconnect silently; caught by an agent's own sweep | After a prose rename, sweep `rg -i` and `rg '\\[nrt]Orca'` as well, and read the matches by neighbour character |
 | 2026-09-18 | Homebrew's pnpm downloads a placeholder instead of the pnpm 12 binary, so the husky pre-commit hook, which calls bare `pnpm`, fails with `ENOEXEC` even under `mise exec --`. Clearing `~/Library/pnpm/.tools/pnpm/12.0.0` re-fetches the same placeholder | One docs-only commit made with `--no-verify` | For a commit that stages no file lint-staged matches (its globs cover TypeScript, JavaScript, JSON and CSS only), `--no-verify` is safe. For code, run `pnpm exec oxlint` and `oxfmt --check` on the staged files first |
 | 2026-09-16 | A `package.json` `bin` change makes pnpm install before every `pnpm run`, and that postinstall rebuild needs `DEVELOPER_DIR` while the Xcode licence is unaccepted | Agents chased a broken node-pty build twice | Run vitest directly (`mise exec -- node node_modules/vitest/vitest.mjs run --config config/vitest.config.ts <files>`) or export `DEVELOPER_DIR=/Library/Developer/CommandLineTools` |
+| 2026-09-18 | `generate-rpc-params-catalog.mjs` bundles every file under `src/shared/rpc-contract/` into CommonJS, so a `.test.ts` placed there fails `pnpm lint` with "Vitest cannot be imported in a CommonJS module" | One lint run and a file move | Test a contract schema from outside that directory |
 | 2026-09-18 | `pairingCommand` and `960e901ae4` in the locale catalogues still read `orca serve --pairing-address <host>`, and nothing references either: the mobile pairing removal orphaned them. `verify-localization-extraction` reports 1,331 such entries | None; caught before editing them | Check a locale key has a caller before renaming its value. Dead keys belong to a prune, not a sweep |
 | 2026-09-18 | Two tests pin the prose of the Linux guides verbatim: `config/scripts/headless-serve-shutdown-workflow.test.mjs` and `orcad-operations-restart-safety.test.mjs`. A doc edit fails them | Three assertions, found by running them | Run both after editing `docs/reference/headless-linux-server.md` or `orcad-operations.md`. `headlessLinuxProse` is whitespace-collapsed, `headlessLinuxGuide` is the raw file; assert wrapped prose against the former |
 | 2026-09-16 | Tests in `config/scripts` assert the prose of files that agents own, so a rename splits across ownership areas and the area owner never runs them | Four skill-guidance test files failed in the full suite | Give the lead every test outside the areas, and run the full suite before calling a sweep done |

@@ -1,8 +1,9 @@
 import { RuntimeClientError } from '../../runtime-client'
 
-// Why pre-rename tokens on the wire: the host validates this against a fixed enum, so a peer that
-// predates the rename rejects `girra` outright. Every name below stays an installed alias, so the
-// hint the host renders still runs. Widen the enum on both ends before sending the new spelling.
+// Why pre-rename tokens on the wire: the host validates this against a fixed enum, and a host built
+// before the enum was widened rejects `girra` outright, failing the whole call. Every name below
+// stays an installed alias, so the hint the host renders still runs. Send `girra` only once no
+// supported host predates that widening; the enum itself already accepts it.
 export function resolveCompatibilityCliCommand(): 'orca' | 'orca-ide' | 'orca-dev' {
   const configured = process.env.ORCA_CLI_COMMAND
   if (configured === 'girra-dev' || configured === 'orca-dev') {
