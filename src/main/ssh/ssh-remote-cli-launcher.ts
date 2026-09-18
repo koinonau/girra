@@ -18,9 +18,16 @@ type RemoteCliInstallFile = {
 
 export type RemoteCliInstallPlan = {
   launcherPath: string
+  /** The current name, installed beside `launcherPath`, which keeps the pre-rename one. */
+  aliasPath: string
   files: RemoteCliInstallFile[]
   postWriteCommands: string[]
 }
+
+// Why `orca` stays the primary: a host reached by a client that predates this install, or one
+// whose refresh failed, has only that name, and the install is best-effort by design
+// (`ssh-relay-session.ts` warns rather than failing the connection on a MaxSessions=1 remote).
+export const REMOTE_CLI_ALIAS_NAMES = { posix: 'girra', win32: 'girra.exe' } as const
 
 const WINDOWS_REMOTE_CLI_LAUNCHER_SOURCE = String.raw`using System;
 using System.Diagnostics;
@@ -160,7 +167,8 @@ function createWindowsLauncherCompileCommand(
   launcherFileName: string,
   launcherPath: string,
   sourcePath: string,
-  legacyShimPath: string
+  legacyShimPath: string,
+  aliasPath: string
 ): string {
   // Why: legacy csc.exe mis-parses space-bearing absolute paths handed to it by
   // Windows PowerShell 5.1's native-argument quoting, so compile from the bin
@@ -185,6 +193,9 @@ function createWindowsLauncherCompileCommand(
       `& $compiler ${compilerArgs}`,
       'if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }',
       `if (-not (Test-Path -LiteralPath ${powerShellLiteral(launcherPath)} -PathType Leaf)) { Write-Error 'The Girra SSH CLI launcher compiler produced no executable.'; exit 1 }`,
+      // Why copy rather than compile twice: the launcher never reads its own name, so one
+      // build serves both, and a second csc.exe run would double the install's failure surface.
+      `Copy-Item -LiteralPath ${powerShellLiteral(launcherPath)} -Destination ${powerShellLiteral(aliasPath)} -Force`,
       // Why: remove the legacy %* bridge only after a successful compile, so a
       // host missing csc.exe keeps its existing CLI (orca.exe shadows orca.cmd).
       `Remove-Item -LiteralPath ${powerShellLiteral(legacyShimPath)} -Force -ErrorAction SilentlyContinue`,
@@ -200,9 +211,11 @@ export function createRemoteCliInstallPlan(env: RemoteCliInstallEnv): RemoteCliI
     const launcherPath = joinRemotePath(env.hostPlatform, env.binDir, launcherFileName)
     const sourcePath = joinRemotePath(env.hostPlatform, env.binDir, sourceFileName)
     const legacyShimPath = joinRemotePath(env.hostPlatform, env.binDir, 'orca.cmd')
+    const aliasPath = joinRemotePath(env.hostPlatform, env.binDir, REMOTE_CLI_ALIAS_NAMES.win32)
     const binDir = joinRemotePath(env.hostPlatform, env.binDir)
     return {
       launcherPath,
+      aliasPath,
       files: [{ path: sourcePath, contents: WINDOWS_REMOTE_CLI_LAUNCHER_SOURCE }],
       // Why: compiling on the Windows target avoids shipping an unsigned
       // cross-host binary while ensuring argv never crosses cmd.exe's parser.
@@ -213,35 +226,37 @@ export function createRemoteCliInstallPlan(env: RemoteCliInstallEnv): RemoteCliI
           launcherFileName,
           launcherPath,
           sourcePath,
-          legacyShimPath
+          legacyShimPath,
+          aliasPath
         )
       ]
     }
   }
 
   const launcherPath = joinRemotePath(env.hostPlatform, env.binDir, 'orca')
+  const aliasPath = joinRemotePath(env.hostPlatform, env.binDir, REMOTE_CLI_ALIAS_NAMES.posix)
+  const script = [
+    '#!/usr/bin/env sh',
+    'set -eu',
+    `ORCA_RELAY_NODE_PATH=\${ORCA_RELAY_NODE_PATH:-${quoteSh(env.nodePath)}}`,
+    `ORCA_RELAY_DIR=\${ORCA_RELAY_DIR:-${quoteSh(env.relayDir)}}`,
+    `ORCA_RELAY_SOCKET_PATH=\${ORCA_RELAY_SOCKET_PATH:-${quoteSh(env.sockPath)}}`,
+    `ORCA_RELAY_CREDENTIAL_FILE=\${ORCA_RELAY_CREDENTIAL_FILE:-${quoteSh(env.credentialFile ?? `${env.sockPath}.credential`)}}`,
+    'if [ ! -S "$ORCA_RELAY_SOCKET_PATH" ]; then',
+    '  echo "Girra SSH CLI bridge cannot find the relay socket: $ORCA_RELAY_SOCKET_PATH" >&2',
+    '  exit 1',
+    'fi',
+    'exec "$ORCA_RELAY_NODE_PATH" "$ORCA_RELAY_DIR/relay.js" --sock-path "$ORCA_RELAY_SOCKET_PATH" --credential-file "$ORCA_RELAY_CREDENTIAL_FILE" --orca-cli "$@"',
+    ''
+  ].join('\n')
   return {
     launcherPath,
+    aliasPath,
     files: [
-      {
-        path: launcherPath,
-        contents: [
-          '#!/usr/bin/env sh',
-          'set -eu',
-          `ORCA_RELAY_NODE_PATH=\${ORCA_RELAY_NODE_PATH:-${quoteSh(env.nodePath)}}`,
-          `ORCA_RELAY_DIR=\${ORCA_RELAY_DIR:-${quoteSh(env.relayDir)}}`,
-          `ORCA_RELAY_SOCKET_PATH=\${ORCA_RELAY_SOCKET_PATH:-${quoteSh(env.sockPath)}}`,
-          `ORCA_RELAY_CREDENTIAL_FILE=\${ORCA_RELAY_CREDENTIAL_FILE:-${quoteSh(env.credentialFile ?? `${env.sockPath}.credential`)}}`,
-          'if [ ! -S "$ORCA_RELAY_SOCKET_PATH" ]; then',
-          '  echo "Girra SSH CLI bridge cannot find the relay socket: $ORCA_RELAY_SOCKET_PATH" >&2',
-          '  exit 1',
-          'fi',
-          'exec "$ORCA_RELAY_NODE_PATH" "$ORCA_RELAY_DIR/relay.js" --sock-path "$ORCA_RELAY_SOCKET_PATH" --credential-file "$ORCA_RELAY_CREDENTIAL_FILE" --orca-cli "$@"',
-          ''
-        ].join('\n')
-      }
+      { path: launcherPath, contents: script },
+      { path: aliasPath, contents: script }
     ],
     // Surface chmod failures: a non-executable launcher must fail install loudly, not silently.
-    postWriteCommands: [`chmod +x ${quoteSh(launcherPath)}`]
+    postWriteCommands: [`chmod +x ${quoteSh(launcherPath)} ${quoteSh(aliasPath)}`]
   }
 }
