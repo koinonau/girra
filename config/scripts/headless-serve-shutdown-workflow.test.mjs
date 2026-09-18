@@ -153,7 +153,7 @@ describe('headless serve shutdown PR gate', () => {
     const managedXvfbUnits = serveUnits.filter((unit) => /^Environment=DISPLAY=/m.test(unit))
 
     expect(ownedXvfbUnits).toHaveLength(1)
-    expect(ownedXvfbUnits[0]).toMatch(/^ExecStart=.*orca-linux\.AppImage serve.*$/m)
+    expect(ownedXvfbUnits[0]).toMatch(/^ExecStart=.*girra-linux\.AppImage serve.*$/m)
     expect(ownedXvfbUnits[0]).toMatch(/^KillMode=mixed$/m)
     expect(managedXvfbUnits).toHaveLength(1)
     expect(managedXvfbUnits[0]).not.toMatch(/^KillMode=/m)

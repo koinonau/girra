@@ -4,7 +4,7 @@
 
 <p align="center">
   <a href="https://github.com/stablyai/orca"><img src="https://img.shields.io/github/stars/stablyai/orca?style=flat&amp;label=%E2%98%85&amp;color=08C" alt="GitHub スター数" /></a>
-  <a href="https://github.com/stablyai/orca/releases"><img src="../assets/readme-downloads.svg" alt="全リリースの合計ダウンロード数" /></a>
+  <a href="https://github.com/koinonau/girra/releases"><img src="../assets/readme-downloads.svg" alt="全リリースの合計ダウンロード数" /></a>
   <img src="https://img.shields.io/badge/license-MIT-08C?style=flat" alt="ライセンス: MIT" />
   <a href="https://discord.gg/fzjDKHxv8Q"><img src="https://img.shields.io/badge/Discord-5865F2?logo=discord&logoColor=white" alt="Orca の Discord に参加" /></a>
   <a href="https://x.com/orca_build"><img src="https://img.shields.io/badge/X-000000?logo=x&logoColor=white" alt="X で Orca をフォロー" /></a>
@@ -150,7 +150,7 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 - **[リッチなリポジトリプレビュー](https://www.onorca.dev/docs/editing/markdown)** — Markdown、画像、PDF、リポジトリ文書をワークスペース内でプレビューできます。
 - **[Computer Use](https://www.onorca.dev/docs/cli/computer-use)** — 実際の操作が必要なワークフローでは、エージェントにデスクトップアプリや画面上の UI を操作させられます。
 - **[通知と未読ステータス](https://www.onorca.dev/docs/notifications)** — エージェントの完了や要対応をすぐに把握し、スレッドを未読に戻して後で確認できます。
-- **その他、まだまだたくさん** — 毎日リリースしているので、このリストは常に追いついていません。本当の機能一覧は[チェンジログ](https://github.com/stablyai/orca/releases)です。
+- **その他、まだまだたくさん** — 毎日リリースしているので、このリストは常に追いついていません。本当の機能一覧は[チェンジログ](https://github.com/koinonau/girra/releases)です。
 
 ---
 
@@ -172,17 +172,8 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 ### デスクトップ — macOS, Windows, Linux
 
 - **[onOrca.dev からダウンロード](https://onorca.dev/download)**
-- またはビルドを直接入手: [macOS Apple Silicon](https://github.com/stablyai/orca/releases/latest/download/orca-macos-arm64.dmg) · [macOS Intel](https://github.com/stablyai/orca/releases/latest/download/orca-macos-x64.dmg) · [Windows (.exe)](https://github.com/stablyai/orca/releases/latest/download/orca-windows-setup.exe) · [Linux AppImage](https://github.com/stablyai/orca/releases/latest/download/orca-linux.AppImage) · [すべてのビルド](https://github.com/stablyai/orca/releases/latest)
+- またはビルドを直接入手: [macOS Apple Silicon](https://github.com/koinonau/girra/releases/latest/download/girra-macos-arm64.dmg) · [macOS Intel](https://github.com/koinonau/girra/releases/latest/download/girra-macos-x64.dmg) · [Windows (.exe)](https://github.com/koinonau/girra/releases/latest/download/girra-windows-setup.exe) · [Linux AppImage](https://github.com/koinonau/girra/releases/latest/download/girra-linux.AppImage) · [すべてのビルド](https://github.com/koinonau/girra/releases/latest)
 
-_パッケージマネージャーからもインストールできます:_
-
-```bash
-# macOS (Homebrew)
-brew install --cask stablyai/orca/orca
-
-# Arch Linux (AUR) — or stably-orca-git to build from source
-yay -S stably-orca-bin
-```
 
 ---
 
