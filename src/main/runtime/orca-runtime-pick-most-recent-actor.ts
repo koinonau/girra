@@ -1,8 +1,8 @@
 // @ts-nocheck -- mechanically split from OrcaRuntimeService; behavior is covered by AST equivalence and characterization tests.
-import { OrcaRuntimeWithReclaimTerminalForDesktop } from './orca-runtime-reclaim-terminal-for-desktop'
+import { OrcaRuntimeWithMarkPtyLivenessUnverifiable } from './orca-runtime-mark-pty-liveness-unverifiable'
 import type { ApplyLayoutResult, PtyLayoutState, PtyLayoutTarget } from './orca-runtime-core'
 
-export class OrcaRuntimeWithPickMostRecentActor extends OrcaRuntimeWithReclaimTerminalForDesktop {
+export class OrcaRuntimeWithPickMostRecentActor extends OrcaRuntimeWithMarkPtyLivenessUnverifiable {
   // ─── Layout state machine ─────────────────────────────────────────
   //
   // See docs/mobile-terminal-layout-state-machine.md.

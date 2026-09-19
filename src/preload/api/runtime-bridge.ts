@@ -47,8 +47,6 @@ export const runtimeApi = {
     ipcRenderer.invoke('runtime:getBrowserRemoteViewerPages'),
   getClientHostedBrowserRows: (): Promise<ClientHostedBrowserRowsEvent[]> =>
     ipcRenderer.invoke('runtime:getClientHostedBrowserRows'),
-  restoreTerminalFit: (ptyId: string): Promise<{ restored: boolean }> =>
-    ipcRenderer.invoke('runtime:restoreTerminalFit', { ptyId }),
   onTerminalFitOverrideChanged: (
     callback: (event: {
       ptyId: string

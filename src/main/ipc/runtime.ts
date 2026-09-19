@@ -7,7 +7,6 @@ import type {
 } from '../../shared/runtime-types'
 import type { RuntimeRpcResponse } from '../../shared/runtime-rpc-envelope'
 import type { ClientHostedBrowserRowsEvent } from '../../shared/client-hosted-browser-rows'
-import { TERMINAL_FIT_RESTORE_DEADLINE_MS } from '../../shared/terminal-fit-restore-deadline'
 import {
   AGENT_SESSION_BACKGROUND_TASK_ROW_STOP_CAPABILITY,
   AGENT_SESSION_BACKGROUND_TASK_STOP_CAPABILITY,
@@ -20,17 +19,7 @@ import { RpcDispatcher } from '../runtime/rpc/dispatcher'
 import { ALL_RPC_METHODS } from '../runtime/rpc/methods'
 import { DesktopRuntimeSenderLifecycle } from './desktop-runtime-sender-lifecycle'
 
-function boundTerminalFitRestore(pending: Promise<boolean>): Promise<boolean> {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  const deadline = new Promise<boolean>((resolve) => {
-    timer = setTimeout(() => resolve(false), TERMINAL_FIT_RESTORE_DEADLINE_MS)
-    timer.unref?.()
-  })
-  return Promise.race([pending, deadline]).finally(() => clearTimeout(timer))
-}
-
 export function registerRuntimeHandlers(runtime: OrcaRuntimeService): void {
-  const pendingTerminalFitRestores = new Map<string, Promise<boolean>>()
   const desktopSenders = new DesktopRuntimeSenderLifecycle(runtime)
   ipcMain.removeHandler('runtime:syncWindowGraph')
   ipcMain.removeHandler('runtime:getStatus')
@@ -181,42 +170,4 @@ export function registerRuntimeHandlers(runtime: OrcaRuntimeService): void {
   ipcMain.handle('runtime:getClientHostedBrowserRows', (): ClientHostedBrowserRowsEvent[] =>
     runtime.listClientHostedBrowserRows()
   )
-
-  // Why: this IPC powers the desktop "Take back" button — it drops a remote
-  // desktop's fit hold and restores the PTY to this window's dimensions.
-  ipcMain.removeHandler('runtime:restoreTerminalFit')
-  ipcMain.handle('runtime:restoreTerminalFit', async (_event, args: { ptyId: string }) => {
-    // Why async: reclaimTerminalForDesktop awaits a PTY-resize chain. Returning
-    // the unresolved Promise to ipcMain made Electron try to structured-clone a
-    // Promise — "An object could not be cloned" error — and the renderer's
-    // restoreTerminalFit() rejected with no useful info.
-    // Why: keep one underlying reclaim per PTY even after callers time out;
-    // layout serialization means a retry cannot bypass the wedged operation.
-    let pending = pendingTerminalFitRestores.get(args.ptyId)
-    if (!pending) {
-      try {
-        let tracked!: Promise<boolean>
-        const clearTrackedRestore = (): void => {
-          if (pendingTerminalFitRestores.get(args.ptyId) === tracked) {
-            pendingTerminalFitRestores.delete(args.ptyId)
-          }
-        }
-        tracked = runtime.reclaimTerminalForDesktop(args.ptyId).then(
-          (restored) => {
-            clearTrackedRestore()
-            return restored
-          },
-          () => {
-            clearTrackedRestore()
-            return false
-          }
-        )
-        pending = tracked
-        pendingTerminalFitRestores.set(args.ptyId, pending)
-      } catch {
-        return { restored: false }
-      }
-    }
-    return { restored: await boundTerminalFitRestore(pending) }
-  })
 }

@@ -35,7 +35,6 @@ export type RuntimeApi = {
     >
     getBrowserRemoteViewerPages?: () => Promise<string[]>
     getClientHostedBrowserRows: () => Promise<ClientHostedBrowserRowsEvent[]>
-    restoreTerminalFit: (ptyId: string) => Promise<{ restored: boolean }>
     onTerminalFitOverrideChanged: (
       callback: (event: {
         ptyId: string

@@ -22,8 +22,11 @@ const TERMINAL_PANE_HOOK_SOURCE_PATTERN =
 // Then the mobile prune renamed two stages -- useTerminalPaneMobileActions to
 // useTerminalPaneFitActions and useMobileOverlayTicks to useFitOverlayTicks --
 // which moves the hash without moving the count.
+// Then deleting the orphaned desktop take-back path dropped four `useCallback`s from
+// fit-actions -- getHeldTerminalPtyIds, scheduleRestoredTerminalRefit, restorePaneTerminalFit
+// and restoreAllTerminalFits, which no component ever called (203 hooks, still 8 useMemo).
 const PRE_REFACTOR_HOOK_ORDER_SHA256 =
-  'ed5e5fed37fcce5d253865a4314332e64a41b13ff6869581464252a25cc46acc'
+  '9f743b274e69602c9720065ccc5c667483a2b4a8da08a0d130686d5193df7014'
 
 const sourceFiles = readdirSync(__dirname)
   .filter((name) => TERMINAL_PANE_HOOK_SOURCE_PATTERN.test(name))
@@ -88,7 +91,7 @@ function readFlattenedHookOrder(): string[] {
 describe('TerminalPane refactor hook parity', () => {
   it('preserves the recursively flattened render hook order', () => {
     const hooks = readFlattenedHookOrder()
-    expect(hooks).toHaveLength(207)
+    expect(hooks).toHaveLength(203)
     expect(hooks.filter((hook) => hook === 'useMemo')).toHaveLength(8)
     expect(createHash('sha256').update(hooks.join('\n')).digest('hex')).toBe(
       PRE_REFACTOR_HOOK_ORDER_SHA256

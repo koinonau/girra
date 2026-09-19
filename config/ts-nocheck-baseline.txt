@@ -11,6 +11,7 @@ src/main/runtime/orca-runtime-apply-mobile-session-tab-navigation.ts
 src/main/runtime/orca-runtime-apply-tracked-pty-title.ts
 src/main/runtime/orca-runtime-attach-remote-terminal-source-range-consumer.ts
 src/main/runtime/orca-runtime-attach-window.ts
+src/main/runtime/orca-runtime-automation-operations.ts
 src/main/runtime/orca-runtime-bind-pty-incarnation-handle.ts
 src/main/runtime/orca-runtime-build-headless-mobile-session-browser-tabs.ts
 src/main/runtime/orca-runtime-build-pty-terminal-summary.ts
@@ -33,7 +34,6 @@ src/main/runtime/orca-runtime-create-terminal.ts
 src/main/runtime/orca-runtime-deliver-pending-messages.ts
 src/main/runtime/orca-runtime-emit-daemon-pty-transient-fact.ts
 src/main/runtime/orca-runtime-emit-terminal-agent-status-events.ts
-src/main/runtime/orca-runtime-automation-operations.ts
 src/main/runtime/orca-runtime-file-commands.ts
 src/main/runtime/orca-runtime-fit-override-listeners.ts
 src/main/runtime/orca-runtime-focus-terminal.ts
@@ -74,7 +74,6 @@ src/main/runtime/orca-runtime-prove-recovered-structured-tui-pty-process.ts
 src/main/runtime/orca-runtime-prune-mobile-session-tab-group-layout.ts
 src/main/runtime/orca-runtime-pty-foreground-process-reads.ts
 src/main/runtime/orca-runtime-publish-pty-backed-mobile-session-terminal.ts
-src/main/runtime/orca-runtime-reclaim-terminal-for-desktop.ts
 src/main/runtime/orca-runtime-reconcile-headless-mobile-session-browser-tabs.ts
 src/main/runtime/orca-runtime-record-agent-prompt-lifecycle-state.ts
 src/main/runtime/orca-runtime-record-pty-worktree.ts
