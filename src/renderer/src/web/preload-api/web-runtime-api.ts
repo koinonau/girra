@@ -30,7 +30,6 @@ export function createWebRuntimeApi(): NonNullable<Partial<PreloadApi>['runtime'
     // Why: client-hosted rows describe pages a paired desktop renders for a host; the web client
     // is never that host.
     getClientHostedBrowserRows: () => Promise.resolve([]),
-    restoreTerminalFit: () => Promise.resolve({ restored: false }),
     onTerminalFitOverrideChanged: () => noopUnsubscribe,
     onBrowserRemoteViewersChanged: () => noopUnsubscribe,
     onClientHostedBrowserRowsChanged: () => noopUnsubscribe

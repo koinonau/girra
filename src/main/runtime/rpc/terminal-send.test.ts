@@ -411,10 +411,12 @@ describe('terminal send RPC', () => {
     expect(runtime.sendTerminal).not.toHaveBeenCalled()
   })
 
-  it('routes terminal restore fit through the runtime driver state machine', async () => {
+  // Why the method survives with nothing behind it: an older paired client still carries the
+  // preload bridge the desktop take-back used, and `method_not_found` is a louder failure than
+  // the `false` that path already returned. A host reclaims through `pty:claimViewport` instead.
+  it('answers terminal restore fit without reclaiming anything', async () => {
     const runtime = stubRuntime({
-      resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' }),
-      reclaimTerminalForDesktop: vi.fn().mockResolvedValue(true)
+      resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-1' })
     })
     const dispatcher = new RpcDispatcher({ runtime, methods: TERMINAL_METHODS })
 
@@ -428,8 +430,7 @@ describe('terminal send RPC', () => {
     if (!response.ok) {
       throw new Error(response.error.message)
     }
-    expect(response.result).toEqual({ restored: true })
-    expect(runtime.reclaimTerminalForDesktop).toHaveBeenCalledWith('pty-1')
+    expect(response.result).toEqual({ restored: false })
   })
   // Why: mobile gates reply forwarding on this static capability; removing it
   // would silently re-break mobile query answering against current hosts.

@@ -1,8 +1,5 @@
 import React, { useCallback } from 'react'
 import type { ManagedPane } from '@/lib/pane-manager/pane-manager'
-import { getAllOverrides } from '@/lib/pane-manager/fit-overrides'
-import { refitAndRefreshAllTerminalPanes } from '@/lib/pane-manager/pane-manager-registry'
-import { restoreTerminalFitToDesktop, restoreTerminalFitsToDesktop } from './terminal-fit-restore'
 import {
   armPrimarySelectionNativePasteSuppression,
   isPrimarySelectionEnabled,
@@ -20,52 +17,8 @@ import { splitTerminalPaneWithInheritedCwd } from './terminal-pane-split-with-in
 import type { TerminalPaneContextController } from './use-terminal-pane-context-actions'
 
 export function useTerminalPaneFitActions(controller: TerminalPaneContextController) {
-  const {
-    cwd,
-    managerRef,
-    paneCwdRef,
-    paneTransportsRef,
-    refreshFitOverlays,
-    setTerminalError,
-    settingsRef,
-    tabId,
-    worktreeId
-  } = controller
-  const getHeldTerminalPtyIds = useCallback((): string[] => [...getAllOverrides().keys()], [])
-  const scheduleRestoredTerminalRefit = useCallback((): void => {
-    requestAnimationFrame(refitAndRefreshAllTerminalPanes)
-    window.setTimeout(refitAndRefreshAllTerminalPanes, 100)
-  }, [])
-  const restorePaneTerminalFit = useCallback(
-    async (pane: ManagedPane, ptyId: string): Promise<void> => {
-      const currentPtyId = paneTransportsRef.current.get(pane.id)?.getPtyId() ?? null
-      if (currentPtyId !== ptyId) {
-        refreshFitOverlays()
-        return
-      }
-      const restored = await restoreTerminalFitToDesktop(ptyId, settingsRef.current ?? undefined)
-      if (restored) {
-        scheduleRestoredTerminalRefit()
-        pane.terminal.focus()
-      }
-    },
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
-    [refreshFitOverlays, scheduleRestoredTerminalRefit]
-  )
-  const restoreAllTerminalFits = useCallback(
-    async (focusPane: ManagedPane): Promise<void> => {
-      const restored = await restoreTerminalFitsToDesktop(
-        getHeldTerminalPtyIds(),
-        settingsRef.current ?? undefined
-      )
-      if (restored) {
-        scheduleRestoredTerminalRefit()
-        focusPane.terminal.focus()
-      }
-    },
-    // oxlint-disable-next-line react-hooks/exhaustive-deps -- Preserve the pre-split dependency contract.
-    [getHeldTerminalPtyIds, scheduleRestoredTerminalRefit]
-  )
+  const { cwd, managerRef, paneCwdRef, paneTransportsRef, setTerminalError, tabId, worktreeId } =
+    controller
   const terminalShouldHandleMiddleClick = useCallback(
     (target: EventTarget | null): target is Node => {
       if (!(target instanceof Element)) {
@@ -226,10 +179,6 @@ export function useTerminalPaneFitActions(controller: TerminalPaneContextControl
   )
 
   return {
-    getHeldTerminalPtyIds,
-    scheduleRestoredTerminalRefit,
-    restorePaneTerminalFit,
-    restoreAllTerminalFits,
     terminalShouldHandleMiddleClick,
     getPrimarySelectionMiddleClickPane,
     handlePrimarySelectionMiddleMouseDown,

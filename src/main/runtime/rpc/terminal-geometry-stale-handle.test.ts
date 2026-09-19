@@ -75,12 +75,14 @@ describe('terminal geometry family rejects stale handles instead of mutating the
 })
 
 describe('terminal geometry family still mutates the live PTY for a fresh handle', () => {
-  it('terminal.restoreFit reclaims the resolved PTY when the handle is live', async () => {
-    const reclaimTerminalForDesktop = vi.fn().mockResolvedValue(true)
+  // Why it reclaims nothing: the desktop take-back path is gone and this method survives only so
+  // an older paired client gets `false` rather than `method_not_found`. It still resolves the
+  // handle, so the stale case above keeps failing before the answer.
+  it('terminal.restoreFit answers a live handle without reclaiming', async () => {
+    const resolveLiveLeafForHandle = vi.fn().mockReturnValue({ ptyId: 'pty-a' })
     const runtime = {
       getRuntimeId: () => 'test-runtime',
-      resolveLiveLeafForHandle: vi.fn().mockReturnValue({ ptyId: 'pty-a' }),
-      reclaimTerminalForDesktop
+      resolveLiveLeafForHandle
     } as unknown as OrcaRuntimeService
     const dispatcher = new RpcDispatcher({ runtime, methods: TERMINAL_METHODS })
 
@@ -92,8 +94,8 @@ describe('terminal geometry family still mutates the live PTY for a fresh handle
     if (!response.ok) {
       throw new Error(response.error.message)
     }
-    expect(response.result).toEqual({ restored: true })
-    expect(reclaimTerminalForDesktop).toHaveBeenCalledWith('pty-a')
+    expect(response.result).toEqual({ restored: false })
+    expect(resolveLiveLeafForHandle).toHaveBeenCalledWith('live-terminal')
   })
 
   it('terminal.updateViewport updates the resolved PTY when the handle is live', async () => {

@@ -5,15 +5,20 @@ import { updateViewportForClient } from './terminal-viewport-update'
 
 export const TERMINAL_VIEWPORT_METHODS = [
   defineMethod({
+    // Why kept with nothing behind it: the desktop take-back path is gone, but an older paired
+    // client still carries its preload bridge, and `method_not_found` is a louder failure than the
+    // `false` that path already returned for every caller. A host reclaims through
+    // `pty:claimViewport` on host input instead. Retire this with the next wire cleanup.
+    // Why still resolve the handle: a stale one must fail with terminal_handle_stale (#7718)
+    // rather than answer for a PTY it does not name.
     name: 'terminal.restoreFit',
     params: TerminalHandle,
     handler: async (params, { runtime }) => {
-      // Why: a stale handle must fail with terminal_handle_stale, not reclaim the wrong PTY to desktop dims (#7718).
       const leaf = runtime.resolveLiveLeafForHandle(params.terminal)
       if (!leaf?.ptyId) {
         throw new Error('no_connected_pty')
       }
-      return { restored: await runtime.reclaimTerminalForDesktop(leaf.ptyId) }
+      return { restored: false }
     }
   }),
   defineMethod({

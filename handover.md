@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, the orchestration wire enum accepts `girra`, and the runtime's recovery strings now name `girra` with the SSH relay installing that name too. The user answered three open decisions on 2026-09-18. Two are built. The third, deleting the take-back path, was withdrawn when tracing showed the path is broken rather than inert. Actions is still disabled, and the repository has no Apple signing secrets yet.
+As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, the orchestration wire enum accepts `girra`, and the runtime's recovery strings now name `girra` with the SSH relay installing that name too. The user answered three open decisions on 2026-09-18, and all three are built. The take-back deletion went ahead on 2026-09-19 once tracing established what the path actually was: an orphaned API stack with no caller, beside a reclaim that works. Actions is still disabled, and the repository has no Apple signing secrets yet.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -33,6 +33,7 @@ As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-ver
 - The mobile client prune merged in [#27](https://github.com/koinonau/girra/pull/27): the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path. 67 files deleted, 18,972 lines removed.
 - The documentation command sweep writes `girra <verb>` in every `docs/**` example and corrects the Linux CLI name. It merged in [#29](https://github.com/koinonau/girra/pull/29): 33 files changed, 432 lines added and 424 removed. Measured 2026-09-18 with a verb-anchored `rg` over `docs/`: 0 files still write `orca <verb>`, down from 29.
 - The desktop string sweep writes `girra <verb>` in the 55 strings the app prints about its own local CLI: seven source files and the six locale catalogues. It merged in [#30](https://github.com/koinonau/girra/pull/30).
+- The orphaned desktop take-back stack is deleted: `reclaimTerminalForDesktop`, the `runtime:restoreTerminalFit` IPC, the preload bridge, the renderer restore actions and their shared deadline constant. 344 lines removed across four deleted files, plus edits in eight more.
 - The install documentation names girra's own artifacts and points at `koinonau/girra/releases`. Those links 404 until a release exists, which the user accepted. The Homebrew cask and AUR instructions are gone: girra publishes to neither, so following them installed Orca.
 - The 41 runtime recovery strings name `girra`. The SSH relay installs `girra` beside `orca` on every host, and `retargetCliOutputCommandName` rewrites the name to whatever the caller actually has, so a host whose best-effort shim refresh failed still reads a command it can run.
 - The orchestration wire enum accepts `girra` and `girra-dev`. It merged in [#31](https://github.com/koinonau/girra/pull/31). Only the host side moved; the CLI still normalises down, because a host built before the widening rejects the new spelling and fails the whole call.
@@ -369,6 +370,15 @@ After the SSH shim and runtime string sweep, on 2026-09-18 (same `DEVELOPER_DIR`
 | `pnpm lint` | 0 | 44 s | Clean, 111 reliability gates |
 | `pnpm build` | 0 | 45 s | Desktop and native |
 
+After deleting the take-back stack, on 2026-09-19 (same `DEVELOPER_DIR`, stock `/bin/bash`):
+
+| Command | Exit | Time | Result |
+|---|---|---|---|
+| `pnpm tc` | 0 | 20 s | No errors |
+| `pnpm test` | 1 | 679 s | Files: 5 failed, 7,612 passed, 45 skipped of 7,662. Tests: 5 failed, 69,796 passed, 279 skipped of 70,080. The five known failures and nothing else |
+| `pnpm lint` | 0 | 43 s | Clean, 111 reliability gates, 165 ts-nocheck files after pruning the deleted one |
+| `pnpm build` | 0 | 36 s | Desktop and native |
+
 A phase matches the baseline when these, and only these, fail. Rerun any other failure alone before calling it a regression:
 
 | Tests | Failing | Cause |
@@ -505,14 +515,14 @@ All 2026-09-13 unless dated otherwise.
   3. **Leave them as `orca`.** Costs telling the local majority a name the documentation no longer uses. Buys nothing.
 
   Answered: 2 plus 1. Raised and answered 2026-09-18.
-- **The desktop take-back path is broken, not inert.** The earlier framing was wrong, and the deletion the user approved on 2026-09-18 was withdrawn before any code changed. Measured 2026-09-18:
-  - `applyLayout` emits `terminalFitOverrideChanged(ptyId, 'remote-desktop-fit', ...)` whenever a layout targets `kind: 'remote-desktop'` (`orca-runtime-apply-layout.ts:70`), and **never writes** `terminalFitOverrides`: it deletes the entry at line 26 and restores it only when the resize fails.
-  - The renderer stores that hold. `setFitOverride` keeps an entry exactly when the mode is `remote-desktop-fit` (`src/renderer/src/lib/pane-manager/fit-overrides.ts:54`), fed by `fit-override-ipc-bridge.ts` and the remote-runtime transport.
-  - So the overlay appears for a real remote-desktop hold, and take-back cannot clear it: `reclaimTerminalForDesktop` looks in `terminalFitOverrides`, which that hold never populated, and returns `false`.
+- **DECIDED 2026-09-19 (user): delete the desktop take-back stack, keep the fit-override state.** Three tracing passes, each correcting the last, so the record is worth keeping:
+  1. The first framing called the path inert because the host's `terminalFitOverrides` has no writer. True, but only half the system.
+  2. The second framing called it a user-visible bug, because the renderer keeps its own override store that `applyLayout` feeds directly with `remote-desktop-fit` (`orca-runtime-apply-layout.ts:70`, `src/renderer/src/lib/pane-manager/fit-overrides.ts:54`). That store is live, but the conclusion was wrong.
+  3. What settled it: **no `.tsx` file reads the fit overrides at all.** The take-back UI went with the mobile prune. `restorePaneTerminalFit`, `restoreAllTerminalFits` and `getHeldTerminalPtyIds` were returned from `use-terminal-pane-fit-actions.ts` and consumed by nothing, and the only other reference in the repo was their own test. Nobody could reach the path, so nobody saw it fail.
 
-  Automatic release still works: a layout flipping back to `desktop` emits `desktop-fit`, and the renderer drops the entry. Take-back is the manual escape, and it is the broken half.
+  **Taking back already works, by another route.** On host keystroke `claimViewportForUserActivity` (`pty-input-recovery.ts:189`), gated on `mode === 'remote-desktop-fit'`, sends `pty:claimViewport` to `claimRemoteDesktopHost`, and `RemoteDesktopTerminalFloor.claimHost` drops the viewer owner and lays the PTY out at the host size. `src/main/runtime/remote-desktop-host-take-back.test.ts` pins that, which nothing did before.
 
-  That makes option 2, rewiring to `remoteDesktopFloor`, a bug fix rather than the new behaviour the earlier note called it, and makes option 1 a deletion of a user's only manual way out of a hold. Reopened 2026-09-18, needs the user again.
+  **Kept deliberately:** `terminalFitOverrides` and the fit-override notifier, because `remote-desktop-fit` parks xterm at the remote's dimensions and a mismatched grid garbles the wrapped stream; and `terminal.restoreFit` as a `{ restored: false }` stub, because an older paired client still carries the preload bridge and `method_not_found` is a louder failure than the `false` every caller already got. Retire the stub with the orchestration normalisation.
 - **DECIDED 2026-09-18 (user): write girra's asset names now.** The install pages name what `config/electron-builder.config.cjs` builds and link `koinonau/girra/releases`, accepting that every link 404s until a release exists. `mac-build.yml` is dispatch only, Actions is disabled, and the repository holds no Apple signing secrets, so publishing one is still item 4 of "Start Here".
 
 ## Traps
@@ -559,7 +569,8 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-16 | A capital-only rename misses lowercased copies of the same prose used by `toLowerCase()` comparisons and `/i` regexes, and copies written after an escape such as `\nOrca:`, which no `\bOrca\b` matches | Would have killed remote-runtime auto-reconnect silently; caught by an agent's own sweep | After a prose rename, sweep `rg -i` and `rg '\\[nrt]Orca'` as well, and read the matches by neighbour character |
 | 2026-09-18 | Homebrew's pnpm downloads a placeholder instead of the pnpm 12 binary, so the husky pre-commit hook, which calls bare `pnpm`, fails with `ENOEXEC` even under `mise exec --`. Clearing `~/Library/pnpm/.tools/pnpm/12.0.0` re-fetches the same placeholder | One docs-only commit made with `--no-verify` | For a commit that stages no file lint-staged matches (its globs cover TypeScript, JavaScript, JSON and CSS only), `--no-verify` is safe. For code, run `pnpm exec oxlint` and `oxfmt --check` on the staged files first |
 | 2026-09-16 | A `package.json` `bin` change makes pnpm install before every `pnpm run`, and that postinstall rebuild needs `DEVELOPER_DIR` while the Xcode licence is unaccepted | Agents chased a broken node-pty build twice | Run vitest directly (`mise exec -- node node_modules/vitest/vitest.mjs run --config config/vitest.config.ts <files>`) or export `DEVELOPER_DIR=/Library/Developer/CommandLineTools` |
-| 2026-09-18 | A code comment called the take-back path inert, and the handover repeated it. The main process's `terminalFitOverrides` really is unwritten, but the renderer keeps its own override map that the host feeds directly, so the path is reachable and broken | A decision taken on a false premise; caught before any deletion | When a comment says a path is dead, check both ends. A host-to-renderer notifier can keep renderer state alive with no host state behind it |
+| 2026-09-18 | A code comment called the take-back path inert, and the handover repeated it. Correcting it once overshot: the renderer's override store is live, but no component reads it, so the path was unreachable rather than broken | Two decisions taken on wrong premises, both caught before any deletion | State and reachability are different questions. Ask who writes it, then ask who reads it, and treat a hook's return value as unused until a consumer is named |
+| 2026-09-19 | `terminal-pane-hook-order-parity.test.ts` pins the flattened render-hook count and a SHA over their order, so removing a `useCallback` fails it | One run; the file's comment block is a log of every prior move | Update the count, the SHA and add a line saying why. Read the new SHA from the assertion's Received value |
 | 2026-09-18 | The six translated READMEs and the install page told the reader to `brew install --cask stablyai/orca/orca` or `yay -S stably-orca-bin`. Both install Orca, a different application with a different bundle id, under prose that says Girra | None; removed with the release-link rename | A download instruction is only correct if girra publishes the thing it names. Girra publishes to no package manager |
 | 2026-09-18 | `generate-rpc-params-catalog.mjs` bundles every file under `src/shared/rpc-contract/` into CommonJS, so a `.test.ts` placed there fails `pnpm lint` with "Vitest cannot be imported in a CommonJS module" | One lint run and a file move | Test a contract schema from outside that directory |
 | 2026-09-18 | `pairingCommand` and `960e901ae4` in the locale catalogues still read `orca serve --pairing-address <host>`, and nothing references either: the mobile pairing removal orphaned them. `verify-localization-extraction` reports 1,331 such entries | None; caught before editing them | Check a locale key has a caller before renaming its value. Dead keys belong to a prune, not a sweep |
