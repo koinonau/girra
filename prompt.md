@@ -4,12 +4,13 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-19. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. The CLI-name work is finished, and so is the take-back deletion. **Nothing here is unblocked**; each item names what unblocks it.
+Measured 2026-09-20. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. The app was launched and the e2e suite run for the first time on 2026-09-19; what that found is in `handover.md` under "End-to-end Suite".
 
-1. **Re-enable Actions and publish a build.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only. The install pages link `koinonau/girra/releases`, so every download link 404s until this ships, and item 2 waits on it too.
-2. **Retire what a release supersedes.** Once a release has shipped and no supported host predates it: drop the orchestration normalisation in `resolveCompatibilityCliCommand` and `resolvePackagedWindowsCompatibilityCommand` (`src/cli/handlers/orchestration/runtime-compatibility.ts`), whose host enum already accepts `girra`; and delete the `terminal.restoreFit` stub in `terminal-viewport-methods.ts`, which exists only so an older paired client gets `false` rather than `method_not_found`.
+1. **Attribute the 24 unexplained e2e failures.** Parked on the decision of the same name in `handover.md`, which proposes building the fork point in a scratch worktree and running the same specs there. Until that runs, nothing says whether they are fork defects or failures this laptop would also produce on upstream Orca.
+2. **Send `girra` on the orchestration wire.** The host enum already accepts it. Drop the normalisation in `resolveCompatibilityCliCommand` and `resolvePackagedWindowsCompatibilityCommand` (`src/cli/handlers/orchestration/runtime-compatibility.ts`) once no supported host predates that widening, which needs a release to have shipped first.
+3. **Re-enable Actions and publish a build.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only. The install pages link `koinonau/girra/releases`, so every download link 404s until this ships. Turning `e2e.yml` on would also give these specs a clean Linux runner, where this laptop's shell config cannot reach them.
 
-Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev` download and logo links, and their total-downloads badge, which counts Orca's releases; and the dead locale keys `pairingCommand` and `960e901ae4`, which no code references.
+Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev` download and logo links, and their total-downloads badge, which counts Orca's releases; and the dead locale keys, `pairingCommand`, `960e901ae4` and the `dictation` entries the voice deletion orphaned, which no code references.
 
 ## Backlog
 

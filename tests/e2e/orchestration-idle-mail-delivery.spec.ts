@@ -51,7 +51,7 @@ import {
 import { waitForPtyShellEcho } from './terminal-pty-readiness'
 import { parkHiddenTabBehindDecoy } from './helpers/terminal-hidden-parking'
 
-const POINTER_COMMAND = 'orca-dev orchestration check'
+const POINTER_COMMAND = 'girra-dev orchestration check'
 
 // Why generous: the push runs a microtask behind the send, may defer once more
 // behind a liveness probe, and submits Enter after a 500ms delay.

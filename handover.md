@@ -4,7 +4,7 @@ Facts, each dated when measured. Check a fact against its source before acting o
 
 ## Status
 
-As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, the orchestration wire enum accepts `girra`, and the runtime's recovery strings now name `girra` with the SSH relay installing that name too. The user answered three open decisions on 2026-09-18, and all three are built. The take-back deletion went ahead on 2026-09-19 once tracing established what the path actually was: an orphaned API stack with no caller, beside a reclaim that works. Actions is still disabled, and the repository has no Apple signing secrets yet.
+As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-version harness deletion, the remote serving cleanup and kothar install, the workflow prune with the signed macOS build, and the mobile client prune. The documentation command sweep is merged, the desktop's own CLI strings follow it, the orchestration wire enum accepts `girra`, and the runtime's recovery strings now name `girra` with the SSH relay installing that name too. The app was launched and the e2e suite run for the first time on 2026-09-19, which found the `ORCA` wordmark and a set of stale specs. The user answered three open decisions on 2026-09-18, and all three are built. The take-back deletion went ahead on 2026-09-19 once tracing established what the path actually was: an orphaned API stack with no caller, beside a reclaim that works. Actions is still disabled, and the repository has no Apple signing secrets yet.
 
 - Feature selection is final: 432 kept, 103 dropped. See [GIRRA-FEATURE-TREE.md](GIRRA-FEATURE-TREE.md).
 - The build is a fork of Orca with rejected features deleted. See [GIRRA-BUILD-PLAN.md](GIRRA-BUILD-PLAN.md) for phases, order and verification.
@@ -33,6 +33,8 @@ As of 2026-09-18: every phase through 7b is merged, with the ADRs, the cross-ver
 - The mobile client prune merged in [#27](https://github.com/koinonau/girra/pull/27): the presence lock, the driver subsystem, phone fit, the driver overlays, ten uncalled RPC methods and the legacy terminal subscription path. 67 files deleted, 18,972 lines removed.
 - The documentation command sweep writes `girra <verb>` in every `docs/**` example and corrects the Linux CLI name. It merged in [#29](https://github.com/koinonau/girra/pull/29): 33 files changed, 432 lines added and 424 removed. Measured 2026-09-18 with a verb-anchored `rg` over `docs/`: 0 files still write `orca <verb>`, down from 29.
 - The desktop string sweep writes `girra <verb>` in the 55 strings the app prints about its own local CLI: seven source files and the six locale catalogues. It merged in [#30](https://github.com/koinonau/girra/pull/30).
+- **The app runs.** First launch and e2e run of this fork, 2026-09-19: a fresh profile reaches Landing, a seeded workspace opens, and a shell command round-trips through a real PTY, with no renderer console errors. Runtime identity reads `Girra Dev`, window title `Girra`.
+- The Landing wordmark said `ORCA`. The Phase 7b sweep renamed capital `Orca` and never matched all-caps, so the most prominent brand string in the app kept the old name until 2026-09-20.
 - The orphaned desktop take-back stack is deleted: `reclaimTerminalForDesktop`, the `runtime:restoreTerminalFit` IPC, the preload bridge, the renderer restore actions and their shared deadline constant. 344 lines removed across four deleted files, plus edits in eight more.
 - The install documentation names girra's own artifacts and points at `koinonau/girra/releases`. Those links 404 until a release exists, which the user accepted. The Homebrew cask and AUR instructions are gone: girra publishes to neither, so following them installed Orca.
 - The 41 runtime recovery strings name `girra`. The SSH relay installs `girra` beside `orca` on every host, and `retargetCliOutputCommandName` rewrites the name to whatever the caller actually has, so a host whose best-effort shim refresh failed still reads a command it can run.
@@ -398,6 +400,46 @@ Load-flaky: these failed under a full suite and passed alone (2026-09-14):
 - `src/renderer/src/lib/palette-match/palette-match-performance.test.ts`, a wall-clock budget (2026-09-18).
 - `src/main/daemon/pty-subprocess-io-failure-native.test.ts`, `src/main/native-chat/transcript-watch-liveness.test.ts`, `src/renderer/src/components/right-sidebar/ai-vault-session-worktree-map.test.tsx` and `src/renderer/src/lib/browser-history-match.performance.test.ts`, all four under one heavily loaded run (2026-09-18).
 
+## End-to-end Suite
+
+First run on this fork, 2026-09-19. `pnpm test:e2e` runs Playwright against a real
+Electron app and is **not** part of `pnpm test`; the 349 spec files under
+`tests/e2e/` had never executed here, and `e2e.yml` is dispatch-only with Actions
+off.
+
+Run it windowless: `ORCA_BACKGROUND_LAUNCH=1 SKIP_BUILD=1 pnpm exec playwright test
+--config tests/playwright.config.ts --project=electron-headless`. Omit `SKIP_BUILD`
+after a source change, because the suite needs its own `--mode e2e` build that
+exposes `window.__store`. Switch native modules first with
+`pnpm run ensure:electron-runtime`, and switch back with
+`node config/scripts/ensure-native-runtime.mjs --runtime=node` or the unit suite
+cannot load them.
+
+| 2026-09-19 | Result |
+|---|---|
+| First run, 4 workers | 530 passed, 53 failed, 98 skipped, 7 did not run, 48 min |
+| The 53 rerun alone at 1 worker | 11 passed, 42 failed |
+
+**Use 2 workers on this laptop, not 4.** Four parallel Electron instances drove the
+load average to 53 on 10 cores, and every one of the 11 that passed alone had failed
+in that window, three of them after 18 minutes against a 120 s budget.
+
+The 42 deterministic failures, as classified on 2026-09-19:
+
+| Cause | Count | Standing |
+|---|---|---|
+| Stale assertions from the rename | 9 | Fixed 2026-09-20; the two `POINTER_COMMAND` constants said `orca-dev`, the app prints `girra-dev` |
+| Specs for deleted features | 3 | Deleted 2026-09-20: `voice-microphone-selection` (2) and `dictation-indicator`, both for voice input, gone in Phase 2 |
+| This laptop's `~/.zshrc` | 3 | Not a fork defect. Line 67 is `export PATH="/usr/local/bin:…"` with no `$PATH`, so it discards the stub directory the agent goldens prepend, and the stub is then `command not found` |
+| `ORCA_BACKGROUND_LAUNCH` refusing a reveal | 2 | The guard working. Both specs need native focus or a visible window, which `AGENTS.md` keeps off the user's desktop |
+| Docker absent | 1 | `ephemeral-vm-provisioned-root` builds an image |
+| **Unattributed** | **24** | Not yet separated into fork defect and pre-existing. See the open decision |
+
+**Why the terminal specs are suspect on this machine at all:** an e2e PTY sources the
+real `~/.zshrc`, powerline prompt and all, even though the fixture isolates `HOME`.
+Orca's zsh shell-integration wrapper sources the user's own config by design, and
+`git log` shows no girra commit touched it.
+
 ## Environment
 
 Measured 2026-09-14 on this laptop.
@@ -523,6 +565,7 @@ All 2026-09-13 unless dated otherwise.
   **Taking back already works, by another route.** On host keystroke `claimViewportForUserActivity` (`pty-input-recovery.ts:189`), gated on `mode === 'remote-desktop-fit'`, sends `pty:claimViewport` to `claimRemoteDesktopHost`, and `RemoteDesktopTerminalFloor.claimHost` drops the viewer owner and lays the PTY out at the host size. `src/main/runtime/remote-desktop-host-take-back.test.ts` pins that, which nothing did before.
 
   **Kept deliberately:** `terminalFitOverrides` and the fit-override notifier, because `remote-desktop-fit` parks xterm at the remote's dimensions and a mismatched grid garbles the wrapped stream; and `terminal.restoreFit` as a `{ restored: false }` stub, because an older paired client still carries the preload bridge and `method_not_found` is a louder failure than the `false` every caller already got. Retire the stub with the orchestration normalisation.
+- **What the 24 unattributed e2e failures mean.** They fail deterministically at one worker, and nothing yet separates a fork defect from a failure this laptop would also produce on upstream Orca. The cheap answer is an A/B: build `orca-full-history`, the fork point, in a scratch worktree and run the same 24 specs. Upstream telemetry is off with `DO_NOT_TRACK=1`, `ORCA_TELEMETRY_DISABLED=1` or `CI=1` (`src/main/telemetry/consent.ts` at that commit), and the windowless policy predates the fork, so the run is safe. Costs roughly 30 minutes and a separate `node_modules`, since sharing one into a worktree wipes node-pty. Until it runs, "the fork passes its e2e suite" is unproven. Raised 2026-09-19.
 - **DECIDED 2026-09-18 (user): write girra's asset names now.** The install pages name what `config/electron-builder.config.cjs` builds and link `koinonau/girra/releases`, accepting that every link 404s until a release exists. `mac-build.yml` is dispatch only, Actions is disabled, and the repository holds no Apple signing secrets, so publishing one is still item 4 of "Start Here".
 
 ## Traps
@@ -570,6 +613,8 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-18 | Homebrew's pnpm downloads a placeholder instead of the pnpm 12 binary, so the husky pre-commit hook, which calls bare `pnpm`, fails with `ENOEXEC` even under `mise exec --`. Clearing `~/Library/pnpm/.tools/pnpm/12.0.0` re-fetches the same placeholder | One docs-only commit made with `--no-verify` | For a commit that stages no file lint-staged matches (its globs cover TypeScript, JavaScript, JSON and CSS only), `--no-verify` is safe. For code, run `pnpm exec oxlint` and `oxfmt --check` on the staged files first |
 | 2026-09-16 | A `package.json` `bin` change makes pnpm install before every `pnpm run`, and that postinstall rebuild needs `DEVELOPER_DIR` while the Xcode licence is unaccepted | Agents chased a broken node-pty build twice | Run vitest directly (`mise exec -- node node_modules/vitest/vitest.mjs run --config config/vitest.config.ts <files>`) or export `DEVELOPER_DIR=/Library/Developer/CommandLineTools` |
 | 2026-09-18 | A code comment called the take-back path inert, and the handover repeated it. Correcting it once overshot: the renderer's override store is live, but no component reads it, so the path was unreachable rather than broken | Two decisions taken on wrong premises, both caught before any deletion | State and reachability are different questions. Ask who writes it, then ask who reads it, and treat a hook's return value as unused until a consumer is named |
+| 2026-09-19 | A capital-only rename misses an all-caps wordmark. `ORCA` sat in the Landing page's `<h1>`, the largest brand string in the app, through every phase | Nobody saw it until the app was launched for the first time | After a brand rename, grep the all-caps form too, and launch the app and look at it |
+| 2026-09-19 | The e2e suite is not in `pnpm test`, so 349 spec files never ran and their assertions rotted quietly against the rename | 9 stale failures and 3 specs for features deleted a week earlier | Run `pnpm test:e2e` after any sweep that changes displayed strings or deletes a feature |
 | 2026-09-19 | `terminal-pane-hook-order-parity.test.ts` pins the flattened render-hook count and a SHA over their order, so removing a `useCallback` fails it | One run; the file's comment block is a log of every prior move | Update the count, the SHA and add a line saying why. Read the new SHA from the assertion's Received value |
 | 2026-09-18 | The six translated READMEs and the install page told the reader to `brew install --cask stablyai/orca/orca` or `yay -S stably-orca-bin`. Both install Orca, a different application with a different bundle id, under prose that says Girra | None; removed with the release-link rename | A download instruction is only correct if girra publishes the thing it names. Girra publishes to no package manager |
 | 2026-09-18 | `generate-rpc-params-catalog.mjs` bundles every file under `src/shared/rpc-contract/` into CommonJS, so a `.test.ts` placed there fails `pnpm lint` with "Vitest cannot be imported in a CommonJS module" | One lint run and a file move | Test a contract schema from outside that directory |
