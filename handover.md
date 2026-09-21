@@ -432,8 +432,47 @@ The 42 deterministic failures, as classified on 2026-09-19:
 | Specs for deleted features | 3 | Deleted 2026-09-20: `voice-microphone-selection` (2) and `dictation-indicator`, both for voice input, gone in Phase 2 |
 | This laptop's `~/.zshrc` | 3 | Not a fork defect, proved 2026-09-20. Line 67 is `export PATH="/usr/local/bin:…"` with no `$PATH`, so it discards the stub directory the agent goldens prepend, and the stub is then `command not found`. Overriding `agentCmdOverrides.claude` with the stub's **absolute path** launches it in 5.6 s while the bare name still fails, so only `PATH` resolution is broken, not agent launch |
 | `ORCA_BACKGROUND_LAUNCH` refusing a reveal | 2 | The guard working. Both specs need native focus or a visible window, which `AGENTS.md` keeps off the user's desktop |
-| Docker absent | 1 | `ephemeral-vm-provisioned-root` builds an image |
-| **Unattributed** | **24** | Not yet separated into fork defect and pre-existing. See the open decision |
+| ~~Docker absent~~ | 0 | Wrong on 2026-09-19. Docker 29.5.2 was running the whole time and the image builds in 31 s; the build failed only under the load-53 window. `ephemeral-vm-provisioned-root` now fails a visibility assertion instead, so it moved to unattributed |
+| Specs that need a runner's env vars | 2 | `paired-startup-exec-readiness` passes in the terminal-parking lane and `remote-session-bulk-open-freeze-repro` in its own; both fail in a plain suite run because no shard sets their gates |
+| **Unattributed** | **23** | Not yet separated into fork defect and pre-existing. See the open decision |
+
+### Docker-gated lanes, 2026-09-21
+
+26 specs self-skip without `ORCA_E2E_SSH_DOCKER`, so they never ran here either. Docker
+29.5.2 runs them fine. Run each lane on its own: parallel Electron plus containers is
+what poisoned the first suite run.
+
+| Lane | Command | Result |
+|---|---|---|
+| Main SSH over Docker | `pnpm test:e2e:ssh-docker -- --grep-invert=@headful` | **32 passed**, 18.2 min |
+| Watcher isolation | `pnpm test:e2e:ssh-docker-watcher-isolation` | **2 passed** |
+| Terminal parking | `pnpm test:e2e:ssh-docker-terminal-parking` | **5 passed** |
+| Bulk-open freeze | `pnpm test:e2e:ssh-docker-bulk-open-freeze` | **1 passed** |
+| Relay perf | `pnpm test:e2e:ssh-docker-perf` | **4 passed**, latency budgets met |
+| Nested runtime | `pnpm test:e2e:nested-runtime-ssh` | **2 failed, 3 did not run** |
+
+That is 44 green tests over real SSH containers: remote PTYs, reconnects, transport
+drops, cold activation, port forwards, the AI Vault history and client-hosted browsers.
+It is the strongest evidence so far that the fork's SSH boundary survived, and it covers
+the `girra`-beside-`orca` shim from [#33](https://github.com/koinonau/girra/pull/33),
+which nothing else exercises end to end.
+
+`--grep-invert=@headful` matters: the runner lists the `electron-headful` project, and
+under `ORCA_BACKGROUND_LAUNCH=1` a headful spec fails on the reveal guard rather than
+showing a window.
+
+**Nested runtime has never run in any CI, upstream or here** — its gate,
+`ORCA_E2E_NESTED_RUNTIME_SSH`, is set by no workflow, and `run-ssh-docker-e2e.mjs` says
+so in its own comments. Both failures are behavioural, not stale assertions: a dialog
+stays visible when the spec expects it hidden, and a renamed file never reaches a paired
+client's explorer. Three more tests in the lifecycle file never ran, because Playwright
+stops a file after its first failure. This is paired and remote code, the area the fork
+pruned hardest, so it is the most likely place for a real regression and the least likely
+to have a clean upstream baseline. Treat it as part of the attribution decision.
+
+`ssh-egress-indicator-preview` and `ssh-routing-optout-demo` belong to no runner on
+purpose: both are opt-in demos, and the first holds a window open for 20 minutes for a
+human to watch. Not coverage gaps.
 
 **Why the terminal specs are suspect on this machine at all:** an e2e PTY sources the
 real `~/.zshrc`, powerline prompt and all, even though the fixture isolates `HOME`.
@@ -565,7 +604,7 @@ All 2026-09-13 unless dated otherwise.
   **Taking back already works, by another route.** On host keystroke `claimViewportForUserActivity` (`pty-input-recovery.ts:189`), gated on `mode === 'remote-desktop-fit'`, sends `pty:claimViewport` to `claimRemoteDesktopHost`, and `RemoteDesktopTerminalFloor.claimHost` drops the viewer owner and lays the PTY out at the host size. `src/main/runtime/remote-desktop-host-take-back.test.ts` pins that, which nothing did before.
 
   **Kept deliberately:** `terminalFitOverrides` and the fit-override notifier, because `remote-desktop-fit` parks xterm at the remote's dimensions and a mismatched grid garbles the wrapped stream; and `terminal.restoreFit` as a `{ restored: false }` stub, because an older paired client still carries the preload bridge and `method_not_found` is a louder failure than the `false` every caller already got. Retire the stub with the orchestration normalisation.
-- **What the 24 unattributed e2e failures mean.** They fail deterministically at one worker, and nothing yet separates a fork defect from a failure this laptop would also produce on upstream Orca. The cheap answer is an A/B: build `orca-full-history`, the fork point, in a scratch worktree and run the same 24 specs. Upstream telemetry is off with `DO_NOT_TRACK=1`, `ORCA_TELEMETRY_DISABLED=1` or `CI=1` (`src/main/telemetry/consent.ts` at that commit), and the windowless policy predates the fork, so the run is safe. Costs roughly 30 minutes and a separate `node_modules`, since sharing one into a worktree wipes node-pty. Until it runs, "the fork passes its e2e suite" is unproven. Raised 2026-09-19.
+- **What the 23 unattributed e2e failures, and the 2 nested-runtime ones, mean.** They fail deterministically at one worker, and nothing yet separates a fork defect from a failure this laptop would also produce on upstream Orca. The cheap answer is an A/B: build `orca-full-history`, the fork point, in a scratch worktree and run the same 24 specs. Upstream telemetry is off with `DO_NOT_TRACK=1`, `ORCA_TELEMETRY_DISABLED=1` or `CI=1` (`src/main/telemetry/consent.ts` at that commit), and the windowless policy predates the fork, so the run is safe. Costs roughly 30 minutes and a separate `node_modules`, since sharing one into a worktree wipes node-pty. Until it runs, "the fork passes its e2e suite" is unproven. The two nested-runtime failures need the same treatment and are the strongest candidates for a real regression, because they touch paired and remote code and no CI has ever run them. Raised 2026-09-19, extended 2026-09-21.
 - **DECIDED 2026-09-18 (user): write girra's asset names now.** The install pages name what `config/electron-builder.config.cjs` builds and link `koinonau/girra/releases`, accepting that every link 404s until a release exists. `mac-build.yml` is dispatch only, Actions is disabled, and the repository holds no Apple signing secrets, so publishing one is still item 4 of "Start Here".
 
 ## Traps
@@ -614,6 +653,7 @@ All 2026-09-13 unless dated otherwise.
 | 2026-09-16 | A `package.json` `bin` change makes pnpm install before every `pnpm run`, and that postinstall rebuild needs `DEVELOPER_DIR` while the Xcode licence is unaccepted | Agents chased a broken node-pty build twice | Run vitest directly (`mise exec -- node node_modules/vitest/vitest.mjs run --config config/vitest.config.ts <files>`) or export `DEVELOPER_DIR=/Library/Developer/CommandLineTools` |
 | 2026-09-18 | A code comment called the take-back path inert, and the handover repeated it. Correcting it once overshot: the renderer's override store is live, but no component reads it, so the path was unreachable rather than broken | Two decisions taken on wrong premises, both caught before any deletion | State and reachability are different questions. Ask who writes it, then ask who reads it, and treat a hook's return value as unused until a consumer is named |
 | 2026-09-19 | A capital-only rename misses an all-caps wordmark. `ORCA` sat in the Landing page's `<h1>`, the largest brand string in the app, through every phase | Nobody saw it until the app was launched for the first time | After a brand rename, grep the all-caps form too, and launch the app and look at it |
+| 2026-09-21 | A failing `docker build` in a spec was read as "Docker is not installed" without checking. Docker was running the whole time, and the build takes 31 s; it had only been starved during the load-53 window. That wrong verdict hid 26 Docker-gated specs, including the only end-to-end coverage of the SSH shim | Two days of SSH coverage not run | Check the tool before believing the error. `docker info` costs a second |
 | 2026-09-20 | `pnpm build` writes a production bundle over the same `out/` the e2e suite uses, and the suite needs its own `--mode e2e` build that exposes `window.__store`. With `SKIP_BUILD=1` afterwards, specs run against the wrong bundle and fail far from the cause: every store helper, `waitForActiveWorktree` included, times out on a landing page with no workspace | Two confusing runs and a wrong conclusion about a diagnostic | Never pass `SKIP_BUILD=1` after a plain `pnpm build`. Let global setup rebuild, or rebuild with `npx electron-vite build --mode e2e` |
 | 2026-09-19 | The e2e suite is not in `pnpm test`, so 349 spec files never ran and their assertions rotted quietly against the rename | 9 stale failures and 3 specs for features deleted a week earlier | Run `pnpm test:e2e` after any sweep that changes displayed strings or deletes a feature |
 | 2026-09-19 | `terminal-pane-hook-order-parity.test.ts` pins the flattened render-hook count and a SHA over their order, so removing a `useCallback` fails it | One run; the file's comment block is a log of every prior move | Update the count, the SHA and add a line saying why. Read the new SHA from the assertion's Received value |
