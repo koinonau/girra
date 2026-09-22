@@ -4,11 +4,12 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-22. No tracker exists, so these come from the build plan's phases. Every phase through 7b is merged, with the workflow prune, the mobile client prune and the ADRs. The app has been launched, the e2e suite run, the Docker-gated lanes run, and every failure attributed against upstream Orca: **the fork introduced no e2e regression in app behaviour.** See "End-to-end Suite" in `handover.md`.
+Measured 2026-09-22. No tracker exists, so these come from the build plan's phases. Every phase is merged, the e2e suite is attributed with no fork regression, Actions is on with CI green, and the first signed, notarized DMG is built and boots. What remains needs the user.
 
-1. **Re-enable Actions and publish a build.** Ask the user first, and only once `gh api repos/koinonau/girra/actions/secrets` lists `MAC_CERTS`, `MAC_CERTS_PASSWORD`, `APPLE_ID`, `APPLE_APP_SPECIFIC_PASSWORD` and `APPLE_TEAM_ID`. The kept set is `pr.yml`, `unit-tests.yml`, `e2e.yml` and `mac-build.yml`, the last two dispatch only. The install pages link `koinonau/girra/releases`, so every download link 404s until this ships. No packaged build has ever been produced or launched, so signing, notarization and the first-run migration are untested.
-2. **Send `girra` on the orchestration wire, and retire the `terminal.restoreFit` stub.** Both wait on a release having shipped. The host enum already accepts `girra`; drop the normalisation in `resolveCompatibilityCliCommand` and `resolvePackagedWindowsCompatibilityCommand` (`src/cli/handlers/orchestration/runtime-compatibility.ts`), and delete the stub in `terminal-viewport-methods.ts`.
-3. **The three identity decisions parked on 2026-09-15**, all Orca identity pointing upstream: the Help menu, the star and support links, and `.orca/` with `ORCA_*`. See "Open Decisions" in `handover.md`. They need the user.
+1. **Publish a release.** `mac-build.yml` signs and notarizes but only uploads an artifact, so the install pages' `koinonau/girra/releases` links still 404. Decide with the user whether to add a release step or publish by hand, and what version to call it. A published release also unblocks item 3.
+2. **First run on a real profile.** The packaged app boots in isolation, but nothing has exercised it against real state, the safe-storage fallback that reads Orca's old keychain item included. The user should open the DMG themselves; see the trap about keychain prompts before launching a packaged build any other way.
+3. **Retire two compatibility shims** once a release has shipped and no supported host predates it: the orchestration name normalisation in `runtime-compatibility.ts`, and the `terminal.restoreFit` stub in `terminal-viewport-methods.ts`.
+4. **The three identity decisions parked on 2026-09-15**: the Help menu, the star and support links, and `.orca/` with `ORCA_*`. See "Open Decisions" in `handover.md`.
 
 Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev` download and logo links, and their total-downloads badge, which counts Orca's releases; and the dead locale keys, `pairingCommand`, `960e901ae4` and the `dictation` entries the voice deletion orphaned, which no code references.
 
@@ -37,7 +38,7 @@ One pull request per story. Cut the branch from `origin/main`, stage files by na
 
 When a story must build on an unmerged one, stack it: branch from the earlier story's branch and target that branch. After the earlier pull request merges, retarget the stacked one to `main` with `gh pr edit --base main` before deleting the merged branch. Deleting it first closes the stacked pull request.
 
-Actions is disabled, so no CI runs. The workflows are pruned and the signed macOS build is written, so the local checks in the loop stand in for CI only until the user adds the Apple secrets and turns Actions on.
+Actions is on, and `pr.yml` runs on every pull request against `main`. Watch it to green before merging, and read a failure before calling it flake: a private repository's small runners and CI-only scripts have both hidden real problems. Local checks still come first, because CI takes about 20 minutes.
 
 Standing permission from the user, 2026-09-14: work through the phases without waiting for approval, and merge each pull request and clean up its branch once step 5 passes. Merge with a merge commit so `git branch -d` recognises the branch, then run the cleanup from the global instructions.
 
