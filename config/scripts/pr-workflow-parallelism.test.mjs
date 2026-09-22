@@ -427,16 +427,25 @@ describe('PR workflow parallelism', () => {
     expect(steps[cacheIndex].with['restore-keys']).not.toContain('tsbuildinfo-${{ runner.os }}-\n')
   })
 
-  it('checks out full history without historical blobs', () => {
-    const fullHistoryCheckouts = Object.values(workflow.jobs)
-      .flatMap((job) => job.steps ?? [])
-      .filter(
-        (step) => step.uses?.startsWith('actions/checkout@') && step.with?.['fetch-depth'] === 0
-      )
+  // Why static_analysis is the exception: its changed-code checks diff file contents, which a
+  // partial clone fetches on demand, and with persist-credentials off that fetch is anonymous. A
+  // private repository refuses it, so that job needs every blob up front.
+  it('checks out full history without historical blobs, except where contents are diffed', () => {
+    const fullHistoryCheckouts = Object.entries(workflow.jobs).flatMap(([jobName, job]) =>
+      (job.steps ?? [])
+        .filter(
+          (step) => step.uses?.startsWith('actions/checkout@') && step.with?.['fetch-depth'] === 0
+        )
+        .map((checkout) => ({ jobName, checkout }))
+    )
 
-    expect(fullHistoryCheckouts.length).toBeGreaterThan(0)
-    for (const checkout of fullHistoryCheckouts) {
-      expect(checkout.with.filter).toBe('blob:none')
+    expect(fullHistoryCheckouts.length).toBeGreaterThan(1)
+    for (const { jobName, checkout } of fullHistoryCheckouts) {
+      if (jobName === 'static_analysis') {
+        expect(checkout.with.filter).toBeUndefined()
+      } else {
+        expect(checkout.with.filter).toBe('blob:none')
+      }
     }
   })
 

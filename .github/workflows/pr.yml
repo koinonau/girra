@@ -72,11 +72,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
         with:
-          # Why blob:none: full history is needed for the merge-base diff, but historical
-          # file contents are not. Blobs are ~89% of this repo's pack, and Git fetches the
-          # few this job actually reads on demand.
+          # Why no blob filter here, unlike the other jobs: the changed-code checks diff file
+          # contents against the base, and a partial clone fetches those blobs on demand. With
+          # persist-credentials off that fetch is anonymous, which a private repository refuses.
+          # The whole repository is about 110 MB, so a full clone costs little.
           fetch-depth: 0
-          filter: blob:none
           persist-credentials: false
 
       - uses: ./.github/actions/install-node-dependencies
