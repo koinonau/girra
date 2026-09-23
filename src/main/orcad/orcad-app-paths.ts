@@ -7,6 +7,7 @@
  * beside, or resolves resources against. The failure surfaces far from here, as a missing
  * file rather than a missing implementation.
  */
+import { existsSync } from 'node:fs'
 import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { homedir, tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
@@ -26,7 +27,14 @@ export function resolveUserDataPath(): string {
     return explicit
   }
   const xdg = env('XDG_DATA_HOME')
-  return xdg ? join(xdg, 'Girra') : getGirraHomeDir()
+  if (!xdg) {
+    return getGirraHomeDir()
+  }
+  // Why the same rule as the home tree: a headless server upgrades on its own
+  // schedule and runs no migration, so it reads the Orca directory it already has.
+  const current = join(xdg, 'Girra')
+  const legacy = join(xdg, 'Orca')
+  return existsSync(current) || !existsSync(legacy) ? current : legacy
 }
 
 /** Electron's `'appData'` definition, computed without Electron. */

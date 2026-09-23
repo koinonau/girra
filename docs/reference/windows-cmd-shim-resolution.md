@@ -22,7 +22,7 @@ cover, and it does not:
 - **The interactive terminal.** `src/main/daemon/pty-subprocess/native-pty-spawn.ts`
   calls `pty.spawn` directly, so typing `claude` in a Girra terminal is
   completely unaffected.
-- **Girra's own hook wrappers** (the `.cmd` scripts under `~/.orca/agent-hooks`). These are batch
+- **Girra's own hook wrappers** (the `.cmd` scripts under `~/.girra/agent-hooks`). These are batch
   files Girra writes, matching none of the generator shapes, so they keep the
   cmd.exe path. They are addressable — we generate them — but not by this
   module.

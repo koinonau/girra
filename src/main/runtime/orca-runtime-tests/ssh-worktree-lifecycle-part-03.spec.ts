@@ -63,7 +63,7 @@ describe('OrcaRuntimeService', () => {
     )
     expect(fsProvider.writeFile).toHaveBeenCalledWith(
       'C:\\remote\\repo\\.gitignore',
-      'node_modules\n.orca\n'
+      'node_modules\n.girra\n'
     )
   })
 })

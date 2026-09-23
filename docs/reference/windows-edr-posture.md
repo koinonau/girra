@@ -271,7 +271,7 @@ _shorten the interpreter chain_ rather than to hide a window.
 
 #18875 is a worked example of that doctrine. The Claude Code lifecycle hook was
 registered as `powershell.exe -NoProfile -EncodedCommand <...>` whose entire
-decoded payload was a `Test-Path` and a call to `~/.orca/agent-hooks/claude-hook.cmd`.
+decoded payload was a `Test-Path` and a call to `~/.girra/agent-hooks/claude-hook.cmd`.
 It now registers the script path itself (`<path> || echo {}`), so `bash ->
 powershell -> cmd -> curl` became `bash -> cmd -> curl` and one
 `powershell.exe -EncodedCommand` per hook event — a first-class Defender alert

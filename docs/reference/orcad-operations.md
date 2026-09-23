@@ -49,7 +49,7 @@ loopback is the correct default and the pairing credential travels over SSH.
 
 ## Data root and the instance lock
 
-The data root is `$GIRRA_USER_DATA`, else `$XDG_DATA_HOME/Orca`, else `~/.orca`.
+The data root is `$GIRRA_USER_DATA`, else `$XDG_DATA_HOME/Girra`, else `~/.girra`. Each falls back to the Orca-named directory beside it while that is the only one present, so a server that has not been migrated keeps its state.
 
 Before the profile index or the store is touched, orcad takes `<data-root>/orcad.lock`.
 It refuses to start when:
