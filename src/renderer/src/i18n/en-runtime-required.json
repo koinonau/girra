@@ -1035,15 +1035,6 @@
           "reviewUpdateOne": "1 update available",
           "reviewUpdates": "{{value0}} updates available"
         },
-        "GeneralSupportSection": {
-          "1e29570462": "starring",
-          "511782265b": "Support the project with a GitHub star via the gh CLI.",
-          "5c49f02662": "hidden",
-          "73b327e793": "Try Again",
-          "9d181300e3": "starred",
-          "b3f0584f5d": "loading",
-          "c9f96d4234": "error"
-        },
         "GeneralUpdateSettingsSection": {
           "3394d1f663": "checking",
           "4c1c001813": "downloading",
@@ -1441,6 +1432,7 @@
         },
         "general": {
           "search": {
+            "06ea5a69a6": "github",
             "41c2f9a025": "default",
             "8436ff6f8e": "Proxy Bypass Rules",
             "882c4896fd": "opencode",
@@ -1452,6 +1444,7 @@
             "e2da948f59": "Pre-select an AI coding agent in the new-workspace composer.",
             "e3b1d42f95": "Proxy URL for Girra network requests and local terminal children.",
             "e55d62dfa4": "launchpad",
+            "e6b01c8e30": "feedback",
             "eb8946b2c9": "Hosts that should bypass the configured HTTP proxy."
           }
         },
@@ -1819,6 +1812,9 @@
           "1e5d410df0": "events",
           "8095a63426": "n/a",
           "bc0cb89901": "sessions •"
+        },
+        "ShareUsageCard": {
+          "0eb31e79ee": "Orca IDE"
         },
         "StatsPane": {
           "eb6a066185": "claude",
