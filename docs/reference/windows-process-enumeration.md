@@ -165,14 +165,14 @@ through `toIdentityRow`, so an identity row carries no command line on any host.
 
 ### Which callers need which
 
-| caller                                     | reads                             | flag set |
-| ------------------------------------------ | --------------------------------- | -------- |
-| `windows-agent-foreground-process.ts`      | `command` (agent recognition)     | detailed |
-| `local-workspace-platform-port-scanner.ts` | `command` (port attribution)      | detailed |
-| `structured-tui-process-identity.ts`       | `command` (child match)           | detailed |
-| `windows-pty-root-identity.ts`             | `pid` / `ppid` only               | identity |
-| `agent-session-process-identity-probe.ts`  | `creationTimeMs` only             | identity |
-| `relay/windows-port-scan.ts`               | `name` (port owner label)         | detailed |
+| caller                                     | reads                         | flag set |
+| ------------------------------------------ | ----------------------------- | -------- |
+| `windows-agent-foreground-process.ts`      | `command` (agent recognition) | detailed |
+| `local-workspace-platform-port-scanner.ts` | `command` (port attribution)  | detailed |
+| `structured-tui-process-identity.ts`       | `command` (child match)       | detailed |
+| `windows-pty-root-identity.ts`             | `pid` / `ppid` only           | identity |
+| `agent-session-process-identity-probe.ts`  | `creationTimeMs` only         | identity |
+| `relay/windows-port-scan.ts`               | `name` (port owner label)     | detailed |
 
 `windows-port-scan.ts` is the one mismatch in the table: it reads only `pid` and
 `name`, which the identity set answers, but it calls the detailed reader. On a
@@ -581,8 +581,8 @@ breakaway hands the whole tree its escape. The per-PTY job therefore omits
 `BREAKAWAY_OK` whenever `msys-2.0.dll` or `cygwin1.dll` sits on the shell's DLL
 search path — beside the executable, or under `usr/bin` for Git's `bin`
 launcher. Native shells keep explicit breakaway. Denying it costs Cygwin
-nothing, because it *pre-checks* the limit rather than retrying, so no spawn
-fails; but a *native* program that passes `CREATE_BREAKAWAY_FROM_JOB` itself
+nothing, because it _pre-checks_ the limit rather than retrying, so no spawn
+fails; but a _native_ program that passes `CREATE_BREAKAWAY_FROM_JOB` itself
 inside such a pane now gets `ERROR_ACCESS_DENIED`. `nohup` and `disown` are
 unaffected — they are Cygwin signal/session concepts, unrelated to job
 membership. The daemon's host job is unchanged.

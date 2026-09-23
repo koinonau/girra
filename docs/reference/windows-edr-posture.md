@@ -33,7 +33,7 @@ Four independent evidence clusters, from six incidents:
 
 | Cluster           | Incidents | Evidence                                                                                                                              |
 | ----------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| **Update**        | A, B, C   | `girra-windows-setup.exe` → `old-uninstaller.exe`, `Uninstall Orca.exe` (electron-builder generates these; they are in no repo file)   |
+| **Update**        | A, B, C   | `girra-windows-setup.exe` → `old-uninstaller.exe`, `Uninstall Orca.exe` (electron-builder generates these; they are in no repo file)  |
 | **Spawn**         | all six   | `Orca.exe` → `orca-terminal-daemon.exe` → `powershell.exe` / `pwsh.exe` / `cmd.exe` / `reg.exe` → `claude.exe`, `gh.exe`, `codex.cmd` |
 | **Process table** | D         | "suspicious memory activity" — `OpenProcess` plus a PEB read against every process on a repeating cadence                             |
 | **Computer use**  | E, F      | `runtime.ps1`, `computer-sidecar.js`, many `operation.json`, a burst of ~10 short-lived `powershell.exe`                              |

@@ -4,7 +4,6 @@ Girra's readiness and blocked-prompt rules are text rules over what an agent CLI
 terminal. They are only as good as the screens they were written against. This is how to record
 one, byte for byte, so a rule can be pinned to evidence instead of to a remembered screen.
 
-
 ## The recorder
 
 ```

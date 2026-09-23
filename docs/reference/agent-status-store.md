@@ -278,7 +278,6 @@ writers:
 | remote-runtime OSC parse (bytes never transit local main)         | keep, fenced behind the host's published row once the host is new enough; rule 3 of the wire doc applies |
 | web-session mirror receipt clock                                  | keep; the decay rule needs both clocks from one machine                                                  |
 
-
 ## PR 3: one rollup, one clock
 
 The worktree card status is derived three times: `lib/worktree-status.ts` in

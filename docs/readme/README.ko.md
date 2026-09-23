@@ -175,7 +175,6 @@ diff의 어느 줄에든 코멘트를 남기고 에이전트에게 바로 보내
 - 또는 빌드를 직접 받기: [macOS Apple Silicon](https://github.com/koinonau/girra/releases/latest/download/girra-macos-arm64.dmg) · [macOS Intel](https://github.com/koinonau/girra/releases/latest/download/girra-macos-x64.dmg) · [Windows (.exe)](https://github.com/koinonau/girra/releases/latest/download/girra-windows-setup.exe) · [Linux AppImage](https://github.com/koinonau/girra/releases/latest/download/girra-linux.AppImage) · [전체 빌드](https://github.com/koinonau/girra/releases/latest)
 - headless Linux 서버에서 `girra serve`를 실행하시나요? [Headless Linux 서버 가이드](../reference/headless-linux-server.md)를 확인하세요.
 
-
 ---
 
 ## 커뮤니티와 지원

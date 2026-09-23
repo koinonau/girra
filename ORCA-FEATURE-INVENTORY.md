@@ -28,6 +28,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ## Part 1. Agent providers and runtimes
 
 ### Claude Code Provider
+
 - [x] **Claude Code agent runtime (Agent SDK)** - Launches and manages the Claude Code CLI/Agent SDK as an embedded agent: session lifecycle, structured turns, streaming. `src/main/claude` _(Large)_
 - [x] **Claude subagent roster tracking** - Tracks and displays subagents spawned within a Claude session. `src/main/claude` (claude-subagent-*), `src/shared/claude-subagent-roster.ts` _(Medium)_
 - [x] **Claude background task tracking** - Surfaces long-running background tasks a Claude session launched. `src/main/claude` (claude-background-task-*) _(Small)_
@@ -37,6 +38,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Claude hook install & settings management** - Installs/manages Claude Code lifecycle hooks and settings files. `src/main/claude/hook-service.ts`, `hook-settings.ts` _(Medium)_
 
 ### Claude Accounts
+
 - [x] **Claude account login & registration** - Add, register, and switch between multiple Claude accounts. `src/main/claude-accounts` _(Large)_
 - [x] **Claude OAuth capture & token refresh** - Captures OAuth login and auto-refreshes access tokens. `claude-auth-capture.ts`, `oauth-refresh.ts` _(Medium)_
 - [x] **Claude credential keychain storage** - Stores Claude auth in the OS keychain. `keychain.ts` _(Small)_
@@ -44,11 +46,13 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Duplicate Claude account detection** - Warns/prevents adding the same account twice. `claude-duplicate-account.ts` _(Small)_
 
 ### Claude Usage
+
 - [x] **Claude token usage & cost reporting** - Parses transcripts into per-session/account token usage and $ cost. `src/main/claude-usage` _(Large)_
 - [x] **Claude usage attribution by worktree/automation** - Attributes cost to the worktree or automation that generated it. `worktree-attribution.ts`, `claude-usage-automation-attribution.ts` _(Small)_
 - [x] **Claude model pricing table** - Maintains per-model pricing for cost estimates. `claude-model-pricing.ts` _(Small)_
 
 ### Codex Provider
+
 - [ ] **Codex agent runtime (app-server protocol)** - Runs the Codex CLI as an embedded agent over its JSON-RPC app-server protocol. `src/main/codex` (codex-app-server-*) _(Large)_
 - [ ] **Codex session backfill & migration** - Migrates/backfills older Codex rollout files into Orca's index after format changes. `codex-session-backfill-*` _(Large)_
 - [ ] **Codex hook install & trust management** - Installs Codex lifecycle hooks and manages its "trust this project" state. `codex-hook-*`, `codex-trust-*`, `config-toml-trust.ts` _(Large)_
@@ -59,16 +63,19 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **WSL bridge for Codex sessions** - Bridges Codex sessions in WSL back to the Windows host UI. `wsl-codex-session-bridge.ts` _(Medium)_
 
 ### Codex Accounts
+
 - [ ] **Codex account login & registration** - Add, register, select between multiple Codex accounts. `src/main/codex-accounts` _(Large)_
 - [ ] **Codex managed home isolation** - Gives each Codex account its own isolated `$CODEX_HOME`. `codex-managed-home-*` _(Large)_
 - [ ] **Codex reset-credit tracking** - Tracks/ledgers Codex's "reset credit" grants per account. `codex-reset-credit-*` _(Medium)_
 - [ ] **Legacy Codex WSL auth migration** - One-time migration draining old shared WSL Codex auth into the per-account model. `legacy-wsl-runtime-auth-*` _(Large)_
 
 ### Codex CLI / Usage
+
 - [ ] **Codex CLI process lock** - Prevents concurrent Codex CLI invocations from corrupting shared state. `codex-cli/codex-home-process-lock.ts` _(Small)_
 - [ ] **Codex token usage & cost reporting** - Parses Codex session files into usage/cost rollups. `src/main/codex-usage` _(Large)_
 
 ### Other Agent CLI Integrations
+
 - [ ] **Amp agent status plugin** - Installs a plugin so Orca can read live Amp agent status. `src/main/amp` _(Small)_
 - [ ] **Antigravity hook integration** - Installs lifecycle hooks for the Antigravity agent. `src/main/antigravity` _(Small)_
 - [ ] **GitHub Copilot CLI hook integration** - Installs local/remote hooks for Copilot CLI sessions. `src/main/copilot` _(Small)_
@@ -88,9 +95,10 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Command Code hook integration** - Installs lifecycle hooks for the "Command Code" CLI. `src/main/command-code` _(Small)_
 - [ ] **Hermes hook & config integration** - Installs hooks and edits Hermes's YAML config/plugin registration. `src/main/hermes` _(Medium)_
 - [x] **AI commit-message generation** - Runs a background agent to draft a commit message from the staged diff. `src/main/text-generation` (commit-message-*) _(Medium)_
-- [x] **AI pull-request description generation** - Runs a background agent to draft a PR title/description from local or remote branch context. `src/main/text-generation` (pull-request-*, source-control-*) _(Large)_
+- [x] **AI pull-request description generation** - Runs a background agent to draft a PR title/description from local or remote branch context. `src/main/text-generation` (pull-request-_, source-control-_) _(Large)_
 
 ### Rate Limits & Quota
+
 - [x] **Per-provider rate-limit polling service** - Central service periodically polling usage/rate-limit endpoints for every connected account. `src/main/rate-limits/service*` _(Large)_
 - [x] **Claude usage-window / rate-limit display** - Fetches and classifies Claude's 5-hour/weekly rate-limit windows. `rate-limits/claude-*` _(Medium)_
 - [ ] **Codex rate-limit probing (RPC & PTY)** - Fetches Codex rate-limit windows via app-server RPC or a hidden PTY session. `rate-limits/codex-*` _(Medium)_
@@ -105,6 +113,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **GitHub/GitLab API rate-limit display** - Shows remaining GitHub/GitLab REST API rate limit. `components/github`, `components/gitlab` _(Small)_
 
 ### Usage & Billing (cross-provider)
+
 - [x] **Unified usage dashboard** - Combined page showing usage/cost across all connected agent accounts. `components/feature-wall/agents-orchestration/UsagePage.tsx` _(Medium)_
 - [x] **Usage-by-account summary cards** - Per-account usage/cost cards on the dashboard. `UsageAccountsCard.tsx` _(Small)_
 - [x] **Status-bar usage percentage indicator** - Live usage-percentage badge in the app status bar, configurable display mode. `src/shared/status-bar-usage-mode.ts` _(Small)_
@@ -112,6 +121,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Generic usage-provider contract & store** - Shared interface/store all per-provider usage trackers plug into (scope filters, rollups, worktree refs). `src/main/usage` _(Medium)_
 
 ### Agent Trust & Hooks Infrastructure
+
 - [x] **Agent trust presets (skip trust prompt)** - Pre-writes trust marker files cursor-agent/Copilot/Codex expect so their "trust this folder?" menu never intercepts an automated launch. `src/main/agent-trust-presets.ts` _(Small)_
 - [x] **Universal agent-hook install/uninstall** - Shared installer writing/removing lifecycle-hook scripts and config for every supported agent CLI, local and remote. `src/main/agent-hooks` (installer-utils*, managed-hook-*) _(Large)_
 - [x] **Agent-hook relay server** - Local server receiving lifecycle events (turn start/stop, tool calls) from every agent CLI and republishing live status. `agent-hooks/server` _(Large)_
@@ -123,6 +133,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Orca YAML hook trust dialog** - Prompts the user to approve a repo-declared `orca.yaml` hook before it runs. `components/sidebar/OrcaYamlTrustDialog.tsx` _(Small)_
 
 ### AI Vault (session history)
+
 - [x] **Cross-provider session history browser (AI Vault)** - Lists, searches, and reopens past sessions from every supported agent CLI, local and SSH-remote. `src/main/ai-vault`, `components/right-sidebar/AiVaultPanel.tsx` _(Large)_
 - [x] **Per-provider session parsers** - Format-specific parsers turning each CLI's on-disk transcript format into a common session record. `ai-vault/session-scanner-*-parser.ts` _(Large)_
 - [x] **Session resume / "resume in chat"** - Reopens a past session into a live agent pane, restoring its provider-native resume flag. `ai-vault-resume-*`, `ai-vault-session-resume*` _(Medium)_
@@ -132,7 +143,8 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **AI Vault full-text search** - Indexes and full-text-searches all scanned sessions, with typo tolerance and retention policy. `src/main/ai-vault-search` _(Large)_
 
 ### Skills
-- [x] **Agent skills marketplace/install** - Discovers, downloads, and installs "skill" packages into an agent's config, local or SSH-relayed. `src/main/skills` (skill-install-*, skill-cloud-*) _(Large)_
+
+- [x] **Agent skills marketplace/install** - Discovers, downloads, and installs "skill" packages into an agent's config, local or SSH-relayed. `src/main/skills` (skill-install-_, skill-cloud-_) _(Large)_
 - [x] **Skill bundle creation & sharing** - Packages a folder into a shareable skill bundle with a share link. `skill-bundle-creation.ts`, `src/shared/skill-share-link.ts` _(Medium)_
 - [x] **Skill removal with recovery** - Uninstalls a skill via a staged, recoverable delete. `skills/skill-delete` _(Medium)_
 - [x] **Skill freshness/update checking** - Detects when an installed skill is stale vs. its source and offers an update. `skill-freshness-*`, `skill-update-*` _(Medium)_
@@ -140,13 +152,16 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Skill setup panel (settings)** - Settings UI to manage installed skills per agent, incl. install-failure recheck. `components/settings/AgentSkillSetupPanel.tsx` _(Medium)_
 
 ### Memory
+
 - [x] **Host & PTY resource telemetry** - Collects per-process CPU/memory metrics for running agent terminals (with a Windows collector) and rehydrates the active-PTY registry after restart. `src/main/memory` _(Medium)_
 
 ### Speech
+
 - [x] **Speech-to-text dictation for agent input** - Local offline-model or OpenAI-API transcription for dictating prompts into an agent pane, with a securely stored API key for the cloud path. `src/main/speech` _(Large)_
 - [x] **STT model download & management** - Downloads, caches, and deletes local offline speech-recognition models. `speech/model-*`, `speech-model-*` _(Medium)_
 
 ### Execution Providers (remote/local agent hosting)
+
 - [x] **Local PTY execution provider** - Runs agent CLIs in a real local pseudo-terminal, with "shell ready" detection before injecting commands. `src/main/providers/local-pty-*` _(Large)_
 - [x] **SSH remote execution provider (PTY/git/filesystem)** - Runs agents, git ops, and file access on a remote SSH host, so agents can work on remote machines. `src/main/providers/ssh-*` _(Large)_
 - [x] **Foreground-process detection (per-OS)** - Detects what command is actually running in a pane vs. the shell, used to tell whether an agent is active. `providers/windows-*`, `macos-*`, `posix-pane-foreground-fingerprint.ts` _(Medium)_ (internal?)
@@ -156,6 +171,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ## Part 2. Source control, forges and issue trackers
 
 ### Worktree Management
+
 - [x] **Worktree-per-agent isolation** - creates an isolated git worktree per task/agent so parallel agents don't collide on files. `src/main/git/worktree.ts`, `src/main/git/worktree-add.ts` _(Large)_
 - [x] **Sparse worktree checkout** - supports git sparse-checkout so a worktree only materializes a subset of files. `src/main/git/worktree-sparse-add.ts`, `worktree-sparse-checkout.ts` _(Medium)_
 - [x] **Worktree listing & scan cache** - enumerates all worktrees for a repo with a cache to avoid repeated `git worktree list` calls. `src/main/git/worktree-listing.ts`, `worktree-scan-cache.ts` _(Medium)_
@@ -175,6 +191,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Sleeping/parking idle worktrees** - pauses idle worktrees to save resources, resumable later. `src/renderer/src/components/sidebar/sleep-worktree-flow.ts`, `src/renderer/src/lib/worktree-sleep-intent.ts` _(Medium)_
 
 ### Git Core / Source Control Engine
+
 - [x] **Admission-controlled git command runner** - throttles/queues concurrent git subprocesses to avoid overload. `src/main/git/command-runner/git-subprocess-admission.ts` _(internal?)_ `(Large)`
 - [x] **Git status polling & coalescing** - periodically polls `git status` per worktree, coalescing overlapping calls. `src/main/git/status.ts`, `src/renderer/src/components/right-sidebar/useGitStatusPolling.ts` _(Large)_
 - [x] **Porcelain status parsing** - parses `git status --porcelain` including quoted/special paths. `src/main/git/porcelain-v1-records.ts` _(internal?)_ `(Medium)`
@@ -191,6 +208,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Nested repo / monorepo discovery** - scans a folder for nested git repos and offers to import each individually. `src/main/project-groups/nested-repo-discovery.ts`, `nested-repo-import.ts` _(Medium)_
 
 ### Diff Review & Commit UI
+
 - [x] **Monaco-based inline diff viewer** - side-by-side/inline syntax-highlighted diff rendering. `src/renderer/src/components/editor/DiffViewer.tsx` _(Large)_
 - [x] **Large-diff fallback / on-demand loading** - avoids eagerly rendering huge diffs, with a manual load prompt. `src/renderer/src/components/editor/LargeDiffFallback.tsx` _(Medium)_
 - [x] **Image diff viewer** - before/after comparison for binary image changes. `src/renderer/src/components/editor/ImageDiffViewer.tsx` _(Small)_
@@ -201,6 +219,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Branch/commit compare view** - diffs two branches or commits against each other. `src/main/git/source-control/branch-compare.ts`, `commit-compare.ts` _(Medium)_
 
 ### Pull/Merge Request Workflow
+
 - [x] **Cross-forge hosted review abstraction** - unifies PR/MR creation and lookup across GitHub, GitLab, Bitbucket, Azure DevOps, and Gitea. `src/main/source-control/forge-provider.ts`, `hosted-review.ts` _(Large)_
 - [x] **Create & push PR/MR from the app** - drafts title/description (with repo PR templates) and opens the review without leaving the IDE. `src/main/source-control/hosted-review-creation.ts`, `pull-request-template.ts` _(Large)_
 - [x] **Stacked PR creation** - creates a chain of dependent PRs for stacked-branch workflows. `src/main/source-control/stacked-hosted-review-creation.ts`, `src/main/github/github-pr-stack.ts` _(Large)_
@@ -214,6 +233,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **PR conflict summary** - shows a summary of merge conflicts blocking a PR. `src/main/github/conflict-summary.ts` _(Small)_
 
 ### Forge Integrations
+
 - [x] **GitHub issue browsing & creation** - lists, filters, and creates GitHub issues from the task page. `src/main/github/issues.ts`, `src/renderer/src/components/task-page/github` _(Large)_
 - [x] **GitHub Projects (v2) board integration** - reads and mutates GitHub Projects fields and items. `src/main/github/project-view/` _(Large)_
 - [x] **GitHub Enterprise support** - supports self-hosted GitHub Enterprise hosts alongside github.com. `src/main/github/github-enterprise-repository.ts` _(Small)_
@@ -226,6 +246,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Gitea PR creation** - creates and maps pull requests against a Gitea instance. `src/main/gitea/pull-request-creation.ts` _(Small)_
 
 ### Issue Trackers - Jira & Linear
+
 - [x] **Jira issue browsing & creation** - searches, lists, and creates Jira issues tied to a workspace. `src/main/jira/issues.ts`, `src/renderer/src/components/JiraIssueWorkspace.tsx` _(Large)_
 - [x] **Jira ADF ↔ markdown conversion** - converts Jira's Atlassian Document Format to/from markdown for editing. `src/main/jira/adf-markdown.ts` _(Medium)_
 - [x] **Jira attachment/image caching** - fetches and caches images/attachments embedded in Jira issues. `src/main/jira/attachment-image-cache.ts` _(Medium)_
@@ -239,6 +260,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Multi-workspace Linear support** - connects to and switches between multiple Linear workspaces. `src/main/linear/linear-workspace-registry.ts` _(Small)_
 
 ### Project Groups, Folder Workspaces, Builds & Preflight
+
 - [x] **Project groups (multi-repo grouping)** - groups related worktrees/repos under a named project group in the sidebar. `src/renderer/src/store/project-groups/` _(Large)_
 - [x] **Folder workspaces (non-git folders)** - treats a plain folder without git as a workspace alongside git worktrees. `src/main/project-groups/folder-workspace-path-status.ts` _(Large)_
 - [x] **Local build feed & switch** - serves/consumes locally built app updates and lets a user switch to a local dev build. `src/main/local-builds/local-build-feed-server.ts` _(internal?)_ `(Medium)`
@@ -249,6 +271,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ## Part 3. Terminal, remote access and infrastructure
 
 ### Terminal & Shell Environment
+
 - [x] **Embedded PTY-backed terminal per session** - spawns a real shell process behind each terminal pane using node-pty. `src/main/daemon/pty-subprocess.ts`, `src/main/daemon/session.ts` _(Large)_
 - [x] **Terminal scrollback history with disk persistence** - saves and restores terminal output across restarts, including checkpointed restore points. `src/main/daemon/history-manager.ts`, `terminal-history-*.ts` _(Large)_
 - [x] **Cold/warm session restore after app or daemon restart** - reattaches to a still-running shell and replays buffered output instead of losing the session. `src/main/daemon/cold-restore-*.ts`, `terminal-mode-rehydrate-sequences.ts` _(Large)_
@@ -270,6 +293,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Clipboard copy of terminal selection** - copies selected terminal text to the OS clipboard. `src/renderer/src/web/web-clipboard-copy-terminal-selection.ts` _(Small)_
 
 ### Windows & WSL
+
 - [x] **WSL distro execution support** - runs shells and agents inside a WSL distribution from Windows. `src/main/wsl` _(Medium)_
 - [x] **Windows ConPTY job-object process management** - uses Windows job objects to reliably track and kill process trees under ConPTY. `src/main/windows/windows-pty-job.ts` _(Medium)_
 - [x] **Windows process table inspection** - enumerates and inspects running processes via WMI/CIM for diagnostics and cleanup. `src/main/windows/windows-process-table*.ts` _(Medium)_
@@ -279,6 +303,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Windows command-line recovery from truncated process info** - reconstructs the full command line when Windows APIs only return a partial one. `src/main/windows/windows-command-line-recovery-health.ts` _(Small)_
 
 ### SSH - Connections & Remote Access
+
 - [x] **SSH into a remote host and run a terminal there** - full interactive SSH terminal sessions from within Orca. `src/main/ssh/ssh-connection.ts`, `ssh-connection-manager.ts` _(Large)_
 - [x] **SSH config file parsing (`~/.ssh/config`)** - reads user's SSH config, including `Include` directives, to populate host list. `src/main/ssh/ssh-config-parser.ts`, `ssh-config-include-expander.ts` _(Medium)_
 - [x] **SSH host picker / add remote host UI** - lets the user browse and select known SSH hosts to connect to. `src/main/ssh/ssh-config-host-picker.ts`, `src/renderer/src/components/sidebar/AddRemoteHostSshConfigPicker.tsx` _(Medium)_
@@ -303,6 +328,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Forget/remove SSH workspace** - cleanly detaches a remote workspace and its SSH target. `src/renderer/src/components/sidebar/ForgetSshWorkspaceDialog.tsx` _(Small)_
 
 ### Remote Daemon Deployment (orcad)
+
 - [x] **Auto-deploy Orca's remote agent (`orcad`) to a remote host** - uploads and installs the remote runtime binary over SSH so agents can run there. `src/main/ssh/orcad-remote-deploy.ts`, `orcad-remote-launch.ts` _(Large)_
 - [x] **Versioned remote install with activation gate** - installs a new orcad version alongside the old one and only "activates" it after a health check passes. `src/main/ssh/orcad-activation-gate.ts`, `remote-install-model.ts` _(Large)_
 - [x] **Remote install rollback** - reverts to the previous working orcad version if activation fails. `src/main/ssh/orcad-remote-rollback.ts` _(Medium)_
@@ -316,6 +342,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **orcad health endpoint** - reports orcad's health/version for local and remote checks. `src/main/orcad/orcad-health.ts` _(Small)_
 
 ### Terminal Daemon Core
+
 - [x] **Background daemon that keeps terminal sessions alive** - a separate long-lived process hosts PTYs so sessions survive the app closing. `src/main/daemon/daemon-server.ts`, `daemon-main.ts` _(Large)_
 - [x] **Daemon endpoint ownership protocol** - a strict handoff protocol (documented in AGENTS.md) so only a live daemon can claim the Unix-socket path, preventing terminal "zombie" states. `src/main/daemon/daemon-endpoint-ownership.ts` _(Large)_
 - [x] **Daemon auto-respawn on crash** - detects a dead daemon and restarts it with throttling to avoid respawn storms. `src/main/daemon/daemon-respawn-throttle.ts`, `daemon-restart-state.ts` _(Medium)_
@@ -327,6 +354,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **PTY buffer/checkpoint snapshotting** - periodically snapshots terminal buffer state to disk for fast cold restore. `src/main/daemon/daemon-pty-checkpoint-scheduler.ts`, `terminal-checkpoint-serializer.ts` _(Medium)_
 
 ### Application Startup & Lifecycle
+
 - [x] **Single-instance app lock** - prevents multiple copies of Orca running at once, focusing the existing window instead. `src/main/startup/single-instance-lock.ts` _(Small)_
 - [x] **GPU fallback / software rendering switch** - detects GPU crashes and falls back to software rendering automatically. `src/main/startup/gpu-fallback-*.ts`, `gpu-lifecycle.ts` _(Medium)_
 - [x] **Headless "serve" mode** - runs Orca without a desktop window, as a server process (for remote/CI use). `src/main/startup/serve-*.ts`, `src/main/server` _(Large)_
@@ -340,6 +368,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **OS "open with" markdown file handling** - lets the OS hand a `.md` file to Orca on open/double-click. `src/main/startup/os-opened-markdown-files.ts` _(Small)_
 
 ### Networking & Ports
+
 - [x] **Local dev-server port scanning** - detects ports opened by processes in the user's workspace and lists them. `src/main/ports/local-workspace-port-scanner.ts` _(Medium)_
 - [x] **Advertised URL detection/caching for dev servers** - watches terminal output for server URLs and surfaces them as clickable links. `src/main/ports/advertised-url-watcher.ts`, `advertised-url-parsing.ts` _(Medium)_
 - [x] **Port ownership attribution** - attributes an open port back to the workspace/agent session that opened it. `src/main/ports/workspace-port-ownership.ts` _(Small)_
@@ -349,6 +378,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Bounded default proxy application** - applies proxy config across Electron sessions/webviews consistently. `src/main/network/bounded-proxy-application.ts` _(Small)_
 
 ### Remote/Web Access & Mobile Companion
+
 - [x] **Web UI served over the network** - serves Orca's UI over HTTP/WebSocket so it can be reached from another device/browser. `src/main/server`, `src/main/startup/serve-desktop-activation.ts` _(Large)_
 - [ ] **Mobile companion pairing via QR code** - generates a QR code the mobile app scans to pair with the desktop. `src/main/runtime/mobile-pairing-qr.ts`, `mobile-pairing-files.ts` _(Medium)_
 - [ ] **End-to-end encrypted mobile pairing** - encrypts the desktop↔mobile WebSocket channel using an ECDH keypair. `src/main/runtime/e2ee-keypair.ts` _(Medium)_
@@ -358,6 +388,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Network exposure guidance / warnings** - warns the user about the security implications of exposing the server on the network. `src/main/runtime/network-exposure-guidance.ts` _(Small)_
 
 ### Remote Browser & Chromium Sidecar
+
 - [x] **External Chromium sidecar process management** - launches and manages a separate Chromium process (for agent browser automation) independent of Electron's own browser. `src/main/orcad/external-chromium-browser-process.ts`, `external-chromium-tab-registry.ts` _(Large)_
 - [x] **Electron-hosted browser sidecar (fallback)** - serves the same remote-browser role using Electron's own browser when standalone Chromium isn't available. `src/main/orcad/electron-serve-browser-process.ts` _(Medium)_
 - [x] **Remote browser command routing over the sidecar** - dispatches browser automation commands (navigate, click, etc.) to whichever browser provider is active. `src/main/orcad/electron-sidecar-method-routing.ts`, `orcad-browser-provider.ts` _(Medium)_
@@ -365,6 +396,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Browser screencast streaming** - streams a live screen feed of the remote browser tab back to the UI. `src/main/runtime/browser-screencast-driver-scope.ts` _(Medium)_
 
 ### Agent Session & Process Management
+
 - [x] **Agent session lifecycle (spawn, claim, lease, handoff)** - tracks the lifetime and ownership of each running coding-agent process, including takeover between windows. `src/main/runtime/agent-session-*.ts` _(Large)_
 - [x] **Agent session record store (persisted to disk)** - durably records session metadata so sessions can be recovered after restart. `src/main/runtime/agent-session-record-store.ts` _(Medium)_
 - [x] **Agent prompt submission verification** - confirms a prompt was actually delivered into the agent's terminal before reporting success. `src/main/runtime/agent-prompt-submission-verification.ts` _(Medium)_
@@ -376,6 +408,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Electron speech services bridge** - exposes OS text-to-speech/dictation to the renderer. `src/main/host/electron-speech-services.ts` _(Small)_
 
 ### CLI (`orca` command)
+
 - [x] **`orca` CLI for scripting terminals/agents** - a standalone command-line tool to create/list/control terminals and agent sessions from scripts. `src/cli/index.ts`, `src/cli/dispatch.ts` _(Large)_
 - [x] **CLI worktree management commands** - create, list, and target git worktrees from the CLI. `src/cli/handlers` (worktree-*), `worktree-selector-recovery.ts` _(Medium)_
 - [x] **CLI browser automation commands** - drive the browser sidecar (navigate, click, cookies, storage) from the CLI. `src/cli/browser-format.ts`, `browser-handler-groups.ts` _(Large)_
@@ -386,6 +419,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **CLI automation scheduling** - schedules a recurring automated command run from the CLI. `src/cli/automation-format.ts`, `automation-owner-conflict-recovery.ts` _(Medium)_
 
 ### Relay / IPC Backend (internal?)
+
 - [x] **Relay dispatcher (renderer↔main RPC transport)** - the framed request/response/notification protocol connecting the UI to filesystem, git, PTY, and browser backends. `src/relay/dispatcher.ts`, `relay.ts` _(Large)_ `(internal?)`
 - [x] **Filesystem operations handler (read/list/watch files)** - serves file read, directory listing, and search (ripgrep) requests from the UI. `src/relay/fs-handler.ts`, `fs-handler-list-files.ts` _(Large)_
 - [x] **Git operations handler** - runs and streams git commands (status, diff, worktree, branch, submodules) requested by the UI. `src/relay/git-handler.ts`, `git-handler-worktree-operations.ts` _(Large)_
@@ -400,6 +434,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **WSL hook/filesystem bridge** - bridges relay filesystem and agent-hook calls into a WSL guest. `src/relay/wsl-hook-fs-bridge.ts`, `wsl-agent-hook-relay.ts` _(Medium)_
 
 ### Preload Bridge (internal?)
+
 - [x] **Secure IPC bridge (contextBridge API surface)** - the whitelisted API exposed from Electron's main process into the sandboxed renderer. `src/preload/index.ts`, `src/preload/api` _(Large)_ `(internal?)`
 - [x] **In-app markdown/doc link preview** - intercepts clicked links to preview a document instead of opening a browser. `src/preload/doc-preview-link.ts` _(Small)_
 - [x] **Renderer heap/memory diagnostics** - reports renderer process memory usage for performance monitoring. `src/preload/renderer-heap-statistics-reader.ts`, `renderer-process-memory-reader.ts` _(Small)_
@@ -410,6 +445,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ## Part 4. User interface and desktop shell
 
 ### Window, App Shell & Chrome
+
 - [x] **Custom titlebar with window controls** - Frameless window chrome with app-drawn title bar, traffic lights/min-max-close, drag regions. `src/renderer/src/app-shell` _(Medium)_
 - [x] **Split-pane multi-agent workspace shell** - Root layout hosting sidebar, tab groups, and panes so multiple agent sessions run side by side. `src/renderer/src/app-shell` _(Large)_
 - [x] **Background services bootstrapper** - Wires up cross-cutting renderer services (sync, notifications, telemetry) at app start. `src/renderer/src/app-shell/AppBackgroundServices.tsx` _(Medium)_
@@ -427,12 +463,14 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Editable-field native context menu** - OS-native cut/copy/paste context menu in text fields. `src/main/window/editable-context-menu.ts` _(Small)_
 
 ### Command Palette & Quick Actions
+
 - [x] **Cmd+J command palette** - Global fuzzy-searchable command palette for jumping to projects, agents, and actions. `src/renderer/src/components/cmd-j` _(Large)_
 - [x] **Live status rows in palette** - Palette entries show live agent/host status badges while searching. `src/renderer/src/components/cmd-j` _(Small)_
 - [x] **Terminal quick commands** - Saved, reusable terminal command snippets with scoping and toggle options, run from a dialog. `src/renderer/src/components/terminal-quick-commands` _(Medium)_
 - [x] **Link action popover** - Popover offering actions (open, copy, send-to-agent) on detected links. `src/renderer/src/components/link-actions` _(Small)_
 
 ### Dashboards & Agent Monitoring
+
 - [x] **Agent dashboard drawer** - Slide-out drawer listing all running/finished agents with status and settings. `src/renderer/src/components/dashboard` _(Large)_
 - [x] **Dashboard pop-out window** - Detaches the agent dashboard into its own OS window. `src/renderer/src/components/dashboard-popout`, `src/main/window/dashboard-popout-window.ts` _(Medium)_
 - [x] **Agent map / board view with lineage** - Visual canvas showing agent relationships, lineage chevrons, zoom/pan, filtering. `src/renderer/src/components/dashboard-popout` (agent-map-*) _(Large)_
@@ -446,10 +484,11 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Desktop pet overlay** - Animated on-screen "pet" companion reflecting agent activity state. `src/renderer/src/components/pet` _(Medium)_
 
 ### Agent Interaction Surfaces
+
 - [x] **Native in-app agent chat pane** - Chat-style composer/thread UI for talking to an agent (vs raw terminal). `src/renderer/src/components/native-chat`, `src/main/native-chat` _(Large)_
 - [x] **Agent combobox / picker** - Searchable dropdown for choosing which agent/CLI to run. `src/renderer/src/components/agent` _(Small)_
 - [x] **Per-agent settings dialog** - Dialog for configuring an individual agent's options. `src/renderer/src/components/agent/AgentSettingsDialog.tsx` _(Small)_
-- [X] **Agent session continuation dialog** - Prompts to resume/continue a prior agent session. `src/renderer/src/components/agent-session-continuation` _(Small)_
+- [x] **Agent session continuation dialog** - Prompts to resume/continue a prior agent session. `src/renderer/src/components/agent-session-continuation` _(Small)_
 - [x] **Composer with attachments/dictation/drag-drop** - Rich prompt composer supporting file/image attachments, autogrow, drop targets. `src/renderer/src/hooks/composer-state` _(Large)_
 - [ ] **Voice dictation** - Press-and-hold mic dictation with audio meter and insertion into composer. `src/renderer/src/components/dictation` _(Medium)_
 - [x] **Background/detached agent tasks** - Runs and tracks agent tasks not tied to a visible foreground pane. `src/renderer/src/components/native-chat` (background-task-*) _(Medium)_
@@ -460,6 +499,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [x] **Parent worktree picker** - Choose which existing worktree/branch to branch a new session from. `src/renderer/src/components/new-workspace/ComposerParentWorktreePicker.tsx` _(Small)_
 
 ### Terminal
+
 - [ ] **Multi-pane terminal with splits** - xterm-based terminal supporting infinite splits, tabs, and background mounting. `src/renderer/src/components/terminal`, `src/renderer/src/components/terminal-pane` _(Large)_
 - [ ] **Floating/detachable terminal panel** - A terminal window that floats above the app, draggable/resizable. `src/renderer/src/components/floating-terminal` _(Medium)_
 - [ ] **Agent completion detection in terminal** - Watches terminal output/hooks to detect when an agent turn finished, for notifications. `src/renderer/src/components/terminal-pane` (agent-completion-*) _(Large)_
@@ -467,6 +507,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Terminal quick-command palette in tab bar** - Search/run saved terminal commands from the tab strip. `src/renderer/src/components/tab-bar` (hosted-terminal-quick-command-search.ts) _(Small)_
 
 ### Editor & Diff/Review
+
 - [ ] **In-app Monaco code editor tabs** - Multi-tab code editing surface with file tabs. `src/renderer/src/components/editor`, `src/renderer/src/components/tab-bar` (EditorFileTab*) _(Large)_
 - [ ] **Changes/diff mode view** - Git-changes-focused view mode for reviewing modified files. `src/renderer/src/components/editor/ChangesModeView.tsx` _(Medium)_
 - [ ] **Inline diff comments** - Add/view threaded comments anchored to diff lines, like a PR review. `src/renderer/src/components/diff-comments` _(Medium)_
@@ -476,6 +517,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Sparse checkout presets** - UI to select/save sparse-checkout presets for large repos. `src/renderer/src/components/sparse` _(Small)_
 
 ### GitHub / GitLab / Linear / Jira Integration
+
 - [ ] **Unified task page (multi-provider issue/PR list)** - Cross-provider list/board of GitHub, GitLab, Jira, and Linear items with filters. `src/renderer/src/components/task-page` _(Large)_
 - [ ] **GitHub PR/issue detail dialog** - Rich dialog for viewing/discussing/editing a GitHub issue or PR (conversation, checks, files, reviewers). `src/renderer/src/components/github-item-dialog` _(Large)_
 - [ ] **Full GitHub PR review page** - Dedicated page for reviewing a PR: files diff, checks, comments, reviewers, merge actions. `src/renderer/src/components/pull-request-page` _(Large)_
@@ -489,6 +531,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Linear issue board & project views** - Kanban board, list, and project overview for Linear issues/projects with connect flow. `src/renderer/src/components/task-page/linear` _(Large)_
 
 ### Onboarding, Tips & Guidance
+
 - [ ] **First-run onboarding flow** - Multi-step wizard (agent pick, integrations, notifications) shown to new users. `src/renderer/src/components/onboarding` _(Large)_
 - [ ] **Setup guide modal with progress ring** - Persistent checklist modal tracking setup completion (browser, agents, etc.) with telemetry. `src/renderer/src/components/setup-guide` _(Medium)_
 - [ ] **Contextual product tours** - Step-by-step overlay tours pointing at specific UI elements. `src/renderer/src/components/contextual-tours` _(Medium)_
@@ -497,6 +540,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **"Star the repo" nag toast** - Occasional toast nudging engaged users to star the GitHub repo. `src/renderer/src/components/star-nag` _(Small)_
 
 ### Browser Pane & Design Mode
+
 - [ ] **Embedded Chromium browser pane** - Full in-app browser tab with address bar, navigation, find-in-page, tabs. `src/renderer/src/components/browser-pane` _(Large)_
 - [ ] **Browser annotate/markup tool** - Draw shapes/markup on a captured page screenshot and send to an agent. `src/renderer/src/components/browser-pane/annotate` _(Large)_
 - [ ] **"Grab" element capture (Design Mode)** - Click a page element to capture its HTML/CSS/screenshot into an agent prompt. `src/renderer/src/components/browser-pane` (grab-*) _(Medium)_
@@ -505,10 +549,12 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Workspace port scanner** - Detects and lists locally listening ports for a workspace, for quick open. `src/renderer/src/components/ports` _(Small)_
 
 ### Mobile Emulator & Companion
+
 - [ ] **Android emulator pane** - Embedded Android device emulator with hardware buttons, keyboard paste, gestures. `src/renderer/src/components/emulator-pane`, `src/main/emulator` _(Large)_
 - [ ] **Mobile companion pairing page** - In-app hero/help page for pairing the Orca mobile app (QR/network interface picker, Android APK help). `src/renderer/src/components/mobile` _(Medium)_
 
 ### Settings & Accounts
+
 - [ ] **Settings pane (multi-section)** - Central settings surface covering accounts, network, advanced options. `src/renderer/src/components/settings` _(Large)_
 - [ ] **Multi-provider account management** - Connect/sign-in/sign-out flows per AI provider (Claude, Codex, MiniMax, etc.) with removal confirmation dialogs. `src/renderer/src/components/settings` (accounts-pane-*) _(Large)_
 - [ ] **Unexpected sign-out recovery card** - Notifies and helps re-auth when a provider account is unexpectedly signed out. `src/renderer/src/components/unexpected-signout` _(Small)_
@@ -516,6 +562,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Advanced network settings search** - Searchable settings list for network/proxy configuration. `src/renderer/src/components/settings/advanced-network-search.ts` _(Small)_
 
 ### Sidebar, Workspaces & Repos
+
 - [ ] **Project/repo sidebar tree** - Primary navigation tree of projects, repos, and worktree workspaces. `src/renderer/src/components/sidebar` _(Large)_
 - [ ] **Add repo / remote host dialog** - Dialog to add a local or SSH remote repo, browse folders/hosts. `src/renderer/src/components/sidebar` (AddRepo/AddRemoteHost) _(Large)_
 - [ ] **Nested-repo detection checklist** - Warns about and lets users select nested git repos when adding a folder. `src/renderer/src/components/repo/NestedRepoChecklist.tsx` _(Small)_
@@ -527,36 +574,43 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **AI Vault credential/secrets pane** - Original-pane UI for scanning and managing secret/credential findings ("AI vault"). `src/renderer/src/components/right-sidebar` (ai-vault-*), `src/main/ai-vault`, `src/main/ai-vault-search` _(Large)_
 
 ### Tabs & Panes
+
 - [ ] **Draggable tab groups with drop zones** - Tabs can be dragged between groups/panes with hover previews and drop indicators. `src/renderer/src/components/tab-group` _(Large)_
 - [ ] **Editor/browser/terminal tab bar** - Unified tab strip for editor files, browser tabs, and hosted terminals, with context menus. `src/renderer/src/components/tab-bar` _(Large)_
 - [ ] **Retained-pane host (keep-alive panes)** - Keeps certain panes (browser/AI-vault) mounted in the background across tab switches. `src/renderer/src/components/tab-group/RetainedPaneHost.tsx` _(Medium)_
 
 ### Artifacts
+
 - [ ] **Artifact collection/gallery view** - Table/list view of published Claude Artifacts with search, sort, toolbar. `src/renderer/src/components/artifacts` _(Large)_
 - [ ] **Artifact preview & detail drawer** - Inline preview and a detail drawer with header/actions for a single artifact. `src/renderer/src/components/artifacts` _(Medium)_
 - [ ] **Artifact publish flow** - Publishes/updates an artifact and manages its published link and cloud sync. `src/renderer/src/components/artifacts` (artifact-publish-flow.ts), `src/main/artifacts` _(Medium)_
 
 ### Automations
+
 - [ ] **Automation editor (scheduled/triggered agent runs)** - Create/edit automations that launch agents on a schedule or external trigger, with destination and project targeting. `src/renderer/src/components/automations` _(Large)_
 - [ ] **Automation delete confirmation preference** - Remembers user's choice to skip delete confirmations for automations. `src/renderer/src/components/automations/automation-delete-confirm-preference.ts` _(Small)_
 
 ### Localization
+
 - [ ] **Multi-language UI (6 locales)** - Full renderer UI translated into English, Spanish, French, Japanese, Korean, and Chinese (README also references pt/zh-CN docs). `src/renderer/src/i18n/locales`, `src/main/i18n` _(Large)_
 - [ ] **Main-process lazy locale loading** - Loads locale bundles for main-process UI (menus, notifications) on demand. `src/main/i18n/main-i18n.ts` _(Small)_
 - [ ] **Localized contextual-tour/dictation copy** - Ensures overlay and indicator copy respects locale (dedicated localization tests). `src/renderer/src/components/contextual-tours`, `src/renderer/src/components/dictation` _(internal?)_ _(Small)_
 
 ### UI Foundation & Theming
+
 - [ ] **Shared shadcn-style UI kit** - Design-system primitives (button, dialog, dropdown, popover, command, accordion, etc.) used app-wide. `src/renderer/src/components/ui` _(Large)_
 - [ ] **Dark/light theming via CSS tokens** - Token-based theme system (monochrome-first, git-decoration colors) switching light/dark. `src/renderer/src/assets/main.css`, `docs/STYLEGUIDE.md` _(Medium)_
 - [ ] **Color picker component** - Custom color-swatch picker used in settings/workspace customization. `src/renderer/src/components/ui/color-picker.tsx` _(Small)_
 - [ ] **Palette/theme matching for terminal & UI** - Matches terminal/OS color schemes to app palette. `src/renderer/src/lib/palette-match` _(Small)_
 
 ### Startup & Session Sync
+
 - [ ] **Startup action restoration** - Determines and replays what should reopen/run when the app launches. `src/renderer/src/startup`, `src/renderer/src/app-shell/startup-actions-selector.ts` _(Medium)_
 - [ ] **Cross-device session tab sync (local & web)** - Syncs open session tabs between local app instances and a web/mobile client. `src/renderer/src/runtime/local-structured-session-tabs-sync`, `src/renderer/src/runtime/web-session-tabs-sync` _(Large)_
 - [ ] **Web/mobile companion renderer** - A separate lightweight web build of the renderer for the mobile companion app. `src/renderer/src/web` _(Large)_
 
 ### Misc Utility Surfaces
+
 - [ ] **Sound/typing-latency instrumentation** - Measures and reports input latency (perf-focused, likely internal). `src/renderer/src/lib/typing-latency` _(internal?)_ _(Small)_
 - [ ] **SSH host UI helpers** - Renderer-side SSH connection status glyphs and remote host forms. `src/renderer/src/ssh`, `src/renderer/src/components/sidebar/AddRemoteHostServerFormPanel.tsx` _(Medium)_
 - [ ] **Linux package-install recovery card** - Helps Linux users recover from a failed native package install. `src/renderer/src/components/LinuxPackageInstallRecoveryCard.tsx` _(Small)_
@@ -566,6 +620,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ## Part 5. Automation, storage and platform services
 
 ### Automations
+
 - [ ] **In-app scheduled automations** - define automations that run agent prompts on a schedule/trigger against a workspace. `src/main/automations`, `src/main/persistence/scheduling-automations` _(Large)_
 - [ ] **Automation dispatch & precheck** - validates and launches an automation run (target resolution, precheck, refusal handling). `src/main/automations/service.ts`, `precheck-runner.ts`, `dispatch-refusal.ts` _(Medium)_
 - [ ] **Automation run history & output snapshots** - persists run outcomes, terminal output, and reconciles retained runs. `src/main/automations/automation-run-writer.ts`, `retained-run-reconciliation.ts` _(Medium)_
@@ -575,6 +630,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Run usage collection** - aggregates token/usage stats per automation run. `src/main/automations/run-usage-collection.ts` _(internal?)_ _(Small)_
 
 ### Plugin system
+
 - [ ] **Third-party plugin platform** - install, run, and manage extensions in an isolated worker process with a host-call API. `src/main/plugins` _(Large)_
 - [ ] **Plugin marketplace (incl. official + private marketplaces)** - browse/install plugins from Git-based marketplaces, including private SSH-hosted ones. `src/main/plugins/plugin-marketplace-*.ts`, `plugin-private-marketplace-ssh-shim.cjs` _(Large)_
 - [ ] **Plugin sandboxed worker process pool** - spawns/supervises/restarts plugin workers with slot pooling and idle reaping. `src/main/plugins/plugin-worker-*.ts`, `plugin-supervisor.ts` _(Large)_
@@ -593,6 +649,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Plugin command palette integration** - plugins can register invokable commands. `src/main/plugins/plugin-command-registry.ts`, `plugin-command-invocation.ts` _(Small)_
 
 ### Skills library (shareable agent skills)
+
 - [ ] **Local skill discovery** - scans repos/known roots for agent "skill" files and summarizes them. `src/main/skills/discovery.ts`, `skill-discovery-sources.ts` _(Medium)_
 - [ ] **Skill install/uninstall pipeline** - transactional install, placement, recovery, and removal of skill packages onto disk (incl. WSL). `src/main/skills/skill-install-*.ts`, `skill-placement-*.ts`, `skill-remove-*.ts`, `skills/skill-delete` _(Large)_
 - [ ] **Skill packaging (tar/gzip archives)** - creates/extracts deterministic skill package archives with content hashing. `src/main/skills/skill-package-*.ts`, `skill-bundle-*.ts` _(Medium)_
@@ -603,6 +660,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Agent-driven skill selection** - logic for an agent to pick which installed skill to invoke. `src/main/skills/agent-skill-selection.ts` _(internal?)_ _(Small)_
 
 ### Persistence & storage
+
 - [ ] **Local JSON app-state store with migrations** - the core persisted store (settings, sessions, repos, automations, ptys) with versioned schema migrations, backups, and crash-safe writes. `src/main/persistence/loading-store` _(Large)_
 - [ ] **Session/workspace restore on relaunch** - restores terminal panes, tabs, and floating workspaces from the last session. `src/main/persistence/restoring-sessions` _(Large)_
 - [ ] **Settings persistence & migrations** - applies and migrates user settings (source control, terminal, onboarding, UI state). `src/main/persistence/applying-settings` _(Medium)_
@@ -612,10 +670,12 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Secret redaction at rest** - substitutes secrets with sentinels before writing state to disk. `src/main/persistence/loading-store/secret-sentinel-substitution.ts`, `state-serialization-secret-handling.ts` _(Small)_ (security, not really "droppable")
 
 ### Stats
+
 - [ ] **Local usage stats collector** - counts local product-usage events (e.g., PRs created) capped in size, written to a local stats file. `src/main/stats` _(Medium)_
 - [ ] **Agent session transition recorder** - records agent session state transitions for stats purposes. `src/main/stats/agent-session-transition-recorder.ts` _(internal?)_ _(Small)_
 
 ### PHONE-HOME / TELEMETRY
+
 - [ ] **PHONE-HOME/TELEMETRY: Anonymous product telemetry (PostHog)** - opt-in/opt-out analytics client sending named events (with per-event/session burst caps, cohort classification) to PostHog. `src/main/telemetry` _(Large)_
 - [ ] **PHONE-HOME/TELEMETRY: Telemetry consent management** - resolves and stores the user's telemetry opt-in/out state, incl. env/CI overrides. `src/main/telemetry/consent.ts` _(Small)_
 - [ ] **PHONE-HOME/TELEMETRY: Anonymous install ID** - generates/persists a random per-install identifier used to key telemetry (not tied to identity). `src/main/telemetry/install-id.ts` _(Small)_
@@ -624,6 +684,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **PHONE-HOME: Auto-update nudge/campaign polling** - polls a remote "nudge" feed to show update campaign banners the user can dismiss. `src/main/updater/updater-nudge.ts` _(Small)_
 
 ### Observability & crash reporting
+
 - [ ] **Local structured tracing/spans** - in-process span recorder (NDJSON) for IPC, agent sessions, git ops, PTY, updater, etc., written to local diagnostic files. `src/main/observability/tracer.ts`, `instrumentation.ts` _(Medium)_
 - [ ] **Local rotating log sink** - writes app logs to rotated local files. `src/main/observability/local-file-sink.ts`, `logs-directory.ts` _(Small)_
 - [ ] **Log/trace redaction** - scrubs secrets/PII from logs and diagnostic bundles before they're stored or uploaded. `src/main/observability/redactor.ts` _(Small)_
@@ -636,6 +697,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Main-thread stall/churn diagnostics probe** - opt-in env-flag diagnostic that detects main-thread blocking (macOS "Performance Diagnostics" style). `src/main/diagnostics/main-thread-churn-probe.ts` _(Small)_ _(internal?)_
 
 ### Auto-update
+
 - [ ] **Auto-update with release channels** - checks for, downloads, and installs app updates across stable/beta/dev channels. `src/main/updater` _(Large)_
 - [ ] **Update scheduling & retry backoff** - periodic background update checks with retry/backoff timers. `src/main/updater/updater-scheduling.ts` _(Small)_
 - [ ] **Prerelease/rollback-safe release feed pinning** - pins to a release feed and falls back once if a prerelease manifest is missing. `src/main/updater/updater-release-feed.ts` _(Medium)_
@@ -644,6 +706,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Update menu integration** - "Check for Updates" app-menu wiring and status. `src/main/updater/updater-menu-checks.ts` _(Small)_
 
 ### Orca cloud profiles / accounts
+
 - [ ] **Orca cloud account sign-in (OAuth/PKCE)** - sign in to an Orca cloud account, linking a local profile to a cloud identity. `src/main/orca-profiles/profile-cloud-auth-*.ts`, `profile-cloud-pkce.ts`, `profile-cloud-session-*.ts` _(Large)_
 - [ ] **Multiple local profiles + cloud linking** - supports multiple local Orca profiles, each optionally linked to a cloud org. `src/main/orca-profiles/profile-index-store.ts`, `profile-cloud-index.ts` _(Medium)_
 - [ ] **Org selection & membership management** - pick active org, invite/remove members, change roles. `src/main/orca-profiles/profile-cloud-org-*.ts` _(Large)_
@@ -651,21 +714,25 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Cloud capability refresh** - periodically refreshes what cloud features/entitlements the signed-in account has. `src/main/orca-profiles/profile-cloud-capability-refresh.ts` _(Small)_
 
 ### Notifications
+
 - [ ] **Desktop idle/away detection for mobile notifications** - detects the desktop app is idle/locked so notifications get routed to the paired mobile app instead. `src/main/notifications/desktop-away-state.ts` _(Small)_
 - [ ] **Native OS notifications** - sends native desktop notifications for agent/automation events, with sound and burst-cooldown control. `src/main/ipc/native-notification-*.ts`, `notification-burst-cooldown.ts`, `notification-sound-*.ts` _(Medium)_
 
 ### Computer use / desktop automation
+
 - [ ] **AI computer-use (screen control) provider** - lets an agent take screenshots and control mouse/keyboard on the user's desktop, via a macOS-native helper or a cross-platform script sidecar. `src/main/computer` _(Large)_
 - [ ] **macOS native computer-use permission handling** - checks/prompts for macOS Accessibility/Screen Recording permission needed for computer use. `src/main/computer/macos-computer-use-permission*.ts`, `src/main/ipc/computer-use-permissions.ts` _(Small)_
 - [ ] **Computer-use sidecar diagnostics** - health/diagnostic checks for the desktop-control helper process. `src/main/computer/computer-sidecar-diagnostics.ts` _(Small)_ _(internal?)_
 
 ### Mobile emulator / simulator control
+
 - [ ] **Android emulator control (AVD)** - boot/list Android virtual devices, run adb input/app/permission commands, stream video via scrcpy. `src/main/emulator/android`, `emulator/backends/android-emulator-backend.ts` _(Large)_
 - [ ] **iOS simulator control** - list/boot iOS simulators (simctl) and drive them as an emulator backend. `src/main/emulator/backends/ios-emulator-backend.ts`, `simctl-simulator-devices.ts`, `simulator-app-visibility.ts` _(Medium)_
 - [ ] **Emulator screen streaming (MJPEG/video)** - streams emulator/simulator video frames into the app UI. `src/main/emulator/mjpeg-frame-*.ts`, `scrcpy-video-registry.ts`, `src/main/ipc/emulator-frame-stream.ts`, `emulator-video-stream.ts` _(Medium)_
 - [ ] **Accessibility-tree inspection for simulators** - reads/normalizes the iOS simulator accessibility tree for agent-driven UI testing. `src/main/emulator/serve-sim-accessibility-tree.ts`, `serve-sim-ax-normalization.ts` _(Medium)_
 
 ### Misc IPC-hosted features (small, standalone)
+
 - [ ] **Custom desktop pet/companion import** - lets a user import a custom animated "pet" sprite bundle into the app. `src/main/ipc/pet*.ts` _(Small)_
 - [ ] **Worktree git hooks management** - install/inspect/run custom git hooks scoped to a worktree. `src/main/ipc/hooks` _(Medium)_
 - [ ] **Feedback with image attachments** - in-app feedback form supporting screenshot/image attachments. `src/main/ipc/feedback.ts`, `feedback-image-attachments.ts` _(Small)_
@@ -677,6 +744,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ### Mobile Companion Apps (`mobile/`)
 
 #### Connectivity & pairing
+
 - [ ] **Host pairing & device tokens** - Pair the phone to a desktop Orca install and hold the paired host's auth token. `mobile/transport` _(Large)_
 - [ ] **Relay-to-direct connection upgrade** - Start over the cloud relay for reachability, then silently upgrade to a direct LAN/local connection when possible. `mobile/transport` _(Medium)_
 - [ ] **Background reconnect grace period** - Keep a connection alive briefly when the app backgrounds instead of dropping immediately. `mobile/transport` _(Small)_
@@ -684,6 +752,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Multi-host home screen** - List every paired desktop host with live connection state and a resume-last-session card. `mobile/home` _(Medium)_
 
 #### Agent & task management
+
 - [ ] **Tasks list (GitHub/Linear projects)** - Browse linked GitHub/Linear project items and spin up work from the phone. `mobile/tasks` _(Large)_
 - [ ] **PR review sidebar & file diffs** - View a pull request's file list and diffs inline on mobile. `mobile/tasks`, `mobile/components/pr-sidebar` _(Medium)_
 - [ ] **Agent session history & resume** - Browse past agent sessions per worktree and resume one from the phone. `mobile/agent-history` _(Medium)_
@@ -695,6 +764,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Codex account reset/credit action** - Trigger a Codex usage reset/credit action from a session. `mobile/components`, `mobile/session` (codex-reset-credit) _(Small)_
 
 #### Terminal, files & voice
+
 - [ ] **Mobile terminal webview** - Render the desktop's PTY output in a touch-friendly xterm webview with keyboard/dictation input. `mobile/terminal` _(Large)_
 - [ ] **Live dictation / voice input** - Dictate agent prompts and terminal input, with keep-awake handling while recording. `mobile/dictation`, `mobile/hooks` _(Medium)_
 - [ ] **File explorer & file preview** - Browse the repo tree and preview/edit files (with syntax highlighting) remotely. `mobile/files` _(Large)_
@@ -710,6 +780,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 ### Browser Automation & Computer Use
 
 #### Browser (`src/main/browser`)
+
 - [ ] **Cross-browser cookie import** - Import cookies from Chrome/Edge/Brave (via OS keychain decryption) and Safari into an Orca browser session. `src/main/browser/browser-cookie-*` _(Large)_
 - [ ] **Chromium cookie decryption** - Decrypt OS-keychain-protected Chromium cookie stores for import. `src/main/browser/browser-cookie-decryption.ts` _(Small)_
 - [ ] **WebAuthn/passkey account picker** - Surface a native-style account picker for WebAuthn flows inside the embedded browser. `src/main/browser/browser-webauthn-*` _(Small)_
@@ -730,6 +801,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Programmatic text insertion into page fields** - Fill form fields from agent commands, bypassing OS-level keystroke simulation. `src/main/browser/browser-text-insertion.ts` _(Small)_
 
 #### Computer use (`src/main/computer`)
+
 - [ ] **macOS native computer-use provider** - Native helper for screenshots, clicks, and accessibility-tree reads/writes against any macOS app. `src/main/computer/macos-native-provider-*.ts` _(Large)_
 - [ ] **macOS computer-use permission management** - Check/request/reset Screen Recording and Accessibility permissions needed for computer use. `src/main/computer/macos-computer-use-permission*.ts` _(Small)_
 - [ ] **Windows desktop-script computer-use provider** - PowerShell-driven runtime for desktop automation on Windows, with execution-policy fallback handling. `src/main/computer/desktop-script-*.ts`, `windows-powershell-execution-policy.ts` _(Large)_
@@ -737,6 +809,7 @@ Domains overlap by design. The same capability often appears twice: once as a ma
 - [ ] **Sidecar process isolation for computer use** - Run OS automation in an isolated child process with its own IPC protocol. `src/main/computer/sidecar-entry.ts`, `sidecar-client.ts` _(Medium)_
 
 #### Emulator / mobile device control (`src/main/emulator`)
+
 - [ ] **iOS Simulator control** - Boot, screenshot, tap, and read the accessibility tree of an iOS Simulator instance. `src/main/emulator/backends/ios-emulator-backend.ts`, `simctl-simulator-devices.ts`, `serve-sim-*.ts` _(Large)_
 - [ ] **Android device/emulator control via ADB** - Install/launch apps, send input, and read logs on a connected Android device or emulator. `src/main/emulator/backends/android-emulator-backend.ts`, `android/*.ts` _(Large)_
 - [ ] **scrcpy-based Android screen mirroring** - Stream a live video feed of an Android device/emulator screen into Orca. `src/main/emulator/android/scrcpy-*.ts`, `mjpeg-frame-*.ts` _(Medium)_
