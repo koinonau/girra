@@ -1,4 +1,3 @@
-import { GIRRA_DIR } from '../../issue-command-file'
 import { ipcMain } from 'electron'
 import type { ExecutionHostId } from '../../../shared/execution-host'
 import { isFolderRepo } from '../../../shared/repo-kind'
@@ -6,7 +5,7 @@ import { joinWorktreeRelativePath } from '../../runtime/runtime-relative-paths'
 import { getSshFilesystemProvider } from '../../providers/ssh-filesystem-dispatch'
 import { isENOENT } from '../filesystem-path-containment'
 import { parseOrcaYaml } from '../../hooks'
-import { readIssueCommand, writeIssueCommand } from '../../issue-command-file'
+import { GIRRA_DIR, readIssueCommand, writeIssueCommand } from '../../issue-command-file'
 import { resolveRepoForExecutionHost } from '../worktrees/repo-host-ownership'
 import type { WorktreeIpcContext } from '../worktrees/worktree-ipc-context'
 
