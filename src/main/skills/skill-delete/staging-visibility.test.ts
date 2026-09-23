@@ -31,7 +31,7 @@ describe('isSkillStagingEntryName', () => {
     expect(isSkillStagingEntryName(name)).toBe(true)
   })
 
-  it.each(['demo', '.hidden-skill', '..cache', '.orca'])('leaves %s alone', (name) => {
+  it.each(['demo', '.hidden-skill', '..cache', '.girra'])('leaves %s alone', (name) => {
     expect(isSkillStagingEntryName(name)).toBe(false)
   })
 })

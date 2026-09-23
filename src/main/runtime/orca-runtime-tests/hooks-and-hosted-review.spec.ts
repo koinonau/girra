@@ -101,7 +101,7 @@ describe('OrcaRuntimeService', () => {
     })
     const fsProvider = {
       readFile: vi.fn(async (filePath: string) => {
-        if (filePath.endsWith('.orca/issue-command')) {
+        if (filePath.endsWith('.girra/issue-command')) {
           throw Object.assign(new Error('missing'), { code: 'ENOENT' })
         }
         if (filePath.endsWith('orca.yaml')) {
@@ -121,7 +121,7 @@ describe('OrcaRuntimeService', () => {
         localContent: null,
         sharedContent: 'claude -p "Fix #{{issue}}"',
         effectiveContent: 'claude -p "Fix #{{issue}}"',
-        localFilePath: '/remote/repo/.orca/issue-command',
+        localFilePath: '/remote/repo/.girra/issue-command',
         source: 'shared'
       })
       await expect(runtime.writeRepoIssueCommand('id:repo-1', '   ')).resolves.toEqual({
@@ -132,9 +132,9 @@ describe('OrcaRuntimeService', () => {
     }
 
     expect(fsProvider.readFile).toHaveBeenCalledWith('/remote/repo/orca.yaml')
-    expect(fsProvider.deletePath).toHaveBeenCalledWith('/remote/repo/.orca/issue-command', false)
+    expect(fsProvider.deletePath).toHaveBeenCalledWith('/remote/repo/.girra/issue-command', false)
     expect(fsProvider.writeFile).not.toHaveBeenCalledWith(
-      '/remote/repo/.orca/issue-command',
+      '/remote/repo/.girra/issue-command',
       expect.anything()
     )
   })

@@ -230,7 +230,7 @@ describe('agent hook spool', () => {
       'GIRRA_AGENT_HOOK_PORT=9\nGIRRA_AGENT_HOOK_TOKEN=stale\nGIRRA_AGENT_HOOK_ENV=production\nGIRRA_AGENT_HOOK_VERSION=1\n'
     )
     await claudeHookService.installRemote(createManagedHookLocalFilesystem(), dir)
-    const scriptDir = join(dir, '.orca', 'agent-hooks')
+    const scriptDir = join(dir, '.girra', 'agent-hooks')
     const script = join(
       scriptDir,
       readdirSync(scriptDir).find((name) => name.endsWith('.sh'))!

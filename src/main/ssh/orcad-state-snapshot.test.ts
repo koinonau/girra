@@ -15,7 +15,7 @@ import { getRemoteHostPlatform } from './ssh-remote-platform'
 
 const posix = getRemoteHostPlatform('linux-x64')
 const windows = getRemoteHostPlatform('win32-x64')
-const ROOT = '/home/u/.orca'
+const ROOT = '/home/u/.girra'
 const SNAP = '/home/u/.orca-remote/orcad-state-snapshots/pre-0.2.0+bb01-1000'
 
 describe('capturing the pre-activation snapshot', () => {

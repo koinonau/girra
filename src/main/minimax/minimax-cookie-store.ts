@@ -1,7 +1,7 @@
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { safeStorage } from 'electron'
 import { decryptSealedSecret } from '../host/legacy-orca-safe-storage'
 import { existsSync, readFileSync, rmSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { hardenExistingSecureFile, writeSecureFile } from '../../shared/secure-file'
 
@@ -16,7 +16,7 @@ type MiniMaxCookieEnvelope = {
 }
 
 function getOrcaDir(): string {
-  return join(homedir(), '.orca')
+  return getGirraHomeDir()
 }
 
 function getMiniMaxCookiePath(): string {

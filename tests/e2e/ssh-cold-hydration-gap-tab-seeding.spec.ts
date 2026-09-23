@@ -17,7 +17,7 @@ import { createRestartSession } from './helpers/orca-restart'
 const RUN_DOCKER_SSH = process.env.GIRRA_E2E_SSH_DOCKER === '1'
 const BASELINE_TAB_COUNT = 3
 /** Where the relay persists a target's workspace snapshot inside the fixture container. */
-const REMOTE_SNAPSHOT_DIR = '/root/.orca/sessions'
+const REMOTE_SNAPSHOT_DIR = '/root/.girra/sessions'
 
 test.use({ seedTestRepo: false })
 

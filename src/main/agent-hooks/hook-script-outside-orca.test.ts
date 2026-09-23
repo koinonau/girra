@@ -13,7 +13,7 @@ const NEUTRAL_STDOUT = '{}\n'
 beforeAll(async () => {
   const home = mkdtempSync(join(tmpdir(), 'orca-outside-home-'))
   await claudeHookService.installRemote(createManagedHookLocalFilesystem(), home)
-  managedScript = readFileSync(join(home, '.orca', 'agent-hooks', 'claude-hook.sh'), 'utf8')
+  managedScript = readFileSync(join(home, '.girra', 'agent-hooks', 'claude-hook.sh'), 'utf8')
 })
 
 /** Managed hooks are installed into the user's agent config, so they also run when the

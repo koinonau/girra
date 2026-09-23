@@ -26,7 +26,7 @@ afterEach(() => {
 })
 
 describe('resolveUserDataPath', () => {
-  it('prefers GIRRA_USER_DATA, then XDG_DATA_HOME, then ~/.orca', () => {
+  it('prefers GIRRA_USER_DATA, then XDG_DATA_HOME, then ~/.girra', () => {
     vi.stubEnv('GIRRA_USER_DATA', join(sep, 'srv', 'orca-state'))
     vi.stubEnv('XDG_DATA_HOME', join(sep, 'xdg'))
     expect(resolveUserDataPath()).toBe(join(sep, 'srv', 'orca-state'))
@@ -35,7 +35,7 @@ describe('resolveUserDataPath', () => {
     expect(resolveUserDataPath()).toBe(join(sep, 'xdg', 'Orca'))
 
     vi.stubEnv('XDG_DATA_HOME', '')
-    expect(resolveUserDataPath()).toBe(join(homedir(), '.orca'))
+    expect(resolveUserDataPath()).toBe(join(homedir(), '.girra'))
   })
 })
 

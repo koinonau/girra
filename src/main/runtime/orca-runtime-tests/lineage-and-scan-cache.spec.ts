@@ -506,8 +506,8 @@ describe('OrcaRuntimeService', () => {
         })
       ).rejects.toThrow('Worktree instance identity was unavailable')
 
-      await expect(lstat(join(childPath, '.orca'))).rejects.toThrow()
-      await expect(lstat(join(parentPath, '.orca'))).rejects.toThrow()
+      await expect(lstat(join(childPath, '.girra'))).rejects.toThrow()
+      await expect(lstat(join(parentPath, '.girra'))).rejects.toThrow()
       expect(setWorktreeLineage).not.toHaveBeenCalled()
     } finally {
       await rm(tempRoot, { recursive: true, force: true })

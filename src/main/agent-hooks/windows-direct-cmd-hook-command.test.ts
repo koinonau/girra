@@ -12,12 +12,12 @@ import { WINDOWS_CMD_SAFE_PATH } from './installer-utils'
 import { wrapWindowsDirectCmdHookCommand } from './windows-direct-cmd-hook-command'
 import { findGitBash } from './windows-git-bash-path.test-fixture'
 
-const SAFE_PATH = 'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd'
+const SAFE_PATH = 'C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.cmd'
 
 describe('wrapWindowsDirectCmdHookCommand', () => {
   it('emits the script path with forward slashes and a neutral-JSON fallback', () => {
     expect(wrapWindowsDirectCmdHookCommand(SAFE_PATH)).toBe(
-      'C:/Users/alice/.orca/agent-hooks/claude-hook.cmd || echo {}'
+      'C:/Users/alice/.girra/agent-hooks/claude-hook.cmd || echo {}'
     )
   })
 
@@ -37,16 +37,16 @@ describe('wrapWindowsDirectCmdHookCommand', () => {
 
   it('declines any path the shells cannot carry bare', () => {
     for (const path of [
-      'C:\\Users\\Bob Smith\\.orca\\agent-hooks\\claude-hook.cmd',
-      'C:\\Users\\%name%\\.orca\\agent-hooks\\claude-hook.cmd',
-      'C:\\Users\\a^b\\.orca\\agent-hooks\\claude-hook.cmd',
-      'C:\\Users\\a&b\\.orca\\agent-hooks\\claude-hook.cmd',
-      'C:\\Users\\a(b)\\.orca\\agent-hooks\\claude-hook.cmd',
-      'C:\\Users\\rené\\.orca\\agent-hooks\\claude-hook.cmd',
-      '/home/alice/.orca/agent-hooks/claude-hook.sh',
+      'C:\\Users\\Bob Smith\\.girra\\agent-hooks\\claude-hook.cmd',
+      'C:\\Users\\%name%\\.girra\\agent-hooks\\claude-hook.cmd',
+      'C:\\Users\\a^b\\.girra\\agent-hooks\\claude-hook.cmd',
+      'C:\\Users\\a&b\\.girra\\agent-hooks\\claude-hook.cmd',
+      'C:\\Users\\a(b)\\.girra\\agent-hooks\\claude-hook.cmd',
+      'C:\\Users\\rené\\.girra\\agent-hooks\\claude-hook.cmd',
+      '/home/alice/.girra/agent-hooks/claude-hook.sh',
       // Why: WINDOWS_CMD_SAFE_PATH admits a UNC profile, but `//server/share/...` is not a
       // command cmd.exe reliably starts — keep those on the encoded launcher.
-      '\\\\server\\share\\alice\\.orca\\agent-hooks\\claude-hook.cmd'
+      '\\\\server\\share\\alice\\.girra\\agent-hooks\\claude-hook.cmd'
     ]) {
       expect(wrapWindowsDirectCmdHookCommand(path), path).toBeNull()
     }

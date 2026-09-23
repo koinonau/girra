@@ -19,7 +19,7 @@ type RegisteredRoute = LocalhostWorktreeLabelRoute & {
   target: URL
 }
 
-const GIRRA_LOCALHOST_SUFFIX = '.orca.localhost'
+const GIRRA_LOCALHOST_SUFFIX = '.girra.localhost'
 
 export class LocalhostWorktreeLabelProxy {
   private server: Server | null = null

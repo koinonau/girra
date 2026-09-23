@@ -260,7 +260,10 @@ export class ClaudeHookService {
     // Why: remote Windows is unsupported; local process.platform cannot identify the remote OS.
     const remoteConfigPath = getRemoteConfigPath(remoteHome, this.options.settings)
     const remoteScriptFileName = getPosixManagedScriptFileName(this.options.settings)
-    const remoteScriptPath = `${remoteHome.replace(/\/$/, '')}/.orca/agent-hooks/${remoteScriptFileName}`
+    // Why no fallback here: installRemote rewrites the host's settings.json in the
+    // same pass, and the script an older client left under ~/.orca keeps working
+    // until it does, so nothing is reading a path that is about to move.
+    const remoteScriptPath = `${remoteHome.replace(/\/$/, '')}/.girra/agent-hooks/${remoteScriptFileName}`
     // Why: surface fallible SFTP installs as structured errors.
     try {
       const config = await readHooksJsonRemote(sftp, remoteConfigPath)

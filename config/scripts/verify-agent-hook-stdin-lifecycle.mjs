@@ -98,7 +98,7 @@ function assertSuccessfulWrite(result, label) {
 }
 
 function readGeneratedScripts(home, minMtime) {
-  const hooksDir = join(home, '.orca', 'agent-hooks')
+  const hooksDir = join(home, '.girra', 'agent-hooks')
   return MANAGED_SCRIPTS.map(([fileName, source]) => {
     const path = join(hooksDir, fileName)
     const stats = statSync(path)
@@ -282,7 +282,7 @@ async function verifyInstalledLauncher(home, payload) {
   )
   if (
     !command ||
-    !command.includes('"${HOME-}/.orca/agent-hooks/claude-hook.sh"') ||
+    !command.includes('"${HOME-}/.girra/agent-hooks/claude-hook.sh"') ||
     !command.includes('] && [ -r ') ||
     !command.includes('else { command -p cat')
   ) {
@@ -297,8 +297,8 @@ async function verifyInstalledLauncher(home, payload) {
     )
     assertSuccessfulWrite(missingResult, 'installed missing-script launcher')
 
-    const failingPath = join(scratch, '.orca', 'agent-hooks', 'claude-hook.sh')
-    mkdirSync(join(scratch, '.orca', 'agent-hooks'), { recursive: true })
+    const failingPath = join(scratch, '.girra', 'agent-hooks', 'claude-hook.sh')
+    mkdirSync(join(scratch, '.girra', 'agent-hooks'), { recursive: true })
     writeFileSync(failingPath, '#!/bin/sh\ncat >/dev/null\nexit 7\n', 'utf8')
     chmodSync(failingPath, 0o755)
     const failingResult = await runShell(

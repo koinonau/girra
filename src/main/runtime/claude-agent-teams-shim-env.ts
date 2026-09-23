@@ -1,6 +1,6 @@
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { chmod, mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises'
 import { accessSync, constants, existsSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { delimiter, dirname, isAbsolute, join } from 'node:path'
 import {
   addClaudeTeammateModeAuto,
@@ -93,7 +93,7 @@ export function resolveClaudeAgentTeamsShimBin(
 }
 
 function defaultShimRoot(): string {
-  return join(homedir(), '.orca', 'claude-agent-teams-bin')
+  return join(getGirraHomeDir(), 'claude-agent-teams-bin')
 }
 
 function bundledLauncherPath(): string | null {

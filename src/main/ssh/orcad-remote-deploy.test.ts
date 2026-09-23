@@ -116,7 +116,7 @@ function options(overrides: Partial<OrcadDeployOptions> = {}): OrcadDeployOption
     remoteHome: '/home/u',
     localOrcadDir: '/local/out/orcad',
     nodePath: '/usr/bin/node',
-    userDataDir: '/home/u/.orca',
+    userDataDir: '/home/u/.girra',
     bindHost: '127.0.0.1',
     port: 7777,
     census: { liveSessions: 0, startedSinceActivation: 0 },

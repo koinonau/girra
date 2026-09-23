@@ -1,3 +1,4 @@
+import { GIRRA_DIR, LEGACY_GIRRA_DIR } from '../issue-command-file'
 import type { Repo } from '../../shared/repo-types'
 import { parseOrcaYaml } from '../hooks'
 import { readIssueCommand, writeIssueCommand } from '../issue-command-file'
@@ -28,7 +29,7 @@ export class RuntimeRepositoryIssueCommand {
     if (!repo.connectionId) {
       return readIssueCommand(repo.path)
     }
-    const issueCommandPath = joinWorktreeRelativePath(repo.path, '.orca/issue-command')
+    const issueCommandPath = joinWorktreeRelativePath(repo.path, `${GIRRA_DIR}/issue-command`)
     const fsProvider = getSshFilesystemProvider(repo.connectionId)
     if (!fsProvider) {
       return {
@@ -39,7 +40,10 @@ export class RuntimeRepositoryIssueCommand {
         source: 'none' as const
       }
     }
-    const localContent = await readRemoteOverride(fsProvider, issueCommandPath)
+    const legacyPath = joinWorktreeRelativePath(repo.path, `${LEGACY_GIRRA_DIR}/issue-command`)
+    const localContent =
+      (await readRemoteOverride(fsProvider, issueCommandPath)) ??
+      (await readRemoteOverride(fsProvider, legacyPath))
     const sharedContent = await readRemoteShared(fsProvider, repo.path)
     return {
       localContent,
@@ -63,22 +67,26 @@ export class RuntimeRepositoryIssueCommand {
       writeIssueCommand(repo.path, content)
       return { ok: true }
     }
-    const issueCommandPath = joinWorktreeRelativePath(repo.path, '.orca/issue-command')
+    const issueCommandPath = joinWorktreeRelativePath(repo.path, `${GIRRA_DIR}/issue-command`)
     const fsProvider = getSshFilesystemProvider(repo.connectionId)
     if (!fsProvider) {
       return { ok: true }
     }
     const trimmed = content.trim()
     if (!trimmed) {
-      await fsProvider.deletePath(issueCommandPath, false).catch((error: unknown) => {
-        if (!isENOENT(error)) {
-          throw error
-        }
-      })
+      // Why both: clearing the override has to remove whichever one is in effect.
+      const legacyPath = joinWorktreeRelativePath(repo.path, `${LEGACY_GIRRA_DIR}/issue-command`)
+      for (const path of [issueCommandPath, legacyPath]) {
+        await fsProvider.deletePath(path, false).catch((error: unknown) => {
+          if (!isENOENT(error)) {
+            throw error
+          }
+        })
+      }
       return { ok: true }
     }
-    await fsProvider.createDir(joinWorktreeRelativePath(repo.path, '.orca'))
-    await ensureRemoteOrcaDirIgnored(fsProvider, repo.path)
+    await fsProvider.createDir(joinWorktreeRelativePath(repo.path, GIRRA_DIR))
+    await ensureRemoteGirraDirIgnored(fsProvider, repo.path)
     await fsProvider.writeFile(issueCommandPath, `${trimmed}\n`)
     return { ok: true }
   }
@@ -108,7 +116,7 @@ async function readRemoteShared(
   }
 }
 
-async function ensureRemoteOrcaDirIgnored(
+async function ensureRemoteGirraDirIgnored(
   fsProvider: IFilesystemProvider,
   repoPath: string
 ): Promise<void> {
@@ -118,23 +126,23 @@ async function ensureRemoteOrcaDirIgnored(
     result = await fsProvider.readFile(gitignorePath)
   } catch (error) {
     if (!isENOENT(error)) {
-      console.warn('[runtime] Could not inspect remote .gitignore for .orca', error)
+      console.warn('[runtime] Could not inspect remote .gitignore for the Girra directory', error)
       return
     }
     try {
-      await fsProvider.writeFile(gitignorePath, '.orca\n')
+      await fsProvider.writeFile(gitignorePath, `${GIRRA_DIR}\n`)
     } catch (writeError) {
-      console.warn('[runtime] Could not update remote .gitignore to exclude .orca', writeError)
+      console.warn('[runtime] Could not update remote .gitignore to exclude the Girra directory', writeError)
     }
     return
   }
-  if (result.isBinary || /^\.orca\/?$/m.test(result.content)) {
+  if (result.isBinary || new RegExp(`^\\${GIRRA_DIR}/?$`, 'm').test(result.content)) {
     return
   }
   const separator = result.content.endsWith('\n') ? '' : '\n'
   try {
-    await fsProvider.writeFile(gitignorePath, `${result.content}${separator}.orca\n`)
+    await fsProvider.writeFile(gitignorePath, `${result.content}${separator}${GIRRA_DIR}\n`)
   } catch (writeError) {
-    console.warn('[runtime] Could not update remote .gitignore to exclude .orca', writeError)
+    console.warn('[runtime] Could not update remote .gitignore to exclude the Girra directory', writeError)
   }
 }

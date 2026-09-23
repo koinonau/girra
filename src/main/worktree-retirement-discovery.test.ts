@@ -112,7 +112,7 @@ describe('discoverRetiredWorktreeNames', () => {
   it('matches a dot-directory root, where the separator run encodes to two dashes', async () => {
     await withFakeHome([`-Users-ada--orca-worktrees-${FIRST}`], async (home) => {
       const retired = await discoverRetiredWorktreeNames({
-        workspaceRoots: ['/Users/ada/.orca/worktrees'],
+        workspaceRoots: ['/Users/ada/.girra/worktrees'],
         home,
         env: {}
       })

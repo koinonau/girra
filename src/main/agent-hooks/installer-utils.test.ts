@@ -14,6 +14,7 @@ import {
 } from 'node:fs'
 import { homedir, tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { spawnSync } from 'node:child_process'
 import {
   buildWindowsAgentHookCurlPostCommand,
@@ -268,7 +269,7 @@ describe('createManagedCommandMatcher', () => {
   })
 
   it('matches encoded Windows launcher commands by decoding their script path', () => {
-    const command = wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd')
+    const command = wrapWindowsHookCommand('C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.cmd')
     expect(match(command)).toBe(true)
   })
 
@@ -277,7 +278,7 @@ describe('createManagedCommandMatcher', () => {
     // still recognize them, or an upgrade would leave the stale entry beside the new one.
     expect(
       match(
-        'if [ -z "$HOME" ]; then :; else if [ -f "$HOME/.orca/agent-hooks/claude-hook.sh" ]; then /bin/sh "$HOME/.orca/agent-hooks/claude-hook.sh"; fi; fi'
+        'if [ -z "$HOME" ]; then :; else if [ -f "$HOME/.girra/agent-hooks/claude-hook.sh" ]; then /bin/sh "$HOME/.girra/agent-hooks/claude-hook.sh"; fi; fi'
       )
     ).toBe(true)
   })
@@ -286,20 +287,20 @@ describe('createManagedCommandMatcher', () => {
     const matchPosix = createManagedCommandMatcher('claude-hook.sh')
     const matchPowerShell = createManagedCommandMatcher('claude-hook.ps1')
 
-    expect(matchPosix("& 'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.ps1'")).toBe(true)
+    expect(matchPosix("& 'C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.ps1'")).toBe(true)
     expect(
-      matchPosix(wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.ps1'))
+      matchPosix(wrapWindowsHookCommand('C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.ps1'))
     ).toBe(true)
-    expect(matchPowerShell("/bin/sh '/home/alice/.orca/agent-hooks/claude-hook.sh'")).toBe(true)
+    expect(matchPowerShell("/bin/sh '/home/alice/.girra/agent-hooks/claude-hook.sh'")).toBe(true)
   })
 
-  it('matches the legacy per-userData script path AND the new shared ~/.orca path', () => {
+  it('matches the legacy per-userData script path AND the new shared ~/.girra path', () => {
     // Why: install() must sweep old per-userData commands when migrating to
-    // the shared ~/.orca script path, or stale launchers keep failing.
+    // the shared ~/.girra script path, or stale launchers keep failing.
     expect(
       match("/bin/sh '/Users/alice/Library/Application Support/orca/agent-hooks/claude-hook.sh'")
     ).toBe(true)
-    expect(match("/bin/sh '/Users/alice/.orca/agent-hooks/claude-hook.sh'")).toBe(true)
+    expect(match("/bin/sh '/Users/alice/.girra/agent-hooks/claude-hook.sh'")).toBe(true)
   })
 })
 
@@ -363,7 +364,7 @@ describe('removeManagedCommands', () => {
                 'C:\\Windows\\System32\\cmd.exe',
                 '/d',
                 '/c',
-                'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd'
+                'C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.cmd'
               ]
             },
             { type: 'command', command: 'echo keep me' }
@@ -428,7 +429,7 @@ describe('hookDefinitionHasManagedCommand', () => {
             {
               type: 'command',
               command: 'C:\\Windows\\System32\\conhost.exe',
-              args: ['--headless', 'C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd']
+              args: ['--headless', 'C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.cmd']
             }
           ]
         },
@@ -454,10 +455,13 @@ describe('hookDefinitionHasManagedCommand', () => {
 })
 
 describe('getSharedManagedScriptPath', () => {
-  it("returns ~/.orca/agent-hooks/<scriptFileName> rooted at the user's home", () => {
+  it("returns <girra home>/agent-hooks/<scriptFileName> rooted at the user's home", () => {
+    // Why not the literal `.girra`: the resolver still reads a `~/.orca` that has
+    // not been migrated yet, and this machine may have one.
     expect(getSharedManagedScriptPath('claude-hook.sh')).toBe(
-      join(homedir(), '.orca', 'agent-hooks', 'claude-hook.sh')
+      join(getGirraHomeDir(), 'agent-hooks', 'claude-hook.sh')
     )
+    expect(getGirraHomeDir().startsWith(homedir())).toBe(true)
   })
 
   it('does not depend on Electron app.getPath, so two Girra instances resolve to the same path', () => {
@@ -587,11 +591,11 @@ function expectedDecodedWindowsHookCommand(scriptPath: string): string {
 
 describe('wrapWindowsHookCommand', () => {
   it('invokes the .cmd through an encoded PowerShell command', () => {
-    const command = wrapWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd')
+    const command = wrapWindowsHookCommand('C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.cmd')
     expect(command).toMatch(qualifiedWindowsPowerShellCommand)
     expect(command).not.toMatch(/^powershell\b/i)
     expect(decodeWindowsHookCommand(command)).toBe(
-      expectedDecodedWindowsHookCommand('C:\\Users\\alice\\.orca\\agent-hooks\\claude-hook.cmd')
+      expectedDecodedWindowsHookCommand('C:\\Users\\alice\\.girra\\agent-hooks\\claude-hook.cmd')
     )
   })
 
@@ -600,12 +604,12 @@ describe('wrapWindowsHookCommand', () => {
   // the whole path inside the encoded command so shells do not split it.
   it('preserves spaces in the script path (user profile with space case)', () => {
     const cmd = wrapWindowsHookCommand(
-      'C:\\Users\\Jorge Silva\\.orca\\agent-hooks\\claude-hook.cmd'
+      'C:\\Users\\Jorge Silva\\.girra\\agent-hooks\\claude-hook.cmd'
     )
     expect(cmd).toMatch(qualifiedWindowsPowerShellCommand)
     expect(decodeWindowsHookCommand(cmd)).toBe(
       expectedDecodedWindowsHookCommand(
-        'C:\\Users\\Jorge Silva\\.orca\\agent-hooks\\claude-hook.cmd'
+        'C:\\Users\\Jorge Silva\\.girra\\agent-hooks\\claude-hook.cmd'
       )
     )
   })
@@ -622,7 +626,7 @@ describe('wrapWindowsHookCommand', () => {
   it.skipIf(process.platform !== 'win32')(
     'executes a script path containing a cmd.exe caret literally',
     () => {
-      const scriptDir = join(tmpDir, 'home with ^ caret', '.orca', 'agent-hooks')
+      const scriptDir = join(tmpDir, 'home with ^ caret', '.girra', 'agent-hooks')
       mkdirSync(scriptDir, { recursive: true })
       const scriptPath = join(scriptDir, 'claude-hook.cmd')
       writeFileSync(scriptPath, '@echo off\r\nexit /b 7\r\n', 'utf-8')
@@ -643,8 +647,8 @@ describe('wrapRuntimeHomeHookCommand', () => {
     expect(command).toContain('case "${OSTYPE-}" in msys*|cygwin*|win32*)')
     expect(command).toContain('case "${HOME-}" in *\\&*|*\\^*|*\\(*|*\\)*|*\\;*|*,*|*=*|*%*|*\\!*)')
     expect(command).not.toContain('uname')
-    expect(command).toContain('"${HOME-}/.orca/agent-hooks/claude-hook.cmd"')
-    expect(command).toContain('/bin/sh "${HOME-}/.orca/agent-hooks/claude-hook.sh"')
+    expect(command).toContain('"${HOME-}/.girra/agent-hooks/claude-hook.cmd"')
+    expect(command).toContain('/bin/sh "${HOME-}/.girra/agent-hooks/claude-hook.sh"')
     expect(command).not.toMatch(/[A-Z]:[\\/]|\/Users\/|\/home\//)
   })
 
@@ -684,8 +688,8 @@ describe('wrapRuntimeHomeHookCommand', () => {
   it('executes the destination HOME script for the current runtime', () => {
     const sourceHome = join(tmpDir, 'source profile')
     const destinationHome = join(tmpDir, "destination $HOME ' & profile")
-    const sourceScriptDir = join(sourceHome, '.orca', 'agent-hooks')
-    const destinationScriptDir = join(destinationHome, '.orca', 'agent-hooks')
+    const sourceScriptDir = join(sourceHome, '.girra', 'agent-hooks')
+    const destinationScriptDir = join(destinationHome, '.girra', 'agent-hooks')
     mkdirSync(sourceScriptDir, { recursive: true })
     mkdirSync(destinationScriptDir, { recursive: true })
     const windowsExitCode = process.platform === 'win32' ? 7 : 9
@@ -722,7 +726,7 @@ describe('wrapRuntimeHomeHookCommand', () => {
 
   it.skipIf(process.platform !== 'win32')('keeps common Windows profiles on the fast path', () => {
     const destinationHome = join(tmpDir, 'destination 国際 profile')
-    const scriptDir = join(destinationHome, '.orca', 'agent-hooks')
+    const scriptDir = join(destinationHome, '.girra', 'agent-hooks')
     mkdirSync(scriptDir, { recursive: true })
     writeFileSync(join(scriptDir, 'claude-hook.cmd'), '@echo off\r\nexit /b 7\r\n', 'utf-8')
     const gitBash = join(process.env.ProgramFiles ?? 'C:\\Program Files', 'Git', 'bin', 'bash.exe')

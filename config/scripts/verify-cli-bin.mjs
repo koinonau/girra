@@ -26,7 +26,7 @@ export function verifyPackageCliBin({
 } = {}) {
   const packageJsonPath = path.join(projectDir, 'package.json')
   const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf8'))
-  const binTarget = packageJson.bin?.orca
+  const binTarget = packageJson.bin?.girra
   if (typeof binTarget !== 'string' || binTarget.length === 0) {
     throw new Error('package.json must declare bin.orca')
   }

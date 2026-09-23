@@ -1,5 +1,5 @@
+import { getGirraHomeDir } from '../shared/girra-home-dir'
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import type { RelayDispatcher } from './dispatcher'
 import { publishWorkspaceSnapshotChange } from './workspace-snapshot-publication'
@@ -58,7 +58,7 @@ export class WorkspaceSessionHandler {
 
   constructor(
     private dispatcher: RelayDispatcher,
-    private baseDir = join(homedir(), '.orca', 'sessions')
+    private baseDir = join(getGirraHomeDir(), 'sessions')
   ) {
     this.dispatcher.onRequest('workspace.get', (params) => this.get(params))
     this.dispatcher.onRequest('workspace.patch', (params) => this.patch(params))

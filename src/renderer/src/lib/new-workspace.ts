@@ -88,7 +88,7 @@ function getSetupConfigKind(
 /**
  * Substitute the issue-command template variables. Prefers `{{artifact_url}}`
  * and keeps `{{issue}}` working silently for repos that have not migrated
- * their `orca.yaml` / `.orca/issue-command` yet.
+ * their `orca.yaml` / `.girra/issue-command` yet.
  */
 export function renderIssueCommandTemplate(
   template: string,

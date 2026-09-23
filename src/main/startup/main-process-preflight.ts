@@ -1,3 +1,4 @@
+import { migrateGirraHomeDirOnStartup } from './girra-home-dir-migration'
 import { app, ipcMain, powerMonitor, session } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import os from 'node:os'
@@ -148,6 +149,9 @@ export function runMainProcessPreflight(options: MainProcessPreflightOptions): b
   // Why captured now: after the dev/E2E override above, and before app.setName('Girra') (whenReady)
   // changes how userData resolves on a case-sensitive filesystem. See persistence.ts:20-28.
   initDataPath()
+  // Why here: after userData is settled and before anything resolves a path under
+  // the per-user tree, so nothing reads ~/.girra and then finds it moved.
+  migrateGirraHomeDirOnStartup()
   state.startupDiagnosticsEnabled = isStartupDiagnosticsEnabled()
   if (state.startupDiagnosticsEnabled) {
     logStartupDiagnostic('before-single-instance-lock', {

@@ -739,12 +739,12 @@ describe('legacy terminal shim neutralization', () => {
 
   it('drops inherited shim env and its PATH entry without touching real entries', () => {
     const env: Record<string, string> = {
-      PATH: `/home/u/.orca/orca-terminal-attribution/posix:/usr/local/bin:/usr/bin`,
+      PATH: `/home/u/.girra/orca-terminal-attribution/posix:/usr/local/bin:/usr/bin`,
       GIRRA_ENABLE_GIT_ATTRIBUTION: '1',
       GIRRA_GIT_COMMIT_TRAILER: 'Co-authored-by: Girra <help@stably.ai>',
       GIRRA_GH_PR_FOOTER: 'footer',
       GIRRA_GH_ISSUE_FOOTER: 'footer',
-      GIRRA_ATTRIBUTION_SHIM_DIR: '/home/u/.orca/orca-terminal-attribution/posix',
+      GIRRA_ATTRIBUTION_SHIM_DIR: '/home/u/.girra/orca-terminal-attribution/posix',
       GIRRA_REAL_GIT: '/usr/bin/git',
       GIRRA_REAL_GH: '/usr/bin/gh',
       HOME: '/home/u'
@@ -837,14 +837,14 @@ describe('legacy terminal shim neutralization', () => {
     // Why: without normalizing the trailing separator the entry does not match, so Girra's own
     // scrub leaves the legacy shim directory on the spawned PATH and the wrapper stays reachable.
     const posix: Record<string, string> = {
-      PATH: '/home/u/.orca/orca-terminal-attribution/posix/:/usr/bin'
+      PATH: '/home/u/.girra/orca-terminal-attribution/posix/:/usr/bin'
     }
     stripLegacyTerminalShimEnv(posix, 'linux')
     expect(posix.PATH).toBe('/usr/bin')
 
     // Why: more than one trailing separator is still the same directory.
     const many: Record<string, string> = {
-      PATH: '/home/u/.orca/orca-terminal-attribution/posix///:/usr/bin'
+      PATH: '/home/u/.girra/orca-terminal-attribution/posix///:/usr/bin'
     }
     stripLegacyTerminalShimEnv(many, 'linux')
     expect(many.PATH).toBe('/usr/bin')

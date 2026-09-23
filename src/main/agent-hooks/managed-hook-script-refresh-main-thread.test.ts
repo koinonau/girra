@@ -1,3 +1,4 @@
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import type * as NodeFsModule from 'node:fs'
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
 import type * as NodeFsPromisesModule from 'node:fs/promises'
@@ -70,13 +71,16 @@ describe('managed hook script refresh stays off the main thread', () => {
   })
 
   it('uses no synchronous HOME filesystem calls for missing or stale scripts', async () => {
-    const hooksDir = join(state.home, '.orca', 'agent-hooks')
+    const hooksDir = join(state.home, '.girra', 'agent-hooks')
     const claudeScript = join(
       hooksDir,
       process.platform === 'win32' ? 'claude-hook.cmd' : 'claude-hook.sh'
     )
     await mkdir(hooksDir, { recursive: true })
     await writeFile(claudeScript, 'stale', 'utf-8')
+    // Why: startup resolves the per-user directory once, before any refresh can
+    // run, so the probe under test is the refresh's own work and not that.
+    getGirraHomeDir()
     state.syncCalls = []
 
     for (const [, refresh] of MANAGED_AGENT_HOOK_SCRIPT_REFRESHERS) {

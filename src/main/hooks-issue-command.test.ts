@@ -85,10 +85,10 @@ describe('readIssueCommand', () => {
 })
 
 describe('writeIssueCommand', () => {
-  it('writes only the local override file and keeps .orca ignored locally', async () => {
+  it('writes only the local override file and keeps .girra ignored locally', async () => {
     const fs = await import('node:fs')
     vi.mocked(fs.existsSync).mockImplementation(
-      (path) => path === TEST_GITIGNORE_PATH || path === join(TEST_REPO_PATH, '.orca')
+      (path) => path === TEST_GITIGNORE_PATH || path === join(TEST_REPO_PATH, '.girra')
     )
     vi.mocked(fs.readFileSync).mockImplementation((path) => {
       if (path === TEST_GITIGNORE_PATH) {

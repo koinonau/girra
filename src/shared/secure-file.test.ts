@@ -116,7 +116,7 @@ describe('hardenSecurePath', () => {
   })
 
   it('rewrites Windows ACLs through icacls, purging explicit ACEs before granting', async () => {
-    hardenSecurePath('C:\\Users\\me\\.orca\\secret.json', {
+    hardenSecurePath('C:\\Users\\me\\.girra\\secret.json', {
       isDirectory: false,
       platform: 'win32'
     })
@@ -131,10 +131,10 @@ describe('hardenSecurePath', () => {
     const specs = vi.mocked(runProcess).mock.calls.map(([spec]) => spec)
     expect(specs.every((spec) => spec.program === 'C:\\Windows\\System32\\icacls.exe')).toBe(true)
     // Verify runs first, so an already-correct DACL is never rewritten.
-    expect(specs[0]!.args?.slice(0, 2)).toEqual(['C:\\Users\\me\\.orca\\secret.json', '/save'])
-    expect(specs[1]!.args).toEqual(['C:\\Users\\me\\.orca\\secret.json', '/reset', '/q'])
+    expect(specs[0]!.args?.slice(0, 2)).toEqual(['C:\\Users\\me\\.girra\\secret.json', '/save'])
+    expect(specs[1]!.args).toEqual(['C:\\Users\\me\\.girra\\secret.json', '/reset', '/q'])
     expect(specs[2]!.args).toEqual([
-      'C:\\Users\\me\\.orca\\secret.json',
+      'C:\\Users\\me\\.girra\\secret.json',
       '/inheritance:r',
       '/grant:r',
       `*${USER_SID}:(F)`,
@@ -145,14 +145,14 @@ describe('hardenSecurePath', () => {
       '/q'
     ])
     // The apply is read back: a loosened ACL has to be detectable, not just overwritten.
-    expect(specs[3]!.args?.slice(0, 2)).toEqual(['C:\\Users\\me\\.orca\\secret.json', '/save'])
+    expect(specs[3]!.args?.slice(0, 2)).toEqual(['C:\\Users\\me\\.girra\\secret.json', '/save'])
     expect(specs[2]!.timeoutMs).toBe(5000)
   })
 
   // BLOCKING 1: re-running /reset on an already-correct DACL restores the inherited (broader) one
   // for the few ms until the grant pass lands, for no gain. A correct DACL must be left alone.
   it('leaves an already-correct ACL untouched instead of rewriting it', async () => {
-    const target = 'C:\\Users\\me\\.orca\\secret.json'
+    const target = 'C:\\Users\\me\\.girra\\secret.json'
     hardenedByFake.set(target, '')
 
     hardenSecurePath(target, { isDirectory: false, platform: 'win32' })
@@ -179,7 +179,7 @@ describe('hardenSecurePath', () => {
     ['read-only rights', `D:PAI(A;;FR;;;BA)(A;;FA;;;SY)(A;;FA;;;${USER_SID})`, 'not full control']
   ])('rejects a verified DACL granting %s', async (_label, sddl, expected) => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const target = 'C:\\Users\\me\\.orca\\secret.json'
+    const target = 'C:\\Users\\me\\.girra\\secret.json'
     forcedBadSddl.set(target, sddl)
 
     hardenSecurePath(target, { isDirectory: false, platform: 'win32' })
@@ -374,7 +374,7 @@ describe('hardenSecurePath', () => {
     tempDirs.push(userDataPath)
     // Cover both runners: the write path is synchronous, the directory re-harden is not.
     writeSecureFile(join(userDataPath, 'secret.json'), 'contents')
-    hardenSecurePath('C:\\Users\\me\\.orca\\other.json', {
+    hardenSecurePath('C:\\Users\\me\\.girra\\other.json', {
       isDirectory: false,
       platform: 'win32'
     })
@@ -391,7 +391,7 @@ describe('hardenSecurePath', () => {
   })
 
   it('adds inheritable rules when hardening a Windows directory', async () => {
-    hardenSecurePath('C:\\Users\\me\\.orca', { isDirectory: true, platform: 'win32' })
+    hardenSecurePath('C:\\Users\\me\\.girra', { isDirectory: true, platform: 'win32' })
     await flushAsyncAcl()
 
     const grantArgs = vi
@@ -406,7 +406,7 @@ describe('hardenSecurePath', () => {
     vi.mocked(runProcess).mockRejectedValue(new Error('access denied'))
 
     expect(() =>
-      hardenSecurePath('C:\\Users\\me\\.orca\\secret.json', {
+      hardenSecurePath('C:\\Users\\me\\.girra\\secret.json', {
         isDirectory: false,
         platform: 'win32'
       })
@@ -420,7 +420,7 @@ describe('hardenSecurePath', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.mocked(runProcess).mockResolvedValue({ ...OK, code: 5, stderr: 'Access is denied.' })
 
-    hardenSecurePath('C:\\Users\\me\\.orca\\secret.json', {
+    hardenSecurePath('C:\\Users\\me\\.girra\\secret.json', {
       isDirectory: false,
       platform: 'win32'
     })
@@ -429,7 +429,7 @@ describe('hardenSecurePath', () => {
     expect(warn).toHaveBeenCalledWith(
       '[secure-path.windows-acl] failed to restrict path',
       expect.objectContaining({
-        targetPath: 'C:\\Users\\me\\.orca\\secret.json',
+        targetPath: 'C:\\Users\\me\\.girra\\secret.json',
         stage: 'reset',
         detail: 'Access is denied.'
       })
@@ -460,7 +460,7 @@ describe('hardenSecurePath', () => {
 
   // Paths past MAX_PATH make icacls report "cannot find the path specified"; the extended prefix is the escape.
   it('uses the extended-length prefix for paths past MAX_PATH', async () => {
-    const longPath = `C:\\Users\\me\\.orca\\${'d'.repeat(300)}\\secret.json`
+    const longPath = `C:\\Users\\me\\.girra\\${'d'.repeat(300)}\\secret.json`
     hardenSecurePath(longPath, { isDirectory: false, platform: 'win32' })
     await flushAsyncAcl()
 
@@ -622,7 +622,7 @@ describe('hardenSecurePath', () => {
   })
 
   it('applies the read-path ACL asynchronously without blocking (async runProcess)', () => {
-    hardenSecurePath('C:\\Users\\me\\.orca\\secret.json', {
+    hardenSecurePath('C:\\Users\\me\\.girra\\secret.json', {
       isDirectory: false,
       platform: 'win32'
     })
