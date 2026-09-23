@@ -1,3 +1,4 @@
+import './startup/legacy-orca-env-adoption'
 import { app, type BrowserWindow } from 'electron'
 import { createMacAppActivationHandler } from './window/macos-app-activation'
 import {

@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import './legacy-orca-env-adoption'
 import {
   findCommandSpec,
   isCommandGroup,

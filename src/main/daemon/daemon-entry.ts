@@ -6,6 +6,7 @@
  * Signals readiness to parent via IPC: { type: 'ready' }
  * Shuts down cleanly on SIGTERM.
  */
+import '../startup/legacy-orca-env-adoption'
 import { readFileSync } from 'node:fs'
 import { startDaemon, type DaemonHandle } from './daemon-main'
 import { createPtySubprocess } from './pty-subprocess'
