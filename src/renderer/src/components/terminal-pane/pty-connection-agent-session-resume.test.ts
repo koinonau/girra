@@ -158,10 +158,10 @@ describe('connectPanePty', () => {
       agentArgs: '--model opus --effort high',
       agentEnv: {
         CLAUDE_PROFILE: 'captured',
-        ORCA_PANE_KEY: 'wrong-pane',
-        ORCA_TAB_ID: 'wrong-tab',
-        ORCA_WORKTREE_ID: 'wrong-worktree',
-        ORCA_WORKSPACE_ID: 'wrong-workspace'
+        GIRRA_PANE_KEY: 'wrong-pane',
+        GIRRA_TAB_ID: 'wrong-tab',
+        GIRRA_WORKTREE_ID: 'wrong-worktree',
+        GIRRA_WORKSPACE_ID: 'wrong-workspace'
       }
     }
     mockStoreState = {
@@ -207,7 +207,7 @@ describe('connectPanePty', () => {
       ([args]) => args.sessionId === 'lost-pty'
     )?.[0]
     const launchToken = (reattachArgs?.env as Record<string, string> | undefined)
-      ?.ORCA_AGENT_LAUNCH_TOKEN
+      ?.GIRRA_AGENT_LAUNCH_TOKEN
 
     expect(transport.sendInput).not.toHaveBeenCalled()
     expect(launchToken).toMatch(new RegExp(`^${UUID_RE}$`))
@@ -217,11 +217,11 @@ describe('connectPanePty', () => {
         command: "claude '--model' 'opus' '--effort' 'high' '--resume' 'claude-session-1'",
         env: expect.objectContaining({
           CLAUDE_PROFILE: 'captured',
-          ORCA_PANE_KEY: paneKey,
-          ORCA_TAB_ID: 'tab-1',
-          ORCA_WORKTREE_ID: 'wt-1',
-          ORCA_WORKSPACE_ID: 'wt-1',
-          ORCA_AGENT_LAUNCH_TOKEN: launchToken
+          GIRRA_PANE_KEY: paneKey,
+          GIRRA_TAB_ID: 'tab-1',
+          GIRRA_WORKTREE_ID: 'wt-1',
+          GIRRA_WORKSPACE_ID: 'wt-1',
+          GIRRA_AGENT_LAUNCH_TOKEN: launchToken
         })
       })
     )
@@ -386,7 +386,7 @@ describe('connectPanePty', () => {
         sessionId: 'lost-pty',
         command: "claude '--model' 'sonnet' '--resume' 'claude-session-1'",
         env: expect.objectContaining({
-          ORCA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
+          GIRRA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
         })
       })
     )

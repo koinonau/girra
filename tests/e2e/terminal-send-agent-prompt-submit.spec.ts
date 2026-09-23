@@ -13,7 +13,7 @@ import { SWALLOWED_ENTER_FIXTURE_TIMEOUT_MS } from '../../src/shared/orchestrati
 const execFileAsync = promisify(execFile)
 const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), 'orca-terminal-send-agent-prompt-'))
 const fixtureReport = path.join(fixtureRoot, 'report.json')
-const fixtureMarker = `ORCA_TERMINAL_SEND_E2E_${process.pid}`
+const fixtureMarker = `GIRRA_TERMINAL_SEND_E2E_${process.pid}`
 const fixtureScript = path.join(process.cwd(), 'tests', 'tools', 'repro-terminal-send-submit.mjs')
 const fakeClaude = path.join(fixtureRoot, process.platform === 'win32' ? 'claude.cmd' : 'claude')
 const fakeClaudeCommand = buildFakeAgentCommandOverride(fakeClaude)
@@ -22,8 +22,8 @@ const swallowedEnterFixtureTimeoutMs = SWALLOWED_ENTER_FIXTURE_TIMEOUT_MS
 writeFileSync(
   fakeClaude,
   process.platform === 'win32'
-    ? `@echo off\r\n"${process.execPath}" "${fixtureScript}" --fake-agent --report "%ORCA_FAKE_AGENT_REPORT%" --marker "%ORCA_FAKE_AGENT_MARKER%" --allow-unframed-paste %*\r\n`
-    : `#!/usr/bin/env sh\n"${process.execPath}" "${fixtureScript}" --fake-agent --report "$ORCA_FAKE_AGENT_REPORT" --marker "$ORCA_FAKE_AGENT_MARKER" "$@"\n`,
+    ? `@echo off\r\n"${process.execPath}" "${fixtureScript}" --fake-agent --report "%GIRRA_FAKE_AGENT_REPORT%" --marker "%GIRRA_FAKE_AGENT_MARKER%" --allow-unframed-paste %*\r\n`
+    : `#!/usr/bin/env sh\n"${process.execPath}" "${fixtureScript}" --fake-agent --report "$GIRRA_FAKE_AGENT_REPORT" --marker "$GIRRA_FAKE_AGENT_MARKER" "$@"\n`,
   'utf8'
 )
 if (process.platform !== 'win32') {
@@ -64,8 +64,8 @@ async function createFakeClaudeTerminal(
     command: [fakeClaudeCommand, ...args].join(' '),
     launchAgent: 'claude',
     env: {
-      ORCA_FAKE_AGENT_REPORT: fixtureReport,
-      ORCA_FAKE_AGENT_MARKER: fixtureMarker
+      GIRRA_FAKE_AGENT_REPORT: fixtureReport,
+      GIRRA_FAKE_AGENT_MARKER: fixtureMarker
     },
     title: 'terminal send submit repro'
   })
@@ -114,7 +114,7 @@ test('CLI text plus Enter waits for a slow agent composer before submitting', as
       ],
       {
         cwd: repoRoot,
-        env: { ...process.env, ORCA_DEV_USER_DATA_PATH: userDataDir },
+        env: { ...process.env, GIRRA_DEV_USER_DATA_PATH: userDataDir },
         timeout: 60_000
       }
     )
@@ -172,7 +172,7 @@ test('CLI reports a swallowed Enter as accepted without submitting a second Ente
       ],
       {
         cwd: repoRoot,
-        env: { ...process.env, ORCA_DEV_USER_DATA_PATH: userDataDir },
+        env: { ...process.env, GIRRA_DEV_USER_DATA_PATH: userDataDir },
         timeout: 90_000
       }
     )
@@ -229,7 +229,7 @@ test('CLI does not write prompt bytes into an active permission dialog', async (
       ],
       {
         cwd: repoRoot,
-        env: { ...process.env, ORCA_DEV_USER_DATA_PATH: userDataDir },
+        env: { ...process.env, GIRRA_DEV_USER_DATA_PATH: userDataDir },
         timeout: 60_000
       }
     )

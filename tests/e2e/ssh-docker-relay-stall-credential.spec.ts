@@ -22,7 +22,7 @@ import {
   stopDockerSshRelayProcesses
 } from './helpers/docker-ssh-relay-faults'
 
-const RUN_DOCKER_SSH = process.env.ORCA_E2E_SSH_DOCKER === '1'
+const RUN_DOCKER_SSH = process.env.GIRRA_E2E_SSH_DOCKER === '1'
 
 // Why two durations: the live incident held both relay pids for 20 s, which is exactly the client
 // mux liveness timeout, so which side of it the client lands on is a race. 40 s is past it for
@@ -126,7 +126,7 @@ function readRelayLog(target: DockerSshRelayTarget): string {
  * has no mismatch line at all, because the wedge is gone rather than healed after the fact.
  */
 test.describe('SSH relay stall does not rotate the endpoint credential', () => {
-  test.skip(!RUN_DOCKER_SSH, 'Set ORCA_E2E_SSH_DOCKER=1 to run the dockerized SSH relay tests')
+  test.skip(!RUN_DOCKER_SSH, 'Set GIRRA_E2E_SSH_DOCKER=1 to run the dockerized SSH relay tests')
 
   for (const { stallMs, title } of STALL_CASES) {
     test(title, async ({ orcaPage }, testInfo) => {

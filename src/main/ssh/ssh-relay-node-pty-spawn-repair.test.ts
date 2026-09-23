@@ -110,7 +110,7 @@ const NODE_PTY_BROKEN = 'ORCA-NATIVE-DEPS-MISSING:node-pty\nMISSING'
 
 function repairSucceedsResponses(): ExecResponse[] {
   return [
-    '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+    '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
     '/home/u',
     NODE_PTY_BROKEN, // health probe before the lock
     NODE_PTY_BROKEN, // re-probe under the repair lock
@@ -127,7 +127,7 @@ function repairSucceedsResponses(): ExecResponse[] {
 
 function lockUnavailableResponses(): ExecResponse[] {
   return [
-    '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+    '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
     '/home/u',
     NODE_PTY_BROKEN, // health probe before the lock
     'DEAD',

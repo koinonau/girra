@@ -388,8 +388,8 @@ describe('createPtySubprocess', () => {
     spawnMock.mockImplementation(() => {
       throw new Error('File not found: ')
     })
-    const previousVersion = process.env.ORCA_APP_VERSION
-    process.env.ORCA_APP_VERSION = '1.4.178-test'
+    const previousVersion = process.env.GIRRA_APP_VERSION
+    process.env.GIRRA_APP_VERSION = '1.4.178-test'
 
     try {
       await expect(
@@ -404,9 +404,9 @@ describe('createPtySubprocess', () => {
       )
     } finally {
       if (previousVersion === undefined) {
-        delete process.env.ORCA_APP_VERSION
+        delete process.env.GIRRA_APP_VERSION
       } else {
-        process.env.ORCA_APP_VERSION = previousVersion
+        process.env.GIRRA_APP_VERSION = previousVersion
       }
       if (platform) {
         Object.defineProperty(process, 'platform', platform)

@@ -29,7 +29,7 @@ const posix = getRemoteHostPlatform('linux-x64')
 const windows = getRemoteHostPlatform('win32-x64')
 const owner = '.sftp-namespace-123e4567e89b12d3a456426614174000'
 const roots: string[] = []
-const configuredPowerShell = process.env.ORCA_POWERSHELL_EXECUTABLE
+const configuredPowerShell = process.env.GIRRA_POWERSHELL_EXECUTABLE
 const powerShellExecutable = [
   configuredPowerShell,
   ...(process.platform === 'win32' ? ['pwsh.exe', 'powershell.exe'] : ['pwsh'])
@@ -154,7 +154,7 @@ describe.each([
         host,
         pool,
         owner,
-        `noise\n__ORCA_UPLOAD_STAGE_SLOT__${owner}:slot-0\n`
+        `noise\n__GIRRA_UPLOAD_STAGE_SLOT__${owner}:slot-0\n`
       )
 
       const result = runCommand(
@@ -186,7 +186,7 @@ describe.each([
           host,
           pool,
           owner,
-          `__ORCA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
+          `__GIRRA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
         )
 
         const result = runCommand(
@@ -242,7 +242,7 @@ describe('POSIX ownership race fencing', () => {
       posix,
       pool,
       owner,
-      `__ORCA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
+      `__GIRRA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
     )
     const prefix = [
       'raced=0',
@@ -279,7 +279,7 @@ describe('POSIX ownership race fencing', () => {
       posix,
       pool,
       owner,
-      `__ORCA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
+      `__GIRRA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
     )
     const prefix = [
       'raced=0',
@@ -316,7 +316,7 @@ describe.runIf(powerShellExecutable)(
         windows,
         pool,
         owner,
-        `__ORCA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
+        `__GIRRA_UPLOAD_STAGE_SLOT__${owner}:slot-0`
       )
       const prefix = [
         '$script:raced = $false',

@@ -5,7 +5,7 @@ import { RuntimeClientError } from '../../runtime-client'
 // stays an installed alias, so the hint the host renders still runs. Send `girra` only once no
 // supported host predates that widening; the enum itself already accepts it.
 export function resolveCompatibilityCliCommand(): 'orca' | 'orca-ide' | 'orca-dev' {
-  const configured = process.env.ORCA_CLI_COMMAND
+  const configured = process.env.GIRRA_CLI_COMMAND
   if (configured === 'girra-dev' || configured === 'orca-dev') {
     return 'orca-dev'
   }
@@ -16,10 +16,10 @@ export function resolveCompatibilityCliCommand(): 'orca' | 'orca-ide' | 'orca-de
 }
 
 export function resolvePackagedWindowsCompatibilityCommand(): 'orca' | 'orca-ide' | undefined {
-  if (process.env.ORCA_WINDOWS_PACKAGED_CLI_LAUNCHER !== '1') {
+  if (process.env.GIRRA_WINDOWS_PACKAGED_CLI_LAUNCHER !== '1') {
     return undefined
   }
-  const command = process.env.ORCA_CLI_COMMAND
+  const command = process.env.GIRRA_CLI_COMMAND
   if (command === 'girra' || command === 'girra.cmd' || command === 'orca') {
     return 'orca'
   }
@@ -46,7 +46,7 @@ export async function flushOrchestrationStdout(): Promise<void> {
 
 export function isDevCliInvocation(): boolean {
   return (
-    process.env.ORCA_DEV_CLI_INVOCATION === '1' ||
-    (process.env.ORCA_USER_DATA_PATH?.includes('orca-dev') ?? false)
+    process.env.GIRRA_DEV_CLI_INVOCATION === '1' ||
+    (process.env.GIRRA_USER_DATA_PATH?.includes('orca-dev') ?? false)
   )
 }

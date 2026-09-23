@@ -339,32 +339,32 @@ describe('terminal-history', () => {
       expect(envA.fish_history).not.toBe(envB.fish_history)
     })
 
-    it('drops an ORCA_HISTFILE inherited from a parent Girra PTY', () => {
+    it('drops an GIRRA_HISTFILE inherited from a parent Girra PTY', () => {
       // Why: a Girra terminal opened from inside another Girra terminal inherits
       // it, and the zsh wrapper would then re-export the PARENT worktree's
       // history path here. Credit: caught by @innocarpe in #11146.
       const env: Record<string, string> = {
-        ORCA_HISTFILE: ['', 'other', 'wt', 'zsh_history'].join(sep)
+        GIRRA_HISTFILE: ['', 'other', 'wt', 'zsh_history'].join(sep)
       }
 
       injectHistoryEnv(env, 'repo-1::/path/wt', '/bin/zsh', '/path/wt')
 
-      expect(env.ORCA_HISTFILE).toBe(env.HISTFILE)
-      expect(env.ORCA_HISTFILE).not.toContain('other')
+      expect(env.GIRRA_HISTFILE).toBe(env.HISTFILE)
+      expect(env.GIRRA_HISTFILE).not.toContain('other')
     })
 
-    it('drops an inherited ORCA_HISTFILE even when it injects nothing', () => {
+    it('drops an inherited GIRRA_HISTFILE even when it injects nothing', () => {
       // The dangerous variant: the early return would otherwise leave the stale
       // value pointing the wrapper at another worktree, overriding HISTFILE.
       const env: Record<string, string> = {
         HISTFILE: ['', 'mine', 'zsh_history'].join(sep),
-        ORCA_HISTFILE: ['', 'other', 'wt', 'zsh_history'].join(sep)
+        GIRRA_HISTFILE: ['', 'other', 'wt', 'zsh_history'].join(sep)
       }
 
       injectHistoryEnv(env, 'repo-1::/path/wt', '/bin/zsh', '/path/wt')
 
       expect(env.HISTFILE).toBe(['', 'mine', 'zsh_history'].join(sep))
-      expect(env.ORCA_HISTFILE).toBeUndefined()
+      expect(env.GIRRA_HISTFILE).toBeUndefined()
     })
 
     it.each([

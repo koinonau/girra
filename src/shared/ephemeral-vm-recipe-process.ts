@@ -184,19 +184,19 @@ function buildRecipeEnv(
   return {
     ...process.env,
     ...env,
-    ORCA_VM_MODE: mode,
-    ORCA_VM_INSTANCE_ID: context.instanceId ?? '',
-    ORCA_RECIPE_ID: context.recipeId,
-    ORCA_PROJECT_ID: context.projectId ?? '',
-    ORCA_WORKSPACE_ID: context.workspaceId ?? '',
-    ORCA_WORKSPACE_NAME: context.workspaceName ?? '',
-    ORCA_REPO_PATH: context.repoPath,
-    ORCA_REPO_URL: context.repoUrl ?? '',
-    ORCA_REPO_BRANCH: context.branch ?? '',
-    ORCA_REPO_REF: context.ref ?? '',
-    ORCA_REPO_REF_HEAD: context.expectedRefHead ?? '',
-    ORCA_RECIPE_RESULT_SCHEMA_VERSION: String(resultSchemaVersion),
-    ORCA_VERSION: context.orcaVersion ?? ''
+    GIRRA_VM_MODE: mode,
+    GIRRA_VM_INSTANCE_ID: context.instanceId ?? '',
+    GIRRA_RECIPE_ID: context.recipeId,
+    GIRRA_PROJECT_ID: context.projectId ?? '',
+    GIRRA_WORKSPACE_ID: context.workspaceId ?? '',
+    GIRRA_WORKSPACE_NAME: context.workspaceName ?? '',
+    GIRRA_REPO_PATH: context.repoPath,
+    GIRRA_REPO_URL: context.repoUrl ?? '',
+    GIRRA_REPO_BRANCH: context.branch ?? '',
+    GIRRA_REPO_REF: context.ref ?? '',
+    GIRRA_REPO_REF_HEAD: context.expectedRefHead ?? '',
+    GIRRA_RECIPE_RESULT_SCHEMA_VERSION: String(resultSchemaVersion),
+    GIRRA_VERSION: context.orcaVersion ?? ''
   }
 }
 

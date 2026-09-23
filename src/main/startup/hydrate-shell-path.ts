@@ -10,7 +10,7 @@ import { WindowsShellPathOwnership, windowsPathSegmentKey } from './windows-shel
 //
 // Probe the profile-loading shell once instead of hard-coding every tool's install path.
 
-const DELIMITER = '__ORCA_SHELL_PATH__'
+const DELIMITER = '__GIRRA_SHELL_PATH__'
 // Why 10s: 5s was chosen without measurement and a real profile overruns it —
 // a bash -ilc loading nvm, rvm, conda and gcloud measures ~1s idle but 6-7s on a
 // loaded machine, so a cold start under load silently fell back to the seeded
@@ -56,7 +56,7 @@ const LAUNCH_PATH_KEY =
 const LAUNCH_PATH = process.env[LAUNCH_PATH_KEY] ?? null
 // Why: rc files that exec into a multiplexer or start a heavy prompt can outrun the
 // probe budget. This lets them detect the probe and take a fast path.
-const PROBE_MARKER_ENV_VAR = 'ORCA_SHELL_PATH_PROBE'
+const PROBE_MARKER_ENV_VAR = 'GIRRA_SHELL_PATH_PROBE'
 let launchPathOverride: { key: string; value: string } | null = null
 let configuredWindowsShell = 'powershell.exe'
 let configuredWindowsGitBashPath: string | null = null

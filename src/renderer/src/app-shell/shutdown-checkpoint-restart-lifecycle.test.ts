@@ -1,12 +1,12 @@
 // @vitest-environment happy-dom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
-  ORCA_APP_RESTART_ABORTED_EVENT,
-  ORCA_APP_RESTART_STARTED_EVENT
+  GIRRA_APP_RESTART_ABORTED_EVENT,
+  GIRRA_APP_RESTART_STARTED_EVENT
 } from '../../../shared/app-restart-events'
 import {
-  ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
-  ORCA_RENDERER_UNLOAD_PREVENTED_EVENT
+  GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
+  GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT
 } from '../../../shared/renderer-shutdown-events'
 import { prepareRendererForAppRestart } from '../../../shared/renderer-restart-preparation'
 import {
@@ -58,11 +58,11 @@ function createLifecycleHarness(
   const cleanupRestartTracking = registerAppRestartBeforeUnloadBypass()
   window.addEventListener('beforeunload', checkpoint)
   window.addEventListener(
-    ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
+    GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
     guard.abortAfterCheckpointFailure
   )
   window.addEventListener(abortedEventName, guard.abandonAttempt)
-  window.addEventListener(ORCA_RENDERER_UNLOAD_PREVENTED_EVENT, guard.abandonAttempt)
+  window.addEventListener(GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT, guard.abandonAttempt)
   return {
     stageBeforeUnloadSync,
     prepare: () =>
@@ -75,11 +75,11 @@ function createLifecycleHarness(
       cleanupRestartTracking()
       window.removeEventListener('beforeunload', checkpoint)
       window.removeEventListener(
-        ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
+        GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
         guard.abortAfterCheckpointFailure
       )
       window.removeEventListener(abortedEventName, guard.abandonAttempt)
-      window.removeEventListener(ORCA_RENDERER_UNLOAD_PREVENTED_EVENT, guard.abandonAttempt)
+      window.removeEventListener(GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT, guard.abandonAttempt)
     }
   }
 }
@@ -95,8 +95,8 @@ describe('shutdown checkpoint restart lifecycle', () => {
   it.each([
     {
       lifecycle: 'app restart',
-      startedEventName: ORCA_APP_RESTART_STARTED_EVENT,
-      abortedEventName: ORCA_APP_RESTART_ABORTED_EVENT
+      startedEventName: GIRRA_APP_RESTART_STARTED_EVENT,
+      abortedEventName: GIRRA_APP_RESTART_ABORTED_EVENT
     }
   ])(
     'preserves retry-then-degrade across a checkpoint-caused $lifecycle abort',
@@ -120,14 +120,14 @@ describe('shutdown checkpoint restart lifecycle', () => {
   it('abandons retry state when a later restart attempt is independently canceled', async () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const harness = createLifecycleHarness(
-      ORCA_APP_RESTART_STARTED_EVENT,
-      ORCA_APP_RESTART_ABORTED_EVENT
+      GIRRA_APP_RESTART_STARTED_EVENT,
+      GIRRA_APP_RESTART_ABORTED_EVENT
     )
     cleanupFns.push(harness.cleanup)
 
     await expect(harness.prepare()).rejects.toThrow('deterministic full-stage failure')
-    window.dispatchEvent(new Event(ORCA_APP_RESTART_STARTED_EVENT))
-    window.dispatchEvent(new Event(ORCA_APP_RESTART_ABORTED_EVENT))
+    window.dispatchEvent(new Event(GIRRA_APP_RESTART_STARTED_EVENT))
+    window.dispatchEvent(new Event(GIRRA_APP_RESTART_ABORTED_EVENT))
     await expect(harness.prepare()).rejects.toThrow('deterministic full-stage failure')
 
     expect(harness.stageBeforeUnloadSync).toHaveBeenCalledTimes(2)
@@ -137,8 +137,8 @@ describe('shutdown checkpoint restart lifecycle', () => {
     const snapshotFailure = "Cannot read properties of null (reading 'toLowerCase')"
     vi.spyOn(console, 'error').mockImplementation(() => {})
     const harness = createLifecycleHarness(
-      ORCA_APP_RESTART_STARTED_EVENT,
-      ORCA_APP_RESTART_ABORTED_EVENT,
+      GIRRA_APP_RESTART_STARTED_EVENT,
+      GIRRA_APP_RESTART_ABORTED_EVENT,
       {
         buildSessionSnapshots: () => {
           throw new Error(snapshotFailure)

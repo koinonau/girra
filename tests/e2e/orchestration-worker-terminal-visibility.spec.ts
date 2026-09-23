@@ -34,13 +34,13 @@ function appendLedger(envName, event) {
 }
 // Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
 if (require('node:path').basename(process.cwd()) === 'rate-limit-pty-cwd') process.exit(0)
-appendLedger('ORCA_E2E_SPAWN_LEDGER', { event: 'spawn', startedAt: Date.now() })
+appendLedger('GIRRA_E2E_SPAWN_LEDGER', { event: 'spawn', startedAt: Date.now() })
 process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 let acknowledged = false
 process.stdin.on('data', (chunk) => {
   const input = chunk.toString()
   if (input.includes('\\x03')) {
-    appendLedger('ORCA_E2E_INTERRUPTION_LEDGER', { event: 'stdin-ctrl-c' })
+    appendLedger('GIRRA_E2E_INTERRUPTION_LEDGER', { event: 'stdin-ctrl-c' })
   }
   if (!acknowledged && input.includes('\\r')) {
     acknowledged = true
@@ -49,7 +49,7 @@ process.stdin.on('data', (chunk) => {
 })
 for (const signal of ['SIGINT', 'SIGHUP', 'SIGTERM']) {
   process.on(signal, () => {
-    appendLedger('ORCA_E2E_INTERRUPTION_LEDGER', { event: 'signal', signal })
+    appendLedger('GIRRA_E2E_INTERRUPTION_LEDGER', { event: 'signal', signal })
     process.exit(0)
   })
 }
@@ -73,8 +73,8 @@ const test = base.extend({
   launchEnv: [
     {
       PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`,
-      ORCA_E2E_SPAWN_LEDGER: spawnLedgerPath,
-      ORCA_E2E_INTERRUPTION_LEDGER: interruptionLedgerPath
+      GIRRA_E2E_SPAWN_LEDGER: spawnLedgerPath,
+      GIRRA_E2E_INTERRUPTION_LEDGER: interruptionLedgerPath
     },
     { option: true }
   ]

@@ -28,10 +28,10 @@ type RecordedPost = {
 }
 
 const ENV_KEYS = [
-  'ORCA_PANE_KEY',
-  'ORCA_AGENT_HOOK_PORT',
-  'ORCA_AGENT_HOOK_TOKEN',
-  'ORCA_AGENT_HOOK_ENDPOINT'
+  'GIRRA_PANE_KEY',
+  'GIRRA_AGENT_HOOK_PORT',
+  'GIRRA_AGENT_HOOK_TOKEN',
+  'GIRRA_AGENT_HOOK_ENDPOINT'
 ] as const
 
 describe('OpenCode plugin lifecycle delivery', () => {
@@ -47,10 +47,10 @@ describe('OpenCode plugin lifecycle delivery', () => {
     for (const key of ENV_KEYS) {
       savedEnv[key] = process.env[key]
     }
-    process.env.ORCA_PANE_KEY = 'tab-1:leaf-1'
-    process.env.ORCA_AGENT_HOOK_PORT = '45678'
-    process.env.ORCA_AGENT_HOOK_TOKEN = 'test-token'
-    delete process.env.ORCA_AGENT_HOOK_ENDPOINT
+    process.env.GIRRA_PANE_KEY = 'tab-1:leaf-1'
+    process.env.GIRRA_AGENT_HOOK_PORT = '45678'
+    process.env.GIRRA_AGENT_HOOK_TOKEN = 'test-token'
+    delete process.env.GIRRA_AGENT_HOOK_ENDPOINT
     savedFetch = globalThis.fetch
     globalThis.fetch = vi.fn(async (_url: RequestInfo | URL, init?: RequestInit) => {
       posts.push(readPayload(init))
@@ -151,9 +151,9 @@ describe('OpenCode plugin lifecycle delivery', () => {
     const endpointPath = join(tempDir, 'endpoint.env')
     writeFileSync(
       endpointPath,
-      'not-an-assignment\nORCA_AGENT_HOOK_TOKEN=file-token\nBROKEN LINE\n'
+      'not-an-assignment\nGIRRA_AGENT_HOOK_TOKEN=file-token\nBROKEN LINE\n'
     )
-    process.env.ORCA_AGENT_HOOK_ENDPOINT = endpointPath
+    process.env.GIRRA_AGENT_HOOK_ENDPOINT = endpointPath
 
     const fetchMock = vi.fn(
       async (_url: RequestInfo | URL, _init?: RequestInit) => new Response(null, { status: 204 })
@@ -170,8 +170,8 @@ describe('OpenCode plugin lifecycle delivery', () => {
   })
 
   it('warns once for an unreadable endpoint without exposing hook credentials', async () => {
-    process.env.ORCA_AGENT_HOOK_ENDPOINT = tempDir
-    process.env.ORCA_AGENT_HOOK_TOKEN = 'fallback-secret-token'
+    process.env.GIRRA_AGENT_HOOK_ENDPOINT = tempDir
+    process.env.GIRRA_AGENT_HOOK_TOKEN = 'fallback-secret-token'
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     try {
@@ -793,8 +793,8 @@ describe('OpenCode plugin lifecycle delivery', () => {
     const handler = await loadHandler()
 
     await handler({ event: status('busy') })
-    process.env.ORCA_AGENT_HOOK_PORT = '56789'
-    process.env.ORCA_AGENT_HOOK_TOKEN = 'refreshed-token'
+    process.env.GIRRA_AGENT_HOOK_PORT = '56789'
+    process.env.GIRRA_AGENT_HOOK_TOKEN = 'refreshed-token'
     await handler({ event: delta('still working') })
 
     expect(names()).toEqual(['SessionBusy', 'SessionBusy'])

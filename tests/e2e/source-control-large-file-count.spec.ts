@@ -13,7 +13,7 @@
  *   - heap growth      JS heap across repeated poll cycles (leak signal)
  *
  * Run a single scenario at a custom scale:
- *   ORCA_LARGE_FILE_COUNT=9500 npx playwright test \
+ *   GIRRA_LARGE_FILE_COUNT=9500 npx playwright test \
  *     tests/e2e/source-control-large-file-count.spec.ts \
  *     --config tests/playwright.config.ts --project electron-headless
  */
@@ -276,11 +276,11 @@ test.describe('Source Control large file count (#8013)', () => {
     registerPostElectronShutdownCleanup
   }) => {
     test.setTimeout(600_000)
-    const untrackedFiles = Number(process.env.ORCA_LARGE_FILE_COUNT ?? '950')
-    // Why: ORCA_LARGE_FILE_BYTES gives untracked files realistic sizes so the
+    const untrackedFiles = Number(process.env.GIRRA_LARGE_FILE_COUNT ?? '950')
+    // Why: GIRRA_LARGE_FILE_BYTES gives untracked files realistic sizes so the
     // per-poll line-stat reads (cache-capped at 2,048 entries) become visible
     // in rescanMs instead of hiding behind ~30-byte fixture files.
-    const untrackedFileBytes = Number(process.env.ORCA_LARGE_FILE_BYTES ?? '0')
+    const untrackedFileBytes = Number(process.env.GIRRA_LARGE_FILE_BYTES ?? '0')
     const fixture = createLargeFileCountRepo({
       trackedFiles: 100,
       untrackedFiles,
@@ -328,7 +328,7 @@ test.describe('Source Control large file count (#8013)', () => {
     registerPostElectronShutdownCleanup
   }) => {
     test.setTimeout(600_000)
-    const modifiedFiles = Number(process.env.ORCA_LARGE_FILE_COUNT ?? '750')
+    const modifiedFiles = Number(process.env.GIRRA_LARGE_FILE_COUNT ?? '750')
     const fixture = createLargeFileCountRepo({ trackedFiles: modifiedFiles, modifiedFiles })
     registerPostElectronShutdownCleanup(() => removeLargeFileCountRepo(fixture.repoPath))
     try {
@@ -419,14 +419,14 @@ test.describe('Source Control large file count (#8013)', () => {
 
       const tooManyChangesBanner = orcaPage.getByTestId('too-many-changes-banner')
       await expect(tooManyChangesBanner).toBeVisible()
-      if (process.env.ORCA_LARGE_FILE_SCREENSHOT_PATH) {
+      if (process.env.GIRRA_LARGE_FILE_SCREENSHOT_PATH) {
         // Narrowest supported sidebar is where the banner layout is worst.
         await orcaPage.evaluate((minWidth) => {
           window.__store?.getState().setRightSidebarWidth(minWidth)
           document.documentElement.classList.add('dark')
         }, RIGHT_SIDEBAR_MIN_WIDTH)
         await tooManyChangesBanner.screenshot({
-          path: process.env.ORCA_LARGE_FILE_SCREENSHOT_PATH
+          path: process.env.GIRRA_LARGE_FILE_SCREENSHOT_PATH
         })
       }
 
@@ -526,7 +526,7 @@ test.describe('Source Control large file count (#8013)', () => {
     registerPostElectronShutdownCleanup
   }) => {
     test.setTimeout(600_000)
-    const trackedFiles = Number(process.env.ORCA_LARGE_FILE_COUNT ?? '15000')
+    const trackedFiles = Number(process.env.GIRRA_LARGE_FILE_COUNT ?? '15000')
     const fixture = createLargeFileCountRepo({ trackedFiles })
     registerPostElectronShutdownCleanup(() => removeLargeFileCountRepo(fixture.repoPath))
     try {

@@ -92,10 +92,10 @@ describe('electron-builder markdown file associations', () => {
     expect(hooks).toMatch(
       /WriteRegNone\s+SHELL_CONTEXT\s+"Software\\Classes\\\$\{EXT\}\\OpenWithProgids"/
     )
-    expect(hooks).toMatch(/!macro\s+ORCA_REGISTER_MARKDOWN_OPEN_WITH\s+EXT/)
+    expect(hooks).toMatch(/!macro\s+GIRRA_REGISTER_MARKDOWN_OPEN_WITH\s+EXT/)
     for (const ext of MARKDOWN_EXTENSIONS) {
-      expect(hooks).toContain(`ORCA_REGISTER_MARKDOWN_OPEN_WITH ".${ext}"`)
-      expect(hooks).toContain(`ORCA_UNREGISTER_MARKDOWN_OPEN_WITH ".${ext}"`)
+      expect(hooks).toContain(`GIRRA_REGISTER_MARKDOWN_OPEN_WITH ".${ext}"`)
+      expect(hooks).toContain(`GIRRA_UNREGISTER_MARKDOWN_OPEN_WITH ".${ext}"`)
     }
     expect(hooks).toMatch(/!macro\s+customInstall\b/)
     expect(hooks).toMatch(/!macro\s+customUnInstall\b/)

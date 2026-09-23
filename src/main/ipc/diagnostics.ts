@@ -23,7 +23,7 @@ import type { CollectedBundle } from '../observability/bundle'
 export type DiagnosticsBundlePreview = Omit<CollectedBundle, 'payload'>
 
 function resolveOrcaChannel(): 'stable' | 'rc' | 'dev' {
-  const ident = typeof ORCA_BUILD_IDENTITY !== 'undefined' ? ORCA_BUILD_IDENTITY : null
+  const ident = typeof GIRRA_BUILD_IDENTITY !== 'undefined' ? GIRRA_BUILD_IDENTITY : null
   return ident === 'stable' || ident === 'rc' ? ident : 'dev'
 }
 

@@ -1,6 +1,6 @@
 import { shell } from 'electron'
 import { randomUUID } from 'node:crypto'
-import { ORCA_BROWSER_BLANK_URL } from '../../shared/constants'
+import { GIRRA_BROWSER_BLANK_URL } from '../../shared/constants'
 import {
   normalizeBrowserNavigationUrl,
   normalizeExternalBrowserUrl,
@@ -197,7 +197,7 @@ export abstract class BrowserManagerGuestPopupPolicy extends BrowserManagerNavig
       }
 
       // Why: file URLs are fine for in-pane previews, but must not spawn native child windows targeting local paths.
-      const canOpenAsChild = Boolean(externalUrl || browserUrl === ORCA_BROWSER_BLANK_URL)
+      const canOpenAsChild = Boolean(externalUrl || browserUrl === GIRRA_BROWSER_BLANK_URL)
       if (browserTabId && canOpenAsChild) {
         // Why: OAuth may request size/position, but content must not create deceptive or inescapable native chrome.
         return {

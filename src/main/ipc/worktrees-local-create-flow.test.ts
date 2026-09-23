@@ -634,7 +634,7 @@ describe('registerWorktreeHandlers', () => {
       createdWithAgent: 'claude',
       startup: {
         command: 'claude --prefill test',
-        env: { ORCA_AGENT_MODE: 'direct' },
+        env: { GIRRA_AGENT_MODE: 'direct' },
         viewMode: 'chat',
         telemetry: {
           agent_kind: 'claude',
@@ -665,7 +665,7 @@ describe('registerWorktreeHandlers', () => {
       {
         claudeAgentTeamsSourceCommand: 'claude --prefill test',
         command: 'claude --prefill test',
-        env: { ORCA_AGENT_MODE: 'direct' },
+        env: { GIRRA_AGENT_MODE: 'direct' },
         launchAgent: 'claude',
         viewMode: 'chat',
         startupCommandDelivery: undefined,
@@ -684,8 +684,8 @@ describe('registerWorktreeHandlers', () => {
         title: 'Setup',
         command: expect.stringContaining('bash /workspace/repo/.git/orca/setup-runner.sh'),
         env: {
-          ORCA_ROOT_PATH: '/workspace/repo',
-          ORCA_WORKTREE_PATH: '/workspace/improve-dashboard'
+          GIRRA_ROOT_PATH: '/workspace/repo',
+          GIRRA_WORKTREE_PATH: '/workspace/improve-dashboard'
         },
         activate: false
       }
@@ -737,8 +737,8 @@ describe('registerWorktreeHandlers', () => {
       runnerScriptPath: 'C:\\workspace\\repo\\.git\\orca\\setup-runner.sh',
       shell: { family: 'posix', executable: 'wsl.exe' },
       envVars: {
-        ORCA_ROOT_PATH: 'C:\\workspace\\repo',
-        ORCA_WORKTREE_PATH: 'C:\\workspace\\improve-dashboard'
+        GIRRA_ROOT_PATH: 'C:\\workspace\\repo',
+        GIRRA_WORKTREE_PATH: 'C:\\workspace\\improve-dashboard'
       },
       waitForAgentStartup: true
     })
@@ -752,7 +752,7 @@ describe('registerWorktreeHandlers', () => {
       createdWithAgent: 'claude',
       startup: {
         command: 'claude --prefill test',
-        env: { ORCA_AGENT_MODE: 'direct' },
+        env: { GIRRA_AGENT_MODE: 'direct' },
         telemetry: {
           agent_kind: 'claude',
           launch_source: 'new_workspace_composer',

@@ -5,7 +5,7 @@
  * Launches the built app (out/) against a synthetic userData fixture that
  * mimics a long-lived real profile (tens of thousands of Chromium cache
  * files — the documented pathological case for the win32 startup ACL grant),
- * parses `ORCA_STARTUP_DIAGNOSTICS=1` milestone lines from stderr, and
+ * parses `GIRRA_STARTUP_DIAGNOSTICS=1` milestone lines from stderr, and
  * reports per-phase timings across iterations.
  *
  * Usage:
@@ -214,12 +214,12 @@ function buildLaunchEnvironment({ fixtureDir, githubRepos, ghShimDir }) {
   mkdirSync(isolatedHome, { recursive: true })
   const env = {
     ...process.env,
-    ORCA_STARTUP_DIAGNOSTICS: '1',
-    ORCA_E2E_USER_DATA_DIR: fixtureDir,
+    GIRRA_STARTUP_DIAGNOSTICS: '1',
+    GIRRA_E2E_USER_DATA_DIR: fixtureDir,
     HOME: isolatedHome,
     USERPROFILE: isolatedHome,
-    ORCA_E2E_HOME_DIR: isolatedHome,
-    ORCA_E2E_HEADLESS: '1'
+    GIRRA_E2E_HOME_DIR: isolatedHome,
+    GIRRA_E2E_HEADLESS: '1'
   }
   delete env.CLAUDE_CONFIG_DIR
   if (ghShimDir) {

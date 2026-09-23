@@ -81,14 +81,14 @@ describe('serveOrcaApp', () => {
   beforeEach(() => {
     spawnMock.mockReset()
     spawnSyncMock.mockReset()
-    process.env.ORCA_APP_EXECUTABLE = '/Applications/Orca.app/Contents/MacOS/Orca'
+    process.env.GIRRA_APP_EXECUTABLE = '/Applications/Orca.app/Contents/MacOS/Orca'
   })
 
   afterEach(() => {
     vi.restoreAllMocks()
-    delete process.env.ORCA_APP_EXECUTABLE
-    delete process.env.ORCA_APP_EXECUTABLE_NEEDS_APP_ROOT
-    delete process.env.ORCA_USER_DATA_PATH
+    delete process.env.GIRRA_APP_EXECUTABLE
+    delete process.env.GIRRA_APP_EXECUTABLE_NEEDS_APP_ROOT
+    delete process.env.GIRRA_USER_DATA_PATH
     return Promise.all(
       temporaryDirectories.splice(0).map((directory) => rm(directory, { recursive: true }))
     )
@@ -151,8 +151,8 @@ describe('serveOrcaApp', () => {
   })
 
   it('passes the app root before serve flags for dev Electron executables', async () => {
-    process.env.ORCA_APP_EXECUTABLE = '/repo/node_modules/.bin/electron'
-    process.env.ORCA_APP_EXECUTABLE_NEEDS_APP_ROOT = '1'
+    process.env.GIRRA_APP_EXECUTABLE = '/repo/node_modules/.bin/electron'
+    process.env.GIRRA_APP_EXECUTABLE_NEEDS_APP_ROOT = '1'
     const child = {
       kill: vi.fn(),
       once: vi.fn(
@@ -202,7 +202,7 @@ describe('serveOrcaApp', () => {
       temporaryDirectories.push(root)
       const executable = join(root, 'orca-ide')
       await writeFile(join(root, 'AppRun'), '', { mode: 0o755 })
-      process.env.ORCA_APP_EXECUTABLE = executable
+      process.env.GIRRA_APP_EXECUTABLE = executable
       Object.defineProperty(process, 'platform', { value: 'linux' })
       Object.defineProperty(process, 'getuid', { configurable: true, value: () => 1000 })
       spawnSyncMock.mockReturnValue(userNamespaceResult)
@@ -358,7 +358,7 @@ describe('serveOrcaApp', () => {
   it('uses a shell when a Windows npm command shim is the Electron executable', async () => {
     const platformDescriptor = Object.getOwnPropertyDescriptor(process, 'platform')
     Object.defineProperty(process, 'platform', { value: 'win32' })
-    process.env.ORCA_APP_EXECUTABLE = 'C:\\repo\\node_modules\\.bin\\electron.cmd'
+    process.env.GIRRA_APP_EXECUTABLE = 'C:\\repo\\node_modules\\.bin\\electron.cmd'
     const child = {
       kill: vi.fn(),
       once: vi.fn(
@@ -396,13 +396,13 @@ describe('launchOrcaApp', () => {
   })
 
   afterEach(() => {
-    delete process.env.ORCA_OPEN_COMMAND
-    delete process.env.ORCA_APP_EXECUTABLE
-    delete process.env.ORCA_APP_EXECUTABLE_NEEDS_APP_ROOT
+    delete process.env.GIRRA_OPEN_COMMAND
+    delete process.env.GIRRA_APP_EXECUTABLE
+    delete process.env.GIRRA_APP_EXECUTABLE_NEEDS_APP_ROOT
   })
 
   it('handles asynchronous detached spawn errors without throwing', async () => {
-    process.env.ORCA_APP_EXECUTABLE = '/missing/Orca'
+    process.env.GIRRA_APP_EXECUTABLE = '/missing/Orca'
     const child = new FakeChildProcess()
     spawnMock.mockReturnValue(child)
 
@@ -421,7 +421,7 @@ describe('launchOrcaApp', () => {
 
     try {
       await writeFile(join(root, 'AppRun'), '')
-      process.env.ORCA_APP_EXECUTABLE = executable
+      process.env.GIRRA_APP_EXECUTABLE = executable
       process.env.ELECTRON_RUN_AS_NODE = '1'
       Object.defineProperty(process, 'platform', { configurable: true, value: 'linux' })
       Object.defineProperty(process, 'getuid', { configurable: true, value: () => 1000 })

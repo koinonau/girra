@@ -133,7 +133,7 @@ describe('native-deps repair probe verdicts', () => {
   it('launches an intact relay when the health probe never answers', async () => {
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       { reject: 'SSH channel closed unexpectedly' }, // health probe: unverifiable, not MISSING
       '', // launch namespace marker
@@ -171,7 +171,7 @@ describe('native-deps repair probe verdicts', () => {
     // (bad NODE_OPTIONS, OOM kill, exit 127). The shell answered; the answer is not about the deps.
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       'MISSING', // answered, no marker line: nothing here names a dep
       '', // launch namespace marker
@@ -203,7 +203,7 @@ describe('native-deps repair probe verdicts', () => {
   it('carries the probe stderr into the unparseable-answer warning', async () => {
     const conn = makeMockConnection(sftpCapture)
     vi.mocked(execCommand)
-      .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       .mockResolvedValueOnce('/home/u')
       .mockImplementationOnce((_conn, _command, options) => {
         options?.onStderr?.('node: --inspect-brk is not allowed in NODE_OPTIONS')
@@ -222,7 +222,7 @@ describe('native-deps repair probe verdicts', () => {
   it('still resets both deps when the probe names both', async () => {
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       BOTH_NATIVE_DEPS_MISSING_PROBE, // answered: both deps are genuinely broken
       BOTH_NATIVE_DEPS_MISSING_PROBE, // re-probe under the repair lock
@@ -251,7 +251,7 @@ describe('native-deps repair probe verdicts', () => {
     vi.mocked(resolveRemoteNodePath).mockResolvedValueOnce('C:/Program Files/nodejs/node.exe')
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Windows AMD64',
+      '__GIRRA_REMOTE_PLATFORM__ Windows AMD64',
       'C:\\Users\\u',
       '', // health probe: PowerShell swallowed the native failure, so nothing names a dep
       '', // no persisted active pipe marker
@@ -277,7 +277,7 @@ describe('native-deps repair probe verdicts', () => {
     const conn = makeMockConnection(sftpCapture)
     const watcherMissing = 'ORCA-NATIVE-DEPS-MISSING:@parcel/watcher\nMISSING'
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       watcherMissing,
       watcherMissing, // re-probe under the repair lock
@@ -302,7 +302,7 @@ describe('native-deps repair probe verdicts', () => {
   it('skips repair entirely when the probe answers OK', async () => {
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       'ORCA-NATIVE-DEPS-OK',
       '', // launch namespace marker
@@ -319,7 +319,7 @@ describe('native-deps repair probe verdicts', () => {
   it('keeps the answered reset scope when the locked re-probe cannot answer', async () => {
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       'ORCA-NATIVE-DEPS-MISSING:@parcel/watcher\nMISSING', // answered: only the watcher is broken
       { reject: 'SSH channel closed unexpectedly' }, // re-probe under the lock: unverifiable

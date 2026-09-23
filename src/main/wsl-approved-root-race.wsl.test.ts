@@ -5,8 +5,8 @@ import { containedDeleteCommand } from './wsl-contained-delete'
 import { parseWslPath } from './wsl'
 
 const execFileAsync = promisify(execFile)
-const DISTRO = process.env.ORCA_WSL_TEST_DISTRO ?? 'Ubuntu-24.04'
-const runRealWsl = process.platform === 'win32' && process.env.ORCA_REAL_WSL_DELETE_TEST === '1'
+const DISTRO = process.env.GIRRA_WSL_TEST_DISTRO ?? 'Ubuntu-24.04'
+const runRealWsl = process.platform === 'win32' && process.env.GIRRA_REAL_WSL_DELETE_TEST === '1'
 
 function unc(linuxPath: string): string {
   return `\\\\wsl.localhost\\${DISTRO}${linuxPath.replaceAll('/', '\\')}`
@@ -28,10 +28,10 @@ describe.skipIf(!runRealWsl)('WSL approved-root traversal race', () => {
     fixtureRoot = await wsl("mktemp -d -p /tmp 'orca-wsl-root-race.XXXXXX'")
     const statHook = String.raw`#!/bin/sh
 for argument do last=$argument; done
-if [ "$PWD" = "$ORCA_RACE_PARENT" ] && [ "$(/usr/bin/basename "$last")" = vault ]; then
+if [ "$PWD" = "$GIRRA_RACE_PARENT" ] && [ "$(/usr/bin/basename "$last")" = vault ]; then
   inspected=$(/usr/bin/stat "$@") || exit $?
-  /usr/bin/mv -- "$ORCA_RACE_PARENT/vault" "$ORCA_RACE_PARENT/vault-original" || exit $?
-  /usr/bin/ln -s -- "$ORCA_RACE_OUTSIDE" "$ORCA_RACE_PARENT/vault" || exit $?
+  /usr/bin/mv -- "$GIRRA_RACE_PARENT/vault" "$GIRRA_RACE_PARENT/vault-original" || exit $?
+  /usr/bin/ln -s -- "$GIRRA_RACE_OUTSIDE" "$GIRRA_RACE_PARENT/vault" || exit $?
   printf '%s\n' "$inspected"
   exit 0
 fi
@@ -74,13 +74,13 @@ exec /usr/bin/stat "$@"
           '--exec',
           'env',
           `PATH=${fixtureRoot}/hook-bin:/usr/bin:/bin`,
-          `ORCA_RACE_PARENT=${fixtureRoot}/race`,
-          `ORCA_RACE_OUTSIDE=${fixtureRoot}/outside/root-target`,
+          `GIRRA_RACE_PARENT=${fixtureRoot}/race`,
+          `GIRRA_RACE_OUTSIDE=${fixtureRoot}/outside/root-target`,
           ...(command ?? [])
         ],
         { encoding: 'utf-8', timeout: 30000 }
       )
-    ).rejects.toMatchObject({ stderr: expect.stringContaining('ORCA_WSL_DELETE_REJECT:race') })
+    ).rejects.toMatchObject({ stderr: expect.stringContaining('GIRRA_WSL_DELETE_REJECT:race') })
 
     await expect(
       wsl(

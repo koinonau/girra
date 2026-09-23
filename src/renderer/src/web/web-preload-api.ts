@@ -48,8 +48,8 @@ import { readStoredWebRuntimeEnvironment } from './web-runtime-environment'
 
 export function installWebPreloadApi(): void {
   webRuntimeState.activeEnvironment = readStoredWebRuntimeEnvironment()
-  const webWindow = window as unknown as { __ORCA_WEB_CLIENT__?: boolean }
-  webWindow.__ORCA_WEB_CLIENT__ = true
+  const webWindow = window as unknown as { __GIRRA_WEB_CLIENT__?: boolean }
+  webWindow.__GIRRA_WEB_CLIENT__ = true
   window.electron = createFallbackProxy(['electron']) as Window['electron']
   window.api = withFallback(createWebPreloadApi(), []) as PreloadApi
 }

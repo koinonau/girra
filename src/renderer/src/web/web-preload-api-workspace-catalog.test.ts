@@ -600,11 +600,11 @@ describe('web worktree preload API', () => {
       displayNameKind: 'user',
       startup: {
         command: "opencode 'summarize repo'",
-        env: { ORCA_AGENT_MODE: 'direct' },
+        env: { GIRRA_AGENT_MODE: 'direct' },
         launchConfig: {
           agentCommand: 'opencode',
           agentArgs: '--model gpt-5',
-          agentEnv: { ORCA_AGENT_MODE: 'direct' }
+          agentEnv: { GIRRA_AGENT_MODE: 'direct' }
         },
         startupCommandDelivery: 'shell-ready'
       }
@@ -641,11 +641,11 @@ describe('web worktree preload API', () => {
           displayName: 'Review label',
           displayNameKind: 'user',
           startupCommand: "opencode 'summarize repo'",
-          startupEnv: { ORCA_AGENT_MODE: 'direct' },
+          startupEnv: { GIRRA_AGENT_MODE: 'direct' },
           startupLaunchConfig: {
             agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
-            agentEnv: { ORCA_AGENT_MODE: 'direct' }
+            agentEnv: { GIRRA_AGENT_MODE: 'direct' }
           },
           startupCommandDelivery: 'shell-ready',
           activate: true

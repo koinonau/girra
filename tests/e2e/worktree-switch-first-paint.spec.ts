@@ -37,13 +37,13 @@ import {
 
 // Why 3: the field profile that motivated this budget has 449 worktrees whose
 // median tab count is 2-3, so a 3-tab worktree is the switch users actually pay for.
-const TABS_PER_WORKTREE = Number(process.env.ORCA_SWITCH_TABS ?? '3')
+const TABS_PER_WORKTREE = Number(process.env.GIRRA_SWITCH_TABS ?? '3')
 const SCROLLBACK_LINES = 1_500
 // Budget: a switch has to look instant. Anything over this reads as a stall.
-const FIRST_PAINT_BUDGET_MS = Number(process.env.ORCA_SWITCH_BUDGET_MS ?? '250')
+const FIRST_PAINT_BUDGET_MS = Number(process.env.GIRRA_SWITCH_BUDGET_MS ?? '250')
 // Why repeat: a single cold reveal on a loaded dev machine swings by tens of ms,
 // which is the same order as the effect under test.
-const SWITCH_SAMPLE_COUNT = Number(process.env.ORCA_SWITCH_ROUNDS ?? '5')
+const SWITCH_SAMPLE_COUNT = Number(process.env.GIRRA_SWITCH_ROUNDS ?? '5')
 
 type SwitchSample = {
   activationMs: number | null
@@ -297,7 +297,7 @@ async function publish(testInfo: TestInfo, name: string, body: string): Promise<
 // Why 8 extra: hot-retain keeps the 4 most recently hidden worktrees mounted and
 // exempts the last-active one, so a target only cold-parks once enough other
 // worktrees have been visited after it. That is the steady state at field scale.
-const FILLER_WORKTREE_COUNT = Number(process.env.ORCA_SWITCH_FILLER_WORKTREES ?? '8')
+const FILLER_WORKTREE_COUNT = Number(process.env.GIRRA_SWITCH_FILLER_WORKTREES ?? '8')
 
 async function addFillerWorktrees(
   page: Page,
@@ -375,7 +375,7 @@ function median(values: readonly number[]): number {
 // Linux needs a mapped window for animation frames after reload; run on an isolated display.
 test.describe('Worktree switch first paint @headful', () => {
   test.skip(
-    process.env.ORCA_BACKGROUND_LAUNCH === '1',
+    process.env.GIRRA_BACKGROUND_LAUNCH === '1',
     'First-paint measurement requires a mapped window'
   )
   test('repaints an unmounted worktree within the switch budget', async ({

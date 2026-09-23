@@ -227,7 +227,7 @@ describe('agent hook spool', () => {
     const endpoint = join(endpointDir, 'endpoint.env')
     writeFileSync(
       endpoint,
-      'ORCA_AGENT_HOOK_PORT=9\nORCA_AGENT_HOOK_TOKEN=stale\nORCA_AGENT_HOOK_ENV=production\nORCA_AGENT_HOOK_VERSION=1\n'
+      'GIRRA_AGENT_HOOK_PORT=9\nGIRRA_AGENT_HOOK_TOKEN=stale\nGIRRA_AGENT_HOOK_ENV=production\nGIRRA_AGENT_HOOK_VERSION=1\n'
     )
     await claudeHookService.installRemote(createManagedHookLocalFilesystem(), dir)
     const scriptDir = join(dir, '.orca', 'agent-hooks')
@@ -239,12 +239,12 @@ describe('agent hook spool', () => {
       input: '{"hook_event_name":"SubagentStop","agent_id":"child"}\n',
       env: {
         ...process.env,
-        ORCA_AGENT_HOOK_ENDPOINT: endpoint,
+        GIRRA_AGENT_HOOK_ENDPOINT: endpoint,
         CLAUDE_JOB_DIR: '',
         DEVIN_PROJECT_DIR: '',
-        ORCA_PANE_KEY: 'tab-failure:0',
-        ORCA_TAB_ID: 'tab-failure',
-        ORCA_AGENT_LAUNCH_TOKEN: 'generation-token'
+        GIRRA_PANE_KEY: 'tab-failure:0',
+        GIRRA_TAB_ID: 'tab-failure',
+        GIRRA_AGENT_LAUNCH_TOKEN: 'generation-token'
       },
       timeout: 5000
     })

@@ -277,7 +277,7 @@ jobs:
               # produced them are most of the tree and would bloat the cache entry.
               find "$source" -name '*.o' -delete
             fi
-            ORCA_GIT_COMPAT_BINARY="$source/git" ORCA_GIT_COMPAT_VERSION="2.25.5" \
+            GIRRA_GIT_COMPAT_BINARY="$source/git" GIRRA_GIT_COMPAT_VERSION="2.25.5" \
               pnpm exec vitest run --config config/vitest.config.ts \
               src/shared/git-binary-compatibility.test.ts
           ) &
@@ -289,7 +289,7 @@ jobs:
             (
               image="${spec%%|*}"
               version="${spec#*|}"
-              ORCA_GIT_COMPAT_IMAGE="$image" ORCA_GIT_COMPAT_VERSION="$version" \
+              GIRRA_GIT_COMPAT_IMAGE="$image" GIRRA_GIT_COMPAT_VERSION="$version" \
                 pnpm exec vitest run --config config/vitest.config.ts \
                 src/shared/git-binary-compatibility.test.ts
             ) &
@@ -350,7 +350,7 @@ jobs:
       # right on a developer machine and wrong here — this job is a required check
       # and its fish lane is the only end-to-end guard for #9993, so a skip would
       # report green with nothing exercised. Turns those skips into failures.
-      ORCA_REQUIRE_FISH: '1'
+      GIRRA_REQUIRE_FISH: '1'
 
     steps:
       - name: Checkout
@@ -414,7 +414,7 @@ jobs:
           timeout 300 sudo apt-get install -y zsh fish
 
       # Separate from the install so the failure names the contract, not an apt error.
-      # ORCA_REQUIRE_FISH re-checks this at test time; this step just fails in seconds
+      # GIRRA_REQUIRE_FISH re-checks this at test time; this step just fails in seconds
       # instead of after a full dependency install.
       - name: Require fish 4+
         run: |
@@ -501,7 +501,7 @@ jobs:
       # Why the runner's Google Chrome and not its chromium: Ubuntu 24.04 only ships an
       # AppArmor userns profile for the Chrome .deb, so chromium dies with "No usable
       # sandbox" and the provider passes no --no-sandbox. Why fail instead of skip: an
-      # unset ORCA_BROWSER_EXECUTABLE is exactly how this test went uncovered for so long.
+      # unset GIRRA_BROWSER_EXECUTABLE is exactly how this test went uncovered for so long.
       - name: Resolve Chrome for the browser provider
         run: |
           set -euo pipefail
@@ -511,7 +511,7 @@ jobs:
             exit 1
           fi
           "$chrome" --version
-          echo "ORCA_BROWSER_EXECUTABLE=$chrome" >> "$GITHUB_ENV"
+          echo "GIRRA_BROWSER_EXECUTABLE=$chrome" >> "$GITHUB_ENV"
 
       - name: Test external Chromium browser provider
         run: |
@@ -610,7 +610,7 @@ jobs:
 
       - name: Package unpacked app
         env:
-          ORCA_REUSE_PREPARED_NATIVE_RUNTIME: '1'
+          GIRRA_REUSE_PREPARED_NATIVE_RUNTIME: '1'
         # PR artifacts are only inspected locally; gzip avoids release-size xz compression.
         run: >-
           pnpm exec electron-builder --config config/electron-builder.config.cjs
@@ -736,7 +736,7 @@ jobs:
 
       - name: Build package inputs
         env:
-          ORCA_REUSE_WINDOWS_CLI_LAUNCHER: '1'
+          GIRRA_REUSE_WINDOWS_CLI_LAUNCHER: '1'
         run: pnpm run build:release:parallel
 
       - name: Restore compiled Electron native modules
@@ -753,7 +753,7 @@ jobs:
 
       - name: Package unpacked app
         env:
-          ORCA_REUSE_PREPARED_NATIVE_RUNTIME: '1'
+          GIRRA_REUSE_PREPARED_NATIVE_RUNTIME: '1'
         run: pnpm exec electron-builder --config config/electron-builder.config.cjs --dir
 
       - name: Smoke packaged Windows PTY native capability

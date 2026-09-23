@@ -30,11 +30,11 @@ describe('AgentHookServer OpenCode lifecycle', () => {
     return {
       server,
       post: (payload, launchToken, paneKey = PANE) =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/opencode`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/opencode`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify({
             paneKey,

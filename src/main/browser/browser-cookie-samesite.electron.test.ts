@@ -206,7 +206,7 @@ async function runFixture(): Promise<{ fixture: FixtureResult; sourceShape: Sour
       : electronArgs
   const run = spawnSync(executable, args, {
     encoding: 'utf8',
-    env: { ...env, ORCA_BACKGROUND_LAUNCH: '1' },
+    env: { ...env, GIRRA_BACKGROUND_LAUNCH: '1' },
     timeout: 90_000
   })
   const fixtureResult = existsSync(resultPath) ? readFileSync(resultPath, 'utf8') : 'no result'

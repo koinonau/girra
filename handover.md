@@ -83,13 +83,13 @@ Until a tracker exists, the phases in the build plan are the backlog.
 
 ## Commands
 
-Run in this repository through mise, so Node 24 and pnpm 12 apply: prefix each with `mise exec --`, or use a shell where `mise activate` has run. Set `ORCA_BACKGROUND_LAUNCH=1` for tests, as `AGENTS.md` requires, so Electron windows stay hidden.
+Run in this repository through mise, so Node 24 and pnpm 12 apply: prefix each with `mise exec --`, or use a shell where `mise activate` has run. Set `GIRRA_BACKGROUND_LAUNCH=1` for tests, as `AGENTS.md` requires, so Electron windows stay hidden.
 
 | Purpose | Command |
 |---|---|
 | Install | `mise exec -- pnpm install --frozen-lockfile` |
 | Typecheck | `mise exec -- pnpm tc`, an alias of `pnpm typecheck`. Narrower: `tc:node`, `tc:cli`, `tc:web` |
-| Unit tests | `ORCA_BACKGROUND_LAUNCH=1 mise exec -- pnpm test`, or append file paths (Vitest, `config/vitest.config.ts`) |
+| Unit tests | `GIRRA_BACKGROUND_LAUNCH=1 mise exec -- pnpm test`, or append file paths (Vitest, `config/vitest.config.ts`) |
 | Lint | `mise exec -- pnpm lint` for everything. `pnpm run check:code-quality:changed` for changed files |
 | Format | `mise exec -- pnpm format` |
 | Build | `mise exec -- pnpm build`, desktop and native |
@@ -119,7 +119,7 @@ stays because hook scripts and SSH hosts on disk still call it.
 writes both names from one script, and copies the compiled `orca.exe` to
 `girra.exe` on Windows. `orca` keeps the primary slot because a host reached by a
 client that predates this install has only that one, and
-`ssh-remote-cli-host-passthrough.ts:116` still pins `ORCA_CLI_COMMAND=orca` to
+`ssh-remote-cli-host-passthrough.ts:116` still pins `GIRRA_CLI_COMMAND=orca` to
 match. So `orca <verb>` in `src/main/ssh` help text is correct, not stale.
 
 **The install is best-effort, which is why the CLI also rewrites the name.**
@@ -133,7 +133,7 @@ whatever `resolveOrchestrationCliExecutable` says the caller has, on both the
 human and `--json` paths.
 
 `resolveOrchestrationCliExecutable` (`src/cli/runtime/orchestration-recovery-command.ts`)
-is how a caller learns its own name: `ORCA_CLI_COMMAND` first, then `girra-dev`
+is how a caller learns its own name: `GIRRA_CLI_COMMAND` first, then `girra-dev`
 in a dev checkout, then `girra`. `src/cli/orchestration-mutation-recovery.ts`
 already uses it, rebuilding the recovery command from the caller's own
 executable rather than trusting the name the runtime wrote.
@@ -408,7 +408,7 @@ Electron app and is **not** part of `pnpm test`; the 349 spec files under
 `tests/e2e/` had never executed here, and `e2e.yml` is dispatch-only with Actions
 off.
 
-Run it windowless: `ORCA_BACKGROUND_LAUNCH=1 SKIP_BUILD=1 pnpm exec playwright test
+Run it windowless: `GIRRA_BACKGROUND_LAUNCH=1 SKIP_BUILD=1 pnpm exec playwright test
 --config tests/playwright.config.ts --project=electron-headless`. Omit `SKIP_BUILD`
 after a source change, because the suite needs its own `--mode e2e` build that
 exposes `window.__store`. Switch native modules first with
@@ -432,14 +432,14 @@ The 42 deterministic failures, as classified on 2026-09-19:
 | Stale assertions from the rename | 9 | Fixed 2026-09-20; the two `POINTER_COMMAND` constants said `orca-dev`, the app prints `girra-dev` |
 | Specs for deleted features | 3 | Deleted 2026-09-20: `voice-microphone-selection` (2) and `dictation-indicator`, both for voice input, gone in Phase 2 |
 | This laptop's `~/.zshrc` | 3 | Not a fork defect, proved 2026-09-20. Line 67 is `export PATH="/usr/local/bin:…"` with no `$PATH`, so it discards the stub directory the agent goldens prepend, and the stub is then `command not found`. Overriding `agentCmdOverrides.claude` with the stub's **absolute path** launches it in 5.6 s while the bare name still fails, so only `PATH` resolution is broken, not agent launch |
-| `ORCA_BACKGROUND_LAUNCH` refusing a reveal | 2 | The guard working. Both specs need native focus or a visible window, which `AGENTS.md` keeps off the user's desktop |
+| `GIRRA_BACKGROUND_LAUNCH` refusing a reveal | 2 | The guard working. Both specs need native focus or a visible window, which `AGENTS.md` keeps off the user's desktop |
 | ~~Docker absent~~ | 0 | Wrong on 2026-09-19. Docker 29.5.2 was running the whole time and the image builds in 31 s; the build failed only under the load-53 window. `ephemeral-vm-provisioned-root` now fails a visibility assertion instead, so it moved to unattributed |
 | Specs that need a runner's env vars | 2 | `paired-startup-exec-readiness` passes in the terminal-parking lane and `remote-session-bulk-open-freeze-repro` in its own; both fail in a plain suite run because no shard sets their gates |
 | ~~Unattributed~~ | 0 | All 23 attributed on 2026-09-22 by the upstream A/B below: 12 pre-existing, 10 stale "Orca" text in specs (fixed), 1 flaky |
 
 ### Docker-gated lanes, 2026-09-21
 
-26 specs self-skip without `ORCA_E2E_SSH_DOCKER`, so they never ran here either. Docker
+26 specs self-skip without `GIRRA_E2E_SSH_DOCKER`, so they never ran here either. Docker
 29.5.2 runs them fine. Run each lane on its own: parallel Electron plus containers is
 what poisoned the first suite run.
 
@@ -459,11 +459,11 @@ the `girra`-beside-`orca` shim from [#33](https://github.com/koinonau/girra/pull
 which nothing else exercises end to end.
 
 `--grep-invert=@headful` matters: the runner lists the `electron-headful` project, and
-under `ORCA_BACKGROUND_LAUNCH=1` a headful spec fails on the reveal guard rather than
+under `GIRRA_BACKGROUND_LAUNCH=1` a headful spec fails on the reveal guard rather than
 showing a window.
 
 **Nested runtime has never run in any CI, upstream or here** — its gate,
-`ORCA_E2E_NESTED_RUNTIME_SSH`, is set by no workflow, and `run-ssh-docker-e2e.mjs` says
+`GIRRA_E2E_NESTED_RUNTIME_SSH`, is set by no workflow, and `run-ssh-docker-e2e.mjs` says
 so in its own comments. Both failures are behavioural, not stale assertions: a dialog
 stays visible when the spec expects it hidden, and a renamed file never reaches a paired
 client's explorer. Three more tests in the lifecycle file never ran, because Playwright
@@ -482,8 +482,8 @@ run is now accounted for, and none is a defect the fork put into the product.
 
 Method: a detached worktree at `orca-full-history` (Orca `403b62a8d`, the fork point),
 its own `node_modules`, and the same specs under the same conditions Girra failed them —
-one worker, `ORCA_BACKGROUND_LAUNCH=1`. Telemetry off with `DO_NOT_TRACK=1` and
-`ORCA_TELEMETRY_DISABLED=1`; upstream crashpad runs with `uploadToServer: false` and no
+one worker, `GIRRA_BACKGROUND_LAUNCH=1`. Telemetry off with `DO_NOT_TRACK=1` and
+`GIRRA_TELEMETRY_DISABLED=1`; upstream crashpad runs with `uploadToServer: false` and no
 submit URL, and an unpackaged build runs no updater, so the run cannot phone home. A
 passing upstream test that Girra fails is a regression; a test failing on both is not.
 The install took 7 s because pnpm hardlinks from the shared store. The worktree was
@@ -529,7 +529,7 @@ First run 2026-09-22. Dispatch with `gh workflow run mac-build.yml --repo koinon
 
 Verified again on this laptop from the downloaded DMG: `codesign --verify --deep --strict` valid; authority `Developer ID Application: Shane Dolley (6LWM9PW77S)` with a secure timestamp and the hardened runtime; Gatekeeper `accepted, source=Notarized Developer ID`; stapled ticket valid.
 
-**The packaged app boots.** Launched windowless from a copy, with home and user data isolated through `ORCA_E2E_USER_DATA_DIR` and `ORCA_E2E_HOME_DIR`, it reached the landing page with title `Girra` and wordmark `GIRRA`, logged no console errors, and exited 0. **First run against a real profile is still untested,** on purpose: it writes to live state and can raise macOS prompts, so the user should open the DMG themselves.
+**The packaged app boots.** Launched windowless from a copy, with home and user data isolated through `GIRRA_E2E_USER_DATA_DIR` and `GIRRA_E2E_HOME_DIR`, it reached the landing page with title `Girra` and wordmark `GIRRA`, logged no console errors, and exited 0. **First run against a real profile is still untested,** on purpose: it writes to live state and can raise macOS prompts, so the user should open the DMG themselves.
 
 ## Environment
 
@@ -584,7 +584,7 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-15: delete the main-thread hang watchdog with telemetry. Its worker only wrote a marker that the telemetry event read.
 - 2026-09-15: keep the startup payload field named `telemetry` (`agent_kind`, `launch_source`, `request_kind`). Terminal colour-query replies, tab launch agents and the Windows focus guard read it. Renaming it is Phase 7 work at most.
 - 2026-09-15: remove telemetry-only RPC params (`telemetrySource` on `terminal.split` and `worktree.create`). Neither schema is strict, so older clients that still send the field have it stripped; a test for each proves it.
-- 2026-09-15: the Privacy settings section now holds only local diagnostics. Its copy still says diagnostics go to support, and observability still honours `ORCA_TELEMETRY_DISABLED`; both wait for Phase 7.
+- 2026-09-15: the Privacy settings section now holds only local diagnostics. Its copy still says diagnostics go to support, and observability still honours `GIRRA_TELEMETRY_DISABLED`; both wait for Phase 7.
 - 2026-09-15: Phase 4a deletes only hook integrations. The 14 agents stay launchable, with title-based status, until the launch roster decision below. AI Vault session resume for them still works; it never used hooks.
 - 2026-09-15: drop Cursor's workspace trust bypass as the feature tree says, and keep Copilot's trust preset and Claude's `DEVIN_PROJECT_DIR` guard while those agents stay launchable.
 - 2026-09-15: leave the PowerShell execution-policy bypass in `windows-powershell-hook-launcher.ts`. Only Copilot's removed `.ps1` hook needed it, but it is part of an antivirus-scored payload documented in `docs/reference/windows-edr-posture.md`.
@@ -626,10 +626,10 @@ All 2026-09-13 unless dated otherwise.
 - 2026-09-16: the workflow prune keeps four workflows. `e2e.yml` is dispatch only, so `pr.yml` no longer runs end-to-end specs and the changed-spec routing that fed it is gone. `mac-build.yml` builds an arm64 DMG on `macos-latest`, signs and notarizes it with the five Apple secrets, verifies the staple before uploading, and publishes nothing. The dev channels, the release cut, the Homebrew bump and the Windows signing rehearsal are gone, along with the release scripts and `.github` actions only they used. Neither the credentials nor the notary round trip can be verified until Actions is on.
 - 2026-09-16 (user): a packaged Girra does not adopt the installed Orca.app's profile. The two stay separate, so Orca keeps working and Girra never touches another app's live data.
 - 2026-09-16: what the rename actually breaks, measured rather than assumed. The dev profile keeps its own directory (`orca-dev`, pinned in `configure-process.ts`), and Windows and Linux resolve their user-data directory from `package.json`'s `name`, still `orca`, because the file carries no `productName`. So only macOS moves, and a packaged Girra has no earlier profile of its own. The one real loss is the macOS safe-storage key, which Electron names after the app.
-- 2026-09-16: instead of a bulk re-encryption, `decryptSealedSecret` in `src/main/host/legacy-orca-safe-storage.ts` reads the old key when the current one fails: it finds the pre-rename keychain item, derives Chromium's PBKDF2 key and decrypts the `v10` AES-128-CBC blob. Every secret path routes through it (the secret store port, both MiniMax stores, plugin secrets). Nothing is rewritten, so a failed read loses nothing and the next save reseals under the new key. `ORCA_CLAUDE_SERVICE` keeps its Orca name for the same reason: renaming it would orphan every managed Claude account behind a keychain prompt.
+- 2026-09-16: instead of a bulk re-encryption, `decryptSealedSecret` in `src/main/host/legacy-orca-safe-storage.ts` reads the old key when the current one fails: it finds the pre-rename keychain item, derives Chromium's PBKDF2 key and decrypts the `v10` AES-128-CBC blob. Every secret path routes through it (the secret store port, both MiniMax stores, plugin secrets). Nothing is rewritten, so a failed read loses nothing and the next save reseals under the new key. `GIRRA_CLAUDE_SERVICE` keeps its Orca name for the same reason: renaming it would orphan every managed Claude account behind a keychain prompt.
 - 2026-09-16: `TERM_PROGRAM` stays `'Orca'`. Nothing in the repo reads it; the readers are third-party tools that feature-gate on the value.
 - 2026-09-16: the CLI is `girra`, with `orca`, `orca-ide` and `orca-dev` shipped as aliases in the same directory every managed terminal puts on `PATH`, so hook scripts and SSH hosts written against the old name keep working. `girra` and `girra-dev` are normalised to the legacy token before crossing the orchestration RPC wire, because an older host's strict enum would reject them.
-- 2026-09-16: two string pairs are parsed as well as displayed, so their text and their parser moved together: `ORCA_DISPATCH_STATUS_PREAMBLE_PREFIX` with `orchestration/preamble.ts`, and `ORCA_LINE_PREFIX` with the truncation marker in `journal-payload-bounds.ts`. A capital-only sweep also misses lowercased copies compared with `toLowerCase()` or an `/i` regex; three existed in `src/shared`.
+- 2026-09-16: two string pairs are parsed as well as displayed, so their text and their parser moved together: `GIRRA_DISPATCH_STATUS_PREAMBLE_PREFIX` with `orchestration/preamble.ts`, and `GIRRA_LINE_PREFIX` with the truncation marker in `journal-payload-bounds.ts`. A capital-only sweep also misses lowercased copies compared with `toLowerCase()` or an `/i` regex; three existed in `src/shared`.
 - Keep Claude, OpenCode, Pi and MiniMax credentials. Drop Codex and 13 minor agent CLIs.
 - Drop the mobile companion, Orca cloud profiles, telemetry, crash submission, the updater, voice input, marketing pages, product tours and onboarding.
 - Drop artifacts and skill sharing, which publish to `share.onorca.dev`. Skill install stays.
@@ -644,7 +644,7 @@ All 2026-09-13 unless dated otherwise.
 - **DECIDED 2026-09-18 (user): install `girra` on SSH hosts, and rewrite the name at the CLI seam as well.** Kept below for the reasoning. The second half was added because the shim install is best-effort by design: `ssh-relay-session.ts:1065` warns rather than failing the connection, since it can fail on a `MaxSessions=1` remote, so a host with an old `orca`-only shim can keep it across a connect.
 - ~~**The 39 runtime strings that name a command.**~~ The main process builds `nextSteps`, `recovery` and `recoveryCommand` strings saying `orca <verb>`, and they reach a caller that may be local, where the command is `girra`, or on an SSH host, where it is `orca`. Counted 2026-09-18 across `src/main`, excluding tests and comments: 15 in the Linear write and lookup commands, 11 in orchestration worker receipts and releases, 6 in the browser CDP paths, 2 in the emulator, and 5 elsewhere. Three options.
   1. **Rewrite at the CLI output seam.** The runtime writes `girra` canonically and `src/cli/cli-error.ts` substitutes `resolveOrchestrationCliExecutable(process.env)` on both the human and `--json` paths. Costs one helper and two call sites, plus care not to rewrite prose that legitimately says Girra. Buys one canonical name in the runtime and the existing precedent in `orchestration-mutation-recovery.ts`.
-  2. **Install `girra` on SSH hosts too,** then sweep the strings plainly. `createRemoteCliInstallPlan` writes one shim; writing the same launcher again as `girra` and flipping the passthrough's `ORCA_CLI_COMMAND` makes one name correct everywhere. Costs a compatibility window for a host whose shim an older client installed, which the remote-wire rules cover, and it changes what lands on remote machines. Buys no per-message machinery at all.
+  2. **Install `girra` on SSH hosts too,** then sweep the strings plainly. `createRemoteCliInstallPlan` writes one shim; writing the same launcher again as `girra` and flipping the passthrough's `GIRRA_CLI_COMMAND` makes one name correct everywhere. Costs a compatibility window for a host whose shim an older client installed, which the remote-wire rules cover, and it changes what lands on remote machines. Buys no per-message machinery at all.
   3. **Leave them as `orca`.** Costs telling the local majority a name the documentation no longer uses. Buys nothing.
 
   Answered: 2 plus 1. Raised and answered 2026-09-18.

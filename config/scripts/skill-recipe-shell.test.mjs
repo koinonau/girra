@@ -16,7 +16,7 @@ const cleanup = vercel.match(/```bash\n(cleanup_snapshot\(\) \{[\s\S]*?\n\})\n``
 async function runShell(script, env = {}) {
   try {
     const output = await run('bash', ['-c', script], {
-      env: { ...process.env, ORCA_BACKGROUND_LAUNCH: '1', ...env }
+      env: { ...process.env, GIRRA_BACKGROUND_LAUNCH: '1', ...env }
     })
     return { ...output, code: 0 }
   } catch (error) {
@@ -58,7 +58,7 @@ exit 0`)
 
   it('disables Git prompts when the Vercel token is absent', async () => {
     const prefix = vercel.match(
-      /-- bash -lc 'set -euo pipefail; cd "\$ORCA_PROJECT_ROOT"; \\\n([\s\S]*?)    git fetch/u
+      /-- bash -lc 'set -euo pipefail; cd "\$GIRRA_PROJECT_ROOT"; \\\n([\s\S]*?)    git fetch/u
     )?.[1]
     expect(prefix).toBeDefined()
     const result = await runShell(

@@ -13,22 +13,22 @@ __orca_usable_zdotdir() {
   done
   return 1
 }
-if __orca_usable_zdotdir "${ORCA_ORIG_ZDOTDIR:-}"; then
-  builtin export ZDOTDIR="$ORCA_ORIG_ZDOTDIR"
+if __orca_usable_zdotdir "${GIRRA_ORIG_ZDOTDIR:-}"; then
+  builtin export ZDOTDIR="$GIRRA_ORIG_ZDOTDIR"
 else
   builtin unset ZDOTDIR
 fi
-builtin unset ORCA_ORIG_ZDOTDIR ORCA_ZSHENV_SOURCE_DIR
+builtin unset GIRRA_ORIG_ZDOTDIR GIRRA_ZSHENV_SOURCE_DIR
 builtin unfunction __orca_usable_zdotdir
 builtin typeset -ga _orca_shell_features
-_orca_shell_features=(${(s:,:)${ORCA_SHELL_FEATURES:-}})
-builtin unset ORCA_SHELL_FEATURES
-# Why ORCA_HISTFILE is consumed HERE and not in the deferred hook: a user config
+_orca_shell_features=(${(s:,:)${GIRRA_SHELL_FEATURES:-}})
+builtin unset GIRRA_SHELL_FEATURES
+# Why GIRRA_HISTFILE is consumed HERE and not in the deferred hook: a user config
 # that replaces precmd_functions wholesale drops the hook, and an exported value
 # nothing will ever consume is then inherited by every child of this pane,
 # including a nested Girra (#11146). Captured non-exported, it cannot escape.
-builtin typeset -g _orca_histfile="${ORCA_HISTFILE:-}"
-builtin unset ORCA_HISTFILE
+builtin typeset -g _orca_histfile="${GIRRA_HISTFILE:-}"
+builtin unset GIRRA_HISTFILE
 __orca_has_feature() { (( ${_orca_shell_features[(Ie)$1]} )) }
 __orca_has_feature identity && printf "\033]777;orca-shell-start:%s\007" "$$"
 __orca_osc133_precmd() {
@@ -63,14 +63,14 @@ __orca_deferred_init() {
   if __orca_has_feature overlay; then
     # Why: ~/.zshrc can export the user's default OpenCode config after spawn.
     __orca_restore_agent_teams_path() {
-      [[ -n "${ORCA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0
+      [[ -n "${GIRRA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0
       case "$PATH" in
-        "${ORCA_AGENT_TEAMS_SHIM_DIR}"|"${ORCA_AGENT_TEAMS_SHIM_DIR}:"*) return 0 ;;
+        "${GIRRA_AGENT_TEAMS_SHIM_DIR}"|"${GIRRA_AGENT_TEAMS_SHIM_DIR}:"*) return 0 ;;
       esac
-      export PATH="${ORCA_AGENT_TEAMS_SHIM_DIR}:$PATH"
+      export PATH="${GIRRA_AGENT_TEAMS_SHIM_DIR}:$PATH"
     }
     __orca_restore_agent_teams_path
-    [[ -n "${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${ORCA_OPENCODE_CONFIG_DIR}"
+    [[ -n "${GIRRA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${GIRRA_OPENCODE_CONFIG_DIR}"
   fi
   if [[ -n "${_orca_histfile:-}" ]]; then
     HISTFILE="$_orca_histfile"

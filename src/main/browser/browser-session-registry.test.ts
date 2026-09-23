@@ -37,9 +37,9 @@ import { setupGoogleAuthUserAgentOverride } from './browser-session-ua'
 import { setBrowserNetworkProxySettingsResolver } from './browser-session-proxy'
 import { handleElectronProxyLogin } from '../network/electron-proxy-credentials'
 import { applyProxySettingsToSession } from '../network/proxy-settings'
-import { ORCA_BROWSER_PARTITION } from '../../shared/constants'
+import { GIRRA_BROWSER_PARTITION } from '../../shared/constants'
 import {
-  DEFAULT_LOCAL_ORCA_PROFILE_ID,
+  DEFAULT_LOCAL_GIRRA_PROFILE_ID,
   getOrcaProfileBrowserDefaultPartition,
   getOrcaProfileBrowserSessionPartition
 } from '../../shared/orca-profiles'
@@ -72,11 +72,11 @@ describe('BrowserSessionRegistry', () => {
     const defaultProfile = browserSessionRegistry.getDefaultProfile()
     expect(defaultProfile.id).toBe('default')
     expect(defaultProfile.scope).toBe('default')
-    expect(defaultProfile.partition).toBe(ORCA_BROWSER_PARTITION)
+    expect(defaultProfile.partition).toBe(GIRRA_BROWSER_PARTITION)
   })
 
   it('allows the default partition', () => {
-    expect(browserSessionRegistry.isAllowedPartition(ORCA_BROWSER_PARTITION)).toBe(true)
+    expect(browserSessionRegistry.isAllowedPartition(GIRRA_BROWSER_PARTITION)).toBe(true)
   })
 
   it('rejects unknown partitions', () => {
@@ -88,7 +88,7 @@ describe('BrowserSessionRegistry', () => {
     expect(profile).not.toBeNull()
     expect(profile!.scope).toBe('isolated')
     expect(profile!.partition).toMatch(/^persist:orca-browser-session-/)
-    expect(profile!.partition).not.toBe(ORCA_BROWSER_PARTITION)
+    expect(profile!.partition).not.toBe(GIRRA_BROWSER_PARTITION)
     expect(profile!.label).toBe('Test Isolated')
     expect(profile!.source).toBeNull()
   })
@@ -221,21 +221,21 @@ describe('BrowserSessionRegistry', () => {
   })
 
   it('resolves default partition for null/undefined profileId', () => {
-    expect(browserSessionRegistry.resolvePartition(null)).toBe(ORCA_BROWSER_PARTITION)
-    expect(browserSessionRegistry.resolvePartition(undefined)).toBe(ORCA_BROWSER_PARTITION)
+    expect(browserSessionRegistry.resolvePartition(null)).toBe(GIRRA_BROWSER_PARTITION)
+    expect(browserSessionRegistry.resolvePartition(undefined)).toBe(GIRRA_BROWSER_PARTITION)
   })
 
   it('resolves default partition for unknown profileId', () => {
-    expect(browserSessionRegistry.resolvePartition('nonexistent')).toBe(ORCA_BROWSER_PARTITION)
+    expect(browserSessionRegistry.resolvePartition('nonexistent')).toBe(GIRRA_BROWSER_PARTITION)
   })
 
   it('strictly resolves known profile partitions without downgrading unknown profiles', async () => {
     const profile = await browserSessionRegistry.createProfile('isolated', 'Strict Resolve')
     expect(profile).not.toBeNull()
 
-    expect(browserSessionRegistry.resolveKnownPartition(null)).toBe(ORCA_BROWSER_PARTITION)
-    expect(browserSessionRegistry.resolveKnownPartition(undefined)).toBe(ORCA_BROWSER_PARTITION)
-    expect(browserSessionRegistry.resolveKnownPartition('default')).toBe(ORCA_BROWSER_PARTITION)
+    expect(browserSessionRegistry.resolveKnownPartition(null)).toBe(GIRRA_BROWSER_PARTITION)
+    expect(browserSessionRegistry.resolveKnownPartition(undefined)).toBe(GIRRA_BROWSER_PARTITION)
+    expect(browserSessionRegistry.resolveKnownPartition('default')).toBe(GIRRA_BROWSER_PARTITION)
     expect(browserSessionRegistry.resolveKnownPartition(profile!.id)).toBe(profile!.partition)
     expect(browserSessionRegistry.resolveKnownPartition('missing-profile')).toBeNull()
   })
@@ -514,7 +514,7 @@ describe('BrowserSessionRegistry', () => {
     expect(browserSessionRegistry.getDefaultProfile().partition).toBe(
       getOrcaProfileBrowserDefaultPartition(orcaProfileId)
     )
-    expect(browserSessionRegistry.isAllowedPartition(ORCA_BROWSER_PARTITION)).toBe(false)
+    expect(browserSessionRegistry.isAllowedPartition(GIRRA_BROWSER_PARTITION)).toBe(false)
 
     const profile = await browserSessionRegistry.createProfile('isolated', 'Work Browser')
     expect(profile).not.toBeNull()
@@ -523,7 +523,7 @@ describe('BrowserSessionRegistry', () => {
     )
 
     browserSessionRegistry.configureForOrcaProfile({
-      orcaProfileId: DEFAULT_LOCAL_ORCA_PROFILE_ID,
+      orcaProfileId: DEFAULT_LOCAL_GIRRA_PROFILE_ID,
       profileDirectory: '/profiles/local-default'
     })
   })

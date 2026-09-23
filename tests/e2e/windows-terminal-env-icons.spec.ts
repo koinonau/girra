@@ -19,7 +19,7 @@ test.describe('Windows terminal env and shell identity', () => {
     await waitForActiveTerminalManager(orcaPage)
 
     const ptyId = await waitForActivePanePtyId(orcaPage)
-    const marker = `__ORCA_E2E_NODE_PATH_${Date.now()}__`
+    const marker = `__GIRRA_E2E_NODE_PATH_${Date.now()}__`
 
     // Why: before the dev PATH fallback, daemon-spawned PTYs could get PATH set
     // to only Orca's dev CLI bin. A real terminal command catches that failure.

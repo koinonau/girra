@@ -6,7 +6,7 @@ import {
   makeHookTestRepo,
   TEST_GITIGNORE_PATH,
   TEST_ISSUE_COMMAND_PATH,
-  TEST_REPO_ORCA_YAML_PATH,
+  TEST_REPO_GIRRA_YAML_PATH,
   TEST_REPO_PATH
 } from './hooks-test-fixtures'
 
@@ -41,13 +41,13 @@ describe('readIssueCommand', () => {
   it('prefers the local override over the shared orca.yaml command', async () => {
     const fs = await import('node:fs')
     vi.mocked(fs.existsSync).mockImplementation(
-      (path) => path === TEST_ISSUE_COMMAND_PATH || path === TEST_REPO_ORCA_YAML_PATH
+      (path) => path === TEST_ISSUE_COMMAND_PATH || path === TEST_REPO_GIRRA_YAML_PATH
     )
     vi.mocked(fs.readFileSync).mockImplementation((path) => {
       if (path === TEST_ISSUE_COMMAND_PATH) {
         return 'local command\n'
       }
-      if (path === TEST_REPO_ORCA_YAML_PATH) {
+      if (path === TEST_REPO_GIRRA_YAML_PATH) {
         return 'issueCommand: |\n  shared command\n'
       }
       return ''
@@ -65,9 +65,9 @@ describe('readIssueCommand', () => {
 
   it('falls back to the shared orca.yaml command when no local override exists', async () => {
     const fs = await import('node:fs')
-    vi.mocked(fs.existsSync).mockImplementation((path) => path === TEST_REPO_ORCA_YAML_PATH)
+    vi.mocked(fs.existsSync).mockImplementation((path) => path === TEST_REPO_GIRRA_YAML_PATH)
     vi.mocked(fs.readFileSync).mockImplementation((path) => {
-      if (path === TEST_REPO_ORCA_YAML_PATH) {
+      if (path === TEST_REPO_GIRRA_YAML_PATH) {
         return 'issueCommand: |\n  shared command\n'
       }
       return ''

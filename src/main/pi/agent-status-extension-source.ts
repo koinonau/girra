@@ -3,7 +3,7 @@
 // etc.). To get pi panes into the unified agent-hooks pipeline alongside
 // Claude and OpenCode, we ship a bundled extension into
 // the Pi extension dir (PiTitlebarExtensionService) that POSTs to
-// /hook/pi using the same ORCA_AGENT_HOOK_* + ORCA_PANE_KEY env that every
+// /hook/pi using the same GIRRA_AGENT_HOOK_* + GIRRA_PANE_KEY env that every
 // PTY already receives from ipc/pty.ts.
 //
 // Each Pi process gets its own paneKey through env. Like the OpenCode plugin,
@@ -13,7 +13,7 @@
 import { getPiAgentStatusHandlerSourceLines } from './agent-status-handler-source'
 import { getPiAgentStatusWslCurlSourceLines } from './agent-status-wsl-curl-source'
 
-export const ORCA_PI_AGENT_STATUS_EXTENSION_FILE = 'orca-agent-status.ts'
+export const GIRRA_PI_AGENT_STATUS_EXTENSION_FILE = 'orca-agent-status.ts'
 
 export function getPiAgentStatusExtensionSource(): string {
   // Why: keep this string self-contained — it runs inside the pi process,
@@ -65,7 +65,7 @@ export function getPiAgentStatusExtensionSource(): string {
     'let cachedEndpointValues: Record<string, string> | null = null',
     '',
     'function readEndpointFile(): Record<string, string> | null {',
-    '  const path = process.env.ORCA_AGENT_HOOK_ENDPOINT',
+    '  const path = process.env.GIRRA_AGENT_HOOK_ENDPOINT',
     '  if (!path) return null',
     '  try {',
     "    const fs = require('fs')",
@@ -105,10 +105,10 @@ export function getPiAgentStatusExtensionSource(): string {
     'function resolveHookCoords() {',
     '  const fileEnv = readEndpointFile() || {}',
     '  return {',
-    '    port: fileEnv.ORCA_AGENT_HOOK_PORT || process.env.ORCA_AGENT_HOOK_PORT,',
-    '    token: fileEnv.ORCA_AGENT_HOOK_TOKEN || process.env.ORCA_AGENT_HOOK_TOKEN,',
-    "    env: fileEnv.ORCA_AGENT_HOOK_ENV || process.env.ORCA_AGENT_HOOK_ENV || '',",
-    "    version: fileEnv.ORCA_AGENT_HOOK_VERSION || process.env.ORCA_AGENT_HOOK_VERSION || '',",
+    '    port: fileEnv.GIRRA_AGENT_HOOK_PORT || process.env.GIRRA_AGENT_HOOK_PORT,',
+    '    token: fileEnv.GIRRA_AGENT_HOOK_TOKEN || process.env.GIRRA_AGENT_HOOK_TOKEN,',
+    "    env: fileEnv.GIRRA_AGENT_HOOK_ENV || process.env.GIRRA_AGENT_HOOK_ENV || '',",
+    "    version: fileEnv.GIRRA_AGENT_HOOK_VERSION || process.env.GIRRA_AGENT_HOOK_VERSION || '',",
     '  }',
     '}',
     '',
@@ -136,14 +136,14 @@ export function getPiAgentStatusExtensionSource(): string {
     '',
     'async function postOnce(hookEventName: string, extra: Record<string, unknown>): Promise<void> {',
     '  const coords = resolveHookCoords()',
-    '  const paneKey = process.env.ORCA_PANE_KEY',
+    '  const paneKey = process.env.GIRRA_PANE_KEY',
     '  if (!coords.port || !coords.token || !paneKey) return',
     '  const url = `http://127.0.0.1:${coords.port}/hook/pi`',
     '  const body = JSON.stringify({',
     '    paneKey,',
-    "    launchToken: process.env.ORCA_AGENT_LAUNCH_TOKEN || '',",
-    "    tabId: process.env.ORCA_TAB_ID || '',",
-    "    worktreeId: process.env.ORCA_WORKTREE_ID || '',",
+    "    launchToken: process.env.GIRRA_AGENT_LAUNCH_TOKEN || '',",
+    "    tabId: process.env.GIRRA_TAB_ID || '',",
+    "    worktreeId: process.env.GIRRA_WORKTREE_ID || '',",
     '    env: coords.env,',
     '    version: coords.version,',
     '    payload: { hook_event_name: hookEventName, ...getPersistedSessionMetadata(), ...extra },',

@@ -108,7 +108,7 @@ export const ROOT_HELP_TEXT_SECONDARY = [
   '',
   'Behavior:',
   '  Most commands require a running Girra runtime. If Girra is not open yet, run `girra open` first.',
-  '  Remote runtime access can also be supplied with ORCA_PAIRING_CODE or ORCA_ENVIRONMENT.',
+  '  Remote runtime access can also be supplied with GIRRA_PAIRING_CODE or GIRRA_ENVIRONMENT.',
   '  Use selectors for discovery and handles for repeated live terminal operations.',
   '',
   'Agent Sessions And Worktrees:',

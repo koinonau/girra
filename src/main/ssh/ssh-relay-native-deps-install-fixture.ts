@@ -66,13 +66,13 @@ const STAGE_OWNER = '.sftp-namespace-00000000000000000000000000000000'
 
 export function makeStagedFirstInstallExecPrefix(): ExecResponse[] {
   return [
-    '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+    '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
     '/home/u',
     '', // bounded stale-stage recovery
-    `__ORCA_UPLOAD_STAGE_SLOT__${STAGE_OWNER}:slot-0`,
+    `__GIRRA_UPLOAD_STAGE_SLOT__${STAGE_OWNER}:slot-0`,
     '', // chmod staged node
     '', // final install namespace marker
-    `__ORCA_UPLOAD_STAGE_PROMOTION__${STAGE_OWNER}:PROMOTED`,
+    `__GIRRA_UPLOAD_STAGE_PROMOTION__${STAGE_OWNER}:PROMOTED`,
     // Shared native-deps cache probe; an empty answer is a miss, so the per-directory install runs.
     ''
   ]
@@ -82,7 +82,7 @@ export function makeStagedFirstInstallExecPrefix(): ExecResponse[] {
 // cannot compile node-pty, so the caller's resets must survive into the node-pty-less reinstall.
 export function makeRepairToolchainSkipExecResponses(): ExecResponse[] {
   return [
-    '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+    '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
     '/home/u',
     BOTH_NATIVE_DEPS_MISSING_PROBE, // health probe before lock
     BOTH_NATIVE_DEPS_MISSING_PROBE, // re-probe under the repair lock

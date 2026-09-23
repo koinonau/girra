@@ -18,7 +18,7 @@ export type LogStreamChild = ChildProcessByStdio<null, Readable, Readable>
  */
 
 /** Why: terminals run from the detached helper, which TCC can hold responsible independently. */
-const ORCA_RESPONSIBLE_IDENTIFIERS = new Set([
+const GIRRA_RESPONSIBLE_IDENTIFIERS = new Set([
   'com.koinonau.girra',
   'com.koinonau.girra.helper',
   'com.koinonau.girra.dev',
@@ -75,7 +75,7 @@ export function parseTccPromptEvent(line: string): TccPromptEvent | null {
 /** True when this dialog is one macOS raised in Girra's name for a watched file-access service. */
 export function isOrcaAttributedPrompt(event: TccPromptEvent): boolean {
   return (
-    ORCA_RESPONSIBLE_IDENTIFIERS.has(event.responsibleIdentifier) &&
+    GIRRA_RESPONSIBLE_IDENTIFIERS.has(event.responsibleIdentifier) &&
     WATCHED_SERVICES.has(event.service)
   )
 }

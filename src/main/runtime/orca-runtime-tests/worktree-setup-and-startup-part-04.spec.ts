@@ -280,8 +280,8 @@ describe('OrcaRuntimeService', () => {
     vi.mocked(createSetupRunnerScript).mockReturnValue({
       runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-startup-setup-split'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-startup-setup-split'
       },
       waitForAgentStartup: true
     })
@@ -321,9 +321,9 @@ describe('OrcaRuntimeService', () => {
         cwd: '/tmp/workspaces/runtime-startup-setup-split',
         command: expect.stringContaining('bash /tmp/repo/.git/orca/setup-runner.sh'),
         env: expect.objectContaining({
-          ORCA_ROOT_PATH: '/tmp/repo',
-          ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-startup-setup-split',
-          ORCA_WORKTREE_ID: result.worktree.id
+          GIRRA_ROOT_PATH: '/tmp/repo',
+          GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-startup-setup-split',
+          GIRRA_WORKTREE_ID: result.worktree.id
         }),
         worktreeId: result.worktree.id
       })
@@ -351,15 +351,15 @@ describe('OrcaRuntimeService', () => {
       state: 'running',
       terminalHandle: expect.stringMatching(/^term_/)
     })
-    expect(mainEnv.ORCA_TAB_ID).toBeDefined()
-    expect(mainEnv.ORCA_PANE_KEY).toBeDefined()
-    expect(setupEnv.ORCA_TAB_ID).toBe(mainEnv.ORCA_TAB_ID)
-    const mainLeafId = mainEnv.ORCA_PANE_KEY!.slice(`${mainEnv.ORCA_TAB_ID!}:`.length)
+    expect(mainEnv.GIRRA_TAB_ID).toBeDefined()
+    expect(mainEnv.GIRRA_PANE_KEY).toBeDefined()
+    expect(setupEnv.GIRRA_TAB_ID).toBe(mainEnv.GIRRA_TAB_ID)
+    const mainLeafId = mainEnv.GIRRA_PANE_KEY!.slice(`${mainEnv.GIRRA_TAB_ID!}:`.length)
     expect(revealTerminalSession).toHaveBeenLastCalledWith(
       result.worktree.id,
       expect.objectContaining({
         ptyId: 'pty-startup-split-setup',
-        tabId: mainEnv.ORCA_TAB_ID,
+        tabId: mainEnv.GIRRA_TAB_ID,
         activate: false,
         splitFromLeafId: mainLeafId,
         splitDirection: 'vertical'
@@ -407,8 +407,8 @@ describe('OrcaRuntimeService', () => {
       runnerScriptPath: 'C:\\tmp\\repo\\.git\\orca\\setup-runner.sh',
       shell: { family: 'posix', executable: 'wsl.exe' },
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-startup-setup-retry'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-startup-setup-retry'
       },
       waitForAgentStartup: true
     })

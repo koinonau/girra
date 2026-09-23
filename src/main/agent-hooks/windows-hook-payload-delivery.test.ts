@@ -134,7 +134,7 @@ function seedCmdAutoRunTarget(home: string): void {
 
 function hookEnvironment(extra: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   const base = Object.fromEntries(
-    Object.entries(process.env).filter(([key]) => !key.startsWith('ORCA_'))
+    Object.entries(process.env).filter(([key]) => !key.startsWith('GIRRA_') && !key.startsWith('ORCA_'))
   )
   return { ...base, ...extra }
 }
@@ -188,9 +188,9 @@ describe.skipIf(process.platform !== 'win32')('Windows managed hook payload deli
     const env = hookEnvironment({
       USERPROFILE: home,
       HOME: home,
-      ORCA_AGENT_HOOK_PORT: String(listener.port),
-      ORCA_AGENT_HOOK_TOKEN: HOOK_TOKEN,
-      ORCA_PANE_KEY: PANE_KEY
+      GIRRA_AGENT_HOOK_PORT: String(listener.port),
+      GIRRA_AGENT_HOOK_TOKEN: HOOK_TOKEN,
+      GIRRA_PANE_KEY: PANE_KEY
     })
 
     const shells = [

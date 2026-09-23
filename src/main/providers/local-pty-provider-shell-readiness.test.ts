@@ -164,11 +164,11 @@ describe('LocalPtyProvider', () => {
       await provider.spawn({
         cols: 80,
         rows: 24,
-        env: { ORCA_POSIX_SHELL_STARTUP_COMMAND: 'poisoned command' }
+        env: { GIRRA_POSIX_SHELL_STARTUP_COMMAND: 'poisoned command' }
       })
 
       const spawnEnv = spawnMock.mock.calls.at(-1)?.[2].env
-      expect(spawnEnv.ORCA_POSIX_SHELL_STARTUP_COMMAND).toBeUndefined()
+      expect(spawnEnv.GIRRA_POSIX_SHELL_STARTUP_COMMAND).toBeUndefined()
       expect(mockProc.write).not.toHaveBeenCalled()
     })
 

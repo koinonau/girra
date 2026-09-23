@@ -44,7 +44,7 @@ it('native Playwright test-list preserves full discovery, serial suites, skips a
         '--reporter=json',
         ...extra
       ],
-      env: { ...process.env, ORCA_BACKGROUND_LAUNCH: '1' },
+      env: { ...process.env, GIRRA_BACKGROUND_LAUNCH: '1' },
       timeoutMs: 20000
     })
     expect(result.code, result.stderr).toBe(0)

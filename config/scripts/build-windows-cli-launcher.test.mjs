@@ -117,7 +117,7 @@ describe('Windows CLI launcher', () => {
   argv: process.argv.slice(2),
   electronRunAsNode: process.env.ELECTRON_RUN_AS_NODE,
   nodeOptions: process.env.NODE_OPTIONS ?? null,
-  orcaNodeOptions: process.env.ORCA_NODE_OPTIONS ?? null
+  orcaNodeOptions: process.env.GIRRA_NODE_OPTIONS ?? null
 }))\n`,
         'utf8'
       )
@@ -136,15 +136,15 @@ describe('Windows CLI launcher', () => {
           '-NoProfile',
           '-NonInteractive',
           '-Command',
-          '& $env:ORCA_TEST_LAUNCHER orchestration send --body $env:ORCA_TEST_BODY --json'
+          '& $env:GIRRA_TEST_LAUNCHER orchestration send --body $env:GIRRA_TEST_BODY --json'
         ],
         {
           encoding: 'utf8',
           env: {
             ...process.env,
             NODE_OPTIONS: '--no-warnings',
-            ORCA_TEST_BODY: body,
-            ORCA_TEST_LAUNCHER: launcherPath
+            GIRRA_TEST_BODY: body,
+            GIRRA_TEST_LAUNCHER: launcherPath
           }
         }
       )
@@ -181,7 +181,7 @@ describe('Windows CLI launcher', () => {
       copyFileSync(process.execPath, join(appRoot, 'Girra.exe'))
       writeFileSync(
         cliPath,
-        `require('node:fs').writeFileSync(process.env.ORCA_TEST_OUTPUT, JSON.stringify({
+        `require('node:fs').writeFileSync(process.env.GIRRA_TEST_OUTPUT, JSON.stringify({
   electronRunAsNode: process.env.ELECTRON_RUN_AS_NODE,
   pathKeys: Object.keys(process.env).filter((key) => key.toLowerCase() === 'path')
 }))\n`,

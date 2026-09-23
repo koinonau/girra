@@ -19,6 +19,7 @@ import type { TerminalWorkspaceLaunchScope } from './runtime-legacy-worker-termi
 import { resolveTerminalStartupCwd } from '../../shared/terminal-startup-cwd'
 import type { ResolvedTerminalWorkspaceLaunchTarget } from './orca-runtime-core'
 import { AGENT_HOOK_RUNTIME_ENV_KEYS } from './orca-runtime-core'
+import { legacyOrcaEnvName } from '../../shared/legacy-orca-env-aliases'
 import { FLOATING_TERMINAL_WORKTREE_ID } from '../../shared/constants'
 import { homedir } from 'node:os'
 import { getExplicitWorktreeIdSelector } from './runtime-worktree-selection'
@@ -165,23 +166,27 @@ export class OrcaRuntimeWithResolveBrowserNetworkExecutionHostForWorktree extend
     const cleanBaseEnv = { ...baseEnv }
     for (const key of AGENT_HOOK_RUNTIME_ENV_KEYS) {
       delete cleanBaseEnv[key]
+      const legacy = legacyOrcaEnvName(key)
+      if (legacy !== null) {
+        delete cleanBaseEnv[legacy]
+      }
     }
     const env = {
       ...cleanBaseEnv,
       ...agentTeamsEnv,
       ...this.buildAgentHookPtyEnv?.(),
-      ORCA_PANE_KEY: paneKey,
-      ORCA_TAB_ID: tabId,
-      ORCA_WORKTREE_ID: scope.id
+      GIRRA_PANE_KEY: paneKey,
+      GIRRA_TAB_ID: tabId,
+      GIRRA_WORKTREE_ID: scope.id
     }
     if (!scope.folderWorkspace) {
       return env
     }
     return {
       ...env,
-      ORCA_WORKSPACE_ID: scope.id,
-      ORCA_PROJECT_GROUP_ID: scope.folderWorkspace.projectGroupId,
-      ORCA_WORKSPACE_ROOT: scope.folderWorkspace.folderPath
+      GIRRA_WORKSPACE_ID: scope.id,
+      GIRRA_PROJECT_GROUP_ID: scope.folderWorkspace.projectGroupId,
+      GIRRA_WORKSPACE_ROOT: scope.folderWorkspace.folderPath
     }
   }
 

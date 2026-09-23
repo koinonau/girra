@@ -4,7 +4,7 @@ import { requireTuiAgentConfig } from './require-tui-agent-config'
 
 describe('requireTuiAgentConfig', () => {
   it('returns the config for a known agent', () => {
-    expect(requireTuiAgentConfig('pi').draftPromptEnvVar).toBe('ORCA_PI_PREFILL')
+    expect(requireTuiAgentConfig('pi').draftPromptEnvVar).toBe('GIRRA_PI_PREFILL')
   })
 
   it('names the unknown id instead of throwing a property-of-undefined error', () => {

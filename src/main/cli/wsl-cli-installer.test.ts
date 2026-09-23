@@ -38,19 +38,19 @@ function makeHostStatus(
 const PRE_RC4_MANAGED_WSL_LAUNCHER = `#!/usr/bin/env bash
 set -euo pipefail
 # Orca managed WSL CLI launcher
-# ORCA_WIN_LAUNCHER_B64=QzpcUHJvZ3JhbSBGaWxlc1xPcmNhXHJlc291cmNlc1xiaW5cb3JjYS5jbWQ=
-ORCA_WIN_LAUNCHER='C:\\Program Files\\Orca\\resources\\bin\\orca.cmd'
-ORCA_BRIDGE_PS1='/home/alice/.local/share/orca/orca-wsl-bridge.ps1'
+# GIRRA_WIN_LAUNCHER_B64=QzpcUHJvZ3JhbSBGaWxlc1xPcmNhXHJlc291cmNlc1xiaW5cb3JjYS5jbWQ=
+GIRRA_WIN_LAUNCHER='C:\\Program Files\\Orca\\resources\\bin\\orca.cmd'
+GIRRA_BRIDGE_PS1='/home/alice/.local/share/orca/orca-wsl-bridge.ps1'
 if command -v powershell.exe >/dev/null 2>&1; then
-  ORCA_POWERSHELL=powershell.exe
+  GIRRA_POWERSHELL=powershell.exe
 elif [ -x /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe ]; then
-  ORCA_POWERSHELL=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+  GIRRA_POWERSHELL=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
 else
   echo "Orca WSL CLI requires Windows interop and could not find powershell.exe." >&2
   exit 1
 fi
-ORCA_BRIDGE_PS1_WIN=$(wslpath -w "$ORCA_BRIDGE_PS1")
-exec "$ORCA_POWERSHELL" -NoProfile -ExecutionPolicy Bypass -File "$ORCA_BRIDGE_PS1_WIN" "$ORCA_WIN_LAUNCHER" "$@"
+GIRRA_BRIDGE_PS1_WIN=$(wslpath -w "$GIRRA_BRIDGE_PS1")
+exec "$GIRRA_POWERSHELL" -NoProfile -ExecutionPolicy Bypass -File "$GIRRA_BRIDGE_PS1_WIN" "$GIRRA_WIN_LAUNCHER" "$@"
 `
 
 function createWslRunner(
@@ -96,13 +96,13 @@ function createWslRunner(
         files.has(bridgePath) &&
         !files.get(bridgePath)?.includes('# Orca managed WSL CLI PowerShell bridge')
       ) {
-        throw new Error('__ORCA_CONFLICT__')
+        throw new Error('__GIRRA_CONFLICT__')
       }
       const launcher =
-        command.match(/cat > "\$command_tmp" <<'ORCA_WSL_CLI'\n([\s\S]*)\nORCA_WSL_CLI/)?.[1] ?? ''
+        command.match(/cat > "\$command_tmp" <<'GIRRA_WSL_CLI'\n([\s\S]*)\nGIRRA_WSL_CLI/)?.[1] ?? ''
       const bridge =
         command.match(
-          /cat > "\$bridge_tmp" <<'ORCA_WSL_BRIDGE'\n([\s\S]*)\nORCA_WSL_BRIDGE/
+          /cat > "\$bridge_tmp" <<'GIRRA_WSL_BRIDGE'\n([\s\S]*)\nGIRRA_WSL_BRIDGE/
         )?.[1] ?? ''
       files.set(commandPath, launcher)
       files.set(bridgePath, bridge)
@@ -120,7 +120,7 @@ function createWslRunner(
           files.has(bridgePath) &&
           !files.get(bridgePath)?.includes('# Orca managed WSL CLI PowerShell bridge')
         ) {
-          throw new Error('__ORCA_CONFLICT__')
+          throw new Error('__GIRRA_CONFLICT__')
         }
         files.delete(commandPath)
         files.delete(bridgePath)
@@ -135,13 +135,13 @@ function createWslRunner(
     }
     if (command.includes('cat ')) {
       if (command.includes(commandPath)) {
-        return files.get(commandPath) ?? '__ORCA_MISSING__'
+        return files.get(commandPath) ?? '__GIRRA_MISSING__'
       }
       if (command.includes(bridgePath)) {
-        return files.get(bridgePath) ?? '__ORCA_MISSING__'
+        return files.get(bridgePath) ?? '__GIRRA_MISSING__'
       }
       if (command.includes(legacyCommandPath)) {
-        return files.get(legacyCommandPath) ?? '__ORCA_MISSING__'
+        return files.get(legacyCommandPath) ?? '__GIRRA_MISSING__'
       }
     }
     throw new Error(`Unexpected WSL command: ${command}`)
@@ -322,15 +322,15 @@ describe('WslCliInstaller', () => {
     expect(launcher).toContain(
       'Orca WSL CLI requires Windows interop and could not find powershell.exe.'
     )
-    expect(launcher).toContain('"$ORCA_POWERSHELL" -NoProfile -ExecutionPolicy Bypass -File')
-    expect(launcher).toContain('ORCA_WSL_CWD=$(pwd -P 2>/dev/null) || {')
-    expect(launcher).toContain('ORCA_WSL_CWD=/')
+    expect(launcher).toContain('"$GIRRA_POWERSHELL" -NoProfile -ExecutionPolicy Bypass -File')
+    expect(launcher).toContain('GIRRA_WSL_CWD=$(pwd -P 2>/dev/null) || {')
+    expect(launcher).toContain('GIRRA_WSL_CWD=/')
     expect(launcher).toContain('cd /')
-    expect(launcher).toContain('ORCA_WSL_CWD_WIN=$(wslpath -w "$ORCA_WSL_CWD")')
-    expect(launcher.indexOf('ORCA_WSL_CWD=$(pwd -P')).toBeLessThan(
-      launcher.indexOf('ORCA_BRIDGE_PS1_WIN=$(wslpath')
+    expect(launcher).toContain('GIRRA_WSL_CWD_WIN=$(wslpath -w "$GIRRA_WSL_CWD")')
+    expect(launcher.indexOf('GIRRA_WSL_CWD=$(pwd -P')).toBeLessThan(
+      launcher.indexOf('GIRRA_BRIDGE_PS1_WIN=$(wslpath')
     )
-    expect(launcher).toContain('"$ORCA_WIN_LAUNCHER" -WslCwd "$ORCA_WSL_CWD_WIN" "$@"')
+    expect(launcher).toContain('"$GIRRA_WIN_LAUNCHER" -WslCwd "$GIRRA_WSL_CWD_WIN" "$@"')
     expect(launcher).not.toContain('-Command')
     expect(bridge).not.toContain('[CmdletBinding')
     expect(bridge).not.toMatch(/^param\(/m)
@@ -339,7 +339,7 @@ describe('WslCliInstaller', () => {
     expect(bridge).toContain('$WslCwd = $args[2]')
     expect(bridge).toContain('$ForwardArgs = @($args[$ForwardArgStart..($args.Count - 1)])')
     expect(bridge).toContain('if ([string]::IsNullOrEmpty($WslCwd))')
-    expect(bridge).toContain('$env:ORCA_CLI_CWD = $WslCwd')
+    expect(bridge).toContain('$env:GIRRA_CLI_CWD = $WslCwd')
     expect(bridge).toContain('$LauncherDirectory = Split-Path -Parent $OrcaLauncher')
     expect(bridge).toContain('Push-Location -LiteralPath $LauncherDirectory')
     // Why (#16463): Push-Location moves only the PowerShell provider location.
@@ -354,7 +354,7 @@ describe('WslCliInstaller', () => {
     expect(bridge).toContain('$Process.WaitForExit()')
     expect(bridge).toContain('$exitCode = $Process.ExitCode')
     expect(bridge).not.toContain('& $OrcaLauncher @ForwardArgs')
-    expect(bridge).toContain('Remove-Item Env:ORCA_CLI_CWD -ErrorAction SilentlyContinue')
+    expect(bridge).toContain('Remove-Item Env:GIRRA_CLI_CWD -ErrorAction SilentlyContinue')
     expect(bridge).toContain('catch')
     expect(bridge).toContain('$exitCode = 1')
     expect(bridge).toContain('exit $exitCode')
@@ -775,7 +775,7 @@ describe('WslCliInstaller', () => {
     await expect(installer.repairManagedRegistration()).resolves.toMatchObject({ changed: true })
     await expect(installer.repairManagedRegistration()).resolves.toMatchObject({ changed: false })
     expect(wsl.calls.filter((command) => command.includes('cat > "$command_tmp"'))).toHaveLength(1)
-    expect(wsl.getFile()).toContain("ORCA_WIN_LAUNCHER='D:\\Custom Orca\\resources\\bin\\orca.exe'")
+    expect(wsl.getFile()).toContain("GIRRA_WIN_LAUNCHER='D:\\Custom Orca\\resources\\bin\\orca.exe'")
   })
 
   it('settles when wsl.exe never reports completion', async () => {
@@ -827,12 +827,40 @@ describe('WslCliInstaller', () => {
           return 'user bridge'
         }
         if (command.includes('rm -f')) {
-          throw new Error('__ORCA_CONFLICT__')
+          throw new Error('__GIRRA_CONFLICT__')
         }
         return wsl.runner(distro, command)
       }
     })
 
-    await expect(installer.remove()).rejects.toThrow('__ORCA_CONFLICT__')
+    await expect(installer.remove()).rejects.toThrow('__GIRRA_CONFLICT__')
+  })
+})
+
+describe('parseManagedLauncherTarget across the GIRRA_ rename', () => {
+  const target = 'C:\\Program Files\\Girra\\resources\\bin\\girra.cmd'
+  const encoded = Buffer.from(target, 'utf8').toString('base64')
+
+  it('reads a launcher this build wrote', () => {
+    expect(
+      _internals.parseManagedLauncherTarget(`#!/bin/sh\n# GIRRA_WIN_LAUNCHER_B64=${encoded}\n`)
+    ).toBe(target)
+  })
+
+  // Why: the guest keeps whichever launcher the installing build wrote, and a
+  // pre-rename one says ORCA_. Misreading it reinstalls over a working shim.
+  it('reads a launcher a build before the rename wrote', () => {
+    expect(
+      _internals.parseManagedLauncherTarget(`#!/bin/sh\n# ORCA_WIN_LAUNCHER_B64=${encoded}\n`)
+    ).toBe(target)
+  })
+
+  it('reads the older unencoded form under either prefix', () => {
+    expect(_internals.parseManagedLauncherTarget("GIRRA_WIN_LAUNCHER='/usr/bin/girra'\n")).toBe(
+      '/usr/bin/girra'
+    )
+    expect(_internals.parseManagedLauncherTarget("ORCA_WIN_LAUNCHER='/usr/bin/orca'\n")).toBe(
+      '/usr/bin/orca'
+    )
   })
 })

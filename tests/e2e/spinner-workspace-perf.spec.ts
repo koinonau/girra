@@ -23,13 +23,13 @@ import {
 import { sampleCpu } from '../tools/benchmarks/spinner-rendering/sample-cpu.mjs'
 import { traceIterations } from '../tools/benchmarks/spinner-rendering/trace-iterations.mjs'
 
-const enabled = process.env.ORCA_SPINNER_BENCH === '1'
-const sampleMs = Number(process.env.ORCA_SPINNER_SAMPLE_MS ?? 10000)
-const rounds = Number(process.env.ORCA_SPINNER_ROUNDS ?? 4)
-const keyCount = Number(process.env.ORCA_SPINNER_KEYS ?? 48)
+const enabled = process.env.GIRRA_SPINNER_BENCH === '1'
+const sampleMs = Number(process.env.GIRRA_SPINNER_SAMPLE_MS ?? 10000)
+const rounds = Number(process.env.GIRRA_SPINNER_ROUNDS ?? 4)
+const keyCount = Number(process.env.GIRRA_SPINNER_KEYS ?? 48)
 // Avoid phase-locking keystrokes to the 200 ms status burst or 60 Hz frames.
-const keyCadenceMs = Number(process.env.ORCA_SPINNER_KEY_CADENCE_MS ?? 113)
-const variants = (process.env.ORCA_SPINNER_VARIANTS ?? 'original,long').split(',')
+const keyCadenceMs = Number(process.env.GIRRA_SPINNER_KEY_CADENCE_MS ?? 113)
+const variants = (process.env.GIRRA_SPINNER_VARIANTS ?? 'original,long').split(',')
 if (enabled) {
   for (const [name, value, minimum] of [
     ['sample duration', sampleMs, 1000],
@@ -57,7 +57,7 @@ const scenarios = [
 
 test.use({
   seedTestRepo: false,
-  orcaAppExtraEnv: { ORCA_BACKGROUND_LAUNCH: '1' },
+  orcaAppExtraEnv: { GIRRA_BACKGROUND_LAUNCH: '1' },
   orcaAppExtraArgs: [
     '--disable-backgrounding-occluded-windows',
     '--disable-renderer-backgrounding'
@@ -74,7 +74,7 @@ for (const scenario of scenarios) {
     registerPostElectronShutdownCleanup
   }, testInfo) => {
     test.setTimeout(900_000)
-    const output = path.resolve(process.env.ORCA_SPINNER_OUTPUT ?? '.bench-fixtures/spinner-app')
+    const output = path.resolve(process.env.GIRRA_SPINNER_OUTPUT ?? '.bench-fixtures/spinner-app')
     mkdirSync(output, { recursive: true })
     const fixture = await createSpinnerRepository(scenario.worktrees)
     registerPostElectronShutdownCleanup(async () =>
@@ -131,7 +131,7 @@ for (const scenario of scenarios) {
     )
     const cdp = await page.context().newCDPSession(page)
     await cdp.send('Performance.enable')
-    for (let round = 0; round < (process.env.ORCA_SPINNER_CPU === '0' ? 0 : rounds); round++) {
+    for (let round = 0; round < (process.env.GIRRA_SPINNER_CPU === '0' ? 0 : rounds); round++) {
       const order = round % 2 ? variants.toReversed() : variants
       for (const variant of order) {
         await setSpinnerVariant(page, variant)

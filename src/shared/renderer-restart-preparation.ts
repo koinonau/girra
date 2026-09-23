@@ -1,11 +1,11 @@
 import {
-  ORCA_EDITOR_PREPARE_HOT_EXIT_EVENT,
+  GIRRA_EDITOR_PREPARE_HOT_EXIT_EVENT,
   type EditorPrepareHotExitDetail
 } from './editor-save-events'
 import {
   consumeShutdownCheckpointFailureReason,
-  ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
-  ORCA_RENDERER_SHUTDOWN_CHECKPOINT_FAILED_EVENT
+  GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT,
+  GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_FAILED_EVENT
 } from './renderer-shutdown-events'
 
 export type AppRestartPrepOptions = {
@@ -19,7 +19,7 @@ function requestEditorHotExitBackup(eventTarget: EventTarget): Promise<void> {
   return new Promise<void>((resolve, reject) => {
     let claimed = false
     eventTarget.dispatchEvent(
-      new CustomEvent<EditorPrepareHotExitDetail>(ORCA_EDITOR_PREPARE_HOT_EXIT_EVENT, {
+      new CustomEvent<EditorPrepareHotExitDetail>(GIRRA_EDITOR_PREPARE_HOT_EXIT_EVENT, {
         detail: {
           claim: () => {
             claimed = true
@@ -53,7 +53,7 @@ export async function prepareRendererForAppRestart(
       checkpointFailed = true
     }
     eventTarget.addEventListener(
-      ORCA_RENDERER_SHUTDOWN_CHECKPOINT_FAILED_EVENT,
+      GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_FAILED_EVENT,
       markCheckpointFailed
     )
     try {
@@ -61,7 +61,7 @@ export async function prepareRendererForAppRestart(
       eventTarget.dispatchEvent(new Event('beforeunload', { cancelable: true }))
     } finally {
       eventTarget.removeEventListener(
-        ORCA_RENDERER_SHUTDOWN_CHECKPOINT_FAILED_EVENT,
+        GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_FAILED_EVENT,
         markCheckpointFailed
       )
     }
@@ -83,7 +83,7 @@ export async function prepareRendererForAppRestart(
     // retry-then-degrade budget that the next user attempt must consume.
     eventTarget.dispatchEvent(
       new Event(
-        checkpointFailed ? ORCA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT : abortedEventName
+        checkpointFailed ? GIRRA_RENDERER_SHUTDOWN_CHECKPOINT_ABORTED_EVENT : abortedEventName
       )
     )
     throw error

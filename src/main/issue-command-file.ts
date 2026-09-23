@@ -3,11 +3,11 @@ import { readFileSync, existsSync, mkdirSync, writeFileSync, rmSync } from 'node
 import { join } from 'node:path'
 import { loadHooks } from './hooks'
 
-const ORCA_DIR = '.orca'
+const GIRRA_DIR = '.orca'
 const ISSUE_COMMAND_FILENAME = 'issue-command'
 
 export function getIssueCommandFilePath(repoPath: string): string {
-  return join(repoPath, ORCA_DIR, ISSUE_COMMAND_FILENAME)
+  return join(repoPath, GIRRA_DIR, ISSUE_COMMAND_FILENAME)
 }
 
 export function getSharedIssueCommand(repoPath: string): string | null {
@@ -64,7 +64,7 @@ export function writeIssueCommand(repoPath: string, content: string): void {
       return
     }
 
-    const orcaDir = join(repoPath, ORCA_DIR)
+    const orcaDir = join(repoPath, GIRRA_DIR)
     if (!existsSync(orcaDir)) {
       mkdirSync(orcaDir, { recursive: true })
     }

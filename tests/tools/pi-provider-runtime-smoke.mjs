@@ -91,7 +91,7 @@ try {
         WINDIR: process.env.WINDIR,
         HOME: scratch,
         USERPROFILE: scratch,
-        ORCA_BACKGROUND_LAUNCH: '1',
+        GIRRA_BACKGROUND_LAUNCH: '1',
         PI_CODING_AGENT_DIR: dir
       },
       input: planned.plan.stdinPayload,

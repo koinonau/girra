@@ -89,7 +89,7 @@ const LIVE_UNENUMERABLE_PROBE = [
 
 function queueAliveSocketThenProbe(): void {
   vi.mocked(execCommand)
-    .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+    .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
     .mockResolvedValueOnce('/home/user')
     .mockResolvedValueOnce('ORCA-NATIVE-DEPS-OK')
     .mockResolvedValueOnce('') // launch namespace marker
@@ -109,7 +109,7 @@ function launchedDaemon(conn: SshConnection): boolean {
 describe('deployAndLaunchRelay honours the incumbent verdict', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(execCommand).mockReset().mockResolvedValue('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+    vi.mocked(execCommand).mockReset().mockResolvedValue('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
     vi.mocked(waitForSentinel).mockReset()
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.spyOn(console, 'log').mockImplementation(() => {})
@@ -136,7 +136,7 @@ describe('deployAndLaunchRelay honours the incumbent verdict', () => {
   it('still launches fresh when the socket probe itself fails', async () => {
     const conn = makeMockConnection()
     vi.mocked(execCommand)
-      .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       .mockResolvedValueOnce('/home/user')
       .mockResolvedValueOnce('ORCA-NATIVE-DEPS-OK')
       .mockResolvedValueOnce('') // launch namespace marker

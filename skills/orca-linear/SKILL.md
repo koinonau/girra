@@ -16,9 +16,10 @@ This discovery stub loads the version-matched guide from the Girra executable us
 
 Choose the executable once and reuse it for every later command:
 
-- If the `ORCA_CLI_COMMAND` environment variable is set, use its value. Girra exports this
-  for managed WSL sessions.
-- Otherwise, in a dev checkout whose session exposes `ORCA_DEV_REPO_ROOT`, use `girra-dev`.
+- If the `GIRRA_CLI_COMMAND` environment variable is set, use its value, and if only the
+  older `ORCA_CLI_COMMAND` is set, use that. Girra exports these for managed WSL sessions.
+- Otherwise, in a dev checkout whose session exposes `GIRRA_DEV_REPO_ROOT` or the older
+  `ORCA_DEV_REPO_ROOT`, use `girra-dev`.
 - Otherwise, use `girra`.
 
 If `girra` is not found, the host predates the rename: fall back to `orca-dev` in a dev

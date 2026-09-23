@@ -11,7 +11,7 @@
  *
  *   Xvfb :65 -extension GLX &
  *   DISPLAY=:65 gnome-shell --nested --wayland     # nested, NOT --headless
- *   ORCA_E2E_NATIVE_IBUS_HANGUL=1 ORCA_E2E_IME_INJECTOR=nested npx playwright test \
+ *   GIRRA_E2E_NATIVE_IBUS_HANGUL=1 GIRRA_E2E_IME_INJECTOR=nested npx playwright test \
  *     tests/e2e/terminal-hangul-terminating-digit-native.spec.ts
  *
  * Nested Wayland prerequisites:
@@ -64,15 +64,15 @@ import {
 } from './terminal-ime-byte-reader'
 
 const NATIVE_COMMAND_TIMEOUT_MS = 10_000
-const REPETITIONS = Number(process.env.ORCA_E2E_DIGIT_REPETITIONS ?? 3)
-const INJECTOR = process.env.ORCA_E2E_IME_INJECTOR ?? 'xdotool'
-const WAYLAND_INJECT = process.env.ORCA_E2E_WAYLAND_INJECT ?? '/tmp/ime15299/wayland-inject.py'
+const REPETITIONS = Number(process.env.GIRRA_E2E_DIGIT_REPETITIONS ?? 3)
+const INJECTOR = process.env.GIRRA_E2E_IME_INJECTOR ?? 'xdotool'
+const WAYLAND_INJECT = process.env.GIRRA_E2E_WAYLAND_INJECT ?? '/tmp/ime15299/wayland-inject.py'
 // The nested compositor is one X11 window; keys land on it and mutter routes
 // them to the focused Wayland client through the IME.
-const NESTED_FOCUS_CMD = process.env.ORCA_E2E_NESTED_FOCUS_CMD ?? '/tmp/ime15299/focus-nested.sh'
+const NESTED_FOCUS_CMD = process.env.GIRRA_E2E_NESTED_FOCUS_CMD ?? '/tmp/ime15299/focus-nested.sh'
 // Dubeolsik: d=ㅇ, k=ㅏ, so `d k` composes 아 and the digit terminates it.
-const KEY_TOKENS = (process.env.ORCA_E2E_DIGIT_KEYS ?? 'd k 1 Return').split(' ').filter(Boolean)
-const EXPECTED_LINE = process.env.ORCA_E2E_DIGIT_EXPECTED ?? '아1'
+const KEY_TOKENS = (process.env.GIRRA_E2E_DIGIT_KEYS ?? 'd k 1 Return').split(' ').filter(Boolean)
+const EXPECTED_LINE = process.env.GIRRA_E2E_DIGIT_EXPECTED ?? '아1'
 
 test.use({
   orcaAppExtraEnv: {
@@ -80,11 +80,11 @@ test.use({
     IBUS_ENABLE_SYNC_MODE: '1',
     QT_IM_MODULE: 'ibus',
     XMODIFIERS: '@im=ibus',
-    ...(process.env.ORCA_E2E_EXTRA_APP_ENV
-      ? (JSON.parse(process.env.ORCA_E2E_EXTRA_APP_ENV) as Record<string, string>)
+    ...(process.env.GIRRA_E2E_EXTRA_APP_ENV
+      ? (JSON.parse(process.env.GIRRA_E2E_EXTRA_APP_ENV) as Record<string, string>)
       : {})
   },
-  orcaAppExtraArgs: (process.env.ORCA_E2E_EXTRA_APP_ARGS ?? '').split(' ').filter(Boolean)
+  orcaAppExtraArgs: (process.env.GIRRA_E2E_EXTRA_APP_ARGS ?? '').split(' ').filter(Boolean)
 })
 
 function injectKeys(tokens: string[]): void {
@@ -126,7 +126,7 @@ function captureNestedScreen(name: string): void {
 
 async function focusNativeTerminalWindow(page: Page): Promise<void> {
   await focusActiveTerminalInput(page)
-  const title = `ORCA_NATIVE_IBUS_${randomUUID()}`
+  const title = `GIRRA_NATIVE_IBUS_${randomUUID()}`
   await page.evaluate((nextTitle) => {
     document.title = nextTitle
   }, title)
@@ -169,7 +169,7 @@ async function writeEvidence(
 }
 
 test.describe('Hangul terminating digit @headful', () => {
-  test.skip(process.env.ORCA_E2E_NATIVE_IBUS_HANGUL !== '1', 'native ibus harness only')
+  test.skip(process.env.GIRRA_E2E_NATIVE_IBUS_HANGUL !== '1', 'native ibus harness only')
 
   test('a digit typed right after a Hangul syllable reaches the pty', async ({
     electronApp,

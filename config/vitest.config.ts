@@ -13,7 +13,7 @@ export default defineConfig({
   },
   test: {
     environment: 'node',
-    ...(process.env.ORCA_BALANCE_UNIT_SHARDS === '1'
+    ...(process.env.GIRRA_BALANCE_UNIT_SHARDS === '1'
       ? { sequence: { sequencer: TimingSequencer } }
       : {}),
     // Why: Node 26's undefined Web Storage globals prevent Vitest from installing happy-dom's.

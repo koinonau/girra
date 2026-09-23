@@ -52,7 +52,7 @@ describe('OrcaRuntimeService', () => {
     const waiting = runtime.waitForSetupTerminalCompletion(handle)
     runtime.onPtyData(
       'pty-setup',
-      'setup failed\r\n__ORCA_SETUP_COMPLETE__:token-live:17\r\nPS>',
+      'setup failed\r\n__GIRRA_SETUP_COMPLETE__:token-live:17\r\nPS>',
       100
     )
 
@@ -76,7 +76,7 @@ describe('OrcaRuntimeService', () => {
     ).setupCompletionTokenByPtyId.set('pty-fast-setup', 'token-fast')
     runtime.onPtyData(
       'pty-fast-setup',
-      '__ORCA_SETUP_COMPLETE__:wrong:9\r\n__ORCA_SETUP_COMPLETE__:token-fast:0\r\n$',
+      '__GIRRA_SETUP_COMPLETE__:wrong:9\r\n__GIRRA_SETUP_COMPLETE__:token-fast:0\r\n$',
       100
     )
 
@@ -125,7 +125,7 @@ describe('OrcaRuntimeService', () => {
 
     const waiting = runtime.waitForSetupTerminalCompletion(handle)
     await Promise.resolve()
-    runtime.onPtyData('pty-uncertain-setup', '__ORCA_SETUP_COMPLETE__:token-uncertain:0\r\n', 100)
+    runtime.onPtyData('pty-uncertain-setup', '__GIRRA_SETUP_COMPLETE__:token-uncertain:0\r\n', 100)
 
     await expect(waiting).resolves.toEqual({ exitCode: 0 })
   })

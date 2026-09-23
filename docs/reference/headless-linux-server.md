@@ -488,17 +488,17 @@ remain active for the whole operation:
 set -euo pipefail
 
 # Replace this example with the release tag you intend to deploy
-ORCA_VERSION=v1.4.147
+GIRRA_VERSION=v1.4.147
 
 # Select the release asset on the server where Girra runs
 case "$(uname -m)" in
   x86_64)
-    ORCA_ASSET=girra-linux.AppImage
-    ORCA_FILE_MACHINE=x86-64
+    GIRRA_ASSET=girra-linux.AppImage
+    GIRRA_FILE_MACHINE=x86-64
     ;;
   aarch64 | arm64)
-    ORCA_ASSET=girra-linux-arm64.AppImage
-    ORCA_FILE_MACHINE='ARM aarch64'
+    GIRRA_ASSET=girra-linux-arm64.AppImage
+    GIRRA_FILE_MACHINE='ARM aarch64'
     ;;
   *)
     echo "Unsupported architecture: $(uname -m)" >&2
@@ -506,10 +506,10 @@ case "$(uname -m)" in
     ;;
 esac
 
-ORCA_ROLLBACK_NEW=
-ORCA_ROLLBACK=
-ORCA_SERVICE_STOPPED=0
-ORCA_BINARY_PROMOTED=0
+GIRRA_ROLLBACK_NEW=
+GIRRA_ROLLBACK=
+GIRRA_SERVICE_STOPPED=0
+GIRRA_BINARY_PROMOTED=0
 recover_failed_upgrade() {
   exit_status=$?
   trap - EXIT
@@ -518,21 +518,21 @@ recover_failed_upgrade() {
     sudo rm -f /opt/orca/girra-linux.AppImage.new /opt/orca/VERSION.new \
       /opt/orca/girra-linux.AppImage.recovering /opt/orca/VERSION.recovering
   fi
-  if ((exit_status != 0)) && [[ -n "$ORCA_ROLLBACK_NEW" ]] && \
-    sudo test -d "$ORCA_ROLLBACK_NEW"; then
-    sudo rm -rf -- "$ORCA_ROLLBACK_NEW"
+  if ((exit_status != 0)) && [[ -n "$GIRRA_ROLLBACK_NEW" ]] && \
+    sudo test -d "$GIRRA_ROLLBACK_NEW"; then
+    sudo rm -rf -- "$GIRRA_ROLLBACK_NEW"
   fi
-  if ((exit_status != 0 && ORCA_SERVICE_STOPPED)); then
+  if ((exit_status != 0 && GIRRA_SERVICE_STOPPED)); then
     recovery_ok=1
-    if ((ORCA_BINARY_PROMOTED)); then
-      if ! sudo cp -a "$ORCA_ROLLBACK/girra-linux.AppImage" \
+    if ((GIRRA_BINARY_PROMOTED)); then
+      if ! sudo cp -a "$GIRRA_ROLLBACK/girra-linux.AppImage" \
         /opt/orca/girra-linux.AppImage.recovering || \
         ! sudo mv -f /opt/orca/girra-linux.AppImage.recovering \
           /opt/orca/girra-linux.AppImage; then
         recovery_ok=0
       fi
-      if sudo test -f "$ORCA_ROLLBACK/VERSION"; then
-        if ! sudo cp -a "$ORCA_ROLLBACK/VERSION" /opt/orca/VERSION.recovering || \
+      if sudo test -f "$GIRRA_ROLLBACK/VERSION"; then
+        if ! sudo cp -a "$GIRRA_ROLLBACK/VERSION" /opt/orca/VERSION.recovering || \
           ! sudo mv -f /opt/orca/VERSION.recovering /opt/orca/VERSION; then
           recovery_ok=0
         fi
@@ -555,37 +555,37 @@ recover_failed_upgrade() {
 trap recover_failed_upgrade EXIT
 
 # 1. Stage and verify the new build while the server stays online
-sudo curl -fL --retry 3 "https://github.com/koinonau/girra/releases/download/${ORCA_VERSION}/${ORCA_ASSET}" \
+sudo curl -fL --retry 3 "https://github.com/koinonau/girra/releases/download/${GIRRA_VERSION}/${GIRRA_ASSET}" \
   -o /opt/orca/girra-linux.AppImage.new
 sudo chown root:root /opt/orca/girra-linux.AppImage.new
 sudo chmod 755 /opt/orca/girra-linux.AppImage.new
 
 # Both checks must match; either grep stops this fail-fast block otherwise
-ORCA_FILE_INFO=$(LC_ALL=C file /opt/orca/girra-linux.AppImage.new)
-grep 'ELF .* executable' <<<"$ORCA_FILE_INFO"
-grep -F "$ORCA_FILE_MACHINE" <<<"$ORCA_FILE_INFO"
+GIRRA_FILE_INFO=$(LC_ALL=C file /opt/orca/girra-linux.AppImage.new)
+grep 'ELF .* executable' <<<"$GIRRA_FILE_INFO"
+grep -F "$GIRRA_FILE_MACHINE" <<<"$GIRRA_FILE_INFO"
 
 # 2. Assemble the prior binary and version in a root-only rollback bundle
-ORCA_ROLLBACK_BASE=/opt/orca/orca-rollback-$(date +%F-%H%M%S-%N)
-ORCA_ROLLBACK_NEW=${ORCA_ROLLBACK_BASE}.new
-ORCA_ROLLBACK=${ORCA_ROLLBACK_BASE}.ready
-sudo install -d -m 700 "$ORCA_ROLLBACK_NEW"
-sudo cp -a /opt/orca/girra-linux.AppImage "$ORCA_ROLLBACK_NEW/girra-linux.AppImage"
+GIRRA_ROLLBACK_BASE=/opt/orca/orca-rollback-$(date +%F-%H%M%S-%N)
+GIRRA_ROLLBACK_NEW=${GIRRA_ROLLBACK_BASE}.new
+GIRRA_ROLLBACK=${GIRRA_ROLLBACK_BASE}.ready
+sudo install -d -m 700 "$GIRRA_ROLLBACK_NEW"
+sudo cp -a /opt/orca/girra-linux.AppImage "$GIRRA_ROLLBACK_NEW/girra-linux.AppImage"
 if sudo test -f /opt/orca/VERSION; then
-  sudo cp -a /opt/orca/VERSION "$ORCA_ROLLBACK_NEW/VERSION"
+  sudo cp -a /opt/orca/VERSION "$GIRRA_ROLLBACK_NEW/VERSION"
 fi
 
 # Stage the new version record before the stop window
-printf '%s\n' "$ORCA_VERSION" | sudo tee /opt/orca/VERSION.new >/dev/null
+printf '%s\n' "$GIRRA_VERSION" | sudo tee /opt/orca/VERSION.new >/dev/null
 sudo chown root:root /opt/orca/VERSION.new
 sudo chmod 644 /opt/orca/VERSION.new
 
 # 3. Stop the server so the profile backup is consistent
-ORCA_SERVICE_STOPPED=1
+GIRRA_SERVICE_STOPPED=1
 sudo systemctl stop orca-serve.service
 
 # Add only Girra-owned profile directories, then publish the complete bundle
-ORCA_PROFILE_DIRS=()
+GIRRA_PROFILE_DIRS=()
 for profile_dir in orca Orca; do
   if sudo test -L "/home/orca/.config/$profile_dir"; then
     echo "Refusing symlinked Girra profile: /home/orca/.config/$profile_dir" >&2
@@ -596,26 +596,26 @@ for profile_dir in orca Orca; do
       sudo test /home/orca/.config/orca -ef /home/orca/.config/Orca; then
       continue
     fi
-    ORCA_PROFILE_DIRS+=("$profile_dir")
+    GIRRA_PROFILE_DIRS+=("$profile_dir")
   fi
 done
-if ((${#ORCA_PROFILE_DIRS[@]} == 0)); then
+if ((${#GIRRA_PROFILE_DIRS[@]} == 0)); then
   echo 'No Girra profile directory found under /home/orca/.config' >&2
   exit 1
 fi
-sudo tar czf "$ORCA_ROLLBACK_NEW/profile.tgz" \
-  -C /home/orca/.config "${ORCA_PROFILE_DIRS[@]}"
-sudo chmod 600 "$ORCA_ROLLBACK_NEW/profile.tgz"
-sudo mv "$ORCA_ROLLBACK_NEW" "$ORCA_ROLLBACK"
+sudo tar czf "$GIRRA_ROLLBACK_NEW/profile.tgz" \
+  -C /home/orca/.config "${GIRRA_PROFILE_DIRS[@]}"
+sudo chmod 600 "$GIRRA_ROLLBACK_NEW/profile.tgz"
+sudo mv "$GIRRA_ROLLBACK_NEW" "$GIRRA_ROLLBACK"
 
 # 4. Atomically replace the binary and version record, then start
-ORCA_BINARY_PROMOTED=1
+GIRRA_BINARY_PROMOTED=1
 sudo mv -f /opt/orca/girra-linux.AppImage.new /opt/orca/girra-linux.AppImage
 sudo mv -f /opt/orca/VERSION.new /opt/orca/VERSION
 # Clears a start-limit hit left by the version being replaced
 sudo systemctl reset-failed orca-serve.service
 sudo systemctl start orca-serve.service
-ORCA_SERVICE_STOPPED=0
+GIRRA_SERVICE_STOPPED=0
 trap - EXIT
 ```
 
@@ -641,12 +641,12 @@ removing it:
 
 ```bash
 shopt -s nullglob
-ORCA_ROLLBACK_SETS=(/opt/orca/orca-rollback-*.ready)
-((${#ORCA_ROLLBACK_SETS[@]} > 0))
-ORCA_ROLLBACK=${ORCA_ROLLBACK_SETS[${#ORCA_ROLLBACK_SETS[@]} - 1]}
-printf 'Removing rollback bundle: %s\n' "$ORCA_ROLLBACK"
-sudo test -d "$ORCA_ROLLBACK"
-sudo rm -rf -- "$ORCA_ROLLBACK"
+GIRRA_ROLLBACK_SETS=(/opt/orca/orca-rollback-*.ready)
+((${#GIRRA_ROLLBACK_SETS[@]} > 0))
+GIRRA_ROLLBACK=${GIRRA_ROLLBACK_SETS[${#GIRRA_ROLLBACK_SETS[@]} - 1]}
+printf 'Removing rollback bundle: %s\n' "$GIRRA_ROLLBACK"
+sudo test -d "$GIRRA_ROLLBACK"
+sudo rm -rf -- "$GIRRA_ROLLBACK"
 ```
 
 Each `.ready` directory is a self-contained rollback generation; never combine
@@ -667,52 +667,52 @@ set -euo pipefail
 
 # Select and validate one complete generation before taking the service offline
 shopt -s nullglob
-ORCA_ROLLBACK_SETS=(/opt/orca/orca-rollback-*.ready)
-((${#ORCA_ROLLBACK_SETS[@]} > 0))
-ORCA_ROLLBACK=${ORCA_ROLLBACK_SETS[${#ORCA_ROLLBACK_SETS[@]} - 1]}
-sudo test -f "$ORCA_ROLLBACK/girra-linux.AppImage"
-sudo tar tzf "$ORCA_ROLLBACK/profile.tgz" >/dev/null
+GIRRA_ROLLBACK_SETS=(/opt/orca/orca-rollback-*.ready)
+((${#GIRRA_ROLLBACK_SETS[@]} > 0))
+GIRRA_ROLLBACK=${GIRRA_ROLLBACK_SETS[${#GIRRA_ROLLBACK_SETS[@]} - 1]}
+sudo test -f "$GIRRA_ROLLBACK/girra-linux.AppImage"
+sudo tar tzf "$GIRRA_ROLLBACK/profile.tgz" >/dev/null
 
 # Extract and validate the old profile while the current server stays online
 sudo test ! -L /home
-ORCA_HOME_OWNER=$(sudo stat -c %u /home)
-ORCA_HOME_MODE=$(sudo stat -c %a /home)
-if [[ "$ORCA_HOME_OWNER" != 0 ]] || ((8#$ORCA_HOME_MODE & 0022)) || \
+GIRRA_HOME_OWNER=$(sudo stat -c %u /home)
+GIRRA_HOME_MODE=$(sudo stat -c %a /home)
+if [[ "$GIRRA_HOME_OWNER" != 0 ]] || ((8#$GIRRA_HOME_MODE & 0022)) || \
   sudo -u orca test -w /home; then
   echo 'Refusing rollback because /home is not root-controlled' >&2
   exit 1
 fi
-ORCA_RESTORE=$(sudo mktemp -d /home/.orca-restore.XXXXXX)
-ORCA_SERVICE_STOPPED=0
-ORCA_MOVED_CURRENT_DIRS=()
-ORCA_INSTALLED_RESTORE_DIRS=()
-ORCA_CURRENT_BINARY_MOVED=0
-ORCA_CURRENT_VERSION_MOVED=0
-ORCA_VERSION_REPLACEMENT_STARTED=0
-ORCA_POST_UPGRADE=
-ORCA_ROLLBACK_BINARY_STAGED=
-ORCA_ROLLBACK_VERSION_STAGED=
-ORCA_ROLLBACK_HAS_VERSION=0
+GIRRA_RESTORE=$(sudo mktemp -d /home/.orca-restore.XXXXXX)
+GIRRA_SERVICE_STOPPED=0
+GIRRA_MOVED_CURRENT_DIRS=()
+GIRRA_INSTALLED_RESTORE_DIRS=()
+GIRRA_CURRENT_BINARY_MOVED=0
+GIRRA_CURRENT_VERSION_MOVED=0
+GIRRA_VERSION_REPLACEMENT_STARTED=0
+GIRRA_POST_UPGRADE=
+GIRRA_ROLLBACK_BINARY_STAGED=
+GIRRA_ROLLBACK_VERSION_STAGED=
+GIRRA_ROLLBACK_HAS_VERSION=0
 restart_after_rollback_error() {
   exit_status=$?
   trap - EXIT
   set +e
-  if ((exit_status != 0 && ORCA_SERVICE_STOPPED)); then
+  if ((exit_status != 0 && GIRRA_SERVICE_STOPPED)); then
     recovery_ok=1
-    if ((${#ORCA_INSTALLED_RESTORE_DIRS[@]})); then
-      for profile_dir in "${ORCA_INSTALLED_RESTORE_DIRS[@]}"; do
+    if ((${#GIRRA_INSTALLED_RESTORE_DIRS[@]})); then
+      for profile_dir in "${GIRRA_INSTALLED_RESTORE_DIRS[@]}"; do
         if sudo test -d "/home/orca/.config/$profile_dir"; then
           if ! sudo mv "/home/orca/.config/$profile_dir" \
-            "$ORCA_RESTORE/$profile_dir.failed"; then
+            "$GIRRA_RESTORE/$profile_dir.failed"; then
             recovery_ok=0
           fi
         fi
       done
     fi
-    if ((${#ORCA_MOVED_CURRENT_DIRS[@]})); then
-      for profile_dir in "${ORCA_MOVED_CURRENT_DIRS[@]}"; do
-        if sudo test -d "$ORCA_POST_UPGRADE/$profile_dir"; then
-          if ! sudo mv "$ORCA_POST_UPGRADE/$profile_dir" /home/orca/.config/; then
+    if ((${#GIRRA_MOVED_CURRENT_DIRS[@]})); then
+      for profile_dir in "${GIRRA_MOVED_CURRENT_DIRS[@]}"; do
+        if sudo test -d "$GIRRA_POST_UPGRADE/$profile_dir"; then
+          if ! sudo mv "$GIRRA_POST_UPGRADE/$profile_dir" /home/orca/.config/; then
             recovery_ok=0
           fi
         elif ! sudo test -d "/home/orca/.config/$profile_dir"; then
@@ -720,27 +720,27 @@ restart_after_rollback_error() {
         fi
       done
     fi
-    if [[ -n "$ORCA_POST_UPGRADE" ]]; then
-      sudo rmdir "$ORCA_POST_UPGRADE" 2>/dev/null || true
+    if [[ -n "$GIRRA_POST_UPGRADE" ]]; then
+      sudo rmdir "$GIRRA_POST_UPGRADE" 2>/dev/null || true
     fi
-    if ((ORCA_CURRENT_BINARY_MOVED)); then
-      if sudo test -f "$ORCA_CURRENT_BINARY"; then
-        if ! sudo mv -f "$ORCA_CURRENT_BINARY" /opt/orca/girra-linux.AppImage; then
+    if ((GIRRA_CURRENT_BINARY_MOVED)); then
+      if sudo test -f "$GIRRA_CURRENT_BINARY"; then
+        if ! sudo mv -f "$GIRRA_CURRENT_BINARY" /opt/orca/girra-linux.AppImage; then
           recovery_ok=0
         fi
       elif ! sudo test -f /opt/orca/girra-linux.AppImage; then
         recovery_ok=0
       fi
     fi
-    if ((ORCA_CURRENT_VERSION_MOVED)); then
-      if sudo test -f "$ORCA_CURRENT_VERSION"; then
-        if ! sudo mv -f "$ORCA_CURRENT_VERSION" /opt/orca/VERSION; then
+    if ((GIRRA_CURRENT_VERSION_MOVED)); then
+      if sudo test -f "$GIRRA_CURRENT_VERSION"; then
+        if ! sudo mv -f "$GIRRA_CURRENT_VERSION" /opt/orca/VERSION; then
           recovery_ok=0
         fi
       elif ! sudo test -f /opt/orca/VERSION; then
         recovery_ok=0
       fi
-    elif ((ORCA_VERSION_REPLACEMENT_STARTED)); then
+    elif ((GIRRA_VERSION_REPLACEMENT_STARTED)); then
       if ! sudo rm -f /opt/orca/VERSION; then
         recovery_ok=0
       fi
@@ -753,59 +753,59 @@ restart_after_rollback_error() {
       echo 'Rollback recovery failed; service remains stopped' >&2
     fi
   fi
-  if [[ -n "$ORCA_ROLLBACK_BINARY_STAGED" ]]; then
-    sudo rm -f -- "$ORCA_ROLLBACK_BINARY_STAGED"
+  if [[ -n "$GIRRA_ROLLBACK_BINARY_STAGED" ]]; then
+    sudo rm -f -- "$GIRRA_ROLLBACK_BINARY_STAGED"
   fi
-  if [[ -n "$ORCA_ROLLBACK_VERSION_STAGED" ]]; then
-    sudo rm -f -- "$ORCA_ROLLBACK_VERSION_STAGED"
+  if [[ -n "$GIRRA_ROLLBACK_VERSION_STAGED" ]]; then
+    sudo rm -f -- "$GIRRA_ROLLBACK_VERSION_STAGED"
   fi
-  sudo rm -rf -- "$ORCA_RESTORE"
+  sudo rm -rf -- "$GIRRA_RESTORE"
   exit "$exit_status"
 }
 trap restart_after_rollback_error EXIT
 
-if [[ "$(sudo stat -c %d "$ORCA_RESTORE")" != \
+if [[ "$(sudo stat -c %d "$GIRRA_RESTORE")" != \
   "$(sudo stat -c %d /home/orca/.config)" ]]; then
   echo 'Refusing rollback because staging and the Girra profile are on different filesystems' >&2
   exit 1
 fi
-sudo tar xzf "$ORCA_ROLLBACK/profile.tgz" -C "$ORCA_RESTORE"
-ORCA_RESTORE_DIRS=()
+sudo tar xzf "$GIRRA_ROLLBACK/profile.tgz" -C "$GIRRA_RESTORE"
+GIRRA_RESTORE_DIRS=()
 for profile_dir in orca Orca; do
-  if sudo test -L "$ORCA_RESTORE/$profile_dir"; then
+  if sudo test -L "$GIRRA_RESTORE/$profile_dir"; then
     echo "Rollback bundle contains a symlinked profile: $profile_dir" >&2
     exit 1
   fi
-  if sudo test -d "$ORCA_RESTORE/$profile_dir"; then
+  if sudo test -d "$GIRRA_RESTORE/$profile_dir"; then
     if [[ "$profile_dir" == Orca ]] && \
-      sudo test "$ORCA_RESTORE/orca" -ef "$ORCA_RESTORE/Orca"; then
+      sudo test "$GIRRA_RESTORE/orca" -ef "$GIRRA_RESTORE/Orca"; then
       continue
     fi
-    ORCA_RESTORE_DIRS+=("$profile_dir")
+    GIRRA_RESTORE_DIRS+=("$profile_dir")
   fi
 done
-if ((${#ORCA_RESTORE_DIRS[@]} == 0)); then
-  echo "Rollback bundle has no Girra profile directories: $ORCA_ROLLBACK" >&2
+if ((${#GIRRA_RESTORE_DIRS[@]} == 0)); then
+  echo "Rollback bundle has no Girra profile directories: $GIRRA_ROLLBACK" >&2
   exit 1
 fi
-for profile_dir in "${ORCA_RESTORE_DIRS[@]}"; do
-  sudo chown -R orca:orca "$ORCA_RESTORE/$profile_dir"
+for profile_dir in "${GIRRA_RESTORE_DIRS[@]}"; do
+  sudo chown -R orca:orca "$GIRRA_RESTORE/$profile_dir"
 done
 
-ORCA_ROLLBACK_STAMP=$(date +%F-%H%M%S-%N)
-ORCA_ROLLBACK_BINARY_STAGED=/opt/orca/girra-linux.AppImage.rollback-staged-$ORCA_ROLLBACK_STAMP
-sudo cp -a "$ORCA_ROLLBACK/girra-linux.AppImage" "$ORCA_ROLLBACK_BINARY_STAGED"
-if sudo test -f "$ORCA_ROLLBACK/VERSION"; then
-  ORCA_ROLLBACK_HAS_VERSION=1
-  ORCA_ROLLBACK_VERSION_STAGED=/opt/orca/VERSION.rollback-staged-$ORCA_ROLLBACK_STAMP
-  sudo cp -a "$ORCA_ROLLBACK/VERSION" "$ORCA_ROLLBACK_VERSION_STAGED"
+GIRRA_ROLLBACK_STAMP=$(date +%F-%H%M%S-%N)
+GIRRA_ROLLBACK_BINARY_STAGED=/opt/orca/girra-linux.AppImage.rollback-staged-$GIRRA_ROLLBACK_STAMP
+sudo cp -a "$GIRRA_ROLLBACK/girra-linux.AppImage" "$GIRRA_ROLLBACK_BINARY_STAGED"
+if sudo test -f "$GIRRA_ROLLBACK/VERSION"; then
+  GIRRA_ROLLBACK_HAS_VERSION=1
+  GIRRA_ROLLBACK_VERSION_STAGED=/opt/orca/VERSION.rollback-staged-$GIRRA_ROLLBACK_STAMP
+  sudo cp -a "$GIRRA_ROLLBACK/VERSION" "$GIRRA_ROLLBACK_VERSION_STAGED"
 fi
 
-ORCA_SERVICE_STOPPED=1
+GIRRA_SERVICE_STOPPED=1
 sudo systemctl stop orca-serve.service
 
 # Preserve and replace only Girra-owned profile directories
-ORCA_CURRENT_DIRS=()
+GIRRA_CURRENT_DIRS=()
 for profile_dir in orca Orca; do
   if sudo test -L "/home/orca/.config/$profile_dir"; then
     echo "Refusing symlinked Girra profile: /home/orca/.config/$profile_dir" >&2
@@ -816,43 +816,43 @@ for profile_dir in orca Orca; do
       sudo test /home/orca/.config/orca -ef /home/orca/.config/Orca; then
       continue
     fi
-    ORCA_CURRENT_DIRS+=("$profile_dir")
+    GIRRA_CURRENT_DIRS+=("$profile_dir")
   fi
 done
-ORCA_POST_UPGRADE=/home/orca/.config/orca-rollback-$ORCA_ROLLBACK_STAMP
-sudo install -d -o orca -g orca -m 700 "$ORCA_POST_UPGRADE"
-if ((${#ORCA_CURRENT_DIRS[@]})); then
-  for profile_dir in "${ORCA_CURRENT_DIRS[@]}"; do
-    ORCA_MOVED_CURRENT_DIRS+=("$profile_dir")
-    sudo mv "/home/orca/.config/$profile_dir" "$ORCA_POST_UPGRADE/"
+GIRRA_POST_UPGRADE=/home/orca/.config/orca-rollback-$GIRRA_ROLLBACK_STAMP
+sudo install -d -o orca -g orca -m 700 "$GIRRA_POST_UPGRADE"
+if ((${#GIRRA_CURRENT_DIRS[@]})); then
+  for profile_dir in "${GIRRA_CURRENT_DIRS[@]}"; do
+    GIRRA_MOVED_CURRENT_DIRS+=("$profile_dir")
+    sudo mv "/home/orca/.config/$profile_dir" "$GIRRA_POST_UPGRADE/"
   done
 fi
-for profile_dir in "${ORCA_RESTORE_DIRS[@]}"; do
-  ORCA_INSTALLED_RESTORE_DIRS+=("$profile_dir")
-  sudo mv "$ORCA_RESTORE/$profile_dir" /home/orca/.config/
+for profile_dir in "${GIRRA_RESTORE_DIRS[@]}"; do
+  GIRRA_INSTALLED_RESTORE_DIRS+=("$profile_dir")
+  sudo mv "$GIRRA_RESTORE/$profile_dir" /home/orca/.config/
 done
 
-ORCA_CURRENT_BINARY=/opt/orca/girra-linux.AppImage.rollback-current-$ORCA_ROLLBACK_STAMP
-ORCA_CURRENT_BINARY_MOVED=1
-sudo mv /opt/orca/girra-linux.AppImage "$ORCA_CURRENT_BINARY"
-sudo mv -f "$ORCA_ROLLBACK_BINARY_STAGED" /opt/orca/girra-linux.AppImage
+GIRRA_CURRENT_BINARY=/opt/orca/girra-linux.AppImage.rollback-current-$GIRRA_ROLLBACK_STAMP
+GIRRA_CURRENT_BINARY_MOVED=1
+sudo mv /opt/orca/girra-linux.AppImage "$GIRRA_CURRENT_BINARY"
+sudo mv -f "$GIRRA_ROLLBACK_BINARY_STAGED" /opt/orca/girra-linux.AppImage
 
-ORCA_CURRENT_VERSION=/opt/orca/VERSION.rollback-current-$ORCA_ROLLBACK_STAMP
+GIRRA_CURRENT_VERSION=/opt/orca/VERSION.rollback-current-$GIRRA_ROLLBACK_STAMP
 if sudo test -f /opt/orca/VERSION; then
-  ORCA_CURRENT_VERSION_MOVED=1
-  sudo mv /opt/orca/VERSION "$ORCA_CURRENT_VERSION"
+  GIRRA_CURRENT_VERSION_MOVED=1
+  sudo mv /opt/orca/VERSION "$GIRRA_CURRENT_VERSION"
 fi
-ORCA_VERSION_REPLACEMENT_STARTED=1
-if ((ORCA_ROLLBACK_HAS_VERSION)); then
-  sudo mv -f "$ORCA_ROLLBACK_VERSION_STAGED" /opt/orca/VERSION
+GIRRA_VERSION_REPLACEMENT_STARTED=1
+if ((GIRRA_ROLLBACK_HAS_VERSION)); then
+  sudo mv -f "$GIRRA_ROLLBACK_VERSION_STAGED" /opt/orca/VERSION
 else
   sudo rm -f /opt/orca/VERSION
 fi
 # The crash-looping build you are rolling back from tripped StartLimitBurst
 sudo systemctl reset-failed orca-serve.service
 sudo systemctl start orca-serve.service
-ORCA_SERVICE_STOPPED=0
-sudo rm -rf -- "$ORCA_RESTORE"
+GIRRA_SERVICE_STOPPED=0
+sudo rm -rf -- "$GIRRA_RESTORE"
 trap - EXIT
 ```
 

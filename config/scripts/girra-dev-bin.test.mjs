@@ -24,9 +24,9 @@ describe('girra-dev package bin', () => {
         'const fs = require("node:fs");',
         `fs.writeFileSync(${JSON.stringify(outputPath)}, JSON.stringify({`,
         '  argv: process.argv.slice(2),',
-        '  userDataPath: process.env.ORCA_USER_DATA_PATH,',
-        '  devCliInvocation: process.env.ORCA_DEV_CLI_INVOCATION,',
-        '  appExecutable: process.env.ORCA_APP_EXECUTABLE',
+        '  userDataPath: process.env.GIRRA_USER_DATA_PATH,',
+        '  devCliInvocation: process.env.GIRRA_DEV_CLI_INVOCATION,',
+        '  appExecutable: process.env.GIRRA_APP_EXECUTABLE',
         '}));'
       ].join('\n'),
       'utf8'
@@ -38,9 +38,9 @@ describe('girra-dev package bin', () => {
     execFileSync(process.execPath, [wrapperPath, '--help'], {
       env: {
         ...process.env,
-        ORCA_DEV_CLI_ENTRY_PATH: cliEntry,
-        ORCA_DEV_USER_DATA_PATH: path.join(root, 'user-data'),
-        ORCA_APP_EXECUTABLE: path.join(root, 'Electron')
+        GIRRA_DEV_CLI_ENTRY_PATH: cliEntry,
+        GIRRA_DEV_USER_DATA_PATH: path.join(root, 'user-data'),
+        GIRRA_APP_EXECUTABLE: path.join(root, 'Electron')
       },
       stdio: 'ignore'
     })

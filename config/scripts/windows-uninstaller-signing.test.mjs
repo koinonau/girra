@@ -145,7 +145,7 @@ describe('relayNsisUninstaller', () => {
 // continue-on-error. If it throws, the release job dies before a single
 // SignPath request is made. Nothing else in the chain guards that.
 describe('signWindowsUninstallerViaSignPath', () => {
-  const RELAY_VARS = ['ORCA_WIN_UNINSTALLER_EXPORT_PATH', 'ORCA_WIN_UNINSTALLER_SIGNED_PATH']
+  const RELAY_VARS = ['GIRRA_WIN_UNINSTALLER_EXPORT_PATH', 'GIRRA_WIN_UNINSTALLER_SIGNED_PATH']
 
   const withEnv = (env, run) => {
     const saved = Object.fromEntries(RELAY_VARS.map((key) => [key, process.env[key]]))
@@ -177,7 +177,7 @@ describe('signWindowsUninstallerViaSignPath', () => {
     ['a configuration with no path', {}],
     ['a non-uninstaller path', { path: 'C:\\dist\\win-unpacked\\Orca.exe' }]
   ])('never throws on %s', (_label, configuration) => {
-    withEnv({ ORCA_WIN_UNINSTALLER_EXPORT_PATH: join(makeDir(), 'out', 'x.exe') }, () => {
+    withEnv({ GIRRA_WIN_UNINSTALLER_EXPORT_PATH: join(makeDir(), 'out', 'x.exe') }, () => {
       expect(() => signWindowsUninstallerViaSignPath(configuration)).not.toThrow()
     })
   })
@@ -189,7 +189,7 @@ describe('signWindowsUninstallerViaSignPath', () => {
     const filePath = writeBuiltUninstaller(dir)
     const exportPath = join(dir, 'relay', 'unsigned', 'orca-uninstaller.exe')
 
-    withEnv({ ORCA_WIN_UNINSTALLER_EXPORT_PATH: exportPath }, () => {
+    withEnv({ GIRRA_WIN_UNINSTALLER_EXPORT_PATH: exportPath }, () => {
       signWindowsUninstallerViaSignPath({ path: filePath })
       signWindowsUninstallerViaSignPath({ path: filePath })
     })
@@ -199,7 +199,7 @@ describe('signWindowsUninstallerViaSignPath', () => {
     mkdirSync(join(dir, 'relay', 'signed'), { recursive: true })
     writeFileSync(signedPath, 'signpath-signed')
 
-    withEnv({ ORCA_WIN_UNINSTALLER_SIGNED_PATH: signedPath }, () => {
+    withEnv({ GIRRA_WIN_UNINSTALLER_SIGNED_PATH: signedPath }, () => {
       signWindowsUninstallerViaSignPath({ path: filePath })
       signWindowsUninstallerViaSignPath({ path: filePath })
     })
@@ -217,7 +217,7 @@ describe('signWindowsUninstallerViaSignPath', () => {
     const blocker = join(dir, 'blocker')
     writeFileSync(blocker, 'not a directory')
 
-    withEnv({ ORCA_WIN_UNINSTALLER_EXPORT_PATH: join(blocker, 'sub', 'x.exe') }, () => {
+    withEnv({ GIRRA_WIN_UNINSTALLER_EXPORT_PATH: join(blocker, 'sub', 'x.exe') }, () => {
       expect(() => signWindowsUninstallerViaSignPath({ path: filePath })).not.toThrow()
     })
     expect(readFileSync(filePath, 'utf8')).toBe('built-by-makensis')

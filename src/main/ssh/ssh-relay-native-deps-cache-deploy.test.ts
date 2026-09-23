@@ -261,7 +261,7 @@ describe('relay native-deps cache on the deploy path', () => {
     const conn = makeMockConnection(sftpCapture)
     const bothMissing = 'ORCA-NATIVE-DEPS-MISSING:node-pty,@parcel/watcher\nMISSING'
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       bothMissing, // health probe before the repair lock
       bothMissing, // re-probe under the lock

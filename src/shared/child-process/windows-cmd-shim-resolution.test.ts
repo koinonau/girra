@@ -220,7 +220,7 @@ describeOnWindows('resolveWindowsCmdShim', () => {
     expect(
       resolveWindowsCmdShim(shim, {
         ...env,
-        ORCA_DISABLE_CMD_SHIM_RESOLUTION: '1'
+        GIRRA_DISABLE_CMD_SHIM_RESOLUTION: '1'
       })
     ).toBeNull()
   })

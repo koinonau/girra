@@ -1,3 +1,4 @@
+import { legacyOrcaEnvName } from '../legacy-orca-env-aliases'
 import { randomUUID } from 'node:crypto'
 import { chmodSync, mkdirSync, renameSync, unlinkSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -35,13 +36,13 @@ export function writeEndpointFile(
   const tmpPath = join(endpointDir, `.endpoint-${process.pid}-${randomUUID()}.tmp`)
   const prefix = process.platform === 'win32' ? 'set ' : ''
   const valuesToWrite: [string, string][] = [
-    ['ORCA_AGENT_HOOK_PORT', String(fields.port)],
-    ['ORCA_AGENT_HOOK_TOKEN', fields.token],
-    ['ORCA_AGENT_HOOK_ENV', fields.env],
-    ['ORCA_AGENT_HOOK_VERSION', fields.version]
+    ['GIRRA_AGENT_HOOK_PORT', String(fields.port)],
+    ['GIRRA_AGENT_HOOK_TOKEN', fields.token],
+    ['GIRRA_AGENT_HOOK_ENV', fields.env],
+    ['GIRRA_AGENT_HOOK_VERSION', fields.version]
   ]
   if (fields.transport) {
-    valuesToWrite.push(['ORCA_AGENT_HOOK_TRANSPORT', fields.transport])
+    valuesToWrite.push(['GIRRA_AGENT_HOOK_TRANSPORT', fields.transport])
   }
   for (const [key, value] of valuesToWrite) {
     if (!isShellSafeEndpointValue(value)) {
@@ -52,7 +53,16 @@ export function writeEndpointFile(
       return false
     }
   }
-  const lines = [...valuesToWrite.map(([key, value]) => `${prefix}${key}=${value}`), '']
+  // Why both names: this file is sourced by a hook script or plugin that any
+  // build may have installed, and one from before the rename reads ORCA_*.
+  const lines = [
+    ...valuesToWrite.flatMap(([key, value]) => {
+      const legacy = legacyOrcaEnvName(key)
+      const legacyLine = legacy === null ? [] : [`${prefix}${legacy}=${value}`]
+      return [`${prefix}${key}=${value}`, ...legacyLine]
+    }),
+    ''
+  ]
   let tmpWritten = false
   try {
     // Why: 0o700 owner-only so the dir doesn't leak this install's existence to other local users.

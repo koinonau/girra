@@ -112,8 +112,8 @@ describe('bundled skill guide generator', () => {
       'utf8'
     )
 
-    expect(corpus).toContain('ORCA_RECIPE_ID')
-    expect(corpus).not.toContain('ORCA_VM_RECIPE_ID')
+    expect(corpus).toContain('GIRRA_RECIPE_ID')
+    expect(corpus).not.toContain('GIRRA_VM_RECIPE_ID')
     expect(vercelReference).toContain('recipe_id="${recipe_id//./-}"')
     expect(vercelReference).toContain('max_recipe_id_length=$((128 - ${#instance_id} - 6))')
     expect(vercelReference).toContain(
@@ -129,7 +129,7 @@ describe('bundled skill guide generator', () => {
         'utf8'
       )
       const assignment =
-        'orca_user_data_path="${ORCA_USER_DATA_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/orca}"'
+        'orca_user_data_path="${GIRRA_USER_DATA_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/orca}"'
       expect(source).toContain(assignment)
       const renderPath = async (env) =>
         (
@@ -150,7 +150,7 @@ describe('bundled skill guide generator', () => {
         renderPath({
           HOME: '/home/orca',
           XDG_CONFIG_HOME: '/srv/config',
-          ORCA_USER_DATA_PATH: '/var/lib/orca-custom'
+          GIRRA_USER_DATA_PATH: '/var/lib/orca-custom'
         })
       ).resolves.toBe('/var/lib/orca-custom')
     }
@@ -169,7 +169,7 @@ describe('bundled skill guide generator', () => {
         ),
         'utf8'
       )
-      const startMarker = 'recipe_id="${ORCA_RECIPE_ID:-vercel-sandbox}"'
+      const startMarker = 'recipe_id="${GIRRA_RECIPE_ID:-vercel-sandbox}"'
       const endMarker = 'name="orca-${recipe_id:0:max_recipe_id_length}-${instance_id}"'
       const start = source.indexOf(startMarker)
       const endStart = source.indexOf(endMarker, start)
@@ -179,7 +179,7 @@ describe('bundled skill guide generator', () => {
       const renderName = async (recipeId, instanceId) =>
         (
           await execFileAsync('bash', ['-u', '-c', script], {
-            env: { ...process.env, ORCA_RECIPE_ID: recipeId, ORCA_VM_INSTANCE_ID: instanceId }
+            env: { ...process.env, GIRRA_RECIPE_ID: recipeId, GIRRA_VM_INSTANCE_ID: instanceId }
           })
         ).stdout
 
@@ -401,13 +401,13 @@ describe('bundled skill guide generator', () => {
   // G2, second half: the ladder is pre-resolution guidance and belongs only to the stub —
   // every path that delivers a guide body has already resolved an executable. Guides keep
   // the `ORCA` placeholder rule. Red until the guide bodies drop their ladders; retiring
-  // those also retires the ORCA_CLI_COMMAND/orca-dev/orca-ide assertions in
+  // those also retires the GIRRA_CLI_COMMAND/orca-dev/orca-ide assertions in
   // 'keeps CLI guide examples safe across shells and Linux command names' above, which
   // pin the opposite contract.
   it('keeps the CLI resolver ladder out of every guide body', async () => {
     for (const name of CANONICAL_GUIDE_NAMES) {
       const source = await readFile(path.join(projectDir, 'skill-guides', `${name}.md`), 'utf8')
-      expect(source, name).not.toContain('ORCA_CLI_COMMAND')
+      expect(source, name).not.toContain('GIRRA_CLI_COMMAND')
     }
   })
 

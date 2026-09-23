@@ -14,7 +14,7 @@ const FALLBACK_RECT_MIN_CHANGE_PX = 1
 function shouldUseCssAnchorPositioning(): boolean {
   return (
     HAS_CSS_ANCHOR_POSITIONING &&
-    (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ !== true
+    (globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ !== true
   )
 }
 

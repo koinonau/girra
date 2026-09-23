@@ -38,7 +38,7 @@ function runBootstrap(
     cwd,
     process.env.USERPROFILE ?? cwd,
     undefined,
-    '$env:ORCA_TEST_STARTUP_COUNT = 1 + [int]$env:ORCA_TEST_STARTUP_COUNT'
+    '$env:GIRRA_TEST_STARTUP_COUNT = 1 + [int]$env:GIRRA_TEST_STARTUP_COUNT'
   )
   expect(launch.startupCommandDeliveredInShellArgs).toBe(true)
   const encodedCommandIndex = launch.shellArgs.indexOf('-EncodedCommand')
@@ -54,9 +54,9 @@ function runBootstrap(
       env: {
         ...process.env,
         OPENCODE_CONFIG_DIR: PROFILE_CONFIG_DIR,
-        ORCA_OPENCODE_CONFIG_DIR: MANAGED_CONFIG_DIR,
-        ORCA_TEST_BOOTSTRAP: encodedCommand,
-        ORCA_TEST_LANGUAGE_MODE: languageMode
+        GIRRA_OPENCODE_CONFIG_DIR: MANAGED_CONFIG_DIR,
+        GIRRA_TEST_BOOTSTRAP: encodedCommand,
+        GIRRA_TEST_LANGUAGE_MODE: languageMode
       },
       windowsHide: true
     }
@@ -80,20 +80,20 @@ function isAvailable(shell: (typeof WINDOWS_POWERSHELLS)[number]): boolean {
 
 const harness = encodePowerShellCommand(`
 $initialState = [System.Management.Automation.Runspaces.InitialSessionState]::CreateDefault()
-$initialState.LanguageMode = $env:ORCA_TEST_LANGUAGE_MODE
+$initialState.LanguageMode = $env:GIRRA_TEST_LANGUAGE_MODE
 $runspace = [System.Management.Automation.Runspaces.RunspaceFactory]::CreateRunspace($initialState)
 $runspace.Open()
 $runner = [System.Management.Automation.PowerShell]::Create()
 $runner.Runspace = $runspace
 $bootstrap = [Text.Encoding]::Unicode.GetString(
-  [Convert]::FromBase64String($env:ORCA_TEST_BOOTSTRAP)
+  [Convert]::FromBase64String($env:GIRRA_TEST_BOOTSTRAP)
 )
 $null = $runner.AddScript($bootstrap).Invoke()
 $runner.Commands.Clear()
 $null = $runner.AddScript($bootstrap).Invoke()
 $runner.Commands.Clear()
 $runner.AddScript(
-  '"mode=$($ExecutionContext.SessionState.LanguageMode);configDir=$env:OPENCODE_CONFIG_DIR;orcaConfigDir=$env:ORCA_OPENCODE_CONFIG_DIR;startupCount=$env:ORCA_TEST_STARTUP_COUNT;cwd=$($PWD.Path)"'
+  '"mode=$($ExecutionContext.SessionState.LanguageMode);configDir=$env:OPENCODE_CONFIG_DIR;orcaConfigDir=$env:GIRRA_OPENCODE_CONFIG_DIR;startupCount=$env:GIRRA_TEST_STARTUP_COUNT;cwd=$($PWD.Path)"'
 ).Invoke()
 $runner.Dispose()
 $runspace.Dispose()

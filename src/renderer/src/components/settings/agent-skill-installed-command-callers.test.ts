@@ -51,11 +51,11 @@ const updateCapableCallers = new Map<string, readonly string[]>([
   ],
   [
     'src/renderer/src/components/settings/CliSection.tsx',
-    ['ORCA_CLI_SKILL_UPDATE_COMMAND', 'installedCommand={cliSkillUpdateCommand}']
+    ['GIRRA_CLI_SKILL_UPDATE_COMMAND', 'installedCommand={cliSkillUpdateCommand}']
   ],
   [
     'src/renderer/src/components/settings/BrowserUsePane.tsx',
-    ['ORCA_CLI_SKILL_UPDATE_COMMAND', 'installedCommand={browserUseUpdateCommand}']
+    ['GIRRA_CLI_SKILL_UPDATE_COMMAND', 'installedCommand={browserUseUpdateCommand}']
   ],
   [
     'src/renderer/src/components/settings/BrowserUseSkillStep.tsx',
@@ -74,12 +74,12 @@ const updateCapableCallers = new Map<string, readonly string[]>([
   [
     'src/renderer/src/components/settings/MobileEmulatorAgentControlRow.tsx',
     [
-      'ORCA_CLI_SKILL_UPDATE_COMMAND',
+      'GIRRA_CLI_SKILL_UPDATE_COMMAND',
       'installedCommand={cliSkillUpdateCommand}',
       'terminalShellOverride={activeSkillRuntime.terminalShellOverride}',
       // Detection here scans the local host only, so the command must stay host-built.
-      'buildSkillCommandForRuntime(ORCA_CLI_SKILL_INSTALL_COMMAND)',
-      'buildSkillCommandForRuntime(ORCA_CLI_SKILL_UPDATE_COMMAND)'
+      'buildSkillCommandForRuntime(GIRRA_CLI_SKILL_INSTALL_COMMAND)',
+      'buildSkillCommandForRuntime(GIRRA_CLI_SKILL_UPDATE_COMMAND)'
     ]
   ]
 ])
@@ -89,7 +89,7 @@ const installOnlyCallers = new Map<string, readonly string[]>([
     'src/renderer/src/components/emulator-pane/MobileEmulatorAgentSetupGuideSteps.tsx',
     [
       // Detection here scans the local host only, so the command must stay host-built.
-      'buildSkillCommandForRuntime(ORCA_CLI_SKILL_INSTALL_COMMAND)',
+      'buildSkillCommandForRuntime(GIRRA_CLI_SKILL_INSTALL_COMMAND)',
       'command={skillInstallCommand}',
       'terminalShellOverride={activeSkillRuntime.terminalShellOverride}',
       'showInstallWhenInstalled={!setup.cliSkillInstalled}'
@@ -168,7 +168,7 @@ describe('AgentSkillSetupPanel installed-command call sites', () => {
     expect(source).toContain('command={skillCommand}')
     expect(source).toContain('prepareCommandForShell={prepareCommandForShell}')
     expect(source).toContain('shellOverride={activeSkillRuntime.terminalShellOverride}')
-    expect(source).not.toContain('command={ORCA_CLI_ORCHESTRATION_SKILL_INSTALL_COMMAND}')
+    expect(source).not.toContain('command={GIRRA_CLI_ORCHESTRATION_SKILL_INSTALL_COMMAND}')
     // This terminal auto-pastes with no install gate, so a repair-required runtime
     // must fall back to the host rather than skip the Windows npx preflight.
     expect(source).toContain(
@@ -184,7 +184,7 @@ describe('AgentSkillSetupPanel installed-command call sites', () => {
       ],
       [
         'src/renderer/src/components/settings/MobileEmulatorAgentControlRow.tsx',
-        'activeSkillRuntime.canUseLocalSkillFreshness ? ORCA_CLI_SKILL_NAME : undefined'
+        'activeSkillRuntime.canUseLocalSkillFreshness ? GIRRA_CLI_SKILL_NAME : undefined'
       ],
       [
         'src/renderer/src/components/settings/use-settings-store-model.ts',

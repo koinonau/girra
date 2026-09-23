@@ -39,25 +39,25 @@ function withTempFile(callback) {
 }
 
 describe('verify-windows-inner-signature', () => {
-  const originalExpectedSigners = process.env.ORCA_WINDOWS_EXPECTED_SIGNERS
-  const originalExpectedThumbprints = process.env.ORCA_WINDOWS_EXPECTED_THUMBPRINTS
+  const originalExpectedSigners = process.env.GIRRA_WINDOWS_EXPECTED_SIGNERS
+  const originalExpectedThumbprints = process.env.GIRRA_WINDOWS_EXPECTED_THUMBPRINTS
 
   beforeEach(() => {
-    delete process.env.ORCA_WINDOWS_EXPECTED_SIGNERS
-    delete process.env.ORCA_WINDOWS_EXPECTED_THUMBPRINTS
+    delete process.env.GIRRA_WINDOWS_EXPECTED_SIGNERS
+    delete process.env.GIRRA_WINDOWS_EXPECTED_THUMBPRINTS
   })
 
   afterEach(() => {
     if (originalExpectedSigners === undefined) {
-      delete process.env.ORCA_WINDOWS_EXPECTED_SIGNERS
+      delete process.env.GIRRA_WINDOWS_EXPECTED_SIGNERS
     } else {
-      process.env.ORCA_WINDOWS_EXPECTED_SIGNERS = originalExpectedSigners
+      process.env.GIRRA_WINDOWS_EXPECTED_SIGNERS = originalExpectedSigners
     }
 
     if (originalExpectedThumbprints === undefined) {
-      delete process.env.ORCA_WINDOWS_EXPECTED_THUMBPRINTS
+      delete process.env.GIRRA_WINDOWS_EXPECTED_THUMBPRINTS
     } else {
-      process.env.ORCA_WINDOWS_EXPECTED_THUMBPRINTS = originalExpectedThumbprints
+      process.env.GIRRA_WINDOWS_EXPECTED_THUMBPRINTS = originalExpectedThumbprints
     }
   })
 
@@ -177,7 +177,7 @@ describe('verify-windows-inner-signature', () => {
       expect.objectContaining({
         encoding: 'utf8',
         env: expect.objectContaining({
-          ORCA_WINDOWS_INNER_EXECUTABLE: 'C:\\Path With Spaces\\Orca.exe'
+          GIRRA_WINDOWS_INNER_EXECUTABLE: 'C:\\Path With Spaces\\Orca.exe'
         })
       })
     )

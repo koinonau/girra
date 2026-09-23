@@ -8,10 +8,10 @@ const RESTRICTED_ENV_KEYS = new Set([
   'HOMEDRIVE',
   'HOMEPATH',
   'CLAUDE_CONFIG_DIR',
-  'ORCA_E2E_USER_DATA_DIR',
-  'ORCA_E2E_HOME_DIR',
+  'GIRRA_E2E_USER_DATA_DIR',
+  'GIRRA_E2E_HOME_DIR',
   'ZDOTDIR',
-  'ORCA_ORIG_ZDOTDIR',
+  'GIRRA_ORIG_ZDOTDIR',
   'BASH_ENV',
   'ENV'
 ])
@@ -88,8 +88,8 @@ export function createElectronHomeIsolation({
       ...extraEnv,
       HOME: isolatedHome,
       USERPROFILE: isolatedHome,
-      ORCA_E2E_USER_DATA_DIR: userDataDir,
-      ORCA_E2E_HOME_DIR: isolatedHome
+      GIRRA_E2E_USER_DATA_DIR: userDataDir,
+      GIRRA_E2E_HOME_DIR: isolatedHome
     }
   }
 }

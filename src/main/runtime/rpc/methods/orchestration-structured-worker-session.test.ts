@@ -81,7 +81,7 @@ describe('structured worker session hold', () => {
     let envAtSpawn: Record<string, string> | undefined
     createSpy.mockImplementation(async (args: { envelope: { sessionId: string } }) => {
       // `attach` is what spawns the provider child, and the child's env is read from the registry
-      // at spawn time. Registering afterwards ships a worker with no ORCA_TERMINAL_HANDLE.
+      // at spawn time. Registering afterwards ships a worker with no GIRRA_TERMINAL_HANDLE.
       envAtSpawn = structuredWorkerChildIdentityEnv(args.envelope.sessionId, {})
       return { ok: true, value: { sessionId: args.envelope.sessionId } }
     })
@@ -92,9 +92,9 @@ describe('structured worker session hold', () => {
       dispatchId: 'd_spawn',
       onJournalActivity: () => {}
     })
-    expect(envAtSpawn?.ORCA_TERMINAL_HANDLE).toBe(created.identity.handle)
-    expect(envAtSpawn?.ORCA_CLI_COMMAND).toBe('girra')
-    expect(envAtSpawn?.ORCA_PANE_KEY).toBeUndefined()
+    expect(envAtSpawn?.GIRRA_TERMINAL_HANDLE).toBe(created.identity.handle)
+    expect(envAtSpawn?.GIRRA_CLI_COMMAND).toBe('girra')
+    expect(envAtSpawn?.GIRRA_PANE_KEY).toBeUndefined()
     releaseStructuredWorkerSession('d_spawn')
   })
 

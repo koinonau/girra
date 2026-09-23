@@ -99,11 +99,11 @@ describe('orca cli worktree awareness', () => {
     expect(logSpy).toHaveBeenCalledTimes(1)
   })
 
-  it('resolves the invocation cwd from ORCA_CLI_CWD when no cwd is passed', async () => {
+  it('resolves the invocation cwd from GIRRA_CLI_CWD when no cwd is passed', async () => {
     // Why: the SSH relay bridge runs the CLI on the Girra host with the remote
-    // shell's cwd carried in ORCA_CLI_CWD (#7716); cwd-based selectors must
+    // shell's cwd carried in GIRRA_CLI_CWD (#7716); cwd-based selectors must
     // resolve against it, not the host process cwd.
-    process.env.ORCA_CLI_CWD = '/tmp/repo/feature/src'
+    process.env.GIRRA_CLI_CWD = '/tmp/repo/feature/src'
     try {
       queueFixtures(
         callMock,
@@ -127,14 +127,14 @@ describe('orca cli worktree awareness', () => {
         worktree: 'id:repo::/tmp/repo/feature'
       })
     } finally {
-      delete process.env.ORCA_CLI_CWD
+      delete process.env.GIRRA_CLI_CWD
     }
   })
 
   it.skipIf(process.platform === 'win32')(
     'prepares and starts Claude Agent Teams in the current Girra terminal',
     async () => {
-      process.env.ORCA_PANE_KEY = 'tab-1:11111111-1111-4111-8111-111111111111'
+      process.env.GIRRA_PANE_KEY = 'tab-1:11111111-1111-4111-8111-111111111111'
       queueFixtures(
         callMock,
         okFixture('req_agent_teams_prepare', {
@@ -154,7 +154,7 @@ describe('orca cli worktree awareness', () => {
       expect(callMock).toHaveBeenCalledWith('agentTeams.prepareLaunch', {
         paneKey: 'tab-1:11111111-1111-4111-8111-111111111111',
         env: expect.objectContaining({
-          ORCA_PANE_KEY: 'tab-1:11111111-1111-4111-8111-111111111111'
+          GIRRA_PANE_KEY: 'tab-1:11111111-1111-4111-8111-111111111111'
         })
       })
       expect(spawnMock).toHaveBeenCalledWith('claude', ['--teammate-mode', 'auto'], {
@@ -170,7 +170,7 @@ describe('orca cli worktree awareness', () => {
   it.skipIf(process.platform === 'win32')(
     'passes Claude Agent Teams arguments through to Claude Code',
     async () => {
-      process.env.ORCA_PANE_KEY = 'tab-1:11111111-1111-4111-8111-111111111111'
+      process.env.GIRRA_PANE_KEY = 'tab-1:11111111-1111-4111-8111-111111111111'
       queueFixtures(
         callMock,
         okFixture('req_agent_teams_prepare', {
@@ -207,7 +207,7 @@ describe('orca cli worktree awareness', () => {
   it.skipIf(process.platform === 'win32')(
     'does not duplicate an explicit Claude teammate mode',
     async () => {
-      process.env.ORCA_PANE_KEY = 'tab-1:11111111-1111-4111-8111-111111111111'
+      process.env.GIRRA_PANE_KEY = 'tab-1:11111111-1111-4111-8111-111111111111'
       queueFixtures(
         callMock,
         okFixture('req_agent_teams_prepare', {

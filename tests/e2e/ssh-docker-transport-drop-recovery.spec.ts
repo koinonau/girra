@@ -2,7 +2,7 @@ import path from 'node:path'
 import { readFileSync } from 'node:fs'
 import type { ElectronApplication } from '@playwright/test'
 import { test, expect } from './helpers/orca-app'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 import { sshRemotePtyLeaseAllowsReattach, type SshRemotePtyLease } from '../../src/shared/ssh-types'
 import { toRelaySshPtyId } from '../../src/shared/ssh-pty-id'
 import { ensureTerminalVisible, waitForActiveWorktree, waitForSessionReady } from './helpers/store'
@@ -32,7 +32,7 @@ import {
 
 import { attachSshRecoveryInputObservation } from './helpers/ssh-recovery-input-observation'
 
-const RUN_DOCKER_SSH = process.env.ORCA_E2E_SSH_DOCKER === '1'
+const RUN_DOCKER_SSH = process.env.GIRRA_E2E_SSH_DOCKER === '1'
 
 /**
  * Every existing reconnect spec reconnects by calling ssh.disconnect() then ssh.connect() — a
@@ -63,7 +63,7 @@ function readSshLeases(userDataDir: string, targetId: string): SshRemotePtyLease
   const dataPath = path.join(
     userDataDir,
     'profiles',
-    DEFAULT_LOCAL_ORCA_PROFILE_ID,
+    DEFAULT_LOCAL_GIRRA_PROFILE_ID,
     'orca-data.json'
   )
   const parsed = JSON.parse(readFileSync(dataPath, 'utf8')) as {
@@ -111,7 +111,7 @@ function readUserDataDir(electronApp: ElectronApplication): Promise<string> {
  * flaky enough to cost more than it proves.
  */
 test.describe('SSH transport drop recovery', () => {
-  test.skip(!RUN_DOCKER_SSH, 'Set ORCA_E2E_SSH_DOCKER=1 to run the dockerized SSH relay tests')
+  test.skip(!RUN_DOCKER_SSH, 'Set GIRRA_E2E_SSH_DOCKER=1 to run the dockerized SSH relay tests')
 
   test('recovers a live pane after the transport dies under it', async ({ orcaPage }, testInfo) => {
     test.slow()
@@ -205,7 +205,7 @@ test.describe('SSH transport drop recovery', () => {
         ptyId,
         `yes "$(printf 'ORCA_%s' FLOOD_LINE)" | head -c 48000000; printf 'FLOO%s\\n' DED`
       )
-      await waitForTerminalOutput(orcaPage, 'ORCA_FLOOD_LINE', 30_000, 20_000)
+      await waitForTerminalOutput(orcaPage, 'GIRRA_FLOOD_LINE', 30_000, 20_000)
       await recoverDockerSshRelayAfterFault(orcaPage, remote.targetId, () => {
         expect(dropDockerSshRelayTransport(target!)).toBeGreaterThan(0)
       })

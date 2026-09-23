@@ -31,4 +31,4 @@ Concretely:
 
 - Use the store to reach a state; use the DOM to prove the state is correct.
 - If a render-layer regression would leave the store clean but the UI broken, a store-only test will not catch it. Mount the affected subtree and assert on what the user sees.
-- Headless (`ORCA_E2E_HEADLESS=1`) does not exempt you from this rule — Playwright drives the real DOM via CDP regardless of window visibility. The rare cases that need focus or pointer capture use `ORCA_E2E_HEADFUL=1` via `project.metadata.orcaHeadful`.
+- Headless (`GIRRA_E2E_HEADLESS=1`) does not exempt you from this rule — Playwright drives the real DOM via CDP regardless of window visibility. The rare cases that need focus or pointer capture use `GIRRA_E2E_HEADFUL=1` via `project.metadata.orcaHeadful`.

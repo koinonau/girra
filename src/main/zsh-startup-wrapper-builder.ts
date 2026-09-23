@@ -54,16 +54,16 @@ export type ZshStartupHookSpec = {
 }
 
 const AGENT_TEAMS_PATH_RESTORE_BLOCK = `__orca_restore_agent_teams_path() {
-  [[ -n "\${ORCA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0
+  [[ -n "\${GIRRA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0
   case "$PATH" in
-    "\${ORCA_AGENT_TEAMS_SHIM_DIR}"|"\${ORCA_AGENT_TEAMS_SHIM_DIR}:"*) return 0 ;;
+    "\${GIRRA_AGENT_TEAMS_SHIM_DIR}"|"\${GIRRA_AGENT_TEAMS_SHIM_DIR}:"*) return 0 ;;
   esac
-  export PATH="\${ORCA_AGENT_TEAMS_SHIM_DIR}:$PATH"
+  export PATH="\${GIRRA_AGENT_TEAMS_SHIM_DIR}:$PATH"
 }
 __orca_restore_agent_teams_path`
 
-const OPENCODE_CONFIG_DIR_RESTORE = `[[ -n "\${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${ORCA_OPENCODE_CONFIG_DIR}"`
-const REMOTE_CLI_BIN_DIR_RESTORE = `[[ -n "\${ORCA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"\${ORCA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="\${ORCA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac`
+const OPENCODE_CONFIG_DIR_RESTORE = `[[ -n "\${GIRRA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${GIRRA_OPENCODE_CONFIG_DIR}"`
+const REMOTE_CLI_BIN_DIR_RESTORE = `[[ -n "\${GIRRA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"\${GIRRA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="\${GIRRA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac`
 
 /**
  * The OSC 133 hooks, defined at top level so their bodies are parsed before the

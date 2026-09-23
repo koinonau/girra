@@ -8,7 +8,7 @@ export const STATUS_METHODS = [
       return {
         ...runtime.getStatus(),
         ...(pairedDeviceId ? { pairedDeviceId } : {}),
-        ...(process.env.ORCA_APP_VERSION ? { appVersion: process.env.ORCA_APP_VERSION } : {})
+        ...(process.env.GIRRA_APP_VERSION ? { appVersion: process.env.GIRRA_APP_VERSION } : {})
       }
     }
   })

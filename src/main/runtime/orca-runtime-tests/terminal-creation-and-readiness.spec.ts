@@ -74,9 +74,9 @@ describe('OrcaRuntimeService', () => {
     const spawnCall = spawn.mock.calls[0]?.[0] as { env?: Record<string, string> } | undefined
     const spawnedEnv = spawnCall?.env ?? {}
     expectStablePaneKeyEnv(spawnedEnv)
-    const spawnedLeafId = spawnedEnv.ORCA_PANE_KEY.slice(`${spawnedEnv.ORCA_TAB_ID}:`.length)
-    expect(spawnedEnv.ORCA_WORKTREE_ID).toBe(TEST_WORKTREE_ID)
-    expect(spawnedEnv.ORCA_AGENT_LAUNCH_TOKEN).toMatch(UUID_RE)
+    const spawnedLeafId = spawnedEnv.GIRRA_PANE_KEY.slice(`${spawnedEnv.GIRRA_TAB_ID}:`.length)
+    expect(spawnedEnv.GIRRA_WORKTREE_ID).toBe(TEST_WORKTREE_ID)
+    expect(spawnedEnv.GIRRA_AGENT_LAUNCH_TOKEN).toMatch(UUID_RE)
     expect(revealTerminalSession).toHaveBeenCalledWith(TEST_WORKTREE_ID, {
       ptyId: 'pty-bg',
       title: 'worker',
@@ -84,9 +84,9 @@ describe('OrcaRuntimeService', () => {
         agentArgs: '--model sonnet',
         agentEnv: { AGENT_PROFILE: 'captured' }
       },
-      launchToken: spawnedEnv.ORCA_AGENT_LAUNCH_TOKEN,
+      launchToken: spawnedEnv.GIRRA_AGENT_LAUNCH_TOKEN,
       activate: false,
-      tabId: spawnedEnv.ORCA_TAB_ID,
+      tabId: spawnedEnv.GIRRA_TAB_ID,
       leafId: spawnedLeafId
     })
   })
@@ -132,8 +132,8 @@ describe('OrcaRuntimeService', () => {
       (spawn.mock.calls[0]?.[0] as { env?: Record<string, string> } | undefined)?.env ?? {}
     const evidence = {
       terminalHandle: terminal.handle,
-      paneKey: spawnEnv.ORCA_PANE_KEY,
-      launchToken: spawnEnv.ORCA_AGENT_LAUNCH_TOKEN
+      paneKey: spawnEnv.GIRRA_PANE_KEY,
+      launchToken: spawnEnv.GIRRA_AGENT_LAUNCH_TOKEN
     }
 
     expect(runtime.verifyOrchestrationCompatibilityCaller(evidence)).not.toBeNull()
@@ -143,7 +143,7 @@ describe('OrcaRuntimeService', () => {
 
     runtime.onPtyData('pty-authority', '\x1b]133;D;0\x07', 100)
 
-    expect(retireAuthority).toHaveBeenCalledWith(spawnEnv.ORCA_PANE_KEY)
+    expect(retireAuthority).toHaveBeenCalledWith(spawnEnv.GIRRA_PANE_KEY)
     expect(runtime.verifyOrchestrationCompatibilityCaller(evidence)).toBeNull()
     expect((await runtime.listTerminals()).terminals).toEqual([
       expect.not.objectContaining({ agentIdentity: expect.anything() })

@@ -56,7 +56,7 @@ describe('OpenCode hook plugin source', () => {
     const digest = (source: string): string => createHash('sha256').update(source).digest('hex')
 
     expect(digest(getOpenCodePluginSource())).toBe(
-      '17a8b6ec31f58a7ac85fa03e9a188c3682c696917a7a1463a5efdcb1f93e7489'
+      '98a47a2049dc4875591e2889e3a84c334b7be7208492fc4d78c04043bbd260a6'
     )
   })
 
@@ -95,16 +95,16 @@ describe('OpenCode hook plugin source', () => {
     const source = _internals.getOpenCodePluginSource()
 
     expect(source).toContain('function readEndpointFile()')
-    expect(source).toContain('process.env.ORCA_AGENT_HOOK_ENDPOINT')
+    expect(source).toContain('process.env.GIRRA_AGENT_HOOK_ENDPOINT')
     // Parser accepts both `KEY=VALUE` (Unix) and `set KEY=VALUE` (Windows):
     expect(source).toContain('/^(?:set\\s+)?([A-Z0-9_]+)=(.*)$/')
     expect(source).toContain('function resolveHookCoords()')
     // File takes precedence over env — the whole point of v2:
     expect(source).toContain(
-      'port: fileEnv.ORCA_AGENT_HOOK_PORT || process.env.ORCA_AGENT_HOOK_PORT'
+      'port: (fileEnv.GIRRA_AGENT_HOOK_PORT || fileEnv.ORCA_AGENT_HOOK_PORT) || (process.env.GIRRA_AGENT_HOOK_PORT || process.env.ORCA_AGENT_HOOK_PORT)'
     )
     expect(source).toContain(
-      'token: fileEnv.ORCA_AGENT_HOOK_TOKEN || process.env.ORCA_AGENT_HOOK_TOKEN'
+      'token: (fileEnv.GIRRA_AGENT_HOOK_TOKEN || fileEnv.ORCA_AGENT_HOOK_TOKEN) || (process.env.GIRRA_AGENT_HOOK_TOKEN || process.env.ORCA_AGENT_HOOK_TOKEN)'
     )
     // post() uses the resolved coords, not a cached-at-startup url:
     expect(source).toContain('const coords = resolveHookCoords();')

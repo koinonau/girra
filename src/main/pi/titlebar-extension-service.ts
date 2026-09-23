@@ -4,14 +4,14 @@ import { join } from 'node:path'
 import { getAppEnvironment } from '../../shared/app-environment'
 import { createHash } from 'node:crypto'
 import {
-  ORCA_PI_AGENT_STATUS_EXTENSION_FILE,
+  GIRRA_PI_AGENT_STATUS_EXTENSION_FILE,
   getPiAgentStatusExtensionSource
 } from './agent-status-extension-source'
 import {
-  ORCA_PI_PREFILL_EXTENSION_FILE,
+  GIRRA_PI_PREFILL_EXTENSION_FILE,
   getPiPrefillExtensionSource
 } from './prefill-extension-source'
-import { ORCA_PI_EXTENSION_FILE, getPiTitlebarExtensionSource } from './titlebar-extension-source'
+import { GIRRA_PI_EXTENSION_FILE, getPiTitlebarExtensionSource } from './titlebar-extension-source'
 import {
   isSafeDescendCandidate as sharedIsSafeDescendCandidate,
   safeRemoveOverlay
@@ -23,7 +23,7 @@ import {
 // keeps holding after the helper moved to src/main/pty/overlay-mirror.ts.
 export const isSafeDescendCandidate = sharedIsSafeDescendCandidate
 
-const ORCA_MANAGED_EXTENSION_MARKER = '@orca-managed-pi-extension'
+const GIRRA_MANAGED_EXTENSION_MARKER = '@orca-managed-pi-extension'
 // Why: old Girra versions used PTY-scoped overlays under this root. Keep the
 // name so spawn and teardown can remove stale pre-migration dirs.
 const OVERLAY_ROOT_DIR_NAME = 'pi-agent-overlays'
@@ -37,9 +37,9 @@ function toSafeOverlayDirName(ptyId: string): string {
 }
 
 function withOrcaManagedExtensionMarker(source: string): string {
-  return source.includes(ORCA_MANAGED_EXTENSION_MARKER)
+  return source.includes(GIRRA_MANAGED_EXTENSION_MARKER)
     ? source
-    : `// ${ORCA_MANAGED_EXTENSION_MARKER}\n${source}`
+    : `// ${GIRRA_MANAGED_EXTENSION_MARKER}\n${source}`
 }
 
 export class PiTitlebarExtensionService {
@@ -54,7 +54,7 @@ export class PiTitlebarExtensionService {
 
   private canOverwriteManagedExtension(path: string): boolean {
     try {
-      return readFileSync(path, 'utf8').includes(ORCA_MANAGED_EXTENSION_MARKER)
+      return readFileSync(path, 'utf8').includes(GIRRA_MANAGED_EXTENSION_MARKER)
     } catch {
       return true
     }
@@ -80,15 +80,15 @@ export class PiTitlebarExtensionService {
     }
 
     this.writeManagedExtension(
-      join(extensionsDir, ORCA_PI_EXTENSION_FILE),
+      join(extensionsDir, GIRRA_PI_EXTENSION_FILE),
       withOrcaManagedExtensionMarker(getPiTitlebarExtensionSource())
     )
     this.writeManagedExtension(
-      join(extensionsDir, ORCA_PI_PREFILL_EXTENSION_FILE),
+      join(extensionsDir, GIRRA_PI_PREFILL_EXTENSION_FILE),
       withOrcaManagedExtensionMarker(getPiPrefillExtensionSource())
     )
     this.writeManagedExtension(
-      join(extensionsDir, ORCA_PI_AGENT_STATUS_EXTENSION_FILE),
+      join(extensionsDir, GIRRA_PI_AGENT_STATUS_EXTENSION_FILE),
       withOrcaManagedExtensionMarker(getPiAgentStatusExtensionSource())
     )
   }
@@ -116,7 +116,7 @@ export class PiTitlebarExtensionService {
     }
 
     this.installManagedExtensions(sourceAgentDir)
-    return { ORCA_PI_SOURCE_AGENT_DIR: sourceAgentDir }
+    return { GIRRA_PI_SOURCE_AGENT_DIR: sourceAgentDir }
   }
 
   clearPty(ptyId: string): void {

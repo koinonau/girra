@@ -93,19 +93,19 @@ describe('getRelayShellLaunchConfig', () => {
     () => {
       const config = getRelayShellLaunchConfig('/bin/zsh', {
         HOME: homeDir,
-        ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay'
+        GIRRA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay'
       })
       const zshRoot = join(homeDir, '.orca-relay', 'shell-ready', 'zsh')
 
       expect(config.args).toEqual(['-l'])
       expect(config.env.ZDOTDIR).toBe(zshRoot)
       const zshenv = readFileSync(join(zshRoot, '.zshenv'), 'utf8')
-      // Why no ORCA_USER_ZDOTDIR: the relay used to republish the inherited
+      // Why no GIRRA_USER_ZDOTDIR: the relay used to republish the inherited
       // ZDOTDIR under that name so its three later wrapper files could prefer it
       // over the spawn-time value. There are no later wrapper files, and a
       // ZDOTDIR the user's own .zshenv exports simply stands.
-      expect(zshenv).not.toContain('ORCA_USER_ZDOTDIR')
-      expect(zshenv).toContain('builtin export ZDOTDIR="$ORCA_ORIG_ZDOTDIR"')
+      expect(zshenv).not.toContain('GIRRA_USER_ZDOTDIR')
+      expect(zshenv).toContain('builtin export ZDOTDIR="$GIRRA_ORIG_ZDOTDIR"')
       expect(zshenv).toContain('builtin source -- "$_orca_user_zshenv"')
       for (const name of ['.zprofile', '.zshrc', '.zlogin']) {
         expect(existsSync(join(zshRoot, name))).toBe(false)
@@ -140,7 +140,7 @@ describe('getRelayShellLaunchConfig', () => {
     () => {
       // Why the real builder: the relay's wrapping rule is only meaningful
       // against the env main actually sends. Every relay session with a CLI
-      // bridge sets ORCA_REMOTE_CLI_BIN_DIR, which was already enough to wrap.
+      // bridge sets GIRRA_REMOTE_CLI_BIN_DIR, which was already enough to wrap.
       const env = buildSshPtySpawnEnv({
         env: { HOME: homeDir, PATH: '/usr/bin:/bin' },
         remoteCliBridgeEnv: {
@@ -150,12 +150,12 @@ describe('getRelayShellLaunchConfig', () => {
           sockPath: '/home/remote/.orca-relay/relay.sock'
         }
       })
-      env.ORCA_HISTFILE = join(homeDir, 'orca-history', 'zsh_history')
+      env.GIRRA_HISTFILE = join(homeDir, 'orca-history', 'zsh_history')
 
       const config = getRelayShellLaunchConfig('/bin/zsh', env)
 
       expect(config.env.ZDOTDIR).toBe(join(homeDir, '.orca-relay', 'shell-ready', 'zsh'))
-      expect(config.env.ORCA_SHELL_FEATURES).toBe('overlay,history,markers')
+      expect(config.env.GIRRA_SHELL_FEATURES).toBe('overlay,history,markers')
     }
   )
 
@@ -167,12 +167,12 @@ describe('getRelayShellLaunchConfig', () => {
       // It is the one pane class the relay was NOT already wrapping, and
       // leaving it unwrapped silently loses its worktree history.
       const env = buildSshPtySpawnEnv({ env: { HOME: homeDir, PATH: '/usr/bin:/bin' } })
-      env.ORCA_HISTFILE = join(homeDir, 'orca-history', 'zsh_history')
+      env.GIRRA_HISTFILE = join(homeDir, 'orca-history', 'zsh_history')
 
       const config = getRelayShellLaunchConfig('/bin/zsh', env)
 
       expect(config.env.ZDOTDIR).toBe(join(homeDir, '.orca-relay', 'shell-ready', 'zsh'))
-      expect(config.env.ORCA_SHELL_FEATURES).toBe('history')
+      expect(config.env.GIRRA_SHELL_FEATURES).toBe('history')
     }
   )
 
@@ -204,11 +204,11 @@ describe('getRelayShellLaunchConfig', () => {
 
     getRelayShellLaunchConfig('/bin/zsh', {
       HOME: homeDir,
-      ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay'
+      GIRRA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay'
     })
 
     expect(readFileSync(join(zshRoot, '.zshenv'), 'utf8')).toContain(
-      'builtin export ZDOTDIR="$ORCA_ORIG_ZDOTDIR"'
+      'builtin export ZDOTDIR="$GIRRA_ORIG_ZDOTDIR"'
     )
   })
 
@@ -222,7 +222,7 @@ describe('getRelayShellLaunchConfig', () => {
       expect(config.args).toEqual(['--rcfile', rcfile])
       // Why the empty allowlist: bash keeps its unconditional OSC 133 hooks, and
       // an explicit empty value also overrides anything the relay inherited.
-      expect(config.env).toEqual({ ORCA_SHELL_FEATURES: '' })
+      expect(config.env).toEqual({ GIRRA_SHELL_FEATURES: '' })
       expect(bashRc).toContain('printf "\\033]133;D;%s\\007"')
       expect(bashRc).toContain('printf "\\033]133;C\\007"')
     }
@@ -240,10 +240,10 @@ describe('getRelayShellLaunchConfig', () => {
       expect(config.args).toEqual(['-l'])
       expect(config.env.ZDOTDIR).toBe(zshRoot)
       expect(config.supportsReadyMarker).toBe(true)
-      expect(config.env.ORCA_SHELL_FEATURES).toContain('ready')
+      expect(config.env.GIRRA_SHELL_FEATURES).toContain('ready')
       expect(zshenv).toContain('printf "\\033]777;orca-shell-start:%s\\007" "$$"')
       // Why: the channel is destroyed before the user's own config is sourced.
-      expect(zshenv).toContain('builtin unset ORCA_SHELL_FEATURES')
+      expect(zshenv).toContain('builtin unset GIRRA_SHELL_FEATURES')
       expect(zshenv).toContain('zle -N zle-line-init __orca_prompt_mark')
       expect(zshenv).toContain('printf "\\033]777;orca-shell-ready\\007"')
     }
@@ -258,9 +258,9 @@ describe('getRelayShellLaunchConfig', () => {
       const bashRc = readFileSync(config.args[1] as string, 'utf8')
 
       expect(config.supportsReadyMarker).toBe(true)
-      expect(config.env.ORCA_SHELL_FEATURES).toContain('ready')
+      expect(config.env.GIRRA_SHELL_FEATURES).toContain('ready')
       expect(bashRc).toContain('printf "\\033]777;orca-shell-start:%s\\007" "$$"')
-      expect(bashRc).toContain('builtin unset ORCA_SHELL_FEATURES')
+      expect(bashRc).toContain('builtin unset GIRRA_SHELL_FEATURES')
       expect(bashRc).toContain('__orca_append_prompt_command "__orca_prompt_mark"')
       expect(bashRc).toContain('printf "\\033]777;orca-shell-ready\\007"')
     }
@@ -274,11 +274,11 @@ describe('getRelayShellLaunchConfig', () => {
       })
 
       expect(config.env.ZDOTDIR).toBe(join(homeDir, '.orca-relay', 'shell-ready', 'zsh'))
-      expect(config.env.ORCA_SHELL_FEATURES).toContain('identity')
+      expect(config.env.GIRRA_SHELL_FEATURES).toContain('identity')
       // Why the negative half: identity emission alone must not arm the
       // readiness handshake, or the delivering side waits for a marker that
       // this shell was never told to print.
-      expect(config.env.ORCA_SHELL_FEATURES).not.toContain('ready')
+      expect(config.env.GIRRA_SHELL_FEATURES).not.toContain('ready')
       expect(config.supportsReadyMarker).toBe(false)
     }
   )

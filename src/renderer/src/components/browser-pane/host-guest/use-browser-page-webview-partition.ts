@@ -1,5 +1,5 @@
 import { useAppStore } from '@/store'
-import { ORCA_BROWSER_PARTITION } from '../../../../../shared/constants'
+import { GIRRA_BROWSER_PARTITION } from '../../../../../shared/constants'
 
 export function useBrowserPageWebviewPartition({
   sessionProfileId,
@@ -17,6 +17,6 @@ export function useBrowserPageWebviewPartition({
     sessionPartition ??
     sessionProfile?.partition ??
     defaultSessionProfile?.partition ??
-    ORCA_BROWSER_PARTITION
+    GIRRA_BROWSER_PARTITION
   )
 }

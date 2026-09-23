@@ -4,7 +4,7 @@ import {
   normalizeBrowserNavigationUrl,
   redactKagiSessionToken
 } from '../../../../../shared/browser-url'
-import { ORCA_BROWSER_BLANK_URL } from '../../../../../shared/constants'
+import { GIRRA_BROWSER_BLANK_URL } from '../../../../../shared/constants'
 import {
   applyBrowserPageViewportLayout,
   syncBrowserPageChromeInset
@@ -99,10 +99,10 @@ export function useBrowserPageWebviewUrlSync({
       declaredSrc !== normalizedUrl
     ) {
       // Why: browserTab.url changes are Girra-driven navigations; gate did-start-loading so only real navigations show loading UI.
-      trackNextLoadingEventRef.current = normalizedUrl !== ORCA_BROWSER_BLANK_URL
+      trackNextLoadingEventRef.current = normalizedUrl !== GIRRA_BROWSER_BLANK_URL
       lastKnownWebviewUrlRef.current = normalizedUrl
       webview.src = normalizedUrl
-      if (normalizedUrl !== ORCA_BROWSER_BLANK_URL) {
+      if (normalizedUrl !== GIRRA_BROWSER_BLANK_URL) {
         keepAddressBarFocusRef.current = false
         if (document.activeElement === addressBarInputRef.current) {
           focusWebviewNow()

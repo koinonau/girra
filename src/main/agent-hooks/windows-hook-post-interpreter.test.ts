@@ -54,20 +54,20 @@ describe('Windows managed hook post interpreter', () => {
   let home = ''
 
   beforeEach(() => {
-    previousUserDataPath = process.env.ORCA_USER_DATA_PATH
+    previousUserDataPath = process.env.GIRRA_USER_DATA_PATH
     isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-interpreter-user-data-'))
-    // Why: Girra-managed hook paths can resolve through ORCA_USER_DATA_PATH before the mocked
+    // Why: Girra-managed hook paths can resolve through GIRRA_USER_DATA_PATH before the mocked
     // home; an inherited live path would let this test rewrite the developer's own hooks.
-    process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
+    process.env.GIRRA_USER_DATA_PATH = isolatedUserDataDir
     home = mkdtempSync(join(tmpdir(), 'orca-hook-interpreter-'))
     homedirMock.mockReturnValue(home)
   })
 
   afterEach(() => {
     if (previousUserDataPath === undefined) {
-      delete process.env.ORCA_USER_DATA_PATH
+      delete process.env.GIRRA_USER_DATA_PATH
     } else {
-      process.env.ORCA_USER_DATA_PATH = previousUserDataPath
+      process.env.GIRRA_USER_DATA_PATH = previousUserDataPath
     }
     rmSync(isolatedUserDataDir, { recursive: true, force: true })
     homedirMock.mockImplementation(() => process.env.HOME ?? tmpdir())
@@ -102,7 +102,7 @@ describe('Windows managed hook post interpreter', () => {
 
     // Why: `%~dp0` marks an event wrapper that only sets env and delegates to the core script.
     const isWrapper = (body: string): boolean => body.includes('%~dp0')
-    const posts = (body: string): boolean => body.includes('127.0.0.1:%ORCA_AGENT_HOOK_PORT%')
+    const posts = (body: string): boolean => body.includes('127.0.0.1:%GIRRA_AGENT_HOOK_PORT%')
 
     // Why: name the script that stopped posting rather than failing on a bare count.
     expect(

@@ -10,8 +10,8 @@ import { dirname } from 'node:path'
 import { bestEffortFsyncDirectorySync, fsyncFileSync } from '../../shared/secure-file'
 import {
   createDefaultLocalOrcaProfile,
-  DEFAULT_LOCAL_ORCA_PROFILE_ID,
-  ORCA_PROFILE_INDEX_SCHEMA_VERSION,
+  DEFAULT_LOCAL_GIRRA_PROFILE_ID,
+  GIRRA_PROFILE_INDEX_SCHEMA_VERSION,
   type OrcaProfileIndex,
   type OrcaProfileSummary
 } from '../../shared/orca-profiles'
@@ -80,7 +80,7 @@ function normalizeProfileIndex(raw: unknown): OrcaProfileIndex | null {
     return null
   }
   return {
-    schemaVersion: ORCA_PROFILE_INDEX_SCHEMA_VERSION,
+    schemaVersion: GIRRA_PROFILE_INDEX_SCHEMA_VERSION,
     activeProfileId,
     profiles
   }
@@ -145,7 +145,7 @@ function copyLegacyStateToProfile(userDataPath: string, profileId: string): void
 function createInitialProfileIndex(now = Date.now()): OrcaProfileIndex {
   const profile = createDefaultLocalOrcaProfile(now)
   return {
-    schemaVersion: ORCA_PROFILE_INDEX_SCHEMA_VERSION,
+    schemaVersion: GIRRA_PROFILE_INDEX_SCHEMA_VERSION,
     activeProfileId: profile.id,
     profiles: [profile]
   }
@@ -179,7 +179,7 @@ export function ensureActiveOrcaProfile(
 
   const profileDirectory = getOrcaProfileDirectory(activeProfile.id, userDataPath)
   mkdirSync(profileDirectory, { recursive: true })
-  if (activeProfile.id === DEFAULT_LOCAL_ORCA_PROFILE_ID) {
+  if (activeProfile.id === DEFAULT_LOCAL_GIRRA_PROFILE_ID) {
     copyLegacyStateToProfile(userDataPath, activeProfile.id)
   }
 

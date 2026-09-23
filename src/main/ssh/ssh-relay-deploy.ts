@@ -1649,8 +1649,8 @@ function getLocalRelayPath(platform: RelayPlatform): string | null {
 
 export function getLocalRelayCandidates(platform: RelayPlatform): string[] {
   const candidates: string[] = []
-  if (process.env.ORCA_RELAY_PATH) {
-    candidates.push(join(process.env.ORCA_RELAY_PATH, platform))
+  if (process.env.GIRRA_RELAY_PATH) {
+    candidates.push(join(process.env.GIRRA_RELAY_PATH, platform))
   }
 
   // Why: electron-builder copies extraResources next to the app bundle, but app.getAppPath() points at app.asar in packaged builds.

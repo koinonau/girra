@@ -119,8 +119,8 @@ describe('launchAgentBackgroundSession', () => {
         cwd: '/repo/worktree',
         command: "claude '--dangerously-skip-permissions' 'run the automation'",
         env: expect.objectContaining({
-          ORCA_TAB_ID: tabId,
-          ORCA_WORKTREE_ID: 'wt-1'
+          GIRRA_TAB_ID: tabId,
+          GIRRA_WORKTREE_ID: 'wt-1'
         }),
         connectionId: null,
         worktreeId: 'wt-1',
@@ -148,7 +148,7 @@ describe('launchAgentBackgroundSession', () => {
       launchToken: expect.stringMatching(UUID_RE)
     })
     expect(mockSpawn.mock.calls[0]?.[0].launchToken).toBe(
-      mockSpawn.mock.calls[0]?.[0].env.ORCA_AGENT_LAUNCH_TOKEN
+      mockSpawn.mock.calls[0]?.[0].env.GIRRA_AGENT_LAUNCH_TOKEN
     )
     expect(mockSetTabCustomTitle).toHaveBeenCalledWith(tabId, 'Nightly audit', {
       recordInteraction: false
@@ -279,7 +279,7 @@ describe('launchAgentBackgroundSession', () => {
     const effectiveLaunchConfig = {
       agentCommand: "claude '--dangerously-skip-permissions'",
       agentArgs: '--dangerously-skip-permissions',
-      agentEnv: { ORCA_AGENT_TEAMS_TEAM_ID: 'team-fresh' }
+      agentEnv: { GIRRA_AGENT_TEAMS_TEAM_ID: 'team-fresh' }
     }
     mockSpawn.mockResolvedValue({ id: 'pty-1', launchConfig: effectiveLaunchConfig })
     const { launchAgentBackgroundSession } = await import('./launch-agent-background-session')
@@ -295,7 +295,7 @@ describe('launchAgentBackgroundSession', () => {
     const leafId = paneKey.slice(`${tabId}:`.length)
     expect(mockRegisterAgentLaunchConfig).toHaveBeenLastCalledWith(paneKey, effectiveLaunchConfig, {
       agentType: 'claude',
-      launchToken: mockSpawn.mock.calls[0]?.[0].env.ORCA_AGENT_LAUNCH_TOKEN,
+      launchToken: mockSpawn.mock.calls[0]?.[0].env.GIRRA_AGENT_LAUNCH_TOKEN,
       tabId,
       leafId
     })

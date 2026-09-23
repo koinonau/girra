@@ -36,7 +36,7 @@ function execProfileContents(
   execLine: string,
   barrier?: BashExecProfileBarrier
 ): string {
-  const guard = `ORCA_STA4067_EXEC_${runId.replaceAll(/[^A-Za-z0-9_]/g, '_')}`
+  const guard = `GIRRA_STA4067_EXEC_${runId.replaceAll(/[^A-Za-z0-9_]/g, '_')}`
   const barrierScript = barrier
     ? [
         `: > ${shellQuote(barrier.startedPath)}`,

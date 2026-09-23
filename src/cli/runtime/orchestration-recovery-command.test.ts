@@ -6,9 +6,9 @@ import {
 
 describe('orchestration recovery command identity', () => {
   it.each([
-    ['configured dev', { ORCA_CLI_COMMAND: 'girra-dev' }, 'girra-dev'],
-    ['pre-rename alias', { ORCA_CLI_COMMAND: 'orca-ide' }, 'orca-ide'],
-    ['dev checkout', { ORCA_DEV_REPO_ROOT: '/repo' }, 'girra-dev'],
+    ['configured dev', { GIRRA_CLI_COMMAND: 'girra-dev' }, 'girra-dev'],
+    ['pre-rename alias', { GIRRA_CLI_COMMAND: 'orca-ide' }, 'orca-ide'],
+    ['dev checkout', { GIRRA_DEV_REPO_ROOT: '/repo' }, 'girra-dev'],
     ['no signal', {}, 'girra']
   ] as const)('resolves the %s CLI identity', (_name, env, expected) => {
     expect(resolveOrchestrationCliExecutable(env)).toBe(expected)

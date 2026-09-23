@@ -100,9 +100,9 @@ describe('registerPtyHandlers', () => {
       tabId,
       leafId,
       env: {
-        ORCA_PANE_KEY: makePaneKey(tabId, leafId),
-        ORCA_TAB_ID: tabId,
-        ORCA_WORKTREE_ID: worktreeId
+        GIRRA_PANE_KEY: makePaneKey(tabId, leafId),
+        GIRRA_TAB_ID: tabId,
+        GIRRA_WORKTREE_ID: worktreeId
       }
     })
     await new Promise<void>((resolve) => setImmediate(resolve))
@@ -191,7 +191,7 @@ describe('registerPtyHandlers', () => {
       sessionId: 'pty-runtime-reservation',
       tabId,
       leafId,
-      env: { ORCA_PANE_KEY: paneKey }
+      env: { GIRRA_PANE_KEY: paneKey }
     }
 
     const rendererSpawn = handlers.get('pty:spawn')!(null, {
@@ -319,9 +319,9 @@ describe('registerPtyHandlers', () => {
       tabId: 'tab-race',
       leafId,
       env: {
-        ORCA_PANE_KEY: paneKey,
-        ORCA_TAB_ID: 'tab-race',
-        ORCA_WORKTREE_ID: 'repo-1::/tmp'
+        GIRRA_PANE_KEY: paneKey,
+        GIRRA_TAB_ID: 'tab-race',
+        GIRRA_WORKTREE_ID: 'repo-1::/tmp'
       }
     }) as Promise<{ id: string }>
     await Promise.resolve()
@@ -334,7 +334,7 @@ describe('registerPtyHandlers', () => {
       worktreeId: 'repo-1::/tmp',
       tabId: 'tab-race',
       leafId,
-      env: { ORCA_PANE_KEY: paneKey },
+      env: { GIRRA_PANE_KEY: paneKey },
       persistHostSessionBinding: true
     })
     await vi.waitFor(() => expect(providerSpawn).toHaveBeenCalledTimes(1))
@@ -509,7 +509,7 @@ describe('registerPtyHandlers', () => {
         preAllocatedHandle: 'term-live-owner',
         tabId,
         leafId,
-        env: { ORCA_PANE_KEY: paneKey },
+        env: { GIRRA_PANE_KEY: paneKey },
         persistHostSessionBinding: true
       })
       ownerPublished = true
@@ -542,9 +542,9 @@ describe('registerPtyHandlers', () => {
         tabId,
         leafId,
         env: {
-          ORCA_PANE_KEY: paneKey,
-          ORCA_TAB_ID: tabId,
-          ORCA_WORKTREE_ID: worktreeId
+          GIRRA_PANE_KEY: paneKey,
+          GIRRA_TAB_ID: tabId,
+          GIRRA_WORKTREE_ID: worktreeId
         },
         telemetry: {
           agent_kind: 'claude',
@@ -608,7 +608,7 @@ describe('registerPtyHandlers', () => {
         preAllocatedHandle: 'term-live-owner',
         tabId,
         leafId,
-        env: { ORCA_PANE_KEY: paneKey },
+        env: { GIRRA_PANE_KEY: paneKey },
         persistHostSessionBinding: true,
         adoptedStablePane: adoptedOwner,
         agentSessionEnsure: {

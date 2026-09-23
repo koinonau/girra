@@ -46,7 +46,7 @@ describe('getWindowsManagedLifecycleHook', () => {
 
   it('registers the script itself, with no interpreter in front of it (#18875)', () => {
     // Why this is the whole point: the encoded launcher spent a PowerShell start-up per hook
-    // event (471ms vs 201ms measured) before the .cmd could reach its ORCA_PANE_KEY guard, and
+    // event (471ms vs 201ms measured) before the .cmd could reach its GIRRA_PANE_KEY guard, and
     // its orphan outlived the hook's timeout kill still holding the stdout the agent reads.
     const hook = getWindowsManagedLifecycleHook(SAFE_SCRIPT_PATH, { gitBashAvailable: true })
 
@@ -294,7 +294,7 @@ describe('ClaudeHookService.install', () => {
       // Why: non-subscriber sessions never carry rate_limits; both branches must guard before spawning curl.
       if (process.platform === 'win32') {
         expect(script).toContain('findstr.exe" /c:\\"rate_limits\\"')
-        expect(script).toContain('--data-urlencode "payload@%ORCA_STATUSLINE_PAYLOAD_FILE%"')
+        expect(script).toContain('--data-urlencode "payload@%GIRRA_STATUSLINE_PAYLOAD_FILE%"')
       } else {
         expect(script).toContain('"rate_limits"')
         expect(script).toContain('--data-urlencode "payload@-"')
@@ -594,7 +594,7 @@ describe('ClaudeHookService.install', () => {
 
 describe('backgrounded-session pane guard (#9236)', () => {
   // Why: a `--bg` / `/background` worker runs under the shared daemon and inherits the
-  // env of whichever pane started that daemon, so ORCA_PANE_KEY names a pane the session
+  // env of whichever pane started that daemon, so GIRRA_PANE_KEY names a pane the session
   // does not run in. CLAUDE_JOB_DIR is set only in those workers, so it is the signal to
   // decline rather than post a pane identity the worker cannot prove is current.
   it('declines to post from a daemon worker, before spawning curl', async () => {
@@ -712,7 +712,7 @@ describe('ClaudeHookService.installRemote', () => {
     expect(script).toContain('printf \'%s\' "$payload" | curl')
     expect(script).toContain('-H "Content-Type: application/json"')
     expect(script).toContain('orca_hook_metadata=$(printf')
-    expect(script).toContain('unset ORCA_AGENT_HOOK_TRANSPORT')
+    expect(script).toContain('unset GIRRA_AGENT_HOOK_TRANSPORT')
     expect(script).toContain('-H "X-Orca-Agent-Hook-Meta: ${orca_hook_metadata}"')
     expect(script).toContain('--data-binary @-')
     expect(script).toContain('--data-urlencode "payload@-"')

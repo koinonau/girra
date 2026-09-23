@@ -101,7 +101,7 @@ describe('createPtySubprocess', () => {
         rows: 24,
         env: {
           SHELL: '/bin/zsh',
-          ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config'
+          GIRRA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config'
         }
       })
     } finally {
@@ -113,7 +113,7 @@ describe('createPtySubprocess', () => {
     const lastCall = spawnMock.mock.calls.at(-1)!
     expect(lastCall[1]).toEqual(['-l'])
     expect(lastCall[2].env.ZDOTDIR).toMatch(ZSH_SHELL_READY_DIR)
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).not.toContain('ready')
+    expect(lastCall[2].env.GIRRA_SHELL_FEATURES).not.toContain('ready')
   })
 
   it('uses shell wrapper when OpenCode config must survive shell startup', async () => {
@@ -130,7 +130,7 @@ describe('createPtySubprocess', () => {
         env: {
           SHELL: '/bin/zsh',
           OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay',
-          ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay'
+          GIRRA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-overlay'
         }
       })
     } finally {
@@ -142,7 +142,7 @@ describe('createPtySubprocess', () => {
     const lastCall = spawnMock.mock.calls.at(-1)!
     expect(lastCall[1]).toEqual(['-l'])
     expect(lastCall[2].env.ZDOTDIR).toMatch(ZSH_SHELL_READY_DIR)
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).not.toContain('ready')
+    expect(lastCall[2].env.GIRRA_SHELL_FEATURES).not.toContain('ready')
   })
 
   it('uses shell wrapper when Agent Teams shim path must survive shell startup', async () => {
@@ -159,8 +159,8 @@ describe('createPtySubprocess', () => {
         env: {
           SHELL: '/bin/zsh',
           PATH: '/tmp/orca-agent-teams-bin:/usr/bin',
-          ORCA_AGENT_TEAMS_TEAM_ID: 'team-test',
-          ORCA_AGENT_TEAMS_SHIM_DIR: '/tmp/orca-agent-teams-bin'
+          GIRRA_AGENT_TEAMS_TEAM_ID: 'team-test',
+          GIRRA_AGENT_TEAMS_SHIM_DIR: '/tmp/orca-agent-teams-bin'
         }
       })
     } finally {
@@ -172,7 +172,7 @@ describe('createPtySubprocess', () => {
     const lastCall = spawnMock.mock.calls.at(-1)!
     expect(lastCall[1]).toEqual(['-l'])
     expect(lastCall[2].env.ZDOTDIR).toMatch(ZSH_SHELL_READY_DIR)
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).not.toContain('ready')
+    expect(lastCall[2].env.GIRRA_SHELL_FEATURES).not.toContain('ready')
   })
 
   it('enables readiness and shell identity for plain agent startup', async () => {
@@ -199,8 +199,8 @@ describe('createPtySubprocess', () => {
     const lastCall = spawnMock.mock.calls.at(-1)!
     expect(lastCall[1]).toEqual(['-l'])
     expect(lastCall[2].env.ZDOTDIR).toMatch(ZSH_SHELL_READY_DIR)
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).toContain('ready')
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).toContain('identity')
+    expect(lastCall[2].env.GIRRA_SHELL_FEATURES).toContain('ready')
+    expect(lastCall[2].env.GIRRA_SHELL_FEATURES).toContain('identity')
   })
 
   it('uses shell-ready wrapper for delivery-hinted agent startup commands', async () => {
@@ -228,7 +228,7 @@ describe('createPtySubprocess', () => {
     const lastCall = spawnMock.mock.calls.at(-1)!
     expect(lastCall[1]).toEqual(['-l'])
     expect(lastCall[2].env.ZDOTDIR).toMatch(ZSH_SHELL_READY_DIR)
-    expect(lastCall[2].env.ORCA_SHELL_FEATURES).toContain('ready')
+    expect(lastCall[2].env.GIRRA_SHELL_FEATURES).toContain('ready')
   })
 
   it('deletes requested env keys after merging daemon process env', async () => {

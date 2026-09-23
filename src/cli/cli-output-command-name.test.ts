@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { retargetCliOutputCommandName } from './cli-output-command-name'
 
-const SSH_CALLER = { ORCA_CLI_COMMAND: 'orca' } as NodeJS.ProcessEnv
+const SSH_CALLER = { GIRRA_CLI_COMMAND: 'orca' } as NodeJS.ProcessEnv
 const LOCAL_CALLER = {} as NodeJS.ProcessEnv
 
 describe('retargetCliOutputCommandName', () => {
@@ -38,7 +38,7 @@ describe('retargetCliOutputCommandName', () => {
   it('follows a dev checkout', () => {
     expect(
       retargetCliOutputCommandName('Run `girra status`.', {
-        ORCA_DEV_REPO_ROOT: '/repo'
+        GIRRA_DEV_REPO_ROOT: '/repo'
       } as NodeJS.ProcessEnv)
     ).toBe('Run `girra-dev status`.')
   })

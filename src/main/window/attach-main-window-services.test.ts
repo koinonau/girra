@@ -706,8 +706,8 @@ describe('attachMainWindowServices', () => {
     notifier.activateWorktree('repo-1', 'wt-1', {
       runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/worktrees/wt-1'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/worktrees/wt-1'
       }
     })
 
@@ -722,8 +722,8 @@ describe('attachMainWindowServices', () => {
           setup: {
             runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
             envVars: {
-              ORCA_ROOT_PATH: '/tmp/repo',
-              ORCA_WORKTREE_PATH: '/tmp/worktrees/wt-1'
+              GIRRA_ROOT_PATH: '/tmp/repo',
+              GIRRA_WORKTREE_PATH: '/tmp/worktrees/wt-1'
             }
           }
         }

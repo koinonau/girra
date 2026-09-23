@@ -9,26 +9,26 @@ export function buildWslLauncher(
   return `#!/usr/bin/env bash
 set -euo pipefail
 ${MANAGED_MARKER}
-# ORCA_WIN_LAUNCHER_B64=${encodedTarget}
-ORCA_WIN_LAUNCHER=${quoteShell(windowsLauncherPath)}
-ORCA_BRIDGE_PS1=${quoteShell(bridgePath)}
+# GIRRA_WIN_LAUNCHER_B64=${encodedTarget}
+GIRRA_WIN_LAUNCHER=${quoteShell(windowsLauncherPath)}
+GIRRA_BRIDGE_PS1=${quoteShell(bridgePath)}
 if command -v powershell.exe >/dev/null 2>&1; then
-  ORCA_POWERSHELL=powershell.exe
+  GIRRA_POWERSHELL=powershell.exe
 elif [ -x /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe ]; then
-  ORCA_POWERSHELL=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+  GIRRA_POWERSHELL=/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
 else
   echo "Orca WSL CLI requires Windows interop and could not find powershell.exe." >&2
   exit 1
 fi
 # Why: a shell can outlive a deleted worktree; keep explicit CLI selectors and
 # help usable, and repair cwd before any WSL interop tool tries to resolve it.
-ORCA_WSL_CWD=$(pwd -P 2>/dev/null) || {
-  ORCA_WSL_CWD=/
+GIRRA_WSL_CWD=$(pwd -P 2>/dev/null) || {
+  GIRRA_WSL_CWD=/
   cd /
 }
-ORCA_BRIDGE_PS1_WIN=$(wslpath -w "$ORCA_BRIDGE_PS1")
-ORCA_WSL_CWD_WIN=$(wslpath -w "$ORCA_WSL_CWD")
-exec "$ORCA_POWERSHELL" -NoProfile -ExecutionPolicy Bypass -File "$ORCA_BRIDGE_PS1_WIN" "$ORCA_WIN_LAUNCHER" -WslCwd "$ORCA_WSL_CWD_WIN" "$@"
+GIRRA_BRIDGE_PS1_WIN=$(wslpath -w "$GIRRA_BRIDGE_PS1")
+GIRRA_WSL_CWD_WIN=$(wslpath -w "$GIRRA_WSL_CWD")
+exec "$GIRRA_POWERSHELL" -NoProfile -ExecutionPolicy Bypass -File "$GIRRA_BRIDGE_PS1_WIN" "$GIRRA_WIN_LAUNCHER" -WslCwd "$GIRRA_WSL_CWD_WIN" "$@"
 `
 }
 
@@ -84,9 +84,9 @@ try {
     $ForwardArgs = @($args[$ForwardArgStart..($args.Count - 1)])
   }
   if ([string]::IsNullOrEmpty($WslCwd)) {
-    Remove-Item Env:ORCA_CLI_CWD -ErrorAction SilentlyContinue
+    Remove-Item Env:GIRRA_CLI_CWD -ErrorAction SilentlyContinue
   } else {
-    $env:ORCA_CLI_CWD = $WslCwd
+    $env:GIRRA_CLI_CWD = $WslCwd
   }
   $LauncherDirectory = Split-Path -Parent $OrcaLauncher
   Push-Location -LiteralPath $LauncherDirectory
@@ -130,10 +130,10 @@ export function buildSafeReplaceGuard(path: string, managedMarker: string): stri
   const quotedMarker = quoteShell(managedMarker)
   return [
     `if [ -L ${quotedPath} ]; then`,
-    '  echo "__ORCA_CONFLICT__"',
+    '  echo "__GIRRA_CONFLICT__"',
     '  exit 23',
     `elif [ -e ${quotedPath} ] && { [ ! -f ${quotedPath} ] || ! grep -Fq ${quotedMarker} ${quotedPath}; }; then`,
-    '  echo "__ORCA_CONFLICT__"',
+    '  echo "__GIRRA_CONFLICT__"',
     '  exit 23',
     'fi'
   ].join('\n')
@@ -173,8 +173,10 @@ export function buildSafeRemoveCommand(commandPath: string, legacyCommandPath?: 
   ].join('\n')
 }
 
+// Why both prefixes: this parses a launcher script already on disk in the guest,
+// written by whichever build installed it, including one that predates GIRRA_*.
 export function parseManagedLauncherTarget(content: string): string | null {
-  const encoded = content.match(/^# ORCA_WIN_LAUNCHER_B64=([A-Za-z0-9+/=]+)$/m)?.[1]
+  const encoded = content.match(/^# (?:GIRRA|ORCA)_WIN_LAUNCHER_B64=([A-Za-z0-9+/=]+)$/m)?.[1]
   if (encoded) {
     try {
       return Buffer.from(encoded, 'base64').toString('utf8')
@@ -183,7 +185,7 @@ export function parseManagedLauncherTarget(content: string): string | null {
     }
   }
 
-  const legacyTarget = content.match(/^ORCA_WIN_LAUNCHER='((?:[^']|'"'"')*)'$/m)?.[1]
+  const legacyTarget = content.match(/^(?:GIRRA|ORCA)_WIN_LAUNCHER='((?:[^']|'"'"')*)'$/m)?.[1]
   return legacyTarget ? legacyTarget.replaceAll(`'"'"'`, "'") : null
 }
 

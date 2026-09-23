@@ -10,8 +10,7 @@ import {
   renderLegacyTerminalWindowsPowerShellTombstone
 } from './legacy-terminal-windows-tombstone'
 
-const LEGACY_TERMINAL_ATTRIBUTION_ENABLE_ENV_KEY = 'ORCA_ENABLE_GIT_ATTRIBUTION'
-const LEGACY_TERMINAL_ATTRIBUTION_BYPASS_ENV_KEY = 'ORCA_ATTRIBUTION_BYPASS'
+const LEGACY_TERMINAL_ATTRIBUTION_ENABLE_ENV_KEY = 'GIRRA_ENABLE_GIT_ATTRIBUTION'
 
 const LEGACY_SHIM_ROOT_DIR = 'orca-terminal-attribution'
 // Why: must differ from the retired shim's own '7'. A rolled-back build compares this marker and
@@ -19,19 +18,27 @@ const LEGACY_SHIM_ROOT_DIR = 'orca-terminal-attribution'
 // its attribution toggle claimed to be on.
 const LEGACY_SHIM_VERSION = '7-neutralized'
 const NEUTRALIZATION_RETRY_DELAYS_MS = [1_000, 5_000, 15_000, 30_000]
-export const LEGACY_TERMINAL_SHIM_ENV_KEYS = [
-  'ORCA_ENABLE_GIT_ATTRIBUTION',
-  'ORCA_GIT_COMMIT_TRAILER',
-  'ORCA_GH_PR_FOOTER',
-  'ORCA_GH_ISSUE_FOOTER',
-  'ORCA_ATTRIBUTION_SHIM_DIR',
-  'ORCA_REAL_GIT',
-  'ORCA_REAL_GH',
-  LEGACY_TERMINAL_ATTRIBUTION_BYPASS_ENV_KEY
+// Why both prefixes: the retired shim shipped under Orca and exported the ORCA_
+// names, and a pane or remote host can still be carrying them.
+const LEGACY_TERMINAL_SHIM_ENV_SUFFIXES = [
+  'ENABLE_GIT_ATTRIBUTION',
+  'GIT_COMMIT_TRAILER',
+  'GH_PR_FOOTER',
+  'GH_ISSUE_FOOTER',
+  'ATTRIBUTION_SHIM_DIR',
+  'REAL_GIT',
+  'REAL_GH',
+  'ATTRIBUTION_BYPASS'
 ] as const
+export const LEGACY_TERMINAL_SHIM_ENV_KEYS = LEGACY_TERMINAL_SHIM_ENV_SUFFIXES.flatMap(
+  (suffix) => [`GIRRA_${suffix}`, `ORCA_${suffix}`]
+)
 export const LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS = [
-  LEGACY_TERMINAL_ATTRIBUTION_ENABLE_ENV_KEY
+  LEGACY_TERMINAL_ATTRIBUTION_ENABLE_ENV_KEY,
+  'ORCA_ENABLE_GIT_ATTRIBUTION'
 ] as const
+
+const LEGACY_TERMINAL_SHIM_DIR_ENV_KEYS = ['GIRRA_ATTRIBUTION_SHIM_DIR', 'ORCA_ATTRIBUTION_SHIM_DIR']
 
 let neutralized = false
 let neutralizationRetryTimer: ReturnType<typeof setTimeout> | null = null
@@ -205,11 +212,11 @@ export function stripLegacyTerminalShimEnv(
   const legacyKeySet = new Set(
     LEGACY_TERMINAL_SHIM_ENV_KEYS.map((key) => (windows ? key.toLowerCase() : key))
   )
-  const shimDirKey = 'ORCA_ATTRIBUTION_SHIM_DIR'.toLowerCase()
+  const shimDirKeys = new Set(
+    LEGACY_TERMINAL_SHIM_DIR_ENV_KEYS.map((key) => (windows ? key.toLowerCase() : key))
+  )
   const explicitShimDirs = Object.entries(env)
-    .filter(([key]) =>
-      windows ? key.toLowerCase() === shimDirKey : key === 'ORCA_ATTRIBUTION_SHIM_DIR'
-    )
+    .filter(([key]) => shimDirKeys.has(windows ? key.toLowerCase() : key))
     .map(([, value]) => value)
     .filter(Boolean)
   for (const key of Object.keys(env)) {

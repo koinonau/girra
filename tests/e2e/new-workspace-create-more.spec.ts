@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process'
 import { test, expect } from './helpers/orca-app'
 import { waitForActiveWorktree, waitForSessionReady } from './helpers/store'
 
-test.use({ orcaAppExtraEnv: { ORCA_BACKGROUND_LAUNCH: '1' } })
+test.use({ orcaAppExtraEnv: { GIRRA_BACKGROUND_LAUNCH: '1' } })
 
 test('Create more clears the GitHub PR source before the next worktree', async ({
   electronApp,

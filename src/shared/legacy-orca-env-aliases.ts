@@ -32,26 +32,32 @@ export function adoptLegacyOrcaEnvNames(env: EnvRecord): void {
   }
 }
 
-/** Copy `env` with an `ORCA_*` alias beside every `GIRRA_*`, for older children. */
-export function withLegacyOrcaEnvAliases<T extends EnvRecord>(env: T): T {
-  const aliased = { ...env } as EnvRecord
+/** Add an `ORCA_*` alias beside every `GIRRA_*`, in place, for older children. */
+export function applyLegacyOrcaEnvAliases(env: EnvRecord): void {
   for (const [name, value] of Object.entries(env)) {
-    const legacy = legacyNameFor(name)
-    if (legacy !== null && value !== undefined && aliased[legacy] === undefined) {
-      aliased[legacy] = value
+    const legacy = legacyOrcaEnvName(name)
+    if (legacy !== null && value !== undefined && env[legacy] === undefined) {
+      env[legacy] = value
     }
   }
-  return aliased as T
+}
+
+/** As above, on a copy, where the caller's object must not change. */
+export function withLegacyOrcaEnvAliases<T extends EnvRecord>(env: T): T {
+  const aliased = { ...env }
+  applyLegacyOrcaEnvAliases(aliased)
+  return aliased
+}
+
+/** The `ORCA_*` name a `GIRRA_*` one replaced, for call sites that strip both. */
+export function legacyOrcaEnvName(name: string): string | null {
+  return name.length > PREFIX.length && name.startsWith(PREFIX)
+    ? `${LEGACY_PREFIX}${name.slice(PREFIX.length)}`
+    : null
 }
 
 function renameLegacy(name: string): string | null {
   return name.length > LEGACY_PREFIX.length && name.startsWith(LEGACY_PREFIX)
     ? `${PREFIX}${name.slice(LEGACY_PREFIX.length)}`
-    : null
-}
-
-function legacyNameFor(name: string): string | null {
-  return name.length > PREFIX.length && name.startsWith(PREFIX)
-    ? `${LEGACY_PREFIX}${name.slice(PREFIX.length)}`
     : null
 }

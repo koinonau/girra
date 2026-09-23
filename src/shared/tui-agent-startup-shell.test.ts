@@ -72,15 +72,15 @@ describe('one Unix startup dialect', () => {
     // any shell the user pastes copied text into — would not have the helper.
     // startup-shell-portability.live-shell.test.ts proves this form works in
     // real sh/bash/zsh/dash/ksh/fish.
-    expect(clearEnvCommand('ORCA_PI_PREFILL', 'posix')).toBe(
-      `command test -n "$fish_pid" && set --erase -g ORCA_PI_PREFILL; command test -z "$fish_pid" && unset ORCA_PI_PREFILL; true`
+    expect(clearEnvCommand('GIRRA_PI_PREFILL', 'posix')).toBe(
+      `command test -n "$fish_pid" && set --erase -g GIRRA_PI_PREFILL; command test -z "$fish_pid" && unset GIRRA_PI_PREFILL; true`
     )
     expect(clearEnvCommand(['A', 'B'], 'posix')).toBe(
       `command test -n "$fish_pid" && set --erase -g A B; command test -z "$fish_pid" && unset A B; true`
     )
-    expect(clearEnvCommand('ORCA_PI_PREFILL', 'cmd')).toBe('set "ORCA_PI_PREFILL="')
-    expect(clearEnvCommand('ORCA_PI_PREFILL', 'powershell')).toBe(
-      'Remove-Item Env:ORCA_PI_PREFILL -ErrorAction SilentlyContinue'
+    expect(clearEnvCommand('GIRRA_PI_PREFILL', 'cmd')).toBe('set "GIRRA_PI_PREFILL="')
+    expect(clearEnvCommand('GIRRA_PI_PREFILL', 'powershell')).toBe(
+      'Remove-Item Env:GIRRA_PI_PREFILL -ErrorAction SilentlyContinue'
     )
   })
 
@@ -143,8 +143,8 @@ describe('one Unix startup dialect', () => {
     })
 
     expect(plan?.launchCommand).toBe(
-      `pi; command test -n "$fish_pid" && set --erase -g ORCA_PI_PREFILL; command test -z "$fish_pid" && unset ORCA_PI_PREFILL; true`
+      `pi; command test -n "$fish_pid" && set --erase -g GIRRA_PI_PREFILL; command test -z "$fish_pid" && unset GIRRA_PI_PREFILL; true`
     )
-    expect(plan?.env?.ORCA_PI_PREFILL).toBe('hello')
+    expect(plan?.env?.GIRRA_PI_PREFILL).toBe('hello')
   })
 })

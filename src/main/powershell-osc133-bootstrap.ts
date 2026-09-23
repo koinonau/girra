@@ -36,7 +36,7 @@ export { encodePowerShellCommand } from '../shared/powershell-command-encoding'
 const POWERSHELL_OSC133_BOOTSTRAP = `# Girra OSC 133 shell integration for PowerShell.
 # Profiles have already loaded normally by the time -EncodedCommand runs.
 # Restore managed ownership before the shell-integration compatibility guard.
-if ($env:ORCA_OPENCODE_CONFIG_DIR) { $env:OPENCODE_CONFIG_DIR = $env:ORCA_OPENCODE_CONFIG_DIR }
+if ($env:GIRRA_OPENCODE_CONFIG_DIR) { $env:OPENCODE_CONFIG_DIR = $env:GIRRA_OPENCODE_CONFIG_DIR }
 
 if ($ExecutionContext.SessionState.LanguageMode -eq "FullLanguage" -and
     ((-not (Test-Path variable:global:__OrcaOsc133State)) -or

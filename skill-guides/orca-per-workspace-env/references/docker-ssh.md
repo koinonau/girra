@@ -30,7 +30,7 @@ authenticated image per-workspace `create` boots from. The emitted result is the
 
 ```bash
 docker image inspect "$auth_image" --format '{{json .Config.Entrypoint}}'
-docker run -d --name "$name" -p 127.0.0.1::22 -e "ORCA_SSH_PUBLIC_KEY=$pubkey" "$auth_image"
+docker run -d --name "$name" -p 127.0.0.1::22 -e "GIRRA_SSH_PUBLIC_KEY=$pubkey" "$auth_image"
 docker ps -a --filter "name=$name"
 docker logs "$name"
 ssh -i "$key" -p "$port" -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes user@127.0.0.1 'claude --version'

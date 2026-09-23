@@ -262,7 +262,7 @@ describe('createWebRuntimeSessionTerminal', () => {
         command: "opencode --prompt 'linked issue context'",
         cwd: '/repo/packages/app',
         env: { OPENCODE_CONFIG: 'captured' },
-        envToDelete: ['OPENCODE_CONFIG_DIR', 'ORCA_OPENCODE_CONFIG_DIR'],
+        envToDelete: ['OPENCODE_CONFIG_DIR', 'GIRRA_OPENCODE_CONFIG_DIR'],
         startupCommandDelivery: 'shell-ready',
         launchConfig: {
           agentArgs: '--model gpt-5',

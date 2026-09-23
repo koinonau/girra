@@ -59,8 +59,8 @@ describe('OrcaRuntimeService', () => {
     vi.mocked(createSetupRunnerScript).mockReturnValue({
       runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-bg-split-setup'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-bg-split-setup'
       }
     })
     vi.mocked(listWorktrees).mockResolvedValue([
@@ -89,7 +89,7 @@ describe('OrcaRuntimeService', () => {
         result.worktree.id,
         expect.objectContaining({
           ptyId: 'pty-bg-split-setup',
-          tabId: mainEnv.ORCA_TAB_ID,
+          tabId: mainEnv.GIRRA_TAB_ID,
           activate: false,
           surfaceOwner: false,
           splitDirection: 'horizontal'
@@ -140,8 +140,8 @@ describe('OrcaRuntimeService', () => {
     vi.mocked(createSetupRunnerScript).mockReturnValue({
       runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-active-split-setup'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-active-split-setup'
       }
     })
     vi.mocked(listWorktrees).mockResolvedValue([

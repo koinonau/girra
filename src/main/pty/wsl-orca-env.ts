@@ -44,11 +44,11 @@ function worktreeSetupWslenvEntries(env: Record<string, string | undefined>): st
   return [
     // Setup/hook scripts read these (#9206). A pre-translated Linux value must
     // cross untranslated (/u); a raw C:\ path still needs WSLENV to convert it (/p).
-    ...['ORCA_ROOT_PATH', 'ORCA_WORKTREE_PATH', 'CONDUCTOR_ROOT_PATH', 'GHOSTX_ROOT_PATH'].map(
+    ...['GIRRA_ROOT_PATH', 'GIRRA_WORKTREE_PATH', 'CONDUCTOR_ROOT_PATH', 'GHOSTX_ROOT_PATH'].map(
       (name) => `${name}/${env[name]?.startsWith('/') ? 'u' : 'p'}`
     ),
     // A display name, never a path.
-    'ORCA_WORKSPACE_NAME/u'
+    'GIRRA_WORKSPACE_NAME/u'
   ]
 }
 
@@ -57,44 +57,44 @@ export function addOrcaWslInteropEnv(env: Record<string, string>): void {
   // in-guest login script needs the resolved wrapper root. Windows/WSL wrappers
   // are always the local file set -- windows-shell-args.ts is shared by the
   // in-process provider and the daemon spawner, so both resolve the same tree.
-  env.ORCA_SHELL_READY_ROOT = getShellReadyWrapperRoot()
+  env.GIRRA_SHELL_READY_ROOT = getShellReadyWrapperRoot()
   // Why: the endpoint is a Windows path (/p-translated so the guest reads it
   // via /mnt/c) until the WSL hook relay reports the guest home — then it is
   // already a guest-side POSIX path and must cross untranslated.
-  const endpointFlag = env.ORCA_AGENT_HOOK_ENDPOINT?.startsWith('/') ? 'u' : 'p'
+  const endpointFlag = env.GIRRA_AGENT_HOOK_ENDPOINT?.startsWith('/') ? 'u' : 'p'
   // Why: ONLY a guest-side POSIX overlay may cross. /p would path-translate a
   // Windows value into /mnt/c and let in-guest OpenCode adopt it as its config
   // root — reachable via the relay spawn's process.env (wsl-hook-relay-launch)
   // and via daemon-inherited env, which buildPtyHostEnv's delete cannot reach.
-  const opencodeOverlayEntries = (['OPENCODE_CONFIG_DIR', 'ORCA_OPENCODE_CONFIG_DIR'] as const)
+  const opencodeOverlayEntries = (['OPENCODE_CONFIG_DIR', 'GIRRA_OPENCODE_CONFIG_DIR'] as const)
     .filter((name) => env[name]?.startsWith('/'))
     .map((name) => `${name}/u`)
   // Why: wsl.exe only imports selected Windows env vars, so WSL needs the wrapper root, pane identity, and hook coordinates at start.
   const passthroughEntries = [
-    'ORCA_TERMINAL_HANDLE/u',
-    'ORCA_USER_DATA_PATH/p',
+    'GIRRA_TERMINAL_HANDLE/u',
+    'GIRRA_USER_DATA_PATH/p',
     // Why /p: the guest reads the content-addressed wrapper tree through /mnt/c,
-    // and it cannot derive the hash segment from ORCA_USER_DATA_PATH alone.
-    'ORCA_SHELL_READY_ROOT/p',
-    'ORCA_CLI_COMMAND/u',
-    'ORCA_PANE_KEY/u',
-    'ORCA_TAB_ID/u',
-    'ORCA_WORKTREE_ID/u',
-    'ORCA_AGENT_LAUNCH_TOKEN/u',
+    // and it cannot derive the hash segment from GIRRA_USER_DATA_PATH alone.
+    'GIRRA_SHELL_READY_ROOT/p',
+    'GIRRA_CLI_COMMAND/u',
+    'GIRRA_PANE_KEY/u',
+    'GIRRA_TAB_ID/u',
+    'GIRRA_WORKTREE_ID/u',
+    'GIRRA_AGENT_LAUNCH_TOKEN/u',
     `${SETUP_AGENT_SEQUENCE_STARTUP_COMMAND_ENV}/u`,
     `${SETUP_AGENT_SEQUENCE_STARTUP_SCRIPT_ENV}/u`,
-    'ORCA_ORCHESTRATION_COMPATIBILITY_HOST_KIND/u',
-    'ORCA_ORCHESTRATION_COMPATIBILITY_HOST_ID/u',
-    'ORCA_ORCHESTRATION_COMPATIBILITY_HOST_INCARNATION/u',
-    'ORCA_AGENT_HOOK_PORT/u',
-    'ORCA_AGENT_HOOK_TOKEN/u',
-    'ORCA_AGENT_HOOK_ENV/u',
-    'ORCA_AGENT_HOOK_VERSION/u',
-    'ORCA_AGENT_HOOK_TRANSPORT/u',
-    `ORCA_AGENT_HOOK_ENDPOINT/${endpointFlag}`,
+    'GIRRA_ORCHESTRATION_COMPATIBILITY_HOST_KIND/u',
+    'GIRRA_ORCHESTRATION_COMPATIBILITY_HOST_ID/u',
+    'GIRRA_ORCHESTRATION_COMPATIBILITY_HOST_INCARNATION/u',
+    'GIRRA_AGENT_HOOK_PORT/u',
+    'GIRRA_AGENT_HOOK_TOKEN/u',
+    'GIRRA_AGENT_HOOK_ENV/u',
+    'GIRRA_AGENT_HOOK_VERSION/u',
+    'GIRRA_AGENT_HOOK_TRANSPORT/u',
+    `GIRRA_AGENT_HOOK_ENDPOINT/${endpointFlag}`,
     ...opencodeOverlayEntries,
-    'ORCA_WSL_HOOK_RELAY_VERSION/u',
-    'ORCA_WSL_HOOK_INSTANCE/u',
+    'GIRRA_WSL_HOOK_RELAY_VERSION/u',
+    'GIRRA_WSL_HOOK_INSTANCE/u',
     ...worktreeSetupWslenvEntries(env)
   ]
   applyWslenvPassthrough(env, passthroughEntries)

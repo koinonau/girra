@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
-import { ORCA_RENDERER_UNLOAD_PREVENTED_EVENT } from '../shared/renderer-shutdown-events'
-import { ORCA_APP_RESTART_ABORTED_EVENT } from '../shared/app-restart-events'
+import { GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT } from '../shared/renderer-shutdown-events'
+import { GIRRA_APP_RESTART_ABORTED_EVENT } from '../shared/app-restart-events'
 import { registerRendererRestartIpcRelays } from './renderer-restart-wiring'
 
 describe('renderer restart wiring', () => {
@@ -15,8 +15,8 @@ describe('renderer restart wiring', () => {
         return ipcRenderer
       })
     } as unknown as Parameters<typeof registerRendererRestartIpcRelays>[0]
-    eventTarget.addEventListener(ORCA_RENDERER_UNLOAD_PREVENTED_EVENT, unloadPrevented)
-    eventTarget.addEventListener(ORCA_APP_RESTART_ABORTED_EVENT, restartAborted)
+    eventTarget.addEventListener(GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT, unloadPrevented)
+    eventTarget.addEventListener(GIRRA_APP_RESTART_ABORTED_EVENT, restartAborted)
 
     registerRendererRestartIpcRelays(ipcRenderer, eventTarget)
     listeners.get('window:unload-prevented')?.({})

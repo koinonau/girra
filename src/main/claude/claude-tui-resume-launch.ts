@@ -86,7 +86,7 @@ export function createClaudeTuiResumeLaunchBuilder(
         ...carriedAuth,
         ...configuredEnv,
         ...claudeConfigDirEnvPatch(record.accountHome.path, { env: inheritedEnv }),
-        ORCA_AGENT_LAUNCH_TOKEN: spawnToken,
+        GIRRA_AGENT_LAUNCH_TOKEN: spawnToken,
         [CLAUDE_SPAWN_TOKEN_ENV]: spawnToken
       },
       { inheritedEnv: deps.inheritedEnv }

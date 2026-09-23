@@ -38,7 +38,7 @@ function prepareShellConfigDirEnv(agentId: string): { ok: true; env?: NodeJS.Pro
     return null
   }
   const sourceVar =
-    agentId === 'opencode' ? 'ORCA_OPENCODE_SOURCE_CONFIG_DIR' : 'ORCA_PI_SOURCE_AGENT_DIR'
+    agentId === 'opencode' ? 'GIRRA_OPENCODE_SOURCE_CONFIG_DIR' : 'GIRRA_PI_SOURCE_AGENT_DIR'
 
   const value = readInheritedOrShellEnvVar(configVar, sourceVar)
   if (!value) {

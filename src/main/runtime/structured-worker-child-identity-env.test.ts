@@ -67,24 +67,24 @@ describe('structuredWorkerChildIdentityEnv', () => {
     installFakeAppEnvironment({ isPackaged: () => true, getPath: () => USER_DATA })
     const childEnv = { PATH: '/usr/bin' }
     const env = structuredWorkerChildIdentityEnv(SESSION_ID, childEnv)
-    expect(env).toEqual({ PATH: '/usr/bin', ORCA_STRUCTURED_SESSION: '1' })
-    expect(env.ORCA_TERMINAL_HANDLE).toBeUndefined()
-    expect(env.ORCA_PANE_KEY).toBeUndefined()
-    expect(env.ORCA_CLI_COMMAND).toBeUndefined()
+    expect(env).toEqual({ PATH: '/usr/bin', GIRRA_STRUCTURED_SESSION: '1' })
+    expect(env.GIRRA_TERMINAL_HANDLE).toBeUndefined()
+    expect(env.GIRRA_PANE_KEY).toBeUndefined()
+    expect(env.GIRRA_CLI_COMMAND).toBeUndefined()
     // Still no CLI reachability granted, so packaged builds keep today's exposure.
     expect(childEnv.PATH).toBe('/usr/bin')
     expect(shim.ensureLinuxTerminalOrcaCliShimDir).not.toHaveBeenCalled()
   })
 
-  it('gives a packaged-Linux worker the shim dir its ORCA_CLI_COMMAND assumes', () => {
+  it('gives a packaged-Linux worker the shim dir its GIRRA_CLI_COMMAND assumes', () => {
     // Without this the child's first `girra orchestration check` finds no command at all, because
     // global CLI registration is optional, and the dispatch hangs to timeout.
     pinPlatform('linux')
     installFakeAppEnvironment({ isPackaged: () => true, getPath: () => USER_DATA })
     const handle = registerWorker()
     const env = structuredWorkerChildIdentityEnv(SESSION_ID, { PATH: '/usr/bin:/bin' })
-    expect(env.ORCA_TERMINAL_HANDLE).toBe(handle)
-    expect(env.ORCA_CLI_COMMAND).toBe('girra')
+    expect(env.GIRRA_TERMINAL_HANDLE).toBe(handle)
+    expect(env.GIRRA_CLI_COMMAND).toBe('girra')
     expect(env.PATH).toBe(`${SHIM_DIR}:/usr/bin:/bin`)
   })
 
@@ -120,7 +120,7 @@ describe('structuredWorkerChildIdentityEnv', () => {
     installFakeAppEnvironment({ isPackaged: () => true, getPath: () => USER_DATA })
     registerWorker()
     const env = structuredWorkerChildIdentityEnv(SESSION_ID, { PATH: '/usr/bin' })
-    expect(env.ORCA_PANE_KEY).toBeUndefined()
+    expect(env.GIRRA_PANE_KEY).toBeUndefined()
     expect(Object.keys(env).filter((key) => key.includes('PANE'))).toEqual([])
   })
 
@@ -140,7 +140,7 @@ describe('structuredWorkerChildIdentityEnv', () => {
     installFakeAppEnvironment({ isPackaged: () => true, getPath: () => USER_DATA })
     registerWorker()
     expect(
-      structuredWorkerChildIdentityEnv(SESSION_ID, { PATH: '/usr/bin' }).ORCA_CLI_COMMAND
+      structuredWorkerChildIdentityEnv(SESSION_ID, { PATH: '/usr/bin' }).GIRRA_CLI_COMMAND
     ).not.toBe('orca-ide')
   })
 })

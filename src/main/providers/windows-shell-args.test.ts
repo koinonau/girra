@@ -31,16 +31,16 @@ describe('resolveWindowsShellLaunchArgs', () => {
   let userDataPath: string
 
   beforeEach(() => {
-    previousUserDataPath = process.env.ORCA_USER_DATA_PATH
+    previousUserDataPath = process.env.GIRRA_USER_DATA_PATH
     userDataPath = mkdtempSync(join(tmpdir(), 'windows-shell-args-test-'))
-    process.env.ORCA_USER_DATA_PATH = userDataPath
+    process.env.GIRRA_USER_DATA_PATH = userDataPath
   })
 
   afterEach(() => {
     if (previousUserDataPath === undefined) {
-      delete process.env.ORCA_USER_DATA_PATH
+      delete process.env.GIRRA_USER_DATA_PATH
     } else {
-      process.env.ORCA_USER_DATA_PATH = previousUserDataPath
+      process.env.GIRRA_USER_DATA_PATH = previousUserDataPath
     }
     rmSync(userDataPath, { recursive: true, force: true })
   })
@@ -102,7 +102,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
     const command = decodePowerShellCommand(result)
     const outputEncodingIndex = command.indexOf('[Console]::OutputEncoding')
     const opencodeRestoreIndex = command.indexOf(
-      '$env:OPENCODE_CONFIG_DIR = $env:ORCA_OPENCODE_CONFIG_DIR'
+      '$env:OPENCODE_CONFIG_DIR = $env:GIRRA_OPENCODE_CONFIG_DIR'
     )
     const duplicateStateGuardIndex = command.indexOf('Test-Path variable:global:__OrcaOsc133State')
     const languageModeGuardIndex = command.indexOf('LanguageMode -eq "FullLanguage"')
@@ -112,7 +112,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
     )
 
     expect(command).not.toContain('$PROFILE')
-    expect(command).not.toContain('ORCA_PI_CODING_AGENT_DIR')
+    expect(command).not.toContain('GIRRA_PI_CODING_AGENT_DIR')
     expect(opencodeRestoreIndex).toBeGreaterThanOrEqual(0)
     expect(opencodeRestoreIndex).toBeLessThan(duplicateStateGuardIndex)
     expect(opencodeRestoreIndex).toBeLessThan(languageModeGuardIndex)
@@ -171,7 +171,7 @@ describe('resolveWindowsShellLaunchArgs', () => {
 
   it('preserves complex PowerShell startup command text through EncodedCommand', () => {
     const startupCommand =
-      '& "C:\\Program Files\\Orca CLI\\orca.exe" "--label" "quoted value"; $env:ORCA_VALUE = "nested"'
+      '& "C:\\Program Files\\Orca CLI\\orca.exe" "--label" "quoted value"; $env:GIRRA_VALUE = "nested"'
     const result = resolveWindowsShellLaunchArgs(
       'powershell.exe',
       'C:\\Users\\alice',

@@ -70,8 +70,8 @@ describe('detectWslCommandsOnPath', () => {
       environmentResolved: true,
       code: 0,
       stdout:
-        '__ORCA_AGENT_PATH__claude\t/usr/bin/claude\n' +
-        '__ORCA_AGENT_PATH__opencode\t/home/user/.local/bin/opencode\n',
+        '__GIRRA_AGENT_PATH__claude\t/usr/bin/claude\n' +
+        '__GIRRA_AGENT_PATH__opencode\t/home/user/.local/bin/opencode\n',
       stderr: '',
       timedOut: false
     })
@@ -85,7 +85,7 @@ describe('detectWslCommandsOnPath', () => {
     runWslProcessMock.mockResolvedValue({
       environmentResolved: true,
       code: 0,
-      stdout: '__ORCA_AGENT_PATH__claude\tclaude\n' + '__ORCA_AGENT_PATH__opencode\tC:\\spoof\n',
+      stdout: '__GIRRA_AGENT_PATH__claude\tclaude\n' + '__GIRRA_AGENT_PATH__opencode\tC:\\spoof\n',
       stderr: '',
       timedOut: false
     })
@@ -107,7 +107,7 @@ describe('detectWslCommandsOnPath', () => {
       code: 0,
       stdout:
         'Welcome to Ubuntu! Run a command as administrator (user "root")...\n' +
-        '__ORCA_AGENT_PATH__claude\t/home/user/.nvm/versions/node/v20/bin/claude\n',
+        '__GIRRA_AGENT_PATH__claude\t/home/user/.nvm/versions/node/v20/bin/claude\n',
       stderr: '',
       timedOut: false
     })
@@ -141,7 +141,7 @@ it('does not veto a guest binary on an ordinary Linux mount under /mnt', async (
   runWslProcessMock.mockResolvedValue({
     environmentResolved: true,
     code: 0,
-    stdout: '__ORCA_AGENT_PATH__claude\t/mnt/d/tools/claude\n',
+    stdout: '__GIRRA_AGENT_PATH__claude\t/mnt/d/tools/claude\n',
     stderr: '',
     timedOut: false
   })
@@ -154,7 +154,7 @@ it('still counts a genuine guest install', async () => {
   runWslProcessMock.mockResolvedValue({
     environmentResolved: true,
     code: 0,
-    stdout: '__ORCA_AGENT_PATH__claude\t/home/alice/.nvm/versions/node/v20.1.0/bin/claude\n',
+    stdout: '__GIRRA_AGENT_PATH__claude\t/home/alice/.nvm/versions/node/v20.1.0/bin/claude\n',
     stderr: '',
     timedOut: false
   })
@@ -205,13 +205,13 @@ describe('the detection script itself, run by a real POSIX shell', () => {
     // reports a working install as "not installed".
     plant('.nvm/versions/node/v20.1.0/bin', 'orca-fake-cli')
     const out = await runScript()
-    expect(out).toContain('__ORCA_AGENT_PATH__orca-fake-cli')
+    expect(out).toContain('__GIRRA_AGENT_PATH__orca-fake-cli')
     expect(out).toContain('.nvm/versions/node/v20.1.0/bin/orca-fake-cli')
   })
 
   itPosix('finds a ~/.local/bin install', async () => {
     plant('.local/bin', 'orca-fake-cli')
-    expect(await runScript()).toContain('__ORCA_AGENT_PATH__orca-fake-cli')
+    expect(await runScript()).toContain('__GIRRA_AGENT_PATH__orca-fake-cli')
   })
 
   itPosix('still reports nothing for a command that is genuinely absent', async () => {
@@ -238,7 +238,7 @@ describe('the detection script itself, run by a real POSIX shell', () => {
     // Directories are mode 755 and pass -x. Preflight would say installed and
     // the launch would fail later with EISDIR.
     mkdirSync(join(home, '.local/bin/orca-fake-cli'), { recursive: true })
-    expect(await runScript()).not.toContain('__ORCA_AGENT_PATH__orca-fake-cli')
+    expect(await runScript()).not.toContain('__GIRRA_AGENT_PATH__orca-fake-cli')
   })
 
   itPosix.each([
@@ -248,7 +248,7 @@ describe('the detection script itself, run by a real POSIX shell', () => {
     '.local/share/mise/shims'
   ])('covers %s, which the native fallback also probes', async (dir) => {
     plant(dir, 'orca-fake-cli')
-    expect(await runScript()).toContain('__ORCA_AGENT_PATH__orca-fake-cli')
+    expect(await runScript()).toContain('__GIRRA_AGENT_PATH__orca-fake-cli')
   })
 })
 
@@ -376,8 +376,8 @@ describe('the mount table read, counted against a real shell', () => {
       }
       const out = String(execFileSync('/bin/sh', ['-c', script], options))
       // BOTH must resolve behind the mount, not just the first.
-      expect(out).toContain(`__ORCA_AGENT_PATH__claude\t${join(guest, 'claude')}`)
-      expect(out).toContain(`__ORCA_AGENT_PATH__opencode\t${join(guest, 'opencode')}`)
+      expect(out).toContain(`__GIRRA_AGENT_PATH__claude\t${join(guest, 'claude')}`)
+      expect(out).toContain(`__GIRRA_AGENT_PATH__opencode\t${join(guest, 'opencode')}`)
     } finally {
       rmSync(root, { recursive: true, force: true })
     }

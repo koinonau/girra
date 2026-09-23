@@ -52,7 +52,7 @@ or a `\\?\` device path, and the last is already refused as absolute.
 
 ## Kill switch
 
-Set **`ORCA_DISABLE_CMD_SHIM_RESOLUTION`** to any non-empty value in the
+Set **`GIRRA_DISABLE_CMD_SHIM_RESOLUTION`** to any non-empty value in the
 environment a child is spawned with, and every `.cmd` goes back through
 `cmd.exe /c` unchanged. It is read from the spawn's own environment, so
 exporting it before launching Girra disables resolution process-wide.

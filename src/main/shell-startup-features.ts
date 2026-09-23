@@ -3,15 +3,15 @@
  * features its wrapper should turn on, plus the pure selection that fills it.
  *
  * Why a positive allowlist the wrapper destroys before anything else runs:
- * every earlier switch was a negative, exported one (`ORCA_SHELL_READY_MARKER=0`,
- * `ORCA_SHELL_COMMAND_MARKERS=0`). Those live in the pane's PTY env, so every
+ * every earlier switch was a negative, exported one (`GIRRA_SHELL_READY_MARKER=0`,
+ * `GIRRA_SHELL_COMMAND_MARKERS=0`). Those live in the pane's PTY env, so every
  * child inherits them — a pane launched with a feature suppressed suppressed it
  * for a Girra started from that pane too. With an allowlist, an inherited or
  * stale value can only ever mean *fewer* features, never more, and the wrapper
  * unsets it before the user's own config (or anything it spawns) can see it.
  */
 
-export const SHELL_STARTUP_FEATURE_ENV = 'ORCA_SHELL_FEATURES'
+export const SHELL_STARTUP_FEATURE_ENV = 'GIRRA_SHELL_FEATURES'
 
 export const SHELL_STARTUP_FEATURES = [
   'overlay',
@@ -25,9 +25,9 @@ export type ShellStartupFeature = (typeof SHELL_STARTUP_FEATURES)[number]
 
 /** Spawn-env keys that mean this pane carries a Girra overlay the wrapper must re-apply. */
 const OVERLAY_ENV_KEYS = [
-  'ORCA_OPENCODE_CONFIG_DIR',
-  'ORCA_AGENT_TEAMS_SHIM_DIR',
-  'ORCA_REMOTE_CLI_BIN_DIR'
+  'GIRRA_OPENCODE_CONFIG_DIR',
+  'GIRRA_AGENT_TEAMS_SHIM_DIR',
+  'GIRRA_REMOTE_CLI_BIN_DIR'
 ] as const
 
 export type ShellStartupFeatureInput = {
@@ -49,7 +49,7 @@ function shellName(shellPath: string): string {
 
 /**
  * Pure function of spawn env + launch intent. Nothing here reads
- * `ORCA_SHELL_FEATURES`, so a value inherited from a parent shell cannot
+ * `GIRRA_SHELL_FEATURES`, so a value inherited from a parent shell cannot
  * enable or disable anything for the shell Girra is about to launch.
  */
 export function selectShellStartupFeatures(input: ShellStartupFeatureInput): ShellStartupFeature[] {
@@ -64,7 +64,7 @@ export function selectShellStartupFeatures(input: ShellStartupFeatureInput): She
   // place while the system zshrc runs, so the clobbered value it derives lands
   // inside Girra's wrapper dir and has to be repaired the same way.
   const history =
-    shellName(input.shellPath) === 'zsh' && (Boolean(input.env.ORCA_HISTFILE) || wrappedBefore)
+    shellName(input.shellPath) === 'zsh' && (Boolean(input.env.GIRRA_HISTFILE) || wrappedBefore)
 
   const features: ShellStartupFeature[] = []
   if (overlay) {

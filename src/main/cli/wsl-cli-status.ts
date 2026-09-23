@@ -20,20 +20,20 @@ export async function readWslCliCommandFile(
     distro,
     [
       `if [ -L ${quoteShell(commandPath)} ]; then`,
-      '  printf __ORCA_NOT_FILE__',
+      '  printf __GIRRA_NOT_FILE__',
       `elif [ ! -e ${quoteShell(commandPath)} ]; then`,
-      '  printf __ORCA_MISSING__',
+      '  printf __GIRRA_MISSING__',
       `elif [ ! -f ${quoteShell(commandPath)} ]; then`,
-      '  printf __ORCA_NOT_FILE__',
+      '  printf __GIRRA_NOT_FILE__',
       'else',
       `  cat ${quoteShell(commandPath)}`,
       'fi'
     ].join('\n')
   )
-  if (output === '__ORCA_MISSING__') {
+  if (output === '__GIRRA_MISSING__') {
     return null
   }
-  if (output === '__ORCA_NOT_FILE__') {
+  if (output === '__GIRRA_NOT_FILE__') {
     return 'not_file'
   }
   return output

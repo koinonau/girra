@@ -37,12 +37,12 @@ const OPENCODE_OVERLAY_SUBDIR = 'opencode-overlays'
 const LEGACY_PI_OVERLAY_SUBDIR = 'pi-overlays'
 const OPENCODE_PLUGIN_FILE = 'orca-opencode-status.js'
 const PI_EXTENSION_FILE = 'orca-agent-status.ts'
-const ORCA_MANAGED_EXTENSION_MARKER = '@orca-managed-pi-extension'
+const GIRRA_MANAGED_EXTENSION_MARKER = '@orca-managed-pi-extension'
 
 function withOrcaManagedPiExtensionMarker(source: string): string {
-  return source.includes(ORCA_MANAGED_EXTENSION_MARKER)
+  return source.includes(GIRRA_MANAGED_EXTENSION_MARKER)
     ? source
-    : `// ${ORCA_MANAGED_EXTENSION_MARKER}\n${source}`
+    : `// ${GIRRA_MANAGED_EXTENSION_MARKER}\n${source}`
 }
 function safeDirName(input: string): string {
   // Why: paneKey embeds tabId:paneId where tabId may itself contain
@@ -196,7 +196,7 @@ export class PluginOverlayManager {
 
   private canOverwritePiExtension(path: string): boolean {
     try {
-      return readFileSync(path, 'utf8').includes(ORCA_MANAGED_EXTENSION_MARKER)
+      return readFileSync(path, 'utf8').includes(GIRRA_MANAGED_EXTENSION_MARKER)
     } catch {
       return true
     }

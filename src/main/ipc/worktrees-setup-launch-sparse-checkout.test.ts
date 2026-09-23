@@ -130,8 +130,8 @@ describe('registerWorktreeHandlers', () => {
       setup: {
         runnerScriptPath: '/workspace/repo/.git/orca/setup-runner.sh',
         envVars: {
-          ORCA_ROOT_PATH: '/workspace/repo',
-          ORCA_WORKTREE_PATH: '/workspace/improve-dashboard'
+          GIRRA_ROOT_PATH: '/workspace/repo',
+          GIRRA_WORKTREE_PATH: '/workspace/improve-dashboard'
         }
       }
     })

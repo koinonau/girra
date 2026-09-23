@@ -109,18 +109,18 @@ describe('cross-version isolation', () => {
     // The v2 client has fullVersion='0.1.0+222222222222' (from the fs mock above).
     //
     mockExec.mockImplementation((_conn, command) => {
-      if (command.includes('__ORCA_UPLOAD_STAGE_SLOT__')) {
+      if (command.includes('__GIRRA_UPLOAD_STAGE_SLOT__')) {
         return Promise.resolve(
-          '__ORCA_UPLOAD_STAGE_SLOT__.sftp-namespace-00000000000000000000000000000000:slot-0'
+          '__GIRRA_UPLOAD_STAGE_SLOT__.sftp-namespace-00000000000000000000000000000000:slot-0'
         )
       }
-      if (command.includes('__ORCA_UPLOAD_STAGE_PROMOTION__')) {
+      if (command.includes('__GIRRA_UPLOAD_STAGE_PROMOTION__')) {
         return Promise.resolve(
-          '__ORCA_UPLOAD_STAGE_PROMOTION__.sftp-namespace-00000000000000000000000000000000:PROMOTED'
+          '__GIRRA_UPLOAD_STAGE_PROMOTION__.sftp-namespace-00000000000000000000000000000000:PROMOTED'
         )
       }
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/u')
@@ -146,7 +146,7 @@ describe('cross-version isolation', () => {
       if (command.includes('test -S') && command.includes('echo ALIVE || echo DEAD')) {
         return Promise.resolve('DEAD')
       }
-      if (command.includes('__ORCA_RELAY_GC_FIND_STATUS__')) {
+      if (command.includes('__GIRRA_RELAY_GC_FIND_STATUS__')) {
         return Promise.resolve('relay-0.1.0+111111111111\nrelay-0.1.0+222222222222\n')
       }
       if (command.includes('relay-0.1.0+111111111111/.install-lock')) {

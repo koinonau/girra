@@ -11,6 +11,7 @@
  * the runtime factory, but only when an Electron serve sidecar or an operator-supplied
  * Chromium proves available at startup.
  */
+import '../startup/legacy-orca-env-adoption'
 import process from 'node:process'
 import { setAppEnvironment, type AppEnvironment } from '../../shared/app-environment'
 import { setSecretStore, type SecretStore } from '../../shared/secret-store'
@@ -44,7 +45,7 @@ function createNodeAppEnvironment(): AppEnvironment {
   return {
     getPath: resolveOrcadPath,
     getAppPath: () => resolveOrcadInstallRoot(),
-    getVersion: () => process.env.ORCA_VERSION ?? '0.0.0-orcad',
+    getVersion: () => process.env.GIRRA_VERSION ?? '0.0.0-orcad',
     // Why still true: consumers read this as "production build, not a dev checkout" —
     // it gates HTTPS-only skill downloads, the real CLI command name, and shell-PATH
     // hydration. Answering false to satisfy a path resolver would relax a security

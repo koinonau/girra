@@ -45,7 +45,7 @@ function lookupArgs(command: string, mode: '-lc' | '-ilc' = '-lc'): string[] {
     [
       buildPosixCommandPathLookupScript({ kind: 'literal', value: command }),
       'if [ -n "$resolved" ]; then',
-      'printf \'__ORCA_AGENT_PATH__%s\\n\' "$resolved"',
+      'printf \'__GIRRA_AGENT_PATH__%s\\n\' "$resolved"',
       'fi'
     ].join('\n')
   ]
@@ -57,7 +57,7 @@ function fishLookupArgs(command: string): string[] {
     [
       `set -l resolved (command -v ${command} 2>/dev/null)`,
       'if test -n "$resolved"',
-      'printf \'__ORCA_AGENT_PATH__%s\\n\' "$resolved"',
+      'printf \'__GIRRA_AGENT_PATH__%s\\n\' "$resolved"',
       'end'
     ].join('\n')
   ]
@@ -163,7 +163,7 @@ describe('isCommandOnPathForRelay', () => {
   it('falls back to inherited PATH when shell startup returns no absolute command path', async () => {
     execFileAsyncMock
       .mockResolvedValueOnce({ stdout: 'welcome\nopencode is a function\n' })
-      .mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/opencode\n' })
+      .mockResolvedValueOnce({ stdout: '__GIRRA_AGENT_PATH__/relay/path/opencode\n' })
 
     await expect(
       isCommandOnPathForRelay('opencode', {
@@ -192,7 +192,7 @@ describe('isCommandOnPathForRelay', () => {
   it('falls back to inherited PATH when shell startup fails', async () => {
     execFileAsyncMock
       .mockRejectedValueOnce(new Error('startup failed'))
-      .mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/opencode\n' })
+      .mockResolvedValueOnce({ stdout: '__GIRRA_AGENT_PATH__/relay/path/opencode\n' })
 
     await expect(
       isCommandOnPathForRelay('opencode', {
@@ -205,7 +205,7 @@ describe('isCommandOnPathForRelay', () => {
   })
 
   it('does not execute an untrusted configured shell before inherited PATH lookup', async () => {
-    execFileAsyncMock.mockResolvedValueOnce({ stdout: '__ORCA_AGENT_PATH__/relay/path/opencode\n' })
+    execFileAsyncMock.mockResolvedValueOnce({ stdout: '__GIRRA_AGENT_PATH__/relay/path/opencode\n' })
 
     await expect(
       isCommandOnPathForRelay('opencode', {
@@ -237,7 +237,7 @@ describe('hasAbsoluteCommandPath', () => {
   it('recognizes a sentinel-marked command path amid shell startup and exit output', () => {
     expect(
       hasAbsoluteCommandPath(
-        'welcome\n__ORCA_AGENT_PATH__/opt/bin/opencode\nlogout-banner\n',
+        'welcome\n__GIRRA_AGENT_PATH__/opt/bin/opencode\nlogout-banner\n',
         'linux'
       )
     ).toBe(true)
@@ -255,7 +255,7 @@ describe('PreflightHandler', () => {
     execFileAsyncMock.mockImplementation(async (_file, args) => {
       const script = String(args[1])
       if (script.includes("'orca'")) {
-        return { stdout: '__ORCA_AGENT_PATH__/relay/path/orca\n' }
+        return { stdout: '__GIRRA_AGENT_PATH__/relay/path/orca\n' }
       }
       throw new Error('not found')
     })

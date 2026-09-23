@@ -611,11 +611,11 @@ describe('wrapWindowsHookCommand', () => {
   })
 
   it('keeps cmd.exe percent expansion and caret escapes out of the command line', () => {
-    const cmd = wrapWindowsHookCommand('C:\\Users\\%ORCA_TEST%\\a^b\\claude-hook.cmd')
-    expect(cmd).not.toContain('%ORCA_TEST%')
+    const cmd = wrapWindowsHookCommand('C:\\Users\\%GIRRA_TEST%\\a^b\\claude-hook.cmd')
+    expect(cmd).not.toContain('%GIRRA_TEST%')
     expect(cmd).not.toContain('^')
     expect(decodeWindowsHookCommand(cmd)).toBe(
-      expectedDecodedWindowsHookCommand('C:\\Users\\%ORCA_TEST%\\a^b\\claude-hook.cmd')
+      expectedDecodedWindowsHookCommand('C:\\Users\\%GIRRA_TEST%\\a^b\\claude-hook.cmd')
     )
   })
 
@@ -628,7 +628,7 @@ describe('wrapWindowsHookCommand', () => {
       writeFileSync(scriptPath, '@echo off\r\nexit /b 7\r\n', 'utf-8')
 
       const result = spawnSync('cmd.exe', ['/d', '/c', wrapWindowsHookCommand(scriptPath)], {
-        env: { ...process.env, ORCA_WRAP_TEST: 'expanded' }
+        env: { ...process.env, GIRRA_WRAP_TEST: 'expanded' }
       })
 
       expect(result.status).toBe(7)
@@ -772,7 +772,7 @@ describe('buildPosixAgentHookPostCommand', () => {
   it('uses raw JSON only when the listener advertises support', () => {
     const command = buildPosixAgentHookPostCommand('claude').join('\n')
 
-    expect(command).toContain('ORCA_AGENT_HOOK_TRANSPORT:-}')
+    expect(command).toContain('GIRRA_AGENT_HOOK_TRANSPORT:-}')
     expect(command).toContain('raw-json-v1')
     expect(command).toContain('command -v base64')
     expect(command).toContain('command -v tr')
@@ -780,8 +780,8 @@ describe('buildPosixAgentHookPostCommand', () => {
     expect(command).toContain('X-Orca-Agent-Hook-Meta-Encoding: base64')
     expect(command).toContain('X-Orca-Agent-Hook-Meta: ${orca_hook_metadata}')
     expect(command).toContain("printf '%s\\037%s\\037%s\\037%s\\037%s\\037%s'")
-    expect(command).toContain('$ORCA_PANE_KEY')
-    expect(command).toContain('$ORCA_WORKTREE_ID')
+    expect(command).toContain('$GIRRA_PANE_KEY')
+    expect(command).toContain('$GIRRA_WORKTREE_ID')
     expect(command).toContain('--data-binary @-')
     expect(command).toContain('Content-Type: application/x-www-form-urlencoded')
     expect(command).toContain('--data-urlencode "payload@-"')
@@ -796,11 +796,11 @@ describe('buildWindowsAgentHookCurlPostCommand', () => {
     // is the regression this replaces.
     expect(command).not.toMatch(/powershell/i)
     expect(command).toContain('%SystemRoot%\\System32\\curl.exe')
-    expect(command).toContain('http://127.0.0.1:%ORCA_AGENT_HOOK_PORT%/hook/claude')
+    expect(command).toContain('http://127.0.0.1:%GIRRA_AGENT_HOOK_PORT%/hook/claude')
     expect(command).toContain('-H "Content-Type: application/x-www-form-urlencoded"')
-    expect(command).toContain('-H "X-Orca-Agent-Hook-Token: %ORCA_AGENT_HOOK_TOKEN%"')
-    expect(command).toContain('--data-urlencode "paneKey=%ORCA_PANE_KEY%"')
-    expect(command).toContain('--data-urlencode "worktreeId=%ORCA_WORKTREE_ID%"')
+    expect(command).toContain('-H "X-Orca-Agent-Hook-Token: %GIRRA_AGENT_HOOK_TOKEN%"')
+    expect(command).toContain('--data-urlencode "paneKey=%GIRRA_PANE_KEY%"')
+    expect(command).toContain('--data-urlencode "worktreeId=%GIRRA_WORKTREE_ID%"')
     // Why: `payload@-` makes curl read raw bytes from stdin and urlencode them,
     // so UTF-8 prompts survive without a code-page conversion.
     expect(command).toContain('--data-urlencode "payload@-"')

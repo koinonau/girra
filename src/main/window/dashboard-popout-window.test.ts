@@ -173,9 +173,9 @@ const RENDERER_URL = 'http://localhost:5173'
 
 // These cases exercise foreground behavior against Electron mocks.
 beforeEach(() => {
-  vi.stubEnv('ORCA_BACKGROUND_LAUNCH', undefined)
-  vi.stubEnv('ORCA_E2E_HEADLESS', undefined)
-  vi.stubEnv('ORCA_E2E_HEADFUL', undefined)
+  vi.stubEnv('GIRRA_BACKGROUND_LAUNCH', undefined)
+  vi.stubEnv('GIRRA_E2E_HEADLESS', undefined)
+  vi.stubEnv('GIRRA_E2E_HEADFUL', undefined)
 })
 afterEach(() => vi.unstubAllEnvs())
 

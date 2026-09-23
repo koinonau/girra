@@ -1,5 +1,5 @@
-import { ORCA_BROWSER_BLANK_URL } from '../../../../../shared/constants'
-import { ORCA_BROWSER_GUEST_WEB_PREFERENCES_ATTRIBUTE } from '../../../../../shared/browser-guest-web-preferences'
+import { GIRRA_BROWSER_BLANK_URL } from '../../../../../shared/constants'
+import { GIRRA_BROWSER_GUEST_WEB_PREFERENCES_ATTRIBUTE } from '../../../../../shared/browser-guest-web-preferences'
 import {
   destroyPersistentWebview,
   registerPersistentWebview,
@@ -53,7 +53,7 @@ export function ensureBrowserPageWebview({
   // Keep Chromium's normal page canvas opaque while the host underneath follows Girra's theme.
   webview.setAttribute(
     'webpreferences',
-    `${ORCA_BROWSER_GUEST_WEB_PREFERENCES_ATTRIBUTE},transparent=false`
+    `${GIRRA_BROWSER_GUEST_WEB_PREFERENCES_ATTRIBUTE},transparent=false`
   )
   webview.style.display = 'flex'
   webview.style.flex = '1'
@@ -66,7 +66,7 @@ export function ensureBrowserPageWebview({
   guest.addEventListener('load-commit', (event) => {
     if (event.isMainFrame) {
       guest.style.visibility =
-        event.url === 'about:blank' || event.url === ORCA_BROWSER_BLANK_URL ? 'hidden' : 'visible'
+        event.url === 'about:blank' || event.url === GIRRA_BROWSER_BLANK_URL ? 'hidden' : 'visible'
     }
   })
   guest.addEventListener('render-process-gone', () => {

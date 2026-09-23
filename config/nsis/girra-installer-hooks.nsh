@@ -24,12 +24,12 @@
 ; ---------------------------------------------------------------------------
 !define MARKDOWN_PROGID "Girra.Markdown"
 
-!macro ORCA_REGISTER_MARKDOWN_OPEN_WITH EXT
+!macro GIRRA_REGISTER_MARKDOWN_OPEN_WITH EXT
   WriteRegNone SHELL_CONTEXT "Software\Classes\${EXT}\OpenWithProgids" "${MARKDOWN_PROGID}"
   WriteRegStr SHELL_CONTEXT "Software\Classes\Applications\${APP_EXECUTABLE_FILENAME}\SupportedTypes" "${EXT}" ""
 !macroend
 
-!macro ORCA_UNREGISTER_MARKDOWN_OPEN_WITH EXT
+!macro GIRRA_UNREGISTER_MARKDOWN_OPEN_WITH EXT
   DeleteRegValue SHELL_CONTEXT "Software\Classes\${EXT}\OpenWithProgids" "${MARKDOWN_PROGID}"
   DeleteRegValue SHELL_CONTEXT "Software\Classes\Applications\${APP_EXECUTABLE_FILENAME}\SupportedTypes" "${EXT}"
 !macroend
@@ -39,9 +39,9 @@
   WriteRegStr SHELL_CONTEXT "Software\Classes\${MARKDOWN_PROGID}\DefaultIcon" "" "$appExe,0"
   WriteRegStr SHELL_CONTEXT "Software\Classes\${MARKDOWN_PROGID}\shell\open" "" "Open with ${PRODUCT_NAME}"
   WriteRegStr SHELL_CONTEXT "Software\Classes\${MARKDOWN_PROGID}\shell\open\command" "" '"$appExe" "%1"'
-  !insertmacro ORCA_REGISTER_MARKDOWN_OPEN_WITH ".md"
-  !insertmacro ORCA_REGISTER_MARKDOWN_OPEN_WITH ".markdown"
-  !insertmacro ORCA_REGISTER_MARKDOWN_OPEN_WITH ".mdx"
+  !insertmacro GIRRA_REGISTER_MARKDOWN_OPEN_WITH ".md"
+  !insertmacro GIRRA_REGISTER_MARKDOWN_OPEN_WITH ".markdown"
+  !insertmacro GIRRA_REGISTER_MARKDOWN_OPEN_WITH ".mdx"
   ; Why: Explorer caches the association list until told otherwise.
   System::Call "shell32::SHChangeNotify(i,i,i,i) (0x08000000, 0x1000, 0, 0)"
 !macroend
@@ -98,8 +98,8 @@
   ; Why outside the ${isUpdated} guard: customInstall rewrites these on every update, so
   ; dropping them during uninstallOldVersion is correct and keeps the pair symmetric.
   DeleteRegKey SHELL_CONTEXT "Software\Classes\${MARKDOWN_PROGID}"
-  !insertmacro ORCA_UNREGISTER_MARKDOWN_OPEN_WITH ".md"
-  !insertmacro ORCA_UNREGISTER_MARKDOWN_OPEN_WITH ".markdown"
-  !insertmacro ORCA_UNREGISTER_MARKDOWN_OPEN_WITH ".mdx"
+  !insertmacro GIRRA_UNREGISTER_MARKDOWN_OPEN_WITH ".md"
+  !insertmacro GIRRA_UNREGISTER_MARKDOWN_OPEN_WITH ".markdown"
+  !insertmacro GIRRA_UNREGISTER_MARKDOWN_OPEN_WITH ".mdx"
   System::Call "shell32::SHChangeNotify(i,i,i,i) (0x08000000, 0x1000, 0, 0)"
 !macroend

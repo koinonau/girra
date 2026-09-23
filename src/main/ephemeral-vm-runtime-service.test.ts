@@ -73,7 +73,7 @@ describe('ephemeral VM runtime service', () => {
         '  schemaVersion: 1,',
         `  pairingCode: ${JSON.stringify(makePairingCode())},`,
         "  projectRoot: '/workspace/repo',",
-        '  userData: { providerResourceId: process.env.ORCA_VM_INSTANCE_ID }',
+        '  userData: { providerResourceId: process.env.GIRRA_VM_INSTANCE_ID }',
         '}))'
       ].join('\n')
     )

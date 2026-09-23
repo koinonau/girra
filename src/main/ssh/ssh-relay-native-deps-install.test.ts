@@ -401,7 +401,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     const conn = makeMockConnection(sftpCapture)
     vi.mocked(isRelayAlreadyInstalled).mockResolvedValue(true)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       { reject: 'Command "node -e ..." timed out after 30s' } // health probe never answered
     ])
@@ -549,11 +549,11 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(resolveRemoteNodePath).mockResolvedValueOnce('C:/Program Files/nodejs/node.exe')
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Windows AMD64',
+      '__GIRRA_REMOTE_PLATFORM__ Windows AMD64',
       'C:\\Users\\u',
       '', // bounded stale-stage recovery
-      '__ORCA_UPLOAD_STAGE_SLOT__.sftp-namespace-00000000000000000000000000000000:slot-0',
-      '__ORCA_UPLOAD_STAGE_PROMOTION__.sftp-namespace-00000000000000000000000000000000:PROMOTED',
+      '__GIRRA_UPLOAD_STAGE_SLOT__.sftp-namespace-00000000000000000000000000000000:slot-0',
+      '__GIRRA_UPLOAD_STAGE_PROMOTION__.sftp-namespace-00000000000000000000000000000000:PROMOTED',
       '', // npm install native deps
       'MISSING\n', // native process exit normalized by PowerShell command
       '', // npm rebuild native deps
@@ -645,7 +645,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(isRelayAlreadyInstalled).mockResolvedValue(true)
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       'ORCA-NATIVE-DEPS-MISSING:@parcel/watcher\nMISSING', // first probe before lock
       'ORCA-NATIVE-DEPS-MISSING:@parcel/watcher\nMISSING', // re-probe after lock
@@ -700,7 +700,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(isRelayAlreadyInstalled).mockResolvedValue(true)
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       BOTH_NATIVE_DEPS_MISSING_PROBE, // health probe: require() names both deps
       BOTH_NATIVE_DEPS_MISSING_PROBE, // re-probe after lock
@@ -724,7 +724,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(isRelayAlreadyInstalled).mockResolvedValue(true)
     const conn = makeMockConnection(sftpCapture)
     vi.mocked(execCommand)
-      .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       .mockResolvedValueOnce('/home/u')
       .mockResolvedValueOnce(BOTH_NATIVE_DEPS_MISSING_PROBE)
       .mockResolvedValueOnce(BOTH_NATIVE_DEPS_MISSING_PROBE)
@@ -866,7 +866,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(tryAcquireRelayRepairLock).mockResolvedValueOnce(lockResult)
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       BOTH_NATIVE_DEPS_MISSING_PROBE,
       'DEAD',
@@ -888,7 +888,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(isRelayAlreadyInstalled).mockResolvedValue(true)
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       'ORCA-NATIVE-DEPS-OK',
       '', // launch namespace marker
@@ -912,7 +912,7 @@ describe('installNativeDeps (via deployAndLaunchRelay)', () => {
     vi.mocked(isRelayAlreadyInstalled).mockResolvedValue(true)
     const conn = makeMockConnection(sftpCapture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       '/home/u',
       'ORCA-NATIVE-DEPS-OK',
       '', // launch namespace marker

@@ -50,7 +50,7 @@ describe('registerPtyHandlers', () => {
         })
         expect(openCodeBuildPtyEnvMock).toHaveBeenCalled()
         expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-config')
-        expect(env.ORCA_OPENCODE_HOOK_PORT).toBe('4567')
+        expect(env.GIRRA_OPENCODE_HOOK_PORT).toBe('4567')
       })
       it('mirrors a user-provided OPENCODE_CONFIG_DIR into a source-scoped overlay on the daemon path', async () => {
         const env = await daemonSpawnAndGetEnv({ OPENCODE_CONFIG_DIR: '/user/custom/opencode' })
@@ -60,21 +60,21 @@ describe('registerPtyHandlers', () => {
           '/user/custom/opencode'
         )
         expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-        expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-        expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/user/custom/opencode')
+        expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
+        expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/user/custom/opencode')
       })
       it('uses source OpenCode config env instead of remirroring a parent overlay', async () => {
         const env = await daemonSpawnAndGetEnv({
           OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
-          ORCA_OPENCODE_SOURCE_CONFIG_DIR: '/user/custom/opencode'
+          GIRRA_OPENCODE_SOURCE_CONFIG_DIR: '/user/custom/opencode'
         })
         expect(openCodeBuildPtyEnvMock).toHaveBeenCalledWith(
           expect.any(String),
           '/user/custom/opencode'
         )
         expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-        expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-        expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/user/custom/opencode')
+        expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
+        expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/user/custom/opencode')
       })
       it('installs Pi managed extensions without redirecting homes on the daemon path', async () => {
         const env = await daemonSpawnAndGetEnv({ PI_CODING_AGENT_DIR: '/user/.pi/agent' })
@@ -83,8 +83,8 @@ describe('registerPtyHandlers', () => {
           materializeDefaultHome: false
         })
         expect(env.PI_CODING_AGENT_DIR).toBe('/user/.pi/agent')
-        expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
+        expect(env.GIRRA_PI_CODING_AGENT_DIR).toBeUndefined()
+        expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
       })
       it('does not materialize the Pi home when another daemon agent mentions Pi', async () => {
         const env = await daemonSpawnAndGetEnv(undefined, undefined, undefined, {
@@ -96,7 +96,7 @@ describe('registerPtyHandlers', () => {
         expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, {
           materializeDefaultHome: false
         })
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
+        expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBeUndefined()
       })
       it('threads command: "pi" through to piBuildPtyEnv on the daemon path', async () => {
         // Why: the daemon path's `command` forwarding could silently regress otherwise.
@@ -110,8 +110,8 @@ describe('registerPtyHandlers', () => {
           materializeDefaultHome: true
         })
         expect(env.PI_CODING_AGENT_DIR).toBe('/user/.pi/agent')
-        expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
+        expect(env.GIRRA_PI_CODING_AGENT_DIR).toBeUndefined()
+        expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
       })
       it('uses sequenced startup env as the daemon Pi launch hint when command is a wrapper', async () => {
         const env = await daemonSpawnAndGetEnv(
@@ -127,7 +127,7 @@ describe('registerPtyHandlers', () => {
         expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/user/.pi/agent', {
           materializeDefaultHome: true
         })
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
+        expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/user/.pi/agent')
       })
     })
   })

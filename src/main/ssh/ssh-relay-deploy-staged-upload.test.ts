@@ -41,7 +41,7 @@ vi.mock('./ssh-relay-deploy-helpers', () => ({
   isUnconfirmedSshCommandTermination: (error: unknown) =>
     error instanceof Error &&
     (error as Error & { sshChannelCloseConfirmed?: boolean }).sshChannelCloseConfirmed === false,
-  execCommand: vi.fn().mockResolvedValue('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+  execCommand: vi.fn().mockResolvedValue('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
 }))
 
 vi.mock('./ssh-remote-node-resolution', () => ({
@@ -112,11 +112,11 @@ function makeMockConnection(): SshConnection {
 
 function stageCommandResponse(command: string): string | undefined {
   const marker = command.match(/\.sftp-namespace-[0-9a-f]{32}/u)?.[0]
-  if (command.includes('__ORCA_UPLOAD_STAGE_SLOT__') && marker) {
-    return `__ORCA_UPLOAD_STAGE_SLOT__${marker}:slot-0`
+  if (command.includes('__GIRRA_UPLOAD_STAGE_SLOT__') && marker) {
+    return `__GIRRA_UPLOAD_STAGE_SLOT__${marker}:slot-0`
   }
-  if (command.includes('__ORCA_UPLOAD_STAGE_PROMOTION__') && marker) {
-    return `__ORCA_UPLOAD_STAGE_PROMOTION__${marker}:PROMOTED`
+  if (command.includes('__GIRRA_UPLOAD_STAGE_PROMOTION__') && marker) {
+    return `__GIRRA_UPLOAD_STAGE_PROMOTION__${marker}:PROMOTED`
   }
   return command.includes('.upload-stages') ? '' : undefined
 }
@@ -124,7 +124,7 @@ function stageCommandResponse(command: string): string | undefined {
 describe('deployAndLaunchRelay staged uploads', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    vi.mocked(execCommand).mockReset().mockResolvedValue('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+    vi.mocked(execCommand).mockReset().mockResolvedValue('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
     vi.mocked(waitForSentinel).mockReset().mockResolvedValue({
       write: vi.fn(),
       onData: vi.fn(),
@@ -142,7 +142,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
       vi.mocked(isRelayAlreadyInstalled).mockReset().mockResolvedValue(true)
       vi.mocked(execCommand).mockImplementation((_conn, command) => {
         if (command.includes('uname')) {
-          return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+          return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
         }
         if (command === 'echo $HOME') {
           return Promise.resolve('/home/user')
@@ -182,7 +182,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
       vi.mocked(isRelayAlreadyInstalled).mockReset().mockResolvedValue(false)
       vi.mocked(execCommand).mockImplementation((_conn, command) => {
         if (command.includes('uname')) {
-          return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+          return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
         }
         if (command === 'echo $HOME') {
           return Promise.resolve('/home/user')
@@ -228,7 +228,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
@@ -281,7 +281,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
@@ -325,7 +325,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
@@ -369,7 +369,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
@@ -410,7 +410,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
@@ -444,7 +444,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       return Promise.resolve(
-        command.includes('uname') ? '__ORCA_REMOTE_PLATFORM__ Linux x86_64' : '/home/user'
+        command.includes('uname') ? '__GIRRA_REMOTE_PLATFORM__ Linux x86_64' : '/home/user'
       )
     })
     conn.writeFile = vi.fn().mockResolvedValue(undefined)
@@ -494,7 +494,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
@@ -534,7 +534,7 @@ describe('deployAndLaunchRelay staged uploads', () => {
         return Promise.resolve(stageResponse)
       }
       if (command.includes('uname')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       }
       if (command === 'echo $HOME') {
         return Promise.resolve('/home/user')
