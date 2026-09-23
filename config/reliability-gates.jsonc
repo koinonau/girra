@@ -121,7 +121,9 @@
         },
         {
           "file": "src/main/native-chat/agent-session-wire/structured-agent-session-unexpected-exit.test.ts",
-          "assertions": ["keeps exit receipt %s on retry"]
+          "assertions": [
+            "keeps exit receipt %s on retry"
+          ]
         },
         {
           "file": "src/shared/structured-agent-session-turn-timing-retention.test.ts",
@@ -132,7 +134,9 @@
         },
         {
           "file": "src/renderer/src/components/native-chat/NativeChatMessageList.turn-timing.test.tsx",
-          "assertions": ["renders a host-settled duration without ever clocking the turn locally"]
+          "assertions": [
+            "renders a host-settled duration without ever clocking the turn locally"
+          ]
         }
       ],
       "evidenceRuns": [
@@ -924,7 +928,9 @@
         "gh run view 34046230389 --log",
         "ORCA_E2E_SSH_LOCALHOST=1 ORCA_FEATURE_REMOTE_AGENT_HOOKS=1 pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/ssh-localhost.spec.ts --project=electron-headless --workers=1"
       ],
-      "testFiles": ["tests/e2e/ssh-localhost.spec.ts"],
+      "testFiles": [
+        "tests/e2e/ssh-localhost.spec.ts"
+      ],
       "assertionRefs": [
         {
           "file": "tests/e2e/ssh-localhost.spec.ts",
@@ -9207,7 +9213,9 @@
       "commands": [
         "node tests/tools/win-crash-survival-e2e/run.mjs --expect survival --exe-path \"$env:ORCA_EXE\" --soak-seconds 8"
       ],
-      "testFiles": ["tests/tools/win-crash-survival-e2e/run.mjs"],
+      "testFiles": [
+        "tests/tools/win-crash-survival-e2e/run.mjs"
+      ],
       "assertionRefs": [
         {
           "file": "tests/tools/win-crash-survival-e2e/run.mjs",
@@ -18326,7 +18334,9 @@
         "gh run view 34074017928 --log",
         "pnpm exec playwright test --config tests/playwright.config.ts tests/e2e/terminal-hangul-terminating-digit-native.spec.ts --project=electron-headful --workers=1 --repeat-each=3 --retries=0 --reporter=list,json"
       ],
-      "testFiles": ["tests/e2e/terminal-hangul-terminating-digit-native.spec.ts"],
+      "testFiles": [
+        "tests/e2e/terminal-hangul-terminating-digit-native.spec.ts"
+      ],
       "assertionRefs": [
         {
           "file": "tests/e2e/terminal-hangul-terminating-digit-native.spec.ts",

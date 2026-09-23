@@ -180,6 +180,7 @@ Fonctionne avec **n'importe quel agent CLI** — s'il tourne dans un terminal, i
 - **Sous Windows :** utilisez la [dernière RC (`v1.4.147-rc.3`)](https://github.com/koinonau/girra/releases#release-v1.4.147-rc.3) — elle inclut des correctifs Windows absents de la stable.
 - Vous lancez `girra serve` sur un serveur Linux headless ? Consultez le [guide serveur Linux headless](../reference/headless-linux-server.md).
 
+
 ---
 
 ## Communauté &amp; support

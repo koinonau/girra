@@ -174,6 +174,7 @@ Funciona con **cualquier agente CLI** — si corre en una terminal, corre en Gir
 - **[Descarga desde onOrca.dev](https://onorca.dev/download)**
 - O descarga un build directamente: [macOS Apple Silicon](https://github.com/koinonau/girra/releases/latest/download/girra-macos-arm64.dmg) · [macOS Intel](https://github.com/koinonau/girra/releases/latest/download/girra-macos-x64.dmg) · [Windows (.exe)](https://github.com/koinonau/girra/releases/latest/download/girra-windows-setup.exe) · [Linux AppImage](https://github.com/koinonau/girra/releases/latest/download/girra-linux.AppImage) · [Todos los builds](https://github.com/koinonau/girra/releases/latest)
 
+
 ---
 
 ## Comunidad y soporte

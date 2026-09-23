@@ -21,6 +21,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 - **Secret redaction at rest** - substitutes secrets with sentinels before writing state to disk. `src/main/persistence/loading-store/secret-sentinel-substitution.ts`, `state-serialization-secret-handling.ts` _(Small)_ (security, not really "droppable")
 - **Secure IPC bridge (contextBridge API surface)** - the whitelisted API exposed from Electron's main process into the sandboxed renderer. `src/preload/index.ts`, `src/preload/api` _(Large)_ `(internal?)`
 
+
 ---
 
 ## Part 1. Agent providers and runtimes
@@ -76,7 +77,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 ### Other Agent CLI Integrations
 
 - [x] **AI commit-message generation** - Runs a background agent to draft a commit message from the staged diff. `src/main/text-generation` (commit-message-*) _(Medium)_
-- [x] **AI pull-request description generation** - Runs a background agent to draft a PR title/description from local or remote branch context. `src/main/text-generation` (pull-request-_, source-control-_) _(Large)_
+- [x] **AI pull-request description generation** - Runs a background agent to draft a PR title/description from local or remote branch context. `src/main/text-generation` (pull-request-*, source-control-*) _(Large)_
 - [x] **OpenCode status plugin** - Installs a status-reporting plugin (session lifecycle, message previews) into OpenCode. `src/main/opencode` _(Medium)_
 - [x] **OpenCode usage tracking** - Reads OpenCode's local SQLite session DB for usage rollups. `src/main/opencode-usage` _(Medium)_
   - ↳ needs: Local SQLite storage layer
@@ -147,7 +148,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 
 ### Skills
 
-- [x] **Agent skills marketplace/install** - Discovers, downloads, and installs "skill" packages into an agent's config, local or SSH-relayed. `src/main/skills` (skill-install-_, skill-cloud-_) _(Large)_
+- [x] **Agent skills marketplace/install** - Discovers, downloads, and installs "skill" packages into an agent's config, local or SSH-relayed. `src/main/skills` (skill-install-*, skill-cloud-*) _(Large)_
   - [x] **Skill removal with recovery** - Uninstalls a skill via a staged, recoverable delete. `skills/skill-delete` _(Medium)_
   - [x] **Agent-driven skill selection** - logic for an agent to pick which installed skill to invoke. `src/main/skills/agent-skill-selection.ts` _(internal?)_ _(Small)_
   - [x] **Local skill discovery** - scans repos/known roots for agent "skill" files and summarizes them. `src/main/skills/discovery.ts`, `skill-discovery-sources.ts` _(Medium)_
@@ -175,6 +176,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 - [x] **Foreground-process detection (per-OS)** - Detects what command is actually running in a pane vs. the shell, used to tell whether an agent is active. `providers/windows-*`, `macos-*`, `posix-pane-foreground-fingerprint.ts` _(Medium)_ (internal?)
 - [x] **Local PTY execution provider** - Runs agent CLIs in a real local pseudo-terminal, with "shell ready" detection before injecting commands. `src/main/providers/local-pty-*` _(Large)_
 - [x] **SSH remote execution provider (PTY/git/filesystem)** - Runs agents, git ops, and file access on a remote SSH host, so agents can work on remote machines. `src/main/providers/ssh-*` _(Large)_
+
 
 ---
 
@@ -256,6 +258,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 - [x] **Local build feed & switch** - serves/consumes locally built app updates and lets a user switch to a local dev build. `src/main/local-builds/local-build-feed-server.ts` _(internal?)_ `(Medium)`
 - [x] **Project groups (multi-repo grouping)** - groups related worktrees/repos under a named project group in the sidebar. `src/renderer/src/store/project-groups/` _(Large)_
 - [x] **Startup preflight checks** - runs agent/CLI-availability checks before an agent runs, surfacing issues on the landing screen. `src/main/preflight/agent-detection.ts`, `src/renderer/src/components/landing-preflight-issues.ts` _(Medium)_
+
 
 ---
 
@@ -431,6 +434,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 - [x] **App restart with checkpoint routing** - restarts the Electron app while preserving in-flight terminal/session checkpoints. `src/preload/app-restart-checkpoint-routing.ts` _(Small)_
 - [x] **In-app markdown/doc link preview** - intercepts clicked links to preview a document instead of opening a browser. `src/preload/doc-preview-link.ts` _(Small)_
 - [x] **Renderer heap/memory diagnostics** - reports renderer process memory usage for performance monitoring. `src/preload/renderer-heap-statistics-reader.ts`, `renderer-process-memory-reader.ts` _(Small)_
+
 
 ---
 
@@ -640,6 +644,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 - [x] **SSH host UI helpers** - Renderer-side SSH connection status glyphs and remote host forms. `src/renderer/src/ssh`, `src/renderer/src/components/sidebar/AddRemoteHostServerFormPanel.tsx` _(Medium)_
 - [x] **Sound/typing-latency instrumentation** - Measures and reports input latency (perf-focused, likely internal). `src/renderer/src/lib/typing-latency` _(internal?)_ _(Small)_
 
+
 ---
 
 ## Part 5. Automation, storage and platform services
@@ -750,6 +755,7 @@ Not tickable. Every branch below rests on these; the import graph confirms it.
 - [ ] **Feedback with image attachments** - in-app feedback form supporting screenshot/image attachments. `src/main/ipc/feedback.ts`, `feedback-image-attachments.ts` _(Small)_
 - [x] **Worktree git hooks management** - install/inspect/run custom git hooks scoped to a worktree. `src/main/ipc/hooks` _(Medium)_
 
+
 ---
 
 ## Part 6. Mobile, browser and computer use
@@ -856,3 +862,4 @@ Orca's own marketing vocabulary, scraped from its docs site as a cross-check aga
 - **Tabs, panes & split layouts** - Drag-to-split panes, tab groups, pinned boundaries. `docs/site/content/docs/model/tabs-panes-splits.mdx` _(Medium)_
 - **Terminal Splits** - "Ghostty-class terminals with WebGL rendering, infinite splits." `docs/site/content/docs/terminal.mdx` _(Large)_
 - **Worktree checkpoints (status comment field)** - Free-text status field on a worktree, updatable from the CLI by agents. `docs/site/content/docs/cli/worktree-checkpoints.mdx` _(Small)_
+

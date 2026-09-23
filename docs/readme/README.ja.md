@@ -174,6 +174,7 @@ PR、Issue、プロジェクトボードをアプリ内で閲覧 — 任意の�
 - **[onOrca.dev からダウンロード](https://onorca.dev/download)**
 - またはビルドを直接入手: [macOS Apple Silicon](https://github.com/koinonau/girra/releases/latest/download/girra-macos-arm64.dmg) · [macOS Intel](https://github.com/koinonau/girra/releases/latest/download/girra-macos-x64.dmg) · [Windows (.exe)](https://github.com/koinonau/girra/releases/latest/download/girra-windows-setup.exe) · [Linux AppImage](https://github.com/koinonau/girra/releases/latest/download/girra-linux.AppImage) · [すべてのビルド](https://github.com/koinonau/girra/releases/latest)
 
+
 ---
 
 ## コミュニティとサポート

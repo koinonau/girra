@@ -197,7 +197,7 @@ powershell -File tests/tools/win-update-e2e/window-enum.ps1
 | `cli-args.mjs`                 | Argument parsing / validation                                                 |
 | `preflight.mjs`                | win32/elevation checks, pre-existing-app refusal, baseline snapshot           |
 | `installer-steps.mjs`          | Silent install/update/uninstall, exe discovery, gh download                   |
-| `registry-shortcut-backup.mjs` | Isolated mode: snapshot/restore the shared HKCU keys + Girra shortcuts        |
+| `registry-shortcut-backup.mjs` | Isolated mode: snapshot/restore the shared HKCU keys + Girra shortcuts         |
 | `app-driver.mjs`               | Playwright Electron launch + terminal driving (production-safe DOM selectors) |
 | `interactivity-probes.mjs`     | Sentinel-file echo / heartbeat / Ctrl+C probes                                |
 | `daemon-processes.mjs`         | Daemon PID discovery (command-line marker + pid file), scoped                 |

@@ -175,6 +175,7 @@ Funciona com **qualquer agente CLI** — se roda em um terminal, roda no Girra.
 - Ou baixe um build diretamente: [macOS Apple Silicon](https://github.com/koinonau/girra/releases/latest/download/girra-macos-arm64.dmg) · [macOS Intel](https://github.com/koinonau/girra/releases/latest/download/girra-macos-x64.dmg) · [Windows (.exe)](https://github.com/koinonau/girra/releases/latest/download/girra-windows-setup.exe) · [Linux AppImage](https://github.com/koinonau/girra/releases/latest/download/girra-linux.AppImage) · [Todos os builds](https://github.com/koinonau/girra/releases/latest)
 - Rodando `girra serve` em um servidor Linux headless? Veja o [guia de servidor Linux headless](../reference/headless-linux-server.md).
 
+
 ---
 
 ## Comunidade e suporte

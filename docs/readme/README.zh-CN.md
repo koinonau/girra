@@ -174,6 +174,7 @@ VS Code 的编辑器，处处自动保存 — 把文件或图片直接拖入智�
 - **[从 onOrca.dev 下载](https://onorca.dev/download)**
 - 或直接获取安装包：[macOS Apple Silicon](https://github.com/koinonau/girra/releases/latest/download/girra-macos-arm64.dmg) · [macOS Intel](https://github.com/koinonau/girra/releases/latest/download/girra-macos-x64.dmg) · [Windows (.exe)](https://github.com/koinonau/girra/releases/latest/download/girra-windows-setup.exe) · [Linux AppImage](https://github.com/koinonau/girra/releases/latest/download/girra-linux.AppImage) · [全部构建](https://github.com/koinonau/girra/releases/latest)
 
+
 ---
 
 ## 社区与支持
