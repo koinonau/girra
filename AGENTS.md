@@ -76,6 +76,15 @@ The execution host owns agent status in one store, the hook server's, and every 
 
 A rule that reads what an agent CLI paints on a terminal — readiness, blocked prompts, idle — must be written against a captured transcript, not a remembered screen. Record one with [`docs/reference/agent-pty-transcript-capture.md`](./docs/reference/agent-pty-transcript-capture.md), which keeps escapes and wrapping intact and scrubs account identifiers before they reach git.
 
+## Girra and Orca Names
+
+Girra's environment variables are `GIRRA_*` and its per-user directory is
+`~/.girra`. Orca's `ORCA_*` and `~/.orca` are still read, because a hook script,
+a remote CLI shim or a headless server outlives the build that wrote it. Write
+new code against the Girra names only, and before adding a per-call-site
+fallback or touching either compatibility seam, read
+[`docs/reference/girra-and-orca-names.md`](./docs/reference/girra-and-orca-names.md).
+
 ## Remote Wire Compatibility
 
 Clients and remote Girra servers update independently, so mixed versions are the normal state. Before changing anything a paired client and host exchange — RPC params, stream frames, or the content either side publishes over them — follow [`docs/reference/remote-wire-compatibility.md`](./docs/reference/remote-wire-compatibility.md). A new optional field is safe; a new stream opcode must be capability-negotiated because decoders drop unknown opcodes silently; and changing what the host publishes reaches old clients even with no wire change.
