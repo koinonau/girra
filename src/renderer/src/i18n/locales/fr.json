@@ -1194,7 +1194,6 @@
         "6ca6ff404e": "GIRRA",
         "520304a067": "Logo Girra",
         "ce44fad849": "Dépendances manquantes",
-        "c1cf168479": "Masquer",
         "00cee697c1": "Exécutez \"gh auth login\" dans un terminal pour connecter votre compte GitHub.",
         "9f96d018b7": "GitHub CLI n'est pas authentifiée",
         "73e1ad4282": "Girra utilise la GitHub CLI (gh) pour afficher les pull requests, les tickets et les vérifications.",
@@ -1204,9 +1203,6 @@
         "cd21242762": "Ajoutez un projet pour commencer.",
         "9c00bd4adf": "Sélectionnez un espace de travail dans la barre latérale pour commencer.",
         "16e9e3df89": "favori",
-        "0d0ace8861": "Mettre une étoile sur GitHub",
-        "ec43b38ba7": "Étoile ajoutée sur GitHub",
-        "157bb5ecbb": "Ouvrir GitHub",
         "preflightDismiss": "Ignorer"
       },
       "LinearIssueMarkdownDescriptionEditor": {
@@ -3664,7 +3660,6 @@
         "share": {
           "card": {
             "utils": {
-              "19f4b4dc75": "github.com/stablyai/orca",
               "d864fc5f98": "sortie",
               "5d66fdd7c2": "entrée",
               "33d38e2177": "Sortie",
@@ -6074,22 +6069,6 @@
           "projectRuntime": "Runtime des projets",
           "projectRuntimeDescription": "Runtime par défaut pour les projets Windows locaux qui ne le remplacent pas."
         },
-        "GeneralSupportSection": {
-          "af7d9f4396": "Merci pour votre soutien !",
-          "6922c1fa2b": "Ajouter une étoile à Orca sur GitHub",
-          "511782265b": "Soutenez le projet avec une étoile GitHub via la CLI gh.",
-          "55a87e5fd1": "Soutenir Orca",
-          "964acc6bb4": "Ajouter une étoile",
-          "73b327e793": "Réessayer",
-          "c9f96d4234": "error",
-          "397719bee5": "Ajout de l'étoile...",
-          "1e29570462": "ajout de l'étoile",
-          "9d181300e3": "favori",
-          "5c49f02662": "masqué",
-          "b3f0584f5d": "chargement",
-          "cb65c75b11": "Ouverture...",
-          "f2d4f877b2": "Ouvrir GitHub"
-        },
         "GeneralUpdateSettingsSection": {
           "6405510b92": "error",
           "a0832ccdb1": "téléchargée",
@@ -8148,13 +8127,8 @@
         },
         "general": {
           "search": {
-            "bdfb6dc21b": "j'aime",
             "e6b01c8e30": "commentaires",
-            "b65665703a": "assistance",
             "06ea5a69a6": "github",
-            "e4fb4516d0": "étoile",
-            "e0b8c8bc25": "Soutenez le projet avec une étoile GitHub via la CLI gh.",
-            "36a72f0d9e": "Ajouter une étoile à Orca sur GitHub",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
             "95b63edde7": "claude",

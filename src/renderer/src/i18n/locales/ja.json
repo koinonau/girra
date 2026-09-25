@@ -1045,7 +1045,6 @@
         "6ca6ff404e": "GIRRA",
         "520304a067": "Girra のロゴ",
         "ce44fad849": "依存関係が欠落している",
-        "c1cf168479": "非表示",
         "00cee697c1": "ターミナルで「gh auth login」を実行して、GitHub アカウントに接続します。",
         "9f96d018b7": "GitHub CLI が認証されていません",
         "73e1ad4282": "Girra は、GitHub CLI (gh) を使用して、PR、Issue、チェックを表示します。",
@@ -1055,9 +1054,6 @@
         "cd21242762": "プロジェクトを追加して開始します。",
         "9c00bd4adf": "開始するには、サイドバーからワークスペースを選択します。",
         "16e9e3df89": "星付き",
-        "0d0ace8861": "GitHub でスターを付ける",
-        "ec43b38ba7": "GitHub でスター済み",
-        "157bb5ecbb": "GitHub を開く",
         "preflightDismiss": "閉じる"
       },
       "LinearIssueMarkdownDescriptionEditor": {
@@ -3454,7 +3450,6 @@
         "share": {
           "card": {
             "utils": {
-              "19f4b4dc75": "github.com/stablyai/orca",
               "d864fc5f98": "出力",
               "5d66fdd7c2": "入力",
               "33d38e2177": "出力",
@@ -5629,22 +5624,6 @@
           "projectRuntime": "プロジェクトのランタイム",
           "projectRuntimeDescription": "個別に指定していないローカル Windows プロジェクトの既定のランタイム。"
         },
-        "GeneralSupportSection": {
-          "af7d9f4396": "サポートありがとうございます!",
-          "6922c1fa2b": "GitHub 上のスター Orca",
-          "511782265b": "gh CLI を介して GitHub スターでプロジェクトをサポートします。",
-          "55a87e5fd1": "Orca をサポートする",
-          "964acc6bb4": "スター",
-          "73b327e793": "再試行",
-          "c9f96d4234": "エラー",
-          "397719bee5": "スターを付けています…",
-          "1e29570462": "スター付け中",
-          "9d181300e3": "星付き",
-          "5c49f02662": "隠れた",
-          "b3f0584f5d": "読み込み中",
-          "cb65c75b11": "開いています…",
-          "f2d4f877b2": "GitHub を開く"
-        },
         "GeneralUpdateSettingsSection": {
           "6405510b92": "エラー",
           "a0832ccdb1": "ダウンロードされた",
@@ -7677,13 +7656,8 @@
         },
         "general": {
           "search": {
-            "bdfb6dc21b": "のように",
             "e6b01c8e30": "フィードバック",
-            "b65665703a": "サポート",
             "06ea5a69a6": "GitHub",
-            "e4fb4516d0": "星",
-            "e0b8c8bc25": "gh CLI を介して GitHub スターでプロジェクトをサポートします。",
-            "36a72f0d9e": "GitHub 上のスター Orca",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
             "95b63edde7": "claude",

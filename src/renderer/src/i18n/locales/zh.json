@@ -1048,7 +1048,6 @@
         "6ca6ff404e": "GIRRA",
         "520304a067": "Girra 标志",
         "ce44fad849": "缺少依赖项",
-        "c1cf168479": "隐藏",
         "00cee697c1": "在终端中运行“gh auth login”以连接您的 GitHub 账户。",
         "9f96d018b7": "GitHub CLI 未经过身份验证",
         "73e1ad4282": "Girra 使用 GitHub CLI (gh) 来显示PR、议题和检查。",
@@ -1058,9 +1057,6 @@
         "cd21242762": "添加一个项目即可开始。",
         "9c00bd4adf": "从侧边栏中选择一个工作区开始。",
         "16e9e3df89": "已加星标",
-        "0d0ace8861": "在 GitHub 上加星标",
-        "ec43b38ba7": "已在 GitHub 上加星标",
-        "157bb5ecbb": "打开 GitHub",
         "preflightDismiss": "关闭"
       },
       "LinearIssueMarkdownDescriptionEditor": {
@@ -3469,7 +3465,6 @@
         "share": {
           "card": {
             "utils": {
-              "19f4b4dc75": "github.com/stablyai/orca",
               "d864fc5f98": "输出",
               "5d66fdd7c2": "输入",
               "33d38e2177": "输出",
@@ -5695,22 +5690,6 @@
           "projectRuntime": "项目运行时",
           "projectRuntimeDescription": "不覆盖此项的本地 Windows 项目的默认运行时。"
         },
-        "GeneralSupportSection": {
-          "af7d9f4396": "感谢您的支持！",
-          "6922c1fa2b": "GitHub 上的 Star Orca",
-          "511782265b": "通过 gh CLI 通过 GitHub star 支持该项目。",
-          "55a87e5fd1": "支持 Orca",
-          "964acc6bb4": "加星标",
-          "73b327e793": "重试",
-          "c9f96d4234": "错误",
-          "397719bee5": "正在加星标...",
-          "1e29570462": "正在加星标",
-          "9d181300e3": "已加星标",
-          "5c49f02662": "隐",
-          "b3f0584f5d": "加载中",
-          "cb65c75b11": "正在打开...",
-          "f2d4f877b2": "打开 GitHub"
-        },
         "GeneralUpdateSettingsSection": {
           "6405510b92": "错误",
           "a0832ccdb1": "下载的",
@@ -7710,13 +7689,8 @@
         },
         "general": {
           "search": {
-            "bdfb6dc21b": "喜欢",
             "e6b01c8e30": "反馈",
-            "b65665703a": "支持",
             "06ea5a69a6": "GitHub",
-            "e4fb4516d0": "星星",
-            "e0b8c8bc25": "点赞 GitHub star 支持该项目（通过 gh CLI ",
-            "36a72f0d9e": "GitHub 上的 Star Orca",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
             "95b63edde7": "claude",

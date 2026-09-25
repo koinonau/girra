@@ -4,14 +4,12 @@ import { useAppStore } from '../../store'
 import { Separator } from '../ui/separator'
 import { CliSection } from './CliSection'
 import { GeneralEditorSettingsSection } from './GeneralEditorSettingsSection'
-import { GeneralSupportSection } from './GeneralSupportSection'
 import { GeneralWorkspaceSettingsSection } from './GeneralWorkspaceSettingsSection'
 import {
   getGeneralCliSearchEntries,
   getGeneralEditorSearchEntries,
   getGeneralNavigationSearchEntries,
   getGeneralPaneSearchEntries,
-  getGeneralSupportSearchEntries,
   getGeneralWorkspaceSearchEntries
 } from './general-search'
 import { getGeneralProjectRuntimeSearchEntries } from './general-project-runtime-search'
@@ -227,9 +225,6 @@ export function GeneralPane({
           {section}
         </div>
       ))}
-      {matchesSettingsSearch(searchQuery, getGeneralSupportSearchEntries()) ? (
-        <GeneralSupportSection hasPrecedingSections={visibleSections.length > 0} />
-      ) : null}
     </div>
   )
 }

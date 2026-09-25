@@ -1,12 +1,10 @@
 import { ipcMain } from 'electron'
 import { diagnoseGhAuth } from '../github/auth-diagnose'
-import { checkOrcaStarred, getAuthenticatedViewer, starOrca } from '../github/client'
+import { getAuthenticatedViewer } from '../github/client'
 import { getRateLimit } from '../github/rate-limit'
 
 export function registerGitHubAccountHandlers(): void {
   ipcMain.handle('gh:viewer', () => getAuthenticatedViewer())
-  ipcMain.handle('gh:checkOrcaStarred', () => checkOrcaStarred())
-  ipcMain.handle('gh:starOrca', () => starOrca())
 
   ipcMain.handle('gh:rateLimit', (_event, args?: { force?: boolean }) =>
     getRateLimit(args?.force ? { force: true } : undefined)
