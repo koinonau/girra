@@ -208,8 +208,8 @@ async function runValidation(mode) {
           env: {
             ...env,
             NODE_ENV: 'development',
-            ORCA_BACKGROUND_LAUNCH: '1',
-            ORCA_DEV_USER_DATA_PATH: userDataPath,
+            GIRRA_BACKGROUND_LAUNCH: '1',
+            GIRRA_DEV_USER_DATA_PATH: userDataPath,
             HOME: isolatedHome,
             USERPROFILE: isolatedHome,
             ELECTRON_ENABLE_LOGGING: '1',
@@ -224,7 +224,7 @@ async function runValidation(mode) {
     app.process().stderr?.on('data', (chunk) => {
       const text = chunk.toString()
       stderrLines.push(...text.split(/\r?\n/).filter(Boolean))
-      if (process.env.ORCA_WAYLAND_GPU_VERBOSE === '1') {
+      if (process.env.GIRRA_WAYLAND_GPU_VERBOSE === '1') {
         process.stderr.write(text)
       }
     })

@@ -34,8 +34,8 @@ const RESTRICTED_E2E_ENV_KEYS = new Set([
   'HOME',
   'USERPROFILE',
   'CLAUDE_CONFIG_DIR',
-  'ORCA_E2E_HOME_DIR',
-  'ORCA_E2E_USER_DATA_DIR'
+  'GIRRA_E2E_HOME_DIR',
+  'GIRRA_E2E_USER_DATA_DIR'
 ])
 
 /**
@@ -82,15 +82,15 @@ export async function launchInstalledApp({
     args: [],
     env: {
       ...cleanEnv,
-      // Packaged main honors ORCA_E2E_USER_DATA_DIR to relocate userData
+      // Packaged main honors GIRRA_E2E_USER_DATA_DIR to relocate userData
       // (logs/daemon/terminal-history) under a controlled dir.
       ...extraEnv,
-      ORCA_E2E_USER_DATA_DIR: userDataDir,
+      GIRRA_E2E_USER_DATA_DIR: userDataDir,
       // Why: the driven app stays off the foreground so a local run doesn't steal focus.
-      ORCA_BACKGROUND_LAUNCH: '1',
+      GIRRA_BACKGROUND_LAUNCH: '1',
       HOME: isolatedHome,
       USERPROFILE: isolatedHome,
-      ORCA_E2E_HOME_DIR: isolatedHome
+      GIRRA_E2E_HOME_DIR: isolatedHome
     }
   })
   // If firstWindow times out (the launched main never shows a window), the

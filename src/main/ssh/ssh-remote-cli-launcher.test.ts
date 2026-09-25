@@ -147,10 +147,10 @@ describe('SSH remote Girra CLI launcher', () => {
           encoding: 'utf8',
           env: {
             ...process.env,
-            ORCA_RELAY_NODE_PATH: process.execPath,
-            ORCA_RELAY_DIR: relayDir,
-            ORCA_RELAY_SOCKET_PATH: sockPath,
-            ORCA_RELAY_CREDENTIAL_FILE: credentialFile
+            GIRRA_RELAY_NODE_PATH: process.execPath,
+            GIRRA_RELAY_DIR: relayDir,
+            GIRRA_RELAY_SOCKET_PATH: sockPath,
+            GIRRA_RELAY_CREDENTIAL_FILE: credentialFile
           }
         }
       )
@@ -173,10 +173,10 @@ describe('SSH remote Girra CLI launcher', () => {
         encoding: 'utf8',
         env: {
           ...process.env,
-          ORCA_RELAY_NODE_PATH: process.execPath,
-          ORCA_RELAY_DIR: relayDir,
-          ORCA_RELAY_SOCKET_PATH: sockPath,
-          ORCA_RELAY_CREDENTIAL_FILE: ''
+          GIRRA_RELAY_NODE_PATH: process.execPath,
+          GIRRA_RELAY_DIR: relayDir,
+          GIRRA_RELAY_SOCKET_PATH: sockPath,
+          GIRRA_RELAY_CREDENTIAL_FILE: ''
         }
       })
       expect(defaulted.status, defaulted.stderr).toBe(0)

@@ -35,8 +35,8 @@ describe('computer-use smoke script', () => {
       encoding: 'utf8',
       env: {
         ...process.env,
-        ORCA_COMPUTER_SMOKE_CLI_PATH: cliPath,
-        ORCA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data')
+        GIRRA_COMPUTER_SMOKE_CLI_PATH: cliPath,
+        GIRRA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data')
       }
     })
 
@@ -60,9 +60,9 @@ describe('computer-use smoke script', () => {
       encoding: 'utf8',
       env: {
         ...process.env,
-        ORCA_COMPUTER_SMOKE_CLI_PATH: cliPath,
-        ORCA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data'),
-        ORCA_COMPUTER_SMOKE_APPS: 'TestApp'
+        GIRRA_COMPUTER_SMOKE_CLI_PATH: cliPath,
+        GIRRA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data'),
+        GIRRA_COMPUTER_SMOKE_APPS: 'TestApp'
       }
     })
 
@@ -78,9 +78,9 @@ describe('computer-use smoke script', () => {
       encoding: 'utf8',
       env: {
         ...process.env,
-        ORCA_COMPUTER_SMOKE_CLI_PATH: cliPath,
-        ORCA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data'),
-        ORCA_COMPUTER_SMOKE_APPS: 'TestApp'
+        GIRRA_COMPUTER_SMOKE_CLI_PATH: cliPath,
+        GIRRA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data'),
+        GIRRA_COMPUTER_SMOKE_APPS: 'TestApp'
       }
     })
 
@@ -105,9 +105,9 @@ describe('computer-use smoke script', () => {
       encoding: 'utf8',
       env: {
         ...process.env,
-        ORCA_COMPUTER_SMOKE_CLI_PATH: cliPath,
-        ORCA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data'),
-        ORCA_COMPUTER_SMOKE_APPS: 'Edge,Notepad'
+        GIRRA_COMPUTER_SMOKE_CLI_PATH: cliPath,
+        GIRRA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data'),
+        GIRRA_COMPUTER_SMOKE_APPS: 'Edge,Notepad'
       }
     })
 
@@ -124,8 +124,8 @@ describe('computer-use smoke script', () => {
       encoding: 'utf8',
       env: {
         ...process.env,
-        ORCA_COMPUTER_SMOKE_CLI_PATH: cliPath,
-        ORCA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data')
+        GIRRA_COMPUTER_SMOKE_CLI_PATH: cliPath,
+        GIRRA_COMPUTER_SMOKE_USER_DATA_PATH: path.join(root, 'user-data')
       }
     })
 

@@ -165,7 +165,7 @@ export function getRepositoryGitHooksSearchEntries(repo: Repo): SettingsSearchEn
         ),
         ...translateSearchKeyword(
           'auto.components.settings.repository.search.bc7e504b8e',
-          '.orca/issue-command'
+          '.girra/issue-command'
         )
       ]
     }

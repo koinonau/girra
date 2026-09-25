@@ -30,7 +30,7 @@ const JSON_INSTALLERS = [
   }
 ] as const
 
-const MANAGED_HOOKS_DIR_NEEDLE = '/.orca/agent-hooks/'
+const MANAGED_HOOKS_DIR_NEEDLE = '/.girra/agent-hooks/'
 // Why: statusLine is not a hook — Claude's schema has no timeout field (type/command/padding/refreshInterval), and a slow statusline can't block agent turns.
 const STATUSLINE_SCRIPT_NEEDLE = '-statusline.'
 
@@ -132,12 +132,12 @@ describe('managed agent hook timeouts', () => {
         const child = spawn('sh', [scriptPath], {
           env: {
             ...process.env,
-            ORCA_AGENT_HOOK_ENDPOINT: '',
-            ORCA_AGENT_HOOK_PORT: String(port),
-            ORCA_AGENT_HOOK_TOKEN: 'test-token',
-            ORCA_PANE_KEY: 'pane-1',
-            ORCA_TAB_ID: 'tab-1',
-            ORCA_WORKTREE_ID: 'wt-1'
+            GIRRA_AGENT_HOOK_ENDPOINT: '',
+            GIRRA_AGENT_HOOK_PORT: String(port),
+            GIRRA_AGENT_HOOK_TOKEN: 'test-token',
+            GIRRA_PANE_KEY: 'pane-1',
+            GIRRA_TAB_ID: 'tab-1',
+            GIRRA_WORKTREE_ID: 'wt-1'
           },
           stdio: ['pipe', 'ignore', 'ignore']
         })
@@ -168,7 +168,7 @@ describe('managed agent hook timeouts', () => {
         // Reuse a real generated POSIX wrapper rather than re-deriving the script.
         const { sftp, fs } = createFakeSftp()
         await new ClaudeHookService().installRemote(sftp, REMOTE_HOME)
-        const wrapperBody = fs.files.get(`${REMOTE_HOME}/.orca/agent-hooks/claude-hook.sh`)!
+        const wrapperBody = fs.files.get(`${REMOTE_HOME}/.girra/agent-hooks/claude-hook.sh`)!
 
         tempDir = mkdtempSync(join(tmpdir(), 'orca-hook-timeout-'))
         const scriptPath = join(tempDir, 'claude-hook.sh')

@@ -46,42 +46,42 @@ describe('registerPtyHandlers', () => {
       const env = await spawnAndGetEnv(undefined, { OPENCODE_CONFIG_DIR: undefined })
       expect(openCodeBuildPtyEnvMock).toHaveBeenCalledTimes(1)
       expect(openCodeBuildPtyEnvMock.mock.calls[0]?.[0]).toEqual(expect.any(String))
-      expect(env.ORCA_OPENCODE_HOOK_PORT).toBe('4567')
-      expect(env.ORCA_OPENCODE_HOOK_TOKEN).toBe('opencode-token')
-      expect(env.ORCA_OPENCODE_PTY_ID).toBe('test-pty')
+      expect(env.GIRRA_OPENCODE_HOOK_PORT).toBe('4567')
+      expect(env.GIRRA_OPENCODE_HOOK_TOKEN).toBe('opencode-token')
+      expect(env.GIRRA_OPENCODE_PTY_ID).toBe('test-pty')
       expect(env.OPENCODE_CONFIG_DIR).toEqual(expect.any(String))
-      expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe(env.OPENCODE_CONFIG_DIR)
+      expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe(env.OPENCODE_CONFIG_DIR)
     })
     it('mirrors the original OpenCode source dir when launched from a Girra overlay shell', async () => {
       const env = await spawnAndGetEnv({
         OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
-        ORCA_OPENCODE_SOURCE_CONFIG_DIR: '/tmp/user-opencode-config'
+        GIRRA_OPENCODE_SOURCE_CONFIG_DIR: '/tmp/user-opencode-config'
       })
       expect(openCodeBuildPtyEnvMock).toHaveBeenCalledWith(
         expect.any(String),
         '/tmp/user-opencode-config'
       )
       expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-      expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-      expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/tmp/user-opencode-config')
+      expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
+      expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/tmp/user-opencode-config')
     })
     it('does not treat inherited Girra OpenCode config as user config without a source dir', async () => {
       const env = await spawnAndGetEnv({
         OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
-        ORCA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay'
+        GIRRA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay'
       })
 
       expect(openCodeBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined)
       expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-config')
-      expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-config')
-      expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
+      expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-config')
+      expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
     })
     it('restores user OpenCode config when agent status hooks are disabled in a nested Girra shell', async () => {
       const env = await spawnAndGetEnv(
         {
           OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
-          ORCA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
-          ORCA_OPENCODE_SOURCE_CONFIG_DIR: '/tmp/user-opencode-config'
+          GIRRA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
+          GIRRA_OPENCODE_SOURCE_CONFIG_DIR: '/tmp/user-opencode-config'
         },
         undefined,
         () => ({ agentStatusHooksEnabled: false })
@@ -89,14 +89,14 @@ describe('registerPtyHandlers', () => {
 
       expect(openCodeBuildPtyEnvMock).not.toHaveBeenCalled()
       expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/user-opencode-config')
-      expect(env.ORCA_OPENCODE_CONFIG_DIR).toBeUndefined()
-      expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
+      expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBeUndefined()
+      expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
     })
     it('strips inherited OpenCode overlay env when agent status hooks are disabled without a source dir', async () => {
       const env = await spawnAndGetEnv(
         {
           OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay',
-          ORCA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay'
+          GIRRA_OPENCODE_CONFIG_DIR: '/tmp/parent-orca-opencode-overlay'
         },
         undefined,
         () => ({ agentStatusHooksEnabled: false })
@@ -104,8 +104,8 @@ describe('registerPtyHandlers', () => {
 
       expect(openCodeBuildPtyEnvMock).not.toHaveBeenCalled()
       expect(env.OPENCODE_CONFIG_DIR).toBeUndefined()
-      expect(env.ORCA_OPENCODE_CONFIG_DIR).toBeUndefined()
-      expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
+      expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBeUndefined()
+      expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
     })
     posixOnlyIt(
       'reproduces issue #1534: GUI-launched Girra mirrors zshrc-only OpenCode config',
@@ -126,7 +126,7 @@ describe('registerPtyHandlers', () => {
           HOME: '/home/pim',
           SHELL: '/bin/zsh',
           OPENCODE_CONFIG_DIR: undefined,
-          ORCA_OPENCODE_SOURCE_CONFIG_DIR: undefined
+          GIRRA_OPENCODE_SOURCE_CONFIG_DIR: undefined
         })
 
         expect(openCodeBuildPtyEnvMock).toHaveBeenCalledWith(
@@ -134,9 +134,9 @@ describe('registerPtyHandlers', () => {
           '/home/pim/company/opencode-config'
         )
         expect(env.OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-        expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
-        expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/home/pim/company/opencode-config')
-        expect(env.OPENCODE_CONFIG_DIR).not.toBe(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR)
+        expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe('/tmp/orca-opencode-overlay')
+        expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBe('/home/pim/company/opencode-config')
+        expect(env.OPENCODE_CONFIG_DIR).not.toBe(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR)
       }
     )
     it('installs Pi managed extensions without redirecting Girra terminal PTY homes', async () => {
@@ -146,8 +146,8 @@ describe('registerPtyHandlers', () => {
         materializeDefaultHome: false
       })
       expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/user-pi-agent')
-      expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
+      expect(env.GIRRA_PI_CODING_AGENT_DIR).toBeUndefined()
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
     })
     it('does not materialize a missing Pi home when another agent mentions Pi', async () => {
       const env = await spawnAndGetEnv(
@@ -162,7 +162,7 @@ describe('registerPtyHandlers', () => {
       expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, {
         materializeDefaultHome: false
       })
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBeUndefined()
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBeUndefined()
     })
     it('materializes Pi home for an explicit Pi launch through a custom command', async () => {
       const env = await spawnAndGetEnv(undefined, undefined, undefined, 'custom-pi-wrapper', 'pi')
@@ -170,7 +170,7 @@ describe('registerPtyHandlers', () => {
       expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), undefined, {
         materializeDefaultHome: true
       })
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/default-pi-agent')
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/tmp/default-pi-agent')
     })
     it('threads command: "pi" through to piBuildPtyEnv as an explicit launch', async () => {
       const env = await spawnAndGetEnv(
@@ -183,8 +183,8 @@ describe('registerPtyHandlers', () => {
         materializeDefaultHome: true
       })
       expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/user-pi-agent')
-      expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
+      expect(env.GIRRA_PI_CODING_AGENT_DIR).toBeUndefined()
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
     })
     it('uses sequenced startup env as the Pi launch hint when command is a wrapper', async () => {
       const env = await spawnAndGetEnv(
@@ -200,19 +200,19 @@ describe('registerPtyHandlers', () => {
       expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/tmp/user-pi-agent', {
         materializeDefaultHome: true
       })
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
     })
     it('mirrors the original Pi source dir when launched from a Girra overlay shell', async () => {
       const env = await spawnAndGetEnv({
         PI_CODING_AGENT_DIR: '/tmp/parent-orca-pi-overlay',
-        ORCA_PI_SOURCE_AGENT_DIR: '/tmp/user-pi-agent'
+        GIRRA_PI_SOURCE_AGENT_DIR: '/tmp/user-pi-agent'
       })
       expect(piBuildPtyEnvMock).toHaveBeenCalledWith(expect.any(String), '/tmp/user-pi-agent', {
         materializeDefaultHome: false
       })
       expect(env.PI_CODING_AGENT_DIR).toBe('/tmp/parent-orca-pi-overlay')
-      expect(env.ORCA_PI_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
+      expect(env.GIRRA_PI_CODING_AGENT_DIR).toBeUndefined()
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe('/tmp/user-pi-agent')
     })
   })
 })

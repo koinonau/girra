@@ -42,7 +42,7 @@ const DEFAULTS_TIMEOUT_MS = 5_000
 /** Why: `defaults` exits 1 for "does not exist"; anything else means the probe itself failed. */
 const DEFAULTS_MISSING_STATUS = 1
 
-const ORCA_BUNDLE_ID = 'com.koinonau.girra'
+const GIRRA_BUNDLE_ID = 'com.koinonau.girra'
 
 export type PressAndHoldDecision =
   /** Not macOS — nothing is read or written. */
@@ -83,7 +83,7 @@ export type PressAndHoldHost = {
 /** Only Girra's own bundle: an unpackaged run is `com.github.Electron`, shared with every other
  *  unpackaged Electron app on the machine. */
 export function isOrcaPreferencesDomain(domain: string): boolean {
-  return domain === ORCA_BUNDLE_ID || domain.startsWith(`${ORCA_BUNDLE_ID}.`)
+  return domain === GIRRA_BUNDLE_ID || domain.startsWith(`${GIRRA_BUNDLE_ID}.`)
 }
 
 /** `<bundle>/Contents/MacOS/<exe>` → `<bundle>/Contents/Info.plist`. */

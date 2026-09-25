@@ -173,7 +173,7 @@ describe('installNativeDeps staged uploads', () => {
       expect(command!.indexOf('npm_config_nodedir')).toBeLessThan(command!.indexOf(compileStep))
       expect(command).toContain('node_version.h')
       // The marker lands in the captured output, so a failure after it can say what was exported.
-      expect(command).toContain('echo "ORCA-NODE-HEADERS:${ORCA_NODE_HEADERS_DIR:-none}"')
+      expect(command).toContain('echo "ORCA-NODE-HEADERS:${GIRRA_NODE_HEADERS_DIR:-none}"')
     }
   })
 
@@ -266,11 +266,11 @@ describe('installNativeDeps staged uploads', () => {
   it('retains the lock after an unconfirmed promotion termination', async () => {
     const conn = makeMockConnection(sftpCapture)
     vi.mocked(execCommand)
-      .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       .mockResolvedValueOnce('/home/u')
       .mockResolvedValueOnce('')
       .mockResolvedValueOnce(
-        '__ORCA_UPLOAD_STAGE_SLOT__.sftp-namespace-00000000000000000000000000000000:slot-0'
+        '__GIRRA_UPLOAD_STAGE_SLOT__.sftp-namespace-00000000000000000000000000000000:slot-0'
       )
       .mockResolvedValueOnce('')
       .mockResolvedValueOnce('')

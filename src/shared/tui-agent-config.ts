@@ -79,7 +79,7 @@ const TUI_AGENT_CONFIG_SOURCE: Record<TuiAgent, TuiAgentConfigSource> = {
     detectCmd: 'pi',
     promptInjectionMode: 'argv',
     // Why: pi has no `--prefill` and paste-after-ready races its long startup; the orca-prefill extension seeds this env var instead.
-    draftPromptEnvVar: 'ORCA_PI_PREFILL',
+    draftPromptEnvVar: 'GIRRA_PI_PREFILL',
     // Why: Pi decodes CSI-u; Esc+CR submits after tool subprocesses reset live KKP state (#9703).
     windowsShiftEnterEncoding: 'csi-u'
   }

@@ -6,6 +6,7 @@
  * Signals readiness to parent via IPC: { type: 'ready' }
  * Shuts down cleanly on SIGTERM.
  */
+import '../startup/legacy-orca-env-adoption'
 import { readFileSync } from 'node:fs'
 import { startDaemon, type DaemonHandle } from './daemon-main'
 import { createPtySubprocess } from './pty-subprocess'
@@ -201,7 +202,7 @@ async function main(): Promise<void> {
   // audit-session teardown), so e2e drives the oracles from a verdict file:
   // 'alive' → accepted/healthy, 'dead' → rejected/unhealthy, 'hang' →
   // timeout-inconclusive/unhealthy (the fail-safe path), else inconclusive.
-  const e2eProbeFile = process.env.ORCA_E2E_LOGIN_SESSION_PROBE_FILE
+  const e2eProbeFile = process.env.GIRRA_E2E_LOGIN_SESSION_PROBE_FILE
   const readE2eVerdict = (): string => {
     try {
       return readFileSync(e2eProbeFile as string, 'utf8').trim()
@@ -322,7 +323,7 @@ async function main(): Promise<void> {
 
 // Only auto-run when executed directly (not imported for testing, or for the build guard's
 // load check — see config/scripts/build-orcad.mjs).
-const isDirectExecution = !process.env.VITEST && !process.env.ORCA_DAEMON_ENTRY_LOAD_CHECK
+const isDirectExecution = !process.env.VITEST && !process.env.GIRRA_DAEMON_ENTRY_LOAD_CHECK
 if (isDirectExecution) {
   main().catch((err) => {
     console.error('[daemon] Fatal:', err)

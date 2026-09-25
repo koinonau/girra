@@ -9,14 +9,14 @@ export function readEnvWithProcessFallback(
 }
 
 export function resolvePiAgentSourceDir(baseEnv: Record<string, string>): string | undefined {
-  const sourceDir = readEnvWithProcessFallback(baseEnv, 'ORCA_PI_SOURCE_AGENT_DIR')
+  const sourceDir = readEnvWithProcessFallback(baseEnv, 'GIRRA_PI_SOURCE_AGENT_DIR')
   if (sourceDir) {
     return sourceDir
   }
 
   const publicDir = readEnvWithProcessFallback(baseEnv, 'PI_CODING_AGENT_DIR')
   // Why: if PI_CODING_AGENT_DIR is a restored Girra overlay with no source shadow, remirroring leaks the overlay tree; fall through to defaults.
-  if (publicDir && publicDir !== readEnvWithProcessFallback(baseEnv, 'ORCA_PI_CODING_AGENT_DIR')) {
+  if (publicDir && publicDir !== readEnvWithProcessFallback(baseEnv, 'GIRRA_PI_CODING_AGENT_DIR')) {
     return publicDir
   }
 
@@ -27,11 +27,11 @@ export function exposePiManagedExtensionEnv(
   baseEnv: Record<string, string>,
   managedEnv: Record<string, string>
 ): void {
-  delete baseEnv.ORCA_PI_CODING_AGENT_DIR
-  if (managedEnv.ORCA_PI_SOURCE_AGENT_DIR) {
-    baseEnv.ORCA_PI_SOURCE_AGENT_DIR = managedEnv.ORCA_PI_SOURCE_AGENT_DIR
+  delete baseEnv.GIRRA_PI_CODING_AGENT_DIR
+  if (managedEnv.GIRRA_PI_SOURCE_AGENT_DIR) {
+    baseEnv.GIRRA_PI_SOURCE_AGENT_DIR = managedEnv.GIRRA_PI_SOURCE_AGENT_DIR
   } else {
-    delete baseEnv.ORCA_PI_SOURCE_AGENT_DIR
+    delete baseEnv.GIRRA_PI_SOURCE_AGENT_DIR
   }
 }
 
@@ -87,13 +87,13 @@ export function resolveOpenCodeSourceConfigDir(
   baseEnv: Record<string, string>
 ): string | undefined {
   const sourceDir =
-    baseEnv.ORCA_OPENCODE_SOURCE_CONFIG_DIR ?? process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR
+    baseEnv.GIRRA_OPENCODE_SOURCE_CONFIG_DIR ?? process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
   if (sourceDir) {
     return sourceDir
   }
 
   const configDir = baseEnv.OPENCODE_CONFIG_DIR ?? process.env.OPENCODE_CONFIG_DIR
-  const orcaConfigDir = baseEnv.ORCA_OPENCODE_CONFIG_DIR ?? process.env.ORCA_OPENCODE_CONFIG_DIR
+  const orcaConfigDir = baseEnv.GIRRA_OPENCODE_CONFIG_DIR ?? process.env.GIRRA_OPENCODE_CONFIG_DIR
   // Why: with no recorded source dir, an inherited OPENCODE_CONFIG_DIR is Girra-owned, not user config; treating it as user config makes child Orcas mirror the hook dir.
   if (configDir && orcaConfigDir && configDir === orcaConfigDir) {
     return undefined

@@ -3,7 +3,7 @@ import { createBrowserClientPageRendererRequests } from './browser-client-page-r
 import { createBrowserFindSubscriptions } from './browser-find-subscriptions'
 import { registerRendererRestartIpcRelays } from './renderer-restart-wiring'
 import {
-  ORCA_INTERNAL_FILE_DRAG_TYPE,
+  GIRRA_INTERNAL_FILE_DRAG_TYPE,
   createNativeFileDropPayload,
   createRejectedNativeFileDropPayload,
   hasNativeFileDragTypes,
@@ -24,7 +24,7 @@ export async function awaitBeforeUnloadCheckpoint(): Promise<void> {
   }
 }
 
-export const startupDiagnosticsEnabled = process.env.ORCA_STARTUP_DIAGNOSTICS === '1'
+export const startupDiagnosticsEnabled = process.env.GIRRA_STARTUP_DIAGNOSTICS === '1'
 
 export function getLinuxDisplayServer(): 'wayland' | 'x11' | null {
   if (process.platform !== 'linux') {
@@ -102,7 +102,7 @@ export function installNativeFileDropHandlers(): void {
   document.addEventListener(
     'drop',
     (event) => {
-      if (event.dataTransfer?.types.includes(ORCA_INTERNAL_FILE_DRAG_TYPE)) {
+      if (event.dataTransfer?.types.includes(GIRRA_INTERNAL_FILE_DRAG_TYPE)) {
         return
       }
       event.preventDefault()

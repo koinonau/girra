@@ -112,7 +112,7 @@ describe('PiTitlebarExtensionService', () => {
     const env = svc.buildPtyEnv('pty-1', piHome)
 
     expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
-    expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe(piHome)
+    expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe(piHome)
     const extensions = readdirSync(join(piHome, 'extensions')).sort()
     expect(extensions).toEqual([
       'orca-agent-status.ts',
@@ -135,9 +135,9 @@ describe('PiTitlebarExtensionService', () => {
     expect(statusExtensionSource).toContain('@orca-managed-pi-extension')
     expect(statusExtensionSource).toContain('/hook/pi')
     expect(titlebarExtensionSource).toContain('@orca-managed-pi-extension')
-    expect(titlebarExtensionSource).toContain('process.env.ORCA_PANE_KEY')
+    expect(titlebarExtensionSource).toContain('process.env.GIRRA_PANE_KEY')
     expect(prefillExtensionSource).toContain('@orca-managed-pi-extension')
-    expect(prefillExtensionSource).toContain('process.env.ORCA_PANE_KEY')
+    expect(prefillExtensionSource).toContain('process.env.GIRRA_PANE_KEY')
     expectPiHomeIntact()
   })
 
@@ -157,7 +157,7 @@ describe('PiTitlebarExtensionService', () => {
 
     expect(firstEnv.PI_CODING_AGENT_DIR).toBeUndefined()
     expect(secondEnv.PI_CODING_AGENT_DIR).toBeUndefined()
-    expect(secondEnv.ORCA_PI_SOURCE_AGENT_DIR).toBe(firstEnv.ORCA_PI_SOURCE_AGENT_DIR)
+    expect(secondEnv.GIRRA_PI_SOURCE_AGENT_DIR).toBe(firstEnv.GIRRA_PI_SOURCE_AGENT_DIR)
     expect(readFileSync(join(piHome, 'extensions', 'user-ext', 'ext.ts'), 'utf-8')).toBe(
       'user extension'
     )
@@ -264,7 +264,7 @@ describe('PiTitlebarExtensionService', () => {
       const env = svc.buildPtyEnv('pty-4', piHome)
 
       expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe(piHome)
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe(piHome)
       expect(existsSync(legacyOverlayDir)).toBe(false)
       expectPiHomeIntact()
     }
@@ -290,7 +290,7 @@ describe('PiTitlebarExtensionService', () => {
         const env = svc.buildPtyEnv('pty-pi-both', undefined)
 
         expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
-        expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe(join(fakeHome, '.pi', 'agent'))
+        expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe(join(fakeHome, '.pi', 'agent'))
         expect(
           existsSync(join(fakeHome, '.pi', 'agent', 'extensions', 'orca-agent-status.ts'))
         ).toBe(true)

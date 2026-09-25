@@ -1,5 +1,5 @@
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs'
-import { homedir } from 'node:os'
 import { join } from 'node:path'
 import { getSecretStore } from '../../shared/secret-store'
 import {
@@ -24,7 +24,7 @@ const cachedTokens = new Map<string, string>()
 export const credentialErrors = new Map<string, string>()
 
 function getOrcaDir(): string {
-  return join(homedir(), '.orca')
+  return getGirraHomeDir()
 }
 
 function getSiteFilePath(): string {

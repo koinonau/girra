@@ -11,7 +11,7 @@ async function readElectronHomeState(electronApp: ElectronApplication) {
     return {
       appHome: app.getPath('home'),
       nodeHome: nodeOs.homedir(),
-      userDataDir: process.env.ORCA_E2E_USER_DATA_DIR,
+      userDataDir: process.env.GIRRA_E2E_USER_DATA_DIR,
       home: process.env.HOME,
       userProfile: process.env.USERPROFILE,
       claudeConfigDir: process.env.CLAUDE_CONFIG_DIR

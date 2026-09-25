@@ -189,23 +189,23 @@ export function createPtyIpcSuiteEnvironment(): PtyIpcSuiteEnvironment {
       }
     })
     getPathMock.mockReturnValue('/tmp/orca-user-data')
-    // Why: wrapper roots resolve from ORCA_USER_DATA_PATH; mirror the mocked userData so ZDOTDIR/wrapper assertions match.
-    process.env.ORCA_USER_DATA_PATH = '/tmp/orca-user-data'
+    // Why: wrapper roots resolve from GIRRA_USER_DATA_PATH; mirror the mocked userData so ZDOTDIR/wrapper assertions match.
+    process.env.GIRRA_USER_DATA_PATH = '/tmp/orca-user-data'
     existsSyncMock.mockReturnValue(true)
     // size: the shell wrapper writer verifies each generated file is non-empty.
     statSyncMock.mockReturnValue({ isDirectory: () => true, mode: 0o755, size: 1 })
     readFileSyncMock.mockReturnValue('')
     openCodeBuildPtyEnvMock.mockImplementation((_ptyId: string, existingConfigDir?: string) => ({
-      ORCA_OPENCODE_HOOK_PORT: '4567',
-      ORCA_OPENCODE_HOOK_TOKEN: 'opencode-token',
-      ORCA_OPENCODE_PTY_ID: 'test-pty',
+      GIRRA_OPENCODE_HOOK_PORT: '4567',
+      GIRRA_OPENCODE_HOOK_TOKEN: 'opencode-token',
+      GIRRA_OPENCODE_PTY_ID: 'test-pty',
       OPENCODE_CONFIG_DIR: existingConfigDir
         ? '/tmp/orca-opencode-overlay'
         : '/tmp/orca-opencode-config'
     }))
     buildAgentHookEnvMock.mockReturnValue({
-      ORCA_AGENT_HOOK_PORT: '5678',
-      ORCA_AGENT_HOOK_TOKEN: 'agent-token'
+      GIRRA_AGENT_HOOK_PORT: '5678',
+      GIRRA_AGENT_HOOK_TOKEN: 'agent-token'
     })
     piBuildPtyEnvMock.mockImplementation(
       (
@@ -218,7 +218,7 @@ export function createPtyIpcSuiteEnvironment(): PtyIpcSuiteEnvironment {
           return {}
         }
         return {
-          ORCA_PI_SOURCE_AGENT_DIR: existingAgentDir ?? '/tmp/default-pi-agent'
+          GIRRA_PI_SOURCE_AGENT_DIR: existingAgentDir ?? '/tmp/default-pi-agent'
         }
       }
     )

@@ -245,11 +245,11 @@ describe('worktree remote runtime mutations', () => {
         undefined,
         {
           command: "opencode 'summarize repo'",
-          env: { ORCA_AGENT_MODE: 'direct' },
+          env: { GIRRA_AGENT_MODE: 'direct' },
           launchConfig: {
             agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
-            agentEnv: { ORCA_AGENT_MODE: 'direct' }
+            agentEnv: { GIRRA_AGENT_MODE: 'direct' }
           }
         }
       )
@@ -264,11 +264,11 @@ describe('worktree remote runtime mutations', () => {
           displayName: 'Launch agent',
           createdWithAgent: 'opencode',
           startupCommand: "opencode 'summarize repo'",
-          startupEnv: { ORCA_AGENT_MODE: 'direct' },
+          startupEnv: { GIRRA_AGENT_MODE: 'direct' },
           startupLaunchConfig: {
             agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
-            agentEnv: { ORCA_AGENT_MODE: 'direct' }
+            agentEnv: { GIRRA_AGENT_MODE: 'direct' }
           },
           activate: true
         })
@@ -347,7 +347,7 @@ describe('worktree remote runtime mutations', () => {
         undefined,
         {
           command: "claude --prefill 'summarize repo'",
-          env: { ORCA_AGENT_MODE: 'direct' },
+          env: { GIRRA_AGENT_MODE: 'direct' },
           telemetry: {
             agent_kind: 'claude-code',
             launch_source: 'new_workspace_composer',
@@ -365,7 +365,7 @@ describe('worktree remote runtime mutations', () => {
         createdWithAgent: 'claude',
         startup: {
           command: "claude --prefill 'summarize repo'",
-          env: { ORCA_AGENT_MODE: 'direct' },
+          env: { GIRRA_AGENT_MODE: 'direct' },
           telemetry: {
             agent_kind: 'claude-code',
             launch_source: 'new_workspace_composer',

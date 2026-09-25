@@ -46,15 +46,15 @@ describe('structured agent-session launch args wiring', () => {
     const deps = await installedDeps({
       agentDefaultArgs: {},
       agentDefaultEnv: {
-        claude: { ORCA_CLAUDE_OVERLAY: 'claude-value' },
-        opencode: { ORCA_OPENCODE_OVERLAY: 'opencode-value' }
+        claude: { GIRRA_CLAUDE_OVERLAY: 'claude-value' },
+        opencode: { GIRRA_OPENCODE_OVERLAY: 'opencode-value' }
       }
     })
 
     expect(deps.resolveClaudeLaunchEnv).toBeTypeOf('function')
     expect(deps.resolveClaudeLaunchEnv?.()).toMatchObject({
-      ORCA_CLAUDE_OVERLAY: 'claude-value'
+      GIRRA_CLAUDE_OVERLAY: 'claude-value'
     })
-    expect(deps.resolveClaudeLaunchEnv?.()).not.toHaveProperty('ORCA_OPENCODE_OVERLAY')
+    expect(deps.resolveClaudeLaunchEnv?.()).not.toHaveProperty('GIRRA_OPENCODE_OVERLAY')
   })
 })

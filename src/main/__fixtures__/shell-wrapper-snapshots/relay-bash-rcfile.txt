@@ -1,6 +1,6 @@
 # Girra relay bash overlay wrapper
-_orca_shell_features=",${ORCA_SHELL_FEATURES:-},"
-builtin unset ORCA_SHELL_FEATURES
+_orca_shell_features=",${GIRRA_SHELL_FEATURES:-},"
+builtin unset GIRRA_SHELL_FEATURES
 __orca_has_feature() { [[ "$_orca_shell_features" == *",$1,"* ]]; }
 __orca_has_feature identity && printf "\033]777;orca-shell-start:%s\007" "$$"
 # Why a plain variable: the channel is consumed and destroyed in these first
@@ -23,18 +23,18 @@ fi
 # continuation. Modern readline defaults this on; force it for the rest.
 [[ $- == *i* ]] && bind 'set enable-bracketed-paste on' 2>/dev/null
 # Why: remote startup files can re-export user defaults after relay spawn.
-[[ -n "${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${ORCA_OPENCODE_CONFIG_DIR}"
-[[ -n "${ORCA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"${ORCA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="${ORCA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac
-if [[ -n "${ORCA_HISTFILE:-}" ]]; then
-  HISTFILE="$ORCA_HISTFILE"
-  builtin unset ORCA_HISTFILE
+[[ -n "${GIRRA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${GIRRA_OPENCODE_CONFIG_DIR}"
+[[ -n "${GIRRA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"${GIRRA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="${GIRRA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac
+if [[ -n "${GIRRA_HISTFILE:-}" ]]; then
+  HISTFILE="$GIRRA_HISTFILE"
+  builtin unset GIRRA_HISTFILE
 elif [[ "${HISTFILE:-}" == "$ZDOTDIR/.zsh_history" ]]; then
   # Why also when Girra injected nothing: /etc/zshrc derived this from Girra's
   # wrapper ZDOTDIR, so history would accumulate INSIDE the wrapper dir and the
   # user's real history would be invisible — the plain #11044 bug, with no
   # per-worktree scoping involved. Matching the exact clobbered value means a
   # HISTFILE the user set deliberately is never touched.
-  HISTFILE="${ORCA_ORIG_ZDOTDIR:-$HOME}/.zsh_history"
+  HISTFILE="${GIRRA_ORIG_ZDOTDIR:-$HOME}/.zsh_history"
 fi
 # Why: SSH bash sessions need the same command lifecycle markers as local
 # bash so agent rows stop showing "working" when the foreground command exits.

@@ -66,8 +66,8 @@ describe('registerPtyHandlers', () => {
           })
           // Why: relay not connected yet → never cross the Windows overlay path into WSL.
           expect(env.OPENCODE_CONFIG_DIR).toBeUndefined()
-          expect(env.ORCA_OPENCODE_CONFIG_DIR).toBeUndefined()
-          expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
+          expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBeUndefined()
+          expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
         })
       })
       it('points OPENCODE_CONFIG_DIR at the guest overlay when the WSL relay reports it', async () => {
@@ -76,15 +76,15 @@ describe('registerPtyHandlers', () => {
         try {
           await withWin32Platform(async () => {
             const env = await daemonSpawnAndGetEnv(
-              { ORCA_OPENCODE_SOURCE_CONFIG_DIR: '/home/jin/.config/opencode' },
+              { GIRRA_OPENCODE_SOURCE_CONFIG_DIR: '/home/jin/.config/opencode' },
               undefined,
               undefined,
               { shellOverride: 'wsl.exe' }
             )
             expect(env.OPENCODE_CONFIG_DIR).toBe(guestDir)
-            expect(env.ORCA_OPENCODE_CONFIG_DIR).toBe(guestDir)
+            expect(env.GIRRA_OPENCODE_CONFIG_DIR).toBe(guestDir)
             // The Windows-side source pointer must not cross into the guest.
-            expect(env.ORCA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
+            expect(env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR).toBeUndefined()
           })
         } finally {
           spy.mockRestore()
@@ -136,7 +136,7 @@ describe('registerPtyHandlers', () => {
           // Why: bare `orca` must resolve to the Girra CLI before /usr/bin/orca (the GNOME screen reader) in Girra terminals (#7904).
           expect(entries.indexOf(shimDir)).toBeGreaterThanOrEqual(0)
           expect(entries.indexOf(shimDir)).toBeLessThan(entries.indexOf('/usr/bin'))
-          expect(env.ORCA_CLI_COMMAND).toBeUndefined()
+          expect(env.GIRRA_CLI_COMMAND).toBeUndefined()
         } finally {
           Object.defineProperty(process, 'platform', {
             configurable: true,
@@ -163,20 +163,20 @@ describe('registerPtyHandlers', () => {
       })
       it('injects the agent-hook receiver env on the daemon path', async () => {
         const env = await daemonSpawnAndGetEnv({})
-        expect(env.ORCA_AGENT_HOOK_PORT).toBe('5678')
-        expect(env.ORCA_AGENT_HOOK_TOKEN).toBe('agent-token')
+        expect(env.GIRRA_AGENT_HOOK_PORT).toBe('5678')
+        expect(env.GIRRA_AGENT_HOOK_TOKEN).toBe('agent-token')
       })
       it('deletes stale Claude scoped settings env from daemon-hosted PTYs', async () => {
         const spawnOptions = await daemonSpawnAndGetOptions({}, undefined, {
-          ORCA_CLAUDE_AGENT_STATUS_SETTINGS:
+          GIRRA_CLAUDE_AGENT_STATUS_SETTINGS:
             '/tmp/orca/agent-hooks/claude-agent-status-settings.json'
         })
-        expect(spawnOptions.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS).toBeUndefined()
+        expect(spawnOptions.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS).toBeUndefined()
         expect(spawnOptions.envToDelete).toEqual(
-          expect.arrayContaining(['ORCA_CLAUDE_AGENT_STATUS_SETTINGS'])
+          expect.arrayContaining(['GIRRA_CLAUDE_AGENT_STATUS_SETTINGS'])
         )
-        expect(spawnOptions.env.ORCA_AGENT_HOOK_PORT).toBe('5678')
-        expect(spawnOptions.env.ORCA_AGENT_HOOK_TOKEN).toBe('agent-token')
+        expect(spawnOptions.env.GIRRA_AGENT_HOOK_PORT).toBe('5678')
+        expect(spawnOptions.env.GIRRA_AGENT_HOOK_TOKEN).toBe('agent-token')
       })
       it('asks surviving pre-upgrade daemons to delete legacy attribution env', async () => {
         const spawnOptions = await daemonSpawnAndGetOptions({})
@@ -184,8 +184,8 @@ describe('registerPtyHandlers', () => {
         expect(spawnOptions.envToDelete).toEqual(
           expect.arrayContaining([...LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS])
         )
-        expect(spawnOptions.envToDelete).not.toContain('ORCA_REAL_GIT')
-        expect(spawnOptions.envToDelete).not.toContain('ORCA_REAL_GH')
+        expect(spawnOptions.envToDelete).not.toContain('GIRRA_REAL_GIT')
+        expect(spawnOptions.envToDelete).not.toContain('GIRRA_REAL_GH')
       })
       it('deletes stale Claude scoped settings env from runtime-created daemon PTYs', async () => {
         type RuntimeSpawnController = {
@@ -207,7 +207,7 @@ describe('registerPtyHandlers', () => {
           onPtyExit: vi.fn(),
           onPtyData: vi.fn()
         }
-        process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS =
+        process.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS =
           '/tmp/orca/agent-hooks/claude-agent-status-settings.json'
         handlers.clear()
         registerPtyHandlers(mainWindow as never, runtime as never)
@@ -216,12 +216,12 @@ describe('registerPtyHandlers', () => {
         await controller.spawn({ cols: 80, rows: 24, worktreeId: 'wt-runtime', env: {} })
 
         const spawnOptions = daemonSpawn.mock.calls.at(-1)?.[0] as DaemonSpawnCall
-        expect(spawnOptions.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS).toBeUndefined()
+        expect(spawnOptions.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS).toBeUndefined()
         expect(spawnOptions.envToDelete).toEqual(
-          expect.arrayContaining(['ORCA_CLAUDE_AGENT_STATUS_SETTINGS'])
+          expect.arrayContaining(['GIRRA_CLAUDE_AGENT_STATUS_SETTINGS'])
         )
-        expect(spawnOptions.env.ORCA_AGENT_HOOK_PORT).toBe('5678')
-        expect(spawnOptions.env.ORCA_AGENT_HOOK_TOKEN).toBe('agent-token')
+        expect(spawnOptions.env.GIRRA_AGENT_HOOK_PORT).toBe('5678')
+        expect(spawnOptions.env.GIRRA_AGENT_HOOK_TOKEN).toBe('agent-token')
       })
       it('asks surviving pre-upgrade daemons to delete legacy attribution env for runtime PTYs', async () => {
         type RuntimeSpawnController = {
@@ -251,8 +251,8 @@ describe('registerPtyHandlers', () => {
         expect(spawnOptions.envToDelete).toEqual(
           expect.arrayContaining([...LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS])
         )
-        expect(spawnOptions.envToDelete).not.toContain('ORCA_REAL_GIT')
-        expect(spawnOptions.envToDelete).not.toContain('ORCA_REAL_GH')
+        expect(spawnOptions.envToDelete).not.toContain('GIRRA_REAL_GIT')
+        expect(spawnOptions.envToDelete).not.toContain('GIRRA_REAL_GH')
       })
       it('strips inherited Claude child-session stamps from runtime-created PTYs', async () => {
         // Why: the runtime controller is the `orca` CLI / automation spawn path and

@@ -1,3 +1,4 @@
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 import { setTimeout as delay } from 'node:timers/promises'
@@ -49,7 +50,7 @@ async function acquireInstallLock(
   suppliedHostIdentity?: string,
   waitTimeoutMs = LOCK_WAIT_TIMEOUT_MS
 ): Promise<() => Promise<void>> {
-  const lockParent = join(home, '.orca')
+  const lockParent = getGirraHomeDir(home)
   const lockPath = join(lockParent, 'managed-hook-install.lock')
   await mkdir(lockParent, { recursive: true })
   const hostIdentity = suppliedHostIdentity ?? (await readManagedHookHostIdentity())

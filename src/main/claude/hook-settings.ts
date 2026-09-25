@@ -176,7 +176,7 @@ export function getWindowsManagedLifecycleHook(
   }
   const scriptFileName = win32.basename(scriptPath)
   // Why: runtime profile resolution keeps the managed entry portable across users (STA-3348).
-  const quotedRelativePath = quotePowerShellString(`.orca\\agent-hooks\\${scriptFileName}`)
+  const quotedRelativePath = quotePowerShellString(`.girra\\agent-hooks\\${scriptFileName}`)
   // Why: compat consumers require neutral JSON even when the managed script is missing (#14818).
   const innerCommand =
     `$scriptPath = Join-Path $env:USERPROFILE ${quotedRelativePath}; ` +

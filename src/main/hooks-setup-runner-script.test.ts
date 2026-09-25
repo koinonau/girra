@@ -348,9 +348,9 @@ describe('createSetupRunnerScript', () => {
     const setup = createSetupRunnerScript(makeRepo(), '/test/worktree', 'git fetch')
 
     expect(setup.envVars).toMatchObject({
-      ORCA_ROOT_PATH: '/test/repo',
-      ORCA_WORKTREE_PATH: '/test/worktree',
-      ORCA_INTERNAL_TERMINAL_GIT_CREDENTIAL_GUARD_POLICY: 'guard'
+      GIRRA_ROOT_PATH: '/test/repo',
+      GIRRA_WORKTREE_PATH: '/test/worktree',
+      GIRRA_INTERNAL_TERMINAL_GIT_CREDENTIAL_GUARD_POLICY: 'guard'
     })
   })
 })

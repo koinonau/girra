@@ -4,8 +4,8 @@ import { join } from 'node:path'
 // Why: Windows hook tests must run the registered command through MSYS too — it
 // rewrites switches and paths, so a launcher can pass under cmd.exe and fail here.
 export function findGitBash(): string {
-  if (process.env.ORCA_TEST_GIT_BASH_PATH) {
-    return process.env.ORCA_TEST_GIT_BASH_PATH
+  if (process.env.GIRRA_TEST_GIT_BASH_PATH) {
+    return process.env.GIRRA_TEST_GIT_BASH_PATH
   }
   const candidates = [
     process.env.ProgramFiles && join(process.env.ProgramFiles, 'Git', 'bin', 'bash.exe'),

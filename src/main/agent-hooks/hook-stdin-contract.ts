@@ -7,6 +7,32 @@ export type PosixHookEmptyPayloadPolicy = 'exit' | 'empty-object'
 export const POSIX_HOOK_STDIN_READER = '{ command -p cat 2>/dev/null || cat; }'
 export const POSIX_HOOK_STDIN_DRAIN_COMMAND = `${POSIX_HOOK_STDIN_READER} >/dev/null 2>&1 || :`
 
+// The names Girra exports into a pane, and the hook script reads back.
+const HOOK_SCRIPT_ENV_NAMES = [
+  'PANE_KEY',
+  'TAB_ID',
+  'WORKTREE_ID',
+  'AGENT_LAUNCH_TOKEN',
+  'AGENT_HOOK_PORT',
+  'AGENT_HOOK_TOKEN',
+  'AGENT_HOOK_ENV',
+  'AGENT_HOOK_VERSION',
+  'AGENT_HOOK_TRANSPORT',
+  'AGENT_HOOK_ENDPOINT'
+] as const
+
+/**
+ * Take the ORCA_* value when only it is set.
+ *
+ * Why in the script rather than at spawn: this script is overwritten by whichever
+ * build installed it last, but the shells it runs in are not. A pane started
+ * before the rename carries only the ORCA_* names for its whole life, and without
+ * this the hook reads an empty port and spools every event instead of posting it.
+ */
+export function buildPosixHookLegacyEnvPrelude(): string[] {
+  return HOOK_SCRIPT_ENV_NAMES.map((name) => `: "\${GIRRA_${name}:=\${ORCA_${name}:-}}"`)
+}
+
 // Why: every POSIX hook must own stdin before any no-op exit; sharing this
 // prelude prevents agent templates from inventing different drain semantics.
 export function buildPosixHookPayloadCapture(
@@ -26,24 +52,24 @@ export function buildPosixHookPayloadCapture(
 export function buildPosixHookSpoolLines(source: string): string[] {
   const spoolRecordLine = "  { printf '\\n{".concat(
     '"paneKey":"%s","tabId":"%s","worktreeId":"%s","env":"%s","version":"%s","launchToken":"%s","source":"%s","receivedAt":%s,"payload":%s}\\n\'',
-    ' "$(spool_json_escape "${ORCA_PANE_KEY:-}")" "$(spool_json_escape "${ORCA_TAB_ID:-}")" "$(spool_json_escape "${ORCA_WORKTREE_ID:-}")" "$(spool_json_escape "${ORCA_AGENT_HOOK_ENV:-}")" "$(spool_json_escape "${ORCA_AGENT_HOOK_VERSION:-}")" "$(spool_json_escape "${ORCA_AGENT_LAUNCH_TOKEN:-}")" "$(spool_json_escape "',
+    ' "$(spool_json_escape "${GIRRA_PANE_KEY:-}")" "$(spool_json_escape "${GIRRA_TAB_ID:-}")" "$(spool_json_escape "${GIRRA_WORKTREE_ID:-}")" "$(spool_json_escape "${GIRRA_AGENT_HOOK_ENV:-}")" "$(spool_json_escape "${GIRRA_AGENT_HOOK_VERSION:-}")" "$(spool_json_escape "${GIRRA_AGENT_LAUNCH_TOKEN:-}")" "$(spool_json_escape "',
     source,
     '")" "$spool_now" "$payload"; } >> "$spool_file" 2>/dev/null || :'
   )
   return [
     'spool_hook_event() {',
     '  case "$payload" in *\'"PreToolUse"\'*|*\'"PostToolUse"\'*|*\'"PostToolUseFailure"\'*) return 0 ;; esac',
-    '  [ -n "${ORCA_AGENT_HOOK_ENDPOINT:-}" ] || return 0',
+    '  [ -n "${GIRRA_AGENT_HOOK_ENDPOINT:-}" ] || return 0',
     // Why: an endpoint can linger in a parent shell after leaving Girra; without a pane key
     // the record is un-attributable and would accumulate as pane-unknown.jsonl.
-    '  [ -n "${ORCA_PANE_KEY:-}" ] || return 0',
+    '  [ -n "${GIRRA_PANE_KEY:-}" ] || return 0',
     // Why: a stale env var must not create a spool tree for a Girra that is not installed here.
-    '  [ -r "$ORCA_AGENT_HOOK_ENDPOINT" ] || return 0',
-    '  spool_base=${ORCA_AGENT_HOOK_ENDPOINT%/*}',
+    '  [ -r "$GIRRA_AGENT_HOOK_ENDPOINT" ] || return 0',
+    '  spool_base=${GIRRA_AGENT_HOOK_ENDPOINT%/*}',
     '  spool_dir="$spool_base/spool"',
     '  mkdir -p "$spool_dir" 2>/dev/null || return 0',
     '  chmod 700 "$spool_dir" 2>/dev/null || :',
-    "  spool_id=$(printf %s \"${ORCA_PANE_KEY:-unknown}\" | tail -c 36 | tr '/:' '__')",
+    "  spool_id=$(printf %s \"${GIRRA_PANE_KEY:-unknown}\" | tail -c 36 | tr '/:' '__')",
     '  spool_file="$spool_dir/pane-$spool_id.jsonl"',
     '  if [ -f "$spool_file" ] && find "$spool_file" -mtime +7 -print -quit 2>/dev/null | grep -q .; then : > "$spool_file"; fi',
     '  [ -f "$spool_file" ] || : > "$spool_file"',
@@ -66,9 +92,9 @@ const WINDOWS_HOOK_STDIN_DRAIN_COMMAND = `${WINDOWS_HOOK_STDIN_READER} >nul 2>nu
 
 // The Girra context a hook needs before it may own stdin; see the rule below.
 const WINDOWS_HOOK_ENVIRONMENT_VARS = [
-  'ORCA_AGENT_HOOK_PORT',
-  'ORCA_AGENT_HOOK_TOKEN',
-  'ORCA_PANE_KEY'
+  'GIRRA_AGENT_HOOK_PORT',
+  'GIRRA_AGENT_HOOK_TOKEN',
+  'GIRRA_PANE_KEY'
 ] as const
 
 // Why (#11549): missing Girra context means the hook ran outside a Girra pane, where the caller

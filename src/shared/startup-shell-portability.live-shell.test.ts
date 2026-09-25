@@ -148,7 +148,7 @@ describe.skipIf(process.platform === 'win32')(
         // The child must read its own environment, the way the agent binary does;
         // expanding it in the caller would just echo the caller's value back.
         const launch = withoutEnvCommand(
-          ['CLAUDE_CONFIG_DIR', 'ORCA_CLAUDE_CONFIG_DIR'],
+          ['CLAUDE_CONFIG_DIR', 'GIRRA_CLAUDE_CONFIG_DIR'],
           `sh -c 'printf "LAUNCHED:%s" "\${CLAUDE_CONFIG_DIR-unset}"'`,
           'posix'
         )
@@ -161,20 +161,20 @@ describe.skipIf(process.platform === 'win32')(
       })
 
       it('clears an exported variable with no wrapper installed', () => {
-        const clear = clearEnvCommand('ORCA_PI_PREFILL', 'posix')
+        const clear = clearEnvCommand('GIRRA_PI_PREFILL', 'posix')
         const probe =
           shell.name === 'fish'
-            ? `set -gx ORCA_PI_PREFILL draft; ${clear}; set -q ORCA_PI_PREFILL; and echo STILL; or echo CLEARED`
-            : `ORCA_PI_PREFILL=draft; export ORCA_PI_PREFILL; ${clear}; echo "\${ORCA_PI_PREFILL:+STILL}\${ORCA_PI_PREFILL:-CLEARED}"`
+            ? `set -gx GIRRA_PI_PREFILL draft; ${clear}; set -q GIRRA_PI_PREFILL; and echo STILL; or echo CLEARED`
+            : `GIRRA_PI_PREFILL=draft; export GIRRA_PI_PREFILL; ${clear}; echo "\${GIRRA_PI_PREFILL:+STILL}\${GIRRA_PI_PREFILL:-CLEARED}"`
         expect(runInShell(shell, probe).trim()).toBe('CLEARED')
       })
 
       it('clears several variables in one statement', () => {
-        const clear = clearEnvCommand(['ORCA_A', 'ORCA_B'], 'posix')
+        const clear = clearEnvCommand(['GIRRA_A', 'GIRRA_B'], 'posix')
         const probe =
           shell.name === 'fish'
-            ? `set -gx ORCA_A 1; set -gx ORCA_B 2; ${clear}; set -q ORCA_A; or set -q ORCA_B; and echo STILL; or echo CLEARED`
-            : `ORCA_A=1 ORCA_B=2; export ORCA_A ORCA_B; ${clear}; echo "\${ORCA_A:+STILL}\${ORCA_B:+STILL}\${ORCA_A:-CLEARED}"`
+            ? `set -gx GIRRA_A 1; set -gx GIRRA_B 2; ${clear}; set -q GIRRA_A; or set -q GIRRA_B; and echo STILL; or echo CLEARED`
+            : `GIRRA_A=1 GIRRA_B=2; export GIRRA_A GIRRA_B; ${clear}; echo "\${GIRRA_A:+STILL}\${GIRRA_B:+STILL}\${GIRRA_A:-CLEARED}"`
         expect(runInShell(shell, probe).trim()).toBe('CLEARED')
       })
 
@@ -185,11 +185,11 @@ describe.skipIf(process.platform === 'win32')(
         ['already set', true],
         ['already unset', false]
       ])('exits 0 and writes nothing to stderr when the variable is %s', (_label, preset) => {
-        const clear = clearEnvCommand('ORCA_PI_PREFILL', 'posix')
+        const clear = clearEnvCommand('GIRRA_PI_PREFILL', 'posix')
         const setUp = preset
           ? shell.name === 'fish'
-            ? 'set -gx ORCA_PI_PREFILL draft; '
-            : 'ORCA_PI_PREFILL=draft; export ORCA_PI_PREFILL; '
+            ? 'set -gx GIRRA_PI_PREFILL draft; '
+            : 'GIRRA_PI_PREFILL=draft; export GIRRA_PI_PREFILL; '
           : ''
         const stderr = execFileSync(shell.path, ['-c', `${setUp}${clear} 2>&1 1>/dev/null`], {
           encoding: 'utf8',
@@ -206,12 +206,12 @@ describe.skipIf(process.platform === 'win32')(
       it.runIf(['bash', 'zsh'].includes(shell.name))(
         'clears even when `test` is aliased away in an interactive shell',
         () => {
-          const clear = clearEnvCommand('ORCA_PI_PREFILL', 'posix')
+          const clear = clearEnvCommand('GIRRA_PI_PREFILL', 'posix')
           const script = [
             'alias test=false',
-            'ORCA_PI_PREFILL=draft; export ORCA_PI_PREFILL',
+            'GIRRA_PI_PREFILL=draft; export GIRRA_PI_PREFILL',
             clear,
-            'echo "RESULT=${ORCA_PI_PREFILL:+STILL}${ORCA_PI_PREFILL:-CLEARED}"'
+            'echo "RESULT=${GIRRA_PI_PREFILL:+STILL}${GIRRA_PI_PREFILL:-CLEARED}"'
           ].join('\n')
           const out = execFileSync(shell.path, ['-i'], {
             input: `${script}\n`,
@@ -240,23 +240,23 @@ describe.skipIf(process.platform === 'win32')(
       // have — is permanently deleted from every future session. Reachable from
       // the clipboard command, which may run with no injected value at all.
       it.runIf(shell.name === 'fish')('never deletes a lone universal variable', () => {
-        const clear = clearEnvCommand('ORCA_PI_PREFILL', 'posix')
-        const probe = `set -Ux ORCA_PI_PREFILL persisted; ${clear}; set -q ORCA_PI_PREFILL; and echo "RESULT=$ORCA_PI_PREFILL"; or echo RESULT=DESTROYED; set -Ue ORCA_PI_PREFILL`
+        const clear = clearEnvCommand('GIRRA_PI_PREFILL', 'posix')
+        const probe = `set -Ux GIRRA_PI_PREFILL persisted; ${clear}; set -q GIRRA_PI_PREFILL; and echo "RESULT=$GIRRA_PI_PREFILL"; or echo RESULT=DESTROYED; set -Ue GIRRA_PI_PREFILL`
         expect(runInShell(shell, probe)).toContain('RESULT=persisted')
       })
 
       // A universal shadowed by the injected global: the global goes, theirs
       // comes back. That is the wanted outcome, not a missed erase.
       it.runIf(shell.name === 'fish')('reveals a shadowed universal instead of deleting it', () => {
-        const clear = clearEnvCommand('ORCA_PI_PREFILL', 'posix')
-        const probe = `set -Ux ORCA_PI_PREFILL mine; set -gx ORCA_PI_PREFILL injected; ${clear}; echo "RESULT=$ORCA_PI_PREFILL"; set -Ue ORCA_PI_PREFILL`
+        const clear = clearEnvCommand('GIRRA_PI_PREFILL', 'posix')
+        const probe = `set -Ux GIRRA_PI_PREFILL mine; set -gx GIRRA_PI_PREFILL injected; ${clear}; echo "RESULT=$GIRRA_PI_PREFILL"; set -Ue GIRRA_PI_PREFILL`
         expect(runInShell(shell, probe)).toContain('RESULT=mine')
       })
 
       it.runIf(['bash', 'zsh'].includes(shell.name))(
         'never enables errexit when $fish_pid misfires',
         () => {
-          const clear = clearEnvCommand('ORCA_PI_PREFILL', 'posix')
+          const clear = clearEnvCommand('GIRRA_PI_PREFILL', 'posix')
           const probe = `fish_pid=1; export fish_pid; ${clear} 2>/dev/null; printf '%s' "$-"`
           expect(runInShell(shell, probe).trim()).not.toContain('e')
         }

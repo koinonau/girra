@@ -248,7 +248,7 @@ describe('createRemoteRuntimePtyTransport', () => {
       tabId: 'tab-1',
       leafId: 'pane:1',
       command: "claude 'linked issue context'",
-      envToDelete: ['CLAUDE_CONFIG_DIR', 'ORCA_CLAUDE_CONFIG_DIR'],
+      envToDelete: ['CLAUDE_CONFIG_DIR', 'GIRRA_CLAUDE_CONFIG_DIR'],
       startupCommandDelivery: 'shell-ready',
       terminalColorQueryReplies: { foreground: '#ffffff', background: '#282c34' }
     })
@@ -261,7 +261,7 @@ describe('createRemoteRuntimePtyTransport', () => {
         method: 'terminal.create',
         params: expect.objectContaining({
           command: "claude 'linked issue context'",
-          envToDelete: ['CLAUDE_CONFIG_DIR', 'ORCA_CLAUDE_CONFIG_DIR'],
+          envToDelete: ['CLAUDE_CONFIG_DIR', 'GIRRA_CLAUDE_CONFIG_DIR'],
           startupCommandDelivery: 'shell-ready',
           terminalColorQueryReplies: { foreground: '#ffffff', background: '#282c34' }
         })
@@ -297,7 +297,7 @@ describe('createRemoteRuntimePtyTransport', () => {
     await transport.connect({
       url: '',
       command: "claude '--model' 'sonnet' '--resume' 'session-1'",
-      env: { CLAUDE_CONFIG_DIR: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
+      env: { CLAUDE_CONFIG_DIR: 'captured', GIRRA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
       launchConfig: {
         agentArgs: '--model sonnet',
         agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
@@ -410,7 +410,7 @@ describe('createRemoteRuntimePtyTransport', () => {
     await transport.connect({
       url: '',
       command: "claude '--model' 'sonnet' '--resume' 'session-1'",
-      env: { CLAUDE_CONFIG_DIR: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
+      env: { CLAUDE_CONFIG_DIR: 'captured', GIRRA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
       launchConfig: {
         agentArgs: '--model sonnet',
         agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }
@@ -427,7 +427,7 @@ describe('createRemoteRuntimePtyTransport', () => {
         worktree: 'id:wt-1',
         clientMutationId: expect.any(String),
         command: "claude '--model' 'sonnet' '--resume' 'session-1'",
-        env: { CLAUDE_CONFIG_DIR: 'captured', ORCA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
+        env: { CLAUDE_CONFIG_DIR: 'captured', GIRRA_AGENT_LAUNCH_TOKEN: 'fresh-token' },
         launchConfig: {
           agentArgs: '--model sonnet',
           agentEnv: { CLAUDE_CONFIG_DIR: 'captured' }

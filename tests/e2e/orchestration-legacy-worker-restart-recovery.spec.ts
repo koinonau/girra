@@ -21,7 +21,7 @@ import {
   LEGACY_CONTRACT_VERSION,
   LEGACY_RUN_ID
 } from '../../src/main/runtime/orchestration/db'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 import type { RuntimeTerminalListResult, RuntimeTerminalRead } from '../../src/shared/runtime-types'
 import { listAllOrchestrationRuns } from './orchestration-run-pages'
 import {
@@ -50,10 +50,10 @@ function appendLedger(envName, event) {
   } catch {}
 }
 async function emitAuthorityHook(hookEventName) {
-  const port = process.env.ORCA_AGENT_HOOK_PORT
-  const token = process.env.ORCA_AGENT_HOOK_TOKEN
-  const launchToken = process.env.ORCA_AGENT_LAUNCH_TOKEN
-  if (!port || !token || !launchToken || !process.env.ORCA_PANE_KEY) return
+  const port = process.env.GIRRA_AGENT_HOOK_PORT
+  const token = process.env.GIRRA_AGENT_HOOK_TOKEN
+  const launchToken = process.env.GIRRA_AGENT_LAUNCH_TOKEN
+  if (!port || !token || !launchToken || !process.env.GIRRA_PANE_KEY) return
   try {
     const response = await fetch('http://127.0.0.1:' + port + '/hook/claude', {
       method: 'POST',
@@ -62,11 +62,11 @@ async function emitAuthorityHook(hookEventName) {
         'X-Orca-Agent-Hook-Token': token
       },
       body: JSON.stringify({
-        paneKey: process.env.ORCA_PANE_KEY,
-        tabId: process.env.ORCA_TAB_ID,
-        worktreeId: process.env.ORCA_WORKTREE_ID,
-        env: process.env.ORCA_AGENT_HOOK_ENV,
-        version: process.env.ORCA_AGENT_HOOK_VERSION,
+        paneKey: process.env.GIRRA_PANE_KEY,
+        tabId: process.env.GIRRA_TAB_ID,
+        worktreeId: process.env.GIRRA_WORKTREE_ID,
+        env: process.env.GIRRA_AGENT_HOOK_ENV,
+        version: process.env.GIRRA_AGENT_HOOK_VERSION,
         launchToken,
         payload: {
           hook_event_name: hookEventName,
@@ -76,13 +76,13 @@ async function emitAuthorityHook(hookEventName) {
         }
       })
     })
-    appendLedger('ORCA_E2E_AUTHORITY_LEDGER', {
+    appendLedger('GIRRA_E2E_AUTHORITY_LEDGER', {
       event: 'authority-hook',
       hookEventName,
       status: response.status
     })
   } catch (error) {
-    appendLedger('ORCA_E2E_AUTHORITY_LEDGER', {
+    appendLedger('GIRRA_E2E_AUTHORITY_LEDGER', {
       event: 'authority-hook-error',
       error: error instanceof Error ? error.message : String(error)
     })
@@ -90,7 +90,7 @@ async function emitAuthorityHook(hookEventName) {
 }
 // Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
 if (require('node:path').basename(process.cwd()) === 'rate-limit-pty-cwd') process.exit(0)
-appendLedger('ORCA_E2E_SPAWN_LEDGER', { event: 'spawn', argv: process.argv.slice(2) })
+appendLedger('GIRRA_E2E_SPAWN_LEDGER', { event: 'spawn', argv: process.argv.slice(2) })
 process.stdout.write('\\u001b]0;Claude ready\\u0007Claude Code\\n')
 const sessionStartHook = emitAuthorityHook('SessionStart')
 let acknowledged = false
@@ -104,7 +104,7 @@ process.stdin.on('data', (chunk) => {
     process.stdout.write('\\x1b[?25h')
   }
   if (input.includes('\\x03')) {
-    appendLedger('ORCA_E2E_INTERRUPTION_LEDGER', { event: 'stdin-ctrl-c' })
+    appendLedger('GIRRA_E2E_INTERRUPTION_LEDGER', { event: 'stdin-ctrl-c' })
   }
   if (!acknowledged) {
     fakeAgentMaybeAck(pasteEndScan, input, (mode) => {
@@ -115,11 +115,11 @@ process.stdin.on('data', (chunk) => {
       setTimeout(() => process.stdout.write('\\u001b]0;Claude ready\\u0007'), 10)
     })
   }
-  const legacyCompletion = input.match(/ORCA_E2E_RUN_LEGACY_DONE:([A-Za-z0-9+/=]+)/)
+  const legacyCompletion = input.match(/GIRRA_E2E_RUN_LEGACY_DONE:([A-Za-z0-9+/=]+)/)
   if (!lifecycleSent && legacyCompletion) {
     lifecycleSent = true
     const identity = JSON.parse(Buffer.from(legacyCompletion[1], 'base64').toString('utf8'))
-    const cliEntry = process.env.ORCA_E2E_CLI_ENTRY
+    const cliEntry = process.env.GIRRA_E2E_CLI_ENTRY
     const args = [
       'orchestration',
       'send',
@@ -144,8 +144,8 @@ process.stdin.on('data', (chunk) => {
           env: process.env,
           encoding: 'utf8'
         })
-      : { status: 127, stdout: '', stderr: 'ORCA_E2E_CLI_ENTRY missing' }
-    appendLedger('ORCA_E2E_LIFECYCLE_LEDGER', {
+      : { status: 127, stdout: '', stderr: 'GIRRA_E2E_CLI_ENTRY missing' }
+    appendLedger('GIRRA_E2E_LIFECYCLE_LEDGER', {
       event: 'legacy-command',
       argv: args,
       status: result.status,
@@ -158,7 +158,7 @@ process.stdin.on('data', (chunk) => {
 process.stdin.setRawMode?.(true)
 for (const signal of ['SIGINT', 'SIGHUP', 'SIGTERM']) {
   process.on(signal, () => {
-    appendLedger('ORCA_E2E_INTERRUPTION_LEDGER', { event: 'signal', signal })
+    appendLedger('GIRRA_E2E_INTERRUPTION_LEDGER', { event: 'signal', signal })
     process.exit(0)
   })
 }
@@ -232,7 +232,7 @@ function isProcessAlive(pid: number): boolean {
 }
 
 function persistedDataPath(userDataDir: string): string {
-  return path.join(userDataDir, 'profiles', DEFAULT_LOCAL_ORCA_PROFILE_ID, 'orca-data.json')
+  return path.join(userDataDir, 'profiles', DEFAULT_LOCAL_GIRRA_PROFILE_ID, 'orca-data.json')
 }
 
 function readPersistedData(userDataDir: string): PersistedData {
@@ -425,11 +425,11 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
 
     const session = createRestartSession(testInfo, {
       PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`,
-      ORCA_E2E_SPAWN_LEDGER: spawnLedgerPath,
-      ORCA_E2E_INTERRUPTION_LEDGER: interruptionLedgerPath,
-      ORCA_E2E_AUTHORITY_LEDGER: authorityLedgerPath,
-      ORCA_E2E_LIFECYCLE_LEDGER: lifecycleLedgerPath,
-      ORCA_E2E_CLI_ENTRY: path.join(process.cwd(), 'out', 'cli', 'index.js')
+      GIRRA_E2E_SPAWN_LEDGER: spawnLedgerPath,
+      GIRRA_E2E_INTERRUPTION_LEDGER: interruptionLedgerPath,
+      GIRRA_E2E_AUTHORITY_LEDGER: authorityLedgerPath,
+      GIRRA_E2E_LIFECYCLE_LEDGER: lifecycleLedgerPath,
+      GIRRA_E2E_CLI_ENTRY: path.join(process.cwd(), 'out', 'cli', 'index.js')
     })
     let firstApp: ElectronApplication | null = null
     let secondApp: ElectronApplication | null = null
@@ -743,7 +743,7 @@ for (const contractVersion of [LEGACY_CONTRACT_VERSION, CURRENT_CONTRACT_VERSION
         ).toString('base64')
         await secondClient.call('terminal.send', {
           terminal: recovered!.handle,
-          text: `ORCA_E2E_RUN_LEGACY_DONE:${legacyCompletion}`,
+          text: `GIRRA_E2E_RUN_LEGACY_DONE:${legacyCompletion}`,
           enter: true
         })
         await expect

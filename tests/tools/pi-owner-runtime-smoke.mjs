@@ -68,7 +68,7 @@ try {
   `
   )
   const results = []
-  const ownerKey = 'ORCA_PI_STATUS_OWNED'
+  const ownerKey = 'GIRRA_PI_STATUS_OWNED'
   for (const scenario of ['baseline-dead', 'fixed-dead', 'fixed-live']) {
     let source = getPiAgentStatusExtensionSource()
     if (scenario === 'baseline-dead') {
@@ -86,12 +86,12 @@ try {
       cwd: scratch,
       env: {
         ...process.env,
-        ORCA_BACKGROUND_LAUNCH: '1',
-        ORCA_PANE_KEY: 'owner-proof',
-        ORCA_AGENT_HOOK_PORT: String(server.address().port),
-        ORCA_AGENT_HOOK_TOKEN: 'isolated-proof-token',
-        ORCA_AGENT_HOOK_ENV: 'proof',
-        ORCA_AGENT_HOOK_ENDPOINT: '',
+        GIRRA_BACKGROUND_LAUNCH: '1',
+        GIRRA_PANE_KEY: 'owner-proof',
+        GIRRA_AGENT_HOOK_PORT: String(server.address().port),
+        GIRRA_AGENT_HOOK_TOKEN: 'isolated-proof-token',
+        GIRRA_AGENT_HOOK_ENV: 'proof',
+        GIRRA_AGENT_HOOK_ENDPOINT: '',
         [ownerKey]: String(owner)
       },
       timeoutMs: 15000

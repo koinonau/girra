@@ -53,7 +53,7 @@ export function hasHooksFile(repoPath: string): boolean {
 }
 
 // Why: detect unrecognised keys so the UI can suggest an update instead of showing a "could not be parsed" error.
-const RECOGNIZED_ORCA_YAML_KEYS = new Set([
+const RECOGNIZED_GIRRA_YAML_KEYS = new Set([
   'scripts',
   'setupAgentStartupPolicy',
   'issueCommand',
@@ -69,7 +69,7 @@ export function hasUnrecognizedOrcaYamlKeys(repoPath: string): boolean {
     for (const line of iterateLfScriptLines(content)) {
       // Why: match bare `key:` at end-of-line too, since a mapping with a block value on the next line is valid YAML.
       const m = line.match(/^([A-Za-z][A-Za-z0-9_-]*):(\s|$)/)
-      if (m != null && !RECOGNIZED_ORCA_YAML_KEYS.has(m[1])) {
+      if (m != null && !RECOGNIZED_GIRRA_YAML_KEYS.has(m[1])) {
         return true
       }
     }

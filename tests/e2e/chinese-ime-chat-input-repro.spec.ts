@@ -766,8 +766,8 @@ test.describe('Chinese IME terminal chat input repro', () => {
     orcaPage
   }, testInfo) => {
     test.skip(
-      process.env.ORCA_E2E_REAL_CLAUDE_IME !== '1',
-      'Set ORCA_E2E_REAL_CLAUDE_IME=1 to exercise the locally installed Claude Code TUI'
+      process.env.GIRRA_E2E_REAL_CLAUDE_IME !== '1',
+      'Set GIRRA_E2E_REAL_CLAUDE_IME=1 to exercise the locally installed Claude Code TUI'
     )
 
     await waitForSessionReady(orcaPage)

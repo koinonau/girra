@@ -28,9 +28,9 @@ function isExternalMainModule(source: string): boolean {
   )
 }
 
-// Why: CI release builds set ORCA_BUILD_IDENTITY; every other build substitutes literal `null`.
-const orcaBuildIdentity = process.env.ORCA_BUILD_IDENTITY
-const ORCA_BUILD_IDENTITY_LITERAL =
+// Why: CI release builds set GIRRA_BUILD_IDENTITY; every other build substitutes literal `null`.
+const orcaBuildIdentity = process.env.GIRRA_BUILD_IDENTITY
+const GIRRA_BUILD_IDENTITY_LITERAL =
   orcaBuildIdentity === 'stable' || orcaBuildIdentity === 'rc'
     ? JSON.stringify(orcaBuildIdentity)
     : 'null'
@@ -39,7 +39,7 @@ function createStartupDiagnosticsBanner(chunkName: string): string {
   return `
 ;(() => {
   const env = typeof process !== 'undefined' ? process.env : undefined
-  const mode = env?.ORCA_STARTUP_DIAGNOSTICS
+  const mode = env?.GIRRA_STARTUP_DIAGNOSTICS
   if (mode !== '1' && mode !== 'trace') {
     return
   }
@@ -64,7 +64,7 @@ function createStartupDiagnosticsBanner(chunkName: string): string {
     openSync = undefined
     writeSync = undefined
   }
-  const diagnosticFile = env?.ORCA_STARTUP_DIAGNOSTICS_FILE
+  const diagnosticFile = env?.GIRRA_STARTUP_DIAGNOSTICS_FILE
   if (typeof diagnosticFile === 'string' && diagnosticFile.length > 0 && typeof openSync === 'function') {
     try {
       diagnosticFileDescriptor = openSync(diagnosticFile, 'a', 0o600)
@@ -87,8 +87,8 @@ function createStartupDiagnosticsBanner(chunkName: string): string {
   }
   const chunkName = ${JSON.stringify(chunkName)}
   writeLine('[bootstrap] bundle-enter chunk=' + safeJson(chunkName) + ' pid=' + process.pid + ' ppid=' + process.ppid + ' execPath=' + safeJson(process.execPath) + ' argv=' + safeJson(process.argv) + ' electronRunAsNode=' + safeJson(env?.ELECTRON_RUN_AS_NODE ?? null))
-  if (!globalThis.__ORCA_BOOTSTRAP_EXIT_LOG_INSTALLED__) {
-    globalThis.__ORCA_BOOTSTRAP_EXIT_LOG_INSTALLED__ = true
+  if (!globalThis.__GIRRA_BOOTSTRAP_EXIT_LOG_INSTALLED__) {
+    globalThis.__GIRRA_BOOTSTRAP_EXIT_LOG_INSTALLED__ = true
     process.once('exit', (code) => {
       writeLine('[bootstrap] process-exit code=' + code)
       if (typeof closeSync === 'function' && typeof diagnosticFileDescriptor === 'number') {
@@ -108,12 +108,12 @@ function createStartupDiagnosticsBanner(chunkName: string): string {
       writeLine('[bootstrap] unhandled-rejection error=' + safeJson(String(message)))
     })
   }
-  if (mode === 'trace' && !globalThis.__ORCA_BOOTSTRAP_REQUIRE_TRACE_INSTALLED__) {
-    globalThis.__ORCA_BOOTSTRAP_REQUIRE_TRACE_INSTALLED__ = true
+  if (mode === 'trace' && !globalThis.__GIRRA_BOOTSTRAP_REQUIRE_TRACE_INSTALLED__) {
+    globalThis.__GIRRA_BOOTSTRAP_REQUIRE_TRACE_INSTALLED__ = true
     try {
       const Module = require('node:module')
       const originalLoad = Module._load
-      const parsedTraceLimit = Number(env?.ORCA_STARTUP_DIAGNOSTICS_TRACE_LIMIT ?? 20000)
+      const parsedTraceLimit = Number(env?.GIRRA_STARTUP_DIAGNOSTICS_TRACE_LIMIT ?? 20000)
       const traceLimit = Number.isFinite(parsedTraceLimit) && parsedTraceLimit > 0 ? parsedTraceLimit : 20000
       let traceLineCount = 0
       let traceLimitReported = false
@@ -238,7 +238,7 @@ export const electronViteConfig: UserConfig = {
       }
     },
     define: {
-      ORCA_BUILD_IDENTITY: ORCA_BUILD_IDENTITY_LITERAL
+      GIRRA_BUILD_IDENTITY: GIRRA_BUILD_IDENTITY_LITERAL
     },
     // Why: @xterm/headless declares "exports": null in package.json, which
     // prevents Vite's default resolver from finding the CJS entry. Point

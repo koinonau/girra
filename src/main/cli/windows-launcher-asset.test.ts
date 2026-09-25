@@ -19,12 +19,12 @@ describe('packaged Windows CLI launcher asset', () => {
     // Why: the marker and command name must ride the launcher's own environment, never
     // ProcessStartInfo's case-insensitive copy of a PATH/Path block (stablyai/orca#12046).
     expect(source).toContain(
-      'Environment.SetEnvironmentVariable("ORCA_WINDOWS_PACKAGED_CLI_LAUNCHER", "1");'
+      'Environment.SetEnvironmentVariable("GIRRA_WINDOWS_PACKAGED_CLI_LAUNCHER", "1");'
     )
     expect(source).toContain(
-      'string requestedCliCommand = Environment.GetEnvironmentVariable("ORCA_CLI_COMMAND");'
+      'string requestedCliCommand = Environment.GetEnvironmentVariable("GIRRA_CLI_COMMAND");'
     )
-    // Why `girra` is the fallback, not the match: nothing sets ORCA_CLI_COMMAND on the normal
+    // Why `girra` is the fallback, not the match: nothing sets GIRRA_CLI_COMMAND on the normal
     // packaged path, so making the old name the default would hide the new one from every
     // invocation. Only an explicit alias passes through. Whitespace is normalized because the
     // C# expression wraps across lines.

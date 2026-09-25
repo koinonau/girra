@@ -432,7 +432,7 @@ function makeStore(): {
   }))
   return {
     store: {
-      getSettings: () => ({ nestWorkspaces: false, workspaceDir: '.orca/worktrees' }),
+      getSettings: () => ({ nestWorkspaces: false, workspaceDir: '.girra/worktrees' }),
       setWorktreeMeta
     } as unknown as Store,
     setWorktreeMeta

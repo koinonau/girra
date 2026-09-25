@@ -45,7 +45,7 @@ describe('OrcaRuntimeService', () => {
       await expect(runtime.readRepoIssueCommand('id:repo-1')).resolves.toMatchObject({
         localContent: 'Fix it',
         effectiveContent: 'Fix it',
-        localFilePath: 'C:\\remote\\repo\\.orca\\issue-command'
+        localFilePath: 'C:\\remote\\repo\\.girra\\issue-command'
       })
       await expect(runtime.writeRepoIssueCommand('id:repo-1', 'Ship it')).resolves.toEqual({
         ok: true
@@ -55,15 +55,15 @@ describe('OrcaRuntimeService', () => {
     }
 
     expect(fsProvider.readFile).toHaveBeenCalledWith('C:\\remote\\repo\\orca.yaml')
-    expect(fsProvider.readFile).toHaveBeenCalledWith('C:\\remote\\repo\\.orca\\issue-command')
-    expect(fsProvider.createDir).toHaveBeenCalledWith('C:\\remote\\repo\\.orca')
+    expect(fsProvider.readFile).toHaveBeenCalledWith('C:\\remote\\repo\\.girra\\issue-command')
+    expect(fsProvider.createDir).toHaveBeenCalledWith('C:\\remote\\repo\\.girra')
     expect(fsProvider.writeFile).toHaveBeenCalledWith(
-      'C:\\remote\\repo\\.orca\\issue-command',
+      'C:\\remote\\repo\\.girra\\issue-command',
       'Ship it\n'
     )
     expect(fsProvider.writeFile).toHaveBeenCalledWith(
       'C:\\remote\\repo\\.gitignore',
-      'node_modules\n.orca\n'
+      'node_modules\n.girra\n'
     )
   })
 })

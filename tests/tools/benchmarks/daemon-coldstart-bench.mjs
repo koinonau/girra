@@ -172,12 +172,12 @@ function runIteration({ exe, fixtureDir, timeoutMs, lingerMs }) {
     mkdirSync(isolatedHome, { recursive: true })
     const env = {
       ...process.env,
-      ORCA_STARTUP_DIAGNOSTICS: '1',
-      ORCA_E2E_USER_DATA_DIR: fixtureDir,
+      GIRRA_STARTUP_DIAGNOSTICS: '1',
+      GIRRA_E2E_USER_DATA_DIR: fixtureDir,
       HOME: isolatedHome,
       USERPROFILE: isolatedHome,
-      ORCA_E2E_HOME_DIR: isolatedHome,
-      ORCA_E2E_HEADLESS: '1'
+      GIRRA_E2E_HOME_DIR: isolatedHome,
+      GIRRA_E2E_HEADLESS: '1'
     }
     delete env.CLAUDE_CONFIG_DIR
     const child = spawn(command, commandArgs, {

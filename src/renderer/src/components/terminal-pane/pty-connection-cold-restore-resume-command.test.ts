@@ -216,11 +216,11 @@ describe('connectPanePty', () => {
           commandDelivery: 'provider',
           startupCommandDelivery: 'shell-ready',
           env: expect.objectContaining({
-            ORCA_PANE_KEY: paneKey,
-            ORCA_TAB_ID: 'tab-1',
-            ORCA_WORKTREE_ID: 'wt-1',
-            ORCA_WORKSPACE_ID: 'wt-1',
-            ORCA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
+            GIRRA_PANE_KEY: paneKey,
+            GIRRA_TAB_ID: 'tab-1',
+            GIRRA_WORKTREE_ID: 'wt-1',
+            GIRRA_WORKSPACE_ID: 'wt-1',
+            GIRRA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
           })
         })
       )
@@ -316,8 +316,8 @@ describe('connectPanePty', () => {
         expect.objectContaining({
           command: "claude '--dangerously-skip-permissions' '--resume' 'claude-session-1'",
           env: expect.objectContaining({
-            ORCA_PANE_KEY: paneKey,
-            ORCA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
+            GIRRA_PANE_KEY: paneKey,
+            GIRRA_AGENT_LAUNCH_TOKEN: expect.stringMatching(new RegExp(`^${UUID_RE}$`))
           })
         })
       )

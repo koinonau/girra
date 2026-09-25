@@ -67,11 +67,11 @@ export class HostCliUnavailableError extends Error {}
 
 // Only terminal identity may cross hosts; remote paths and Node options cannot.
 const REMOTE_CONTEXT_ENV_VARS = [
-  'ORCA_TERMINAL_HANDLE',
-  'ORCA_WORKTREE_ID',
-  'ORCA_PANE_KEY',
-  'ORCA_AGENT_LAUNCH_TOKEN',
-  'ORCA_WORKSPACE_ID'
+  'GIRRA_TERMINAL_HANDLE',
+  'GIRRA_WORKTREE_ID',
+  'GIRRA_PANE_KEY',
+  'GIRRA_AGENT_LAUNCH_TOKEN',
+  'GIRRA_WORKSPACE_ID'
 ] as const
 
 // Bound output retained for the relay response.
@@ -106,18 +106,18 @@ export function buildHostCliEnv(args: {
   }
   // Why: bind the subprocess to this app instance's runtime metadata (dev and
   // parallel instances use non-default userData dirs).
-  env.ORCA_USER_DATA_PATH = args.userDataPath
+  env.GIRRA_USER_DATA_PATH = args.userDataPath
   // Why: the caller's working directory lives on the remote machine, so the
-  // subprocess cwd cannot be chdir'd there; ORCA_CLI_CWD carries it for
+  // subprocess cwd cannot be chdir'd there; GIRRA_CLI_CWD carries it for
   // cwd-based selectors like `--worktree active`.
-  env.ORCA_CLI_CWD = args.remoteCwd
+  env.GIRRA_CLI_CWD = args.remoteCwd
   // Why: recovery commands run on the SSH execution host through its relay shim, and a remote on an
   // older build has only the pre-rename name; `orca` stays an installed alias on every new one.
-  env.ORCA_CLI_COMMAND = 'orca'
+  env.GIRRA_CLI_COMMAND = 'orca'
   // Why: same node-mode hygiene as the shipped CLI launchers — stash and clear
   // NODE_OPTIONS so Electron's node bootstrap does not inherit them.
-  env.ORCA_NODE_OPTIONS = args.hostEnv.NODE_OPTIONS ?? ''
-  env.ORCA_NODE_REPL_EXTERNAL_MODULE = args.hostEnv.NODE_REPL_EXTERNAL_MODULE ?? ''
+  env.GIRRA_NODE_OPTIONS = args.hostEnv.NODE_OPTIONS ?? ''
+  env.GIRRA_NODE_REPL_EXTERNAL_MODULE = args.hostEnv.NODE_REPL_EXTERNAL_MODULE ?? ''
   delete env.NODE_OPTIONS
   delete env.NODE_REPL_EXTERNAL_MODULE
   delete env[ORCHESTRATION_COMPATIBILITY_HOST_KIND_ENV]

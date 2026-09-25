@@ -2,7 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import path from 'node:path'
 import { DaemonClient } from '../../src/main/daemon/client'
 import { getDaemonSocketPath, getDaemonTokenPath } from '../../src/main/daemon/daemon-spawner'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 import type { ElectronApplication, Page } from '@stablyai/playwright-test'
 import { test, expect } from './helpers/orca-app'
 import { TEST_REPO_PATH_FILE } from './global-setup'
@@ -89,7 +89,7 @@ async function backgroundMountTab(page: Page, worktreeId: string, tabId: string)
 function readPersistedSession(userDataDir: string) {
   return JSON.parse(
     readFileSync(
-      path.join(userDataDir, 'profiles', DEFAULT_LOCAL_ORCA_PROFILE_ID, 'orca-data.json'),
+      path.join(userDataDir, 'profiles', DEFAULT_LOCAL_GIRRA_PROFILE_ID, 'orca-data.json'),
       'utf8'
     )
   ).workspaceSession

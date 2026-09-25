@@ -114,7 +114,7 @@ Provisioning and building often takes 20 to 30 minutes.
   box's logs, terminal history, and orchestration database. Two VMs from one such snapshot emitted
   identical `deviceToken` and `pairedDeviceId`. Snapshot before the runtime has ever run, or delete
   the resolved user-data directory first:
-  `orca_user_data_path="${ORCA_USER_DATA_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/orca}"`.
+  `orca_user_data_path="${GIRRA_USER_DATA_PATH:-${XDG_CONFIG_HOME:-$HOME/.config}/orca}"`.
   Resolve symlinks and inspect that path before deleting it: it must be an absolute directory
   dedicated to Girra runtime data, never `/`, the home directory, or an ancestor of home. Refuse
   empty or relative paths. Remove only that verified directory, not an unchecked environment value.
@@ -246,7 +246,7 @@ set -euo pipefail
 set -euo pipefail
 # read authenticated snapshotId/scope/project/port/repo*/project_root (env→state→fallback)
 # fail clearly if snapshotId is missing (point back to the snapshot phases)
-# name = orca-${ORCA_RECIPE_ID}-${ORCA_VM_INSTANCE_ID} (sanitized, length-capped)
+# name = orca-${GIRRA_RECIPE_ID}-${GIRRA_VM_INSTANCE_ID} (sanitized, length-capped)
 # 1. boot from snapshotId with a published port; capture the public URL → pairing address
 #    (an externally reachable wss:// URL); trap: remove the environment on error
 # 2. remote exec: ensure repo at desired commit; rebuild only if commit changed (cache marker)
@@ -309,7 +309,7 @@ Three named deltas change that shape:
 - **SSH mode** replaces `pairingCode` and `projectRoot` with a `connection` block whose `type` is
   `"ssh"`, and does not run `girra serve`. The exact target shape is in `references/ssh-host.md`.
 - **Provisioned root** applies only to direct SSH and only when the user explicitly asked for it. Add
-  `checkoutMode: provisioned-root` to the recipe, require `ORCA_RECIPE_RESULT_SCHEMA_VERSION=2`, and
+  `checkoutMode: provisioned-root` to the recipe, require `GIRRA_RECIPE_RESULT_SCHEMA_VERSION=2`, and
   emit `"schemaVersion": 2` with `"checkoutMode": "provisioned-root"`. Fail if the requested schema
   is not `2` rather than falling back to the ordinary shape. Details are in `references/ssh-host.md`.
 

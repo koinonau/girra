@@ -225,7 +225,7 @@ describe('createPtySubprocess', () => {
         rows: 24,
         cwd: '\\\\wsl.localhost\\Ubuntu\\home\\jin\\repo',
         env: {
-          ORCA_TERMINAL_HANDLE: 'term_wsl',
+          GIRRA_TERMINAL_HANDLE: 'term_wsl',
           WSLENV: 'FOO/u'
         }
       })
@@ -238,11 +238,11 @@ describe('createPtySubprocess', () => {
     const spawnCall = spawnMock.mock.calls.at(-1)!
     expect(spawnCall[0]).toBe('wsl.exe')
     expect(spawnCall[1]).toEqual(expect.any(Array))
-    expect(spawnCall[2].env.ORCA_TERMINAL_HANDLE).toBe('term_wsl')
+    expect(spawnCall[2].env.GIRRA_TERMINAL_HANDLE).toBe('term_wsl')
     // Why: the daemon inherits optional agent-hook env in development. This
     // test owns only the terminal handle and Powerlevel10k WSLENV contract.
     expect(spawnCall[2].env.WSLENV?.split(':')).toEqual(
-      expect.arrayContaining(['FOO/u', 'ORCA_TERMINAL_HANDLE/u', POWERLEVEL10K_WIZARD_DISABLE_ENV])
+      expect.arrayContaining(['FOO/u', 'GIRRA_TERMINAL_HANDLE/u', POWERLEVEL10K_WIZARD_DISABLE_ENV])
     )
   })
 

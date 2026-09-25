@@ -17,6 +17,7 @@ import {
 } from '../agent-hooks/installer-utils-remote'
 import { refreshManagedScriptIfPresent } from '../agent-hooks/managed-hook-script-refresh'
 import {
+  buildPosixHookLegacyEnvPrelude,
   buildPosixHookPayloadCapture,
   buildPosixHookSpoolLines,
   buildWindowsHookEnvironmentGuardLines,
@@ -70,12 +71,12 @@ function getManagedScript(
       // Why: Claude-compatible permission hooks fail closed on empty stdout (#14818).
       'echo {}',
       // Why: refresh endpoint coordinates for PTYs surviving a Girra restart.
-      'if defined ORCA_AGENT_HOOK_ENDPOINT if exist "%ORCA_AGENT_HOOK_ENDPOINT%" call "%ORCA_AGENT_HOOK_ENDPOINT%" 2>nul',
+      'if defined GIRRA_AGENT_HOOK_ENDPOINT if exist "%GIRRA_AGENT_HOOK_ENDPOINT%" call "%GIRRA_AGENT_HOOK_ENDPOINT%" 2>nul',
       // Why (#11549): the env guards must outrank the Devin skip — the Devin skip parks in more.com,
       // and outside a Girra pane the caller can abandon stdin, so more.com never returns.
       ...buildWindowsHookEnvironmentGuardLines(),
       // Why: a backgrounded session runs in a daemon worker that inherited the dispatching
-      // pane's env, so ORCA_PANE_KEY names a pane this session does not run in (#9236).
+      // pane's env, so GIRRA_PANE_KEY names a pane this session does not run in (#9236).
       // Why exit, not the drain label: the drain parks in more.com and a worker is outside
       // a Girra pane — the abandoned-stdin hang #11549 guards against.
       'if not "%CLAUDE_JOB_DIR%"=="" exit /b 0',
@@ -97,6 +98,7 @@ function getManagedScript(
     '#!/bin/sh',
     // Why: Claude-compatible permission hooks fail closed on empty stdout (#14818).
     'printf "{}\\n"',
+    ...buildPosixHookLegacyEnvPrelude(),
     ...buildPosixHookPayloadCapture(),
     ...buildPosixHookSpoolLines('claude'),
     ...(options.skipWhenDevinImportsClaude
@@ -108,17 +110,17 @@ function getManagedScript(
         ]
       : []),
     // Why: a backgrounded session runs in a daemon worker that inherited the dispatching
-    // pane's env, so ORCA_PANE_KEY names a pane this session does not run in (#9236).
+    // pane's env, so GIRRA_PANE_KEY names a pane this session does not run in (#9236).
     'if [ -n "$CLAUDE_JOB_DIR" ]; then',
     '  exit 0',
     'fi',
     // Why: refresh endpoint coordinates for PTYs surviving a Girra restart.
     // Why: suppress parse errors so they neither leak nor trip outer set -e.
-    'if [ -n "$ORCA_AGENT_HOOK_ENDPOINT" ] && [ -r "$ORCA_AGENT_HOOK_ENDPOINT" ]; then',
-    '  unset ORCA_AGENT_HOOK_TRANSPORT',
-    '  . "$ORCA_AGENT_HOOK_ENDPOINT" 2>/dev/null || :',
+    'if [ -n "$GIRRA_AGENT_HOOK_ENDPOINT" ] && [ -r "$GIRRA_AGENT_HOOK_ENDPOINT" ]; then',
+    '  unset GIRRA_AGENT_HOOK_TRANSPORT',
+    '  . "$GIRRA_AGENT_HOOK_ENDPOINT" 2>/dev/null || :',
     'fi',
-    'if [ -z "$ORCA_AGENT_HOOK_PORT" ] || [ -z "$ORCA_AGENT_HOOK_TOKEN" ] || [ -z "$ORCA_PANE_KEY" ]; then',
+    'if [ -z "$GIRRA_AGENT_HOOK_PORT" ] || [ -z "$GIRRA_AGENT_HOOK_TOKEN" ] || [ -z "$GIRRA_PANE_KEY" ]; then',
     '  spool_hook_event',
     '  exit 0',
     'fi',
@@ -258,7 +260,10 @@ export class ClaudeHookService {
     // Why: remote Windows is unsupported; local process.platform cannot identify the remote OS.
     const remoteConfigPath = getRemoteConfigPath(remoteHome, this.options.settings)
     const remoteScriptFileName = getPosixManagedScriptFileName(this.options.settings)
-    const remoteScriptPath = `${remoteHome.replace(/\/$/, '')}/.orca/agent-hooks/${remoteScriptFileName}`
+    // Why no fallback here: installRemote rewrites the host's settings.json in the
+    // same pass, and the script an older client left under ~/.orca keeps working
+    // until it does, so nothing is reading a path that is about to move.
+    const remoteScriptPath = `${remoteHome.replace(/\/$/, '')}/.girra/agent-hooks/${remoteScriptFileName}`
     // Why: surface fallible SFTP installs as structured errors.
     try {
       const config = await readHooksJsonRemote(sftp, remoteConfigPath)

@@ -199,7 +199,7 @@ describe('legacy terminal shim neutralization', () => {
   })
 
   itOnPosix('rejects a distinct legacy shim directory named by the environment', () => {
-    // Why: ORCA_ATTRIBUTION_SHIM_DIR can name a *different* directory than the wrapper's own (an
+    // Why: GIRRA_ATTRIBUTION_SHIM_DIR can name a *different* directory than the wrapper's own (an
     // older install's dir inherited by a pre-upgrade pane). Nothing exercised that reject, so
     // neutering it left the suite green.
     const userData = makeUserDataDir()
@@ -219,7 +219,7 @@ describe('legacy terminal shim neutralization', () => {
     const run = spawnSync(join(posixDir, 'git'), ['--version'], {
       env: {
         ...process.env,
-        ORCA_ATTRIBUTION_SHIM_DIR: legacyDir,
+        GIRRA_ATTRIBUTION_SHIM_DIR: legacyDir,
         PATH: `${legacyDir}:${realBin}:/usr/bin:/bin`
       },
       encoding: 'utf8',
@@ -254,7 +254,7 @@ describe('legacy terminal shim neutralization', () => {
       const run = spawnSync(join(posixDir, 'git'), ['--version'], {
         env: {
           ...process.env,
-          ORCA_ATTRIBUTION_SHIM_DIR: legacyDir,
+          GIRRA_ATTRIBUTION_SHIM_DIR: legacyDir,
           PATH: `${spelling}:${realBin}:/usr/bin:/bin`
         },
         encoding: 'utf8',
@@ -351,14 +351,14 @@ describe('legacy terminal shim neutralization', () => {
     // survived the literal removal and kept the captured directory on PATH.
     const posixEnv = {
       PATH: '/custom/elsewhere///:/usr/bin',
-      ORCA_ATTRIBUTION_SHIM_DIR: '/custom/elsewhere'
+      GIRRA_ATTRIBUTION_SHIM_DIR: '/custom/elsewhere'
     }
     stripLegacyTerminalShimEnv(posixEnv, 'linux')
     expect(posixEnv.PATH).toBe('/usr/bin')
 
     const windowsEnv = {
       Path: 'C:\\Custom\\Else\\\\;C:\\Windows',
-      ORCA_ATTRIBUTION_SHIM_DIR: 'C:\\Custom\\Else'
+      GIRRA_ATTRIBUTION_SHIM_DIR: 'C:\\Custom\\Else'
     }
     stripLegacyTerminalShimEnv(windowsEnv, 'win32')
     expect(windowsEnv.Path).toBe('C:\\Windows')
@@ -368,7 +368,7 @@ describe('legacy terminal shim neutralization', () => {
     'ignores a relative legacy shim directory instead of resolving it against the cwd',
     () => {
       // Why: bash resolves a relative -ef operand against the wrapper's current directory, so a
-      // relative ORCA_ATTRIBUTION_SHIM_DIR let the cwd decide which PATH entry counted as the legacy
+      // relative GIRRA_ATTRIBUTION_SHIM_DIR let the cwd decide which PATH entry counted as the legacy
       // directory. Reproduced as SAFE vs LATER purely by changing the cwd.
       const userData = makeUserDataDir()
       const posixDir = join(userData, 'orca-terminal-attribution', 'posix')
@@ -389,7 +389,7 @@ describe('legacy terminal shim neutralization', () => {
           cwd,
           env: {
             ...process.env,
-            ORCA_ATTRIBUTION_SHIM_DIR: 'safe-bin',
+            GIRRA_ATTRIBUTION_SHIM_DIR: 'safe-bin',
             PATH: `${safeBin}:${laterBin}:/usr/bin:/bin`
           },
           encoding: 'utf8',
@@ -409,13 +409,13 @@ describe('legacy terminal shim neutralization', () => {
     // `/tmp/captured\` and `/tmp/captured` compare equal and deleted a real directory from PATH.
     const env = {
       PATH: '/tmp/captured\\',
-      ORCA_ATTRIBUTION_SHIM_DIR: '/tmp/captured'
+      GIRRA_ATTRIBUTION_SHIM_DIR: '/tmp/captured'
     }
     stripLegacyTerminalShimEnv(env, 'linux')
     expect(env.PATH).toBe('/tmp/captured\\')
 
     // Why the Windows half: there a backslash really is a separator, so it must still be stripped.
-    const windowsEnv = { Path: 'C:\\captured\\', ORCA_ATTRIBUTION_SHIM_DIR: 'C:\\captured' }
+    const windowsEnv = { Path: 'C:\\captured\\', GIRRA_ATTRIBUTION_SHIM_DIR: 'C:\\captured' }
     stripLegacyTerminalShimEnv(windowsEnv, 'win32')
     expect(windowsEnv.Path).toBeUndefined()
   })
@@ -580,8 +580,8 @@ describe('legacy terminal shim neutralization', () => {
     neutralizeLegacyTerminalShimDir(userData)
 
     const cmd = readFileSync(join(win32Dir, 'git.cmd'), 'utf8')
-    const cmdCapture = 'set "orca_legacy_wrapper_dir=%ORCA_ATTRIBUTION_SHIM_DIR%"'
-    expectOrdered(cmd, cmdCapture, 'set "ORCA_ATTRIBUTION_SHIM_DIR="')
+    const cmdCapture = 'set "orca_legacy_wrapper_dir=%GIRRA_ATTRIBUTION_SHIM_DIR%"'
+    expectOrdered(cmd, cmdCapture, 'set "GIRRA_ATTRIBUTION_SHIM_DIR="')
     expect(cmd).toContain('for %%P in ("%PATH:;=" "%") do (')
     expect(cmd).toContain('if /I "%orca_path_entry_dir%"=="%orca_wrapper_dir%" exit /b')
     expect(cmd).toContain('if defined orca_legacy_wrapper_dir call :orca_reject_legacy_dir')
@@ -593,7 +593,7 @@ describe('legacy terminal shim neutralization', () => {
     const powershell = readFileSync(join(win32Dir, 'git-wrapper.ps1'), 'utf8')
     expectOrdered(
       powershell,
-      '$legacyWrapperDir = $env:ORCA_ATTRIBUTION_SHIM_DIR',
+      '$legacyWrapperDir = $env:GIRRA_ATTRIBUTION_SHIM_DIR',
       'Remove-Item "Env:$_"'
     )
     expect(powershell).toContain('$wrapperDirs = @($wrapperDir, $legacyWrapperDir)')
@@ -698,9 +698,9 @@ describe('legacy terminal shim neutralization', () => {
       env: {
         ...process.env,
         PATH: `${shimDir}//::${realBin}:${process.env.PATH ?? ''}`,
-        ORCA_ENABLE_GIT_ATTRIBUTION: '1',
-        ORCA_GIT_COMMIT_TRAILER: 'Co-authored-by: Girra <help@stably.ai>',
-        ORCA_ATTRIBUTION_SHIM_DIR: ''
+        GIRRA_ENABLE_GIT_ATTRIBUTION: '1',
+        GIRRA_GIT_COMMIT_TRAILER: 'Co-authored-by: Girra <help@stably.ai>',
+        GIRRA_ATTRIBUTION_SHIM_DIR: ''
       },
       stdio: ['pipe', 'pipe', 'pipe']
     })
@@ -714,8 +714,8 @@ describe('legacy terminal shim neutralization', () => {
     child.stderr.on('data', (chunk: string) => {
       stderr += chunk
     })
-    const ready = waitForOutput(child.stdout, '__ORCA_HASH_READY__\n')
-    child.stdin.write(`hash -p ${quoteBash(shimGit)} git\nprintf '__ORCA_HASH_READY__\\n'\n`)
+    const ready = waitForOutput(child.stdout, '__GIRRA_HASH_READY__\n')
+    child.stdin.write(`hash -p ${quoteBash(shimGit)} git\nprintf '__GIRRA_HASH_READY__\\n'\n`)
 
     try {
       await ready
@@ -739,14 +739,14 @@ describe('legacy terminal shim neutralization', () => {
 
   it('drops inherited shim env and its PATH entry without touching real entries', () => {
     const env: Record<string, string> = {
-      PATH: `/home/u/.orca/orca-terminal-attribution/posix:/usr/local/bin:/usr/bin`,
-      ORCA_ENABLE_GIT_ATTRIBUTION: '1',
-      ORCA_GIT_COMMIT_TRAILER: 'Co-authored-by: Girra <help@stably.ai>',
-      ORCA_GH_PR_FOOTER: 'footer',
-      ORCA_GH_ISSUE_FOOTER: 'footer',
-      ORCA_ATTRIBUTION_SHIM_DIR: '/home/u/.orca/orca-terminal-attribution/posix',
-      ORCA_REAL_GIT: '/usr/bin/git',
-      ORCA_REAL_GH: '/usr/bin/gh',
+      PATH: `/home/u/.girra/orca-terminal-attribution/posix:/usr/local/bin:/usr/bin`,
+      GIRRA_ENABLE_GIT_ATTRIBUTION: '1',
+      GIRRA_GIT_COMMIT_TRAILER: 'Co-authored-by: Girra <help@stably.ai>',
+      GIRRA_GH_PR_FOOTER: 'footer',
+      GIRRA_GH_ISSUE_FOOTER: 'footer',
+      GIRRA_ATTRIBUTION_SHIM_DIR: '/home/u/.girra/orca-terminal-attribution/posix',
+      GIRRA_REAL_GIT: '/usr/bin/git',
+      GIRRA_REAL_GH: '/usr/bin/gh',
       HOME: '/home/u'
     }
 
@@ -760,7 +760,7 @@ describe('legacy terminal shim neutralization', () => {
     // them literally left the shim directory on PATH and the wrapper reachable.
     const posix: Record<string, string> = {
       PATH: '/custom/elsewhere/:/usr/bin',
-      ORCA_ATTRIBUTION_SHIM_DIR: '/custom/elsewhere'
+      GIRRA_ATTRIBUTION_SHIM_DIR: '/custom/elsewhere'
     }
     stripLegacyTerminalShimEnv(posix, 'linux')
     expect(posix.PATH).toBe('/usr/bin')
@@ -768,7 +768,7 @@ describe('legacy terminal shim neutralization', () => {
     // And the reverse spelling, plus Windows slash style.
     const win: Record<string, string> = {
       Path: 'C:\\Custom\\Else;C:\\Windows',
-      ORCA_ATTRIBUTION_SHIM_DIR: 'C:\\Custom\\Else\\'
+      GIRRA_ATTRIBUTION_SHIM_DIR: 'C:\\Custom\\Else\\'
     }
     stripLegacyTerminalShimEnv(win, 'win32')
     expect(win.Path).toBe('C:\\Windows')
@@ -778,7 +778,7 @@ describe('legacy terminal shim neutralization', () => {
     const shimDir = '/tmp/orca:user/orca-terminal-attribution/posix'
     const env: Record<string, string> = {
       PATH: `/usr/local/bin:${shimDir}:/usr/bin`,
-      ORCA_ATTRIBUTION_SHIM_DIR: shimDir
+      GIRRA_ATTRIBUTION_SHIM_DIR: shimDir
     }
 
     stripLegacyTerminalShimEnv(env, 'linux')
@@ -837,14 +837,14 @@ describe('legacy terminal shim neutralization', () => {
     // Why: without normalizing the trailing separator the entry does not match, so Girra's own
     // scrub leaves the legacy shim directory on the spawned PATH and the wrapper stays reachable.
     const posix: Record<string, string> = {
-      PATH: '/home/u/.orca/orca-terminal-attribution/posix/:/usr/bin'
+      PATH: '/home/u/.girra/orca-terminal-attribution/posix/:/usr/bin'
     }
     stripLegacyTerminalShimEnv(posix, 'linux')
     expect(posix.PATH).toBe('/usr/bin')
 
     // Why: more than one trailing separator is still the same directory.
     const many: Record<string, string> = {
-      PATH: '/home/u/.orca/orca-terminal-attribution/posix///:/usr/bin'
+      PATH: '/home/u/.girra/orca-terminal-attribution/posix///:/usr/bin'
     }
     stripLegacyTerminalShimEnv(many, 'linux')
     expect(many.PATH).toBe('/usr/bin')

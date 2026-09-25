@@ -162,8 +162,8 @@ describe('command aliases dispatch to the canonical handler', () => {
   })
 
   it('keeps `agent-context` local when remote environment variables are set', async () => {
-    vi.stubEnv('ORCA_PAIRING_CODE', 'pairing-code')
-    vi.stubEnv('ORCA_ENVIRONMENT', 'stale-environment')
+    vi.stubEnv('GIRRA_PAIRING_CODE', 'pairing-code')
+    vi.stubEnv('GIRRA_ENVIRONMENT', 'stale-environment')
     try {
       await main(['agent-context', '--json'], '/tmp/repo')
 

@@ -12,8 +12,8 @@ describe('PowerShell OSC 133 bootstrap', () => {
     const script = getPowerShellOsc133Bootstrap()
 
     expect(script).toContain('[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()')
-    expect(script).toContain('ORCA_OPENCODE_CONFIG_DIR')
-    expect(script).not.toContain('ORCA_PI_CODING_AGENT_DIR')
+    expect(script).toContain('GIRRA_OPENCODE_CONFIG_DIR')
+    expect(script).not.toContain('GIRRA_PI_CODING_AGENT_DIR')
     expect(script).toContain('function Global:prompt')
     expect(script).toContain('function Global:PSConsoleHostReadLine')
     expect(script).toContain('Esc = [char]27')
@@ -27,7 +27,7 @@ describe('PowerShell OSC 133 bootstrap', () => {
     expect(script).not.toContain('ExecutionPolicy')
     expect(script).not.toContain('NoProfile')
 
-    const configDirRestore = script.indexOf('if ($env:ORCA_OPENCODE_CONFIG_DIR)')
+    const configDirRestore = script.indexOf('if ($env:GIRRA_OPENCODE_CONFIG_DIR)')
     expect(configDirRestore).toBeGreaterThan(-1)
     expect(configDirRestore).toBeLessThan(script.indexOf('Test-Path variable:global:'))
     expect(configDirRestore).toBeLessThan(script.indexOf('LanguageMode -eq "FullLanguage"'))

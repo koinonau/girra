@@ -168,7 +168,7 @@ describe('relay launch with a long remote $HOME', () => {
     const conn = makeMockConnection()
     vi.mocked(execCommand)
       .mockReset()
-      .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       .mockResolvedValueOnce(LONG_HOME)
       .mockResolvedValueOnce('ORCA-NATIVE-DEPS-OK')
       .mockResolvedValueOnce('') // launch namespace marker
@@ -222,7 +222,7 @@ describe('relay launch with a long remote $HOME', () => {
     const conn = makeMockConnection()
     vi.mocked(execCommand)
       .mockReset()
-      .mockResolvedValueOnce('__ORCA_REMOTE_PLATFORM__ Linux x86_64')
+      .mockResolvedValueOnce('__GIRRA_REMOTE_PLATFORM__ Linux x86_64')
       .mockResolvedValueOnce('/home/user')
       .mockResolvedValueOnce('ORCA-NATIVE-DEPS-OK')
       .mockResolvedValueOnce('')

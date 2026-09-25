@@ -487,7 +487,7 @@ describe('orchestration install stub', () => {
 
     expect(stub).toContain('discovery stub')
     expect(stub).toContain('ORCA skills get orchestration')
-    expect(stub).toContain('ORCA_CLI_COMMAND')
+    expect(stub).toContain('GIRRA_CLI_COMMAND')
     expect(stub).toContain('orca-dev')
     expect(stub).toContain('orca-ide')
     expect(stub).toContain('GNOME Orca screen reader')

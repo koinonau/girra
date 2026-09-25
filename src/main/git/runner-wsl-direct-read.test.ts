@@ -50,8 +50,8 @@ const LOGIN_ENVIRONMENT = {
 
 /** Stand in for the guest shell: rc chatter first, then the payload inside the command's own fence. */
 function fencedProbeStdout(command: unknown, payload: string): string {
-  const nonce = /__ORCA_WSL_CAPTURE_BEGIN_([^_]+)__/.exec(String(command))?.[1] ?? ''
-  return `profile banner\n__ORCA_WSL_CAPTURE_BEGIN_${nonce}__${payload}__ORCA_WSL_CAPTURE_END_${nonce}__`
+  const nonce = /__GIRRA_WSL_CAPTURE_BEGIN_([^_]+)__/.exec(String(command))?.[1] ?? ''
+  return `profile banner\n__GIRRA_WSL_CAPTURE_BEGIN_${nonce}__${payload}__GIRRA_WSL_CAPTURE_END_${nonce}__`
 }
 
 const LOGIN_ENVIRONMENT_FIELDS = `${LOGIN_ENVIRONMENT.path}\0${LOGIN_ENVIRONMENT.gitPath}\0${LOGIN_ENVIRONMENT.home}`
@@ -271,10 +271,10 @@ describe('WSL direct Git reads', () => {
         const child = createMockChild()
         queueMicrotask(() => {
           const capturedCommand = args?.find((arg) =>
-            String(arg).includes('__ORCA_WSL_CAPTURE_BEGIN_')
+            String(arg).includes('__GIRRA_WSL_CAPTURE_BEGIN_')
           )
           const fenced = fencedProbeStdout(capturedCommand, 'fork-point\n')
-          const echoedMarker = fenced.match(/__ORCA_WSL_CAPTURE_BEGIN_[^_]+__/)?.[0] ?? ''
+          const echoedMarker = fenced.match(/__GIRRA_WSL_CAPTURE_BEGIN_[^_]+__/)?.[0] ?? ''
           child.stdout.emit('data', Buffer.from(`${echoedMarker}shell trace\n${fenced}`))
           child.emit('close', 0, null)
         })
@@ -292,7 +292,7 @@ describe('WSL direct Git reads', () => {
       ).resolves.toEqual({ stdout: 'fork-point\n', stderr: '' })
 
       expect(spawnMock.mock.calls[0]?.[1]?.join(' ')).toContain('setsid --wait')
-      expect(spawnMock.mock.calls[0]?.[1]?.join(' ')).toContain('__ORCA_WSL_CAPTURE_BEGIN_')
+      expect(spawnMock.mock.calls[0]?.[1]?.join(' ')).toContain('__GIRRA_WSL_CAPTURE_BEGIN_')
     })
   })
 
@@ -304,7 +304,7 @@ describe('WSL direct Git reads', () => {
         if (spawnMock.mock.calls.length === 1) {
           queueMicrotask(() => {
             const marker = String(args?.join(' ')).match(
-              /(__ORCA_WSL_PROCESS_GROUP_[0-9a-f-]+__=)/
+              /(__GIRRA_WSL_PROCESS_GROUP_[0-9a-f-]+__=)/
             )?.[1]
             command.stderr.emit('data', Buffer.from(`${marker}4321\n`))
           })

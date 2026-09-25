@@ -29,8 +29,8 @@ function makeHome(): string {
   tempDirs.push(dir)
   process.env.HOME = dir
   process.env.SHELL = '/bin/zsh'
-  delete process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR
-  delete process.env.ORCA_PI_SOURCE_AGENT_DIR
+  delete process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
+  delete process.env.GIRRA_PI_SOURCE_AGENT_DIR
   return dir
 }
 
@@ -52,7 +52,7 @@ describe('prepareLocalCommitMessageAgentEnv', () => {
 
   it('prefers the original OpenCode config root over inherited PTY overlays', async () => {
     process.env.OPENCODE_CONFIG_DIR = '/tmp/orca-opencode-overlay'
-    process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR = '/Users/tester/company/opencode'
+    process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR = '/Users/tester/company/opencode'
 
     const result = await prepareLocalCommitMessageAgentEnv('opencode', undefined)
 
@@ -81,7 +81,7 @@ describe('prepareLocalCommitMessageAgentEnv', () => {
 
   it('prefers the original Pi agent root over inherited PTY overlays', async () => {
     process.env.PI_CODING_AGENT_DIR = '/tmp/orca-pi-overlay'
-    process.env.ORCA_PI_SOURCE_AGENT_DIR = '/Users/tester/.pi/agent'
+    process.env.GIRRA_PI_SOURCE_AGENT_DIR = '/Users/tester/.pi/agent'
 
     const result = await prepareLocalCommitMessageAgentEnv('pi', undefined)
 

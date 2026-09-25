@@ -1,10 +1,10 @@
 /**
  * Freeze repro R2 — direct SSH topology via Docker SSH relay.
  *
- * Requires: ORCA_E2E_SSH_DOCKER=1 and Docker available.
+ * Requires: GIRRA_E2E_SSH_DOCKER=1 and Docker available.
  *
  * Run:
- *   ORCA_E2E_SSH_DOCKER=1 pnpm run test:e2e:ssh-docker-bulk-open-freeze
+ *   GIRRA_E2E_SSH_DOCKER=1 pnpm run test:e2e:ssh-docker-bulk-open-freeze
  */
 import path from 'node:path'
 import { expect, test } from './helpers/orca-app'
@@ -28,7 +28,7 @@ import {
 import { startRendererLagProbe } from './paired-runtime-retention-metrics'
 import { HARD_FREEZE_LAG_MS, SOFT_FREEZE_LAG_MS } from './helpers/remote-session-bulk-open-oracle'
 
-const RUN_DOCKER_SSH = process.env.ORCA_E2E_SSH_DOCKER === '1'
+const RUN_DOCKER_SSH = process.env.GIRRA_E2E_SSH_DOCKER === '1'
 const REPORT_DIR = path.join(process.cwd(), 'test-results', 'freeze-repro')
 const SESSION_SPLITS = 5
 const FLOOD_READ_CHARS = 80_000
@@ -51,7 +51,7 @@ function continuousFloodCommand(runId: string, index: number): string {
 }
 
 test.describe('R2 Docker SSH bulk-open freeze', () => {
-  test.skip(!RUN_DOCKER_SSH, 'Set ORCA_E2E_SSH_DOCKER=1 to run Docker SSH freeze repro')
+  test.skip(!RUN_DOCKER_SSH, 'Set GIRRA_E2E_SSH_DOCKER=1 to run Docker SSH freeze repro')
 
   // Headless Linux disables compositing and schedules idle RAFs ~1s apart; use headed CI.
   // Headed SwiftShader restores ~16ms frames without changing the freeze budgets.

@@ -14,7 +14,7 @@ import {
 import { ensureTerminalVisible, waitForActiveWorktree, waitForSessionReady } from './helpers/store'
 import { attachRepoAndOpenTerminal, createRestartSession } from './helpers/orca-restart'
 import { PROTOCOL_VERSION } from '../../src/main/daemon/types'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 
 const PROVIDER_SESSION_ID = 'e2e-quit-resume-session'
 
@@ -22,7 +22,7 @@ function stubPersistedResumeCommand(userDataDir: string): void {
   const dataPath = path.join(
     userDataDir,
     'profiles',
-    DEFAULT_LOCAL_ORCA_PROFILE_ID,
+    DEFAULT_LOCAL_GIRRA_PROFILE_ID,
     'orca-data.json'
   )
   const data = JSON.parse(readFileSync(dataPath, 'utf8')) as {

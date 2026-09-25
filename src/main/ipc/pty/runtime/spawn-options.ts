@@ -62,7 +62,7 @@ export async function buildRuntimePtySpawnOptions(
   ctx.spawnOptions.envToDelete = mergePtyEnvDeletions(
     authEnvToDelete,
     args.envToDelete ?? [],
-    // Why: disable old hosts without removing ORCA_REAL_* while their Windows shim remains on PATH.
+    // Why: disable old hosts without removing GIRRA_REAL_* while their Windows shim remains on PATH.
     ctx.isDaemonHostSpawn || args.connectionId ? LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS : [],
     ctx.isDaemonHostSpawn ? getInheritedAgentHookEnvKeysToDelete(ctx.env) : [],
     // Why: ungated, unlike the agent-hook keys — the local provider and the relay host also spread their own process.env into every spawn.

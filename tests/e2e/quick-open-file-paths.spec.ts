@@ -57,7 +57,7 @@ test('cmd+p quick open prioritizes the filename and reveals the full path on hov
   // uniquely good for is that the tooltip really opens with the whole path.
   await expect(tooltip).toBeVisible()
 
-  const proofPath = process.env.ORCA_QUICK_OPEN_PROOF_PATH
+  const proofPath = process.env.GIRRA_QUICK_OPEN_PROOF_PATH
   if (proofPath) {
     await orcaPage.screenshot({ path: proofPath })
   }

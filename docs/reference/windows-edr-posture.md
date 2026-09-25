@@ -271,13 +271,13 @@ _shorten the interpreter chain_ rather than to hide a window.
 
 #18875 is a worked example of that doctrine. The Claude Code lifecycle hook was
 registered as `powershell.exe -NoProfile -EncodedCommand <...>` whose entire
-decoded payload was a `Test-Path` and a call to `~/.orca/agent-hooks/claude-hook.cmd`.
+decoded payload was a `Test-Path` and a call to `~/.girra/agent-hooks/claude-hook.cmd`.
 It now registers the script path itself (`<path> || echo {}`), so `bash ->
 powershell -> cmd -> curl` became `bash -> cmd -> curl` and one
 `powershell.exe -EncodedCommand` per hook event — a first-class Defender alert
 title — leaves the tree. The reporting box fired ~6 900 of them in five days,
 70% from Claude sessions that were not running under Girra at all and whose hook
-exits at its first `ORCA_PANE_KEY` guard.
+exits at its first `GIRRA_PANE_KEY` guard.
 
 What is measured is latency and the hop count, nothing else: median 471 ms ->
 213 ms per event idle, and 656 ms -> 296 ms (p95 696 ms -> 337 ms) under 10-way

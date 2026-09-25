@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const callMock = vi.fn()
 const originalExitCode = process.exitCode
-const originalCliCommand = process.env.ORCA_CLI_COMMAND
+const originalCliCommand = process.env.GIRRA_CLI_COMMAND
 
 vi.mock('../format', () => ({ printResult: vi.fn() }))
 vi.mock('../selectors', () => ({ getTerminalHandle: vi.fn() }))
@@ -21,17 +21,17 @@ describe('orchestration timeout flag validation', () => {
 
   beforeEach(() => {
     callMock.mockReset()
-    delete process.env.ORCA_TERMINAL_HANDLE
-    delete process.env.ORCA_PANE_KEY
+    delete process.env.GIRRA_TERMINAL_HANDLE
+    delete process.env.GIRRA_PANE_KEY
     process.exitCode = undefined
   })
 
   afterEach(() => {
     process.exitCode = originalExitCode
     if (originalCliCommand === undefined) {
-      delete process.env.ORCA_CLI_COMMAND
+      delete process.env.GIRRA_CLI_COMMAND
     } else {
-      process.env.ORCA_CLI_COMMAND = originalCliCommand
+      process.env.GIRRA_CLI_COMMAND = originalCliCommand
     }
     vi.restoreAllMocks()
   })
@@ -73,7 +73,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('passes a parsed check timeout and peek mode into the RPC payload', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     callMock.mockResolvedValue({ result: { messages: [], count: 0 } })
     await invokeCheck(
       new Map<string, string | boolean>([
@@ -100,7 +100,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('filters already-read rows from a peek response for pre-peek runtimes', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     callMock.mockResolvedValue({
       result: {
         messages: [
@@ -122,7 +122,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('rejects combined read modes before calling the runtime', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     await expect(
       invokeCheck(
         new Map<string, string | boolean>([
@@ -138,7 +138,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('warns when a pre-peek runtime returned a full 100-row page', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     const rows = Array.from({ length: 100 }, (_, index) => ({
       id: `msg_${index}`,
       from_handle: 'a',
@@ -153,7 +153,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('fails --peek --wait against a runtime that returned only read rows', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     callMock.mockResolvedValue({
       result: {
         messages: [{ id: 'msg_old', from_handle: 'a', subject: 'seen', read: 1 }],
@@ -184,7 +184,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('uses the parsed ask timeout for both runtime wait and client timeout', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     callMock.mockResolvedValue({
       result: { answer: 'yes', messageId: 'msg_1', threadId: 'thread_1', timedOut: false }
     })
@@ -214,7 +214,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('passes an ask resume without creating a new question payload', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     callMock.mockResolvedValue({
       result: {
         answer: 'yes',
@@ -243,8 +243,8 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('prints the pending message ID and exact capability-bound resume command on timeout', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
-    process.env.ORCA_CLI_COMMAND = 'orca-dev'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_CLI_COMMAND = 'orca-dev'
     callMock.mockResolvedValue({
       result: {
         answer: null,
@@ -274,7 +274,7 @@ describe('orchestration timeout flag validation', () => {
   })
 
   it('rejects ambiguous ask create/resume input before RPC', async () => {
-    process.env.ORCA_TERMINAL_HANDLE = 'term_worker'
+    process.env.GIRRA_TERMINAL_HANDLE = 'term_worker'
     await expect(
       invokeAsk(
         new Map<string, string | boolean>([

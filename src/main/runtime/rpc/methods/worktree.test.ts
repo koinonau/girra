@@ -484,11 +484,11 @@ describe('worktree RPC methods', () => {
         startupAgent: 'opencode',
         startupCommand: "opencode --prompt 'summarize repo'",
         startupCommandDelivery: 'shell-ready',
-        startupEnv: { ORCA_AGENT_MODE: 'direct' },
+        startupEnv: { GIRRA_AGENT_MODE: 'direct' },
         startupLaunchConfig: {
           agentCommand: 'opencode',
           agentArgs: '--model gpt-5',
-          agentEnv: { ORCA_AGENT_MODE: 'direct' }
+          agentEnv: { GIRRA_AGENT_MODE: 'direct' }
         },
         activate: true
       })
@@ -508,11 +508,11 @@ describe('worktree RPC methods', () => {
         startup: {
           command: "opencode --prompt 'summarize repo'",
           startupCommandDelivery: 'shell-ready',
-          env: { ORCA_AGENT_MODE: 'direct' },
+          env: { GIRRA_AGENT_MODE: 'direct' },
           launchConfig: {
             agentCommand: 'opencode',
             agentArgs: '--model gpt-5',
-            agentEnv: { ORCA_AGENT_MODE: 'direct' }
+            agentEnv: { GIRRA_AGENT_MODE: 'direct' }
           }
         }
       })

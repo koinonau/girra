@@ -11,7 +11,7 @@ describe('Pi status owner recovery', () => {
     // pane never reports status again.
     const harness = createHarness({
       pid: SELF_PID,
-      env: { ORCA_PI_STATUS_OWNED: String(SELF_PID - 1) },
+      env: { GIRRA_PI_STATUS_OWNED: String(SELF_PID - 1) },
       killImpl: () => {
         throw Object.assign(new Error('ESRCH'), { code: 'ESRCH' })
       }
@@ -19,7 +19,7 @@ describe('Pi status owner recovery', () => {
 
     expect(harness.killMock).toHaveBeenCalledWith(SELF_PID - 1, 0)
     expect(harness.handlers.agent_end).toBeTypeOf('function')
-    expect(harness.processEnv.ORCA_PI_STATUS_OWNED).toBe(String(SELF_PID))
+    expect(harness.processEnv.GIRRA_PI_STATUS_OWNED).toBe(String(SELF_PID))
 
     await harness.callHook('agent_end')
     expect(harness.fetchMock).toHaveBeenCalledTimes(1)
@@ -32,14 +32,14 @@ describe('Pi status owner recovery', () => {
       // claiming the pane there would reintroduce double-reporting.
       const harness = createHarness({
         pid: SELF_PID,
-        env: { ORCA_PI_STATUS_OWNED: String(SELF_PID - 1) },
+        env: { GIRRA_PI_STATUS_OWNED: String(SELF_PID - 1) },
         killImpl: () => {
           throw Object.assign(new Error('probe failed'), { code })
         }
       })
 
       expect(harness.handlers).toEqual({})
-      expect(harness.processEnv.ORCA_PI_STATUS_OWNED).toBe(String(SELF_PID - 1))
+      expect(harness.processEnv.GIRRA_PI_STATUS_OWNED).toBe(String(SELF_PID - 1))
     }
   )
 
@@ -47,33 +47,33 @@ describe('Pi status owner recovery', () => {
     // Why: a truncated/garbage marker is not evidence of a live owner.
     const harness = createHarness({
       pid: SELF_PID,
-      env: { ORCA_PI_STATUS_OWNED: 'not-a-pid' }
+      env: { GIRRA_PI_STATUS_OWNED: 'not-a-pid' }
     })
 
     expect(harness.killMock).not.toHaveBeenCalled()
     expect(harness.handlers.agent_end).toBeTypeOf('function')
-    expect(harness.processEnv.ORCA_PI_STATUS_OWNED).toBe(String(SELF_PID))
+    expect(harness.processEnv.GIRRA_PI_STATUS_OWNED).toBe(String(SELF_PID))
   })
 
   it('claims the pane when the inherited owner PID exceeds safe integer precision', () => {
     const harness = createHarness({
       pid: SELF_PID,
-      env: { ORCA_PI_STATUS_OWNED: '99999999999999999999999' }
+      env: { GIRRA_PI_STATUS_OWNED: '99999999999999999999999' }
     })
 
     expect(harness.killMock).not.toHaveBeenCalled()
     expect(harness.handlers.agent_end).toBeTypeOf('function')
-    expect(harness.processEnv.ORCA_PI_STATUS_OWNED).toBe(String(SELF_PID))
+    expect(harness.processEnv.GIRRA_PI_STATUS_OWNED).toBe(String(SELF_PID))
   })
 
   it('claims the pane when the inherited owner PID exceeds the process API range', () => {
     const harness = createHarness({
       pid: SELF_PID,
-      env: { ORCA_PI_STATUS_OWNED: String(2 ** 31) }
+      env: { GIRRA_PI_STATUS_OWNED: String(2 ** 31) }
     })
 
     expect(harness.killMock).not.toHaveBeenCalled()
     expect(harness.handlers.agent_end).toBeTypeOf('function')
-    expect(harness.processEnv.ORCA_PI_STATUS_OWNED).toBe(String(SELF_PID))
+    expect(harness.processEnv.GIRRA_PI_STATUS_OWNED).toBe(String(SELF_PID))
   })
 })

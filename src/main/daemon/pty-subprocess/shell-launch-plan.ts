@@ -136,7 +136,7 @@ export function createPtyShellLaunchPlan(
       )
     }
     const waitsForShellReady = Boolean(opts.command)
-    delete env.ORCA_SHELL_FEATURES
+    delete env.GIRRA_SHELL_FEATURES
     const shellLaunch = getShellLaunchConfig(
       shellPath,
       selectShellStartupFeatures({

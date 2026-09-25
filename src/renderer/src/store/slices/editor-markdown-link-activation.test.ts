@@ -280,8 +280,8 @@ describe('createEditorSlice activateMarkdownLink', () => {
 
     store.getState().openFile(
       {
-        filePath: '/remote/.orca/drops/log.txt',
-        relativePath: '.orca/drops/log.txt',
+        filePath: '/remote/.girra/drops/log.txt',
+        relativePath: '.girra/drops/log.txt',
         worktreeId: 'wt-1',
         language: 'text',
         mode: 'edit'
@@ -290,7 +290,7 @@ describe('createEditorSlice activateMarkdownLink', () => {
     )
 
     expect(store.getState().openFiles[0]).toMatchObject({
-      filePath: '/remote/.orca/drops/log.txt'
+      filePath: '/remote/.girra/drops/log.txt'
     })
     expect(store.getState().openFiles[0]?.runtimeEnvironmentId).toBeNull()
   })

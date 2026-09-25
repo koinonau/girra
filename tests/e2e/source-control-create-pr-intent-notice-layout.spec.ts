@@ -74,9 +74,9 @@ test.describe('Source Control Create PR intent notice layout', () => {
     const settingsLink = notice.getByRole('button', { name: 'Source Control AI settings' })
     await expect(settingsLink).toBeVisible({ timeout: 20_000 })
 
-    if (process.env.ORCA_PR_INTENT_NOTICE_SCREENSHOT_PATH) {
+    if (process.env.GIRRA_PR_INTENT_NOTICE_SCREENSHOT_PATH) {
       await orcaPage.evaluate(() => document.documentElement.classList.add('dark'))
-      await notice.screenshot({ path: process.env.ORCA_PR_INTENT_NOTICE_SCREENSHOT_PATH })
+      await notice.screenshot({ path: process.env.GIRRA_PR_INTENT_NOTICE_SCREENSHOT_PATH })
     }
 
     // The layout contract: the link starts below the message's last line.

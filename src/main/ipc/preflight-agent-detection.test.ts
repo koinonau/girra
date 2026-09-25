@@ -403,7 +403,7 @@ describe('preflight', () => {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '__ORCA_AGENT_PATH__claude\t/home/test/.local/bin/claude\n',
+          stdout: '__GIRRA_AGENT_PATH__claude\t/home/test/.local/bin/claude\n',
           stderr: '',
           timedOut: false
         }
@@ -430,7 +430,7 @@ describe('preflight', () => {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '__ORCA_AGENT_PATH__claude\t/home/test/.local/bin/claude\n',
+          stdout: '__GIRRA_AGENT_PATH__claude\t/home/test/.local/bin/claude\n',
           stderr: '',
           timedOut: false
         }
@@ -485,7 +485,7 @@ describe('preflight', () => {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '__ORCA_AGENT_PATH__claude\t/home/test/.local/bin/claude\n',
+          stdout: '__GIRRA_AGENT_PATH__claude\t/home/test/.local/bin/claude\n',
           stderr: '',
           timedOut: false
         }
@@ -515,7 +515,7 @@ describe('preflight', () => {
         return {
           environmentResolved: true,
           code: 0,
-          stdout: '__ORCA_AGENT_PATH__opencode\t/home/test/.local/bin/opencode\n',
+          stdout: '__GIRRA_AGENT_PATH__opencode\t/home/test/.local/bin/opencode\n',
           stderr: '',
           timedOut: false
         }

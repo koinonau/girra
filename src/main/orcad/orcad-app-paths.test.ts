@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { homedir, tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
 import { afterEach, describe, expect, it, vi } from 'vitest'
@@ -26,22 +28,25 @@ afterEach(() => {
 })
 
 describe('resolveUserDataPath', () => {
-  it('prefers ORCA_USER_DATA, then XDG_DATA_HOME, then ~/.orca', () => {
-    vi.stubEnv('ORCA_USER_DATA', join(sep, 'srv', 'orca-state'))
+  it('prefers GIRRA_USER_DATA, then XDG_DATA_HOME, then the per-user tree', () => {
+    vi.stubEnv('GIRRA_USER_DATA', join(sep, 'srv', 'orca-state'))
     vi.stubEnv('XDG_DATA_HOME', join(sep, 'xdg'))
     expect(resolveUserDataPath()).toBe(join(sep, 'srv', 'orca-state'))
 
-    vi.stubEnv('ORCA_USER_DATA', '')
-    expect(resolveUserDataPath()).toBe(join(sep, 'xdg', 'Orca'))
+    vi.stubEnv('GIRRA_USER_DATA', '')
+    expect(resolveUserDataPath()).toBe(join(sep, 'xdg', 'Girra'))
 
     vi.stubEnv('XDG_DATA_HOME', '')
-    expect(resolveUserDataPath()).toBe(join(homedir(), '.orca'))
+    // Why not the literal: this machine may still have an unmigrated ~/.orca,
+    // which the resolver reads on purpose.
+    expect(resolveUserDataPath()).toBe(getGirraHomeDir())
+    expect(getGirraHomeDir()).toBe(join(homedir(), existsSync(join(homedir(), '.girra')) ? '.girra' : '.orca'))
   })
 })
 
 describe('resolveOrcadPath', () => {
   it('answers every path name without ever falling back to the data directory', () => {
-    vi.stubEnv('ORCA_USER_DATA', join(sep, 'srv', 'orca-state'))
+    vi.stubEnv('GIRRA_USER_DATA', join(sep, 'srv', 'orca-state'))
     const answers = new Map(ALL_PATH_NAMES.map((name) => [name, resolveOrcadPath(name)]))
 
     for (const [name, answer] of answers) {
@@ -61,7 +66,7 @@ describe('resolveOrcadPath', () => {
   })
 
   it("keeps 'logs' inside the data root so the whole deployment is one directory", () => {
-    vi.stubEnv('ORCA_USER_DATA', join(sep, 'srv', 'orca-state'))
+    vi.stubEnv('GIRRA_USER_DATA', join(sep, 'srv', 'orca-state'))
     expect(resolveOrcadPath('logs')).toBe(join(sep, 'srv', 'orca-state', 'logs'))
   })
 

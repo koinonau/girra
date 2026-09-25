@@ -24,7 +24,7 @@ export async function buildPtyIpcSpawnOptions(
 ): Promise<{ isReattach: true } | null> {
   const args = ctx.args
   ctx.spawnEnv = ctx.preAllocatedHandle
-    ? { ...ctx.env, ORCA_TERMINAL_HANDLE: ctx.preAllocatedHandle }
+    ? { ...ctx.env, GIRRA_TERMINAL_HANDLE: ctx.preAllocatedHandle }
     : ctx.env
   const envToDelete = ctx.claudeAuth?.stripAuthEnv
     ? [...CLAUDE_AUTH_ENV_VARS, 'ANTHROPIC_CUSTOM_HEADERS']
@@ -33,7 +33,7 @@ export async function buildPtyIpcSpawnOptions(
     envToDelete,
     args.envToDelete ?? [],
     ctx.agentTeamsEnvToDelete ?? [],
-    // Why: disable old hosts without removing ORCA_REAL_* while their Windows shim remains on PATH.
+    // Why: disable old hosts without removing GIRRA_REAL_* while their Windows shim remains on PATH.
     ctx.isDaemonHostSpawn || args.connectionId ? LEGACY_TERMINAL_SHIM_REMOTE_ENV_KEYS : [],
     ctx.isDaemonHostSpawn ? getInheritedAgentHookEnvKeysToDelete(ctx.spawnEnv) : [],
     getInheritedClaudeSessionStampEnvKeysToDelete(ctx.spawnEnv)

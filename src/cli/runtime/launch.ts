@@ -14,13 +14,13 @@ const IGNORED_NON_RECIPE_STDOUT = '[serve] ignored non-recipe stdout'
 const USER_NAMESPACE_PROBE_TIMEOUT_MS = 2_000
 
 export function launchOrcaApp(): void {
-  const overrideCommand = process.env.ORCA_OPEN_COMMAND
+  const overrideCommand = process.env.GIRRA_OPEN_COMMAND
   if (typeof overrideCommand === 'string' && overrideCommand.trim().length > 0) {
     spawnDetached(overrideCommand, [], { shell: true })
     return
   }
 
-  const overrideExecutable = process.env.ORCA_APP_EXECUTABLE
+  const overrideExecutable = process.env.GIRRA_APP_EXECUTABLE
   if (typeof overrideExecutable === 'string' && overrideExecutable.trim().length > 0) {
     spawnDetached(overrideExecutable, getExecutableAppArgs(overrideExecutable), {
       ...getExecutableSpawnOptions(overrideExecutable),
@@ -209,7 +209,7 @@ function waitForRecipeJson(child: ReturnType<typeof spawnProcess>): Promise<numb
 }
 
 function getExecutableAppArgs(executable: string): string[] {
-  const args = process.env.ORCA_APP_EXECUTABLE_NEEDS_APP_ROOT === '1' ? [resolveAppRoot()] : []
+  const args = process.env.GIRRA_APP_EXECUTABLE_NEEDS_APP_ROOT === '1' ? [resolveAppRoot()] : []
   if (shouldDisableExtractedAppImageSandbox(executable)) {
     args.push('--no-sandbox')
   }
@@ -250,7 +250,7 @@ function resolveAppRoot(): string {
 }
 
 function resolveForegroundOrcaExecutable(): string {
-  const overrideExecutable = process.env.ORCA_APP_EXECUTABLE
+  const overrideExecutable = process.env.GIRRA_APP_EXECUTABLE
   if (typeof overrideExecutable === 'string' && overrideExecutable.trim().length > 0) {
     return overrideExecutable
   }
@@ -259,7 +259,7 @@ function resolveForegroundOrcaExecutable(): string {
   }
   throw new RuntimeClientError(
     'runtime_serve_failed',
-    'Could not determine how to start Girra server. Set ORCA_APP_EXECUTABLE to the Girra executable.'
+    'Could not determine how to start Girra server. Set GIRRA_APP_EXECUTABLE to the Girra executable.'
   )
 }
 

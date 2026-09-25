@@ -17,11 +17,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -61,11 +61,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -101,11 +101,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -142,11 +142,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -189,11 +189,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -235,11 +235,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -281,11 +281,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -328,11 +328,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -378,11 +378,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -421,11 +421,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -466,11 +466,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -511,11 +511,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -556,11 +556,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -596,11 +596,11 @@ describe('AgentHookServer listener replay', () => {
     try {
       const env = server.buildPtyEnv()
       const postClaudeHook = async (payload: Record<string, unknown>): Promise<Response> =>
-        fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+        fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+            'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
           },
           body: JSON.stringify(buildBody(payload))
         })
@@ -635,11 +635,11 @@ describe('AgentHookServer listener replay', () => {
     await server.start({ env: 'production' })
     try {
       const env = server.buildPtyEnv()
-      await fetch(`http://127.0.0.1:${env.ORCA_AGENT_HOOK_PORT}/hook/claude`, {
+      await fetch(`http://127.0.0.1:${env.GIRRA_AGENT_HOOK_PORT}/hook/claude`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-Orca-Agent-Hook-Token': env.ORCA_AGENT_HOOK_TOKEN
+          'X-Orca-Agent-Hook-Token': env.GIRRA_AGENT_HOOK_TOKEN
         },
         body: JSON.stringify(
           buildBody({

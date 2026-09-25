@@ -46,7 +46,7 @@ describe('PiTitlebarExtensionService legacy overlay paths', () => {
       const env = svc.buildPtyEnv(PATH_SHAPED_PTY_ID, piHome)
 
       expect(env.PI_CODING_AGENT_DIR).toBeUndefined()
-      expect(env.ORCA_PI_SOURCE_AGENT_DIR).toBe(piHome)
+      expect(env.GIRRA_PI_SOURCE_AGENT_DIR).toBe(piHome)
       expect(existsSync(join(userDataDir, 'pi-agent-overlays'))).toBe(false)
       expect(readdirSync(join(piHome, 'extensions')).sort()).toEqual([
         'orca-agent-status.ts',

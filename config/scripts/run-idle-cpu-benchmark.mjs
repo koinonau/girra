@@ -297,11 +297,11 @@ async function main() {
     env: {
       ...cleanEnv,
       NODE_ENV: 'development',
-      ORCA_E2E_USER_DATA_DIR: userDataDir,
+      GIRRA_E2E_USER_DATA_DIR: userDataDir,
       HOME: isolatedHome,
       USERPROFILE: isolatedHome,
-      ORCA_E2E_HOME_DIR: isolatedHome,
-      ...(options.headful ? { ORCA_E2E_HEADFUL: '1' } : { ORCA_E2E_HEADLESS: '1' })
+      GIRRA_E2E_HOME_DIR: isolatedHome,
+      ...(options.headful ? { GIRRA_E2E_HEADFUL: '1' } : { GIRRA_E2E_HEADLESS: '1' })
     }
   })
   const rootPid = app.process().pid

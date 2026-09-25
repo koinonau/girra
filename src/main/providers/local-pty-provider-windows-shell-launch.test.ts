@@ -371,9 +371,9 @@ describe('LocalPtyProvider', () => {
       Object.defineProperty(process, 'platform', { configurable: true, value: 'win32' })
       provider.configure({
         buildSpawnEnv: (_id, env, ctx) => {
-          env.ORCA_TERMINAL_HANDLE = 'term_wsl'
+          env.GIRRA_TERMINAL_HANDLE = 'term_wsl'
           if (ctx?.isWsl) {
-            env.WSLENV = 'ORCA_TERMINAL_HANDLE/u'
+            env.WSLENV = 'GIRRA_TERMINAL_HANDLE/u'
           }
           return env
         }
@@ -387,9 +387,9 @@ describe('LocalPtyProvider', () => {
 
       const spawnCall = spawnMock.mock.calls.at(-1)!
       expect(spawnCall[0]).toBe('wsl.exe')
-      expect(spawnCall[2].env.ORCA_TERMINAL_HANDLE).toBe('term_wsl')
+      expect(spawnCall[2].env.GIRRA_TERMINAL_HANDLE).toBe('term_wsl')
       expect(spawnCall[2].env.WSLENV?.split(':')).toEqual(
-        expect.arrayContaining(['ORCA_TERMINAL_HANDLE/u', POWERLEVEL10K_WIZARD_DISABLE_ENV])
+        expect.arrayContaining(['GIRRA_TERMINAL_HANDLE/u', POWERLEVEL10K_WIZARD_DISABLE_ENV])
       )
     })
 

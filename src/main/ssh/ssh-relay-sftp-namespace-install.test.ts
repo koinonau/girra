@@ -109,8 +109,8 @@ const MARKER_PATTERN = /\.sftp-namespace-[0-9a-f]{32}/
 // freshly installed node-pty loads (#17915).
 const NPTY_CLOEXEC_PATCHED = 'ORCA-NPTY-CLOEXEC:patched\n'
 const STAGE_OWNER = '.sftp-namespace-00000000000000000000000000000000'
-const STAGE_RESERVED = `__ORCA_UPLOAD_STAGE_SLOT__${STAGE_OWNER}:slot-0`
-const STAGE_PROMOTED = `__ORCA_UPLOAD_STAGE_PROMOTION__${STAGE_OWNER}:PROMOTED`
+const STAGE_RESERVED = `__GIRRA_UPLOAD_STAGE_SLOT__${STAGE_OWNER}:slot-0`
+const STAGE_PROMOTED = `__GIRRA_UPLOAD_STAGE_PROMOTION__${STAGE_OWNER}:PROMOTED`
 
 type ConnectionOptions = {
   // '/homes/u' models a DSM host whose SFTP subsystem starts outside the shell home.
@@ -247,7 +247,7 @@ function feed(responses: string[]): void {
 
 // POSIX first install, healthy npm install and node-pty probe.
 const POSIX_FIRST_INSTALL = [
-  '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+  '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
   SHELL_HOME,
   '', // bounded stale-stage recovery
   STAGE_RESERVED,
@@ -267,7 +267,7 @@ const POSIX_FIRST_INSTALL = [
 ]
 
 const POSIX_SYSTEM_SSH_FIRST_INSTALL = [
-  '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+  '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
   SHELL_HOME,
   '', // bounded stale-stage recovery
   STAGE_RESERVED,
@@ -287,7 +287,7 @@ const POSIX_SYSTEM_SSH_FIRST_INSTALL = [
 
 // POSIX repair of an installed dir whose native deps are missing.
 const POSIX_REPAIR = [
-  '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+  '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
   SHELL_HOME,
   BOTH_NATIVE_DEPS_MISSING_PROBE, // probe before the repair lock: the marker names both deps
   BOTH_NATIVE_DEPS_MISSING_PROBE, // re-probe under the lock
@@ -302,7 +302,7 @@ const POSIX_REPAIR = [
 ]
 
 const POSIX_HEALTHY_RECONNECT = [
-  '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+  '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
   SHELL_HOME,
   'ORCA-NATIVE-DEPS-OK',
   '', // per-launch namespace marker
@@ -361,7 +361,7 @@ describe('relay install writes on a split SFTP namespace', () => {
 
     const markerCommands = execCommands().filter((command) => MARKER_PATTERN.test(command))
     const reservation = markerCommands.find((command) =>
-      command.includes('__ORCA_UPLOAD_STAGE_SLOT__')
+      command.includes('__GIRRA_UPLOAD_STAGE_SLOT__')
     )
     const installMarker = markerCommands.find((command) => command.includes('.install-lock'))
     expect(reservation).toContain('mkdir')
@@ -491,16 +491,16 @@ describe('relay install writes on a split SFTP namespace', () => {
     const conn = makeConnection(capture)
     vi.mocked(execCommand).mockImplementation((_conn, command) => {
       const decoded = decodeCommand(command)
-      if (decoded.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return Promise.resolve('__ORCA_REMOTE_PLATFORM__ Windows AMD64')
+      if (decoded.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return Promise.resolve('__GIRRA_REMOTE_PLATFORM__ Windows AMD64')
       }
       if (decoded.includes('[Environment]::GetFolderPath')) {
         return Promise.resolve('C:\\Users\\u')
       }
-      if (decoded.includes('__ORCA_UPLOAD_STAGE_SLOT__')) {
+      if (decoded.includes('__GIRRA_UPLOAD_STAGE_SLOT__')) {
         return Promise.resolve(STAGE_RESERVED)
       }
-      if (decoded.includes('__ORCA_UPLOAD_STAGE_PROMOTION__')) {
+      if (decoded.includes('__GIRRA_UPLOAD_STAGE_PROMOTION__')) {
         return Promise.resolve(STAGE_PROMOTED)
       }
       if (decoded.includes('npm install')) {
@@ -619,7 +619,7 @@ describe('relay repair writes on a split SFTP namespace', () => {
       const conn = makeConnection(capture)
       vi.mocked(tryAcquireRelayRepairLock).mockResolvedValue(lockResult)
       feed([
-        '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+        '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
         SHELL_HOME,
         'ORCA-NATIVE-DEPS-OK',
         'DEAD',
@@ -637,7 +637,7 @@ describe('relay repair writes on a split SFTP namespace', () => {
   it('keeps a healthy system-SSH reconnect on its secure shell-path writer', async () => {
     const conn = makeConnection(capture, { systemSsh: true, transferMethods: true })
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       SHELL_HOME,
       'ORCA-NATIVE-DEPS-OK',
       'DEAD',
@@ -653,7 +653,7 @@ describe('relay repair writes on a split SFTP namespace', () => {
 
   it('launches without a client-side credential when a healthy marker is unavailable', async () => {
     const conn = makeConnection(capture)
-    feed(['__ORCA_REMOTE_PLATFORM__ Linux x86_64', SHELL_HOME, 'ORCA-NATIVE-DEPS-OK'])
+    feed(['__GIRRA_REMOTE_PLATFORM__ Linux x86_64', SHELL_HOME, 'ORCA-NATIVE-DEPS-OK'])
     vi.mocked(execCommand).mockRejectedValueOnce(new Error('read-only marker'))
     feed(['DEAD', 'READY'])
 
@@ -685,7 +685,7 @@ describe('relay repair writes on a split SFTP namespace', () => {
   it('does not stamp a marker when repairing over system SSH', async () => {
     const conn = makeConnection(capture, { systemSsh: true, transferMethods: true })
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       SHELL_HOME,
       BOTH_NATIVE_DEPS_MISSING_PROBE,
       BOTH_NATIVE_DEPS_MISSING_PROBE,
@@ -710,7 +710,7 @@ describe('relay repair writes on a split SFTP namespace', () => {
   it('degrades to shell paths when marker creation fails outright', async () => {
     const conn = makeConnection(capture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       SHELL_HOME,
       BOTH_NATIVE_DEPS_MISSING_PROBE,
       BOTH_NATIVE_DEPS_MISSING_PROBE
@@ -739,7 +739,7 @@ describe('relay repair writes on a split SFTP namespace', () => {
   it('keeps the repair lock when marker creation has unconfirmed termination', async () => {
     const conn = makeConnection(capture)
     feed([
-      '__ORCA_REMOTE_PLATFORM__ Linux x86_64',
+      '__GIRRA_REMOTE_PLATFORM__ Linux x86_64',
       SHELL_HOME,
       BOTH_NATIVE_DEPS_MISSING_PROBE,
       BOTH_NATIVE_DEPS_MISSING_PROBE

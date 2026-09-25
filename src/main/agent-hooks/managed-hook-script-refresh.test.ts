@@ -22,16 +22,16 @@ let isolatedUserDataDir = ''
 let previousUserDataPath: string | undefined
 
 beforeEach(() => {
-  previousUserDataPath = process.env.ORCA_USER_DATA_PATH
+  previousUserDataPath = process.env.GIRRA_USER_DATA_PATH
   isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-refresh-user-data-'))
-  process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
+  process.env.GIRRA_USER_DATA_PATH = isolatedUserDataDir
 })
 
 afterEach(() => {
   if (previousUserDataPath === undefined) {
-    delete process.env.ORCA_USER_DATA_PATH
+    delete process.env.GIRRA_USER_DATA_PATH
   } else {
-    process.env.ORCA_USER_DATA_PATH = previousUserDataPath
+    process.env.GIRRA_USER_DATA_PATH = previousUserDataPath
   }
   rmSync(isolatedUserDataDir, { recursive: true, force: true })
 })
@@ -76,7 +76,7 @@ async function withPlatform<T>(platform: NodeJS.Platform, run: () => T | Promise
 const STALE_WINDOWS_HOOK = [
   '@echo off',
   'setlocal',
-  'if "%ORCA_AGENT_HOOK_PORT%"=="" goto :orca_agent_hook_drain_stdin',
+  'if "%GIRRA_AGENT_HOOK_PORT%"=="" goto :orca_agent_hook_drain_stdin',
   ':orca_agent_hook_drain_stdin',
   '"%SystemRoot%\\System32\\more.com" >nul 2>nul',
   'exit /b 0',
@@ -119,15 +119,15 @@ describe('managed hook script refresh', () => {
     try {
       // Why: the bug population has a script (from a past install) but no reachable
       // CLI — and possibly no config dir Girra may create. Seed only the script.
-      const hooksDir = join(home, '.orca', 'agent-hooks')
+      const hooksDir = join(home, '.girra', 'agent-hooks')
       mkdirSync(hooksDir, { recursive: true })
       writeFileSync(join(hooksDir, 'claude-hook.cmd'), STALE_WINDOWS_HOOK)
 
       await withPlatform('win32', () => new ClaudeHookService().refreshManagedScripts())
 
       const refreshed = readFileSync(join(hooksDir, 'claude-hook.cmd'), 'utf8')
-      expect(refreshed).toContain('if "%ORCA_AGENT_HOOK_PORT%"=="" exit /b 0')
-      expect(refreshed).not.toContain('if "%ORCA_AGENT_HOOK_PORT%"=="" goto')
+      expect(refreshed).toContain('if "%GIRRA_AGENT_HOOK_PORT%"=="" exit /b 0')
+      expect(refreshed).not.toContain('if "%GIRRA_AGENT_HOOK_PORT%"=="" goto')
       // Why: refresh must not resurrect config for a CLI the user may have removed.
       expect(existsSync(join(home, '.claude'))).toBe(false)
       // Why: the statusline script was never installed here, so it must not appear.
@@ -147,7 +147,7 @@ describe('managed hook script refresh', () => {
           install()
         }
       })
-      const hooksDir = join(home, '.orca', 'agent-hooks')
+      const hooksDir = join(home, '.girra', 'agent-hooks')
       const files = readdirSync(hooksDir)
       expect(files.length).toBeGreaterThan(0)
       const refresherAgents = MANAGED_AGENT_HOOK_SCRIPT_REFRESHERS.map(([agent]) => agent)
@@ -156,7 +156,7 @@ describe('managed hook script refresh', () => {
       for (const file of files) {
         expect(
           refresherAgents.some((agent) => file.startsWith(`${agent}-`)),
-          `${file} is written to ~/.orca/agent-hooks but no refresher owns it`
+          `${file} is written to ~/.girra/agent-hooks but no refresher owns it`
         ).toBe(true)
       }
       // Why: the reverse direction — a refresher naming an agent that writes nothing is a

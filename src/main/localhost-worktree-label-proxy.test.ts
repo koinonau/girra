@@ -27,7 +27,7 @@ function fetchThroughProxy(
 ): Promise<{ status: number; body: string; headers: http.IncomingHttpHeaders }> {
   const url = new URL(labeledUrl)
   return new Promise((resolve, reject) => {
-    // Why: *.orca.localhost is not resolvable DNS; connect to the proxy on
+    // Why: *.girra.localhost is not resolvable DNS; connect to the proxy on
     // loopback and carry the label through the Host header instead.
     const request = http.request(
       {

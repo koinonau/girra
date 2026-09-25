@@ -14,18 +14,18 @@ let isolatedUserDataDir = ''
 let previousUserDataPath: string | undefined
 
 beforeEach(() => {
-  previousUserDataPath = process.env.ORCA_USER_DATA_PATH
+  previousUserDataPath = process.env.GIRRA_USER_DATA_PATH
   isolatedUserDataDir = mkdtempSync(join(tmpdir(), 'orca-hook-stdin-user-data-'))
-  // Why: Girra-managed hook paths can resolve through ORCA_USER_DATA_PATH before
+  // Why: Girra-managed hook paths can resolve through GIRRA_USER_DATA_PATH before
   // the mocked home; an inherited live path would let this test rewrite them.
-  process.env.ORCA_USER_DATA_PATH = isolatedUserDataDir
+  process.env.GIRRA_USER_DATA_PATH = isolatedUserDataDir
 })
 
 afterEach(() => {
   if (previousUserDataPath === undefined) {
-    delete process.env.ORCA_USER_DATA_PATH
+    delete process.env.GIRRA_USER_DATA_PATH
   } else {
-    process.env.ORCA_USER_DATA_PATH = previousUserDataPath
+    process.env.GIRRA_USER_DATA_PATH = previousUserDataPath
   }
   rmSync(isolatedUserDataDir, { recursive: true, force: true })
 })
@@ -141,12 +141,12 @@ function runHookProcess(
 
 function hookEnvironment(extraEnv: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   const env = Object.fromEntries(
-    Object.entries(process.env).filter(([key]) => !key.startsWith('ORCA_'))
+    Object.entries(process.env).filter(([key]) => !key.startsWith('GIRRA_') && !key.startsWith('ORCA_'))
   )
   return {
     ...env,
     HOME: REMOTE_HOME,
-    ORCA_AGENT_HOOK_ENDPOINT: '',
+    GIRRA_AGENT_HOOK_ENDPOINT: '',
     ...extraEnv
   }
 }
@@ -162,7 +162,7 @@ async function generatePosixScripts(): Promise<Map<string, string>> {
     const status = await entry.install(memory.sftp)
     expect(status.state, `${entry.agent} install status`).toBe('installed')
     const generated = [...memory.fs.files.entries()].filter(
-      ([path]) => path.includes('/.orca/agent-hooks/') && path.endsWith('.sh')
+      ([path]) => path.includes('/.girra/agent-hooks/') && path.endsWith('.sh')
     )
     // Why: Claude ships a second managed script (the statusline usage feed); the stdin lifecycle contract applies to every generated script.
     expect(generated.length, `${entry.agent} generated scripts`).toBeGreaterThan(0)
@@ -198,19 +198,19 @@ describe('Windows managed hook stdin structure', () => {
           expect((await entry.install()).state, `${entry.agent} install status`).toBe('installed')
         }
       })
-      const hooksDir = join(home, '.orca', 'agent-hooks')
+      const hooksDir = join(home, '.girra', 'agent-hooks')
       const mainBatchScripts = readdirSync(hooksDir).filter((name) => name.endsWith('-hook.cmd'))
       expect(mainBatchScripts).toHaveLength(1)
       for (const fileName of mainBatchScripts) {
         const script = readFileSync(join(hooksDir, fileName), 'utf8')
         // Why: missing-env path must not touch more.com — hang class from #11549.
         expect(script, `${fileName} port guard`).toContain(
-          'if "%ORCA_AGENT_HOOK_PORT%"=="" exit /b 0'
+          'if "%GIRRA_AGENT_HOOK_PORT%"=="" exit /b 0'
         )
         expect(script, `${fileName} token guard`).toContain(
-          'if "%ORCA_AGENT_HOOK_TOKEN%"=="" exit /b 0'
+          'if "%GIRRA_AGENT_HOOK_TOKEN%"=="" exit /b 0'
         )
-        expect(script, `${fileName} pane guard`).toContain('if "%ORCA_PANE_KEY%"=="" exit /b 0')
+        expect(script, `${fileName} pane guard`).toContain('if "%GIRRA_PANE_KEY%"=="" exit /b 0')
         // Why: pin the rule, not today's three guards — a fourth ORCA_* guard routed to the
         // drain would reintroduce #11549 with this suite green. The pattern spans the guard so
         // it catches both `if "%VAR%"==""` and `if not defined VAR`; the Devin skip names no
@@ -236,7 +236,7 @@ describe('Windows managed hook stdin structure', () => {
       expect(claude, 'claude devin guard present').toContain(
         'if not "%DEVIN_PROJECT_DIR%"=="" goto :orca_agent_hook_drain_stdin'
       )
-      expect(claude.indexOf('if "%ORCA_PANE_KEY%"=="" exit /b 0')).toBeLessThan(
+      expect(claude.indexOf('if "%GIRRA_PANE_KEY%"=="" exit /b 0')).toBeLessThan(
         claude.indexOf('if not "%DEVIN_PROJECT_DIR%"=="" goto :orca_agent_hook_drain_stdin')
       )
 
@@ -282,7 +282,7 @@ describe('Windows managed hook stdin structure', () => {
         for (const entry of LOCAL_INSTALLERS) {
           expect((await entry.install()).state, `${entry.agent} install status`).toBe('installed')
         }
-        const hooksDir = join(home, '.orca', 'agent-hooks')
+        const hooksDir = join(home, '.girra', 'agent-hooks')
         const mainScripts = readdirSync(hooksDir).filter((name) => name.endsWith('-hook.cmd'))
         expect(mainScripts).toHaveLength(1)
         for (const fileName of mainScripts) {
@@ -341,9 +341,9 @@ describe('Windows managed hook stdin structure', () => {
             launcher.executable,
             launcher.args,
             hookEnvironment({
-              ORCA_AGENT_HOOK_PORT: '59999',
-              ORCA_AGENT_HOOK_TOKEN: 'token',
-              ORCA_PANE_KEY: 'tab:leaf'
+              GIRRA_AGENT_HOOK_PORT: '59999',
+              GIRRA_AGENT_HOOK_TOKEN: 'token',
+              GIRRA_PANE_KEY: 'tab:leaf'
             })
           )
           expect(insideAPane.exitCode, `${launcher.name} in-pane exit code`).toBe(0)
@@ -396,9 +396,9 @@ describe('Windows managed hook stdin structure', () => {
             name: 'Girra env with dead listener',
             env: hookEnvironment({
               USERPROFILE: home,
-              ORCA_AGENT_HOOK_PORT: '59999',
-              ORCA_AGENT_HOOK_TOKEN: 'token',
-              ORCA_PANE_KEY: 'tab:leaf'
+              GIRRA_AGENT_HOOK_PORT: '59999',
+              GIRRA_AGENT_HOOK_TOKEN: 'token',
+              GIRRA_PANE_KEY: 'tab:leaf'
             })
           },
           {
@@ -432,7 +432,7 @@ describe('Windows managed hook stdin structure', () => {
 
 describe.skipIf(process.platform === 'win32')('managed hook stdin lifecycle', () => {
   it('emits neutral JSON when the Claude lifecycle script is missing', async () => {
-    const command = getRemoteManagedCommand('/home/dev/.orca/agent-hooks/claude-hook.sh')
+    const command = getRemoteManagedCommand('/home/dev/.girra/agent-hooks/claude-hook.sh')
     const result = await runPosixHook(command)
 
     expect(result.exitCode).toBe(0)

@@ -209,8 +209,8 @@ describe.skipIf(process.platform === 'win32')('CLI command filesystem races', ()
       [
         '#!/usr/bin/env bash',
         `CLI='${oldCliPath}'`,
-        'export ORCA_NODE_OPTIONS="${NODE_OPTIONS-}"',
-        'export ORCA_NODE_REPL_EXTERNAL_MODULE="${NODE_REPL_EXTERNAL_MODULE-}"',
+        'export GIRRA_NODE_OPTIONS="${NODE_OPTIONS-}"',
+        'export GIRRA_NODE_REPL_EXTERNAL_MODULE="${NODE_REPL_EXTERNAL_MODULE-}"',
         'ELECTRON_RUN_AS_NODE=1 exec electron "$CLI" "$@"'
       ].join('\n')
     )

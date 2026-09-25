@@ -45,7 +45,7 @@ describe('resolveRemoteNodePath', () => {
     execCommandMock
       .mockResolvedValueOnce('/usr/bin/node\n/home/u/.nvm/versions/node/v22.22.0/bin/node\n')
       .mockRejectedValueOnce(new Error('/usr/bin/npm: not found'))
-      .mockResolvedValueOnce('__ORCA_NODE_VERSION__\nv22.22.0\n__ORCA_NPM_VERSION__\n11.13.0\n')
+      .mockResolvedValueOnce('__GIRRA_NODE_VERSION__\nv22.22.0\n__GIRRA_NPM_VERSION__\n11.13.0\n')
 
     await expect(resolveRemoteNodePath(conn)).resolves.toBe(
       '/home/u/.nvm/versions/node/v22.22.0/bin/node'

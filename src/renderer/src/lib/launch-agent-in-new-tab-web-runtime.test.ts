@@ -99,7 +99,7 @@ describe('launchAgentInNewTab paired web runtime', () => {
 
   it('forwards prompt launch env and captured config to the host runtime', async () => {
     store.settings.agentDefaultArgs = { claude: '--model sonnet --effort high' }
-    store.settings.agentDefaultEnv = { claude: { ORCA_TEST_PROFILE: 'captured' } }
+    store.settings.agentDefaultEnv = { claude: { GIRRA_TEST_PROFILE: 'captured' } }
     const { launchAgentInNewTab } = await import('./launch-agent-in-new-tab')
 
     const result = launchAgentInNewTab({
@@ -118,11 +118,11 @@ describe('launchAgentInNewTab paired web runtime', () => {
       agentSessionKind: 'fresh',
       launchAgent: 'claude',
       command: "claude '--model' 'sonnet' '--effort' 'high' 'fix the spinner'",
-      env: { ORCA_TEST_PROFILE: 'captured' },
+      env: { GIRRA_TEST_PROFILE: 'captured' },
       launchConfig: {
         agentCommand: "claude '--model' 'sonnet' '--effort' 'high'",
         agentArgs: '--model sonnet --effort high',
-        agentEnv: { ORCA_TEST_PROFILE: 'captured' }
+        agentEnv: { GIRRA_TEST_PROFILE: 'captured' }
       },
       prompt: 'fix the spinner',
       promptDelivery: 'auto-submit',

@@ -6,7 +6,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { ORCA_RENDERER_UNLOAD_PREVENTED_EVENT } from '../../../shared/renderer-shutdown-events'
+import { GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT } from '../../../shared/renderer-shutdown-events'
 import {
   isLazyChunkLoadError,
   loadLazyWithRetry,
@@ -78,7 +78,7 @@ describe('loadLazyWithRetry when the recovery reload never lands', () => {
 
   it('contains an unload-vetoed reload', async () => {
     vi.spyOn(window.location, 'reload').mockImplementation(() => {
-      window.dispatchEvent(new Event(ORCA_RENDERER_UNLOAD_PREVENTED_EVENT))
+      window.dispatchEvent(new Event(GIRRA_RENDERER_UNLOAD_PREVENTED_EVENT))
     })
 
     const settled = loadLazyWithRetry(() => Promise.reject(CORRUPT_CHUNK_ERROR()), {

@@ -45,16 +45,16 @@ export function configureLocalPtyProvider(args: {
         routeBrowserOpensToClient: runtime?.shouldRelayTerminalBrowserOpens?.()
       })
       // Why: agents need their terminal handle at process start to self-identify in orchestration messages without an extra RPC.
-      const requestedHandle = baseEnv.ORCA_TERMINAL_HANDLE
+      const requestedHandle = baseEnv.GIRRA_TERMINAL_HANDLE
       const preAllocatedHandle =
         requestedHandle && trustedTerminalHandleEnv.has(requestedHandle)
           ? requestedHandle
           : runtime?.preAllocateHandleForPty(id)
       if (requestedHandle && requestedHandle !== preAllocatedHandle) {
-        delete env.ORCA_TERMINAL_HANDLE
+        delete env.GIRRA_TERMINAL_HANDLE
       }
       if (preAllocatedHandle) {
-        env.ORCA_TERMINAL_HANDLE = preAllocatedHandle
+        env.GIRRA_TERMINAL_HANDLE = preAllocatedHandle
       }
       stampWslOrchestrationCompatibilityHost(
         env,

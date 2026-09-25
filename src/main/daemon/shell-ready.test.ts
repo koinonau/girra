@@ -71,9 +71,9 @@ async function runInteractiveZshLogin(args: {
       HOME: args.tempHome,
       TERM: 'xterm-256color',
       ZDOTDIR: args.wrapperZdotdir,
-      ORCA_ORIG_ZDOTDIR: args.tempHome,
-      ORCA_ZSHENV_SOURCE_DIR: args.tempHome,
-      ORCA_SHELL_FEATURES: 'ready'
+      GIRRA_ORIG_ZDOTDIR: args.tempHome,
+      GIRRA_ZSHENV_SOURCE_DIR: args.tempHome,
+      GIRRA_SHELL_FEATURES: 'ready'
     }
   })
   let output = ''
@@ -111,7 +111,7 @@ async function runInteractiveZshRc(args: {
       HOME: args.zdotdir,
       TERM: 'xterm-256color',
       ZDOTDIR: args.zdotdir,
-      ORCA_SHELL_FEATURES: 'ready'
+      GIRRA_SHELL_FEATURES: 'ready'
     }
   })
   let output = ''
@@ -143,23 +143,23 @@ describePosix('daemon shell-ready launch config', () => {
   let userDataPath: string
 
   beforeEach(() => {
-    previousUserDataPath = process.env.ORCA_USER_DATA_PATH
-    previousOrcaOrigZdotdir = process.env.ORCA_ORIG_ZDOTDIR
-    delete process.env.ORCA_ORIG_ZDOTDIR
+    previousUserDataPath = process.env.GIRRA_USER_DATA_PATH
+    previousOrcaOrigZdotdir = process.env.GIRRA_ORIG_ZDOTDIR
+    delete process.env.GIRRA_ORIG_ZDOTDIR
     userDataPath = mkdtempSync(join(tmpdir(), 'daemon-shell-ready-test-'))
-    process.env.ORCA_USER_DATA_PATH = userDataPath
+    process.env.GIRRA_USER_DATA_PATH = userDataPath
   })
 
   afterEach(() => {
     if (previousUserDataPath === undefined) {
-      delete process.env.ORCA_USER_DATA_PATH
+      delete process.env.GIRRA_USER_DATA_PATH
     } else {
-      process.env.ORCA_USER_DATA_PATH = previousUserDataPath
+      process.env.GIRRA_USER_DATA_PATH = previousUserDataPath
     }
     if (previousOrcaOrigZdotdir === undefined) {
-      delete process.env.ORCA_ORIG_ZDOTDIR
+      delete process.env.GIRRA_ORIG_ZDOTDIR
     } else {
-      process.env.ORCA_ORIG_ZDOTDIR = previousOrcaOrigZdotdir
+      process.env.GIRRA_ORIG_ZDOTDIR = previousOrcaOrigZdotdir
     }
     rmSync(userDataPath, { recursive: true, force: true })
     vi.restoreAllMocks()
@@ -340,7 +340,7 @@ describePosix('daemon shell-ready launch config', () => {
     15_000
   )
 
-  it('sets no ORCA_ORIG_ZDOTDIR when the inherited ZDOTDIR points at a wrapper dir', async () => {
+  it('sets no GIRRA_ORIG_ZDOTDIR when the inherited ZDOTDIR points at a wrapper dir', async () => {
     // Why: a Girra-PTY parent has ZDOTDIR=.../shell-ready/zsh; propagating it makes the wrapper source itself (recursion loop).
     const previousZdotdir = process.env.ZDOTDIR
     const previousHome = process.env.HOME
@@ -349,7 +349,7 @@ describePosix('daemon shell-ready launch config', () => {
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBeUndefined()
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBeUndefined()
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR
@@ -364,18 +364,18 @@ describePosix('daemon shell-ready launch config', () => {
     }
   })
 
-  it('uses inherited ORCA_ORIG_ZDOTDIR when ZDOTDIR is a Girra wrapper dir', async () => {
+  it('uses inherited GIRRA_ORIG_ZDOTDIR when ZDOTDIR is a Girra wrapper dir', async () => {
     const previousZdotdir = process.env.ZDOTDIR
-    const previousOrigZdotdir = process.env.ORCA_ORIG_ZDOTDIR
+    const previousOrigZdotdir = process.env.GIRRA_ORIG_ZDOTDIR
     const previousHome = process.env.HOME
     const userZdotdir = makeUserZdotdir(userDataPath, '.config', 'zsh')
     process.env.ZDOTDIR = '/some/other/orca/shell-ready/zsh'
-    process.env.ORCA_ORIG_ZDOTDIR = userZdotdir
+    process.env.GIRRA_ORIG_ZDOTDIR = userZdotdir
     process.env.HOME = userDataPath
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBe(userZdotdir)
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBe(userZdotdir)
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR
@@ -383,9 +383,9 @@ describePosix('daemon shell-ready launch config', () => {
         process.env.ZDOTDIR = previousZdotdir
       }
       if (previousOrigZdotdir === undefined) {
-        delete process.env.ORCA_ORIG_ZDOTDIR
+        delete process.env.GIRRA_ORIG_ZDOTDIR
       } else {
-        process.env.ORCA_ORIG_ZDOTDIR = previousOrigZdotdir
+        process.env.GIRRA_ORIG_ZDOTDIR = previousOrigZdotdir
       }
       if (previousHome === undefined) {
         delete process.env.HOME
@@ -395,17 +395,17 @@ describePosix('daemon shell-ready launch config', () => {
     }
   })
 
-  it('sets no ORCA_ORIG_ZDOTDIR when the inherited one points at a wrapper dir', async () => {
+  it('sets no GIRRA_ORIG_ZDOTDIR when the inherited one points at a wrapper dir', async () => {
     const previousZdotdir = process.env.ZDOTDIR
-    const previousOrigZdotdir = process.env.ORCA_ORIG_ZDOTDIR
+    const previousOrigZdotdir = process.env.GIRRA_ORIG_ZDOTDIR
     const previousHome = process.env.HOME
     delete process.env.ZDOTDIR
-    process.env.ORCA_ORIG_ZDOTDIR = '/some/other/orca/shell-ready/zsh'
+    process.env.GIRRA_ORIG_ZDOTDIR = '/some/other/orca/shell-ready/zsh'
     process.env.HOME = '/Users/alice'
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBeUndefined()
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBeUndefined()
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR
@@ -413,9 +413,9 @@ describePosix('daemon shell-ready launch config', () => {
         process.env.ZDOTDIR = previousZdotdir
       }
       if (previousOrigZdotdir === undefined) {
-        delete process.env.ORCA_ORIG_ZDOTDIR
+        delete process.env.GIRRA_ORIG_ZDOTDIR
       } else {
-        process.env.ORCA_ORIG_ZDOTDIR = previousOrigZdotdir
+        process.env.GIRRA_ORIG_ZDOTDIR = previousOrigZdotdir
       }
       if (previousHome === undefined) {
         delete process.env.HOME
@@ -431,8 +431,8 @@ describePosix('daemon shell-ready launch config', () => {
     getShellReadyLaunchConfig('/bin/zsh')
 
     const zshenv = readFileSync(join(getShellReadyWrapperRoot(), 'zsh', '.zshenv'), 'utf8')
-    expect(zshenv).toContain('builtin export ZDOTDIR="$ORCA_ORIG_ZDOTDIR"')
-    expect(zshenv).toContain('builtin unset ORCA_ORIG_ZDOTDIR ORCA_ZSHENV_SOURCE_DIR')
+    expect(zshenv).toContain('builtin export ZDOTDIR="$GIRRA_ORIG_ZDOTDIR"')
+    expect(zshenv).toContain('builtin unset GIRRA_ORIG_ZDOTDIR GIRRA_ZSHENV_SOURCE_DIR')
     expect(zshenv).toContain('printf "\\033]777;orca-shell-start:%s\\007" "$$"')
     expect(zshenv.indexOf('builtin export ZDOTDIR=')).toBeLessThan(
       zshenv.indexOf('builtin source -- "$_orca_user_zshenv"')
@@ -580,14 +580,14 @@ describePosix('daemon shell-ready launch config', () => {
     const zlogin = zshrc
     const bashRc = readFileSync(join(getShellReadyWrapperRoot(), 'bash', 'rcfile'), 'utf8')
     const restoreLine =
-      '[[ -n "${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${ORCA_OPENCODE_CONFIG_DIR}"'
-    const agentTeamsPathRestoreLine = '[[ -n "${ORCA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0'
+      '[[ -n "${GIRRA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="${GIRRA_OPENCODE_CONFIG_DIR}"'
+    const agentTeamsPathRestoreLine = '[[ -n "${GIRRA_AGENT_TEAMS_SHIM_DIR:-}" ]] || return 0'
     expect(zshrc).toContain(restoreLine)
     expect(zlogin).toContain(restoreLine)
     expect(bashRc).toContain(restoreLine)
-    expect(zshrc).not.toContain('ORCA_PI_CODING_AGENT_DIR')
-    expect(zlogin).not.toContain('ORCA_PI_CODING_AGENT_DIR')
-    expect(bashRc).not.toContain('ORCA_PI_CODING_AGENT_DIR')
+    expect(zshrc).not.toContain('GIRRA_PI_CODING_AGENT_DIR')
+    expect(zlogin).not.toContain('GIRRA_PI_CODING_AGENT_DIR')
+    expect(bashRc).not.toContain('GIRRA_PI_CODING_AGENT_DIR')
     expect(zshrc).toContain(agentTeamsPathRestoreLine)
     expect(zlogin).toContain(agentTeamsPathRestoreLine)
     expect(bashRc).toContain(agentTeamsPathRestoreLine)
@@ -596,7 +596,7 @@ describePosix('daemon shell-ready launch config', () => {
     }
   })
 
-  it('preserves a real inherited ZDOTDIR as ORCA_ORIG_ZDOTDIR', async () => {
+  it('preserves a real inherited ZDOTDIR as GIRRA_ORIG_ZDOTDIR', async () => {
     // Why: only the wrapper self-loop should be rejected; a real user ZDOTDIR must round-trip so their configs load.
     const previousZdotdir = process.env.ZDOTDIR
     const userZdotdir = makeUserZdotdir(userDataPath, '.config', 'zsh')
@@ -604,7 +604,7 @@ describePosix('daemon shell-ready launch config', () => {
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBe(userZdotdir)
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBe(userZdotdir)
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR
@@ -623,7 +623,7 @@ describePosix('daemon shell-ready launch config', () => {
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBeUndefined()
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBeUndefined()
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR
@@ -647,7 +647,7 @@ describePosix('daemon shell-ready launch config', () => {
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBeUndefined()
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBeUndefined()
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR
@@ -670,7 +670,7 @@ describePosix('daemon shell-ready launch config', () => {
     try {
       const { getShellReadyLaunchConfig } = await importFreshShellReady()
       const config = getShellReadyLaunchConfig('/bin/zsh')
-      expect(config.env.ORCA_ORIG_ZDOTDIR).toBe(userZdotdir)
+      expect(config.env.GIRRA_ORIG_ZDOTDIR).toBe(userZdotdir)
     } finally {
       if (previousZdotdir === undefined) {
         delete process.env.ZDOTDIR

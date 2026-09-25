@@ -18,7 +18,7 @@ export const STARTUP_COMMAND_FEATURES = selectShellStartupFeatures({
 /** A pane carrying a Girra overlay but no startup command. */
 export const OVERLAY_ONLY_FEATURES = selectShellStartupFeatures({
   shellPath: 'zsh',
-  env: { ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config' },
+  env: { GIRRA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config' },
   hasStartupCommand: false,
   waitsForShellReady: false,
   emitsStartupIdentity: false

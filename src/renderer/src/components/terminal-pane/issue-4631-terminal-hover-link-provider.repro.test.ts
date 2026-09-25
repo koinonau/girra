@@ -46,7 +46,7 @@ function configuredRowCount(): number {
 }
 
 function logStage(stage: string, details: Record<string, unknown>): void {
-  if (process.env.ORCA_LOG_4631_REPRO !== '1') {
+  if (process.env.GIRRA_LOG_4631_REPRO !== '1') {
     return
   }
   process.stderr.write(`${JSON.stringify({ issue: 4631, stage, ...details })}\n`)

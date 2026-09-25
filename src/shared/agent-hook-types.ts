@@ -32,7 +32,7 @@ export type AgentHookInstallStatus = {
 // need to distinguish from: Claude installs run for everyone on first
 // launch but no v1 fleet ever shipped. Reserve the next bump for a real wire
 // change.
-export const ORCA_HOOK_PROTOCOL_VERSION = '1' as const
+export const GIRRA_HOOK_PROTOCOL_VERSION = '1' as const
 
 // Why: absence means the listener predates raw-JSON metadata headers, so managed scripts must keep using form posts.
-export const ORCA_HOOK_RAW_JSON_TRANSPORT = 'raw-json-v1' as const
+export const GIRRA_HOOK_RAW_JSON_TRANSPORT = 'raw-json-v1' as const

@@ -16,7 +16,7 @@ export const MANAGED_AGENT_HOOK_INSTALLERS: readonly ManagedAgentHookInstaller[]
   ['claude', () => claudeHookService.install()]
 ]
 
-// Why: covers the shared launcher/statusline scripts under ~/.orca/agent-hooks — the files a
+// Why: covers the shared launcher/statusline scripts under ~/.girra/agent-hooks — the files a
 // user-wide agent config keeps invoking after the CLI falls off PATH. Enforced by the coverage
 // test in managed-hook-script-refresh.test.ts: a new installer that writes a launcher without
 // adding a refresher here fails that test.

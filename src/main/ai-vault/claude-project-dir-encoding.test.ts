@@ -9,7 +9,7 @@ describe('encodeClaudeProjectPath', () => {
   it('emits one dash per non-alphanumeric character rather than per run', () => {
     // The distinction is the whole contract: collapsing runs stops matching real bucket names.
     expect(encodeClaudeProjectPath('/Users/ada/orca/workspaces')).toBe('-Users-ada-orca-workspaces')
-    expect(encodeClaudeProjectPath('/Users/ada/.orca/worktrees')).toBe('-Users-ada--orca-worktrees')
+    expect(encodeClaudeProjectPath('/Users/ada/.girra/worktrees')).toBe('-Users-ada--girra-worktrees')
   })
 
   it('encodes a Windows drive path', () => {

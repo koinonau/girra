@@ -376,9 +376,9 @@ describe('OrcaRuntimeService', () => {
     expect(spawnCall?.command).toBe("opencode '--print-logs'")
     expect(spawnCall?.env).toMatchObject({
       OPENCODE_PROFILE: 'captured',
-      ORCA_WORKTREE_ID: TEST_WORKTREE_ID
+      GIRRA_WORKTREE_ID: TEST_WORKTREE_ID
     })
-    expect(spawnCall?.env?.ORCA_AGENT_LAUNCH_TOKEN).toMatch(UUID_RE)
+    expect(spawnCall?.env?.GIRRA_AGENT_LAUNCH_TOKEN).toMatch(UUID_RE)
   })
 
   it('launches the configured agent CLI for a startupAgent id', async () => {

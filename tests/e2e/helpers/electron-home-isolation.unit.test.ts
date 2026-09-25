@@ -49,7 +49,7 @@ describe('createElectronHomeIsolation', () => {
       EXTRA_TEST_FLAG: '1',
       HOME: canonicalHome,
       USERPROFILE: canonicalHome,
-      ORCA_E2E_USER_DATA_DIR: userDataDir
+      GIRRA_E2E_USER_DATA_DIR: userDataDir
     })
     expect(isolation.env.CLAUDE_CONFIG_DIR).toBeUndefined()
     expect(isolation.env.ZDOTDIR).toBeUndefined()
@@ -74,11 +74,11 @@ describe('createElectronHomeIsolation', () => {
       createElectronHomeIsolation({
         inheritedEnv: {},
         launchEnv: {},
-        extraEnv: { ORCA_E2E_USER_DATA_DIR: '/unsafe' },
+        extraEnv: { GIRRA_E2E_USER_DATA_DIR: '/unsafe' },
         userDataDir: createUserDataDir(),
         realHome: '/real/home'
       })
-    ).toThrow(/orcaAppExtraEnv\.ORCA_E2E_USER_DATA_DIR/)
+    ).toThrow(/orcaAppExtraEnv\.GIRRA_E2E_USER_DATA_DIR/)
   })
 
   it('compares Windows home paths case-insensitively', () => {

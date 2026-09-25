@@ -31,7 +31,7 @@ import type {
 } from '../../src/shared/runtime-types'
 import { PROTOCOL_VERSION } from '../../src/main/daemon/types'
 import { parsePaneKey } from '../../src/shared/stable-pane-id'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 
 const electronPackageDir = path.join(process.cwd(), 'node_modules', 'electron')
 const electronPath = path.join(
@@ -47,10 +47,10 @@ function createHeadlessLaunchIsolation(userDataDir: string): ElectronHomeIsolati
     inheritedEnv: cleanEnv,
     launchEnv: {
       NODE_ENV: 'development',
-      ORCA_E2E_HEADLESS: '1',
+      GIRRA_E2E_HEADLESS: '1',
       // Why: production builds always use the lock; this opt-in makes the dev
       // E2E bundle exercise the same second-instance ownership path.
-      ORCA_E2E_ENFORCE_SINGLE_INSTANCE_LOCK: '1'
+      GIRRA_E2E_ENFORCE_SINGLE_INSTANCE_LOCK: '1'
     },
     extraEnv: {},
     userDataDir
@@ -78,7 +78,7 @@ function readPersistedPromotionBinding(
   try {
     const persisted = JSON.parse(
       readFileSync(
-        path.join(userDataDir, 'profiles', DEFAULT_LOCAL_ORCA_PROFILE_ID, 'orca-data.json'),
+        path.join(userDataDir, 'profiles', DEFAULT_LOCAL_GIRRA_PROFILE_ID, 'orca-data.json'),
         'utf8'
       )
     ) as {
@@ -202,7 +202,7 @@ test('promotes the headless owner without replacing its daemon terminal', async 
       )
       .toContain(beforeMarker)
 
-    const forwardAppLogs = process.env.ORCA_E2E_FORWARD_APP_LOGS === '1'
+    const forwardAppLogs = process.env.GIRRA_E2E_FORWARD_APP_LOGS === '1'
     activatingProcess = spawn(electronPath, getOrcaElectronLaunchArgs(mainPath, false), {
       env,
       stdio: forwardAppLogs ? 'pipe' : 'ignore'

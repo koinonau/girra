@@ -1,9 +1,9 @@
 import { app, session } from 'electron'
 import { randomUUID } from 'node:crypto'
 import { join } from 'node:path'
-import { ORCA_BROWSER_PARTITION } from '../../shared/constants'
+import { GIRRA_BROWSER_PARTITION } from '../../shared/constants'
 import {
-  DEFAULT_LOCAL_ORCA_PROFILE_ID,
+  DEFAULT_LOCAL_GIRRA_PROFILE_ID,
   getOrcaProfileBrowserDefaultPartition,
   getOrcaProfileBrowserSessionPartition
 } from '../../shared/orca-profiles'
@@ -48,9 +48,9 @@ export type BrowserSessionRegistryProfileOptions = {
 
 class BrowserSessionRegistry {
   private readonly profiles = new Map<string, BrowserSessionProfile>()
-  private activeOrcaProfileId = DEFAULT_LOCAL_ORCA_PROFILE_ID
+  private activeOrcaProfileId = DEFAULT_LOCAL_GIRRA_PROFILE_ID
   private metadataPathOverride: string | null = null
-  private defaultPartition = ORCA_BROWSER_PARTITION
+  private defaultPartition = GIRRA_BROWSER_PARTITION
 
   constructor() {
     this.resetDefaultProfile()

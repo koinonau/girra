@@ -150,9 +150,9 @@ describe('registerPtyHandlers', () => {
         tabId,
         leafId,
         env: {
-          ORCA_PANE_KEY: paneKey,
-          ORCA_TAB_ID: tabId,
-          ORCA_WORKTREE_ID: worktreeId
+          GIRRA_PANE_KEY: paneKey,
+          GIRRA_TAB_ID: tabId,
+          GIRRA_WORKTREE_ID: worktreeId
         }
       })
 
@@ -242,9 +242,9 @@ describe('registerPtyHandlers', () => {
         tabId,
         leafId,
         env: {
-          ORCA_PANE_KEY: paneKey,
-          ORCA_TAB_ID: tabId,
-          ORCA_WORKTREE_ID: worktreeId
+          GIRRA_PANE_KEY: paneKey,
+          GIRRA_TAB_ID: tabId,
+          GIRRA_WORKTREE_ID: worktreeId
         }
       })
     ).rejects.toThrow('terminal_pane_owner_conflict')
@@ -287,9 +287,9 @@ describe('registerPtyHandlers', () => {
         tabId: 'tab-host-scope',
         leafId,
         env: {
-          ORCA_PANE_KEY: paneKey,
-          ORCA_TAB_ID: 'tab-host-scope',
-          ORCA_WORKTREE_ID: worktreeId
+          GIRRA_PANE_KEY: paneKey,
+          GIRRA_TAB_ID: 'tab-host-scope',
+          GIRRA_WORKTREE_ID: worktreeId
         }
       })
 
@@ -394,7 +394,7 @@ describe('registerPtyHandlers', () => {
       worktreeId: 'wt-1',
       tabId: 'tab-runtime-reservation',
       leafId,
-      env: { ORCA_PANE_KEY: paneKey },
+      env: { GIRRA_PANE_KEY: paneKey },
       persistHostSessionBinding: true
     }
 

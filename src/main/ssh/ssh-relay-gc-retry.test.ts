@@ -83,8 +83,8 @@ describe('relay GC deploy retry', () => {
     const conn = makeConnection()
     vi.mocked(tryAcquireRelayRepairLock).mockResolvedValueOnce('gc')
     vi.mocked(execCommand).mockImplementation(async (_conn, command) => {
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return '__ORCA_REMOTE_PLATFORM__ Linux x86_64'
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return '__GIRRA_REMOTE_PLATFORM__ Linux x86_64'
       }
       if (command === 'echo $HOME') {
         return '/home/user'
@@ -115,8 +115,8 @@ describe('relay GC deploy retry', () => {
       .mockResolvedValueOnce(false)
       .mockResolvedValue(true)
     vi.mocked(execCommand).mockImplementation(async (_conn, command) => {
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return '__ORCA_REMOTE_PLATFORM__ Linux x86_64'
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return '__GIRRA_REMOTE_PLATFORM__ Linux x86_64'
       }
       if (command === 'echo $HOME') {
         return '/home/user'
@@ -152,8 +152,8 @@ describe('relay GC deploy retry', () => {
         })
     )
     vi.mocked(execCommand).mockImplementation(async (_conn, command) => {
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return '__ORCA_REMOTE_PLATFORM__ Linux x86_64'
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return '__GIRRA_REMOTE_PLATFORM__ Linux x86_64'
       }
       if (command === 'echo $HOME') {
         return '/home/user'
@@ -191,8 +191,8 @@ describe('relay GC deploy retry', () => {
     const conn = makeConnection()
     vi.mocked(waitForSentinel).mockRejectedValueOnce(new Error('launch failed'))
     vi.mocked(execCommand).mockImplementation(async (_conn, command) => {
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return '__ORCA_REMOTE_PLATFORM__ Linux x86_64'
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return '__GIRRA_REMOTE_PLATFORM__ Linux x86_64'
       }
       if (command === 'echo $HOME') {
         return '/home/user'
@@ -220,8 +220,8 @@ describe('relay GC deploy retry', () => {
     vi.mocked(tryAcquireRelayRepairLock).mockResolvedValueOnce('busy')
     vi.mocked(waitForSentinel).mockRejectedValueOnce(new Error('launch failed'))
     vi.mocked(execCommand).mockImplementation(async (_conn, command) => {
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return '__ORCA_REMOTE_PLATFORM__ Linux x86_64'
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return '__GIRRA_REMOTE_PLATFORM__ Linux x86_64'
       }
       if (command === 'echo $HOME') {
         return '/home/user'
@@ -252,8 +252,8 @@ describe('relay GC deploy retry', () => {
       .mockResolvedValueOnce(null)
       .mockResolvedValue('launch-token')
     vi.mocked(execCommand).mockImplementation(async (_conn, command) => {
-      if (command.includes('__ORCA_REMOTE_PLATFORM__')) {
-        return '__ORCA_REMOTE_PLATFORM__ Linux x86_64'
+      if (command.includes('__GIRRA_REMOTE_PLATFORM__')) {
+        return '__GIRRA_REMOTE_PLATFORM__ Linux x86_64'
       }
       if (command === 'echo $HOME') {
         return '/home/user'

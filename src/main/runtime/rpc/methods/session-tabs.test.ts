@@ -427,7 +427,7 @@ describe('session tab RPC methods', () => {
         command: 'zsh',
         cwd: '/repo/packages/app',
         env: { OPENCODE_PROFILE: 'captured' },
-        envToDelete: ['OPENCODE_CONFIG', 'ORCA_OPENCODE_CONFIG'],
+        envToDelete: ['OPENCODE_CONFIG', 'GIRRA_OPENCODE_CONFIG'],
         launchToken: 'launch-token-123',
         launchConfig: {
           agentArgs: '--model gpt-5',
@@ -446,7 +446,7 @@ describe('session tab RPC methods', () => {
       command: 'zsh',
       cwd: '/repo/packages/app',
       env: { OPENCODE_PROFILE: 'captured' },
-      envToDelete: ['OPENCODE_CONFIG', 'ORCA_OPENCODE_CONFIG'],
+      envToDelete: ['OPENCODE_CONFIG', 'GIRRA_OPENCODE_CONFIG'],
       startupCommandDelivery: undefined,
       agent: undefined,
       launchToken: 'launch-token-123',

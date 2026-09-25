@@ -239,11 +239,11 @@ describe('resolvePiSourceAgentDir', () => {
     const env = {
       HOME: mkdtempSync(join(tmpdir(), 'plugin-overlay-env-')),
       PI_CODING_AGENT_DIR: '/tmp/parent-orca-pi-overlay',
-      ORCA_PI_CODING_AGENT_DIR: '/tmp/parent-orca-pi-overlay'
+      GIRRA_PI_CODING_AGENT_DIR: '/tmp/parent-orca-pi-overlay'
     }
     try {
       expect(
-        resolvePiSourceAgentDir({ ...env, ORCA_PI_SOURCE_AGENT_DIR: '/user/.pi/agent' }, undefined)
+        resolvePiSourceAgentDir({ ...env, GIRRA_PI_SOURCE_AGENT_DIR: '/user/.pi/agent' }, undefined)
       ).toBe('/user/.pi/agent')
       expect(resolvePiSourceAgentDir(env, undefined)).toBeUndefined()
     } finally {

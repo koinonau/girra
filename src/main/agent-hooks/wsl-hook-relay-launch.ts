@@ -36,8 +36,8 @@ export function resolveWslHookRelayBundle(): WslHookRelayBundle | null {
   // Mirrors getLocalRelayCandidates in ssh-relay-deploy: env override for
   // tests/dev, then packaged extraResources, then dev out/ paths.
   const candidates: string[] = []
-  if (process.env.ORCA_RELAY_PATH) {
-    candidates.push(join(process.env.ORCA_RELAY_PATH, 'wsl'))
+  if (process.env.GIRRA_RELAY_PATH) {
+    candidates.push(join(process.env.GIRRA_RELAY_PATH, 'wsl'))
   }
   if (process.resourcesPath) {
     candidates.push(join(process.resourcesPath, 'relay', 'wsl'))
@@ -109,13 +109,13 @@ export function buildGuestInstallScript(bundleJs: Buffer, version: string): stri
     'umask 077',
     `d="${guestRelayDirExpr(version)}"`,
     'mkdir -p "$d"',
-    `base64 -d > "$d/bundle.$$.tmp" << 'ORCA_EOF_BUNDLE'`,
+    `base64 -d > "$d/bundle.$$.tmp" << 'GIRRA_EOF_BUNDLE'`,
     b64.trimEnd(),
-    'ORCA_EOF_BUNDLE',
+    'GIRRA_EOF_BUNDLE',
     `mv "$d/bundle.$$.tmp" "$d/${WSL_HOOK_RELAY_BUNDLE_NAME}"`,
-    `cat > "$d/launch.$$.tmp" << 'ORCA_EOF_LAUNCH'`,
+    `cat > "$d/launch.$$.tmp" << 'GIRRA_EOF_LAUNCH'`,
     buildGuestLaunchScript(version).trimEnd(),
-    'ORCA_EOF_LAUNCH',
+    'GIRRA_EOF_LAUNCH',
     'mv "$d/launch.$$.tmp" "$d/launch.sh"',
     'chmod 700 "$d/launch.sh"',
     // Version marker last: a partial install stays "stale" and reinstalls.
@@ -281,16 +281,16 @@ export function buildWslRelaySpawnEnv(
   const env: NodeJS.ProcessEnv = {
     ...process.env,
     WSL_UTF8: '1',
-    ORCA_AGENT_HOOK_PORT: coords.ORCA_AGENT_HOOK_PORT,
-    ORCA_AGENT_HOOK_TOKEN: coords.ORCA_AGENT_HOOK_TOKEN,
-    ORCA_AGENT_HOOK_ENV: coords.ORCA_AGENT_HOOK_ENV,
-    ORCA_AGENT_HOOK_VERSION: coords.ORCA_AGENT_HOOK_VERSION,
+    GIRRA_AGENT_HOOK_PORT: coords.GIRRA_AGENT_HOOK_PORT,
+    GIRRA_AGENT_HOOK_TOKEN: coords.GIRRA_AGENT_HOOK_TOKEN,
+    GIRRA_AGENT_HOOK_ENV: coords.GIRRA_AGENT_HOOK_ENV,
+    GIRRA_AGENT_HOOK_VERSION: coords.GIRRA_AGENT_HOOK_VERSION,
     [WSL_HOOK_RELAY_VERSION_ENV]: bundleVersion,
     [WSL_HOOK_RELAY_INSTANCE_ENV]: instanceKey
   }
   // Why: the relay derives its own guest endpoint path; a /p-translated
   // Windows endpoint here would only add WSLENV noise.
-  delete env.ORCA_AGENT_HOOK_ENDPOINT
+  delete env.GIRRA_AGENT_HOOK_ENDPOINT
   addOrcaWslInteropEnv(env as Record<string, string>)
   return env
 }

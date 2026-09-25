@@ -2,6 +2,7 @@
 
 // Girra Relay — remote-host daemon and reconnect bridge entry point.
 
+import './legacy-orca-env-adoption'
 import { parseRelayLaunchOptions, readRelayEndpointCredential } from './relay-launch-options'
 import { runRelayConnectChannel } from './relay-connect-channel'
 import { runRelayOrcaCliChannel } from './relay-orca-cli-channel'

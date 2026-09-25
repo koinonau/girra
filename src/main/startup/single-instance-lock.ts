@@ -4,10 +4,10 @@ import { writeStartupDiagnosticLine, type StartupDiagnosticSink } from './startu
 
 export const SINGLE_INSTANCE_LOCK_FAILURE_MESSAGE =
   '[single-instance] Another Girra instance is already running for this userData profile; exiting this launch after requesting the existing window. If no Girra process is running, this may be an Electron/macOS single-instance lock failure.'
-export const SINGLE_INSTANCE_LOCK_BYPASS_ENV = 'ORCA_BYPASS_SINGLE_INSTANCE_LOCK'
-export const SINGLE_INSTANCE_LOCK_E2E_ENFORCE_ENV = 'ORCA_E2E_ENFORCE_SINGLE_INSTANCE_LOCK'
+export const SINGLE_INSTANCE_LOCK_BYPASS_ENV = 'GIRRA_BYPASS_SINGLE_INSTANCE_LOCK'
+export const SINGLE_INSTANCE_LOCK_E2E_ENFORCE_ENV = 'GIRRA_E2E_ENFORCE_SINGLE_INSTANCE_LOCK'
 export const SINGLE_INSTANCE_LOCK_BYPASS_MESSAGE =
-  '[single-instance] ORCA_BYPASS_SINGLE_INSTANCE_LOCK=1 is set; bypassing the packaged macOS single-instance lock for diagnostics. Do not use this with another Girra instance running for the same profile.'
+  '[single-instance] GIRRA_BYPASS_SINGLE_INSTANCE_LOCK=1 is set; bypassing the packaged macOS single-instance lock for diagnostics. Do not use this with another Girra instance running for the same profile.'
 // Why: stable "another process owns this profile" contract that systemd RestartPreventExitStatus= keys off; changing it silently un-fixes #11935.
 export const SINGLE_INSTANCE_ALREADY_RUNNING_EXIT_CODE = 3
 

@@ -4,9 +4,9 @@
 // every official Node install does, at `<prefix>/include/node`. This drives the real deploy at a
 // Docker sshd whose nodejs.org resolves to 127.0.0.1 (ECONNREFUSED, exactly what the user saw).
 //
-// Run: ORCA_REVIEW_SSH_OFFLINE_HEADERS=1 pnpm test src/main/ssh/ssh-relay-offline-node-headers.docker.test.ts
-// Needs Docker and `pnpm build:relay`. ORCA_REVIEW_SSH_NODE_IMAGE picks the Node image
-// (default node:24.12.0-bookworm, the user's version); ORCA_REVIEW_SSH_TARGET_HOST overrides
+// Run: GIRRA_REVIEW_SSH_OFFLINE_HEADERS=1 pnpm test src/main/ssh/ssh-relay-offline-node-headers.docker.test.ts
+// Needs Docker and `pnpm build:relay`. GIRRA_REVIEW_SSH_NODE_IMAGE picks the Node image
+// (default node:24.12.0-bookworm, the user's version); GIRRA_REVIEW_SSH_TARGET_HOST overrides
 // the address the app connects to (default 127.0.0.1).
 import { execFileSync, spawnSync } from 'node:child_process'
 import { randomUUID } from 'node:crypto'
@@ -22,9 +22,9 @@ import { SshConnection } from './ssh-connection'
 import { deployAndLaunchRelay } from './ssh-relay-deploy'
 import type { SshTarget } from '../../shared/ssh-types'
 
-const RUN_REVIEW_ORACLE = process.env.ORCA_REVIEW_SSH_OFFLINE_HEADERS === '1'
-const NODE_IMAGE = process.env.ORCA_REVIEW_SSH_NODE_IMAGE ?? 'node:24.12.0-bookworm'
-const TARGET_HOST = process.env.ORCA_REVIEW_SSH_TARGET_HOST ?? '127.0.0.1'
+const RUN_REVIEW_ORACLE = process.env.GIRRA_REVIEW_SSH_OFFLINE_HEADERS === '1'
+const NODE_IMAGE = process.env.GIRRA_REVIEW_SSH_NODE_IMAGE ?? 'node:24.12.0-bookworm'
+const TARGET_HOST = process.env.GIRRA_REVIEW_SSH_TARGET_HOST ?? '127.0.0.1'
 
 type TargetFixture = {
   containerName: string

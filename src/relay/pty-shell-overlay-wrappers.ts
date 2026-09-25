@@ -18,8 +18,8 @@ import { buildZshStartupHook, type ZshStartupHookSpec } from '../main/zsh-startu
 const SHELL_READY_MARKER_ESCAPED = '\\033]777;orca-shell-ready\\007'
 
 // Why the relay no longer needs its own ZDOTDIR shape: it used to republish the
-// inherited value as ORCA_USER_ZDOTDIR so the later wrapper files could prefer
-// it over the spawn-time ORCA_ORIG_ZDOTDIR. There are no later wrapper files
+// inherited value as GIRRA_USER_ZDOTDIR so the later wrapper files could prefer
+// it over the spawn-time GIRRA_ORIG_ZDOTDIR. There are no later wrapper files
 // now, and ZDOTDIR itself carries the answer, so the relay and desktop bodies
 // are one template again.
 function getRelayZshWrapperSpec(): ZshStartupHookSpec {
@@ -65,8 +65,8 @@ fi
 # continuation. Modern readline defaults this on; force it for the rest.
 [[ $- == *i* ]] && bind 'set enable-bracketed-paste on' 2>/dev/null
 # Why: remote startup files can re-export user defaults after relay spawn.
-[[ -n "\${ORCA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${ORCA_OPENCODE_CONFIG_DIR}"
-[[ -n "\${ORCA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"\${ORCA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="\${ORCA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac
+[[ -n "\${GIRRA_OPENCODE_CONFIG_DIR:-}" ]] && export OPENCODE_CONFIG_DIR="\${GIRRA_OPENCODE_CONFIG_DIR}"
+[[ -n "\${GIRRA_REMOTE_CLI_BIN_DIR:-}" ]] && case ":$PATH:" in *:"\${GIRRA_REMOTE_CLI_BIN_DIR}":*) ;; *) export PATH="\${GIRRA_REMOTE_CLI_BIN_DIR}:$PATH" ;; esac
 ${BASH_HISTFILE_RESTORE_BLOCK}
 # Why: SSH bash sessions need the same command lifecycle markers as local
 # bash so agent rows stop showing "working" when the foreground command exits.

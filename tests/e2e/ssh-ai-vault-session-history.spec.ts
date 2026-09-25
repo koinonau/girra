@@ -11,11 +11,11 @@ import {
 import { connectDockerSshRelayTarget } from './helpers/docker-ssh-relay-connection'
 import { waitForActiveWorktree, waitForSessionReady } from './helpers/store'
 
-const RUN_DOCKER_SSH = process.env.ORCA_E2E_SSH_DOCKER === '1'
+const RUN_DOCKER_SSH = process.env.GIRRA_E2E_SSH_DOCKER === '1'
 const REMOTE_CLAUDE_PROJECT_DIR = '/root/.claude/projects/orca'
 
 test.describe('SSH Agent Session History', () => {
-  test.skip(!RUN_DOCKER_SSH, 'Set ORCA_E2E_SSH_DOCKER=1 to run Docker-backed SSH tests.')
+  test.skip(!RUN_DOCKER_SSH, 'Set GIRRA_E2E_SSH_DOCKER=1 to run Docker-backed SSH tests.')
   test.skip(process.platform === 'win32', 'Docker SSH tests use POSIX ssh tooling.')
 
   test('shows remote session history only for the SSH host and resumes Claude on that worktree', async ({

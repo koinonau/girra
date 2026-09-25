@@ -17,6 +17,7 @@ import {
   restoreOrStripOverlayEnv
 } from './pi-agent'
 import { AGENT_HOOK_RUNTIME_ENV_KEYS } from './spawn-env-keys'
+import { legacyOrcaEnvName } from '../../../../shared/legacy-orca-env-aliases'
 
 /**
  * Mutates `baseEnv` in place with all host-local PTY env vars and returns it.
@@ -54,25 +55,29 @@ export function buildPtyHostEnv(
     Object.assign(baseEnv, openCodeHookService.buildPtyEnv(id, preexistingOpenCodeConfigDir))
     if (baseEnv.OPENCODE_CONFIG_DIR) {
       // Why: ~/.zshrc can re-export the user's default after spawn; shell-ready wrappers restore this PTY-scoped value.
-      baseEnv.ORCA_OPENCODE_CONFIG_DIR = baseEnv.OPENCODE_CONFIG_DIR
+      baseEnv.GIRRA_OPENCODE_CONFIG_DIR = baseEnv.OPENCODE_CONFIG_DIR
       if (preexistingOpenCodeConfigDir) {
         // Why: nested Girra terminals inherit the overlay as OPENCODE_CONFIG_DIR; keep the real source so overlays don't mirror overlays.
-        baseEnv.ORCA_OPENCODE_SOURCE_CONFIG_DIR = preexistingOpenCodeConfigDir
+        baseEnv.GIRRA_OPENCODE_SOURCE_CONFIG_DIR = preexistingOpenCodeConfigDir
       } else {
-        delete baseEnv.ORCA_OPENCODE_SOURCE_CONFIG_DIR
+        delete baseEnv.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
       }
     }
   } else {
     restoreOrStripOverlayEnv(baseEnv, {
       primary: 'OPENCODE_CONFIG_DIR',
-      overlay: 'ORCA_OPENCODE_CONFIG_DIR',
-      source: 'ORCA_OPENCODE_SOURCE_CONFIG_DIR'
+      overlay: 'GIRRA_OPENCODE_CONFIG_DIR',
+      source: 'GIRRA_OPENCODE_SOURCE_CONFIG_DIR'
     })
   }
 
   // Why: strip inherited hook coordinates before injecting this PTY's fresh loopback receiver, so nested-terminal callbacks route to the owning pane.
   for (const key of AGENT_HOOK_RUNTIME_ENV_KEYS) {
     delete baseEnv[key]
+    const legacy = legacyOrcaEnvName(key)
+    if (legacy !== null) {
+      delete baseEnv[legacy]
+    }
   }
   if (opts.agentStatusHooksEnabled) {
     Object.assign(baseEnv, agentHookServer.buildPtyEnv())
@@ -82,19 +87,19 @@ export function buildPtyHostEnv(
       wslHookRelayManager.ensureForDistro(distro)
       const guestEndpoint = wslHookRelayManager.getGuestEndpointFilePath(distro)
       if (guestEndpoint) {
-        baseEnv.ORCA_AGENT_HOOK_ENDPOINT = guestEndpoint
+        baseEnv.GIRRA_AGENT_HOOK_ENDPOINT = guestEndpoint
       }
       // Why: OpenCode loads its status plugin from a guest config overlay, so point OPENCODE_CONFIG_DIR at the guest dir the relay materialized.
       const opencodeOverlayDir = wslHookRelayManager.getOpenCodeOverlayDir(distro)
       if (opencodeOverlayDir) {
         baseEnv.OPENCODE_CONFIG_DIR = opencodeOverlayDir
-        baseEnv.ORCA_OPENCODE_CONFIG_DIR = opencodeOverlayDir
-        delete baseEnv.ORCA_OPENCODE_SOURCE_CONFIG_DIR
+        baseEnv.GIRRA_OPENCODE_CONFIG_DIR = opencodeOverlayDir
+        delete baseEnv.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
       } else {
         // Why: relay not connected yet (or older guest bundle) — never cross the Windows overlay path into WSL; drop it so in-guest OpenCode uses its own config (pre-fix behavior, no status but no regression).
         delete baseEnv.OPENCODE_CONFIG_DIR
-        delete baseEnv.ORCA_OPENCODE_CONFIG_DIR
-        delete baseEnv.ORCA_OPENCODE_SOURCE_CONFIG_DIR
+        delete baseEnv.GIRRA_OPENCODE_CONFIG_DIR
+        delete baseEnv.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
       }
     }
   }
@@ -113,21 +118,21 @@ export function buildPtyHostEnv(
     // Why: nested PTYs must not inherit stale source or overlay state from another agent.
     restoreOrStripOverlayEnv(baseEnv, {
       primary: 'PI_CODING_AGENT_DIR',
-      overlay: 'ORCA_PI_CODING_AGENT_DIR',
-      source: 'ORCA_PI_SOURCE_AGENT_DIR'
+      overlay: 'GIRRA_PI_CODING_AGENT_DIR',
+      source: 'GIRRA_PI_SOURCE_AGENT_DIR'
     })
   }
 
   // Why: WSL shells need the managed userData root for shell-ready wrappers; dev-mode terminals need the same export so `girra` targets the live dev instance.
   if (opts.isWsl) {
-    baseEnv.ORCA_USER_DATA_PATH = opts.userDataPath
+    baseEnv.GIRRA_USER_DATA_PATH = opts.userDataPath
     // Why: exposing the managed WSL registration's own name scopes agent guidance to WSL without a bare-name shim.
-    baseEnv.ORCA_CLI_COMMAND = opts.isPackaged ? 'girra' : 'girra-dev'
+    baseEnv.GIRRA_CLI_COMMAND = opts.isPackaged ? 'girra' : 'girra-dev'
   } else {
     if (!opts.isPackaged) {
-      baseEnv.ORCA_USER_DATA_PATH ??= opts.userDataPath
+      baseEnv.GIRRA_USER_DATA_PATH ??= opts.userDataPath
     }
-    delete baseEnv.ORCA_CLI_COMMAND
+    delete baseEnv.GIRRA_CLI_COMMAND
   }
   prependOrcaCliDirToChildPath(baseEnv, {
     isPackaged: opts.isPackaged,

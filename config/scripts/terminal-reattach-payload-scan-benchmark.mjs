@@ -9,7 +9,7 @@
 import { performance } from 'node:perf_hooks'
 import { TerminalKittyKeyboardModeTracker } from '../../src/shared/terminal-kitty-keyboard-mode-tracker.ts'
 
-const ROUNDS = Number(process.env.ORCA_REATTACH_SCAN_BENCH_ROUNDS ?? '7')
+const ROUNDS = Number(process.env.GIRRA_REATTACH_SCAN_BENCH_ROUNDS ?? '7')
 const MIN_ITERATION_MS = 120
 
 // --- payload generation -----------------------------------------------------

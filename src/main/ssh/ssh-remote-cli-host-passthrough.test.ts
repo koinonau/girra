@@ -68,11 +68,11 @@ describe('buildHostCliEnv', () => {
     const env = buildHostCliEnv({
       hostEnv: { PATH: '/host/bin', NODE_OPTIONS: '--inspect' },
       remoteEnv: {
-        ORCA_TERMINAL_HANDLE: 'term_remote',
-        ORCA_WORKTREE_ID: 'repo::/home/alice/wt',
-        ORCA_PANE_KEY: 'pane-9',
-        ORCA_AGENT_LAUNCH_TOKEN: 'launch-secret',
-        ORCA_WORKSPACE_ID: 'ws-1',
+        GIRRA_TERMINAL_HANDLE: 'term_remote',
+        GIRRA_WORKTREE_ID: 'repo::/home/alice/wt',
+        GIRRA_PANE_KEY: 'pane-9',
+        GIRRA_AGENT_LAUNCH_TOKEN: 'launch-secret',
+        GIRRA_WORKSPACE_ID: 'ws-1',
         [ORCHESTRATION_COMPATIBILITY_HOST_KIND_ENV]: 'wsl',
         [ORCHESTRATION_COMPATIBILITY_HOST_ID_ENV]: 'caller-host',
         [ORCHESTRATION_COMPATIBILITY_HOST_INCARNATION_ENV]: 'caller-incarnation',
@@ -81,7 +81,7 @@ describe('buildHostCliEnv', () => {
         // subprocess (PATH would break host binary lookup; user-data would
         // retarget the CLI at a different local instance).
         PATH: '/remote/bin',
-        ORCA_USER_DATA_PATH: '/remote/user-data'
+        GIRRA_USER_DATA_PATH: '/remote/user-data'
       },
       userDataPath: '/host/user-data',
       remoteCwd: '/home/alice/wt/sub',
@@ -93,39 +93,39 @@ describe('buildHostCliEnv', () => {
       }
     })
 
-    expect(env.ORCA_TERMINAL_HANDLE).toBe('term_remote')
-    expect(env.ORCA_WORKTREE_ID).toBe('repo::/home/alice/wt')
-    expect(env.ORCA_PANE_KEY).toBe('pane-9')
-    expect(env.ORCA_AGENT_LAUNCH_TOKEN).toBe('launch-secret')
-    expect(env.ORCA_WORKSPACE_ID).toBe('ws-1')
+    expect(env.GIRRA_TERMINAL_HANDLE).toBe('term_remote')
+    expect(env.GIRRA_WORKTREE_ID).toBe('repo::/home/alice/wt')
+    expect(env.GIRRA_PANE_KEY).toBe('pane-9')
+    expect(env.GIRRA_AGENT_LAUNCH_TOKEN).toBe('launch-secret')
+    expect(env.GIRRA_WORKSPACE_ID).toBe('ws-1')
     expect(env[ORCHESTRATION_COMPATIBILITY_HOST_KIND_ENV]).toBe('ssh')
     expect(env[ORCHESTRATION_COMPATIBILITY_HOST_ID_ENV]).toBe('saved-target')
     expect(env[ORCHESTRATION_COMPATIBILITY_HOST_INCARNATION_ENV]).toBe('connection-incarnation')
     expect(env[ORCHESTRATION_COMPATIBILITY_ATTACHMENT_ENV]).toBe('runtime-attachment')
     expect(env.PATH).toBe('/host/bin')
-    expect(env.ORCA_USER_DATA_PATH).toBe('/host/user-data')
-    expect(env.ORCA_CLI_CWD).toBe('/home/alice/wt/sub')
-    expect(env.ORCA_CLI_COMMAND).toBe('orca')
+    expect(env.GIRRA_USER_DATA_PATH).toBe('/host/user-data')
+    expect(env.GIRRA_CLI_CWD).toBe('/home/alice/wt/sub')
+    expect(env.GIRRA_CLI_COMMAND).toBe('orca')
     expect(env.ELECTRON_RUN_AS_NODE).toBe('1')
     expect(env.NODE_OPTIONS).toBeUndefined()
-    expect(env.ORCA_NODE_OPTIONS).toBe('--inspect')
+    expect(env.GIRRA_NODE_OPTIONS).toBe('--inspect')
   })
 
   it.each([
-    ['dev host', { ORCA_DEV_REPO_ROOT: '/repo', ORCA_CLI_COMMAND: 'orca-dev' }],
-    ['packaged Linux host', { ORCA_CLI_COMMAND: 'orca-ide' }],
+    ['dev host', { GIRRA_DEV_REPO_ROOT: '/repo', GIRRA_CLI_COMMAND: 'orca-dev' }],
+    ['packaged Linux host', { GIRRA_CLI_COMMAND: 'orca-ide' }],
     ['local host', {}],
-    ['WSL host', { WSL_DISTRO_NAME: 'Ubuntu', ORCA_CLI_COMMAND: 'orca-ide' }],
+    ['WSL host', { WSL_DISTRO_NAME: 'Ubuntu', GIRRA_CLI_COMMAND: 'orca-ide' }],
     ['Windows host', { ComSpec: 'C:\\Windows\\System32\\cmd.exe' }]
   ])('pins %s recovery to the remote shim', (_name, hostEnv) => {
     const env = buildHostCliEnv({
       hostEnv,
-      remoteEnv: { ORCA_CLI_COMMAND: 'untrusted-remote-command' },
+      remoteEnv: { GIRRA_CLI_COMMAND: 'untrusted-remote-command' },
       userDataPath: '/host/user-data',
       remoteCwd: '/srv/repo'
     })
 
-    expect(env.ORCA_CLI_COMMAND).toBe('orca')
+    expect(env.GIRRA_CLI_COMMAND).toBe('orca')
   })
 })
 
@@ -239,7 +239,7 @@ describe('runHostOrcaCliPassthrough', () => {
       {
         argv: ['orchestration', 'task-create', '--spec', 'do the thing', '--json'],
         cwd: '/home/alice/wt',
-        env: { ORCA_TERMINAL_HANDLE: 'term_remote' }
+        env: { GIRRA_TERMINAL_HANDLE: 'term_remote' }
       },
       { ...BASE_OPTIONS, spawn: spawn as never }
     )
@@ -268,8 +268,8 @@ describe('runHostOrcaCliPassthrough', () => {
       '--json'
     ])
     expect(options.env.ELECTRON_RUN_AS_NODE).toBe('1')
-    expect(options.env.ORCA_CLI_CWD).toBe('/home/alice/wt')
-    expect(options.env.ORCA_TERMINAL_HANDLE).toBe('term_remote')
+    expect(options.env.GIRRA_CLI_CWD).toBe('/home/alice/wt')
+    expect(options.env.GIRRA_TERMINAL_HANDLE).toBe('term_remote')
     // Why: stdin must be closed even without a payload so CLI handlers that
     // stream stdin see EOF instead of hanging forever.
     expect(child.stdin.end).toHaveBeenCalledWith()

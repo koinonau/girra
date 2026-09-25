@@ -2,15 +2,15 @@
 // this scope captures the real values once and puts them back afterwards.
 export function createPtyIpcProcessEnvScope() {
   const savedOpenCodeConfigDir = process.env.OPENCODE_CONFIG_DIR
-  const savedOrcaOpenCodeConfigDir = process.env.ORCA_OPENCODE_CONFIG_DIR
-  const savedOrcaOpenCodeSourceConfigDir = process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR
+  const savedOrcaOpenCodeConfigDir = process.env.GIRRA_OPENCODE_CONFIG_DIR
+  const savedOrcaOpenCodeSourceConfigDir = process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
   const savedPiAgentDir = process.env.PI_CODING_AGENT_DIR
-  const savedOrcaPiAgentDir = process.env.ORCA_PI_CODING_AGENT_DIR
-  const savedOrcaPiSourceAgentDir = process.env.ORCA_PI_SOURCE_AGENT_DIR
-  const savedOrcaClaudeAgentStatusSettings = process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS
+  const savedOrcaPiAgentDir = process.env.GIRRA_PI_CODING_AGENT_DIR
+  const savedOrcaPiSourceAgentDir = process.env.GIRRA_PI_SOURCE_AGENT_DIR
+  const savedOrcaClaudeAgentStatusSettings = process.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS
   const savedProcessPlatform = Object.getOwnPropertyDescriptor(process, 'platform')
-  const savedDisableMacosLoginShell = process.env.ORCA_DISABLE_MACOS_LOGIN_SHELL
-  const savedOrcaUserDataPath = process.env.ORCA_USER_DATA_PATH
+  const savedDisableMacosLoginShell = process.env.GIRRA_DISABLE_MACOS_LOGIN_SHELL
+  const savedOrcaUserDataPath = process.env.GIRRA_USER_DATA_PATH
 
   function applyTestEnvDefaults() {
     // Why: most PTY spawn tests assert POSIX shell behavior; Windows cases opt into win32 explicitly below.
@@ -19,15 +19,15 @@ export function createPtyIpcProcessEnvScope() {
       value: 'darwin'
     })
     // Why: forced darwin makes the TCC login(1) wrapper rewrite every asserted argv; its own test below re-enables it.
-    process.env.ORCA_DISABLE_MACOS_LOGIN_SHELL = '1'
+    process.env.GIRRA_DISABLE_MACOS_LOGIN_SHELL = '1'
     delete process.env.OPENCODE_CONFIG_DIR
-    delete process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR
-    delete process.env.ORCA_OPENCODE_CONFIG_DIR
-    delete process.env.ORCA_AGENT_HOOK_ENDPOINT
-    delete process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS
+    delete process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
+    delete process.env.GIRRA_OPENCODE_CONFIG_DIR
+    delete process.env.GIRRA_AGENT_HOOK_ENDPOINT
+    delete process.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS
     delete process.env.PI_CODING_AGENT_DIR
-    delete process.env.ORCA_PI_SOURCE_AGENT_DIR
-    delete process.env.ORCA_PI_CODING_AGENT_DIR
+    delete process.env.GIRRA_PI_SOURCE_AGENT_DIR
+    delete process.env.GIRRA_PI_CODING_AGENT_DIR
   }
 
   function restoreProcessEnv() {
@@ -35,14 +35,14 @@ export function createPtyIpcProcessEnvScope() {
       Object.defineProperty(process, 'platform', savedProcessPlatform)
     }
     if (savedDisableMacosLoginShell !== undefined) {
-      process.env.ORCA_DISABLE_MACOS_LOGIN_SHELL = savedDisableMacosLoginShell
+      process.env.GIRRA_DISABLE_MACOS_LOGIN_SHELL = savedDisableMacosLoginShell
     } else {
-      delete process.env.ORCA_DISABLE_MACOS_LOGIN_SHELL
+      delete process.env.GIRRA_DISABLE_MACOS_LOGIN_SHELL
     }
     if (savedOrcaUserDataPath !== undefined) {
-      process.env.ORCA_USER_DATA_PATH = savedOrcaUserDataPath
+      process.env.GIRRA_USER_DATA_PATH = savedOrcaUserDataPath
     } else {
-      delete process.env.ORCA_USER_DATA_PATH
+      delete process.env.GIRRA_USER_DATA_PATH
     }
     if (savedOpenCodeConfigDir !== undefined) {
       process.env.OPENCODE_CONFIG_DIR = savedOpenCodeConfigDir
@@ -50,14 +50,14 @@ export function createPtyIpcProcessEnvScope() {
       delete process.env.OPENCODE_CONFIG_DIR
     }
     if (savedOrcaOpenCodeConfigDir !== undefined) {
-      process.env.ORCA_OPENCODE_CONFIG_DIR = savedOrcaOpenCodeConfigDir
+      process.env.GIRRA_OPENCODE_CONFIG_DIR = savedOrcaOpenCodeConfigDir
     } else {
-      delete process.env.ORCA_OPENCODE_CONFIG_DIR
+      delete process.env.GIRRA_OPENCODE_CONFIG_DIR
     }
     if (savedOrcaOpenCodeSourceConfigDir !== undefined) {
-      process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR = savedOrcaOpenCodeSourceConfigDir
+      process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR = savedOrcaOpenCodeSourceConfigDir
     } else {
-      delete process.env.ORCA_OPENCODE_SOURCE_CONFIG_DIR
+      delete process.env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR
     }
     if (savedPiAgentDir !== undefined) {
       process.env.PI_CODING_AGENT_DIR = savedPiAgentDir
@@ -65,19 +65,19 @@ export function createPtyIpcProcessEnvScope() {
       delete process.env.PI_CODING_AGENT_DIR
     }
     if (savedOrcaPiAgentDir !== undefined) {
-      process.env.ORCA_PI_CODING_AGENT_DIR = savedOrcaPiAgentDir
+      process.env.GIRRA_PI_CODING_AGENT_DIR = savedOrcaPiAgentDir
     } else {
-      delete process.env.ORCA_PI_CODING_AGENT_DIR
+      delete process.env.GIRRA_PI_CODING_AGENT_DIR
     }
     if (savedOrcaPiSourceAgentDir === undefined) {
-      delete process.env.ORCA_PI_SOURCE_AGENT_DIR
+      delete process.env.GIRRA_PI_SOURCE_AGENT_DIR
     } else {
-      process.env.ORCA_PI_SOURCE_AGENT_DIR = savedOrcaPiSourceAgentDir
+      process.env.GIRRA_PI_SOURCE_AGENT_DIR = savedOrcaPiSourceAgentDir
     }
     if (savedOrcaClaudeAgentStatusSettings === undefined) {
-      delete process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS
+      delete process.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS
     } else {
-      process.env.ORCA_CLAUDE_AGENT_STATUS_SETTINGS = savedOrcaClaudeAgentStatusSettings
+      process.env.GIRRA_CLAUDE_AGENT_STATUS_SETTINGS = savedOrcaClaudeAgentStatusSettings
     }
   }
 

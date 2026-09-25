@@ -163,7 +163,7 @@ describe('PluginPanel', () => {
 
   it('remounts with fresh host theme tokens when the app theme changes', async () => {
     readPanelEntryMock.mockResolvedValue({
-      html: '<html class="__ORCA_COLOR_SCHEME__"><head><style>:root{/*__ORCA_PANEL_TOKENS__*/}</style></head>',
+      html: '<html class="__GIRRA_COLOR_SCHEME__"><head><style>:root{/*__GIRRA_PANEL_TOKENS__*/}</style></head>',
       sessionToken: SESSION_TOKEN
     })
     await renderPanel('plugin:orca-samples.my-plugin/dashboard')

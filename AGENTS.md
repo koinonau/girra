@@ -4,7 +4,7 @@ All UI work — layout, color, typography, spacing, component selection, UX beha
 
 ## Electron UI Validation
 
-Always run tests and agent-launched apps in the background with `ORCA_BACKGROUND_LAUNCH=1`.
+Always run tests and agent-launched apps in the background with `GIRRA_BACKGROUND_LAUNCH=1`.
 Never steal monitor focus or reveal test windows: no `show()`, `showInactive()`, `bringToFront()`,
 `app.focus()`, or OS activation. Use CDP screenshots of hidden renderers. Keep native-focus and
 visible-window tests paused on the user's desktop; run them on an isolated display or CI.
@@ -75,6 +75,15 @@ The execution host owns agent status in one store, the hook server's, and every 
 ## Agent Terminal Screens
 
 A rule that reads what an agent CLI paints on a terminal — readiness, blocked prompts, idle — must be written against a captured transcript, not a remembered screen. Record one with [`docs/reference/agent-pty-transcript-capture.md`](./docs/reference/agent-pty-transcript-capture.md), which keeps escapes and wrapping intact and scrubs account identifiers before they reach git.
+
+## Girra and Orca Names
+
+Girra's environment variables are `GIRRA_*` and its per-user directory is
+`~/.girra`. Orca's `ORCA_*` and `~/.orca` are still read, because a hook script,
+a remote CLI shim or a headless server outlives the build that wrote it. Write
+new code against the Girra names only, and before adding a per-call-site
+fallback or touching either compatibility seam, read
+[`docs/reference/girra-and-orca-names.md`](./docs/reference/girra-and-orca-names.md).
 
 ## Remote Wire Compatibility
 

@@ -175,12 +175,12 @@ async function createFakeClaudeCommand(tempDir, args) {
 }
 
 async function parentMain() {
-  const cli = argValue('cli', process.env.ORCA_REPRO_CLI ?? 'orca')
+  const cli = argValue('cli', process.env.GIRRA_REPRO_CLI ?? 'orca')
   const cwd = path.resolve(argValue('worktree', process.cwd()))
   const timeoutMs = parsePositiveInteger('timeout-ms', DEFAULT_TIMEOUT_MS)
   const tempDir = path.join(tmpdir(), `orca-terminal-send-submit-${process.pid}-${Date.now()}`)
   const reportPath = path.resolve(argValue('report', path.join(tempDir, 'report.json')))
-  const marker = argValue('marker', `ORCA_TERMINAL_SEND_${process.pid}_${Date.now()}`)
+  const marker = argValue('marker', `GIRRA_TERMINAL_SEND_${process.pid}_${Date.now()}`)
   const prompt = `${marker} ${'slow composer payload '.repeat(24)}`
   const expectUnsubmitted = hasFlag('expect-unsubmitted')
   const expectBlocked = hasFlag('expect-blocked')
@@ -368,7 +368,7 @@ async function fakeAgentMain() {
     }
     finished = true
     const report = await writeReport(true)
-    process.stdout.write(`\nORCA_TERMINAL_SEND_REPORT ${report.contractOk ? 'ok' : 'rescued'}\n`)
+    process.stdout.write(`\nGIRRA_TERMINAL_SEND_REPORT ${report.contractOk ? 'ok' : 'rescued'}\n`)
     process.exit(report.contractOk ? 0 : 7)
   }
 

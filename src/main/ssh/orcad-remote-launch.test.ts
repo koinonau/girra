@@ -23,7 +23,7 @@ const SPEC = {
   remoteInstallDir: '/home/u/.orca-remote/orcad-0.2.0+bb01',
   nodePath: '/usr/bin/node',
   fullVersion: '0.2.0+bb01',
-  userDataDir: '/home/u/.orca',
+  userDataDir: '/home/u/.girra',
   bindHost: '127.0.0.1',
   port: 7777
 }
@@ -54,8 +54,8 @@ describe('orcadLaunchCommand', () => {
 
   it('exports the version and the shared data root the deploy decided on', () => {
     const command = orcadLaunchCommand(posix, SPEC)
-    expect(command).toContain(`ORCA_VERSION '${SPEC.fullVersion}'`.replace(' ', '='))
-    expect(command).toContain(`ORCA_USER_DATA='${SPEC.userDataDir}'`)
+    expect(command).toContain(`GIRRA_VERSION '${SPEC.fullVersion}'`.replace(' ', '='))
+    expect(command).toContain(`GIRRA_USER_DATA='${SPEC.userDataDir}'`)
   })
 
   it('declares the Windows refusal instead of emitting a command that cannot work', () => {

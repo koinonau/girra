@@ -16,7 +16,7 @@ import {
 import { ensureTerminalVisible, waitForActiveWorktree, waitForSessionReady } from './helpers/store'
 import { attachRepoAndOpenTerminal, createRestartSession } from './helpers/orca-restart'
 import { PROTOCOL_VERSION } from '../../src/main/daemon/types'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 
 const PROVIDER_SESSION_ID = 'e2e-live-force-exit-session'
 
@@ -43,7 +43,7 @@ type PersistedData = {
 
 function dataFilePath(userDataDir: string): string {
   // Fresh sessions migrate the seeded legacy file, then persist only here.
-  return path.join(userDataDir, 'profiles', DEFAULT_LOCAL_ORCA_PROFILE_ID, 'orca-data.json')
+  return path.join(userDataDir, 'profiles', DEFAULT_LOCAL_GIRRA_PROFILE_ID, 'orca-data.json')
 }
 
 function readPersistedData(userDataDir: string): PersistedData {

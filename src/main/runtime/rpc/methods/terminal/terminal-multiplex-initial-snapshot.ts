@@ -18,7 +18,7 @@ export async function publishMultiplexInitialSnapshot(
   const { runtime, streams, emit } = state
   const { ptyId } = stream
   const forcedInitialSnapshotTruncated =
-    process.env.ORCA_E2E_FORCE_REMOTE_TERMINAL_INITIAL_SNAPSHOT_TRUNCATED === '1'
+    process.env.GIRRA_E2E_FORCE_REMOTE_TERMINAL_INITIAL_SNAPSHOT_TRUNCATED === '1'
   let read = await runtime.readTerminal(request.terminal)
   let serialized = await serializeInitialStreamSnapshot(runtime, ptyId)
   if (state.closed || streams.get(request.streamId) !== stream) {

@@ -67,8 +67,8 @@ describe('OrcaRuntimeService', () => {
       runnerScriptPath: 'C:\\tmp\\repo\\.git\\orca\\setup-runner.sh',
       shell: { family: 'posix', executable: 'wsl.exe' },
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-headless-startup-setup'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-headless-startup-setup'
       },
       waitForAgentStartup: true
     })
@@ -153,8 +153,8 @@ describe('OrcaRuntimeService', () => {
     vi.mocked(createSetupRunnerScript).mockReturnValue({
       runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-headless-parallel'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-headless-parallel'
       }
     })
     vi.mocked(listWorktrees).mockResolvedValue([
@@ -182,7 +182,7 @@ describe('OrcaRuntimeService', () => {
     expect(spawn).toHaveBeenNthCalledWith(
       2,
       expect.objectContaining({
-        command: expect.stringContaining('__ORCA_SETUP_COMPLETE__:')
+        command: expect.stringContaining('__GIRRA_SETUP_COMPLETE__:')
       })
     )
     expect(result.setupReceipt).toMatchObject({
@@ -230,8 +230,8 @@ describe('OrcaRuntimeService', () => {
       runnerScriptPath: 'C:\\tmp\\repo\\.git\\orca\\setup-runner.sh',
       shell: { family: 'posix', executable: 'wsl.exe' },
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-observed-wsl-shell'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-observed-wsl-shell'
       }
     })
     vi.mocked(listWorktrees).mockResolvedValue([
@@ -256,7 +256,7 @@ describe('OrcaRuntimeService', () => {
     await vi.waitFor(() => expect(spawn).toHaveBeenCalledTimes(2))
     const setupCommand = (spawn.mock.calls[1]![0] as { command: string }).command
     expect(setupCommand).toContain('bash /mnt/c/tmp/repo/.git/orca/setup-runner.sh')
-    expect(setupCommand).toContain('__ORCA_SETUP_COMPLETE__:')
+    expect(setupCommand).toContain('__GIRRA_SETUP_COMPLETE__:')
   })
 
   it('creates the first terminal for CLI-created worktrees without activating them', async () => {
@@ -314,8 +314,8 @@ describe('OrcaRuntimeService', () => {
     const initialSpawnEnv =
       (spawn.mock.calls[0]?.[0] as { env?: Record<string, string> } | undefined)?.env ?? {}
     expectStablePaneKeyEnv(initialSpawnEnv)
-    const initialLeafId = initialSpawnEnv.ORCA_PANE_KEY.slice(
-      `${initialSpawnEnv.ORCA_TAB_ID}:`.length
+    const initialLeafId = initialSpawnEnv.GIRRA_PANE_KEY.slice(
+      `${initialSpawnEnv.GIRRA_TAB_ID}:`.length
     )
     // Why: the renderer treats a missing surfaceOwner as "reveal the owner", which
     // scrolled the sidebar to background CLI creates.
@@ -324,7 +324,7 @@ describe('OrcaRuntimeService', () => {
       title: null,
       activate: false,
       surfaceOwner: false,
-      tabId: initialSpawnEnv.ORCA_TAB_ID,
+      tabId: initialSpawnEnv.GIRRA_TAB_ID,
       leafId: initialLeafId
     })
   })
@@ -549,8 +549,8 @@ describe('OrcaRuntimeService', () => {
     vi.mocked(createSetupRunnerScript).mockReturnValue({
       runnerScriptPath: '/tmp/repo/.git/orca/setup-runner.sh',
       envVars: {
-        ORCA_ROOT_PATH: '/tmp/repo',
-        ORCA_WORKTREE_PATH: '/tmp/workspaces/runtime-cli-setup-split'
+        GIRRA_ROOT_PATH: '/tmp/repo',
+        GIRRA_WORKTREE_PATH: '/tmp/workspaces/runtime-cli-setup-split'
       }
     })
     vi.mocked(listWorktrees).mockResolvedValue([
@@ -575,13 +575,13 @@ describe('OrcaRuntimeService', () => {
     const setupEnv = (spawn.mock.calls[1]![0] as { env?: Record<string, string> }).env ?? {}
     expectStablePaneKeyEnv(mainEnv)
     expectStablePaneKeyEnv(setupEnv)
-    expect(setupEnv.ORCA_TAB_ID).toBe(mainEnv.ORCA_TAB_ID)
-    const mainLeafId = mainEnv.ORCA_PANE_KEY!.slice(`${mainEnv.ORCA_TAB_ID!}:`.length)
+    expect(setupEnv.GIRRA_TAB_ID).toBe(mainEnv.GIRRA_TAB_ID)
+    const mainLeafId = mainEnv.GIRRA_PANE_KEY!.slice(`${mainEnv.GIRRA_TAB_ID!}:`.length)
     expect(revealTerminalSession).toHaveBeenLastCalledWith(
       result.worktree.id,
       expect.objectContaining({
         ptyId: 'pty-cli-setup-setup',
-        tabId: mainEnv.ORCA_TAB_ID,
+        tabId: mainEnv.GIRRA_TAB_ID,
         activate: false,
         splitFromLeafId: mainLeafId,
         splitDirection: 'vertical'

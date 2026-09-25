@@ -40,7 +40,7 @@ function sh(command: string): string {
 
 beforeEach(() => {
   root = mkdtempSync(join(tmpdir(), 'orcad-shell-'))
-  dataDir = join(root, '.orca')
+  dataDir = join(root, '.girra')
   snapshotDir = join(root, 'snapshots', 'pre-0.2.0+bb01-1000')
   versionDir = join(root, '.orca-remote', 'orcad-0.2.0+bb01')
   mkdirSync(join(dataDir, 'profiles', 'p1'), { recursive: true })

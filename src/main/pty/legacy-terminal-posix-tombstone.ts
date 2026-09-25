@@ -100,10 +100,10 @@ export function readVerifiedShebangInterpreter(filePath: string): string | null 
   return isExecutable(interpreter) ? interpreter : null
 }
 
-const POSIX_TOMBSTONE = String.raw`#!__ORCA_INTERPRETER__
+const POSIX_TOMBSTONE = String.raw`#!__GIRRA_INTERPRETER__
 set -u
 
-command_name="__ORCA_COMMAND__"
+command_name="__GIRRA_COMMAND__"
 # Why this shape, rather than dirname: an unresolvable external would leave the substitution empty
 # and cd into it succeeds, silently making wrapper_dir the cwd. With no slash the %/* strip yields the
 # file name rather than a directory, so that case takes $PWD. CDPATH is cleared because cd searches
@@ -116,7 +116,7 @@ case "$wrapper_src" in
   *) wrapper_dir="$PWD" ;;
 esac
 [[ -n "$wrapper_dir" ]] || wrapper_dir="$PWD"
-legacy_wrapper_dir="${SHELL_DOLLAR}{ORCA_ATTRIBUTION_SHIM_DIR:-}"
+legacy_wrapper_dir="${SHELL_DOLLAR}{GIRRA_ATTRIBUTION_SHIM_DIR:-}"
 cleaned_path="${SHELL_DOLLAR}{PATH:-}"
 
 filter_path() {
@@ -154,7 +154,7 @@ filter_path() {
       # when either path is gone, which is when the lexical test still holds, so neither alone is
       # enough.
       # Why only for an absolute target: bash resolves a relative -ef operand against the current
-      # directory, so a relative ORCA_ATTRIBUTION_SHIM_DIR let the cwd decide which PATH entry
+      # directory, so a relative GIRRA_ATTRIBUTION_SHIM_DIR let the cwd decide which PATH entry
       # counted as the legacy directory and got a legitimate one skipped.
       :
     elif [[ "$entry" -ef "$wrapper_dir" ]]; then
@@ -170,8 +170,8 @@ filter_path() {
 }
 
 filter_path
-unset ORCA_ENABLE_GIT_ATTRIBUTION ORCA_GIT_COMMIT_TRAILER ORCA_GH_PR_FOOTER
-unset ORCA_GH_ISSUE_FOOTER ORCA_ATTRIBUTION_SHIM_DIR ORCA_REAL_GIT ORCA_REAL_GH ORCA_ATTRIBUTION_BYPASS
+unset GIRRA_ENABLE_GIT_ATTRIBUTION GIRRA_GIT_COMMIT_TRAILER GIRRA_GH_PR_FOOTER
+unset GIRRA_GH_ISSUE_FOOTER GIRRA_ATTRIBUTION_SHIM_DIR GIRRA_REAL_GIT GIRRA_REAL_GH GIRRA_ATTRIBUTION_BYPASS
 
 real_command=""
 if [[ "$path_entry_kept" == 1 ]]; then
@@ -191,8 +191,8 @@ export function renderLegacyTerminalPosixTombstone(
   command: 'git' | 'gh',
   interpreter: string = resolvePosixTombstoneInterpreter() ?? WINDOWS_POSIX_INTERPRETER
 ): string {
-  return POSIX_TOMBSTONE.replaceAll('__ORCA_INTERPRETER__', interpreter).replaceAll(
-    '__ORCA_COMMAND__',
+  return POSIX_TOMBSTONE.replaceAll('__GIRRA_INTERPRETER__', interpreter).replaceAll(
+    '__GIRRA_COMMAND__',
     command
   )
 }

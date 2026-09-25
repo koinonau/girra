@@ -10,7 +10,7 @@ describe('orchestration setup completion signal', () => {
     )
 
     expect(command).toContain('bash /repo/.git/orca/setup-runner.sh')
-    expect(command).toContain('__ORCA_SETUP_COMPLETE__:token-posix:%s\\n')
+    expect(command).toContain('__GIRRA_SETUP_COMPLETE__:token-posix:%s\\n')
     expect(command).toContain('"$status"')
     expect(command).toContain('exit "$status"')
   })
@@ -22,9 +22,9 @@ describe('orchestration setup completion signal', () => {
     const script = Buffer.from(encodedCommand ?? '', 'base64').toString('utf16le')
 
     expect(observed.command).toContain('powershell.exe -NoLogo -NoProfile -NonInteractive')
-    expect(observed.env).toEqual({ ORCA_SETUP_RUNNER_PATH: runnerPath })
+    expect(observed.env).toEqual({ GIRRA_SETUP_RUNNER_PATH: runnerPath })
     expect(script).toContain('& $runner')
-    expect(script).toContain('__ORCA_SETUP_COMPLETE__:token-windows:')
+    expect(script).toContain('__GIRRA_SETUP_COMPLETE__:token-windows:')
     expect(script).toContain('exit $status')
     expect(script).not.toContain(runnerPath)
   })
@@ -37,7 +37,7 @@ describe('orchestration setup completion signal', () => {
     )
 
     expect(command).toContain('bash /repo/.git/orca/setup-runner.sh')
-    expect(command).toContain('__ORCA_SETUP_COMPLETE__:token-wsl:%s\\n')
+    expect(command).toContain('__GIRRA_SETUP_COMPLETE__:token-wsl:%s\\n')
     expect(command).toContain('exit "$status"')
   })
 
@@ -74,20 +74,20 @@ describe('orchestration setup completion signal', () => {
 
     expect(observed.command).toContain('powershell.exe -NoLogo -NoProfile -NonInteractive')
     expect(observed.command).not.toContain('bash ')
-    expect(observed.env).toEqual({ ORCA_SETUP_RUNNER_PATH: runnerPath })
+    expect(observed.env).toEqual({ GIRRA_SETUP_RUNNER_PATH: runnerPath })
   })
 
   it('recognizes one completion signal across output chunk boundaries', () => {
     const onComplete = vi.fn()
     const scanner = createSetupCompletionScanner('token-chunks', onComplete)
 
-    scanner.scan('installing...\r\n__ORCA_SETUP_COMPLETE__:wrong:0\r\n__ORCA_SETUP_COMP')
+    scanner.scan('installing...\r\n__GIRRA_SETUP_COMPLETE__:wrong:0\r\n__GIRRA_SETUP_COMP')
     scanner.scan('LETE__:token-chunks:1')
     expect(onComplete).not.toHaveBeenCalled()
     scanner.scan('7\r')
     expect(onComplete).not.toHaveBeenCalled()
     scanner.scan('\nPS C:\\repo>')
-    scanner.scan('__ORCA_SETUP_COMPLETE__:token-chunks:0\r\n')
+    scanner.scan('__GIRRA_SETUP_COMPLETE__:token-chunks:0\r\n')
 
     expect(onComplete).toHaveBeenCalledOnce()
     expect(onComplete).toHaveBeenCalledWith(17)

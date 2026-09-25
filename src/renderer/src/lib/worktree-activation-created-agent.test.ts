@@ -35,7 +35,7 @@ function activateAndExpectNoRelaunch(
 }
 
 afterEach(() => {
-  delete (globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__
+  delete (globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__
   vi.unstubAllGlobals()
   resetWebSessionTabsSnapshotFreshnessForTests()
   resetWebRuntimeWakeTerminalRespawnForTests()
@@ -268,7 +268,7 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { repoId: worktree.repoId, worktreeId: worktree.id, activated: true }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+    ;(globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ = true
     vi.stubGlobal('window', {
       api: {
         runtimeEnvironments: {
@@ -336,7 +336,7 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { repoId: worktree.repoId, worktreeId: worktree.id, activated: true }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+    ;(globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ = true
     vi.stubGlobal('window', {
       api: {
         runtimeEnvironments: {
@@ -406,7 +406,7 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { repoId: worktree.repoId, worktreeId: worktree.id, activated: true }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+    ;(globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ = true
     vi.stubGlobal('window', {
       api: {
         runtimeEnvironments: {
@@ -463,7 +463,7 @@ describe('activateAndRevealWorktree', () => {
   it('does not respawn when the host snapshot still has terminal tabs', async () => {
     const worktree = makeWorktree()
     const callRuntimeEnvironment = vi.fn()
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+    ;(globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ = true
 
     useAppStore.setState({
       repos: [
@@ -544,7 +544,7 @@ describe('activateAndRevealWorktree', () => {
         ok: true,
         result: { tabId: 'host-tab-1', terminal: 'term_host' }
       })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+    ;(globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ = true
     vi.stubGlobal('window', {
       api: {
         runtimeEnvironments: {
@@ -626,7 +626,7 @@ describe('activateAndRevealWorktree', () => {
       ok: true,
       result: { tabId: 'host-tab-1', terminal: 'term_host' }
     })
-    ;(globalThis as { __ORCA_WEB_CLIENT__?: boolean }).__ORCA_WEB_CLIENT__ = true
+    ;(globalThis as { __GIRRA_WEB_CLIENT__?: boolean }).__GIRRA_WEB_CLIENT__ = true
     vi.stubGlobal('window', {
       api: {
         runtimeEnvironments: {

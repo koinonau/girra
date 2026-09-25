@@ -6,7 +6,7 @@ import { FEATURE_TIP_IDS } from '../../shared/feature-tips'
 import type { PersistedUIState } from '../../shared/persisted-ui-state-types'
 import type { Store } from '../persistence'
 
-export const DEV_SHOW_FIRST_RUN_EDUCATION_ENV = 'ORCA_DEV_SHOW_FIRST_RUN_EDUCATION'
+export const DEV_SHOW_FIRST_RUN_EDUCATION_ENV = 'GIRRA_DEV_SHOW_FIRST_RUN_EDUCATION'
 
 type DevEducationStore = Pick<Store, 'getUI' | 'updateUI'>
 
@@ -17,7 +17,7 @@ export function shouldSuppressDevEducation(args: {
   const env = args.env ?? process.env
   return (
     args.isDev &&
-    env.ORCA_E2E_USER_DATA_DIR === undefined &&
+    env.GIRRA_E2E_USER_DATA_DIR === undefined &&
     env[DEV_SHOW_FIRST_RUN_EDUCATION_ENV] !== '1'
   )
 }

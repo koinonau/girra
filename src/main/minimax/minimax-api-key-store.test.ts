@@ -23,7 +23,9 @@ const homedirMock = vi.fn(() => '/home/test')
 vi.mock('node:fs', () => ({
   existsSync: existsSyncMock,
   readFileSync: readFileSyncMock,
-  rmSync: rmSyncMock
+  rmSync: rmSyncMock,
+  // Why: girra-home-dir imports it, and a mock factory must cover every named import.
+  renameSync: vi.fn()
 }))
 
 vi.mock('node:os', () => ({
@@ -39,7 +41,7 @@ vi.mock('../../shared/secure-file', () => ({
   writeSecureFile: writeSecureFileMock
 }))
 
-const storePath = '/home/test/.orca/minimax-api-key.enc'
+const storePath = '/home/test/.girra/minimax-api-key.enc'
 const envelope = (kind: 'encrypted' | 'plaintext', value: string): string =>
   `orca-minimax-api-key:v1:${kind}:${Buffer.from(value, 'utf8').toString('base64')}`
 
@@ -48,7 +50,12 @@ async function loadStore(): Promise<typeof MiniMaxApiKeyStore> {
 }
 
 describe('minimax-api-key-store', () => {
-  beforeEach(() => {
+  beforeEach(async () => {
+    // Why: the per-user directory resolves through existsSync once per home, and
+    // without this it eats the first mockReturnValueOnce below. Imported here
+    // because a top-level import runs before the mock factories above exist.
+    const { getGirraHomeDir } = await import('../../shared/girra-home-dir')
+    getGirraHomeDir('/home/test')
     existsSyncMock.mockReset()
     readFileSyncMock.mockReset()
     rmSyncMock.mockReset()

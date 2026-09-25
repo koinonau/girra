@@ -13,7 +13,7 @@ import path from 'node:path'
 import type { ElectronApplication, Page } from '@stablyai/playwright-test'
 import { getHistorySessionDirName } from '../../src/main/daemon/history-paths'
 import { LOG_HEADER_BYTES } from '../../src/main/daemon/terminal-history-log'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../src/shared/orca-profiles'
 import type { RuntimeMobileSessionTabsResult } from '../../src/shared/runtime-types'
 import { toRemoteRuntimePtyId } from '../../src/shared/remote-runtime-pty-id'
 import { toWebTerminalSurfaceTabId } from '../../src/shared/terminal-surface-id'
@@ -117,7 +117,7 @@ type PersistedData = {
 }
 
 function persistedDataPath(userDataDir: string): string {
-  return path.join(userDataDir, 'profiles', DEFAULT_LOCAL_ORCA_PROFILE_ID, 'orca-data.json')
+  return path.join(userDataDir, 'profiles', DEFAULT_LOCAL_GIRRA_PROFILE_ID, 'orca-data.json')
 }
 
 function removePersistedTerminalBinding(

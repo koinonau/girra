@@ -33,7 +33,7 @@ function floodWithInputAcknowledgements(marker: string): string {
 }
 
 test.describe('five SSH panes under simultaneous output', () => {
-  test.skip(process.env.ORCA_E2E_SSH_DOCKER !== '1', 'Requires the Docker SSH target')
+  test.skip(process.env.GIRRA_E2E_SSH_DOCKER !== '1', 'Requires the Docker SSH target')
 
   test('each pane acknowledges keyboard input after hiding and reopening the flooding workspace', async ({
     orcaPage,

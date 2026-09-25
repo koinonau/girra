@@ -176,8 +176,8 @@ export async function launchPairedElectronClient(
     env: {
       ...homeIsolation.env,
       NODE_ENV: 'development',
-      ORCA_E2E_HEADLESS: '1',
-      ORCA_E2E_FORBID_LOCAL_SSH_CONNECT_PROBE: directSshProbePath
+      GIRRA_E2E_HEADLESS: '1',
+      GIRRA_E2E_FORBID_LOCAL_SSH_CONNECT_PROBE: directSshProbePath
     }
   })
 

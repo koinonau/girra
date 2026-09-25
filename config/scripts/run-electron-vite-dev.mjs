@@ -43,10 +43,10 @@ const rawForwardedArgs = process.argv.slice(2)
 // Why: keep an escape hatch for tools that key off Electron's stock app name.
 // The flag is runner-only and must not leak into Chromium/electron-vite.
 const useStableElectronName =
-  process.env.ORCA_DEV_STABLE_NAME === '1' || rawForwardedArgs.includes(STABLE_NAME_FLAG)
+  process.env.GIRRA_DEV_STABLE_NAME === '1' || rawForwardedArgs.includes(STABLE_NAME_FLAG)
 const forwardedRaw = rawForwardedArgs.filter((arg) => arg !== STABLE_NAME_FLAG)
 if (useStableElectronName) {
-  process.env.ORCA_DEV_STABLE_NAME = '1'
+  process.env.GIRRA_DEV_STABLE_NAME = '1'
 }
 
 function readGitValue(args) {
@@ -81,28 +81,28 @@ function createDockTitle(branch, label) {
 
 function seedDevInstanceIdentityEnv() {
   const branch =
-    process.env.ORCA_DEV_BRANCH ||
+    process.env.GIRRA_DEV_BRANCH ||
     readGitValue(['symbolic-ref', '--quiet', '--short', 'HEAD']) ||
     readGitValue(['rev-parse', '--short', 'HEAD'])
-  const worktreeName = process.env.ORCA_DEV_WORKTREE_NAME || path.basename(repoRoot)
-  const label = process.env.ORCA_DEV_INSTANCE_LABEL || formatDevInstanceLabel(branch, worktreeName)
-  const identitySeed = process.env.ORCA_DEV_INSTANCE_KEY || repoRoot
-  const dockTitle = process.env.ORCA_DEV_DOCK_TITLE || createDockTitle(branch, label)
+  const worktreeName = process.env.GIRRA_DEV_WORKTREE_NAME || path.basename(repoRoot)
+  const label = process.env.GIRRA_DEV_INSTANCE_LABEL || formatDevInstanceLabel(branch, worktreeName)
+  const identitySeed = process.env.GIRRA_DEV_INSTANCE_KEY || repoRoot
+  const dockTitle = process.env.GIRRA_DEV_DOCK_TITLE || createDockTitle(branch, label)
 
-  process.env.ORCA_DEV_REPO_ROOT ||= repoRoot
-  process.env.ORCA_DEV_INSTANCE_KEY ||= identitySeed
+  process.env.GIRRA_DEV_REPO_ROOT ||= repoRoot
+  process.env.GIRRA_DEV_INSTANCE_KEY ||= identitySeed
   if (branch) {
-    process.env.ORCA_DEV_BRANCH ||= branch
+    process.env.GIRRA_DEV_BRANCH ||= branch
   }
   if (worktreeName) {
-    process.env.ORCA_DEV_WORKTREE_NAME ||= worktreeName
+    process.env.GIRRA_DEV_WORKTREE_NAME ||= worktreeName
   }
   if (label) {
     // Why: parallel `pn dev` runs need a stable origin label for window titles,
     // Dock names, and automation sessions without re-running git in Electron.
-    process.env.ORCA_DEV_INSTANCE_LABEL ||= label
+    process.env.GIRRA_DEV_INSTANCE_LABEL ||= label
   }
-  process.env.ORCA_DEV_DOCK_TITLE ||= dockTitle
+  process.env.GIRRA_DEV_DOCK_TITLE ||= dockTitle
 }
 
 function setPlistValue(plistPath, key, value) {
@@ -175,8 +175,8 @@ function prepareMacDevElectronApp() {
     electronVersion = JSON.parse(readFileSync(electronPackagePath, 'utf8')).version ?? null
   } catch {}
 
-  const title = process.env.ORCA_DEV_DOCK_TITLE || 'Orca: dev'
-  const identityKey = process.env.ORCA_DEV_INSTANCE_KEY || repoRoot
+  const title = process.env.GIRRA_DEV_DOCK_TITLE || 'Orca: dev'
+  const identityKey = process.env.GIRRA_DEV_INSTANCE_KEY || repoRoot
   // v11: stop patching the branch title into Info.plist so every dev bundle signs to one cdhash.
   // A stale copy only emits extra fields the parser ignores, so narrowing its schema needs no bump.
   const bundleLayoutVersion = 'stable-cdhash-dock-name-from-bundle-dir-v11'
@@ -204,7 +204,7 @@ function prepareMacDevElectronApp() {
   // Electron drops clicks for notification ids it didn't create, so the
   // click is lost, not misdirected.
   const bundleId = DEV_BUNDLE_ID
-  process.env.ORCA_DEV_MACOS_BUNDLE_ID = bundleId
+  process.env.GIRRA_DEV_MACOS_BUNDLE_ID = bundleId
   // Why the patches are in the marker: bundleLayoutVersion alone does not cover them, so a cache
   // built before a patch value changed would be reused and keep presenting the old identity.
   const expectedMarker = JSON.stringify(
@@ -426,8 +426,8 @@ function restoreElectronFrameworkSymlinks(appPath) {
 }
 
 function getDevUserDataPath() {
-  if (process.env.ORCA_DEV_USER_DATA_PATH) {
-    return process.env.ORCA_DEV_USER_DATA_PATH
+  if (process.env.GIRRA_DEV_USER_DATA_PATH) {
+    return process.env.GIRRA_DEV_USER_DATA_PATH
   }
   if (process.platform === 'darwin') {
     return path.join(process.env.HOME ?? '', 'Library', 'Application Support', 'orca-dev')
@@ -463,22 +463,22 @@ function getElectronExecutable() {
   return path.join(repoRoot, 'node_modules', '.bin', 'electron')
 }
 
-if (process.env.ORCA_SKIP_DEV_CLI_PREPARE !== '1') {
+if (process.env.GIRRA_SKIP_DEV_CLI_PREPARE !== '1') {
   prepareDevCliWrapper()
 }
 
 seedDevInstanceIdentityEnv()
-if (!useStableElectronName && process.env.ORCA_SKIP_DEV_ELECTRON_APP_PREPARE !== '1') {
+if (!useStableElectronName && process.env.GIRRA_SKIP_DEV_ELECTRON_APP_PREPARE !== '1') {
   prepareMacDevElectronApp()
 }
 
 // Why: tests inject a tiny fake CLI here so they can verify Ctrl+C tears down
 // the full child tree without depending on a real electron-vite install.
 const electronViteCli =
-  process.env.ORCA_ELECTRON_VITE_CLI ||
+  process.env.GIRRA_ELECTRON_VITE_CLI ||
   path.join(path.dirname(require.resolve('electron-vite/package.json')), 'bin', 'electron-vite.js')
 const viteCli =
-  process.env.ORCA_VITE_CLI ||
+  process.env.GIRRA_VITE_CLI ||
   path.join(path.dirname(require.resolve('vite/package.json')), 'bin', 'vite.js')
 
 function getMtimeMs(filePath) {
@@ -532,14 +532,14 @@ function isDevWebClientFresh() {
 }
 
 function prepareDevWebClient() {
-  if (process.env.ORCA_SKIP_DEV_WEB_PREPARE === '1' || isHelpOrVersion) {
+  if (process.env.GIRRA_SKIP_DEV_WEB_PREPARE === '1' || isHelpOrVersion) {
     return
   }
   // Why: fresh worktrees should start Electron immediately; pairing already
   // falls back to non-browser URLs when the optional web bundle is unavailable.
-  if (!existsSync(getDevWebClientIndexPath()) && process.env.ORCA_DEV_WEB_PREPARE !== '1') {
+  if (!existsSync(getDevWebClientIndexPath()) && process.env.GIRRA_DEV_WEB_PREPARE !== '1') {
     console.error(
-      '[orca-dev] Web client bundle missing; skipping pairing web build. Run `pnpm run build:web` or set ORCA_DEV_WEB_PREPARE=1 when you need browser pairing.'
+      '[orca-dev] Web client bundle missing; skipping pairing web build. Run `pnpm run build:web` or set GIRRA_DEV_WEB_PREPARE=1 when you need browser pairing.'
     )
     return
   }
@@ -610,12 +610,12 @@ const userPassedPort = forwardedRaw.some(
 // Why: --help/--version exit immediately; binding a probe socket and printing
 // a debug-port line would be noise.
 const isHelpOrVersion = forwardedRaw.some((a) => a === '--help' || a === '-h' || a === '--version')
-if (!isHelpOrVersion && process.env.ORCA_DEV_INSTANCE_LABEL) {
-  console.error(`[orca-dev] Instance: ${process.env.ORCA_DEV_INSTANCE_LABEL}`)
+if (!isHelpOrVersion && process.env.GIRRA_DEV_INSTANCE_LABEL) {
+  console.error(`[orca-dev] Instance: ${process.env.GIRRA_DEV_INSTANCE_LABEL}`)
 }
 // Why: automation launches this app while someone is working; announce that the
 // window will come up without taking the foreground so the mode is visible in logs.
-if (!isHelpOrVersion && process.env.ORCA_BACKGROUND_LAUNCH === '1') {
+if (!isHelpOrVersion && process.env.GIRRA_BACKGROUND_LAUNCH === '1') {
   console.error('[orca-dev] Background launch: window stays off screen; automate through CDP')
 }
 let forwardedExtras = []

@@ -6,7 +6,7 @@ import { userInfo } from 'node:os'
 const ACTIVE_CLAUDE_SERVICE = 'Claude Code-credentials'
 // Why the old name survives the rebrand: an opaque service string no user sees, and renaming it
 // orphans every managed account behind one macOS keychain prompt each.
-const ORCA_CLAUDE_SERVICE = 'Orca Claude Code Managed Credentials'
+const GIRRA_CLAUDE_SERVICE = 'Orca Claude Code Managed Credentials'
 const KEYCHAIN_COMMAND_TIMEOUT_MS = 3_000
 
 type SecurityCommandResult = {
@@ -86,18 +86,18 @@ export async function deleteActiveClaudeKeychainCredentialsStrict(
 export async function readManagedClaudeKeychainCredentials(
   accountId: string
 ): Promise<string | null> {
-  return readKeychainPassword(ORCA_CLAUDE_SERVICE, accountId)
+  return readKeychainPassword(GIRRA_CLAUDE_SERVICE, accountId)
 }
 
 export async function writeManagedClaudeKeychainCredentials(
   accountId: string,
   contents: string
 ): Promise<void> {
-  await writeKeychainPassword(ORCA_CLAUDE_SERVICE, accountId, contents)
+  await writeKeychainPassword(GIRRA_CLAUDE_SERVICE, accountId, contents)
 }
 
 export async function deleteManagedClaudeKeychainCredentials(accountId: string): Promise<void> {
-  await deleteKeychainPassword(ORCA_CLAUDE_SERVICE, accountId)
+  await deleteKeychainPassword(GIRRA_CLAUDE_SERVICE, accountId)
 }
 
 const KEYCHAIN_ACCOUNT_PATTERN = /^[a-zA-Z0-9._-]+$/

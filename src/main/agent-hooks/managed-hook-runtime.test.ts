@@ -28,7 +28,7 @@ describe.runIf(process.platform !== 'win32')('installManagedHooks', () => {
 
     await expect(installManagedHooks(options)).resolves.toEqual({ installers: 0, errors: 0 })
 
-    // Why: no agent config home and no ~/.orca install lock.
+    // Why: no agent config home and no ~/.girra install lock.
     expect(await readdir(home)).toEqual([])
   })
 
@@ -49,6 +49,6 @@ describe.runIf(process.platform !== 'win32')('installManagedHooks', () => {
       errors: 0
     })
 
-    expect((await readdir(home)).sort()).toEqual(['.claude', '.orca'])
+    expect((await readdir(home)).sort()).toEqual(['.claude', '.girra'])
   })
 })

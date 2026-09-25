@@ -176,7 +176,7 @@ describe('SshRelaySession reconnect incarnation ordering', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     muxInstances.splice(0)
-    delete process.env.ORCA_FEATURE_REMOTE_AGENT_HOOKS
+    delete process.env.GIRRA_FEATURE_REMOTE_AGENT_HOOKS
     muxRequestMock.mockReset()
     muxRequestMock.mockResolvedValue([])
     vi.mocked(randomUUID).mockReset()

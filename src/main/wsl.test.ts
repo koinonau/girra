@@ -715,7 +715,7 @@ describe('wslUncDirectoryExists', () => {
   })
 
   it('returns true when the distro reports the directory exists', () => {
-    execFileSyncMock.mockReturnValue('__ORCA_DIRECTORY_EXISTS__')
+    execFileSyncMock.mockReturnValue('__GIRRA_DIRECTORY_EXISTS__')
     const result = withPlatform('win32', () =>
       wslUncDirectoryExists('\\\\wsl.localhost\\Ubuntu\\home\\jin\\repo')
     )
@@ -728,7 +728,7 @@ describe('wslUncDirectoryExists', () => {
         '--exec',
         'sh',
         '-c',
-        expect.stringContaining('__ORCA_DIRECTORY_EXISTS__'),
+        expect.stringContaining('__GIRRA_DIRECTORY_EXISTS__'),
         'sh',
         '/home/jin/repo'
       ],
@@ -737,7 +737,7 @@ describe('wslUncDirectoryExists', () => {
   })
 
   it('returns false when the guest reports the directory missing', () => {
-    execFileSyncMock.mockReturnValue('__ORCA_DIRECTORY_MISSING__')
+    execFileSyncMock.mockReturnValue('__GIRRA_DIRECTORY_MISSING__')
     const result = withPlatform('win32', () =>
       wslUncDirectoryExists('\\\\wsl.localhost\\Ubuntu\\home\\jin\\missing')
     )
@@ -772,7 +772,7 @@ describe('wslUncDirectoryExistsAsync', () => {
 
   it('returns true when the distro reports the directory exists', async () => {
     execFileMock.mockImplementation((_command, _args, _options, callback) =>
-      callback(null, '__ORCA_DIRECTORY_EXISTS__')
+      callback(null, '__GIRRA_DIRECTORY_EXISTS__')
     )
 
     await expect(
@@ -788,7 +788,7 @@ describe('wslUncDirectoryExistsAsync', () => {
         '--exec',
         'sh',
         '-c',
-        expect.stringContaining('__ORCA_DIRECTORY_EXISTS__'),
+        expect.stringContaining('__GIRRA_DIRECTORY_EXISTS__'),
         'sh',
         '/home/jin/repo'
       ],
@@ -800,7 +800,7 @@ describe('wslUncDirectoryExistsAsync', () => {
   it('distinguishes a missing directory from an inconclusive probe', async () => {
     execFileMock
       .mockImplementationOnce((_command, _args, _options, callback) =>
-        callback(null, '__ORCA_DIRECTORY_MISSING__')
+        callback(null, '__GIRRA_DIRECTORY_MISSING__')
       )
       .mockImplementationOnce((_command, _args, _options, callback) =>
         callback(Object.assign(new Error('distro unavailable'), { code: 4294967295 }), '')

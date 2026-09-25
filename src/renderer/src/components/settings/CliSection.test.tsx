@@ -5,8 +5,8 @@ import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { getDefaultSettings } from '../../../../shared/constants'
 import {
-  ORCA_CLI_SKILL_INSTALL_COMMAND,
-  ORCA_CLI_SKILL_UPDATE_COMMAND
+  GIRRA_CLI_SKILL_INSTALL_COMMAND,
+  GIRRA_CLI_SKILL_UPDATE_COMMAND
 } from '@/lib/agent-feature-install-commands'
 import { CliSection } from './CliSection'
 
@@ -140,8 +140,8 @@ describe('CliSection project runtime defaults', () => {
         sourceKinds: ['global']
       })
     )
-    expect(capturedPanel.props?.command).toBe(ORCA_CLI_SKILL_INSTALL_COMMAND)
-    expect(capturedPanel.props?.installedCommand).toBe(ORCA_CLI_SKILL_UPDATE_COMMAND)
+    expect(capturedPanel.props?.command).toBe(GIRRA_CLI_SKILL_INSTALL_COMMAND)
+    expect(capturedPanel.props?.installedCommand).toBe(GIRRA_CLI_SKILL_UPDATE_COMMAND)
     expect(capturedPanel.props?.terminalRuntime).toEqual({
       runtime: 'wsl',
       wslDistro: 'Ubuntu',

@@ -399,9 +399,9 @@ describe('registerPtyHandlers', () => {
         expect.objectContaining({
           cwd: '/tmp',
           env: expect.objectContaining({
-            ORCA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config',
+            GIRRA_OPENCODE_CONFIG_DIR: '/tmp/orca-opencode-config',
             // No `ready`: the fallback shell carries an overlay, not a startup command.
-            ORCA_SHELL_FEATURES: 'overlay,history,markers',
+            GIRRA_SHELL_FEATURES: 'overlay,history,markers',
             ZDOTDIR: join(getShellReadyWrapperRoot(), 'zsh')
           })
         })

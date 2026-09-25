@@ -79,7 +79,7 @@ jobs:
       - name: Build app
         run: pnpm build:release
 
-      # ORCA_MAC_RELEASE turns on the hardened runtime, forceCodeSigning and
+      # GIRRA_MAC_RELEASE turns on the hardened runtime, forceCodeSigning and
       # notarization; @electron/notarize staples the ticket onto the .app.
       # Why arm64 only: macos-latest is an Apple Silicon runner, so a second
       # architecture would cross-compile every native module for no local use.
@@ -89,7 +89,7 @@ jobs:
           timeout_minutes: 45
           max_attempts: 2
           retry_wait_seconds: 30
-          command: node config/scripts/ensure-native-runtime.mjs --runtime=electron && ORCA_MAC_RELEASE=1 pnpm exec electron-builder --config config/electron-builder.config.cjs --mac dmg --arm64 --publish never
+          command: node config/scripts/ensure-native-runtime.mjs --runtime=electron && GIRRA_MAC_RELEASE=1 pnpm exec electron-builder --config config/electron-builder.config.cjs --mac dmg --arm64 --publish never
         env:
           CSC_LINK: ${{ secrets.MAC_CERTS }}
           CSC_KEY_PASSWORD: ${{ secrets.MAC_CERTS_PASSWORD }}

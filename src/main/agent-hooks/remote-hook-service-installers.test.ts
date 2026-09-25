@@ -115,7 +115,7 @@ describe('remote hook service installers', () => {
     try {
       const installers = [
         {
-          path: '/home/dev/.orca/agent-hooks/claude-hook.sh',
+          path: '/home/dev/.girra/agent-hooks/claude-hook.sh',
           install: (sftp: SFTPWrapper) => new ClaudeHookService().installRemote(sftp, '/home/dev')
         }
       ]

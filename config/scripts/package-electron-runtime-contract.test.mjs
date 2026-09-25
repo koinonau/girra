@@ -254,8 +254,8 @@ describe('Electron runtime package contract', () => {
     expect(packageStep.with.command).toContain(
       'node config/scripts/ensure-native-runtime.mjs --runtime=electron'
     )
-    // ORCA_MAC_RELEASE is what turns on the hardened runtime and notarization.
-    expect(packageStep.with.command).toContain('ORCA_MAC_RELEASE=1')
+    // GIRRA_MAC_RELEASE is what turns on the hardened runtime and notarization.
+    expect(packageStep.with.command).toContain('GIRRA_MAC_RELEASE=1')
     expect(packageStep.with.command).toContain('--mac dmg --arm64')
     expect(packageStep.with.command).toContain('--publish never')
     expect(packageStep.with.command.indexOf('ensure-native-runtime')).toBeLessThan(

@@ -37,7 +37,7 @@ const ALL_GENERATION_PROTOCOLS = [
   ])
 ]
 const configuredReconnectBursts = Number.parseInt(
-  process.env.ORCA_DAEMON_GENERATION_RECONNECT_BURSTS ?? '3',
+  process.env.GIRRA_DAEMON_GENERATION_RECONNECT_BURSTS ?? '3',
   10
 )
 const RECONNECT_BURSTS =
@@ -139,7 +139,7 @@ function launchReconnectClient(options: {
       ...process.env,
       ELECTRON_RUN_AS_NODE: '1',
       NODE_PATH: path.join(process.cwd(), 'node_modules'),
-      ORCA_USER_DATA_PATH: runtime.userDataDir
+      GIRRA_USER_DATA_PATH: runtime.userDataDir
     },
     stdio: ['ignore', 'ignore', 'pipe', 'ipc']
   })

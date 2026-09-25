@@ -79,9 +79,9 @@ export class RelayAgentHookRuntime {
       const dir = this.pluginOverlay.materializeOpenCode(overlayId, sourceDir)
       if (dir) {
         env.OPENCODE_CONFIG_DIR = dir
-        env.ORCA_OPENCODE_CONFIG_DIR = dir
+        env.GIRRA_OPENCODE_CONFIG_DIR = dir
         if (sourceDir) {
-          env.ORCA_OPENCODE_SOURCE_CONFIG_DIR = sourceDir
+          env.GIRRA_OPENCODE_SOURCE_CONFIG_DIR = sourceDir
         }
       }
     }
@@ -98,7 +98,7 @@ export class RelayAgentHookRuntime {
       { materializeDefaultHome: isExplicitPiLaunch }
     )
     if (result) {
-      env.ORCA_PI_SOURCE_AGENT_DIR = result.sourceAgentDir
+      env.GIRRA_PI_SOURCE_AGENT_DIR = result.sourceAgentDir
     }
     return env
   }

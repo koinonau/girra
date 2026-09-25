@@ -1,6 +1,6 @@
 import { getPiTitlebarLifetimeSourceLines } from './titlebar-extension-lifetime-source'
 
-export const ORCA_PI_EXTENSION_FILE = 'orca-titlebar-spinner.ts'
+export const GIRRA_PI_EXTENSION_FILE = 'orca-titlebar-spinner.ts'
 
 export function getPiTitlebarExtensionSource(): string {
   const uiPromptHandlers = [
@@ -91,13 +91,13 @@ export function getPiTitlebarExtensionSource(): string {
     '}',
     '',
     'export default function (pi) {',
-    '  if (!process.env.ORCA_PANE_KEY) return',
+    '  if (!process.env.GIRRA_PANE_KEY) return',
     '  // Why: child agents inherit the pane env, and the spinner is harmlessly',
     '  // per-process, but the needs-input marker is status the pane reports, so only',
-    '  // one process may assert it. Mirrors ORCA_PI_STATUS_OWNED in the status hook.',
-    '  const markerOwnerPid = process.env.ORCA_PI_TITLE_MARKER_OWNED',
+    '  // one process may assert it. Mirrors GIRRA_PI_STATUS_OWNED in the status hook.',
+    '  const markerOwnerPid = process.env.GIRRA_PI_TITLE_MARKER_OWNED',
     '  const ownsMarker = !markerOwnerPid || markerOwnerPid === String(process.pid)',
-    '  if (ownsMarker) process.env.ORCA_PI_TITLE_MARKER_OWNED = String(process.pid)',
+    '  if (ownsMarker) process.env.GIRRA_PI_TITLE_MARKER_OWNED = String(process.pid)',
 
     ...getPiTitlebarLifetimeSourceLines(),
     '  let timer = null',

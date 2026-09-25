@@ -1,9 +1,9 @@
 import { spawn, spawnSync } from 'node:child_process'
 import path from 'node:path'
 
-export const MAX_ORCA_RPC_OUTPUT_BYTES = 20 * 1024 * 1024
+export const MAX_GIRRA_RPC_OUTPUT_BYTES = 20 * 1024 * 1024
 
-export function appendOrcaRpcOutput(output, chunk, bytes, limit = MAX_ORCA_RPC_OUTPUT_BYTES) {
+export function appendOrcaRpcOutput(output, chunk, bytes, limit = MAX_GIRRA_RPC_OUTPUT_BYTES) {
   const nextBytes = bytes + Buffer.byteLength(chunk)
   return {
     output: nextBytes > limit ? output : output + chunk,
@@ -14,10 +14,10 @@ export function appendOrcaRpcOutput(output, chunk, bytes, limit = MAX_ORCA_RPC_O
 
 // Why no platform: `girra` is the command on every platform since the rename.
 export function resolveOrcaCliCommand({ env = process.env } = {}) {
-  if (env.ORCA_CLI_COMMAND?.trim()) {
-    return env.ORCA_CLI_COMMAND.trim()
+  if (env.GIRRA_CLI_COMMAND?.trim()) {
+    return env.GIRRA_CLI_COMMAND.trim()
   }
-  if (env.ORCA_DEV_REPO_ROOT) {
+  if (env.GIRRA_DEV_REPO_ROOT) {
     return 'girra-dev'
   }
   return 'girra'
@@ -32,7 +32,7 @@ export function resolveOrcaCliInvocation({
   const commandName = platform === 'win32' ? path.win32.basename(command).toLowerCase() : command
   if (
     platform === 'win32' &&
-    env.ORCA_DEV_REPO_ROOT &&
+    env.GIRRA_DEV_REPO_ROOT &&
     (commandName === 'orca-dev' || commandName === 'orca-dev.cmd')
   ) {
     const defaultUserDataPath = path.win32.join(
@@ -41,22 +41,22 @@ export function resolveOrcaCliInvocation({
     )
     return {
       command: nodeExecutable,
-      prefixArgs: [path.win32.join(env.ORCA_DEV_REPO_ROOT, 'out', 'cli', 'index.js')],
+      prefixArgs: [path.win32.join(env.GIRRA_DEV_REPO_ROOT, 'out', 'cli', 'index.js')],
       env: {
         ...env,
-        ORCA_USER_DATA_PATH:
-          env.ORCA_USER_DATA_PATH ?? env.ORCA_DEV_USER_DATA_PATH ?? defaultUserDataPath,
-        ORCA_DEV_CLI_INVOCATION: '1',
-        ORCA_APP_EXECUTABLE:
-          env.ORCA_APP_EXECUTABLE ??
+        GIRRA_USER_DATA_PATH:
+          env.GIRRA_USER_DATA_PATH ?? env.GIRRA_DEV_USER_DATA_PATH ?? defaultUserDataPath,
+        GIRRA_DEV_CLI_INVOCATION: '1',
+        GIRRA_APP_EXECUTABLE:
+          env.GIRRA_APP_EXECUTABLE ??
           path.win32.join(
-            env.ORCA_DEV_REPO_ROOT,
+            env.GIRRA_DEV_REPO_ROOT,
             'node_modules',
             'electron',
             'dist',
             'electron.exe'
           ),
-        ORCA_APP_EXECUTABLE_NEEDS_APP_ROOT: '1'
+        GIRRA_APP_EXECUTABLE_NEEDS_APP_ROOT: '1'
       }
     }
   }
@@ -85,7 +85,7 @@ export function createOrcaRpc({
     const result = spawnSync(cliInvocation.command, commandArgs(args, opts.local), {
       encoding: 'utf8',
       env: cliInvocation.env,
-      maxBuffer: MAX_ORCA_RPC_OUTPUT_BYTES,
+      maxBuffer: MAX_GIRRA_RPC_OUTPUT_BYTES,
       timeout: opts.timeoutMs ?? 120_000
     })
     const elapsedMs = performance.now() - started

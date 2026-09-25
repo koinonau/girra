@@ -152,9 +152,9 @@ async function runBuiltCli(
   const child = spawn(process.execPath, [CLI_PATH, ...args], {
     env: {
       ...process.env,
-      ORCA_USER_DATA_PATH: userDataPath,
-      ORCA_TERMINAL_HANDLE: TERMINAL_HANDLE,
-      ORCA_PANE_KEY: PANE_KEY
+      GIRRA_USER_DATA_PATH: userDataPath,
+      GIRRA_TERMINAL_HANDLE: TERMINAL_HANDLE,
+      GIRRA_PANE_KEY: PANE_KEY
     },
     stdio: ['ignore', 'pipe', 'pipe']
   })

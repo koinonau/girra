@@ -1,3 +1,4 @@
+import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import {
   existsSync,
   mkdirSync,
@@ -8,7 +9,6 @@ import {
   renameSync,
   unlinkSync
 } from 'node:fs'
-import { homedir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 import type { AgentHookSource } from '../../shared/agent-hook-relay'
@@ -97,7 +97,7 @@ function decodePowerShellEncodedCommand(command: string): string | null {
 
 // Why: prod/dev/parallel Girra instances must write the same managed entry, not race between per-userData script paths.
 export function getSharedManagedScriptPath(scriptFileName: string): string {
-  return join(homedir(), '.orca', 'agent-hooks', scriptFileName)
+  return join(getGirraHomeDir(), 'agent-hooks', scriptFileName)
 }
 
 export { wrapPosixHookCommand } from './posix-hook-command'
@@ -126,16 +126,16 @@ export const WINDOWS_CMD_SAFE_PATH = /^[A-Za-z0-9_.:\\~-]+$/
 export function buildWindowsAgentHookCurlPostCommand(source: AgentHookSource): string {
   return [
     '"%SystemRoot%\\System32\\curl.exe" -sS -X POST',
-    `"http://127.0.0.1:%ORCA_AGENT_HOOK_PORT%/hook/${source}"`,
+    `"http://127.0.0.1:%GIRRA_AGENT_HOOK_PORT%/hook/${source}"`,
     '--connect-timeout 0.5 --max-time 1.5',
     '-H "Content-Type: application/x-www-form-urlencoded"',
-    '-H "X-Orca-Agent-Hook-Token: %ORCA_AGENT_HOOK_TOKEN%"',
-    '--data-urlencode "paneKey=%ORCA_PANE_KEY%"',
-    '--data-urlencode "tabId=%ORCA_TAB_ID%"',
-    '--data-urlencode "launchToken=%ORCA_AGENT_LAUNCH_TOKEN%"',
-    '--data-urlencode "worktreeId=%ORCA_WORKTREE_ID%"',
-    '--data-urlencode "env=%ORCA_AGENT_HOOK_ENV%"',
-    '--data-urlencode "version=%ORCA_AGENT_HOOK_VERSION%"',
+    '-H "X-Orca-Agent-Hook-Token: %GIRRA_AGENT_HOOK_TOKEN%"',
+    '--data-urlencode "paneKey=%GIRRA_PANE_KEY%"',
+    '--data-urlencode "tabId=%GIRRA_TAB_ID%"',
+    '--data-urlencode "launchToken=%GIRRA_AGENT_LAUNCH_TOKEN%"',
+    '--data-urlencode "worktreeId=%GIRRA_WORKTREE_ID%"',
+    '--data-urlencode "env=%GIRRA_AGENT_HOOK_ENV%"',
+    '--data-urlencode "version=%GIRRA_AGENT_HOOK_VERSION%"',
     '--data-urlencode "payload@-"',
     '>nul 2>&1'
   ].join(' ')

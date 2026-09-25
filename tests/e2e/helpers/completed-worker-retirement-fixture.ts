@@ -12,7 +12,7 @@ import os from 'node:os'
 import path from 'node:path'
 import type { RuntimeClient } from '../../../src/cli/runtime-client'
 import { encodeClaudeProjectPath } from '../../../src/main/ai-vault/claude-project-dir-encoding'
-import { DEFAULT_LOCAL_ORCA_PROFILE_ID } from '../../../src/shared/orca-profiles'
+import { DEFAULT_LOCAL_GIRRA_PROFILE_ID } from '../../../src/shared/orca-profiles'
 import type {
   RuntimeTerminalListResult,
   RuntimeTerminalSummary
@@ -27,7 +27,7 @@ export const completedWorkerFakeClaudeCommand = buildFakeAgentCommandOverride(
 )
 const fakeClaudeSource = `
 const { appendFileSync } = require('node:fs')
-const ledger = process.env.ORCA_E2E_WORKER_LIFECYCLE_LEDGER
+const ledger = process.env.GIRRA_E2E_WORKER_LIFECYCLE_LEDGER
 const append = (event) => appendFileSync(ledger, JSON.stringify({ pid: process.pid, ...event }) + '\\n')
 const args = process.argv.slice(2)
 // Why: Orca's hidden Claude usage probe also runs claude from PATH; keep it out of the spawn ledger.
@@ -43,7 +43,7 @@ process.stdin.on('data', (chunk) => {
     process.stdout.write('\\x1b[?25h')
   }
   append({ event: 'input', input })
-  if (input.includes('ORCA_E2E_EXIT_AFTER_DONE')) {
+  if (input.includes('GIRRA_E2E_EXIT_AFTER_DONE')) {
     append({ event: 'normal-exit' })
     process.exit(0)
   }
@@ -78,7 +78,7 @@ installCompletedWorkerFakeClaude()
 
 export const completedWorkerLaunchEnv = {
   PATH: `${fakeCliDir}${path.delimiter}${process.env.PATH ?? ''}`,
-  ORCA_E2E_WORKER_LIFECYCLE_LEDGER: lifecycleLedgerPath
+  GIRRA_E2E_WORKER_LIFECYCLE_LEDGER: lifecycleLedgerPath
 }
 
 export type LifecycleEvent = {
@@ -133,9 +133,9 @@ export function runBuiltOrcaCli(
   options: { userDataDir: string; cwd: string }
 ): unknown {
   const {
-    ORCA_ENVIRONMENT: _environment,
-    ORCA_PAIRING_CODE: _pairingCode,
-    ORCA_USER_DATA_PATH: _userDataPath,
+    GIRRA_ENVIRONMENT: _environment,
+    GIRRA_PAIRING_CODE: _pairingCode,
+    GIRRA_USER_DATA_PATH: _userDataPath,
     ...cleanEnv
   } = process.env
   void _environment
@@ -146,7 +146,7 @@ export function runBuiltOrcaCli(
     [path.join(process.cwd(), 'out', 'cli', 'index.js'), ...args],
     {
       cwd: options.cwd,
-      env: { ...cleanEnv, ORCA_USER_DATA_PATH: options.userDataDir },
+      env: { ...cleanEnv, GIRRA_USER_DATA_PATH: options.userDataDir },
       encoding: 'utf8',
       timeout: 30_000
     }
@@ -190,7 +190,7 @@ export function readPersistedWorkerRecoveryRecord(userDataDir: string, paneKey: 
   const dataPath = path.join(
     userDataDir,
     'profiles',
-    DEFAULT_LOCAL_ORCA_PROFILE_ID,
+    DEFAULT_LOCAL_GIRRA_PROFILE_ID,
     'orca-data.json'
   )
   if (!existsSync(dataPath)) {

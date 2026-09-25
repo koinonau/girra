@@ -156,7 +156,7 @@ export const NEVER_TRANSLATE_VALUES = new Set([
   '/home/user',
   '/home/user/project',
   '/path/to/destination',
-  '.orca/issue-command',
+  '.girra/issue-command',
   'PLAN.md',
   'feat/mobile-page',
   'sk-...',
