@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 
 import { act, type ReactNode } from 'react'
-import { createRoot, type Root } from 'react-dom/client'
+import type { Root } from 'react-dom/client'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { SidebarSettingsHelpMenu } from './SidebarSettingsHelpMenu'
@@ -131,27 +131,6 @@ function installWindowApi(): void {
   })
 }
 
-async function renderMenu(): Promise<HTMLDivElement> {
-  const container = document.createElement('div')
-  document.body.appendChild(container)
-  const root = createRoot(container)
-  roots.push(root)
-
-  await act(async () => {
-    root.render(<SidebarSettingsHelpMenu />)
-  })
-
-  return container
-}
-
-function findMenuItem(container: HTMLElement, label: string): HTMLButtonElement {
-  const button = Array.from(
-    container.querySelectorAll<HTMLButtonElement>('[data-testid="menu-item"]')
-  ).find((element) => element.textContent?.includes(label))
-  expect(button).toBeDefined()
-  return button as HTMLButtonElement
-}
-
 describe('SidebarSettingsHelpMenu', () => {
   beforeEach(() => {
     globalThis.IS_REACT_ACT_ENVIRONMENT = true
@@ -228,43 +207,13 @@ describe('SidebarSettingsHelpMenu', () => {
     expect(html).toContain('Restart Girra')
   })
 
-  it('renders Docs link', () => {
-    const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('Docs')
-  })
-
-  it('renders Changelog link', () => {
-    const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('Changelog')
-  })
-
-  it('renders GitHub link', () => {
-    const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('GitHub')
-  })
-
-  it('renders Discord link', () => {
-    const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('Discord')
-    expect(html).toContain('viewBox="0 0 20 20"')
-    expect(html).toContain('M16.0742 4.45014C14.9244 3.92097 13.7106 3.54556 12.4638 3.3335')
-  })
-
-  it('opens Discord invite through the shell bridge', async () => {
-    const container = await renderMenu()
-    const discordButton = findMenuItem(container, 'Discord')
-
-    await act(async () => {
-      discordButton.click()
-    })
-
-    expect(mocks.shellOpenUrl).toHaveBeenCalledWith('https://discord.gg/fzjDKHxv8Q')
-  })
-
-  it('renders X link', () => {
-    const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
-    expect(html).toContain('>X<')
-  })
+  it.each(['Docs', 'Changelog', 'GitHub', 'Discord', '>X<'])(
+    'does not render the %s link',
+    (label) => {
+      const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
+      expect(html).not.toContain(label)
+    }
+  )
 
   it('renders shortcut keys in the settings tooltip', () => {
     const html = renderToStaticMarkup(<SidebarSettingsHelpMenu />)
