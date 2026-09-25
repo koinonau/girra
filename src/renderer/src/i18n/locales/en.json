@@ -1368,7 +1368,6 @@
         "6ca6ff404e": "GIRRA",
         "520304a067": "Girra logo",
         "ce44fad849": "Missing dependencies",
-        "c1cf168479": "Hide",
         "00cee697c1": "Run \"gh auth login\" in a terminal to connect your GitHub account.",
         "9f96d018b7": "GitHub CLI is not authenticated",
         "73e1ad4282": "Girra uses the GitHub CLI (gh) to show pull requests, issues, and checks.",
@@ -1378,9 +1377,6 @@
         "cd21242762": "Add a project to get started.",
         "9c00bd4adf": "Select a workspace from the sidebar to begin.",
         "16e9e3df89": "starred",
-        "0d0ace8861": "Star on GitHub",
-        "ec43b38ba7": "Starred on GitHub",
-        "157bb5ecbb": "Open GitHub",
         "preflightDismiss": "Dismiss"
       },
       "LinearIssueMarkdownDescriptionEditor": {
@@ -3899,7 +3895,6 @@
         "share": {
           "card": {
             "utils": {
-              "19f4b4dc75": "github.com/stablyai/orca",
               "d864fc5f98": "output",
               "5d66fdd7c2": "input",
               "33d38e2177": "Output",
@@ -4615,18 +4610,13 @@
         },
         "SidebarSettingsHelpMenu": {
           "ad3d3ed7f1": "Restart Girra",
-          "eb9884e55b": "Discord",
-          "5687ab246a": "GitHub",
-          "5f83d86d92": "Changelog",
-          "cdc87f897e": "Docs",
           "e565171a7c": "Keyboard Shortcuts",
           "a428c25998": "Settings",
           "2991a0106c": "Help",
           "4e8f5710d3": "Couldn't restart Girra.",
           "5161eef55d": "Restarting Girra…",
           "d396773ef0": "checking",
-          "f8a2c91d4e": "Milestones",
-          "c4f8e1b72a": "X"
+          "f8a2c91d4e": "Milestones"
         },
         "SidebarToolbar": {
           "87d0064026": "Workspace board moved to the bottom bar",
@@ -6364,22 +6354,6 @@
           "36b2a5dc6d": "Show a confirmation dialog before a pinned tab is closed.",
           "projectRuntime": "Project Runtime",
           "projectRuntimeDescription": "Default runtime for local Windows projects that do not override it."
-        },
-        "GeneralSupportSection": {
-          "af7d9f4396": "Thanks for the support!",
-          "6922c1fa2b": "Star Orca on GitHub",
-          "511782265b": "Support the project with a GitHub star via the gh CLI.",
-          "55a87e5fd1": "Support Orca",
-          "964acc6bb4": "Star",
-          "73b327e793": "Try Again",
-          "c9f96d4234": "error",
-          "397719bee5": "Starring...",
-          "1e29570462": "starring",
-          "9d181300e3": "starred",
-          "5c49f02662": "hidden",
-          "b3f0584f5d": "loading",
-          "cb65c75b11": "Opening...",
-          "f2d4f877b2": "Open GitHub"
         },
         "GeneralUpdateSettingsSection": {
           "6405510b92": "error",
@@ -8523,13 +8497,8 @@
         },
         "general": {
           "search": {
-            "bdfb6dc21b": "like",
             "e6b01c8e30": "feedback",
-            "b65665703a": "support",
             "06ea5a69a6": "github",
-            "e4fb4516d0": "star",
-            "e0b8c8bc25": "Support the project with a GitHub star via the gh CLI.",
-            "36a72f0d9e": "Star Orca on GitHub",
             "9b0bc30160": "pi",
             "882c4896fd": "opencode",
             "95b63edde7": "claude",
