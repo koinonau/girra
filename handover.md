@@ -531,6 +531,20 @@ Verified again on this laptop from the downloaded DMG: `codesign --verify --deep
 
 **The packaged app boots.** Launched windowless from a copy, with home and user data isolated through `GIRRA_E2E_USER_DATA_DIR` and `GIRRA_E2E_HOME_DIR`, it reached the landing page with title `Girra` and wordmark `GIRRA`, logged no console errors, and exited 0. **First run against a real profile is still untested,** on purpose: it writes to live state and can raise macOS prompts, so the user should open the DMG themselves.
 
+## Local CI
+
+`pr.yml` cannot run while Actions is blocked, so 28 of its lanes run here instead, through
+`scratchpad/ci-branch.sh <branch>` (session-local; rewrite it from the workflow if it is gone).
+It checks out the branch, runs each lane into its own log, and writes a PASS/FAIL summary.
+
+Green means 27 lanes pass and the unit suite fails only in the five files listed under
+"End-to-end Suite" as failing on `main`. All four merges of 2026-09-25 met that bar.
+
+Two lanes have no local equivalent: `package`, which builds AppImage, deb and rpm on Linux, and
+`package (windows)`. Windows also failed twice on GitHub for reasons unrelated to the changes,
+`secure-path-windows-acl.win32` and a browser renderer attach timeout, on runs that passed a day
+earlier; suspect the runner image before the diff.
+
 ## Environment
 
 Measured 2026-09-14 on this laptop.
@@ -638,9 +652,9 @@ All 2026-09-13 unless dated otherwise.
 
 ## Open Decisions
 
-- **Help menu.** Its Docs and Changelog links point at `onorca.dev`, and its Discord and GitHub items at Orca's community. Remove the menu or repoint it. Left for now (user, 2026-09-15).
-- **Star and support links.** The settings Support section stars and links `github.com/stablyai/orca`, and the usage share card says "Orca IDE" with that URL. Left for now (user, 2026-09-15).
-- **`.orca/` and `ORCA_*`.** Renaming breaks existing worktrees and hook scripts. Keeping them leaves Orca's name in every hook you debug. Not part of the 2026-09-15 rename; they stay until decided.
+- **DECIDED 2026-09-23 (user): drop the Help menu's five outbound links.** Docs, Changelog, GitHub, Discord and X all pointed at Orca's, and `koinonau/girra` is private, so a repointed GitHub link 404s for everyone else. Keyboard Shortcuts, Milestones and Restart stay. Merged in [#44](https://github.com/koinonau/girra/pull/44).
+- **DECIDED 2026-09-23 (user): delete the star stack, recaption the share card.** The landing star button, the settings Support section and the two `gh` calls behind them starred `stablyai/orca`; the write was the only code that mutated a viewer's GitHub account. The usage card now says Girra with no repository URL. Merged in [#45](https://github.com/koinonau/girra/pull/45).
+- **DECIDED 2026-09-23 (user): rename both `ORCA_*` and `.orca/`, with fallbacks.** Merged in [#47](https://github.com/koinonau/girra/pull/47). Every Orca name is still read, through two seams that [`docs/reference/girra-and-orca-names.md`](docs/reference/girra-and-orca-names.md) documents. Retire them with the other shims.
 - **DECIDED 2026-09-18 (user): install `girra` on SSH hosts, and rewrite the name at the CLI seam as well.** Kept below for the reasoning. The second half was added because the shim install is best-effort by design: `ssh-relay-session.ts:1065` warns rather than failing the connection, since it can fail on a `MaxSessions=1` remote, so a host with an old `orca`-only shim can keep it across a connect.
 - ~~**The 39 runtime strings that name a command.**~~ The main process builds `nextSteps`, `recovery` and `recoveryCommand` strings saying `orca <verb>`, and they reach a caller that may be local, where the command is `girra`, or on an SSH host, where it is `orca`. Counted 2026-09-18 across `src/main`, excluding tests and comments: 15 in the Linear write and lookup commands, 11 in orchestration worker receipts and releases, 6 in the browser CDP paths, 2 in the emulator, and 5 elsewhere. Three options.
   1. **Rewrite at the CLI output seam.** The runtime writes `girra` canonically and `src/cli/cli-error.ts` substitutes `resolveOrchestrationCliExecutable(process.env)` on both the human and `--json` paths. Costs one helper and two call sites, plus care not to rewrite prose that legitimately says Girra. Buys one canonical name in the runtime and the existing precedent in `orchestration-mutation-recovery.ts`.
@@ -657,12 +671,17 @@ All 2026-09-13 unless dated otherwise.
 
   **Kept deliberately:** `terminalFitOverrides` and the fit-override notifier, because `remote-desktop-fit` parks xterm at the remote's dimensions and a mismatched grid garbles the wrapped stream; and `terminal.restoreFit` as a `{ restored: false }` stub, because an older paired client still carries the preload bridge and `method_not_found` is a louder failure than the `false` every caller already got. Retire the stub with the orchestration normalisation.
 - **DECIDED 2026-09-22: the e2e failures are attributed, and none is a fork regression.** The upstream A/B under "End-to-end Suite" settles all 23 unattributed failures and both nested-runtime ones. Run on the user's go-ahead once disk space allowed.
-- **DECIDED 2026-09-18 (user): write girra's asset names now.** The install pages name what `config/electron-builder.config.cjs` builds and link `koinonau/girra/releases`, accepting that every link 404s until a release exists. `mac-build.yml` now signs and notarizes, but it uploads the DMG as a run artifact and publishes no GitHub Release, so the links still 404. Publishing a release is item 1 of "Start Here".
+- **DECIDED 2026-09-18 (user): write girra's asset names now.** The install pages name what `config/electron-builder.config.cjs` builds and link `koinonau/girra/releases`, accepting that every link 404s until a release exists. `mac-build.yml` now publishes a GitHub Release at the package version's tag, guarded on `main`, so the links resolve from the first dispatch that runs. The version is 1.0.0, down from Orca's inherited 1.4.197 ([#46](https://github.com/koinonau/girra/pull/46)).
 
 ## Traps
 
 | Date | Trap | Cost | Avoid it |
 |---|---|---|---|
+| 2026-09-25 | GitHub refuses to start any Actions job: "recent account payments have failed or your spending limit needs to be increased". Nothing in the repository causes it and nothing in the repository fixes it | Every check on four pull requests, and the release dispatch | The user clears it under Settings, Billing and plans. Until then verify locally, with the runner below |
+| 2026-09-25 | `ripgrep` treats `src/main/runtime/browser-client-download-transfers.ts` as binary, because it holds a NUL byte, so every `rg`-driven sweep skips it silently. Its `.orca/browser-downloads` constant survived a rename that moved all of its callers | One failing test, found by luck rather than by the sweep | Finish a repository-wide rename with `grep -arl`, which reads a binary file, and never trust an `rg -l` file list as complete |
+| 2026-09-25 | `pnpm run build:native` fails on this laptop with `lipo: no eligible inputs found` unless `DEVELOPER_DIR=/Library/Developer/CommandLineTools` is set. A Swift 6.4-dev toolchain on PATH writes to `.build/out/Products/Release/` rather than the `.build/<triple>/release/` the script reads, and can leave a universal binary in the per-arch path that makes `lipo` fail differently | Two wrong diagnoses before the toolchain was the answer | Export `DEVELOPER_DIR` for any native build. GitHub's macos-latest carries the stable toolchain and needs nothing |
+| 2026-09-25 | The Git compatibility lane skips all 18 tests rather than failing when its image variable is absent, so a run with the wrong variable name looks like a pass. It is `GIRRA_GIT_COMPAT_IMAGE` after [#47](https://github.com/koinonau/girra/pull/47) and `ORCA_GIT_COMPAT_IMAGE` before it | A baseline comparison that proved nothing | Check the test count, not the exit code. Docker on macOS also cannot bind-mount `/var/folders`, so set `TMPDIR` to a directory under `$HOME` |
+| 2026-09-25 | A new file under `docs/reference/` is invisible to git: `.gitignore` ignores `docs/**` and allow-lists each tracked reference doc by name | A doc written, committed and absent | Add `!docs/reference/<name>.md` beside the others, and link it from `AGENTS.md` |
 | 2026-09-12 | Named subagents are mailbox-only. Their final text is lost | One round of messages to recover six surveys; bit again 2026-09-15, caught by a hook | Tell each named agent to send its report to `main` with SendMessage; now in `prompt.md` |
 | 2026-09-12 | The shell's `ls` alias prints nothing in tool output | Two empty directory listings | Use `/bin/ls` |
 | 2026-09-13 | Transitive import closure reaches 11,213 of about 13,000 files | One analysis pass with 191 false dependencies | Measure direct imports only |

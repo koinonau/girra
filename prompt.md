@@ -4,14 +4,31 @@ Girra is a personal fork of Orca with 103 features deleted and the Orca identity
 
 ## Start Here
 
-Measured 2026-09-22. No tracker exists, so these come from the build plan's phases. Every phase is merged, the e2e suite is attributed with no fork regression, Actions is on with CI green, and the first signed, notarized DMG is built and boots. What remains needs the user.
+Measured 2026-09-25. No tracker exists, so these come from the build plan's phases. Every phase is
+merged, and so is every identity decision: the Help menu, the star stack, and the `GIRRA_*` and
+`~/.girra` rename. `main` is version 1.0.0 and `mac-build.yml` publishes a release. What remains
+needs the user, or needs Actions.
 
-1. **Publish a release.** `mac-build.yml` signs and notarizes but only uploads an artifact, so the install pages' `koinonau/girra/releases` links still 404. Decide with the user whether to add a release step or publish by hand, and what version to call it. A published release also unblocks item 3.
-2. **First run on a real profile.** The packaged app boots in isolation, but nothing has exercised it against real state, the safe-storage fallback that reads Orca's old keychain item included. The user should open the DMG themselves; see the trap about keychain prompts before launching a packaged build any other way.
-3. **Retire two compatibility shims** once a release has shipped and no supported host predates it: the orchestration name normalisation in `runtime-compatibility.ts`, and the `terminal.restoreFit` stub in `terminal-viewport-methods.ts`.
-4. **The three identity decisions parked on 2026-09-15**: the Help menu, the star and support links, and `.orca/` with `ORCA_*`. See "Open Decisions" in `handover.md`.
+1. **GitHub Actions is blocked on billing.** No job starts, so nothing here can be verified in CI.
+   The user clears it under Settings, Billing and plans. Verify locally meanwhile, per "Local CI"
+   in `handover.md`.
+2. **Publish the release.** Dispatch `mac-build.yml` from `main` once Actions runs. It signs,
+   notarizes and creates `v1.0.0` with the DMG attached, which makes the install pages' links
+   resolve.
+3. **First run on a real profile.** The packaged app boots in isolation, but nothing has exercised
+   it against real state, the safe-storage fallback that reads Orca's old keychain item included.
+   The user should open the DMG themselves; see the trap about keychain prompts before launching a
+   packaged build any other way. The `~/.orca` to `~/.girra` migration also runs for the first time
+   here, and rewrites the hook paths in `~/.claude/settings.json`.
+4. **Retire four compatibility shims** once a release has shipped and no supported host predates
+   it: the orchestration name normalisation in `runtime-compatibility.ts`, the
+   `terminal.restoreFit` stub in `terminal-viewport-methods.ts`, and both seams in
+   `docs/reference/girra-and-orca-names.md`.
 
-Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev` download and logo links, and their total-downloads badge, which counts Orca's releases; and the dead locale keys, `pairingCommand`, `960e901ae4` and the `dictation` entries the voice deletion orphaned, which no code references.
+Smaller items, each needing somewhere to point before it can be fixed: the six READMEs' `onorca.dev`
+download and logo links, and their total-downloads badge, which counts Orca's releases; and the dead
+locale keys, `pairingCommand`, `960e901ae4` and the `dictation` entries the voice deletion orphaned,
+which no code references.
 
 ## Backlog
 
