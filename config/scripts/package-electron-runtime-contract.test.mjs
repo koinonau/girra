@@ -224,7 +224,7 @@ describe('Electron runtime package contract', () => {
     )
   })
 
-  it('signs, notarizes and keeps the macOS build off GitHub Releases', () => {
+  it('signs, notarizes and publishes the macOS build from main only', () => {
     const macWorkflow = parse(
       readFileSync(join(projectDir, '.github/workflows/mac-build.yml'), 'utf8')
     )
@@ -242,7 +242,7 @@ describe('Electron runtime package contract', () => {
     ]
 
     expect(Object.keys(macWorkflow.on)).toEqual(['workflow_dispatch'])
-    expect(macWorkflow.permissions).toEqual({ contents: 'read' })
+    expect(macWorkflow.permissions).toEqual({ contents: 'write' })
     expect(job['runs-on']).toBe('macos-latest')
     // A missing credential must fail before the build, not after it.
     expect(names.indexOf(verifyEnvStep.name)).toBeLessThan(names.indexOf('Build app'))
@@ -263,5 +263,14 @@ describe('Electron runtime package contract', () => {
     )
     expect(uploadStep.with.path).toBe('dist/girra-macos-arm64.dmg')
     expect(uploadStep.with['if-no-files-found']).toBe('error')
+    // electron-builder never publishes; the release is a separate, main-only step,
+    // so a dispatch from a feature branch cannot tag a commit outside the trunk.
+    const releaseStep = job.steps.find((step) => step.name === 'Publish the GitHub Release')
+    expect(releaseStep.if).toBe("github.ref == 'refs/heads/main'")
+    expect(releaseStep.run).toContain('gh release create')
+    expect(releaseStep.run).toContain('dist/girra-macos-arm64.dmg')
+    expect(names.indexOf('Verify the DMG carries a notarization ticket')).toBeLessThan(
+      names.indexOf(releaseStep.name)
+    )
   })
 })
