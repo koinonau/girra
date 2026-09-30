@@ -81,8 +81,8 @@ export async function initializeReadyFoundation(): Promise<void> {
   }
   electronApp.setAppUserModelId(identity.appUserModelId)
   // Why: names the app menu/About panel. Dev already applied this pre-ready (see the
-  // safeStorage note above); this call stays unconditional so packaged builds keep their
-  // existing post-ready rename, which lands after the Keychain name is already resolved.
+  // safeStorage note in main-process-preflight); for a packaged build package.json's
+  // `productName` already made this the current name, so it is a no-op there.
   app.setName(identity.appName)
   updateGpuAccelerationAboutPanel()
   // Why: managed WSL launchers live outside the Windows app bundle, so keep their launcher/bridge contract synced across app updates.

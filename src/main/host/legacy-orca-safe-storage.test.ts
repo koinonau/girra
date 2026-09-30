@@ -84,4 +84,18 @@ describe('legacy Orca safe storage', () => {
     keychainHit('Orca Safe Storage')
     expect(decryptSealedSecret(sealWithLegacyKey('sk-live-42'))).toBe('sk-live-42')
   })
+
+  // Why: someone who ran upstream Orca as well as Girra 1.0.0 has both items, and only
+  // one of them sealed the blob. Stopping at the first hit reported the secret as lost.
+  it('keeps trying later keys when an earlier legacy item is the wrong one', () => {
+    runProcessSync.mockImplementation(({ args }: { args: readonly string[] }) => {
+      if (args.includes('Orca Safe Storage')) {
+        return { code: 0, stdout: 'a-different-app-password\n', stderr: '', timedOut: false }
+      }
+      return args.includes('orca Safe Storage')
+        ? { code: 0, stdout: `${KEYCHAIN_PASSWORD}\n`, stderr: '', timedOut: false }
+        : { code: 44, stdout: '', stderr: 'not found', timedOut: false }
+    })
+    expect(decryptWithLegacyOrcaKey(sealWithLegacyKey('sk-live-42'))).toBe('sk-live-42')
+  })
 })

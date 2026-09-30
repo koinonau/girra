@@ -36,7 +36,8 @@ const isWinHourly = process.env.GIRRA_WIN_HOURLY === '1'
 const isWinDaily = process.env.GIRRA_WIN_DAILY === '1'
 const isWinAdhoc = process.env.GIRRA_WIN_ADHOC === '1'
 const isWinDevChannel = isWinHourly || isWinDaily || isWinAdhoc
-const isMacRelease = process.env.GIRRA_MAC_RELEASE === '1' || isMacHourly || isMacDaily || isMacAdhoc
+const isMacRelease =
+  process.env.GIRRA_MAC_RELEASE === '1' || isMacHourly || isMacDaily || isMacAdhoc
 const isLinuxArm64Release = process.env.GIRRA_LINUX_ARM64_RELEASE === '1'
 const localBuildVersion =
   isMacRelease || isWinDevChannel ? undefined : process.env.GIRRA_LOCAL_BUILD_VERSION
@@ -132,8 +133,8 @@ const MARKDOWN_FILE_EXTENSIONS = ['md', 'markdown', 'mdx']
 /** @type {import('electron-builder').Configuration} */
 module.exports = {
   appId,
-  // Why this diverges from package.json's `name`, still 'orca': Electron derives the Linux
-  // userData directory from that field, so renaming it would orphan every Linux profile.
+  // Why it must match package.json's `productName`: this names the bundle, that one names
+  // `app.getName()` and so the userData directory. Two values means two profiles.
   productName: 'Girra',
   // Why the scheme stays `orca`: links already in the wild resolve against it (ADR 0002).
   protocols: [{ name: 'Girra', schemes: ['orca'] }],
