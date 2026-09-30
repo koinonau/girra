@@ -2,7 +2,7 @@
   "name": "orca",
   "version": "1.0.0",
   "description": "Next-gen IDE for parallel agentic development",
-  "homepage": "https://github.com/stablyai/orca",
+  "homepage": "https://github.com/koinonau/girra",
   "author": "stablyai",
   "bin": {
     "girra": "./out/cli/index.js",

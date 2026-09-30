@@ -76,10 +76,10 @@ describe('electron-builder mac channel config', () => {
   // break update checks for every real user.
   it('publishes hourly builds to the separate hourly repo', () => {
     withHourlyEnv((config) => {
-      expect(config.publish).toMatchObject({ repo: 'orca-hourly', releaseType: 'prerelease' })
+      expect(config.publish).toMatchObject({ repo: 'girra-hourly', releaseType: 'prerelease' })
     })
     expect(electronBuilderConfig.publish).toMatchObject({
-      repo: 'orca',
+      repo: 'girra',
       releaseType: 'release'
     })
   })
@@ -102,7 +102,7 @@ describe('electron-builder mac channel config', () => {
       expect(config.mac.hardenedRuntime).toBe(true)
       expect(config.mac.notarize).toBe(true)
       expect(config.forceCodeSigning).toBe(true)
-      expect(config.publish).toMatchObject({ repo: 'orca-adhoc', releaseType: 'prerelease' })
+      expect(config.publish).toMatchObject({ repo: 'girra-adhoc', releaseType: 'prerelease' })
     })
   })
 
@@ -121,7 +121,7 @@ describe('electron-builder mac channel config', () => {
       expect(config.mac.hardenedRuntime).toBe(true)
       expect(config.mac.notarize).toBe(true)
       expect(config.forceCodeSigning).toBe(true)
-      expect(config.publish).toMatchObject({ repo: 'orca-daily', releaseType: 'prerelease' })
+      expect(config.publish).toMatchObject({ repo: 'girra-daily', releaseType: 'prerelease' })
     })
   })
 
@@ -136,7 +136,7 @@ describe('electron-builder mac channel config', () => {
 
   // Why: the dev channels share every packaging decision except where they
   // publish, so a future edit that collapses them must not also collapse the
-  // repos — a branch or daily build landing in orca-hourly would be offered to
+  // repos — a branch or daily build landing in girra-hourly would be offered to
   // everyone riding main's hourlies.
   it('keeps the dev channels on separate repos', () => {
     withHourlyEnv((hourly) => {

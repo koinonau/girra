@@ -39,7 +39,7 @@ describe('electron-builder dev-channel identity', () => {
 
     expect(config.win.signtoolOptions.publisherName).toBe('SignPath Foundation')
     expect(config.win.verifyUpdateCodeSignature).toBeUndefined()
-    expect(config.publish.repo).toBe('orca')
+    expect(config.publish.repo).toBe('girra')
     expect(config.publish.releaseType).toBe('release')
   })
 
@@ -67,9 +67,9 @@ describe('electron-builder dev-channel identity', () => {
   })
 
   it.each([
-    ['hourly', { GIRRA_WIN_HOURLY: '1' }, 'orca-hourly'],
-    ['daily', { GIRRA_WIN_DAILY: '1' }, 'orca-daily'],
-    ['adhoc', { GIRRA_WIN_ADHOC: '1' }, 'orca-adhoc']
+    ['hourly', { GIRRA_WIN_HOURLY: '1' }, 'girra-hourly'],
+    ['daily', { GIRRA_WIN_DAILY: '1' }, 'girra-daily'],
+    ['adhoc', { GIRRA_WIN_ADHOC: '1' }, 'girra-adhoc']
   ])('publishes %s Windows builds to its own repo as a prerelease', (_channel, env, repo) => {
     const config = loadConfigWithEnv(env)
 
@@ -95,13 +95,13 @@ describe('electron-builder dev-channel identity', () => {
     })
 
     expect(config.mac.notarize).toBe(true)
-    expect(config.publish.repo).toBe('orca-adhoc')
+    expect(config.publish.repo).toBe('girra-adhoc')
   })
 })
 
 describe('collectDevChannelPackagingProblems', () => {
   const goodWinConfig = {
-    publish: { repo: 'orca-adhoc', releaseType: 'prerelease' },
+    publish: { repo: 'girra-adhoc', releaseType: 'prerelease' },
     extraMetadata: { version: '1.4.178-adhoc.20260819010203' },
     win: { verifyUpdateCodeSignature: false }
   }
@@ -124,11 +124,11 @@ describe('collectDevChannelPackagingProblems', () => {
     const problems = collectDevChannelPackagingProblems({
       channel: 'adhoc',
       platform: 'win32',
-      config: { ...goodWinConfig, publish: { repo: 'orca', releaseType: 'release' } },
+      config: { ...goodWinConfig, publish: { repo: 'girra', releaseType: 'release' } },
       env
     })
 
-    expect(problems.join('\n')).toContain('must publish to "orca-adhoc"')
+    expect(problems.join('\n')).toContain('must publish to "girra-adhoc"')
     expect(problems.join('\n')).toContain('rebase it onto a main that does')
   })
 
@@ -165,7 +165,7 @@ describe('collectDevChannelPackagingProblems', () => {
         channel: 'adhoc',
         platform: 'darwin',
         config: {
-          publish: { repo: 'orca-adhoc', releaseType: 'prerelease' },
+          publish: { repo: 'girra-adhoc', releaseType: 'prerelease' },
           extraMetadata: { version: '1.4.178-adhoc.20260819010203' },
           win: { signtoolOptions: { publisherName: 'SignPath Foundation' } }
         },

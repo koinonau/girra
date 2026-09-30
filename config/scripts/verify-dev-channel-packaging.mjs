@@ -16,9 +16,9 @@ import { resolve } from 'node:path'
 import { pathToFileURL } from 'node:url'
 
 const CHANNEL_REPOS = {
-  hourly: 'orca-hourly',
-  daily: 'orca-daily',
-  adhoc: 'orca-adhoc'
+  hourly: 'girra-hourly',
+  daily: 'girra-daily',
+  adhoc: 'girra-adhoc'
 }
 
 const CHANNEL_VERSION_ENV = {
@@ -113,7 +113,7 @@ function main() {
     process.exit(1)
   }
   console.log(
-    `Dev-channel packaging verified: ${channel} on ${platform} → stablyai/${CHANNEL_REPOS[channel]} @ ${config.extraMetadata?.version}`
+    `Dev-channel packaging verified: ${channel} on ${platform} → koinonau/${CHANNEL_REPOS[channel]} @ ${config.extraMetadata?.version}`
   )
 }
 

@@ -57,11 +57,11 @@ const devChannelBuildVersion = isHourlyChannel
 // or a once-a-day cut cannot be picked up by someone who only meant to ride
 // main's hourlies.
 const devChannelRepo = isHourlyChannel
-  ? 'orca-hourly'
+  ? 'girra-hourly'
   : isDailyChannel
-    ? 'orca-daily'
+    ? 'girra-daily'
     : isAdhocChannel
-      ? 'orca-adhoc'
+      ? 'girra-adhoc'
       : null
 const appId = 'com.koinonau.girra'
 // Why: freshness detection needs immutable identity metadata from this exact
@@ -622,8 +622,8 @@ module.exports = {
   npmRebuild: true,
   publish: {
     provider: 'github',
-    owner: 'stablyai',
-    repo: devChannelRepo ?? 'orca',
+    owner: 'koinonau',
+    repo: devChannelRepo ?? 'girra',
     releaseType: devChannelRepo ? 'prerelease' : 'release'
   }
 }
