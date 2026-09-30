@@ -242,7 +242,11 @@ describe('Electron runtime package contract', () => {
     ]
 
     expect(Object.keys(macWorkflow.on)).toEqual(['workflow_dispatch'])
-    expect(macWorkflow.permissions).toEqual({ contents: 'write' })
+    // Top level stays read-only; only the release job needs to write, and only
+    // under the `release` environment's protection rules.
+    expect(macWorkflow.permissions).toEqual({ contents: 'read' })
+    expect(job.permissions).toEqual({ contents: 'write' })
+    expect(job.environment).toBe('release')
     expect(job['runs-on']).toBe('macos-latest')
     // A missing credential must fail before the build, not after it.
     expect(names.indexOf(verifyEnvStep.name)).toBeLessThan(names.indexOf('Build app'))

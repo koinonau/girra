@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: mac-build-${{ github.ref }}
@@ -13,6 +13,9 @@ concurrency:
 jobs:
   build-mac:
     runs-on: macos-latest
+    environment: release
+    permissions:
+      contents: write
     # Why 90: the notary queue is the unbounded part, and the install retry budget
     # below can add 30 on its own.
     timeout-minutes: 90
@@ -28,7 +31,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup pnpm
-        uses: pnpm/setup@v2
+        uses: pnpm/setup@84cb39b217b10273981911c288cd62326dc7c6d2 # v2
         with:
           install: false
 
@@ -53,7 +56,7 @@ jobs:
       # Why retry: electron's postinstall downloads its binary from GitHub release
       # assets, and that CDN returns occasional 504s.
       - name: Install dependencies
-        uses: nick-fields/retry@v4
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 10
           max_attempts: 3
@@ -84,7 +87,7 @@ jobs:
       # Why arm64 only: macos-latest is an Apple Silicon runner, so a second
       # architecture would cross-compile every native module for no local use.
       - name: Package signed and notarized DMG
-        uses: nick-fields/retry@v4
+        uses: nick-fields/retry@ad984534de44a9489a53aefd81eb77f87c70dc60 # v4
         with:
           timeout_minutes: 45
           max_attempts: 2
