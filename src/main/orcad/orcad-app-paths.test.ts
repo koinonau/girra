@@ -38,9 +38,15 @@ describe('resolveUserDataPath', () => {
 
     vi.stubEnv('XDG_DATA_HOME', '')
     // Why not the literal: this machine may still have an unmigrated ~/.orca,
-    // which the resolver reads on purpose.
+    // which the resolver reads on purpose. It falls back to the legacy tree only
+    // when that is the one that exists; with neither present (a fresh runner), it
+    // defaults to the current name.
     expect(resolveUserDataPath()).toBe(getGirraHomeDir())
-    expect(getGirraHomeDir()).toBe(join(homedir(), existsSync(join(homedir(), '.girra')) ? '.girra' : '.orca'))
+    const girraDir = join(homedir(), '.girra')
+    const orcaDir = join(homedir(), '.orca')
+    expect(getGirraHomeDir()).toBe(
+      existsSync(girraDir) || !existsSync(orcaDir) ? girraDir : orcaDir
+    )
   })
 })
 

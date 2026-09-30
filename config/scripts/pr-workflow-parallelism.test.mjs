@@ -250,7 +250,9 @@ describe('PR workflow parallelism', () => {
       const parsed = parse(readFileSync(workflowPath, 'utf8'))
       return Object.values(parsed.jobs ?? {}).flatMap((job) =>
         (job.steps ?? [])
-          .filter((step) => step.uses === 'pnpm/setup@v2')
+          // A hardened workflow SHA-pins the action (`pnpm/setup@<sha>`), so match
+          // the action itself rather than the unpinned `v2` tag.
+          .filter((step) => step.uses?.startsWith('pnpm/setup@'))
           .map((step) => ({ workflowPath, step }))
       )
     })
