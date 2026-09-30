@@ -4,6 +4,7 @@
 // homedir-derived path when no AppEnvironment is installed (unit tests).
 
 import { getAppEnvironment, hasAppEnvironment } from '../../shared/app-environment'
+import { USER_DATA_DIR_NAME } from '../../shared/desktop-user-data-dir'
 import { homedir, platform } from 'node:os'
 import { join } from 'node:path'
 
@@ -17,15 +18,15 @@ function getUserDataDir(): string {
     return getAppEnvironment().getPath('userData')
   }
   const home = homedir()
-  // Why the case split: darwin reads CFBundleName (productName), the other two read package.json's
-  // `name`, still 'orca', and initDataPath() runs before the packaged app.setName can change it.
+  // Why the shared constant on every platform: all three name this directory after
+  // package.json's `productName`, which is what Electron resolves userData from.
   if (platform() === 'darwin') {
-    return join(home, 'Library', 'Application Support', 'Girra')
+    return join(home, 'Library', 'Application Support', USER_DATA_DIR_NAME)
   }
   if (platform() === 'win32') {
-    return join(process.env.APPDATA ?? home, 'orca')
+    return join(process.env.APPDATA ?? home, USER_DATA_DIR_NAME)
   }
-  return join(home, '.config', 'orca')
+  return join(home, '.config', USER_DATA_DIR_NAME)
 }
 
 export function getLogsDirectory(): string {

@@ -20,9 +20,10 @@ export type DevInstanceIdentity = AppIdentity & {
  *
  * Why: Electron resolves the macOS safeStorage Keychain service name
  * ("<app name> Safe Storage") before `ready`, so a post-ready setName cannot move it.
- * Dev-only on purpose — a packaged build must keep deriving its key from its own
- * CFBundleName, which downstream forks ship differently ("Girra ALab Edition").
- * Renaming it pre-ready would orphan their encrypted secrets.
+ * Dev-only on purpose: a packaged build already reads `Girra` pre-ready from
+ * package.json's `productName`, so it needs no call here, and a downstream fork that
+ * ships its own `productName` ("Girra ALab Edition") keeps its own key by the same
+ * route. Setting the dev name here instead would orphan every packaged secret.
  */
 export function shouldApplyPreReadyAppName(identity: Pick<AppIdentity, 'isDev'>): boolean {
   return identity.isDev

@@ -218,6 +218,8 @@ export function configureDevUserDataPath(isDev: boolean): void {
     return
   }
   // Why: without a dev-only path, pnpm dev overwrites the packaged app's runtime pointer under userData and breaks the orca CLI.
+  // Why still `orca-dev` while packaged runs are `Girra`: the CLI and the coordinator detect a
+  // dev instance by the `orca-dev` substring in GIRRA_USER_DATA_PATH.
   app.setPath('userData', join(app.getPath('appData'), 'orca-dev'))
 }
 

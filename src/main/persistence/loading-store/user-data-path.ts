@@ -6,7 +6,7 @@ import { hardenExistingSecureFile } from '../../../shared/secure-file'
 import { MOBILE_PAIRING_USERDATA_FILES } from '../../runtime/mobile-pairing-files'
 
 // Why capture once (not a module const, not per-call): a const resolves before configureDevUserDataPath() redirects userData (dev/prod collide);
-// per-call resolves after app.setName('Girra') flips path case and loses data on case-sensitive FS. index.ts calls initDataPath() at the right moment.
+// per-call can resolve after the pre-ready app.setName(), which dev applies and which does move userData. index.ts calls initDataPath() at the right moment.
 let _dataFile: string | null = null
 let _userDataDir: string | null = null
 
@@ -51,7 +51,7 @@ export function readGithubCacheSnapshot(dataFile: string): PersistedState['githu
 }
 
 /**
- * Return the userData directory captured at initDataPath() time, before app.setName() can change how getAppEnvironment().getPath('userData') resolves.
+ * Return the userData directory captured at initDataPath() time, before a pre-ready app.setName() can change how getAppEnvironment().getPath('userData') resolves.
  *
  * Subsystems sharing storage with orca-data.json read this instead of resolving late, which on case-sensitive FS can lose paired devices.
  */

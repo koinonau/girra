@@ -34,7 +34,7 @@ export function shouldActivateDesktopForSecondInstance(argv: readonly string[] =
  *
  * Electron derives the lock identity from the current `userData` path, so
  * callers MUST invoke this AFTER `configureDevUserDataPath(is.dev)` — that
- * way dev (`orca-dev` userData) and packaged (`orca` userData) runs lock in
+ * way dev (`orca-dev` userData) and packaged (`Girra` userData) runs lock in
  * separate namespaces instead of serialising against each other.
  */
 export function acquireSingleInstanceLock(

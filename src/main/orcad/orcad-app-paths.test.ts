@@ -1,4 +1,4 @@
-import { existsSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, rmSync } from 'node:fs'
 import { getGirraHomeDir } from '../../shared/girra-home-dir'
 import { homedir, tmpdir } from 'node:os'
 import { join, sep } from 'node:path'
@@ -47,6 +47,23 @@ describe('resolveUserDataPath', () => {
     expect(getGirraHomeDir()).toBe(
       existsSync(girraDir) || !existsSync(orcaDir) ? girraDir : orcaDir
     )
+  })
+
+  // Why: a headless server upgrades on its own schedule and runs no migration, so it has to
+  // keep reading the Orca tree it already has until something creates the Girra one.
+  it('reads the legacy XDG tree while it is the only one present', () => {
+    const xdg = mkdtempSync(join(tmpdir(), 'orcad-xdg-'))
+    try {
+      vi.stubEnv('GIRRA_USER_DATA', '')
+      vi.stubEnv('XDG_DATA_HOME', xdg)
+      mkdirSync(join(xdg, 'Orca'))
+      expect(resolveUserDataPath()).toBe(join(xdg, 'Orca'))
+
+      mkdirSync(join(xdg, 'Girra'))
+      expect(resolveUserDataPath()).toBe(join(xdg, 'Girra'))
+    } finally {
+      rmSync(xdg, { recursive: true, force: true })
+    }
   })
 })
 
