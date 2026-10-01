@@ -18,8 +18,9 @@ needs the user, or needs Actions.
 3. **First run on a real profile.** The packaged app boots in isolation, but nothing has exercised
    it against real state, the safe-storage fallback that reads Orca's old keychain item included.
    The user should open the DMG themselves; see the trap about keychain prompts before launching a
-   packaged build any other way. The `~/.orca` to `~/.girra` migration also runs for the first time
-   here, and rewrites the hook paths in `~/.claude/settings.json`.
+   packaged build any other way. There is no longer a `~/.orca` to `~/.girra` migration, so what
+   this run proves instead is that Girra starts from its own tree and registers its hooks beside a
+   running Orca's; see `docs/adr/0004-leave-the-orca-home-tree-alone.md`.
 4. **Retire four compatibility shims** once a release has shipped and no supported host predates
    it: the orchestration name normalisation in `runtime-compatibility.ts`, the
    `terminal.restoreFit` stub in `terminal-viewport-methods.ts`, and both seams in

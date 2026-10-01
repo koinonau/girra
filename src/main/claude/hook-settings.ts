@@ -2,6 +2,7 @@ import { homedir } from 'node:os'
 import { basename, extname, join, win32 } from 'node:path'
 import {
   buildManagedCommandHook,
+  createLegacyGirraCommandMatcher,
   createManagedCommandMatcher,
   getSharedManagedScriptPath,
   isPlainObject,
@@ -19,14 +20,40 @@ import { isGitBashAvailable } from '../git-bash'
 
 export type ClaudeCompatibleHookSettings = {
   configDirName: '.claude'
-  scriptBaseName: 'claude-hook'
+  scriptBaseName: 'claude-girra-hook'
   usesWindowsCompatLauncher: boolean
 }
 
 export const CLAUDE_HOOK_SETTINGS: ClaudeCompatibleHookSettings = {
   configDirName: '.claude',
-  scriptBaseName: 'claude-hook',
+  scriptBaseName: 'claude-girra-hook',
   usesWindowsCompatLauncher: true
+}
+
+/**
+ * The names Girra shared with upstream Orca before the two had to coexist.
+ *
+ * Why Girra's scripts carry `girra` at all: `~/.claude/settings.json` is one file both
+ * apps manage, and each sweeps managed entries by script file name alone. Under one name
+ * every install deleted the other app's hooks, so the last app to launch owned them and
+ * the other app's sidebar went dark (ADR-0004).
+ */
+const SUPERSEDED_SCRIPT_FILE_NAMES: Readonly<Record<string, string>> = {
+  'claude-girra-hook': 'claude-hook.sh',
+  'claude-girra-statusline': 'claude-statusline.sh'
+}
+
+/** Girra's managed entries, under the current script name and the superseded one. */
+function createGirraManagedCommandMatcher(
+  scriptFileName: string
+): (command: string | undefined) => boolean {
+  const current = createManagedCommandMatcher(scriptFileName)
+  const superseded = SUPERSEDED_SCRIPT_FILE_NAMES[scriptFileName.replace(/\.(?:cmd|ps1|sh)$/, '')]
+  if (!superseded) {
+    return current
+  }
+  const legacy = createLegacyGirraCommandMatcher(superseded)
+  return (command) => current(command) || legacy(command)
 }
 
 export const CLAUDE_EVENTS = [
@@ -209,7 +236,7 @@ export function applyManagedHooks(
   scriptFileName = getManagedScriptFileName()
 ): HooksConfig {
   const nextHooks = { ...config.hooks }
-  const isManagedCommand = createManagedCommandMatcher(scriptFileName)
+  const isManagedCommand = createGirraManagedCommandMatcher(scriptFileName)
 
   for (const event of CLAUDE_EVENTS) {
     const current = Array.isArray(nextHooks[event.eventName]) ? nextHooks[event.eventName] : []
@@ -232,7 +259,7 @@ export function getStatusLineSlotState(
   config: HooksConfig,
   scriptFileName = getStatusLineScriptFileName()
 ): StatusLineSlotState {
-  const isManagedCommand = createManagedCommandMatcher(scriptFileName)
+  const isManagedCommand = createGirraManagedCommandMatcher(scriptFileName)
   const current = config.statusLine
   const currentCommand =
     isPlainObject(current) && typeof current.command === 'string' ? current.command : null
@@ -264,7 +291,7 @@ export function removeManagedStatusLine(
   config: HooksConfig,
   scriptFileName = getStatusLineScriptFileName()
 ): { config: HooksConfig; changed: boolean } {
-  const isManagedCommand = createManagedCommandMatcher(scriptFileName)
+  const isManagedCommand = createGirraManagedCommandMatcher(scriptFileName)
   const current = config.statusLine
   const currentCommand =
     isPlainObject(current) && typeof current.command === 'string' ? current.command : null
@@ -284,7 +311,7 @@ export function removeManagedHooks(
   changed: boolean
 } {
   const nextHooks = { ...config.hooks }
-  const isManagedCommand = createManagedCommandMatcher(scriptFileName)
+  const isManagedCommand = createGirraManagedCommandMatcher(scriptFileName)
   let changed = false
 
   for (const [eventName, definitions] of Object.entries(nextHooks)) {

@@ -60,18 +60,20 @@ export {
   type HooksJsonSnapshot
 } from './hooks-json-read'
 
-// Why: match by script file name, not exact command, so a fresh install sweeps stale entries from old/parallel installs.
-export function createManagedCommandMatcher(
-  scriptFileName: string
-): (command: string | undefined) => boolean {
+// Why: installs use .cmd/.ps1 (Windows) or .sh (SSH/POSIX); match all so a platform switch still sweeps stale hooks.
+function managedScriptNeedles(prefix: string, scriptFileName: string): string[] {
   const scriptStem = scriptFileName.replace(/\.(?:cmd|ps1|sh)$/, '')
-  // Why: installs use .cmd/.ps1 (Windows) or .sh (SSH/POSIX); match all so a platform switch still sweeps stale hooks.
-  const needles = [
-    `agent-hooks/${scriptFileName}`,
-    `agent-hooks/${scriptStem}.cmd`,
-    `agent-hooks/${scriptStem}.ps1`,
-    `agent-hooks/${scriptStem}.sh`
+  return [
+    `${prefix}agent-hooks/${scriptFileName}`,
+    `${prefix}agent-hooks/${scriptStem}.cmd`,
+    `${prefix}agent-hooks/${scriptStem}.ps1`,
+    `${prefix}agent-hooks/${scriptStem}.sh`
   ]
+}
+
+function matchesManagedNeedle(
+  needles: readonly string[]
+): (command: string | undefined) => boolean {
   return (command) => {
     if (!command) {
       return false
@@ -81,6 +83,26 @@ export function createManagedCommandMatcher(
     const normalizedCommand = searchText.replaceAll('\\', '/')
     return needles.some((needle) => normalizedCommand.includes(needle))
   }
+}
+
+// Why: match by script file name, not exact command, so a fresh install sweeps stale entries from old/parallel installs.
+export function createManagedCommandMatcher(
+  scriptFileName: string
+): (command: string | undefined) => boolean {
+  return matchesManagedNeedle(managedScriptNeedles('', scriptFileName))
+}
+
+/**
+ * Girra's own entries from before the script gained its `girra-` prefix.
+ *
+ * Why scoped to `.girra/`: those entries used the same file name upstream Orca
+ * installs under, and Orca stays installed beside Girra. An unscoped sweep of that
+ * name would delete the hooks of a running Orca (ADR-0004).
+ */
+export function createLegacyGirraCommandMatcher(
+  scriptFileName: string
+): (command: string | undefined) => boolean {
+  return matchesManagedNeedle(managedScriptNeedles('.girra/', scriptFileName))
 }
 
 function decodePowerShellEncodedCommand(command: string): string | null {

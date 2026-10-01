@@ -121,17 +121,17 @@ describe('managed hook script refresh', () => {
       // CLI — and possibly no config dir Girra may create. Seed only the script.
       const hooksDir = join(home, '.girra', 'agent-hooks')
       mkdirSync(hooksDir, { recursive: true })
-      writeFileSync(join(hooksDir, 'claude-hook.cmd'), STALE_WINDOWS_HOOK)
+      writeFileSync(join(hooksDir, 'claude-girra-hook.cmd'), STALE_WINDOWS_HOOK)
 
       await withPlatform('win32', () => new ClaudeHookService().refreshManagedScripts())
 
-      const refreshed = readFileSync(join(hooksDir, 'claude-hook.cmd'), 'utf8')
+      const refreshed = readFileSync(join(hooksDir, 'claude-girra-hook.cmd'), 'utf8')
       expect(refreshed).toContain('if "%GIRRA_AGENT_HOOK_PORT%"=="" exit /b 0')
       expect(refreshed).not.toContain('if "%GIRRA_AGENT_HOOK_PORT%"=="" goto')
       // Why: refresh must not resurrect config for a CLI the user may have removed.
       expect(existsSync(join(home, '.claude'))).toBe(false)
       // Why: the statusline script was never installed here, so it must not appear.
-      expect(existsSync(join(hooksDir, 'claude-statusline.cmd'))).toBe(false)
+      expect(existsSync(join(hooksDir, 'claude-girra-statusline.cmd'))).toBe(false)
     } finally {
       homedirMock.mockImplementation(() => process.env.HOME ?? tmpdir())
       rmSync(home, { recursive: true, force: true })

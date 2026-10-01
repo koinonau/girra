@@ -141,7 +141,9 @@ function runHookProcess(
 
 function hookEnvironment(extraEnv: NodeJS.ProcessEnv = {}): NodeJS.ProcessEnv {
   const env = Object.fromEntries(
-    Object.entries(process.env).filter(([key]) => !key.startsWith('GIRRA_') && !key.startsWith('ORCA_'))
+    Object.entries(process.env).filter(
+      ([key]) => !key.startsWith('GIRRA_') && !key.startsWith('ORCA_')
+    )
   )
   return {
     ...env,
@@ -232,7 +234,7 @@ describe('Windows managed hook stdin structure', () => {
       // Why (#11549): the Devin skip is the only remaining in-script jump to more.com, so it
       // must sit below the env guards — otherwise a Devin session outside a Girra pane still
       // parks there and strands the hook exactly like the pre-fix guards did.
-      const claude = readFileSync(join(hooksDir, 'claude-hook.cmd'), 'utf8')
+      const claude = readFileSync(join(hooksDir, 'claude-girra-hook.cmd'), 'utf8')
       expect(claude, 'claude devin guard present').toContain(
         'if not "%DEVIN_PROJECT_DIR%"=="" goto :orca_agent_hook_drain_stdin'
       )
@@ -505,7 +507,7 @@ describe.skipIf(process.platform === 'win32')('managed hook stdin lifecycle', ()
   })
 
   it('drains before Claude skips hooks imported by Devin', async () => {
-    const script = (await generatePosixScripts()).get('claude claude-hook.sh')
+    const script = (await generatePosixScripts()).get('claude claude-girra-hook.sh')
     expect(script).toBeDefined()
     const result = await runPosixHook(script!, { DEVIN_PROJECT_DIR: '/tmp/devin-project' })
     expect(result.exitCode).toBe(0)

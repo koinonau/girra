@@ -136,7 +136,10 @@ describe.skipIf(process.platform === 'win32')(
         readFileSync(join(home, '.claude', 'settings.json'), 'utf8')
       )
       expect(claudeSettings.hooks).toBeTruthy()
-      const script = readFileSync(join(home, '.girra', 'agent-hooks', 'claude-hook.sh'), 'utf8')
+      const script = readFileSync(
+        join(home, '.girra', 'agent-hooks', 'claude-girra-hook.sh'),
+        'utf8'
+      )
       expect(script).toContain('/hook/claude')
     }, 20_000)
   }

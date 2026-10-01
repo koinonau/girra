@@ -1,4 +1,4 @@
-import { getGirraHomeDir } from '../shared/girra-home-dir'
+import { getGirraHomeDirWithLegacyFallback } from '../shared/girra-home-dir'
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import type { RelayDispatcher } from './dispatcher'
@@ -58,7 +58,7 @@ export class WorkspaceSessionHandler {
 
   constructor(
     private dispatcher: RelayDispatcher,
-    private baseDir = join(getGirraHomeDir(), 'sessions')
+    private baseDir = join(getGirraHomeDirWithLegacyFallback(), 'sessions')
   ) {
     this.dispatcher.onRequest('workspace.get', (params) => this.get(params))
     this.dispatcher.onRequest('workspace.patch', (params) => this.patch(params))

@@ -168,7 +168,7 @@ describe('managed agent hook timeouts', () => {
         // Reuse a real generated POSIX wrapper rather than re-deriving the script.
         const { sftp, fs } = createFakeSftp()
         await new ClaudeHookService().installRemote(sftp, REMOTE_HOME)
-        const wrapperBody = fs.files.get(`${REMOTE_HOME}/.girra/agent-hooks/claude-hook.sh`)!
+        const wrapperBody = fs.files.get(`${REMOTE_HOME}/.girra/agent-hooks/claude-girra-hook.sh`)!
 
         tempDir = mkdtempSync(join(tmpdir(), 'orca-hook-timeout-'))
         const scriptPath = join(tempDir, 'claude-hook.sh')
