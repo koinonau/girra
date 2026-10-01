@@ -8,7 +8,7 @@
  * file rather than a missing implementation.
  */
 import { existsSync } from 'node:fs'
-import { getGirraHomeDir } from '../../shared/girra-home-dir'
+import { getGirraHomeDirWithLegacyFallback } from '../../shared/girra-home-dir'
 import { homedir, tmpdir } from 'node:os'
 import { dirname, join, resolve } from 'node:path'
 import process from 'node:process'
@@ -28,7 +28,7 @@ export function resolveUserDataPath(): string {
   }
   const xdg = env('XDG_DATA_HOME')
   if (!xdg) {
-    return getGirraHomeDir()
+    return getGirraHomeDirWithLegacyFallback()
   }
   // Why the same rule as the home tree: a headless server upgrades on its own
   // schedule and runs no migration, so it reads the Orca directory it already has.

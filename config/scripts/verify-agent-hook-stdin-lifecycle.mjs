@@ -16,7 +16,7 @@ import { createServer } from 'node:http'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-const MANAGED_SCRIPTS = [['claude-hook.sh', 'claude']]
+const MANAGED_SCRIPTS = [['claude-girra-hook.sh', 'claude']]
 
 function parseArgs(argv) {
   const result = { home: process.env.HOME ?? '', minMtime: 0 }
@@ -182,7 +182,7 @@ async function verifyNoOpWrites(scripts, home, payload) {
 }
 
 async function verifyClaudeDevinSkip(scripts, home, payload) {
-  const claude = scripts.find((script) => script.fileName === 'claude-hook.sh')
+  const claude = scripts.find((script) => script.fileName === 'claude-girra-hook.sh')
   let unexpectedRequests = 0
   const server = createServer((_request, response) => {
     unexpectedRequests += 1
@@ -278,11 +278,11 @@ async function verifyInstalledLauncher(home, payload) {
   const settingsPath = join(home, '.claude', 'settings.json')
   const settings = JSON.parse(readFileSync(settingsPath, 'utf8'))
   const command = findStrings(settings).find(
-    (value) => value.includes('claude-hook.sh') && value.includes('if [ -f ')
+    (value) => value.includes('claude-girra-hook.sh') && value.includes('if [ -f ')
   )
   if (
     !command ||
-    !command.includes('"${HOME-}/.girra/agent-hooks/claude-hook.sh"') ||
+    !command.includes('"${HOME-}/.girra/agent-hooks/claude-girra-hook.sh"') ||
     !command.includes('] && [ -r ') ||
     !command.includes('else { command -p cat')
   ) {
@@ -297,7 +297,7 @@ async function verifyInstalledLauncher(home, payload) {
     )
     assertSuccessfulWrite(missingResult, 'installed missing-script launcher')
 
-    const failingPath = join(scratch, '.girra', 'agent-hooks', 'claude-hook.sh')
+    const failingPath = join(scratch, '.girra', 'agent-hooks', 'claude-girra-hook.sh')
     mkdirSync(join(scratch, '.girra', 'agent-hooks'), { recursive: true })
     writeFileSync(failingPath, '#!/bin/sh\ncat >/dev/null\nexit 7\n', 'utf8')
     chmodSync(failingPath, 0o755)

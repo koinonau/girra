@@ -2,11 +2,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync, readFileSync, existsSync
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import {
-  getGirraHomeDir,
-  getLegacyGirraHomeDir,
-  migrateLegacyGirraHomeDir
-} from './girra-home-dir'
+import { getGirraHomeDir, getGirraHomeDirWithLegacyFallback } from './girra-home-dir'
 
 let home = ''
 
@@ -19,51 +15,45 @@ afterEach(() => {
 })
 
 describe('getGirraHomeDir', () => {
+  it('names its own tree when neither exists, so a first write creates it', () => {
+    expect(getGirraHomeDir(home)).toBe(join(home, '.girra'))
+  })
+
+  // Why: upstream Orca stays installed and running, and owns ~/.orca (ADR-0004).
+  it('names its own tree while only the Orca one is present', () => {
+    mkdirSync(join(home, '.orca'))
+    expect(getGirraHomeDir(home)).toBe(join(home, '.girra'))
+  })
+
+  it('leaves the Orca tree and its contents untouched on a first launch', () => {
+    mkdirSync(join(home, '.orca', 'agent-hooks'), { recursive: true })
+    const orcaScript = join(home, '.orca', 'agent-hooks', 'claude-hook.sh')
+    writeFileSync(orcaScript, '#!/bin/sh\n')
+
+    // Resolving, then writing under the resolved tree, is the whole startup path now
+    // that no migration runs.
+    mkdirSync(getGirraHomeDir(home), { recursive: true })
+
+    expect(existsSync(join(home, '.orca'))).toBe(true)
+    expect(readFileSync(orcaScript, 'utf8')).toBe('#!/bin/sh\n')
+  })
+})
+
+describe('getGirraHomeDirWithLegacyFallback', () => {
+  // Why this reader exists: the relay and a headless orcad run no migration, so state
+  // predating the rename is only reachable through the legacy tree.
   it('reads the legacy tree while it is the only one present', () => {
     mkdirSync(join(home, '.orca'))
-    expect(getGirraHomeDir(home)).toBe(join(home, '.orca'))
+    expect(getGirraHomeDirWithLegacyFallback(home)).toBe(join(home, '.orca'))
   })
 
   it('prefers the current tree once it exists', () => {
     mkdirSync(join(home, '.orca'))
     mkdirSync(join(home, '.girra'))
-    expect(getGirraHomeDir(home)).toBe(join(home, '.girra'))
+    expect(getGirraHomeDirWithLegacyFallback(home)).toBe(join(home, '.girra'))
   })
 
-  it('names the current tree when neither exists, so a first write creates it', () => {
-    expect(getGirraHomeDir(home)).toBe(join(home, '.girra'))
-    expect(getLegacyGirraHomeDir(home)).toBe(join(home, '.orca'))
-  })
-})
-
-describe('migrateLegacyGirraHomeDir', () => {
-  it('moves the tree and its contents', () => {
-    mkdirSync(join(home, '.orca', 'agent-hooks'), { recursive: true })
-    writeFileSync(join(home, '.orca', 'agent-hooks', 'claude-hook.sh'), '#!/bin/sh\n')
-
-    expect(migrateLegacyGirraHomeDir(home)).toBe('moved')
-    expect(readFileSync(join(home, '.girra', 'agent-hooks', 'claude-hook.sh'), 'utf8')).toBe(
-      '#!/bin/sh\n'
-    )
-    expect(existsSync(join(home, '.orca'))).toBe(false)
-  })
-
-  it('is a no-op on the second run', () => {
-    mkdirSync(join(home, '.orca'))
-    expect(migrateLegacyGirraHomeDir(home)).toBe('moved')
-    expect(migrateLegacyGirraHomeDir(home)).toBe('already-migrated')
-  })
-
-  it('reports nothing to move on a first install', () => {
-    expect(migrateLegacyGirraHomeDir(home)).toBe('nothing-to-move')
-  })
-
-  // Why: an older build recreates ~/.orca after a migration, and merging the two
-  // without knowing which is current loses whichever gets overwritten.
-  it('refuses when both trees exist rather than merging them', () => {
-    mkdirSync(join(home, '.orca'))
-    mkdirSync(join(home, '.girra'))
-    expect(migrateLegacyGirraHomeDir(home)).toBe('failed')
-    expect(existsSync(join(home, '.orca'))).toBe(true)
+  it('names the current tree when neither exists', () => {
+    expect(getGirraHomeDirWithLegacyFallback(home)).toBe(join(home, '.girra'))
   })
 })

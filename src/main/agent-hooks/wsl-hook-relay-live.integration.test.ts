@@ -117,7 +117,7 @@ describe.skipIf(process.platform === 'win32')(
         { timeout: 15_000 }
       )
       const claudeScript = readFileSync(
-        join(fakeHome, '.girra', 'agent-hooks', 'claude-hook.sh'),
+        join(fakeHome, '.girra', 'agent-hooks', 'claude-girra-hook.sh'),
         'utf8'
       )
       expect(claudeScript).toContain('/hook/claude')

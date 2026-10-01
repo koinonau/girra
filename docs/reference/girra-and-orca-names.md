@@ -30,21 +30,24 @@ survive an upgrade, so they read whichever name the build that wrote them used.
 
 ## The per-user directory
 
-`~/.girra` replaced `~/.orca`, and the same two rules apply.
+`~/.girra` replaced `~/.orca`, and upstream Orca stays installed and running
+beside Girra, so `~/.orca` is Orca's. **There is no home-directory migration.**
+See [`../adr/0004-leave-the-orca-home-tree-alone.md`](../adr/0004-leave-the-orca-home-tree-alone.md).
 
-`getGirraHomeDir` in `src/shared/girra-home-dir.ts` reads whichever tree exists,
-preferring the current one. The CLI, the relay and a headless `orcad` never run a
-migration, so this is what keeps them working. `resolveUserDataPath` applies the
-rule to `$XDG_DATA_HOME/Girra` and `$XDG_DATA_HOME/Orca` as well.
+`getGirraHomeDir` in `src/shared/girra-home-dir.ts` names `~/.girra` and nothing
+else. Every desktop reader calls it: hook scripts, `keybindings.json`, the
+hook-install lock, and the Jira, Linear, Bitbucket and MiniMax credential stores.
+A user arriving from Orca therefore starts from an empty `~/.girra` and re-enters
+those credentials, exactly as they do for the profile directory below.
 
-`migrateGirraHomeDirOnStartup` does the move once, on the desktop, and then
-rewrites the hook-script paths stored in `~/.claude/settings.json`. The move and
-the rewrite are one step because between them the agent's stored command names a
-script that is not there, and a missing hook script fails silently.
-
-The move refuses when both trees exist. That means an older build recreated
-`~/.orca` after a migration, and merging them without knowing which is current
-loses whichever gets overwritten.
+`getGirraHomeDirWithLegacyFallback` keeps the old reading, `~/.girra` or the
+`~/.orca` it replaced while that is the only tree present. Two processes call it,
+and no others may: the relay's session store in
+`src/relay/workspace-session-handler.ts` and `resolveOrcadPath` in
+`src/main/orcad/orcad-app-paths.ts`. Both run on a host that upgrades on its own
+schedule and runs no migration, so legacy state is only reachable through the
+legacy name. `resolveUserDataPath` applies the same rule to
+`$XDG_DATA_HOME/Girra` and `$XDG_DATA_HOME/Orca`.
 
 Per-repo directories are the user's own files, so they are read where they lie:
 `.girra/issue-command` is written, `.orca/issue-command` still read, locally and
@@ -52,8 +55,44 @@ over SFTP. Staging directories, `.girra/drops` and `.girra/browser-downloads`,
 just moved.
 
 A remote host's hook script is installed under `~/.girra` on the next connect,
-which rewrites that host's `settings.json` in the same pass. The old script stays
-where it is and keeps working until then.
+and registers itself in that host's `settings.json` in the same pass. An Orca
+client's script stays where it is and keeps working, because the two entries no
+longer collide.
+
+## The shared agent settings file
+
+`~/.claude/settings.json` is one file both Girra and an installed Orca manage,
+and `createManagedCommandMatcher` in
+`src/main/agent-hooks/installer-utils.ts` decides which entries an install may
+sweep by the script file name alone. Under one name each install deleted the
+other app's hooks, so the last app to launch owned them.
+
+Girra's scripts are therefore named `claude-girra-hook` and
+`claude-girra-statusline`, set by `scriptBaseName` in
+`src/main/claude/hook-settings.ts`. Neither name contains Orca's
+`agent-hooks/claude-hook.sh` needle, so Orca's sweep passes over them, and
+Girra's needles miss Orca's entries. The agent prefix stays first: a refresher
+owns a script by the `<agent>-` start of its file name, and a test in
+`managed-hook-script-refresh.test.ts` enforces it.
+
+`SUPERSEDED_SCRIPT_FILE_NAMES` adds one more needle, for the entries Girra wrote
+under the shared `claude-hook` name. `createLegacyGirraCommandMatcher` scopes it
+to `.girra/`, because an unscoped sweep of that name is the thing this section
+exists to prevent.
+
+Three consequences follow, and a real launch is what confirms them:
+
+- Both apps' hooks fire on every Claude event. Each script reads its own pane's
+  environment, so a Girra pane reports to Girra's hook server and an Orca pane to
+  Orca's. A hook never crosses to the other app's store, but a pane does post
+  twice to its own.
+- `statusLine` is a single slot, so one app owns it. Neither app recognises the
+  other's statusline script, so neither steals the slot and the first to find it
+  empty keeps it. When Orca holds it, Girra falls back to the OAuth usage poll.
+- Two home trees means two hook-install locks, so the apps no longer serialize
+  their merges into the file. Each merge is read-modify-write with an atomic
+  rename and touches only its own entries, so a simultaneous launch can drop one
+  app's entries until its next install.
 
 ## The desktop profile directory
 
@@ -93,7 +132,12 @@ Renaming the app moved the macOS safeStorage Keychain item from
 it finds, because a host that ran both apps has more than one and only one of them
 sealed a given blob.
 
-## Retiring both
+## Retiring the seams
 
-Drop the two functions and their call sites once no supported host predates the
-rename, alongside the other compatibility shims listed in `prompt.md`.
+Drop `adoptLegacyOrcaEnvNames` and `applyLegacyOrcaEnvAliases` with their call
+sites once no supported host predates the rename, alongside the other
+compatibility shims listed in `prompt.md`.
+
+`getGirraHomeDirWithLegacyFallback` and `SUPERSEDED_SCRIPT_FILE_NAMES` go on the
+same terms. The script names do not: they keep Girra's entries separable from a
+coexisting Orca's for as long as both apps are installed.

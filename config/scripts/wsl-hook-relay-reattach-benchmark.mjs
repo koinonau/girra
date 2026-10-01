@@ -340,7 +340,7 @@ async function main() {
     ).stdout.trim()
     const instanceKey = `bench-${process.pid}-${Date.now().toString(36)}`
     const benchmarkRoot = `${guestHome}/.orca-wsl/benchmarks/${instanceKey}`
-    const scriptPath = `${benchmarkRoot}/.girra/agent-hooks/claude-hook.sh`
+    const scriptPath = `${benchmarkRoot}/.girra/agent-hooks/claude-girra-hook.sh`
     const endpointPath = `${guestHome}/.orca-wsl/agent-hooks/instance-${instanceKey}/endpoint.env`
     cleanupPaths = [benchmarkRoot, `${guestHome}/.orca-wsl/agent-hooks/instance-${instanceKey}`]
     if (cleanupPaths.some((cleanupPath) => !cleanupPath.startsWith(`${guestHome}/.orca-wsl/`))) {
