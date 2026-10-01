@@ -41,8 +41,8 @@ try {
   assert.deepEqual(summary, { installers: 1, errors: 0 })
 
   const claudeSettings = await readFile(join(home, '.claude', 'settings.json'), 'utf8')
-  assert.match(claudeSettings, /\.girra\/agent-hooks\/claude-hook\.sh/)
-  await access(join(home, '.girra', 'agent-hooks', 'claude-hook.sh'), constants.X_OK)
+  assert.match(claudeSettings, /\.girra\/agent-hooks\/claude-girra-hook\.sh/)
+  await access(join(home, '.girra', 'agent-hooks', 'claude-girra-hook.sh'), constants.X_OK)
 } finally {
   if (originalHome === undefined) {
     delete process.env.HOME
