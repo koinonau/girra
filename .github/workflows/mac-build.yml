@@ -128,6 +128,14 @@ jobs:
         run: |
           set -euo pipefail
           tag="v$(node -p "require('./package.json').version")"
+          # Why refuse on the asset and not on the release: a shipped DMG is the thing
+          # no re-dispatch may replace, while a run that created the release and then
+          # failed to upload has to stay completable.
+          if gh release view "$tag" --json assets --jq '.assets[].name' 2>/dev/null |
+            grep -qx girra-macos-arm64.dmg; then
+            echo "::error::$tag already carries girra-macos-arm64.dmg. Bump the version in package.json; this build would have replaced a published binary."
+            exit 1
+          fi
           gh release view "$tag" >/dev/null 2>&1 ||
             gh release create "$tag" --target "$GITHUB_SHA" --title "$tag" --generate-notes
-          gh release upload "$tag" dist/girra-macos-arm64.dmg --clobber
+          gh release upload "$tag" dist/girra-macos-arm64.dmg
