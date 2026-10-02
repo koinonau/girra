@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import {
   buildAgentFeatureSkillInstallArgs,
@@ -11,30 +13,37 @@ import {
   GIRRA_LINEAR_SKILL_UPDATE_COMMAND,
   GIRRA_CLI_ORCHESTRATION_SKILL_INSTALL_COMMAND,
   GIRRA_CLI_SKILL_UPDATE_COMMAND,
-  ORCHESTRATION_SKILL_UPDATE_COMMAND
+  ORCHESTRATION_SKILL_UPDATE_COMMAND,
+  GIRRA_SKILLS_REPOSITORY_URL,
+  GIRRA_CLI_SKILL_NAME,
+  COMPUTER_USE_SKILL_NAME,
+  ORCHESTRATION_SKILL_NAME,
+  EPHEMERAL_VMS_SKILL_NAME,
+  GIRRA_LINEAR_SKILL_NAME,
+  LINEAR_TICKETS_SKILL_NAME
 } from './agent-feature-install-commands'
 
 describe('agent feature skill commands', () => {
   it('builds a global install command by default', () => {
     expect(buildAgentFeatureSkillInstallCommand(['orca-cli'])).toBe(
-      'npx skills add https://github.com/stablyai/orca --skill orca-cli --global'
+      'npx skills add https://github.com/koinonau/girra --skill orca-cli --global'
     )
   })
 
   it('drops --global when installing locally', () => {
     expect(buildAgentFeatureSkillInstallCommand(['orca-cli'], { global: false })).toBe(
-      'npx skills add https://github.com/stablyai/orca --skill orca-cli'
+      'npx skills add https://github.com/koinonau/girra --skill orca-cli'
     )
   })
 
   it('repeats --skill per name for multi-skill installs', () => {
     expect(buildAgentFeatureSkillInstallCommand(['orca-cli', 'orchestration'])).toBe(
-      'npx skills add https://github.com/stablyai/orca --skill orca-cli --skill orchestration --global'
+      'npx skills add https://github.com/koinonau/girra --skill orca-cli --skill orchestration --global'
     )
     expect(buildAgentFeatureSkillInstallArgs(['orca-cli', 'orchestration'])).toEqual([
       'skills',
       'add',
-      'https://github.com/stablyai/orca',
+      'https://github.com/koinonau/girra',
       '--skill',
       'orca-cli',
       '--skill',
@@ -76,7 +85,7 @@ describe('agent feature skill commands', () => {
     expect(
       buildAgentFeatureSkillInstallCommand(['orca-cli'], { yes: true, agents: ['universal'] })
     ).toBe(
-      'npx skills add https://github.com/stablyai/orca --skill orca-cli --global --agent universal -y'
+      'npx skills add https://github.com/koinonau/girra --skill orca-cli --global --agent universal -y'
     )
     expect(buildAgentFeatureSkillUpdateCommand(['orca-cli'], { global: false, yes: true })).toBe(
       'npx skills update orca-cli --project -y'
@@ -128,5 +137,30 @@ describe('agent feature skill commands', () => {
     expect(GIRRA_CLI_ORCHESTRATION_SKILL_INSTALL_COMMAND).toBe(
       buildAgentFeatureSkillInstallCommand(['orca-cli', 'orchestration'])
     )
+  })
+})
+
+/**
+ * Why a ratchet and not a literal: the constant carries a `GIRRA_` name and shipped
+ * pointing at `stablyai/orca`, so every generated install sourced the fork's skills
+ * from upstream and the updater's lock recorded upstream as their origin. A second
+ * copy of the URL would drift the same way, so tie it to the repository this build
+ * already declares and to the skills that repository actually ships.
+ */
+describe('the skills repository the installer names', () => {
+  it('is the repository this build belongs to', () => {
+    const homepage = JSON.parse(readFileSync('package.json', 'utf8')).homepage
+    expect(GIRRA_SKILLS_REPOSITORY_URL).toBe(homepage)
+  })
+
+  it.each([
+    GIRRA_CLI_SKILL_NAME,
+    COMPUTER_USE_SKILL_NAME,
+    ORCHESTRATION_SKILL_NAME,
+    EPHEMERAL_VMS_SKILL_NAME,
+    GIRRA_LINEAR_SKILL_NAME,
+    LINEAR_TICKETS_SKILL_NAME
+  ])('ships %s, so an install from that repository can resolve it', (name) => {
+    expect(existsSync(join('skills', name, 'SKILL.md'))).toBe(true)
   })
 })

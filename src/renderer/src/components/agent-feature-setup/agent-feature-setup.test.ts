@@ -120,7 +120,7 @@ describe('agent feature setup runner', () => {
 
     expect(text).toBe(ALL_SKILL_INSTALL_COMMAND)
     expect(text).toBe(
-      'npx skills add https://github.com/stablyai/orca --skill orca-cli --skill computer-use --skill orchestration --skill orca-linear --global'
+      'npx skills add https://github.com/koinonau/girra --skill orca-cli --skill computer-use --skill orchestration --skill orca-linear --global'
     )
   })
 

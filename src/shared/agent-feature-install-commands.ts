@@ -1,6 +1,6 @@
 import { isSkillsCliAgentKeyShaped } from './skills-cli-agent-keys'
 
-export const GIRRA_SKILLS_REPOSITORY_URL = 'https://github.com/stablyai/orca'
+export const GIRRA_SKILLS_REPOSITORY_URL = 'https://github.com/koinonau/girra'
 
 export const GIRRA_CLI_SKILL_NAME = 'orca-cli'
 export const COMPUTER_USE_SKILL_NAME = 'computer-use'
@@ -8,7 +8,10 @@ export const ORCHESTRATION_SKILL_NAME = 'orchestration'
 export const EPHEMERAL_VMS_SKILL_NAME = 'orca-per-workspace-env'
 export const GIRRA_LINEAR_SKILL_NAME = 'orca-linear'
 export const LINEAR_TICKETS_SKILL_NAME = 'linear-tickets'
-export const LINEAR_AGENT_SKILL_NAMES = [GIRRA_LINEAR_SKILL_NAME, LINEAR_TICKETS_SKILL_NAME] as const
+export const LINEAR_AGENT_SKILL_NAMES = [
+  GIRRA_LINEAR_SKILL_NAME,
+  LINEAR_TICKETS_SKILL_NAME
+] as const
 
 // Why: `yes` and `agents` default off so every Settings/onboarding string a human
 // pastes keeps its interactive prompts and the CLI's own agent detection. Only an
